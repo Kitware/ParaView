@@ -81,6 +81,18 @@ public:
         }
       }
     }
+
+  void removeProxy(const QString& pgroup, const QString& pname)
+    {
+    if (!pname.isEmpty() && !pgroup.isEmpty())
+      {
+      QPair<QString, QString> pair(pgroup, pname);
+      if (this->Proxies.contains(pair) )
+        {
+        this->Proxies.remove(pair);
+        }
+      }
+    }
  
   // Proxies and Categories is what gets shown in the menu.
   ProxyInfoMap Proxies;
@@ -116,6 +128,14 @@ void pqProxyGroupMenuManager::addProxy(
 {
   this->Internal->addProxy(xmlgroup.toAscii().data(),
     xmlname.toAscii().data(), QString());
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::removeProxy(
+  const QString& xmlgroup, const QString& xmlname)
+{
+  this->Internal->removeProxy(xmlgroup.toAscii().data(),
+    xmlname.toAscii().data());
 }
 
 //-----------------------------------------------------------------------------

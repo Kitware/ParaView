@@ -393,9 +393,6 @@ void MyProcess::Execute()
     renWin->SetNumberOfLayers(2);
     renderer2->Delete();
     this->CreatePipeline2(renderer2);
-//    syncRenderers2 = vtkSynchronizedRenderers::New();
-//    syncRenderers2->SetRenderer(renderer2);
-//    syncRenderers2->SetParallelController(this->Controller);
     }
 
   vtkSynchronizedRenderWindows* syncWindows =
@@ -411,7 +408,7 @@ void MyProcess::Execute()
   this->CreatePipeline(renderer);
   this->SetupRenderPasses(renderer);
 
-  int retVal;
+  int retVal=vtkTesting::FAILED;
   if (myId == 0)
     {
     // root node
@@ -428,12 +425,12 @@ void MyProcess::Execute()
       syncWindows2->SetIdentifier(2);
       syncWindows2->SetRootProcessId(1);
 
-      vtkSynchronizedRenderers* syncRenderers2 = vtkSynchronizedRenderers::New();
       syncRenderers2->SetRenderer(renderer);
       syncRenderers2->SetParallelController(this->SocketController);
       syncRenderers2->SetRootProcessId(1);
 
       this->SocketController->ProcessRMIs();
+      retVal=vtkTesting::PASSED;
       }
     else
       {

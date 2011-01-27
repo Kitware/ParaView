@@ -106,7 +106,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Utilities.Xdmf2.libsrc"
   "Utilities.Xdmf2.Ice"
   "Utilities.IceT"
-  "Utilities.hdf5"
   "vtk.*tab.c"
   "Utilities.vtksqlite"
   "Utilities.vtkexodus2"
@@ -132,6 +131,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # disable any warning coming from Qt headers.
   "[Qq]t.*/include/qt.*"
+
+  # Suppress warning caused when QT 'foreach' loops are combined
+  ".*warning: declaration of '_container_' shadows a previous local.*warning: shadowed declaration is here"
 
   # disable warnings from UI files.
   "ui_.*"
@@ -161,7 +163,6 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "moc_[^\\.]+.cxx"
   "ui_[^\\.]+.h"
   "qrc_[^\\.]+.cxx"
-  "Utilities.hdf5.*"
   "Utilities.Xdmf2.libsrc.*"
   "Utilities.VisItBridge.avt"
   "Utilities.VisItBridge.CMake"

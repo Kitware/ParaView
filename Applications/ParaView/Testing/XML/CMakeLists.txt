@@ -64,6 +64,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
@@ -132,7 +133,7 @@ set (ColorEditor4_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
 SET (PlotEdges2_BREAK TRUE)
-SET (PropertyConversion1_BREAK TRUE)
+SET (PropertyConversion2_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 set (EyeDomeLighting_BREAK TRUE)
@@ -165,9 +166,14 @@ IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
+# Composite Surface Selection is currently broken in everything but bultin
+SET (CompositeSurfaceSelection_DISABLE_CS TRUE)
+SET (CompositeSurfaceSelection_DISABLE_CRS TRUE)
+
 # Clip test has object picking which is not supported in client-render-server
 # mode.
 SET (Clip_DISABLE_CRS TRUE)
+
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
@@ -207,13 +213,19 @@ IF (NOT BUILD_SHARED_LIBS)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
+SET (EyeDomeLighting_DISABLE_CS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
+SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+
+IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
+  SET(EyeDomeLighting_DISABLE_C TRUE)
+ENDIF()
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)

@@ -61,8 +61,8 @@ protected:
   // Used internall so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);
 
-  char * SequenceName;
   int SequenceIndex;
+  char * SequenceName;
 private:
   vtkFileSequenceParser(const vtkFileSequenceParser&); // Not implemented.
   void operator=(const vtkFileSequenceParser&); // Not implemented.

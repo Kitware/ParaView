@@ -74,7 +74,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
         str >> info.LowerRight[j];
         }
       }
-    else if(key == "UpperLeft")
+    else if(key == "UpperRight")
       {
       caveBounds++;
       vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));

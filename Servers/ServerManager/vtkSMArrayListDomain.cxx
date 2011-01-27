@@ -48,7 +48,14 @@ struct vtkSMArrayListDomainInternals
   vtkstd::map<vtkStdString, int> PartialMap;
   vtkstd::vector<int> DataTypes;
   vtkstd::vector<int> FieldAssociation;
+  vtkstd::map<int,int> DomainAssociation;
   vtkstd::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
+
+  void SetAssociations(int index, int field, int domain)
+    {
+    this->FieldAssociation[index] = field;
+    this->DomainAssociation[index] =  domain == -1 ? field : domain;
+    }
 };
 
 //---------------------------------------------------------------------------
@@ -75,6 +82,17 @@ int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 {
   const char* name = this->GetString(idx);
   return this->ALDInternals->PartialMap[name];
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::GetDomainAssociation(unsigned int idx )
+{
+if ( this->ALDInternals->DomainAssociation.find(idx) ==
+  this->ALDInternals->DomainAssociation.end() )
+  {
+  return this->GetFieldAssociation(idx);
+  }
+  return this->ALDInternals->DomainAssociation.find(idx)->second;
 }
 
 //---------------------------------------------------------------------------
@@ -132,7 +150,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
                                      int outputport,
                                      vtkPVDataSetAttributesInformation* info,
                                      vtkSMInputArrayDomain* iad,
-                                     int association)
+                                     int association, int domainAssociation)
 {
   this->DefaultElement = 0;
 
@@ -151,7 +169,8 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         {
         if(this->CheckInformationKeys(arrayInfo))
         {
-          unsigned int newidx = this->AddArray(arrayInfo, association, iad);
+          unsigned int newidx = this->AddArray(arrayInfo, association,
+            domainAssociation, iad);
           if (arrayInfo == attrInfo)
             {
             attrIdx = newidx;
@@ -165,7 +184,8 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
           {
           if(this->CheckInformationKeys(arrayInfo))
             {
-            unsigned int newidx = this->AddArray(arrayInfo, association, iad);
+            unsigned int newidx = this->AddArray(arrayInfo, association,
+              domainAssociation, iad);
             if (arrayInfo == attrInfo)
               {
               attrIdx = newidx;
@@ -184,33 +204,38 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMArrayListDomain::AddArray(
-  vtkPVArrayInformation* arrayInfo, int association, vtkSMInputArrayDomain* iad)
+  vtkPVArrayInformation* arrayInfo, int association,int domainAssociation,
+  vtkSMInputArrayDomain* iad)
 {
   if (iad->GetAutomaticPropertyConversion() &&
     iad->GetNumberOfComponents() == 1 &&
     arrayInfo->GetNumberOfComponents() > 1)
     {
     // add magnitude only for numeric arrays.
-    unsigned int first_index = -1;
+    unsigned int first_index = VTK_UNSIGNED_INT_MAX;
     if (arrayInfo->GetDataType() != VTK_STRING)
       {
       vtkStdString name = this->CreateMangledName(arrayInfo,
         arrayInfo->GetNumberOfComponents());
       first_index = this->AddString(name.c_str());
-      this->ALDInternals->FieldAssociation[first_index] = association;
+      this->ALDInternals->SetAssociations(first_index,association,domainAssociation);
       }
     for (int cc=0; cc < arrayInfo->GetNumberOfComponents(); cc++)
       {
       vtkStdString name = this->CreateMangledName(arrayInfo,cc);
       unsigned int newidx = this->AddString(name.c_str());
-      this->ALDInternals->FieldAssociation[newidx] = association;
+      if (first_index == VTK_UNSIGNED_INT_MAX)
+        {
+        first_index = newidx;
+        }
+      this->ALDInternals->SetAssociations(newidx,association,domainAssociation);
       }
     return first_index;
     }
   else
     {
     unsigned int newidx = this->AddString(arrayInfo->GetName());
-    this->ALDInternals->FieldAssociation[newidx] = association;
+    this->ALDInternals->SetAssociations(newidx,association,domainAssociation);
     return  newidx;
     }
 }
@@ -263,12 +288,22 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
   case vtkSMInputArrayDomain::POINT:
     this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
       vtkDataObject:: FIELD_ASSOCIATION_POINTS);
+    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
+     {
+     this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
+       vtkDataObject::FIELD_ASSOCIATION_CELLS, vtkDataObject::FIELD_ASSOCIATION_POINTS);
+     }
     this->Association = vtkDataObject:: FIELD_ASSOCIATION_POINTS;
     break;
 
   case vtkSMInputArrayDomain::CELL:
     this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
       vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
+     {
+     this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
+       vtkDataObject::FIELD_ASSOCIATION_POINTS, vtkDataObject::FIELD_ASSOCIATION_CELLS);
+     }
     this->Association = vtkDataObject:: FIELD_ASSOCIATION_CELLS;
     break;
 
@@ -780,7 +815,7 @@ vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(
   size_t pos = extractedName.rfind("_");
   if (pos == vtkStdString::npos)
     {
-    return vtkStdString("");
+    return extractedName;
     }
   return extractedName.substr(0,pos);
 }

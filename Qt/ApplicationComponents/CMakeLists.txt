@@ -52,7 +52,7 @@ SET (MOC_HEADERS
   pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
-  pqListNewProxyDefinitionsBehavior.h
+  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h
@@ -116,9 +116,11 @@ SET (UI_FILES
 )
 
 # List qrc files
-SET (UI_RESOURCES
-  Resources/pqApplicationComponents.qrc
-)
+# DP - the resource file is empty at the moment
+# comment this back in when we have some resources
+#SET (UI_RESOURCES
+#  Resources/pqApplicationComponents.qrc
+#)
 
 # List all source files.
 SET (SOURCE_FILES
@@ -184,8 +186,8 @@ SET (SOURCE_FILES
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
-  pqListNewProxyDefinitionsBehavior.cxx
-  pqListNewProxyDefinitionsBehavior.h
+  pqUpdateProxyDefinitionsBehavior.cxx
+  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.cxx
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx

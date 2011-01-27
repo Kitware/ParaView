@@ -20,8 +20,6 @@
 
 struct vtkCPProcessorInternals;
 class vtkCPDataDescription;
-class vtkDataObject;
-class vtkFieldData;
 class vtkCPPipeline;
 
 /// @defgroup CoProcessing ParaView CoProcessing
@@ -64,7 +62,17 @@ public:
 
   /// Add in a pipeline that is externally configured. Returns 1 if 
   /// successful and 0 otherwise.
-  virtual int AddPipeline(vtkCPPipeline* Pipeline);
+  virtual int AddPipeline(vtkCPPipeline* pipeline);
+
+  /// Get the number of pipelines.
+  virtual int GetNumberOfPipelines();
+
+  /// Return a specific pipeline.
+  virtual vtkCPPipeline* GetPipeline(int which);
+
+  /// Remove pipelines.
+  virtual void RemovePipeline(vtkCPPipeline* pipeline);
+  virtual void RemoveAllPipelines();
 
   /// Initialize the co-proccesor. Returns 1 if successful and 0
   /// otherwise.
@@ -78,11 +86,11 @@ public:
   /// in order to fulfill all the coprocessing requests for this
   /// TimeStep/Time combination.
   virtual int RequestDataDescription(
-    vtkCPDataDescription* DataDescription);
+    vtkCPDataDescription* dataDescription);
 
   /// Processing Step:
   /// Provides the grid and the field data for the co-procesor to process.
-  virtual int CoProcess(vtkCPDataDescription* DataDescription);
+  virtual int CoProcess(vtkCPDataDescription* dataDescription);
 
   /// Called after all co-processing is complete giving the Co-Processor 
   /// implementation an opportunity to clean up, before it is destroyed.

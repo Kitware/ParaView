@@ -53,6 +53,7 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
 
 
   vtkAppendFilter* appender = vtkAppendFilter::New();
+  appender->MergePointsOn();
   if (ds)
     {
     this->AddDataSet(ds, appender);

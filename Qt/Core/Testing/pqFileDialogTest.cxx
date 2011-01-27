@@ -190,8 +190,8 @@ void pqFileDialogTestWidget::openFileDialog()
                     testDirName, this->FileFilter->text());
   QVariant mode = this->FileMode->itemData(this->FileMode->currentIndex());
   diag.setFileMode(static_cast<pqFileDialog::FileMode>(mode.toInt()));
-  QObject::connect(&diag, SIGNAL(filesSelected(const QStringList&)),
-                   this, SLOT(emittedFiles(const QStringList&)));
+  QObject::connect(&diag, SIGNAL(filesSelected(const QList<QStringList>&)),
+                   this, SLOT(emittedFiles(const QList<QStringList>&)));
   if(diag.exec() == QDialog::Accepted)
     {
     this->ReturnLabel->setText(diag.getSelectedFiles().join(";"));
@@ -202,9 +202,9 @@ void pqFileDialogTestWidget::openFileDialog()
     }
 }
 
-void pqFileDialogTestWidget::emittedFiles(const QStringList& files)
+void pqFileDialogTestWidget::emittedFiles(const QList<QStringList>& files)
 {
-  this->EmitLabel->setText(files.join(";"));
+  this->EmitLabel->setText(files[0].join(";"));
 }
 
 void pqFileDialogTestWidget::record()

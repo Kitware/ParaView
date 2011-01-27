@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardColorLinkAdaptor.h"
 
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
 {
@@ -153,9 +154,8 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       PV_GROUPBOX_REGISTER(CubeAxesZCustomBounds, "CustomBoundsActive", 2);
 
       //now they are linked, set them to objects bounds.
-#ifdef FIXME
-      pvProxy->GetBounds( pvBounds );
-#endif
+      vtkSMPropertyHelper(repr,"DataBounds").UpdateValueFromServer();
+      vtkSMPropertyHelper(repr,"DataBounds").Get(pvBounds,6);
       this->setupCustomAxes( pvBounds[0],pvBounds[1],
         !this->Internal->CubeAxesXCustomBounds->isChecked(),
         this->Internal->CubeAxesXCustomBoundsMin,

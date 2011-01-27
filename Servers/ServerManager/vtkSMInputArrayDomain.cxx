@@ -448,25 +448,6 @@ bool vtkSMInputArrayDomain::GetAutomaticPropertyConversion()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputArrayDomain::SetAttributeType(unsigned char type)
-{
-  if ( vtkSMInputArrayDomain::AutomaticPropertyConversion &&
-      (type == vtkSMInputArrayDomain::POINT ||
-       type == vtkSMInputArrayDomain::CELL ))
-    {
-    //if we are doing automatic conversion we want to emulate
-    //the input array accepting any property
-    type = vtkSMInputArrayDomain::ANY;
-    }
-  if (this->AttributeType != type)
-    {
-    this->AttributeType = type;
-    this->Modified();
-    }
-}
-
-
-//---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

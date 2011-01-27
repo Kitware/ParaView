@@ -32,7 +32,6 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 //----------------------------------------------------------------------------
 vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 {
-  vtkSelection* sel = 0;
   if (this->NeedToRenderForSelection())
     {
     int* size = this->Renderer->GetSize();

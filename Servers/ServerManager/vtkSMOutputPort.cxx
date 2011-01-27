@@ -34,6 +34,10 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
 
+bool vtkSMOutputPort::UseStreaming = false;
+int vtkSMOutputPort::DefaultPass = 0;
+int vtkSMOutputPort::DefaultNumPasses = 0;
+double vtkSMOutputPort::DefaultResolution = 0;
 
 //----------------------------------------------------------------------------
 vtkSMOutputPort::vtkSMOutputPort()
@@ -253,9 +257,55 @@ void vtkSMOutputPort::GatherDataInformation()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
   this->DataInformation->Initialize();
-  pm->GatherInformation(this->ConnectionID, this->Servers,
-                        this->DataInformation, this->GetID());
 
+  if (vtkSMOutputPort::UseStreaming)
+    {
+    vtkClientServerStream stream;
+    vtkClientServerID infoHelper =
+    pm->NewStreamObject("vtkPriorityHelper", stream);
+
+    stream
+      << vtkClientServerStream::Invoke
+      << infoHelper << "SetInputConnection" << this->GetID()
+      << vtkClientServerStream::End;
+
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End;
+
+    stream
+      << vtkClientServerStream::Invoke
+      << infoHelper
+      << "SetSplitUpdateExtent"
+      << this->PortIndex //algorithm's output port
+      << vtkClientServerStream::LastResult //processor
+      << pm->GetNumberOfPartitions(this->ConnectionID) //numprocessors
+      << vtkSMOutputPort::DefaultPass //pass
+      << vtkSMOutputPort::DefaultNumPasses //number of passes
+      << vtkSMOutputPort::DefaultResolution //resolution
+      << vtkClientServerStream::End;
+
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
+
+    //gather the data information for that piece
+    vtkPVDataInformation *di = vtkPVDataInformation::New();
+    di->Initialize();
+    pm->GatherInformation(this->ConnectionID, this->Servers,
+                          di,
+                          infoHelper);
+
+    //merge it in
+    this->DataInformation->AddInformation(di);
+
+    di->Delete();
+    pm->DeleteStreamObject(infoHelper, stream);
+    }
+  else
+    {
+    pm->GatherInformation(this->ConnectionID, this->Servers,
+                          this->DataInformation, this->GetID());
+    }
   this->DataInformationValid = true;
 
   pm->SendCleanupPendingProgress(this->ConnectionID);
@@ -702,30 +752,81 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
          << this->GetProducerID() << "UpdateInformation"
          << vtkClientServerStream::End;
 
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetPartitionId"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
-         << vtkClientServerStream::LastResult
-         << pm->GetNumberOfPartitions(this->ConnectionID) << 0
-         << vtkClientServerStream::End;
+  if (vtkSMOutputPort::UseStreaming)
+    {
+    vtkClientServerID infoHelper =
+      pm->NewStreamObject("vtkPriorityHelper", stream);
 
-  if (doTime)
+    stream
+      << vtkClientServerStream::Invoke
+      << infoHelper << "SetInputConnection" << this->GetID()
+      << vtkClientServerStream::End;
+
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End;
+
+    stream
+      << vtkClientServerStream::Invoke
+      << infoHelper
+      << "SetSplitUpdateExtent"
+      << this->PortIndex //algorithm's output port
+      << vtkClientServerStream::LastResult //processor
+      << pm->GetNumberOfPartitions(this->ConnectionID) //numprocessors
+      << vtkSMOutputPort::DefaultPass //pass
+      << vtkSMOutputPort::DefaultNumPasses //number of passes
+      << vtkSMOutputPort::DefaultResolution //resolution
+      << vtkClientServerStream::End;
+
+    stream << vtkClientServerStream::Invoke
+           << this->GetProducerID() << "UpdateInformation"
+           << vtkClientServerStream::End;
+
+    if (doTime)
+      {
+      stream
+        << vtkClientServerStream::Invoke
+        << this->GetExecutiveID() << "SetUpdateTimeStep"
+        << this->PortIndex << time
+        << vtkClientServerStream::End;
+      }
+
+    stream
+      << vtkClientServerStream::Invoke
+      << infoHelper << "Update"
+      << vtkClientServerStream::End;
+
+    pm->DeleteStreamObject(infoHelper, stream);
+    }
+  else
     {
     stream << vtkClientServerStream::Invoke
-           << this->GetExecutiveID() << "SetUpdateTimeStep"
-           << this->PortIndex << time
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
+           << vtkClientServerStream::LastResult
+           << pm->GetNumberOfPartitions(this->ConnectionID) << 0
+           << vtkClientServerStream::End;
+
+    if (doTime)
+      {
+      stream << vtkClientServerStream::Invoke
+             << this->GetExecutiveID() << "SetUpdateTimeStep"
+             << this->PortIndex << time
+             << vtkClientServerStream::End;
+      }
+
+    stream << vtkClientServerStream::Invoke
+           << this->GetProducerID() << "Update"
            << vtkClientServerStream::End;
     }
-
-  stream << vtkClientServerStream::Invoke
-         << this->GetProducerID() << "Update"
-         << vtkClientServerStream::End;
 
   pm->SendPrepareProgress(this->ConnectionID);
   pm->SendStream(this->ConnectionID, this->Servers, stream);
   pm->SendCleanupPendingProgress(this->ConnectionID);
+
 }
 
 //----------------------------------------------------------------------------
@@ -736,6 +837,16 @@ void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetUseStreaming(bool value)
+{
+  vtkSMOutputPort::UseStreaming = value;
+};
 
-
-
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, double dr)
+{
+  vtkSMOutputPort::DefaultPass = dp;
+  vtkSMOutputPort::DefaultNumPasses = dnp;
+  vtkSMOutputPort::DefaultResolution = dr;
+};

@@ -425,7 +425,7 @@ void PrismSurfacePanel::onConversionFileButton()
         QString(),
         "(*.xml);;All Files (*)");
 
-    fileDialog.setFileMode(pqFileDialog::ExistingFiles);
+    fileDialog.setFileMode(pqFileDialog::ExistingFile);
 
 
     QString fileName;
@@ -2352,7 +2352,7 @@ void PrismSurfacePanel::upperYChanged(double val)
     this->UI->PanelHelper->UpdatePropertyInformation();
     this->setModified();
 }
-void PrismSurfacePanel::showCurve( bool b)
+void PrismSurfacePanel::showCurve( bool)
 {
     this->setModified();
 }

@@ -95,9 +95,9 @@ QStringList MantaViewOptions::getPageList()
 void MantaViewOptions::applyChanges()
 {
   pqView* view = pqActiveView::instance().current();
-  pqRenderView *View = qobject_cast<pqRenderView*>(view);
+  pqRenderView *rView = qobject_cast<pqRenderView*>(view);
 /*
-  if(!this->View)
+  if(!this->rView)
     {
     return;
     }
@@ -109,7 +109,7 @@ void MantaViewOptions::applyChanges()
   int intSetting;
   bool boolSetting;
 
-  vtkSMRenderViewProxy *proxy = View->getRenderViewProxy();
+  vtkSMRenderViewProxy *proxy = rView->getRenderViewProxy();
   intSetting = this->Internal->ui.threads->value();
   vtkSMPropertyHelper(proxy, "Threads").Set(intSetting);
 

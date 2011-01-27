@@ -7,16 +7,19 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   ParaViewMainWindow.ui
 )
 
-SOURCE_GROUP("Generated" FILES
+source_group("Generated" FILES
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )
 
-INCLUDE_DIRECTORIES(
+set (QT_USE_QTNETWORK TRUE)
+include(${QT_USE_FILE})
+
+include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(ParaView_SOURCE_FILES
+set(ParaView_SOURCE_FILES
   ParaViewMainWindow.cxx
   ParaViewMainWindow.h
   ${MOC_BUILT_SOURCES}
@@ -24,11 +27,10 @@ SET(ParaView_SOURCE_FILES
 
 #------------------------------------------------------------------------------
 # Add install rules for required system runtimes such as MSVCRxx.dll
-SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
-SET (CMAKE_INSTALL_DEBUG_LIBRARIES ON)
-INCLUDE(InstallRequiredSystemLibraries)
-IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+set (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
+include(InstallRequiredSystemLibraries)
+if (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
     DESTINATION ${PV_INSTALL_BIN_DIR}
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
     COMPONENT Runtime)
@@ -36,11 +38,11 @@ IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
   # Install the runtimes to the lib dir as well since python modules are
   # installed in that directory and the manifest files need to present there as
   # well.
-  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+  install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
     DESTINATION ${PV_INSTALL_LIB_DIR}
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
     COMPONENT Runtime)
-ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+endif (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
 #------------------------------------------------------------------------------
 # Build the client
@@ -65,135 +67,178 @@ build_paraview_client(paraview
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
     INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
-    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}"
-)
+    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
+
+# Configure the ".plugins" configuration xml for making paraview aware of the
+# distributed plugins.
+set (plugins_ini "<?xml version=\"1.0\"?>\n<Plugins>\n")
+foreach(pluginname ${PARAVIEW_PLUGINLIST})
+  set (plugins_ini "${plugins_ini}  <Plugin name=\"${pluginname}\" auto_load=\"0\"/>\n")
+endforeach(pluginname ${PARAVIEW_PLUGINLIST})
+set (plugins_ini "${plugins_ini}</Plugins>\n")
+
 
 write_plugins_file()
 
 # This ensure that the paraview.qch file is generated.
-ADD_DEPENDENCIES(${paraview_client_real_exe_name}
+add_dependencies(${paraview_client_real_exe_name}
   ParaViewOnlineHelp)
 
-IF (BUILD_TESTING)
+if (BUILD_TESTING)
   add_subdirectory(Testing)
-ENDIF (BUILD_TESTING)
+endif (BUILD_TESTING)
 
 
 #########################################################################
 # Add install rules for installing certain dependencies.
 
-IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
+if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   if(WIN32)
-    # Now install the plugins for sqldrivers. For use by the help system
-    INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
-            DESTINATION ${PV_INSTALL_BIN_DIR}
-            COMPONENT Runtime
-            FILES_MATCHING
-              PATTERN "*.dll")
+   set(pv_runtime_dest ${PV_INSTALL_BIN_DIR})
+  else()
+   set(pv_runtime_dest ${PV_INSTALL_LIB_DIR})
+  endif()
 
-    # Python Lib dir contains all of the native python modules
-    IF(PARAVIEW_ENABLE_PYTHON)
-      get_filename_component(_python_base_dir ${PYTHON_EXECUTABLE} PATH)
-      INSTALL(DIRECTORY ${_python_base_dir}/Lib
-              DESTINATION ${PV_INSTALL_BIN_DIR}
+  # Now install the plugins for sqldrivers. For use by the help system
+  install(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)
+
+  if(PARAVIEW_ENABLE_PYTHON)
+    option(PARAVIEW_INSTALL_PYTHON "Install core python modules in ParaView." OFF)
+    mark_as_advanced(PARAVIEW_INSTALL_PYTHON)
+
+    if(PARAVIEW_INSTALL_PYTHON)
+      if(WIN32)
+        execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(standard_lib=1)"
+                        OUTPUT_VARIABLE PYTHON_LIBS_DIR
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+      else(WIN32)
+        get_filename_component(PYTHON_LIBS_DIR "${PYTHON_LIBRARY}" PATH)
+        file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+      endif(WIN32)
+      
+      file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+      install(DIRECTORY ${PYTHON_LIBS_DIR}
+              DESTINATION ${pv_runtime_dest}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime)
-    ENDIF(PARAVIEW_ENABLE_PYTHON)
-  else(WIN32)
-    # Now install the plugins for sqldrivers. For use by the help system
-    INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
-            DESTINATION ${PV_INSTALL_LIB_DIR}
-            COMPONENT Runtime
-            FILES_MATCHING
-              PATTERN "*.so")
+    endif(PARAVIEW_INSTALL_PYTHON)
+  endif(PARAVIEW_ENABLE_PYTHON)
+
+  set(DIRS) # directories to search for prerequisites
+
+  if(PARAVIEW_BUILD_QT_GUI)
+    list(APPEND DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR})
+  endif(PARAVIEW_BUILD_QT_GUI)
+
+  if(VTK_USE_FFMPEG_ENCODER)
+    get_filename_component(FFMPEG_DIR "${FFMPEG_avcodec_LIBRARY}" PATH)
+    list(APPEND DIRS ${FFMPEG_DIR})
+  endif(VTK_USE_FFMPEG_ENCODER)
+
+  if(PARAVIEW_ENABLE_PYTHON)
+    get_filename_component(PYTHON_BIN_DIR "${PYTHON_EXECUTABLE}" PATH)
+    get_filename_component(PYTHON_LIB_DIR "${PYTHON_LIBRARY}" PATH)
+    list(APPEND DIRS ${PYTHON_BIN_DIR} ${PYTHON_LIB_DIR})
+  endif(PARAVIEW_ENABLE_PYTHON)
+
+  if(PARAVIEW_BUILD_PLUGIN_Manta)
+    if(WIN32)
+      list(APPEND DIRS ${MANTA_BUILD}/lib/${CMAKE_CFG_INTDIR})
+    else()
+      list(APPEND DIRS ${MANTA_BUILD}/lib)
+    endif()
+  endif(PARAVIEW_BUILD_PLUGIN_Manta)
+
+  if(PARAVIEW_USE_MPI)
+    get_filename_component(MPI_LIB_DIR "${MPI_LIBRARY}" PATH)
+    get_filename_component(MPI_BIN_DIR "${MPIEXEC}" PATH)
+    list(APPEND DIRS ${MPI_LIB_DIR} ${MPI_BIN_DIR})
+
+    option(PARAVIEW_INSTALL_MPIEXEC "Include the MPI executable in an installation." OFF)
+    mark_as_advanced(PARAVIEW_INSTALL_MPIEXEC)
+    if(PARAVIEW_INSTALL_MPIEXEC)
+      GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
+      install(DIRECTORY ${mpi_bin_dir}/
+        DESTINATION ${pv_runtime_dest}
+        USE_SOURCE_PERMISSIONS
+        COMPONENT Runtime)
+    endif(PARAVIEW_INSTALL_MPIEXEC)
+  endif(PARAVIEW_USE_MPI)
+
+  set(_dir "${PV_INSTALL_LIB_DIR}")
+  if(WIN32)
+    set(_dir "bin")
   endif(WIN32)
 
-set(DIRS) # directories to search for prerequisites
+  set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${DIRS} CACHE STRING
+      "Directories for FixupBundle to search for dependencies" FORCE)
+  mark_as_advanced(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 
-IF(PARAVIEW_BUILD_QT_GUI)
-  list(APPEND DIRS ${QT_BINARY_DIR} ${QT_LIBRARY_DIR})
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
 
-IF(VTK_USE_FFMPEG_ENCODER)
-  get_filename_component(FFMPEG_DIR "${FFMPEG_avcodec_LIBRARY}" PATH)
-  list(APPEND DIRS ${FFMPEG_DIR})
-ENDIF(VTK_USE_FFMPEG_ENCODER)
+  install(CODE "
+include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
+fixup_bundle(\"${APPS}\"   \"\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
+" COMPONENT BrandedRuntime)
 
-IF(PARAVIEW_ENABLE_PYTHON)
-  get_filename_component(PYTHON_BIN_DIR "${PYTHON_EXECUTABLE}" PATH)
-  get_filename_component(PYTHON_LIB_DIR "${PYTHON_LIBRARY}" PATH)
-  list(APPEND DIRS ${PYTHON_BIN_DIR} ${PYTHON_LIB_DIR})
-ENDIF(PARAVIEW_ENABLE_PYTHON)
-
-IF(PARAVIEW_USE_MPI)
-  get_filename_component(MPI_LIB_DIR "${MPI_LIBRARY}" PATH)
-  get_filename_component(MPI_BIN_DIR "${MPIEXEC}" PATH)
-  list(APPEND DIRS ${MPI_LIB_DIR} ${MPI_BIN_DIR})
-ENDIF(PARAVIEW_USE_MPI)
-
-set(_extension)
-set(_dir "${PV_INSTALL_LIB_DIR}")
-IF(WIN32)
-  set(_extension ".exe")
-  set(_dir "bin")
-ENDIF(WIN32)
-
-set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${_extension}")  # paths to executables
-
-INSTALL(CODE "
-   include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-   fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
-   " COMPONENT BrandedRuntime)
-
-ENDIF(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
+endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
 #------------------------------------------------------------------------
 # Import site specific installation rules file, if any.
-SET (PARAVIEW_EXTRA_INSTALL_RULES_FILE "" CACHE FILEPATH 
+set (PARAVIEW_EXTRA_INSTALL_RULES_FILE "" CACHE FILEPATH 
   "Path to site-specific install rules for ParaView.")
-  
-MARK_AS_ADVANCED(PARAVIEW_EXTRA_INSTALL_RULES_FILE)
+mark_as_advanced(PARAVIEW_EXTRA_INSTALL_RULES_FILE)
 
-IF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
-  INCLUDE("${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
-ENDIF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+if (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+  foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+    include("${rule_file}")
+  endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 
 #------------------------------------------------------------------------
 # Install the .plugins configuration file.
-INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
+install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_PLUGIN_DIR}
         COMPONENT BrandedRuntime)
 
 # Call this last so the install script runs after the above targets are installed:
 #
-IF(APPLE)
-  SET(distributed_plugins ${PARAVIEW_PLUGINLIST})
-  SET(PV_EXE_NAME "paraview")
-  SET(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
+if(APPLE)
+
+  set (ParaView_BUNDLE_LOCATION "" CACHE STRING
+  "Subdirectory in which to place ParaView app inside a bundle.")
+
+  mark_as_advanced(ParaView_BUNDLE_LOCATION)
+
+  set(distributed_plugins ${PARAVIEW_PLUGINLIST})
+  set(PV_EXE_NAME "paraview")
+  set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
     "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
-  SET(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
+  set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
     "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
     
-  SET (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
+  set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
 
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
     "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
     "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
 
-  INSTALL(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
-ENDIF(APPLE)
+  install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+endif(APPLE)
 
-SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
-IF(PARAVIEW_VERSION_RC)
-  SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
-ENDIF(PARAVIEW_VERSION_RC)
+set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
+if(PARAVIEW_VERSION_RC)
+  set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
+endif(PARAVIEW_VERSION_RC)
 
-SET(_package_name "ParaView")
-IF(PARAVIEW_INSTALL_DEVELOPMENT)
-  SET(_package_name "ParaView-Development")
-ENDIF(PARAVIEW_INSTALL_DEVELOPMENT)
+set(_package_name "ParaView")
+if(PARAVIEW_INSTALL_DEVELOPMENT)
+  set(_package_name "ParaView-Development")
+endif(PARAVIEW_INSTALL_DEVELOPMENT)
 
 #------------------------------------------------------------------------
 # Install ParaView client
@@ -210,25 +255,25 @@ build_paraview_client_cpack_config_init(
 )
 
 # Set NSIS specific CPACK vars for install icons, strings etc..
-IF(WIN32 AND NOT UNIX)
+if(WIN32 AND NOT UNIX)
     # There is a bug in NSI that does not handle full unix paths properly. Make
     # sure there is at least one set of four (4) backlasshes.
-    SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\pvIcon.png")
-    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview.exe")
-    SET(CPACK_NSIS_DISPLAY_NAME "${_package_name}-${PARAVIEW_VERSION_FULL} a cross-platform, open-source visualization system")
-    SET(CPACK_NSIS_PACKAGE_NAME "${_package_name}-${PARAVIEW_VERSION_FULL}")
-    SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
-    SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
-    SET(CPACK_NSIS_CONTACT "webmaster@paraview.org")
-    SET(CPACK_NSIS_MODIFY_PATH OFF)
-    SET(CPACK_NSIS_MUI_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
-    SET(CPACK_NSIS_MUI_UNIICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
+    set(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\pvIcon.png")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview.exe")
+    set(CPACK_NSIS_DISPLAY_NAME "${_package_name}-${PARAVIEW_VERSION_FULL} a cross-platform, open-source visualization system")
+    set(CPACK_NSIS_PACKAGE_NAME "${_package_name}-${PARAVIEW_VERSION_FULL}")
+    set(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
+    set(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
+    set(CPACK_NSIS_CONTACT "webmaster@paraview.org")
+    set(CPACK_NSIS_MODIFY_PATH OFF)
+    set(CPACK_NSIS_MUI_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
+    set(CPACK_NSIS_MUI_UNIICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
   
-ENDIF(WIN32 AND NOT UNIX)
+endif(WIN32 AND NOT UNIX)
 
 # This ensure that the only component that is used by cpack when building the
 # drag-n-drop on Mac is the "Bundle" component.
-SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
+set (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
   "${CMAKE_CURRENT_BINARY_DIR}" "ParaView Mac Bundle" "Bundle" "/")
 
 build_paraview_client_cpack_config()

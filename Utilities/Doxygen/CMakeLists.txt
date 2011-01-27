@@ -40,8 +40,6 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
         \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/StreamingParaView/\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/AdaptiveParaView//\" \\
         \"${ParaView_SOURCE_DIR}/Applications/ParaView\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\

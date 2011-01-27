@@ -55,7 +55,7 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>inside</string>
+        <string>from</string>
        </property>
       </widget>
      </item>

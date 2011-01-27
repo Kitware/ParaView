@@ -73,20 +73,6 @@ public:
   
   friend class vtkPQSelectionObserver;
 
-  /// For the current selection, returns the list of global ids selected. This
-  /// valid only if the selected data source indeed has global ids.
-  QList<vtkIdType> getGlobalIDs();
- 
-  /// For the given parameters, returns the list of global ids selected. This
-  /// valid only if the selected data source indeed has global ids.  
-  QList<vtkIdType> getGlobalIDs(vtkSMProxy* selectionSource,pqOutputPort* opport);
-
-  /// For the current selection, returns the list of indices selected.
-  QList<QPair<int, vtkIdType> > getIndices();
-
-  /// For the current selection, returns the list of indices selected.
-  QList<QPair<int, vtkIdType> > getIndices(vtkSMProxy* selectionSource,pqOutputPort* opport);
-
   /// Make a selection source proxy for a client-side selection.
   /// Only supports pedigree id selections.
   static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkIdType connId);

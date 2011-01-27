@@ -82,11 +82,18 @@ public:
 
   // Description:
   // Get the grid for coprocessing.
-  vtkDataObject* GetGrid();
+  vtkGetObjectMacro(Grid, vtkDataObject);
 
   // Description:
   // Returns true if the grid is necessary..
   bool GetIfGridIsNecessary();
+
+  // Description:
+  // Set/get the extents for a partitioned topologically regular grid
+  // (i.e. vtkUniformGrid, vtkImageData, vtkRectilinearGrid, and
+  // vtkStructuredGrid).
+  vtkSetVector6Macro(WholeExtent, int);
+  vtkGetVector6Macro(WholeExtent, int);
 
 //BTX
 protected:
@@ -121,6 +128,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+  int WholeExtent[6];
 //ETX
 };
 

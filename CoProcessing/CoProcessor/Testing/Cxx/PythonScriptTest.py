@@ -33,8 +33,8 @@ def DoCoProcessing(datadescription):
   rep.Representation="Surface"
  
   #save screenshot
-  pressureimagefilename = 'CPPressure'+str(timestep) + '.png'
-  WriteImage(pressureimagefilename)
+  gridimagefilename = 'CPGrid'+str(timestep) + '.png'
+  WriteImage(gridimagefilename)
 
   rep = Show(trivialproducer)
   rep.LookupTable = MakeBlueToRedLT(pressurerange[0], pressurerange[1])
@@ -47,8 +47,8 @@ def DoCoProcessing(datadescription):
   ren = Render()
   ren.Background=[1,1,1]  #white
 
-  gridimagefilename = 'CPGrid'+str(timestep) + '.png'
-  WriteImage(gridimagefilename)
+  pressureimagefilename = 'CPPressure'+str(timestep) + '.png'
+  WriteImage(pressureimagefilename)
   
   return
 

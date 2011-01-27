@@ -52,11 +52,11 @@ public:
 
   // Description:
   // Adds a representation proxy to this view.
-  virtual void AddRepresentation(vtkSMRepresentationProxy*);
+  virtual void AddRepresentation(vtkSMProxy*);
 
   // Description:
   // Removes a representation proxy from this view.
-  virtual void RemoveRepresentation(vtkSMRepresentationProxy*);
+  virtual void RemoveRepresentation(vtkSMProxy*);
 
   // Description:
   // Removes all added representations from this view.

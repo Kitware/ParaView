@@ -69,12 +69,16 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
         options->GetLowerRight(cc), options->GetUpperLeft(cc));
       }
     }
+
+  // Screen surface rotation matrix
+  SurfaceRot = vtkMatrix4x4::New();
 }
 
 //----------------------------------------------------------------------------
 vtkCaveSynchronizedRenderers::~vtkCaveSynchronizedRenderers()
 {
   this->SetNumberOfDisplays(0);
+  this->SurfaceRot->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -162,92 +166,84 @@ void vtkCaveSynchronizedRenderers::DefineDisplay(
 // It is the room camera transformed by the world camera.
 void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
 {
-  int idx;
-  // pos is the user position
-  double pos[4];
-  //cam->GetPosition(pos);
-  pos[0] = 0.;
-  pos[1] = 0.;
-  pos[2] = 0.;
-  pos[3] = 1.;
+  if ( cam->GetLeftEye() == 1 )
+    return;
 
-  // Use the camera here  tempoarily to get the client view transform.
- // Create a transform from the client camera.
-  vtkTransform* trans = cam->GetViewTransformObject();
-  // The displays are defined in camera coordinates.
-  // We want to convert them to world coordinates.
-  trans->Inverse();
+  this->SetDisplayConfig();
+  cam->SetHeadTracked( true );
 
-  // Apply the transform on the local display info.
-  double p[4];
-  double o[4];
-  double x[4];
-  double y[4];
-  trans->MultiplyPoint(pos, p);
-  trans->MultiplyPoint(this->DisplayOrigin, o);
-  trans->MultiplyPoint(this->DisplayX, x);
-  trans->MultiplyPoint(this->DisplayY, y);
-  // Handle homogeneous coordinates.
-  for (idx = 0; idx < 3; ++idx)
+  // Set O2Screen, O2Right, O2Left, O2Bottom, O2Top
+  double O2Screen = - this->DisplayOrigin[2];
+  double O2Right  =   this->DisplayX[0];
+  double O2Left   = - this->DisplayOrigin[0];
+  double O2Top    =   this->DisplayY[1];
+  double O2Bottom = - this->DisplayX[1];
+  cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
+                        0.065, 1.0,
+                        this->SurfaceRot);
+}
+
+//------------------------------------------------------------------HeadTracked
+// This enables the display config for head tracking
+void vtkCaveSynchronizedRenderers::SetDisplayConfig()
+{
+  // The room coordinates
+  double xRoom[3]={1.0, 0.0, 0.0 };
+  double yRoom[3]={0.0, 1.0, 0.0 };
+  double zRoom[3]={0.0, 0.0, 1.0 };
+
+  // Base coordinates of the screen
+  double xBase[3], yBase[3], zBase[3];
+  for (int i = 0; i < 3; ++i)
     {
-    p[idx] = p[idx] / p[3];
-    o[idx] = o[idx] / o[3];
-    x[idx] = x[idx] / x[3];
-    y[idx] = y[idx] / y[3];
+    xBase[i] = this->DisplayX[i]-this->DisplayOrigin[i];
+    yBase[i] = this->DisplayY[i]-this->DisplayX[i];
     }
+  vtkMath::Cross( xBase, yBase, zBase );
 
-  // Now compute the camera.
-  float vn[3];
-  float ox[3];
-  float oy[3];
-  float cp[3];
-  float center[3];
-  float offset[3];
-  float xOffset, yOffset;
-  float dist;
-  float height;
-  float width;
-  float viewAngle;
-  float tmp;
+  this->SetSurfaceRotation( xBase, yBase, zBase, xRoom, yRoom, zRoom );
 
-  // Compute the view plane normal.
-  for ( idx = 0; idx < 3; ++idx)
-    {
-    ox[idx] = x[idx] - o[idx];
-    oy[idx] = y[idx] - o[idx];
-    center[idx] = o[idx] + 0.5*(ox[idx] + oy[idx]);
-    cp[idx] = p[idx] - center[idx];
-    }
-  vtkMath::Cross(ox, oy, vn);
-  vtkMath::Normalize(vn);
-  // Compute distance to plane.
-  dist = vtkMath::Dot(vn,cp);
-  // Compute width and height of the window.
-  width = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
-  height = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
+  // Get the new DisplayOrigin, DisplayX and DisplayY after transfromation
+  this->SurfaceRot->MultiplyPoint( this->DisplayOrigin, this->DisplayOrigin );
+  this->SurfaceRot->MultiplyPoint( this->DisplayX, this->DisplayX );
+  this->SurfaceRot->MultiplyPoint( this->DisplayY, this->DisplayY );
+}
 
-  // Point the camera orthogonal toward the plane.
-  cam->SetPosition(p[0], p[1], p[2]);
-  cam->SetFocalPoint(p[0]-vn[0], p[1]-vn[1], p[2]-vn[2]);
-  cam->SetViewUp(oy[0], oy[1], oy[2]);
+void vtkCaveSynchronizedRenderers::SetSurfaceRotation( double xBase[3],
+                                                       double yBase[3],
+                                                       double zBase[3],
+                                                       double vtkNotUsed(xRoom)[3],
+                                                       double vtkNotUsed(yRoom)[3],
+                                                       double vtkNotUsed(zRoom)[3])
+{
+  vtkMath::Normalize( xBase );
+  vtkMath::Normalize( yBase );
+  vtkMath::Normalize( zBase );
 
-  // Compute view angle.
-  viewAngle = atan(height/(2.0*dist)) * 360.0 / 3.1415926;
-  cam->SetViewAngle(viewAngle);
+  this->SurfaceRot->SetElement( 0, 0, xBase[0] );
+  this->SurfaceRot->SetElement( 0, 1, xBase[1] );
+  this->SurfaceRot->SetElement( 0, 2, xBase[2] );
 
-  // Compute the shear/offset vector (focal point to window center).
-  offset[0] = center[0] - (p[0]-dist*vn[0]);
-  offset[1] = center[1] - (p[1]-dist*vn[1]);
-  offset[2] = center[2] - (p[2]-dist*vn[2]);
+  this->SurfaceRot->SetElement( 1, 0, yBase[0] );
+  this->SurfaceRot->SetElement( 1, 1, yBase[1] );
+  this->SurfaceRot->SetElement( 1, 2, yBase[2] );
 
-  // Compute the normalized x and y components of shear offset.
-  tmp = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
-  xOffset = vtkMath::Dot(offset, ox) / (tmp * tmp);
-  tmp = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
-  yOffset = vtkMath::Dot(offset, oy) / (tmp * tmp);
+  this->SurfaceRot->SetElement( 2, 0, zBase[0]);
+  this->SurfaceRot->SetElement( 2, 1, zBase[1]);
+  this->SurfaceRot->SetElement( 2, 2, zBase[2]);
 
-  // Off angle positioning of window.
-  cam->SetWindowCenter(2*xOffset, 2*yOffset);
+  // // Calculate directional cosine matrix to get surface rotation
+  // SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
+
+  // SurfaceRot->SetElement( 1, 0, vtkMath::Dot( xBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 1, vtkMath::Dot( yBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 2, vtkMath::Dot( zBase, yRoom ) );
+
+  // SurfaceRot->SetElement( 2, 0, vtkMath::Dot( xBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 1, vtkMath::Dot( yBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 2, vtkMath::Dot( zBase, zRoom ) );
 }
 
 //----------------------------------------------------------------------------

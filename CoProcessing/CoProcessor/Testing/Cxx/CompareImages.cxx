@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     testing->AddArgument(argv[cc]);
     }
 
-  double threshold = atof(argv[3]);
+  double threshold = atof(argv[2]);
 
   if(!testing->RegressionTest(vtkImageData::SafeDownCast(reader->GetOutput()), threshold))
     {

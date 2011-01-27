@@ -10644,7 +10644,7 @@ double vtkMaterialInterfaceFilterHalfSphere::EvaluateHalfSpherePoint(double pt[3
   tmp[1] = pt[1] - this->Center[1];
   tmp[2] = pt[2] - this->Center[2];
 
-  double sphereDist;
+  double sphereDist = 0.0;
   if (this->ClipWithSphere)
     {
     // First compute the distance squared from the sphere.

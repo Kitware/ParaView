@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Initialize the driver with the coprocessor.  fileName is the
-  // name of the python script.
+  // name of the python script.  Returns 0 on failure.
   virtual int Initialize(const char* fileName);
 
   // Description:

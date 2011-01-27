@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotReaderMap_h
 #define __vtkSpyPlotReaderMap_h
 
+#include "vtkSystemIncludes.h"
+
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtkstd/map>
-#include "vtkSystemIncludes.h"
 
 class vtkSpyPlotReader;
 class vtkSpyPlotUniReader;

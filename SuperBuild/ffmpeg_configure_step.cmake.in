@@ -1,0 +1,11 @@
+
+if(APPLE)
+  set(ENV{MACOSX_DEPLOYMENT_TARGET} "10.5")
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
+  EXECUTE_PROCESS(
+    COMMAND sh ./configure --disable-static --disable-network --disable-zlib --disable-ffserver --disable-ffplay --disable-decoders --enable-shared --enable-swscale --prefix=@ffmpeg_install@
+    WORKING_DIRECTORY "@ffmpeg_source@"
+    RESULT_VARIABLE rv
+    )

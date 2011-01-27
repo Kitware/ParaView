@@ -27,6 +27,7 @@
 #include "vtkSynchronizedRenderers.h"
 
 class vtkCamera;
+class vtkMatrix4x4;
 
 class VTK_EXPORT vtkCaveSynchronizedRenderers : public vtkSynchronizedRenderers
 {
@@ -61,11 +62,27 @@ protected:
   // Method to update the camera.
   void ComputeCamera(vtkCamera* cam);
 
+  // Description:
+  // This method is used to configure the display at startup. The
+  // display is only configurable if the head tracking is set. The
+  // typical use case is a CAVE like VR setting and we would like the
+  // head-tracked camera to be aware of the display in the room
+  // coordinates.
+  void SetDisplayConfig();
+
+  // Description:
+  // This sets the SurfaceRot transfromation based on the screen
+  // basis and the room basis
+  void SetSurfaceRotation( double xBase[3], double yBase[3], double zBase[3],
+                           double xRoom[3], double yRoom[3], double zRoom[3] );
+
+
   int    NumberOfDisplays;
   double **Displays;
   double DisplayOrigin[4];
   double DisplayX[4];
   double DisplayY[4];
+  vtkMatrix4x4 *SurfaceRot;
 
 private:
   vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&); // Not implemented

@@ -74,6 +74,9 @@ public:
   /// Provides mechanism to explicitly add a proxy to the menu.
   void addProxy(const QString& xmlgroup, const QString& xmlname);
 
+  /// Provides mechanism to explicitly remove a proxy to the menu.
+  void removeProxy(const QString& xmlgroup, const QString& xmlname);
+
   /// Forces a re-population of the menu. Any need to call this only after
   /// addProxy() has been used to explicitly add entries.
   void populateMenu();

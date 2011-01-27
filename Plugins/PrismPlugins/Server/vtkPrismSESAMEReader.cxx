@@ -604,7 +604,6 @@ void vtkPrismSESAMEReader::ExecuteInformation()
   {
     float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
     int numberTemperature = 0;
-    int numRead = 0;
     int result=0;
 
     JumpToTable(this->Internal->TableId);
@@ -1297,7 +1296,6 @@ void vtkPrismSESAMEReader::ReadVaporization401Table()
 
   float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
   int numberTemperatures=0;
-  int numRead = 0;
   int result=0;
 
   result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
@@ -1349,34 +1347,6 @@ void vtkPrismSESAMEReader::ReadVaporization401Table()
         scalars[scalarIndex]->InsertNextTuple1(v[k]);
       }
     }
-
-
-    /*
-    if ( numRead < numberTemperatures )
-    {
-    xCoords->InsertNextTuple1(  v[k] );
-    }
-    else if ( numRead < (numberTemperatures + numberTemperatures))
-    {
-    yCoords->InsertNextTuple1(  v[k] );
-    }
-    else
-    {
-    scalarCount++;
-    if(scalarCount > numberTemperatures)
-    {
-    scalarCount = 1;
-    scalarIndex++;
-    }
-    if(this->Internal->TableArrayStatus.size() > scalarIndex &&
-    this->Internal->TableArrayStatus[scalarIndex])
-    {
-    scalars[scalarIndex]->InsertNextTuple1(v[k]);
-    }
-    }
-
-    numRead++;
-    } */
   }
 
 

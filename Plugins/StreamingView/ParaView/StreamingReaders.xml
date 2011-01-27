@@ -1,0 +1,17 @@
+<ParaViewReaders>
+  <Reader name="StridedReader1"
+          extensions="sraw"
+          file_description="Raw Files (Strided rev 1)" >
+  </Reader>
+
+  <Reader name="ACosmoReader"
+          extensions="cosmo"
+          file_description="Cosmo (adaptive) Files" >
+  </Reader>
+
+  <Reader name="StreamingNetCDFPOP"
+          extensions="pop.ncdf pop.nc"
+          file_description="POP Ocean NetCDF (streaming image)">
+  </Reader>
+
+</ParaViewReaders>

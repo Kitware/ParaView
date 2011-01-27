@@ -11,7 +11,7 @@ PrismMenuActions::PrismMenuActions(QObject* p)
      this->setParent(pqCoreUtilities::mainWidget());
     PrismCore* core=PrismCore::instance();
 
-    core->createActions(this);
+    core->createMenuActions(this);
 /*
     QList<QAction*> actionsList;
     core->actions(actionsList);

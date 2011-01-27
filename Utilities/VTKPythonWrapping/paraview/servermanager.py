@@ -167,11 +167,17 @@ class Proxy(object):
             self.Port = args['port']
             del args['port']
 
+        update = True
+        if 'no_update' in args:
+            if args['no_update']:
+                update = False
+            del args['no_update']
+
         if 'proxy' in args:
             self.InitializeFromProxy(args['proxy'])
             del args['proxy']
         else:
-            self.Initialize()
+            self.Initialize(None, update)
         if 'registrationGroup' in args:
             registrationGroup = args['registrationGroup']
             del args['registrationGroup']
@@ -181,11 +187,6 @@ class Proxy(object):
                 del args['registrationName']
             pxm = ProxyManager()
             pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
-        update = True
-        if 'no_update' in args:
-            if args['no_update']:
-                update = False
-            del args['no_update']
         if update:
             self.UpdateVTKObjects()
         for key in args.keys():
@@ -224,12 +225,13 @@ class Proxy(object):
         if self.SMProxy and (self.SMProxy, self.Port) in _pyproxies:
             del _pyproxies[(self.SMProxy, self.Port)]
 
-    def InitializeFromProxy(self, aProxy):
+    def InitializeFromProxy(self, aProxy, update=True):
         """Constructor. Assigns proxy to self.SMProxy, updates the server
         object as well as register the proxy in _pyproxies dictionary."""
         import weakref
         self.SMProxy = aProxy
-        self.SMProxy.UpdateVTKObjects()
+        if update:
+            self.SMProxy.UpdateVTKObjects()
         _pyproxies[(self.SMProxy, self.Port)] = weakref.ref(self)
 
     def Initialize(self):
@@ -350,7 +352,7 @@ class Proxy(object):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
         if not self.SMProxy:
-            raise AttributeError("class has no attribute %s" % name)
+            raise AttributeError("class %s has no attribute %s" % ("None", name))
             return None
         # Handle GetActiveCamera specially.
         if name == "GetActiveCamera" and \
@@ -2355,14 +2357,14 @@ def _createInitialize(group, name):
     of Proxy"""
     pgroup = group
     pname = name
-    def aInitialize(self, connection=None):
+    def aInitialize(self, connection=None, update=True):
         if not connection:
             connection = ActiveConnection
         if not connection:
             raise RuntimeError,\
                   'Cannot create a proxy without a connection.'
         self.InitializeFromProxy(\
-            CreateProxy(pgroup, pname, connection))
+            CreateProxy(pgroup, pname, connection), update)
     return aInitialize
 
 def _createGetProperty(pName):

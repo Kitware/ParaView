@@ -187,6 +187,10 @@ protected:
   /// settings.
   virtual const char* interactorStyleSettingsGroup() const=0;
 
+  /// On Mac, we usually try to cache the front buffer to avoid unecessary
+  //  updates.
+  bool AllowCaching;
+
 private: 
   pqRenderViewBase(const pqRenderViewBase&); // Not implemented.
   void operator=(const pqRenderViewBase&); // Not implemented.

@@ -599,6 +599,7 @@
          <Property name="CameraParallelScaleInfo" />
          <Property name="CameraParallelProjection" />
          <Property name="EyeAngle" />
+	 <Property name="HeadPose" />
        </ExposedProperties>
      </SubProxy>
     </RenderViewProxy>
@@ -1222,6 +1223,7 @@
           <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
           <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
           <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+		  <Property name="DataBounds" />
           <Property name="CustomBounds"/>
           <Property name="CustomBoundsActive"/>
         </ExposedProperties>
@@ -2750,6 +2752,15 @@
         number_of_elements="3"
         default_values="0 0 0">
         <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+	  <DoubleVectorProperty
+        name="DataBounds"
+        command="GetDataBounds"
+		information_only="1"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+		<SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty

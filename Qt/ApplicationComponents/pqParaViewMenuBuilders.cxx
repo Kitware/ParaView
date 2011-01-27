@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
-#include "pqListNewProxyDefinitionsBehavior.h"
+#include "pqUpdateProxyDefinitionsBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
@@ -156,8 +156,8 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu&  menu,
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   new pqSourcesMenuReaction(mgr);
-  new pqListNewProxyDefinitionsBehavior(
-    pqListNewProxyDefinitionsBehavior::SOURCES, "sources", mgr);
+  new pqUpdateProxyDefinitionsBehavior(
+    pqUpdateProxyDefinitionsBehavior::SOURCES, "sources", mgr);
   pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
   if (mainWindow)
     {
@@ -174,8 +174,8 @@ void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->setRecentlyUsedMenuSize(10);
   new pqFiltersMenuReaction(mgr);
-  new pqListNewProxyDefinitionsBehavior(
-    pqListNewProxyDefinitionsBehavior::FILTERS, "filters", mgr);
+  new pqUpdateProxyDefinitionsBehavior(
+    pqUpdateProxyDefinitionsBehavior::FILTERS, "filters", mgr);
   pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
 
   if (mainWindow)

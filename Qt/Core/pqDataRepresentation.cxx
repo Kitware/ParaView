@@ -224,7 +224,7 @@ bool pqDataRepresentation::getDataBounds(double bounds[6])
 
 //-----------------------------------------------------------------------------
 vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
-  bool update/*=true*/) const
+  bool vtkNotUsed(update)/*=true*/) const
 {
   vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());

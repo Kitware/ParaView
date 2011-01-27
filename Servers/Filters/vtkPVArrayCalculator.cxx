@@ -97,9 +97,10 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
         }
       }
     }
-  
+
   assert(this->GetMTime() == mtime &&
     "post: mtime cannot be changed in RequestData()");
+  static_cast<void>(mtime); // added so compiler won't complain im release mode.
 }
 
 // ----------------------------------------------------------------------------
