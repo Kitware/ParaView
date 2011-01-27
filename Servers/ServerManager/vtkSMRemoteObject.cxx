@@ -107,11 +107,15 @@ const char* vtkSMRemoteObject::GetGlobalIDAsString()
 //---------------------------------------------------------------------------
 void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
 {
-  // Unregister current object with previous ID if already registered
-  if(this->GlobalID != 0 && this->Session &&
-     this->Session->GetRemoteObject(this->GlobalID) == this)
+  if(this->GlobalID == guid)
     {
-    this->Session->UnRegisterRemoteObject(this);
+    return;
+    }
+
+  if(this->GlobalID != 0)
+    {
+    vtkErrorMacro("GlobalID must NOT be changed once it has been assigned");
+    abort();
     }
 
   // Keep new ID

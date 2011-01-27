@@ -64,6 +64,11 @@ public:
   // Returns the VTKClassName.
   vtkGetStringMacro(VTKClassName);
 
+  // Description:
+  // Return true if that Proxy is supposed to have NO vtk class, which means
+  // its a NullProxy.
+  bool IsNullProxy() { return (VTKClassName == NULL); };
+
 //BTX
 protected:
   vtkPMProxy();

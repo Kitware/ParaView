@@ -44,9 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#ifdef FIXME_COLLABORATION
 #include "vtkSMInteractionUndoStackBuilder.h"
-#endif
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -101,26 +99,22 @@ class pqRenderView::pqInternal
 {
 public:
 
-#ifdef FIXME_COLLABORATION
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
-#endif
 
   bool InitializedWidgets;
   pqInternal()
     {
     this->InitializedWidgets = false;
-#ifdef FIXME_COLLABORATION
     this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
-    this->InteractionUndoStack->SetClientOnly(true);
+    // FIXME this->InteractionUndoStack->SetClientOnly(true);
     this->UndoStackBuilder = 
       vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
     this->UndoStackBuilder->SetUndoStack(
       this->InteractionUndoStack);
-#endif
     }
 
   ~pqInternal()
@@ -134,11 +128,9 @@ void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
   this->Internal = new pqRenderView::pqInternal();
 
   // we need to fire signals when undo stack changes.
-#ifdef FIXME_COLLABORATION
   this->getConnector()->Connect(this->Internal->InteractionUndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onUndoStackChanged()),
     0, 0, Qt::QueuedConnection);
-#endif
 
   this->ResetCenterWithCamera = true;
   this->UseMultipleRepresentationSelection = false;
@@ -222,9 +214,7 @@ void pqRenderView::initializeWidgets()
   // preferences.
   this->restoreAnnotationSettings();
 
-#ifdef FIXME_COLLABORATION
   this->Internal->UndoStackBuilder->SetRenderView(renModule);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -480,61 +470,48 @@ void pqRenderView::linkToOtherView()
 //-----------------------------------------------------------------------------
 void pqRenderView::onUndoStackChanged()
 {
-#ifdef FIXME_COLLABORATION
   bool can_undo = this->Internal->InteractionUndoStack->CanUndo();
   bool can_redo = this->Internal->InteractionUndoStack->CanRedo();
 
   emit this->canUndoChanged(can_undo);
   emit this->canRedoChanged(can_redo);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 bool pqRenderView::canUndo() const
 {
-#ifdef FIXME_COLLABORATION
   return this->Internal->InteractionUndoStack->CanUndo();
-#endif
-  return false;
 }
 
 //-----------------------------------------------------------------------------
 bool pqRenderView::canRedo() const
 {
-#ifdef FIXME_COLLABORATION
   return this->Internal->InteractionUndoStack->CanRedo();
-#endif
-  return false;
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::undo()
 {
-#ifdef FIXME_COLLABORATION
   this->Internal->InteractionUndoStack->Undo();
   this->getProxy()->UpdateVTKObjects();
   this->render();
 
   this->fakeUndoRedo(false, false);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::redo()
 {
-#ifdef FIXME_COLLABORATION
   this->Internal->InteractionUndoStack->Redo();
   this->getProxy()->UpdateVTKObjects();
   this->render();
   
   this->fakeUndoRedo(true, false);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::linkUndoStack(pqRenderView* other)
 {
-#ifdef FIXME_COLLABORATION
   if (other == this)
     {
     // Sanity check, nothing to link if both are same.
@@ -545,25 +522,21 @@ void pqRenderView::linkUndoStack(pqRenderView* other)
 
   // Clear all linked stacks until now.
   this->clearUndoStack();
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::unlinkUndoStack(pqRenderView* other)
 {
-#ifdef FIXME_COLLABORATION
   if (!other || other == this)
     {
     return;
     }
   this->Internal->LinkedUndoStacks.removeAll(other);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::clearUndoStack()
 {
-#ifdef FIXME_COLLABORATION
   if (this->Internal->UpdatingStack)
     {
     return;
@@ -578,13 +551,11 @@ void pqRenderView::clearUndoStack()
       }
     }
   this->Internal->UpdatingStack = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::fakeUndoRedo(bool fake_redo, bool self)
 {
-#ifdef FIXME_COLLABORATION
   if (this->Internal->UpdatingStack)
     {
     return;
@@ -609,13 +580,11 @@ void pqRenderView::fakeUndoRedo(bool fake_redo, bool self)
       }
     }
   this->Internal->UpdatingStack = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::fakeInteraction(bool start)
 {
-#ifdef FIXME_COLLABORATION
   if (this->Internal->UpdatingStack)
     {
     return;
@@ -637,7 +606,6 @@ void pqRenderView::fakeInteraction(bool start)
     other->fakeInteraction(start);
     }
   this->Internal->UpdatingStack = false;
-#endif
 }
 
 //-----------------------------------------------------------------------------

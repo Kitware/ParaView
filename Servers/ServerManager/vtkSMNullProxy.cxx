@@ -31,7 +31,7 @@ vtkSMNullProxy::~vtkSMNullProxy()
 //-----------------------------------------------------------------------------
 void vtkSMNullProxy::CreateVTKObjects()
 {
-  this->SetGlobalID(2); // GlobalId 2 is a reserved one for NULL proxy
+  this->SetVTKClassName(0);
   this->Superclass::CreateVTKObjects();
 }
 

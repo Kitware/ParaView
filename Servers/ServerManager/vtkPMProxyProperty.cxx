@@ -233,8 +233,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     {
     vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
 
-    // GlobalID 2 is reserved for NULL proxy object
-    if(arg != NULL || proxy_ids[cc] == 2)
+    if(arg != NULL || this->IsValidNull(proxy_ids[cc]))
       {
       stream << vtkClientServerStream::Invoke
              << object
@@ -291,4 +290,10 @@ vtkObjectBase* vtkPMProxyProperty::GetObject(vtkTypeUInt32 globalId)
       return this->ProxyHelper->GetPMObject(globalId);
     }
   return NULL;
+}
+//----------------------------------------------------------------------------
+bool vtkPMProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
+{
+  vtkPMProxy* pmProxy = vtkPMProxy::SafeDownCast(this->GetPMObject(globalId));
+  return pmProxy->IsNullProxy();
 }

@@ -98,6 +98,9 @@ protected:
   // Base on the ArgumentType will return either the VTK object or the SMProxy object
   vtkObjectBase* GetObject(vtkTypeUInt32 globalId);
 
+  // Allow to detect if a null argument is really meant to be null
+  bool IsValidNull(vtkTypeUInt32 globalId);
+
 private:
   vtkPMProxyProperty(const vtkPMProxyProperty&); // Not implemented
   void operator=(const vtkPMProxyProperty&); // Not implemented

@@ -1657,18 +1657,34 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
         this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
                         msg->GetExtension(ProxyState::xml_name).c_str());
 
-    proxy->LoadState(msg);
-
     // Update proxy global-ids
     proxy->SetGlobalID(msg->global_id());
-    // sub-proxy global-ids management
+
+    // sub-proxy management
     int nbSubProxy = msg->ExtensionSize(ProxyState::subproxy);
     for(int idx=0; idx < nbSubProxy; idx++)
       {
       const ProxyState_SubProxy *subProxyMsg = &msg->GetExtension(ProxyState::subproxy, idx);
-      vtkSMProxy *subProxy = proxy->GetSubProxy(subProxyMsg->name().c_str());
-      subProxy->SetGlobalID(subProxyMsg->global_id());
+      vtkSMProxy *subProxy =
+          vtkSMProxy::SafeDownCast(
+              this->GetSession()->GetRemoteObject(subProxyMsg->global_id()));
+      // If Sub-Proxy already exist just replace it
+      if(subProxy)
+        {
+        proxy->AddSubProxy(subProxyMsg->name().c_str(), subProxy);
+        }
+      else
+        {
+        // Otherwise just set its previous ID
+        vtkSMProxy *subProxy = proxy->GetSubProxy(subProxyMsg->name().c_str());
+        subProxy->SetGlobalID(subProxyMsg->global_id());
+        }
       }
+
+    // Then load the state for the current proxy
+    // (This do not include the exposed properties)
+    proxy->LoadState(msg);
+
 
     // FIXME in collaboration mode we shouldn't push the state if it already come
     // from the server side

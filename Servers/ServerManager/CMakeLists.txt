@@ -81,6 +81,7 @@ SET (Kit_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInputProperty.cxx
+  vtkSMInteractionUndoStackBuilder.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
   vtkSMNamedPropertyIterator.cxx
@@ -98,6 +99,7 @@ SET (Kit_SRCS
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
+  vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
