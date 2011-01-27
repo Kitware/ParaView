@@ -6,6 +6,7 @@ set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-install")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
+  
 
   ExternalProject_Add(OpenMPI
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -23,8 +24,8 @@ if(WIN32)
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
-
 else()
+  # on linux build the binaries static
   ExternalProject_Add(OpenMPI
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${OpenMPI_source}
@@ -33,9 +34,8 @@ else()
     URL_MD5 ${OPENMPI_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    CONFIGURE_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --enable-shared
   )
-
 endif()
 
 set(MPIEXEC ${OpenMPI_install}/bin/mpiexec${CMAKE_EXECUTABLE_SUFFIX})
@@ -46,7 +46,7 @@ if(WIN32)
   set(MPI_LIBRARY optimized ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpid${_LINK_LIBRARY_SUFFIX})
   set(MPI_EXTRA_LIBRARY optimized ${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpi_cxxd${_LINK_LIBRARY_SUFFIX})
 else()
-  set(MPI_LIBRARY optimized ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX})
-  set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX})
+  set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi.a)
+  set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx.a)
 endif()
 mark_as_advanced(OpenMPI_DIR)
