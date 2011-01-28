@@ -174,7 +174,7 @@ protected:
   void InterpolateAttributes(
     vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
     vtkDataSet* mesh, vtkIdType outId);
-  void vtkAMRDualContour::CopyAttributes(
+  void CopyAttributes(
     vtkDataSet* uGrid, vtkIdType inId,
     vtkDataSet* mesh, vtkIdType outId);
   void FinalizeCopyAttributes(vtkDataSet* mesh);
