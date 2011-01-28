@@ -117,6 +117,12 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       else(WIN32)
         get_filename_component(PYTHON_LIBS_DIR "${PYTHON_LIBRARY}" PATH)
         file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+
+        # install pyconfig.h
+        string(REGEX MATCH "python[0-9].[0-9]" py_inc_dir ${PYTHON_INCLUDE_DIR})
+        install(FILES ${PYTHON_INCLUDE_DIR}/pyconfig.h
+                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_inc_dir}
+                COMPONENT Runtime)
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
