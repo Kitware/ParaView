@@ -342,13 +342,18 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
         }
       break;
 
-  case vtkSMSessionClient::INVOKE:
+  case vtkSMSessionClient::EXECUTE_STREAM:
       {
-      vtkstd::string string;
-      stream >> string;
-      vtkSMMessage msg;
-      msg.ParseFromString(string);
-      this->Invoke(&msg);
+      int ignore_errors, size;
+      stream >> ignore_errors >> size;
+      unsigned char* css_data = new unsigned char[size+1];
+      this->ClientController->Receive(css_data, size, 1,
+        vtkSMSessionClient::EXECUTE_STREAM_TAG);
+      vtkClientServerStream stream;
+      stream.SetData(css_data, size);
+      this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS,
+        stream, ignore_errors != 0);
+      delete [] css_data;
       }
     break;
 
@@ -385,11 +390,19 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
 //----------------------------------------------------------------------------
 void vtkSMSessionServer::SendLastResultToClient()
 {
-  const vtkSMMessage* result =
-    this->GetLastResult(vtkPVSession::CLIENT_AND_SERVERS);
-  vtkMultiProcessStream reply;
-  reply << result->SerializeAsString();
-  this->ClientController->Send(reply, 1, vtkSMSessionClient::REPLY_LAST_RESULT);
+  const vtkClientServerStream& reply = this->GetLastResult(
+    vtkPVSession::CLIENT_AND_SERVERS);
+
+  const unsigned char* data; size_t size_size_t;
+  int size;
+
+  reply.GetData(&data, &size_size_t);
+  size = static_cast<int>(size);
+
+  this->ClientController->Send(&size, 1, 1,
+    vtkSMSessionClient::REPLY_LAST_RESULT);
+  this->ClientController->Send(data, size, 1,
+    vtkSMSessionClient::REPLY_LAST_RESULT);
 }
 
 //----------------------------------------------------------------------------

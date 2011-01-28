@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMViewProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
@@ -74,11 +75,13 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
     }
 
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest()
-    << "Initialize"
-    << static_cast<int>(this->GetGlobalID());
-  this->Invoke(&message);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "Initialize"
+         << static_cast<int>(this->GetGlobalID())
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 
   vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
     vtkPVView::ViewTimeChangedEvent,
@@ -126,9 +129,12 @@ void vtkSMViewProxy::StillRender()
 
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "StillRender";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "StillRender"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 
   this->PostRender(interactive==1);
@@ -149,9 +155,12 @@ void vtkSMViewProxy::InteractiveRender()
 
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "InteractiveRender";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "InteractiveRender"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 
   this->PostRender(interactive==1);
@@ -163,9 +172,12 @@ void vtkSMViewProxy::Update()
 {
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "Update";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "Update"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 }
 
@@ -210,18 +222,24 @@ vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
 {
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "PrepareForScreenshot";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "PrepareForScreenshot"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 
   vtkImageData* capture = this->CaptureWindowInternal(magnification);
 
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "CleanupAfterScreenshot";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "CleanupAfterScreenshot"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 
   if (capture)

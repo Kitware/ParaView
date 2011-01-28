@@ -238,44 +238,6 @@ bool vtkPMSourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-void vtkPMSourceProxy::Invoke(vtkSMMessage* message)
-{
-  vtkstd::string command;
-  const VariantList* arguments;
-  command = message->GetExtension(InvokeRequest::method);
-  arguments = &message->GetExtension(InvokeRequest::arguments);
-
-  if (command == "UpdatePipeline")
-    {
-    assert(arguments->variant_size() == 3);
-    int port_index = arguments->variant(0).integer(0);
-    double time = arguments->variant(1).float64(0);
-    bool doTime = arguments->variant(2).integer(0) != 0;
-    this->UpdatePipeline(port_index, time, doTime);
-    message->Clear();
-    }
-  else if (command == "UpdateInformation")
-    {
-    this->UpdateInformation();
-    message->Clear();
-    }
-  else if (command == "SetupSelectionProxy")
-    {
-    assert(arguments->variant_size() == 2);
-    int index = arguments->variant(0).integer(0);
-    vtkTypeUInt32 guid = static_cast<vtkTypeUInt32>(
-      arguments->variant(1).integer(0));
-    this->SetupSelectionProxy(index,
-      vtkPMProxy::SafeDownCast(this->GetPMObject(guid)));
-    message->Clear();
-    }
-  else
-    {
-    return this->Superclass::Invoke(message);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPMSourceProxy::UpdateInformation()
 {
   if (this->GetVTKObject())

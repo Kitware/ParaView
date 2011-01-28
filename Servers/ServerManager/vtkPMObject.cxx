@@ -86,10 +86,3 @@ void vtkPMObject::Pull(vtkSMMessage* msg)
 {
   msg->CopyFrom(*this->LastPushedMessage);
 }
-//----------------------------------------------------------------------------
-void vtkPMObject::Invoke(vtkSMMessage* msg)
-{
-  msg->Clear();
-  // build an empty response message.
-  *msg << pvstream::InvokeResponse();
-}

@@ -16,11 +16,9 @@
 
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractWidget.h"
-#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
@@ -122,17 +120,13 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
   // Bind the Widget and the representations on the server side
-  vtkSMMessage msg;
-  msg.set_global_id(this->GlobalID);
-  msg.set_location(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
-  Variant* arg = args->add_variant();
-  arg->set_type(Variant::PROXY);
-  arg->add_proxy_global_id(this->RepresentationProxy->GetGlobalID());
-  msg.SetExtension(InvokeRequest::method, "SetRepresentation");
-
-  // Make the call
-  this->Invoke(&msg);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SetRepresentation"
+         << VTKOBJECT(this->RepresentationProxy)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 
   // Location 0 is for prototype objects !!! No need to send to the server something.
   if (!this->WidgetProxy || this->Location == 0)

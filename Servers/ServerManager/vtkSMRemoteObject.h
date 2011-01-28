@@ -101,11 +101,6 @@ protected:
   bool PullState(vtkSMMessage* msg);
 
   // Description:
-  // Same as Push() except that the msg is not treated as a state message instead
-  // just an instantaneous trigger that is not synchronized among processes.
-  void Invoke(vtkSMMessage* msg);
-
-  // Description:
   // Destroys the vtkPMObject associated with this->GlobalID.
   void DestroyPMObject();
 

@@ -15,6 +15,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyInternals.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkGarbageCollector.h"
@@ -1906,4 +1907,54 @@ void vtkSMProxy::UpdateSelfAndAllInputs()
   iter->Delete();
 
   this->UpdateVTKObjects();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
+{
+  if (this->ObjectsCreated)
+    {
+    vtkWarningMacro("Cannot Initialize since proxy already created.");
+    return;
+    }
+  if (this->GetSession() != fromP->GetSession())
+    {
+    vtkErrorMacro("Proxies on different sessions.");
+    return;
+    }
+
+  fromP->CreateVTKObjects();
+  this->SetLocation(fromP->GetLocation());
+  this->UpdateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << PMPROXY(this)
+         << "SetVTKObject"
+         << PMPROXY(fromP)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
+  bool ignore_errors/*=false*/, vtkTypeUInt32 location/*=0*/)
+{
+  if (location == 0)
+    {
+    location = this->Location;
+    }
+  if (location == 0 || stream.GetNumberOfMessages() == 0)
+    {
+    return;
+    }
+
+  if (this->GetSession())
+    {
+    this->GetSession()->ExecuteStream(location, stream, ignore_errors);
+    }
+  else
+    {
+    vtkErrorMacro("Could not locate session to execute stream on.");
+    }
 }

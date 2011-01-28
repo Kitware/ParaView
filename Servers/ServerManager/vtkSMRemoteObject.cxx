@@ -182,22 +182,6 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMRemoteObject::Invoke(vtkSMMessage* msg)
-{
-  msg->set_global_id(this->GlobalID);
-  msg->set_location(this->Location);
-  if(this->GetSession())
-    {
-    this->GetSession()->Invoke(msg);
-    }
-  else
-    {
-    vtkErrorMacro("Attempting to call Invoke() on a " << this->GetClassName()
-      << " after the session has been destroyed.");
-    }
-}
-
-//---------------------------------------------------------------------------
 void vtkSMRemoteObject::DestroyPMObject()
 {
   Message msg;

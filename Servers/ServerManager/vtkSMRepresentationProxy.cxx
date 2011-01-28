@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMRepresentationProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRepresentedDataInformation.h"
@@ -95,17 +96,23 @@ void vtkSMRepresentationProxy::UpdatePipeline(double time)
 void vtkSMRepresentationProxy::UpdatePipelineInternal(
   double time, bool doTime)
 {
+  vtkClientServerStream stream;
   if (doTime)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "SetUpdateTime" << time;
-    this->Invoke(&message);
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "SetUpdateTime" << time
+           << vtkClientServerStream::End;
     }
 
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "Update";
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "Update"
+         << vtkClientServerStream::End;
+
+  // FIXME_COLLABORATION
   //pm->SendPrepareProgress(this->ConnectionID);
-  this->Invoke(&message);
+  this->ExecuteStream(stream);
   //pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
@@ -117,9 +124,12 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     if (!this->MarkedModified)
       {
       this->MarkedModified = true;
-      vtkSMMessage message;
-      message << pvstream::InvokeRequest() << "MarkModified";
-      this->Invoke(&message);
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "MarkModified"
+         << vtkClientServerStream::End;
+      this->ExecuteStream(stream);
       }
     }
   this->Superclass::MarkDirty(modifiedProxy);

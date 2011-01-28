@@ -32,6 +32,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRemoteObject.h"
+#include "vtkSMSessionCoreInterpreterHelper.h"
 #include "vtkSMSession.h"
 
 #include "assert.h"
@@ -62,8 +63,8 @@ namespace
       sessioncore->GatherInformationStatelliteCallback();
       break;
 
-    case vtkSMSessionCore::INVOKE_STATE:
-      sessioncore->InvokeSatelliteCallback();
+    case vtkSMSessionCore::EXECUTE_STREAM:
+      sessioncore->ExecuteStreamSatelliteCallback();
       break;
       }
     }
@@ -189,6 +190,18 @@ vtkSMSessionCore::vtkSMSessionCore()
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
 
+  vtkSMSessionCoreInterpreterHelper* helper =
+    vtkSMSessionCoreInterpreterHelper::New();
+  helper->SetCore(this);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Assign
+         << vtkClientServerID(1)
+         << helper
+         << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
+  helper->Delete();
+
   vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
       vtkMemberFunctionCommand<vtkSMSessionCore>::New();
   observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
@@ -222,8 +235,6 @@ vtkSMSessionCore::vtkSMSessionCore()
     LOG("Log for " << options->GetArgv0() << " ("
       << this->ParallelController->GetLocalProcessId() << ")");
     }
-
-  this->LastInvokeResult = new vtkSMMessage();
 }
 
 //----------------------------------------------------------------------------
@@ -240,8 +251,6 @@ vtkSMSessionCore::~vtkSMSessionCore()
   delete this->Internals;
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
-  delete this->LastInvokeResult;
-  this->LastInvokeResult = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -457,13 +466,24 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::Invoke(vtkSMMessage* message)
+void vtkSMSessionCore::ExecuteStream(
+  vtkTypeUInt32 location, const vtkClientServerStream& stream,
+  bool ignore_errors/*=false*/)
 {
+  if (stream.GetNumberOfMessages() == 0)
+    {
+    return;
+    }
+
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);
 
-  if ( (message->location() & vtkProcessModule::SERVERS) != 0)
+  size_t byte_size;
+  const unsigned char *raw_data;
+  stream.GetData(&raw_data, &byte_size);
+
+  if ( (location & vtkProcessModule::SERVERS) != 0)
     {
     // send message to satellites and then start processing.
 
@@ -479,70 +499,45 @@ void vtkSMSessionCore::Invoke(vtkSMMessage* message)
       // configuration, the message will end up being send to all data-server
       // nodes as well. Although we never do that presently, it's a possibility
       // and we should fix this.
-      unsigned char type = INVOKE_STATE;
+      unsigned char type = EXECUTE_STREAM;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
         ROOT_SATELLITE_RMI_TAG);
-
-      int byte_size = message->ByteSize();
-      unsigned char *raw_data = new unsigned char[byte_size + 1];
-      message->SerializeToArray(raw_data, byte_size);
-      this->ParallelController->Broadcast(&byte_size, 1, 0);
-      this->ParallelController->Broadcast(raw_data, byte_size, 0);
-      delete [] raw_data;
+      int size[2];
+      size[0] = static_cast<int>(byte_size);
+      size[1] = (ignore_errors? 1 : 0);
+      this->ParallelController->Broadcast(size, 2, 0);
+      this->ParallelController->Broadcast(
+        const_cast<unsigned char*>(raw_data), size[0], 0);
       }
     }
-  this->InvokeInternal(message);
+
+  this->ExecuteStreamInternal(raw_data, byte_size, ignore_errors);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::InvokeSatelliteCallback()
+void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
 {
-  int byte_size = 0;
-  this->ParallelController->Broadcast(&byte_size, 1, 0);
-  unsigned char *raw_data = new unsigned char[byte_size + 1];
-  this->ParallelController->Broadcast(raw_data, byte_size, 0);
-  vtkSMMessage message;
-  if (!message.ParseFromArray(raw_data, byte_size))
-    {
-    vtkErrorMacro("Failed to parse protobuf message.");
-    }
-  else
-    {
-    this->InvokeInternal(&message);
-    }
+  int byte_size[2] = {0, 0};
+  this->ParallelController->Broadcast(byte_size, 2, 0);
+  unsigned char *raw_data = new unsigned char[byte_size[0] + 1];
+  this->ParallelController->Broadcast(raw_data, byte_size[0], 0);
+  this->ExecuteStreamInternal(raw_data, byte_size[0], byte_size[1] != 0);
   delete [] raw_data;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::InvokeInternal(vtkSMMessage* message)
+void vtkSMSessionCore::ExecuteStreamInternal(
+  const unsigned char* raw_message, size_t size, bool ignore_errors)
 {
-  LOG(
-    << "----------------------------------------------------------------\n"
-    << "Invoke ( " << message->ByteSize() << " bytes )\n"
-    << "----------------------------------------------------------------\n"
-    << message->DebugString().c_str());
+  LOG ("ExecuteStream\n");
+  // FIXME_COLLABORATION : need to log the contents of the stream.
 
-  this->LastInvokeResult->Clear();
+  this->Interpreter->ClearLastResult();
 
-  vtkPMObject* obj = this->Internals->GetPMObject(message->global_id());
-  if (obj)
-    {
-    obj->Invoke(message);
-    if (message->HasExtension(paraview_protobuf::InvokeResponse::arguments) ||
-      message->HasExtension(paraview_protobuf::InvokeResponse::error))
-      {
-      // preserve the response.
-      this->LastInvokeResult->CopyFrom(*message);
-      message->Clear(); // this is unnecessary, but to avoid not detecting bugs
-      // when someone simply uses the invoke stream's value as the response in
-      // builtin mode, we clear it.
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Failed to locate object with global id: " <<
-      message->global_id());
-    }
+  int temp = this->Interpreter->GetGlobalWarningDisplay();
+  this->Interpreter->SetGlobalWarningDisplay(ignore_errors? 0 : 1);
+  this->Interpreter->ProcessStream(raw_message, size);
+  this->Interpreter->SetGlobalWarningDisplay(temp);
 }
 
 //----------------------------------------------------------------------------
@@ -746,4 +741,10 @@ void vtkSMSessionCore::UnRegisterRemoteObject(vtkSMRemoteObject* obj)
 void vtkSMSessionCore::GetAllRemoteObjects(vtkCollection* collection)
 {
   this->Internals->GetAllRemoteObjects(collection);
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkSMSessionCore::GetLastResult()
+{
+  return this->Interpreter->GetLastResult();
 }

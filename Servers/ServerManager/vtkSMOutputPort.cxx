@@ -113,7 +113,7 @@ void vtkSMOutputPort::GatherDataInformation()
     return;
     }
 
-  // FIXME; Progress
+  // FIXME_COLLABORATION; Progress
   //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID);
   this->DataInformation->Initialize();
@@ -133,7 +133,7 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
     return;
     }
 
-  // FIXME: Progress
+  // FIXME_COLLABORATION: Progress
   //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID);
   this->TemporalDataInformation->Initialize();
@@ -184,10 +184,13 @@ void vtkSMOutputPort::UpdatePipeline(double time)
 void vtkSMOutputPort::UpdatePipelineInternal(double time,
                                              bool doTime)
 {
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest()
-    << "UpdatePipeline" << this->PortIndex << time << doTime;
-  this->SourceProxy->Invoke(&message);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << PMPROXY(this->SourceProxy)
+         << "UpdatePipeline"
+         << this->PortIndex << time << doTime
+         << vtkClientServerStream::End;
+  this->SourceProxy->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------

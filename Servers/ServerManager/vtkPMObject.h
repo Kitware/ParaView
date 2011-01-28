@@ -53,13 +53,6 @@ public:
   // The provided implementation update the given message with the one
   // that has been previously pushed
   virtual void Pull(vtkSMMessage* msg);
-
-  // Description:
-  // Invoke a given method on the underneath objects
-  // The provided implementation is Empty and do nothing
-  // Invoke changes the contents of \c msg to be the result of the invocation if
-  // any.
-  virtual void Invoke(vtkSMMessage* msg);
 //ETX
 
 //BTX

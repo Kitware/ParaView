@@ -126,16 +126,15 @@
 //BTX
 struct vtkSMProxyInternals;
 //ETX
-class vtkGarbageCollector;
+class vtkClientServerStream;
+class vtkPVInformation;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
 class vtkSMPropertyIterator;
+class vtkSMProxyLocator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
-class vtkClientServerStream;
-class vtkSMProxyLocator;
-class vtkPVInformation;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
@@ -327,6 +326,15 @@ public:
   vtkGetMacro(ObjectsCreated, int);
 
   // Description:
+  // Given a source proxy, makes this proxy point to the same server-side
+  // object (with a new id). This method copies connection id as well as
+  // server ids. This method can be called only once on an uninitialized
+  // proxy (CreateVTKObjects() also initialized a proxy) This is useful to
+  // make two (or more) proxies represent the same VTK object. This method
+  // does not copy IDs for any subproxies.
+  void InitializeAndCopyFromProxy(vtkSMProxy* source);
+
+  // Description:
   // Dirty means this algorithm will execute during next update.
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -392,6 +400,12 @@ public:
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
+
+  // Description:
+  // Invoke that takes a vtkClientServerStream as the argument.
+  void ExecuteStream(const vtkClientServerStream& msg,
+    bool ignore_errors=false,
+    vtkTypeUInt32 location=0);
 
   // Description:
   // Add a property with the given key (name). The name can then

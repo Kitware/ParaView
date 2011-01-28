@@ -185,11 +185,12 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
 {
   if (this->ObjectsCreated)
     {
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "UpdateInformation";
-    // vtkPMSourceProxy ensures that it calls UpdateInformation() on each of the
-    // subproxies as well.
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << PMPROXY(this)
+           << "UpdateInformation"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
@@ -485,15 +486,17 @@ void vtkSMSourceProxy::CreateSelectionProxies()
 
       // We don't use input property since that leads to reference loop cycles
       // and I don't feel like doing the garbage collection thing right now.
-      vtkSMMessage message;
-      message << pvstream::InvokeRequest()
-              << "SetupSelectionProxy" << static_cast<int>(cc)
-              << static_cast<int>(esProxy->GetGlobalID());
-      this->Invoke(&message);
+      stream << vtkClientServerStream::Invoke
+             << PMPROXY(this)
+             << "SetupSelectionProxy"
+             << cc
+             << PMPROXY(esProxy)
+             << vtkClientServerStream::End;
       }
 
     this->PInternals->SelectionProxies.push_back(esProxy);
     }
+  this->ExecuteStream(stream);
   this->SelectionProxiesCreated = true;
 }
 

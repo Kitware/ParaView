@@ -14,6 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkSMWriterProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
@@ -66,10 +67,16 @@ int vtkSMWriterProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 //-----------------------------------------------------------------------------
 void vtkSMWriterProxy::UpdatePipeline()
 {
+  // FIXME_COLLABORATION
   //pm->SendPrepareProgress(this->ConnectionID);
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "Write";
-  this->Invoke(&message);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "Write"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
   // pm->SendCleanupPendingProgress(this->ConnectionID);
 
   this->Superclass::UpdatePipeline();
@@ -78,10 +85,16 @@ void vtkSMWriterProxy::UpdatePipeline()
 //-----------------------------------------------------------------------------
 void vtkSMWriterProxy::UpdatePipeline(double time)
 {
+  // FIXME_COLLABORATION
   //pm->SendPrepareProgress(this->ConnectionID);
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "Write";
-  this->Invoke(&message);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "Write"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
   // pm->SendCleanupPendingProgress(this->ConnectionID);
   this->Superclass::UpdatePipeline(time);
 }

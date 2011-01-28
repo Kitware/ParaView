@@ -22,6 +22,7 @@
 #include "vtkPVSession.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
+class vtkClientServerStream;
 class vtkCollection;
 class vtkPMObject;
 class vtkPVInformation;
@@ -87,15 +88,18 @@ public:
   virtual void PullState(vtkSMMessage* msg);
 
   // Description:
-  // Invoke a method. Use GetLastResult() to obtain the response of an
-  // invocation.
-  virtual void Invoke(vtkSMMessage* msg);
+  // Execute a command on the given processes. Use GetLastResult() to obtain the
+  // last result after the command stream is evaluated. Once can set
+  // \c ignore_errors to true, to ignore any interpreting errors.
+  virtual void ExecuteStream(
+    vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignore_errors=false);
 
   // Description:
-  // Returns the response of the Invoke() call from the location. Note if
+  // Returns the response of the ExecuteStream() call from the location. Note if
   // location refers to multiple processes, then the reply is only fetched from
   // the "closest" process.
-  virtual const vtkSMMessage* GetLastResult(vtkTypeUInt32 location);
+  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
 
   // Description:
   // Delete server side object. (PMObject)

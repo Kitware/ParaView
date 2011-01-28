@@ -178,19 +178,21 @@ void vtkSMSession::PullState(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSession::Invoke(vtkSMMessage* msg)
+void vtkSMSession::ExecuteStream(
+  vtkTypeUInt32 location, const vtkClientServerStream& stream,
+  bool ignore_errors/*=false*/)
 {
   this->Activate();
 
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
-  this->Core->Invoke(msg);
+  this->Core->ExecuteStream(location, stream, ignore_errors);
 
   this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
-const vtkSMMessage* vtkSMSession::GetLastResult(
+const vtkClientServerStream& vtkSMSession::GetLastResult(
   vtkTypeUInt32 vtkNotUsed(location))
 {
   // This class does not handle remote sessions, so all messages are directly

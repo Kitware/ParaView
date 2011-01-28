@@ -39,11 +39,20 @@ public:
   // Returns the vtkAlgorithmOutput for an output port, if valid.
   virtual vtkAlgorithmOutput* GetOutputPort(int port);
 
-//BTX
   // Description:
-  // Invoke a given method on the underneath objects
-  virtual void Invoke(vtkSMMessage* msg);
+  // Triggers UpdatePipeline().
+  // Called from client.
+  virtual void UpdatePipeline(int port, double time, bool doTime);
 
+  // Description:
+  // Triggers UpdateInformation().
+  virtual void UpdateInformation();
+
+  // Description:
+  // setups extract selection proxies.
+  virtual void SetupSelectionProxy(int port, vtkPMProxy* extractSelection);
+
+//BTX
 protected:
   vtkPMSourceProxy();
   ~vtkPMSourceProxy();
@@ -80,18 +89,6 @@ protected:
   // Insert a filter to create the Post Filter
   // so that filters can request data conversions
   void InsertPostFilterIfNecessary(vtkAlgorithm* algo, int port);
-
-  // Description:
-  // Triggers UpdatePipeline().
-  virtual void UpdatePipeline(int port, double time, bool doTime);
-
-  // Description:
-  // Triggers UpdateInformation().
-  virtual void UpdateInformation();
-
-  // Description:
-  // setups extract selection proxies.
-  virtual void SetupSelectionProxy(int port, vtkPMProxy* extractSelection);
 
   // Description:
   // Callbacks to add start/end events to the timer log.

@@ -43,10 +43,6 @@ public:
   // Description:
   // Pull the current state of the underneath implementation
   virtual void Pull(vtkSMMessage* msg);
-
-  // Description:
-  // Invoke a given method on the underneath objects
-  virtual void Invoke(vtkSMMessage* msg);
 //ETX
 
   // Description:

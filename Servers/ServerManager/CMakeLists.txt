@@ -129,6 +129,7 @@ SET (Kit_SRCS
   vtkSMSelectionHelper.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
+  vtkSMSessionCoreInterpreterHelper.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMSILModel.cxx

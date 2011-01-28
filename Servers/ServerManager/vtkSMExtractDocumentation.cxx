@@ -24,7 +24,8 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
-
+#include "vtkInitializationHelper.h"
+#include "vtkSMSession.h"
 #include <vtkstd/list>
 #include <vtkstd/string>
 #include <vtkstd/map>
@@ -1000,18 +1001,13 @@ int main(int argc, char *argv[])
 
   char* proxyTypeName = strchr(baseName, 'w');
   proxyTypeName++;
-  
-  vtkProcessModule *pm = vtkProcessModule::New();
-  vtkPVOptions* options  = vtkPVOptions::New();
-  pm->SetOptions(options);
 
-  pm->Initialize();
-  vtkProcessModule::SetProcessModule(pm);
-  vtkSMApplication *app = vtkSMApplication::New();
-  app->Initialize();
+  vtkInitializationHelper::Initialize(argv[0],
+    vtkProcessModule::PROCESS_CLIENT);
+  vtkSMSession* session = vtkSMSession::New();
+  session->Initialize();
 
   vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
-
   vtkStringPairList *proxyNameList = new vtkStringPairList;
   ExtractProxyNames(rootElem, proxyNameList);
   proxyNameList->sort();
@@ -1059,10 +1055,7 @@ int main(int argc, char *argv[])
 
   baseFile.close();
   parser->Delete();
-  pm->Finalize();
-  pm->Delete();
-  options->Delete();
-  app->Finalize();
-  app->Delete();
+  session->Delete();
+  vtkInitializationHelper::Finalize();
   return 0;
 }

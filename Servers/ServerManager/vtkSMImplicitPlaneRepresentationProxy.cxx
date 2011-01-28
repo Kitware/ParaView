@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
@@ -24,10 +25,12 @@ vtkStandardNewMacro(vtkSMImplicitPlaneRepresentationProxy);
 vtkSMImplicitPlaneRepresentationProxy::vtkSMImplicitPlaneRepresentationProxy()
 {
 }
+
 //---------------------------------------------------------------------------
 vtkSMImplicitPlaneRepresentationProxy::~vtkSMImplicitPlaneRepresentationProxy()
 {
 }
+
 //---------------------------------------------------------------------------
 void vtkSMImplicitPlaneRepresentationProxy::SendRepresentation()
 {
@@ -42,9 +45,13 @@ void vtkSMImplicitPlaneRepresentationProxy::SendRepresentation()
     }
   this->RepresentationState = repState;
 
-  vtkSMMessage msg;
-  msg << pvstream::InvokeRequest() << "SetRepresentationState" << repState;
-  this->Invoke(&msg);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SetRepresentationState"
+         << repState
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //---------------------------------------------------------------------------
@@ -53,10 +60,3 @@ void vtkSMImplicitPlaneRepresentationProxy::PrintSelf( ostream& os,
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
-
-
-
-
-

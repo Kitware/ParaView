@@ -16,6 +16,7 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
@@ -475,12 +476,14 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 {
   this->CreateVTKObjects();
 
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest()
-    << "ResetCamera"
-    << bounds[0] << bounds[1] << bounds[2]
-    << bounds[3] << bounds[4] << bounds[5];
-  this->Invoke(&message);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "ResetCamera"
+         << bounds[0] << bounds[1] << bounds[2]
+         << bounds[3] << bounds[4] << bounds[5]
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -489,9 +492,12 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   if (this->IsSelectionCached)
     {
     this->IsSelectionCached = false;
-    vtkSMMessage message;
-    message << pvstream::InvokeRequest() << "InvalidateCachedSelection";
-    this->Invoke(&message);
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << VTKOBJECT(this)
+            << "InvalidateCachedSelection"
+            << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 }
 
@@ -530,10 +536,14 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
 
   this->IsSelectionCached = true;
 
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "SelectCells"
-    << region[0] << region[1] << region[2] << region[3];
-  this->Invoke(&message);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SelectCells"
+         << region[0] << region[1] << region[2] << region[3]
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
   return this->FetchLastSelection(
     multiple_selections, selectedRepresentations, selectionSources);
 }
@@ -550,10 +560,15 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     }
 
   this->IsSelectionCached = true;
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "SelectPoints"
-    << region[0] << region[1] << region[2] << region[3];
-  this->Invoke(&message);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SelectPoints"
+         << region[0] << region[1] << region[2] << region[3]
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
   return this->FetchLastSelection(
     multiple_selections, selectedRepresentations, selectionSources);
 }
@@ -799,7 +814,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   w2i->ShouldRerenderOff();
   w2i->FixBoundaryOn();
 
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.
   vtkClientServerStream stream;

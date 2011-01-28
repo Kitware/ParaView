@@ -24,12 +24,13 @@
 #include "vtkSMMessageMinimal.h"
 
 class vtkClientServerInterpreter;
+class vtkClientServerStream;
+class vtkCollection;
 class vtkMultiProcessController;
 class vtkPMObject;
-class vtkSMProxyDefinitionManager;
 class vtkPVInformation;
+class vtkSMProxyDefinitionManager;
 class vtkSMRemoteObject;
-class vtkCollection;
 
 class VTK_EXPORT vtkSMSessionCore : public vtkObject
 {
@@ -56,14 +57,18 @@ public:
   virtual void PullState(vtkSMMessage* message);
 
   // Description:
-  // Invoke a method remotely
-  virtual void Invoke(vtkSMMessage* message);
+  // Execute a command on the given processes. Use GetLastResult() to obtain the
+  // last result after the command stream is evaluated. Once can set
+  // \c ignore_errors to true, to ignore any interpreting errors.
+  virtual void ExecuteStream(
+    vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignore_errors=false);
 
   // Description:
-  // Returns the return value for the most recent Invoke() call.
-  // When running in parallel, this only returns the result from the root node.
-  virtual const vtkSMMessage* GetLastResult()
-    { return this->LastInvokeResult; }
+  // Returns the response of the ExecuteStream() call from the location. Note if
+  // location refers to multiple processes, then the reply is only fetched from
+  // the "closest" process.
+  virtual const vtkClientServerStream& GetLastResult();
 
   // Description:
   // Invoke a method remotely
@@ -102,11 +107,11 @@ public:
     {
     PUSH_STATE   = 12,
     PULL_STATE   = 13,
-    INVOKE_STATE = 14,
+    EXECUTE_STREAM = 14,
     GATHER_INFORMATION = 15
     };
   void PushStateSatelliteCallback();
-  void InvokeSatelliteCallback();
+  void ExecuteStreamSatelliteCallback();
   void GatherInformationStatelliteCallback();
 
   // Description:
@@ -121,7 +126,8 @@ protected:
 
   // Description:
   virtual void PushStateInternal(vtkSMMessage*);
-  virtual void InvokeInternal(vtkSMMessage*);
+  virtual void ExecuteStreamInternal(
+    const unsigned char* raw_message, size_t size, bool ignore_errors);
   bool GatherInformationInternal(
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);
@@ -140,10 +146,6 @@ protected:
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkMultiProcessController* ParallelController;
   vtkClientServerInterpreter* Interpreter;
-
-  // Used to preserve the response from the most recent "Invoke" call until
-  // requested.
-  vtkSMMessage* LastInvokeResult;
 
 private:
   vtkSMSessionCore(const vtkSMSessionCore&); // Not implemented

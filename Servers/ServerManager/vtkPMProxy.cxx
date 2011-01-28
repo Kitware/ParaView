@@ -111,62 +111,6 @@ void vtkPMProxy::Push(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkPMProxy::Invoke(vtkSMMessage* message)
-{
-  if (!this->CreateVTKObjects(message))
-    {
-    return;
-    }
-
-  vtkstd::string command;
-  const VariantList* arguments;
-  command = message->GetExtension(InvokeRequest::method);
-  arguments = &message->GetExtension(InvokeRequest::arguments);
-  bool disableError = message->GetExtension(InvokeRequest::no_error);
-  vtkPMProxy* proxy = NULL;
-
-  // Manage warning message
-  int previousWarningValue = this->Interpreter->GetGlobalWarningDisplay();
-  this->Interpreter->SetGlobalWarningDisplay( disableError ? 0 : 1);
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << this->GetVTKObject()
-         << command.c_str();
-  for (int cc=0; cc < arguments->variant_size(); cc++)
-    {
-    const Variant *v = &arguments->variant(cc);
-    switch (v->type())
-      {
-      case Variant::PROXY:
-        proxy =
-            vtkPMProxy::SafeDownCast(
-                this->SessionCore->GetPMObject(v->proxy_global_id(0)));
-        if(proxy == NULL)
-          {
-          vtkErrorMacro("Did not find a PMProxy with id " << v->proxy_global_id(0));
-          }
-        else
-          {
-          stream << proxy->GetVTKObject();
-          }
-        break;
-      default:
-        stream << *v;
-        break;
-      }
-    }
-  stream << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
-
-  // Manage warning message (put back the previous value)
-  this->Interpreter->SetGlobalWarningDisplay( previousWarningValue );
-
-  // send back the result
-  (*message) << pvstream::InvokeResponse()
-             << this->Interpreter->GetLastResult();
-}
-
-//----------------------------------------------------------------------------
 void vtkPMProxy::Pull(vtkSMMessage* message)
 {
   if (!this->ObjectsCreated)

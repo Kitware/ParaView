@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMPluginLoaderProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
@@ -33,9 +34,14 @@ vtkSMPluginLoaderProxy::~vtkSMPluginLoaderProxy()
 bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
 {
   this->CreateVTKObjects();
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest() << "LoadPlugin" << filename;
-  this->Invoke(&message);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "LoadPlugin"
+         << filename
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
   this->UpdatePropertyInformation();
   return vtkSMPropertyHelper(this, "Loaded").GetAsInt(0) != 0;
 }
@@ -45,11 +51,14 @@ void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(
   const char* xmlcontents)
 {
   this->CreateVTKObjects();
-  vtkSMMessage message;
-  message << pvstream::InvokeRequest()
-          << "LoadPluginConfigurationXMLFromString"
-          << xmlcontents;
-  this->Invoke(&message);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "LoadPluginConfigurationXMLFromString"
+         << xmlcontents
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
   this->UpdatePropertyInformation();
 }
 

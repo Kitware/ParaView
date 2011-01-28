@@ -640,24 +640,22 @@ bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid
 bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 {
   // Assume that it can read the file if CanReadFile does not exist.
+  // FIXME_COLLABORATION : Can't the proxy-manager simply forward the session to
+  // this guy?
   int canRead = 1;
   vtkSMSession* session =
       vtkSMSession::SafeDownCast(
           vtkProcessModule::GetProcessModule()->GetSession());
 
-  vtkSMMessage msg;
-  msg.set_global_id(proxy->GetGlobalID());
-  msg.set_location(proxy->GetLocation());
-  msg << pvstream::InvokeRequestNoWarning() << "CanReadFile" << filename;
-  session->Invoke(&msg);
 
-  const vtkSMMessage* reply = session->GetLastResult(proxy->GetLocation());
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(proxy)
+         << "CanReadFile" << filename
+         << vtkClientServerStream::End;
 
-  if (!reply->GetExtension(InvokeResponse::error))
-    {
-    canRead = reply->GetExtension(InvokeResponse::arguments).variant(0).integer(0);
-    }
-
+  session->ExecuteStream(proxy->GetLocation(), stream, /*ignore_error*/true);
+  session->GetLastResult(proxy->GetLocation()).GetArgument(0, 0, &canRead);
   return (canRead != 0);
 }
 

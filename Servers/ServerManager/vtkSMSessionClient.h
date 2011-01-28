@@ -88,8 +88,10 @@ public:
   // Push the state.
   virtual void PushState(vtkSMMessage* msg);
   virtual void PullState(vtkSMMessage* message);
-  virtual void Invoke(vtkSMMessage* msg);
-  virtual const vtkSMMessage* GetLastResult(vtkTypeUInt32 location);
+  virtual void ExecuteStream(
+    vtkTypeUInt32 location, const vtkClientServerStream& stream,
+    bool ignore_errors=false);
+  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
 //ETX
 
   // Description:
@@ -121,7 +123,7 @@ public:
 //BTX
   enum {
     PUSH=1,
-    INVOKE=2,
+    EXECUTE_STREAM=2,
     PULL=3,
     GATHER_INFORMATION=4,
     REGISTER_MTON_SOCKET_CONNECTION=5,
@@ -131,6 +133,7 @@ public:
     REPLY_GATHER_INFORMATION_TAG=55627,
     REPLY_PULL=55628,
     REPLY_LAST_RESULT=55629,
+    EXECUTE_STREAM_TAG=55630,
     };
 
 protected:
@@ -149,7 +152,7 @@ protected:
   vtkPVServerInformation* DataServerInformation;
   vtkPVServerInformation* RenderServerInformation;
   vtkPVServerInformation* ServerInformation;
-  vtkSMMessage* ServerLastInvokeResult;
+  vtkClientServerStream* ServerLastInvokeResult;
 
   vtkSetStringMacro(URI);
 

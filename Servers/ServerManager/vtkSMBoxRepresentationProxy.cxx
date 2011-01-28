@@ -43,15 +43,13 @@ void vtkSMBoxRepresentationProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
-  // Set the transform
-  vtkSMMessage msg;
-  msg.set_global_id(this->GlobalID);
-  msg.set_location(this->Location);
-  VariantList *args = (msg << pvstream::InvokeRequest() << "SetTransform")._arguments;
-  Variant* arg = args->add_variant();
-  arg->set_type(Variant::PROXY);
-  arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
-  this->Session->Invoke(&msg);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SetTransform"
+         << VTKOBJECT(this->GetSubProxy("Transform"))
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------
@@ -68,15 +66,13 @@ void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
 
   if (something_changed)
     {
-    // Set the transform
-    vtkSMMessage msg;
-    msg.set_global_id(this->GlobalID);
-    msg.set_location(this->Location);
-    VariantList *args = (msg << pvstream::InvokeRequest() << "SetTransform")._arguments;
-    Variant* arg = args->add_variant();
-    arg->set_type(Variant::PROXY);
-    arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
-    this->Session->Invoke(&msg);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << VTKOBJECT(this)
+      << "SetTransform"
+      << VTKOBJECT(this->GetSubProxy("Transform"))
+      << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
     }
 }
 
