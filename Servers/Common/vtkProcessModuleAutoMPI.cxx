@@ -239,7 +239,11 @@ int vtkProcessModuleAutoMPIInternals::
       vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
 
 #if defined(__APPLE__)
-    vtkstd::string serverExe =  app_dir.c_str() "../bin/" PARAVIEW_SERVER;
+    vtkstd::string pvserver_rel(app_dir + "/../bin/" + vtkstd::string(PARAVIEW_SERVER));
+    vtkstd::string serverExe = vtksys::SystemTools::CollapseFullPath(pvserver_rel.c_str());
+    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
+    cerr << "Mac AppDir: " << serverExe << endl;
+    cerr << "Mac ServerExe: " << serverExe << endl;
 #elif defined(WIN32)
     vtkstd::string serverExe = PARAVIEW_SERVER;
 
@@ -250,7 +254,7 @@ int vtkProcessModuleAutoMPIInternals::
     vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
 #else
     vtkstd::string serverExe = 
-      app_dir.c_str() + vtkstd::string("/") + vtkstd::string(PARAVIEW_SERVER);
+      app_dir + vtkstd::string("/") + vtkstd::string(PARAVIEW_SERVER);
 #endif
 
     this->CreateCommandLine(serverCommandStr,
