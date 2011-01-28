@@ -38,6 +38,7 @@ fi
 #
 ParaView_App="$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
 
+BinDir="$ParaView_App/Contents/bin"
 FrameworksDir="$ParaView_App/Contents/Frameworks"
 LibrariesDir="$ParaView_App/Contents/Libraries"
 PluginsDir="$ParaView_App/Contents/Plugins"
@@ -47,12 +48,22 @@ SupportDir="$ParaView_App/Contents/Support"
 
 # Create directories in the install tree bundle
 #
+mkdir -p "$BinDir"
 mkdir -p "$FrameworksDir"
 mkdir -p "$LibrariesDir"
 mkdir -p "$PluginsDir"
 mkdir -p "$PluginsDir/sqldrivers"
 mkdir -p "$PythonDir"
 mkdir -p "$SupportDir"
+
+# Copy the command line tools into bin
+echo "Copying command line tools into $BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvbatch" "$BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvblot" "$BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvdataserver" "$BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvpython" "$BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvrenderserver" "$BinDir"
+cp -p "@EXECUTABLE_OUTPUT_PATH@/pvserver" "$BinDir"
 
 # Copy the ".plugins" configuration file.
 echo "Copying $ParaViewExeOutputDir/.plugins to $SupportDir"
