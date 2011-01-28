@@ -38,6 +38,8 @@
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkUniformGrid.h"
+#include "vtkAMRBox.h"
 
 #include "vtkIntArray.h"
 #include "vtkLongArray.h"
@@ -48,14 +50,19 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkDataArraySelection.h"
+#include "vtkCallbackCommand.h"
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <hdf5.h>    // for the HDF data loading engine
+#include <hdf5.h>          // for the HDF data loading engine
+#include <cassert>
+#include <cmath>
+#include "vtksys/SystemTools.hxx"
 
 #include <vtkstd/string>
 
@@ -151,39 +158,9 @@ const char * GetEnzoMajorFileName( const char * path )
 const char * GetEnzoDirectory( const char * path )
 {
   int start;
-
   GetEnzoMajorFileName( path, start );
-
-  if ( start == -1 )
-    {
-    strcpy( ENZO_READER_STRING, ENZO_READER_SLASH_STRING );
-    return  ENZO_READER_STRING;
-    }
-  else 
-  if ( start == 0 )
-    {
-    strcpy( ENZO_READER_STRING, "." );
-    return  ENZO_READER_STRING;
-    }
-  else
-    {
-    int   i;
-    for ( i = 0; i < start; i ++ )
-      {
-      ENZO_READER_STRING[i] = path[i];
-      }
-      
-    if (  ENZO_READER_STRING[ i - 1 ]  ==  ENZO_READER_SLASH_CHAR  )
-      {
-      ENZO_READER_STRING[ i - 1 ] = '\0';
-      }
-    else
-      {
-      ENZO_READER_STRING[i] = '\0';
-      }
-      
-    return ENZO_READER_STRING;
-    }
+  std::string mydir = vtksys::SystemTools::GetFilenamePath( std::string(path) );
+  return mydir.c_str( );
 }
 
 
@@ -219,7 +196,7 @@ public:
              
   vtkstd::string        BlockFileName;
   vtkstd::string        ParticleFileName;
-  
+
   void   Init()
          {
            this->BlockFileName    = ""; 
@@ -513,38 +490,38 @@ public:
   vtkstd::vector< vtkEnzoReaderBlock > Blocks;
  
   void   Init()
-         {
-           this->DataTime   = 0.0;
-           this->FileName   = NULL;
-           this->TheReader  = NULL;
-           this->DataArray  = NULL;
-           this->CycleIndex = 0;
- 
-           this->ReferenceBlock = 0;
-           this->NumberOfBlocks = 0;
-           this->NumberOfLevels = 0;
-           this->NumberOfDimensions  = 0;
-           this->NumberOfMultiBlocks = 0;
-           
-           this->DirectoryName = "";
-           this->MajorFileName = "";
-           this->BoundaryFileName  = "";
-           this->HierarchyFileName = "";
-           
-           this->Blocks.clear();
-           this->BlockAttributeNames.clear();
-           this->ParticleAttributeNames.clear();
-           this->TracerParticleAttributeNames.clear();
-         }
+     {
+       this->DataTime   = 0.0;
+       this->FileName   = NULL;
+       this->TheReader  = NULL;
+       this->DataArray  = NULL;
+       this->CycleIndex = 0;
+
+       this->ReferenceBlock = 0;
+       this->NumberOfBlocks = 0;
+       this->NumberOfLevels = 0;
+       this->NumberOfDimensions  = 0;
+       this->NumberOfMultiBlocks = 0;
+
+       this->DirectoryName = "";
+       this->MajorFileName = "";
+       this->BoundaryFileName  = "";
+       this->HierarchyFileName = "";
+
+       this->Blocks.clear();
+       this->BlockAttributeNames.clear();
+       this->ParticleAttributeNames.clear();
+       this->TracerParticleAttributeNames.clear();
+     }
          
   void   ReleaseDataArray()
-         {
-         if ( this->DataArray ) 
-           {
-           this->DataArray->Delete();
-           this->DataArray = NULL;
-           }
-         }
+     {
+     if ( this->DataArray )
+       {
+       this->DataArray->Delete();
+       this->DataArray = NULL;
+       }
+     }
          
   void   SetFileName( char * fileName ) { this->FileName = fileName; }
   void   ReadMetaData();
@@ -702,7 +679,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
         }
       stream >> theStr; // '='
       stream >> szName;
-      tmpBlk.BlockFileName = this->DirectoryName + "\\" + 
+      tmpBlk.BlockFileName = this->DirectoryName + "/" +
                              GetEnzoMajorFileName( szName.c_str() );
 
       // obtain the particle file name (szName includes the full path)
@@ -721,7 +698,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
           }
         stream >> theStr; // '='
         stream >> szName;
-        tmpBlk.ParticleFileName = this->DirectoryName + "\\" + 
+        tmpBlk.ParticleFileName = this->DirectoryName + "/" +
                                   GetEnzoMajorFileName( szName.c_str() );
         }
 
@@ -747,7 +724,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
       theStr = "";
       int    tmpInt;
       char   tmpChr;
-      while (  ( tmpChr = stream.get() )  !=  '['  ) {}
+      while (  ( tmpChr = stream.get() )  !=  '['  );
       while (  ( tmpChr = stream.get() )  !=  ']'  ) theStr += tmpChr;
       
       int    blkIdx = atoi( theStr.c_str() );
@@ -890,10 +867,10 @@ void vtkEnzoReaderInternal::GetAttributeNames()
   
   if ( fileIndx < 0 )
     {
-    vtkGenericWarningMacro( "Failed to open HDF5 grid file " << blckFile.c_str() );
-    return;
+        vtkGenericWarningMacro(
+                "Failed to open HDF5 grid file " << blckFile.c_str() );
+        return;
     }
-  
   
   // retrieve the contents of the root directory to look for a group
   // corresponding to the specified block name (the one with the fewest
@@ -989,7 +966,8 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
   int           numCells = theBlock.BlockCellDimensions[0] *
                            theBlock.BlockCellDimensions[1] *
                            theBlock.BlockCellDimensions[2];
-  
+
+
   // number of particles of the reference block, if any                         
   vtkPolyData * polyData = vtkPolyData::New();
   this->TheReader->GetParticles( this->ReferenceBlock - 1, polyData, 0, 0 );
@@ -1011,9 +989,10 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
     // the actual number of tuples of a block attribute loaded from the
     // file for the reference block
     int   numTupls = 0;
-    if (  this->TheReader->LoadAttribute
-                           ( this->BlockAttributeNames[i].c_str(), 
-                             this->ReferenceBlock - 1 )  )
+    if(this->TheReader->GetCellArrayStatus(
+            this->BlockAttributeNames[i].c_str() ) &&
+       this->TheReader->LoadAttribute(
+            this->BlockAttributeNames[i].c_str(),this->ReferenceBlock - 1)  )
       {
       numTupls = this->DataArray->GetNumberOfTuples();
       this->ReleaseDataArray();
@@ -1031,6 +1010,7 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
         toRemove.push_back( this->BlockAttributeNames[i] );
         }
       }
+
     }
     
   int  nRemoves = static_cast < int > ( toRemove.size() );
@@ -1105,10 +1085,12 @@ void vtkEnzoReaderInternal::ReadMetaData()
     
   // locate the block that contains the fewest cells (either with or without
   // particles) and collect the attribute names
+
   this->GetAttributeNames();
   
   // verify the initial set of attribute names
   this->CheckAttributeNames();
+
 }
 
 
@@ -1117,22 +1099,56 @@ void vtkEnzoReaderInternal::ReadMetaData()
 // ----------------------------------------------------------------------------
 
 
+int vtkEnzoReader::UpdateMetaData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector* vtkNotUsed(outputVector))
+{
+  // TODO: ?
+}
+
+//----------------------------------------------------------------------------
+void vtkEnzoReader::SelectionModifiedCallback(vtkObject*, unsigned long,
+                                                 void* clientdata, void*)
+{
+  static_cast<vtkEnzoReader*>(clientdata)->Modified();
+}
+
 //-----------------------------------------------------------------------------
 vtkEnzoReader::vtkEnzoReader()
-{ 
+{
+
   this->SetNumberOfInputPorts( 0 );
 
-  this->FileName = NULL;
-  this->MaxLevel = 1000;
+  this->FileName        = NULL;
+  this->MaxLevel        = 1000;
+  this->SelectedBlockId = -1;
   this->LoadParticles   = 1;
+  this->GenerateIBLANK  = 0;
   this->BlockOutputType = 0;
   this->BlockMap.clear();
   this->Internal = new vtkEnzoReaderInternal( this );
+
+
+  this->CellDataArraySelection  = vtkDataArraySelection::New();
+  this->PointDataArraySelection = vtkDataArraySelection::New();
+  this->SelectionObserver       = vtkCallbackCommand::New();
+  this->SelectionObserver->SetCallback(
+      &vtkEnzoReader::SelectionModifiedCallback);
+  this->SelectionObserver->SetClientData( this );
+  this->CellDataArraySelection->AddObserver(
+      vtkCommand::ModifiedEvent,this->SelectionObserver );
+  this->PointDataArraySelection->AddObserver(
+      vtkCommand::ModifiedEvent, this->SelectionObserver );
 }
 
 //-----------------------------------------------------------------------------
 vtkEnzoReader::~vtkEnzoReader()
 {
+  this->PointDataArraySelection->RemoveObserver( this->SelectionObserver );
+  this->CellDataArraySelection->RemoveObserver( this->SelectionObserver );
+  this->SelectionObserver->Delete( );
+  this->CellDataArraySelection->Delete( );
+  this->PointDataArraySelection->Delete( );
+
   delete this->Internal;
   this->Internal = NULL;
   
@@ -1143,6 +1159,93 @@ vtkEnzoReader::~vtkEnzoReader()
     delete [] this->FileName;
     this->FileName = NULL;
     } 
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::GetNumberOfPointArrays()
+{
+  return( this->PointDataArraySelection->GetNumberOfArrays() );
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::GetNumberOfCellArrays()
+{
+  return( this->CellDataArraySelection->GetNumberOfArrays() );
+}
+
+// ----------------------------------------------------------------------------
+const char* vtkEnzoReader::GetPointArrayName(int index)
+{
+  return( this->PointDataArraySelection->GetArrayName( index ) );
+}
+
+// ----------------------------------------------------------------------------
+const char* vtkEnzoReader::GetCellArrayName(int index)
+{
+  return( this->CellDataArraySelection->GetArrayName( index )  );
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::GetPointArrayStatus(const char* name)
+{
+  return( this->PointDataArraySelection->ArrayIsEnabled( name ) );
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::GetCellArrayStatus(const char* name)
+{
+  return( this->CellDataArraySelection->ArrayIsEnabled( name ) );
+}
+
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::SetPointArrayStatus(const char* name, int status)
+{
+
+  if( status )
+    {
+    this->PointDataArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->PointDataArraySelection->DisableArray(name);
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::SetCellArrayStatus(const char* name, int status)
+{
+  if( status )
+    {
+    this->CellDataArraySelection->EnableArray( name );
+    }
+  else
+    {
+    this->CellDataArraySelection->DisableArray( name );
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::SetUpDataArraySelections( )
+{
+  this->Internal->ReadMetaData();
+//  this->Internal->ReadGeneralParameters();
+//  this->Internal->ReadBlockStructures();
+  this->Internal->GetAttributeNames();
+  // attach the data attributes to the grid
+ int numAttrs = static_cast < int >
+   ( this->Internal->BlockAttributeNames.size() );
+ for ( int i = 0; i < numAttrs; i ++ )
+   {
+   this->CellDataArraySelection->AddArray(
+       this->Internal->BlockAttributeNames[i].c_str( ) );
+   }
+}
+
+// ----------------------------------------------------------------------------
+char* vtkEnzoReader::GetFileName( )
+{
+  return( this->FileName );
 }
 
 // ----------------------------------------------------------------------------
@@ -1207,9 +1310,10 @@ void vtkEnzoReader::SetFileName( const char * fileName )
     this->FileName[ strlen( fileName ) ] = '\0';
     
     this->Internal->SetFileName( this->FileName );
-    
-    this->Modified();
     }
+
+    this->SetUpDataArraySelections( );
+    this->Modified( );
 }
 
 // ----------------------------------------------------------------------------
@@ -1246,6 +1350,20 @@ int  vtkEnzoReader::GetNumberOfDimensions()
 {
   this->Internal->ReadMetaData();
   return this->Internal->NumberOfDimensions;
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::GetNumberOfProcessors( )
+{
+  // TODO: implement this
+  return 1;
+}
+
+// ----------------------------------------------------------------------------
+int vtkEnzoReader::HaveProcessorsInformation( )
+{
+  // TODO: implement this
+  return 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -1468,7 +1586,8 @@ const char * vtkEnzoReader::GetBlockFileName( int blockIdx )
   
   if ( blockIdx < 0 || blockIdx >= this->Internal->NumberOfBlocks )
     {
-    return NULL;
+      vtkGenericWarningMacro( "Block index out-of-bounds!" );
+      return NULL;
     }
     
   return  this->Internal->Blocks[ blockIdx + 1 ].BlockFileName.c_str();
@@ -1481,7 +1600,8 @@ const char * vtkEnzoReader::GetParticleFileName( int blockIdx )
   
   if ( blockIdx < 0 || blockIdx >= this->Internal->NumberOfBlocks )
     {
-    return NULL;
+      vtkGenericWarningMacro( "Block index out-of-bounds!" );
+      return NULL;
     }
     
   return  this->Internal->Blocks[ blockIdx + 1 ].ParticleFileName.c_str();
@@ -1494,7 +1614,8 @@ int  vtkEnzoReader::GetNumberOfParticles( int blockIdx )
   
   if ( blockIdx < 0 || blockIdx >= this->Internal->NumberOfBlocks )
     {
-    return -1;
+      vtkGenericWarningMacro( "Block index out-of-bounds!" );
+      return -1;
     }
     
   return  this->Internal->Blocks[ blockIdx + 1 ].NumberOfParticles;
@@ -1649,7 +1770,7 @@ void vtkEnzoReader::PrintSelf( ostream & os, vtkIndent indent )
 int vtkEnzoReader::FillOutputPortInformation
   (  int vtkNotUsed( port ),  vtkInformation * info  )
 {
-  info->Set( vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet" );
+  info->Set( vtkDataObject::DATA_TYPE_NAME(), "vtkHierarchicalBoxDataSet" );
   return 1;
 }
 
@@ -1674,21 +1795,33 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
   vtkInformationVector ** vtkNotUsed( inputVector ),
   vtkInformationVector  * outputVector )
 {
-  vtkInformation *       outInf = outputVector->GetInformationObject( 0 );
-  vtkMultiBlockDataSet * output = vtkMultiBlockDataSet::SafeDownCast
-                         (  outInf->Get( vtkDataObject::DATA_OBJECT() )  );
-  
+  vtkInformation            *outInf = outputVector->GetInformationObject( 0 );
+  vtkHierarchicalBoxDataSet *output =
+      vtkHierarchicalBoxDataSet::SafeDownCast(
+          outInf->Get( vtkDataObject::DATA_OBJECT() ) );
+
   this->Internal->ReadMetaData();
+
+  std::vector< int > idxcounter;
+  idxcounter.resize( this->Internal->NumberOfLevels,0 );
+
   this->GenerateBlockMap();
   this->Internal->NumberOfMultiBlocks = 0;
   
-  // load rectilinear blocks (either vtkImageData or vtkRectilinearGrid)
   int   nmblocks = static_cast < int > ( this->BlockMap.size() );
   for ( int i = 0; i < nmblocks; i ++ )
     {
-    this->GetBlock( i, output );
+    // Load all blocks if SelectedBlockId==-1, otherwise, just
+    // load the selected block
+    if( (this->SelectedBlockId == -1) || (this->SelectedBlockId == i) )
+      this->GetBlock( i, output, idxcounter );
     }
   
+  if( this->GenerateIBLANK )
+    {
+    output->GenerateVisibilityArrays( );
+    }
+
   outInf = NULL;
   output = NULL;
   
@@ -1696,89 +1829,295 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 }
 
 // ----------------------------------------------------------------------------
-void  vtkEnzoReader::GetBlock( int mapIndex, vtkMultiBlockDataSet * multiBlk )
+int vtkEnzoReader::GetRefinementRatio( const int level )
 {
+  assert( level >= 0 && level < this->GetNumberOfLevels()  );
+  // TODO: Implement this
+  return 4;
+}
+
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::GetExtentBasedOnRootBlock(
+    const int *dims, const double *blkorigin,
+    const double *spacing, int *ijkextent )
+{
+  assert( dims != NULL );
+  assert( blkorigin != NULL );
+  assert( spacing != NULL );
+  assert( ijkextent != NULL );
+  assert( this->Internal->Blocks.size() > 1 );
+
+  ijkextent[0] = 0;
+  ijkextent[1] = 0;
+  ijkextent[2] = 0;
+  ijkextent[3] = 0;
+  ijkextent[4] = 0;
+  ijkextent[5] = 0;
+
+  vtkEnzoReaderBlock *rootBlock = &(this->Internal->Blocks[0]);
+  assert( rootBlock != NULL );
+
+  // Set min extent
+  ijkextent[0] = round((blkorigin[0]-rootBlock->MinBounds[0])/spacing[0]);
+  ijkextent[2] = round((blkorigin[1]-rootBlock->MinBounds[1])/spacing[1]);
+  ijkextent[4] = round((blkorigin[2]-rootBlock->MinBounds[2])/spacing[2]);
+
+  // Set max extent
+  ijkextent[1] = ijkextent[0]+dims[0];
+  ijkextent[3] = ijkextent[2]+dims[1];
+  ijkextent[5] = ijkextent[4]+dims[2];
+}
+
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds,
+    std::vector< int > &idxcounter )
+{
+  assert( hbds != NULL );
+
   this->Internal->ReadMetaData();
   
-  int  blockIdx = this->BlockMap[ mapIndex ];
-  
-  if ( multiBlk == NULL || blockIdx < 0 || 
-       blockIdx >= this->Internal->NumberOfBlocks )
+  int blockIdx = this->BlockMap[ mapIndex ];
+
+  if( hbds == NULL || blockIdx < 0 ||
+      blockIdx >= this->Internal->NumberOfBlocks )
     {
-    vtkDebugMacro( "Invalid block index or vtkMultiBlockDataSet NULL" << endl );
+    vtkDebugMacro("Invalid block index or vtkHierachicalBoxDataSet is NULL");
     return;
     }
   
-  
-  int                  bSuccess = 0;
-  char                 blckName[100];
-  
-  
-  // always load the rectilinear block
-  vtkDataSet         * pDataSet = NULL;
-  vtkImageData       * imagData = NULL;
-  vtkRectilinearGrid * rectGrid = NULL;
-  
-  if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+  int  bSuccess = 0;
+  char blckName[100];
+
+  vtkUniformGrid *uniformGrid = vtkUniformGrid::New( );
+  bSuccess = this->GetBlock( blockIdx, uniformGrid );
+
+  vtkAMRBox   amrBox;
+  double origin[ 3 ];
+  int      dims[ 3 ];
+  int   ijkextent[6];
+  double  spacing[3];
+
+  uniformGrid->GetDimensions( dims );
+
+  amrBox.SetDimensionality( uniformGrid->GetDataDimension( ) );
+
+  // Set origin and dimensionality of the AMR Box
+  uniformGrid->GetOrigin( origin );
+
+  // Set the grid spacing
+  uniformGrid->GetSpacing( spacing );
+  amrBox.SetGridSpacing( spacing );
+
+//  if( blockIdx > 0 )
+//    {
+//    this->GetExtentBasedOnRootBlock( dims, origin, spacing, ijkextent );
+//
+////    for( int i=0; i < 6; ++i )
+////      std::cout << "ijkextent[" << i << "]=" << ijkextent[ i ] << std::endl;
+////    std::cout.flush( );
+//
+//    amrBox.SetDataSetOrigin( origin );
+//    amrBox.SetDimensions( ijkextent );
+//    }
+//  else
+//    {
+    ijkextent[ 0 ] = 0;
+    ijkextent[ 1 ] = dims[ 0 ];
+    ijkextent[ 2 ] = 0;
+    ijkextent[ 3 ] = dims[ 1 ];
+    ijkextent[ 4 ] = 0;
+    ijkextent[ 5 ] = dims[ 2 ];
+    amrBox.SetDataSetOrigin( origin );
+    amrBox.SetDimensions( ijkextent );
+//    }
+
+
+
+  if( bSuccess == 1 )
     {
-    imagData = vtkImageData::New();
-    pDataSet = imagData;
-    bSuccess = this->GetBlock( blockIdx, imagData );
+     sprintf( blckName, "Block%03d_Level%d",
+               this->Internal->Blocks[ blockIdx+1 ].Index,
+               this->Internal->Blocks[ blockIdx+1 ].Level );
+
+     unsigned int myLevel = static_cast< unsigned int >(
+         this->Internal->Blocks[blockIdx+1].Level );
+
+     unsigned int myIndex = static_cast< unsigned int >(
+         this->Internal->Blocks[blockIdx+1].Index );
+
+     if( myLevel != this->GetNumberOfLevels() )
+       {
+       hbds->SetRefinementRatio( myLevel, this->GetRefinementRatio( myLevel ) );
+       }
+
+//     std::cout << "myLevel: " << myLevel << " ";
+//     std::cout << "idx: " << idxcounter[ myLevel ] << std::endl;
+//     std::cout.flush( );
+
+     hbds->SetDataSet( myLevel, idxcounter[ myLevel ], amrBox, uniformGrid );
+     hbds->GetMetaData( myLevel,idxcounter[ myLevel ] )->Set(
+         vtkCompositeDataSet::NAME(), blckName );
+     this->Internal->NumberOfMultiBlocks ++;
+     idxcounter[ myLevel ]++;
     }
-  else                              // take each clock as a vtkRectilinearGrid
+  else
     {
-    rectGrid = vtkRectilinearGrid::New();
-    pDataSet = rectGrid;
-    bSuccess = this->GetBlock( blockIdx, rectGrid );
+    vtkDebugMacro( "Could not acquire block!\n");
     }
-  
-  if ( bSuccess == 1 )
+
+  uniformGrid->Delete();
+  uniformGrid = NULL;
+
+  if( this->LoadParticles )
     {
-    // this->Internal->Blocks includes a pseudo block --- the root as block #0
-    sprintf( blckName, "Block%03d_Level%d", 
-             this->Internal->Blocks[ blockIdx + 1 ].Index, 
-             this->Internal->Blocks[ blockIdx + 1 ].Level );
-    multiBlk->SetBlock( this->Internal->NumberOfMultiBlocks, pDataSet );
-    multiBlk->GetMetaData( this->Internal->NumberOfMultiBlocks )
-            ->Set( vtkCompositeDataSet::NAME(), blckName );
-    this->Internal->NumberOfMultiBlocks ++;
+    // TODO: Dealing with particles?
+    vtkDebugMacro( "Loading of particles is not currently implemented!\n" );
     }
-    
-  pDataSet = NULL;
-  
-  if ( imagData )
+
+
+}
+
+// ----------------------------------------------------------------------------
+//void vtkEnzoReader::GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds)
+////void  vtkEnzoReader::GetBlock( int mapIndex, vtkMultiBlockDataSet *
+//multiBlk )
+//{
+//  this->Internal->ReadMetaData();
+//
+//  int  blockIdx = this->BlockMap[ mapIndex ];
+//
+//  if ( hbds == NULL || blockIdx < 0 ||
+//       blockIdx >= this->Internal->NumberOfBlocks )
+//    {
+//      vtkDebugMacro(
+//          "Invalid block index or vtkHierarchicalBoxDataSet NULL" << endl );
+//      return;
+//    }
+//
+//
+//  int                  bSuccess = 0;
+//  char                 blckName[100];
+//
+//
+//  // always load the rectilinear block
+//  vtkDataSet         * pDataSet = NULL;
+//  vtkImageData       * imagData = NULL;
+//  vtkRectilinearGrid * rectGrid = NULL;
+//
+//  if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+//    {
+//    imagData = vtkImageData::New();
+//    pDataSet = imagData;
+//    bSuccess = this->GetBlock( blockIdx, imagData );
+//    }
+//  else                              // take each clock as a vtkRectilinearGrid
+//    {
+//    rectGrid = vtkRectilinearGrid::New();
+//    pDataSet = rectGrid;
+//    bSuccess = this->GetBlock( blockIdx, rectGrid );
+//    }
+//
+//  if ( bSuccess == 1 )
+//    {
+//    // this->Internal->Blocks includes a pseudo block --- the root as block #0
+//    sprintf( blckName, "Block%03d_Level%d",
+//             this->Internal->Blocks[ blockIdx + 1 ].Index,
+//             this->Internal->Blocks[ blockIdx + 1 ].Level );
+////    hbds->Set
+////    hbds->SetBlock( this->Internal->NumberOfMultiBlocks, pDataSet );
+////    hbds->GetMetaData( this->Internal->NumberOfMultiBlocks )
+////            ->Set( vtkCompositeDataSet::NAME(), blckName );
+//    this->Internal->NumberOfMultiBlocks ++;
+//    }
+//
+//  pDataSet = NULL;
+//
+//  if ( imagData )
+//    {
+//    imagData->Delete();
+//    imagData = NULL;
+//    }
+//
+//  if ( rectGrid )
+//    {
+//    rectGrid->Delete();
+//    rectGrid = NULL;
+//    }
+//
+//
+//  // possibly load the set of particles falling within the scope of this
+//  // rectlinear block
+//  if ( this->LoadParticles )
+//    {
+//    vtkPolyData * polyData = vtkPolyData::New();
+//
+//    if (  this->GetParticles( blockIdx, polyData )  )
+//      {
+//      sprintf( blckName, "Particles%03d_Level%d",
+//               this->Internal->Blocks[ blockIdx + 1 ].Index,
+//               this->Internal->Blocks[ blockIdx + 1 ].Level );
+//      hbds->SetBlock( this->Internal->NumberOfMultiBlocks, polyData );
+//      hbds->GetMetaData( this->Internal->NumberOfMultiBlocks )
+//              ->Set( vtkCompositeDataSet::NAME(), blckName );
+//      this->Internal->NumberOfMultiBlocks ++;
+//      }
+//
+//    polyData->Delete();
+//    polyData = NULL;
+//    }
+//}
+
+// ----------------------------------------------------------------------------
+int  vtkEnzoReader::GetBlock( int blockIdx, vtkUniformGrid * uniformGrid )
+{
+  this->Internal->ReadMetaData();
+
+  if( uniformGrid == NULL || blockIdx < 0 ||
+      blockIdx >= this->Internal->NumberOfBlocks )
     {
-    imagData->Delete();
-    imagData = NULL;
+      vtkDebugMacro( "Invalid block index or vtkUniformGrid NULL" << endl );
+      return 0;
     }
-  
-  if ( rectGrid )
+
+  // this->Internal->Blocks includes a pseudo block --- the root as block #0
+  vtkEnzoReaderBlock & theBlock = this->Internal->Blocks[ blockIdx + 1 ];
+
+  int     i;
+  double  blockMin[3];
+  double  blockMax[3];
+  double  spacings[3];
+
+  for ( int i = 0; i < 3; i++ )
     {
-    rectGrid->Delete();
-    rectGrid = NULL;
+    blockMin[i] =   theBlock.MinBounds[i];
+    blockMax[i] =   theBlock.MaxBounds[i];
+    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
+                ? ( blockMax[i] - blockMin[i] ) /
+                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
+                :   1.0;
     }
-  
-  
-  // possibly load the set of particles falling within the scope of this 
-  // rectlinear block
-  if ( this->LoadParticles ) 
+
+  uniformGrid->SetDimensions( theBlock.BlockNodeDimensions );
+  uniformGrid->SetOrigin( blockMin[0], blockMin[1], blockMin[2] );
+  uniformGrid->SetSpacing( spacings[0], spacings[1], spacings[2] );
+
+  // attach the data attributes to the grid
+  int numAttrs =
+      static_cast < int >( this->Internal->BlockAttributeNames.size() );
+
+  for ( i = 0; i < numAttrs; i ++ )
     {
-    vtkPolyData * polyData = vtkPolyData::New();
-    
-    if (  this->GetParticles( blockIdx, polyData )  )
+
+      if( this->GetCellArrayStatus(
+          this->Internal->BlockAttributeNames[i].c_str() ) )
       {
-      sprintf( blckName, "Particles%03d_Level%d", 
-               this->Internal->Blocks[ blockIdx + 1 ].Index, 
-               this->Internal->Blocks[ blockIdx + 1 ].Level );
-      multiBlk->SetBlock( this->Internal->NumberOfMultiBlocks, polyData );
-      multiBlk->GetMetaData( this->Internal->NumberOfMultiBlocks )
-              ->Set( vtkCompositeDataSet::NAME(), blckName );
-      this->Internal->NumberOfMultiBlocks ++;
+      this->GetBlockAttribute( this->Internal->BlockAttributeNames[i].c_str(),
+                             blockIdx, uniformGrid );
       }
-    
-    polyData->Delete();
-    polyData = NULL;
+
     }
+
+  return 1;
 }
 
 // ----------------------------------------------------------------------------
@@ -1949,9 +2288,9 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   vtkstd::string particle = 
                           this->Internal->Blocks[ blockIdx ].ParticleFileName;
   if ( particle == "" )
-    {
+  {
     return 0;
-    }
+  }
     
     
   // currently only the HDF5 file format is supported
@@ -2169,8 +2508,8 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
     }
     
   // this->Internal->Blocks includes a pseudo block --- the root as block #0
-  blockIdx ++; 
-    
+  blockIdx ++;
+
     
   // currently only the HDF5 file format is supported
   
@@ -2184,31 +2523,32 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
     return 0;
     }
 
-  
   // retrieve the contents of the root directory to look for a group
   // corresponding to the target block, if available, open that group
   
+  int     blckIndx;
+  char    blckName[65];
   int     objIndex;
   hsize_t numbObjs;
   hid_t   rootIndx = H5Gopen( fileIndx, "/" );
   H5Gget_num_objs( rootIndx, &numbObjs );
-  for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs ); 
-         objIndex ++  )
+  for ( objIndex=0; objIndex < static_cast < int >( numbObjs ); objIndex ++  )
     {
-    if (  H5Gget_objtype_by_idx( rootIndx, objIndex )  ==  H5G_GROUP  )
-      {
-      int   blckIndx;
-      char  blckName[65];
-      H5Gget_objname_by_idx( rootIndx, objIndex, blckName, 64 );
-      if (   (  sscanf( blckName, "Grid%d", &blckIndx )  ==  1  )  &&
-             (  blckIndx  ==  blockIdx  ) // is this the target block?
-         )
-        {
-        rootIndx = H5Gopen( rootIndx, blckName ); // located the target block
-        break;
-        }
-      }
-    }
+        int type = H5Gget_objtype_by_idx( rootIndx, objIndex );
+        if ( type == H5G_GROUP )
+          {
+            H5Gget_objname_by_idx( rootIndx, objIndex, blckName, 64 );
+            if (   (  sscanf( blckName, "Grid%d", &blckIndx )  ==  1  )  &&
+                 (  blckIndx  ==  blockIdx+1 ) // is this the target block?
+               )
+              {
+              // located the target block
+              rootIndx = H5Gopen( rootIndx, blckName );
+              break;
+              }
+          }
+
+    } // END for all objects
 
   // disable error messages while looking for the attribute (if any) name
   // and enable error messages when it is done
@@ -2216,16 +2556,19 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   H5E_auto_t   erorFunc;
   H5Eget_auto( &erorFunc, &pContext );
   H5Eset_auto( NULL, NULL );
+
   hid_t        attrIndx = H5Dopen( rootIndx, atribute );
+
   H5Eset_auto( erorFunc, pContext );
   pContext   = NULL;
 
   // check if the data attribute exists
   if ( attrIndx < 0 )
     {
-    H5Gclose( rootIndx );
-    H5Fclose( fileIndx );
-    return 0;
+        vtkGenericWarningMacro( << "Attribute data does not exist!" );
+        H5Gclose( rootIndx );
+        H5Fclose( fileIndx );
+        return 0;
     }
 
   // get cell dimensions and the valid number
@@ -2271,17 +2614,20 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   hid_t dataType = H5Tget_native_type( tRawType, H5T_DIR_ASCEND );
   if (  H5Tequal( dataType, H5T_NATIVE_FLOAT )  )
     {
+
     this->Internal->DataArray = vtkFloatArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     float  * arrayPtr = static_cast < float * > 
     (  vtkFloatArray::SafeDownCast( this->Internal->DataArray )
-       ->GetPointer( 0 )  );                   
+    ->GetPointer( 0 )  );
     H5Dread( attrIndx, dataType, H5S_ALL, H5S_ALL, H5P_DEFAULT, arrayPtr );
     arrayPtr = NULL;
+
     }
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_DOUBLE )  )
     {
+
     this->Internal->DataArray = vtkDoubleArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     double  * arrayPtr = static_cast < double * > 
@@ -2293,6 +2639,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_INT )  )
     {
+
     this->Internal->DataArray = vtkIntArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     int  * arrayPtr = static_cast < int * > 
@@ -2304,6 +2651,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_UINT )  )
     {
+
     this->Internal->DataArray = vtkUnsignedIntArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     unsigned int  * arrayPtr = static_cast < unsigned int * > 
@@ -2315,6 +2663,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_SHORT )  )
     {
+
     this->Internal->DataArray = vtkShortArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     short  * arrayPtr = static_cast < short * > 
@@ -2326,6 +2675,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else
   if (  H5Tequal( dataType, H5T_NATIVE_USHORT )  )
     {
+
     this->Internal->DataArray = vtkUnsignedShortArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     unsigned short  * arrayPtr = static_cast < unsigned short * > 
@@ -2337,6 +2687,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_UCHAR )  )
     {
+
     this->Internal->DataArray = vtkUnsignedCharArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     unsigned char  * arrayPtr = static_cast < unsigned char * > 
@@ -2348,6 +2699,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_LONG )  )
     {
+
     this->Internal->DataArray = vtkLongArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
     long  * arrayPtr = static_cast < long * > 
@@ -2359,38 +2711,41 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   else 
   if (  H5Tequal( dataType, H5T_NATIVE_LLONG )  )
     {
+
     this->Internal->DataArray = vtkLongLongArray::New();
     this->Internal->DataArray->SetNumberOfTuples( numTupls );
-    long long  * arrayPtr = static_cast < long long * > 
+    long long  * arrayPtr = static_cast < long long * >
     (  vtkLongLongArray::SafeDownCast( this->Internal->DataArray )
-       ->GetPointer( 0 )  );                    
+       ->GetPointer( 0 )  );
     H5Dread( attrIndx, dataType, H5S_ALL, H5S_ALL, H5P_DEFAULT, arrayPtr );
     arrayPtr = NULL;
     }
   else
     {
-    vtkErrorMacro( "Unknown HDF5 data type --- it is not FLOAT, "       << 
-                   "DOUBLE, INT, UNSIGNED INT, SHORT, UNSIGNED SHORT, " <<
-                   "UNSIGNED CHAR, LONG, or LONG LONG." << endl );
-    
-    H5Tclose( dataType );
-    H5Tclose( tRawType );
-    H5Tclose( spaceIdx );
-    H5Dclose( attrIndx );
-    H5Gclose( rootIndx );
-    H5Fclose( fileIndx );
-    return 0;
+        vtkErrorMacro( "Unknown HDF5 data type --- it is not FLOAT, "       <<
+                       "DOUBLE, INT, UNSIGNED INT, SHORT, UNSIGNED SHORT, " <<
+                       "UNSIGNED CHAR, LONG, or LONG LONG." << endl );
+
+        H5Tclose( dataType );
+        H5Tclose( tRawType );
+        H5Tclose( spaceIdx );
+        H5Dclose( attrIndx );
+        H5Gclose( rootIndx );
+        H5Fclose( fileIndx );
+        return 0;
     }
   
+
   // do not forget to provide a name for the array
   this->Internal->DataArray->SetName( atribute );
   
-  H5Tclose( dataType );
-  H5Tclose( tRawType );
-  H5Tclose( spaceIdx );
-  H5Dclose( attrIndx );
-  H5Gclose( rootIndx );
-  H5Fclose( fileIndx );
+// This close statements cause a crash!
+//  H5Tclose( dataType );
+//  H5Tclose( tRawType );
+//  H5Tclose( spaceIdx );
+//  H5Dclose( attrIndx );
+//  H5Gclose( rootIndx );
+//  H5Fclose( fileIndx );
   
   return 1;
 }

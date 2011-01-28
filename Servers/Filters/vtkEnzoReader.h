@@ -44,30 +44,37 @@
 #ifndef __vtkEnzoReader_h
 #define __vtkEnzoReader_h
 
-#include "vtkMultiBlockDataSetAlgorithm.h"
-
+//#include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkHierarchicalBoxDataSetAlgorithm.h"
 #include <vtkstd/vector> // STL Header
 
 class    vtkDataSet;
 class    vtkPolyData;
 class    vtkDataArray;
 class    vtkImageData;
+class    vtkUniformGrid;
 class    vtkDoubleArray;
 class    vtkRectilinearGrid;
 class    vtkMultiBlockDataSet;
 class    vtkEnzoReaderInternal;
+class    vtkDataArraySelection;
+class    vtkCallbackCommand;
 
-class VTK_EXPORT vtkEnzoReader : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkEnzoReader : public vtkHierarchicalBoxDataSetAlgorithm
 {
 public:
   static vtkEnzoReader * New();
-  vtkTypeMacro( vtkEnzoReader, vtkMultiBlockDataSetAlgorithm );
+  vtkTypeMacro( vtkEnzoReader, vtkHierarchicalBoxDataSetAlgorithm );
   void PrintSelf( ostream & os, vtkIndent indent );
   
   // Description:
   // Set the level, up to which the blocks are loaded.
   vtkSetMacro( MaxLevel,int);
   
+  // Description:
+  // Set the Block ID to show a specific block
+  vtkSetMacro( SelectedBlockId, int);
+
   // Description:
   // Set/Get the output type of each rectilinear block (vtkImageData or 
   // vtkRectilinearGrid), with vtkImageData as the default. (note that this type
@@ -83,8 +90,40 @@ public:
   vtkBooleanMacro( LoadParticles, int );
   
   // Description:
+  // Set/Get whether IBLANK information ara generated
+  vtkSetMacro( GenerateIBLANK, int );
+  vtkGetMacro( GenerateIBLANK, int );
+  vtkBooleanMacro( GenerateIBLANK, int );
+
+  // Description:
+  // Get the data array selection tables used to configure which data
+  // arrays are loaded by the reader.
+  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
+  vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
+
+  // Description:
+  // Get the number of point or cell arrays available in the input.
+  int GetNumberOfPointArrays();
+  int GetNumberOfCellArrays();
+
+  // Description:
+  // Get the name of the point or cell array with the given index in
+  // the input.
+  const char* GetPointArrayName(int index);
+  const char* GetCellArrayName(int index);
+
+  // Description:
+  // Get/Set whether the point or cell array with the given name is to
+  // be read.
+  int GetPointArrayStatus(const char* name);
+  int GetCellArrayStatus(const char* name);
+  void SetPointArrayStatus(const char* name, int status);
+  void SetCellArrayStatus(const char* name, int status);
+
+  // Description:
   // Set the Enzo data file name (hierarchy or boundary).
-  void           SetFileName( const char * fileName );
+  void          SetFileName( const char * fileName );
+  char*         GetFileName( );
   
   // --------------------------------------------------------------------------
   // --------------------------- General Information --------------------------
@@ -106,6 +145,14 @@ public:
   // Get the number of dimensions (2 or 3).
   int            GetNumberOfDimensions();
   
+  // Description:
+   // Get the number of processors (used to generate the data).
+   int           GetNumberOfProcessors();
+
+   // Description:
+   // Check whether the processors information is available (1) or not (0).
+   int           HaveProcessorsInformation();
+
   // Description:
   // Get the bounding box of the whole hierarchy (covering all rectilinear
   // blocks). The bounding range along the degenerate dimension (e.g., the
@@ -272,6 +319,12 @@ public:
   int            GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid );
   
   // Description:
+  // This function fills an allocated vtkUniformGrid instance with a block
+  // specified by 0-based blockIdx and loads the associated cell data attributes
+  // from the file. The returned value indicates (0) or success (1).
+  int            GetBlock( int blockIdx, vtkUniformGrid * uniformGrid );
+
+  // Description:
   // This function loads particles (and the associated data attributes) from the 
   // file that fall within the scope of a rectilinear block specified by 0-based
   // blockIdx and fills an allocated vtkPolyDara with them. The returned value 
@@ -298,6 +351,24 @@ protected:
   ~vtkEnzoReader();
   
   // Description:
+  // Returns the refinement ratio at the user-supplied level.
+  // NOTE: the refinement ratio is defined as follows:
+  // refRatio( level ) = spacing( level ) / spacing( level+1 )
+  int GetRefinementRatio( const int level );
+
+  // Description:
+  // Implements the extent calculator based on the root block at blockIdx 0.
+  // dims -- user-supplied buffer of size (3) of the block dimensions (in)
+  // blkorigin -- user-supplied buffer consisting of the block origin (in)
+  // spacing   -- user-supplied buffer consisting of the block spacing (in)
+  // ijkextent -- user-supplied buffer of size(6) to store the extent (out)
+  // NOTE: Computed ijk extent is indexed as follows:
+  //       ijkextent = { ilo,jlo,klo,ihi,jhi,khi };
+  void GetExtentBasedOnRootBlock(
+   const int *dims, const double *blkorigin,
+   const double *spacing, int *ijkextent );
+
+  // Description:
   // This function creates a rectilinear block (and loads the associated 
   // cell data attributes from the file) specified by 0-based mapIndex
   // (referencing an Id-map for the actual 0-based blockId while the Id-map
@@ -307,7 +378,8 @@ protected:
   // is on, this function additionally creates a vtkPolyData to load the
   // particles (and the associated attributes) falling within the scope of 
   // this recilinear block and insert it to the vtkMultiBlockDataSet.
-  void           GetBlock( int mapIndex, vtkMultiBlockDataSet * multiBlk );
+  void          GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds,
+                          std::vector< int > &idx );
   
   // Description:
   // This function, called by GetBlockAttribute() or GetParticleAttribute(), 
@@ -334,8 +406,9 @@ protected:
                                         vtkPolyData * polyData );
                                     
   virtual int    FillOutputPortInformation( int port, vtkInformation * info );
-  int            RequestData( vtkInformation *,
-                              vtkInformationVector **, vtkInformationVector * );
+  int            RequestData( vtkInformation*,
+                              vtkInformationVector**,
+                              vtkInformationVector* );
                               
 //BTX
   friend  class  vtkEnzoReaderInternal; // to call LoadAttribute()
@@ -344,14 +417,44 @@ protected:
   vtkEnzoReaderInternal * Internal;
   int            BlockOutputType;
   int            LoadParticles;
+  int            GenerateIBLANK;
   int            MaxLevel;
+  int            SelectedBlockId;
   char         * FileName;
   
 //BTX
   vtkstd::vector<int> BlockMap;
 //ETX
   virtual void GenerateBlockMap();
-                            
+
+  // The array selections.
+  vtkDataArraySelection *PointDataArraySelection;
+  vtkDataArraySelection *CellDataArraySelection;
+  vtkCallbackCommand    *SelectionObserver;
+
+  // Description:
+  // Initializes the PointDataArraySelection & CellDataArraySelection
+  void SetUpDataArraySelections( );
+
+  // Description:
+  // This does the updating of meta data of the dataset from the
+  // first binary file registered in the map:
+  // - number of time steps
+  // - number of fields
+  // - name of fields
+  int UpdateMetaData(vtkInformation* request,
+                     vtkInformationVector* outputVector);
+
+  // Callback registered with the SelectionObserver.
+  static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
+                                        void *clientdata, void *calldata);
+
+  // Files are split up between processes as whole trees.
+  // Keep track of the number of roots so we know how to
+  // assigne the trees.  This is set in the RequestInformation method.
+  int NumberOfRoots;
+  int MyProcessId;
+
 private:
 
   vtkEnzoReader( const vtkEnzoReader & );     // Not implemented.

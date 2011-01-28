@@ -1,6 +1,142 @@
 <ServerManagerConfiguration>
 
   <ProxyGroup name="internal_sources">
+  
+  
+    <SourceProxy name="EnzoReaderCore" 
+                class="vtkEnzoReader" 
+                label="Enzo Reader">
+     <Documentation
+       short_help="Read multi-block dataset from an Enzo file."
+       long_help="Read multi-block dataset from an Enzo file.">
+         This Enzo reader loads data stored in Enzo format. The output of this reader is a multi-block dataset.
+     </Documentation>
+     
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="1"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+            This property specifies the file name for the Enzo reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+       name="BlockOutputType"
+       command="SetBlockOutputType"
+       number_of_elements="1"
+       default_values="0"
+       animateable="0">
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Image Data"/>
+         <Entry value="1" text="Rectilinear Grid"/>
+       </EnumerationDomain>
+       <Documentation>
+         The property indicates the output type of each block, either vtkImageData (by default) or vtkRectilinearGrid.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+       name="MaxLevel"
+       command="SetMaxLevel"
+       number_of_elements="1"
+       default_values="100" >
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         Do not display blocks above this level.
+       </Documentation>
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+       name="SelectedBlockId"
+       command="SetSelectedBlockId"
+       number_of_elements="1"
+       default_values="100" >
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         Show only the selected block
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="LoadParticles"
+       command="SetLoadParticles"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Load particles when on.
+       </Documentation>
+     </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateIBLANK" 
+        command="SetGenerateIBLANK"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Blanks coarse resolution points/cells when on.
+        </Documentation>  
+      </IntVectorProperty>
+      
+      <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+      
+     <Hints>
+      <ReaderFactory extensions="boundary hierarchy"
+            file_description="Enzo Files" />
+     </Hints>
+   </SourceProxy>
+   
+  
    <SourceProxy name="AVSucdReader"
                 class="vtkAVSucdReader"
                 label="AVS UCD Reader">
@@ -2323,6 +2459,72 @@
 
   <ProxyGroup name="sources">
 
+
+   <FileSeriesReaderProxy name="EnzoReader" 
+                          class="vtkFileSeriesReader" 
+                          label="Enzo Reader" 
+                          file_name_method="SetFileName" >
+     <Documentation
+       short_help="Read multi-block dataset from an Enzo file."
+       long_help="Read multi-block dataset from an Enzo file.">
+         This Enzo reader loads data stored in Enzo format. The output of this reader is a multi-block dataset.
+     </Documentation>
+     
+     <SubProxy>
+         <Proxy name="Reader" 
+                proxygroup="internal_sources" 
+                proxyname="EnzoReaderCore">
+         </Proxy>
+         <ExposedProperties>
+            <Property name="LoadParticles" />
+            <Property name="GenerateIBLANK" />
+            <Property name="SelectedBlockId" />
+            <Property name="MaxLevel" />
+            <Property name="PointArrayStatus" />
+            <Property name="CellArrayStatus" />
+         </ExposedProperties> 
+     </SubProxy>
+    
+    
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+      <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0" 
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified, 
+         the reader will switch to file series mode in which it will pretend that it 
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+ 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+      
+     <Hints>
+      <ReaderFactory extensions="boundary hierarchy"
+            file_description="Enzo Files" />
+     </Hints>
+     
+   </FileSeriesReaderProxy>
+   
+   
    <SourceProxy name="DEMReader"
                 class="vtkDEMReader"
                 label="DEM Reader">
@@ -3260,7 +3462,10 @@
      <Documentation
        short_help="Read EnSight files."
        long_help="Read EnSight 6 and Gold files.">
-       The EnSight reader reads files in the format produced by CEI's EnSight. EnSight 6 and Gold files (both ASCII and binary) are supported. The default extension is .case. The output of this reader is a multi-block dataset.
+       The EnSight reader reads files in the format produced by CEI's EnSight. 
+       EnSight 6 and Gold files (both ASCII and binary) are supported. 
+       The default extension is .case. The output of this reader is a 
+       multi-block dataset.
      </Documentation>
      <StringVectorProperty
         name="CaseFileName"
@@ -3345,7 +3550,9 @@
      <Documentation
        short_help="Read files in the Spy Plot format."
        long_help="Read files in the SPCTH Spy Plot file format.">
-       The Spy Plot reader loads an ASCII meta-file called the "case" file (extension .spcth). The case file lists all the binary files containing the dataset. This reader produces hierarchical datasets.
+       The Spy Plot reader loads an ASCII meta-file called the "case" file 
+       (extension .spcth). The case file lists all the binary files containing 
+       the dataset. This reader produces hierarchical datasets.
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -3375,7 +3582,8 @@
         default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 0, the type of the volume fraction is float; is set to 1, the type is unsigned char.
+         If this property is set to 0, the type of the volume fraction 
+         is float; is set to 1, the type is unsigned char.
        </Documentation>
      </IntVectorProperty>
 
@@ -3386,7 +3594,8 @@
         default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         In parallel mode, if this property is set to 1, the reader will distribute files or blocks.
+         In parallel mode, if this property is set to 1, the reader 
+         will distribute files or blocks.
        </Documentation>
      </IntVectorProperty>
 
@@ -3397,7 +3606,8 @@
         default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, a cell array will be generated that stores the level of each block.
+         If this property is set to 1, a cell array will be generated 
+         that stores the level of each block.
        </Documentation>
      </IntVectorProperty>
 
@@ -3408,7 +3618,8 @@
         default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, a cell array will be generated that stores the active status of a block.
+         If this property is set to 1, a cell array will be generated 
+         that stores the active status of a block.
        </Documentation>
      </IntVectorProperty>
 
@@ -3419,7 +3630,8 @@
         default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, a cell array will be generated that stores the coordinates of any tracers.
+         If this property is set to 1, a cell array will be generated 
+         that stores the coordinates of any tracers.
        </Documentation>
      </IntVectorProperty>
 
@@ -3430,7 +3642,8 @@
         default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, a cell array will be generated that stores a unique blockId for each block.
+         If this property is set to 1, a cell array will be generated 
+         that stores a unique blockId for each block.
        </Documentation>
      </IntVectorProperty>
 
@@ -3441,7 +3654,9 @@
         default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, cell arrays named (for example) X velocity, Y velocity and Z velocity will be combined into a single vector array named velocity.
+         If this property is set to 1, cell arrays named (for example) 
+         X velocity, Y velocity and Z velocity will be combined into a 
+         single vector array named velocity.
        </Documentation>
      </IntVectorProperty>
 
@@ -3724,66 +3939,7 @@
      </Hints>
    </SourceProxy>
 
-   <SourceProxy name="EnzoReader"
-                class="vtkEnzoReader"
-                label="Enzo Reader">
-     <Documentation
-       short_help="Read multi-block dataset from an Enzo file."
-       long_help="Read multi-block dataset from an Enzo file.">
-         This Enzo reader loads data stored in Enzo format. The output of this reader is a multi-block dataset.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-            This property specifies the file name for the Enzo reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-       name="BlockOutputType"
-       command="SetBlockOutputType"
-       number_of_elements="1"
-       default_values="0"
-       animateable="0">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Image Data"/>
-         <Entry value="1" text="Rectilinear Grid"/>
-       </EnumerationDomain>
-       <Documentation>
-         The property indicates the output type of each block, either vtkImageData (by default) or vtkRectilinearGrid.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-       name="MaxLevel"
-       command="SetMaxLevel"
-       number_of_elements="1"
-       default_values="100" >
-       <IntRangeDomain name="range"/>
-       <Documentation>
-         Do not blocks above this level.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="LoadParticles"
-       command="SetLoadParticles"
-       number_of_elements="1"
-       default_values="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-         Load particles when on.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="boundary hierarchy"
-          file_description="Enzo Files" />
-     </Hints>
-   </SourceProxy>
+   
 
    <SourceProxy name="FlashReader"
                 class="vtkFlashReader"
