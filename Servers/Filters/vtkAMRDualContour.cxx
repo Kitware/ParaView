@@ -762,7 +762,6 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     return;
     }
   vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   double  origin[3];
   double* spacing;
   int     extent[6];
