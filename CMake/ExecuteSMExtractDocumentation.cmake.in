@@ -2,12 +2,14 @@
 if(WIN32)
   get_filename_component(QT_BIN_DIR "@QT_QMAKE_EXECUTABLE@" PATH)
   get_filename_component(PYTHON_BIN "@PYTHON_EXECUTABLE@" PATH)
-  set(ENV{PATH} "${PYTHON_BIN};${QT_BIN_DIR};$ENV{PATH}")
+  get_filename_component(MPI_BIN "@MPIEXEC@" PATH)
+  set(ENV{PATH} "${MPI_BIN};${PYTHON_BIN};${QT_BIN_DIR};$ENV{PATH}")
 elseif(APPLE)
   set(ENV{DYLD_LIBRARY_PATH} "@QT_LIBRARY_DIR@:$ENV{DYLD_LIBRARY_PATH}")
 else(WIN32)
   get_filename_component(PYTHON_LIB "@PYTHON_LIBRARY@" PATH)
-  set(ENV{LD_LIBRARY_PATH} "${PYTHON_LIB};@QT_LIBRARY_DIR@:$ENV{LD_LIBRARY_PATH}")
+  get_filename_component(MPI_LIB "@MPI_LIBRARY@" PATH)
+  set(ENV{LD_LIBRARY_PATH} "${MPI_LIB}:${PYTHON_LIB}:@QT_LIBRARY_DIR@:$ENV{LD_LIBRARY_PATH}")
 endif(WIN32)
 
 execute_process(
