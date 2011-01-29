@@ -51,6 +51,7 @@ public:
   // changes you make directly using this object pointer will not be reflected
   // on other processes.
   vtkObjectBase* GetVTKObject();
+  void SetVTKObject(vtkObjectBase*);
 
   // Description:
   // Provides access to the property helper.

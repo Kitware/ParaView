@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkGeometryRepresentationWithFaces.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -819,9 +820,9 @@ void PrismDisplayProxyEditor::updateEnableState()
       = pqSMAdaptor::getElementProperty(backfaceRepProperty).toInt();
 
     bool backFollowsFront
-      = (   (backRepType == vtkSMPVRepresentationProxy::FOLLOW_FRONTFACE)
-         || (backRepType == vtkSMPVRepresentationProxy::CULL_BACKFACE)
-         || (backRepType == vtkSMPVRepresentationProxy::CULL_FRONTFACE) );
+      = (   (backRepType == vtkGeometryRepresentationWithFaces::FOLLOW_FRONTFACE)
+         || (backRepType == vtkGeometryRepresentationWithFaces::CULL_BACKFACE)
+         || (backRepType == vtkGeometryRepresentationWithFaces::CULL_FRONTFACE) );
 
     this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
     }

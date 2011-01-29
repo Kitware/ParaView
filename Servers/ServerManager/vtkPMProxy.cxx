@@ -73,6 +73,12 @@ vtkPMProxy::~vtkPMProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkPMProxy::SetVTKObject(vtkObjectBase* obj)
+{
+  this->VTKObject == obj;
+}
+
+//----------------------------------------------------------------------------
 void vtkPMProxy::Push(vtkSMMessage* message)
 {
   if (!this->CreateVTKObjects(message))
