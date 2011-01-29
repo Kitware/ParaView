@@ -1958,3 +1958,32 @@ void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
     vtkErrorMacro("Could not locate session to execute stream on.");
     }
 }
+
+
+//---------------------------------------------------------------------------
+vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+  const PMPROXY& manipulator)
+{
+  vtkClientServerStream substream;
+  substream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
+            << "GetPMObject"
+            << manipulator.Reference->GetGlobalID()
+            << vtkClientServerStream::End;
+  stream << substream;
+  return stream;
+}
+
+//---------------------------------------------------------------------------
+vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+  const VTKOBJECT& manipulator)
+{
+  vtkClientServerStream substream;
+  substream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
+            << "GetVTKObject"
+            << manipulator.Reference->GetGlobalID()
+            << vtkClientServerStream::End;
+  stream << substream;
+  return stream;
+}

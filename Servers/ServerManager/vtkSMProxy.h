@@ -664,4 +664,29 @@ private:
 //ETX
 };
 
+//BTX
+class PMPROXY
+{
+  vtkSMProxy* Reference;
+  friend vtkClientServerStream& operator<<(
+    vtkClientServerStream& stream, const PMPROXY& manipulator);
+public:
+  PMPROXY(vtkSMProxy* proxy) : Reference(proxy) {}
+};
+
+vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+  const PMPROXY& manipulator);
+
+class VTKOBJECT
+{
+  vtkSMProxy* Reference;
+  friend vtkClientServerStream& operator<<(
+    vtkClientServerStream& stream, const VTKOBJECT& manipulator);
+public:
+  VTKOBJECT(vtkSMProxy* proxy) : Reference(proxy) {}
+};
+vtkClientServerStream& operator<<(
+  vtkClientServerStream& stream, const VTKOBJECT& manipulator);
+
+//ETX
 #endif

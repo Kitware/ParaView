@@ -46,6 +46,7 @@ vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid
 {
   return vtkPMProxy::SafeDownCast(this->Core->GetPMObject(gid))->GetVTKObject();
 }
+
 //----------------------------------------------------------------------------
 void vtkSMSessionCoreInterpreterHelper::PrintSelf(ostream& os, vtkIndent indent)
 {

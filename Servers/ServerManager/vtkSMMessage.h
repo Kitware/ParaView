@@ -72,27 +72,5 @@ inline vtkClientServerStream& operator << (vtkClientServerStream& stream,
   return stream;
 }
 
-// Used to push a reference to the PMObject (or subclass) to a stream.
-// e.g.
-// vtkClientServerStream stream;
-// stream << vtkClientServerStream::Invoke
-//        << PMPROXY(proxy) << "MethodToCallOnPMProxy"
-//        << vtkClientServerStream::End;
-#define PMPROXY(__arg)\
-  (vtkClientServerStream() \
-   << vtkClientServerStream::Invoke \
-   << vtkClientServerID(1)\
-   << "GetPMObject" \
-   << __arg->GetGlobalID() \
-   << vtkClientServerStream::End)
-
-#define VTKOBJECT(__arg)\
-  (vtkClientServerStream() \
-   << vtkClientServerStream::Invoke \
-   << vtkClientServerID(1)\
-   << "GetVTKObject" \
-   << __arg->GetGlobalID() \
-   << vtkClientServerStream::End)
-
 using namespace paraview_protobuf;
 #endif

@@ -188,7 +188,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
   stream << vtkClientServerStream::Invoke
          << PMPROXY(this->SourceProxy)
          << "UpdatePipeline"
-         << this->PortIndex << time << doTime
+         << this->PortIndex << time << (doTime? 1 : 0)
          << vtkClientServerStream::End;
   this->SourceProxy->ExecuteStream(stream);
 }
