@@ -665,6 +665,20 @@ private:
 };
 
 //BTX
+
+// This defines a manipulator for the vtkClientServerStream that can be used on
+// the to indicate to the interpreter that the placeholder is to be replaced by
+// the vtkPMProxy instance for the given vtkSMProxy instance.
+// e.g.
+// <code>
+// vtkClientServerStream stream;
+// stream << vtkClientServerStream::Invoke
+//        << PMPROXY(proxyA)
+//        << "MethodName"
+//        << vtkClientServerStream::End;
+// </code>
+// Will result in calling the vtkPMProxy::MethodName() when the stream in
+// interpreted.
 class PMPROXY
 {
   vtkSMProxy* Reference;
@@ -677,6 +691,20 @@ public:
 vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   const PMPROXY& manipulator);
 
+// This defines a manipulator for the vtkClientServerStream that can be used on
+// the to indicate to the interpreter that the placeholder is to be replaced by
+// the vtkObject instance for the given vtkSMProxy instance.
+// e.g.
+// <code>
+// vtkClientServerStream stream;
+// stream << vtkClientServerStream::Invoke
+//        << VTKOBJECT(proxyA)
+//        << "MethodName"
+//        << vtkClientServerStream::End;
+// </code>
+// Will result in calling the vtkClassName::MethodName() when the stream in
+// interpreted where vtkClassName is the type for the VTKObject which the proxyA
+// represents.
 class VTKOBJECT
 {
   vtkSMProxy* Reference;
