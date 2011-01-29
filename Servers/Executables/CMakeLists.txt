@@ -24,8 +24,7 @@ ENDIF(VTK_WRAP_TCL)
 SET(PV_EXE_LIST
    pvserver pvrenderserver pvdataserver
    pvtest pvxmlstatetest pvstatetest pvInformationPropertyTest pvlocationtest
-   pvundotest pvundotest2 pvhelpertest pvmergetest pvclientxmldefinitiontest
-   pvinvoketest)
+   pvundotest pvundotest2 pvhelpertest pvmergetest pvclientxmldefinitiontest)
 
 FOREACH(pvexe ${PV_EXE_LIST})
   add_executable_with_forwarding(pv_exe_suffix
