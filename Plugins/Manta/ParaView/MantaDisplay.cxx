@@ -38,14 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqDisplayPanel.h"
 #include "pqPropertyLinks.h"
-
 #include "vtkSMPVRepresentationProxy.h"
-//#include "pqMantaView.h"
 #include "pqSignalAdaptors.h"
+#include "pqActiveObjects.h"
+#include "MantaView.h"
 
 #include <iostream>
-
-using namespace std;
 
 class MantaDisplay::pqInternal
 {
@@ -62,21 +60,31 @@ MantaDisplay::MantaDisplay(pqDisplayPanel* panel)
   QWidget* frame = new QWidget(panel);
   this->Internal = new pqInternal;
   this->Internal->ui.setupUi(frame);
-
   QVBoxLayout* l = qobject_cast<QVBoxLayout*>(panel->layout());
   l->addWidget(frame);
+
+  this->Internal->strAdapt =
+    new pqSignalAdaptorComboBox(this->Internal->ui.material);
+
+  MantaView* mView = qobject_cast<MantaView*>
+    (pqActiveObjects::instance().activeView());
+  if (!mView)
+    {
+    frame->setEnabled(false);
+    return;
+    }
 
   pqRepresentation *rep = panel->getRepresentation();
   vtkSMPVRepresentationProxy *mrep = vtkSMPVRepresentationProxy::SafeDownCast
     (rep->getProxy());
   if (!mrep)
     {
+    frame->setEnabled(false);
     return;
     }
+
   vtkSMProperty *prop = mrep->GetProperty("MaterialType");
   //have to use a helper class because pqPropertyLinks won't map directly
-  this->Internal->strAdapt =
-    new pqSignalAdaptorComboBox(this->Internal->ui.material);
   this->Internal->links.addPropertyLink(
     this->Internal->strAdapt,
     "currentText",
