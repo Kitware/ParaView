@@ -4,7 +4,7 @@ PROJECT ( vtkManta )
 #a "real time" Ray Tracer. 
 
 #It creates a library that includes Manta specific subclasses
-#of VTK's rendering classes, RenderWindow, Renderer, Camera, etc.
+#of VTK's rendering classes, Renderer, Camera, etc.
 #These can be instantiated by name, or by using object factory overloading 
 #at post compile time (ie, set VTK_AUTOLOAD_PATH to vtkManta's build 
 #directory and run a normal vtk app)
@@ -106,26 +106,6 @@ IF (NOT BUILD_AGAINST_PARAVIEW)
   SET ( BUILD_AGAINST_PARAVIEW 0 )
 ENDIF (NOT BUILD_AGAINST_PARAVIEW)
 
-#TODO: I think having the .h in the build tree is breaking wrapping
-#choose correct lineage for renderwindow class based on platform
-IF(VTK_USE_CARBON)
-  SET(RenderWindowType "vtkCarbonRenderWindow")
-ELSEIF(VTK_USE_COCOA)
-  SET(RenderWindowType "vtkCocoaRenderWindow")
-ELSEIF(VTK_USE_X)
-  SET(RenderWindowType "vtkXOpenGLRenderWindow")
-ELSEIF(VTK_OPENGL_HAS_OSMESA)
- SET(RenderWindowType "vtkOSOpenGLRenderWindow")
-ELSE()
-  SET(RenderWindowType "vtkWin32OpenGLRenderWindow")
-ENDIF()
-#configure_file(
-#  "${CMAKE_CURRENT_SOURCE_DIR}/vtkMantaRenderWindow.h.in"
-#  "${CMAKE_CURRENT_BINARY_DIR}/vtkMantaRenderWindow.h"
-#  @ONLY
-#  IMMEDIATE
-#  )
-
 # Set VTKMANTA_BUILD_SHARED_LIBS to 1 or 0 for safe keeping in 
 #vtkMantaConfigure.h
 IF ( MANTA_BUILD_SHARED_LIBS )
@@ -165,7 +145,6 @@ SET ( MANTA_CLASSES
   vtkMantaPolyDataMapper.cxx
   vtkMantaProperty.cxx
   vtkMantaRenderer.cxx
-#  vtkMantaRenderWindow.cxx
   vtkMantaTestSource.cxx
   vtkMantaTexture.cxx
   )
@@ -206,7 +185,7 @@ ENDIF (PV_INSTALL_PLUGIN_DIR)
  
 # Create the instantiator for these classes.
 
-# Be sure to wrap vtkMantaRenderWindow.h, which lives in the build directory.
+# I used to wrap a configured files in the build directory.
 # This code was lifted from ParaViewPlugins.cmake
 SET(HDRS)
 SET(REALSRCS)
