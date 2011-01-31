@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 
 #include "vtkSMPVRepresentationProxy.h"
-#include "pqMantaView.h"
+//#include "pqMantaView.h"
 #include "pqSignalAdaptors.h"
 
 #include <iostream>
