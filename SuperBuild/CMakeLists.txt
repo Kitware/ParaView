@@ -179,6 +179,21 @@ if(NOT APPLE)
   endif()
 
   include(External_NUMPY)
+
+  if(NOT WIN32)
+    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Depenednecies for VisTrails" FALSE)
+    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
+    if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
+      # Build SIP and PyQt for vistrails plugin.
+      include(External_SIP)
+      list(APPEND PyQt_dependencies SIP)
+      include(External_PyQt)
+      list(APPEND ParaView_dependencies PyQt)
+
+      set(VISTRAILS_ARGS
+        -DPARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON)
+    endif()
+  endif()
 else()
 
   find_package(PythonInterp)
@@ -292,6 +307,8 @@ ExternalProject_Add(${proj}
     #-DSILO_INCLUDE_DIR:PATH=
     #-DSILO_LIBRARY:FILEPATH=
     # Documentation
+    # VisTrails
+    ${VISTRAILS_ARGS}
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )
