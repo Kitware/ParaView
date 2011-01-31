@@ -745,7 +745,7 @@ void vtkSMProxy::CreateVTKObjects()
 bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
 {
   assert(information);
-  if (this->GetSession())
+  if (this->GetSession() && this->Location != 0)
     {
     // ensure that the proxy is created.
     this->CreateVTKObjects();
