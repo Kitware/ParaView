@@ -493,7 +493,8 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
 {
   this->CreateVTKObjects();
 
-  if (!this->ObjectsCreated)
+  // If no location, it means no state...
+  if (!this->ObjectsCreated || this->Location == 0)
     {
     return;
     }
