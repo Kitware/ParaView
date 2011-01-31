@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqMantaView.cxx
+  Module:    MantaView.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    pqMantaView.cxx
+  Module:    MantaView.cxx
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,29 +58,11 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME pqMantaView -
-// .SECTION Description
-//
 
-#include "pqMantaView.h"
-
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <vtkSMProxy.h>
-#include <vtkSMRenderViewProxy.h>
-#include <vtkSMPropertyHelper.h>
-#include <vtkSMProxyManager.h>
-
-#include <pqOutputPort.h>
-#include <pqPipelineSource.h>
-#include <pqRepresentation.h>
-#include <pqServer.h>
-#include <pqApplicationCore.h>
-#include <pqSettings.h>
+#include "MantaView.h"
 
 //-----------------------------------------------------------------------------
-pqMantaView::pqMantaView(
+MantaView::MantaView(
   const QString& viewType,
   const QString& group,
   const QString& name,
@@ -92,6 +74,6 @@ pqMantaView::pqMantaView(
 }
 
 //-----------------------------------------------------------------------------
-pqMantaView::~pqMantaView()
+MantaView::~MantaView()
 {
 }

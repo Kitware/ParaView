@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqMantaView.h
+  Module:    MantaView.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    pqMantaView.h
+  Module:    MantaView.h
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,16 +58,16 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME pqMantaView -
+// .NAME MantaView - QT GUI interface to a Manta Rendered 3D View
 // .SECTION Description
-//
+// This is the Qt layer interface to the Manta Rendered 3D view.
 
-#ifndef _pqMantaView_h
-#define _pqMantaView_h
+#ifndef _MantaView_h
+#define _MantaView_h
 
 #include "pqRenderView.h"
 
-class pqMantaView : public pqRenderView
+class MantaView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
@@ -77,21 +77,21 @@ public:
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView
-  pqMantaView(
+  MantaView(
          const QString& viewtype,
          const QString& group,
          const QString& name,
          vtkSMViewProxy* viewmodule,
          pqServer* server,
          QObject* p);
-  ~pqMantaView();
+  ~MantaView();
 
 protected:
 
 private:
-  pqMantaView(const pqMantaView&); // Not implemented.
-  void operator=(const pqMantaView&); // Not implemented.
+  MantaView(const MantaView&); // Not implemented.
+  void operator=(const MantaView&); // Not implemented.
 
 };
 
-#endif // _pqMantaView_h
+#endif // _MantaView_h
