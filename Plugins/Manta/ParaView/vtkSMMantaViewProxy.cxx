@@ -65,24 +65,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMMantaViewProxy.h"
 #include "vtkObjectFactory.h"
-#include "vtkClientServerStream.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkSMSourceProxy.h"
-
-#include "vtkSmartPointer.h" // xxx
-#include "vtkCollection.h" // xxx
-#include "vtkCollectionIterator.h" // xxx
-
 #include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMantaViewProxy);
@@ -119,6 +109,9 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
                  stream);
 
   this->Superclass::CreateVTKObjects();
+
+  vtkSMPropertyHelper(this, "UseLight").Set(0);
+  vtkSMPropertyHelper(this, "LightSwitch").Set(1);
 }
 
 //-----------------------------------------------------------------------------
