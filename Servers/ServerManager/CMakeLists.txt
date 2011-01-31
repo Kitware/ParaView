@@ -237,6 +237,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx
   vtkSMLink.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyDefinitionIterator
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
   vtkSMStateVersionControllerBase.cxx

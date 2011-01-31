@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 class vtkPVXMLElement;
 
-vtkStandardNewMacro(vtkSMProxyDefinitionIterator)
 //-----------------------------------------------------------------------------
 vtkSMProxyDefinitionIterator::vtkSMProxyDefinitionIterator()
 {

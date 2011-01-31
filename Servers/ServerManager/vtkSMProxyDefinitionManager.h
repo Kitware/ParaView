@@ -41,7 +41,7 @@ class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkSMObject
 public:
   // FIXME COLLABORATION : For now we dynamically convert InformationHelper
   // into the correct kernel_class and attribute sets.
-  // THIS CODE MUST BE REMOVED once InformationHelper have been removed from
+  // THIS CODE SHOULD BE REMOVED once InformationHelper have been removed from
   // legacy XML
   static void PatchXMLProperty(vtkPVXMLElement* propElement);
 

@@ -34,7 +34,6 @@ class vtkSMProxyDefinitionManager;
 class VTK_EXPORT vtkSMProxyDefinitionIterator : public vtkSMObject
 {
 public:
-  static vtkSMProxyDefinitionIterator* New();
   vtkTypeMacro(vtkSMProxyDefinitionIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
