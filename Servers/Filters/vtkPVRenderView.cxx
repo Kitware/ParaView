@@ -66,6 +66,7 @@ vtkInformationKeyMacro(vtkPVRenderView, GEOMETRY_SIZE, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, DATA_DISTRIBUTION_MODE, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT, Integer);
+vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT_FOR_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, DELIVER_LOD_TO_CLIENT, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
@@ -623,7 +624,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
-  this->UsedLODForLastRender = use_lod_rendering;
 
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();
@@ -657,11 +657,22 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
 
-  if ( (in_tile_display_mode || interactive) &&
-    this->GetDeliverOutlineToClient())
+  if (in_tile_display_mode && this->GetDeliverOutlineToClient())
     {
     this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
     this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
+    }
+  else if (!in_tile_display_mode && this->GetDeliverOutlineToClient())
+    {
+    this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT_FOR_LOD(), 1);
+    if (interactive && !use_distributed_rendering)
+      {
+      // also force LOD mode. Otherwise the outline is delivered only when LOD
+      // mode is kicked in, even when the user requested that the LOD be
+      // delivered to client for a lower threshold that the LOD threshold.
+      use_lod_rendering = true;
+      this->SetRequestLODRendering(use_lod_rendering);
+      }
     }
   else
     {
@@ -717,6 +728,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GatherBoundsInformation(use_distributed_rendering);
     this->UpdateCenterAxes(this->LastComputedBounds);
     }
+
+  this->UsedLODForLastRender = use_lod_rendering;
 
   if (skip_rendering)
     {

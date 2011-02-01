@@ -42,6 +42,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set this to true when this filter is used in a LOD pipeline. This ensures
+  // that the respect the delivery flags correctly in ProcessViewRequest(). Some
+  // keys are only to be handled when the filter is in a low-res pipeline.
+  // Default is false.
+  vtkSetMacro(LODMode, bool);
+  vtkGetMacro(LODMode, bool);
+
+  // Description:
   // Set whether the data is vtkPolyData or vtkUnstucturedGrid.
   // Note only VTK_POLY_DATA and VTK_UNSTRUCTURED_GRID are supported.
   void SetOutputDataType(int);
@@ -77,6 +85,7 @@ protected:
 
   vtkMPIMoveData* MoveData;
   int OutputDataType;
+  bool LODMode;
 
 private:
   vtkUnstructuredDataDeliveryFilter(const vtkUnstructuredDataDeliveryFilter&); // Not implemented
