@@ -39,6 +39,8 @@ vtkUnstructuredDataDeliveryFilter::vtkUnstructuredDataDeliveryFilter()
   this->OutputDataType = VTK_VOID;
   this->SetOutputDataType(VTK_POLY_DATA);
 
+  this->LODMode = false;
+
   // Discover process type and setup communication ivars.
   this->InitializeForCommunication();
 }
@@ -175,7 +177,14 @@ void vtkUnstructuredDataDeliveryFilter::ProcessViewRequest(vtkInformation* info)
     this->MoveData->SetMoveModeToPassThrough();
     }
 
-  if (info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT()))
+  bool deliver_outline =
+    (info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT()) != 0);
+  if (this->LODMode)
+    {
+    deliver_outline |=
+      info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT_FOR_LOD());
+    }
+  if (deliver_outline)
     {
     this->MoveData->SetDeliverOutlineToClient(1);
     }
