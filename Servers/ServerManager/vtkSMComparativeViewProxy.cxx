@@ -53,6 +53,15 @@ void vtkSMComparativeViewProxy::CreateVTKObjects()
     {
     return;
     }
+
+  // If prototype do not setup subproxy location and do not send anything
+  // to the server
+  if(this->Location == 0)
+    {
+    this->Superclass::CreateVTKObjects();
+    return;
+    }
+
   this->GetSubProxy("RootView")->SetLocation(
     vtkPVSession::CLIENT_AND_SERVERS);
   this->Superclass::CreateVTKObjects();

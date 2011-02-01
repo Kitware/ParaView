@@ -50,9 +50,12 @@ void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* l
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()
 {
-  vtkSMMessage msg;
-  msg.CopyFrom(*this->GetFullState());
-  this->PushState(&msg);
+  if(this->Session)
+    {
+    vtkSMMessage msg;
+    msg.CopyFrom(*this->GetFullState());
+    this->PushState(&msg);
+    }
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::PrintSelf(ostream& os, vtkIndent indent)
