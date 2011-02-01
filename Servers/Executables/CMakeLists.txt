@@ -45,7 +45,6 @@ FOREACH(pvexe ${PV_EXE_LIST})
 
 ENDFOREACH(pvexe)
 
-IF (FIXME)
 SET(PV_TEST_INIT_COMMAND "" CACHE STRING
   "Command to run before a test begins. Multiple commands are separated by ';'.")
 MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)
@@ -111,4 +110,3 @@ build_paraview_client_cpack_config_init(
 SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
   ${CPACK_INSTALL_CMAKE_PROJECTS})
 build_paraview_client_cpack_config()
-ENDIF (FIXME)
