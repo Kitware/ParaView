@@ -205,6 +205,9 @@ protected:
   vtkMantaRenderer();
   ~vtkMantaRenderer();
 
+  //lets manta engine know when viewport changes
+  void UpdateSize();
+
   // Manta renderer does not support picking.
   virtual void DevicePickRender() {};
   virtual void StartPick(unsigned int pickFromSize) {};
