@@ -231,7 +231,14 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
   if (className && className[0])
     {
     this->SetVTKClassName(className);
-    this->VTKObject.TakeReference(vtkInstantiator::CreateInstance(className));
+    vtkObjectBase* obj = this->Interpreter->NewInstance(className);
+    if (!obj)
+      {
+      vtkErrorMacro("Failed to create " << className
+        << ". Aborting for debugging purposes.");
+      abort();
+      }
+    this->VTKObject.TakeReference(obj);
     }
 
 #ifdef FIXME_COLLABORATION

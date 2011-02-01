@@ -925,3 +925,14 @@ vtkClientServerID vtkClientServerInterpreter::GetNextAvailableId()
 {
   return vtkClientServerID(++this->NextAvailableId);
 }
+
+//----------------------------------------------------------------------------
+vtkObjectBase* vtkClientServerInterpreter::NewInstance(const char* classname)
+{
+  if (vtkClientServerNewInstanceFunction n =
+    this->Internal->NewInstanceFunctions[classname])
+    {
+    return n();
+    }
+  return NULL;
+}
