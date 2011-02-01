@@ -1827,8 +1827,11 @@ def CreateProxy(xml_group, xml_name, session=None):
     present. You should not have to use method normally. Instantiate the
     appropriate class from the appropriate module, for example:
     sph = servermanager.sources.SphereSource()"""
-
-    pxm = vtkSMObject.GetProxyManager()
+    if not session:
+        session = ActiveSession
+    if not session:
+        raise RuntimeError, "Cannot create objects with a session."
+    pxm = ProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
         return None
