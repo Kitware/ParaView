@@ -80,6 +80,20 @@ public:
     }
 };
 
+namespace
+{
+  // Functions used to save and obtain a proxy from a QVariant.
+  QVariant DATA(vtkSMProxy* proxy)
+    {
+    return QVariant::fromValue<void*>(proxy);
+    }
+
+  vtkSMProxy* PROXY(const QVariant& variant)
+    {
+    return reinterpret_cast<vtkSMProxy*>(variant.value<void*>());
+    }
+}
+
 #define USEICONS 0
 #define TEXTURESGROUP "textures"
 //-----------------------------------------------------------------------------
@@ -220,7 +234,7 @@ void pqTextureComboBox::updateFromProperty()
   this->setCurrentIndex(0);
   if (texture)
     {
-    int index = this->findData(texture->GetGlobalID());
+    int index = this->findData(DATA(texture));
     if (index != -1)
       {
       this->setCurrentIndex(index);
@@ -256,11 +270,11 @@ void pqTextureComboBox::reload()
     if (this->Internal->TextureIcons.contains(texture))
       {
       this->addItem(this->Internal->TextureIcons[texture].Icon,
-        name, proxyIter->GetProxy()->GetGlobalID());
+        name, DATA(proxyIter->GetProxy()));
       }
     else
       {
-      this->addItem(name, proxyIter->GetProxy()->GetGlobalID());
+      this->addItem(name, DATA(proxyIter->GetProxy()));
       }
     }
   proxyIter->Delete();
@@ -391,7 +405,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
     texture);
   texture->Delete();
 
-  int index = this->findData(QVariant(texture->GetGlobalID()));
+  int index = this->findData(DATA(texture));
   if (index != -1)
     {
     this->setCurrentIndex(index);
@@ -403,11 +417,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqTextureComboBox::getTextureProxy(const QVariant& _data) const
 {
-#ifdef FIXME_COLLABORATION
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkClientServerID proxyID (_data.value<vtkTypeUInt32>());
-  return pxm->GetProxy(proxyID);
-#endif
+  return PROXY(_data);
 }
 
 //-----------------------------------------------------------------------------
