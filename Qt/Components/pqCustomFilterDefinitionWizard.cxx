@@ -218,7 +218,6 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     return;
     }
 
-#ifdef FIXME_COLLABORATION
   // Create the compound proxy. Add all the proxies to it.
   pqPipelineSource *source = 0;
   this->Filter = vtkSMCompoundSourceProxy::New();
@@ -231,8 +230,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
       {
       if (first)
         {
-        this->Filter->SetConnectionID(source->getProxy()->GetConnectionID());
-        this->Filter->SetServers(source->getProxy()->GetServers());
+        this->Filter->SetSession(source->getProxy()->GetSession());
+        this->Filter->SetLocation(source->getProxy()->GetLocation());
         first = false;
         }
       this->Filter->AddProxy(source->getSMName().toAscii().data(),
@@ -297,13 +296,11 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
       this->Form->CustomFilterName->text().toAscii().data(), root);
     }
   root->Delete();
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
 {
-#ifdef FIXME_COLLABORATION
   unsigned int num_of_proxies = this->Filter->GetNumberOfProxies();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
@@ -338,10 +335,9 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
   foreach(vtkSMProxy* proxy, autoIncludeSet)
     {
     QString name = "auto_";
-    name += proxy->GetSelfIDAsString();
+    name += proxy->GetGlobalIDAsString();
     this->Filter->AddProxy(name.toAscii().data(), proxy);
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------

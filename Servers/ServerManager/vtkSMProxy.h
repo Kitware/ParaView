@@ -656,7 +656,7 @@ protected:
   // Flag used to break consumer loops.
   int InMarkModified;
 
-private:
+protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
   vtkSMProxy(const vtkSMProxy&); // Not implemented

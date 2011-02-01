@@ -20,9 +20,14 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyInternals.h"
 
 #include <vtkSmartPointer.h>
 
+#include <vtkstd/list>
+#include <vtkstd/vector>
+
+typedef vtkstd::list<vtkSmartPointer<vtkPVXMLElement> > ElementsType;
 //*****************************************************************************
 class vtkSMCompoundSourceProxy::vtkInternals
 {
@@ -75,15 +80,15 @@ vtkStandardNewMacro(vtkSMCompoundSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 {
-  this->Internals = new vtkInternals();
+  this->CSInternals = new vtkInternals();
   this->SetKernelClassName("vtkPMCompoundSourceProxy");
 }
 
 //----------------------------------------------------------------------------
 vtkSMCompoundSourceProxy::~vtkSMCompoundSourceProxy()
 {
-  delete this->Internals;
-  this->Internals = NULL;
+  delete this->CSInternals;
+  this->CSInternals = NULL;
 }
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
@@ -105,8 +110,8 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
 
   unsigned int index = 0;
   vtkInternals::VectorOfPortInfo::iterator iter;
-  iter = this->Internals->ExposedPorts.begin();
-  while ( iter != this->Internals->ExposedPorts.end() )
+  iter = this->CSInternals->ExposedPorts.begin();
+  while ( iter != this->CSInternals->ExposedPorts.end() )
     {
     vtkSMProxy* subProxy = this->GetSubProxy(iter->ProxyName.c_str());
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(subProxy);
@@ -277,11 +282,11 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
         }
       if (port_name)
         {
-        this->Internals->RegisterExposedPort(proxy_name, exposed_name, port_name);
+        this->CSInternals->RegisterExposedPort(proxy_name, exposed_name, port_name);
         }
       else
         {
-        this->Internals->RegisterExposedPort(proxy_name, exposed_name, index);
+        this->CSInternals->RegisterExposedPort(proxy_name, exposed_name, index);
         }
       }
     }
@@ -302,9 +307,9 @@ void vtkSMCompoundSourceProxy::CreateVTKObjects()
   // --- Specific CompoundSourceProxy behaviour ---
   unsigned int index = 0;
   vtkInternals::VectorOfPortInfo::iterator iter;
-  iter = this->Internals->ExposedPorts.begin();
+  iter = this->CSInternals->ExposedPorts.begin();
   vtkSMProxy* currentProxy;
-  while( iter != this->Internals->ExposedPorts.end() )
+  while( iter != this->CSInternals->ExposedPorts.end() )
     {
     currentProxy = this->GetSubProxy(iter->ProxyName.c_str());
     vtkSMSourceProxy* subProxy = vtkSMSourceProxy::SafeDownCast(currentProxy);
@@ -348,3 +353,193 @@ void vtkSMCompoundSourceProxy::CreateVTKObjects()
     }
 }
 //----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::AddProxy(const char* name, vtkSMProxy* proxy)
+{
+  // If proxy with the name already exists, this->AddSubProxy raises a warning.
+  this->AddSubProxy(name, proxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::ExposeProperty(const char* proxyName,
+  const char* propertyName, const char* exposedName)
+{
+  this->ExposeSubProxyProperty(proxyName, propertyName, exposedName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName,
+  const char* portName, const char* exposedName)
+{
+  this->CSInternals->RegisterExposedPort(proxyName, exposedName, portName);
+  // We don't access the vtkSMOutputPort from the sub proxy here itself, since
+  // the subproxy may not have it ports initialized when this method is called
+  // eg. when loading state.
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName,
+  unsigned int portIndex, const char* exposedName)
+{
+  this->CSInternals->RegisterExposedPort(proxyName, exposedName, portIndex);
+  // We don't access the vtkSMOutputPort from the sub proxy here itself, since
+  // the subproxy may not have it ports initialized when this method is called
+  // eg. when loading state.
+}
+//----------------------------------------------------------------------------
+// Definition is
+// * State i.e. exposed property states (execept those refererring to outside
+// proxies)
+// * Subproxy states.
+// * Exposed property information.
+// * Exposed output port information.
+vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(
+  vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* defElement = this->SaveXMLState(0);
+  defElement->SetName("CompoundSourceProxy");
+  defElement->RemoveAllNestedElements();
+
+  // * Add subproxy states.
+  unsigned int numProxies = this->GetNumberOfSubProxies();
+  for (unsigned int cc=0; cc < numProxies; cc++)
+    {
+    vtkPVXMLElement* newElem =
+      this->GetSubProxy(cc)->SaveXMLState(defElement);
+    const char* compound_name =this->GetSubProxyName(cc);
+    newElem->AddAttribute("compound_name", compound_name);
+    }
+
+  // * Clean references to any external proxies.
+  this->TraverseForProperties(defElement);
+
+  // * Add exposed property information.
+  vtkPVXMLElement* exposed = vtkPVXMLElement::New();
+  exposed->SetName("ExposedProperties");
+  unsigned int numExposed = 0;
+  vtkSMProxyInternals* internals = this->Internals;
+  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
+    internals->ExposedProperties.begin();
+  for(; iter != internals->ExposedProperties.end(); iter++)
+    {
+    numExposed++;
+    vtkPVXMLElement* expElem = vtkPVXMLElement::New();
+    expElem->SetName("Property");
+    expElem->AddAttribute("name", iter->second.PropertyName);
+    expElem->AddAttribute("proxy_name", iter->second.SubProxyName);
+    expElem->AddAttribute("exposed_name", iter->first.c_str());
+    exposed->AddNestedElement(expElem);
+    expElem->Delete();
+    }
+  if (numExposed > 0)
+    {
+    defElement->AddNestedElement(exposed);
+    }
+  exposed->Delete();
+
+  // * Add output port information.
+  vtkInternals::VectorOfPortInfo::iterator iter2 =
+    this->CSInternals->ExposedPorts.begin();
+  for (;iter2 != this->CSInternals->ExposedPorts.end(); ++iter2, numExposed++)
+    {
+    vtkPVXMLElement* expElem = vtkPVXMLElement::New();
+    expElem->SetName("OutputPort");
+    expElem->AddAttribute("name", iter2->ExposedName.c_str());
+    expElem->AddAttribute("proxy", iter2->ProxyName.c_str());
+    if (iter2->PortIndex != VTK_UNSIGNED_INT_MAX)
+      {
+      expElem->AddAttribute("port_index", iter2->PortIndex);
+      }
+    else
+      {
+      expElem->AddAttribute("port_name", iter2->PortName.c_str());
+      }
+    defElement->AddNestedElement(expElem);
+    expElem->Delete();
+    }
+
+
+  if (root)
+    {
+    root->AddNestedElement(defElement);
+    defElement->Delete();
+    }
+
+  return defElement;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMCompoundSourceProxy::ShouldWriteValue(vtkPVXMLElement* valueElem)
+{
+  if (strcmp(valueElem->GetName(), "Proxy") != 0)
+    {
+    return 1;
+    }
+
+  const char* proxyId = valueElem->GetAttribute("value");
+  if (!proxyId)
+    {
+    return 1;
+    }
+
+  unsigned int numProxies = this->GetNumberOfSubProxies();
+  for (unsigned int i=0; i<numProxies; i++)
+    {
+    vtkSMProxy* proxy = this->GetSubProxy(i);
+    if (proxy &&
+        strcmp(proxy->GetGlobalIDAsString(), proxyId) == 0)
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::StripValues(vtkPVXMLElement* propertyElem)
+{
+  ElementsType elements;
+
+  // Find all elements we want to keep
+  unsigned int numElements = propertyElem->GetNumberOfNestedElements();
+  for(unsigned int i=0; i<numElements; i++)
+    {
+    vtkPVXMLElement* nested = propertyElem->GetNestedElement(i);
+    if (this->ShouldWriteValue(nested))
+      {
+      elements.push_back(nested);
+      }
+    }
+
+  // Delete all
+  propertyElem->RemoveAllNestedElements();
+
+  // Add the one we want to keep
+  ElementsType::iterator iter = elements.begin();
+  for (; iter != elements.end(); iter++)
+    {
+    propertyElem->AddNestedElement(iter->GetPointer());
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::TraverseForProperties(vtkPVXMLElement* root)
+{
+  unsigned int numProxies = root->GetNumberOfNestedElements();
+  for(unsigned int i=0; i<numProxies; i++)
+    {
+    vtkPVXMLElement* proxyElem = root->GetNestedElement(i);
+    if (strcmp(proxyElem->GetName(), "Proxy") == 0)
+      {
+      unsigned int numProperties = proxyElem->GetNumberOfNestedElements();
+      for(unsigned int j=0; j<numProperties; j++)
+        {
+        vtkPVXMLElement* propertyElem = proxyElem->GetNestedElement(j);
+        if (strcmp(propertyElem->GetName(), "Property") == 0)
+          {
+          this->StripValues(propertyElem);
+          }
+        }
+      }
+    }
+}
