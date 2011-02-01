@@ -103,7 +103,7 @@ protected slots:
   void saveState(vtkPVXMLElement* root);
 
   /// Loads the state for the view window manager.
-  virtual void loadState(vtkPVXMLElement* rwRoot);
+  bool loadState(vtkPVXMLElement* rwRoot, vtkSMProxyLocator* locator);
 
   /// Called when server disconnects, we reset the view layout.
   void onServerDisconnect();

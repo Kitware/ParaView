@@ -201,7 +201,7 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   core->registerManager("MULTIVIEW_MANAGER", this);
   QObject::connect(core,
     SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
-    this, SLOT(loadState(vtkPVXMLElement*)));
+    this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
   QObject::connect(core,
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(saveState(vtkPVXMLElement*)));
@@ -440,9 +440,20 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   vtkPVXMLElement* state = vtkPVXMLElement::New();
   this->saveState(state);
 
+  // Save views state in XML as well
+  vtkSmartPointer<vtkPVXMLElement> viewsState;
+  viewsState = vtkSmartPointer<vtkPVXMLElement>::New();
+  viewsState->SetName("ServerManagerState");
+  pqInternals::FrameMapType::Iterator iter = this->Internal->Frames.begin();
+  for(; iter != this->Internal->Frames.end(); ++iter)
+    {
+    pqView* view = iter.value();
+    view->getProxy()->SaveXMLState(viewsState);
+    }
+
   pqMultiView::Index index = this->indexOf(frame);
   pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
-  elem->CloseView(index, state->GetNestedElement(0));
+  elem->CloseView(index, state->GetNestedElement(0), viewsState);
   this->Internal->CloseFrameUndoElement = elem;
   elem->Delete();
   state->Delete();
@@ -869,20 +880,22 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
     rwRoot->AddNestedElement(frameElem);
     frameElem->Delete();
     }
+
+  rwRoot->PrintXML();
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::loadState(vtkPVXMLElement* rwRoot)
+bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
+  vtkSMProxyLocator* locator)
 {
   if (!rwRoot || !rwRoot->GetName())
     {
     // qDebug() << "Argument must be <ViewManager /> element.";
-    return; // false;
+    return false;
     }
   if (strcmp(rwRoot->GetName(), "ViewManager") != 0)
     {
-    this->loadState(rwRoot->FindNestedElementByName("ViewManager"));
-    return;
+    return this->loadState(rwRoot->FindNestedElementByName("ViewManager"), locator);
     }
 
   // When state is loaded by the server manager,
@@ -925,20 +938,11 @@ void pqViewManager::loadState(vtkPVXMLElement* rwRoot)
       int id = 0;
       elem->GetScalarAttribute("view_module", &id);
       vtkSmartPointer<vtkSMProxy> viewModule;
-
-      viewModule =
-          vtkSMProxy::SafeDownCast(
-              pqActiveObjects::instance().activeServer()->session()->
-              GetRemoteObject(id));
-      if(!viewModule.GetPointer())
-        {
-        viewModule.TakeReference(
-            pxm->ReNewProxy(id, pxm->GetSession()->GetStateLocator()));
-        }
+      viewModule = locator->LocateProxy(id);
       if (!viewModule.GetPointer())
         {
         qCritical() << "Failed to locate view module mentioned in state!";
-        return; // false;
+        return false;
         }
 
       pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
@@ -974,7 +978,7 @@ void pqViewManager::loadState(vtkPVXMLElement* rwRoot)
       }
     }
 
-  //return true;
+  return true;
 }
 
 //-----------------------------------------------------------------------------

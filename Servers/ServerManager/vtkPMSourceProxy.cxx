@@ -28,6 +28,7 @@
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
+#include "vtkPMPVRepresentationProxy.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
@@ -255,6 +256,12 @@ void vtkPMSourceProxy::UpdateInformation()
     if (src)
       {
       src->UpdateInformation();
+      }
+    vtkPMPVRepresentationProxy* src2 = vtkPMPVRepresentationProxy::SafeDownCast(
+      this->GetSubProxyHelper(cc));
+    if (src2)
+      {
+      src2->UpdateInformation();
       }
     }
 }

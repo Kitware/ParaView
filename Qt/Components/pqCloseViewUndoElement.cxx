@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMStateLoader.h"
+#include "vtkSMProxyManager.h"
 
 #include "pqApplicationCore.h"
 #include "pqViewManager.h"
@@ -53,10 +56,11 @@ pqCloseViewUndoElement::~pqCloseViewUndoElement()
 
 //----------------------------------------------------------------------------
 void pqCloseViewUndoElement::CloseView(
-  pqMultiView::Index frameIndex, vtkPVXMLElement* state)
+  pqMultiView::Index frameIndex, vtkPVXMLElement* state, vtkPVXMLElement* viewsState)
 {
   this->SetIndex(frameIndex.getString().toAscii().data());
   this->State = state;
+  this->ViewsState = viewsState;
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +74,10 @@ int pqCloseViewUndoElement::Undo()
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
-  manager->loadState(this->State); // FIXME maybe provide the session as locator
+  vtkSmartPointer<vtkSMStateLoader> loader = vtkSmartPointer<vtkSMStateLoader>::New();
+  loader->SetSession(vtkSMProxyManager::GetProxyManager()->GetSession());
+  loader->LoadState(this->ViewsState);
+  manager->loadState(this->State, loader->GetProxyLocator());
   return 1;
 }
 

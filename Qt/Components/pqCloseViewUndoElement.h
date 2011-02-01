@@ -64,7 +64,7 @@ public:
   // Creates the undo element for the split operation.
   // \c invert flag inverts the operation of this undo element. When true,
   // Undo() does with Redo() would when invert=false, and vice-versa.
-  void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state);
+  void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state, vtkPVXMLElement* viewsState);
 
 protected:
   pqCloseViewUndoElement();
@@ -73,6 +73,7 @@ protected:
   vtkSetStringMacro(Index);
   char* Index;
   vtkSmartPointer<vtkPVXMLElement> State;
+  vtkSmartPointer<vtkPVXMLElement> ViewsState;
 
 private:
   pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.
