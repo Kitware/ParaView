@@ -1,11 +1,11 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    pqMantaView.cxx
+  Program:   ParaView
+  Module:    vtkSMMantaViewProxy.cxx
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    pqMantaView.cxx
+  Module:    vtkSMMantaViewProxy.cxx
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,40 +58,96 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME pqMantaView -
+// .NAME vtkMantaViewProxy - view setup for vtkManta
 // .SECTION Description
-//
+// A  View that sets up the display pipeline so that it
+// works with manta.
 
-#include "pqMantaView.h"
+#include "vtkSMMantaViewProxy.h"
+#include "vtkObjectFactory.h"
 
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <vtkSMProxy.h>
-#include <vtkSMRenderViewProxy.h>
-#include <vtkSMPropertyHelper.h>
-#include <vtkSMProxyManager.h>
-
-#include <pqOutputPort.h>
-#include <pqPipelineSource.h>
-#include <pqRepresentation.h>
-#include <pqServer.h>
-#include <pqApplicationCore.h>
-#include <pqSettings.h>
+#include "vtkClientServerStream.h"
+#include "vtkProcessModule.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 //-----------------------------------------------------------------------------
-pqMantaView::pqMantaView(
-  const QString& viewType,
-  const QString& group,
-  const QString& name,
-  vtkSMViewProxy* viewProxy,
-  pqServer* server,
-  QObject* p)
-  : pqRenderView(viewType, group, name, viewProxy, server, p)
+vtkStandardNewMacro(vtkSMMantaViewProxy);
+
+
+//-----------------------------------------------------------------------------
+vtkSMMantaViewProxy::vtkSMMantaViewProxy()
 {
 }
 
 //-----------------------------------------------------------------------------
-pqMantaView::~pqMantaView()
+vtkSMMantaViewProxy::~vtkSMMantaViewProxy()
 {
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaViewProxy::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//------------------------------------------------------------------------------
+void vtkSMMantaViewProxy::CreateVTKObjects()
+{
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID id = pm->NewStreamObject("vtkServerSideFactory", stream);
+  stream << vtkClientServerStream::Invoke
+         << id << "EnableFactory"
+         << vtkClientServerStream::End;
+  pm->DeleteStreamObject(id, stream);
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::CLIENT_AND_SERVERS,
+                 stream);
+
+  this->Superclass::CreateVTKObjects();
+
+  vtkSMPropertyHelper(this, "UseLight").Set(0);
+  vtkSMPropertyHelper(this, "LightSwitch").Set(1);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMMantaViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* source, int opport)
+{
+  if (!source)
+    {
+    return 0;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Update with time to avoid domains updating without time later.
+  vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
+  if (sproxy)
+    {
+    double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
+    sproxy->UpdatePipeline(view_time);
+    }
+
+  // Choose which type of representation proxy to create.
+  vtkSMProxy* prototype;
+  prototype = pxm->GetPrototypeProxy("representations",
+    "MantaGeometryRepresentation");
+  vtkSMInputProperty *pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool g = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (g)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "MantaGeometryRepresentation"));
+    }
+
+  return 0;
 }

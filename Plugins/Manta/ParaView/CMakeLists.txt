@@ -17,7 +17,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     )
   INCLUDE(${QT_USE_FILE})
   QT4_WRAP_CPP(MOC_SRCS
-    pqMantaView.h
+    MantaView.h
     MantaDisplay.h
     MantaViewOptions.h)
 
@@ -28,7 +28,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   ADD_PARAVIEW_VIEW_MODULE(
     VIEW_IFACE VIEW_IFACE_SRCS
-    VIEW_TYPE pqMantaView
+    VIEW_TYPE MantaView
     VIEW_NAME Manta
     VIEW_XML_GROUP views
     VIEW_XML_NAME Manta
@@ -36,7 +36,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   ADD_PARAVIEW_VIEW_OPTIONS(
     OPTIONS_IFACE OPTIONS_IFACE_SRCS
-    VIEW_TYPE pqMantaView
+    VIEW_TYPE MantaView
     ACTIVE_VIEW_OPTIONS pqActiveRenderViewOptions
     GLOBAL_VIEW_OPTIONS MantaViewOptions
     )
@@ -65,7 +65,7 @@ add_paraview_plugin(
   GUI_SOURCES
     ${VIEW_IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${DISPLAY_IFACE_SRCS} ${UI_SRCS}
     ${MOC_SRCS}
-    pqMantaView.cxx
+    MantaView.cxx
     MantaDisplay.cxx
     MantaViewOptions.cxx
 )
