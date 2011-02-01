@@ -52,6 +52,7 @@ SET (Kit_SRCS
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
+  vtkPVRepresentationAnimationHelper.cxx
 # --- SM Objects ---
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
@@ -201,7 +202,6 @@ SET(Kit_SRCS
   ## Animation part +++++++++++
   vtkSMCameraManipulatorProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMTimeAnimationCueProxy.cxx
 

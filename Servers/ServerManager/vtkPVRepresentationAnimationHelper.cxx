@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMRepresentationAnimationHelperProxy.cxx
+  Module:    vtkPVRepresentationAnimationHelper.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMRepresentationAnimationHelperProxy.h"
+#include "vtkPVRepresentationAnimationHelper.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 
-vtkStandardNewMacro(vtkSMRepresentationAnimationHelperProxy);
+vtkStandardNewMacro(vtkPVRepresentationAnimationHelper);
 //----------------------------------------------------------------------------
-vtkSMRepresentationAnimationHelperProxy::vtkSMRepresentationAnimationHelperProxy()
+vtkPVRepresentationAnimationHelper::vtkPVRepresentationAnimationHelper()
 {
   this->SourceProxy  = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationAnimationHelperProxy::~vtkSMRepresentationAnimationHelperProxy()
+vtkPVRepresentationAnimationHelper::~vtkPVRepresentationAnimationHelper()
 {
   this->SetSourceProxy(0);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationAnimationHelperProxy::SetSourceProxy(vtkSMProxy* proxy)
+void vtkPVRepresentationAnimationHelper::SetSourceProxy(vtkSMProxy* proxy)
 {
   if (this->SourceProxy != proxy)
     {
@@ -42,7 +42,7 @@ void vtkSMRepresentationAnimationHelperProxy::SetSourceProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationAnimationHelperProxy::SetVisibility(int visible)
+void vtkPVRepresentationAnimationHelper::SetVisibility(int visible)
 {
   if (!this->SourceProxy)
     {
@@ -62,7 +62,7 @@ void vtkSMRepresentationAnimationHelperProxy::SetVisibility(int visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationAnimationHelperProxy::SetOpacity(double opacity)
+void vtkPVRepresentationAnimationHelper::SetOpacity(double opacity)
 {
   if (!this->SourceProxy)
     {
@@ -82,9 +82,7 @@ void vtkSMRepresentationAnimationHelperProxy::SetOpacity(double opacity)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationAnimationHelperProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVRepresentationAnimationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
