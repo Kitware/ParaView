@@ -74,6 +74,7 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->LODMapper = vtkPolyDataMapper::New();
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter->SetOutputDataType(VTK_POLY_DATA);
+  this->LODDeliveryFilter->SetLODMode(true);
 
   this->CacheKeeper->SetInputConnection(this->Preprocessor->GetOutputPort());
   this->LODGeometryFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
