@@ -75,9 +75,13 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
   this->Internal->VTKConnect->Connect(
     proxy->GetProperty("AnimatedProxy"), vtkCommand::ModifiedEvent,
     this, SIGNAL(modified()));
-  this->Internal->VTKConnect->Connect(
-    proxy->GetProperty("AnimatedPropertyName"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(modified()));
+  if (proxy->GetProperty("AnimatedPropertyName"))
+    {
+    // since some cue like that for Camera doesn't have this property.
+    this->Internal->VTKConnect->Connect(
+      proxy->GetProperty("AnimatedPropertyName"), vtkCommand::ModifiedEvent,
+      this, SIGNAL(modified()));
+    }
   this->Internal->VTKConnect->Connect(
     proxy->GetProperty("AnimatedElement"), vtkCommand::ModifiedEvent,
     this, SIGNAL(modified()));

@@ -789,6 +789,10 @@
         Animation cue which can be used for animating Camera using keyframes.
       </Documentation>
 
+      <ProxyProperty name="AnimatedProxy"
+        command="SetView" >
+      </ProxyProperty>
+
       <IntVectorProperty name="Mode"
         command="SetMode"
         number_of_elements="1"
@@ -1169,42 +1173,37 @@
 
     </Proxy>
 
-    <CameraKeyFrameProxy name="CameraKeyFrame"
-      class="vtkCameraInterpolator2"
+    <Proxy name="CameraKeyFrame"
+      class="vtkPVCameraKeyFrame"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
 
       <DoubleVectorProperty name="Position"
         command="SetPosition"
         number_of_elements="3"
-        update_self="1"
         default_values="0.0 0.0 0.0">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="FocalPoint"
         command="SetFocalPoint"
         number_of_elements="3"
-        update_self="1"
         default_values="0.0 0.0 0.0">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="ViewUp"
         command="SetViewUp"
         number_of_elements="3"
-        update_self="1"
         default_values="0.0 1.0 0.0">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="ViewAngle"
         command="SetViewAngle"
         number_of_elements="1"
-        update_self="1"
         default_values="30">
       </DoubleVectorProperty> 
 
       <DoubleVectorProperty name="ParallelScale"
         command="SetParallelScale"
         number_of_elements="1"
-        update_self="1"
         default_values="1.0">
       </DoubleVectorProperty>
 
@@ -1266,8 +1265,10 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-    </CameraKeyFrameProxy>
+      <!-- end of CameraKeyFrame -->
+    </Proxy>
 
+    <!-- end of keyframes -->
   </ProxyGroup>
 
   <ProxyGroup name="piecewise_functions">

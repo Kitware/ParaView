@@ -59,6 +59,17 @@ public:
   void SetViewAngle(double angle);
   void SetParallelScale(double scale);
 
+  // Description:
+  // Forwarded to vtkCameraInterpolator2.
+  void AddPositionPathPoint(double x, double y, double z);
+  void ClearPositionPath();
+  void AddFocalPathPoint(double x, double y, double z);
+  void ClearFocalPath();
+  void SetFocalPointMode(int val);
+  void SetPositionMode(int val);
+  void SetClosedFocalPath(bool val);
+  void SetClosedPositionPath(bool val);
+
 protected:
   vtkPVCameraKeyFrame();
   ~vtkPVCameraKeyFrame();

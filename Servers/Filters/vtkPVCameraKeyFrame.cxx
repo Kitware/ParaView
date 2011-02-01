@@ -123,6 +123,63 @@ void vtkPVCameraKeyFrame::UpdateValue( double currenttime,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::AddPositionPathPoint(double x, double y, double z)
+{
+  this->Interpolator->AddPositionPathPoint(x, y, z);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::ClearPositionPath()
+{
+  this->Interpolator->ClearPositionPath();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::AddFocalPathPoint(double x, double y, double z)
+{
+  this->Interpolator->AddFocalPathPoint(x, y, z);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::ClearFocalPath()
+{
+  this->Interpolator->ClearFocalPath();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::SetFocalPointMode(int val)
+{
+  this->Interpolator->SetFocalPointMode(val);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::SetPositionMode(int val)
+{
+  this->Interpolator->SetPositionMode(val);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::SetClosedFocalPath(bool val)
+{
+  this->Interpolator->SetClosedFocalPath(val);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCameraKeyFrame::SetClosedPositionPath(bool val)
+{
+  this->Interpolator->SetClosedPositionPath(val);
+  this->Modified();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVCameraKeyFrame::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
