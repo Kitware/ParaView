@@ -117,9 +117,8 @@ public:
   vtkGetMacro(Enabled, bool);
 
   // Description:
-  // Tells this to ask the upstream PCF for the appended results.
-  vtkSetMacro(TryAppended, bool);
-  vtkGetMacro(TryAppended, bool);
+  // Tells this to ask the upstream PCF to prepare appended results.
+  void Append();
 
 protected:
   vtkStreamingHarness();
