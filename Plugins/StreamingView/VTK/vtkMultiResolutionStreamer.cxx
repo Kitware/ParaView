@@ -171,10 +171,11 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
     //at this point TD is either empty or has only unimportant pieces in it
     //and NF has all of the pieces we drew last time
 
-    //don't ignore pieces that are unimportant just because they are in
-    //append slot
+    //don't prevent refinement of pieces that are 'unimportant' just because
+    //they are in append slot
     vtkPieceList *NextFrame = harness->GetPieceList2();
     vtkPieceList *tmp = vtkPieceList::New();
+    vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
     while (ToDo->GetNumberOfPieces() != 0)
       {
       vtkPiece p = ToDo->PopPiece();
@@ -190,15 +191,11 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       }
     ToDo->MergePieceList(tmp);
     tmp->Delete();
-    vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
-    if (pcf)
-      {
-      pcf->ClearAppendTable();
-      }
 
     //combine empties that no longer matter
     this->Reap(harness); //merges unimportant pieces left in TD
 
+    //either refine, coarsen or leave alone the pieces depending on mode
     if ((this->ProgressionMode == MANUAL && manualCommand == COARSEN))
       {
       this->Coarsen(harness); //merges pieces in NF and empties NF onto TD
@@ -219,7 +216,8 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       }
 
     //at this point NF is empty and TD has all of the pieces we are going to
-    //draw in this set of passes
+    //draw in this set of passes, including the unimportant ones that we will
+    //skip
 
     //compute priorities for everything we are going to draw this wend
     for (int i = 0; i < ToDo->GetNumberOfPieces(); i++)
@@ -266,10 +264,30 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
          );
       piece.SetViewPriority(gPri);
 
-      //check if piece will be rendered as part of append slot so that we don't
-      //rerender it
+      //don't use cached priority calculated last pass
+      piece.SetCachedPriority(1.0);
+
+      if (!piece.GetPriority() && pcf)
+        {
+        //remove unimportant pieces from the cache
+        int index = pcf->ComputeIndex(p,np);
+        pcf->DeletePiece(index);
+        }
+      ToDo->SetPiece(i, piece);
+      }
+
+    //combine everything we have cached to render it all in the first pass
+    harness->Append();
+    //and don't waste passes re-rendering its content
+    for (int i = 0; i < ToDo->GetNumberOfPieces(); i++)
+      {
+      vtkPiece piece = ToDo->GetPiece(i);
+      int p = piece.GetPiece();
+      int np = piece.GetNumPieces();
+      double res = piece.GetResolution();
       if (harness->InAppend(p,np,res))
         {
+        //cerr << "SKIP " << p << "/" << np << "@" << res << endl;
         piece.SetCachedPriority(0.0);
         }
       else
@@ -280,16 +298,21 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       ToDo->SetPiece(i, piece);
       }
 
-    //sort them
+    //sort list of pieces in most to least important order
     ToDo->SortPriorities();
 
+    //setup pipeline to show the first one in the upcoming render
     vtkPiece p = ToDo->GetPiece(0);
     harness->SetPiece(p.GetPiece());
     harness->SetNumberOfPieces(p.GetNumPieces());
     harness->SetResolution(p.GetResolution());
     harness->ComputePiecePriority(p.GetPiece(), p.GetNumPieces(),
                                   p.GetResolution());
-    harness->SetTryAppended(true);
+    DEBUGPRINT_PASSES
+      (
+       cerr << "FIRST PIECE " << p.GetPiece() << "/" << p.GetNumPieces()
+       << "@" << p.GetResolution() << endl;
+       );
     }
 
   iter->Delete();
@@ -667,14 +690,12 @@ void vtkMultiResolutionStreamer::PrepareNextPass()
       vtkPiece p = ToDo->PopPiece();
       NextFrame->AddPiece(p);
       //adjust pipeline to draw the chosen piece
-      /*
-        DEBUGPRINT_PRIORITY
+      DEBUGPRINT_PASSES
         (
-        cerr << "CHOSE "
-        << p.GetPiece() << "/" << p.GetNumPieces()
-        << "@" << p.GetResolution() << endl;
-        );
-      */
+         cerr << "CHOSE "
+         << p.GetPiece() << "/" << p.GetNumPieces()
+         << "@" << p.GetResolution() << endl;
+         );
       harness->SetPiece(p.GetPiece());
       harness->SetNumberOfPieces(p.GetNumPieces());
       harness->SetResolution(p.GetResolution());
