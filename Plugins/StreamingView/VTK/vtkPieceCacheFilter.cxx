@@ -51,14 +51,6 @@ vtkPieceCacheFilter::~vtkPieceCacheFilter()
     this->AppendFilter->Delete();
     this->AppendFilter = NULL;
     }
-
-  if (this->AppendResult != NULL)
-    {
-    this->AppendResult->Delete();
-    this->AppendResult = NULL;
-    }
-
-  this->ClearAppendTable();
 }
 
 //----------------------------------------------------------------------------
@@ -67,6 +59,12 @@ void vtkPieceCacheFilter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "CacheSize: " << this->CacheSize << endl;
+}
+
+//----------------------------------------------------------------------------
+vtkExecutive* vtkPieceCacheFilter::CreateDefaultExecutive()
+{
+  return vtkPieceCacheExecutive::New();
 }
 
 //----------------------------------------------------------------------------
@@ -92,7 +90,19 @@ void vtkPieceCacheFilter::EmptyCache()
     this->Cache.erase(pos++);
     }
 
-  this->ClearAppendTable();
+  this->EmptyAppend();
+}
+
+//----------------------------------------------------------------------------
+void vtkPieceCacheFilter::EmptyAppend()
+{
+  DEBUGPRINT_APPENDING(cerr << "PCF(" << this << ") ClearAppend" << endl;);
+  //clear appended result content records
+  AppendIndex::iterator pos;
+  for (pos = this->AppendTable.begin(); pos != this->AppendTable.end(); )
+    {
+    this->AppendTable.erase(pos++);
+    }
   if (this->AppendResult != NULL)
     {
     this->AppendResult->Delete();
@@ -125,7 +135,7 @@ unsigned long vtkPieceCacheFilter::GetPieceMTime(int pieceNum)
 //----------------------------------------------------------------------------
 void vtkPieceCacheFilter::DeletePiece(int pieceNum )
 {
-  DEBUGPRINT_APPENDING
+  DEBUGPRINT_CACHING
     (
      cerr << "PCF(" << this << ") Delete piece "
      << this->ComputePiece(pieceNum) << "/"
@@ -144,6 +154,13 @@ void vtkPieceCacheFilter::DeletePiece(int pieceNum )
        );
     pos->second.second->Delete();
     this->Cache.erase(pos);
+
+    AppendIndex::iterator apos = this->AppendTable.find(pieceNum);
+    if (apos != this->AppendTable.end())
+      {
+      //this was also in the append slot, so we have to invalidate that
+      this->EmptyAppend();
+      }
     }
   DEBUGPRINT_CACHING(cerr << endl;);
 
@@ -313,7 +330,7 @@ bool vtkPieceCacheFilter::InCache(int p, int np, double r)
     {
     vtkInformation* dataInfo = ds->GetInformation();
     double dataResolution = dataInfo->Get(vtkDataObject::DATA_RESOLUTION());
-    DEBUGPRINT_APPENDING
+    DEBUGPRINT_CACHING
       (
        vtkPolyData *content = vtkPolyData::SafeDownCast(ds);
        cerr << "PCF(" << this << ") InCache(" << p << "/" << np << "@" << r
@@ -325,7 +342,7 @@ bool vtkPieceCacheFilter::InCache(int p, int np, double r)
       return true;
       }
     }
-  DEBUGPRINT_APPENDING
+  DEBUGPRINT_CACHING
     (
      cerr << "PCF(" << this << ") InCache(" << p << "/" << np << "@"
      << r << ") " << "F" << endl;
@@ -375,19 +392,47 @@ void vtkPieceCacheFilter::AppendPieces()
      << endl;
     );
 
-  this->ClearAppendTable();
-  if (this->AppendResult)
+  CacheType::iterator pos;
+
+  //reuse old append result if it is not stale
+  bool allCached = true;
+#if 1
+  if (this->AppendTable.size() != this->Cache.size())
     {
-    this->AppendResult->Delete();
-    this->AppendResult = NULL;
+    allCached = false;
+    }
+#else
+  for (pos = this->Cache.begin(); pos != this->Cache.end(); )
+    {
+    vtkPolyData *content = vtkPolyData::SafeDownCast(pos->second.second);
+    if (!content)
+      {
+      allCached = false;
+      break;
+      }
+    vtkInformation* dataInfo = content->GetInformation();
+    int dataPiece = dataInfo->Get(vtkDataObject::DATA_PIECE_NUMBER());
+    int dataPieces = dataInfo->Get(vtkDataObject::DATA_NUMBER_OF_PIECES());
+    double dataResolution = dataInfo->Get(vtkDataObject::DATA_RESOLUTION());
+    if (!this->InAppend(dataPiece, dataPieces, dataResolution))
+      {
+      allCached = false;
+      break;
+      }
+    pos++;
+    }
+#endif
+  if (allCached)
+    {
+    return;
     }
 
+  this->EmptyAppend();
   if (!this->Cache.size())
     {
     return;
     }
 
-  CacheType::iterator pos;
   vtkIdType cnt = 0;
   this->AppendFilter->SetNumberOfInputs(this->Cache.size());
   for (pos = this->Cache.begin(); pos != this->Cache.end(); )
@@ -419,34 +464,18 @@ void vtkPieceCacheFilter::AppendPieces()
     pos++;
     }
 
-  this->AppendFilter->SetNumberOfInputs(cnt);
-  this->AppendFilter->Update();
-  this->AppendResult = vtkPolyData::New();
-  this->AppendResult->ShallowCopy(this->AppendFilter->GetOutput());
-
-  DEBUGPRINT_APPENDING
-    (
-    cerr << "PCF("<<this<<") Appended "
-    << this->AppendResult->GetNumberOfPoints()
-    << " verts" << endl;
-     );
-}
-
-//----------------------------------------------------------------------------
-void vtkPieceCacheFilter::ClearAppendTable()
-{
-  DEBUGPRINT_APPENDING(cerr << "PCF(" << this << ") ClearAppendTable" << endl;);
-
-  //clear appended result content records
-  AppendIndex::iterator pos;
-  for (pos = this->AppendTable.begin(); pos != this->AppendTable.end(); )
+  if (cnt)
     {
-    this->AppendTable.erase(pos++);
-    }
-}
+    this->AppendFilter->SetNumberOfInputs(cnt);
+    this->AppendFilter->Update();
+    this->AppendResult = vtkPolyData::New();
+    this->AppendResult->ShallowCopy(this->AppendFilter->GetOutput());
 
-//----------------------------------------------------------------------------
-vtkExecutive* vtkPieceCacheFilter::CreateDefaultExecutive()
-{
-  return vtkPieceCacheExecutive::New();
+    DEBUGPRINT_APPENDING
+      (
+       cerr << "PCF("<<this<<") Appended "
+       << this->AppendResult->GetNumberOfPoints()
+       << " verts" << endl;
+       );
+    }
 }

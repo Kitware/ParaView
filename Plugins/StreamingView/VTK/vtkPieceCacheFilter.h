@@ -67,8 +67,12 @@ public:
   void DeletePiece(int i);
 
   //Description:
-  //Removes all data from the cache.
+  //Removes all data from the cache (and append slot)
   void EmptyCache();
+
+  //Description:
+  //Removes all data from the append slot.
+  void EmptyAppend();
 
   //Description:
   //Convert piece/number of pieces into a unique cache slot index
@@ -106,9 +110,6 @@ public:
   //Returns true if a given piece has been placed into the appended result
   //and was stored with at least the requested resolution.
   bool InAppend(int piece, int numpieces, double res);
-  //Description:
-  //Manually empty the append table, but not the cache itself
-  void ClearAppendTable();
 
 protected:
   vtkPieceCacheFilter();

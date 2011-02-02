@@ -74,7 +74,6 @@ void vtkStreamingHarness::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PieceList1: " << this->PieceList1 << endl;
   os << indent << "PieceList2: " << this->PieceList2 << endl;
   os << indent << "CacheFilter: " << this->CacheFilter << endl;
-  os << indent << "TryAppended: " << (this->TryAppended?"ON":"OFF") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -169,6 +168,15 @@ int vtkStreamingHarness::RequestUpdateExtent
   return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkStreamingHarness::Append()
+{
+  if (this->CacheFilter)
+    {
+    this->CacheFilter->AppendPieces();
+    this->TryAppended = true;
+    }
+}
 
 //----------------------------------------------------------------------------
 int vtkStreamingHarness::RequestData
@@ -183,27 +191,34 @@ int vtkStreamingHarness::RequestData
   vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkPolyData *ipd = vtkPolyData::SafeDownCast(input);
 
-  if (ipd && this->TryAppended && this->CacheFilter)
+  bool usedAppended = false;
+  if (this->TryAppended)
     {
-    /*
-      cerr << "HARNESS(" << this <<") RD APPEND SLOT" << endl;
-    */
-    this->CacheFilter->AppendPieces();
-    vtkPolyData *apd = this->CacheFilter->GetAppendedData();
-    vtkPolyData *opd = vtkPolyData::SafeDownCast(output);
-    opd->ShallowCopy(apd);
-    this->SetTryAppended(false);
+    this->TryAppended = false;
+    if (ipd && this->CacheFilter)
+      {
+      vtkPolyData *apd = this->CacheFilter->GetAppendedData();
+      vtkPolyData *opd = vtkPolyData::SafeDownCast(output);
+      if (apd && opd)
+        {
+        usedAppended = true;
+        //cerr << "HARNESS(" << this <<") RD APPEND SLOT" << endl;
+        opd->ShallowCopy(apd);
+        }
+      }
     }
-  else
+
+  if (!usedAppended)
     {
     /*
-      cerr << "HARNESS(" << this <<") RD "
-      << this->Piece << "/"
-      << this->NumberOfPieces << "@"
-      << this->Resolution  << endl;
+    cerr << "HARNESS(" << this <<") RD "
+         << this->Piece << "/"
+         << this->NumberOfPieces << "@"
+         << this->Resolution  << endl;
     */
     output->ShallowCopy(input);
     }
+
   return 1;
 }
 
@@ -331,10 +346,9 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
 bool vtkStreamingHarness::InAppend(
   int piece, int NumPieces, double resolution)
 {
-  if (this->CacheFilter &&
-      this->CacheFilter->InAppend(piece, NumPieces, resolution))
+  if (this->CacheFilter)
     {
-    return true;
+    return this->CacheFilter->InAppend(piece, NumPieces, resolution);
     }
   return false;
 }
