@@ -441,6 +441,21 @@ def trace_save_screenshot(filename, size, allViews):
       trace_globals.trace_output.append(saveStr)
   trace_globals.trace_output.append("\n")
 
+def trace_save_animation(filename, magnification, quality, frame_rate):
+  """This method is called from the paraview C++ implementation. Do not change
+     the arguments without updating the C++ code."""
+  if not trace_globals.observer_active: return
+
+  # make sure the trace is up to date
+  if len(trace_globals.last_registered_proxies):
+    append_trace()
+
+  trace_globals.trace_output.append(
+    "WriteAnimation('%s', Magnification=%d, Quality=%d, FrameRate=%f)" % \
+     (filename, magnification, quality, frame_rate))
+  trace_globals.trace_output.append("\n")
+
+
 def property_references_untraced_proxy(propPyVariable, propValue, propInfoList):
   """Given a property pyvariable, the property value, and a list of prop_trace_info
   objects, this methods looks for the prop_trace_info in the list with the matching
