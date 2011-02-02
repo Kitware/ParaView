@@ -1978,6 +1978,9 @@ is refined.
       <ProxyListDomain name="proxy_list">
         <Proxy group="parametric_functions" name="Spline" />
       </ProxyListDomain>
+      <Documentation>
+          Property used to reference the parametric function as data generator.
+      </Documentation>
     </ProxyProperty>
    </SourceProxy>
 
