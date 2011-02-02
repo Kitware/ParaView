@@ -5075,12 +5075,20 @@
    </SourceProxy>
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy name="OpenFOAMReader" class="vtkPOpenFOAMReader">
+     <Documentation
+       short_help="Read OpenFOAM data files."
+       long_help="Read OpenFOAM data files, producing multi-block dataset.">
+       The OpenFOAM reader reads OpenFOAM data files and outputs multi-block datasets. Mesh information and time dependent data are supported.
+     </Documentation>
       <StringVectorProperty
          name="FileName"
          command="SetFileName"
          number_of_elements="1"
          animateable="0">
         <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the reader.
+        </Documentation>
       </StringVectorProperty>
 
       <Property
