@@ -58,10 +58,6 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaViewProxy - view setup for vtkManta
-// .SECTION Description
-// A  View that sets up the display pipeline so that it
-// works with manta.
 
 #include "vtkPVMantaRepresentation.h"
 

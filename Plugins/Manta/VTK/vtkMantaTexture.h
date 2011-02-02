@@ -111,8 +111,6 @@ protected:
 
   vtkTimeStamp   LoadTime;
 
-  vtkWeakPointer<vtkRenderWindow> RenderWindow;   // RenderWindow used for previous render
-
 private:
   vtkMantaTexture(const vtkMantaTexture&);  // Not implemented.
   void operator=(const vtkMantaTexture&);  // Not implemented.
