@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMWriterProxy);
 //-----------------------------------------------------------------------------
@@ -67,8 +68,7 @@ int vtkSMWriterProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 //-----------------------------------------------------------------------------
 void vtkSMWriterProxy::UpdatePipeline()
 {
-  // FIXME_COLLABORATION
-  //pm->SendPrepareProgress(this->ConnectionID);
+  this->GetSession()->PrepareProgress();
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -77,7 +77,7 @@ void vtkSMWriterProxy::UpdatePipeline()
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 
-  // pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->GetSession()->CleanupPendingProgress();
 
   this->Superclass::UpdatePipeline();
 }

@@ -16,6 +16,9 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkPVSession.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSessionCore.h"
 
 vtkStandardNewMacro(vtkSMSessionCoreInterpreterHelper);
@@ -45,6 +48,26 @@ vtkPMObject* vtkSMSessionCoreInterpreterHelper::GetPMObject(vtkTypeUInt32 gid)
 vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
   return vtkPMProxy::SafeDownCast(this->Core->GetPMObject(gid))->GetVTKObject();
+}
+
+//----------------------------------------------------------------------------
+vtkProcessModule* vtkSMSessionCoreInterpreterHelper::GetProcessModule()
+{
+  return vtkProcessModule::GetProcessModule();
+}
+
+//----------------------------------------------------------------------------
+vtkPVProgressHandler* vtkSMSessionCoreInterpreterHelper::GetActiveProgressHandler()
+{
+  vtkPVSession* session = vtkPVSession::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetActiveSession());
+  if (!session)
+    {
+    session = vtkPVSession::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetSession());
+    }
+
+  return session? session->GetProgressHandler() : NULL;
 }
 
 //----------------------------------------------------------------------------

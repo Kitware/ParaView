@@ -23,9 +23,11 @@
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
-class vtkSMSessionCore;
-class vtkPMObject;
 class vtkObject;
+class vtkPMObject;
+class vtkPVProgressHandler;
+class vtkProcessModule;
+class vtkSMSessionCore;
 
 class VTK_EXPORT vtkSMSessionCoreInterpreterHelper : public vtkObject
 {
@@ -36,6 +38,9 @@ public:
 
   vtkPMObject* GetPMObject(vtkTypeUInt32 gid);
   vtkObjectBase* GetVTKObject(vtkTypeUInt32 gid);
+
+  vtkProcessModule* GetProcessModule();
+  vtkPVProgressHandler* GetActiveProgressHandler();
 
   void SetCore(vtkSMSessionCore*);
 

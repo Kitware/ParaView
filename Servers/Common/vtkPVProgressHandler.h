@@ -16,7 +16,18 @@
 // .SECTION Description
 // vtkPVProgressHandler handles the progress messages. It handles progress in
 // all configurations single process, client-server, mpi-batch. One progress
-// handler is created per connection.
+// handler is created per Session.
+//
+// .SECTION Events
+// vtkCommand::StartEvent
+// \li fired to indicate beginning of progress handling
+// \li \c calldata: vtkPVProgressHandler*
+// vtkCommand::ProgressEvent
+// \li fired to indicate a progress event.
+// \li \c calldata: vtkPVProgressHandler*
+// vtkCommand::EndEvent
+// \li fired to indicate end of progress handling
+// \li \c calldata: vtkPVProgressHandler*
 // .SECTION See Also
 // vtkPVMPICommunicator
 
@@ -24,8 +35,11 @@
 #define __vtkPVProgressHandler_h
 
 #include "vtkObject.h"
-class vtkProcessModuleConnection;
+
 class vtkMPICommunicatorOpaqueRequest;
+class vtkMultiProcessController;
+class vtkPVSession;
+
 class VTK_EXPORT vtkPVProgressHandler : public vtkObject
 {
 public:
@@ -34,9 +48,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the connection. This is not reference-counted to avoid cycles.
-  void SetConnection(vtkProcessModuleConnection* conn);
-  vtkGetObjectMacro(Connection, vtkProcessModuleConnection);
+  // Get/Set the session. This is not reference-counted to avoid cycles.
+  void SetSession(vtkPVSession* conn);
+  vtkGetObjectMacro(Session, vtkPVSession);
 
   // Description:
   // Listen to progress events from the object.
@@ -53,14 +67,14 @@ public:
   void CleanupPendingProgress();
 
   // Description:
-  // Called when the client connection (vtkClientConnection) receives progress
-  // from the server.
-  void HandleServerProgress(int progress, const char* text);
-
-  // Description:
   // Get/Set the progress frequency in seconds. Default is 0.5 seconds.
   vtkSetClampMacro(ProgressFrequency, double, 0.01, 30.0);
   vtkGetMacro(ProgressFrequency, double);
+
+  // Description:
+  // These are only valid in handler for the vtkCommand::ProgressEvent.
+  vtkGetStringMacro(LastProgressText);
+  vtkGetMacro(LastProgress, int);
 
 //BTX
   // Description:
@@ -73,14 +87,6 @@ protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();
 
-  enum eProcessTypes
-    {
-    INVALID=0,
-    ALL_IN_ONE,
-    CLIENTSERVER_CLIENT,
-    CLIENTSERVER_SERVER_ROOT,
-    SATELLITE
-    };
   enum eTAGS
     {
     CLEANUP_TAG = 188969,
@@ -88,8 +94,9 @@ protected:
     };
 
   // Description:
-  // Determines the process type using the Connection
-  void DetermineProcessType();
+  // Called when the client connection (vtkClientConnection) receives progress
+  // from the server.
+  void HandleServerProgress(int progress, const char* text);
 
   // Description:
   // Called on MPI processes to pass around the CLEANUP_TAG marking the end of
@@ -108,18 +115,17 @@ protected:
   // Returns if the progress should be reported.
   bool ReportProgress(double progress);
 
-
   void SetLocalProgress(int progress, const char* text);
-
-  void SendProgressToClient();
+  void SendProgressToClient(vtkMultiProcessController*);
   void SendProgressToRoot();
   int ReceiveProgressFromSatellites();
-  void ReceiveProgressFromServer();
+  void ReceiveProgressFromServer(vtkMultiProcessController*);
 
+  vtkSetStringMacro(LastProgressText);
+  int LastProgress;
+  char* LastProgressText;
   double ProgressFrequency;
-
-  vtkProcessModuleConnection* Connection;
-  eProcessTypes ProcessType;
+  vtkPVSession* Session;
 private:
   vtkPVProgressHandler(const vtkPVProgressHandler&); // Not implemented
   void operator=(const vtkPVProgressHandler&); // Not implemented
@@ -128,6 +134,11 @@ private:
   // Callback called when vtkCommand::ProgressEvent is received.
   void OnProgressEvent(vtkObject* obj, double progress);
 
+  // Description:
+  // Callback called when WrongTagEvent is fired by the controllers.
+  bool OnWrongTagEvent(void* calldata);
+
+  bool AddedHandlers;
   class vtkInternals;
   vtkInternals* Internals;
 

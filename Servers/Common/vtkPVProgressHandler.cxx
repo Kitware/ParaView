@@ -17,12 +17,11 @@
 #include "vtkAlgorithm.h"
 #include "vtkByteSwap.h"
 #include "vtkCommand.h"
-
+#include "vtkCommunicator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSession.h"
 #include "vtkProcessModule.h"
-#include "vtkRemoteConnection.h"
-#include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h" // For VTK_USE_MPI
 
@@ -41,7 +40,6 @@
 #else
 # define SNPRINTF snprintf
 #endif
-
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
@@ -194,6 +192,13 @@ public:
       {
       this->Target->OnProgressEvent(wdg, *reinterpret_cast<double*>(calldata));
       }
+    if (this->Target && event == vtkCommand::WrongTagEvent)
+      {
+      if (this->Target->OnWrongTagEvent(calldata))
+        {
+        this->AbortFlagOn();
+        }
+      }
     }
 protected:
   vtkObserver() { this->Target = 0; }
@@ -248,19 +253,21 @@ vtkStandardNewMacro(vtkPVProgressHandler);
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
-  this->Connection = 0;
+  this->Session = 0;
   this->Internals = new vtkInternals();
   this->Observer = vtkPVProgressHandler::vtkObserver::New();
   this->Observer->SetTarget(this);
-  this->ProcessType = INVALID;
+  this->LastProgress = 0;
+  this->LastProgressText = NULL;
   this->ProgressFrequency = 2.0; // seconds
-
+  this->AddedHandlers = false;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
-  this->SetConnection(0);
+  this->SetLastProgressText(NULL);
+  this->SetSession(0);
   delete this->Internals;
   this->Observer->SetTarget(0);
   this->Observer->Delete();
@@ -278,47 +285,12 @@ void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::SetConnection(vtkProcessModuleConnection* conn)
+void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
 {
-  if (this->Connection != conn)
+  if (this->Session != conn)
     {
-    this->Connection = conn;
-    this->DetermineProcessType();
+    this->Session = conn;
     this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::DetermineProcessType()
-{
-  this->ProcessType = INVALID;
-#ifdef PV_DISABLE_PROGRESS_HANDLING
-  return;
-#endif
-
-  if (!this->Connection)
-    {
-    return;
-    }
-
-  if (this->Connection->IsA("vtkServerConnection"))
-    {
-    this->ProcessType = CLIENTSERVER_CLIENT;
-    }
-  else if (this->Connection->IsA("vtkClientConnection"))
-    {
-    this->ProcessType = CLIENTSERVER_SERVER_ROOT;
-    }
-  else 
-    {
-    // Not running in client-server. The this is either a parallel batch or
-    // simple all-in-one client.
-    this->ProcessType = ALL_IN_ONE;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (pm->GetPartitionId() > 0)
-      {
-      this->ProcessType = SATELLITE;
-      }
     }
 }
 
@@ -328,8 +300,27 @@ void vtkPVProgressHandler::PrepareProgress()
 #ifdef PV_DISABLE_PROGRESS_HANDLING
   return;
 #endif
-
+  this->InvokeEvent(vtkCommand::StartEvent, this);
   this->Internals->EnableProgress = true;
+
+  if (this->AddedHandlers == false)
+    {
+    vtkMultiProcessController* ds_controller = this->Session->GetController(
+      vtkPVSession::DATA_SERVER_ROOT);
+    vtkMultiProcessController* rs_controller = this->Session->GetController(
+      vtkPVSession::RENDER_SERVER_ROOT);
+    if (rs_controller && rs_controller != ds_controller)
+      {
+      rs_controller->GetCommunicator()->AddObserver(
+        vtkCommand::WrongTagEvent, this->Observer);
+      }
+    if (ds_controller)
+      {
+      ds_controller->GetCommunicator()->AddObserver(
+        vtkCommand::WrongTagEvent, this->Observer);
+      }
+    }
+  this->AddedHandlers = true;
 }
 
 //----------------------------------------------------------------------------
@@ -352,41 +343,40 @@ void vtkPVProgressHandler::CleanupPendingProgress()
   // Receive progress from all children and then send the "Cleaned" signal
   // to the parent (if any).
 
-  if (this->ProcessType == ALL_IN_ONE)
+  // Receive progress from satellites, if any.
+  this->CleanupSatellites();
+
+  // Now, if there exists a client-controller, send reply to the client.
+  vtkMultiProcessController* client_controller =
+    this->Session->GetController(vtkPVSession::CLIENT);
+  if (client_controller != NULL)
     {
-    // Receive progress from satellites, if any.
-    this->CleanupSatellites(); 
+    char temp=0;
+    client_controller->Send(&temp, 1, 1, CLEANUP_TAG);
     }
 
-  if (this->ProcessType == SATELLITE)
+  // Now if there exists a server-controller, wait for reply from the servers.
+
+  // Receive CLEANUP_TAG from Server. While we wait on this receive, we will
+  // consume any progress messages sent by the server.
+  vtkMultiProcessController* ds_controller = this->Session->GetController(
+    vtkPVSession::DATA_SERVER_ROOT);
+  vtkMultiProcessController* rs_controller = this->Session->GetController(
+    vtkPVSession::RENDER_SERVER_ROOT);
+  if (ds_controller)
     {
-    this->CleanupSatellites();
+    char temp=0;
+    ds_controller->Receive(&temp, 1, 1, CLEANUP_TAG);
     }
-
-  if (this->ProcessType == CLIENTSERVER_SERVER_ROOT)
+  if (rs_controller && rs_controller != ds_controller)
     {
-    // Receive progress from satellites, if any.
-    this->CleanupSatellites(); 
-
-    // Send reply to client.
-    vtkRemoteConnection* rconn =
-      vtkRemoteConnection::SafeDownCast(this->Connection);
-    int temp=0;
-    rconn->GetSocketController()->Send(&temp, 1, 1, CLEANUP_TAG);
-    }
-
-  if (this->ProcessType == CLIENTSERVER_CLIENT)
-    {
-    // Receive CLEANUP_TAG from Server. While we wait on this receive, we will
-    // consume any progress messages sent by the server.
-    vtkRemoteConnection* rconn =
-      vtkRemoteConnection::SafeDownCast(this->Connection);
-    int temp=0;
-    rconn->GetSocketController()->Receive(&temp, 1, 1, CLEANUP_TAG);
+    char temp=0;
+    rs_controller->Receive(&temp, 1, 1, CLEANUP_TAG);
     }
 
   this->Internals->ProgressStore.Clear();
   this->Internals->EnableProgress = false;
+  this->InvokeEvent(vtkCommand::EndEvent, this);
 }
 
 //----------------------------------------------------------------------------
@@ -462,36 +452,37 @@ void vtkPVProgressHandler::RefreshProgress()
   vtkstd::string text;
 
   // NOTE: All the sends/receives have to be non-blocking.
-  if (this->ProcessType == ALL_IN_ONE)
-    {
-    // Collect progress from all satellites.
-    this->GatherProgress();
 
-    // Display progress locally.
-    if (this->Internals->ProgressStore.GetProgress(id, text, progress))
-      {
-      this->SetLocalProgress(static_cast<int>(progress*100.0), text.c_str());
-      }
-    }
-  else if (this->ProcessType == CLIENTSERVER_SERVER_ROOT)
-    {
-    // Collect progress from all satellites.
-    this->GatherProgress();
+  // Collect progress from all satellites.
+  this->GatherProgress();
 
-    if (this->GetIsRoot())
-      {
-      // Send to client.
-      this->SendProgressToClient();
-      }
-    }
-  else if (this->ProcessType == SATELLITE)
+  vtkMultiProcessController* client_controller =
+    this->Session->GetController(vtkPVSession::CLIENT);
+  vtkMultiProcessController* ds_controller =
+    this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
+  vtkMultiProcessController* rs_controller =
+    this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+  if (rs_controller && rs_controller == ds_controller)
     {
-    this->GatherProgress();
+    rs_controller = NULL;
     }
-  else if (this->ProcessType == CLIENTSERVER_CLIENT)
-    {
-    this->ReceiveProgressFromServer();
 
+  if (client_controller)
+    {
+    this->SendProgressToClient(client_controller);
+    }
+  if (ds_controller)
+    {
+    this->ReceiveProgressFromServer(ds_controller);
+    }
+  if (rs_controller)
+    {
+    this->ReceiveProgressFromServer(rs_controller);
+    }
+
+  if ( (this->Session->GetProcessRoles() & vtkPVSession::CLIENT) ==
+    vtkPVSession::CLIENT)
+    {
     // Display progress locally.
     if (this->Internals->ProgressStore.GetProgress(id, text, progress))
       {
@@ -521,11 +512,9 @@ bool vtkPVProgressHandler::ReportProgress(double progress)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::SendProgressToClient()
+void vtkPVProgressHandler::SendProgressToClient(
+  vtkMultiProcessController* controller)
 {
-  vtkRemoteConnection* rc =
-    vtkRemoteConnection::SafeDownCast(this->Connection);
-
   // Called on Root node of the server process to send the progress to the
   // client.
   int id;
@@ -539,14 +528,14 @@ void vtkPVProgressHandler::SendProgressToClient()
       buffer[0] = static_cast<int>(progress*100.0);
       SNPRINTF(buffer+1, 1024, "%s", text.c_str());
       int len = static_cast<int>(strlen(buffer+1)) + 2;
-      rc->GetSocketController()->Send(buffer, len, 1,
-        vtkProcessModule::PROGRESS_EVENT_TAG);
+      controller->Send(buffer, len, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::ReceiveProgressFromServer()
+void vtkPVProgressHandler::ReceiveProgressFromServer(
+  vtkMultiProcessController* controller)
 {
   // Nothing to do here. We cannot do non-block receive on SocketController.
   // All progress events from the server will be received as a consequence of
@@ -561,7 +550,12 @@ void vtkPVProgressHandler::HandleServerProgress(int progress, const char* text)
   return;
 #endif
 
-  vtkProcessModule::GetProcessModule()->SetLocalProgress(text, progress);
+  //cout << "Progress: " << (text? text : "(none)") << "==" << progress << endl;
+  this->SetLastProgressText(text);
+  this->LastProgress = progress;
+  this->InvokeEvent(vtkCommand::ProgressEvent, this);
+  this->SetLastProgressText(NULL);
+  this->LastProgress = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -569,7 +563,12 @@ void vtkPVProgressHandler::SetLocalProgress(int progress, const char* text)
 {
   if (this->ReportProgress(progress/100.0))
     {
-    vtkProcessModule::GetProcessModule()->SetLocalProgress(text, progress);
+    this->SetLastProgressText(text);
+    this->LastProgress = progress;
+    this->InvokeEvent(vtkCommand::ProgressEvent, this);
+    this->SetLastProgressText(NULL);
+    this->LastProgress = 0;
+    //cout << "Progress: " << (text? text : "(none)") << "==" << progress << endl;
     }
 }
 
@@ -723,4 +722,36 @@ void vtkPVProgressHandler::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+bool vtkPVProgressHandler::OnWrongTagEvent(void* calldata)
+{
+  int tag = -1;
+  int len = -1;
+  const char* data = reinterpret_cast<const char*>(calldata);
+  const char* ptr = data;
+  memcpy(&tag, ptr, sizeof(tag));
 
+  // FIXME_COLLABORATION
+  // we should leave the error reporting to the default handler.
+  // Also need to handle the ExceptionTag.
+  if ( tag != vtkPVProgressHandler::PROGRESS_EVENT_TAG)
+    {
+    return false;
+    }
+
+  ptr += sizeof(tag);
+  memcpy(&len, ptr, sizeof(len));
+  ptr += sizeof(len);
+  char val = -1;
+  val = *ptr;
+  ptr ++;
+  if ( val < 0 || val > 100 )
+    {
+    vtkErrorMacro("Received progress not in the range 0 - 100: " << (int)val);
+    }
+  else
+    {
+    this->HandleServerProgress(val, ptr);
+    }
+  return true;
+}

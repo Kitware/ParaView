@@ -15,15 +15,22 @@
 #include "vtkPVSession.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVProgressHandler.h"
 
 //----------------------------------------------------------------------------
 vtkPVSession::vtkPVSession()
 {
+  this->ProgressHandler = vtkPVProgressHandler::New();
+  this->ProgressHandler->SetSession(this); // not reference counted.
+  this->ProgressCount = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSession::~vtkPVSession()
 {
+  this->ProgressHandler->SetSession(NULL);
+  this->ProgressHandler->Delete();
+  this->ProgressHandler = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -36,6 +43,43 @@ vtkPVSession::ServerFlags vtkPVSession::GetProcessRoles()
 vtkMultiProcessController* vtkPVSession::GetController(vtkPVSession::ServerFlags)
 {
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSession::PrepareProgress()
+{
+  if (this->ProgressCount == 0)
+    {
+    this->PrepareProgressInternal();
+    }
+  this->ProgressCount++;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSession::CleanupPendingProgress()
+{
+  this->ProgressCount--;
+  if (this->ProgressCount == 0)
+    {
+    this->CleanupPendingProgressInternal();
+    }
+  if (this->ProgressCount < 0)
+    {
+    vtkErrorMacro("PrepareProgress and CleanupPendingProgress mismatch!");
+    this->ProgressCount = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSession::PrepareProgressInternal()
+{
+  this->ProgressHandler->PrepareProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSession::CleanupPendingProgressInternal()
+{
+  this->ProgressHandler->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

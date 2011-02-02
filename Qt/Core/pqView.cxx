@@ -33,13 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkEventQtSlotConnect.h"
+#include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkImageData.h"
+#include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QList>
@@ -192,13 +193,9 @@ void pqView::forceRender()
   vtkSMViewProxy* view = this->getViewProxy();
   if (view)
     {
-    // FIXME:UDA We are managing progess in View module, 
-    // do we need it here?
-    //vtkProcessModule::GetProcessModule()->SendPrepareProgress(
-    //  view->GetConnectionID());
+    view->GetSession()->PrepareProgress();
     view->StillRender();
-    //vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
-    //  view->GetConnectionID());
+    view->GetSession()->CleanupPendingProgress();
     }
 }
 

@@ -20,6 +20,7 @@
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkSMRepresentationProxy);
@@ -110,10 +111,9 @@ void vtkSMRepresentationProxy::UpdatePipelineInternal(
          << "Update"
          << vtkClientServerStream::End;
 
-  // FIXME_COLLABORATION
-  //pm->SendPrepareProgress(this->ConnectionID);
+  this->GetSession()->PrepareProgress();
   this->ExecuteStream(stream);
-  //pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

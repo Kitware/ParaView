@@ -140,6 +140,12 @@ protected:
   vtkSMSessionClient();
   ~vtkSMSessionClient();
 
+  // Description:
+  // Should be called to begin/end receiving progresses on this session.
+  // Overridden to relay to the server(s).
+  virtual void PrepareProgressInternal();
+  virtual void CleanupPendingProgressInternal();
+
   void SetRenderServerController(vtkMultiProcessController*);
   void SetDataServerController(vtkMultiProcessController*);
 

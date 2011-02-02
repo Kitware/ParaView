@@ -241,23 +241,22 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     this->VTKObject.TakeReference(obj);
     }
 
-#ifdef FIXME_COLLABORATION
-  // ensure that this is happening correctly in PMProxy
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream substream;
+    substream << vtkClientServerStream::Invoke
+              << vtkClientServerID(1)
+              << "GetActiveProgressHandler"
+              << vtkClientServerStream::End;
     vtkClientServerStream stream;
-    this->VTKObjectID =
-      pm->NewStreamObject(this->VTKClassName, stream);
     stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID()
+           << substream
            << "RegisterProgressEvent"
-           << this->VTKObjectID
-           << static_cast<int>(this->VTKObjectID.ID)
+           << this->VTKObject
+           << static_cast<int>(this->GetGlobalID())
            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    this->Interpreter->ProcessStream(stream);
     }
-#endif
 
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());

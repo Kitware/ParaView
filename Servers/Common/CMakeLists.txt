@@ -71,7 +71,7 @@ SET(Kit_SRCS
   vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginsInformation.cxx
-#  vtkPVProgressHandler.cxx
+  vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
   vtkPVSelectionInformation.cxx

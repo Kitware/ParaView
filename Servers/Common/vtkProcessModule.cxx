@@ -22,7 +22,6 @@
 #include "vtkDynamicLoader.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkMapper.h"
-#include "vtkMPIController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
@@ -34,6 +33,8 @@
 #include <vtksys/SystemTools.hxx>
 
 #ifdef VTK_USE_MPI
+# include "vtkMPIController.h"
+# include "vtkPVMPICommunicator.h"
 # include <mpi.h>
 #endif
 
@@ -86,6 +87,14 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
     vtkProcessModule::GlobalController = vtkSmartPointer<vtkMPIController>::New();
     vtkProcessModule::GlobalController->Initialize(
       &argc, &argv, /*initializedExternally*/1);
+
+    // Replace the communicator with vtkPVMPICommunicator which handles progress
+    // events better than the conventional vtkMPICommunicator.
+    vtkPVMPICommunicator* comm = vtkPVMPICommunicator::New();
+    comm->CopyFrom(vtkMPICommunicator::GetWorldCommunicator());
+    vtkMPIController::SafeDownCast(
+      vtkProcessModule::GlobalController)->SetCommunicator(comm);
+    comm->Delete();
     }
 #endif // VTK_USE_MPI
   vtkMultiProcessController::SetGlobalController(
@@ -200,14 +209,6 @@ vtkProcessModule::vtkProcessModule()
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
   cddp->Delete();
-
-#ifdef VTK_USE_MPI
-# ifdef PARAVIEW_USE_MPI_SSEND
-  // ParaView uses Ssend for all Trigger RMI calls. This helps in overcoming
-  // bufferring issues with send on some implementations.
-  vtkMPIController::SetUseSsendForRMI(1);
-# endif
-#endif
 
   vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
   vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);

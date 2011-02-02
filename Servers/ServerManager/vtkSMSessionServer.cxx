@@ -101,7 +101,9 @@ vtkMultiProcessController* vtkSMSessionServer::GetController(ServerFlags process
     return this->ClientController;
 
   default:
-    vtkWarningMacro("Invalid processtype of GetController(): " << processType);
+    // we shouldn't warn.
+    // vtkWarningMacro("Invalid processtype of GetController(): " << processType);
+    break;
     }
   return NULL;
 }

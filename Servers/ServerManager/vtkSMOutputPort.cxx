@@ -20,12 +20,13 @@
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 
@@ -113,15 +114,12 @@ void vtkSMOutputPort::GatherDataInformation()
     return;
     }
 
-  // FIXME_COLLABORATION; Progress
-  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //pm->SendPrepareProgress(this->ConnectionID);
+  this->SourceProxy->GetSession()->PrepareProgress();
   this->DataInformation->Initialize();
   this->DataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->DataInformation);
   this->DataInformationValid = true;
-
-  //pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -133,14 +131,12 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
     return;
     }
 
-  // FIXME_COLLABORATION: Progress
-  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //pm->SendPrepareProgress(this->ConnectionID);
+  this->SourceProxy->GetSession()->PrepareProgress();
   this->TemporalDataInformation->Initialize();
   this->SourceProxy->GatherInformation(this->TemporalDataInformation);
 
   this->TemporalDataInformationValid = true;
-  //pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -184,6 +180,7 @@ void vtkSMOutputPort::UpdatePipeline(double time)
 void vtkSMOutputPort::UpdatePipelineInternal(double time,
                                              bool doTime)
 {
+  this->SourceProxy->GetSession()->PrepareProgress();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << PMPROXY(this->SourceProxy)
@@ -191,6 +188,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
          << this->PortIndex << time << (doTime? 1 : 0)
          << vtkClientServerStream::End;
   this->SourceProxy->ExecuteStream(stream);
+  this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

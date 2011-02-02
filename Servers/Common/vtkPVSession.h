@@ -25,6 +25,7 @@
 
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
+class vtkPVProgressHandler;
 class vtkPVServerInformation;
 
 class VTK_EXPORT vtkPVSession : public vtkSession
@@ -73,14 +74,31 @@ public:
   // API for the same if needed.
   virtual vtkPVServerInformation* GetServerInformation()=0;
 
+  // Description:
+  // Provides access to the progress handler.
+  vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
+
+  // Description:
+  // Should be called to begin/end receiving progresses on this session.
+  void PrepareProgress();
+  void CleanupPendingProgress();
+
 //BTX
 protected:
   vtkPVSession();
   ~vtkPVSession();
 
+  // Description:
+  // Virtual methods subclasses can override.
+  virtual void PrepareProgressInternal();
+  virtual void CleanupPendingProgressInternal();
+
+  vtkPVProgressHandler* ProgressHandler;
 private:
   vtkPVSession(const vtkPVSession&); // Not implemented
   void operator=(const vtkPVSession&); // Not implemented
+
+  int ProgressCount;
 //ETX
 };
 
