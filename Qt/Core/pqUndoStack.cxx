@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "vtkEventQtSlotConnect.h"
-// FIXME COLLABORATION #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"

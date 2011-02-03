@@ -511,7 +511,7 @@ void pqApplicationCore::loadState(
 
   emit this->aboutToLoadState(rootElement);
 
-  // FIXME: this->LoadingState cannot be relied upon.
+  // TODO: this->LoadingState cannot be relied upon.
   this->LoadingState = true;
   vtkSMProxyManager* pxm = server->proxyManager();
   pxm->LoadXMLState(rootElement);

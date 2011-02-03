@@ -47,10 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 // Use the property links/manager etc
-#ifdef FIXME_COLLABORATION
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
-#endif
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
 #include "pqSignalAdaptors.h"
@@ -323,7 +321,6 @@ pqXYChartOptionsEditor::~pqXYChartOptionsEditor()
 void pqXYChartOptionsEditor::setView(pqView* view)
 {
   this->disconnectGUI();
-#ifdef FIXME_COLLABORATION
   if (qobject_cast<pqXYChartView*>(view) ||
     qobject_cast<pqComparativeXYChartView*>(view))
     {
@@ -346,7 +343,6 @@ void pqXYChartOptionsEditor::setView(pqView* view)
     this->connectGUI();
     this->setPage(this->Internal->Form->CurrentPage);
     }
-#endif
 }
 
 pqView* pqXYChartOptionsEditor::getView()

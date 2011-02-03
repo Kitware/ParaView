@@ -101,7 +101,7 @@ void pqTableView::forceRender()
     {
     if(!pqRepresentation->isVisible())
       continue;
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
     vtkSMClientDeliveryRepresentationProxy* const display = 
       vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepresentation->getProxy());
       

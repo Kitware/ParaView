@@ -1382,12 +1382,11 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       }
     else if (pt == pqSMAdaptor::SIL)
       {
-#ifdef FIXME_COLLABORATION
       vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(
         SMProperty->GetDomain("array_list"));
 
       pqSILWidget* tree = new pqSILWidget( 
-        silDomain->GetSubtree(), panelLayout->parentWidget());
+        silDomain->GetSubTree(), panelLayout->parentWidget());
       tree->setObjectName(propertyName);
       
       pqSILModel* silModel = new pqSILModel(tree);
@@ -1400,7 +1399,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       panelLayout->setRowStretch(rowCount, 1);
       row_streched = true;
       rowCount++;
-#endif
       }
     }
   iter->Delete();

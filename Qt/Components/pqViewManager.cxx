@@ -731,10 +731,7 @@ void pqViewManager::onConvertToButtonClicked()
 void pqViewManager::onConvertToTriggered(QAction* action)
 {
   QString type = action->data().toString();
-
-  // FIXME: We may want to fix this to use the active server instead.
-  pqServer* server= pqApplicationCore::instance()->
-    getServerManagerModel()->getItemAtIndex<pqServer*>(0);
+  pqServer* server= pqActiveObjects::instance().activeServer();
   if (!server)
     {
     qDebug() << "No server present cannot convert view.";

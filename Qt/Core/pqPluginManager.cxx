@@ -203,7 +203,7 @@ vtkPVPluginsInformation* pqPluginManager::loadedExtensions(bool remote)
 //-----------------------------------------------------------------------------
 void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
 {
-  // FIXME: code that loads plugins from the path.
+  // FIXME_COLLABORATION: code that loads plugins from the path.
 }
 
 //-----------------------------------------------------------------------------

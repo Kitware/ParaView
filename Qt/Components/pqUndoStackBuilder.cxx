@@ -74,7 +74,6 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 {
   vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
 
-  // FIXME COLLABORATION make sure we don't escape too much (Utkarsh)
   // We filter proxy type that must not be involved in undo/redo state.
   // The property themselves are already filtered based on a flag in the XML.
   // XML Flag: state_ignored="1"

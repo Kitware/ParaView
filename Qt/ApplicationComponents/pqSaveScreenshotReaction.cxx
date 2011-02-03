@@ -143,13 +143,11 @@ void pqSaveScreenshotReaction::saveScreenshot()
   // temporarily load the color palette chosen by the user.
   vtkSmartPointer<vtkPVXMLElement> currentPalette;
   pqApplicationCore* core = pqApplicationCore::instance();
-#ifdef FIXME_COLLABORATION
   if (!palette.isEmpty())
     {
     currentPalette.TakeReference(core->getCurrrentPalette());
     core->loadPalette(palette);
     }
-#endif
 
   int stereo = ssDialog.getStereoMode();
   if (stereo)
@@ -161,12 +159,10 @@ void pqSaveScreenshotReaction::saveScreenshot()
     size, ssDialog.quality(), ssDialog.saveAllViews());
 
   // restore palette.
-#ifdef FIXME_COLLABORATION
   if (!palette.isEmpty())
     {
     core->loadPalette(currentPalette);
     }
-#endif
 
   if (stereo)
     {
