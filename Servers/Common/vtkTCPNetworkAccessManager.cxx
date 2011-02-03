@@ -122,7 +122,8 @@ void vtkTCPNetworkAccessManager::AbortPendingConnection()
 //----------------------------------------------------------------------------
 bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
 {
-  vtkWarningMacro("Need to fix this to report real pending connectios");
+  // FIXME_COLLABORATION
+  cout << "Need to fix this to report real pending connections" << endl;
   return false;
 }
 
