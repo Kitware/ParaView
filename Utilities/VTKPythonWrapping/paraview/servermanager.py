@@ -1420,7 +1420,7 @@ def OutputPort(proxy, outputPort=0):
 
 class ProxyManager(object):
     """When running scripts from the python shell in the ParaView application,
-    registering proxies with the proxy manager is the ony mechanism to
+    registering proxies with the proxy manager is the only mechanism to
     notify the graphical user interface (GUI) that a proxy
     exists. Therefore, unless a proxy is registered, it will not show up in
     the user interface. Also, the proxy manager is the only way to get
@@ -1830,7 +1830,7 @@ def CreateProxy(xml_group, xml_name, session=None):
     if not session:
         session = ActiveSession
     if not session:
-        raise RuntimeError, "Cannot create objects with a session."
+        raise RuntimeError, "Cannot create objects without a session."
     pxm = ProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
