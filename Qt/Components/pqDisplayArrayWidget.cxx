@@ -522,4 +522,3 @@ const QString pqDisplayArrayWidget::getArrayName() const
 
   return array;
 }
-
