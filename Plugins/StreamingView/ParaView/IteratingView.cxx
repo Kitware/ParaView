@@ -74,5 +74,5 @@ IteratingView::IteratingView(
   : StreamingView(viewType, group, name, viewProxy, server, p)
 {
   //choose a default piece to ask about for info
-  vtkSMOutputPort::SetDefaultPiece(0,8,1.0);
+  vtkSMOutputPort::SetDefaultPiece(0,16,1.0);
 }
