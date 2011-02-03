@@ -265,7 +265,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
                                      vtkPVXMLElement* element)
 {
-  // FIXME: some of the attributes are no longer necessary on the proxy-side,
+  // TODO: some of the attributes are no longer necessary on the proxy-side,
   // eg. "Command". We will remove those once we've verified that they are
   // present on the PMProperty side.
   const char* xmlname = element->GetAttribute("name");

@@ -233,7 +233,6 @@ int vtkSMProxyListDomain::RemoveProxy(unsigned int index)
 //-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::ChildSaveState(vtkPVXMLElement* element)
 {
-#ifdef FIXME
   this->Superclass::ChildSaveState(element);
 
   vtkSMProxyListDomainInternals::VectorOfProxies::iterator iter;
@@ -248,18 +247,12 @@ void vtkSMProxyListDomain::ChildSaveState(vtkPVXMLElement* element)
     element->AddNestedElement(proxyElem);
     proxyElem->Delete();
     }
-#endif
-  (void)element;
 }
 
 //-----------------------------------------------------------------------------
 int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
   vtkSMProxyLocator* loader)
 {
-  (void)element;
-  (void)loader;
-
-#ifdef FIXME
   this->Internals->ProxyList.clear();
   if (!this->Superclass::LoadState(element, loader))
     {
@@ -282,7 +275,6 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
         }
       }
     }
-#endif
   return 1;
 }
 

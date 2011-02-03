@@ -40,6 +40,7 @@
 class vtkStringList;
 class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
@@ -78,7 +79,7 @@ public:
   // obtain the xmlgroup and xmlname for the reader that can read the file.
   // When this returns false, use GetPossibleReaders() to get the list of
   // readers that can possibly read the file.
-  bool CanReadFile(const char* filename, vtkIdType cid);
+  bool CanReadFile(const char* filename, vtkSMSession* session);
 
   // Description:
   // Returns the xml-name for the reader that can read the file queried by the
@@ -99,26 +100,26 @@ public:
   // Returns a list of 3-tuples where the 1st string is the group, the 2nd
   // string is the reader name and the 3rd string is the reader description
   // Note that the extension test is skipped in this case.
-  vtkStringList* GetPossibleReaders(const char* filename, vtkIdType cid);
+  vtkStringList* GetPossibleReaders(const char* filename, vtkSMSession* session);
 
   // Description:
   // Returns a list of 3-tuples where the 1st string is the group, the 2nd
   // string is the reader name and the 3rd string is the reader description
   // This returns all the possible readers with a given connection id.
-  vtkStringList* GetReaders(vtkIdType cid);
+  vtkStringList* GetReaders(vtkSMSession* session);
 
   // Description:
   // Returls list of readers that can read the file using its extension and
   // connection id.
   // Returns a list of 3-tuples where the 1st string is the group, the 2nd
   // string is the reader name and the 3rd string is the reader description
-  vtkStringList* GetReaders(const char* filename, vtkIdType cid);
+  vtkStringList* GetReaders(const char* filename, vtkSMSession* session);
 
   // Description:
   // Helper method to test is a file is readable on the server side. This has
   // nothing to do with the whether the file is readable by a reader, just test
   // the file permissions etc. Internally uses the ServerFileListing proxy.
-  static bool TestFileReadability(const char* filename, vtkIdType cid);
+  static bool TestFileReadability(const char* filename, vtkSMSession* session);
 
   // Description:
   // Returns a formatted string with all supported file types.
@@ -127,7 +128,7 @@ public:
   // \verbatim
   // "Supported Files (*.vtk *.pvd);;PVD Files (*.pvd);;VTK Files (*.vtk)"
   // \endverbatim
-  const char* GetSupportedFileTypes(vtkIdType cid);
+  const char* GetSupportedFileTypes(vtkSMSession* session);
 
   // Description:
   // Helper method to check if the reader can read the given file. This is a
@@ -136,7 +137,7 @@ public:
   // the file, and return true.
   static bool CanReadFile(const char* filename, vtkSMProxy* reader);
   static bool CanReadFile(const char* filename, const char* readerxmlgroup,
-    const char* readerxmlname, vtkIdType cid);
+    const char* readerxmlname, vtkSMSession* session);
 
   // Description:
   // Returns the number of registered prototypes.

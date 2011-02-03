@@ -85,8 +85,7 @@ void vtkSMWriterProxy::UpdatePipeline()
 //-----------------------------------------------------------------------------
 void vtkSMWriterProxy::UpdatePipeline(double time)
 {
-  // FIXME_COLLABORATION
-  //pm->SendPrepareProgress(this->ConnectionID);
+  this->Session->PrepareProgress();
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -95,7 +94,7 @@ void vtkSMWriterProxy::UpdatePipeline(double time)
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 
-  // pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->Session->CleanupPendingProgress();
   this->Superclass::UpdatePipeline(time);
 }
 

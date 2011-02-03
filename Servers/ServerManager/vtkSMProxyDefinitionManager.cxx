@@ -33,7 +33,6 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
-// #include "vtkSMProxyManager.h" // FIXME <===========================================================================
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -361,7 +360,7 @@ protected:
 
       if(this->GroupNames.size() == 0)
         {
-        // Throw an error FIXME +++++++++++++++++++++++++++++++++++++++++++++++
+        // TODO vtkErrorMacro("No definition available for that iterator.");
         return;
         }
       Reset();
@@ -963,7 +962,7 @@ void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
   msg->set_global_id(1);
   msg->set_location(vtkProcessModule::DATA_SERVER);
 
-  // FIXME: This is made in a naive way, but we are sure that at each request
+  // This is made in a naive way, but we are sure that at each request
   // we have the correct and latest definition available.
   // This is not the most efficient way to do it. But optimistation should come
   // after. And for now, it is the less intrusive way to deal with server
@@ -1060,7 +1059,7 @@ void vtkSMProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     }
 }
 //---------------------------------------------------------------------------
-// FIXME COLLABORATION : For now we dynamically convert InformationHelper
+// For now we dynamically convert InformationHelper
 // into the correct kernel_class and attribute sets.
 // THIS CODE MUST BE REMOVED once InformationHelper have been removed from
 // legacy XML

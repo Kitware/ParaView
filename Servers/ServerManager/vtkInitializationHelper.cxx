@@ -161,8 +161,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   vtkSMObject::SetProxyManager(pxm);
   pxm->Delete();
 
-  // FIXME
-  // vtkSMProperty::SetCheckDomains(0);
+  vtkSMProperty::SetCheckDomains(0);
 }
 
 //----------------------------------------------------------------------------

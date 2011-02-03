@@ -290,38 +290,6 @@ void vtkSMProxyManager::InstantiatePrototypes()
     }
 }
 
-#ifdef FIXME
-//----------------------------------------------------------------------------
-void vtkSMProxyManager::AddElement(const char* groupName,
-                                   const char* name,
-                                   vtkPVXMLElement* element)
-{
-  // FIXME: ensure that extensions are handled by vtkSMProxyDefinitionManager.
-  vtkSMProxyManagerElementMapType& elementMap =
-    this->Internals->GroupMap[groupName];
-
-  if (element->GetName() && strcmp(element->GetName(), "Extension") == 0)
-    {
-    // This is an extension for an existing definition.
-    vtkSMProxyManagerElementMapType::iterator iter = elementMap.find(name);
-    if (iter == elementMap.end())
-      {
-      vtkWarningMacro("Extension for (" << groupName << ", " << name
-        << ") ignored since could not find core definition.");
-      return;
-      }
-    for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); cc++)
-      {
-      iter->second->AddNestedElement(element->GetNestedElement(cc));
-      }
-    }
-  else
-    {
-    elementMap[name] = element;
-    }
-}
-#endif
-
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy(
   const char* groupName, const char* proxyName, const char* subProxyName)
@@ -910,13 +878,6 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
           this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())
           {
-// FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-//          vtksys_ios::ostringstream log;
-//          log << "Updating Proxy: " << it3->GetPointer()->Proxy.GetPointer() << "--("
-//            << it3->GetPointer()->Proxy->GetXMLGroup()
-//            << it3->GetPointer()->Proxy->GetXMLName()
-//            << ")";
-//          vtkProcessModule::DebugLog(log.str().c_str());
           it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
           }
         }
@@ -1014,7 +975,7 @@ void vtkSMProxyManager::UnRegisterLink(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterAllLinks()
 {
-  // FIXME: need to fire unregister events!!!
+  // FIXME: need to fire unregister events ?!?!?!
   this->Internals->RegisteredLinkMap.clear();
 }
 

@@ -166,8 +166,8 @@ void vtkSMCompoundSourceProxy::UpdateVTKObjects()
     {
     vtkSMProxy* subProxy = this->GetSubProxy(i);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(subProxy);
-    // FIXME: for vtkSMCompoundSourceProxy,
-    // GetNumberOfAlgorithmRequiredInputPorts always returns 0.
+    // For vtkSMCompoundSourceProxy,GetNumberOfAlgorithmRequiredInputPorts
+    // always returns 0.
     if (!source || source->GetNumberOfAlgorithmRequiredInputPorts() == 0)
       {
       subProxy->UpdateVTKObjects();

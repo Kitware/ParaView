@@ -53,16 +53,6 @@ void vtkSMObject::SetProxyManager(vtkSMProxyManager* pm)
   vtkSMObject::ProxyManager = pm;
 }
 
-////---------------------------------------------------------------------------
-//vtkSMApplication* vtkSMObject::GetApplication()
-//{
-//  abort();
-//  // FIXME
-//  // return vtkSMApplication::GetInstance();
-//  //return vtkSMObject::Application;
-//  return NULL;
-//}
-//
 //---------------------------------------------------------------------------
 void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {

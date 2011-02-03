@@ -76,7 +76,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
   vtkSMReaderFactory* readerFactory =
     vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   QString filters = readerFactory->GetSupportedFileTypes(
-    server->GetConnectionID());
+    server->session());
   if (!filters.isEmpty())
     {
     filters += ";;";
@@ -123,7 +123,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
   for (int i=0; i < 1 /*files.size()*/; i++)
     {
     if (!readerFactory->TestFileReadability(files[i].toAscii().data(),
-        server->GetConnectionID()))
+        server->session()))
       {
       qWarning() << "File '" << files[i] << "' cannot be read.";
       return NULL;
@@ -135,7 +135,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
   QString filename = files[0];
 
   vtkStringList* list = readerFactory->GetReaders(filename.toAscii().data(),
-                                                  server->GetConnectionID());
+                                                  server->session());
 
   QString readerType, readerGroup;
 
@@ -156,7 +156,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
       }
     }
   else if (readerFactory->CanReadFile(filename.toAscii().data(),
-      server->GetConnectionID()))
+      server->session()))
     {
     readerType = readerFactory->GetReaderName();
     readerGroup = readerFactory->GetReaderGroup();

@@ -113,7 +113,7 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkIdType vtkNotUsed(cid))
+    bool CanCreatePrototype(vtkSMSession* vtkNotUsed(session))
       {
       return (this->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str())
               != NULL);
@@ -122,7 +122,7 @@ public:
     // Returns true if the reader can read the file. More correctly, it returns
     // false is the reader reports that it cannot read the file.
     bool CanReadFile(const char* filename,
-      const vtkstd::vector<vtkstd::string>& extensions, vtkIdType cid,
+      const vtkstd::vector<vtkstd::string>& extensions, vtkSMSession* session,
       bool skip_filename_test=false);
 
     // Tests if 'any' of the strings in extensions is contained in
@@ -235,7 +235,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   const char* filename,
   const vtkstd::vector<vtkstd::string>& extensions,
-  vtkIdType cid,
+  vtkSMSession* session,
   bool skip_filename_test/*=false*/)
 {
   vtkSMProxyManager* pxm = this->GetProxyManager();
@@ -268,7 +268,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   proxy->Delete();
   return canRead;
 }
-
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMReaderFactory);
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
@@ -448,14 +448,14 @@ bool vtkSMReaderFactory::LoadConfiguration(vtkPVXMLElement* elem)
 }
 
 //----------------------------------------------------------------------------
-vtkStringList* vtkSMReaderFactory::GetReaders(vtkIdType cid)
+vtkStringList* vtkSMReaderFactory::GetReaders(vtkSMSession* session)
 {
-  return this->GetPossibleReaders(NULL, cid);
+  return this->GetPossibleReaders(NULL, session);
 }
 
 //----------------------------------------------------------------------------
 vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
-                                              vtkIdType cid)
+                                              vtkSMSession* session)
 {
   this->Readers->RemoveAllItems();
 
@@ -471,8 +471,8 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(cid) &&
-        iter->CanReadFile(filename, extensions, cid))
+    if (iter->CanCreatePrototype(session) &&
+        iter->CanReadFile(filename, extensions, session))
       {
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
@@ -485,7 +485,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
 
 //----------------------------------------------------------------------------
 vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
-  vtkIdType cid)
+  vtkSMSession* session)
 {
   this->Readers->RemoveAllItems();
 
@@ -502,8 +502,8 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(cid) &&
-      (!filename || iter->CanReadFile(filename, extensions, cid, true)))
+    if (iter->CanCreatePrototype(session) &&
+      (!filename || iter->CanReadFile(filename, extensions, session, true)))
       {
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
@@ -515,7 +515,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkIdType cid)
+bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session)
 {
   this->SetReaderGroup(0);
   this->SetReaderName(0);
@@ -532,7 +532,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkIdType cid)
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(cid) && iter->CanReadFile(filename, extensions, cid))
+    if (iter->CanCreatePrototype(session) && iter->CanReadFile(filename, extensions, session))
       {
       this->SetReaderGroup(iter->Group.c_str());
       this->SetReaderName(iter->Name.c_str());
@@ -557,7 +557,7 @@ static vtkstd::string vtkJoin(
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
+const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 {
   vtksys_ios::ostringstream all_types;
   all_types << "Supported Files (";
@@ -568,7 +568,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(cid))
+    if (iter->CanCreatePrototype(session))
       {
       vtkstd::string ext_list;
       if (iter->Extensions.size() > 0)
@@ -612,7 +612,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid)
+bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* session)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
@@ -640,12 +640,8 @@ bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid
 bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 {
   // Assume that it can read the file if CanReadFile does not exist.
-  // FIXME_COLLABORATION : Can't the proxy-manager simply forward the session to
-  // this guy?
   int canRead = 1;
-  vtkSMSession* session =
-      vtkSMSession::SafeDownCast(
-          vtkProcessModule::GetProcessModule()->GetSession());
+  vtkSMSession* session = proxy->GetSession();
 
 
   vtkClientServerStream stream;
@@ -661,7 +657,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
-  const char* readerxmlgroup, const char* readerxmlname, vtkIdType cid)
+  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* session)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );
