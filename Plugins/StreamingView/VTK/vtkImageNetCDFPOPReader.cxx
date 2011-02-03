@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define DEBUGPRINT_RESOLUTION(arg) ;
 
-#define DEBUGPRINT_METAINFORMATION(arg) arg;
+#define DEBUGPRINT_METAINFORMATION(arg) ;
 
 vtkStandardNewMacro(vtkImageNetCDFPOPReader);
 
@@ -100,6 +100,8 @@ vtkImageNetCDFPOPReader::vtkImageNetCDFPOPReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->FileName = NULL;
+  this->NCDFFD = 0;
+
   this->SelectionObserver = vtkCallbackCommand::New();
   this->SelectionObserver->SetCallback
     (&vtkImageNetCDFPOPReader::SelectionModifiedCallback);
@@ -160,23 +162,27 @@ int vtkImageNetCDFPOPReader::RequestInformation(
     return 0;
     }
 
-  int retval = nc_open(this->FileName, NC_NOWRITE, &this->NCDFFD);
-  if (retval != NC_NOERR)
+  int retval;
+  if (!this->NCDFFD)
     {
-    vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
-    return 0;
+    retval = nc_open(this->FileName, NC_NOWRITE, &this->NCDFFD);
+    if (retval != NC_NOERR)
+      {
+      vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
+      return 0;
+      }
+    }
+
+  retval =
+    this->Superclass::RequestInformation(request, inputVector, outputVector);
+  if (retval != VTK_OK)
+    {
+    return retval;
     }
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(vtkDataObject::ORIGIN(),this->Origin,3);
   outInfo->Set(vtkDataObject::SPACING(), this->Spacing, 3);
-
-  int ret =
-    this->Superclass::RequestInformation(request, inputVector, outputVector);
-  if (!ret)
-    {
-    return ret;
-    }
 
   // get number of variables from file
   int numberOfVariables;
@@ -216,7 +222,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
       }
     }
 
- int sWholeExtent[6];
+  int sWholeExtent[6];
   sWholeExtent[0] = this->Internals->WholeExtent[0];
   sWholeExtent[1] = this->Internals->WholeExtent[1];
   sWholeExtent[2] = this->Internals->WholeExtent[2];
@@ -231,10 +237,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
 
   this->Internals->Resolution = 1.0;
 
-  //TODO: Unlike for other sources I am not getting resolution on the
-  //first pass here. Doing this forces no request to 0.0 instead of 1.0
-  //which is not good for anything but multires.
-  if (1)//outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
     double rRes =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
@@ -294,11 +297,6 @@ int vtkImageNetCDFPOPReader::RequestInformation(
        cerr << endl;
        );
     }
-  else
-    {
-    cerr << "NO RES" << endl;
-    }
-
 
   outInfo->Get(vtkDataObject::ORIGIN(), this->Origin);
 
@@ -318,7 +316,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
                bounds, 6);
 
-  return ret;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -411,7 +409,7 @@ int vtkImageNetCDFPOPReader::RequestData(vtkInformation* request,
     (vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
   DEBUGPRINT_METAINFORMATION
     (
-     cerr << "RSR(" << this << ") Calculated range "
+     cerr << "SIP(" << this << ") Calculated range "
      << range[0] << ".." << range[1]
      << " for " << P << "/" << NP << "&" << this->Internals->Resolution
      << endl;
