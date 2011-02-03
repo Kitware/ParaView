@@ -1316,8 +1316,15 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->AddCustomProxyDefinition(group, name, top);
 
-  // Backwards compatibility issue: We are no longer firing events from proxy
-  // manager when definitions are added.
+  RegisteredProxyInformation info;
+  info.Proxy = 0;
+  info.GroupName = group;
+  info.ProxyName = name;
+  info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
+//  bool prev = this->ProxyDefinitionsUpdated;
+//  this->ProxyDefinitionsUpdated = true;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+//  this->ProxyDefinitionsUpdated = prev;
 }
 
 //---------------------------------------------------------------------------

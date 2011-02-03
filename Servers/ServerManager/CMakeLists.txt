@@ -191,7 +191,6 @@ SET (Kit_SRCS
 
 IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET(Kit_SRCS
-
   #vtkSMApplication.cxx ----- Get the configuration parsing stuff -----
   #vtkSMCaveRenderModuleProxy.cxx
   #vtkSMCaveRenderViewProxy.cxx
@@ -203,13 +202,6 @@ SET(Kit_SRCS
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMTimeAnimationCueProxy.cxx
-
-  ## Comparative view +++++++++
-
-  ## Charts stuff +++++++++++++
-
-  ## Reader/Writer factory +++++++++++
-  vtkSMWriterProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
