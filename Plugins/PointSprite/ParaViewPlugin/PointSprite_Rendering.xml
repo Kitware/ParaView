@@ -282,13 +282,6 @@
         <DoubleRangeDomain name="range" min="1" max="8192"/>
       </DoubleVectorProperty>
 
-      <StringVectorProperty
-        name="RadiusArrayName"
-        command="SetRadiusArrayName"
-        number_of_elements="1"
-        default_values="">
-      </StringVectorProperty>
-
     </Proxy>
   </ProxyGroup>
 
@@ -354,7 +347,7 @@
 
    <ProxyGroup name="sources">
      <SourceProxy name="ImageSpriteSource" class="vtkImageSpriteSource"
-                label="Mandelbrot">
+                label="ImageSprite">
       <Documentation
         long_help="ImageSpriteSource produces images with pixel values determined by a Gaussian, and alpha value either proportional to luminance or masking the sprite."
         short_help="ImageSpriteSource produces images with pixel values determined by a Gaussian, and alpha value either proportional to luminance or masking the sprite.">

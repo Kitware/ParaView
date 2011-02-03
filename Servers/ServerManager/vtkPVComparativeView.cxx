@@ -121,14 +121,14 @@ public:
   struct RepresentationCloneItem
     {
     // The clone representation proxy.
-    vtkSmartPointer<vtkSMRepresentationProxy> CloneRepresentation;
+    vtkSmartPointer<vtkSMProxy> CloneRepresentation;
 
     // The sub-view in which this clone exists.
     vtkSmartPointer<vtkSMViewProxy> ViewProxy;
 
     RepresentationCloneItem() {}
     RepresentationCloneItem(
-      vtkSMViewProxy* view, vtkSMRepresentationProxy* repr)
+      vtkSMViewProxy* view, vtkSMProxy* repr)
       : CloneRepresentation(repr), ViewProxy(view) {}
     };
 
@@ -143,13 +143,17 @@ public:
       VectorOfClones::iterator iter;
       for (iter = this->Clones.begin(); iter != this->Clones.end(); ++iter)
         {
-        vtkSMRepresentationProxy * repr = iter->CloneRepresentation;
-        vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
-        helper.Set(0);
-        repr->UpdateProperty("ForceUseCache");
-        repr->MarkDirty(NULL);
-        helper.Set(1);
-        repr->UpdateProperty("ForceUseCache");
+        vtkSMRepresentationProxy * repr =
+          vtkSMRepresentationProxy::SafeDownCast(iter->CloneRepresentation);
+        if (repr)
+          {
+          vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
+          helper.Set(0);
+          repr->UpdateProperty("ForceUseCache");
+          repr->MarkDirty(NULL);
+          helper.Set(1);
+          repr->UpdateProperty("ForceUseCache");
+          }
         }
       }
 
@@ -171,7 +175,7 @@ public:
   typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews Views;
 
-  typedef vtkstd::map<vtkSMRepresentationProxy*, RepresentationData> MapOfReprClones;
+  typedef vtkstd::map<vtkSMProxy*, RepresentationData> MapOfReprClones;
   MapOfReprClones RepresentationClones;
 
   typedef vtkstd::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> >
@@ -192,8 +196,8 @@ public:
   // Arguments:
   // @repr -- representation to clone
   // @view -- the view to which the new clone should be added.
-  vtkSMRepresentationProxy* AddRepresentationClone(
-    vtkSMRepresentationProxy* repr, vtkSMViewProxy* view)
+  vtkSMProxy* AddRepresentationClone(
+    vtkSMProxy* repr, vtkSMViewProxy* view)
     {
     MapOfReprClones::iterator iter = this->RepresentationClones.find(repr);
     if (iter == this->RepresentationClones.end())
@@ -207,8 +211,8 @@ public:
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
     // Create a new representation
-    vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
+    vtkSMProxy* newRepr =
+      pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName());
 
     // Made the new representation a clone
     vtkCopyClone(repr, newRepr);
@@ -401,7 +405,7 @@ void vtkPVComparativeView::Build(int dx, int dy)
     for (reprIter = this->Internal->RepresentationClones.begin();
       reprIter != this->Internal->RepresentationClones.end(); ++reprIter)
       {
-      vtkSMRepresentationProxy* repr = reprIter->first;
+      vtkSMProxy* repr = reprIter->first;
       vtkInternal::RepresentationData& data = reprIter->second;
 
       // remove old root-clones if extra.
@@ -409,7 +413,7 @@ void vtkPVComparativeView::Build(int dx, int dy)
         {
         for (cc = data.Clones.size()-1; cc >= numReprs; cc--)
           {
-          vtkSMRepresentationProxy* root_clone =
+          vtkSMProxy* root_clone =
             data.Clones[cc].CloneRepresentation;
           vtkRemoveRepresentation(root_view, root_clone);
           data.Link->RemoveLinkedProxy(root_clone);
@@ -421,8 +425,8 @@ void vtkPVComparativeView::Build(int dx, int dy)
         // add new root-clones if needed.
         for (cc = data.Clones.size(); cc < numReprs-1; cc++)
           {
-          vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
-            pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
+          vtkSMProxy* newRepr =
+            pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName());
           vtkCopyClone(repr, newRepr); // create a clone
           newRepr->UpdateVTKObjects(); // create objects
           data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT); // link properties
@@ -512,9 +516,9 @@ void vtkPVComparativeView::AddNewView()
   for (reprIter = this->Internal->RepresentationClones.begin();
     reprIter != this->Internal->RepresentationClones.end(); ++reprIter)
     {
-    vtkSMRepresentationProxy* repr = reprIter->first;
+    vtkSMProxy* repr = reprIter->first;
 
-    vtkSMRepresentationProxy* clone =
+    vtkSMProxy* clone =
       this->Internal->AddRepresentationClone(repr, newView);
     assert(clone != NULL);
     }
@@ -540,7 +544,7 @@ void vtkPVComparativeView::RemoveView(vtkSMViewProxy* view)
       data.FindRepresentationClone(view);
     if (cloneIter != data.Clones.end())
       {
-      vtkSMRepresentationProxy* clone = cloneIter->CloneRepresentation;
+      vtkSMProxy* clone = cloneIter->CloneRepresentation;
       vtkRemoveRepresentation(view, clone);
       data.Link->RemoveLinkedProxy(clone);
       data.Clones.erase(cloneIter);
@@ -564,7 +568,7 @@ void vtkPVComparativeView::RemoveView(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeView::AddRepresentation(vtkSMRepresentationProxy* repr)
+void vtkPVComparativeView::AddRepresentation(vtkSMProxy* repr)
 {
   ENSURE_INIT();
 
@@ -603,7 +607,7 @@ void vtkPVComparativeView::AddRepresentation(vtkSMRepresentationProxy* repr)
   for (; iter != this->Internal->Views.end(); ++iter)
     {
     // Create a new representation
-    vtkSMRepresentationProxy* newRepr =
+    vtkSMProxy* newRepr =
       this->Internal->AddRepresentationClone(
         repr, iter->GetPointer());
     (void)newRepr;
@@ -616,7 +620,7 @@ void vtkPVComparativeView::AddRepresentation(vtkSMRepresentationProxy* repr)
     for (size_t cc=1; cc < numReprs; cc++)
       {
       // Create a new representation
-      vtkSMRepresentationProxy* newRepr =
+      vtkSMProxy* newRepr =
         this->Internal->AddRepresentationClone(repr, rootView);
       (void)newRepr;
       assert(newRepr);
@@ -631,7 +635,7 @@ void vtkPVComparativeView::AddRepresentation(vtkSMRepresentationProxy* repr)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeView::RemoveRepresentation(vtkSMRepresentationProxy* repr)
+void vtkPVComparativeView::RemoveRepresentation(vtkSMProxy* repr)
 {
   ENSURE_INIT();
 
@@ -652,7 +656,7 @@ void vtkPVComparativeView::RemoveRepresentation(vtkSMRepresentationProxy* repr)
   for (cloneIter = data.Clones.begin(); cloneIter != data.Clones.end(); ++cloneIter)
     {
     vtkSMViewProxy* view = cloneIter->ViewProxy;
-    vtkSMRepresentationProxy* clone = cloneIter->CloneRepresentation;
+    vtkSMProxy* clone = cloneIter->CloneRepresentation;
     if (view && clone)
       {
       vtkRemoveRepresentation(view, clone);
@@ -684,7 +688,7 @@ void vtkPVComparativeView::RemoveAllRepresentations()
     this->Internal->RepresentationClones.begin();
   while (iter != this->Internal->RepresentationClones.end())
     {
-    vtkSMRepresentationProxy* repr = iter->first;
+    vtkSMProxy* repr = iter->first;
     this->RemoveRepresentation(repr);
     iter = this->Internal->RepresentationClones.begin();
     }
@@ -811,16 +815,20 @@ void vtkPVComparativeView::ClearDataCaches()
     repcloneiter != this->Internal->RepresentationClones.end();
     ++repcloneiter)
     {
-    vtkSMRepresentationProxy* repr = repcloneiter->first;
-    vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
-    helper.Set(0);
-    repr->UpdateProperty("ForceUseCache");
-    // HACK.
-    repr->ClearMarkedModified();
-    repr->MarkDirty(NULL);
-    repcloneiter->second.MarkRepresentationsModified();
-    helper.Set(1);
-    repr->UpdateProperty("ForceUseCache");
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      repcloneiter->first);
+    if (repr)
+      {
+      vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
+      helper.Set(0);
+      repr->UpdateProperty("ForceUseCache");
+      // HACK.
+      repr->ClearMarkedModified();
+      repr->MarkDirty(NULL);
+      repcloneiter->second.MarkRepresentationsModified();
+      helper.Set(1);
+      repr->UpdateProperty("ForceUseCache");
+      }
     }
 }
 
@@ -874,7 +882,7 @@ void vtkPVComparativeView::GetRepresentationsForView(vtkSMViewProxy* view,
     if (cloneIter != data.Clones.end())
       {
       // A representation was found, so add it to the collection.
-      vtkSMRepresentationProxy* repr = cloneIter->CloneRepresentation;
+      vtkSMProxy* repr = cloneIter->CloneRepresentation;
       collection->AddItem(repr);
       }
     }

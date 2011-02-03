@@ -455,7 +455,6 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     numProcs = this->Controller->GetNumberOfProcesses();
     }
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   this->ExecuteBlock(
     input,
     output,

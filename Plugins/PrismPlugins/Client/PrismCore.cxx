@@ -371,7 +371,7 @@ void PrismCore::onSESAMEFileOpen()
 
     file_dialog->setAttribute(Qt::WA_DeleteOnClose);
     file_dialog->setObjectName("FileOpenDialog");
-    file_dialog->setFileMode(pqFileDialog::ExistingFiles);
+    file_dialog->setFileMode(pqFileDialog::ExistingFile);
     QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
         this, SLOT(onSESAMEFileOpen(const QStringList&)));
     file_dialog->setModal(true); 
@@ -455,7 +455,7 @@ void PrismCore::onCreatePrismView()
 
     file_dialog->setAttribute(Qt::WA_DeleteOnClose);
     file_dialog->setObjectName("FileOpenDialog");
-    file_dialog->setFileMode(pqFileDialog::ExistingFiles);
+    file_dialog->setFileMode(pqFileDialog::ExistingFile);
     QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
         this, SLOT(onCreatePrismView(const QStringList&)));
     file_dialog->setModal(true); 

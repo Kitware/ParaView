@@ -111,6 +111,14 @@ void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
       }
     }
 
+  if (!this->MantaManager)
+    {
+    this->MantaManager = mantaRenderer->GetMantaManager();
+    //cerr << "MC(" << this << ") REGISTER " << this->MantaManager << " "
+    //     << this->MantaManager->GetReferenceCount() << endl;
+    this->MantaManager->Register(this);
+    }
+
   // for figuring out aspect ratio
   int lowerLeft[2];
   int usize, vsize;

@@ -206,7 +206,7 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     pqApplicationCore::instance()->manager("SelectionManager"));
   if (selMan)
     {
-    bool valid =QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
+    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
       this, SLOT(onSelectionChanged(pqOutputPort*)));
     }
   QObject::connect(this->UI->checkSelected, SIGNAL(pressed()),

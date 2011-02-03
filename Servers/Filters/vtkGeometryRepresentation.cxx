@@ -101,6 +101,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   //this->Property->SetOpacity(0.5);
   this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
+  this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
+                                             // connected to the LOD pipeline.
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);

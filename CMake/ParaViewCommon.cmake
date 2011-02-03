@@ -247,10 +247,14 @@ ELSE(CMAKE_COMPILER_IS_GNUCXX)
   ENDIF(CMAKE_SYSTEM MATCHES "OSF1-V.*")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
-# Disable deprecation of the entire C library.
-IF(CMAKE_COMPILER_2005)
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
-ENDIF(CMAKE_COMPILER_2005)
+# -----------------------------------------------------------------------------
+# Disable deprecation warnings for standard C and STL functions in VS2005 and
+# later (no, we don't need IF(CMAKE_COMPILER_2005) ... )
+# -----------------------------------------------------------------------------
+IF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400 OR MSVC10)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS)
+  ADD_DEFINITIONS(-D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
+ENDIF(MSVC_VERSION EQUAL 1400 OR MSVC_VERSION GREATER 1400 OR MSVC10)
 
 # On AIX using the IBM xlC compiler check whether the compiler knows about
 # -binitfini:poe_remote_main, which is required to get MPI executables working
@@ -311,13 +315,6 @@ OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
 
 # Set this to get VTKs FOR LOOP "fix" to apply too all of Paraviews Source.
 SET(VTK_USE_FOR_SCOPE_WORKAROUND TRUE)
-
-# -----------------------------------------------------------------------------
-# Disable deprecation warnings for standard C and STL functions in VS2005 and
-# later (no, we don't need IF(CMAKE_COMPILER_2005) ... )
-# -----------------------------------------------------------------------------
-ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
-ADD_DEFINITIONS(-D_SCL_SECURE_NO_DEPRECATE)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)

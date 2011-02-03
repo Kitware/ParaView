@@ -2,6 +2,10 @@ message("Configuring NUMPY:\n@NUMPY_binary@")
 set(ENV{LD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
 # As explained in site.cfg.example - See http://projects.scipy.org/numpy/browser/trunk/site.cfg.example
 # Directories listed in variable such as library_dirs or source_dirs should be separated using os.pathsep
 # On windows, the separator is ";" and ":" on unix-like platform

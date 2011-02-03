@@ -2001,6 +2001,7 @@ attributes of the fragments.
              <DataType value="vtkUnstructuredGrid"/>
              <DataType value="vtkCompositeDataSet"/>
            </DataTypeDomain>
+           <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
    <!-- End Grid Fragment -->
    </SourceProxy>
@@ -2031,6 +2032,7 @@ attributes of the fragments.
 
          <InputArrayDomain name="input_array" attribute_type="cell"
                            number_of_components="1"/>
+         <Documentation>This property specifies the input of the filter.</Documentation>
      </InputProperty>
 
      <StringVectorProperty
@@ -2136,6 +2138,7 @@ attributes of the fragments.
         </DataTypeDomain>
         <InputArrayDomain name="input_array" attribute_type="cell"
                           number_of_components="1"/>
+        <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
 
       <StringVectorProperty
@@ -2226,6 +2229,7 @@ attributes of the fragments.
         <DataTypeDomain name="input_type">
           <DataType value="vtkCompositeDataSet"/>
         </DataTypeDomain>
+        <Documentation>This property specifies the input of the filter.</Documentation>
         <InputArrayDomain name="input_array" attribute_type="cell"
                           number_of_components="1"/>
       </InputProperty>
@@ -2318,6 +2322,7 @@ attributes of the fragments.
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
+        <Documentation>This property specifies the input of the filter.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkCompositeDataSet"/>
         </DataTypeDomain>
@@ -2446,6 +2451,7 @@ attributes of the fragments.
      <InputProperty
         name="Input"
         command="SetInputConnection">
+           <Documentation>This property specifies the input of the filter.</Documentation>
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
@@ -3183,6 +3189,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <DataTypeDomain name="input_type">
         <DataType value="vtkUnstructuredGrid"/>
       </DataTypeDomain>
+      <Documentation>This property specifies the input of the filter.</Documentation>
     </InputProperty>
   </SourceProxy>
    ############################################################################ -->
@@ -3210,6 +3217,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <DataTypeDomain name="input_type">
         <DataType value="vtkUnstructuredGrid"/>
       </DataTypeDomain>
+      <Documentation>This property specifies the input of the filter.</Documentation>
     </InputProperty>
 
     <StringVectorProperty
@@ -3263,6 +3271,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <InputArrayDomain
           name="input_array"
           attribute_type="cell"/>
+       <Documentation>This property specifies the input of the filter.</Documentation>
     </InputProperty>
 
     <!-- Source Array-->
@@ -3312,6 +3321,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <DataTypeDomain name="input_type">
         <DataType value="vtkUnstructuredGrid"/>
       </DataTypeDomain>
+      <Documentation>This property specifies the input of the filter.</Documentation>
     </InputProperty>
   </SourceProxy>
 
@@ -6307,6 +6317,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        <DataTypeDomain name="input_type" composite_data_supported="1">
          <DataType value="vtkDataObject"/>
        </DataTypeDomain>
+       <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
 
       <IntVectorProperty
@@ -6647,6 +6658,9 @@ This filter operates on any type of data set, provided it has point-centered vec
        </DataTypeDomain>
        <InputArrayDomain name="input_array" attribute_type="point"
                          number_of_components="3"/>
+       <Documentation>
+           Specify which is the Input of the StreamTracer filter.
+       </Documentation>
      </InputProperty>
 
       <InputProperty
@@ -6661,6 +6675,11 @@ This filter operates on any type of data set, provided it has point-centered vec
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <Documentation>
+            Specify the seed dataset. Typically fron where the vector field
+            integration should begin. Usually a point/radius or a line with a
+            given resolution.
+        </Documentation>
       </InputProperty>
 
 <!--
@@ -6733,6 +6752,10 @@ This filter operates on any type of data set, provided it has point-centered vec
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <Documentation>
+               Specify which vector array should be used for the integration
+               through that filter.
+           </Documentation>
      </StringVectorProperty>
 
       <DoubleVectorProperty
@@ -9070,6 +9093,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         <Property name="MaximumNumberOfPoints" proxy_name="Glyph1" exposed_name="Glyph Max. Points"/>
         <Property name="RandomMode" proxy_name="Glyph1" exposed_name="Glyph Random Mode"/>
         <Property name="SetScaleFactor" proxy_name="Glyph1" exposed_name="Glyph Scale Factor"/>
+        <Property name="Consistency" proxy_name="GenerateSurfaceNormals1" exposed_name="Consistency"/>
         <Property name="Input" proxy_name="ExtractSurface2" exposed_name="Input"/>
         <Property name="Invert" proxy_name="ArrowSource" exposed_name="InvertArrow"/>
       </ExposedProperties>
@@ -9119,6 +9143,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            X coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
       <StringVectorProperty name="YColumn"
         command="SetYColumn"
@@ -9128,6 +9156,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            Y coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
       <StringVectorProperty name="ZColumn"
         command="SetZColumn"
@@ -9137,6 +9169,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            Z coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
 
     </SourceProxy>
@@ -9195,6 +9231,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            X coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
       <StringVectorProperty name="YColumn"
         command="SetYColumn"
@@ -9204,6 +9244,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            Y coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
       <StringVectorProperty name="ZColumn"
         command="SetZColumn"
@@ -9213,6 +9257,10 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+          <Documentation>
+            This property specifies which data array is going to be used as the
+            Z coordinate in the generated polydata dataset.
+          </Documentation>
       </StringVectorProperty>
 
     </SourceProxy>
@@ -9234,9 +9282,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable" />
         </DataTypeDomain>
-        <Documentation>
-          The input.
-        </Documentation>
+        <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
     </SourceProxy>
 
@@ -9343,9 +9389,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
-        <Documentation>
-          The input.
-        </Documentation>
+        <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
 
       <IntVectorProperty name="FieldAssociation"
@@ -10199,6 +10243,7 @@ This property controls how the filter works to generate tensor cell data. You ca
           <DataTypeDomain name="input_type">
             <DataType value="vtkUnstructuredGrid"/>
           </DataTypeDomain>
+          <Documentation>This property specifies the input of the filter.</Documentation>
      </InputProperty>
 
      <DoubleVectorProperty
@@ -10726,36 +10771,6 @@ This property controls how the filter works to generate tensor cell data. You ca
      </ProxyProperty>
    <!-- End IntersectFragments -->
    </SourceProxy>
-
-  <!-- ==================================================================== -->
-  <FetchDataProxy name="FetchData" class="vtkPVFetchDataFilter"
-                processes="client|dataserver">
-    <Documentation>
-      This is a filter proxy that makes is possible to deliver data to the
-      client. Simply attach this proxy to a data source, and call
-      UpdatePipeline(). The data will be available as the output on the
-      client-side.
-    </Documentation>
-
-    <InputProperty name="Input" command="SetInputConnection">
-      <ProxyGroupDomain name="groups">
-        <Group name="sources"/>
-        <Group name="filters"/>
-      </ProxyGroupDomain>
-      <DataTypeDomain name="input_type">
-        <DataType value="vtkDataObject"/>
-      </DataTypeDomain>
-      <Documentation>
-        The input to this filter.
-      </Documentation>
-    </InputProperty>
-
-    <StringVectorProperty name="PostGatherHelperName"
-      command="SetPostGatherHelperName"
-      number_of_elements="1"
-      default_values="">
-    </StringVectorProperty>
-  </FetchDataProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

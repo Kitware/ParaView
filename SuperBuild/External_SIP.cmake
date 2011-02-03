@@ -1,0 +1,12 @@
+# The SIP external project
+
+ExternalProject_Add(SIP
+  URL ${SIP_URL}/${SIP_GZ}
+  URL_MD5 ${SIP_MD5}
+  DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/SIP
+  BUILD_IN_SOURCE 1
+  CONFIGURE_COMMAND ${PYTHON_EXECUTABLE} configure.py
+  DEPENDS
+    ${SIP_dependencies}
+  )

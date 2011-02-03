@@ -712,7 +712,9 @@ int vtkFileSeriesReader::RequestInformationForInput(
       VTK_CREATE(vtkInformation, tempOutputInfo);
       tempOutputVector->Append(tempOutputInfo);
       }
-    return this->Reader->ProcessRequest(tempRequest, NULL, tempOutputVector);
+    return this->Reader->ProcessRequest(tempRequest,
+                                        (vtkInformationVector**)NULL,
+                                        tempOutputVector);
     }
   return 1;
 }

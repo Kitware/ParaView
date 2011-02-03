@@ -182,8 +182,12 @@ def CreateProducer(datadescription, gridname):
   if not datadescription.GetInputDescriptionByName(gridname):
     raise RuntimeError, "Simulation input name '%%s' does not exist" %% gridname
   grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
-  producer = TrivialProducer()
+  producer = PVTrivialProducer()
   producer.GetClientSideObject().SetOutput(grid)
+  if grid.IsA("vtkImageData") == True or grid.IsA("vtkStructuredGrid") == True or grid.IsA("vtkRectilinearGrid") == True:
+    extent = datadescription.GetInputDescriptionByName(gridname).GetWholeExtent()
+    producer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
+
   producer.UpdatePipeline()
   return producer
 

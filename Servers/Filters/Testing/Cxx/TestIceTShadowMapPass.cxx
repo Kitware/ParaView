@@ -467,7 +467,7 @@ void MyProcess::Execute()
   this->CreatePipeline(renderer);
   this->SetupRenderPasses(renderer);
 
-  int retVal;
+  int retVal = vtkTesting::FAILED;
   if (myId == 0)
     {
     // root node

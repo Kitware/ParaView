@@ -60,7 +60,6 @@
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMExtentDomain.h"
-#include "vtkSMFetchDataProxy.h"
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMFixedTypeDomain.h"
@@ -198,7 +197,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMEnumerationDomain);
   PRINT_SELF(vtkSMExporterProxy);
   PRINT_SELF(vtkSMExtentDomain);
-  PRINT_SELF(vtkSMFetchDataProxy);
   PRINT_SELF(vtkSMFieldDataDomain);
   PRINT_SELF(vtkSMFileListDomain);
   PRINT_SELF(vtkSMFixedTypeDomain);

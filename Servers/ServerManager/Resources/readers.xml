@@ -4551,6 +4551,7 @@
        is .xmf. Metadata is stored in the XDMF file using an XML format, and
        large attribute arrays are stored in a corresponding HDF5 file. The
        output may be unstructured grid, structured grid, or rectiliner grid.
+       See http://www.xdmf.org for a description of the file format.
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -4590,7 +4591,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         This property lists which the point-centered arrays to read.
+         This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -4616,7 +4617,7 @@
           </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         This property lists which the cell-centered arrays to read.
+         This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
 
@@ -4669,6 +4670,10 @@
              <Property name="SILTimeStamp" function="TimeStamp" />
           </RequiredProperties>
        </SILDomain>
+        <Documentation>
+         Controls which particular data sets to read from a file that contains
+         many data sets inside a composite data set collection.
+        </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty
@@ -5104,12 +5109,20 @@
    </SourceProxy>
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy name="OpenFOAMReader" class="vtkPOpenFOAMReader">
+     <Documentation
+       short_help="Read OpenFOAM data files."
+       long_help="Read OpenFOAM data files, producing multi-block dataset.">
+       The OpenFOAM reader reads OpenFOAM data files and outputs multi-block datasets. Mesh information and time dependent data are supported.
+     </Documentation>
       <StringVectorProperty
          name="FileName"
          command="SetFileName"
          number_of_elements="1"
          animateable="0">
         <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the reader.
+        </Documentation>
       </StringVectorProperty>
 
       <Property

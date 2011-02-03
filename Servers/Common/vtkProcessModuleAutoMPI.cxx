@@ -123,6 +123,12 @@ public:
   bool SetMPIRun(vtkstd::string mpiexec);
 };
 
+#ifdef WIN32
+#  define PARAVIEW_SERVER "pvserver.exe"
+#else
+#  define PARAVIEW_SERVER "pvserver"
+#endif
+
 //------------------------------------------------------------------------macro
 /*
  * The standard new macro
@@ -208,7 +214,8 @@ int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
  * @param servername IN Sending in the server name (usually localhost or 127.0.0.1)
  * @return 1 for success 0 otherwise
  */
-int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servername,int port)
+int vtkProcessModuleAutoMPIInternals::
+  StartRemoteBuiltInSelf(const char* vtkNotUsed(servername),int port)
 {
   // Create a new server process structure
   vtksysProcess* server =0;
@@ -225,14 +232,38 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     // Construct the Command line that will be executed
     vtksys_stl::vector<vtkstd::string> serverCommandStr;
     vtksys_stl::vector<const char*> serverCommand;
-    const char* serverExe = this->ParaViewServer.c_str();
+    //vtkstd::string serverExe = this->ParaViewServer;
+
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+    vtkstd::string app_dir =
+      vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
+
+#if defined(__APPLE__)
+    vtkstd::string pvserver_rel(app_dir + "/../bin/" + vtkstd::string(PARAVIEW_SERVER));
+    vtkstd::string serverExe = vtksys::SystemTools::CollapseFullPath(pvserver_rel.c_str());
+    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
+    cerr << "Mac AppDir: " << serverExe << endl;
+    cerr << "Mac ServerExe: " << serverExe << endl;
+#elif defined(WIN32)
+    vtkstd::string serverExe = PARAVIEW_SERVER;
+
+    // Set the working directory as the location of pvserver. Some
+    // mpi packages have issue with full paths containing spaces so
+    // lets just invoke mpiexec  with no path to pvserver.
+    cerr << "Setting working directory to be " << app_dir.c_str() << endl;
+    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
+#else
+    vtkstd::string serverExe = 
+      app_dir + vtkstd::string("/") + vtkstd::string(PARAVIEW_SERVER);
+#endif
 
     this->CreateCommandLine(serverCommandStr,
-                      serverExe,
+                      serverExe.c_str(),
                       this->MPIServerNumProcessFlag.c_str(),
                       port);
     vtkCopy(serverCommand, serverCommandStr);
 
+    
     if(vtksysProcess_SetCommand(server, &serverCommand[0]))
       {
       this->ReportCommand(&serverCommand[0], "SUCCESS:");
@@ -256,8 +287,6 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     }
   return 1;
 }
-
-#define PARAVIEW_SERVER "pvserver"
 
 //---------------------------------------------------------------------internal
 /*

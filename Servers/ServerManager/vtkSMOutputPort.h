@@ -74,6 +74,15 @@ public:
   vtkSMSourceProxy* GetSourceProxy()
     { return this->SourceProxy; }
 
+  // Description:
+  // Streaming plugin turns this on to prevent GUI from updating whole
+  // extent at one time.
+  static void SetUseStreaming(bool value);
+
+  // Description:
+  // Streaming plugin uses this to specify the prototypical piece to update
+  // the get information from.
+  static void SetDefaultPiece(int dp, int dnp, double dr);
 //BTX
 protected:
   vtkSMOutputPort();
@@ -112,6 +121,11 @@ protected:
 
   vtkPVTemporalDataInformation* TemporalDataInformation;
   bool TemporalDataInformationValid;
+
+  static bool UseStreaming;
+  static int DefaultPass;
+  static int DefaultNumPasses;
+  static double DefaultResolution;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&); // Not implemented

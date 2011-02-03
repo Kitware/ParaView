@@ -2259,7 +2259,7 @@ const char * vtkFlashReader::GetParticleAttributeName( int attrIndx )
   vtkstd::map< vtkstd::string, int >::iterator i;
   for (   i  = this->Internal->ParticleAttributeNamesToIds.begin(); 
           i != this->Internal->ParticleAttributeNamesToIds.end() &&
-         (  ( *i ).second != attrIndx  );   i ++   );
+          (  ( *i ).second != attrIndx  );   i ++   ) {}
     
   return ( *i ).first.c_str();
 }

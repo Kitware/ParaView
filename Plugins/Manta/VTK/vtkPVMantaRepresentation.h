@@ -61,7 +61,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkPVMantaRepresentation - representation for manta views
 // .SECTION Description
 // This replaces the GL mapper, actor and property for a display pipline
-// with the manta versions of those so that the objext can be drawn
+// with the manta versions of those so that the object can be drawn
 // in a manta renderer within a PVMantaView
 
 #ifndef __vtkPVMantaRepresentation_h

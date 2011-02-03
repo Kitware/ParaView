@@ -45,6 +45,12 @@ public:
   virtual void UpdatePipeline(int port, double time, bool doTime);
 
   // Description:
+  // When using streaming, this method is called instead on UpdatePipeline().
+  virtual void UpdateStreamingPipeline(
+    int pass, int num_of_passes, double resolution,
+    int port, double time, bool doTime);
+
+  // Description:
   // Triggers UpdateInformation().
   virtual void UpdateInformation();
 

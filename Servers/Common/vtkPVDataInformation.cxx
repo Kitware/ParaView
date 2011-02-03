@@ -44,7 +44,6 @@
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkPriorityHelper.h"
 #include "vtkMultiProcessStream.h"
 
 #include <vtkstd/vector>
@@ -582,7 +581,6 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (!dobj)
     {
     vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(object);
-    vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(object);
     if (algOutput && algOutput->GetProducer())
       {
@@ -593,17 +591,6 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
       dobj = algOutput->GetProducer()->GetOutputDataObject(
         algOutput->GetIndex());
-      }
-    else if (helper)
-      {
-      //Streaming ParaView puts this helper filter into the pipeline.
-      //The helper prevent the whole_extent from being requested and makes
-      //sure that the sub extent that is requested is worthwhile.
-      dobj = helper->ConditionallyGetDataObject();
-      if (!dobj)
-        {
-        return;
-        }
       }
     else if (algo)
       {

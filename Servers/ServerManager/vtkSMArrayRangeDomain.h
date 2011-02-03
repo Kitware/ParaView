@@ -67,9 +67,9 @@ private:
               vtkSMSourceProxy* sp,
               vtkSMInputArrayDomain* iad,
               int outputport);
-  void SetArrayRange(vtkPVDataSetAttributesInformation* info,
+  bool SetArrayRange(vtkPVDataSetAttributesInformation* info,
                      const char* arrayName);
-  void SetArrayRangeForAutoConvertProperty(
+  bool SetArrayRangeForAutoConvertProperty(
           vtkPVDataSetAttributesInformation* info,
           const char* arrayName);
 

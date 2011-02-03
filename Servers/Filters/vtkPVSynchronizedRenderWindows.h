@@ -166,6 +166,21 @@ public:
   // @CallOnClientOnly
   double GetZbufferDataAtPoint(int x, int y, unsigned int id);
 
+  enum ModeEnum
+    {
+    INVALID,
+    BUILTIN,
+    CLIENT,
+    RENDER_SERVER,
+    DATA_SERVER,
+    BATCH
+    };
+
+  // Description:
+  // Streaming uses this class as a conduit for messaging.
+  // Need mode to use it correctly.
+  ModeEnum GetMode() { return this->Mode; };
+
 protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();
@@ -217,16 +232,6 @@ protected:
   // Shrinks gaps between views, rather grows the views to reduce gaps. Only
   // used in tile-display mode to avoid gaps on the server side.
   void ShinkGaps();
-
-  enum ModeEnum
-    {
-    INVALID,
-    BUILTIN,
-    CLIENT,
-    RENDER_SERVER,
-    DATA_SERVER,
-    BATCH
-    };
 
 
   ModeEnum Mode;

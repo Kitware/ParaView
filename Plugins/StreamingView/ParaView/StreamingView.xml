@@ -1,0 +1,609 @@
+<ServerManagerConfiguration>
+
+
+  <ProxyGroup
+      name="sources">
+    <SourceProxy
+        name="StreamingSource"
+        class="vtkStreamedMandelbrot"
+        label="Streamed Mandelbrot">
+
+      <Documentation
+        long_help="Streamed version of ImageMandelbrot"
+        short_help="Streamed Mandelbrot">
+        See documentation of ImageMandebrot.
+      </Documentation>
+      <IntVectorProperty
+         name="WholeExtent"
+         command="SetWholeExtent"
+         number_of_elements="6"
+         default_values="0 100 0 100 0 100" >
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          The six values in the property indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+   <SourceProxy name="StridedReader1"
+                class="vtkRawStridedReader1"
+                label="Strided image reader">
+     <Documentation
+       short_help="Read raw regular rectilinear grid data from a file."
+       long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
+       The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
+     </Documentation>
+
+      <StringVectorProperty
+         name="FileName"
+         command="SetFilename"
+         animateable="0"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The coordinate contained in this property specifies the position of the point with index (0,0,0).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Spacing"
+         command="SetSpacing"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the size of a voxel in each dimension.
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="WholeExtent"
+        command="SetWholeExtent"
+        number_of_elements="6"
+        default_values="0 100 0 100 0 100">
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the minimum and maximum index values of the data in each dimension (xmin, xmax, ymin, ymax, zmin, zmax).
+       </Documentation>
+     </IntVectorProperty>
+
+<!--
+     <IntVectorProperty
+        name="BlockReadSize"
+        command="SetBlockReadSize"
+        number_of_elements="1"
+        default_values="4096" >
+       <Documentation>
+         This property specifies the skip dimension.
+       </Documentation>
+     </IntVectorProperty>
+-->
+
+     <IntVectorProperty
+        name="SwapEndian"
+        command="SwapDataByteOrder"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool" />
+       <Documentation>
+         This property specifies if the dataset was written with opposing endianess to the machine you are on.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="PostPreProcess"
+         command="SetPostPreProcess"
+         number_of_elements="1"
+         default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         When on, the reader saves auxiliary files for every chunk it reads from the file. Re-reader the data then is faster, but the cost is a large number of extra files on the file system.
+       </Documentation>
+     </IntVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="sraw"
+                      file_description="multiresolution raw format" />
+     </Hints>
+
+   <!-- End StridedReader1 -->
+   </SourceProxy>
+
+   <SourceProxy name="ACosmoReader"
+                class="vtkACosmoReader"
+                label="Cosmo (adaptive) reader">
+     <Documentation
+       short_help=""
+       long_help="" >
+     </Documentation>
+
+      <StringVectorProperty
+         name="FileName"
+         command="SetFileName"
+         animateable="0"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="BoxSize"
+         command="SetBoxSize"
+         number_of_elements="1"
+         default_values="90.140846" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="ByteOrder"
+        command="SetByteOrder"
+        label="Little Endian"
+        number_of_elements="1"
+        default_values="1">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TagSize"
+        command="SetTagSize"
+        label="64-bit tags"
+        number_of_elements="1"
+        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="acosmo"
+                      file_description="multiresolution cosmology format" />
+     </Hints>
+   <!-- End ACosmoReader -->
+   </SourceProxy>
+
+   <SourceProxy
+       name="StreamingNetCDFPOP"
+       class="vtkImageNetCDFPOPReader"
+       label="Image NetCDF POP reader">
+     <Documentation
+         short_help="streaming capable netcdf POP reader."
+         long_help="Read netcdf POP files for the multiresolution streaming view">
+     </Documentation>
+
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         The coordinate contained in this property specifies the position of the point with index (0,0,0).
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+         name="Spacing"
+         command="SetSpacing"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the size of a voxel in each dimension.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="pop.ncdf pop.nc"
+                      file_description="POP Ocean NetCDF (streaming image)" />
+     </Hints>
+   </SourceProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup
+      name="utilities">
+
+    <SourceProxy
+        name="PieceCache"
+        class="vtkPieceCacheFilter"
+        executive="vtkPieceCacheExecutive">
+      <Documentation>
+        A cache to speed up streaming.
+      </Documentation>
+
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input which is cached and passed through
+        </Documentation>
+      </InputProperty>
+
+      <Property name="EmptyCache" command="EmptyCache" />
+
+      <!-- End of PieceCache -->
+    </SourceProxy>
+
+
+    <SourceProxy
+        name="StreamingHarness"
+        class="vtkStreamingHarness">
+      <Documentation>
+        A cache to speed up streaming.
+      </Documentation>
+
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input which we control the pipeline of.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+          name="LockRefinement"
+          command="SetLockRefinement"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Property
+          name="RestartRefinement"
+          command="RestartRefinement">
+      </Property>
+
+      <!-- End of StreamingHarness -->
+    </SourceProxy>
+
+    <!-- End Filters -->
+  </ProxyGroup>
+
+  <ProxyGroup
+      name="utilities">
+    <Proxy
+        name="IteratingDriver"
+        class="vtkIterativeStreamer"
+        processes="client|renderserver|dataserver">
+
+      <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
+      <Property
+          name="StopStreaming"
+          command="StopStreaming">
+      </Property>
+
+      <IntVectorProperty
+          name="ShowWhen"
+          command="SetDisplayFrequency"
+          number_of_elements="1"
+          default_values="0">
+       <EnumerationDomain>
+         <Entry value="0" text="Fully Drawn"/>
+         <Entry value="1" text="Each Piece Drawn"/>
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="CacheSize"
+          command="SetCacheSize"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="-1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="NumberOfPasses"
+          command="SetNumberOfPasses"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="LastPass"
+          command="SetLastPass"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+    </Proxy>
+
+    <Proxy
+        name="PrioritizingDriver"
+        class="vtkPrioritizedStreamer"
+        processes="client|renderserver|dataserver">
+
+      <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
+      <Property
+          name="StopStreaming"
+          command="StopStreaming">
+      </Property>
+
+      <IntVectorProperty
+          name="ShowWhen"
+          command="SetDisplayFrequency"
+          number_of_elements="1"
+          default_values="0">
+       <EnumerationDomain>
+         <Entry value="0" text="Fully Drawn"/>
+         <Entry value="1" text="Each Piece Drawn"/>
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="CacheSize"
+          command="SetCacheSize"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="-1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="NumberOfPasses"
+          command="SetNumberOfPasses"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="LastPass"
+          command="SetLastPass"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="PipelinePrioritization"
+          command="SetPipelinePrioritization"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="ViewPrioritization"
+          command="SetViewPrioritization"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+    </Proxy>
+    <Proxy
+        name="MultiResolutionDriver"
+        class="vtkMultiResolutionStreamer"
+        processes="client|renderserver|dataserver">
+
+      <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
+      <Property
+          name="StopStreaming"
+          command="StopStreaming">
+      </Property>
+
+      <IntVectorProperty
+          name="ShowWhen"
+          command="SetDisplayFrequency"
+          number_of_elements="1"
+          default_values="0">
+       <EnumerationDomain>
+         <Entry value="0" text="Fully Drawn"/>
+         <Entry value="1" text="Each Piece Drawn"/>
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="CacheSize"
+          command="SetCacheSize"
+          number_of_elements="1"
+          default_values="32">
+        <IntRangeDomain name="range" min="-1"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="PipelinePrioritization"
+          command="SetPipelinePrioritization"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="ViewPrioritization"
+          command="SetViewPrioritization"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="ProgressionMode"
+          command="SetProgressionMode"
+          number_of_elements="1"
+          default_values="0">
+       <EnumerationDomain>
+         <Entry value="0" text="Manual"/>
+         <Entry value="1" text="Automatic"/>
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="RefinementDepth"
+          command="SetRefinementDepth"
+          number_of_elements="1"
+          default_values="5">
+        <IntRangeDomain name="range" min="1" max="10"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="DepthLimit"
+          command="SetDepthLimit"
+          number_of_elements="1"
+          default_values="10">
+        <IntRangeDomain name="range" min="1" max="10"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="MaxSplits"
+          command="SetMaxSplits"
+          number_of_elements="1"
+          default_values="8">
+        <IntRangeDomain name="range" min="1" max="10000"/>
+      </IntVectorProperty>
+
+      <Property
+          name="Refine"
+          command="Refine">
+      </Property>
+
+      <Property
+          name="Coarsen"
+          command="Coarsen">
+      </Property>
+
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup
+      name="representations">
+    <StreamingRepresentationProxy
+        name="StreamingRepresentation"
+        class="vtkPVStreamingRepresentation"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="representations"
+        base_proxyname="GeometryRepresentation">
+      <!-- proxy that sets up display pipeline which streams over pieces -->
+
+      <SubProxy>
+        <Proxy name="PieceCache"
+          proxygroup="utilities" proxyname="PieceCache">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Harness"
+          proxygroup="utilities" proxyname="StreamingHarness">
+        </Proxy>
+
+        <ExposedProperties>
+          <Property name="LockRefinement"/>
+          <Property name="RestartRefinement"/>
+        </ExposedProperties>
+      </SubProxy>
+
+    </StreamingRepresentationProxy>
+  </ProxyGroup>
+
+  <ProxyGroup
+      name="views">
+
+    <StreamingViewProxy
+        name="StreamingViewBase"
+        class="vtkPVStreamingView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views"
+        base_proxyname="RenderView">
+
+     <IntVectorProperty
+       name="GetIsDisplayDone"
+       command="GetIsDisplayDone"
+       information_only="1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+    </StreamingViewProxy>
+
+    <StreamingViewProxy
+        name="IteratingView"
+        class="vtkPVStreamingView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views"
+        base_proxyname="StreamingViewBase">
+
+      <SubProxy>
+        <Proxy
+            name="StreamingDriver"
+            proxygroup="utilities"
+            proxyname="IteratingDriver">
+        </Proxy>
+      </SubProxy>
+    </StreamingViewProxy>
+
+    <StreamingViewProxy
+        name="PrioritizingView"
+        class="vtkPVStreamingView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views"
+        base_proxyname="StreamingViewBase">
+
+      <SubProxy>
+        <Proxy
+            name="StreamingDriver"
+            proxygroup="utilities"
+            proxyname="PrioritizingDriver">
+        </Proxy>
+      </SubProxy>
+    </StreamingViewProxy>
+
+    <StreamingViewProxy
+        name="RefiningView"
+        class="vtkPVStreamingView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views"
+        base_proxyname="StreamingViewBase">
+
+      <SubProxy>
+        <Proxy
+            name="StreamingDriver"
+            proxygroup="utilities"
+            proxyname="MultiResolutionDriver">
+        </Proxy>
+      </SubProxy>
+    </StreamingViewProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

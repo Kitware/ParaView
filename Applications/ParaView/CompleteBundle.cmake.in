@@ -18,6 +18,16 @@ if(COMMAND CMAKE_POLICY)
 endif(COMMAND CMAKE_POLICY)
 
  
+# gp_resolved_file_type_override resolved_file type_var
+#
+function(gp_resolved_file_type_override resolved_file type_var)
+  if(file MATCHES "^/usr//lib")
+    message("resolving ${file} as system")
+    set(${type_var} system PARENT_SCOPE)
+  endif()
+endfunction()
+
+
 # gp_item_default_embedded_path_override item default_embedded_path_var
 #
 # Return the path that others should refer to the item by when the item
@@ -71,7 +81,15 @@ endfunction(gp_item_default_embedded_path_override)
 # Copy the .app bundle from the build tree to the install tree.
 # Set up the InstallPrefix ENV var and execute the shell script:
 #
-set(InstallPrefix "${CMAKE_INSTALL_PREFIX}")
+
+# Optional subdirectory inside the bundle where the app can be placed.
+set(ParaView_BUNDLE_LOCATION "@ParaView_BUNDLE_LOCATION@")
+
+if(ParaView_BUNDLE_LOCATION)
+  set(InstallPrefix "${CMAKE_INSTALL_PREFIX}/${ParaView_BUNDLE_LOCATION}")
+else()
+  set(InstallPrefix "${CMAKE_INSTALL_PREFIX}")
+endif()
  
 set(ENV{InstallPrefix} "${InstallPrefix}")
  
@@ -108,6 +126,7 @@ if(QT_QTCLUCENE_LIBRARY)
 endif()
  
 list(APPEND libs_path "@QT_PLUGINS_DIR@/sqldrivers")
+list(APPEND libs_path "@PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS@")
  
 list(REMOVE_DUPLICATES libs_path)
 

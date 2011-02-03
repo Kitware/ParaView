@@ -35,6 +35,10 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
 
+bool vtkSMOutputPort::UseStreaming = false;
+int vtkSMOutputPort::DefaultPass = 0;
+int vtkSMOutputPort::DefaultNumPasses = 0;
+double vtkSMOutputPort::DefaultResolution = 0;
 //----------------------------------------------------------------------------
 vtkSMOutputPort::vtkSMOutputPort()
 {
@@ -182,11 +186,25 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
 {
   this->SourceProxy->GetSession()->PrepareProgress();
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << PMPROXY(this->SourceProxy)
-         << "UpdatePipeline"
-         << this->PortIndex << time << (doTime? 1 : 0)
-         << vtkClientServerStream::End;
+  if (vtkSMOutputPort::UseStreaming)
+    {
+    stream << vtkClientServerStream::Invoke
+           << PMPROXY(this->SourceProxy)
+           << "UpdateStreamingPipeline"
+           << vtkSMOutputPort::DefaultPass //pass
+           << vtkSMOutputPort::DefaultNumPasses //number of passes
+           << vtkSMOutputPort::DefaultResolution //resolution
+           << this->PortIndex << time << (doTime? 1:0)
+           << vtkClientServerStream::End;
+    }
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << PMPROXY(this->SourceProxy)
+           << "UpdatePipeline"
+           << this->PortIndex << time << (doTime? 1 : 0)
+           << vtkClientServerStream::End;
+    }
   this->SourceProxy->ExecuteStream(stream);
   this->SourceProxy->GetSession()->CleanupPendingProgress();
 }
@@ -197,4 +215,18 @@ void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "PortIndex: " << this->PortIndex << endl;
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetUseStreaming(bool value)
+{
+  vtkSMOutputPort::UseStreaming = value;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, double dr)
+{
+  vtkSMOutputPort::DefaultPass = dp;
+  vtkSMOutputPort::DefaultNumPasses = dnp;
+  vtkSMOutputPort::DefaultResolution = dr;
 }

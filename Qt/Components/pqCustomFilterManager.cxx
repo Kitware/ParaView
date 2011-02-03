@@ -239,7 +239,7 @@ void pqCustomFilterManager::importFiles()
       "Custom Filter Files (*.cpd *.xml);;All Files (*)");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   fileDialog->setObjectName("FileOpenDialog");
-  fileDialog->setFileMode(pqFileDialog::ExistingFiles);
+  fileDialog->setFileMode(pqFileDialog::ExistingFile);
 
   // Listen for the user's selection.
   this->connect(fileDialog, SIGNAL(filesSelected(const QStringList &)),

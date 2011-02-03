@@ -81,7 +81,6 @@ SET (Kit_SRCS
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMExporterProxy.cxx
-  vtkSMFetchDataProxy.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx

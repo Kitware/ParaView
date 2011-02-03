@@ -272,7 +272,7 @@ protected:
   // Description:
   // Let the property read and set its content from the stream
   virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset),
-                        vtkSMStateLocator* locator) {};
+                        vtkSMStateLocator* vtkNotUsed(locator)) {};
 
   // Description:
   // Set the appropriate ivars from the xml element. Should

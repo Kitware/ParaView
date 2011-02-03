@@ -641,7 +641,7 @@ void vtkPVSynchronizedRenderWindows::SetWindowSize(unsigned int id,
 {
   this->Internals->RenderWindows[id].Size[0] = width;
   this->Internals->RenderWindows[id].Size[1] = height;
-  if (this->Mode == BUILTIN)
+  if (this->Mode == BUILTIN || this->Mode == CLIENT)
     {
     vtkRenderWindow* window = this->GetRenderWindow(id);
     if (window && (window->GetSize()[0] != width ||
@@ -1662,7 +1662,9 @@ double vtkPVSynchronizedRenderWindows::GetZbufferDataAtPoint(int x, int y,
   unsigned int id)
 {
   vtkRenderWindow* window = this->GetRenderWindow(id);
-  if (!this->Enabled || !this->Mode != CLIENT || window == NULL)
+  if (!this->Enabled ||
+      (this->Mode != vtkPVSynchronizedRenderWindows::CLIENT) ||
+      window == NULL)
     {
     return window? window->GetZbufferDataAtPoint(x, y) : 1.0;
     }

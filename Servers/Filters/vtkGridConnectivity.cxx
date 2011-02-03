@@ -474,7 +474,7 @@ vtkGridConnectivity::vtkGridConnectivity()
   this->FaceHash = 0;
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->ProcessId = this->Controller?
-    this->Controller->GetLocalProcessId() : NULL;
+    this->Controller->GetLocalProcessId() : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1316,7 +1316,6 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
           cellId = *msgPtr++;
           faceId = *msgPtr++;
           fragmentId = *msgPtr++;
-          int oldFragmentId = fragmentId;
           // Translate the fragmentId to global value.
           fragmentId +=fragmentIdMap[procIdx];
           // Add the face to the hash.

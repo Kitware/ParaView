@@ -21,6 +21,8 @@
 #include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPMPVRepresentationProxy.h"
+#include "vtkPriorityHelper.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVExtractPieces.h"
 #include "vtkPVPostFilter.h"
@@ -28,7 +30,6 @@
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkPMPVRepresentationProxy.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
@@ -288,6 +289,40 @@ void vtkPMSourceProxy::UpdatePipeline(int port, double time, bool doTime)
     sddp->SetUpdateTimeStep(port, time);
     }
   sddp->Update(port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::UpdateStreamingPipeline(
+  int pass, int num_of_passes, double resolution,
+  int port, double time, bool doTime)
+{
+  int processid =
+    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  int numprocs =
+    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+
+  vtkPriorityHelper* helper = vtkPriorityHelper::New();
+  helper->SetInputConnection(this->GetOutputPort(port));
+  helper->SetSplitUpdateExtent(
+    port,//algorithm's output port
+    processid, //processor
+    numprocs, //numprocessors
+    pass, //pass
+    num_of_passes, //number of passes
+    resolution //resolution
+  );
+
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  assert(algo);
+  algo->UpdateInformation();
+  if (doTime)
+    {
+    vtkStreamingDemandDrivenPipeline* sddp =
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(algo->GetExecutive());
+    sddp->SetUpdateTimeStep(port, time);
+    }
+  helper->Update();
+  helper->Delete();
 }
 
 //----------------------------------------------------------------------------

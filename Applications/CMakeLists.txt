@@ -34,13 +34,4 @@ paraview_build_optional_application(ParaView "Standard ParaView Client" ParaView
 # OverView is disabled until we upgrade it to ParaView Branding
 #paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
 
-# disable streaming views until I upgrade them to new Views
-#IF(BUILD_SHARED_LIBS)
-#  paraview_build_optional_application(StreamingParaView "Streaming ParaView Application" StreamingParaView OFF)
-#ENDIF(BUILD_SHARED_LIBS)
-#
-#IF(BUILD_SHARED_LIBS)
-#  paraview_build_optional_application(AdaptiveParaView "Adaptive ParaView Application" AdaptiveParaView OFF)
-#ENDIF(BUILD_SHARED_LIBS)
-
 ENDIF(QT4_FOUND)

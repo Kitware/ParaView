@@ -1,7 +1,0 @@
-<ParaViewWriters>
-  <Proxy group="writers" name="XMLPolyDataWriter"/>
-  <Proxy group="writers" name="XMLUnstructuredGridWriter"/>
-  <Proxy group="writers" name="XMLStructuredGridWriter"/>
-  <Proxy group="writers" name="XMLRectilinearGridWriter"/>
-  <Proxy group="writers" name="XMLImageDataWriter"/>
-</ParaViewWriters>

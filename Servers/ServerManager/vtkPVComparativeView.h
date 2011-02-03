@@ -25,7 +25,7 @@
 
 class vtkCollection;
 class vtkSMComparativeAnimationCueProxy;
-class vtkSMRepresentationProxy;
+class vtkSMProxy;
 class vtkSMViewProxy;
 
 class VTK_EXPORT vtkPVComparativeView : public vtkObject
@@ -73,11 +73,11 @@ public:
 
   // Description:
   // Adds a representation proxy to this view.
-  void AddRepresentation(vtkSMRepresentationProxy*);
+  void AddRepresentation(vtkSMProxy*);
 
   // Description:
   // Removes a representation proxy from this view.
-  void RemoveRepresentation(vtkSMRepresentationProxy*);
+  void RemoveRepresentation(vtkSMProxy*);
 
   // Description:
   // Removes all added representations from this view.

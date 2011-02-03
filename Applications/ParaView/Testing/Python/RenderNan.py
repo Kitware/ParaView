@@ -21,6 +21,7 @@ object7 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwi
 QtTesting.playCommand(object7, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/fields_..mod')
 object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object8, 'activate', '')
+QtTesting.playCommand(object8, 'activate', '')
 object9 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object9, 'set_string', 'efield')
 

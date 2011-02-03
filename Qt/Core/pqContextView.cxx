@@ -446,10 +446,13 @@ void pqContextView::selectionChanged()
 
   vtkIdTypeArray *arr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
   ids.clear();
-  for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
+  if (arr)
     {
-    ids.push_back(-1);
-    ids.push_back(arr->GetValue(i));
+    for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
+      {
+      ids.push_back(-1);
+      ids.push_back(arr->GetValue(i));
+      }
     }
 
   pqSMAdaptor::setMultipleElementProperty(vp, ids);

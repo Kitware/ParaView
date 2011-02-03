@@ -80,9 +80,9 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
     input->GetColumnByName("vtkCompositeIndexArray"));
   vtkIdTypeArray* originalIdsArray = vtkIdTypeArray::SafeDownCast(
     input->GetColumnByName("vtkOriginalIndices"));
-  for (unsigned int cc=0; cc < inputSelection->GetNumberOfNodes(); cc++)
+  for (unsigned int ii=0; ii < inputSelection->GetNumberOfNodes(); ii++)
     {
-    vtkSelectionNode* node = inputSelection->GetNode(cc);
+    vtkSelectionNode* node = inputSelection->GetNode(ii);
     if ((node->GetFieldType() == vtkSelectionNode::POINT &&
         this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS) ||
       (node->GetFieldType() == vtkSelectionNode::CELL &&

@@ -14,11 +14,20 @@
 =========================================================================*/
 #include "vtkPVTrivialExtentTranslator.h"
 
+#include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
-#include "vtkGarbageCollector.h"
+
+#include <vector>
+
+class vtkPVTrivialExtentTranslatorInternals
+{
+public:
+  std::vector<int> AllProcessExtents;
+};
 
 vtkStandardNewMacro(vtkPVTrivialExtentTranslator);
 vtkCxxSetObjectMacro(vtkPVTrivialExtentTranslator, DataSet, vtkDataSet);
@@ -27,50 +36,100 @@ vtkCxxSetObjectMacro(vtkPVTrivialExtentTranslator, DataSet, vtkDataSet);
 vtkPVTrivialExtentTranslator::vtkPVTrivialExtentTranslator()
 {
   this->DataSet = 0;
+  this->Internals = new vtkPVTrivialExtentTranslatorInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkPVTrivialExtentTranslator::~vtkPVTrivialExtentTranslator()
 {
   this->SetDataSet(0);
+  if(this->Internals)
+    {
+    delete this->Internals;
+    this->Internals = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-template <class T>
 int vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
-  int *resultExtent,
-  T* dataSet)
+  int *resultExtent, vtkDataSet* dataSet)
 {
-  memcpy(resultExtent, dataSet->GetExtent(), sizeof(int)*6);
+  // this is really only meant for topologically structured grids
+  if (vtkImageData* id = vtkImageData::SafeDownCast(dataSet))
+    {
+    memcpy(resultExtent, id->GetExtent(), sizeof(int)*6);
+    }
+  else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(dataSet))
+    {
+    memcpy(resultExtent, sd->GetExtent(), sizeof(int)*6);
+    }
+  else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(dataSet))
+    {
+    memcpy(resultExtent, rd->GetExtent(), sizeof(int)*6);
+    }
+  else
+    {
+    return 0;
+    }
   return 1;
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVTrivialExtentTranslator::PieceToExtentThreadSafe(
-      int vtkNotUsed(piece), int vtkNotUsed(numPieces),
-      int vtkNotUsed(ghostLevel), int *wholeExtent,
-      int *resultExtent, int vtkNotUsed(splitMode),
-      int vtkNotUsed(byPoints))
+  int piece, int vtkNotUsed(numPieces), int vtkNotUsed(ghostLevel), int *wholeExtent,
+  int *resultExtent, int vtkNotUsed(splitMode), int vtkNotUsed(byPoints))
 {
-  if (vtkImageData* id = vtkImageData::SafeDownCast(this->DataSet))
+  if(this->Internals->AllProcessExtents.size() > 6)
     {
-    return vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
-      resultExtent, id);
+    if(static_cast<size_t>(piece*6) >=
+       this->Internals->AllProcessExtents.size())
+      {
+      vtkErrorMacro("Invalid piece.");
+      return 0;
+      }
+    memcpy(resultExtent, &(this->Internals->AllProcessExtents[piece*6]),
+           sizeof(int)*6);
+    return 1;
     }
-  else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(this->DataSet))
+  if(vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(resultExtent, this->DataSet) == 0)
     {
-    return vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
-      resultExtent, sd);
-    }
-  else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(this->DataSet))
-    {
-    return vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
-      resultExtent, rd);
+    memcpy(resultExtent, wholeExtent, sizeof(int)*6);
     }
 
-  memcpy(resultExtent, wholeExtent, sizeof(int)*6);
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVTrivialExtentTranslator::GatherExtents()
+{
+  if(this->DataSet == NULL)
+    {
+    this->Internals->AllProcessExtents.clear();
+    return;
+    }
+  if(vtkMultiProcessController* controller =
+       vtkMultiProcessController::GetGlobalController())
+    {
+    int numProcs = controller->GetNumberOfProcesses();
+    if(numProcs > 1)
+      {
+      int myExtent[6];
+      if(vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
+           myExtent, this->DataSet) == 0)
+        {
+        this->Internals->AllProcessExtents.clear();
+        return;
+        }
+      this->Internals->AllProcessExtents.resize(numProcs*6);
+      controller->AllGather(
+        myExtent, &(this->Internals->AllProcessExtents[0]), 6);
+      return;
+      }
+    }
+  this->Internals->AllProcessExtents.clear();
+  return;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVTrivialExtentTranslator::ReportReferences(vtkGarbageCollector* collector)
 {
@@ -82,4 +141,12 @@ void vtkPVTrivialExtentTranslator::ReportReferences(vtkGarbageCollector* collect
 void vtkPVTrivialExtentTranslator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  if(this->DataSet)
+    {
+    os << indent << "DataSet: " << this->DataSet << "\n";
+    }
+  else
+    {
+    os << indent << "DataSet: (NULL)\n";
+    }
 }

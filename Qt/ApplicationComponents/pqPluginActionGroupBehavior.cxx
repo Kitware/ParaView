@@ -159,7 +159,7 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
     {
     QString msg = 
       QString("Do not know what action group \"%1\" is").arg(splitName[0]);
-    qWarning(msg.toAscii().data());
+    qWarning("%s", msg.toAscii().data());
     }
   else 
     {

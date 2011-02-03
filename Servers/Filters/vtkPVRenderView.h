@@ -219,7 +219,7 @@ public:
   // Description:
   // Resets the clipping range. One does not need to call this directly ever. It
   // is called periodically by the vtkRenderer to reset the camera range.
-  void ResetCameraClippingRange();
+  virtual void ResetCameraClippingRange();
 
   // Description:
   // Enable/Disable light kit.
@@ -235,10 +235,27 @@ public:
   // use LOD etc.
   static vtkInformationIntegerKey* GEOMETRY_SIZE();
 
+  // DATA_DISTRIBUTION_MODE indicates where the geometry/data is to be
+  // delivered for the current render/update.
   static vtkInformationIntegerKey* DATA_DISTRIBUTION_MODE();
+
+  // USE_LOD indicates if LOD is being used for the current render/update.
   static vtkInformationIntegerKey* USE_LOD();
+
+  // DELIVER_LOD_TO_CLIENT is not used currently. I am just defining it as a
+  // placeholder. Currently tile-displays don't have the mode in which only LOD
+  // is delivered to the client.
   static vtkInformationIntegerKey* DELIVER_LOD_TO_CLIENT();
+
+  // DELIVER_OUTLINE_TO_CLIENT is used to tile-display mode which tells the
+  // delivery filters to always delivery outline to the client.
   static vtkInformationIntegerKey* DELIVER_OUTLINE_TO_CLIENT();
+
+  // the difference between DELIVER_OUTLINE_TO_CLIENT_FOR_LOD and
+  // DELIVER_OUTLINE_TO_CLIENT is that DELIVER_OUTLINE_TO_CLIENT_FOR_LOD implies
+  // that only the LOD delivery filters should deliver outline, but use normal
+  // pipeline when delivering full res geometry.
+  static vtkInformationIntegerKey* DELIVER_OUTLINE_TO_CLIENT_FOR_LOD();
   static vtkInformationDoubleKey* LOD_RESOLUTION();
 
   // Description:
@@ -410,7 +427,7 @@ protected:
 
   // Description:
   // Actual render method.
-  void Render(bool interactive, bool skip_rendering);
+  virtual void Render(bool interactive, bool skip_rendering);
 
   // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
