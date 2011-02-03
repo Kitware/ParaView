@@ -47,7 +47,7 @@ class pqScalarsToColors;
 
 /// Provides a standard user interface for selecting among a collection
 /// of dataset variables and .
-class pqDisplayArrayWidget: public QWidget
+class PQCOMPONENTS_EXPORT pqDisplayArrayWidget: public QWidget
 {
   Q_OBJECT
 
