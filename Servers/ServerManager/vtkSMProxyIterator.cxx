@@ -33,6 +33,7 @@ vtkSMProxyIterator::vtkSMProxyIterator()
   this->Internals = new vtkSMProxyIteratorInternals;
   this->Mode = vtkSMProxyIterator::ALL;
   this->Begin();
+  this->SkipPrototypes = true;
 }
 
 //---------------------------------------------------------------------------
@@ -93,6 +94,13 @@ void vtkSMProxyIterator::Begin()
       }
     this->Internals->GroupIterator++;
     }
+  if (this->SkipPrototypes)
+    {
+    if (this->GetProxy() && this->GetProxy()->GetSession() == NULL)
+      {
+      this->Next();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -117,6 +125,14 @@ int vtkSMProxyIterator::IsAtEnd()
 void vtkSMProxyIterator::Next()
 {
   this->NextInternal();
+  if (this->SkipPrototypes)
+    {
+    if (!this->IsAtEnd() &&
+      this->GetProxy() && this->GetProxy()->GetSession() == NULL)
+      {
+      this->Next();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -272,6 +288,6 @@ vtkSMProxy* vtkSMProxyIterator::GetProxy()
 void vtkSMProxyIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  os << indent << "SkipPrototypes: " << this->SkipPrototypes << endl;
   os << indent << "Mode: " << this->Mode << endl;
 }

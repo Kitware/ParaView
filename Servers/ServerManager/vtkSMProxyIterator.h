@@ -76,6 +76,12 @@ public:
   void SetModeToOneGroup() { this->SetMode(ONE_GROUP); }
   void SetModeToAll() { this->SetMode(ALL); }
 
+  // Description:
+  // When set to true (default), the iterator will skip prototype proxies.
+  vtkSetMacro(SkipPrototypes, bool);
+  vtkGetMacro(SkipPrototypes, bool);
+  vtkBooleanMacro(SkipPrototypes, bool);
+
 //BTX
   enum TraversalMode
   {
@@ -89,6 +95,7 @@ protected:
   vtkSMProxyIterator();
   ~vtkSMProxyIterator();
 
+  bool SkipPrototypes;
   int Mode;
   void NextInternal();
 
