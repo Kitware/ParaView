@@ -58,6 +58,8 @@ pqCustomFilterManagerModel::pqCustomFilterManagerModel(QObject *parentObject)
 
 pqCustomFilterManagerModel::~pqCustomFilterManagerModel()
 {
+  this->exportCustomFiltersToSettings();
+
   delete this->Internal;
 }
 
