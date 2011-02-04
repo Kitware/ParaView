@@ -80,19 +80,6 @@ public:
                vtkSMPVRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Overridded to insert the PCF and StreamHarness before the PVRep in the
-  // pipeline and to let the PVRep know about them.
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input,
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input,
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-
 //BTX
 protected:
   vtkSMStreamingRepresentationProxy();

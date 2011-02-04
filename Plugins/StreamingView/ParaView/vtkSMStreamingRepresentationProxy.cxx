@@ -61,10 +61,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMStreamingRepresentationProxy.h"
 
-#include "vtkClientServerID.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkPVSession.h"
 #include "vtkSMOutputPort.h"
 
 vtkStandardNewMacro(vtkSMStreamingRepresentationProxy);
@@ -103,25 +102,25 @@ void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
   this->Harness =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Harness"));
 
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream
     << vtkClientServerStream::Invoke
-    << this->GetID()
+    << VTKOBJECT(this)
     << "SetPieceCache"
-    << this->PieceCache->GetID()
+    << VTKOBJECT(this->PieceCache)
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << this->GetID()
+    << VTKOBJECT(this)
     << "SetHarness"
-    << this->Harness->GetID()
+    << VTKOBJECT(this->Harness)
     << vtkClientServerStream::End;
-  pm->SendStream(this->GetConnectionID(),
-                 vtkProcessModule::SERVERS,
-                 stream);
+  this->ExecuteStream(stream, false, vtkPVSession::SERVERS);
 }
 
 //------------------------------------------------------------------------------
+#ifdef FIXME_COLLABORATION
+// Looks like a filter is being inserted into the pipeline. Maybe we should do
+// this in a PMProxy subclass.
 void vtkSMStreamingRepresentationProxy::AddInput
   (unsigned int inputPort,
    vtkSMSourceProxy *input,
@@ -136,3 +135,4 @@ void vtkSMStreamingRepresentationProxy::AddInput
   this->Harness->AddInput(0, this->PieceCache, 0, "SetInputConnection");
   this->Superclass::AddInput(0, this->Harness, 0, "SetInputConnection");
 }
+#endif

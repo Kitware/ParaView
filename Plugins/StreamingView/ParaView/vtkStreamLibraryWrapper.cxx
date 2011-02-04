@@ -63,7 +63,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 #include "vtkClientServerInterpreter.h"
-#include "vtkProcessModule.h"
+#include "vtkClientServerInterpreterInitializer.h"
 
 //This sets the CS wrapped classes up so ParaView can call them
 extern "C" void vtkStreamingCS_Initialize(vtkClientServerInterpreter *arlu);
@@ -91,7 +91,8 @@ void vtkStreamLibraryWrapper::EnableWrapping()
     vtkStreamLibraryWrapper::WrappingEnabled = 1;
 
     //register the wrapped classes so ParaView can call them too
-    vtkProcessModule::InitializeInterpreter(vtkStreamingCS_Initialize);
+    vtkClientServerInterpreterInitializer::GetInitializer()->RegisterCallback(
+      vtkStreamingCS_Initialize);
     }
 }
 
