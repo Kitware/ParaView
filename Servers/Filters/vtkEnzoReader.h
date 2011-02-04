@@ -378,9 +378,14 @@ protected:
   // is on, this function additionally creates a vtkPolyData to load the
   // particles (and the associated attributes) falling within the scope of 
   // this recilinear block and insert it to the vtkMultiBlockDataSet.
-  void          GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds,
+  void GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds,
                           std::vector< int > &idx );
   
+  // Description:
+  // TODO: Write description here
+  void GetBlockMetaData(
+      int mapIndex, vtkHierarchicalBoxDataSet *hbds, std::vector< int > &idx );
+
   // Description:
   // This function, called by GetBlockAttribute() or GetParticleAttribute(), 
   // loads from the file a cell data attribute (specified by name atribute, 
@@ -435,6 +440,17 @@ protected:
   // Description:
   // Initializes the PointDataArraySelection & CellDataArraySelection
   void SetUpDataArraySelections( );
+
+  // Description:
+  // Given the block index, it returns the process ID (rank) that
+  // this block is assigned to.
+  int GetBlockProcessId( const int blockIdx );
+
+  // Description:
+  // This method determines if the block corresponding to the given block
+  // ID has been assigned to the process that owns this instance of the
+  // vtkEnzoReader.
+  bool IsBlockMine( const int blockIdx );
 
   // Description:
   // This does the updating of meta data of the dataset from the

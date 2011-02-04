@@ -58,6 +58,8 @@
 #include "vtkInformationVector.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkMultiProcessController.h"
+#include "vtkAssertUtils.hpp"
 
 #include <hdf5.h>          // for the HDF data loading engine
 #include <cassert>
@@ -1791,6 +1793,30 @@ void vtkEnzoReader::GenerateBlockMap()
 }
 
 //-----------------------------------------------------------------------------
+bool vtkEnzoReader::IsBlockMine( const int blockIdx )
+{
+  vtkMultiProcessController *myController =
+      vtkMultiProcessController::GetGlobalController( );
+  if( myController == NULL)
+    return true;
+  else if(this->GetBlockProcessId(blockIdx)==myController->GetLocalProcessId())
+    return true;
+  else
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+int vtkEnzoReader::GetBlockProcessId( const int blockIdx )
+{
+  vtkMultiProcessController *myController =
+      vtkMultiProcessController::GetGlobalController( );
+
+  if( myController == NULL )
+    return 0;
+  return( blockIdx%myController->GetNumberOfProcesses() );
+}
+
+//-----------------------------------------------------------------------------
 int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
   vtkInformationVector ** vtkNotUsed( inputVector ),
   vtkInformationVector  * outputVector )
@@ -1802,26 +1828,49 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
   this->Internal->ReadMetaData();
 
+  vtkMultiProcessController *myController =
+      vtkMultiProcessController::GetGlobalController();
+
   std::vector< int > idxcounter;
   idxcounter.resize( this->Internal->NumberOfLevels,0 );
 
   this->GenerateBlockMap();
-  this->Internal->NumberOfMultiBlocks = 0;
+//  this->Internal->NumberOfMultiBlocks = 0;
   
-  int   nmblocks = static_cast < int > ( this->BlockMap.size() );
+  int nmblocks = static_cast < int > ( this->BlockMap.size() );
   for ( int i = 0; i < nmblocks; i ++ )
     {
+
     // Load all blocks if SelectedBlockId==-1, otherwise, just
     // load the selected block
     if( (this->SelectedBlockId == -1) || (this->SelectedBlockId == i) )
-      this->GetBlock( i, output, idxcounter );
-    }
-  
+      {
+
+      if( this->IsBlockMine( i ) )
+        {
+        std::cout << "Loading block " << i << std::endl;
+        std::cout.flush();
+        this->GetBlock( i, output, idxcounter );
+        }
+      else
+        {
+        std::cout << "Loding Metadata of block " << i << std::endl;
+        std::cout.flush( );
+        this->GetBlockMetaData(i,output,idxcounter );
+        }
+
+      }
+
+    } // END loop through all the blocks
+
+  myController->Barrier();
+
   if( this->GenerateIBLANK )
     {
     output->GenerateVisibilityArrays( );
     }
 
+  myController->Barrier( );
   outInf = NULL;
   output = NULL;
   
@@ -1831,7 +1880,8 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 // ----------------------------------------------------------------------------
 int vtkEnzoReader::GetRefinementRatio( const int level )
 {
-  assert( level >= 0 && level < this->GetNumberOfLevels()  );
+  vtkAssertUtils::assertInRange(
+      level,0,this->GetNumberOfLevels(),__FILE__,__LINE__);
   // TODO: Implement this
   return 4;
 }
@@ -1841,11 +1891,11 @@ void vtkEnzoReader::GetExtentBasedOnRootBlock(
     const int *dims, const double *blkorigin,
     const double *spacing, int *ijkextent )
 {
-  assert( dims != NULL );
-  assert( blkorigin != NULL );
-  assert( spacing != NULL );
-  assert( ijkextent != NULL );
-  assert( this->Internal->Blocks.size() > 1 );
+  vtkAssertUtils::assertNotNull( dims, __FILE__, __LINE__ );
+  vtkAssertUtils::assertNotNull( blkorigin, __FILE__, __LINE__ );
+  vtkAssertUtils::assertNotNull( spacing, __FILE__, __LINE__ );
+  vtkAssertUtils::assertNotNull( ijkextent, __FILE__, __LINE__ );
+  vtkAssertUtils::assertTrue(this->Internal->Blocks.size()>1,__FILE__,__LINE__);
 
   ijkextent[0] = 0;
   ijkextent[1] = 0;
@@ -1869,113 +1919,215 @@ void vtkEnzoReader::GetExtentBasedOnRootBlock(
 }
 
 // ----------------------------------------------------------------------------
-void vtkEnzoReader::GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds,
-    std::vector< int > &idxcounter )
+void vtkEnzoReader::GetBlockMetaData(
+    int mapIndex, vtkHierarchicalBoxDataSet *hbds, std::vector<int> &idx )
 {
-  assert( hbds != NULL );
+  // Sanity check!
+  vtkAssertUtils::assertNotNull( hbds,__FILE__,__LINE__ );
 
   this->Internal->ReadMetaData();
-  
+
+  // Grab the controller
+  vtkMultiProcessController *myController =
+   vtkMultiProcessController::GetGlobalController();
+  vtkAssertUtils::assertNotNull( myController, __FILE__, __LINE__ );
+
+
   int blockIdx = this->BlockMap[ mapIndex ];
+  int process  = this->GetBlockProcessId( blockIdx );
 
-  if( hbds == NULL || blockIdx < 0 ||
-      blockIdx >= this->Internal->NumberOfBlocks )
+  vtkAssertUtils::assertInRange(
+      process,0,myController->GetNumberOfProcesses(),__FILE__,__LINE__);
+  vtkAssertUtils::assertNotEquals(
+   process,myController->GetLocalProcessId(),__FILE__, __LINE__);
+
+  // this->Internal->Blocks includes a pseudo block --- the root as block #0
+  vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
+
+  int level = theBlock.Level;
+  vtkAssertUtils::assertInRange(
+   level, 0, this->GetNumberOfLevels()-1,__FILE__,__LINE__ );
+
+
+  double blockMin[3];
+  double blockMax[3];
+  double spacings[3];
+
+  for ( int i = 0; i < 3; i++ )
     {
-    vtkDebugMacro("Invalid block index or vtkHierachicalBoxDataSet is NULL");
-    return;
+    blockMin[i] = theBlock.MinBounds[i];
+    blockMax[i] = theBlock.MaxBounds[i];
+    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
+                ? ( blockMax[i] - blockMin[i] ) /
+                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
+                :   1.0;
     }
-  
-  int  bSuccess = 0;
-  char blckName[100];
 
-  vtkUniformGrid *uniformGrid = vtkUniformGrid::New( );
-  bSuccess = this->GetBlock( blockIdx, uniformGrid );
+  vtkAMRBox myAmrBox(
+    theBlock.MinBounds,theBlock.NumberOfDimensions,
+    theBlock.BlockNodeDimensions,spacings, blockIdx,
+    theBlock.Level, process );
 
-  vtkAMRBox   amrBox;
-  double origin[ 3 ];
-  int      dims[ 3 ];
-  int   ijkextent[6];
-  double  spacing[3];
+  hbds->SetDataSet(level,idx[level],myAmrBox,NULL);
+  idx[ level ]++;
+}
 
-  uniformGrid->GetDimensions( dims );
+// ----------------------------------------------------------------------------
+void vtkEnzoReader::GetBlock(
+ int mapIndex, vtkHierarchicalBoxDataSet *hbds,std::vector<int> &idxcounter)
+{
+  // Sanity Check!
+  vtkAssertUtils::assertNotNull(hbds,__FILE__,__LINE__);
 
-  amrBox.SetDimensionality( uniformGrid->GetDataDimension( ) );
+  int blockIdx = this->BlockMap[ mapIndex ];
+  vtkAssertUtils::assertInRange(
+   blockIdx,0,this->Internal->NumberOfBlocks,__FILE__,__LINE__);
+  this->Internal->ReadMetaData();
 
-  // Set origin and dimensionality of the AMR Box
-  uniformGrid->GetOrigin( origin );
 
-  // Set the grid spacing
-  uniformGrid->GetSpacing( spacing );
-  amrBox.SetGridSpacing( spacing );
+  vtkUniformGrid *uniformGrid = vtkUniformGrid::New();
+  int bSuccess                = this->GetBlock(blockIdx,uniformGrid);
+  int process                 = this->GetBlockProcessId( blockIdx );
 
-//  if( blockIdx > 0 )
+  // this->Internal->Blocks includes a pseudo block --- the root as block #0
+  vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
+
+  int level = theBlock.Level;
+  vtkAssertUtils::assertInRange(
+   level, 0, this->GetNumberOfLevels()-1,__FILE__,__LINE__ );
+
+  double blockMin[3];
+  double blockMax[3];
+  double spacings[3];
+  for ( int i = 0; i < 3; i++ )
+    {
+    blockMin[i] = theBlock.MinBounds[i];
+    blockMax[i] = theBlock.MaxBounds[i];
+    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
+                ? ( blockMax[i] - blockMin[i] ) /
+                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
+                :   1.0;
+    }
+
+  vtkAMRBox myAmrBox(
+   theBlock.MinBounds,theBlock.NumberOfDimensions,
+   theBlock.BlockNodeDimensions,spacings, blockIdx,
+   theBlock.Level, process );
+
+  hbds->SetDataSet( level, idxcounter[level], myAmrBox, uniformGrid );
+  idxcounter[ level ]++;
+}
+
+
+
+
+//void vtkEnzoReader::GetBlock(
+//    int mapIndex, vtkHierarchicalBoxDataSet *hbds,
+//    std::vector< int > &idxcounter )
+//{
+//  vtkAssertUtils::assertNotNull( hbds, __FILE__, __LINE__ );
+//  this->Internal->ReadMetaData();
+//
+//  int blockIdx = this->BlockMap[ mapIndex ];
+//
+//  if( hbds == NULL || blockIdx < 0 ||
+//      blockIdx >= this->Internal->NumberOfBlocks )
 //    {
-//    this->GetExtentBasedOnRootBlock( dims, origin, spacing, ijkextent );
+//    vtkDebugMacro("Invalid block index or vtkHierachicalBoxDataSet is NULL");
+//    return;
+//    }
 //
-////    for( int i=0; i < 6; ++i )
-////      std::cout << "ijkextent[" << i << "]=" << ijkextent[ i ] << std::endl;
-////    std::cout.flush( );
+//  int  bSuccess = 0;
+//  char blckName[100];
 //
+//  vtkUniformGrid *uniformGrid = vtkUniformGrid::New( );
+//  bSuccess = this->GetBlock( blockIdx, uniformGrid );
+//
+//  vtkAMRBox   amrBox;
+//  double origin[ 3 ];
+//  int      dims[ 3 ];
+//  int   ijkextent[6];
+//  double  spacing[3];
+//
+//  uniformGrid->GetDimensions( dims );
+//
+//  amrBox.SetDimensionality( uniformGrid->GetDataDimension( ) );
+//
+//  // Set origin and dimensionality of the AMR Box
+//  uniformGrid->GetOrigin( origin );
+//
+//  // Set the grid spacing
+//  uniformGrid->GetSpacing( spacing );
+//  amrBox.SetGridSpacing( spacing );
+//
+////  if( blockIdx > 0 )
+////    {
+////    this->GetExtentBasedOnRootBlock( dims, origin, spacing, ijkextent );
+////
+//////    for( int i=0; i < 6; ++i )
+//////      std::cout << "ijkextent[" << i << "]=" << ijkextent[ i ] << std::endl;
+//////    std::cout.flush( );
+////
+////    amrBox.SetDataSetOrigin( origin );
+////    amrBox.SetDimensions( ijkextent );
+////    }
+////  else
+////    {
+//    ijkextent[ 0 ] = 0;
+//    ijkextent[ 1 ] = dims[ 0 ];
+//    ijkextent[ 2 ] = 0;
+//    ijkextent[ 3 ] = dims[ 1 ];
+//    ijkextent[ 4 ] = 0;
+//    ijkextent[ 5 ] = dims[ 2 ];
 //    amrBox.SetDataSetOrigin( origin );
 //    amrBox.SetDimensions( ijkextent );
+////    }
+//
+//
+//
+//  if( bSuccess == 1 )
+//    {
+//     sprintf( blckName, "Block%03d_Level%d",
+//               this->Internal->Blocks[ blockIdx+1 ].Index,
+//               this->Internal->Blocks[ blockIdx+1 ].Level );
+//
+//     unsigned int myLevel = static_cast< unsigned int >(
+//         this->Internal->Blocks[blockIdx+1].Level );
+//
+//     unsigned int myIndex = static_cast< unsigned int >(
+//         this->Internal->Blocks[blockIdx+1].Index );
+//
+//     if( myLevel != this->GetNumberOfLevels() )
+//       {
+//       hbds->SetRefinementRatio( myLevel, this->GetRefinementRatio( myLevel ) );
+//       }
+//
+////     std::cout << "myLevel: " << myLevel << " ";
+////     std::cout << "idx: " << idxcounter[ myLevel ] << std::endl;
+////     std::cout.flush( );
+//
+//     hbds->SetDataSet( myLevel, idxcounter[ myLevel ], amrBox, uniformGrid );
+//     hbds->GetMetaData( myLevel,idxcounter[ myLevel ] )->Set(
+//         vtkCompositeDataSet::NAME(), blckName );
+//     this->Internal->NumberOfMultiBlocks ++;
+//     idxcounter[ myLevel ]++;
 //    }
 //  else
 //    {
-    ijkextent[ 0 ] = 0;
-    ijkextent[ 1 ] = dims[ 0 ];
-    ijkextent[ 2 ] = 0;
-    ijkextent[ 3 ] = dims[ 1 ];
-    ijkextent[ 4 ] = 0;
-    ijkextent[ 5 ] = dims[ 2 ];
-    amrBox.SetDataSetOrigin( origin );
-    amrBox.SetDimensions( ijkextent );
+//    vtkDebugMacro( "Could not acquire block!\n");
 //    }
-
-
-
-  if( bSuccess == 1 )
-    {
-     sprintf( blckName, "Block%03d_Level%d",
-               this->Internal->Blocks[ blockIdx+1 ].Index,
-               this->Internal->Blocks[ blockIdx+1 ].Level );
-
-     unsigned int myLevel = static_cast< unsigned int >(
-         this->Internal->Blocks[blockIdx+1].Level );
-
-     unsigned int myIndex = static_cast< unsigned int >(
-         this->Internal->Blocks[blockIdx+1].Index );
-
-     if( myLevel != this->GetNumberOfLevels() )
-       {
-       hbds->SetRefinementRatio( myLevel, this->GetRefinementRatio( myLevel ) );
-       }
-
-//     std::cout << "myLevel: " << myLevel << " ";
-//     std::cout << "idx: " << idxcounter[ myLevel ] << std::endl;
-//     std::cout.flush( );
-
-     hbds->SetDataSet( myLevel, idxcounter[ myLevel ], amrBox, uniformGrid );
-     hbds->GetMetaData( myLevel,idxcounter[ myLevel ] )->Set(
-         vtkCompositeDataSet::NAME(), blckName );
-     this->Internal->NumberOfMultiBlocks ++;
-     idxcounter[ myLevel ]++;
-    }
-  else
-    {
-    vtkDebugMacro( "Could not acquire block!\n");
-    }
-
-  uniformGrid->Delete();
-  uniformGrid = NULL;
-
-  if( this->LoadParticles )
-    {
-    // TODO: Dealing with particles?
-    vtkDebugMacro( "Loading of particles is not currently implemented!\n" );
-    }
-
-
-}
+//
+//  uniformGrid->Delete();
+//  uniformGrid = NULL;
+//
+//  if( this->LoadParticles )
+//    {
+//    // TODO: Dealing with particles?
+//    vtkDebugMacro( "Loading of particles is not currently implemented!\n" );
+//    }
+//
+//
+//}
 
 // ----------------------------------------------------------------------------
 //void vtkEnzoReader::GetBlock( int mapIndex, vtkHierarchicalBoxDataSet *hbds)
