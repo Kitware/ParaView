@@ -16,6 +16,7 @@
 // works are expected.
 
 #include "vtkSMComparativeAnimationCueProxy.h"
+#include "vtkPVComparativeAnimationCue.h"
 #include "vtkSmartPointer.h"
 #include <assert.h>
 
@@ -26,8 +27,9 @@
 
 int main(int, char**)
 {
-  vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cue = 
+  vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy =
     vtkSmartPointer<vtkSMComparativeAnimationCueProxy>::New();
+  vtkPVComparativeAnimationCue* cue = cueProxy->GetCue();
 
   // When no values are added to the cue, we still expect it to work.
   assert(cue->GetValue(0, 0, 10, 10) == -1.0);

@@ -16,36 +16,30 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
-#include "vtkPVMain.h"
+#include "vtkSMSession.h"
 #include "vtkTestingOptions.h"
 #include "vtkTestingProcessModuleGUIHelper.h"
-#include "vtkTestingProcessModuleGUIHelper.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
-
-static void ParaViewInitializeInterpreter(vtkProcessModule* pm)
-{
-  // Initialize built-in wrapper modules.
-  vtkInitializationHelper::InitializeInterpretor(pm);
-}
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::SetUseMPI(0); // don't use MPI at all.
-  vtkPVMain::Initialize(&argc, &argv); 
-  vtkPVMain* pvmain = vtkPVMain::New();
   vtkTestingOptions* options = vtkTestingOptions::New();
   options->SetProcessType(vtkPVOptions::PVBATCH);
+
+  vtkInitializationHelper::Initialize(argc, argv,
+    vtkProcessModule::PROCESS_BATCH, options);
+
+  vtkSMSession* session = vtkSMSession::New();
+  session->Initialize();
+  vtkProcessModule::GetProcessModule()->RegisterSession(session);
+  session->Delete();
+
   vtkTestingProcessModuleGUIHelper* helper = vtkTestingProcessModuleGUIHelper::New();
-  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
-  if (!ret)
-    {
-    ret = helper->Run(options);
-    }
+  int ret = helper->Run();
+
   helper->Delete();
-  pvmain->Delete();
+  vtkInitializationHelper::Finalize();
   options->Delete();
-  vtkPVMain::Finalize();
   return ret;
 }
 

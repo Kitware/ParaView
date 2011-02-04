@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(TestSubProxy
   vtkPVServerCommon vtkPVFilters vtkPVServerManager)
 
 
-IF (FIXME)
 ################################################################################
 SET(ServersServerManager_SRCS
   ServersServerManagerPrintSelf
@@ -73,4 +72,3 @@ IF (PVServerManagerTestData)
       ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
-ENDIF (FIXME)

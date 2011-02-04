@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLParser.h"
 #include "vtkRenderWindow.h"
-#include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
@@ -92,19 +91,11 @@ vtkTestingProcessModuleGUIHelper::vtkTestingProcessModuleGUIHelper()
   vtkTestingOutputWindow* win = vtkTestingOutputWindow::New();
   vtkOutputWindow::SetInstance(win);
   win->Delete();
-
-  this->SMApplication = vtkSMApplication::New();
-  this->ShowProgress = 0;
-  this->Filter = 0;
-  this->CurrentProgress = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkTestingProcessModuleGUIHelper::~vtkTestingProcessModuleGUIHelper()
 {
-  this->SMApplication->Finalize();
-  this->SMApplication->Delete();
-  this->SetFilter(0);
 }
 
 //----------------------------------------------------------------------------
@@ -114,21 +105,13 @@ void vtkTestingProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **, 
-  int numServerProcs, int myId)
+int vtkTestingProcessModuleGUIHelper::Run()
 {
-  (void)myId;
-  (void)numServerProcs;
   int res = 0;
-
-  this->SMApplication->Initialize();
-  vtkSMProperty::SetCheckDomains(0);
-  this->SMApplication->ParseConfigurationFiles();
-
   // Load the state and process it.
   vtkTestingOptions* options = vtkTestingOptions::SafeDownCast(
-    this->ProcessModule->GetOptions());
-  
+    vtkProcessModule::GetProcessModule()->GetOptions());
+
   if (!options->GetSMStateXMLName())
     {
     vtkErrorMacro("No state to load.");
@@ -160,7 +143,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
     }
   parser->Parse(str_buffer.c_str(), str_buffer.length());
 
-  vtkSMProxyManager::GetProxyManager()->LoadState(parser->GetRootElement());
+  vtkSMProxyManager::GetProxyManager()->LoadXMLState(parser->GetRootElement());
   parser->Delete();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -185,7 +168,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
       res = 1;
       }
     testing->Delete();
-    pxm->SaveState("/tmp/foo.pvsm");
+    pxm->SaveXMLState("/tmp/foo.pvsm");
     }
   else
     {
@@ -199,70 +182,3 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   // Exiting:  CLean up.
   return res;
 }
-
-//----------------------------------------------------------------------------
-void vtkTestingProcessModuleGUIHelper::ExitApplication()
-{ 
-}
-
-//----------------------------------------------------------------------------
-void vtkTestingProcessModuleGUIHelper::SendPrepareProgress()
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkTestingProcessModuleGUIHelper::CloseCurrentProgress()
-{
-  if ( this->ShowProgress )
-    {
-    while ( this->CurrentProgress <= 10 )
-      {
-      cout << ".";
-      this->CurrentProgress ++;
-      }
-    cout << "]" << endl;
-    }
-  this->CurrentProgress = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkTestingProcessModuleGUIHelper::SendCleanupPendingProgress()
-{
-  this->CloseCurrentProgress();
-  this->ShowProgress = 0;
-  this->SetFilter(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkTestingProcessModuleGUIHelper::SetLocalProgress(const char* filter, int val)
-{
-  val /= 10;
-  int new_progress = 0;
-  if ( !filter || !this->Filter || strcmp(filter, this->Filter) != 0 )
-    {
-    this->CloseCurrentProgress();
-    this->SetFilter(filter);
-    new_progress = 1;
-    }
-  if ( !this->ShowProgress )
-    {
-    new_progress = 1;
-    this->ShowProgress = 1;
-    }
-  if ( new_progress )
-    {
-    if ( filter[0] == 'v' && filter[1] == 't' && filter[2] == 'k' )
-      {
-      filter += 3;
-      }
-    cout << "Process " << filter << " [";
-    cout.flush();
-    }
-  while ( this->CurrentProgress <= val )
-    {
-    cout << ".";
-    cout.flush();
-    this->CurrentProgress ++;
-    }
-}
-

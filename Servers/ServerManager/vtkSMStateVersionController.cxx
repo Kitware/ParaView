@@ -115,6 +115,15 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     this->UpdateVersion( version, updated_version );
     }
 
+  if ( this->GetMajor(version) == 3 && this->GetMajor(version) < 11 )
+    {
+    status = status && this->Process_3_10_to_4_0(root);
+    // Since now the state file has been updated to version 4.0.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = { 4, 0, 0 };
+    this->UpdateVersion( version, updated_version );
+    }
+
   return status;
 }
 
@@ -857,6 +866,94 @@ bool vtkSMStateVersionController::Process_3_8_to_3_10( vtkPVXMLElement * root )
     this->SelectAndRemove( root, "Proxy",attrs);
     }
   return true;
+}
+
+namespace
+{
+  bool ConvertRepresentationProperty(vtkPVXMLElement* element, void* callData)
+    {
+    vtkSMStateVersionController * self
+      = reinterpret_cast< vtkSMStateVersionController * >( callData );
+    return self->ConvertRepresentationProperty(element);
+    }
+};
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_10_to_4_0( vtkPVXMLElement * root )
+{
+    {
+    // Change all "Representation" properties from ints to string.
+    const char* attrs[] = {
+      "group","representations",
+      "type", "GeometryRepresentation", 0};
+    this->Select( root, "Proxy",attrs, &::ConvertRepresentationProperty, this);
+
+    const char* attrs2[] = {
+      "group","representations",
+      "type", "UnstructuredGridRepresentation", 0};
+    this->Select( root, "Proxy",attrs2, &::ConvertRepresentationProperty, this);
+
+    const char* attrs3[] = {
+      "group","representations",
+      "type", "UniformGridRepresentation", 0};
+    this->Select( root, "Proxy",attrs3, &::ConvertRepresentationProperty, this);
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::ConvertRepresentationProperty(
+  vtkPVXMLElement* element)
+{
+  if (element->GetName() && strcmp(element->GetName(), "Proxy") ==0)
+    {
+    const char* attrs[] = {"name", "Representation", 0};
+    this->Select(element, "Property", attrs, &::ConvertRepresentationProperty,
+      this);
+    return true;
+    }
+  else if (element->GetName() && strcmp(element->GetName(), "Property") == 0)
+    {
+    vtkstd::string newtext;
+    int value = 0;
+    vtkPVXMLElement* valueElement = NULL;
+    vtkPVXMLElement* domainElement = NULL;
+    for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = element->GetNestedElement(cc);
+      if (child && child->GetName() && strcmp(child->GetName(), "Element")==0)
+        {
+        child->GetScalarAttribute("value", &value);
+        valueElement = child;
+        }
+      else if (child && child->GetName() && strcmp(child->GetName(), "Domain")==0)
+        {
+        domainElement = child;
+        }
+      }
+    if (!domainElement || !valueElement)
+      {
+      return false;
+      }
+    for (unsigned int cc=0; cc < domainElement->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = domainElement->GetNestedElement(cc);
+      if (child && child->GetName() && strcmp(child->GetName(), "Entry")==0)
+        {
+        int dvalue=-1;
+        if (child->GetAttribute("text") &&
+          child->GetScalarAttribute("value", &dvalue) &&
+          dvalue == value)
+          {
+          newtext = child->GetAttribute("text");
+          break;
+          }
+        }
+      }
+    valueElement->SetAttribute("value", newtext.c_str());
+    return true;
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
