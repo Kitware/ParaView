@@ -2094,7 +2094,8 @@
       <!-- End of KdTreeManager -->
     </Proxy>
 
-    <Proxy name="RepresentationAnimationHelper" class="vtkPVRepresentationAnimationHelper">
+    <Proxy name="RepresentationAnimationHelper" class="vtkPVRepresentationAnimationHelper"
+           processes="client">
       <Documentation>
         Used to help in animation representation properties.
       </Documentation>
