@@ -181,7 +181,7 @@ class Proxy(object):
         if 'registrationGroup' in args:
             registrationGroup = args['registrationGroup']
             del args['registrationGroup']
-            registrationName = str(self.SMProxy.GetGlobalID())
+            registrationName = self.SMProxy.GetGlobalIDAsString()
             if 'registrationName' in args:
                 registrationName = args['registrationName']
                 del args['registrationName']
@@ -387,7 +387,8 @@ class SourceProxy(Proxy):
             self.SMProxy.UpdatePipeline()
         # This is here to cause a receive
         # on the client side so that progress works properly.
-        self.SMProxy.GetDataInformation()
+        if ActiveConnection and ActiveConnection.IsRemote():
+            self.SMProxy.GetDataInformation()
 
     def FileNameChanged(self):
         "Called when the filename of a source proxy is changed."
@@ -961,7 +962,7 @@ class ProxyProperty(Property):
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 raise ValueError, "Found a 'proxy_list' domain on an InputProperty that is not a ProxyListDomain."
             pm = ProxyManager()
-            group = "pq_helper_proxies.%d" % proxy.GetGlobalID()
+            group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
             if listdomain.GetNumberOfProxies() == 0:
                 for i in xrange(listdomain.GetNumberOfProxyTypes()):
                     igroup = listdomain.GetProxyGroup(i)
@@ -1497,7 +1498,7 @@ class ProxyManager(object):
         proxies = {}
         iter = self.NewGroupIterator(groupname)
         for aProxy in iter:
-            proxies[(iter.GetKey(), "%d" % aProxy.GetGlobalID())] = aProxy
+            proxies[(iter.GetKey(), aProxy.GetGlobalIDAsString())] = aProxy
         return proxies
 
     def UnRegisterProxy(self, groupname, proxyname, aProxy):
@@ -1715,6 +1716,47 @@ class ProxyIterator(object):
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
+class Connection(object):
+    """
+      This is a python representation for a session/connection.
+    """
+    def __init__(self, connectionId, session):
+        """Default constructor. Creates a Connection with the given
+        ID, all other data members initialized to None."""
+        global ActiveConnection
+        self.ID = connectionId
+        self.Session = session
+        if ActiveConnection:
+            raise RuntimeError, "Concurrent connections not supported!"
+        ActiveConnection = self
+        __InitAfterConnect__(self)
+        return
+
+    def __eq__(self, other):
+        "Returns true if the connection ids are the same."
+        return (self.ID == other.ID and self.Session == other.Session)
+
+
+    def __repr__(self):
+        """User friendly string representation"""
+        return "Connection (%s) [%d]" % (self.Session.GetURI(), self.ID)
+
+    def GetURI(self):
+        """Get URI of the connection"""
+        return self.Session.GetURI()
+
+    def IsRemote(self):
+        """Returns True if the connection to a remote server, False if
+        it is local (built-in)"""
+        if self.Session.IsA("vtkSMSessionClient"):
+            return True
+        return False
+
+    def GetNumberOfDataPartitions(self):
+        """Returns the number of partitions on the data server for this
+           connection"""
+        return self.Session.GetServerInformation().GetNumberOfProcesses()
+
 
 def SaveState(filename):
     """Given a state filename, saves the state of objects registered
@@ -1722,13 +1764,13 @@ def SaveState(filename):
     pm = ProxyManager()
     pm.SaveState(filename)
 
-def LoadState(filename, session=None):
-    """Given a state filename and an optional session, loads the server
+def LoadState(filename, connection=None):
+    """Given a state filename and an optional connection, loads the server
     manager state."""
-    if not session:
-        session = ActiveSession
-    if not session:
-        raise RuntimeError, "Cannot load state without a session"
+    if not connection:
+        connection = ActiveConnection
+    if not connection:
+        raise RuntimeError, "Cannot load state without a connection"
     loader = vtkSMPQStateLoader()
     pm = ProxyManager()
     pm.LoadState(filename, loader)
@@ -1745,13 +1787,13 @@ def InitFromGUI():
     """
     Method used to initialize the Python Shell from the ParaView GUI.
     """
-    global ActiveSession
     global fromGUI
     fromGUI = True
     # ToggleProgressPrinting() ### FIXME COLLABORATION
-    ActiveSession = ProxyManager().GetSession()
-    __InitAfterConnect__()
-
+    session = ProxyManager().GetSession();
+    Connection(\
+      vtkProcessModule.GetProcessModule().GetSessionID(session),\
+      session)
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
@@ -1768,25 +1810,22 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
       creates a new connection to the data server on ds_host:ds_port and to the
       render server on rs_host: rs_port.
     """
-    global ActiveSession
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot create a session through python. Use the GUI to setup the connection."
     if ds_host == None:
-        ActiveSession = vtkSMSession()
-        ActiveSession.Initialize()
+        session = vtkSMSession()
+        session.Initialize()
     elif rs_host == None:
-        ActiveSession = vtkSMSessionClient()
-        ActiveSession.Initialize()
-        ActiveSession.Connect("cs://%s:%d" % (ds_host, ds_port))
+        session = vtkSMSessionClient()
+        session.Connect("cs://%s:%d" % (ds_host, ds_port))
     else:
-        ActiveSession = vtkSMSessionClient()
-        ActiveSession.Initialize()
-        ActiveSession.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port))
-
-    vtkProcessModule.GetProcessModule().RegisterSession(ActiveSession)
-    __InitAfterConnect__()
-    return ActiveSession
+        session = vtkSMSessionClient()
+        session.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port))
+    session.Initialize()
+    id = vtkProcessModule.GetProcessModule().RegisterSession(session)
+    connection = Connection(id, session)
+    return connection
 
 def ReverseConnect(port=11111):
     """
@@ -1799,26 +1838,26 @@ def ReverseConnect(port=11111):
     option).
     The optional port specified the port to listen to.
     """
-    global ActiveSession
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
-    session = vtkSMClientSession()
+    session = vtkSMSessionClient()
     session.Connect("csrc://hostname:" + port)
-    if not ActiveSession:
-        ActiveSession = session
+    session.Initialize()
+    id = vtkProcessModule.GetProcessModule().RegisterSession(session)
+    connection = Connection(id, session)
     return session
 
 def Disconnect(session=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
-    global ActiveSession
+    global ActiveConnection
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
-    if not session or session == ActiveSession:
-        session = ActiveSession
-        ActiveSession = None
+    if not session or session == ActiveConnection:
+        session = ActiveConnection
+        ActiveConnection = None
     if session:
       vtkProcessModule.GetProcessModule().UnRegisterSession(session)
     return
@@ -1829,17 +1868,15 @@ def CreateProxy(xml_group, xml_name, session=None):
     present. You should not have to use method normally. Instantiate the
     appropriate class from the appropriate module, for example:
     sph = servermanager.sources.SphereSource()"""
+    global ActiveConnection
     if not session:
-        session = ActiveSession
+        session = ActiveConnection
     if not session:
         raise RuntimeError, "Cannot create objects without a session."
     pxm = ProxyManager()
-    aProxy = pxm.NewProxy(xml_group, xml_name)
-    if not aProxy:
-        return None
-    return aProxy
+    return pxm.NewProxy(xml_group, xml_name)
 
-def GetRenderView():
+def GetRenderView(connection=None):
     """Return the render view in use.  If more than one render view is in
     use, return the first one."""
 
@@ -1850,7 +1887,7 @@ def GetRenderView():
             break
     return render_module
 
-def GetRenderViews():
+def GetRenderViews(connection=None):
     """Returns the set of all render views."""
     render_modules = []
     for aProxy in ProxyManager():
@@ -1875,7 +1912,7 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     This method can also be used to initialize properties by passing
     keyword arguments where the key is the name of the property."""
     if not session:
-        session = ActiveSession
+        session = ActiveConnection
     if not session:
         raise RuntimeError, "Cannot create view without session."
     pxm = ProxyManager()
@@ -1962,26 +1999,22 @@ def LoadXML(xmlstring):
 
 def LoadPlugin(filename,  remote=True, session=None):
     """ Given a filename and a session (optional, otherwise uses
-    ActiveSession), loads a plugin. It then updates the sources,
+    ActiveConnection), loads a plugin. It then updates the sources,
     filters and rendering modules."""
-    global PluginManager
 
     if not session:
-        session = ActiveSession
+        session = ActiveConnection
     if not session:
         raise RuntimeError, "Cannot load a plugin without a session."
-    if not PluginManager:
-        PluginManager = vtkSMPluginManager()
+    plm = session.GetSession().GetPluginManager()
 
-    """ Load the plugin on server. """
     if remote:
-      serverURI = ActiveSession.GetURI()
+        status = plm.LoadRemotePlugin(filename)
     else:
-      serverURI = "builtin:"
+        status = plm.LoadLocalPlugin(filename)
 
-    plinfo = PluginManager.LoadPlugin(filename, serverURI, remote)
-
-    if not plinfo or not plinfo.GetLoaded():
+    # shouldn't the extension check happend before attempting to load the plugin?
+    if not status:
         if os.path.splitext(filename)[1].lower() == ".xml":
             # Assume that it is an xml file
             f = open(filename, 'r')
@@ -1992,6 +2025,7 @@ def LoadPlugin(filename,  remote=True, session=None):
         else:
             raise RuntimeError, "Problem loading plugin %s" % (filename)
     else:
+        # we should never have to call this. The modules should update automatically.
         updateModules()
 
 
@@ -2210,7 +2244,6 @@ def _makeUpdateCameraMethod(rv):
 def _createInitialize(group, name):
     """Internal method to create an Initialize() method for the sub-classes
     of Proxy"""
-    global ActiveSession
     pgroup = group
     pname = name
     def aInitialize(self, connection=None, update=True):
@@ -2227,7 +2260,10 @@ def _createGetProperty(pName):
     """Internal method to create a GetXXX() method where XXX == pName."""
     propName = pName
     def getProperty(self):
-        return self.GetPropertyValue(propName)
+        if paraview.compatibility.GetVersion() >= 3.5:
+            return self.GetPropertyValue(propName)
+        else:
+            return self.GetProperty(propName)
     return getProperty
 
 def _createSetProperty(pName):
@@ -2352,10 +2388,10 @@ def _make_name_valid(name):
 def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
     If mdl is not specified, it also creates the module"""
-    global ActiveSession
+    global ActiveConnection
 
-    if not ActiveSession:
-      raise "Please connect to a server using \"Connect\""
+    if not ActiveConnection:
+      raise RuntimeError, "Please connect to a server using \"Connect\""
 
     pxm = vtkSMObject.GetProxyManager()
     # Use prototypes to find all proxy types.
@@ -2374,7 +2410,8 @@ def createModule(groupName, mdl=None):
            print "Error while loading ", proxyName
            continue
         pname = proxyName
-        if proto.GetXMLLabel():
+        if paraview.compatibility.GetVersion() >= 3.5 and\
+           proto.GetXMLLabel():
             pname = proto.GetXMLLabel()
         pname = _make_name_valid(pname)
         if not pname:
@@ -2538,12 +2575,18 @@ def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
     it to the client using Fetch. It returns a tuple of (data, render
     view)"""
-    if not ActiveSession:
+    if not ActiveConnection:
         Connect()
-    ss = sources.Sphere(Radius=2, ThetaResolution=32)
-    shr = filters.Shrink(Input=OutputPort(ss,0))
-    cs = sources.Cone()
-    app = filters.AppendDatasets()
+    if paraview.compatibility.GetVersion() <= 3.4:
+        ss = sources.SphereSource(Radius=2, ThetaResolution=32)
+        shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
+        cs = sources.ConeSource()
+        app = filters.Append()
+    else:
+        ss = sources.Sphere(Radius=2, ThetaResolution=32)
+        shr = filters.Shrink(Input=OutputPort(ss,0))
+        cs = sources.Cone()
+        app = filters.AppendDatasets()
     app.Input = [shr, cs]
     rv = CreateRenderView()
     rep = CreateRepresentation(app, rv)
@@ -2559,7 +2602,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     Make sure to pass the full path to an exodus file. Also note that certain
     parameters are hard-coded for disk_out_ref.ex2 which can be found
     in ParaViewData. This method returns the render view."""
-    if not ActiveSession:
+    if not ActiveConnection:
         Connect()
     # Create the exodus reader and specify a file name
     reader = sources.ExodusIIReader(FileName=fname)
@@ -2632,7 +2675,7 @@ def demo3():
     import paraview.numpy_support
     import pylab
 
-    if not ActiveSession:
+    if not ActiveConnection:
         Connect()
     # Create a synthetic data source
     if paraview.compatibility.GetVersion() <= 3.4:
@@ -2703,7 +2746,7 @@ def demo3():
 def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
     """This method demonstrates the user of AnimateReader for
     creating animations."""
-    if not ActiveSession:
+    if not ActiveConnection:
         Connect()
     reader = sources.ExodusIIReader(FileName=fname)
     view = CreateRenderView()
@@ -2718,7 +2761,7 @@ def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
 
 def demo5():
     """ Simple sphere animation"""
-    if not ActiveSession:
+    if not ActiveConnection:
         Connect()
     if paraview.compatibility.GetVersion() <= 3.4:
         sphere = sources.SphereSource()
@@ -2763,12 +2806,10 @@ def demo5():
 
 ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
 
-# Users can set the active session which will be used by API
-# to create proxies etc when no session argument is passed.
-ActiveSession = None
-
-# Users can access the plugin Manager
-PluginManager = None
+# Users can set the active connection which will be used by API
+# to create proxies etc when no connection argument is passed.
+# Connect() automatically sets this if it is not already set.
+ActiveConnection = None
 
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.
@@ -2779,7 +2820,8 @@ if not vtkProcessModule.GetProcessModule():
       pvoptions.SetProcessType(0x40)
       if paraview.options.symmetric:
         pvoptions.SetSymmetricMPIMode(True)
-    vtkInitializationHelper.Initialize(sys.executable, 0, pvoptions) # FIXME type 0
+    vtkInitializationHelper.Initialize(sys.executable,
+        vtkProcessModule.PROCESS_CLIENT, pvoptions)
 
 # Initialize progress printing. Can be turned off by calling
 # ToggleProgressPrinting() again.
@@ -2825,7 +2867,7 @@ class __DefinitionUpdater(object):
         if vtkSMObject.GetProxyManager():
             vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
 
-def __InitAfterConnect__():
+def __InitAfterConnect__(connection):
     """
     This function is called everytime after a server connection is made.
     Since the ProxyManager and all proxy definitions are changed every time a

@@ -39,7 +39,7 @@ paraview.compatibility.minor = 5
 import servermanager
 
 def _disconnect():
-    if servermanager.ActiveSession:
+    if servermanager.ActiveConnection:
         servermanager.ProxyManager().UnRegisterProxies()
         active_objects.view = None
         active_objects.source = None
@@ -67,6 +67,7 @@ def ReverseConnect(port=11111):
     an incoming connection from the server."""
     _disconnect()
     session = servermanager.ReverseConnect(port)
+    _add_functions(globals())
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
@@ -345,7 +346,7 @@ def Delete(proxy=None):
         if listdomain:
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 continue
-            group = "pq_helper_proxies.%d" + proxy.GetGlobalID()
+            group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
             for i in xrange(listdomain.GetNumberOfProxies()):
                 pm = servermanager.ProxyManager()
                 iproxy = listdomain.GetProxy(i)
@@ -700,7 +701,7 @@ def _GetRepresentationAnimationHelper(sourceproxy):
     proxy = servermanager.misc.RepresentationAnimationHelper(
       Source=sourceproxy)
     servermanager.ProxyManager().RegisterProxy(
-      "pq_helper_proxies.%d" % sourceproxy.GetGlobalID(),
+      "pq_helper_proxies.%s" % sourceproxy.GetGlobalIDAsString(),
       "RepresentationAnimationHelper", proxy)
     return proxy
 
@@ -964,7 +965,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
-if not servermanager.ActiveSession:
+if not servermanager.ActiveConnection:
     Connect()
 
 active_objects = ActiveObjects()
