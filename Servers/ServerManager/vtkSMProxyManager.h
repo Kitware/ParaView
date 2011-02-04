@@ -400,7 +400,6 @@ public:
   // registered.
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
-//BTX
   // Description:
   // ParaView has notion of "global properties". These are application wide
   // properties such as foreground color, text color etc. Changing values of
@@ -426,7 +425,6 @@ public:
   // Provides access to the writer factory. Before using the reader factory, it
   // is essential that it's configured correctly.
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
-//ETX
 
   // Description:
   // Loads server-manager configuration xml.
