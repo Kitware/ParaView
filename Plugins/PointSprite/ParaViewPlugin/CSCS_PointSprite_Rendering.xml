@@ -67,9 +67,11 @@
         default_values="2"
         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="2" text="SimplePoint"/>
-          <Entry value="1" text="Texture"/>
           <Entry value="0" text="Sphere"/>
+          <Entry value="1" text="Texture"/>
+          <Entry value="2" text="SimplePoint"/>
+          <Entry value="3" text="Sphere (Texture)"/>
+          <Entry value="4" text="Blur (Texture)"/>
         </EnumerationDomain>
       </IntVectorProperty>
 
