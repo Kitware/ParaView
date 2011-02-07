@@ -92,6 +92,8 @@ public:
   void hidePlugin(const QString& lib, bool remote);
   bool isHidden(const QString& lib, bool remote);
 
+  void addInterface(void*){}; // FIXME_COLLABORATION:to fix compilation of Examples/RenderPass
+
 signals:
   /// notification when plugin has been loaded.
   void pluginsUpdated();
