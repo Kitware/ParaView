@@ -174,22 +174,20 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
 
 //-----------------------------------------------------------------------------
 pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
-  const pqServerManagerModel* const vtkNotUsed(model),
-  const QMetaObject& vtkNotUsed(mo), vtkTypeUInt32 vtkNotUsed(id))
+  const pqServerManagerModel* const model,
+  const QMetaObject& mo, vtkTypeUInt32 id)
 {
-  // FIXME:
-  // This API must be discarded since a proxy just by its global-id without any
-  // associated session does not make sense.
-  abort();
-
-  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-  //  pm->GetObjectFromID(id));
-  //if (proxy)
-  //  {
-  //  return pqServerManagerModel::findItemHelper(
-  //    model, mo, proxy);
-  //  }
+  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+    {
+    if (item && mo.cast(item))
+      {
+      pqProxy* proxy = qobject_cast<pqProxy*>(item);
+      if (proxy && proxy->getProxy()->GetGlobalID() == id)
+        {
+        return proxy;
+        }
+      }
+    }
 
   return 0;
 }
