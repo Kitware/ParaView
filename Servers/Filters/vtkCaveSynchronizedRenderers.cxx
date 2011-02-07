@@ -66,7 +66,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
     for (int cc=0; cc < this->NumberOfDisplays; cc++)
       {
       this->DefineDisplay(cc, options->GetLowerLeft(cc),
-        options->GetLowerRight(cc), options->GetUpperLeft(cc));
+        options->GetLowerRight(cc), options->GetUpperRight(cc));
       }
     }
 
@@ -212,9 +212,9 @@ void vtkCaveSynchronizedRenderers::SetDisplayConfig()
 void vtkCaveSynchronizedRenderers::SetSurfaceRotation( double xBase[3],
                                                        double yBase[3],
                                                        double zBase[3],
-                                                       double vtkNotUsed(xRoom)[3],
-                                                       double vtkNotUsed(yRoom)[3],
-                                                       double vtkNotUsed(zRoom)[3])
+                                                       double xRoom[3],
+                                                       double yRoom[3],
+                                                       double zRoom[3])
 {
   vtkMath::Normalize( xBase );
   vtkMath::Normalize( yBase );
@@ -232,7 +232,7 @@ void vtkCaveSynchronizedRenderers::SetSurfaceRotation( double xBase[3],
   this->SurfaceRot->SetElement( 2, 1, zBase[1]);
   this->SurfaceRot->SetElement( 2, 2, zBase[2]);
 
-  // // Calculate directional cosine matrix to get surface rotation
+  // Calculate directional cosine matrix to get surface rotation
   // SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
   // SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
   // SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
