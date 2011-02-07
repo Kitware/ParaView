@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QStringList;
 class pqPipelineSource;
+class pqServer;
+class vtkSMReaderFactory;
 
 /// @ingroup Reactions
 /// Reaction for open data files.
@@ -47,6 +49,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadDataReaction : public pqReaction
 public:
   /// Constructor. Parent cannot be NULL.
   pqLoadDataReaction(QAction* parent);
+
+  /// Loads multiple data files. Uses reader factory to determine what reader are
+  /// supported. If a file requires user input the reader of choice, it will use
+  /// that reader for all other files of that type.
+  /// Returns the reader is creation successful, otherwise returns
+  /// NULL.
+  /// Note that this method is static. Applications can simply use this without
+  /// having to create a reaction instance.
+  static pqPipelineSource* loadData(const QList<QStringList>& files);
 
   /// Loads data files. Uses reader factory to determine what reader are
   /// supported. Returns the reader is creation successful, otherwise returns
@@ -76,6 +87,18 @@ protected:
       emit this->loadedData(source);
       }
     }
+
+  static bool TestFileReadability(const QString& file, 
+    pqServer *server, vtkSMReaderFactory *factory);
+  
+  static bool DetermineFileReader(const QString& filename, 
+    pqServer *server, vtkSMReaderFactory *factory,
+    QPair<QString,QString>& readerInfo);
+
+  static pqPipelineSource* pqLoadDataReaction::LoadFile(
+    const QStringList& files,
+    pqServer *server,
+    const QPair<QString,QString>& readerInfo);
 
 private:
   Q_DISABLE_COPY(pqLoadDataReaction)
