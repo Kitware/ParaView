@@ -33,42 +33,28 @@ set(CoProcessor_SRCS
   vtkCPDataDescription.cxx
   vtkCPInputDataDescription.cxx
   vtkCPPipeline.cxx
+  vtkCPProcessModulePythonHelper.cxx
   vtkCPProcessor.cxx
+  vtkCPPythonHelper.cxx
+  vtkCPPythonScriptPipeline.cxx
 )
-IF (PARAVIEW_ENABLE_PYTHON)
-  set(CoProcessor_SRCS
-    ${CoProcessor_SRCS}
-    vtkCPProcessModulePythonHelper.cxx
-    vtkCPPythonHelper.cxx
-    vtkCPPythonScriptPipeline.cxx
-  )
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-
 set_source_files_properties(
   vtkCPPipeline
   ABSTRACT)
-IF (PARAVIEW_ENABLE_PYTHON)
-  set_source_files_properties(
-    vtkCPProcessModulePythonHelper
-    vtkCPPythonHelper
-    WRAP_EXCLUDE)
-ENDIF (PARAVIEW_ENABLE_PYTHON)
+set_source_files_properties(
+  vtkCPProcessModulePythonHelper
+  vtkCPPythonHelper
+  WRAP_EXCLUDE)
 add_library(vtkCoProcessor ${CoProcessor_SRCS})
-set(CoProcessor_LIBS
+target_link_libraries(
+  vtkCoProcessor
   vtkCommon
   vtkFiltering
   vtkPVFilters
   vtkPVServerManager
-  )
-IF (PARAVIEW_ENABLE_PYTHON)
-  set(CoProcessor_LIBS
-    ${CoProcessor_LIBS}
-    vtkPVPython
-  )
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-target_link_libraries(vtkCoProcessor ${CoProcessor_LIBS})
+  vtkPVPython
+)
 
-IF (PARAVIEW_ENABLE_PYTHON)
 # Create Python bindings for the co-processing library
 INCLUDE(FindPythonLibs)
 SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
@@ -116,26 +102,13 @@ IF(PY_STATIC_MODULES_LIST)
   TARGET_LINK_LIBRARIES(vtkCoProcessor ${PY_STATIC_MODULES_LIST})
 ENDIF(PY_STATIC_MODULES_LIST)
 
-ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 # Install
 #----------------------------------------------------------------------------------------------------
 # Libraries
-set(CoProcessor_INSTALL
-  vtkCoProcessor
-  )
-
-IF (PARAVIEW_ENABLE_PYTHON)
-  set(CoProcessor_INSTALL
-    ${CoProcessor_INSTALL}
-    tkCoProcessorPython 
-    vtkCoProcessorPythonD
-    )
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-
 IF(NOT PV_INSTALL_NO_LIBRARIES)
 
-  INSTALL(TARGETS ${CoProcessor_INSTALL}
+  INSTALL(TARGETS vtkCoProcessor vtkCoProcessorPython vtkCoProcessorPythonD
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
