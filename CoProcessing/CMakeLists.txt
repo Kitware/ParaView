@@ -52,13 +52,6 @@ SET(CoProcessing_INCLUDE_DIRS
   ${CoProcessing_BINARY_DIR}/CoProcessor
   )
 
-IF (PARAVIEW_ENABLE_PYTHON)
-  SET(CoProcessing_INCLUDE_DIRS
-     ${CoProcessing_INCLUDE_DIRS}
-     ${CoProcessing_SOURCE_DIR}/Adaptors/PythonAdapter
-     )
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-
 # Save library dependencies.
 EXPORT_LIBRARY_DEPENDENCIES(
   ${CoProcessing_BINARY_DIR}/CPLibraryDepends.cmake)
