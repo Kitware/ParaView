@@ -65,6 +65,10 @@ void vtkPVSynchronizedRenderer::Initialize()
     }
 
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+
+  // active session must be a paraview-session.
+  assert(activeSession != NULL);
+
   int processtype = pm->GetProcessType();
   switch (processtype)
     {
@@ -98,38 +102,24 @@ void vtkPVSynchronizedRenderer::Initialize()
   bool in_cave_mode = false;
   int tile_dims[2] = {0, 0};
   int tile_mullions[2] = {0, 0};
-#ifdef FIXME_COLLABORATION
-  vtkPVServerInformation* server_info = NULL;
-  if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
-    {
-    vtkIdType connectionID = pm->GetConnectionID(
-      pm->GetActiveRemoteConnection());
-    server_info = pm->GetServerInformation(connectionID);
-    }
-  else
-    {
-    server_info = pm->GetServerInformation(0);
-    }
-  tile_dims[0] = server_info->GetTileDimensions()[0];
-  tile_dims[1] = server_info->GetTileDimensions()[1];
-  tile_mullions[0] = server_info->GetTileMullions()[0];
-  tile_mullions[1] = server_info->GetTileMullions()[1];
+
+  vtkPVServerInformation* info = activeSession->GetServerInformation();
+  info->GetTileDimensions(tile_dims);
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
+  tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
+  info->GetTileMullions(tile_mullions);
   if (!in_tile_display_mode)
     {
-    in_cave_mode = server_info->GetNumberOfMachines() > 0;
+    in_cave_mode = info->GetNumberOfMachines() > 0;
       // these are present when a pvx file is specified.
     }
-#endif
-
 
   // we ensure that tile_dims are non-zero. We are passing the tile_dims to
   // vtkIceTSynchronizedRenderers and should be (1, 1) when not in tile-display
   // mode.
   tile_dims[0] = tile_dims[0] > 0 ? tile_dims[0] : 1;
   tile_dims[1] = tile_dims[1] > 0 ? tile_dims[1] : 1;
-
-
 
   switch (this->Mode)
     {
