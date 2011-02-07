@@ -691,6 +691,8 @@ def WriteAnimation(filename, **params):
       use to fill empty spaces in the image.
     * FrameRate (double): set the frame rate (if applicable)."""
     scene = GetAnimationScene()
+    # ensures that the TimeKeeper track is created.
+    GetTimeTrack()
     iw = servermanager.vtkSMAnimationSceneImageWriter()
     iw.SetAnimationScene(scene.SMProxy)
     iw.SetFileName(filename)
@@ -808,11 +810,13 @@ def GetTimeTrack():
     scene = GetAnimationScene()
     tk = scene.TimeKeeper
     for cue in scene.Cues:
-        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk:
+        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk\
+            and cue.AnimatedPropertyName == "Time":
             return cue
     # no cue was found, create a new one.
     cue = TimeAnimationCue()
     cue.AnimatedProxy = tk
+    cue.AnimatedPropertyName = "Time"
     scene.Cues.append(cue)
     return cue
 
