@@ -41,10 +41,14 @@ vtkSMSILDomain::~vtkSMSILDomain()
 //----------------------------------------------------------------------------
 int vtkSMSILDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem)
 {
-  this->Superclass::ReadXMLAttributes(prop,elem);
+  if (!this->Superclass::ReadXMLAttributes(prop,elem))
+    {
+    return 0;
+    }
 
   // Keep subtree attribute
   this->SetSubTree(elem->GetAttribute("subtree"));
+  return 1;
 }
 //----------------------------------------------------------------------------
 vtkGraph* vtkSMSILDomain::GetSIL()
