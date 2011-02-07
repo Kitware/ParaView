@@ -95,7 +95,7 @@ protected:
     pqServer *server, vtkSMReaderFactory *factory,
     QPair<QString,QString>& readerInfo);
 
-  static pqPipelineSource* pqLoadDataReaction::LoadFile(
+  static pqPipelineSource* LoadFile(
     const QStringList& files,
     pqServer *server,
     const QPair<QString,QString>& readerInfo);
