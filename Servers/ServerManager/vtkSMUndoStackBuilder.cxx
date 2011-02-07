@@ -123,15 +123,18 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 void vtkSMUndoStackBuilder::OnNewState(vtkSMSession *session, vtkTypeUInt32 globalId,
                                        const vtkSMMessage *previousState)
 {
-  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
-    {
-    return;
-    }
-  vtkSMUndoElementStateKeeper* undoElement;
-  undoElement = vtkSMUndoElementStateKeeper::New();
-  undoElement->KeepCreationState(previousState);
-  this->Add(undoElement);
-  undoElement->Delete();
+//  if (this->IgnoreAllChanges || /*!this->HandleChangeEvents() ||*/ !this->UndoStack)
+//    {
+//    return;
+//    }
+
+//  cout << "=======> Sate " << globalId << " added to the undoset" << endl;
+
+//  vtkSMUndoElementStateKeeper* undoElement;
+//  undoElement = vtkSMUndoElementStateKeeper::New();
+//  undoElement->KeepCreationState(previousState);
+//  this->Add(undoElement);
+//  undoElement->Delete();
 }
 
 //-----------------------------------------------------------------------------

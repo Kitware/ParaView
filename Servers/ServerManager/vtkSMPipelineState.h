@@ -49,7 +49,8 @@ public:
 
   // Description:
   // This method is used to initialise the object to the given state
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator);
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
+                          bool definitionOnly);
 
   void ValidateState();
 

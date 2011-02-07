@@ -72,13 +72,7 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      remoteObj->LoadState(state, this->Locator);
-      }
-    else if(this->Locator)
-      {
-      // We are not allowed to re-new a proxy but we can overide the state that
-      // it should get if it is going to be recreated/reloaded by its parent proxy.
-      this->Locator->RegisterState(state);
+      remoteObj->LoadState(state, this->Locator, false);
       }
     }
   return 1; // OK, we say that everything is fine.

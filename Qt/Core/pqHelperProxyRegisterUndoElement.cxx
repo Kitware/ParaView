@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 
@@ -117,7 +118,8 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
 
   if (!proxy)
     {
-    vtkErrorMacro("Failed to locate the proxy.");
+    vtkErrorMacro( "Failed to locate the proxy "
+                   << this->Internal->ProxyGlobalID << endl);
     return 0;
     }
 

@@ -1818,7 +1818,8 @@ const vtkSMMessage* vtkSMProxy::GetFullState()
   return this->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMStateLocator* locator)
+void vtkSMProxy::LoadState( const vtkSMMessage* message,
+                            vtkSMStateLocator* locator, bool definitionOnly)
 {
   // Update globalId. This will fails if that one is already set with a different value
   this->SetGlobalID(message->global_id());
@@ -1835,14 +1836,21 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMStateLocator* locat
     // subproxy is not already alive with a valid GlobalId
     if(!(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id())))
       {
-      cout << "SubProxy has no global ID but its old instance is still arround. " << subProxyMsg->global_id() << endl;
+      vtkErrorMacro("SubProxy has no global ID but its old instance is still arround. "
+                    << subProxyMsg->global_id() << endl
+                    << "Parent Proxy - Group: " << this->XMLGroup
+                    << " - Name: " << this->XMLName << endl
+                    << "SubProxy - XMLName: " << subProxy->GetXMLName()
+                    << " - SubProxyName: " << subProxyMsg->name().c_str()
+                    << endl);
       }
     assert(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id()));
 
     vtkSMMessage subProxyState;
     if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
       {
-      subProxy->LoadState(&subProxyState, locator);
+      subProxy->LoadState(&subProxyState, locator, definitionOnly);
+      subProxy->MarkDirty(NULL);
       }
     else if(!subProxy->HasGlobalID())
       {
@@ -1852,26 +1860,29 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMStateLocator* locat
     }
 
   // Manage properties
-  vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
-  for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
+  if(!definitionOnly)
     {
-    const ProxyState_Property *prop_message =
-        &message->GetExtension(ProxyState::property, i);
-    const char* pname = prop_message->name().c_str();
-    it = this->Internals->Properties.find(pname);
-    if (it != this->Internals->Properties.end())
+    vtkSMProxyInternals::PropertyInfoMap::iterator it;
+    vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
+    for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
       {
-      it->second.Property->ReadFrom(message, i, locator);
-      touchedProperties.push_back(it->second.Property.GetPointer());
+      const ProxyState_Property *prop_message =
+          &message->GetExtension(ProxyState::property, i);
+      const char* pname = prop_message->name().c_str();
+      it = this->Internals->Properties.find(pname);
+      if (it != this->Internals->Properties.end())
+        {
+        it->second.Property->ReadFrom(message, i, locator);
+        touchedProperties.push_back(it->second.Property.GetPointer());
+        }
       }
-    }
 
-  // Make sure all dependent domains are updated. UpdateInformation()
-  // might have produced new information that invalidates the domains.
-  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
-    {
-    touchedProperties[i]->UpdateDependentDomains();
+    // Make sure all dependent domains are updated. UpdateInformation()
+    // might have produced new information that invalidates the domains.
+    for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+      {
+      touchedProperties[i]->UpdateDependentDomains();
+      }
     }
 }
 //---------------------------------------------------------------------------

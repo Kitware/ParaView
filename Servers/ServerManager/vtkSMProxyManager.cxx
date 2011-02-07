@@ -1617,18 +1617,19 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
 }
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
-                                         vtkSMStateLocator* locator)
+                                         vtkSMStateLocator* locator,
+                                         bool definitionOnly)
 {
   if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
       msg->HasExtension(ProxyState::xml_name))
     {
     vtkSMProxy *proxy =
         this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
-                        msg->GetExtension(ProxyState::xml_name).c_str());
+                        msg->GetExtension(ProxyState::xml_name).c_str(), NULL);
 
     // Then load the state for the current proxy
     // (This do not include the exposed properties)
-    proxy->LoadState(msg, locator);
+    proxy->LoadState(msg, locator, definitionOnly);
 
     // FIXME in collaboration mode we shouldn't push the state if it already come
     // from the server side
@@ -1667,7 +1668,16 @@ vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
   vtkSMMessage proxyState;
   if(locator && locator->FindState(globalId, &proxyState))
     {
-    return this->NewProxy( &proxyState, locator );
+    // Only create proxy and sub-proxies
+    vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, true);
+    if(proxy)
+      {
+      // Update properties now that SubProxy are properly set...
+      proxy->LoadState(&proxyState, locator, false);
+      proxy->MarkDirty(NULL);
+      proxy->UpdateVTKObjects();
+      }
+    return proxy;
     }
   return NULL;
 }

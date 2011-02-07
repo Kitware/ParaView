@@ -105,6 +105,7 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
         {
         // Not find => Need to be removed
         this->RemoveProxy(proxy, true);
+        i--; // Make sure we don't skip a proxy in the analysis
         }
       else
         {

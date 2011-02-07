@@ -454,9 +454,15 @@ public:
   // Used in Undo/Redo to bring back a proxy to life or in collaboration mode,
   // where the message come from the server and the purpose is to create the SM
   // side when the PM side has already been created.
-  // The User MUST delete the provided proxy otherwise it will live forever
-  virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg,
-                               vtkSMStateLocator* locator);
+  // The User MUST delete the provided proxy otherwise it will live forever.
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+
+  virtual vtkSMProxy* NewProxy( const vtkSMMessage* msg,
+                                vtkSMStateLocator* locator,
+                                bool definitionOnly = false);
 
   // Description:
   // Re-New a proxy based on its ID and its previous state.

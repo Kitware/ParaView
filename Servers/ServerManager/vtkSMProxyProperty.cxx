@@ -102,6 +102,17 @@ struct vtkSMProxyPropertyInternals
 {
   typedef vtkstd::vector<vtkSMProxyProperty::vtkProxyPointer> VectorOfProxies;
 
+  void PrintProxy()
+    {
+    cout << "ProxyList: ";
+    VectorOfProxies::iterator iter;
+    for(iter = Proxies.begin(); iter != Proxies.end(); iter++)
+      {
+      cout << " " << (iter->Value->HasGlobalID() ? iter->Value->GetGlobalID() : 0);
+      }
+    cout << endl;
+    }
+
   VectorOfProxies Proxies;
   vtkstd::vector<vtkSMProxy*> UncheckedProxies;
   vtkstd::map<void*, int> ProducerCounts;
@@ -379,7 +390,7 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
     vtkstd::set<vtkTypeUInt32>::const_iterator proxyIdIter;
 
     // Fill indexed proxy id list
-    for(int i=0;i<nbProxies;i++)
+    for(int i=0; i < nbProxies; i++)
       {
       newProxyIdList.insert(value->proxy_global_id(i));
       }
@@ -393,18 +404,19 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
         {
         // Not find => Need to be removed
         this->RemoveProxy(proxy, true);
+        i--; // Make sure we don't skip a proxy in the analysis
         }
       else
         {
         // Already there, no need to add it twice
-        newProxyIdList.erase(proxyIdIter);
+        newProxyIdList.erase(id);
         }
       }
 
     // Managed real new proxy
-    for( proxyIdIter=newProxyIdList.begin();
+    for( proxyIdIter =  newProxyIdList.begin();
          proxyIdIter != newProxyIdList.end();
-         proxyIdIter++)
+         proxyIdIter++ )
       {
       // Get the proxy from proxy manager
       vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -414,16 +426,17 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
         {
         this->AddProxy(proxy, true);
         }
-      else
-        {
-        // Recreate the proxy as it used to be
-        proxy = pxm->ReNewProxy(*proxyIdIter, locator);
-        if(proxy)
-          {
-          this->AddProxy(proxy, true);
-          proxy->Delete();
-          }
-        }
+      // We shouldn't ReNew a Proxy if that Input was not found
+      // else
+      //   {
+      //    // Recreate the proxy as it used to be
+      //    proxy = pxm->ReNewProxy(*proxyIdIter, locator);
+      //    if(proxy)
+      //      {
+      //       this->AddProxy(proxy, true);
+      //       proxy->Delete();
+      //      }
+      //    }
       }
     }
   else

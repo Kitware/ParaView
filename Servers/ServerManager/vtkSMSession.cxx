@@ -205,14 +205,6 @@ void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
 {
   this->Activate();
 
-  // Manage Undo/Redo if possible
-  if(this->StateManagement)
-    {
-    // FIXME_COLLABORATION
-    // FIXME Store state in cache
-    // vtkSMMessage previousState = this->Internals->ReplaceState(msg->global_id(),NULL);
-    }
-
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
   this->Core->DeletePMObject(msg);

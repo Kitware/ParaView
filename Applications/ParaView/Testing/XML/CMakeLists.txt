@@ -91,6 +91,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo5.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo6.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo7.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo8.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
@@ -120,6 +121,7 @@ SET (UndoRedo6_BREAK TRUE)
   # <-- since this changes view settings.
 SET (UndoRedo1_BREAK TRUE)
 SET (UndoRedo2_BREAK TRUE)
+SET (UndoRedo7_BREAK TRUE)
   # <-- since these are just long tests, they result in timeouts.
 
 SET (ViewSettingsDialog_BREAK TRUE)
