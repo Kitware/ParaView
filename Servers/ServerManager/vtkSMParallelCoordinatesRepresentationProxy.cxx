@@ -48,7 +48,7 @@ void vtkSMParallelCoordinatesRepresentationProxy::PrintSelf(ostream& os, vtkInde
 void vtkSMParallelCoordinatesRepresentationProxy::UpdatePropertyInformationInternal(
   vtkSMProperty* vtkNotUsed(prop))
 {
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp || !svp->GetInformationOnly() ||
       !vtkTable::SafeDownCast(this->GetOutput()))

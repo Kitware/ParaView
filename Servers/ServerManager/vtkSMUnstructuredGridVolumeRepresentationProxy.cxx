@@ -43,7 +43,7 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->GetID()
@@ -74,7 +74,7 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
 #endif
 }
 
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
 //-----------------------------------------------------------------------------
 void vtkSMUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
   vtkSMViewProxy* view)
