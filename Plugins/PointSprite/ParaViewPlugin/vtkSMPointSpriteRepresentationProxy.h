@@ -54,8 +54,11 @@ protected:
    vtkSMPointSpriteRepresentationProxy();
   ~vtkSMPointSpriteRepresentationProxy();
 
-  static void  InitializeTableValues(vtkSMProperty*);
-  static void  InitializeSpriteTextures(vtkSMProxy* repr);
+  // Description:
+  // Read attributes from an XML element.
+  // Overridden to initialize a few properties that are a bit  tedious to
+  // initialize in the XML.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
 private:
   vtkSMPointSpriteRepresentationProxy(const vtkSMPointSpriteRepresentationProxy&); // Not implemented
