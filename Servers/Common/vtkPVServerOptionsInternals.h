@@ -34,18 +34,18 @@ public:
           {
           this->LowerLeft[i] = 0.0;
           this->LowerRight[i] = 0.0;
-          this->UpperLeft[i] = 0.0;
+          this->UpperRight[i] = 0.0;
           }
         this->CaveBoundsSet = 0;
       }
-    
+
     vtkstd::string Name;  // what is the name of the machine
     vtkstd::string Environment; // what environment variables should be set
     int CaveBoundsSet;  // have the cave bounds been set
     // store the cave bounds  all 0.0 if not set
     double LowerLeft[3];
     double LowerRight[3];
-    double UpperLeft[3];
+    double UpperRight[3];
   };
   void PrintSelf(ostream& os, vtkIndent indent)
     {
@@ -71,10 +71,10 @@ public:
             {
             os << minfo.LowerRight[j] << " ";
             }
-          os << "\n" << ind2 << "UpperLeft: ";
+          os << "\n" << ind2 << "UpperRight: ";
           for(j=0; j < 3; ++j)
             {
-            os << minfo.UpperLeft[j] << " ";
+            os << minfo.UpperRight[j] << " ";
             }
           os << "\n";
           }
