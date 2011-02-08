@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
       vtkSMDoubleVectorProperty::SafeDownCast(
           proxy->GetProperty("TimestepValues"));
   cout << "TimeSteps: " ;
-  for(vtkIdType i=0;i<timeStepsProp->GetNumberOfElements();i++)
+  for(unsigned int i=0;i<timeStepsProp->GetNumberOfElements();i++)
     {
     cout << " " << timeStepsProp->GetElement(i);
     }
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
       vtkSMStringVectorProperty::SafeDownCast(
           proxy->GetProperty("ElementBlocksInfo"));
   cout << "Nb ElementBlocksInfo: " << silProp->GetNumberOfElements() << endl;
-  for(vtkIdType i=0;i<silProp->GetNumberOfElements();i++)
+  for(unsigned int i=0;i<silProp->GetNumberOfElements();i++)
     {
     cout << "  - " << silProp->GetElement(i) << endl;
     }
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
       vtkSMStringVectorProperty::SafeDownCast(
           proxy->GetProperty("NodeSetInfo"));
   cout << "Nb NodeSetInfo: " << arraySelectProp->GetNumberOfElements() << endl;
-  for(vtkIdType i=0;i<arraySelectProp->GetNumberOfElements();i+=2)
+  for(unsigned int i=0;i<arraySelectProp->GetNumberOfElements();i+=2)
     {
     cout << "  - " << (strcmp("0",arraySelectProp->GetElement(i+1)) == 0 ? "[ ]" : "[X]") << " " << arraySelectProp->GetElement(i) << endl;
     }
