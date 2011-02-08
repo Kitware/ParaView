@@ -184,7 +184,7 @@ void vtkPrioritizedStreamer::PrepareFirstPass()
         }
       DEBUGPRINT_PRIORITY
         (
-         if (true || !gPri)
+         if (!gPri)
            {
            cerr << "CHECKED VPRI OF " << i << "/" << max << "@" << 1.0
                 << " [" << pbbox[0] << "," << pbbox[1] << " "

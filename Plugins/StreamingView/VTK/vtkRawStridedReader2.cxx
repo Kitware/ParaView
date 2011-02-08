@@ -474,7 +474,9 @@ int vtkRawStridedReader2::RequestData(
   int NP = outInfo->Get(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
-  this->RangeKeeper->Insert(P, NP, uext, range, this->Resolution);
+  this->RangeKeeper->Insert(P, NP, uext, this->Resolution,
+                            0, NULL, 0,
+                            range);
   return 1;
 }
 
@@ -509,7 +511,9 @@ int vtkRawStridedReader2::ProcessRequest(vtkInformation *request,
     }
 
   double range[2];
-  if (this->RangeKeeper->Search(P, NP, ext, range))
+  if (this->RangeKeeper->Search(P, NP, ext,
+                                0, NULL, 0,
+                                range))
     {
     vtkInformation *fInfo =
       vtkDataObject::GetActiveFieldInformation
