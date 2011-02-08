@@ -573,6 +573,12 @@ protected:
   // Description:
   // If a proxy is deprecated, prints a warning.
   bool WarnIfDeprecated();
+
+  // Description:
+  // This method simply iterates over subproxies and calls 
+  // UpdatePipelineInformation() on them. vtkSMSourceProxy overrides this method
+  // (makes it public) and updates the pipeline information.
+  virtual void UpdatePipelineInformation();
   
   // When an algorithm proxy is marked modified, NeedsUpdate is
   // set to true. In PostUpdateData(), NeedsUpdate is set to false.

@@ -1971,6 +1971,18 @@ void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
     }
 }
 
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdatePipelineInformation()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->UpdatePipelineInformation();
+    }
+
+  this->UpdatePropertyInformation();
+}
 
 //---------------------------------------------------------------------------
 vtkClientServerStream& operator<< (vtkClientServerStream& stream,

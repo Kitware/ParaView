@@ -193,6 +193,9 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
     this->ExecuteStream(stream);
     }
 
+  // This simply iterates over subproxies and calls UpdatePropertyInformation();
+  this->Superclass::UpdatePipelineInformation();
+
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
   // this->MarkModified(this);  
 }
