@@ -801,11 +801,8 @@ void pqRenderViewBase::setStereo(int mode)
     vtkSMProxy* viewProxy = view->getProxy();
     pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoRender"),
       mode != 0);
-    if (mode)
-      {
-      pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoType"),
-        mode);
-      }
+    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoType"),
+      mode);
     viewProxy->UpdateVTKObjects();
     }
 }
