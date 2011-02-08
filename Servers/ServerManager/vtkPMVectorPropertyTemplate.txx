@@ -441,6 +441,7 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::ReadXMLAttributes(
       strcmp("none", element->GetAttribute("default_values")) == 0 )
       {
       // initialized to nothing.
+      return true;
       }
     else
       {

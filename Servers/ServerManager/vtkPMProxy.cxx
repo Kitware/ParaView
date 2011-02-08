@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPMProxy.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkInstantiator.h"
@@ -331,6 +332,26 @@ vtkObjectBase* vtkPMProxy::GetVTKObject()
   return this->VTKObject.GetPointer();
 }
 
+//----------------------------------------------------------------------------
+void vtkPMProxy::UpdateInformation()
+{
+  if (this->GetVTKObject())
+    {
+    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+    assert(algo);
+    algo->UpdateInformation();
+    }
+
+  // Call UpdateInformation() on all subproxies.
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
+    {
+    vtkPMProxy* src = vtkPMProxy::SafeDownCast(this->GetSubProxyHelper(cc));
+    if (src)
+      {
+      src->UpdateInformation();
+      }
+    }
+}
 //----------------------------------------------------------------------------
 bool vtkPMProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {

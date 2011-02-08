@@ -240,34 +240,6 @@ bool vtkPMSourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-void vtkPMSourceProxy::UpdateInformation()
-{
-  if (this->GetVTKObject())
-    {
-    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-    assert(algo);
-    algo->UpdateInformation();
-    }
-
-  // Call UpdateInformation() on all subproxies.
-  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
-    {
-    vtkPMSourceProxy* src = vtkPMSourceProxy::SafeDownCast(
-      this->GetSubProxyHelper(cc));
-    if (src)
-      {
-      src->UpdateInformation();
-      }
-    vtkPMPVRepresentationProxy* src2 = vtkPMPVRepresentationProxy::SafeDownCast(
-      this->GetSubProxyHelper(cc));
-    if (src2)
-      {
-      src2->UpdateInformation();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPMSourceProxy::UpdatePipeline(int port, double time, bool doTime)
 {
   int processid =

@@ -35,6 +35,10 @@ public:
   vtkTypeMacro(vtkPMProxy, vtkPMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Triggers UpdateInformation() on vtkObject if possible.
+  virtual void UpdateInformation();
+
 //BTX
   // Description:
   // Push a new state to the underneath implementation

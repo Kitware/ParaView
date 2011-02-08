@@ -153,30 +153,3 @@ void vtkPMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-//----------------------------------------------------------------------------
-void vtkPMPVRepresentationProxy::UpdateInformation()
-{
-  if (this->GetVTKObject())
-    {
-    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-    assert(algo);
-    algo->UpdateInformation();
-    }
-
-  // Call UpdateInformation() on all subproxies.
-  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
-    {
-    vtkPMPVRepresentationProxy* src = vtkPMPVRepresentationProxy::SafeDownCast(
-      this->GetSubProxyHelper(cc));
-    if (src)
-      {
-      src->UpdateInformation();
-      }
-    vtkPMSourceProxy* src2 = vtkPMSourceProxy::SafeDownCast(
-      this->GetSubProxyHelper(cc));
-    if (src2)
-      {
-      src2->UpdateInformation();
-      }
-    }
-}

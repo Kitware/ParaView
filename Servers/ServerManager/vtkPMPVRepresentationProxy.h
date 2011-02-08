@@ -28,10 +28,6 @@ public:
   vtkTypeMacro(vtkPMPVRepresentationProxy, vtkPMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Triggers UpdateInformation().
-  virtual void UpdateInformation();
-
 //BTX
 protected:
   vtkPMPVRepresentationProxy();

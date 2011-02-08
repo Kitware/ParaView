@@ -51,10 +51,6 @@ public:
     int port, double time, bool doTime);
 
   // Description:
-  // Triggers UpdateInformation().
-  virtual void UpdateInformation();
-
-  // Description:
   // setups extract selection proxies.
   virtual void SetupSelectionProxy(int port, vtkPMProxy* extractSelection);
 
