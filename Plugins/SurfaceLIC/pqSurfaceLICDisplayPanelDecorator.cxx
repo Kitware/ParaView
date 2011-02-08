@@ -117,16 +117,9 @@ void pqSurfaceLICDisplayPanelDecorator::representationTypeChanged()
 {
   if (this->Internals)
     {
-    int reprType = vtkSMPropertyHelper
-        ( this->Internals->Representation, "Representation" ).GetAsInt();
-    
-    vtkSMEnumerationDomain * domain = vtkSMEnumerationDomain::SafeDownCast
-                                      ( this->Internals->Representation
-                                            ->GetProperty("Representation")
-                                            ->GetDomain("enum") );
-    if (   domain->GetEntryTextForValue( reprType ) &&
-           strcmp(  domain->GetEntryTextForValue( reprType ), "Surface LIC"  ) ==0
-       )
+    const char* reprType = vtkSMPropertyHelper
+        ( this->Internals->Representation, "Representation" ).GetAsString();
+    if ( strcmp(  reprType, "Surface LIC"  ) == 0 )
       {
       this->Internals->Frame->setEnabled(true);
       vtkSMPropertyHelper(this->Internals->Representation,
