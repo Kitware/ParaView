@@ -81,11 +81,13 @@ bool vtkPMStringVectorProperty::ReadXMLAttributes(
   element->GetVectorAttribute("element_types",
     number_of_elements_per_command, &this->ElementTypes[0]);
   vtkstd::vector<vtkstd::string> values;
+  bool hasDefaultValues = false;
   if (number_of_elements > 0)
     {
     values.resize(number_of_elements);
     const char* tmp = element->GetAttribute("default_values");
     const char* delimiter = element->GetAttribute("default_values_delimiter");
+    hasDefaultValues = (tmp != NULL);
     if (tmp && delimiter)
       {
       vtkstd::string initVal = tmp;
@@ -110,7 +112,14 @@ bool vtkPMStringVectorProperty::ReadXMLAttributes(
       }
     }
 
-  return this->Push(values);
+  // We only push if a default value has been set otherwise we might trigger
+  // unwanted behaviour underneath.
+  if(hasDefaultValues)
+    {
+    return this->Push(values);
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

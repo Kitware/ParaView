@@ -517,7 +517,7 @@ int vtkPVEnSightMasterServerReader2::ParseMasterServerFile()
   this->Internal->PieceFileNames.clear();
   // Construct the file name to open.
   vtkstd::string sfilename;
-  if(!this->CaseFileName)
+  if(!this->CaseFileName || this->CaseFileName[0] == 0)
     {
     vtkErrorMacro("A case file name must be specified.");
     return VTK_ERROR;
