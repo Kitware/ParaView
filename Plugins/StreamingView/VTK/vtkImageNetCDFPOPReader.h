@@ -52,9 +52,11 @@ public:
   vtkGetVector3Macro(Spacing, double);
 
   // Description:
-  // Variable array selection -- will be the first one available.
+  // Variable array selection
   virtual int GetNumberOfVariableArrays();
-  virtual const char *GetVariableArrayName();
+  virtual const char *GetVariableArrayName(int index);
+  virtual int GetVariableArrayStatus(const char *name);
+  virtual void SetVariableArrayStatus(const char *name, int status);
 
 protected:
   vtkImageNetCDFPOPReader();
