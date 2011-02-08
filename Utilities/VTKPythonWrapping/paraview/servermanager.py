@@ -1579,6 +1579,11 @@ class ProxyManager(object):
             pass
         return getattr(self.SMProxyManager, name)
 
+    def LoadState(self, filename, loader = None):
+        self.SMProxyManager.LoadXMLState(filename, loader)
+
+    def SaveState(self, filename):
+        self.SMProxyManager.SaveXMLState(filename)
 
 class PropertyIterator(object):
     """Wrapper for a vtkSMPropertyIterator class to satisfy
