@@ -79,6 +79,19 @@ void pqSaveAnimationReaction::saveAnimation()
   mgr->saveAnimation();
   QObject::disconnect(mgr, SIGNAL(writeAnimation(const QString&, int, double)),
     this, SLOT(onWriteAnimation(const QString&, int, double)));
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
+  if (manager && manager->interpreterIsInitialized())
+    {
+    QString script =
+    "try:\n"
+    "  paraview.smtrace\n"
+    "  paraview.smtrace.trace_save_animation_end()\n"
+    "except AttributeError: pass\n";
+    pqPythonShell* shell = manager->pythonShellDialog()->shell();
+    shell->executeScript(script);
+    }
+#endif
 }
 
 //-----------------------------------------------------------------------------
