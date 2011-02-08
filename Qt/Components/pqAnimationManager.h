@@ -106,6 +106,9 @@ signals:
   /// disconnecting from the server.
   void disconnectServer();
 
+  /// emitted to indicate an animation is being written out to a file.
+  void writeAnimation(const QString& filename, int magnification, double frameRate);
+
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);

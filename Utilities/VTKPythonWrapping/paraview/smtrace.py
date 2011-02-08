@@ -33,6 +33,7 @@ def reset_trace_globals():
     "representations" : ["Input"],
     "animation" : ["Cues"]}
   trace_globals.proxy_ctor_hook = None
+  trace_globals.paused_for_animation = False
   reset_trace_observer()
 reset_trace_globals()
 
@@ -440,6 +441,30 @@ def trace_save_screenshot(filename, size, allViews):
       saveStr = "WriteImage('%s', view=%s)" % (filename%i, view)
       trace_globals.trace_output.append(saveStr)
   trace_globals.trace_output.append("\n")
+
+def trace_save_animation(filename, magnification, quality, frame_rate):
+  """This method is called from the paraview C++ implementation. Do not change
+     the arguments without updating the C++ code."""
+  if not trace_globals.observer_active: return
+
+  # make sure the trace is up to date
+  append_trace()
+
+  trace_globals.trace_output.append(
+    "WriteAnimation('%s', Magnification=%d, Quality=%d, FrameRate=%f)" % \
+     (filename, magnification, quality, frame_rate))
+  trace_globals.trace_output.append("\n")
+  # we pause tracing while the animation is playing.
+  stop_trace()
+  trace_globals.paused_for_animation = True
+
+def trace_save_animation_end():
+  """This method is caleld from the ParaView C++ implementation. Do not chnage
+     the arguments without updating the C++ code."""
+  if not trace_globals.paused_for_animation: return
+  trace_globals.paused_for_animation = False
+  add_observers()
+
 
 def property_references_untraced_proxy(propPyVariable, propValue, propInfoList):
   """Given a property pyvariable, the property value, and a list of prop_trace_info

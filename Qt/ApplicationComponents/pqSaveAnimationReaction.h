@@ -47,12 +47,17 @@ public:
   /// Saves the animation from the active scene.
   /// Note that this method is static. Applications can simply use this without
   /// having to create a reaction instance.
-  static void saveAnimation();
+  void saveAnimation();
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
   void updateEnableState();
+
+protected slots:
+  /// Slot to trace writing of animation to the Python trace.
+  void onWriteAnimation(
+    const QString& filename, int magnification, double framerate);
 
 protected:
   /// Called when the action is triggered.
