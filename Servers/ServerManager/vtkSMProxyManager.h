@@ -268,13 +268,11 @@ public:
   void SaveCustomProxyDefinitions(const char* filename);
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
-  //BTX
   // Description:
   // Loads the state of the server manager from XML.
   // If loader is not specified, a vtkSMStateLoader instance is used.
   void LoadXMLState(const char* filename, vtkSMStateLoader* loader=NULL);
   void LoadXMLState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
-  //ETX
 
   // Description:
   // Save the state of the server manager in XML format in a file.
