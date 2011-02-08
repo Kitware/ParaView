@@ -480,8 +480,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this)
          << "ResetCamera"
-         << bounds[0] << bounds[1] << bounds[2]
-         << bounds[3] << bounds[4] << bounds[5]
+         << vtkClientServerStream::InsertArray(bounds, 6)
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 }
