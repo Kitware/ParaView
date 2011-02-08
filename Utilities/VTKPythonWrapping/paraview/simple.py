@@ -794,6 +794,7 @@ def GetTimeTrack():
     # no cue was found, create a new one.
     cue = TimeAnimationCue()
     cue.AnimatedProxy = tk
+    cue.AnimatedPropertyName = "Time"
     scene.Cues.append(cue)
     return cue
 
