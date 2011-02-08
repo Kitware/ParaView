@@ -5,6 +5,7 @@
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   char* init_string;
   int parser_ret;
+  (void) parser_ret;
 
 @PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION@
 
