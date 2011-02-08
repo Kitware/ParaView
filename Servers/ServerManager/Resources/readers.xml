@@ -4649,7 +4649,7 @@
      <StringVectorProperty name="GridInfo"
         information_only="1"
         kernel_class="vtkPMSILProperty"
-        subtree="Grids" />
+        subtree="Blocks" />
 
     <IdTypeVectorProperty name="SILTimeStamp"
                           command="GetSILUpdateStamp"
