@@ -338,8 +338,10 @@ void vtkPMProxy::UpdateInformation()
   if (this->GetVTKObject())
     {
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-    assert(algo);
-    algo->UpdateInformation();
+    if(algo)
+      {
+      algo->UpdateInformation();
+      }
     }
 
   // Call UpdateInformation() on all subproxies.
