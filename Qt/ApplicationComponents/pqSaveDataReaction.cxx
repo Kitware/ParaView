@@ -56,6 +56,7 @@ pqSaveDataReaction::pqSaveDataReaction(QAction* parentObject)
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
     this, SLOT(updateEnableState()));
+
   this->updateEnableState();
 }
 
@@ -73,8 +74,23 @@ void pqSaveDataReaction::updateEnableState()
     enable_state = writerFactory->CanWrite(
       vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
       port->getPortNumber());
+
+    if(!enable_state)
+      {
+      QObject::connect(port->getSource(),
+                       SIGNAL(dataUpdated(pqPipelineSource*)),
+                       this, SLOT(dataUpdated(pqPipelineSource*)));
+      }
+
     }
   this->parentAction()->setEnabled(enable_state);
+}
+//-----------------------------------------------------------------------------
+void pqSaveDataReaction::dataUpdated(pqPipelineSource* source)
+{
+  QObject::disconnect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
+                      this, SLOT(dataUpdated(pqPipelineSource*)));
+  updateEnableState();
 }
 
 //-----------------------------------------------------------------------------

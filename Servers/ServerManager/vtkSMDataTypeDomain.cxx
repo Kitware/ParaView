@@ -168,13 +168,6 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
   // Make sure the outputs are created.
   proxy->CreateOutputPorts();
 
-  // FIXME_COLLABORATION:
-  //      This update might need to be done somewhere else ??? It has been added
-  //      here so the "Save Data" became enable once a sphere is created before
-  //      the apply button get hit !!!
-  proxy->UpdatePipeline();
-
-
   vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {
