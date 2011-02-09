@@ -26,8 +26,8 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
+  <!--
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
-  <pqevent object="1pqRecordEventsDialog0/label" command="mousePress" arguments="1,1,0,85,0" />
-  <pqevent object="1pqRecordEventsDialog0/label" command="mouseRelease" arguments="1,0,0,85,0" />
+  -->
 </pqevents>
