@@ -24,7 +24,6 @@
 int main(int argc, char* argv[])
 {
   vtkTestingOptions* options = vtkTestingOptions::New();
-  options->SetProcessType(vtkPVOptions::PVBATCH);
 
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule::PROCESS_BATCH, options);

@@ -226,13 +226,53 @@ vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSession::PrepareProgressInternal()
+{
+  vtkClientServerStream substream;
+  substream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
+            << "GetActiveProgressHandler"
+            << vtkClientServerStream::End;
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << substream
+         << "PrepareProgress"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, stream, false);
+  //this->Superclass::PrepareProgressInternal();
+  //FIXME_COLLABORATION - I don't like code that skips superclass implentations.
+  //Rethink this.
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::CleanupPendingProgressInternal()
+{
+  vtkClientServerStream substream;
+  substream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
+            << "GetActiveProgressHandler"
+            << vtkClientServerStream::End;
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << substream
+         << "CleanupPendingProgress"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, stream, false);
+  //this->Superclass::CleanupPendingProgressInternal();
+  //FIXME_COLLABORATION
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSession::Initialize()
 {
-  // Make sure that the client as the server XML definition
-  vtkSMObject::GetProxyManager()->SetSession(this);
+  if (this->GetProcessRoles() & vtkPVSession::CLIENT)
+    {
+    // Make sure that the client as the server XML definition
+    vtkSMObject::GetProxyManager()->SetSession(this);
 
-  this->PluginManager->SetSession(this);
-  this->PluginManager->Initialize();
+    this->PluginManager->SetSession(this);
+    this->PluginManager->Initialize();
+    }
 }
 
 //----------------------------------------------------------------------------

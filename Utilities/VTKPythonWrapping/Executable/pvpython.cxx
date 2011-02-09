@@ -19,6 +19,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 int main(int argc, char* argv[])
 {
-  return ParaViewPython::Run(vtkPVOptions::PVCLIENT, argc, argv);
+  return ParaViewPython::Run(vtkProcessModule::PROCESS_CLIENT, argc, argv);
 }
 

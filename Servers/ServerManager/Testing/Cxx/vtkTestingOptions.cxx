@@ -26,6 +26,7 @@ vtkStandardNewMacro(vtkTestingOptions);
 //----------------------------------------------------------------------------
 vtkTestingOptions::vtkTestingOptions()
 {
+  this->SetProcessType(vtkPVOptions::PVBATCH);
   this->ServerMode = 0;
   this->DataDir = 0;
   this->TempDir = 0;

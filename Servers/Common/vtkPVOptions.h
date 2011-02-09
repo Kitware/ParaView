@@ -28,10 +28,10 @@ class vtkPVOptionsInternal;
 
 class VTK_EXPORT vtkPVOptions : public vtkCommandOptions
 {
-public:
+protected:
 //BTX
   enum ProcessTypeEnum
-  {
+    {
     PARAVIEW = 0x2,
     PVCLIENT = 0x4,
     PVSERVER = 0x8,
@@ -40,8 +40,10 @@ public:
     PVBATCH = 0x40,
     ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER |
       PVDATA_SERVER | PVBATCH
-  };
+    };
+  friend class vtkPVOptionsXMLParser;
 //ETX
+public:
 
   static vtkPVOptions* New();
   vtkTypeMacro(vtkPVOptions,vtkCommandOptions);

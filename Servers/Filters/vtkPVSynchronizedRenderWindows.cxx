@@ -19,7 +19,6 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkRendererCollection.h"
@@ -1506,8 +1505,8 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToRenderServer(
     return true;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVDATA_SERVER)
+  if (vtkProcessModule::GetProcessType() ==
+    vtkProcessModule::PROCESS_DATA_SERVER)
     {
     return false;
     }

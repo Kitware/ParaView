@@ -28,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVMergeTables.h"
-#include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
@@ -222,8 +221,7 @@ vtkSpreadSheetView::vtkSpreadSheetView()
     &vtkSpreadSheetView::OnRepresentationUpdated);
   this->SomethingUpdated = false;
 
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetProcessType() !=
-    vtkPVOptions::PVRENDER_SERVER)
+  if (vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     this->RMICallbackTag = this->SynchronizedWindows->AddRMICallback(
       ::FetchRMI, this, FETCH_BLOCK_TAG);

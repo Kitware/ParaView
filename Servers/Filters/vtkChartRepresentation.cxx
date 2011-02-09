@@ -31,7 +31,6 @@
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTables.h"
-#include "vtkPVOptions.h"
 #include "vtkReductionFilter.h"
 #include "vtkSelectionDeliveryFilter.h"
 #include "vtkSelection.h"
@@ -161,8 +160,7 @@ vtkTable* vtkChartRepresentation::GetLocalOutput()
 int vtkChartRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetProcessType() ==
-    vtkPVOptions::PVRENDER_SERVER)
+  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     return this->Superclass::RequestData(request, inputVector, outputVector);
     }

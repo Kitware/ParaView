@@ -222,6 +222,13 @@ protected:
   vtkSMSession();
   ~vtkSMSession();
 
+  // Description:
+  // Should be called to begin/end receiving progresses on this session.
+  // Overridden to relay to the server(s).
+  virtual void PrepareProgressInternal();
+  virtual void CleanupPendingProgressInternal();
+
+
   vtkSMSessionCore* Core;
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;

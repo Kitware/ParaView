@@ -695,40 +695,6 @@ bool vtkSMSessionClient::GatherInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::PrepareProgressInternal()
-{
-  vtkClientServerStream substream;
-  substream << vtkClientServerStream::Invoke
-            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
-            << "GetActiveProgressHandler"
-            << vtkClientServerStream::End;
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << substream
-         << "PrepareProgress"
-         << vtkClientServerStream::End;
-  this->ExecuteStream(vtkPVSession::SERVERS, stream, false);
-  this->Superclass::PrepareProgressInternal();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSessionClient::CleanupPendingProgressInternal()
-{
-  vtkClientServerStream substream;
-  substream << vtkClientServerStream::Invoke
-            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
-            << "GetActiveProgressHandler"
-            << vtkClientServerStream::End;
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << substream
-         << "CleanupPendingProgress"
-         << vtkClientServerStream::End;
-  this->ExecuteStream(vtkPVSession::SERVERS, stream, false);
-  this->Superclass::CleanupPendingProgressInternal();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMSessionClient::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

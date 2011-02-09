@@ -545,13 +545,12 @@ void vtkPVRenderView::GatherBoundsInformation(
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_rendering)
 {
-  switch (vtkProcessModule::GetProcessModule()->GetOptions()->GetProcessType())
+  switch (vtkProcessModule::GetProcessType())
     {
-  case vtkPVOptions::PVDATA_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     return false;
 
-  case vtkPVOptions::PARAVIEW:
-  case vtkPVOptions::PVCLIENT:
+  case vtkProcessModule::PROCESS_CLIENT:
     return true;
 
   default:
@@ -894,12 +893,12 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
     return false;
     }
 
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  switch (options->GetProcessType())
+  switch (vtkProcessModule::GetProcessType())
     {
-  case vtkPVOptions::PVSERVER:
-  case vtkPVOptions::PVBATCH:
-  case vtkPVOptions::PVRENDER_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_BATCH:
+  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
     if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
       {
       return true;
