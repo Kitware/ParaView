@@ -15,6 +15,13 @@
 // Tests vtkSMComparativeAnimationCueProxy to ensure that the parameter updating
 // works are expected.
 
+#include "vtkInitializationHelper.h"
+#include "vtkProcessModule.h"
+#include "vtkPVServerOptions.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
+
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkSmartPointer.h"
@@ -25,10 +32,22 @@
   return 1;
 
 
-int main(int, char**)
+int main(int argc, char* argv[])
 {
-  vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy =
-    vtkSmartPointer<vtkSMComparativeAnimationCueProxy>::New();
+  // Initialization
+  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkInitializationHelper::Initialize(argc, argv,
+                                      vtkProcessModule::PROCESS_CLIENT,
+                                      options);
+  vtkSMSession* session = vtkSMSession::New();
+  session->Initialize();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkProcessModule::GetProcessModule()->RegisterSession(session);
+  //---------------------------------------------------------------------------
+
+  vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy;
+  cueProxy = vtkSMComparativeAnimationCueProxy::SafeDownCast(
+      pxm->NewProxy("animation", "ComparativeAnimationCue"));
   vtkPVComparativeAnimationCue* cue = cueProxy->GetCue();
 
   // When no values are added to the cue, we still expect it to work.
@@ -60,6 +79,10 @@ int main(int, char**)
   assert(cue->GetValue(0, 0, 3, 3) == 1.0);
   assert(cue->GetValue(1, 1, 3, 3) == 5.0);
   assert(cue->GetValue(0, 2, 3, 3) == 7.0);
+  session->Delete();
 
+  //---------------------------------------------------------------------------
+  vtkInitializationHelper::Finalize();
+  options->Delete();
   return 0;
 }

@@ -687,6 +687,10 @@ void vtkSMProxy::CreateVTKObjects()
     return;
     }
 
+  assert( "Test Proxy definition"
+          && this->GetClassName() && this->GetKernelClassName()
+          && this->GetXMLGroup()  && this->GetXMLName() );
+
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
   message.SetExtension(DefinitionHeader::server_class, this->GetKernelClassName());
