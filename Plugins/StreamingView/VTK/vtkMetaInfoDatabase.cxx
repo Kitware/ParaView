@@ -16,8 +16,9 @@
 
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/vector>
 #include <vtkstd/map>
+#include <vtkstd/string>
+#include <vtkstd/vector>
 
 #define DEBUGPRINT_METAINFORMATION(arg) ;
 
@@ -200,7 +201,7 @@ public:
   {
     //looks up a record holder for the given array
     //if none found, makes one, adds it to the internal list and returns it
-    int len = (ArrayName?strlen(ArrayName):20) + 11;
+    size_t len = (ArrayName?strlen(ArrayName):20) + 11;
     char *key = new char[len];
     sprintf(key, "%2d_%s_%6d", field, ArrayName, component);
     ArrayRecord *record = records[key];
