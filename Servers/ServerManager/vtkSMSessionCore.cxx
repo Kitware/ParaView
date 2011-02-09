@@ -222,18 +222,21 @@ vtkSMSessionCore::vtkSMSessionCore()
 
   this->LogStream = NULL;
   // Initialize logging, if enabled.
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  if (options->GetLogFileName())
+  if(vtkProcessModule::GetProcessModule())
     {
-    vtksys_ios::ostringstream filename;
-    filename  << options->GetLogFileName();
-    if (this->ParallelController->GetNumberOfProcesses() > 1)
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+    if (options->GetLogFileName())
       {
-      filename << this->ParallelController->GetLocalProcessId();
+      vtksys_ios::ostringstream filename;
+      filename  << options->GetLogFileName();
+      if (this->ParallelController->GetNumberOfProcesses() > 1)
+        {
+        filename << this->ParallelController->GetLocalProcessId();
+        }
+      this->LogStream = new ofstream(filename.str().c_str());
+      LOG("Log for " << options->GetArgv0() << " ("
+          << this->ParallelController->GetLocalProcessId() << ")");
       }
-    this->LogStream = new ofstream(filename.str().c_str());
-    LOG("Log for " << options->GetArgv0() << " ("
-      << this->ParallelController->GetLocalProcessId() << ")");
     }
 }
 

@@ -59,6 +59,13 @@ vtkSMSession::vtkSMSession()
   // controller, this session is marked active. This is essential for
   // satellites when running in parallel.
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+
+  if(!controller)
+    {
+    vtkWarningMacro("No vtkMultiProcessController for Session. The session won't work correctly.");
+    return;
+    }
+
   controller->AddObserver(vtkCommand::StartEvent,
     this, &vtkSMSession::Activate);
   controller->AddObserver(vtkCommand::EndEvent,

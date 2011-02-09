@@ -48,7 +48,7 @@ void vtkSMProxyIterator::Begin(const char* groupName)
   vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
   if (!pm)
     {
-    vtkErrorMacro("ProxyManager is not set. Can not perform operation: Begin()");
+    vtkWarningMacro("ProxyManager is not set. Can not perform operation: Begin()");
     return;
     }
   this->Internals->GroupIterator = 
@@ -70,6 +70,11 @@ void vtkSMProxyIterator::Begin(const char* groupName)
 void vtkSMProxyIterator::Begin()
 {
   vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (!pm)
+    {
+    vtkWarningMacro("ProxyManager is not set. Can not perform operation: Begin()");
+    return;
+    }
   this->Internals->GroupIterator = pm->Internals->RegisteredProxyMap.begin();
   while (this->Internals->GroupIterator!=pm->Internals->RegisteredProxyMap.end())
     {

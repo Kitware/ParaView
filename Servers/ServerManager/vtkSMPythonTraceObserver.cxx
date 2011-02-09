@@ -71,6 +71,12 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   this->Observer->SetTarget(this);
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if(!pxm)
+    {
+    vtkWarningMacro("No ProxyManager available. No Observation will be made");
+    return;
+    }
+
   // Add observer for certain proxy manager events.
   // Use a high priority for the RegisterEvent so that the trace
   // observer is notified before other observers.  Other observers

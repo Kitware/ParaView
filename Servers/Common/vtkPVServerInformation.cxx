@@ -28,8 +28,9 @@ vtkStandardNewMacro(vtkPVServerInformation);
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
-  this->NumberOfProcesses =
-    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+  this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
+                            vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() :
+                            1;
   this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
@@ -112,6 +113,12 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if(!pm)
+    {
+    vtkWarningMacro("ProcessModule is not available.");
+    return;
+    }
+
   vtkPVOptions* options = pm->GetOptions();
   vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
 
