@@ -761,7 +761,6 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     { // Remote blocks are only to setup local block bit flags.
     return;
     }
-  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
   double  origin[3];
   double* spacing;
   int     extent[6];
