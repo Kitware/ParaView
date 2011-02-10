@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QShowEvent>
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -1121,6 +1122,7 @@ void pqFileDialog::fileSelectionChanged()
   this->Implementation->FileNames = fileNames;
 }
 
+//-----------------------------------------------------------------------------
 bool pqFileDialog::selectFile(const QString& f)
 {
   // We don't use QFileInfo here since it messes the paths up if the client and
@@ -1153,3 +1155,13 @@ bool pqFileDialog::selectFile(const QString& f)
   return true;
 }
 
+//-----------------------------------------------------------------------------
+void pqFileDialog::showEvent( QShowEvent *event )
+{  
+  QDialog::showEvent(event);
+  //Qt sets the default keyboard focus to the last item in the tab order
+  //which is determined by the creation order. This means that we have 
+  //to explicitly state that the line edit has the focus on showing no 
+  //matter the tab order
+  this->Implementation->Ui.FileName->setFocus(Qt::OtherFocusReason);
+}
