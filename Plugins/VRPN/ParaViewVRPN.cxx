@@ -42,6 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+
 #include <vtkstd/vector>
 #include <iostream>
 
@@ -99,6 +103,7 @@ public:
   vrpn_Text_Receiver  *Text;
 
   t_user_callback *TC1;
+  t_user_callback *AC1;
 };
 
 void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
@@ -180,6 +185,82 @@ const vrpn_TRACKERCB t)
     }
 }
 
+void VRPN_CALLBACK handleAnalogPos(void *userdata,
+const vrpn_ANALOGCB t)
+{
+  t_user_callback *tData=static_cast<t_user_callback *>(userdata);
+
+  if ( tData->t_counts.size() == 0 )
+    {
+    tData->t_counts.push_back(0);
+    }
+
+  if ( tData->t_counts[0] == 1 )
+    {
+    tData->t_counts[0] = 0;
+
+    // printf("Rendering\n");
+    // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", t.channel[0],
+    //        t.channel[1], t.channel[2], t.channel[3], t.channel[4],
+    //        t.channel[5]);
+
+    pqView *view = 0;
+    view = pqActiveObjects::instance().activeView();
+
+    if ( view )
+      {
+      vtkSMRenderViewProxy *proxy = 0;
+      proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+
+      if ( proxy )
+        {
+        double pos[3], fp[3], up[3], dir[3];
+        vtkCamera* camera = proxy->GetActiveCamera();
+        camera->GetPosition(pos);
+        camera->GetFocalPoint(fp);
+        camera->GetDirectionOfProjection(dir);
+        camera->OrthogonalizeViewUp();
+        camera->GetViewUp(up);
+
+        // Apply up-down motion
+        for (int i = 0; i < 3; i++)
+          {
+          double dx = -0.01*t.channel[2]*up[i];
+          pos[i] += dx;
+          fp[i]  += dx;
+          }
+
+        // Apply right-left motion
+        double r[3];
+        vtkMath::Cross(dir, up, r);
+
+        for (int i = 0; i < 3; i++)
+          {
+          double dx = -0.01*t.channel[0]*r[i];
+          pos[i] += dx;
+          fp[i]  += dx;
+          }
+
+        camera->SetPosition(pos);
+        camera->SetFocalPoint(fp);
+
+        camera->Dolly(pow(1.001,-t.channel[1]));
+        camera->Elevation(  4.0*t.channel[3]);
+        camera->Azimuth(    4.0*t.channel[4]);
+        camera->Roll(      -4.0*t.channel[5]);
+
+        proxy->GetRenderer()->ResetCameraClippingRange();
+        proxy->GetRenderWindow()->Render();
+        }
+      }
+    }
+  else
+    {
+    tData->t_counts[0]++;
+    }
+}
+
+
 // ----------------------------------------------------------------------------
 ParaViewVRPN::ParaViewVRPN()
 {
@@ -240,6 +321,12 @@ void ParaViewVRPN::Init()
             sizeof(this->Internals->TC1->t_name));
     this->Internals->Tracker->register_change_handler(this->Internals->TC1,
                                                       handleTrackerPosQuat);
+
+    this->Internals->AC1=new t_user_callback;
+    strncpy(this->Internals->AC1->t_name, this->Name,
+            sizeof(this->Internals->AC1->t_name));
+    this->Internals->Analog->register_change_handler(this->Internals->AC1,
+                                                     handleAnalogPos);
     }
 }
 
