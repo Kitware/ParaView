@@ -185,6 +185,35 @@ const vrpn_TRACKERCB t)
     }
 }
 
+// ----------------------------------------------------------------------------
+vrpn_ANALOGCB AugmentChannelsToRetainLargestMagnitude(const vrpn_ANALOGCB t)
+{
+  vrpn_ANALOGCB at;
+  // Make a list of the magnitudes into at
+  for(int i=0;i<6;++i)
+    {
+      if(t.channel[i] < 0.0)
+        at.channel[i] = t.channel[i]*-1;
+      else
+        at.channel[i]= t.channel[i];
+    }
+
+  // Get the max value;
+  int max =0;
+  for(int i=1;i<6;++i)
+    {
+      if(at.channel[i] > at.channel[max])
+          max = i;
+    }
+
+  // copy the max value of t into at (rest are 0)
+  for (int i = 0; i < 6; ++i)
+    {
+      (i==max)?at.channel[i]=t.channel[i]:at.channel[i]=0.0;
+    }
+  return at;
+}
+
 void VRPN_CALLBACK handleAnalogPos(void *userdata,
 const vrpn_ANALOGCB t)
 {
@@ -222,10 +251,15 @@ const vrpn_ANALOGCB t)
         camera->OrthogonalizeViewUp();
         camera->GetViewUp(up);
 
+        vrpn_ANALOGCB at = AugmentChannelsToRetainLargestMagnitude(t);
+
+        // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],
+        //    at.channel[1], at.channel[2], at.channel[3], at.channel[4],
+        //    at.channel[5]);
         // Apply up-down motion
         for (int i = 0; i < 3; i++)
           {
-          double dx = -0.01*t.channel[2]*up[i];
+          double dx = 0.01*at.channel[2]*up[i];
           pos[i] += dx;
           fp[i]  += dx;
           }
@@ -236,7 +270,7 @@ const vrpn_ANALOGCB t)
 
         for (int i = 0; i < 3; i++)
           {
-          double dx = -0.01*t.channel[0]*r[i];
+          double dx = -0.01*at.channel[0]*r[i];
           pos[i] += dx;
           fp[i]  += dx;
           }
@@ -244,10 +278,10 @@ const vrpn_ANALOGCB t)
         camera->SetPosition(pos);
         camera->SetFocalPoint(fp);
 
-        camera->Dolly(pow(1.001,-t.channel[1]));
-        camera->Elevation(  4.0*t.channel[3]);
-        camera->Azimuth(    4.0*t.channel[4]);
-        camera->Roll(      -4.0*t.channel[5]);
+        camera->Dolly(pow(1.01,at.channel[1]));
+        camera->Elevation(  4.0*at.channel[3]);
+        camera->Azimuth(    4.0*at.channel[5]);
+        camera->Roll(       4.0*at.channel[4]);
 
         proxy->GetRenderer()->ResetCameraClippingRange();
         proxy->GetRenderWindow()->Render();
@@ -259,7 +293,6 @@ const vrpn_ANALOGCB t)
     tData->t_counts[0]++;
     }
 }
-
 
 // ----------------------------------------------------------------------------
 ParaViewVRPN::ParaViewVRPN()
