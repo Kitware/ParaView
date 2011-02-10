@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QShowEvent>
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -882,7 +883,7 @@ void pqFileDialog::onTextEdited(const QString &str)
   this->Implementation->Ui.Favorites->clearSelection();
   if (str.size() > 0 )
     {
-    pqFileDialog::FileMode realMode = this->Implementation->Mode;
+    pqFileDialog::FileMode realMode = this->Implementation->Mode;    
     this->setFileMode(pqFileDialog::ExistingFile);
     this->Implementation->Ui.Files->keyboardSearch(str);
     this->setFileMode(realMode);
@@ -1114,11 +1115,14 @@ void pqFileDialog::fileSelectionChanged()
   if (!this->Implementation->Ui.FileName->hasFocus())
     {
     //user is currently editing a name, don't change the text
+    this->Implementation->Ui.FileName->blockSignals(true);
     this->Implementation->Ui.FileName->setText(fileString);
+    this->Implementation->Ui.FileName->blockSignals(false);
     }
   this->Implementation->FileNames = fileNames;
 }
 
+//-----------------------------------------------------------------------------
 bool pqFileDialog::selectFile(const QString& f)
 {
   // We don't use QFileInfo here since it messes the paths up if the client and
@@ -1151,3 +1155,13 @@ bool pqFileDialog::selectFile(const QString& f)
   return true;
 }
 
+//-----------------------------------------------------------------------------
+void pqFileDialog::showEvent( QShowEvent *event )
+{  
+  QDialog::showEvent(event);
+  //Qt sets the default keyboard focus to the last item in the tab order
+  //which is determined by the creation order. This means that we have 
+  //to explicitly state that the line edit has the focus on showing no 
+  //matter the tab order
+  this->Implementation->Ui.FileName->setFocus(Qt::OtherFocusReason);
+}
