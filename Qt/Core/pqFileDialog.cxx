@@ -882,7 +882,7 @@ void pqFileDialog::onTextEdited(const QString &str)
   this->Implementation->Ui.Favorites->clearSelection();
   if (str.size() > 0 )
     {
-    pqFileDialog::FileMode realMode = this->Implementation->Mode;
+    pqFileDialog::FileMode realMode = this->Implementation->Mode;    
     this->setFileMode(pqFileDialog::ExistingFile);
     this->Implementation->Ui.Files->keyboardSearch(str);
     this->setFileMode(realMode);
@@ -1114,7 +1114,9 @@ void pqFileDialog::fileSelectionChanged()
   if (!this->Implementation->Ui.FileName->hasFocus())
     {
     //user is currently editing a name, don't change the text
+    this->Implementation->Ui.FileName->blockSignals(true);
     this->Implementation->Ui.FileName->setText(fileString);
+    this->Implementation->Ui.FileName->blockSignals(false);
     }
   this->Implementation->FileNames = fileNames;
 }
