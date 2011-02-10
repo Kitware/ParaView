@@ -188,7 +188,7 @@ vtkStandardNewMacro(vtkSMSessionCore);
 vtkSMSessionCore::vtkSMSessionCore()
 {
   this->Interpreter =
-    vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
+    vtkClientServerInterpreterInitializer::GetInterpreter();
 
   vtkSMSessionCoreInterpreterHelper* helper =
     vtkSMSessionCoreInterpreterHelper::New();
@@ -244,7 +244,6 @@ vtkSMSessionCore::vtkSMSessionCore()
 vtkSMSessionCore::~vtkSMSessionCore()
 {
   LOG("Closing session");
-  this->Interpreter->Delete();
   this->Interpreter = 0;
   if (this->ParallelController &&
     this->ParallelController->GetLocalProcessId() == 0)

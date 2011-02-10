@@ -73,6 +73,20 @@ vtkClientServerInterpreterInitializer::GetInitializer()
 }
 
 //----------------------------------------------------------------------------
+vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::GetInterpreter()
+{
+  static vtkSmartPointer<vtkClientServerInterpreter> Singleton;
+  if (!Singleton)
+    {
+    vtkClientServerInterpreterInitializer* initializer =
+      vtkClientServerInterpreterInitializer::GetInitializer();
+    Singleton.TakeReference(initializer->NewInterpreter());
+    }
+  return Singleton;
+
+}
+
+//----------------------------------------------------------------------------
 vtkClientServerInterpreter*
 vtkClientServerInterpreterInitializer::NewInterpreter()
 {
