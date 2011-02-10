@@ -180,6 +180,7 @@ public:
     RemoteObjectMapType;
   PMObjectMapType PMObjectMap;
   RemoteObjectMapType RemoteObjectMap;
+  unsigned long InterpreterObserverID;
 };
 
 //****************************************************************************/
@@ -202,13 +203,14 @@ vtkSMSessionCore::vtkSMSessionCore()
   this->Interpreter->ProcessStream(stream);
   helper->Delete();
 
+  this->Internals = new vtkInternals();
+
   vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
       vtkMemberFunctionCommand<vtkSMSessionCore>::New();
   observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
-  this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
+  this->Internals->InterpreterObserverID =
+      this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
   observer->Delete();
-
-  this->Internals = new vtkInternals();
 
   this->ProxyDefinitionManager = vtkSMProxyDefinitionManager::New();
 
@@ -244,13 +246,26 @@ vtkSMSessionCore::vtkSMSessionCore()
 vtkSMSessionCore::~vtkSMSessionCore()
 {
   LOG("Closing session");
+
+  // Clean up interpreter
+  this->Interpreter->RemoveObserver(this->Internals->InterpreterObserverID);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Delete
+         << vtkClientServerID(1)
+         << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
   this->Interpreter = 0;
+
+  // Manage controller
   if (this->ParallelController &&
     this->ParallelController->GetLocalProcessId() == 0)
     {
     this->ParallelController->TriggerBreakRMIs();
     }
+
+  // Clean local refs
   delete this->Internals;
+  this->Internals = NULL;
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
 }
