@@ -72,9 +72,8 @@ protected:
 
   // Description:
   // This sets the SurfaceRot transfromation based on the screen
-  // basis and the room basis
-  void SetSurfaceRotation( double xBase[3], double yBase[3], double zBase[3],
-                           double xRoom[3], double yRoom[3], double zRoom[3] );
+  // basis vectors
+  void SetSurfaceRotation( double xBase[3], double yBase[3], double zBase[3]);
 
 
   int    NumberOfDisplays;
@@ -83,6 +82,12 @@ protected:
   double DisplayX[4];
   double DisplayY[4];
   vtkMatrix4x4 *SurfaceRot;
+  double O2Screen;
+  double O2Right;
+  double O2Left;
+  double O2Top;
+  double O2Bottom;
+  int once;
 
 private:
   vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&); // Not implemented
