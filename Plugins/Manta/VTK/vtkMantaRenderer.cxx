@@ -313,6 +313,43 @@ vtkCamera* vtkMantaRenderer::MakeCamera()
 }
 
 //----------------------------------------------------------------------------
+void vtkMantaRenderer::UpdateSize()
+{
+  if (this->EngineStarted)
+    {
+    int     mantaSize[2];
+    int*    renderSize  = NULL;
+    bool    stereoDummyArg;
+
+    renderSize = this->GetSize();
+    this->GetSyncDisplay()->getCurrentImage()->
+      getResolution( stereoDummyArg, mantaSize[0], mantaSize[1] );
+
+    if (mantaSize[0] != renderSize[0] ||
+        mantaSize[1] != renderSize[1])
+      {
+      /*
+      cerr << "MR(" << this << ") "
+           << "Layer: " << this->GetLayer() << ", "
+           << "Props: " << this->NumberOfPropsRendered << endl
+           << "  MantaSize: " << mantaSize[0] << ", " << mantaSize[1] << ", "
+           << "  renderSize: " << renderSize[0] << ", " << renderSize[1] << endl;
+      */
+      this->GetMantaEngine()->addTransaction
+        ("resize",
+         Manta::Callback::create
+         (this->GetMantaEngine(),
+          &Manta::MantaInterface::changeResolution,
+          0, renderSize[0], renderSize[1],
+          true));
+
+      this->GetSyncDisplay()->doneRendering();
+      this->GetSyncDisplay()->waitOnFrameReady();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkMantaRenderer::DeviceRender()
 {
   //cerr << "MR(" << this << ") DeviceRender" << endl;
@@ -337,6 +374,8 @@ void vtkMantaRenderer::DeviceRender()
 
   this->Clear();
 
+  this->UpdateSize();
+
   // call camera::Render()
   this->UpdateCamera();
 
@@ -358,10 +397,7 @@ void vtkMantaRenderer::DeviceRender()
   vtkTimerLog::MarkEndEvent("Geometry");
 
   vtkTimerLog::MarkStartEvent("Total LayerRender");
-  if ( this->EngineStarted )
-    {
-    this->LayerRender();
-    }
+  this->LayerRender();
   vtkTimerLog::MarkEndEvent("Total LayerRender");
 
   vtkTimerLog::MarkEndEvent("Manta Dev Render");
@@ -371,6 +407,10 @@ void vtkMantaRenderer::DeviceRender()
 // let the renderer display itself appropriately based on its layer index
 void vtkMantaRenderer::LayerRender()
 {
+  //TODO:
+  //this needs to be simplified. Now that UpdateSize happens before this
+  //vtk's size and manta's size should always be the same so the ugly
+  //conversion and minsize safety check should go away
   int     i, j;
   int     rowLength,  mantaSize[2];
   int     minWidth,   minHeight;
@@ -383,12 +423,6 @@ void vtkMantaRenderer::LayerRender()
   double* renViewport = NULL;
   const   Manta::SimpleImageBase* mantaBase = NULL;
 
-  vtkTimerLog::MarkStartEvent("ThreadSync");
-  // let the render threads draw what we've asked them to
-  this->GetSyncDisplay()->doneRendering();
-  this->GetSyncDisplay()->waitOnFrameReady();
-  vtkTimerLog::MarkEndEvent("ThreadSync");
-
   // collect some useful info
   renderSize = this->GetSize();
   renWinSize = this->GetRenderWindow()->GetActualSize();
@@ -396,30 +430,24 @@ void vtkMantaRenderer::LayerRender()
   renderPos0[0] = int( renViewport[0] * renWinSize[0] + 0.5f );
   renderPos0[1] = int( renViewport[1] * renWinSize[1] + 0.5f );
   this->GetSyncDisplay()->getCurrentImage()->
-        getResolution( stereoDumy, mantaSize[0], mantaSize[1] );
+    getResolution( stereoDumy, mantaSize[0], mantaSize[1] );
   mantaBase = dynamic_cast< const Manta::SimpleImageBase * >
-              ( this->GetSyncDisplay()->getCurrentImage() );
+    ( this->GetSyncDisplay()->getCurrentImage() );
   rowLength = mantaBase->getRowLength();
 
   // for window re-sizing
   minWidth    = ( mantaSize[0] < renderSize[0] )
-                ? mantaSize[0] : renderSize[0];
+    ? mantaSize[0] : renderSize[0];
   minHeight   = ( mantaSize[1] < renderSize[1] )
-                ? mantaSize[1] : renderSize[1];
+    ? mantaSize[1] : renderSize[1];
   hMantaDiff  = mantaSize[1] - minHeight;
   hRenderDiff = renderSize[1] - minHeight;
-  if (hMantaDiff != 0 || hRenderDiff != 0)
-    {
-    /*
-    cerr << "MR(" << this << ") "
-       << "Layer: " << this->GetLayer() << ", "
-       << "Props: " << this->NumberOfPropsRendered << endl
-       << "  MantaSize: " << mantaSize[0] << ", " << mantaSize[1] << ", "
-       << "  renWinSize: " << renWinSize[0] << ", " << renWinSize[1] << ", "
-       << "  renderSize: " << renderSize[0] << ", " << renderSize[1] << endl;
-    */
-    }
 
+  vtkTimerLog::MarkStartEvent("ThreadSync");
+  // let the render threads draw what we've asked them to
+  this->GetSyncDisplay()->doneRendering();
+  this->GetSyncDisplay()->waitOnFrameReady();
+  vtkTimerLog::MarkEndEvent("ThreadSync");
 
   // memory allocation and acess to the Manta image
   int size = renderSize[0]*renderSize[1];

@@ -168,7 +168,10 @@ public:
 public:
   /// Returns a array of 9 ManipulatorType objects defining
   /// default set of camera manipulators used by this type of view.
-  static const ManipulatorType* getDefaultManipulatorTypes()
+  /// There are exactly 9 entires in the returned array. It's is deliberately
+  /// returned as non-constant. Developers can change the default by directly
+  /// updating the entries.
+  static ManipulatorType* getDefaultManipulatorTypes()
     { return pqRenderView::DefaultManipulatorTypes; }
 
   /// Creates a new surface selection given the rectangle in display

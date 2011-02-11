@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-
 #include <netcdf.h>
 #include <string>
 #include <vector>
@@ -40,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define DEBUGPRINT_RESOLUTION(arg) ;
 
-#define DEBUGPRINT_METAINFORMATION(arg) arg;
+#define DEBUGPRINT_METAINFORMATION(arg) ;
 
 vtkStandardNewMacro(vtkImageNetCDFPOPReader);
 
@@ -100,6 +99,8 @@ vtkImageNetCDFPOPReader::vtkImageNetCDFPOPReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->FileName = NULL;
+  this->NCDFFD = 0;
+
   this->SelectionObserver = vtkCallbackCommand::New();
   this->SelectionObserver->SetCallback
     (&vtkImageNetCDFPOPReader::SelectionModifiedCallback);
@@ -160,23 +161,27 @@ int vtkImageNetCDFPOPReader::RequestInformation(
     return 0;
     }
 
-  int retval = nc_open(this->FileName, NC_NOWRITE, &this->NCDFFD);
-  if (retval != NC_NOERR)
+  int retval;
+  if (!this->NCDFFD)
     {
-    vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
-    return 0;
+    retval = nc_open(this->FileName, NC_NOWRITE, &this->NCDFFD);
+    if (retval != NC_NOERR)
+      {
+      vtkErrorMacro(<< "Can't read file " << nc_strerror(retval));
+      return 0;
+      }
+    }
+
+  retval =
+    this->Superclass::RequestInformation(request, inputVector, outputVector);
+  if (retval != VTK_OK)
+    {
+    return retval;
     }
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(vtkDataObject::ORIGIN(),this->Origin,3);
   outInfo->Set(vtkDataObject::SPACING(), this->Spacing, 3);
-
-  int ret =
-    this->Superclass::RequestInformation(request, inputVector, outputVector);
-  if (!ret)
-    {
-    return ret;
-    }
 
   // get number of variables from file
   int numberOfVariables;
@@ -216,13 +221,15 @@ int vtkImageNetCDFPOPReader::RequestInformation(
       }
     }
 
- int sWholeExtent[6];
+  int sWholeExtent[6];
   sWholeExtent[0] = this->Internals->WholeExtent[0];
   sWholeExtent[1] = this->Internals->WholeExtent[1];
   sWholeExtent[2] = this->Internals->WholeExtent[2];
   sWholeExtent[3] = this->Internals->WholeExtent[3];
   sWholeExtent[4] = this->Internals->WholeExtent[4];
   sWholeExtent[5] = this->Internals->WholeExtent[5];
+  outInfo->Set
+    (vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), sWholeExtent, 6);
 
   double sSpacing[3];
   sSpacing[0] = this->Spacing[0];
@@ -231,10 +238,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
 
   this->Internals->Resolution = 1.0;
 
-  //TODO: Unlike for other sources I am not getting resolution on the
-  //first pass here. Doing this forces no request to 0.0 instead of 1.0
-  //which is not good for anything but multires.
-  if (1)//outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
     double rRes =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
@@ -294,11 +298,6 @@ int vtkImageNetCDFPOPReader::RequestInformation(
        cerr << endl;
        );
     }
-  else
-    {
-    cerr << "NO RES" << endl;
-    }
-
 
   outInfo->Get(vtkDataObject::ORIGIN(), this->Origin);
 
@@ -318,7 +317,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
                bounds, 6);
 
-  return ret;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -347,6 +346,7 @@ int vtkImageNetCDFPOPReader::RequestData(vtkInformation* request,
   outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),subext);
   vtkImageData *imageData = vtkImageData::SafeDownCast(output);
   imageData->SetExtent(subext);
+
   //setup extents for netcdf library to read the netcdf data file
   size_t start[]= {subext[4]*this->Internals->SK,
                    subext[2]*this->Internals->SJ,
@@ -363,9 +363,14 @@ int vtkImageNetCDFPOPReader::RequestData(vtkInformation* request,
   double sSpacing[3];
   outInfo->Get(vtkDataObject::SPACING(), sSpacing);
 
- //initialize memory (raw data space, x y z axis space) and rectilinear grid
-  bool firstPass = true;
-  for(size_t i=0;i<this->Internals->VariableMap.size() && firstPass==true;i++)
+  double range[2];
+  int P = outInfo->Get
+    (vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+  int NP = outInfo->Get
+    (vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+
+  //initialize memory (raw data space, x y z axis space) and rectilinear grid
+  for(size_t i=0;i<this->Internals->VariableMap.size();i++)
     {
     if(this->Internals->VariableMap[i] != -1 &&
        this->Internals->VariableArraySelection->GetArraySetting(
@@ -376,48 +381,41 @@ int vtkImageNetCDFPOPReader::RequestData(vtkInformation* request,
       nc_inq_varid(this->NCDFFD,
                    this->Internals->VariableArraySelection->GetArrayName(
                      this->Internals->VariableMap[i]), &varidp);
-
-     imageData->SetSpacing(sSpacing[0], sSpacing[1], sSpacing[2]);
-
+      imageData->SetSpacing(sSpacing[0], sSpacing[1], sSpacing[2]);
       //create vtkFloatArray and get the scalars into it
       vtkFloatArray *scalars = vtkFloatArray::New();
       vtkIdType numberOfTuples = (count[0])*(count[1])*(count[2]);
+      scalars->SetNumberOfComponents(1);
+      scalars->SetNumberOfTuples(numberOfTuples);
       float* data = new float[numberOfTuples];
-#if 0
-      nc_get_vara_float(this->NCDFFD, varidp, start, count, data);
-#else
       nc_get_vars_float(this->NCDFFD, varidp, start, count, rStride,
                         data);
-#endif
       scalars->SetArray(data, numberOfTuples, 0, 1);
+
       //set list of variables to display data on rectilinear grid
-      scalars->SetName(this->Internals->VariableArraySelection->GetArrayName(
-                         this->Internals->VariableMap[i]));
+      const char *name = this->Internals->VariableArraySelection->GetArrayName
+        (this->Internals->VariableMap[i]);
+      scalars->SetName(name);
       imageData->GetPointData()->AddArray(scalars);
+
+      scalars->GetRange(range);
+      this->Internals->RangeKeeper->Insert(P, NP, subext,
+                                           this->Internals->Resolution,
+                                           0, name, 0,
+                                           range);
+      DEBUGPRINT_METAINFORMATION
+        (
+         cerr << "SIP(" << this << ") Calculated range "
+         << range[0] << ".." << range[1]
+         << " for " << name << " "
+         << P << "/" << NP << "&" << this->Internals->Resolution
+         << endl;
+         );
+
       scalars->Delete();
-      firstPass = false;
-      break;
       }
     this->UpdateProgress((i+1.0)/this->Internals->VariableMap.size());
     }
-
- imageData->GetPointData()->SetActiveAttribute
-    (0,vtkDataSetAttributes::SCALARS);
-  double range[2];
-  imageData->GetPointData()->GetScalars()->GetRange(range);
-  int P = outInfo->Get
-    (vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-  int NP = outInfo->Get
-    (vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-  DEBUGPRINT_METAINFORMATION
-    (
-     cerr << "RSR(" << this << ") Calculated range "
-     << range[0] << ".." << range[1]
-     << " for " << P << "/" << NP << "&" << this->Internals->Resolution
-     << endl;
-     );
-  this->Internals->RangeKeeper->Insert(P, NP, subext, range,
-                                         this->Internals->Resolution);
   return 1;
 }
 
@@ -436,13 +434,41 @@ int vtkImageNetCDFPOPReader::GetNumberOfVariableArrays()
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkImageNetCDFPOPReader::GetVariableArrayName()
+const char* vtkImageNetCDFPOPReader::GetVariableArrayName(int index)
 {
-  if(this->GetNumberOfVariableArrays() == 0)
+  if(index < 0 || index >= this->GetNumberOfVariableArrays())
     {
     return NULL;
     }
-  return this->Internals->VariableArraySelection->GetArrayName(0);
+  return this->Internals->VariableArraySelection->GetArrayName(index);
+}
+
+//-----------------------------------------------------------------------------
+int vtkImageNetCDFPOPReader::GetVariableArrayStatus(const char* name)
+{
+  return this->Internals->VariableArraySelection->ArrayIsEnabled(name);
+}
+
+//-----------------------------------------------------------------------------
+void vtkImageNetCDFPOPReader::SetVariableArrayStatus(const char* name, int status)
+{
+  vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if(this->Internals->VariableArraySelection->ArrayExists(name) == 0)
+    {
+    vtkErrorMacro(<< name << " is not available in the file.");
+    return;
+    }
+  int enabled = this->Internals->VariableArraySelection->ArrayIsEnabled(name);
+  if(status != 0 && enabled == 0)
+    {
+    this->Internals->VariableArraySelection->EnableArray(name);
+    this->Modified();
+    }
+  else if(status == 0 && enabled != 0)
+    {
+    this->Internals->VariableArraySelection->DisableArray(name);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -464,31 +490,6 @@ int vtkImageNetCDFPOPReader::ProcessRequest(vtkInformation *request,
      << this->Internals->SJ << " "
      << this->Internals->SK << endl;
      );
-
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-    {
-    DEBUGPRINT
-      (cerr << "SIP(" << this << ") RDO ============================" << endl;);
-    }
-
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
-    {
-    DEBUGPRINT
-      (cerr << "SIP(" << this << ") RI =============================" << endl;);
-    }
-
-  if(request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
-    {
-    DEBUGPRINT
-      (cerr << "SIP(" << this << ") RUE ============================" << endl;);
-    }
-
-  if(request->Has
-     (vtkStreamingDemandDrivenPipeline::REQUEST_RESOLUTION_PROPAGATE()))
-    {
-    DEBUGPRINT_METAINFORMATION
-      (cerr << "SIP(" << this << ") RRP ============================" << endl;);
-    }
 
   if(request->Has
      (vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT_INFORMATION()))
@@ -520,44 +521,55 @@ int vtkImageNetCDFPOPReader::ProcessRequest(vtkInformation *request,
       (vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(), bounds, 6);
 
     double range[2];
-    range[0] = 0;
-    range[1] = -1;
-    if (this->Internals->RangeKeeper->Search(P, NP, ext, range))
+    vtkInformationVector *miv =
+      outInfo->Get(vtkDataObject::POINT_DATA_VECTOR());
+    int cnt = 0;
+    for(size_t i=0;i<this->Internals->VariableMap.size();i++)
       {
-      DEBUGPRINT_METAINFORMATION
-        (
-         cerr << "Range for "
-         << P << "/" << NP << " "
-         << ext[0] << "," << ext[1] << ","
-         << ext[2] << "," << ext[3] << ","
-         << ext[4] << "," << ext[5] << " is "
-         << range[0] << " .. " << range[1] << endl;
-         );
-      vtkInformation *fInfo =
-        vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-         vtkDataSetAttributes::SCALARS);
-      if (fInfo)
+      if(this->Internals->VariableMap[i] != -1 &&
+         this->Internals->VariableArraySelection->GetArraySetting
+         (this->Internals->VariableMap[i]) != 0)
         {
-        fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
-        }
-      }
-    else
-      {
-      DEBUGPRINT_METAINFORMATION
-        (
-         cerr << "No range for "
-         << ext[0] << "," << ext[1] << ","
-         << ext[2] << "," << ext[3] << ","
-         << ext[4] << "," << ext[5] << " yet" << endl;
-         );
-      vtkInformation *fInfo =
-        vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-         vtkDataSetAttributes::SCALARS);
-      if (fInfo)
-        {
-        fInfo->Remove(vtkDataObject::PIECE_FIELD_RANGE());
+        const char *name = this->Internals->VariableArraySelection->GetArrayName
+          (this->Internals->VariableMap[i]);
+        vtkInformation *fInfo = miv->GetInformationObject(cnt);
+        if (!fInfo)
+          {
+          fInfo = vtkInformation::New();
+          miv->SetInformationObject(cnt, fInfo);
+          fInfo->Delete();
+          }
+        cnt++;
+        range[0] = 0;
+        range[1] = -1;
+        if (this->Internals->RangeKeeper->Search(P, NP, ext,
+                                                 0, name, 0,
+                                                 range))
+          {
+          DEBUGPRINT_METAINFORMATION
+            (
+             cerr << "Found range for " << name << " "
+             << P << "/" << NP << " "
+             << ext[0] << "," << ext[1] << ","
+             << ext[2] << "," << ext[3] << ","
+             << ext[4] << "," << ext[5] << " is "
+             << range[0] << " .. " << range[1] << endl;
+             );
+          fInfo->Set(vtkDataObject::FIELD_ARRAY_NAME(), name);
+          fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
+          }
+        else
+          {
+          DEBUGPRINT_METAINFORMATION
+            (
+             cerr << "No range for "
+             << ext[0] << "," << ext[1] << ","
+             << ext[2] << "," << ext[3] << ","
+             << ext[4] << "," << ext[5] << " yet" << endl;
+             );
+          fInfo->Remove(vtkDataObject::FIELD_ARRAY_NAME());
+          fInfo->Remove(vtkDataObject::PIECE_FIELD_RANGE());
+          }
         }
       }
     }
@@ -583,10 +595,10 @@ int vtkImageNetCDFPOPReader::ProcessRequest(vtkInformation *request,
     bool match = true;
     for (int i = 0; i< 6; i++)
       {
-        if (updateExtent[i] != wholeExtent[i])
-          {
-          match = false;
-          }
+      if (updateExtent[i] != wholeExtent[i])
+        {
+        match = false;
+        }
       }
     if (match && (res == 1.0))
       {

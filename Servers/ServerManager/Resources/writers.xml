@@ -902,6 +902,9 @@
         name="FileName" 
         command="SetFileName"
         number_of_elements="1">
+        <Documentation>
+            The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
       <Hints>
         <Property name="Input" show="0"/>

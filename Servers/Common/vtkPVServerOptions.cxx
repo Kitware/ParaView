@@ -80,13 +80,13 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
       vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
-        str >> info.UpperLeft[j];
+        str >> info.UpperRight[j];
         }
       }
     }
   if(caveBounds && caveBounds != 3)
     {
-    vtkErrorMacro("LowerRight LowerLeft and UpperLeft must all be present, if one is present");
+    vtkErrorMacro("LowerRight LowerLeft and UpperRight must all be present, if one is present");
     return 0;
     }
   if(caveBounds)
@@ -160,13 +160,13 @@ double* vtkPVServerOptions::GetLowerRight(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVServerOptions::GetUpperLeft(unsigned int idx)
+double* vtkPVServerOptions::GetUpperRight(unsigned int idx)
 {
   if (idx >= this->Internals->MachineInformationVector.size())
     {
     return 0;
     }
-  return this->Internals->MachineInformationVector[idx].UpperLeft;
+  return this->Internals->MachineInformationVector[idx].UpperRight;
 }
 
 //----------------------------------------------------------------------------

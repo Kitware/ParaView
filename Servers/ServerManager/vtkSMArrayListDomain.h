@@ -105,7 +105,7 @@ public:
 
   // Description:
   // Get desired association of the current domain
-  int GetDomainAssociation();
+  int GetDomainAssociation(unsigned int idx);
 
   // Description:
   // Return the attribute type. The values are listed in
@@ -213,7 +213,7 @@ protected:
                  int outputport,
                  vtkPVDataSetAttributesInformation* info,
                  vtkSMInputArrayDomain* iad,
-                 int association);
+                 int association, int domainAssociation=-1);
 
   // Description:
   // Adds a new array to the domain. This internally calls add string. If the \c
@@ -224,7 +224,7 @@ protected:
   // the component names).
   // Returns the index for the array. If the array was split into components,
   // then returns the index of the string for the array magnitude.
-  unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association,
+  unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association, int domainAssociation,
     vtkSMInputArrayDomain* iad);
 
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);

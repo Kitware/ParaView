@@ -117,6 +117,12 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       else(WIN32)
         get_filename_component(PYTHON_LIBS_DIR "${PYTHON_LIBRARY}" PATH)
         file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+
+        # install pyconfig.h
+        string(REGEX MATCH "python[0-9].[0-9]" py_inc_dir ${PYTHON_INCLUDE_DIR})
+        install(FILES ${PYTHON_INCLUDE_DIR}/pyconfig.h
+                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_inc_dir}
+                COMPONENT Runtime)
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
@@ -163,6 +169,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
       install(DIRECTORY ${mpi_bin_dir}/
         DESTINATION ${pv_runtime_dest}
+        USE_SOURCE_PERMISSIONS
         COMPONENT Runtime)
     endif(PARAVIEW_INSTALL_MPIEXEC)
   endif(PARAVIEW_USE_MPI)
@@ -178,9 +185,19 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
 
+  if(WIN32)
+    foreach(pluginname ${PARAVIEW_PLUGINLIST})
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/${pluginname}.dll")
+    endforeach(pluginname ${PARAVIEW_PLUGINLIST})
+  else()
+    foreach(pluginname ${PARAVIEW_PLUGINLIST})
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/lib${pluginname}.so")
+    endforeach(pluginname ${PARAVIEW_PLUGINLIST})
+  endif()
+
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
+fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)

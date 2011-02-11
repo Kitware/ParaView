@@ -521,6 +521,8 @@ vtkRawStridedReader1::vtkRawStridedReader1()
   this->SI = 1;
   this->SJ = 1;
   this->SK = 1;
+
+  this->PostPreProcess = false;
 }
 
 //----------------------------------------------------------------------------
@@ -762,10 +764,10 @@ int vtkRawStridedReader1::RequestData(
     }
 
   char pfilename[256];
-  sprintf(pfilename, "%s.%d_%d_%d_%d_%d_%d_%d_%d_%f.block", this->Filename, uext[0], uext[1], uext[2], uext[3], uext[4], uext[5], P, NP, this->Resolution);
-  //cerr << pfilename <<"?" << endl;
+  sprintf(pfilename, "%s.%d_%d_%d_%d_%d_%d_%d_%d_%f.block", this->Filename,
+          uext[0], uext[1], uext[2], uext[3], uext[4], uext[5], P, NP,
+          this->Resolution);
   ifstream pfile(pfilename, ios::in|ios::binary);
-  //pfile.close();
   if(!pfile.is_open())
   {
     ifstream file(this->Filename, ios::in|ios::binary);
@@ -805,11 +807,14 @@ int vtkRawStridedReader1::RequestData(
       });
     file.close();
 
-    //cerr << "creating " << pfilename << " " << endl;
-    ofstream opfile(pfilename, ios::out|ios::binary);
-    unsigned int memsize = (uext[1]-uext[0]+1)*(uext[3]-uext[2]+1)*(uext[5]-uext[4]+1);
-    opfile.write((char*)myfloats, memsize*sizeof(float));
-    opfile.close();
+    if (this->PostPreProcess)
+      {
+      //cerr << "creating " << pfilename << " " << endl;
+      ofstream opfile(pfilename, ios::out|ios::binary);
+      unsigned int memsize = (uext[1]-uext[0]+1)*(uext[3]-uext[2]+1)*(uext[5]-uext[4]+1);
+      opfile.write((char*)myfloats, memsize*sizeof(float));
+      opfile.close();
+      }
   }
   else
   {
@@ -834,7 +839,9 @@ int vtkRawStridedReader1::RequestData(
   DEBUGPRINT_METAINFORMATION(
   cerr << "RSR(" << this << ") Calculate range " << range[0] << ".." << range[1] << " for " << P << "/" << NP << endl;
                              );
-  this->RangeKeeper->Insert(P, NP, uext, range, this->Resolution);
+  this->RangeKeeper->Insert(P, NP, uext, this->Resolution,
+                            0, "PointCenteredData", 0,
+                            range);
 
 /*  double stop = clock();
   double talloc = (c_alloc-start) / CLOCKS_PER_SEC;
@@ -927,34 +934,43 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
     {for (int i = 0; i < 6; i++) cerr << bounds[i] << " ";}
     cerr << endl;
 */
-    double range[2];
-    if (this->RangeKeeper->Search(P, NP, ext, range))
+    vtkInformationVector *miv = outInfo->Get(vtkDataObject::POINT_DATA_VECTOR());
+    vtkInformation *fInfo = miv->GetInformationObject(0);
+    if (!fInfo)
       {
-      DEBUGPRINT_METAINFORMATION(
-      cerr << "Range for "
-           << P << "/" << NP << " "
-           << ext[0] << "," << ext[1] << ","
-           << ext[2] << "," << ext[3] << ","
-           << ext[4] << "," << ext[5] << " is "
-           << range[0] << " .. " << range[1] << endl;
-                                 );
-      vtkInformation *fInfo =
-        vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-         vtkDataSetAttributes::SCALARS);
-      if (fInfo)
-        {
-        fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
-        }
+      fInfo = vtkInformation::New();
+      miv->SetInformationObject(0, fInfo);
+      fInfo->Delete();
+      }
+    const char *name = "PointCenteredData";
+    double range[2];
+    if (this->RangeKeeper->Search(P, NP, ext,
+                                  0, name, 0,
+                                  range))
+      {
+      DEBUGPRINT_METAINFORMATION
+        (
+         cerr << "Range for " << name << " "
+         << P << "/" << NP << " "
+         << ext[0] << "," << ext[1] << ","
+         << ext[2] << "," << ext[3] << ","
+         << ext[4] << "," << ext[5] << " is "
+         << range[0] << " .. " << range[1] << endl;
+         );
+      fInfo->Set(vtkDataObject::FIELD_ARRAY_NAME(), name);
+      fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
       }
     else
       {
-      DEBUGPRINT_METAINFORMATION(
-      cerr << "No range for "
-           << ext[0] << "," << ext[1] << ","
-           << ext[2] << "," << ext[3] << ","
-           << ext[4] << "," << ext[5] << " yet" << endl;
-                                 );
+      DEBUGPRINT_METAINFORMATION
+        (
+         cerr << "No range for " << name << " "
+         << ext[0] << "," << ext[1] << ","
+         << ext[2] << "," << ext[3] << ","
+         << ext[4] << "," << ext[5] << " yet" << endl;
+         );
+      fInfo->Remove(vtkDataObject::FIELD_ARRAY_NAME());
+      fInfo->Remove(vtkDataObject::PIECE_FIELD_RANGE());
       }
     }
 

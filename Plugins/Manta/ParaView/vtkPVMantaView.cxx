@@ -33,10 +33,12 @@ vtkPVMantaView::vtkPVMantaView()
 
   vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::New();
   this->RenderView->SetRenderer(mantaRenderer);
+  mantaRenderer->Delete();
 
   vtkMantaCamera *mantaCamera = vtkMantaCamera::New();
   mantaRenderer->SetActiveCamera(mantaCamera);
   mantaCamera->ParallelProjectionOff();
+  mantaCamera->Delete();
 
 /*
   vtkMemberFunctionCommand<vtkPVRenderView>* observer =
@@ -57,8 +59,9 @@ vtkPVMantaView::vtkPVMantaView()
   this->Light->SetLightType(2); // CameraLight
 
   //TODO:
-  //replace with a manta light kit
+  //replace with a manta light kit that knows to instantiate vtkMantaLights
 //  this->LightKit = NULL;//vtkLightKit::New();
+
   mantaRenderer->AddLight(this->Light);
   mantaRenderer->SetAutomaticLightCreation(0);
 

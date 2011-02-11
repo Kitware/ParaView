@@ -97,7 +97,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
        
     qt4_wrap_cpp(MOC_SRCS 
       pqPointSpriteDisplayPanelDecorator.h
-      pqDisplayArrayWidget.h
       pqTransferFunctionDialog.h
       pqTransferFunctionEditor.h
       pqDoubleEdit.h
@@ -106,7 +105,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
        
     set(Plugin_SRCS
       pqPointSpriteDisplayPanelDecorator.cxx
-      pqDisplayArrayWidget.cxx
       pqTransferFunctionDialog.cxx
       pqTransferFunctionEditor.cxx
       pqDoubleEdit.cxx

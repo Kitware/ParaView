@@ -6581,8 +6581,28 @@
                 label="NetCDF MPAS reader">
      <Documentation
          short_help="Read unstructured grid MPAS data from a file."
-         long_help="Read unstructured grid data from a file. ">
-       The Image reader reads unstructured grid from a file.  Grid is dual grid.
+         long_help="Read unstructured grid MPAS data from a file.">
+       This reader reads unstructured grid MPAS data from a file.  It creates a dual grid
+       It assumes the grid is in the global domain.  By default, it creates a spherical
+       view of vertical layer 0.  It assumes it is ocean data.  It gives several options to
+       change the view to multilayer (all vertical layers will have a thickness determined
+       by the value in the slider), lat/lon projection or atmospheric (vertical layers go out
+       away from the center of the sphere, instead of down towards the center as they do
+       for ocean data).  It doesn't handle data in the rectangular domain.  This is not a
+       parallel reader.  It expects one .nc file of data.  It can display cell or vertex-centered
+       data, but not edge data.  When converted to the dual grid, cell-centered data becomes
+       vertex-centered and vice-versa.
+        NOTES:
+        When using this reader, it is important that you remember to do the following:
+        1.  When changing a selected variable, remember to select it also in the drop
+            down box to color by.  It doesn't color by that variable automatically
+        2.  When selecting multilayer sphere view, start with layer thickness around 100,000
+        3.  When selecting multilayer lat/lon view, start with layer thickness around 10
+        4.  Always click the -Z orientation after making a switch from lat/lon to sphere,
+            from single to multilayer or changing thickness.
+        5.  Be conservative on the number of changes you make before hitting Apply, since there
+            may be bugs in this reader.  Just make one change and then hit Apply.
+       For problems, contact Christine Ahrens (cahrens@lanl.gov)
      </Documentation>
 
      <StringVectorProperty name="FileName"
@@ -6590,7 +6610,7 @@
                            animateable="0" >
        <FileListDomain name="files"/>
        <Documentation>
-         This property specifies the file name to read.
+         This property specifies the file name to read.  It should be an MPAS format NetCDF file ending in .nc.
        </Documentation>
      </StringVectorProperty>
 
@@ -6614,7 +6634,7 @@
          </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         This property lists which netCDF dual-grid point variables to load.
+         This property lists which NetCDF dual-grid point variables to load.
        </Documentation>
      </StringVectorProperty>
 
@@ -6638,9 +6658,88 @@
          </RequiredProperties>
        </ArraySelectionDomain>
        <Documentation>
-         This property lists which netCDF dual-grid cell variables to load.
+         This property lists which NetCDF dual-grid cell variables to load.
        </Documentation>
      </StringVectorProperty>
+
+     <IntVectorProperty
+         name="ProjectLatLon"
+         command="SetProjectLatLon"
+         number_of_elements="1"
+         default_values="0">
+       <BooleanDomain name="bool" />
+         <Documentation>
+           This property indicates whether to view the data in the lat/lon projection.
+         </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="ShowMultilayerView"
+         command="SetShowMultilayerView"
+         number_of_elements="1"
+         default_values="0">
+       <BooleanDomain name="bool" />
+         <Documentation>
+           This property indicates whether to show multiple layers in one view, with each vertical level having the same thickness, specified by the layer thickness slider.  For ocean data, the layers correspond to data at vertical level whose number increases towards the center of the sphere.  For atmospheric data, the layers correspond to data at vertical levels increasing away from the center.
+         </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="IsAtmosphere"
+         command="SetIsAtmosphere"
+         number_of_elements="1"
+         default_values="0">
+       <BooleanDomain name="bool" />
+         <Documentation>
+           This property indicates whether data is atmospheric.  Checking this ensures the vertical levels will go up away from the sphere instead of down towards the center.
+         </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="LayerThicknessRangeInfo"
+        command="GetLayerThicknessRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="LayerThickness"
+         label="Layer Thickness"
+         command="SetLayerThickness"
+         number_of_elements="1"
+         default_values="10">
+       <IntRangeDomain name="LayerThicknessRange">
+       <RequiredProperties>
+         <Property name="LayerThicknessRangeInfo" function="Range"/>
+       </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+       This property specifies how thick the layer should be if viewing the data in multilayer view.  Each layer corresponds to a vertical level.  A good starting point is 100,000 for the spherical view and 10 for the lat/lon projection.  Click on -Z after applying this change, since the scale may change drastically.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="CenterLonRangeInfo"
+        command="GetCenterLonRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="CenterLon"
+         label="Center Longitude"
+         command="SetCenterLon"
+         number_of_elements="1"
+         default_values="180">
+       <IntRangeDomain name="CenterLonRange">
+       <RequiredProperties>
+         <Property name="CenterLonRangeInfo" function="Range"/>
+       </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+       This property specifies where the center will be viewed for a lat/lon projection.
+       </Documentation>
+     </IntVectorProperty>
 
      <IntVectorProperty
          name="VerticalLevelRangeInfo"
@@ -6659,7 +6758,11 @@
            <Property name="VerticalLevelRangeInfo" function="Range"/>
          </RequiredProperties>
        </IntRangeDomain>
+       <Documentation>
+       This property specifies which vertical level is viewed if not in multilayer view.  Only the data for that vertical level will be viewed. The grid is essentially the same for each vertical level, however at some ocean levels, especially the lower ones, due to the topography, the grid becomes more sparse where there is land.
+       </Documentation>
      </IntVectorProperty>
+
 
      <DoubleVectorProperty
          name="TimestepValues"
@@ -6669,14 +6772,12 @@
      </DoubleVectorProperty>
 
      <Hints>
-       <ReaderFactory extensions="ncdf nc"
+       <ReaderFactory extensions="nc"
                       file_description="MPAS NetCDF (Unstructured)" />
      </Hints>
 
    </SourceProxy>
    <!-- End MPASReader -->
-
-
 
     <FileSeriesReaderProxy name="P3DReader"
                         class="vtkFileSeriesReader"

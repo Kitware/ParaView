@@ -64,12 +64,14 @@
 
       <IntVectorProperty name="RenderMode"
         command="SetRenderMode"
-        default_values="2"
+        default_values="3"
         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="2" text="SimplePoint"/>
-          <Entry value="1" text="Texture"/>
           <Entry value="0" text="Sphere"/>
+          <Entry value="1" text="Texture"/>
+          <Entry value="2" text="SimplePoint"/>
+          <Entry value="3" text="Sphere (Texture)"/>
+          <Entry value="4" text="Blur (Texture)"/>
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -278,7 +280,7 @@
 
    <ProxyGroup name="sources">
      <SourceProxy name="ImageSpriteSource" class="vtkImageSpriteSource"
-                label="Mandelbrot">
+                label="ImageSprite">
       <Documentation
         long_help="ImageSpriteSource produces images with pixel values determined by a Gaussian, and alpha value either proportional to luminance or masking the sprite."
         short_help="ImageSpriteSource produces images with pixel values determined by a Gaussian, and alpha value either proportional to luminance or masking the sprite.">

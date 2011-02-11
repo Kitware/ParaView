@@ -17,7 +17,6 @@ if(APPLE)
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
-  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
 
   if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
     if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
@@ -101,6 +100,10 @@ else()
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
 endif()
 
+if(APPLE)
+  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
+endif()
+
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
 string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
@@ -136,8 +139,14 @@ set(ParaView_dependencies)
 set(MPI_ARGS)
 
 if(NOT APPLE)
-  include(External_OpenMPI)
-  list(APPEND ParaView_dependencies OpenMPI)
+
+  if(WIN32)
+    include(External_OpenMPI)
+    list(APPEND ParaView_dependencies OpenMPI)
+  else()
+    include(External_MPICH2)
+    list(APPEND ParaView_dependencies MPICH2)
+  endif()
 
   set(MPI_ARGS
     -DPARAVIEW_USE_MPI:BOOL=ON
@@ -146,6 +155,13 @@ if(NOT APPLE)
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
     -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
     -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
+
+  if(NOT WIN32)
+    set(MPI_COMPILER_ARGS
+       -DCMAKE_C_COMPILER:FILEPTH=${MPI_C_COMPILER}
+       -DCMAKE_CXX_COMPILER:FILEPATH=${MPI_CXX_COMPILER})
+    list(APPEND MPI_ARGS ${MPI_COMPILER_ARGS})
+  endif()
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
@@ -163,6 +179,21 @@ if(NOT APPLE)
   endif()
 
   include(External_NUMPY)
+
+  if(NOT WIN32)
+    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Depenednecies for VisTrails" FALSE)
+    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
+    if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
+      # Build SIP and PyQt for vistrails plugin.
+      include(External_SIP)
+      list(APPEND PyQt_dependencies SIP)
+      include(External_PyQt)
+      list(APPEND ParaView_dependencies PyQt)
+
+      set(VISTRAILS_ARGS
+        -DPARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON)
+    endif()
+  endif()
 else()
 
   find_package(PythonInterp)
@@ -175,6 +206,13 @@ else()
   endif()
 
   find_package(MPI)
+  set(MPI_ARGS
+    -DPARAVIEW_USE_MPI:BOOL=ON
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
+    -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
+    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
+    -DPARAVIEW_INSTALL_MPIEXEC:BOOL=OFF)
 
   include(External_NUMPY)
 endif()
@@ -269,6 +307,8 @@ ExternalProject_Add(${proj}
     #-DSILO_INCLUDE_DIR:PATH=
     #-DSILO_LIBRARY:FILEPATH=
     # Documentation
+    # VisTrails
+    ${VISTRAILS_ARGS}
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )

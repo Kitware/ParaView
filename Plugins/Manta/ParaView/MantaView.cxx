@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqMantaView.h
+  Module:    MantaView.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    pqMantaView.h
+  Module:    MantaView.cxx
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,40 +58,22 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME pqMantaView -
-// .SECTION Description
-//
 
-#ifndef _pqMantaView_h
-#define _pqMantaView_h
+#include "MantaView.h"
 
-#include "pqRenderView.h"
-
-class pqMantaView : public pqRenderView
+//-----------------------------------------------------------------------------
+MantaView::MantaView(
+  const QString& viewType,
+  const QString& group,
+  const QString& name,
+  vtkSMViewProxy* viewProxy,
+  pqServer* server,
+  QObject* p)
+  : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
-  Q_OBJECT
-  typedef pqRenderView Superclass;
-public:
-  static QString mantaViewType() { return "MantaView"; }
-  static QString mantaViewTypeName() { return "Manta Rendered 3D View"; }
+}
 
-  /// constructor takes a bunch of init stuff and must have this signature to
-  /// satisfy pqView
-  pqMantaView(
-         const QString& viewtype,
-         const QString& group,
-         const QString& name,
-         vtkSMViewProxy* viewmodule,
-         pqServer* server,
-         QObject* p);
-  ~pqMantaView();
-
-protected:
-
-private:
-  pqMantaView(const pqMantaView&); // Not implemented.
-  void operator=(const pqMantaView&); // Not implemented.
-
-};
-
-#endif // _pqMantaView_h
+//-----------------------------------------------------------------------------
+MantaView::~MantaView()
+{
+}

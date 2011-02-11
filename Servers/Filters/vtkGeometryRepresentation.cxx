@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -39,6 +40,7 @@
 #include "vtkShadowMapBakerPass.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredDataDeliveryFilter.h"
+#include "vtkUnstructuredGrid.h"
 
 //*****************************************************************************
 class vtkGeometryRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorithm
@@ -99,6 +101,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   //this->Property->SetOpacity(0.5);
   this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
+  this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
+                                             // connected to the LOD pipeline.
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
@@ -231,6 +235,49 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     }
 
   return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+}
+
+//----------------------------------------------------------------------------
+int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
+
+  // ensure that the ghost-level information is setup correctly to avoid
+  // internal faces for unstructured grids.
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+  for (int cc=0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
+    {
+    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
+      {
+      vtkInformation* inInfo = inputVector[cc]->GetInformationObject(kk);
+
+      vtkStreamingDemandDrivenPipeline* sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+      int ghostLevels = sddp->GetUpdateGhostLevel(inInfo);
+      if (controller->GetNumberOfProcesses() > 1)
+        {
+        vtkUnstructuredGrid* ug_input = vtkUnstructuredGrid::GetData(inInfo);
+        vtkCompositeDataSet* cd_input = vtkCompositeDataSet::GetData(inInfo);
+        if (ug_input || cd_input)
+          {
+          // ensure that there's no WholeExtent to ensure
+          // that this UG was never born out of a structured dataset.
+          bool has_whole_extent = (inInfo->Has(
+              vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+          if (!has_whole_extent)
+            {
+            ghostLevels++;
+            }
+          }
+        }
+      sddp->SetUpdateGhostLevel(inInfo, ghostLevels);
+      }
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

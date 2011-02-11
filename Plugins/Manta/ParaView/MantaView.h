@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    PrioritizingView.cxx
+  Module:    MantaView.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    PrioritizingView.cxx
+  Module:    MantaView.h
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,21 +58,40 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME MantaView - QT GUI interface to a Manta Rendered 3D View
+// .SECTION Description
+// This is the Qt layer interface to the Manta Rendered 3D view.
 
-#include "PrioritizingView.h"
+#ifndef _MantaView_h
+#define _MantaView_h
 
-#include "vtkSMOutputPort.h"
+#include "pqRenderView.h"
 
-//-----------------------------------------------------------------------------
-PrioritizingView::PrioritizingView(
-  const QString& viewType,
-  const QString& group,
-  const QString& name,
-  vtkSMViewProxy* viewProxy,
-  pqServer* server,
-  QObject* p)
-  : StreamingView(viewType, group, name, viewProxy, server, p)
+class MantaView : public pqRenderView
 {
-  //choose a default piece to ask about for info
-  vtkSMOutputPort::SetDefaultPiece(0,16,1.0);
-}
+  Q_OBJECT
+  typedef pqRenderView Superclass;
+public:
+  static QString mantaViewType() { return "MantaView"; }
+  static QString mantaViewTypeName() { return "Manta Rendered 3D View"; }
+
+  /// constructor takes a bunch of init stuff and must have this signature to
+  /// satisfy pqView
+  MantaView(
+         const QString& viewtype,
+         const QString& group,
+         const QString& name,
+         vtkSMViewProxy* viewmodule,
+         pqServer* server,
+         QObject* p);
+  ~MantaView();
+
+protected:
+
+private:
+  MantaView(const MantaView&); // Not implemented.
+  void operator=(const MantaView&); // Not implemented.
+
+};
+
+#endif // _MantaView_h

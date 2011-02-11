@@ -67,8 +67,12 @@ public:
   void DeletePiece(int i);
 
   //Description:
-  //Removes all data from the cache.
+  //Removes all data from the cache (and append slot)
   void EmptyCache();
+
+  //Description:
+  //Removes all data from the append slot.
+  void EmptyAppend();
 
   //Description:
   //Convert piece/number of pieces into a unique cache slot index
@@ -122,8 +126,6 @@ protected:
   virtual int RequestData(vtkInformation *,
                           vtkInformationVector **,
                           vtkInformationVector *);
-
-  void ClearAppendTable();
 
 //BTX
   //The cache is a map of slots to datasets. The datasets are stored with their

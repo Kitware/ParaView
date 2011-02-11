@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QModelIndex;
 class QPoint;
 class pqServer;
+class QShowEvent;
 
 /**
   Provides a standard file dialog "front-end" for the pqFileDialogModel
@@ -156,6 +157,8 @@ protected:
   bool acceptDefault(const bool &checkForGrouping);
 
   QStringList buildFileGroup(const QString &filename);
+
+  virtual void showEvent( QShowEvent *event );
 
 private slots:
   void onModelReset();

@@ -53,7 +53,7 @@ vtkMantaManager::vtkMantaManager()
   this->MantaLightSet = NULL;
   this->MantaCamera = NULL;
   this->SyncDisplay = NULL;
-  this->ChannelId = NULL;
+  this->ChannelId = 0;
 }
 
 //----------------------------------------------------------------------------

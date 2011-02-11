@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkPVServerOptions.h
 
@@ -15,7 +15,7 @@
 // .NAME vtkPVServerOptions - ParaView options storage
 // .SECTION Description
 // An object of this class represents a storage for ParaView options
-// 
+//
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
@@ -45,9 +45,9 @@ public:
   const char* GetDisplayName(unsigned int idx);
   double* GetLowerLeft(unsigned int idx);
   double* GetLowerRight(unsigned int idx);
-  double* GetUpperLeft(unsigned int idx);
+  double* GetUpperRight(unsigned int idx);
 
-protected: 
+protected:
   // Description:
   // Add machine information from the xml tag <Machine ....>
   int AddMachineInformation(const char** atts);

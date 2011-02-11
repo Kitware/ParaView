@@ -14,10 +14,9 @@
 =========================================================================*/
 #include "vtkAMRDualContour.h"
 #include "vtkAMRDualGridHelper.h"
-
 #include "vtkstd/vector"
 
-// Pipeline & VTK 
+// Pipeline & VTK
 #include "vtkMarchingCubesCases.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformation.h"
@@ -33,12 +32,14 @@
 #include "vtkDataSet.h"
 #include "vtkCellData.h"
 #include "vtkPointData.h"
+#include "vtkFloatArray.h"
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkHierarchicalBoxDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkAMRBox.h"
 #include "vtkCellArray.h"
@@ -80,7 +81,7 @@ public:
   // Dims are for the dual cells including ghost layers. 
   // This is called multiple times to prepare for a new block.
   void Initialize(int xDualCellDim, int yDualCellDim, int zDualCellDim);
-  
+
   // Description:
   // Lookup and seting uses this pointer. Using a pointer keeps
   // the contour filter from having to lookup a point and second
@@ -108,7 +109,7 @@ public:
  void ShareBlockLocatorWithNeighbor(
     vtkAMRDualGridHelperBlock* block,
     vtkAMRDualGridHelperBlock* neighbor);
-   
+
 
 private:
 
@@ -122,7 +123,7 @@ private:
   vtkIdType* YEdges;
   vtkIdType* ZEdges;
   vtkIdType* Corners;
-  
+
   int RegionLevelDifference[3][3][3];
 };
 //----------------------------------------------------------------------------
@@ -163,8 +164,8 @@ void vtkAMRDualContourEdgeLocator::Initialize(
   int yDualCellDim, 
   int zDualCellDim)
 {
-  if (xDualCellDim != this->DualCellDimensions[0] 
-          || yDualCellDim != this->DualCellDimensions[1] 
+  if (xDualCellDim != this->DualCellDimensions[0]
+          || yDualCellDim != this->DualCellDimensions[1]
           || zDualCellDim != this->DualCellDimensions[2])
     {
     if (this->XEdges)
@@ -197,7 +198,7 @@ void vtkAMRDualContourEdgeLocator::Initialize(
       this->DualCellDimensions[2] = 0;
       }
     }
-      
+
   for (int idx = 0; idx < this->ArrayLength; ++idx)
     {
     this->XEdges[idx] = this->YEdges[idx] = this->ZEdges[idx] = -1;
@@ -261,7 +262,7 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetEdgePointer(
     {
     ++zp1;
     }
-  
+
   // Now we can adjust the cell index based on degeneracy.
   // This is tricky with edges.  Two points in two regions.
   // We can ignore any edge that collapses to a point.
@@ -348,7 +349,7 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetCornerPointer(
   xCell += cornerIdx & 1;
   yCell += (cornerIdx & 2) >> 1;
   zCell += (cornerIdx & 4) >> 2;
-  
+
   // For degenerate regions we do not need to worry about corners.
   // Too many cases (18)  generalize it.
   int rx, ry, rz;
@@ -359,7 +360,7 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetCornerPointer(
   if (yCell == this->DualCellDimensions[1]) {ry=2;}
   if (zCell == 0) {rz=0;}
   if (zCell == this->DualCellDimensions[2]) {rz=2;}
-  
+
   if ( (diff = this->RegionLevelDifference[rx][ry][rz]) )
     {
     if (rx == 1 && xCell > 0)
@@ -375,81 +376,8 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetCornerPointer(
       zCell = (((zCell - 1) >> diff) << diff) + 1;
       }
     }
-   
-  return this->Corners + (xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement));
-}
-  
-//----------------------------------------------------------------------------
-// Deprecciated
-void vtkAMRDualContourEdgeLocator::SharePointIdsWithNeighbor(
-  vtkAMRDualContourEdgeLocator* neighborLocator,
-  int rx, int ry, int rz)
-{
-  int outMinX = 0;
-  int outMinY = 0;
-  int outMinZ = 0;
-  // Compute the extent of the locator to copy.
-  int ext[6];
-  // Copy all possible overlap.
-  // Moving too many will not hurt.
-  ext[0] = 0;
-  ext[1] = this->DualCellDimensions[0];
-  if (rx == -1) { ext[1] = 1; outMinX = this->DualCellDimensions[0]-1; }
-  else if (rx == 1) { ext[0] = this->DualCellDimensions[0]-1; }
-  ext[2] = 0;
-  ext[3] = this->DualCellDimensions[1];
-  if (ry == -1) { ext[3] = 1; outMinY = this->DualCellDimensions[1]-1;}
-  else if (ry == 1) { ext[2] = this->DualCellDimensions[1]-1; }
-  ext[4] = 0;
-  ext[5] = this->DualCellDimensions[2];
-  if (rz == -1) { ext[5] = 1; outMinZ = this->DualCellDimensions[2]-1;}
-  else if (rz == 1) { ext[4] = this->DualCellDimensions[2]-1; }
 
-  vtkIdType pointId;
-  int inOffsetZ = ext[0] + ext[2]*this->YIncrement + ext[4]*this->ZIncrement;
-  int inOffsetY, inOffsetX;
-  int outOffsetZ = outMinX + outMinY*this->YIncrement + outMinZ*this->ZIncrement;
-  int outOffsetY, outOffsetX;
-  for (int z = ext[4]; z <= ext[5]; ++z)
-    {
-    inOffsetY = inOffsetZ;
-    outOffsetY = outOffsetZ;
-    for (int y = ext[2]; y <= ext[3]; ++y)
-      {
-      inOffsetX = inOffsetY;
-      outOffsetX = outOffsetY;
-      for (int x = ext[0]; x <= ext[1]; ++x)
-        {
-        pointId = this->XEdges[inOffsetX];
-        if (pointId > 0)
-          {
-          neighborLocator->XEdges[outOffsetX] = pointId;
-          }
-        pointId = this->YEdges[inOffsetX];
-        if (pointId > 0)
-          {
-          neighborLocator->YEdges[outOffsetX] = pointId;
-          }
-        pointId = this->ZEdges[inOffsetX];
-        if (pointId > 0)
-          {
-          neighborLocator->ZEdges[outOffsetX] = pointId;
-          }
-        pointId = this->Corners[inOffsetX];
-        if (pointId > 0)
-          {
-          neighborLocator->Corners[outOffsetX] = pointId;
-          }
-          
-        inOffsetX += 1;
-        outOffsetX += 1;
-        }
-      inOffsetY += this->YIncrement;
-      outOffsetY += this->YIncrement;
-      }
-    inOffsetZ += this->ZIncrement;
-    outOffsetZ += this->ZIncrement;
-    }
+  return this->Corners + (xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement));
 }
 
 
@@ -536,7 +464,7 @@ void vtkAMRDualContourEdgeLocator::ShareBlockLocatorWithNeighbor(
   vtkIdType pointId;
   int xOut, yOut, zOut;
   int inOffsetZ, inOffsetY, inOffsetX, outOffsetX, outOffsetY, outOffsetZ;
-  inOffsetZ = ext[0] + ext[2]*blockLocator->YIncrement + ext[4]*blockLocator->ZIncrement;  
+  inOffsetZ = ext[0] + ext[2]*blockLocator->YIncrement + ext[4]*blockLocator->ZIncrement;
   for (int zIn = ext[4]; zIn <= ext[5]; ++zIn)
     {
     inOffsetY = inOffsetZ;
@@ -557,7 +485,7 @@ void vtkAMRDualContourEdgeLocator::ShareBlockLocatorWithNeighbor(
         xOut = ((xIn + block->OriginIndex[0]) << levelDiff) - neighbor->OriginIndex[0];
         if (xOut < 0) { xOut = 0; } 
         outOffsetX = outOffsetY + xOut;
-        
+
         pointId = blockLocator->XEdges[inOffsetX];
         if (pointId >= 0)
           {
@@ -578,7 +506,7 @@ void vtkAMRDualContourEdgeLocator::ShareBlockLocatorWithNeighbor(
           {
           neighborLocator->Corners[outOffsetX] = pointId;
           }
-        
+
         inOffsetX += 1;
         } 
       inOffsetY += blockLocator->YIncrement;
@@ -602,7 +530,7 @@ vtkAMRDualContour::vtkAMRDualContour()
 {
   this->IsoValue = 100.0;
   this->SkipGhostCopy = 0;
-  
+
   this->EnableDegenerateCells = 1;
   this->EnableCapping = 1;
   this->EnableMultiProcessCommunication = 1;
@@ -612,8 +540,8 @@ vtkAMRDualContour::vtkAMRDualContour()
 
   // Pipeline
   this->SetNumberOfOutputPorts(1);
-  
 
+  this->TemperatureArray = 0;
   this->BlockIdCellArray = 0;
   this->Helper = 0;
 
@@ -641,7 +569,7 @@ void vtkAMRDualContour::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkAMRDualContour::FillInputPortInformation(int /*port*/,
-                                                    vtkInformation *info)
+                                                vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
 
@@ -713,7 +641,7 @@ int vtkAMRDualContour::RequestData(
     vtkErrorMacro("Missing field name.");
     return 0;
     }
-  const char *arrayNameToProcess = inArrayInfo->Get(vtkDataObject::FIELD_NAME());      
+  const char *arrayNameToProcess = inArrayInfo->Get(vtkDataObject::FIELD_NAME());
 
 
   this->Helper = vtkAMRDualGridHelper::New();
@@ -722,17 +650,19 @@ int vtkAMRDualContour::RequestData(
   this->Helper->SetSkipGhostCopy(this->SkipGhostCopy);
   this->Helper->Initialize(hbdsInput, arrayNameToProcess);
 
-  vtkPolyData* mesh = vtkPolyData::New();
+  this->Mesh = vtkPolyData::New();
   this->Points = vtkPoints::New();
   this->Faces = vtkCellArray::New();
-  mesh->SetPoints(this->Points);
-  mesh->SetPolys(this->Faces);
-  mpds->SetPiece(0, mesh);
+  this->Mesh->SetPoints(this->Points);
+  this->Mesh->SetPolys(this->Faces);
+  mpds->SetPiece(0, this->Mesh);
+
+  this->InitializeCopyAttributes(hbdsInput, this->Mesh);
   
   // For debugging.
   this->BlockIdCellArray = vtkIntArray::New();
   this->BlockIdCellArray->SetName("BlockIds");
-  mesh->GetCellData()->AddArray(this->BlockIdCellArray);
+  this->Mesh->GetCellData()->AddArray(this->BlockIdCellArray);
 
   // Loop through blocks
   int numLevels = hbdsInput->GetNumberOfLevels();
@@ -750,10 +680,12 @@ int vtkAMRDualContour::RequestData(
       }
     }
 
+  this->FinalizeCopyAttributes(this->Mesh);
   this->BlockIdCellArray->Delete();
   this->BlockIdCellArray = 0;
 
-  mesh->Delete();
+  this->Mesh->Delete();
+  this->Mesh = 0;
   this->Points->Delete();
   this->Points = 0;
   this->Faces->Delete();
@@ -767,26 +699,6 @@ int vtkAMRDualContour::RequestData(
 }
 
 //----------------------------------------------------------------------------
-// The only data specific stuff we need to do for the contour.
-template <class T>
-void vtkDualGridContourExtractCornerValues(
-  T* ptr, int yInc, int zInc,
-  double values[8]) 
-{
-  // Because of the marching cubes case table, I am stuck with
-  // VTK's indexing of corners.
-  values[0] = (double)(*ptr);
-  values[1] = (double)(ptr[1]);
-  values[2] = (double)(ptr[1+yInc]);
-  values[3] = (double)(ptr[yInc]);
-  values[4] = (double)(ptr[zInc]);
-  values[5] = (double)(ptr[1+zInc]);
-  values[6] = (double)(ptr[1+yInc+zInc]);
-  values[7] = (double)(ptr[yInc+zInc]);
-}
-
-
-//----------------------------------------------------------------------------
 void vtkAMRDualContour::ShareBlockLocatorWithNeighbors(
   vtkAMRDualGridHelperBlock* block)
 {
@@ -796,8 +708,8 @@ void vtkAMRDualContour::ShareBlockLocatorWithNeighbors(
   int numLevels = this->Helper->GetNumberOfLevels();
   int xMid, yMid, zMid;
   int xMin, xMax, yMin, yMax, zMin, zMax;
-  
-  
+
+
   for (int level = block->Level; level < numLevels; ++level)
     {
     // Neighborhood.
@@ -819,25 +731,21 @@ void vtkAMRDualContour::ShareBlockLocatorWithNeighbors(
         {
         for (int ix = xMin; ix <=xMax; ++ix)
           {
-          if ((ix >> levelDiff) != xMid || 
-              (iy >> levelDiff) != yMid || 
+          if ((ix >> levelDiff) != xMid ||
+              (iy >> levelDiff) != yMid ||
               (iz >> levelDiff) != zMid)
             {
             neighbor = this->Helper->GetBlock(level, ix, iy, iz); 
             // The unused center flag is used as a flag to indicate
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1])
               {
-              // This worked for neighbors in the same level.
-              //vtkAMRDualContourEdgeLocator* blockLocator = vtkAMRDualContourGetBlockLocator(block);
-              //vtkAMRDualContourEdgeLocator* neighborLocator = vtkAMRDualContourGetBlockLocator(neighbor);
-              //blockLocator->SharePointIdsWithNeighbor(neighborLocator, ix-xMid, iy-yMid, iz-zMid);
               vtkAMRDualContourEdgeLocator* blockLocator = vtkAMRDualContourGetBlockLocator(block);
               blockLocator->ShareBlockLocatorWithNeighbor(block, neighbor);
               }
             }
           }
         }
-      }     
+      }
     }
 }
 
@@ -853,12 +761,10 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     { // Remote blocks are only to setup local block bit flags.
     return;
     }
-  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   double  origin[3];
   double* spacing;
   int     extent[6];
-  
+
   // Get the origin and point extent of the dual grid (with ghost level).
   // This is the same as the cell extent of the original grid (with ghosts).
   image->GetExtent(extent);
@@ -890,19 +796,17 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   
   // We deal with the various data types by copying the corner values
   // into a double array.  We have to cast anyway to compute the case.
-  double cornerValues[8];
+  vtkIdType cornerOffsets[8];
 
   // The templated function needs the increments for pointers 
   // cast to the correct datatype.
   int yInc = (extent[1]-extent[0]+1);
   int zInc = yInc * (extent[3]-extent[2]+1);
   // Use void pointers to march through the volume before we cast.
-  int dataType = volumeFractionArray->GetDataType();
-  int xVoidInc = volumeFractionArray->GetDataTypeSize();
-  int yVoidInc = xVoidInc * yInc;
-  int zVoidInc = xVoidInc * zInc;
-
-  int cubeIndex;
+  //int dataType = volumeFractionArray->GetDataType();
+  //int xVoidInc = volumeFractionArray->GetDataTypeSize();
+  //int yVoidInc = xVoidInc * yInc;
+  //int zVoidInc = xVoidInc * zInc;
 
   // Loop over all the cells in the dual grid.
   int x, y, z;
@@ -913,9 +817,10 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   int yMax = extent[3]-1;
   int zMax = extent[5]-1;
   //-
-  unsigned char* zPtr = (unsigned char*)(volumeFractionPtr);
-  unsigned char* yPtr;
-  unsigned char* xPtr;
+  vtkIdType zOffset = 0;
+  vtkIdType yOffset = 0;
+  vtkIdType xOffset = 0;
+  //-
   for (z = extent[4]; z < extent[5]; ++z)
     {
     int nz = 1;
@@ -923,7 +828,7 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     else if (z == zMax) {nz = 2;}
     sz = spacing[2];
     oz = origin[2] + (double)(z)*sz;
-    yPtr = zPtr;
+    yOffset = zOffset;
     for (y = extent[2]; y < extent[3]; ++y)
       {
       int ny = 1;
@@ -931,7 +836,7 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
       else if (y == yMax) {ny = 2;}
       sy = spacing[1];
       oy = origin[1] + (double)(y)*sy;
-      xPtr = yPtr;
+      xOffset = yOffset;
       for (x = extent[0]; x < extent[1]; ++x)
         {
         int nx = 1;
@@ -942,62 +847,27 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
         // Skip the cell if a neighbor is already processing it.
         if ( (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitOwner) )
           {
-          // Get the corner values as doubles
-          switch (dataType)
-            {
-            vtkTemplateMacro(vtkDualGridContourExtractCornerValues(
-                             (VTK_TT *)(xPtr), yInc, zInc,
-                             cornerValues));
-            default:
-              vtkGenericWarningMacro("Execute: Unknown ScalarType");
-            }
-          // compute the case index
-          cubeIndex = 0;
-          if (cornerValues[0] > this->IsoValue)
-            {
-            cubeIndex += 1;
-            }
-          if (cornerValues[1] > this->IsoValue)
-            {
-            cubeIndex += 2;
-            }
-          if (cornerValues[2] > this->IsoValue)
-            {
-            cubeIndex += 4;
-            }
-          if (cornerValues[3] > this->IsoValue)
-            {
-            cubeIndex += 8;
-            }
-          if (cornerValues[4] > this->IsoValue)
-            {
-            cubeIndex += 16;
-            }
-          if (cornerValues[5] > this->IsoValue)
-            {
-            cubeIndex += 32;
-            }
-          if (cornerValues[6] > this->IsoValue)
-            {
-            cubeIndex += 64;
-            }
-          if (cornerValues[7] > this->IsoValue)
-            {
-            cubeIndex += 128;
-            }
-          this->ProcessDualCell(block, blockId,
-                                cubeIndex, x, y, z,
-                                cornerValues);
+          // Get the corner values as offsets
+          cornerOffsets[0] = xOffset;
+          cornerOffsets[1] = xOffset+1;
+          cornerOffsets[2] = xOffset+1+yInc;
+          cornerOffsets[3] = xOffset+yInc;
+          cornerOffsets[4] = xOffset+zInc;
+          cornerOffsets[5] = xOffset+1+zInc;
+          cornerOffsets[6] = xOffset+1+yInc+zInc;
+          cornerOffsets[7] = xOffset+yInc+zInc;
+          this->ProcessDualCell(block, blockId, x, y, z,
+                                cornerOffsets);
           }
-        xPtr += xVoidInc;
+        xOffset += 1; // xInc
         }
-      yPtr += yVoidInc;
+      yOffset += yInc;
       }
-    zPtr += zVoidInc;
+    zOffset += zInc;
     }
-            
+
   if (this->EnableMergePoints)
-    { 
+    {
     // Copy point ids into neighbor locators.
     this->ShareBlockLocatorWithNeighbors(block);
     // We are done.  We no longer need the locator for this block.
@@ -1016,6 +886,20 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
 
 
 
+//----------------------------------------------------------------------------
+template <class T>
+void vtkDualGridContourCastCornerValues(
+  T* ptr, vtkIdType offsets[8], double values[8])
+{
+  values[0] = (double)(ptr[offsets[0]]);
+  values[1] = (double)(ptr[offsets[1]]);
+  values[2] = (double)(ptr[offsets[2]]);
+  values[3] = (double)(ptr[offsets[3]]);
+  values[4] = (double)(ptr[offsets[4]]);
+  values[5] = (double)(ptr[offsets[5]]);
+  values[6] = (double)(ptr[offsets[6]]);
+  values[7] = (double)(ptr[offsets[7]]);
+}
 
 
 // Generic table for clipping a square.
@@ -1055,17 +939,74 @@ static int vtkAMRDualIsoPYCapEdgeMap[8] = {2,3,7,6 ,2,11,6,10};
 static int vtkAMRDualIsoNZCapEdgeMap[8] = {0,1,3,2 ,0,1,2,3};
 static int vtkAMRDualIsoPZCapEdgeMap[8] = {6,7,5,4 ,6,5,4,7};
 
+// WHat a pain using two different vertex orders.
+static int vtkAMRDualLegacyIdToBitIdMap[8] = {0,1,3,2,4,5,7,6};
+
+
 
 
 //----------------------------------------------------------------------------
 // Not implemented as optimally as we could.  It can be improved by making
 // a fast path for internal cells (with no degeneracies).
+// Corner offsets are absolute (relative to origin / 0).
 void vtkAMRDualContour::ProcessDualCell(
   vtkAMRDualGridHelperBlock* block, int blockId,
-  int cubeCase,
   int x, int y, int z,
-  double cornerValues[8])
+  vtkIdType cornerOffsets[8])
 {
+  // compute the case index
+  vtkImageData* image = block->Image;
+  if (image == 0)
+    { // Remote blocks are only to setup local block bit flags.
+    return;
+    }
+
+  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
+  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
+  int dataType = volumeFractionArray->GetDataType();
+  double cornerValues[8];
+  switch (dataType)
+    {
+    vtkTemplateMacro(vtkDualGridContourCastCornerValues(
+                     (VTK_TT *)(volumeFractionPtr), cornerOffsets, cornerValues));
+    default:
+      vtkGenericWarningMacro("Execute: Unknown ScalarType");
+    }
+
+  unsigned char cubeCase = 0;
+  if (cornerValues[0] > this->IsoValue)
+    {
+    cubeCase += 1;
+    }
+  if (cornerValues[1] > this->IsoValue)
+    {
+    cubeCase += 2;
+    }
+  if (cornerValues[2] > this->IsoValue)
+    {
+    cubeCase += 4;
+    }
+  if (cornerValues[3] > this->IsoValue)
+    {
+    cubeCase += 8;
+    }
+  if (cornerValues[4] > this->IsoValue)
+    {
+    cubeCase += 16;
+    }
+  if (cornerValues[5] > this->IsoValue)
+    {
+    cubeCase += 32;
+    }
+  if (cornerValues[6] > this->IsoValue)
+    {
+    cubeCase += 64;
+    }
+  if (cornerValues[7] > this->IsoValue)
+    {
+    cubeCase += 128;
+    }
+
   // I am trying to exit as quick as possible if there is
   // no surface to generate.  I could also check that the index
   // is not on boundary.
@@ -1077,7 +1018,7 @@ void vtkAMRDualContour::ProcessDualCell(
   // Which boundaries does this cube/cell touch?
   unsigned char cubeBoundaryBits = 0;
   // If this cell is degenerate, then remove triangles with 2 points.
-  int degenerateFlag = 0;  
+  int degenerateFlag = 0;
   
   int nx, ny, nz; // Neighbor index [3][3][3];
   vtkIdType pointIds[6];
@@ -1096,7 +1037,7 @@ void vtkAMRDualContour::ProcessDualCell(
     lowerSpacing[ii] = 2.0 * spacing[ii];
     }
   tmp = this->Helper->GetGlobalOrigin();
-  
+
   // Use this range to  determine which dual point index is ghost.
   int ghostDualPointIndexRange[6];
   block->Image->GetExtent(ghostDualPointIndexRange);
@@ -1125,16 +1066,16 @@ void vtkAMRDualContour::ProcessDualCell(
     int px, py, pz; // Corner global xyz index.
     // CornerIndex
     px =(c & 1)?gx+1:gx;
-    if (px == ghostDualPointIndexRange[0]) 
+    if (px == ghostDualPointIndexRange[0])
       {
       nx = 0;
-      if ( (block->BoundaryBits & 1) ) 
+      if ( (block->BoundaryBits & 1) )
         {
         dx = 1.0;
         cubeBoundaryBits = cubeBoundaryBits | 1;
         }
       }
-    else if (px == ghostDualPointIndexRange[1]) 
+    else if (px == ghostDualPointIndexRange[1])
       {
       nx = 2;
       if ( (block->BoundaryBits & 2) )
@@ -1148,7 +1089,7 @@ void vtkAMRDualContour::ProcessDualCell(
     if (py == ghostDualPointIndexRange[2]) 
       {
       ny = 0;
-      if ( (block->BoundaryBits & 4) ) 
+      if ( (block->BoundaryBits & 4) )
         {
         dy = 1.0;
         cubeBoundaryBits = cubeBoundaryBits | 4;
@@ -1165,7 +1106,7 @@ void vtkAMRDualContour::ProcessDualCell(
       }
     else {ny = 1;}
     pz =(c & 4)?gz+1:gz;
-    if (pz == ghostDualPointIndexRange[4]) 
+    if (pz == ghostDualPointIndexRange[4])
       {
       nz = 0;
       if ( (block->BoundaryBits & 16) )
@@ -1174,7 +1115,7 @@ void vtkAMRDualContour::ProcessDualCell(
         cubeBoundaryBits = cubeBoundaryBits | 16;
         }
       }
-    else if (pz == ghostDualPointIndexRange[5]) 
+    else if (pz == ghostDualPointIndexRange[5])
       {
       nz = 2;
       if ( (block->BoundaryBits & 32) )
@@ -1184,7 +1125,7 @@ void vtkAMRDualContour::ProcessDualCell(
         }
       }
     else {nz = 1;}
-    
+
     if (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask)
       { // point lies in lower level neighbor.
       degenerateFlag = 1;
@@ -1210,11 +1151,12 @@ void vtkAMRDualContour::ProcessDualCell(
       {
       // How do I chop the cells in half on the bondaries?
       // Move the tmp origin and change spacing.
-      cornerPoints[c<<2]     = tmp[0] + spacing[0] * ((double)(px)+dx); 
-      cornerPoints[(c<<2)|1] = tmp[1] + spacing[1] * ((double)(py)+dy); 
-      cornerPoints[(c<<2)|2] = tmp[2] + spacing[2] * ((double)(pz)+dz); 
+      cornerPoints[c<<2]     = tmp[0] + spacing[0] * ((double)(px)+dx);
+      cornerPoints[(c<<2)|1] = tmp[1] + spacing[1] * ((double)(py)+dy);
+      cornerPoints[(c<<2)|2] = tmp[2] + spacing[2] * ((double)(pz)+dz);
       }
     }
+
   // We have the points, now contour the cell.
   // Get edges.
   triCase = triCases + cubeCase;
@@ -1267,6 +1209,12 @@ void vtkAMRDualContour::ProcessDualCell(
         pt[1] = cornerPoints[pt1Idx|1] + k*(cornerPoints[pt2Idx|1]-cornerPoints[pt1Idx|1]);
         pt[2] = cornerPoints[pt1Idx|2] + k*(cornerPoints[pt2Idx|2]-cornerPoints[pt1Idx|2]);
         *ptIdPtr = this->Points->InsertNextPoint(pt);
+        // Interpolate attributes
+        // Find the offsets of the two attributes to interpolate
+        vtkIdType offset0 = cornerOffsets[vtkAMRDualIsoEdgeToVTKPointsTable[*edge][0]];
+        vtkIdType offset1 = cornerOffsets[vtkAMRDualIsoEdgeToVTKPointsTable[*edge][1]];
+        this->InterpolateAttributes(block->Image, offset0, offset1, k,
+                                    this->Mesh, *ptIdPtr);
         }
       edgePointIds[*edge] = pointIds[ii] = *ptIdPtr; 
       }
@@ -1279,9 +1227,11 @@ void vtkAMRDualContour::ProcessDualCell(
 
   if (this->EnableCapping)
     {
-    this->CapCell(x,y,z, cubeBoundaryBits, cubeCase, edgePointIds, cornerPoints, blockId);
+    this->CapCell(x,y,z, cubeBoundaryBits, cubeCase, edgePointIds, cornerPoints,
+                  cornerOffsets, blockId, block->Image);
     }
 }
+
 
 
 //----------------------------------------------------------------------------
@@ -1353,8 +1303,12 @@ void vtkAMRDualContour::CapCell(
   vtkIdType edgePointIds[12],
   // Locations of 8 corners (xyz4xyz4...); 4th value is not used.
   double cornerPoints[32],
+  // The id order is VTK from marching cube cases.  Different than axis orded "cornerPoints".
+  vtkIdType cornerOffsets[8],
   // For block id array (for debugging).  I should just make this an ivar.
-  int blockId)
+  int blockId,
+  // For passing attirbutes to output mesh
+  vtkDataSet* inData)
 {
   int cornerIdx;
   vtkIdType *ptIdPtr;
@@ -1376,6 +1330,8 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
           pointIds[ptCount++] = *ptIdPtr; 
           }
@@ -1406,8 +1362,10 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
-          pointIds[ptCount++] = *ptIdPtr; 
+          pointIds[ptCount++] = *ptIdPtr;
           }
         else
           {
@@ -1419,7 +1377,7 @@ void vtkAMRDualContour::CapCell(
       if (*capPtr == -1) {++capPtr;} // Skip to the next triangle.
       }
     }
-    
+
   // -Y
   if ( (cubeBoundaryBits & 4))
     {
@@ -1437,6 +1395,8 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
           pointIds[ptCount++] = *ptIdPtr; 
           }
@@ -1450,7 +1410,7 @@ void vtkAMRDualContour::CapCell(
       if (*capPtr == -1) {++capPtr;} // Skip to the next triangle.
       }
     }
-    
+
   // +Y
   if ( (cubeBoundaryBits & 8))
     {
@@ -1468,6 +1428,8 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
           pointIds[ptCount++] = *ptIdPtr; 
           }
@@ -1481,8 +1443,8 @@ void vtkAMRDualContour::CapCell(
       if (*capPtr == -1) {++capPtr;} // Skip to the next triangle.
       }
     }
-    
-    
+
+
   // -Z
   if ( (cubeBoundaryBits & 16))
     {
@@ -1500,6 +1462,8 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
           pointIds[ptCount++] = *ptIdPtr; 
           }
@@ -1531,6 +1495,8 @@ void vtkAMRDualContour::CapCell(
           if (*ptIdPtr == -1)
             {
             *ptIdPtr = this->Points->InsertNextPoint(cornerPoints+(cornerIdx<<2));
+            this->CopyAttributes(inData, cornerOffsets[vtkAMRDualLegacyIdToBitIdMap[cornerIdx]],
+                                 this->Mesh, *ptIdPtr);
             }
           pointIds[ptCount++] = *ptIdPtr; 
           }
@@ -1547,5 +1513,64 @@ void vtkAMRDualContour::CapCell(
 }
 
 
+//----------------------------------------------------------------------------
+//  Note that the out attribute arrays must be preallocated to correct size.
+template <class T>
+double vtkDualGridContourInterpolateAttribute(
+  T *inPtr, vtkIdType inId0, vtkIdType inId1, double k)
+{
+  double in0 = (double)(inPtr[inId0]);
+  return in0*(1.0-k) + k*(double)(inPtr[inId1]);
+}
+
+//============================================================================
+// Stuff for using input cell attributes to add output point attributes.
+// I am not using the built in Attribute methods for duing this, although
+// it is probably almost identical.
 
 
+//----------------------------------------------------------------------------
+void vtkAMRDualContour::InitializeCopyAttributes(
+  vtkHierarchicalBoxDataSet *hbdsInput,
+  vtkDataSet* mesh)
+{
+  // Most of this is just getting a block with cell attributes so we can
+  // call CopyAllocate.
+  vtkCompositeDataIterator* iter = hbdsInput->NewIterator();
+  iter->GetVisitOnlyLeaves();
+  iter->InitTraversal();
+  if (iter->IsDoneWithTraversal())
+    { // Empty input
+    return;
+    }
+  vtkDataObject *dataObject = iter->GetCurrentDataObject();
+  vtkUniformGrid* uGrid = vtkUniformGrid::SafeDownCast(dataObject);
+  if (uGrid == 0)
+    {
+    vtkErrorMacro("Expecting a uniform grid.");
+    }
+  mesh->GetPointData()->CopyAllocate(uGrid->GetCellData());
+}
+
+//----------------------------------------------------------------------------
+void vtkAMRDualContour::FinalizeCopyAttributes(vtkDataSet* mesh)
+{
+  mesh->GetPointData()->Squeeze();
+}
+
+//----------------------------------------------------------------------------
+void vtkAMRDualContour::InterpolateAttributes(
+  vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
+  vtkDataSet* mesh, vtkIdType outId)
+{
+  mesh->GetPointData()->InterpolateEdge(uGrid->GetCellData(),outId,offset0,offset1,k);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkAMRDualContour::CopyAttributes(
+  vtkDataSet* uGrid, vtkIdType inId,
+  vtkDataSet* mesh,  vtkIdType outId)
+{
+  mesh->GetPointData()->CopyData(uGrid->GetCellData(),inId, outId);
+}
