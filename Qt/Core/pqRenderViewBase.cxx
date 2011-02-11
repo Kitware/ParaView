@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkRenderWindow.h"
 
 // Qt Includes.
 #include <QList>
@@ -799,13 +800,18 @@ void pqRenderViewBase::setStereo(int mode)
   foreach (pqView* view, views)
     {
     vtkSMProxy* viewProxy = view->getProxy();
-    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoRender"),
-      mode != 0);
     pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoType"),
-      mode);
+      mode!=0? mode : VTK_STEREO_RED_BLUE);
+    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoRender"),
+      mode != 0? 1 : 0);
     viewProxy->UpdateVTKObjects();
+    if (mode != 0)
+      {
+      view->forceRender();
+      }
     }
 }
+
 //-----------------------------------------------------------------------------
 void pqRenderViewBase::beginDelayInteractiveRender()
 {
