@@ -29,25 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#include "pqApplicationCore.h"
 #include "pqContourPanel.h"
-#include "pqNamedWidgets.h"
-#include "pqPipelineFilter.h"
-#include "pqPropertyManager.h"
-#include "pqSampleScalarWidget.h"
-#include "pqProxySelectionWidget.h"
-
 #include "ui_pqContourControls.h"
 
-#include <pqCollapsedGroup.h>
-
-#include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMProxyProperty.h>
-#include <vtkSMSourceProxy.h>
-#include <vtkSMStringVectorProperty.h>
+#include "pqApplicationCore.h"
+#include "pqCollapsedGroup.h"
+#include "pqNamedWidgets.h"
+#include "pqOutputPort.h"
+#include "pqPipelineFilter.h"
+#include "pqPropertyManager.h"
+#include "pqProxySelectionWidget.h"
+#include "pqSampleScalarWidget.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <QCheckBox>
+#include <QPointer>
 #include <QVBoxLayout>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -67,6 +66,7 @@ public:
   Ui::pqContourControls Controls;
   /// Controls the number and values of contours
   pqSampleScalarWidget SampleScalarWidget;
+  QPointer<pqPipelineSource> PreviousInput;
 };
 
 pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
@@ -139,6 +139,13 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
 
   pqNamedWidgets::link(
     &this->Implementation->ControlsContainer, this->proxy(), this->propertyManager());
+
+  // Whenever input changes, we ensure that we update the enable state of the
+  // "Compute Normals", "Compute Gradients" and "Compute Scalars" widgets. These
+  // should be available only for structured datasets.
+  QObject::connect(object_proxy, SIGNAL(producerChanged(const QString&)),
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  this->updateEnableState();
 }
 
 pqContourPanel::~pqContourPanel()
@@ -154,4 +161,46 @@ void pqContourPanel::onAccepted()
 void pqContourPanel::onRejected()
 {
   this->Implementation->SampleScalarWidget.reset();
+}
+
+void pqContourPanel::updateEnableState()
+{
+  // Get the current input and ensure that we update the filter status when the
+  // input pipeline updates (in-case the data-type changes).
+  // Refer to BUG #11622.
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
+    this->referenceProxy());
+  pqOutputPort* cur_input = NULL;
+  if (filter)
+    {
+    QList<pqOutputPort*> ports = filter->getAllInputs();
+    cur_input = ports.size() > 0? ports[0] : NULL;
+    }
+
+  if (this->Implementation->PreviousInput != cur_input->getSource())
+    {
+    if (this->Implementation->PreviousInput)
+      {
+      QObject::disconnect(this->Implementation->PreviousInput,
+        SIGNAL(dataUpdated(pqPipelineSource*)),
+        this, SLOT(updateEnableState()));
+      }
+    this->Implementation->PreviousInput = cur_input->getSource();
+    if (this->Implementation->PreviousInput)
+      {
+      QObject::connect(this->Implementation->PreviousInput,
+        SIGNAL(dataUpdated(pqPipelineSource*)),
+        this, SLOT(updateEnableState()), Qt::QueuedConnection);
+      }
+    }
+
+  bool is_data_structured = false;
+  if (cur_input)
+    {
+    vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
+    is_data_structured = dataInfo->IsDataStructured();
+    }
+  this->Implementation->Controls.ComputeScalars->setEnabled(is_data_structured);
+  this->Implementation->Controls.ComputeGradients->setEnabled(is_data_structured);
+  this->Implementation->Controls.ComputeNormals->setEnabled(is_data_structured);
 }
