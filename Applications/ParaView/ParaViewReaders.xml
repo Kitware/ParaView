@@ -4,6 +4,7 @@
     list i.e. if two readers can read the same extension, then the reader
     apperaring later will be tried first when reading the file.
   -->
+  <ProxyManager type="reader" />
   <Proxy group="sources" name="LSDynaReader" />
   <Proxy group="sources" name="PVDReader" />
   <Proxy group="sources" name="XMLPolyDataReader"/>
