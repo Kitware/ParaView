@@ -1947,7 +1947,7 @@ void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
   stream << vtkClientServerStream::Invoke
          << PMPROXY(this)
          << "SetVTKObject"
-         << PMPROXY(fromP)
+         << VTKOBJECT(fromP)
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
 }

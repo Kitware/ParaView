@@ -76,7 +76,7 @@ vtkPMProxy::~vtkPMProxy()
 //----------------------------------------------------------------------------
 void vtkPMProxy::SetVTKObject(vtkObjectBase* obj)
 {
-  this->VTKObject == obj;
+  this->VTKObject = obj;
 }
 
 //----------------------------------------------------------------------------
