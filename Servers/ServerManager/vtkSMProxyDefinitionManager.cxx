@@ -1071,7 +1071,7 @@ void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
   for(unsigned int i=0; i < propElement->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* currentElement = propElement->GetNestedElement(i);
-    if ( vtkstd::string(currentElement->GetName()).find("InformationHelper") !=
+    if ( vtkstd::string(currentElement->GetName()).find("Helper") !=
          vtkstd::string::npos)
       {
       informationHelper = currentElement;
