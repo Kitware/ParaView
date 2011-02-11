@@ -158,7 +158,7 @@ protected:
 
   QStringList buildFileGroup(const QString &filename);
 
-  virtual void showEvent( QShowEvent *event );
+  virtual void showEvent( QShowEvent *showEvent );
 
 private slots:
   void onModelReset();
