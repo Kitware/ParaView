@@ -246,36 +246,28 @@ unsigned long vtkFileSeriesWriter::GetMTime()
 //-----------------------------------------------------------------------------
 void vtkFileSeriesWriter::WriteInternal()
 {
-  if (this->Writer)
+  if (this->Writer && this->FileNameMethod)
     {
-    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
-    if (csId.ID && this->FileNameMethod)
-      {
-      // Get the local process interpreter.
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-             << csId << "Write"
-             << vtkClientServerStream::End;
-      this->Interpreter->ProcessStream(stream);
-      }
+    // Get the local process interpreter.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->Writer << "Write"
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkFileSeriesWriter::SetWriterFileName(const char* fname)
 {
-  if (this->Writer && this->FileName)
+  if (this->Writer && this->FileName && this->FileNameMethod)
     {
-    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
-    if (csId.ID && this->FileNameMethod)
-      {
-      // Get the local process interpreter.
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-             << csId << this->FileNameMethod << fname
-             << vtkClientServerStream::End;
-      this->Interpreter->ProcessStream(stream);
-      }
+    // Get the local process interpreter.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->Writer << this->FileNameMethod << fname
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
     }
 }
 
