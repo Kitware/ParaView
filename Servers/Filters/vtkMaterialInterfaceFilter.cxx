@@ -110,7 +110,7 @@ vtkCxxSetObjectMacro(vtkMaterialInterfaceFilter,ClipFunction,vtkImplicitFunction
 // 3: We can have a special id for not visited and a special id for empty.
 // 4: Depth first is easier but we must protect for stack overflow.
 // 5: For the surface, we are simply going to take the surface of the voxels
-//    and place the verticies based on volume fraction values.
+//    and place the vertices based on volume fraction values.
 // 6: We could walk the surface in a second pass, but that would be complicated.
 // 7: It would be easier to simply create faces as the connectivity search
 //    terminates.

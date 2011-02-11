@@ -227,7 +227,7 @@ void vtkFaceHash::InsertTriInHash(vtkIdType a, vtkIdType b,
     b = tmp;
     }
   // We can't put the second smnallest in b because it might change the order
-  // of the verticies in the final triangle.
+  // of the vertices in the final triangle.
 
   // Look for existing tri in the hash;
   end = this->QuadHash + a;
