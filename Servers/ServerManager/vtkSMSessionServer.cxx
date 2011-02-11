@@ -65,6 +65,9 @@ vtkSMSessionServer::vtkSMSessionServer()
   this->MPIMToNSocketConnection = NULL;
   this->ActivateObserverId = 0;
   this->DeActivateObserverId = 0;
+
+  // Server don't deals with Undo/Redo or proxy revival
+  this->SetStateManagement(false);
 }
 
 //----------------------------------------------------------------------------

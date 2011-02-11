@@ -31,6 +31,7 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMProxyManager.h"
 #include "vtkWeakPointer.h"
+#include "vtkPVSession.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
@@ -121,49 +122,7 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
   this->Activate();
 
   // Manage Undo/Redo if possible
-  if(this->StateManagement)
-    {
-    vtkTypeUInt32 globalId = msg->global_id();
-    vtkSMRemoteObject *remoteObj = this->GetRemoteObject(globalId);
-
-    if(remoteObj && !remoteObj->IsPrototype())
-      {
-      vtkSMMessage newState;
-      newState.CopyFrom(*remoteObj->GetFullState());
-
-      // Need to provide id/location as the full state may not have them yet
-      newState.set_global_id(globalId);
-      newState.set_location(msg->location());
-
-      // Store state in cache
-      vtkSMMessage oldState;
-      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
-
-      // This is a filtering Hack, I don't like it. :-(
-      if(newState.GetExtension(ProxyState::xml_name) != "Camera")
-        {
-        this->StateLocator->RegisterState(&newState);
-        }
-
-      // Propagate to undo stack builder if possible
-      if(this->UndoStackBuilder)
-        {
-        if(createAction)
-          {
-          this->UndoStackBuilder->OnNewState(this, globalId, &newState);
-          }
-        else
-          {
-          // Update
-          if(oldState.SerializeAsString() != newState.SerializeAsString())
-            {
-            this->UndoStackBuilder->OnStateChange( this, globalId,
-                                                   &oldState, &newState);
-            }
-          }
-        }
-      }
-    }
+  this->UpdateStateHistory(msg);
 
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
@@ -438,4 +397,54 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   session->RemoveObserver(id);
   session->Delete();
   return sid;
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
+{
+  if( this->StateManagement &&
+      ((this->GetProcessRoles() & vtkPVSession::CLIENT) != 0) )
+    {
+    vtkTypeUInt32 globalId = msg->global_id();
+    vtkSMRemoteObject *remoteObj = this->GetRemoteObject(globalId);
+
+    //cout << "UpdateStateHistory: " << globalId << endl;
+
+    if(remoteObj && !remoteObj->IsPrototype())
+      {
+      vtkSMMessage newState;
+      newState.CopyFrom(*remoteObj->GetFullState());
+
+      // Need to provide id/location as the full state may not have them yet
+      newState.set_global_id(globalId);
+      newState.set_location(msg->location());
+
+      // Store state in cache
+      vtkSMMessage oldState;
+      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
+
+      // This is a filtering Hack, I don't like it. :-(
+      if(newState.GetExtension(ProxyState::xml_name) != "Camera")
+        {
+        this->StateLocator->RegisterState(&newState);
+        }
+
+      // Propagate to undo stack builder if possible
+      if(this->UndoStackBuilder)
+        {
+        if(createAction)
+          {
+          this->UndoStackBuilder->OnNewState(this, globalId, &newState);
+          }
+        else
+          {
+          // Update
+          if(oldState.SerializeAsString() != newState.SerializeAsString())
+            {
+            this->UndoStackBuilder->OnStateChange( this, globalId,
+                                                   &oldState, &newState);
+            }
+          }
+        }
+      }
+    }
 }

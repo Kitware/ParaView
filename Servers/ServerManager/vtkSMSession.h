@@ -223,6 +223,12 @@ protected:
   ~vtkSMSession();
 
   // Description:
+  // This method has been externalized so classes that heritate from vtkSMSession
+  // and override PushState could easily keep track of the StateHistory and
+  // maintain the UndoRedo mecanisme.
+  void UpdateStateHistory(vtkSMMessage* msg);
+
+  // Description:
   // Should be called to begin/end receiving progresses on this session.
   // Overridden to relay to the server(s).
   virtual void PrepareProgressInternal();

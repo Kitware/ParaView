@@ -57,6 +57,7 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   pqUndoStackBuilder* builder = pqUndoStackBuilder::New();
   pqUndoStack* stack = new pqUndoStack(false, builder, this);
   builder->Delete();
+  core->setUndoStack(stack);
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
@@ -83,12 +84,6 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
 //  QObject::connect(
 //      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
 //      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
-
-  core->setUndoStack(stack);
-
-  // FIXME COLLABORATION (Utkarsh): Where the binding should occur ???
-  vtkSMProxyManager::GetProxyManager()->GetSession()->SetUndoStackBuilder(builder);
-
 }
 
 

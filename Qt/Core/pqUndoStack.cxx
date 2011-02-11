@@ -102,6 +102,12 @@ pqUndoStack::~pqUndoStack()
 }
 
 //-----------------------------------------------------------------------------
+vtkSMUndoStackBuilder* pqUndoStack::GetUndoStackBuilder()
+{
+  return this->Implementation->UndoStackBuilder;
+}
+
+//-----------------------------------------------------------------------------
 bool pqUndoStack::canUndo()
 {
   return this->Implementation->UndoStack->CanUndo();

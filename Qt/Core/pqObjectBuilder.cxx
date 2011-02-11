@@ -929,6 +929,15 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       {
       server = smModel->findServer(id);
       server->setResource(server_resource);
+
+      // Make sure the new session get the undostack
+      pqApplicationCore* core = pqApplicationCore::instance();
+      if(core->getUndoStack())
+        {
+        server->session()->SetUndoStackBuilder(
+            core->getUndoStack()->GetUndoStackBuilder());
+        }
+
       emit this->finishedAddingServer(server);
       }
     }
