@@ -104,6 +104,10 @@ public:
   /// Hides the representations for the input if required, in the given view.
   void hideInputIfRequired(pqView* view);
 
+signals:
+  /// fired whenever an input connection changes.
+  void producerChanged(const QString& inputportname);
+
 protected slots:
   /// process some change in the input property for the proxy.
   void inputChanged(vtkObject*, unsigned long, void* client_data);
