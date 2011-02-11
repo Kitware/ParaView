@@ -140,8 +140,8 @@ public:
   QList<QStringList> SelectedFiles;
   QStringList Filters;
   bool SupressOverwriteWarning;
-  const QString FileNamesSeperator;
   bool ShowMultipleFileHelp;
+  QString FileNamesSeperator;  
 
   // remember the last locations we browsed
   static QMap<QPointer<pqServer>, QString> ServerFilePaths;
@@ -1156,9 +1156,9 @@ bool pqFileDialog::selectFile(const QString& f)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::showEvent( QShowEvent *event )
+void pqFileDialog::showEvent( QShowEvent *showEvent )
 {  
-  QDialog::showEvent(event);
+  QDialog::showEvent(showEvent);
   //Qt sets the default keyboard focus to the last item in the tab order
   //which is determined by the creation order. This means that we have 
   //to explicitly state that the line edit has the focus on showing no 
