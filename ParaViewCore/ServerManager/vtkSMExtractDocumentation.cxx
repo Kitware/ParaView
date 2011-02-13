@@ -3,7 +3,6 @@
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMApplication.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDataTypeDomain.h"
@@ -1005,8 +1004,6 @@ int main(int argc, char *argv[])
   vtkInitializationHelper::Initialize(argv[0],
     vtkProcessModule::PROCESS_CLIENT);
   vtkSMSession* session = vtkSMSession::New();
-  session->Initialize();
-
   vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
   vtkStringPairList *proxyNameList = new vtkStringPairList;
   ExtractProxyNames(rootElem, proxyNameList);

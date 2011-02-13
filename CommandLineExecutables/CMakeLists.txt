@@ -1,30 +1,23 @@
-PROJECT(PVServers)
+PROJECT(PVCommmandLineExecutables)
 
 INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}
-  ${PVSERVERCOMMON_INCLUDE_DIR}
-  ${PVFILTERS_INCLUDE_DIR}
-  ${PVSERVERMANAGER_INCLUDE_DIR}
-  ${VTKCLIENTSERVER_INCLUDE_DIR}
+  ${PVCommon_SOURCE_DIR}
+  ${PVClientServerCore_SOURCE_DIR}
+  ${PVServerImplementation_SOURCE_DIR}
+  ${PVServerManager_SOURCE_DIR}
   ${VTK_INCLUDE_DIR}
-  ${XDMF_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${protobuf_SOURCE_DIR}/src
   )
-SET(LIBS vtkPVServerCommon vtkPVFilters vtkPVServerManager)
+
+SET(LIBS vtkPVServerManager)
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
 
-IF(VTK_WRAP_TCL)
-  INCLUDE_DIRECTORIES(${TCL_INCLUDE_PATH})
-ENDIF(VTK_WRAP_TCL)
-
 # Add main server executables.
 SET(PV_EXE_LIST
-   pvserver pvrenderserver pvdataserver
-   pvtest pvxmlstatetest pvstatetest pvInformationPropertyTest pvlocationtest
-   pvundotest pvundotest2 pvhelpertest pvmergetest pvclientxmldefinitiontest)
+   pvserver pvrenderserver pvdataserver)
 
 FOREACH(pvexe ${PV_EXE_LIST})
   add_executable_with_forwarding(pv_exe_suffix
