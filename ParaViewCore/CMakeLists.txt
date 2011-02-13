@@ -1,0 +1,7 @@
+PROJECT(ParaViewCore)
+
+ADD_SUBDIRECTORY(Common)
+ADD_SUBDIRECTORY(VTKExtensions)
+ADD_SUBDIRECTORY(ClientServerCore)
+ADD_SUBDIRECTORY(ServerImplementation)
+ADD_SUBDIRECTORY(ServerManager)

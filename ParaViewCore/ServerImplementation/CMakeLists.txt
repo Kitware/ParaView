@@ -1,0 +1,214 @@
+PROJECT(PVServerImplementation)
+
+INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
+
+# Any build configured headers should be added to this
+# variable so that they also get installed.
+SET (dynamicHeaders)
+
+
+# needed by vtkExportKit.cmake
+SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
+SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
+
+SET(KIT PVServerImplementation)
+SET(KIT_UPCASE "PVSERVERIMPLEMENTATION")
+IF(NOT WIN32)
+  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
+ENDIF(NOT WIN32)
+
+SET (Kit_SRCS
+  vtkPMArraySelectionProperty.cxx
+  vtkPMChartRepresentationProxy.cxx
+  vtkPMCompoundSourceProxy.cxx
+  vtkPMContextArraysProperty.cxx
+  vtkPMDataArrayProperty.cxx
+  vtkPMDoubleVectorProperty.cxx
+  vtkPMFileSeriesReaderProxy.cxx
+  vtkPMIdTypeVectorProperty.cxx
+  vtkPMImageTextureProxy.cxx
+  vtkPMInputProperty.cxx
+  vtkPMIntVectorProperty.cxx
+  vtkPMObject.cxx
+  vtkPMPVRepresentationProxy.cxx
+  vtkPMProperty.cxx
+  vtkPMProxy.cxx
+  vtkPMProxyProperty.cxx
+  vtkPMSILProperty.cxx
+  vtkPMScalarBarActorProxy.cxx
+  vtkPMSelectionRepresentationProxy.cxx
+  vtkPMSourceProxy.cxx
+  vtkPMStringVectorProperty.cxx
+  vtkPMTextSourceRepresentationProxy.cxx
+  vtkPMTimeRangeProperty.cxx
+  vtkPMTimeStepsProperty.cxx
+  vtkPMUniformGridVolumeRepresentationProxy.cxx
+  vtkPMVectorProperty.cxx
+  vtkPMWriterProxy.cxx
+  vtkPMXMLAnimationWriterRepresentationProperty.cxx
+  vtkSMProxyDefinitionIterator.cxx
+  vtkSMProxyDefinitionManager.cxx
+  vtkSMSessionBase.cxx
+  vtkSMSessionCore.cxx
+  vtkSMSessionCoreInterpreterHelper.cxx
+  vtkSMSessionServer.cxx
+)
+
+#SET_SOURCE_FILES_PROPERTIES(
+#
+#  WRAP_EXCLUDE
+#  )
+#
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMProxyDefinitionIterator.cxx
+  vtkPMObject.cxx
+  vtkPMVectorProperty.cxx
+  vtkSMSessionBase.cxx
+  ABSTRACT)
+
+INCLUDE_DIRECTORIES(
+  ${PVCommon_SOURCE_DIR}
+  ${PVCommon_BINARY_DIR}
+  ${PVVTKExtensions_SOURCE_DIR}
+  ${PVVTKExtensions_BINARY_DIR}
+  ${PVClientServerCore_SOURCE_DIR}
+  ${PVClientServerCore_BINARY_DIR}
+  ${PVServerImplementation_SOURCE_DIR}
+  ${PVServerImplementation_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
+  ${VTK_INCLUDE_DIR}
+  )
+
+#------------------------------------------------------------------------------
+# Compile protobuf resources.
+set (protobuf_generated_files)
+protobuf_generate(
+  protobuf_generated_files
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto)
+#------------------------------------------------------------------------------
+
+SET(resourceFiles
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
+  ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
+  )
+
+IF(PARAVIEW_ENABLE_PYTHON)
+  OPTION(PARAVIEW_ENABLE_PYTHON_FILTERS "Enable Python calculator and programmable filters." ON)
+  IF(PARAVIEW_ENABLE_PYTHON_FILTERS)
+    SET(resourceFiles
+      ${resourceFiles}
+      ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
+      )
+  ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
+
+#needs to depend on vtkParaViewIncludeModulesToSMApplication so
+#we can regenerate when python filters or VisItBridge are toggled on/off
+SET(CMD_DEP kwProcessXML)
+IF(CMAKE_CROSSCOMPILING)
+  SET(CMD kwProcessXML)
+ELSE(CMAKE_CROSSCOMPILING)
+  GET_TARGET_PROPERTY(CMD kwProcessXML LOCATION)
+ENDIF(CMAKE_CROSSCOMPILING)
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+  DEPENDS ${resourceFiles}
+  ${CMD_DEP}
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
+  COMMAND ${CMD}
+  ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+  vtkSMDefaultModules Interface GetInterfaces
+  ${resourceFiles}
+  COMMENT "generating modules")
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkParaViewIncludeModulesToSMApplication.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
+  @ONLY IMMEDIATE)
+SET (dynamicHeaders
+    "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
+
+
+SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
+SET_SOURCE_FILES_PROPERTIES(vtkSMProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
+
+# Setup vtkInstantiator registration for this library's classes.
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator KitInstantiator_SRCS
+  "${Kit_SRCS}"
+  VTK_EXPORT
+  "${CMAKE_CURRENT_BINARY_DIR}" "")
+
+# load the ClientServer command
+INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
+CS_INITIALIZE_WRAP()
+INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
+
+# Wrap PVServer
+# Create ClientServer wrappers for ParaView classes.
+SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
+SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+INCLUDE(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
+VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
+SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
+
+# Wrap PVServerCommon
+SET(KIT_WRAP_DEPS PVClientServerCore)
+SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
+PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
+
+# Create the library.
+VTK_ADD_LIBRARY(vtk${KIT}
+  ${protobuf_generated_files}
+  ${Kit_SRCS}
+  ${KitInstantiator_SRCS}
+  )
+TARGET_LINK_LIBRARIES(vtk${KIT}
+  vtkPVClientServerCore
+  vtkPVClientServerCoreCS
+  ${KIT_LIBS}
+  protobuf
+)
+
+IF(NOT PV_INSTALL_NO_LIBRARIES)
+  SET(temp_TO_INSTALL
+    vtk${KIT})
+
+  INSTALL(TARGETS ${temp_TO_INSTALL}
+    EXPORT ${PV_INSTALL_EXPORT_NAME}
+    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
+
+# Resource files
+IF(NOT PV_INSTALL_NO_RUNTIME)
+  INSTALL(
+    FILES ${resourceFiles}
+    DESTINATION ${PV_INSTALL_LIB_DIR}/ParaViewCore/ServerImplementation/Resources)
+ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+
+# Development files install
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  GLOB_INSTALL_DEVELOPMENT(
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${PV_INSTALL_INCLUDE_DIR}
+      "*.h;*.hxx;*.txx")
+  INSTALL(
+      FILES ${dynamicHeaders}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)

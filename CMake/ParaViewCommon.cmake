@@ -751,7 +751,8 @@ IF(PARAVIEW_USE_VISITBRIDGE)
   PARAVIEW_INCLUDE_GUI_RESOURCES(${VISITBRIDGE_READERS_GUI_XML_FILE})
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
-ADD_SUBDIRECTORY(Servers)
+#ADD_SUBDIRECTORY(Servers)
+ADD_SUBDIRECTORY(ParaViewCore)
 
 #########################################################################
 # Configure Python executable
