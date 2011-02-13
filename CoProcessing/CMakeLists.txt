@@ -46,7 +46,6 @@ SET(CoProcessing_LIBRARY_DIRS
   )
 
 SET(CoProcessing_INCLUDE_DIRS
-  ${CoProcessing_SOURCE_DIR}/Adaptors/PythonAdapter
   ${CoProcessing_SOURCE_DIR}/Adaptors/FortranAdaptors
   ${CoProcessing_SOURCE_DIR}/CoProcessor
   ${CoProcessing_BINARY_DIR}/CoProcessor
