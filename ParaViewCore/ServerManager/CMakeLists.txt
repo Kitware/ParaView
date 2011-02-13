@@ -261,16 +261,13 @@ IF(PARAVIEW_USE_VISITBRIDGE)
   )
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
-IF (FIXME_COLLABORATION)
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET (Kit_SRCS
       ${Kit_SRCS}
     )
   SET(KIT_PYTHON_LIBS
-    vtkPVServerCommonPythonD
-    vtkPVFiltersPythonD
-    vtk${KIT}
+    vtkPVServerImplementationPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
@@ -291,7 +288,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # include python wrapping from VTK
   INCLUDE(KitCommonPythonWrapBlock)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
-ENDIF (FIXME_COLLABORATION)
 
 # Custom command for generating the minimal initializer, requires python interpreter
 IF(PARAVIEW_MINIMAL_BUILD)
