@@ -780,21 +780,25 @@ CONFIGURE_FILE(${ParaView_CMAKE_DIR}/CTestCustom.ctest.in
 
 #########################################################################
 SET(PARAVIEW_INCLUDE_DIRS
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${HDF5_INCLUDE_DIR}
   ${KWCommon_INCLUDE_PATH}
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  ${ParaView_SOURCE_DIR}/Servers/ServerManager
-  ${ParaView_SOURCE_DIR}/Servers/Common
-  ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
-  ${ParaView_SOURCE_DIR}/VTK/Wrapping
-  ${ParaView_BINARY_DIR}/VTK/Wrapping
+  ${PVClientServerCore_BINARY_DIR}
+  ${PVClientServerCore_SOURCE_DIR}
+  ${PVCommon_BINARY_DIR}
+  ${PVCommon_SOURCE_DIR}
+  ${PVServerImplementation_BINARY_DIR}
+  ${PVServerImplementation_SOURCE_DIR}
+  ${PVServerManager_BINARY_DIR}
+  ${PVServerManager_SOURCE_DIR}
+  ${PVVTKExtensions_BINARY_DIR}
+  ${PVVTKExtensions_SOURCE_DIR}
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Servers/Filters
-  ${ParaView_BINARY_DIR}/Servers/ServerManager
-  ${ParaView_BINARY_DIR}/Servers/Common
+  ${ParaView_BINARY_DIR}/VTK/Wrapping
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
+  ${ParaView_SOURCE_DIR}/VTK/Wrapping
   ${XDMF_INCLUDE_DIRS}
-  ${HDF5_INCLUDE_DIR}
   )
 
 IF(PARAVIEW_USE_VISITBRIDGE)

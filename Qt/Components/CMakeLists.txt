@@ -10,7 +10,6 @@ IF(PARAVIEW_ENABLE_PYTHON)
   SET(PYTHON_LINK_LIBRARIES
     vtkPVPythonInterpretor
     QtPython
-    vtkPVServerCommonPythonD
     vtkPVServerManagerPythonD
     ${PYTHON_LIBRARIES})
 

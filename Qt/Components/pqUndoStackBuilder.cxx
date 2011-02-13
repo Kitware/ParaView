@@ -72,7 +72,8 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
 //-----------------------------------------------------------------------------
 bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 {
-  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
+  vtkSMRemoteObject* proxy = vtkSMRemoteObject::SafeDownCast(
+    session->GetRemoteObject(globalId));
 
   // We filter proxy type that must not be involved in undo/redo state.
   // The property themselves are already filtered based on a flag in the XML.
@@ -118,7 +119,8 @@ void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
 
   if (auto_element)
     {
-    vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
+    vtkSMRemoteObject* proxy =
+      vtkSMRemoteObject::SafeDownCast(session->GetRemoteObject(globalId));
     vtksys_ios::ostringstream stream;
     stream << "Changed '" << proxy->GetClassName() <<"'";
     this->Begin(stream.str().c_str());
