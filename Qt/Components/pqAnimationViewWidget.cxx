@@ -766,14 +766,10 @@ void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
 void pqAnimationViewWidget::setActiveView(pqView* view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
-
+  this->Internal->CreateSource->removeProxy("Camera");
   if (rview && this->Internal->CreateSource->findText("Camera") == -1)
     {
     this->Internal->CreateSource->addProxy(0, "Camera", rview->getProxy());
-    }
-  if (!rview)
-    {
-    this->Internal->CreateSource->removeProxy("Camera");
     }
 }
 
