@@ -137,6 +137,7 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
 
   this->SourceProxy->GetSession()->PrepareProgress();
   this->TemporalDataInformation->Initialize();
+  this->TemporalDataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->TemporalDataInformation);
 
   this->TemporalDataInformationValid = true;

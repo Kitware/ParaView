@@ -19,6 +19,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -34,6 +35,7 @@ vtkPVTemporalDataInformation::vtkPVTemporalDataInformation()
   this->NumberOfTimeSteps = 0;
   this->TimeRange[0] = VTK_DOUBLE_MAX;
   this->TimeRange[1] = -VTK_DOUBLE_MAX;
+  this->PortNumber = 0;
 
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
@@ -103,24 +105,41 @@ void vtkPVTemporalDataInformation::Initialize()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVTemporalDataInformation::CopyParametersToStream(vtkMultiProcessStream& str)
+{
+  str << 829993 << this->PortNumber;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTemporalDataInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
+{
+  int magic_number;
+  str >> magic_number >> this->PortNumber;
+  if (magic_number != 829993)
+    {
+    vtkErrorMacro("Magic number mismatch.");
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVTemporalDataInformation::CopyFromObject(vtkObject* object)
 {
-  vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(object);
   vtkAlgorithmOutput* port = vtkAlgorithmOutput::SafeDownCast(object);
-  if (dobj)
+  if (algo)
     {
-    port = dobj->GetProducerPort();
+    port = algo->GetOutputPort(this->PortNumber);
     }
+
   if (!port)
     {
-    vtkErrorMacro("vtkPVTemporalDataInformation needs a vtkDataObject or "
+    vtkErrorMacro("vtkPVTemporalDataInformation needs a vtkAlgorithm or "
       " a vtkAlgorithmOutput.");
     return;
     }
 
   port->GetProducer()->Update();
-
-  dobj = port->GetProducer()->GetOutputDataObject(port->GetIndex());
+  vtkDataObject* dobj = port->GetProducer()->GetOutputDataObject(port->GetIndex());
 
   // Collect current information.
   vtkSmartPointer<vtkPVDataInformation> dinfo =
