@@ -114,7 +114,13 @@ int vtkPVExtractPieces::RequestDataObject(vtkInformation* req,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector)
 {
-  return this->Superclass::RequestDataObject(req, inputVector, outputVector);
+  this->EnsureRealAlgorithm(inputVector[0]->GetInformationObject(0));
+
+  this->Superclass::RequestDataObject(req, inputVector, outputVector);
+  //vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+  //vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
+  //cout << "RequestDataObject: " << input->GetClassName() << " : " << output->GetClassName() << endl;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -142,6 +148,7 @@ int vtkPVExtractPieces::RequestData(
     {
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
     vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
+    //cout << input->GetClassName() << " : " << output->GetClassName() << endl;
     output->ShallowCopy(input);
     return 1;
     }
@@ -167,18 +174,15 @@ int vtkPVExtractPieces::RequestUpdateExtent(
 int vtkPVExtractPieces::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  // We cannot simply cay we accept all data-types since that causes issues when
-  // dealing with vtkTemporalDataSet. So we accept anything but
-  // vtkTemporalDataSet.
+  // We want to exclude vtkTemporalDataSet from being accepted as an input,
+  // everything else is acceptable.
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGraph");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiPieceDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiPieceDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGraph");
   return 1;
 }
 //----------------------------------------------------------------------------
