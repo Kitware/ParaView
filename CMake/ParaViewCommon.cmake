@@ -14,10 +14,8 @@
 # NOTE: To search in directory other than the current
 #       put the search dir in "exts".
 MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
-  #message(${from}\n${to})
   SET(filesToInstall)
   FOREACH(ext ${exts})
-    #message(${ext})
     SET(files)
     FILE(GLOB files RELATIVE ${from} ${ext})
     IF(files)
@@ -25,7 +23,6 @@ MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
     ENDIF(files)
   ENDFOREACH(ext)
   IF(filesToInstall)
-    #message("${filesToInstall}\n\n")
     INSTALL(
         FILES ${filesToInstall}
         DESTINATION ${to}
