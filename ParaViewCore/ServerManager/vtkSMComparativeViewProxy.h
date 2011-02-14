@@ -73,6 +73,9 @@ protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();
 
+  void InvokeConfigureEvent();
+
+
   // Description:
   virtual void CreateVTKObjects();
 

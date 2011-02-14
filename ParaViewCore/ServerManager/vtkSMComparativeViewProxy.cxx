@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMComparativeViewProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVComparativeView.h"
 #include "vtkPVSession.h"
@@ -78,7 +79,17 @@ void vtkSMComparativeViewProxy::CreateVTKObjects()
     return;
     }
 
+  GET_PV_COMPARATIVE_VIEW()->AddObserver(
+    vtkCommand::ConfigureEvent,
+    this, &vtkSMComparativeViewProxy::InvokeConfigureEvent);
+
   GET_PV_COMPARATIVE_VIEW()->Initialize(rootView);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::InvokeConfigureEvent()
+{
+  this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
 
 //----------------------------------------------------------------------------
