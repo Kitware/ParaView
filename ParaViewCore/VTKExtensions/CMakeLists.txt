@@ -337,7 +337,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
     vtkHybridPythonD
     vtkWidgetsPythonD
     vtkParallelPythonD
-    vtkInfovisPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)

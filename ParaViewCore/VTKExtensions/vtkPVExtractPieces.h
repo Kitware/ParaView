@@ -27,19 +27,21 @@
 #ifndef __vtkPVExtractPieces_h
 #define __vtkPVExtractPieces_h
 
-#include "vtkPassThrough.h"
+#include "vtkPassInputTypeAlgorithm.h"
 #include "vtkSmartPointer.h"
-class VTK_EXPORT vtkPVExtractPieces : public vtkPassThrough
+class VTK_EXPORT vtkPVExtractPieces : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkPVExtractPieces* New();
-  vtkTypeMacro(vtkPVExtractPieces, vtkPassThrough);
+  vtkTypeMacro(vtkPVExtractPieces, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
 protected:
   vtkPVExtractPieces();
   ~vtkPVExtractPieces();
+  int FillInputPortInformation(
+    int vtkNotUsed(port), vtkInformation* info);
 
   virtual int RequestDataObject(vtkInformation*,
     vtkInformationVector**,

@@ -140,8 +140,10 @@ int vtkPVExtractPieces::RequestData(
 {
   if (!this->RealAlgorithm)
     {
-    return this->Superclass::RequestData(request, inputVector,
-      outputVector);
+    vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+    vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
+    output->ShallowCopy(input);
+    return 1;
     }
 
   return this->RealAlgorithm->ProcessRequest(request, inputVector, outputVector);
@@ -161,6 +163,24 @@ int vtkPVExtractPieces::RequestUpdateExtent(
   return this->RealAlgorithm->ProcessRequest(request, inputVector, outputVector);
 }
 
+//----------------------------------------------------------------------------
+int vtkPVExtractPieces::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  // We cannot simply cay we accept all data-types since that causes issues when
+  // dealing with vtkTemporalDataSet. So we accept anything but
+  // vtkTemporalDataSet.
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiPieceDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiPieceDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGraph");
+  return 1;
+}
 //----------------------------------------------------------------------------
 void vtkPVExtractPieces::PrintSelf(ostream& os, vtkIndent indent)
 {
