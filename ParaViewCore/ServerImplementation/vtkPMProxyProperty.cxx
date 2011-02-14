@@ -294,5 +294,5 @@ vtkObjectBase* vtkPMProxyProperty::GetObject(vtkTypeUInt32 globalId)
 bool vtkPMProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
   vtkPMProxy* pmProxy = vtkPMProxy::SafeDownCast(this->GetPMObject(globalId));
-  return pmProxy->IsNullProxy();
+  return globalId? pmProxy->IsNullProxy() : true;
 }

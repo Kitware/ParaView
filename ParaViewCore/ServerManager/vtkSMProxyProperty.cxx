@@ -371,7 +371,16 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
   var->set_type(Variant::PROXY);
   for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
     {
-    var->add_proxy_global_id(this->GetProxy(i)->GetGlobalID());
+    vtkSMProxy* argument = this->GetProxy(i);
+    if (argument)
+      {
+      argument->CreateVTKObjects();
+      var->add_proxy_global_id(argument->GetGlobalID());
+      }
+    else
+      {
+      var->add_proxy_global_id(0);
+      }
     }
 }
 

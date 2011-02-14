@@ -47,7 +47,14 @@ vtkPMObject* vtkSMSessionCoreInterpreterHelper::GetPMObject(vtkTypeUInt32 gid)
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
-  return vtkPMProxy::SafeDownCast(this->Core->GetPMObject(gid))->GetVTKObject();
+  vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
+    this->Core->GetPMObject(gid));
+  if (!pmproxy)
+    {
+    vtkErrorMacro("No vtkPMProxy for id : " << gid);
+    return NULL;
+    }
+  return pmproxy->GetVTKObject();
 }
 
 //----------------------------------------------------------------------------

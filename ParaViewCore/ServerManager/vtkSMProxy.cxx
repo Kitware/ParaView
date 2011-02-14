@@ -593,17 +593,6 @@ void vtkSMProxy::UpdateVTKObjects()
           // Push only modified properties
           if(iter->second.ModifiedFlag)
             {
-            // Make sure that dependant proxy are created
-            if(vtkSMProxyProperty::SafeDownCast(property))
-              {
-              vtkSMProxyProperty* proxyProp;
-              proxyProp = vtkSMProxyProperty::SafeDownCast(property);
-              for(unsigned int i=0; i < proxyProp->GetNumberOfProxies(); i++)
-                {
-                proxyProp->GetProxy(i)->CreateVTKObjects();
-                }
-              }
-
             // Write to state
             property->WriteTo(this->State);
 
