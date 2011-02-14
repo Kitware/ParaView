@@ -26,6 +26,7 @@
 #include <vtkstd/vector>
 
 class vtkDataArray;
+class vtkIntArray;
 class vtkHierarchicalBoxDataSet;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperLevel;
@@ -33,6 +34,7 @@ class vtkMultiProcessController;
 class vtkImageData;
 class vtkAMRDualGridHelperDegenerateRegion;
 class vtkAMRDualGridHelperFace;
+class vtkAMRDualGridHelperCommRequestList;
 
 //----------------------------------------------------------------------------
 class VTK_EXPORT vtkAMRDualGridHelper : public vtkObject
@@ -46,13 +48,31 @@ public:
   // An option to turn off copying ghost values across process boundaries.
   // If the ghost values are already correct, then the extra communication is 
   // not necessary.  If this assumption is wrong, this option will produce
-  // cracks / seams.
-  void SetSkipGhostCopy(int val) { this->SkipGhostCopy = val;}
-  
-  // Set this before you call initialize.
-  void SetEnableDegenerateCells(int v) { this->EnableDegenerateCells = v;}
+  // cracks / seams.  This is off by default.
+  vtkGetMacro(SkipGhostCopy, int);
+  vtkSetMacro(SkipGhostCopy, int);
+  vtkBooleanMacro(SkipGhostCopy, int);
 
-  void SetEnableMultiProcessCommunication(int v);
+  // Description:
+  // Turn on/off the ability to create meshing between levels in the grid.  This
+  // is on by default.  Set this before you call initialize.
+  vtkGetMacro(EnableDegenerateCells, int);
+  vtkSetMacro(EnableDegenerateCells, int);
+  vtkBooleanMacro(EnableDegenerateCells, int);
+
+  // Description:
+  // When this option is on (the default) and a controller that supports
+  // asynchronous communication (like MPI) is detected, use asynchronous
+  // communication where appropriate.  This can prevent processes from blocking
+  // while waiting for communication in other processes to finish.
+  vtkGetMacro(EnableAsynchronousCommunication, int);
+  vtkSetMacro(EnableAsynchronousCommunication, int);
+  vtkBooleanMacro(EnableAsynchronousCommunication, int);
+
+  // Description:
+  // The controller to use for communication.
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  virtual void SetController(vtkMultiProcessController *);
 
   int                       Initialize(vtkHierarchicalBoxDataSet* input,
                                        const char* arrayName);
@@ -110,11 +130,8 @@ private:
   // Distributed execution
   void ShareMetaData();
   void ShareBlocks();
-  void SendBlocks(int remoteProc, int localProc);
-  void ReceiveBlocks(int remoteProc);
-  void AllocateMessageBuffer(int maxLength);
-  unsigned char* MessageBuffer;
-  int MessageBufferLength;
+  void MarshalBlocks(vtkIntArray *buffer);
+  void UnmarshalBlocks(vtkIntArray *buffer);
 
   vtkMultiProcessController *Controller;
   void ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* input);
@@ -153,20 +170,43 @@ private:
   vtkstd::vector<vtkAMRDualGridHelperLevel*> Levels;
 
   int EnableDegenerateCells;
+
+  void ProcessRegionRemoteCopyQueueSynchronous(bool hackLevelFlag);
+  void SendDegenerateRegionsFromQueueSynchronous(int destProc);
+  void ReceiveDegenerateRegionsFromQueueSynchronous(int srcProc,
+                                                    bool hackLevelFlag);
+
+  // NOTE: These methods are NOT DEFINED if not compiled with MPI.
+  void ProcessRegionRemoteCopyQueueMPIAsynchronous(bool hackLevelFlag);
+  void SendDegenerateRegionsFromQueueMPIAsynchronous(
+                                 int recvProc,
+                                 vtkAMRDualGridHelperCommRequestList &sendList);
+  void ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
+                              int sendProc,
+                              vtkAMRDualGridHelperCommRequestList &receiveList);
+  void FinishDegenerateRegionsCommMPIAsynchronous(
+                              bool hackLevelFlag,
+                              vtkAMRDualGridHelperCommRequestList &sendList,
+                              vtkAMRDualGridHelperCommRequestList &receiveList);
+
   // Degenerate regions that span processes.  We keep them in a queue
   // to communicate and process all at once.
   vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
-  void SendDegenerateRegionsFromQueue(int remoteProc, int localProc);
-  void ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc, bool hackLevelFlag);  
+  vtkIdType DegenerateRegionMessageSize(int srcProc, int destProc);
   void* CopyDegenerateRegionBlockToMessage(
-    vtkAMRDualGridHelperDegenerateRegion* region,
+    const vtkAMRDualGridHelperDegenerateRegion &region,
     void* messagePtr);
-  void* CopyDegenerateRegionMessageToBlock(
-    vtkAMRDualGridHelperDegenerateRegion* region,
-    void* messagePtr,
+  const void* CopyDegenerateRegionMessageToBlock(
+    const vtkAMRDualGridHelperDegenerateRegion &region,
+    const void* messagePtr,
     bool hackLevelFlag);
+  void MarshalDegenerateRegionMessage(void *messagePtr, int destProc);
+  void UnmarshalDegenerateRegionMessage(const void *messagePtr, int srcProc,
+                                        bool hackLevelFlag);
 
   int SkipGhostCopy;
+
+  int EnableAsynchronousCommunication;
 
 private:
   vtkAMRDualGridHelper(const vtkAMRDualGridHelper&);  // Not implemented.
