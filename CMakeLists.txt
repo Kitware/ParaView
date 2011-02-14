@@ -308,7 +308,7 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
 SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY 
-  "${ParaView_SOURCE_DIR}/Servers/ServerManager/Resources")
+  "${ParaView_SOURCE_DIR}/ParaViewCore/ServerImplementation/Resources")
 
 # Few more variable needed in ParaViewConfig.cmake
 # We don't worry about the debug/release configuration directories on windows
@@ -445,7 +445,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(PARAVIEW_DATA_SERVER_EXECUTABLE             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvdataserver${PV_EXE_SUFFIX}")
   SET(PARAVIEW_RENDER_SERVER_EXECUTABLE           "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvrenderserver${PV_EXE_SUFFIX}")
   SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/smTestDriver${PV_EXE_SUFFIX}")
-  SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
+  SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewCore/ServerImplementation/Resources")
   SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewLibraryDepends.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")

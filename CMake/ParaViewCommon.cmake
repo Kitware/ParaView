@@ -592,18 +592,6 @@ SET(VTKCLIENTSERVER_INCLUDE_DIR
 ADD_SUBDIRECTORY(Utilities/VTKClientServer)
 
 #########################################################################
-# Configure Tcl Wraping.
-# We can't remove this from ParaViewCommon.cmake since it must be
-# included after VTK has been included but before ServerManager.
-IF (PARAVIEW_BUILD_GUI)
-  ADD_SUBDIRECTORY(Utilities/VTKTclWrapping)
-  SET(VTKTclWrapping_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-  SET(VTKTclWrapping_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-  SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-ENDIF (PARAVIEW_BUILD_GUI)
-
-#########################################################################
 # Import external projects, such as SAF.
 
 SET(PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES)
@@ -736,16 +724,6 @@ ENDIF(PARAVIEW_USE_AMRCTH OR AMRCTH_SOURCE_DIR)
 
 #########################################################################
 # Configure Server
-SET(PVFILTERS_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  ${ParaView_BINARY_DIR}/Servers/Filters)
-SET(PVSERVERMANAGER_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/ServerManager
-  ${ParaView_BINARY_DIR}/Servers/ServerManager)
-SET(PVSERVERCOMMON_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/Common
-  ${ParaView_BINARY_DIR}/Servers/Common)
-
 IF(PARAVIEW_USE_VISITBRIDGE)
   PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES(${VISITBRIDGE_READERS_XML_FILE})
   PARAVIEW_INCLUDE_GUI_RESOURCES(${VISITBRIDGE_READERS_GUI_XML_FILE})
