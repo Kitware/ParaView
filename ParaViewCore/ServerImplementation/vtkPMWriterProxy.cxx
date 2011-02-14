@@ -166,31 +166,6 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
   return true;
 }
 
-#ifdef FIXME_COLLABORATION
-//----------------------------------------------------------------------------
-vtkClientServerID vtkPMWriterProxy::GetVTKObjectID(
-  vtkPMProperty* property_helper)
-{
-  if (vtkPMInputProperty::SafeDownCast(property_helper) &&
-    !this->CompleteArraysID.IsNull())
-    {
-    return this->CompleteArraysID;
-    }
-
-  if (!this->WriterObjectID.IsNull())
-    {
-    if (property_helper->GetCommand() &&
-      strcmp(property_helper->GetCommand(), "SetFileName") == 0)
-      {
-      return this->GetVTKObjectID();
-      }
-    return this->WriterObjectID;
-    }
-
-  return this->Superclass::GetVTKObjectID(property_helper);
-}
-#endif
-
 //----------------------------------------------------------------------------
 void vtkPMWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

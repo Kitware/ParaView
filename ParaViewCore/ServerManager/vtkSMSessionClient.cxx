@@ -435,6 +435,12 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     {
     this->Superclass::PushState(message);
     }
+  else
+    {
+    // We do not execute anything locally we just keep track
+    // of the State History for Undo/Redo
+    this->UpdateStateHistory(message);
+    }
 }
 
 //----------------------------------------------------------------------------

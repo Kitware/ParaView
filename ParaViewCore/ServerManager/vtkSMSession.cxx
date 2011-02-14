@@ -79,11 +79,22 @@ vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
 void vtkSMSession::PushState(vtkSMMessage* msg)
 {
   // Manage Undo/Redo if possible
-  if(this->StateManagement)
+  this->UpdateStateHistory(msg);
+
+  this->Superclass::PushState(msg);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
+{
+  if( this->StateManagement &&
+      ((this->GetProcessRoles() & vtkPVSession::CLIENT) != 0) )
     {
     vtkTypeUInt32 globalId = msg->global_id();
-    vtkSMRemoteObject *remoteObj = vtkSMRemoteObject::SafeDownCast(
-      this->GetRemoteObject(globalId));
+    vtkSMRemoteObject *remoteObj =
+      vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
+
+    //cout << "UpdateStateHistory: " << globalId << endl;
 
     if(remoteObj && !remoteObj->IsPrototype())
       {
@@ -123,8 +134,6 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
         }
       }
     }
-
-  this->Superclass::PushState(msg);
 }
 
 //----------------------------------------------------------------------------

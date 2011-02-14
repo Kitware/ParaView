@@ -923,7 +923,12 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
       vtkPVXMLElement* child = element->GetNestedElement(cc);
       if (child && child->GetName() && strcmp(child->GetName(), "Element")==0)
         {
-        child->GetScalarAttribute("value", &value);
+        if (!child->GetScalarAttribute("value", &value))
+          {
+          // the value is already a string. State must have been saved between
+          // 3.10 and 4.0. All's well.
+          return true;
+          }
         valueElement = child;
         }
       else if (child && child->GetName() && strcmp(child->GetName(), "Domain")==0)

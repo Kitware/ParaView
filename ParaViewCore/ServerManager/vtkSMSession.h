@@ -172,6 +172,12 @@ protected:
   // correctly.
   virtual void Initialize();
 
+  // Description:
+  // This method has been externalized so classes that heritate from vtkSMSession
+  // and override PushState could easily keep track of the StateHistory and
+  // maintain the UndoRedo mecanisme.
+  void UpdateStateHistory(vtkSMMessage* msg);
+
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
   vtkSMStateLocator* StateLocator;

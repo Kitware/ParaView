@@ -89,6 +89,8 @@ public:
   vtkUndoSet* getLastUndoSet(); //vistrails
   vtkUndoSet* getUndoSetFromXML(vtkPVXMLElement *root); //vistrails
 
+  /// Get the UndoStackBuilder that is used with that UndoStack
+  vtkSMUndoStackBuilder* GetUndoStackBuilder();
 
 public slots:
   void beginUndoSet(QString label);
