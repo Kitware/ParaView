@@ -71,6 +71,13 @@ vtkPVProgressHandler* vtkSMSessionCoreInterpreterHelper::GetActiveProgressHandle
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSessionCoreInterpreterHelper::SetMPIMToNSocketConnection(
+  vtkMPIMToNSocketConnection* m2n)
+{
+  this->Core->SetMPIMToNSocketConnection(m2n);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionCoreInterpreterHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

@@ -245,6 +245,12 @@ void vtkSMSessionBase::GetAllRemoteObjects(vtkCollection* collection)
 }
 
 //----------------------------------------------------------------------------
+vtkMPIMToNSocketConnection* vtkSMSessionBase::GetMPIMToNSocketConnection()
+{
+  return this->SessionCore->GetMPIMToNSocketConnection();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionBase::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

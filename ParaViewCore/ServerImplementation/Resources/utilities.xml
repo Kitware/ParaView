@@ -633,8 +633,6 @@
         repeat_command="1"
         default_values="" >
       </StringVectorProperty>
-
-      <Property name="Connect" command="ConnectMtoN" />
     </Proxy>
   </ProxyGroup>
 

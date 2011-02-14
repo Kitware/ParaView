@@ -20,18 +20,19 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInstantiator.h"
+#include "vtkMPIMToNSocketConnection.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
-#include "vtkProcessModule.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionCoreInterpreterHelper.h"
+#include "vtkSmartPointer.h"
 
 #include "assert.h"
 #include <fstream>
@@ -188,6 +189,7 @@ vtkSMSessionCore::vtkSMSessionCore()
 {
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInterpreter();
+  this->MPIMToNSocketConnection = NULL;
 
   vtkSMSessionCoreInterpreterHelper* helper =
     vtkSMSessionCoreInterpreterHelper::New();
@@ -266,6 +268,19 @@ vtkSMSessionCore::~vtkSMSessionCore()
   this->Internals = NULL;
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
+
+  this->SetMPIMToNSocketConnection(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::SetMPIMToNSocketConnection(
+  vtkMPIMToNSocketConnection* m2n)
+{
+  vtkSetObjectBodyMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection, m2n);
+  if (m2n)
+    {
+    m2n->ConnectMtoN();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -28,6 +28,7 @@ class vtkPMObject;
 class vtkPVProgressHandler;
 class vtkProcessModule;
 class vtkSMSessionCore;
+class vtkMPIMToNSocketConnection;
 
 class VTK_EXPORT vtkSMSessionCoreInterpreterHelper : public vtkObject
 {
@@ -41,6 +42,11 @@ public:
 
   vtkProcessModule* GetProcessModule();
   vtkPVProgressHandler* GetActiveProgressHandler();
+
+  // Description:
+  // Sets and initializes the MPIMToNSocketConnection for communicating between
+  // data-server and render-server.
+  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
 
   void SetCore(vtkSMSessionCore*);
 

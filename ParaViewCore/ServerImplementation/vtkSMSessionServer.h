@@ -41,12 +41,6 @@ public:
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
   // Description:
-  // This is socket connection, if any to communicate between the data-server
-  // and render-server nodes.
-  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
-    { return this->MPIMToNSocketConnection; }
-
-  // Description:
   // Connects a remote server. URL can be of the following format:
   // cs://<pvserver-host>:<pvserver-port>
   // cdsrs://<pvdataserver-host>:<pvdataserver-port>/<pvrenderserver-host>:<pvrenderserver-port>
@@ -76,7 +70,6 @@ public:
     EXECUTE_STREAM=2,
     PULL=3,
     GATHER_INFORMATION=4,
-    REGISTER_MTON_SOCKET_CONNECTION=5,
     LAST_RESULT=6,
     CLIENT_SERVER_MESSAGE_RMI=55625,
     CLOSE_SESSION=55626,

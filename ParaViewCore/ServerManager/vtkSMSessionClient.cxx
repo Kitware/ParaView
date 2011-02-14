@@ -298,32 +298,19 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
     helper.Set(3*cc+2, info->GetProcessHostName(cc));
     }
   mpiMToN->UpdateVTKObjects();
-  mpiMToN->InvokeCommand("Connect");
-
   info->Delete();
   info = NULL;
 
-  // FIXME_COLLABORATION: I can fix this to use ExecuteStream for a more
-  // graceful solution.
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
+            << "SetMPIMToNSocketConnection"
+            << VTKOBJECT(mpiMToN)
+            << vtkClientServerStream::End;
+  this->ExecuteStream(vtkPVSession::SERVERS, stream);
 
-  vtkSMObject::GetProxyManager()->RegisterProxy("__internals__",
-    "m2n_socket",
-    mpiMToN);
+  // the proxy can now be destroyed.
   mpiMToN->Delete();
-
-  // Now let the server-side sessions know what's the vtkMPIMToNSocketConnection
-  // instance to use for data-server to render-server connection.
-  vtkMultiProcessStream stream;
-  stream << static_cast<int>(vtkSMSessionServer::REGISTER_MTON_SOCKET_CONNECTION)
-         << mpiMToN->GetGlobalID();
-  vtkstd::vector<unsigned char> raw_message;
-  stream.GetRawData(raw_message);
-  this->DataServerController->TriggerRMIOnAllChildren(
-    &raw_message[0], static_cast<int>(raw_message.size()),
-    vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-  this->RenderServerController->TriggerRMIOnAllChildren(
-    &raw_message[0], static_cast<int>(raw_message.size()),
-    vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
 }
 
 //----------------------------------------------------------------------------

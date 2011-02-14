@@ -26,6 +26,7 @@
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
 class vtkCollection;
+class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
 class vtkPMObject;
 class vtkPVInformation;
@@ -101,6 +102,13 @@ public:
   // GetNumberOfProcesses() on this->ParallelController
   int GetNumberOfProcesses();
 
+  // Description:
+  // Get/Set the socket connection used to communicate betweeen data=server and
+  // render-server processes. This is valid only on data-server and
+  // render-server processes.
+  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
+  vtkGetObjectMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
+
 //BTX
   enum MessageTypes
     {
@@ -145,6 +153,7 @@ protected:
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkMultiProcessController* ParallelController;
   vtkClientServerInterpreter* Interpreter;
+  vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
 private:
   vtkSMSessionCore(const vtkSMSessionCore&); // Not implemented

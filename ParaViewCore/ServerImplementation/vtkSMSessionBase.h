@@ -57,6 +57,10 @@ public:
   // the local process information and return it.
   virtual vtkPVServerInformation* GetServerInformation();
 
+  // Description:
+  // This is socket connection, if any to communicate between the data-server
+  // and render-server nodes. Forwarded for vtkSMSessionCore.
+  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection();
 
   //---------------------------------------------------------------------------
   // Remote communication API.

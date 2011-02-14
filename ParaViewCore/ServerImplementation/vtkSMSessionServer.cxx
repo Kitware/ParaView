@@ -17,7 +17,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
-#include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
@@ -61,7 +60,6 @@ vtkStandardNewMacro(vtkSMSessionServer);
 vtkSMSessionServer::vtkSMSessionServer()
 {
   this->ClientController = 0;
-  this->MPIMToNSocketConnection = NULL;
   this->ActivateObserverId = 0;
   this->DeActivateObserverId = 0;
 }
@@ -356,17 +354,6 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
-  case vtkSMSessionServer::REGISTER_MTON_SOCKET_CONNECTION:
-      {
-      vtkTypeUInt32 globalid;
-      stream >> globalid;
-      vtkPMProxy* m2nPMProxy = vtkPMProxy::SafeDownCast(
-        this->GetPMObject(globalid));
-      assert(m2nPMProxy != NULL);
-      this->MPIMToNSocketConnection = vtkMPIMToNSocketConnection::SafeDownCast(
-        m2nPMProxy->GetVTKObject());
-      }
-    break;
     }
 }
 
