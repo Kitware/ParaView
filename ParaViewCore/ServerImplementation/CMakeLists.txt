@@ -130,6 +130,19 @@ ADD_CUSTOM_COMMAND(
   ${resourceFiles}
   COMMENT "generating modules")
 
+SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
+FOREACH(rf ${resourceFiles})
+  STRING(REGEX REPLACE "^.*/(.*).(xml|pvsm)$" "\\1" moduleName "${rf}")
+  SET(oneModule "  init_string =  vtkSMDefaultModules${moduleName}GetInterfaces();\n")
+  SET(oneModule "${oneModule}  parser_ret = parser->Parse(init_string);\n")
+  SET(oneModule "${oneModule}  assert(parser_ret != 0);\n")
+  SET(oneModule "${oneModule} this->LoadConfigurationXML(parser->GetRootElement());\n")
+  SET(oneModule "${oneModule}  delete[] init_string;\n")
+  SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION
+    "${PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION}\n${oneModule}")
+ENDFOREACH(rf)
+
+
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtkParaViewIncludeModulesToSMApplication.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
