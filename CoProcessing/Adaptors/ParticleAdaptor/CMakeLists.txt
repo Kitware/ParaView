@@ -24,35 +24,6 @@ add_library(ParticleAdaptor ${ParticleAdaptor_SRC})
 target_link_libraries(
   ParticleAdaptor vtkCoProcessor
 )
-add_executable(ParticleViewer ParticleViewer.cxx)
-
-set(ParticleViewer_LIBS
-  vtkPVFilters
-  vtkParallel 
-  vtkGraphics
-  vtkRendering 
-  vtkIO 
-  vtkFiltering 
-  vtkCommon 
-  )
-
-IF(VTK_USE_X AND OPENGL_gl_LIBRARY)
-  set(ParticleViewer_LIBS
-    ${ParticleViewer_LIBS}
-    ${OPENGL_gl_LIBRARY}
-    )
-ELSE(VTK_USE_X AND OPENGL_gl_LIBRARY)
-  IF(VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
-    set(ParticleViewer_LIBS
-      ${ParticleViewer_LIBS}
-      ${OSMESA_LIBRARY}
-      )
-  ENDIF(VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
-ENDIF(VTK_USE_X AND OPENGL_gl_LIBRARY)
-
-target_link_libraries(
-  ParticleViewer ${ParticleViewer_LIBS}
-)
 
 # Install
 #----------------------------------------------------------------------------------------------------
