@@ -788,11 +788,17 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::ExtractSubProxy(
     {
     if(strcmp(proxyDefinition->GetNestedElement(cc)->GetName(), "SubProxy") == 0)
       {
-      vtkPVXMLElement* subProxyDef =
-          proxyDefinition->GetNestedElement(cc)->FindNestedElementByName("Proxy");
-      if( subProxyDef && strcmp( subProxyDef->GetAttribute("name"), subProxyName) == 0)
+      unsigned int nbChildren =
+          proxyDefinition->GetNestedElement(cc)->GetNumberOfNestedElements();
+      for(unsigned int childIdx = 0; childIdx < nbChildren; childIdx++)
         {
-        return subProxyDef;
+        vtkPVXMLElement* subProxyDef =
+            proxyDefinition->GetNestedElement(cc)->GetNestedElement(childIdx);
+        // Look for element name that are ending with "Proxy"
+        if(strlen(strstr(subProxyDef->GetName(), "Proxy")) == 5)
+          {
+          return subProxyDef;
+          }
         }
       }
     }
