@@ -37,7 +37,7 @@ vtkSMRemoteObject::~vtkSMRemoteObject()
 {
   if(this->Session && this->GlobalID != 0)
     {
-    this->Session->UnRegisterRemoteObject(this->GlobalID);
+    this->Session->UnRegisterRemoteObject(this->GlobalID, this->Location);
     }
   this->SetSession(0);
   delete [] this->GlobalIDString;
@@ -179,13 +179,4 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
     return false;
     }
   return true; // Successful call
-}
-
-//---------------------------------------------------------------------------
-void vtkSMRemoteObject::DestroyPMObject()
-{
-  Message msg;
-  msg.set_global_id(this->GlobalID);
-  msg.set_location(this->Location);
-  this->GetSession()->DeletePMObject(&msg);
 }

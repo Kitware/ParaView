@@ -106,10 +106,6 @@ protected:
   bool PullState(vtkSMMessage* msg);
 
   // Description:
-  // Destroys the vtkPMObject associated with this->GlobalID.
-  void DestroyPMObject();
-
-  // Description:
   // Set the GlobalUniqueId
   void SetGlobalID(vtkTypeUInt32 guid);
 

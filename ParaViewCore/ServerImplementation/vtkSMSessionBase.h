@@ -124,14 +124,6 @@ public:
   vtkObject* GetRemoteObject(vtkTypeUInt32 globalid);
 
   // Description:
-  // Register a remote object
-  void RegisterRemoteObject(vtkTypeUInt32 globalid,vtkObject* obj);
-
-  // Description:
-  // Unregister a remote object
-  void UnRegisterRemoteObject(vtkTypeUInt32 globalid);
-
-  // Description:
   // Allow the user to fill its vtkCollection with all RemoteObject
   // This could be usefull when you want to hold a reference to them to
   // prevent any deletion across several method call.
@@ -148,6 +140,16 @@ protected:
   // Overridden to relay to the server(s).
   virtual void PrepareProgressInternal();
   virtual void CleanupPendingProgressInternal();
+
+  friend class vtkSMRemoteObject;
+
+  // Description:
+  // Register a remote object
+  void RegisterRemoteObject(vtkTypeUInt32 globalid,vtkObject* obj);
+
+  // Description:
+  // Unregister a remote object
+  void UnRegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location);
 
   vtkSMSessionCore* SessionCore;
 

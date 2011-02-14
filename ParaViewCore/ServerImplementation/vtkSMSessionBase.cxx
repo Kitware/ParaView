@@ -226,16 +226,15 @@ void vtkSMSessionBase::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid)
+void vtkSMSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 location)
 {
-  // FIXME_COLLABORATION: This is not right. Why isn't the PMObject deleted when
-  // the SMObject was cleaning itself up?
-  //// Make sure to delete PMObject as well
-  //vtkSMMessage deleteMsg;
-  //deleteMsg.set_location(obj->GetLocation());
-  //deleteMsg.set_global_id(obj->GetGlobalID());
   this->SessionCore->UnRegisterRemoteObject(gid);
-  //this->DeletePMObject(&deleteMsg);
+
+  // Also delete remote resources as well
+  vtkSMMessage deleteMsg;
+  deleteMsg.set_global_id(gid);
+  deleteMsg.set_location(location);
+  this->DeletePMObject(&deleteMsg);
 }
 
 //----------------------------------------------------------------------------
