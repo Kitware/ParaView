@@ -785,7 +785,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
 
   vtkSMProxyManagerProxyInfo* proxyInfo = vtkSMProxyManagerProxyInfo::New();
   proxy_list.push_back(proxyInfo);
-  proxyInfo->Delete();
+  proxyInfo->FastDelete();
 
   proxyInfo->Proxy = proxy;
   // Add observers to note proxy modification.
