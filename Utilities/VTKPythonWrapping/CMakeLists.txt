@@ -99,6 +99,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     smtrace
     smstate
     pvfilters
+    pvvtkextensions
     )
 
   # Now copy these files if necessary.

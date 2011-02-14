@@ -47,7 +47,8 @@ if not paraview.compatibility.minor:
 if not paraview.compatibility.major:
     paraview.compatibility.minor = 5
 
-from vtkPVServerCommonPython import *
+from vtkPVClientServerCorePython import *
+from vtkPVServerImplementationPython import *
 from vtkPVServerManagerPython import *
 
 def _wrap_property(proxy, smproperty):
@@ -1820,14 +1821,12 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
         raise RuntimeError, "Cannot create a session through python. Use the GUI to setup the connection."
     if ds_host == None:
         session = vtkSMSession()
-        session.Initialize()
     elif rs_host == None:
         session = vtkSMSessionClient()
         session.Connect("cs://%s:%d" % (ds_host, ds_port))
     else:
         session = vtkSMSessionClient()
         session.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port))
-    session.Initialize()
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
     connection = Connection(id, session)
     return connection
@@ -1848,7 +1847,6 @@ def ReverseConnect(port=11111):
         raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
     session = vtkSMSessionClient()
     session.Connect("csrc://hostname:" + port)
-    session.Initialize()
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
     connection = Connection(id, session)
     return session

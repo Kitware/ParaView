@@ -1,2 +1,2 @@
-from paraview import vtk 
-from vtkPVFiltersPython import *
+# deprecated, use import pvvtkextensions instead.
+from pvvtkextensions import *
