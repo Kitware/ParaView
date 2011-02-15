@@ -745,7 +745,9 @@ void pqPluginManager::addPluginFromSettings()
 {
   // get remembered plugins
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QStringList pluginlist = settings->value("/AutoLoadPlugins").toStringList();
+  QString key = QString("/AutoLoadPlugins/%1").arg(
+    QCoreApplication::applicationFilePath());
+  QStringList pluginlist = settings->value(key).toStringList();
   foreach(QString pluginSettingKey, pluginlist)
     {
     this->processPluginSettings(pluginSettingKey);
@@ -756,7 +758,9 @@ void pqPluginManager::addPluginFromSettings()
 void pqPluginManager::savePluginSettings(bool clearFirst)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QStringList pluginlist = settings->value("/AutoLoadPlugins").toStringList();
+  QString key = QString("/AutoLoadPlugins/%1").arg(
+    QCoreApplication::applicationFilePath());
+  QStringList pluginlist = settings->value(key).toStringList();
   if(clearFirst)
     {
     pluginlist.clear();
@@ -774,7 +778,7 @@ void pqPluginManager::savePluginSettings(bool clearFirst)
           }
       }
     }
-  settings->setValue("/AutoLoadPlugins", pluginlist);
+  settings->setValue(key, pluginlist);
 }
 
 //-----------------------------------------------------------------------------
