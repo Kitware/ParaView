@@ -71,10 +71,16 @@ public:
   std::vector<TimeStep> TimeSteps;
 };
 
+class vtkSpyPlotHistoryReader::CachedTables
+{
+public:
+  std::vector<vtkTable*> Tables;
+};
 //-----------------------------------------------------------------------------
 vtkSpyPlotHistoryReader::vtkSpyPlotHistoryReader():
 Info(new MetaInfo)
 {
+  this->CachedOutput = NULL;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->FileName = 0;
@@ -88,6 +94,16 @@ Info(new MetaInfo)
 vtkSpyPlotHistoryReader::~vtkSpyPlotHistoryReader()
 {
   this->SetFileName(0);
+  delete this->Info;
+  if ( this->CachedOutput )
+    {
+    size_t size = this->CachedOutput->Tables.size();
+    for (size_t i=0; i < size; ++i)
+      {
+      this->CachedOutput->Tables[i]->Delete();
+      }
+    delete this->CachedOutput;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -199,6 +215,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
+  
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkTable *output = vtkTable::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -209,6 +226,12 @@ int vtkSpyPlotHistoryReader::RequestData(
     return 1;
     }
 
+  if ( this->CachedOutput == NULL )
+    {
+    //fill the output on the first request
+    this->CachedOutput = new CachedTables();
+    this->FillCache();
+    }
   int tsLength =
     outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   double* steps =
@@ -231,65 +254,76 @@ int vtkSpyPlotHistoryReader::RequestData(
       TimeIndex++;
       }
     }
-
+  output->ShallowCopy( this->CachedOutput->Tables[TimeIndex] );
+  return 1;
+}
+//-----------------------------------------------------------------------------
+void vtkSpyPlotHistoryReader::FillCache()
+{
   std::string line;
   std::ifstream file_stream ( this->FileName , std::ifstream::in );
-  file_stream.seekg(this->Info->TimeSteps[TimeIndex].file_pos);
-  getline(file_stream,line);
 
-  //construct the table
-  this->ConstructTableColumns(output);
-
-  //split the line into the items we want to add into the table
-  std::vector<std::string> items;
-  items.reserve(line.size()/2);
-  split(line,this->Delimeter[0],items);
-
-  //determine the number of rows our table will have
-  vtkIdType numRows = static_cast<vtkIdType>(this->Info->ColumnIndexToTracerId.size());
-  output->SetNumberOfRows(numRows);
-
-  //setup variables we need in the while loop
-  vtkFieldData *fa = output->GetFieldData();
-  vtkIdType numCols = output->GetNumberOfColumns();
-  std::vector<std::string>::const_iterator it(items.begin());
-  int index = 0;
-  double tempValue=0;
-  vtkIdType i=0,j=0;
-  while(it != items.end())
+  std::vector<TimeStep>::iterator tsIt;
+  for ( tsIt = this->Info->TimeSteps.begin(); tsIt != this->Info->TimeSteps.end();
+    tsIt++)
     {
-    if (this->Info->ColumnIndexToTracerId.count(index))
-      {
-      //add in the tracer id first
-      output->SetValue(i,0,vtkVariant(this->Info->ColumnIndexToTracerId[index]));
-      for(j=1; j < numCols; ++j)
-        {
-        output->SetValue(i,j,vtkVariant(*it));
-        ++it;
-        ++index;
-        }
-      ++i;
-      continue;
-      }
-    else if (this->Info->FieldIndexesToNames.find(index) !=
-             this->Info->FieldIndexesToNames.end())
-      {
-      //we have field data
-      vtkDoubleArray *fieldData = vtkDoubleArray::New();
-      fieldData->SetName(
-          (this->Info->FieldIndexesToNames[index]).c_str());
-      fieldData->SetNumberOfValues(1);
-      convert(*it,tempValue);
-      fieldData->InsertValue(0,tempValue);
-      fa->AddArray(fieldData);
-      fieldData->FastDelete();
-      }
-    ++it;
-    ++index;
-    }
+    file_stream.seekg(tsIt->file_pos);
+    getline(file_stream,line);
 
-  file_stream.close();
-  return 1;
+    //construct the table
+    vtkTable *output = vtkTable::New();    
+    this->ConstructTableColumns(output);
+
+    //split the line into the items we want to add into the table
+    std::vector<std::string> items;
+    items.reserve(line.size()/2);
+    split(line,this->Delimeter[0],items);
+
+    //determine the number of rows our table will have
+    vtkIdType numRows = static_cast<vtkIdType>(this->Info->ColumnIndexToTracerId.size());
+    output->SetNumberOfRows(numRows);
+
+    //setup variables we need in the while loop
+    vtkFieldData *fa = output->GetFieldData();
+    vtkIdType numCols = output->GetNumberOfColumns();
+    std::vector<std::string>::const_iterator it(items.begin());
+    int index = 0;
+    double tempValue=0;
+    vtkIdType i=0,j=0;
+    while(it != items.end())
+      {
+      if (this->Info->ColumnIndexToTracerId.count(index))
+        {
+        //add in the tracer id first
+        output->SetValue(i,0,vtkVariant(this->Info->ColumnIndexToTracerId[index]));
+        for(j=1; j < numCols; ++j)
+          {
+          output->SetValue(i,j,vtkVariant(*it));
+          ++it;
+          ++index;
+          }
+        ++i;
+        continue;
+        }
+      else if (this->Info->FieldIndexesToNames.find(index) !=
+               this->Info->FieldIndexesToNames.end())
+        {
+        //we have field data
+        vtkDoubleArray *fieldData = vtkDoubleArray::New();
+        fieldData->SetName(
+            (this->Info->FieldIndexesToNames[index]).c_str());
+        fieldData->SetNumberOfValues(1);
+        convert(*it,tempValue);
+        fieldData->InsertValue(0,tempValue);
+        fa->AddArray(fieldData);
+        fieldData->FastDelete();
+        }
+      ++it;
+      ++index;
+      }
+    this->CachedOutput->Tables.push_back(output);
+    }
+  file_stream.close();  
 }
 
 //-----------------------------------------------------------------------------
