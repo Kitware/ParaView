@@ -621,6 +621,27 @@ void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
       }
     }
 }
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(vtkSMMessage* msg)
+{
+  if (!msg)
+    {
+    return;
+    }
+
+  vtkPVXMLParser *parser = vtkPVXMLParser::New();
+  int size = msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
+  const ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
+  for(int i=0; i < size; i++)
+    {
+    xmlDef = &msg->GetExtension(ProxyDefinitionState::xml_custom_definition_proxy, i);
+    parser->Parse(xmlDef->xml().c_str());
+    this->AddCustomProxyDefinition( xmlDef->group().c_str(),
+                                    xmlDef->name().c_str(),
+                                    parser->GetRootElement());
+    }
+  parser->Delete();
+}
 
 //---------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(const char* filename)
@@ -633,6 +654,40 @@ void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(const char* filenam
   parser->Delete();
 }
 
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(vtkSMMessage* msg)
+{
+  if (!msg)
+    {
+    vtkErrorMacro("State message must be specified.");
+    return;
+    }
+
+  // Reset message state content
+  ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
+  msg->Clear();
+  msg->set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
+  msg->set_location(vtkPVSession::SERVERS); // This should be send to servers
+
+  // Fill the state with the locals custom definitions
+  vtkSMProxyDefinitionIterator* iter = this->NewIterator(2); // 2: Custom only
+  while(!iter->IsDoneWithTraversal())
+    {
+    vtkPVXMLElement* elem = iter->GetProxyDefinition();
+    if (elem)
+      {
+      vtkstd::ostringstream xmlContent;
+      iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
+
+      xmlDef = msg->AddExtension(ProxyDefinitionState::xml_custom_definition_proxy);
+      xmlDef->set_group(iter->GetGroupName());
+      xmlDef->set_name(iter->GetProxyName());
+      xmlDef->set_xml(xmlContent.str());
+      }
+    iter->GoToNextItem();
+    }
+  iter->Delete();
+}
 //---------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(
   vtkPVXMLElement* rootElement)
@@ -969,7 +1024,7 @@ void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
 {
   // Setup required message header
   msg->Clear();
-  msg->set_global_id(1);
+  msg->set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
   msg->set_location(vtkPVSession::DATA_SERVER);
 
   // This is made in a naive way, but we are sure that at each request

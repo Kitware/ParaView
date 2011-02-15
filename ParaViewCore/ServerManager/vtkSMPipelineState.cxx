@@ -21,6 +21,8 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStateLocator.h"
 
+#include "vtkPVSession.h"
+
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
@@ -28,8 +30,8 @@ vtkStandardNewMacro(vtkSMPipelineState);
 //----------------------------------------------------------------------------
 vtkSMPipelineState::vtkSMPipelineState()
 {
-  this->SetGlobalID(1); // Reserved GlobalID
-  this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->SetGlobalID(vtkPVSession::RESERVED_PROXY_MANAGER_ID);
+  this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
 }
 
 //----------------------------------------------------------------------------

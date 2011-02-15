@@ -106,11 +106,18 @@ public:
   // Load custom proxy definitions and register them.
   void LoadCustomProxyDefinitions(const char* filename);
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
+//BTX
+  void LoadCustomProxyDefinitions(vtkSMMessage* msg);
+//ETX
 
   // Description:
   // Save registered custom proxy definitions.
   void SaveCustomProxyDefinitions(const char* filename);
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
+//BTX
+  void SaveCustomProxyDefinitions(vtkSMMessage* msg);
+//ETX
+
 
   // Description:
   // Returns the number of proxies under the group with \c groupName for which

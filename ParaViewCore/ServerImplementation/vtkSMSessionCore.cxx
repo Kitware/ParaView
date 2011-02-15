@@ -26,6 +26,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
+#include "vtkPVSession.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
@@ -180,6 +181,7 @@ public:
   PMObjectMapType PMObjectMap;
   RemoteObjectMapType RemoteObjectMap;
   unsigned long InterpreterObserverID;
+  vtkstd::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
 };
 
 //****************************************************************************/
@@ -338,14 +340,18 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
   vtkTypeUInt32 globalId = message->global_id();
 
   // FIXME handle this part as well for collaboration
-  // 10 are the reserved area for non proxy object that must be shared
-  if(globalId < 10)
+  if(globalId < vtkPVSession::RESERVED_MAX_IDS)
     {
     // Special ParaView specific main components
     switch(globalId)
       {
-      case 1: // ProxyManager
+      case vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID:
+        // Update custom definition
+        this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
+        break;
+      case vtkPVSession::RESERVED_PROXY_MANAGER_ID:
         // TODO - FIXME: Forward registration proxy to other clients...
+        this->Internals->MessageCacheMap[vtkPVSession::RESERVED_PROXY_MANAGER_ID] = *message;
         break;
       }
     return;
@@ -471,13 +477,16 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
 
   vtkPMObject* obj;
 
-  if(message->global_id() < 10)
+  if(message->global_id() < vtkPVSession::RESERVED_MAX_IDS)
     {
     // Special ParaView specific main components
     switch(message->global_id())
       {
-      case 1: // ProxyManager
+      case vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID:
         this->GetProxyDefinitionManager()->GetXMLDefinitionState(message);
+        break;
+      case vtkPVSession::RESERVED_PROXY_MANAGER_ID:
+        message->CopyFrom(this->Internals->MessageCacheMap[vtkPVSession::RESERVED_PROXY_MANAGER_ID]);
         break;
       }
     }

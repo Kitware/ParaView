@@ -40,9 +40,8 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
   this->PluginManager->SetSession(this);
   this->UndoStackBuilder = NULL;
 
-  // The 10 first ID are reserved
-  //  - 1: vtkSMProxyManager
-  this->LastGUID = 10;
+  // Start after the reserved one
+  this->LastGUID = vtkPVSession::RESERVED_MAX_IDS;
 
   if (initialize_during_constructor)
     {

@@ -46,6 +46,14 @@ public:
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
     };
 
+  // This Enum allow the user to list a set of the reserved GlobalIds
+  enum ReservedGlobalIds
+    {
+    RESERVED_PROXY_MANAGER_ID = 1,
+    RESERVED_PROXY_DEFINITION_MANAGER_ID = 2,
+    RESERVED_MAX_IDS = 255
+    };
+
   // Description:
   // Returns a ServerFlags indicate the nature of the current processes. e.g. if
   // the current processes acts as a data-server and a render-server, it returns
