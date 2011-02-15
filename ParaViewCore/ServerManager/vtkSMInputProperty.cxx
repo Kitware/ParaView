@@ -65,8 +65,18 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
   var->set_type(Variant::INPUT);
   for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
     {
-    var->add_proxy_global_id(this->GetProxy(i)->GetGlobalID());
-    var->add_port_number(this->GetOutputPortForConnection(i));
+    vtkSMProxy* argument = this->GetProxy(i);
+    if (argument)
+      {
+      argument->CreateVTKObjects();
+      var->add_proxy_global_id(argument->GetGlobalID());
+      var->add_port_number(this->GetOutputPortForConnection(i));
+      }
+    else
+      {
+      var->add_proxy_global_id(0);
+      var->add_port_number(0);
+      }
     }
 }
 
