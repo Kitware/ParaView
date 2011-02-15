@@ -54,9 +54,55 @@ bool vtkPMStringVectorProperty::Push(vtkSMMessage* message, int offset)
 }
 
 //---------------------------------------------------------------------------
-bool vtkPMStringVectorProperty::Pull(vtkSMMessage*)
+bool vtkPMStringVectorProperty::Pull(vtkSMMessage* message)
 {
-  return true;
+  if (!this->InformationOnly)
+    {
+    return false;
+    }
+
+  if (!this->GetCommand())
+    {
+    // I would say that we should return false since an InformationOnly property
+    // as no meaning if no command is set, but for some legacy reason we just
+    // skip the processing if no command is provided.
+    return true;
+    }
+
+  // Invoke property's method on the root node of the server
+  vtkClientServerStream str;
+  str << vtkClientServerStream::Invoke
+    << this->GetVTKObject() << this->GetCommand()
+    << vtkClientServerStream::End;
+
+  this->ProcessMessage(str);
+
+  // Get the result
+  const vtkClientServerStream& res = this->GetLastResult();
+
+  int numMsgs = res.GetNumberOfMessages();
+  if (numMsgs < 1)
+    {
+    return true;
+    }
+
+  int numArgs = res.GetNumberOfArguments(0);
+  if (numArgs < 1)
+    {
+    return true;
+    }
+
+  // now add the single 'value' to the message.
+  ProxyState_Property *prop = message->AddExtension(ProxyState::property);
+  prop->set_name(this->GetXMLName());
+  Variant* var = prop->mutable_value();
+  var->set_type(Variant_Type_STRING);
+
+  const char* arg = NULL;
+  int retVal = res.GetArgument(0, 0, &arg);
+  var->add_txt(arg ? arg : "Invalid result");
+
+  return retVal;
 }
 
 //---------------------------------------------------------------------------
