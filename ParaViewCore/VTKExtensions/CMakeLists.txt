@@ -55,8 +55,6 @@ SET (Kit_SRCS
   vtkFlashReader.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
-  vtkIceTCompositePass.cxx
-  vtkIceTContext.cxx
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
@@ -217,8 +215,8 @@ SET (Kit_SRCS
 
 IF (VTK_USE_MPI)
   IF (PARAVIEW_USE_ICE_T)
-    SET(Filters_SRCS
-      ${Filters_SRCS}
+    SET(Kit_SRCS
+      ${Kit_SRCS}
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
     INCLUDE_DIRECTORIES(${ICET_INCLUDE_DIR})
