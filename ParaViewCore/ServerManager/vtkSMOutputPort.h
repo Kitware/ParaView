@@ -20,12 +20,14 @@
 // Previously, vtkSMOutputPort used to be a vtkSMProxy subclass since it was
 // indeed a Proxy for the output port. However that has now changed. This merely
 // sits as a datastructure to manage ports specific things like
-// data-information.
+// data-information. However for backwards compatibility, to keep the impact
+// minimal, we leave this as a sub-class of a Proxy with GlobalID=0 and
+// Session=NULL.
 
 #ifndef __vtkSMOutputPort_h
 #define __vtkSMOutputPort_h
 
-#include "vtkSMObject.h"
+#include "vtkSMProxy.h"
 
 class vtkCollection;
 class vtkPVClassNameInformation;
@@ -33,11 +35,11 @@ class vtkPVDataInformation;
 class vtkPVTemporalDataInformation;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMOutputPort : public vtkSMObject
+class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
 {
 public:
   static vtkSMOutputPort* New();
-  vtkTypeMacro(vtkSMOutputPort, vtkSMObject);
+  vtkTypeMacro(vtkSMOutputPort, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

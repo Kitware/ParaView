@@ -270,13 +270,11 @@ int pqServerManagerSelectionModel::getCommand(
 vtkSMProxy*
 pqServerManagerSelectionModel::getProxy(pqServerManagerModelItem* item)
 {
-#ifdef FIXME_COLLABORATION
   pqOutputPort* opport = qobject_cast<pqOutputPort*>(item);
   if (opport)
     {
     return opport->getOutputPortProxy();
     }
-#endif
 
   pqProxy* source = qobject_cast<pqProxy*>(item);
   if (source)

@@ -50,6 +50,7 @@ vtkSMOutputPort::vtkSMOutputPort()
   this->TemporalDataInformationValid = false;
   this->PortIndex = 0;
   this->SourceProxy = 0;
+  this->ObjectsCreated = 1;
 }
 
 //----------------------------------------------------------------------------
