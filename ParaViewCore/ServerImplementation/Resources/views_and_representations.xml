@@ -881,19 +881,12 @@
     <ContextViewProxy name="XYChartView"
       base_proxygroup="views"
       base_proxyname="XYChartViewBase"
-      class="vtkPVXYChartView"
+      class="vtkPVLineChartView"
       processes="client|renderserver|dataserver"
       representation_name="XYChartRepresentation">
       <Documentation>
         This is the proxy for the XY line chart view.
       </Documentation>
-
-      <StringVectorProperty
-        name="ChartType"
-        command="SetChartType"
-        number_of_elements="1"
-        default_values="Line" >
-      </StringVectorProperty>
 
     </ContextViewProxy>
 
@@ -901,19 +894,12 @@
     <ContextViewProxy name="XYBarChartView"
       base_proxygroup="views"
       base_proxyname="XYChartViewBase"
-      class="vtkPVXYChartView"
+      class="vtkPVBarChartView"
       processes="client|renderserver|dataserver"
       representation_name="XYBarChartRepresentation">
       <Documentation>
         This is the proxy for bar chart view.
       </Documentation>
-
-      <StringVectorProperty
-        name="ChartType"
-        command="SetChartType"
-        number_of_elements="1"
-        default_values="Bar" >
-      </StringVectorProperty>
 
     </ContextViewProxy>
 
@@ -921,19 +907,12 @@
     <ContextViewProxy name="ParallelCoordinatesChartView"
       base_proxygroup="views"
       base_proxyname="ViewBase"
-      class="vtkPVXYChartView"
+      class="vtkPVParallelCoordinatesChartView"
       processes="client|renderserver|dataserver"
       representation_name="ParallelCoordinatesRepresentation">
       <Documentation>
         This is the proxy for parallel coordinates chart view.
       </Documentation>
-
-      <StringVectorProperty
-        name="ChartType"
-        command="SetChartType"
-        number_of_elements="1"
-        default_values="ParallelCoordinates" >
-      </StringVectorProperty>
 
     </ContextViewProxy>
 

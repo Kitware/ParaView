@@ -43,6 +43,7 @@ SET (Kit_SRCS
   vtkPV2DRenderView.cxx
   vtkPVAlgorithmPortsInformation.cxx
   vtkPVArrayInformation.cxx
+  vtkPVBarChartView.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVCacheSizeInformation.cxx
@@ -69,9 +70,11 @@ SET (Kit_SRCS
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVInformation.cxx
   vtkPVLastSelectionInformation.cxx
+  vtkPVLineChartView.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
+  vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlugin.cxx
   vtkPVPluginInformation.cxx
