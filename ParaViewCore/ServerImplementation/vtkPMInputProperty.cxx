@@ -82,11 +82,11 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
     }
 
   vtkClientServerStream stream;
-  vtkObjectBase* object = this->GetVTKObject();
   if (this->CleanCommand)
     {
     stream << vtkClientServerStream::Invoke
-      << object
+      << this->ProxyHelper
+      << "CleanInputs"
       << this->CleanCommand
       << vtkClientServerStream::End;
     }
@@ -95,29 +95,26 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
     {
     vtkPMSourceProxy* pmproxy = vtkPMSourceProxy::SafeDownCast(
       this->GetPMObject(proxy_ids[cc]));
-    stream << vtkClientServerStream::Invoke << object << this->GetCommand();
-    if (this->PortIndex > 0)
-      {
-      stream << this->PortIndex;
-      }
-    if (pmproxy)
-      {
-      stream << pmproxy->GetOutputPort(output_ports[cc]);
-      }
-    else
-      {
-      stream << static_cast<vtkObjectBase*>(NULL);
-      }
-    stream << vtkClientServerStream::End;
+    vtkAlgorithmOutput* input_connection =
+      (pmproxy? pmproxy->GetOutputPort(output_ports[cc]) : NULL);
+    stream << vtkClientServerStream::Invoke
+           << this->ProxyHelper
+           << "AddInput"
+           << this->PortIndex
+           << input_connection
+           << this->GetCommand()
+           << vtkClientServerStream::End;
     }
 
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
-      << object
-      << this->GetCommand()
-      << static_cast<vtkObjectBase*>(NULL)
-      << vtkClientServerStream::End;
+           << this->ProxyHelper
+           << "AddInput"
+           << this->PortIndex
+           << static_cast<vtkObjectBase*>(NULL)
+           << this->GetCommand()
+           << vtkClientServerStream::End;
     }
 
   return this->ProcessMessage(stream);

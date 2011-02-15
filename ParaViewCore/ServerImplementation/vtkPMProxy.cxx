@@ -15,6 +15,7 @@
 #include "vtkPMProxy.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkInstantiator.h"
@@ -475,6 +476,33 @@ vtkPMProxy* vtkPMProxy::GetSubProxyHelper(unsigned int cc)
       }
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPMProxy::AddInput(
+  int inputPort, vtkAlgorithmOutput* connection, const char* method)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetVTKObject()
+         << method;
+  if (inputPort > 0)
+    {
+    stream << inputPort;
+    }
+  stream << connection << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMProxy::CleanInputs(const char* method)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetVTKObject()
+         << method
+         << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
 }
 
 //----------------------------------------------------------------------------

@@ -24,9 +24,10 @@
 #include "vtkPMObject.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
-class vtkSMProxyDefinitionManager;
-class vtkPVXMLElement;
+class vtkAlgorithmOutput;
 class vtkPMProperty;
+class vtkPVXMLElement;
+class vtkSMProxyDefinitionManager;
 
 class VTK_EXPORT vtkPMProxy : public vtkPMObject
 {
@@ -69,6 +70,14 @@ public:
   // Return true if that Proxy is supposed to have NO vtk class, which means
   // its a NullProxy.
   bool IsNullProxy() { return (VTKClassName == NULL); };
+
+  // Description:
+  // These methods are called to add/remove input connections by
+  // vtkPMInputProperty. This indirection makes it possible for subclasses to
+  // insert VTK-algorithms in the input pipeline.
+  virtual void AddInput(int input_port,
+    vtkAlgorithmOutput* connection, const char* method);
+  virtual void CleanInputs(const char* method);
 
 //BTX
 protected:
