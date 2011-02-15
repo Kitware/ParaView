@@ -94,6 +94,11 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
     {
     return;
     }
+
+  // Mark TextActor properties modified so the default value will be pushed at
+  // the UpdateVTKObject call. This prevent them from behing overriden by some
+  // vtk initialization code when the TextActor get linked to the representation
+  this->TextActorProxy->MarkAllPropertiesAsModified();
 }
 
 //----------------------------------------------------------------------------
