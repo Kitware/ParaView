@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 
 #include <QComboBox>
+#include <QLineEdit>
+#include <QSlider>
+
 #include "pqDoubleRangeWidget.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "ui_pqThresholdPanel.h"
-
 
 class pqThresholdPanel::pqUI : public Ui::ThresholdPanel { };
 
@@ -58,6 +60,22 @@ pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   QObject::connect(this->findChild<QComboBox*>("SelectInputScalars"),
     SIGNAL(activated(int)), this, SLOT(variableChanged()),
     Qt::QueuedConnection);
+
+  //setup the proper tab order. This process requires us to find
+  //the correct child widgets of the threshold objects. Without these
+  //setting the tab breaks down
+  QSlider *Slider0 = this->UI->ThresholdBetween_0->findChild<QSlider*>("Slider");
+  QLineEdit *LineEdit0 = this->UI->ThresholdBetween_0->findChild<QLineEdit*>("LineEdit");
+
+  QSlider *Slider1 = this->UI->ThresholdBetween_1->findChild<QSlider*>("Slider");
+  QLineEdit *LineEdit1 = this->UI->ThresholdBetween_1->findChild<QLineEdit*>("LineEdit");
+
+  //now setup the correct order
+  QWidget::setTabOrder(this->UI->SelectInputScalars, Slider0);
+  QWidget::setTabOrder(Slider0, LineEdit0);
+  QWidget::setTabOrder(LineEdit0, Slider1);
+  QWidget::setTabOrder(Slider1, LineEdit1);
+  QWidget::setTabOrder(LineEdit1,this->UI->AllScalars);  
 }
 
 pqThresholdPanel::~pqThresholdPanel()
@@ -94,4 +112,3 @@ void pqThresholdPanel::variableChanged()
     this->UI->ThresholdBetween_1->setValue(range[1].toDouble());
     }
 }
-
