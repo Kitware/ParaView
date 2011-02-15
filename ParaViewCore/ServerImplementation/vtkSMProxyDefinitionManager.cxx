@@ -782,6 +782,8 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::ExtractSubProxy(
     {
     return proxyDefinition;
     }
+  
+  vtksys::RegularExpression proxyDefRe(".*Proxy$");
 
   // Extract just the sub-proxy in-line definition
   for(unsigned int cc=0;cc<proxyDefinition->GetNumberOfNestedElements();cc++)
@@ -795,7 +797,9 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::ExtractSubProxy(
         vtkPVXMLElement* subProxyDef =
             proxyDefinition->GetNestedElement(cc)->GetNestedElement(childIdx);
         // Look for element name that are ending with "Proxy"
-        if(strlen(strstr(subProxyDef->GetName(), "Proxy")) == 5)
+        const char* tagname = subProxyDef->GetName();
+        if (tagname && proxyDefRe.find(tagname) &&
+          strcmp(subProxyDef->GetAttribute("name"), subProxyName) == 0)
           {
           return subProxyDef;
           }
