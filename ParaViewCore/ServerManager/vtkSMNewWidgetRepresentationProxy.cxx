@@ -65,7 +65,7 @@ struct vtkSMNewWidgetRepresentationInternals
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
 {
-  this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
   this->RepresentationProxy = 0;
   this->WidgetProxy = 0;
   this->Widget = 0;
@@ -109,12 +109,12 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     return;
     }
   this->RepresentationProxy->SetLocation(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
+    vtkPVSession::RENDER_SERVER | vtkPVSession::CLIENT);
 
   this->WidgetProxy = this->GetSubProxy("Widget");
   if (this->WidgetProxy)
     {
-    this->WidgetProxy->SetLocation(vtkProcessModule::CLIENT);
+    this->WidgetProxy->SetLocation(vtkPVSession::CLIENT);
     }
 
   this->Superclass::CreateVTKObjects();
@@ -126,7 +126,8 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
          << "SetRepresentation"
          << VTKOBJECT(this->RepresentationProxy)
          << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
+  this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER |
+    vtkPVSession::CLIENT);
 
   // Location 0 is for prototype objects !!! No need to send to the server something.
   if (!this->WidgetProxy || this->Location == 0)
