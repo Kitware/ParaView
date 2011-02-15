@@ -135,7 +135,6 @@ SET (Kit_SRCS
   vtkSMUndoElementStateKeeper.cxx
   vtkSMUndoStack.cxx
   vtkSMUndoStackBuilder.cxx
-  vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
   vtkSMViewProxy.cxx

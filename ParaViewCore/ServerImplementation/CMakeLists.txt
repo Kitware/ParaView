@@ -44,6 +44,7 @@ SET (Kit_SRCS
   vtkPMTimeRangeProperty.cxx
   vtkPMTimeStepsProperty.cxx
   vtkPMUniformGridVolumeRepresentationProxy.cxx
+  vtkPMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
   vtkPMXMLAnimationWriterRepresentationProperty.cxx

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
+  Module:    vtkPMUnstructuredGridVolumeRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,74 +12,65 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
+#include "vtkPMUnstructuredGridVolumeRepresentationProxy.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 
 
-vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
+vtkStandardNewMacro(vtkPMUnstructuredGridVolumeRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
+vtkPMUnstructuredGridVolumeRepresentationProxy::vtkPMUnstructuredGridVolumeRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMUnstructuredGridVolumeRepresentationProxy::~vtkSMUnstructuredGridVolumeRepresentationProxy()
+vtkPMUnstructuredGridVolumeRepresentationProxy::~vtkPMUnstructuredGridVolumeRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
+void vtkPMUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-  this->Superclass::CreateVTKObjects();
-  if (!this->ObjectsCreated)
-    {
-    return;
-    }
+  this->Superclass::OnCreateVTKObjects();
 
-#ifdef FIXME_COLLABORATION
+  vtkObjectBase* self = this->GetVTKObject();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << self
          << "AddVolumeMapper"
          << "Projected tetra"
-         << this->GetSubProxy("VolumePTMapper")->GetID()
+         << this->GetSubProxyHelper("VolumePTMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << self
          << "AddVolumeMapper"
          << "HAVS"
-         << this->GetSubProxy("VolumeHAVSMapper")->GetID()
+         << this->GetSubProxyHelper("VolumeHAVSMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << self
          << "AddVolumeMapper"
          << "Z sweep"
-         << this->GetSubProxy("VolumeZSweepMapper")->GetID()
+         << this->GetSubProxyHelper("VolumeZSweepMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << self
          << "AddVolumeMapper"
          << "Bunyk ray cast"
-         << this->GetSubProxy("VolumeBunykMapper")->GetID()
+         << this->GetSubProxyHelper("VolumeBunykMapper")->GetVTKObject()
          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Servers, stream);
-#endif
+  this->Interpreter->ProcessStream(stream);
 }
 
 #ifdef FIXME_COLLABORATION
+// This FIXME is from view-restructuring days.
 //-----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
-  vtkSMViewProxy* view)
+void vtkPMUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
+  vtkPMViewProxy* view)
 {
-  vtkSMRenderViewProxy* rvp = vtkSMRenderViewProxy::SafeDownCast(view);
+  vtkPMRenderViewProxy* rvp = vtkPMRenderViewProxy::SafeDownCast(view);
   if (!rvp)
     {
     return;
@@ -121,11 +112,8 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::UpdateRenderViewExtensions(
 }
 #endif
 
-
 //----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPMUnstructuredGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

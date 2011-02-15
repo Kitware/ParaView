@@ -1398,10 +1398,10 @@
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
-    <UnstructuredGridVolumeRepresentationProxy
-                          name="UnstructuredGridVolumeRepresentation"
-                          class="vtkUnstructuredGridVolumeRepresentation"
-                          processes="client|renderserver|dataserver">
+    <RepresentationProxy name="UnstructuredGridVolumeRepresentation"
+                         class="vtkUnstructuredGridVolumeRepresentation"
+                         kernel_class="vtkPMUnstructuredGridVolumeRepresentationProxy"
+                         processes="client|renderserver|dataserver">
       <Documentation>
         Representation for rendering a vtkImageData as volume.
       </Documentation>
@@ -1630,7 +1630,7 @@
       </SubProxy>
 
       <!-- end of UnstructuredGridVolumeRepresentation -->
-    </UnstructuredGridVolumeRepresentationProxy>
+    </RepresentationProxy>
 
     <!-- ================================================================== -->
     <RepresentationProxy name="UniformGridVolumeRepresentation"
