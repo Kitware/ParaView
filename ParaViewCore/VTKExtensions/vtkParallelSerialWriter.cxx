@@ -15,6 +15,7 @@
 #include "vtkParallelSerialWriter.h"
 
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
@@ -58,6 +59,7 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
   this->CurrentTimeIndex = 0;
 
   this->Interpreter = 0;
+  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetInterpreter());
 }
 
 //-----------------------------------------------------------------------------

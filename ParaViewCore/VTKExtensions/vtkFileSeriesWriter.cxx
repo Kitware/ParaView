@@ -15,6 +15,7 @@
 #include "vtkFileSeriesWriter.h"
 
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
@@ -45,6 +46,7 @@ vtkFileSeriesWriter::vtkFileSeriesWriter()
   this->NumberOfTimeSteps = 1;
   this->CurrentTimeIndex = 0;
   this->Interpreter = 0;
+  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetInterpreter());
 }
 
 //-----------------------------------------------------------------------------

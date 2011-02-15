@@ -59,8 +59,6 @@
 
       <SubProxy>
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
-          <InputProperty name="Input" command="SetInputConnection">
-          </InputProperty>
         </SourceProxy>
       </SubProxy>
 
@@ -120,8 +118,6 @@
         <!-- No harm if use vtkCompleteArrays even in serial mode so, we are
              letting it be -->
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
-          <InputProperty name="Input" command="SetInputConnection">
-          </InputProperty>
         </SourceProxy>
       </SubProxy>
       

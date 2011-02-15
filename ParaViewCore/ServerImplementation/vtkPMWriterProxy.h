@@ -28,6 +28,15 @@ public:
   vtkTypeMacro(vtkPMWriterProxy, vtkPMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // These methods are called to add/remove input connections by
+  // vtkPMInputProperty. This indirection makes it possible for subclasses to
+  // insert VTK-algorithms in the input pipeline.
+  // Overridden to insert "CompleteArrays" filter in the pipeline.
+  virtual void AddInput(int input_port,
+    vtkAlgorithmOutput* connection, const char* method);
+  virtual void CleanInputs(const char* method);
+
 //BTX
 protected:
   vtkPMWriterProxy();

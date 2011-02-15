@@ -14,10 +14,9 @@
 =========================================================================*/
 #include "vtkPMWriterProxy.h"
 
-#include "vtkParallelSerialWriter.h"
-#include "vtkFileSeriesWriter.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
+#include "vtkCompleteArrays.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMInputProperty.h"
@@ -67,20 +66,6 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   vtkObjectBase* object = this->GetVTKObject();
-  vtkParallelSerialWriter* psw =
-    vtkParallelSerialWriter::SafeDownCast(object);
-  if (psw)
-    {
-    psw->SetInterpreter(this->Interpreter);
-    }
-
-  vtkFileSeriesWriter* fsw =
-    vtkFileSeriesWriter::SafeDownCast(object);
-  if (fsw)
-    {
-    fsw->SetInterpreter(this->Interpreter);
-    }
-
   vtkPMProxy* writerProxy = this->GetSubProxyHelper("Writer");
   if (writerProxy)
     {
@@ -164,6 +149,40 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
   stream.Reset();
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkPMWriterProxy::AddInput(
+  int input_port, vtkAlgorithmOutput* connection, const char* method)
+{
+  vtkPMProxy* completeArraysPM = this->GetSubProxyHelper("CompleteArrays");
+  vtkCompleteArrays* completeArrays =
+    completeArraysPM? vtkCompleteArrays::SafeDownCast(
+      completeArraysPM->GetVTKObject()) : NULL;
+  if (completeArrays)
+    {
+    completeArrays->SetInputConnection(connection);
+    this->Superclass::AddInput(input_port, completeArrays->GetOutputPort(),
+      method);
+    }
+  else
+    {
+    this->Superclass::AddInput(input_port, connection, method);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPMWriterProxy::CleanInputs(const char* method)
+{
+  vtkPMProxy* completeArraysPM = this->GetSubProxyHelper("CompleteArrays");
+  vtkCompleteArrays* completeArrays =
+    completeArraysPM? vtkCompleteArrays::SafeDownCast(
+      completeArraysPM->GetVTKObject()) : NULL;
+  if (completeArrays)
+    {
+    completeArrays->SetInputConnection(NULL);
+    }
+  this->Superclass::CleanInputs(method);
 }
 
 //----------------------------------------------------------------------------
