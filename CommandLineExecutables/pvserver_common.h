@@ -19,11 +19,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProcessModule.h"
 #include "vtkSMSessionServer.h"
 
-static bool RealMain(int argc, char* argv[], vtkPVOptions* options,
+static bool RealMain(int argc, char* argv[],
   vtkProcessModule::ProcessTypes type)
 {
+  vtkPVServerOptions* options = vtkPVServerOptions::New();
+
   // Init current process type
   vtkInitializationHelper::Initialize( argc, argv, type, options );
+
+  options->Delete();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
@@ -36,6 +40,7 @@ static bool RealMain(int argc, char* argv[], vtkPVOptions* options,
   bool success = false;
   if (session->Connect())
     {
+    success = true;
     pm->RegisterSession(session);
     if (controller->GetLocalProcessId() == 0)
       {

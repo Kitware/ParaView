@@ -18,8 +18,5 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   // Init current process type
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  bool success = RealMain(argc, argv, options, vtkProcessModule::PROCESS_SERVER);
-  options->Delete();
-  return success? 0 : 1;
+  return RealMain(argc, argv, vtkProcessModule::PROCESS_SERVER)? 0 : 1;
 }
