@@ -6359,6 +6359,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Apply a translation to the data before scaling.
+          To convert T{5,100} to T{0,1} use Preshift=-5, Scale=1/95, PostShift=0
+          To convert T{5,105} to T{5,10} use Preshift=-5, Scale=5/100, PostShift=5
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -6389,6 +6394,19 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="0">
         <BooleanDomain name="bool" />
+        <Documentation>
+          If Periodic is true, requests for time will be wrapped around so that
+          the source appears to be a periodic time source. If data exists for times
+          {0,N-1}, setting periodic to true will cause time 0 to be produced when time
+          N, 2N, 2N etc is requested. This effectively gives the source the ability to
+          generate time data indefinitely in a loop.
+          When combined with Shift/Scale, the time becomes periodic in the
+          shifted and scaled time frame of reference.
+          Note: Since the input time may not start at zero, the wrapping of time
+          from the end of one period to the start of the next, will subtract the
+          initial time - a source with T{5..6} repeated periodicaly will have output
+          time {5..6..7..8} etc.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -6397,6 +6415,15 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          If Periodic time is enabled, this flag determines if the last time step is the same
+          as the first. If PeriodicEndCorrection is true, then it is assumed that the input
+          data goes from 0-1 (or whatever scaled/shifted actual time) and time 1 is the
+          same as time 0 so that steps will be 0,1,2,3...N,1,2,3...N,1,2,3 where step N
+          is the same as 0 and step 0 is not repeated. When this flag is false
+          the data is assumed to be literal and output is of the form 0,1,2,3...N,0,1,2,3...
+          By default this flag is ON
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -6405,6 +6432,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="1.0">
         <DoubleRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          If Periodic time is enabled, this controls how many time periods time is reported
+          for. A filter cannot output an infinite number of time steps and therefore a finite
+          number of periods is generated when reporting time.
+      </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -6685,6 +6717,11 @@ This filter operates on any type of data set, provided it has point-centered vec
            <Property name="TimeStepRangeInfo" function="Range"/>
          </RequiredProperties>
        </IntRangeDomain>
+       <Documentation>
+         Set/Get the TimeStep. This is the primary means of advancing
+         the particles. The TimeStep should be animated and this will drive
+         the pipeline forcing timesteps to be fetched from upstream.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -6720,6 +6757,15 @@ This filter operates on any type of data set, provided it has point-centered vec
         command="SetForceReinjectionEveryNSteps"
         number_of_elements="1"
         default_values="1" >
+       <Documentation>
+         When animating particles, it is nice to inject new ones every Nth step
+         to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
+         non zero value will cause the particle source to reinject particles
+         every Nth step even if it is otherwise unchanged.
+         Note that if the particle source is also animated, this flag will be
+         redundant as the particles will be reinjected whenever the source changes
+         anyway
+       </Documentation>
      </IntVectorProperty>
 
      <StringVectorProperty
@@ -6741,6 +6787,13 @@ This filter operates on any type of data set, provided it has point-centered vec
         number_of_elements="1"
         default_values="0.25" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Specify the Initial step size used for line integration, expressed in:
+          LENGTH_UNIT      = 1
+          CELL_LENGTH_UNIT = 2
+          (either the starting size for an adaptive integrator, e.g., RK45,
+          or the constant / fixed size for non-adaptive ones, i.e., RK2 and RK4)
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -6828,6 +6881,12 @@ This filter operates on any type of data set, provided it has point-centered vec
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Setting TerminationTime to a positive value will cause particles
+          to terminate when the time is reached. Use a vlue of zero to
+          diable termination. The units of time should be consistent with the
+          primary time variable.
+        </Documentation>
       </DoubleVectorProperty>
 
      <IntVectorProperty
