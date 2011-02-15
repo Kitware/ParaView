@@ -1832,7 +1832,7 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
       vtkMultiProcessController::GetGlobalController();
 
   std::vector< int > idxcounter;
-  idxcounter.resize( this->Internal->NumberOfLevels,0 );
+  idxcounter.resize( this->Internal->NumberOfLevels+1,0 );
 
   this->GenerateBlockMap();
 //  this->Internal->NumberOfMultiBlocks = 0;
@@ -1993,8 +1993,7 @@ void vtkEnzoReader::GetBlock(
   vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
 
   int level = theBlock.Level;
-  vtkAssertUtils::assertInRange(
-   level, 0, this->GetNumberOfLevels()-1,__FILE__,__LINE__ );
+  vtkAssertUtils::assertTrue((level>=0),__FILE__,__LINE__);
 
   double blockMin[3];
   double blockMax[3];
@@ -2009,13 +2008,16 @@ void vtkEnzoReader::GetBlock(
                 :   1.0;
     }
 
-  vtkAMRBox myAmrBox(
-   theBlock.MinBounds,theBlock.NumberOfDimensions,
-   theBlock.BlockNodeDimensions,spacings, blockIdx,
-   theBlock.Level, process );
+  if( bSuccess )
+    {
+      vtkAMRBox myAmrBox(
+       theBlock.MinBounds,theBlock.NumberOfDimensions,
+       theBlock.BlockNodeDimensions,spacings, blockIdx,
+       theBlock.Level, process );
 
-  hbds->SetDataSet( level, idxcounter[level], myAmrBox, uniformGrid );
-  idxcounter[ level ]++;
+      hbds->SetDataSet( level, idxcounter[level], myAmrBox, uniformGrid );
+      idxcounter[ level ]++;
+    }
 }
 
 
