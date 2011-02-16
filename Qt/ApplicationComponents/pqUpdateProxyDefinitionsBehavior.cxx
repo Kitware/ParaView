@@ -159,19 +159,20 @@ void pqUpdateProxyDefinitionsBehavior::update()
     {
     return;
     }
-#ifdef FIXME_COLLABORATION
-  // Need to fix removing of old definitions.
-#endif
 
+  // Add new definitions
   bool something_added = false;
   bool add_new = (this->AlreadySeenSet.size() != 0);
+  QSet<QString> definitionSet;
 
-  vtkSMProxyDefinitionIterator* iter = mgr->NewSingleGroupIterator(
-    this->XMLGroup.toAscii().data());
+  vtkSMProxyDefinitionIterator* iter;
+  iter = mgr->NewSingleGroupIterator(this->XMLGroup.toAscii().data());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem())
     {
     QString key = iter->GetProxyName();
+    definitionSet.insert(key);
+
     bool is_custom_filter = iter->IsCustom();
     if ( (add_new || is_custom_filter) && !this->AlreadySeenSet.contains(key) )
       {
@@ -190,33 +191,23 @@ void pqUpdateProxyDefinitionsBehavior::update()
     }
   iter->Delete();
   if (something_added)
+  {
+  this->MenuManager->populateMenu();
+  }
+
+  // Removing old definitions.
+  QSet<QString> setToRemove = this->AlreadySeenSet;
+  setToRemove.subtract(definitionSet);
+  foreach(QString name, setToRemove)
     {
-    this->MenuManager->populateMenu();
+    this->remove(name);
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqUpdateProxyDefinitionsBehavior::remove(QString name)
 {
-  vtkSMProxyDefinitionManager* mgr =
-    vtkSMObject::GetProxyManager()->GetProxyDefinitionManager();
-  if (!mgr)
-    {
-    return;
-    }
-
-  vtkSMProxyDefinitionIterator* iter = mgr->NewSingleGroupIterator(
-    this->XMLGroup.toAscii().data());
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-    iter->GoToNextItem())
-    {
-    QString key = iter->GetProxyName();
-    if ( key == name )
-      {
-      this->AlreadySeenSet.remove(key);
-      this->MenuManager->removeProxy(this->XMLGroup,key);
-      this->MenuManager->populateMenu();
-      }
-    }
-  iter->Delete();
+  this->AlreadySeenSet.remove(name);
+  this->MenuManager->removeProxy(this->XMLGroup,name);
+  this->MenuManager->populateMenu();
 }
