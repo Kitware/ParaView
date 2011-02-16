@@ -153,8 +153,12 @@ static const char * GetEnzoMajorFileName( const char * path, int & start )
 
 const char * GetEnzoMajorFileName( const char * path )
 {
-  int     dummy1;
-  return  GetEnzoMajorFileName( path, dummy1 );
+//  int     dummy1;
+//  return  GetEnzoMajorFileName( path, dummy1 );
+  std::vector< std::string > vpath;
+  vtksys::SystemTools::SplitPath( path,vpath );
+  assert( vpath.size() >= 1);
+  return( vpath[ vpath.size()-1 ].c_str() );
 }
 
 const char * GetEnzoDirectory( const char * path )
@@ -681,6 +685,12 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
         }
       stream >> theStr; // '='
       stream >> szName;
+
+      std::cout << "szName: " << szName.c_str( ) << std::endl;
+      std::cout << "sazam: " << GetEnzoMajorFileName( szName.c_str() );
+      std::cout << std::endl;
+      std::cout.flush();
+
       tmpBlk.BlockFileName = this->DirectoryName + "/" +
                              GetEnzoMajorFileName( szName.c_str() );
 
@@ -1591,7 +1601,16 @@ const char * vtkEnzoReader::GetBlockFileName( int blockIdx )
       vtkGenericWarningMacro( "Block index out-of-bounds!" );
       return NULL;
     }
-    
+
+  std::cout << "Directory Name: " << this->Internal->DirectoryName << std::endl;
+  std::cout << "Block File: ";
+  std::cout << this->Internal->Blocks[ blockIdx+1 ].BlockFileName << std::endl;
+  std::cout.flush( );
+
+//  return(
+//       ( this->Internal->DirectoryName +
+//         this->Internal->Blocks[ blockIdx+1 ].BlockFileName ).c_str()
+//         );
   return  this->Internal->Blocks[ blockIdx + 1 ].BlockFileName.c_str();
 }
 
@@ -1605,7 +1624,10 @@ const char * vtkEnzoReader::GetParticleFileName( int blockIdx )
       vtkGenericWarningMacro( "Block index out-of-bounds!" );
       return NULL;
     }
-    
+//  return(
+//     ( this->Internal->DirectoryName +
+//       this->Internal->Blocks[ blockIdx+1 ].ParticleFileName ).c_str()
+//       );
   return  this->Internal->Blocks[ blockIdx + 1 ].ParticleFileName.c_str();
 }
 
