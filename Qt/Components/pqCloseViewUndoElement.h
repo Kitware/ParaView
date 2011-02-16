@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiView.h"
 #include <vtkSmartPointer.h>
 
+class vtkSMCacheBasedProxyLocator;
 
 /// pqCloseViewUndoElement is undo element used to undo the closing
 /// of a view frame.
@@ -64,7 +65,12 @@ public:
   // Creates the undo element for the split operation.
   // \c invert flag inverts the operation of this undo element. When true,
   // Undo() does with Redo() would when invert=false, and vice-versa.
-  void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state, vtkPVXMLElement* viewsState);
+  void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state);
+
+  // Description:
+  // Get CacheBasedProxyLocator in order to register proxy that we are
+  // interessted in.
+  vtkGetObjectMacro(ViewStateCache, vtkSMCacheBasedProxyLocator);
 
 protected:
   pqCloseViewUndoElement();
@@ -73,7 +79,7 @@ protected:
   vtkSetStringMacro(Index);
   char* Index;
   vtkSmartPointer<vtkPVXMLElement> State;
-  vtkSmartPointer<vtkPVXMLElement> ViewsState;
+  vtkSMCacheBasedProxyLocator* ViewStateCache;
 
 private:
   pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.

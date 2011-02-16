@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
+#include "vtkSMCacheBasedProxyLocator.h"
 
 // Qt includes.
 #include <QAction>
@@ -440,23 +442,20 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   vtkPVXMLElement* state = vtkPVXMLElement::New();
   this->saveState(state);
 
-  // Save views state in XML as well
-  vtkSmartPointer<vtkPVXMLElement> viewsState;
-  viewsState = vtkSmartPointer<vtkPVXMLElement>::New();
-  viewsState->SetName("ServerManagerState");
+  pqMultiView::Index index = this->indexOf(frame);
+  pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
+  elem->CloseView(index, state->GetNestedElement(0));
+  this->Internal->CloseFrameUndoElement = elem;
+  elem->FastDelete();
+  state->FastDelete();
+
+  // Fill with the views states
   pqInternals::FrameMapType::Iterator iter = this->Internal->Frames.begin();
   for(; iter != this->Internal->Frames.end(); ++iter)
     {
     pqView* view = iter.value();
-    view->getProxy()->SaveXMLState(viewsState);
+    elem->GetViewStateCache()->StoreProxyState(view->getProxy());
     }
-
-  pqMultiView::Index index = this->indexOf(frame);
-  pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
-  elem->CloseView(index, state->GetNestedElement(0), viewsState);
-  this->Internal->CloseFrameUndoElement = elem;
-  elem->Delete();
-  state->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -877,8 +876,6 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
     rwRoot->AddNestedElement(frameElem);
     frameElem->Delete();
     }
-
-  rwRoot->PrintXML();
 }
 
 //-----------------------------------------------------------------------------
@@ -922,7 +919,6 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   this->Internal->DontCreateDeleteViewsModules = false;
 
   this->Internal->Frames.clear();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   for(unsigned int cc=0; cc < rwRoot->GetNumberOfNestedElements(); cc++)
     {
     vtkPVXMLElement* elem = rwRoot->GetNestedElement(cc);
@@ -934,21 +930,37 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       index.setFromString(index_string);
       int id = 0;
       elem->GetScalarAttribute("view_module", &id);
-      vtkSmartPointer<vtkSMProxy> viewModule;
-      viewModule = locator->LocateProxy(id);
-      if (!viewModule.GetPointer())
-        {
-        qCritical() << "Failed to locate view module mentioned in state!";
-        return false;
-        }
 
-      pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
-        findItem<pqView*>(viewModule);
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        this->widgetOfIndex(index));
-      if (frame && view)
+      // Do we have a View to bind to that frame ?
+      if(id != 0)
         {
-        this->connect(frame, view);
+        vtkSmartPointer<vtkSMProxy> viewModule;
+        viewModule = locator->LocateProxy(id);
+        if (!viewModule.GetPointer())
+          {
+          qCritical() << "Failed to locate view module mentioned in state! (view id: " << id << ")";
+          return false;
+          }
+
+        pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
+                       findItem<pqView*>(viewModule);
+        pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+            this->widgetOfIndex(index));
+        if (frame && view)
+          {
+          this->connect(frame, view);
+          }
+        else
+          {
+          // If we didn't managed to connect the view yet, we just tell that the
+          // next registered view will be linked to that pending frame. This is
+          // tipically the case for undoCloseView because the given view is not
+          // registered yet inside the proxy manager.
+          // CAUTION: This can only work if one view as been close at a time,
+          //          otherwise we don't have any waranty that the view will get
+          //          back into their original frame.
+          this->Internal->PendingFrames.push_front(frame);
+          }
         }
       }
     }

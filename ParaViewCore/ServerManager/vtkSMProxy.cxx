@@ -1847,7 +1847,10 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
       }
     else if(!subProxy->HasGlobalID())
       {
-      vtkErrorMacro("### Warning !!! : set subproxy global ID without state. " << subProxyMsg->global_id());
+      if(strcmp(subProxy->GetXMLName(),"Camera"))
+        {
+        vtkErrorMacro("### Warning !!! : set subproxy global ID without state. " << subProxyMsg->global_id());
+        }
       subProxy->SetGlobalID(subProxyMsg->global_id());
       }
     }

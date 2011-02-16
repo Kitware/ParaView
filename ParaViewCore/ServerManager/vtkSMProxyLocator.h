@@ -37,7 +37,7 @@ public:
   // Locate a proxy with the given "name". If none can be found returns NULL.
   // If a proxy with the name was not previously located, it will ask the
   // Deserializer (if any) to create a new proxy is possible.
-  vtkSMProxy* LocateProxy(int name);
+  virtual vtkSMProxy* LocateProxy(vtkTypeUInt32 globalID);
 
   // Description:
   // Get/Set the de-serializer to used to locate XMLs for unknown proxies
@@ -47,12 +47,8 @@ public:
 
   // Description:
   // Clear the locator.
-  void Clear();
+  virtual void Clear();
 
-  // Description:
-  // WARNING: Temporary API. This will be restructured soon.
-  vtkSetMacro(ReviveProxies, int);
-  vtkGetMacro(ReviveProxies, int);
 //BTX
 protected:
   vtkSMProxyLocator();
@@ -61,11 +57,10 @@ protected:
   // Description:
   // Create new proxy with the given id. Default implementation asks the
   // Deserializer, if any, to create a new proxy.
-  virtual vtkSMProxy* NewProxy(int id);
+  virtual vtkSMProxy* NewProxy(vtkTypeUInt32 globalID);
 
   vtkSMDeserializer* Deserializer;
 
-  int ReviveProxies;
 private:
   vtkSMProxyLocator(const vtkSMProxyLocator&); // Not implemented
   void operator=(const vtkSMProxyLocator&); // Not implemented

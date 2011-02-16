@@ -35,6 +35,7 @@ SET (Kit_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxRepresentationProxy.cxx
+  vtkSMCacheBasedProxyLocator.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraLink.cxx

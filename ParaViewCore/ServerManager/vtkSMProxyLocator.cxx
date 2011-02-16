@@ -24,7 +24,7 @@
 class vtkSMProxyLocator::vtkInternal
 {
 public:
-  typedef vtkstd::map<int, vtkSmartPointer<vtkSMProxy> > ProxiesType;
+  typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy> > ProxiesType;
   ProxiesType Proxies;
 };
 
@@ -35,7 +35,6 @@ vtkSMProxyLocator::vtkSMProxyLocator()
 {
   this->Internal = new vtkInternal();
   this->Deserializer = 0;
-  this->ReviveProxies = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -46,7 +45,7 @@ vtkSMProxyLocator::~vtkSMProxyLocator()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyLocator::LocateProxy(int id)
+vtkSMProxy* vtkSMProxyLocator::LocateProxy(vtkTypeUInt32 id)
 {
   vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.find(id);
   if (iter != this->Internal->Proxies.end())
@@ -69,7 +68,7 @@ void vtkSMProxyLocator::Clear()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyLocator::NewProxy(int id)
+vtkSMProxy* vtkSMProxyLocator::NewProxy(vtkTypeUInt32 id)
 {
   if (this->Deserializer)
     {
@@ -85,7 +84,6 @@ vtkSMProxy* vtkSMProxyLocator::NewProxy(int id)
 void vtkSMProxyLocator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ReviveProxies: " << this->ReviveProxies << endl;
   os << indent << "Deserializer: " << this->Deserializer << endl;
 }
 

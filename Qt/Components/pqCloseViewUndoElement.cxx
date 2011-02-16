@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyLocator.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMCacheBasedProxyLocator.h"
 
 #include "pqApplicationCore.h"
 #include "pqViewManager.h"
@@ -45,6 +46,7 @@ vtkStandardNewMacro(pqCloseViewUndoElement);
 pqCloseViewUndoElement::pqCloseViewUndoElement()
 {
   this->Index = NULL;
+  this->ViewStateCache = vtkSMCacheBasedProxyLocator::New();
   this->SetSession(NULL); // Maybe keep the one use to create the Element for state loading...
 }
 
@@ -52,15 +54,15 @@ pqCloseViewUndoElement::pqCloseViewUndoElement()
 pqCloseViewUndoElement::~pqCloseViewUndoElement()
 {
   this->SetIndex(NULL);
+  this->ViewStateCache->Delete();
 }
 
 //----------------------------------------------------------------------------
 void pqCloseViewUndoElement::CloseView(
-  pqMultiView::Index frameIndex, vtkPVXMLElement* state, vtkPVXMLElement* viewsState)
+  pqMultiView::Index frameIndex, vtkPVXMLElement* state)
 {
   this->SetIndex(frameIndex.getString().toAscii().data());
   this->State = state;
-  this->ViewsState = viewsState;
 }
 
 //----------------------------------------------------------------------------
@@ -74,10 +76,9 @@ int pqCloseViewUndoElement::Undo()
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
-  vtkSmartPointer<vtkSMStateLoader> loader = vtkSmartPointer<vtkSMStateLoader>::New();
-  loader->SetSession(vtkSMProxyManager::GetProxyManager()->GetSession());
-  loader->LoadState(this->ViewsState);
-  manager->loadState(this->State, loader->GetProxyLocator());
+  manager->loadState(this->State, this->ViewStateCache);
+  this->ViewStateCache->GetLocatedProxies(this->UndoSetWorkingContext);
+  this->ViewStateCache->Clear();
   return 1;
 }
 
