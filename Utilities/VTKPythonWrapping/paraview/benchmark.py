@@ -30,7 +30,12 @@ been tried since before 3.9's view restructuring
 import time
 import sys
 from paraview.simple import *
-import numpy
+
+try:
+    import numpy
+    numpy_loaded = True
+except ImportError:
+    numpy_loaded = False
 
 import re
 import paraview
@@ -492,8 +497,9 @@ def parse_logs(show_parse = False, tabular = False) :
             for x in frecs.keys():
                 v = frecs[x]
                 print "# ", x, len(v),
-                print numpy.min(v), numpy.mean(v), numpy.max(v),
-                print numpy.std(v)
+                if numpy_loaded:
+                    print numpy.min(v), numpy.mean(v), numpy.max(v),
+                    print numpy.std(v)
         else:
             print "#FRAME TIMINGS"
             print "#filter id, filter type, inclusive duration, local duration"
@@ -568,26 +574,16 @@ def run(filename=None, nframes=60):
 
     # Start with these defaults
     #v.RemoteRenderThreshold = 0
-    v.UseImmediateMode = 0
-    v.UseTriangleStrips = 0
+    obj = servermanager.misc.GlobalMapperProperties()
+    obj.GlobalImmediateModeRendering = 0
 
     # Test different configurations
-    v.UseImmediateMode = 0
     title = 'display lists, no triangle strips, solid color'
-    v.UseTriangleStrips = 0
+    obj.GlobalImmediateModeRendering = 0
     results.append(__render(ss, v, title, nframes))
 
-    title = 'display lists, triangle strips, solid color'
-    v.UseTriangleStrips = 1
-    results.append(__render(ss, v, title, nframes))
-
-    v.UseImmediateMode = 1
     title = 'no display lists, no triangle strips, solid color'
-    v.UseTriangleStrips = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, triangle strips, solid color'
-    v.UseTriangleStrips = 1
+    obj.GlobalImmediateModeRendering = 1
     results.append(__render(ss, v, title, nframes))
 
     # Color by normals
@@ -599,23 +595,12 @@ def run(filename=None, nframes=60):
     lt.ColorSpace = 'HSV'
     lt.VectorComponent = 0
 
-    v.UseImmediateMode = 0
     title = 'display lists, no triangle strips, color by array'
-    v.UseTriangleStrips = 0
+    obj.GlobalImmediateModeRendering = 0
     results.append(__render(ss, v, title, nframes))
 
-    title = 'display lists, triangle strips, color by array'
-    v.UseTriangleStrips = 1
-    results.append(__render(ss, v, title, nframes))
-    v.UseImmediateMode = 1
-
-    v.UseImmediateMode = 1
     title = 'no display lists, no triangle strips, color by array'
-    v.UseTriangleStrips = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, triangle strips, color by array'
-    v.UseTriangleStrips = 1
+    obj.GlobalImmediateModeRendering = 1
     results.append(__render(ss, v, title, nframes))
 
     if filename:
