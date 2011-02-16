@@ -377,7 +377,7 @@ void vtkSMSessionServer::SendLastResultToClient()
   int size;
 
   reply.GetData(&data, &size_size_t);
-  size = static_cast<int>(size);
+  size = static_cast<int>(size_size_t);
 
   this->ClientController->Send(&size, 1, 1,
     vtkSMSessionServer::REPLY_LAST_RESULT);
