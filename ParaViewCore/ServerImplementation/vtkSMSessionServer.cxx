@@ -298,30 +298,40 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
   stream >> type;
   switch (type)
     {
-    case vtkSMSessionServer::PUSH:
-        {
-        vtkstd::string string;
-        stream >> string;
-        vtkSMMessage msg;
-        msg.ParseFromString(string);
-        this->PushState(&msg);
-        }
-      break;
+  case vtkSMSessionServer::PUSH:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->PushState(&msg);
+      }
+    break;
 
-    case vtkSMSessionServer::PULL:
-        {
-        vtkstd::string string;
-        stream >> string;
-        vtkSMMessage msg;
-        msg.ParseFromString(string);
-        this->PullState(&msg);
+  case vtkSMSessionServer::PULL:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->PullState(&msg);
 
-        // Send the result back to client
-        vtkMultiProcessStream css;
-        css << msg.SerializeAsString();
-        this->ClientController->Send( css, 1, vtkSMSessionServer::REPLY_PULL);
-        }
-      break;
+      // Send the result back to client
+      vtkMultiProcessStream css;
+      css << msg.SerializeAsString();
+      this->ClientController->Send( css, 1, vtkSMSessionServer::REPLY_PULL);
+      }
+    break;
+
+  case vtkSMSessionServer::DELETE_SI:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->DeletePMObject(&msg);
+      }
+    break;
 
   case vtkSMSessionServer::EXECUTE_STREAM:
       {

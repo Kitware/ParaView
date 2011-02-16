@@ -130,6 +130,15 @@ protected:
 
   void SetupDataServerRenderServerConnection();
 
+  // Description:
+  // Delete server side object. (PMObject)
+  virtual void DeletePMObject(vtkSMMessage* msg);
+
+  // Description:
+  // Translates the location to a real location based on whether a separate
+  // render-server exists.
+  vtkTypeUInt32 GetRealLocation(vtkTypeUInt32);
+
   // Both maybe the same when connected to pvserver.
   vtkMultiProcessController* RenderServerController;
   vtkMultiProcessController* DataServerController;

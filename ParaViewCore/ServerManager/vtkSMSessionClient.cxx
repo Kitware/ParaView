@@ -374,51 +374,59 @@ void vtkSMSessionClient::CloseSession()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::PushState(vtkSMMessage* message)
+vtkTypeUInt32 vtkSMSessionClient::GetRealLocation(vtkTypeUInt32 location)
 {
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (message->location() & vtkPVSession::RENDER_SERVER)
+    if ((location & vtkPVSession::RENDER_SERVER) != 0)
       {
-      message->set_location(message->location() | vtkPVSession::DATA_SERVER);
-      message->set_location(message->location() & ~vtkPVSession::RENDER_SERVER);
+      location |= vtkPVSession::DATA_SERVER;
+      location &= ~vtkPVSession::RENDER_SERVER;
       }
-    if (message->location() & vtkPVSession::RENDER_SERVER_ROOT)
+    if ((location & vtkPVSession::RENDER_SERVER_ROOT) != 0)
       {
-      message->set_location(message->location() | vtkPVSession::DATA_SERVER_ROOT);
-      message->set_location(message->location() & ~vtkPVSession::RENDER_SERVER_ROOT);
+      location |= vtkPVSession::DATA_SERVER_ROOT;
+      location &= ~vtkPVSession::RENDER_SERVER_ROOT;
       }
     }
+  return location;
+}
 
-  if ( (message->location() & vtkPVSession::DATA_SERVER) != 0 ||
-    (message->location() & vtkPVSession::DATA_SERVER_ROOT) != 0)
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::PushState(vtkSMMessage* message)
+{
+  vtkTypeUInt32 location = this->GetRealLocation(message->location());
+  message->set_location(location);
+
+  vtkMultiProcessController* controllers[2] = {NULL, NULL};
+  int num_controllers=0;
+  if ( (location &
+      (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->DataServerController;
+    }
+  if ((location &
+    (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->RenderServerController;
+    }
+  if (num_controllers > 0)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkSMSessionServer::PUSH);
     stream << message->SerializeAsString();
     vtkstd::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
-    this->DataServerController->TriggerRMIOnAllChildren(
-      &raw_message[0], static_cast<int>(raw_message.size()),
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+    for (int cc=0; cc < num_controllers; cc++)
+      {
+      controllers[cc]->TriggerRMIOnAllChildren(
+        &raw_message[0], static_cast<int>(raw_message.size()),
+        vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      }
     }
 
-  if (this->RenderServerController != NULL &&
-    ((message->location() & vtkPVSession::RENDER_SERVER) != 0 ||
-    (message->location() & vtkPVSession::RENDER_SERVER_ROOT) != 0))
-    {
-    vtkMultiProcessStream stream;
-    stream << static_cast<int>(vtkSMSessionServer::PUSH);
-    stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
-    stream.GetRawData(raw_message);
-    this->RenderServerController->TriggerRMIOnAllChildren(
-      &raw_message[0], static_cast<int>(raw_message.size()),
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    }
-
-  if ( (message->location() & vtkPVSession::CLIENT) != 0)
+  if ((location & vtkPVSession::CLIENT) != 0)
     {
     this->Superclass::PushState(message);
     }
@@ -433,66 +441,50 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::PullState(vtkSMMessage* message)
 {
-  if (this->RenderServerController == NULL)
-    {
-    // re-route all render-server messages to data-server.
-    if (message->location() & vtkPVSession::RENDER_SERVER)
-      {
-      message->set_location(message->location() | vtkPVSession::DATA_SERVER);
-      message->set_location(message->location() & ~vtkPVSession::RENDER_SERVER);
-      }
-    if (message->location() & vtkPVSession::RENDER_SERVER_ROOT)
-      {
-      message->set_location(message->location() | vtkPVSession::DATA_SERVER_ROOT);
-      message->set_location(message->location() & ~vtkPVSession::RENDER_SERVER_ROOT);
-      }
-    }
+  vtkTypeUInt32 location = this->GetRealLocation(message->location());
+  message->set_location(location);
+
+  vtkMultiProcessController* controller = NULL;
 
   // We make sure that only ONE location is targeted with a priority order
   // (1) Client (2) DataServer (3) RenderServer
-  if ( (message->location() & vtkPVSession::CLIENT) != 0)
+  if ( (location & vtkPVSession::CLIENT) != 0)
     {
-    this->Superclass::PullState(message);
-    // Everything is local no communication needed (Send/Reply)
+    controller = NULL;
     }
-  else if ( (message->location() & vtkPVSession::DATA_SERVER) != 0 ||
-    (message->location() & vtkPVSession::DATA_SERVER_ROOT) != 0)
+  else if ( (location & 
+      (vtkPVSession::DATA_SERVER | vtkPVSession::DATA_SERVER_ROOT)) != 0)
     {
-    vtkMultiProcessStream stream;
-    stream << static_cast<int>(vtkSMSessionServer::PULL);
-    stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
-    stream.GetRawData(raw_message);
-    this->DataServerController->TriggerRMIOnAllChildren(
-        &raw_message[0], static_cast<int>(raw_message.size()),
-        vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+    controller = this->DataServerController;
+    }
+  else if ( (location & 
+      (vtkPVSession::RENDER_SERVER | vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controller = this->RenderServerController;
+    }
 
-    // Get the reply
-    vtkMultiProcessStream replyStream;
-    this->DataServerController->Receive(replyStream, 1, vtkSMSessionServer::REPLY_PULL);
-    vtkstd::string string;
-    replyStream >> string;
-    message->ParseFromString(string);
-    }
-  else if (this->RenderServerController != NULL &&
-           ((message->location() & vtkPVSession::RENDER_SERVER) != 0 ||
-            (message->location() & vtkPVSession::RENDER_SERVER_ROOT) != 0))
+  if (controller)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkSMSessionServer::PULL);
     stream << message->SerializeAsString();
     vtkstd::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
-    this->RenderServerController->TriggerRMIOnAllChildren(
+    controller->TriggerRMIOnAllChildren(
       &raw_message[0], static_cast<int>(raw_message.size()),
       vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
 
     // Get the reply
     vtkMultiProcessStream replyStream;
-    this->DataServerController->Receive(replyStream, 1, vtkSMSessionServer::REPLY_PULL);
+    controller->Receive(replyStream, 1, vtkSMSessionServer::REPLY_PULL);
     vtkstd::string string;
     replyStream >> string;
     message->ParseFromString(string);
+    }
+  else
+    {
+    this->Superclass::PullState(message);
+    // Everything is local no communication needed (Send/Reply)
     }
 }
 
@@ -501,50 +493,41 @@ void vtkSMSessionClient::ExecuteStream(
   vtkTypeUInt32 location, const vtkClientServerStream& cssstream,
   bool ignore_errors)
 {
-  if (this->RenderServerController == NULL)
+  location = this->GetRealLocation(location);
+
+  vtkMultiProcessController* controllers[2] = {NULL, NULL};
+  int num_controllers=0;
+  if ((location &
+      (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
     {
-    // re-route all render-server messages to data-server.
-    if (location & vtkPVSession::RENDER_SERVER)
-      {
-      location |= vtkPVSession::DATA_SERVER;
-      location &= ~vtkPVSession::RENDER_SERVER;
-      }
-    if (location & vtkPVSession::RENDER_SERVER_ROOT)
-      {
-      location |= vtkPVSession::DATA_SERVER_ROOT;
-      location &= ~vtkPVSession::RENDER_SERVER_ROOT;
-      }
+    controllers[num_controllers++] = this->DataServerController;
+    }
+  if ((location &
+    (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->RenderServerController;
     }
 
-  const unsigned char* data;
-  size_t size;
-  cssstream.GetData(&data, &size);
-
-  vtkMultiProcessStream stream;
-  stream << static_cast<int>(vtkSMSessionServer::EXECUTE_STREAM)
-    << static_cast<int>(ignore_errors) << static_cast<int>(size);
-  vtkstd::vector<unsigned char> raw_message;
-  stream.GetRawData(raw_message);
-
-  if ( (location & vtkPVSession::DATA_SERVER) != 0 ||
-    (location & vtkPVSession::DATA_SERVER_ROOT) != 0)
+  if (num_controllers > 0)
     {
-    this->DataServerController->TriggerRMIOnAllChildren(
-      &raw_message[0], static_cast<int>(raw_message.size()),
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->DataServerController->Send(data, static_cast<int>(size), 1,
-      vtkSMSessionServer::EXECUTE_STREAM_TAG);
-    }
+    const unsigned char* data;
+    size_t size;
+    cssstream.GetData(&data, &size);
 
-  if (this->RenderServerController != NULL &&
-    ((location & vtkPVSession::RENDER_SERVER) != 0 ||
-    (location & vtkPVSession::RENDER_SERVER_ROOT) != 0))
-    {
-    this->RenderServerController->TriggerRMIOnAllChildren(
-      &raw_message[0], static_cast<int>(raw_message.size()),
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->RenderServerController->Send(data, static_cast<int>(size), 1,
-      vtkSMSessionServer::EXECUTE_STREAM_TAG);
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(vtkSMSessionServer::EXECUTE_STREAM)
+      << static_cast<int>(ignore_errors) << static_cast<int>(size);
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+
+    for (int cc=0; cc < num_controllers; cc++)
+      {
+      controllers[cc]->TriggerRMIOnAllChildren(
+        &raw_message[0], static_cast<int>(raw_message.size()),
+        vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      controllers[cc]->Send(data, static_cast<int>(size), 1,
+        vtkSMSessionServer::EXECUTE_STREAM_TAG);
+      }
     }
 
   if ( (location & vtkPVSession::CLIENT) != 0)
@@ -556,28 +539,14 @@ void vtkSMSessionClient::ExecuteStream(
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 location)
 {
-  if (this->RenderServerController == NULL)
-    {
-    // re-route all render-server messages to data-server.
-    if (location & vtkPVSession::RENDER_SERVER)
-      {
-      location |= vtkPVSession::DATA_SERVER_ROOT;
-      location &= ~vtkPVSession::RENDER_SERVER;
-      }
-    if (location & vtkPVSession::RENDER_SERVER_ROOT)
-      {
-      location |= vtkPVSession::DATA_SERVER_ROOT;
-      location &= ~vtkPVSession::RENDER_SERVER_ROOT;
-      }
-    }
-
-  if (location & vtkPVSession::CLIENT)
-    {
-    return this->Superclass::GetLastResult(location);
-    }
+  location = this->GetRealLocation(location);
 
   vtkMultiProcessController* controller = NULL;
-  if ( (location & vtkPVSession::DATA_SERVER_ROOT) ||
+  if (location & vtkPVSession::CLIENT)
+    {
+    controller = NULL;
+    }
+  else if ( (location & vtkPVSession::DATA_SERVER_ROOT) ||
     (location & vtkPVSession::DATA_SERVER) )
     {
     controller = this->DataServerController;
@@ -609,6 +578,7 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
     delete [] raw_data;
     return *this->ServerLastInvokeResult;
     }
+
   return this->Superclass::GetLastResult(location);
 }
 
@@ -693,6 +663,45 @@ bool vtkSMSessionClient::GatherInformation(
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::DeletePMObject(vtkSMMessage* message)
+{
+  vtkTypeUInt32 location = this->GetRealLocation(message->location());
+  message->set_location(location);
+
+  vtkMultiProcessController* controllers[2] = {NULL, NULL};
+  int num_controllers=0;
+  if ((location &
+      (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->DataServerController;
+    }
+  if ((location &
+    (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->RenderServerController;
+    }
+  if (num_controllers > 0)
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(vtkSMSessionServer::DELETE_SI);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    for (int cc=0; cc < num_controllers; cc++)
+      {
+      controllers[cc]->TriggerRMIOnAllChildren(
+        &raw_message[0], static_cast<int>(raw_message.size()),
+        vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      }
+    }
+
+  if  ( (location & vtkPVSession::CLIENT) != 0)
+    {
+    this->Superclass::DeletePMObject(message);
+    }
 }
 
 //----------------------------------------------------------------------------

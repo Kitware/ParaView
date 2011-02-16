@@ -66,6 +66,10 @@ namespace
     case vtkSMSessionCore::EXECUTE_STREAM:
       sessioncore->ExecuteStreamSatelliteCallback();
       break;
+
+    case vtkSMSessionCore::DELETE_SI:
+      sessioncore->DeletePMObjectSatelliteCallback();
+      break;
       }
     }
 };
@@ -581,6 +585,68 @@ void vtkSMSessionCore::ExecuteStreamInternal(
 
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
+{
+  // This can only be called on the root node.
+  assert(this->ParallelController == NULL ||
+    this->ParallelController->GetLocalProcessId() == 0);
+
+  vtkTypeUInt32 location = message->location();
+
+  if ( (location & vtkProcessModule::SERVERS) != 0)
+    {
+    // send message to satellites and then start processing.
+
+    if (this->ParallelController &&
+      this->ParallelController->GetNumberOfProcesses() > 1 &&
+      this->ParallelController->GetLocalProcessId() == 0)
+      {
+      // Forward the message to the satellites if the object is expected to exist
+      // on the satellites.
+
+      // FIXME: There's one flaw in this logic. If a object is to be created on
+      // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
+      // configuration, the message will end up being send to all data-server
+      // nodes as well. Although we never do that presently, it's a possibility
+      // and we should fix this.
+      unsigned char type = DELETE_SI;
+      this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
+        ROOT_SATELLITE_RMI_TAG);
+
+      int byte_size = message->ByteSize();
+      unsigned char *raw_data = new unsigned char[byte_size + 1];
+      message->SerializeToArray(raw_data, byte_size);
+      this->ParallelController->Broadcast(&byte_size, 1, 0);
+      this->ParallelController->Broadcast(raw_data, byte_size, 0);
+      delete [] raw_data;
+      }
+    }
+
+  this->DeletePMObjectInternal(message);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::DeletePMObjectSatelliteCallback()
+{
+  int byte_size = 0;
+  this->ParallelController->Broadcast(&byte_size, 1, 0);
+
+  unsigned char *raw_data = new unsigned char[byte_size + 1];
+  this->ParallelController->Broadcast(raw_data, byte_size, 0);
+
+  vtkSMMessage message;
+  if (!message.ParseFromArray(raw_data, byte_size))
+    {
+    vtkErrorMacro("Failed to parse protobuf message.");
+    }
+  else
+    {
+    this->DeletePMObjectInternal(&message);
+    }
+  delete [] raw_data;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::DeletePMObjectInternal(vtkSMMessage* message)
 {
   LOG(
     << "----------------------------------------------------------------\n"

@@ -115,11 +115,13 @@ public:
     PUSH_STATE   = 12,
     PULL_STATE   = 13,
     EXECUTE_STREAM = 14,
-    GATHER_INFORMATION = 15
+    GATHER_INFORMATION = 15,
+    DELETE_SI=16
     };
   void PushStateSatelliteCallback();
   void ExecuteStreamSatelliteCallback();
   void GatherInformationStatelliteCallback();
+  void DeletePMObjectSatelliteCallback();
 
   // Description:
   // Allow the user to fill its vtkCollection with all RemoteObject
@@ -139,6 +141,7 @@ protected:
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);
 
+  virtual void DeletePMObjectInternal(vtkSMMessage* message);
 
   // Description:
   // Callback for reporting interpreter errors.
