@@ -173,6 +173,7 @@ void vtkSMProxyManager::SetProxyDefinitionManager(
   if (this->ProxyDefinitionManager)
     {
     this->ProxyDefinitionManager->RemoveObserver(this->Forwarder);
+    this->ProxyDefinitionManager->RemoveObserver(this->Observer);
     }
   vtkSetObjectBodyMacro(
     ProxyDefinitionManager, vtkSMProxyDefinitionManager, mgr);
@@ -182,6 +183,14 @@ void vtkSMProxyManager::SetProxyDefinitionManager(
       vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated, this->Forwarder);
     this->ProxyDefinitionManager->AddObserver(
       vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Forwarder);
+
+    this->ProxyDefinitionManager->AddObserver(
+        vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+        this->Observer);
+    this->ProxyDefinitionManager->AddObserver(
+        vtkCommand::RegisterEvent, this->Observer);
+    this->ProxyDefinitionManager->AddObserver(
+        vtkCommand::UnRegisterEvent, this->Observer);
     }
 }
 
@@ -984,6 +993,40 @@ void vtkSMProxyManager::UnRegisterAllLinks()
 void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* data)
 {
+  // Check if we need to reformat custom definition to ProxyManager listeners
+  if(obj == this->ProxyDefinitionManager)
+    {
+    RegisteredDefinitionInformation* defInfo;
+    switch(event)
+      {
+      case vtkCommand::RegisterEvent:
+      case vtkCommand::UnRegisterEvent:
+         defInfo = reinterpret_cast<RegisteredDefinitionInformation*>(data);
+         if(defInfo->CustomDefinition)
+           {
+           RegisteredProxyInformation info;
+           info.Proxy = 0;
+           info.GroupName = defInfo->GroupName;
+           info.ProxyName = defInfo->ProxyName;
+           info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
+           this->InvokeEvent(event, &info);
+           }
+         break;
+      case vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated:
+         // Forward the custom definition to the server side
+         if(this->Session)
+           {
+           vtkSMMessage msg;
+           this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
+           this->Session->PushState(&msg);
+           }
+         break;
+      }
+
+    // No need to go further
+    return;
+    }
+
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
   if (!proxy)
     {
@@ -1296,14 +1339,6 @@ void vtkSMProxyManager::UnRegisterCustomProxyDefinitions()
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->ClearCustomProxyDefinition();
-
-  // Forward the custom definition to the server side
-  if(this->Session)
-    {
-    vtkSMMessage msg;
-    this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-    this->Session->PushState(&msg);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -1312,17 +1347,6 @@ void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->RemoveCustomProxyDefinition(group, name);
-
-  // Backwards compatibility issue: We are no longer firing events from proxy
-  // manager when definitions are added.
-
-  // Forward the custom definition to the server side
-  if(this->Session)
-    {
-    vtkSMMessage msg;
-    this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-    this->Session->PushState(&msg);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -1331,24 +1355,6 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->AddCustomProxyDefinition(group, name, top);
-
-  RegisteredProxyInformation info;
-  info.Proxy = 0;
-  info.GroupName = group;
-  info.ProxyName = name;
-  info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
-//  bool prev = this->ProxyDefinitionsUpdated;
-//  this->ProxyDefinitionsUpdated = true;
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-//  this->ProxyDefinitionsUpdated = prev;
-
-  // Forward the custom definition to the server side
-  if(this->Session)
-    {
-    vtkSMMessage msg;
-    this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-    this->Session->PushState(&msg);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -1371,14 +1377,6 @@ void vtkSMProxyManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->LoadCustomProxyDefinitions(root);
-
-  // Forward the custom definition to the server side
-  if(this->Session)
-    {
-    vtkSMMessage msg;
-    this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-    this->Session->PushState(&msg);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -1386,14 +1384,6 @@ void vtkSMProxyManager::LoadCustomProxyDefinitions(const char* filename)
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->LoadCustomProxyDefinitions(filename);
-
-  // Forward the custom definition to the server side
-  if(this->Session)
-    {
-    vtkSMMessage msg;
-    this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-    this->Session->PushState(&msg);
-    }
 }
 
 //---------------------------------------------------------------------------

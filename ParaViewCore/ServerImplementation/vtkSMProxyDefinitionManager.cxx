@@ -439,6 +439,7 @@ vtkStandardNewMacro(vtkInternalDefinitionIterator)
 //---------------------------------------------------------------------------
 vtkSMProxyDefinitionManager::vtkSMProxyDefinitionManager()
 {
+  this->TriggerNotificationEvent = true;
   this->Internals = new vtkInternals;
   this->InternalsFlatten = new vtkInternals;
 
@@ -493,6 +494,11 @@ void vtkSMProxyDefinitionManager::AddElement(const char* groupName,
     {
     // Just referenced it
     this->Internals->CoreDefinitions[groupName][proxyName] = element;
+    if(this->TriggerNotificationEvent)
+      {
+      RegisteredDefinitionInformation info(groupName, proxyName, false);
+      this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+      }
     }
 }
 
@@ -535,6 +541,10 @@ const char* vtkSMProxyDefinitionManager::GetXMLProxyName(const char* groupName, 
 void vtkSMProxyDefinitionManager::ClearCustomProxyDefinition()
 {
   this->Internals->CustomsDefinitions.clear();
+  if(this->TriggerNotificationEvent)
+    {
+    this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -546,7 +556,12 @@ void vtkSMProxyDefinitionManager::RemoveCustomProxyDefinition(
     this->Internals->CustomsDefinitions[groupName].erase(proxyName);
 
     // Let the world know that definitions may have changed.
-    this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+    if(this->TriggerNotificationEvent)
+      {
+      RegisteredDefinitionInformation info(groupName, proxyName, true);
+      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+      this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+      }
     }
 }
 
@@ -578,7 +593,12 @@ void vtkSMProxyDefinitionManager::AddCustomProxyDefinition(
     this->Internals->CustomsDefinitions[groupName][proxyName] = top;
 
     // Let the world know that definitions may have changed.
-    this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+    if(this->TriggerNotificationEvent)
+      {
+      RegisteredDefinitionInformation info(groupName, proxyName, true);
+      this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+      this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+      }
     }
 }
 
@@ -629,6 +649,8 @@ void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(vtkSMMessage* msg)
     return;
     }
 
+  bool previousValue = this->TriggerNotificationEvent;
+  this->TriggerNotificationEvent = false;
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
   int size = msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
   const ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
@@ -641,6 +663,7 @@ void vtkSMProxyDefinitionManager::LoadCustomProxyDefinitions(vtkSMMessage* msg)
                                     parser->GetRootElement());
     }
   parser->Delete();
+  this->TriggerNotificationEvent = previousValue;
 }
 
 //---------------------------------------------------------------------------
@@ -789,7 +812,10 @@ bool vtkSMProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
         }
       }
     }
-  this->InvokeEvent(vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated);
+  if(this->TriggerNotificationEvent)
+    {
+    this->InvokeEvent(vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated);
+    }
   return true;
 }
 

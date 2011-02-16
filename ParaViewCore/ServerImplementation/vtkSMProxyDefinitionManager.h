@@ -36,6 +36,24 @@ class vtkPVPlugin;
 class vtkPVXMLElement;
 class vtkSMProxyDefinitionIterator;
 
+// Description:
+// Information object used in Event notification
+struct RegisteredDefinitionInformation
+  {
+    const char* GroupName;
+    const char* ProxyName;
+    bool CustomDefinition;
+
+    RegisteredDefinitionInformation(const char* groupName,
+                                    const char* proxyName,
+                                    bool isCustom=false)
+      {
+      this->GroupName = groupName;
+      this->ProxyName = proxyName;
+      this->CustomDefinition = isCustom;
+      }
+  };
+
 class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkObject
 {
 public:
@@ -216,6 +234,8 @@ protected:
 private:
   vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented
   void operator=(const vtkSMProxyDefinitionManager&); // Not implemented
+
+  bool TriggerNotificationEvent;
 
   class vtkInternals;
   vtkInternals* Internals;
