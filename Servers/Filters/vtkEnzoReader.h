@@ -120,10 +120,12 @@ public:
   void SetPointArrayStatus(const char* name, int status);
   void SetCellArrayStatus(const char* name, int status);
 
+
   // Description:
   // Set the Enzo data file name (hierarchy or boundary).
-  void          SetFileName( const char * fileName );
-  char*         GetFileName( );
+  vtkGetStringMacro( FileName );
+  void SetFileName( const char * fileName );
+//  char*         GetFileName( );
   
   // --------------------------------------------------------------------------
   // --------------------------- General Information --------------------------

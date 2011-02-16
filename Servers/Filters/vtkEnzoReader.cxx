@@ -1109,7 +1109,9 @@ void vtkEnzoReaderInternal::ReadMetaData()
 int vtkEnzoReader::UpdateMetaData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector* vtkNotUsed(outputVector))
 {
-  // TODO: ?
+  this->Internal->NumberOfBlocks = 0;
+  this->Internal->FileName = this->GetFileName();
+  this->Internal->ReadMetaData();
 }
 
 //----------------------------------------------------------------------------
@@ -1250,50 +1252,54 @@ void vtkEnzoReader::SetUpDataArraySelections( )
 }
 
 // ----------------------------------------------------------------------------
-char* vtkEnzoReader::GetFileName( )
-{
-  return( this->FileName );
-}
+//char* vtkEnzoReader::GetFileName( )
+//{
+//  return( this->FileName );
+//}
 
 // ----------------------------------------------------------------------------
 void vtkEnzoReader::SetFileName( const char * fileName )
 {
   int     isValid = 0;
-  if (    fileName 
-       && strcmp( fileName, "" )
-       && ( ( this->FileName == NULL ) || strcmp( fileName, this->FileName ) )
+
+  this->BlockMap.clear();
+  this->Internal->Blocks.clear();
+  this->Internal->NumberOfBlocks = 0;
+
+  if( fileName && strcmp( fileName, "" ) &&
+      ( ( this->FileName == NULL ) || strcmp( fileName, this->FileName ) )
      )
     {
     vtkstd::string  tempName( fileName );
     vtkstd::string  bExtName( ".boundary" );
     vtkstd::string  hExtName( ".hierarchy" );
-    
+
     if (  tempName.length() > hExtName.length() &&
           tempName.substr( tempName.length() - hExtName.length() )
-          == hExtName 
+          == hExtName
        )
       {
       this->Internal->MajorFileName = tempName.substr
                                  ( 0, tempName.length() - hExtName.length() );
       this->Internal->HierarchyFileName = tempName;
-      this->Internal->BoundaryFileName  = 
+      this->Internal->BoundaryFileName  =
       this->Internal->MajorFileName + bExtName;
       }
-    else 
+    else
     if (  tempName.length() > bExtName.length() &&
-          tempName.substr( tempName.length() - bExtName.length() ) 
+          tempName.substr( tempName.length() - bExtName.length() )
           == bExtName
        )
       {
       this->Internal->MajorFileName = tempName.substr
                                  ( 0, tempName.length() - bExtName.length() );
       this->Internal->BoundaryFileName  = tempName;
-      this->Internal->HierarchyFileName = 
+      this->Internal->HierarchyFileName =
       this->Internal->MajorFileName + hExtName;
       }
     else
       {
-      vtkErrorMacro( << tempName.c_str() 
+      vtkErrorMacro( << tempName.c_str()
                      << " is not a hierarchy or boundary file." << endl );
       return;
       }
@@ -1302,7 +1308,7 @@ void vtkEnzoReader::SetFileName( const char * fileName )
     this->Internal->DirectoryName = GetEnzoDirectory
                                     ( this->Internal->MajorFileName.c_str() );
     }
-    
+
   if ( isValid )
     {
     if ( this->FileName )
@@ -1311,16 +1317,17 @@ void vtkEnzoReader::SetFileName( const char * fileName )
       this->FileName = NULL;
       this->Internal->SetFileName( NULL );
       }
-      
+
     this->FileName = new char[  strlen( fileName ) + 1  ];
     strcpy( this->FileName, fileName );
     this->FileName[ strlen( fileName ) ] = '\0';
-    
     this->Internal->SetFileName( this->FileName );
     }
 
-    this->SetUpDataArraySelections( );
-    this->Modified( );
+  this->Internal->ReadMetaData();
+  this->SetUpDataArraySelections( );
+  this->Modified( );
+  return;
 }
 
 // ----------------------------------------------------------------------------
@@ -1835,8 +1842,8 @@ int vtkEnzoReader::GetBlockProcessId( const int blockIdx )
 
 //-----------------------------------------------------------------------------
 int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
-  vtkInformationVector ** vtkNotUsed( inputVector ),
-  vtkInformationVector  * outputVector )
+                    vtkInformationVector** vtkNotUsed( inputVector ),
+                    vtkInformationVector* outputVector )
 {
   vtkInformation            *outInf = outputVector->GetInformationObject( 0 );
   vtkHierarchicalBoxDataSet *output =
@@ -1852,8 +1859,13 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
   idxcounter.resize( this->Internal->NumberOfLevels+1,0 );
 
   this->GenerateBlockMap();
-//  this->Internal->NumberOfMultiBlocks = 0;
   
+  std::cout << "====================================\n";
+  std::cout << this->GetFileName() << " -- ";
+  std::cout << this->Internal->FileName << std::endl;
+  std::cout << "====================================\n";
+  std::cout.flush( );
+
   int nmblocks = static_cast < int > ( this->BlockMap.size() );
   for ( int i = 0; i < nmblocks; i ++ )
     {
@@ -1865,7 +1877,8 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
       if( this->IsBlockMine( i ) )
         {
-        std::cout << "Loading block " << i << std::endl;
+        std::cout << "Loading block " << i;
+        std::cout << "/" << this->GetNumberOfBlocks() << std::endl;
         std::cout.flush();
         this->GetBlock( i, output, idxcounter );
         }
@@ -2736,10 +2749,12 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   // check if the data attribute exists
   if ( attrIndx < 0 )
     {
-        vtkGenericWarningMacro( << "Attribute data does not exist!" );
-        H5Gclose( rootIndx );
-        H5Fclose( fileIndx );
-        return 0;
+      vtkGenericWarningMacro(
+       "Attribute (" << atribute << ") data does not exist in file "
+       << blckFile.c_str() );
+      H5Gclose( rootIndx );
+      H5Fclose( fileIndx );
+      return 0;
     }
 
   // get cell dimensions and the valid number
