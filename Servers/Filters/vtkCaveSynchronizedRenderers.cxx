@@ -65,6 +65,11 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
     this->SetNumberOfDisplays(options->GetNumberOfMachines());
     for (int cc=0; cc < this->NumberOfDisplays; cc++)
       {
+      if (options->GetDisplayName(cc))
+        {
+        vtkProcessModule::GetProcessModule()->SetProcessEnvironmentVariable(
+          cc, options->GetDisplayName(cc));
+        }
       this->DefineDisplay(cc, options->GetLowerLeft(cc),
         options->GetLowerRight(cc), options->GetUpperLeft(cc));
       }
