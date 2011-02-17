@@ -37,10 +37,8 @@
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="SelectionColor" />
 
-  <!-- Comment those line because the GlobalProperties are not managed yet in the Undo/Redo
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  -->
 
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/PageNames" command="mousePress" arguments="1,1,0,34,8,/1:0" />

@@ -40,6 +40,8 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkProcessModule.h"
+#include "vtkSMGlobalPropertiesLinkUndoElement.h"
+#include "vtkSMUndoStackBuilder.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -993,7 +995,12 @@ void vtkSMProxyManager::UnRegisterAllLinks()
 void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* data)
 {
-  // Check if we need to reformat custom definition to ProxyManager listeners
+  // Check source object
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+      vtkSMGlobalPropertiesManager::SafeDownCast(obj);
+
+  // Manage ProxyDefinitionManager Events
   if(obj == this->ProxyDefinitionManager)
     {
     RegisteredDefinitionInformation* defInfo;
@@ -1022,60 +1029,75 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
            }
          break;
       }
-
-    // No need to go further
-    return;
     }
-
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
-  if (!proxy)
+  // Manage vtkSMGlobalPropertiesManager to trigger UndoElement
+  else if(globalPropertiesManager)
     {
-    // We are only interested in proxy events.
-    return;
+    const char* globalPropertiesManagerName =
+        this->GetGlobalPropertiesManagerName(globalPropertiesManager);
+    if( globalPropertiesManagerName               &&
+        this->GetSession()->GetUndoStackBuilder() &&
+        event == vtkCommand::ModifiedEvent)
+      {
+      vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
+      modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
+
+      vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
+      undoElem->SetLinkState( globalPropertiesManagerName,
+                              modifiedInfo->GlobalPropertyName,
+                              modifiedInfo->Proxy,
+                              modifiedInfo->PropertyName,
+                              modifiedInfo->AddLink);
+      this->GetSession()->GetUndoStackBuilder()->Add(undoElem);
+      undoElem->Delete();
+      }
     }
-
-  switch (event)
+  // Manage proxy modification call back to mark proxy dirty...
+  else if (proxy)
     {
-  case vtkCommand::PropertyModifiedEvent:
+    switch (event)
       {
-      // Some property on the proxy has been modified.
-      this->MarkProxyAsModified(proxy);
-      ModifiedPropertyInformation info;
-      info.Proxy = proxy;
-      info.PropertyName = reinterpret_cast<const char*>(data);
-      if (info.PropertyName)
+    case vtkCommand::PropertyModifiedEvent:
         {
-        this->InvokeEvent(vtkCommand::PropertyModifiedEvent,
-          &info);
+        // Some property on the proxy has been modified.
+        this->MarkProxyAsModified(proxy);
+        ModifiedPropertyInformation info;
+        info.Proxy = proxy;
+        info.PropertyName = reinterpret_cast<const char*>(data);
+        if (info.PropertyName)
+          {
+          this->InvokeEvent(vtkCommand::PropertyModifiedEvent,
+            &info);
+          }
         }
-      }
-    break;
+      break;
 
-  case vtkCommand::StateChangedEvent:
-      {
-      // I wonder if I need to mark the proxy modified. Cause when state
-      // changes, the properties are pushed as well so ideally we should call
-      // MarkProxyAsModified() and then UnMarkProxyAsModified() :).
-      // this->MarkProxyAsModified(proxy);
-
-      StateChangedInformation info;
-      info.Proxy = proxy;
-      info.StateChangeElement = reinterpret_cast<vtkPVXMLElement*>(data);
-      if (info.StateChangeElement)
+    case vtkCommand::StateChangedEvent:
         {
-        this->InvokeEvent(vtkCommand::StateChangedEvent, &info);
+        // I wonder if I need to mark the proxy modified. Cause when state
+        // changes, the properties are pushed as well so ideally we should call
+        // MarkProxyAsModified() and then UnMarkProxyAsModified() :).
+        // this->MarkProxyAsModified(proxy);
+
+        StateChangedInformation info;
+        info.Proxy = proxy;
+        info.StateChangeElement = reinterpret_cast<vtkPVXMLElement*>(data);
+        if (info.StateChangeElement)
+          {
+          this->InvokeEvent(vtkCommand::StateChangedEvent, &info);
+          }
         }
+      break;
+
+    case vtkCommand::UpdateInformationEvent:
+      this->InvokeEvent(vtkCommand::UpdateInformationEvent, proxy);
+      break;
+
+    case vtkCommand::UpdateEvent:
+      // Proxy has been updated.
+      this->UnMarkProxyAsModified(proxy);
+      break;
       }
-    break;
-
-  case vtkCommand::UpdateInformationEvent:
-    this->InvokeEvent(vtkCommand::UpdateInformationEvent, proxy);
-    break;
-
-  case vtkCommand::UpdateEvent:
-    // Proxy has been updated.
-    this->UnMarkProxyAsModified(proxy);
-    break;
     }
 }
 
@@ -1521,6 +1543,8 @@ void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
     }
   this->RemoveGlobalPropertiesManager(name);
   this->Internals->GlobalPropertiesManagers[name] = mgr;
+  this->Internals->GlobalPropertiesManagersCallBackID[name] =
+      mgr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
 
   RegisteredProxyInformation info;
   info.Proxy = mgr;
@@ -1559,6 +1583,7 @@ void vtkSMProxyManager::RemoveGlobalPropertiesManager(const char* name)
   vtkSMGlobalPropertiesManager* gm = this->GetGlobalPropertiesManager(name);
   if (gm)
     {
+    gm->RemoveObserver(this->Internals->GlobalPropertiesManagersCallBackID[name]);
     RegisteredProxyInformation info;
     info.Proxy = gm;
     info.GroupName = NULL;
