@@ -70,7 +70,7 @@ public:
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
   QPointer<pqServer>                  ActiveServer;
   bool                                IsPythonTracing;
-  pqPythonScriptEditor*               Editor;
+  QPointer<pqPythonScriptEditor>      Editor;
 };
 
 //-----------------------------------------------------------------------------
