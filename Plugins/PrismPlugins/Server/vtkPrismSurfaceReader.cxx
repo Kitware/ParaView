@@ -1191,17 +1191,17 @@ int vtkPrismSurfaceReader::RequestData(
     {
       if(!this->GetXLogScaling())
       {
-        coords[0]=pow(10,coords[0]);
+        coords[0]=pow(10.0,coords[0]);
       }
 
       if(!this->GetYLogScaling())
       {
-        coords[1]=pow(10,coords[1]);
+        coords[1]=pow(10.0,coords[1]);
       }
 
       if(!this->GetZLogScaling())
       {
-        coords[2]=pow(10,coords[2]);
+        coords[2]=pow(10.0,coords[2]);
       }
     }
     else
