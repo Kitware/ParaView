@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
     vtkProcessModule::PROCESS_BATCH, options);
 
   vtkSMSession* session = vtkSMSession::New();
-  session->Initialize();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
   session->Delete();
 

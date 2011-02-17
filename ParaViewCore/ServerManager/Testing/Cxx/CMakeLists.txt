@@ -1,8 +1,5 @@
 INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}
-  ${PVSERVERCOMMON_INCLUDE_DIR}
-  ${PVFILTERS_INCLUDE_DIR}
-  ${PVSERVERMANAGER_INCLUDE_DIR}
   ${VTKCLIENTSERVER_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
   ${XDMF_INCLUDE_DIRS}
@@ -14,7 +11,7 @@ ADD_EXECUTABLE(TestSubProxy
   TestSubProxy.cxx)
 
 TARGET_LINK_LIBRARIES(TestSubProxy
-  vtkPVServerCommon vtkPVFilters vtkPVServerManager)
+  vtkPVServerManager)
 
 
 ################################################################################
@@ -36,10 +33,6 @@ ENDFOREACH(name)
 INCLUDE_DIRECTORIES(
   ${ServerManager_SOURCE_DIR}
   ${ServerManager_BINARY_DIR}
-  ${PVServerCommon_SOURCE_DIR}
-  ${PVServerCommon_BINARY_DIR}
-  ${PVFilters_SOURCE_DIR}
-  ${PVFilters_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   )
  

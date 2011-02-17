@@ -40,7 +40,6 @@ int main(int argc, char* argv[])
                                       vtkProcessModule::PROCESS_CLIENT,
                                       options);
   vtkSMSession* session = vtkSMSession::New();
-  session->Initialize();
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
   //---------------------------------------------------------------------------
