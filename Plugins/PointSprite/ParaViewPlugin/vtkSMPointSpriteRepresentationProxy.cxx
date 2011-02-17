@@ -100,4 +100,5 @@ int vtkSMPointSpriteRepresentationProxy::ReadXMLAttributes(
    this->GetProperty("OpacityTableValues"));
   vtkInitializeTableValues(
    this->GetProperty("RadiusTableValues"));
+  return 1;
 }
