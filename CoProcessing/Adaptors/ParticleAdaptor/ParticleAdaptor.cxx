@@ -5,6 +5,8 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPProcessor.h"
+#include "vtkMPI.h"
+#include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
 #include "vtkParticlePipeline.h"
 #include "vtkPointData.h"
@@ -18,18 +20,22 @@ namespace
   vtkCPDataDescription* coProcessorData = 0;
 }
 
-void coprocessorinitialize (void* communicator) 
+void coprocessorinitialize (void* handle) 
 {
-  if (communicator != NULL) 
-    {
-    cerr << "Setting communicator other than World is not yet supported" << endl;
-    return;
-    }
   if (!controller)
     {
     controller = vtkMPIController::New ();
     controller->Initialize (0, 0, 1);
     vtkMultiProcessController::SetGlobalController (controller);
+    }
+
+  if (handle != NULL) 
+    {
+    vtkMPICommunicatorOpaqueComm mpicomm ((MPI_Comm*)handle);
+    vtkMPICommunicator *comm = vtkMPICommunicator::New ();
+    comm->InitializeExternal (&mpicomm);
+    controller->SetCommunicator (comm);
+    comm->Delete ();
     }
 
   if (!pipeline) 
