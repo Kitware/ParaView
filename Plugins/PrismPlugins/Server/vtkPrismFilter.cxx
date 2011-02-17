@@ -528,17 +528,17 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     {
       if(!this->GetSESAMEXLogScaling())
       {
-        coords[0]=pow(10,coords[0]);
+      coords[0]=pow(10.0,coords[0]);
       }
 
       if(!this->GetSESAMEYLogScaling())
       {
-        coords[1]=pow(10,coords[1]);
+        coords[1]=pow(10.0,coords[1]);
       }
 
       if(!this->GetSESAMEZLogScaling())
       {
-        coords[2]=pow(10,coords[2]);
+        coords[2]=pow(10.0,coords[2]);
       }
     }
     else
