@@ -402,8 +402,9 @@ QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
                                                               true, true))
     {
     dir.setPath(dirPath);
-    foreach(QString filePath , dir.entryList())
+    for (int i = 0; i < dir.entryList().size(); ++i)
       {
+      const QString filePath = dir.entryList().at(i);
       if(filePath.startsWith("."))
         continue;
       macroList.push_back(dirPath + QDir::separator() + filePath);

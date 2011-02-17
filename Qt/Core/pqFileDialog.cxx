@@ -1156,9 +1156,9 @@ bool pqFileDialog::selectFile(const QString& f)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::showEvent( QShowEvent *showEvent )
+void pqFileDialog::showEvent(QShowEvent *_showEvent )
 {  
-  QDialog::showEvent(showEvent);
+  QDialog::showEvent(_showEvent);
   //Qt sets the default keyboard focus to the last item in the tab order
   //which is determined by the creation order. This means that we have 
   //to explicitly state that the line edit has the focus on showing no 
