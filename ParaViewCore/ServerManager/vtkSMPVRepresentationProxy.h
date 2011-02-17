@@ -61,6 +61,7 @@ private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPVRepresentationProxy&); // Not implemented
 
+  bool InReadXMLAttributes;
   class vtkStringSet;
   vtkStringSet* RepresentationSubProxies;
 //ETX

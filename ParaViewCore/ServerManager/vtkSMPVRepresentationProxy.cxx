@@ -32,6 +32,7 @@ vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
   this->SetKernelClassName("vtkPMPVRepresentationProxy");
   this->RepresentationSubProxies = new vtkStringSet();
+  this->InReadXMLAttributes = false;
 }
 
 //----------------------------------------------------------------------------
@@ -79,9 +80,9 @@ void vtkSMPVRepresentationProxy::OnPropertyUpdated(vtkObject*,
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int flag)
 {
-  vtkSMProxy* selectionRepr = this->GetSubProxy("SelectionRepresentation");
-  if (name && strcmp(name, "Input") == 0)
+  if (!this->InReadXMLAttributes && name && strcmp(name, "Input") == 0)
     {
+    vtkSMProxy* selectionRepr = this->GetSubProxy("SelectionRepresentation");
     vtkSMPropertyHelper helper(this, name);
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
       {
@@ -131,18 +132,21 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
 int vtkSMPVRepresentationProxy::ReadXMLAttributes(
   vtkSMProxyManager* pm, vtkPVXMLElement* element)
 {
+  this->InReadXMLAttributes = true;
   for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
     {
-    if (element->GetName() &&
-      strcmp(element->GetName(), "RepresentationType") == 0 &&
-      element->GetAttribute("subproxy") != NULL)
+    vtkPVXMLElement* child = element->GetNestedElement(cc);
+    if (child->GetName() &&
+      strcmp(child->GetName(), "RepresentationType") == 0 &&
+      child->GetAttribute("subproxy") != NULL)
       {
-      this->RepresentationSubProxies->insert(
-        element->GetAttribute("subproxy"));
+      this->RepresentationSubProxies->insert(child->GetAttribute("subproxy"));
       }
     }
 
-  return this->Superclass::ReadXMLAttributes(pm, element);
+  int retVal = this->Superclass::ReadXMLAttributes(pm, element);
+  this->InReadXMLAttributes = false;
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
