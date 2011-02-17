@@ -22,6 +22,7 @@
 #include "vtkDynamicLoader.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkMapper.h"
+#include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
@@ -164,6 +165,8 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 #ifdef PARAVIEW_USE_MPI_SSEND
   vtkMPIController::SetUseSsendForRMI(1);
 #endif
+
+  vtkMultiThreader::SetGlobalMaximumNumberOfThreads(1);
 
   // Create the process module.
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
