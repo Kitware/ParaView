@@ -3907,7 +3907,7 @@
 
 
    <SourceProxy name="spcthhistoryreader" class="vtkSpyPlotHistoryReader"
-   label="spcth history reader">
+   label="Spy Plot History Reader">
       <Documentation
         short_help="Read a comma-separated spctch history file."
         long_help="Read a spcth history file where each row translates into a single time step
@@ -3917,6 +3917,9 @@
         command="SetFileName"
         animateable="0" >
         <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VRML reader.
+        </Documentation>
       </StringVectorProperty>
 
 
@@ -3950,7 +3953,7 @@
 
       <Hints>
        <ReaderFactory extensions="hscth"
-           file_description="SpyPlot CTH history" />
+           file_description="Spy Plot History Files" />
       </Hints>
 
       <!-- End of SPCTHHistoryReader -->
