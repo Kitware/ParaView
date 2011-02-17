@@ -20,6 +20,11 @@ namespace
 
 void coprocessorinitialize (void* communicator) 
 {
+  if (communicator != NULL) 
+    {
+    cerr << "Setting communicator other than World is not yet supported" << endl;
+    return;
+    }
   if (!controller)
     {
     controller = vtkMPIController::New ();
@@ -52,6 +57,12 @@ void coprocessorcreateimage (
                 double *attr, double min, double max,
                 double theta, double phi, double z)
 {
+  if (!coProcessor || !coProcessorData) 
+    {
+    cerr << "CoProcessor has not been properly initialized" << endl;
+    return;
+    }
+
   coProcessorData->SetTimeData (time, timestep);
   if (coProcessor->RequestDataDescription (coProcessorData)) 
     {
