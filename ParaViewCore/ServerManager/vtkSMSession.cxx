@@ -120,7 +120,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
         {
         if(createAction)
           {
-          this->UndoStackBuilder->OnNewState(this, globalId, &newState);
+          // Do we want to manage object creation ?
           }
         else
           {

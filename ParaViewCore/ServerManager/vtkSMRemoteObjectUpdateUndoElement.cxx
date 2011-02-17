@@ -72,7 +72,11 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      remoteObj->LoadState(state, this->Locator, false);
+      remoteObj->LoadState(state,
+                           this->Locator.GetPointer() ?
+                                 this->Locator.GetPointer() :
+                                 this->Session->GetStateLocator(),
+                           false);
       }
     }
   return 1; // OK, we say that everything is fine.

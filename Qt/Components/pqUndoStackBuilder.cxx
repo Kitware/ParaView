@@ -92,18 +92,6 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnNewState(vtkSMSession *session,
-                                    vtkTypeUInt32 globalId,
-                                    const vtkSMMessage *state)
-{
-  if(this->Filter(session, globalId))
-    {
-    return;
-    }
-
-  this->Superclass::OnNewState(session, globalId, state);
-}
-//-----------------------------------------------------------------------------
 void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
                                         vtkTypeUInt32 globalId,
                                         const vtkSMMessage *oldState,

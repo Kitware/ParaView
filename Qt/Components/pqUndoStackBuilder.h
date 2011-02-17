@@ -92,9 +92,6 @@ public:
                              const vtkSMMessage *previousState,
                              const vtkSMMessage *newState);
 
-  /// Overridden to filter unwanted event and manage auto undoset creation
-  virtual void OnNewState(vtkSMSession *session, vtkTypeUInt32 globalId, const vtkSMMessage *creationState);
-
 protected:
   pqUndoStackBuilder();
   ~pqUndoStackBuilder();

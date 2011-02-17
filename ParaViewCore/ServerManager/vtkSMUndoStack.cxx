@@ -27,8 +27,6 @@
 #include "vtkUndoStackInternal.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRemoteObjectUpdateUndoElement.h"
-#include "vtkSMUndoElementStateKeeper.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/set>
@@ -233,30 +231,7 @@ int vtkSMUndoStack::Undo()
   remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
   this->FillWithRemoteObjects(this->GetNextUndoSet(), remoteObjectsCollection.GetPointer());
 
-  // Create a StateLocator for that undoset context
-  vtkSMStateLocator* locator = vtkSMStateLocator::New();
-  locator->SetParentLocator(vtkSMProxyManager::GetProxyManager()->GetSession()->GetStateLocator());
-  vtkUndoSet* undoSet = this->GetNextUndoSet();
-  for(int i=0; i < undoSet->GetNumberOfElements(); i++)
-    {
-    vtkUndoElement* elem = undoSet->GetElement(i);
-    vtkSMRemoteObjectUpdateUndoElement* updateElem =
-        vtkSMRemoteObjectUpdateUndoElement::SafeDownCast(elem);
-    vtkSMUndoElementStateKeeper* stateElem =
-        vtkSMUndoElementStateKeeper::SafeDownCast(elem);
-
-    if(stateElem)
-      {
-      locator->RegisterState(stateElem->GetCreationState());
-      }
-
-    if(updateElem)
-      {
-      updateElem->SetStateLocator(locator);
-      }
-    }
   int retValue = this->Superclass::Undo();
-  locator->Delete();
 
   return retValue;
 }
@@ -275,30 +250,7 @@ int vtkSMUndoStack::Redo()
   remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
   this->FillWithRemoteObjects(this->GetNextRedoSet(), remoteObjectsCollection.GetPointer());
 
-  // Create a StateLocator for that redoset context
-  vtkSMStateLocator* locator = vtkSMStateLocator::New();
-  locator->SetParentLocator(vtkSMProxyManager::GetProxyManager()->GetSession()->GetStateLocator());
-  vtkUndoSet* redoSet = this->GetNextRedoSet();
-  for(int i=0; i < redoSet->GetNumberOfElements(); i++)
-    {
-    vtkUndoElement* elem = redoSet->GetElement(i);
-    vtkSMRemoteObjectUpdateUndoElement* updateElem =
-        vtkSMRemoteObjectUpdateUndoElement::SafeDownCast(elem);
-    vtkSMUndoElementStateKeeper* stateElem =
-        vtkSMUndoElementStateKeeper::SafeDownCast(elem);
-
-    if(stateElem)
-      {
-      locator->RegisterState(stateElem->GetCreationState());
-      }
-
-    if(updateElem)
-      {
-      updateElem->SetStateLocator(locator);
-      }
-    }
   int retValue = this->Superclass::Redo();
-  locator->Delete();
 
   return retValue;
 }

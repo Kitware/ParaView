@@ -64,6 +64,7 @@ SET (Kit_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
@@ -133,7 +134,6 @@ SET (Kit_SRCS
   vtkSMTimeKeeperProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
-  vtkSMUndoElementStateKeeper.cxx
   vtkSMUndoStack.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUtilities.cxx

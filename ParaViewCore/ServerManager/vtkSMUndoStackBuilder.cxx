@@ -27,7 +27,6 @@
 #include "vtkSMSession.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoElement.h"
-#include "vtkSMUndoElementStateKeeper.h"
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
 
@@ -119,24 +118,6 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 
   this->UndoSet->AddElement(element);
 }
-//-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnNewState(vtkSMSession *session, vtkTypeUInt32 globalId,
-                                       const vtkSMMessage *previousState)
-{
-//  if (this->IgnoreAllChanges || /*!this->HandleChangeEvents() ||*/ !this->UndoStack)
-//    {
-//    return;
-//    }
-
-//  cout << "=======> Sate " << globalId << " added to the undoset" << endl;
-
-//  vtkSMUndoElementStateKeeper* undoElement;
-//  undoElement = vtkSMUndoElementStateKeeper::New();
-//  undoElement->KeepCreationState(previousState);
-//  this->Add(undoElement);
-//  undoElement->Delete();
-}
-
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
                                            vtkTypeUInt32 globalId,
