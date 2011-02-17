@@ -142,7 +142,6 @@ void vtkPVOptions::Initialize()
     break;
 
   case vtkProcessModule::PROCESS_BATCH:
-  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->SetProcessType(PVBATCH);
     break;
 

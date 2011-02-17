@@ -861,8 +861,7 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH ||
-    vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_SYMMETRIC_BATCH)
+  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH)
     {
     // currently, we only support parallel rendering in batch mode.
     return true;
@@ -897,7 +896,6 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
     {
   case vtkProcessModule::PROCESS_SERVER:
   case vtkProcessModule::PROCESS_BATCH:
-  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
   case vtkProcessModule::PROCESS_RENDER_SERVER:
     if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
       {

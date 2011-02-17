@@ -196,6 +196,7 @@ vtkSMSessionCore::vtkSMSessionCore()
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInterpreter();
   this->MPIMToNSocketConnection = NULL;
+  this->SymmetricMPIMode = false;
 
   vtkSMSessionCoreInterpreterHelper* helper =
     vtkSMSessionCoreInterpreterHelper::New();
@@ -245,6 +246,8 @@ vtkSMSessionCore::vtkSMSessionCore()
       LOG("Log for " << options->GetArgv0() << " ("
           << this->ParallelController->GetLocalProcessId() << ")");
       }
+    this->SymmetricMPIMode =
+      vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode();
     }
 }
 
@@ -407,9 +410,11 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0);
+    this->ParallelController->GetLocalProcessId() == 0 ||
+    this->SymmetricMPIMode);
 
-  if ( (message->location() & vtkProcessModule::SERVERS) != 0)
+  if ( (message->location() & vtkProcessModule::SERVERS) != 0 &&
+    !this->SymmetricMPIMode)
     {
     // send message to satellites and then start processing.
 
@@ -520,13 +525,15 @@ void vtkSMSessionCore::ExecuteStream(
 
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0);
+    this->ParallelController->GetLocalProcessId() == 0 ||
+    this->SymmetricMPIMode);
 
   size_t byte_size;
   const unsigned char *raw_data;
   stream.GetData(&raw_data, &byte_size);
 
-  if ( (location & vtkProcessModule::SERVERS) != 0)
+  if ( (location & vtkProcessModule::SERVERS) != 0 &&
+    !this->SymmetricMPIMode)
     {
     // send message to satellites and then start processing.
 
@@ -572,8 +579,17 @@ void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
 void vtkSMSessionCore::ExecuteStreamInternal(
   const unsigned char* raw_message, size_t size, bool ignore_errors)
 {
-  LOG ("ExecuteStream\n");
-  // FIXME_COLLABORATION : need to log the contents of the stream.
+  if (this->LogStream)
+    {
+    vtksys_ios::ostringstream log;
+    vtkClientServerStream temp;
+    temp.SetData(raw_message, size);
+    LOG(
+      << "----------------------------------------------------------------\n"
+      << "ExecuteStream  (" << size << " bytes)\n"
+      << temp.StreamToString()
+      << "----------------------------------------------------------------\n");
+    }
 
   this->Interpreter->ClearLastResult();
 
@@ -588,11 +604,12 @@ void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0);
+    this->ParallelController->GetLocalProcessId() == 0 ||
+    this->SymmetricMPIMode);
 
   vtkTypeUInt32 location = message->location();
 
-  if ( (location & vtkProcessModule::SERVERS) != 0)
+  if ( (location & vtkProcessModule::SERVERS) != 0 && !this->SymmetricMPIMode)
     {
     // send message to satellites and then start processing.
 
@@ -695,7 +712,8 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
 {
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0);
+    this->ParallelController->GetLocalProcessId() == 0 ||
+    this->SymmetricMPIMode);
 
   if (!this->GatherInformationInternal(information, globalid))
     {
@@ -711,7 +729,8 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
 
   if (this->ParallelController &&
     this->ParallelController->GetNumberOfProcesses() > 1 &&
-    this->ParallelController->GetLocalProcessId() == 0)
+    this->ParallelController->GetLocalProcessId() == 0 &&
+    !this->SymmetricMPIMode)
     {
     // Forward the message to the satellites if the object is expected to exist
     // on the satellites.

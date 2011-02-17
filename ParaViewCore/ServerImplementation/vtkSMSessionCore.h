@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME vtkSMSessionCore
 // .SECTION Description
-// vtkSMSessionCore is used by vtkSMSession. It encapsulates the
-// vtkClientServerInterpreter as well as the vtkPMObject map.
+// vtkSMSessionCore is used by vtkSMSession. In handles processing of
+// communication locally as well as with satellites (in case on MPI processes). 
 
 #ifndef __vtkSMSessionCore_h
 #define __vtkSMSessionCore_h
@@ -164,6 +164,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+  bool SymmetricMPIMode;
 
   ostream *LogStream;
 //ETX

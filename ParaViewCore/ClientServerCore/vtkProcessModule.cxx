@@ -196,7 +196,6 @@ bool vtkProcessModule::Finalize()
 vtkStandardNewMacro(vtkProcessModule);
 vtkCxxSetObjectMacro(vtkProcessModule, NetworkAccessManager,
   vtkNetworkAccessManager);
-vtkCxxSetObjectMacro(vtkProcessModule, Options, vtkPVOptions);
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
 {
@@ -205,6 +204,7 @@ vtkProcessModule::vtkProcessModule()
   this->Internals = new vtkInternals();
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
+  this->SymmetricMPIMode = false;
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
@@ -372,6 +372,17 @@ vtkSession* vtkProcessModule::GetSession()
   iter = this->Internals->Sessions.begin();
   return (iter != this->Internals->Sessions.end()?
     iter->second.GetPointer() : NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetOptions(vtkPVOptions* options)
+{
+  vtkSetObjectBodyMacro(Options, vtkPVOptions, options);
+  if (options)
+    {
+    this->SetSymmetricMPIMode(
+      options->GetSymmetricMPIMode() != 0);
+    }
 }
 
 //----------------------------------------------------------------------------

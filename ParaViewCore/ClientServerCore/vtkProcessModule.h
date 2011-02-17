@@ -44,8 +44,6 @@ public:
     PROCESS_RENDER_SERVER, /* render-server */
     PROCESS_BATCH, /* Capable of running in parallel with root node acting as client.
               Cannot connect to remote server */
-    PROCESS_SYMMETRIC_BATCH, /* Same as BATCH except, every node acts as a client */
-
     PROCESS_INVALID=-1,
     };
 
@@ -179,10 +177,17 @@ public:
   vtkSetMacro(ReportInterpreterErrors, bool);
   vtkBooleanMacro(ReportInterpreterErrors, bool);
 
+  // Description:
+  // Returns true if ParaView is to be run in symmetric mode. Symmetric mode
+  // implies that satellites process same code as the root node. This is
+  // applicable only for PROCESS_BATCH.
+  vtkGetMacro(SymmetricMPIMode, bool);
 //BTX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
+
+  vtkSetMacro(SymmetricMPIMode, bool);
 
   // Description:
   // Push/Pop the active session.
@@ -221,6 +226,8 @@ private:
 
   static vtkSmartPointer<vtkProcessModule> Singleton;
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
+
+  bool SymmetricMPIMode;
 //ETX
 };
 

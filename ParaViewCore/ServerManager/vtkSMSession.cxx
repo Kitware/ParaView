@@ -66,7 +66,8 @@ vtkSMSession::~vtkSMSession()
 vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
 {
   if (vtkProcessModule::GetProcessModule() &&
-    vtkProcessModule::GetProcessModule()->GetPartitionId() > 0)
+    vtkProcessModule::GetProcessModule()->GetPartitionId() > 0 &&
+    !vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
     {
     return vtkPVSession::SERVERS;
     }

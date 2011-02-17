@@ -87,7 +87,6 @@ vtkSMSessionBase::ServerFlags vtkSMSessionBase::GetProcessRoles()
     return vtkPVSession::RENDER_SERVER;
 
   case vtkProcessModule::PROCESS_BATCH:
-  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     return (process_id == 0)?
       vtkPVSession::CLIENT_AND_SERVERS :
       vtkPVSession::SERVERS;

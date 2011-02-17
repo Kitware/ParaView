@@ -59,31 +59,24 @@ namespace ParaViewPython {
   //---------------------------------------------------------------------------
   int Run(int processType, int argc, char* argv[])
     {
-    // FIXME_COLLABORATION:
-    // Looks like we need to parse options before we can decide the process type
-    // for PROCESS_SYMMETRIC_BATCH!!!
     // Setup options
     vtkPVPythonOptions* options = vtkPVPythonOptions::New();
     vtkInitializationHelper::Initialize( argc, argv, processType, options );
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     int ret_val = 0;
-    if (vtkProcessModule::GetProcessModule()->GetPartitionId() > 0)
+    if (pm->GetSymmetricMPIMode() == false &&
+      pm->GetPartitionId() > 0)
       {
-      vtkSMSession* session = vtkSMSession::New();
-      vtkProcessModule::GetProcessModule()->GetGlobalController()->ProcessRMIs();
-      session->Delete();
+      vtkIdType sid = vtkSMSession::ConnectToSelf();
+      pm->GetGlobalController()->ProcessRMIs();
+      pm->UnRegisterSession(sid);
       }
     else
       {
       int remaining_argc;
       char** remaining_argv;
       options->GetRemainingArguments(&remaining_argc, &remaining_argv);
-
-      //    vtkMultiProcessController *ctrl = vtkMultiProcessController::GetGlobalController();
-      //    if(ctrl->GetLocalProcessId() > 0 && !options->GetSymmetricMPIMode())
-      //      {
-      //      return 0;
-      //      }
 
       // Process arguments
       vtkstd::vector<char*> pythonArgs;

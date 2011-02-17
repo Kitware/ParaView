@@ -73,7 +73,6 @@ void vtkPVSynchronizedRenderer::Initialize()
   switch (processtype)
     {
   case vtkProcessModule::PROCESS_BATCH:
-  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
     break;
 

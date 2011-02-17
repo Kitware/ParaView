@@ -300,7 +300,6 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   switch (processtype)
     {
   case vtkProcessModule::PROCESS_BATCH:
-  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
     this->RenderOneViewAtATime = true;
     break;
@@ -337,7 +336,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 
   case BATCH:
     this->SetParallelController(vtkMultiProcessController::GetGlobalController());
-    if (processtype == vtkProcessModule::PROCESS_SYMMETRIC_BATCH)
+    if (pm->GetSymmetricMPIMode())
       {
       this->RenderEventPropagation = false;
       }
