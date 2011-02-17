@@ -1815,17 +1815,14 @@ vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID(
 }
 
 //----------------------------------------------------------------------------
-// This method leaks memory.  It is a quick and dirty way to set different
-// DISPLAY environment variables on the render server.  I think the string
-// cannot be deleted until paraview exits.  The var should have the form:
-// "DISPLAY=amber1"
+// The var should have the form: "DISPLAY=amber1"
 void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
                                                      const char* var)
 {
   if (this->GetPartitionId() == processId)
     {
-    char* envstr = vtksys::SystemTools::DuplicateString(var);
-    putenv(envstr);
+    // PutEnv() avoids memory leak.
+    vtksys::SystemTools::PutEnv(var);
     }
 }
 
