@@ -30,6 +30,31 @@ MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
   ENDIF(filesToInstall)
 ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 
+# GLOB_RECURSIVE_INSTALL_DEVELOPMENT:
+#     Scrape directory for glob pattern
+#     install the found files to Development
+#     component.  Will recurse subdirectories
+#
+# from:    directory to scrape.
+# to:      destination
+# exts:    list of glob patterns
+MACRO(GLOB_RECURSIVE_INSTALL_DEVELOPMENT from to exts)  
+  SET(filesToInstall)
+  FOREACH(ext ${exts})
+    SET(files)
+    FILE(GLOB_RECURSE files RELATIVE ${from} ${ext})
+    IF(files)
+      SET(filesToInstall "${filesToInstall};${files}")
+    ENDIF(files)
+  ENDFOREACH(ext)
+  IF(filesToInstall)
+    INSTALL(
+        FILES ${filesToInstall}
+        DESTINATION ${to}
+        COMPONENT Development)
+  ENDIF(filesToInstall)
+ENDMACRO(GLOB_RECURSIVE_INSTALL_DEVELOPMENT)
+
 # Common settings
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
 
