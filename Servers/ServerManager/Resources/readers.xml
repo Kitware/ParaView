@@ -53,10 +53,10 @@
        name="SelectedBlockId"
        command="SetSelectedBlockId"
        number_of_elements="1"
-       default_values="100" >
+       default_values="-1" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         Show only the selected block
+         Show only the selected block. Enter a value of (-1) to show all blocks.
        </Documentation>
      </IntVectorProperty>
 
