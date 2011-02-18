@@ -89,7 +89,7 @@ void pqHelperProxyRegisterUndoElement::RegisterHelperProxies(pqProxy* proxy)
 {
   this->Internal->ProxyGlobalID = proxy->getProxy()->GetGlobalID();
   this->Internal->HelperList.clear();
-  this->SetSession(proxy->getServer()->session());
+  this->SetSession(proxy->getProxy()->GetSession());
 
   QList<QString> keys = proxy->getHelperKeys();
   for (int cc=0; cc < keys.size(); cc++)
