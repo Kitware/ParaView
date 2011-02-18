@@ -53,6 +53,7 @@ vtkPMSourceProxy::vtkPMSourceProxy()
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
   this->Internals = new vtkInternals();
+  this->PortsCreated = false;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +66,7 @@ vtkPMSourceProxy::~vtkPMSourceProxy()
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPMSourceProxy::GetOutputPort(int port)
 {
+  this->CreateOutputPorts();
   if (static_cast<int>(this->Internals->OutputPorts.size()) > port)
     {
     return this->Internals->OutputPorts[port];
@@ -110,12 +112,17 @@ bool vtkPMSourceProxy::CreateVTKObjects(vtkSMMessage* message)
     vtkCommand::StartEvent, this, &vtkPMSourceProxy::MarkStartEvent);
   algorithm->AddObserver(
     vtkCommand::EndEvent, this, &vtkPMSourceProxy::MarkEndEvent);
-  return this->CreateOutputPorts();
+  return true;
 }
 
 //----------------------------------------------------------------------------
 bool vtkPMSourceProxy::CreateOutputPorts()
 {
+  if (this->PortsCreated)
+    {
+    return true;
+    }
+  this->PortsCreated = true;
   vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
   if (!algo)
     {

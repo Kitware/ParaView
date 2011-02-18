@@ -69,6 +69,8 @@ protected:
 
   // Description:
   // Create the output ports and add post filters for each output port.
+  // CreateOutputPorts is only called when an output-port is requested, i.e.
+  // GetOutputPort() is called.
   virtual bool CreateOutputPorts();
 
   // Description:
@@ -107,6 +109,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+  bool PortsCreated;
   //ETX
 };
 
