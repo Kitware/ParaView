@@ -116,6 +116,11 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
     return;
     }
 
+  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
+    {
+    return;
+    }
+
   this->UndoSet->AddElement(element);
 }
 //-----------------------------------------------------------------------------
@@ -134,7 +139,7 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
   undoElement->SetSession(session);
   undoElement->SetUndoRedoState( previousState, newState );
   this->Add(undoElement);
-  undoElement->Delete();
+  undoElement->FastDelete();
 }
 
 //-----------------------------------------------------------------------------

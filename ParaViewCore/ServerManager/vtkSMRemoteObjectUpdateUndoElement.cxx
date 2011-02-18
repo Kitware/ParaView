@@ -60,7 +60,7 @@ int vtkSMRemoteObjectUpdateUndoElement::Redo()
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
 {
-  if(this->Session && state->has_global_id())
+  if(this->Session && state && state->has_global_id())
     {
     // Creation or update
     vtkSMRemoteObject* remoteObj = vtkSMRemoteObject::SafeDownCast(
