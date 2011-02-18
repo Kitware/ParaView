@@ -50,6 +50,7 @@ if not paraview.compatibility.major:
 from vtkPVClientServerCorePython import *
 from vtkPVServerImplementationPython import *
 from vtkPVServerManagerPython import *
+from vtkPVCommonPython import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.
