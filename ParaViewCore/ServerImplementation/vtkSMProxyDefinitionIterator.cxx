@@ -36,7 +36,7 @@ bool vtkSMProxyDefinitionIterator::IsDoneWithTraversal()
   return true;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyDefinitionIterator::vtkSMProxyDefinitionIterator::GoToNextItem()
+void vtkSMProxyDefinitionIterator::GoToNextItem()
 {
 }
 //---------------------------------------------------------------------------
