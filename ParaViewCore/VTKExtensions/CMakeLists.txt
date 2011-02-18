@@ -87,7 +87,6 @@ SET (Kit_SRCS
   vtkPExtractHistogram.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
-  vtkPID.cxx
   vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
