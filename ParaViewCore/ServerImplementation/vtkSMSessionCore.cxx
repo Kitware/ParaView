@@ -266,7 +266,8 @@ vtkSMSessionCore::~vtkSMSessionCore()
   this->Interpreter = 0;
 
   // Manage controller
-  if (this->ParallelController &&
+  if (this->SymmetricMPIMode == false &&
+    this->ParallelController &&
     this->ParallelController->GetLocalProcessId() == 0)
     {
     this->ParallelController->TriggerBreakRMIs();
