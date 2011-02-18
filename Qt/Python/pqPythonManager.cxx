@@ -65,17 +65,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPythonManager::pqInternal
 {
 public:
+  pqInternal() : Editor(NULL) 
+  {};
   QTimer                              StatusBarUpdateTimer;
   QPointer<pqPythonDialog>            PythonDialog;
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
   QPointer<pqServer>                  ActiveServer;
   bool                                IsPythonTracing;
-  pqPythonScriptEditor*               Editor;
+  QPointer<pqPythonScriptEditor>      Editor;
 };
 
 //-----------------------------------------------------------------------------
-pqPythonManager::pqPythonManager(QObject* parent/*=null*/) :
-  QObject(parent)
+pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
+  QObject(_parent)
 {
   this->Internal = new pqInternal;
   pqApplicationCore* core = pqApplicationCore::instance();

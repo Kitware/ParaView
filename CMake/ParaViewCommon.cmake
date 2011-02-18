@@ -30,6 +30,31 @@ MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
   ENDIF(filesToInstall)
 ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 
+# GLOB_RECURSIVE_INSTALL_DEVELOPMENT:
+#     Scrape directory for glob pattern
+#     install the found files to Development
+#     component.  Will recurse subdirectories
+#
+# from:    directory to scrape.
+# to:      destination
+# exts:    list of glob patterns
+MACRO(GLOB_RECURSIVE_INSTALL_DEVELOPMENT from to exts)  
+  SET(filesToInstall)
+  FOREACH(ext ${exts})
+    SET(files)
+    FILE(GLOB_RECURSE files RELATIVE ${from} ${ext})
+    IF(files)
+      SET(filesToInstall "${filesToInstall};${files}")
+    ENDIF(files)
+  ENDFOREACH(ext)
+  IF(filesToInstall)
+    INSTALL(
+        FILES ${filesToInstall}
+        DESTINATION ${to}
+        COMPONENT Development)
+  ENDIF(filesToInstall)
+ENDMACRO(GLOB_RECURSIVE_INSTALL_DEVELOPMENT)
+
 # Common settings
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
 
@@ -131,6 +156,7 @@ ENDIF(NOT PV_INSTALL_DOC_DIR)
 # Override QtTesting install variables
 SET(QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+SET(QtTesting_INSTALL_CMAKE_DIR ${PV_INSTALL_CMAKE_DIR})
 
 #########################################################################
 # Install no development files by default, but allow the user to get
@@ -139,8 +165,10 @@ OPTION(PARAVIEW_INSTALL_DEVELOPMENT "Install ParaView plugin development files."
 MARK_AS_ADVANCED(PARAVIEW_INSTALL_DEVELOPMENT)
 IF(NOT PARAVIEW_INSTALL_DEVELOPMENT)
   SET (PV_INSTALL_NO_DEVELOPMENT 1)
+  SET(QT_TESTING_INSTALL_DEVELOPMENT 0)
 ELSE (NOT PARAVIEW_INSTALL_DEVELOPMENT)
   SET (PV_INSTALL_NO_DEVELOPMENT 0)
+  SET (QT_TESTING_INSTALL_DEVELOPMENT 1)
 ENDIF(NOT PARAVIEW_INSTALL_DEVELOPMENT)
 
 OPTION(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES "Enable installation of third party libraries such as Qt and FFMPEG." ON)
