@@ -33,6 +33,17 @@
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/String.hxx>
+
+
+#if defined(WIN32) && !defined(__CYGWIN__)
+/* String comparison routine. */
+# define VTKSTRNCASECMP _strnicmp
+#else
+# include "strings.h"
+# define VTKSTRNCASECMP strncasecmp
+#endif
+
 
 #define vtkPVPluginTrackerDebugMacro(x)\
 { if (debug_plugin) {\
@@ -100,7 +111,7 @@ namespace
     vtkstd::string defaultname =
       vtksys::SystemTools::GetFilenameWithoutExtension(filename);
     if (defaultname.size() > 3 &&
-      strncasecmp(defaultname.c_str(), "lib", 3) == 0)
+      VTKSTRNCASECMP(defaultname.c_str(), "lib", 3) == 0)
       {
       defaultname.erase(0, 3);
       }
