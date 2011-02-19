@@ -13,6 +13,7 @@ if(WIN32)
   UPDATE_COMMAND ""
   SOURCE_DIR ${png_source}
   BINARY_DIR ${png_binary}
+  INSTALL_DIR ${png_install}
   CMAKE_CACHE_ARGS
     -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
@@ -39,4 +40,12 @@ else()
     CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
   )
 
+endif()
+
+set(PNG_INCLUDE_DIR ${png_install}/include)
+
+if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+  set(PNG_LIBRARY optimized ${png_install}/lib/libpng${PNG_MAJOR}${PNG_MINOR}${_LINK_LIBRARY_SUFFIX} debug ${png_install}/lib/libpng${PNG_MAJOR}${PNG_MINOR}d${_LINK_LIBRARY_SUFFIX})
+else()
+  set(PNG_LIBRARY ${PNG_LIBRARY_PATH}/libpng${PNG_MAJOR}${PNG_MINOR}${_LINK_LIBRARY_SUFFIX})
 endif()

@@ -182,7 +182,7 @@ void vtkUnstructuredDataDeliveryFilter::ProcessViewRequest(vtkInformation* info)
   if (this->LODMode)
     {
     deliver_outline |=
-      info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT_FOR_LOD());
+      (info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT_FOR_LOD())!=0);
     }
   if (deliver_outline)
     {
