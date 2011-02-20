@@ -210,8 +210,8 @@ void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
   vtkXdmfCS_Initialize(interp);
 
 # ifdef PARAVIEW_USE_VISITBRIDGE
-  vtkVisItAVTAlgorithmsCS_Initialize(pm->GetInterpreter());
-  vtkVisItDatabasesCS_Initialize(pm->GetInterpreter());
+  vtkVisItAVTAlgorithmsCS_Initialize(interp);
+  vtkVisItDatabasesCS_Initialize(interp);
 # endif
 #endif
 
