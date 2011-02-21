@@ -31,7 +31,5 @@ MACRO(paraview_build_optional_application name comment subdirectory default)
 ENDMACRO(paraview_build_optional_application)
 
 paraview_build_optional_application(ParaView "Standard ParaView Client" ParaView ON)
-# OverView is disabled until we upgrade it to ParaView Branding
-#paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
 
 ENDIF(QT4_FOUND)
