@@ -1,4 +1,5 @@
 
+
 # The Silo external project for ParaView
 set(zlib_source "${CMAKE_CURRENT_BINARY_DIR}/zlib")
 set(zlib_binary "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
@@ -42,8 +43,8 @@ endif()
 
 set(ZLIB_INCLUDE_DIR ${zlib_install}/include)
 
-if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+if(WIN32)
   set(ZLIB_LIBRARY optimized ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} debug ${zlib_install}/lib/zlibd${_LINK_LIBRARY_SUFFIX})
 else()
-  set(ZLIB_LIBRARY ${ZLIB_LIBRARY_PATH}/libz${_LINK_LIBRARY_SUFFIX})
+  set(ZLIB_LIBRARY ${zlib_install}/lib/libz${_LINK_LIBRARY_SUFFIX})
 endif()
