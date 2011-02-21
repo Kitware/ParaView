@@ -28,7 +28,7 @@ class vtkPVOptions;
 class vtkSession;
 class vtkSessionIterator;
 
-class vtkProcessModule : public vtkObject
+class VTK_EXPORT vtkProcessModule : public vtkObject
 {
 public:
   static vtkProcessModule* New();
