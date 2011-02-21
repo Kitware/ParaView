@@ -134,6 +134,10 @@ def _trace_state():
     # Start trace
     smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
 
+    # Disconnect the smtrace module's observer.  It should not be
+    # active while tracing the state.
+    smtrace.reset_trace_observer()
+
     # Get proxy lists ordered by group
     proxy_lists = get_proxy_lists_ordered_by_group()
 
