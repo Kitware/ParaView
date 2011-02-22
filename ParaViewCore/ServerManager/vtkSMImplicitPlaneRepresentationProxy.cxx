@@ -17,7 +17,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkImplicitPlaneRepresentation.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMMessage.h"
 
 vtkStandardNewMacro(vtkSMImplicitPlaneRepresentationProxy);
 

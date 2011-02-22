@@ -18,7 +18,6 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRepresentedDataInformation.h"
-#include "vtkSMMessage.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"

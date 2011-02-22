@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMWriterProxy);

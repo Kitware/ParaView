@@ -43,7 +43,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"

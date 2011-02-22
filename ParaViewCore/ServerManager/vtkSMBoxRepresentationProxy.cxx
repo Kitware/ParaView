@@ -18,7 +18,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkTransform.h"
 

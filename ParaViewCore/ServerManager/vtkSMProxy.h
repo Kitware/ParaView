@@ -690,16 +690,16 @@ protected:
 // </code>
 // Will result in calling the vtkPMProxy::MethodName() when the stream in
 // interpreted.
-class PMPROXY
+class VTK_EXPORT PMPROXY
 {
   vtkSMProxy* Reference;
-  friend vtkClientServerStream& operator<<(
+  friend VTK_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const PMPROXY& manipulator);
 public:
   PMPROXY(vtkSMProxy* proxy) : Reference(proxy) {}
 };
 
-vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+VTK_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   const PMPROXY& manipulator);
 
 // This defines a manipulator for the vtkClientServerStream that can be used on
@@ -716,15 +716,15 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
 // Will result in calling the vtkClassName::MethodName() when the stream in
 // interpreted where vtkClassName is the type for the VTKObject which the proxyA
 // represents.
-class VTKOBJECT
+class VTK_EXPORT VTKOBJECT
 {
   vtkSMProxy* Reference;
-  friend vtkClientServerStream& operator<<(
+  friend VTK_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const VTKOBJECT& manipulator);
 public:
   VTKOBJECT(vtkSMProxy* proxy) : Reference(proxy) {}
 };
-vtkClientServerStream& operator<<(
+VTK_EXPORT vtkClientServerStream& operator<<(
   vtkClientServerStream& stream, const VTKOBJECT& manipulator);
 
 //ETX

@@ -16,7 +16,6 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMPluginLoaderProxy);

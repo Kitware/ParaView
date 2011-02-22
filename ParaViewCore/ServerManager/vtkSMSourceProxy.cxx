@@ -31,7 +31,6 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
