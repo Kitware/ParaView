@@ -149,6 +149,11 @@ pqTimeKeeper* pqServer::getTimeKeeper() const
 }
 
 //-----------------------------------------------------------------------------
+vtkSMSession* pqServer::session() const
+{
+  return this->Session.GetPointer();
+}
+//-----------------------------------------------------------------------------
 void pqServer::createTimeKeeper()
 {
   // Set Global Time keeper.
@@ -239,16 +244,16 @@ void pqServer::setHeartBeatTimeout(int msec)
 //-----------------------------------------------------------------------------
 void pqServer::heartBeat()
 {
-#ifdef FIXME_COLLABORATION
-  // Need a API on vtkSMSession for heart-beats.
-  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //vtkClientServerStream stream;
-  //stream << vtkClientServerStream::Invoke
-  //       << pm->GetProcessModuleID()
-  //       << "GetProcessModule"
-  //       << vtkClientServerStream::End;
-  //pm->SendStream(this->ConnectionID, vtkProcessModule::SERVERS, stream);
-#endif
+  // Send random stream to all processes to produce some traffic and prevent
+  // automatic disconnection
+  if(this->Session)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << "HeartBeat"
+           << vtkClientServerStream::End;
+    this->Session->ExecuteStream(vtkPVSession::SERVERS, stream, true);
+    }
 }
 
 //-----------------------------------------------------------------------------

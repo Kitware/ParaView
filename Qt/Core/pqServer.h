@@ -65,7 +65,7 @@ public:
   void setResource(const pqServerResource &server_resource);
 
   /// Returns the session instance which the pqServer represents.
-  vtkSMSession* session() const { return this->Session; }
+  vtkSMSession* session() const;
 
   /// Returns the connection id for the server connection.
   vtkIdType GetConnectionID() const;
@@ -165,7 +165,7 @@ private:
   pqServerResource Resource;
   vtkIdType ConnectionID;
   vtkWeakPointer<vtkSMProxy> GlobalMapperPropertiesProxy;
-  vtkSMSession* Session;
+  vtkWeakPointer<vtkSMSession> Session;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 
