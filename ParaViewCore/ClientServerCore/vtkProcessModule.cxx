@@ -195,6 +195,18 @@ bool vtkProcessModule::Finalize()
 }
 
 //----------------------------------------------------------------------------
+vtkProcessModule::ProcessTypes vtkProcessModule::GetProcessType()
+{
+  return vtkProcessModule::ProcessType;
+}
+
+//----------------------------------------------------------------------------
+vtkProcessModule* vtkProcessModule::GetProcessModule()
+{ 
+  return vtkProcessModule::Singleton.GetPointer();
+}
+
+//----------------------------------------------------------------------------
 // * vtkProcessModule non-static methods
 vtkStandardNewMacro(vtkProcessModule);
 vtkCxxSetObjectMacro(vtkProcessModule, NetworkAccessManager,

@@ -64,8 +64,7 @@ public:
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
     };
 
-  static ProcessTypes GetProcessType()
-    { return vtkProcessModule::ProcessType; }
+  static ProcessTypes GetProcessType();
 
   //********** PROCESS INITIALIZATION/CLEANUP API *****************************
 
@@ -135,8 +134,7 @@ public:
   // Description:
   // Provides access to the global ProcessModule. This method can only be called
   // after Initialize().
-  static vtkProcessModule* GetProcessModule()
-    { return vtkProcessModule::Singleton.GetPointer(); }
+  static vtkProcessModule* GetProcessModule();
 
   // Description:
   // Set/Get the application command line options object.
