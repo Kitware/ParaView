@@ -280,7 +280,6 @@ void vtkPVRenderView::Initialize(unsigned int id)
 
   this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
   // Synchronize this among all processes involved.
-  cout << "IsRemoteRenderingAllowed: " << vtkPVRenderView::IsRemoteRenderingAllowed() << endl;
   unsigned int cannot_render = (this->RemoteRenderingAvailable &&
                                 vtkPVRenderView::IsRemoteRenderingAllowed()) ? 0 : 1;
   this->SynchronizeSize(cannot_render);
