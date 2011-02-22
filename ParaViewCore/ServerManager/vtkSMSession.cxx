@@ -24,11 +24,18 @@
 #include "vtkSMSessionClient.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkWeakPointer.h"
+#include "vtkPVRenderView.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
+//----------------------------------------------------------------------------
+// STATICS
+vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
+    vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
 vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
@@ -166,16 +173,30 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
-  vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType sid = pm->RegisterSession(session);
-  session->Delete();
+  vtkIdType sid = 0;
+
+  if(vtkSMSession::AutoMPI->IsPossible())
+    {
+    int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
+    sid = vtkSMSession::ConnectToRemote("localhost", port, true);
+    }
+  else
+    {
+    vtkPVRenderView::DisableRemoteRendering = false;
+    vtkSMSession* session = vtkSMSession::New();
+    sid = pm->RegisterSession(session);
+    session->Delete();
+    }
+
   return sid;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
+                                        bool disableRemoteRendering /* = false */)
 {
+  vtkPVRenderView::DisableRemoteRendering = disableRemoteRendering;
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
@@ -191,8 +212,9 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
-  const char* rshost, int rsport)
+  const char* rshost, int rsport, bool disableRemoteRendering /* = false */)
 {
+  vtkPVRenderView::DisableRemoteRendering = disableRemoteRendering;
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
@@ -244,6 +266,7 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 vtkIdType vtkSMSession::ReverseConnectToRemote(
   int dsport, int rsport, bool (*callback)())
 {
+  vtkPVRenderView::DisableRemoteRendering = false;
   vtkTemp temp;
   temp.Callback = callback;
 

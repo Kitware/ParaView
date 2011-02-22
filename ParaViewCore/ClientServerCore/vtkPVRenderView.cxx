@@ -61,6 +61,11 @@
 #include <vtkstd/vector>
 #include <vtkstd/set>
 
+//----------------------------------------------------------------------------
+// Statics
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::DisableRemoteRendering = false;
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, GEOMETRY_SIZE, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, DATA_DISTRIBUTION_MODE, Integer);
@@ -275,14 +280,8 @@ void vtkPVRenderView::Initialize(unsigned int id)
 
   this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
   // Synchronize this among all processes involved.
-  unsigned int cannot_render = this->RemoteRenderingAvailable? 0 : 1;
-#ifdef FIXME_COLLABORATION
-  if (vtkProcessModule::GetProcessModule()->GetIsAutoMPI())
-    {
-    // disable remote-rendering when auto-mpi is employed.
-    cannot_render = 1;
-    }
-#endif
+  unsigned int cannot_render = (this->RemoteRenderingAvailable &&
+                                !vtkPVRenderView::DisableRemoteRendering) ? 0 : 1;
   this->SynchronizeSize(cannot_render);
   this->RemoteRenderingAvailable = cannot_render == 0;
 }

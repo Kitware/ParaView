@@ -69,6 +69,8 @@ public:
   vtkTypeMacro(vtkPVRenderView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  static bool DisableRemoteRendering;
+
   enum InteractionModes
     {
     INTERACTION_MODE_3D=0,

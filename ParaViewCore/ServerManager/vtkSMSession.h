@@ -20,10 +20,12 @@
 #define __vtkSMSession_h
 
 #include "vtkSMSessionBase.h"
+#include "vtkSmartPointer.h"
 
 class vtkSMPluginManager;
 class vtkSMUndoStackBuilder;
 class vtkSMStateLocator;
+class vtkProcessModuleAutoMPI;
 
 class VTK_EXPORT vtkSMSession : public vtkSMSessionBase
 {
@@ -128,7 +130,8 @@ public:
   // sessions. They register the session with the process module and return the
   // session id. Returns 0 on failure.
   // This overload is used to create a client-server session on client.
-  static vtkIdType ConnectToRemote(const char* hostname, int port);
+  static vtkIdType ConnectToRemote(const char* hostname, int port,
+                                   bool disableRemoteRendering = false);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -147,7 +150,7 @@ public:
   // This overload is used to create a client-dataserver-renderserver session on
   // client.
   static vtkIdType ConnectToRemote(const char* dshost, int dsport,
-    const char* rshost, int rsport);
+    const char* rshost, int rsport, bool disableRemoteRendering = false);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -183,12 +186,15 @@ protected:
   vtkSMStateLocator* StateLocator;
   bool StateManagement;
 
-  // FIXME should be managed smartly between client and server.
+  // FIXME_COLLABORATION should be managed smartly between client and server.
   vtkTypeUInt32 LastGUID;
 
 private:
   vtkSMSession(const vtkSMSession&); // Not implemented
   void operator=(const vtkSMSession&); // Not implemented
+
+  // AutoMPI helper class
+  static vtkSmartPointer<vtkProcessModuleAutoMPI> AutoMPI;
 //ETX
 };
 
