@@ -46,6 +46,7 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
   this->PluginManager = vtkSMPluginManager::New();
   this->PluginManager->SetSession(this);
   this->UndoStackBuilder = NULL;
+  this->IsAutoMPI = false;
 
   // Start after the reserved one
   this->LastGUID = vtkPVSession::RESERVED_MAX_IDS;
@@ -179,11 +180,12 @@ vtkIdType vtkSMSession::ConnectToSelf()
   if(vtkSMSession::AutoMPI->IsPossible())
     {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
-    sid = vtkSMSession::ConnectToRemote("localhost", port, true);
+    sid = vtkSMSession::ConnectToRemote("localhost", port, false);
+    vtkSMSession::SafeDownCast(pm->GetSession(sid))->IsAutoMPI = true;
     }
   else
     {
-    vtkPVRenderView::DisableRemoteRendering = false;
+    vtkPVRenderView::AllowRemoteRendering(true);
     vtkSMSession* session = vtkSMSession::New();
     sid = pm->RegisterSession(session);
     session->Delete();
@@ -194,9 +196,9 @@ vtkIdType vtkSMSession::ConnectToSelf()
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
-                                        bool disableRemoteRendering /* = false */)
+                                        bool allowRemoteRendering /* = true */)
 {
-  vtkPVRenderView::DisableRemoteRendering = disableRemoteRendering;
+  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
@@ -212,9 +214,9 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
-  const char* rshost, int rsport, bool disableRemoteRendering /* = false */)
+  const char* rshost, int rsport, bool allowRemoteRendering /* = true */)
 {
-  vtkPVRenderView::DisableRemoteRendering = disableRemoteRendering;
+  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
@@ -266,7 +268,7 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 vtkIdType vtkSMSession::ReverseConnectToRemote(
   int dsport, int rsport, bool (*callback)())
 {
-  vtkPVRenderView::DisableRemoteRendering = false;
+  vtkPVRenderView::AllowRemoteRendering(true);
   vtkTemp temp;
   temp.Callback = callback;
 

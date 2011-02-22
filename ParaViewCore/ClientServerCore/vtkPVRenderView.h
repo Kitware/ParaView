@@ -69,7 +69,11 @@ public:
   vtkTypeMacro(vtkPVRenderView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static bool DisableRemoteRendering;
+  // Description:
+  // This allow the user to overcome the system capability and simply prevent
+  // remote rendering.
+  static bool IsRemoteRenderingAllowed();
+  static void AllowRemoteRendering(bool enable);
 
   enum InteractionModes
     {
@@ -521,6 +525,8 @@ protected:
   bool UseLightKit;
 
   bool UsedLODForLastRender;
+
+  static bool RemoteRenderingAllowed;
 
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
 private:

@@ -64,7 +64,7 @@
 //----------------------------------------------------------------------------
 // Statics
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::DisableRemoteRendering = false;
+bool vtkPVRenderView::RemoteRenderingAllowed = true;
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, GEOMETRY_SIZE, Integer);
@@ -280,8 +280,9 @@ void vtkPVRenderView::Initialize(unsigned int id)
 
   this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
   // Synchronize this among all processes involved.
+  cout << "IsRemoteRenderingAllowed: " << vtkPVRenderView::IsRemoteRenderingAllowed() << endl;
   unsigned int cannot_render = (this->RemoteRenderingAvailable &&
-                                !vtkPVRenderView::DisableRemoteRendering) ? 0 : 1;
+                                vtkPVRenderView::IsRemoteRenderingAllowed()) ? 0 : 1;
   this->SynchronizeSize(cannot_render);
   this->RemoteRenderingAvailable = cannot_render == 0;
 }
@@ -1300,4 +1301,15 @@ void vtkPVRenderView::RemoveAllManipulators()
     {
     this->InteractorStyle->RemoveAllManipulators();
     }
+}
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::IsRemoteRenderingAllowed()
+{
+  return vtkPVRenderView::RemoteRenderingAllowed;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AllowRemoteRendering(bool allowRemoteRendering)
+{
+  vtkPVRenderView::RemoteRenderingAllowed = allowRemoteRendering;
 }

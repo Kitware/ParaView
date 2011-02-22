@@ -131,7 +131,7 @@ public:
   // session id. Returns 0 on failure.
   // This overload is used to create a client-server session on client.
   static vtkIdType ConnectToRemote(const char* hostname, int port,
-                                   bool disableRemoteRendering = false);
+                                   bool allowRemoteRendering = true);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -150,7 +150,7 @@ public:
   // This overload is used to create a client-dataserver-renderserver session on
   // client.
   static vtkIdType ConnectToRemote(const char* dshost, int dsport,
-    const char* rshost, int rsport, bool disableRemoteRendering = false);
+    const char* rshost, int rsport, bool allowRemoteRendering = true);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -161,6 +161,12 @@ public:
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
     { return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL); }
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
+
+  // Description:
+  // This flag if set indicates that the current session
+  // module has automatically started "pvservers" as MPI processes as
+  // default pipeline.
+  vtkGetMacro(IsAutoMPI, bool);
 
 //BTX
 protected:
@@ -188,6 +194,8 @@ protected:
 
   // FIXME_COLLABORATION should be managed smartly between client and server.
   vtkTypeUInt32 LastGUID;
+
+  bool IsAutoMPI;
 
 private:
   vtkSMSession(const vtkSMSession&); // Not implemented

@@ -139,13 +139,10 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkSMSession* session = this->GetSession();
 
-#ifdef FIXME_COLLABORATION
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetIsAutoMPI())
+  if (session->GetIsAutoMPI())
     {
     return "Cannot support selection in auto-mpi mode";
     }
-#endif
   if (session->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
     session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
     {
