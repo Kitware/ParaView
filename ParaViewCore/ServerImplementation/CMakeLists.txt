@@ -215,6 +215,7 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 VTK_ADD_LIBRARY(vtk${KIT}
   ${protobuf_generated_files}
   ${Kit_SRCS}
+  vtkPVMessage.cxx
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}

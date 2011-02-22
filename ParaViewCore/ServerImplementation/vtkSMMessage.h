@@ -26,6 +26,7 @@
 #if __GNUC__
 # pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
+#include "vtkSystemIncludes.h"
 #include "vtkPVMessage.pb.h"
 #if __GNUC__
 # pragma GCC diagnostic warning "-Wsign-compare"

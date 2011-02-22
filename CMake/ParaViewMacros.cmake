@@ -207,11 +207,13 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
   GET_FILENAME_COMPONENT(basename ${in_proto_file} NAME_WE)
   GET_FILENAME_COMPONENT(absolute ${in_proto_file} ABSOLUTE)
   GET_FILENAME_COMPONENT(path ${absolute} PATH)
-  SET (out_file ${CMAKE_CURRENT_BINARY_DIR}/${basename}.pb.cc)
+  SET (out_file ${CMAKE_CURRENT_BINARY_DIR}/${basename}.pb.h)
   SET(${out_cpp_file}  ${out_file} PARENT_SCOPE)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${out_file}
-    COMMAND protoc_compiler --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path ${path} ${absolute}
+    COMMAND protoc_compiler
+      --cpp_out=dllexport_decl=VTK_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
+      --proto_path ${path} ${absolute}
     DEPENDS ${in_proto_file} protoc_compiler
   )
 ENDFUNCTION (protobuf_generate)
