@@ -48,6 +48,7 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
   vtkPMXMLAnimationWriterRepresentationProperty.cxx
+  vtkSMMessage.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
   vtkSMSessionBase.cxx
@@ -56,16 +57,17 @@ SET (Kit_SRCS
   vtkSMSessionServer.cxx
 )
 
-#SET_SOURCE_FILES_PROPERTIES(
-#
-#  WRAP_EXCLUDE
-#  )
-#
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMMessage.cxx
+  WRAP_EXCLUDE
+  )
+
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMProxyDefinitionIterator.cxx
   vtkPMObject.cxx
   vtkPMVectorProperty.cxx
   vtkSMSessionBase.cxx
+  vtkSMMessage.cxx
   ABSTRACT)
 
 INCLUDE_DIRECTORIES(
@@ -152,9 +154,6 @@ SET (dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
 
 
-SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
-
 SET_SOURCE_FILES_PROPERTIES(vtkSMProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
@@ -213,9 +212,7 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 # Create the library.
 VTK_ADD_LIBRARY(vtk${KIT}
-  ${protobuf_generated_files}
   ${Kit_SRCS}
-  vtkPVMessage.cxx
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
@@ -224,6 +221,9 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${KIT_LIBS}
   protobuf
 )
+
+SET_SOURCE_FILES_PROPERTIES(vtkSMMessage.cxx PROPERTIES OBJECT_DEPENDS
+  ${protobuf_generated_files})
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL

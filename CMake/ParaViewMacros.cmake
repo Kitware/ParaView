@@ -212,7 +212,7 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${out_file}
     COMMAND protoc_compiler
-      --cpp_out=dllexport_decl=VTK_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
+      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
       --proto_path ${path} ${absolute}
     DEPENDS ${in_proto_file} protoc_compiler
   )
