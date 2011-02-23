@@ -20,7 +20,7 @@
 #define __vtkSMSession_h
 
 #include "vtkSMSessionBase.h"
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkSMPluginManager;
 class vtkSMUndoStackBuilder;

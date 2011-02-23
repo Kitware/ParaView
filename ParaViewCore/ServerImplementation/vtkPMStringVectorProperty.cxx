@@ -19,18 +19,26 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
+#include <vtkstd/vector>
+#include <vtkstd/string>
 #include <assert.h>
 
+class vtkPMStringVectorProperty::vtkVectorOfStrings :
+  public vtkstd::vector <vtkstd::string> {};
+class vtkPMStringVectorProperty::vtkVectorOfInts :
+  public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkPMStringVectorProperty);
 //----------------------------------------------------------------------------
 vtkPMStringVectorProperty::vtkPMStringVectorProperty()
 {
+  this->ElementTypes = new vtkVectorOfInts();
 }
 
 //----------------------------------------------------------------------------
 vtkPMStringVectorProperty::~vtkPMStringVectorProperty()
 {
+  delete this->ElementTypes;
 }
 
 //---------------------------------------------------------------------------
@@ -44,7 +52,7 @@ bool vtkPMStringVectorProperty::Push(vtkSMMessage* message, int offset)
 
   const Variant *variant = &prop->value();
   int num_elems = variant->txt_size();
-  vtkstd::vector<vtkstd::string> values;
+  vtkVectorOfStrings values;
   values.resize(num_elems);
   for (int cc=0; cc < num_elems; cc++)
     {
@@ -122,11 +130,11 @@ bool vtkPMStringVectorProperty::ReadXMLAttributes(
     {
     number_of_elements_per_command = this->GetNumberOfElementsPerCommand();
     }
-  this->ElementTypes.resize(number_of_elements_per_command, STRING);
+  this->ElementTypes->resize(number_of_elements_per_command, STRING);
 
   element->GetVectorAttribute("element_types",
-    number_of_elements_per_command, &this->ElementTypes[0]);
-  vtkstd::vector<vtkstd::string> values;
+    number_of_elements_per_command, &(*this->ElementTypes)[0]);
+  vtkVectorOfStrings values;
   bool hasDefaultValues = false;
   if (number_of_elements > 0)
     {
@@ -169,7 +177,7 @@ bool vtkPMStringVectorProperty::ReadXMLAttributes(
 }
 
 //----------------------------------------------------------------------------
-bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &values)
+bool vtkPMStringVectorProperty::Push(const vtkVectorOfStrings &values)
 {
   if (this->InformationOnly || !this->Command)
     {
@@ -193,13 +201,13 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
   if (!this->Repeatable)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
-    vtkstd::vector<vtkstd::string>::const_iterator iter;
+    vtkVectorOfStrings::const_iterator iter;
     int i=0;
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)
       {
       // Convert to the appropriate type and add to stream
-      int type = (i < static_cast<int>(this->ElementTypes.size()))?
-        this->ElementTypes[i] : STRING;
+      int type = (i < static_cast<int>(this->ElementTypes->size()))?
+        (*this->ElementTypes)[i] : STRING;
       switch (type)
         {
       case INT:
@@ -236,8 +244,8 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
       for (int j=0; j<this->NumberOfElementsPerCommand; j++)
         {
         // Convert to the appropriate type and add to stream
-        int type = (j < static_cast<int>(this->ElementTypes.size()))?
-          this->ElementTypes[j] : STRING;
+        int type = (j < static_cast<int>(this->ElementTypes->size()))?
+          (*this->ElementTypes)[j] : STRING;
         switch (type)
           {
         case INT:

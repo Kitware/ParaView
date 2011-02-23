@@ -19,15 +19,20 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkMaterialInterfaceProcessRing.h
       vtkMaterialInterfaceToProcMap.h
       vtkMemberFunctionCommand.h
+      vtkPMVectorPropertyTemplate.h
       vtkPriorityHelper.h
       vtkProcessModuleConnectionManagerInternals.h
+      vtkProcessModuleInternals.h
       vtkPVPlugin.h
+      vtkPVPluginTracker.h
       vtkPVPythonPluginInterface.h
       vtkPVServerManagerPluginInterface.h
       vtkPVServerOptionsInternals.h
       vtkPVTestUtities.h
       vtkSciVizStatisticsPrivate.h
       vtkSMCameraConfigurationFileInfo.h
+      vtkSMMessage.h
+      vtkSMMessageMinimal.h
       vtkSMPropertyHelper.h
       vtkSMPropertyInternals.h
       vtkSMPropertyInternals.h
@@ -35,6 +40,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMProxyInternals.h
       vtkSMProxyManagerInternals.h
       vtkSMRepresentationStrategyVector.h
+      vtkSMVectorPropertyTemplate.h
       vtkSpyPlotBlock.h
       vtkSpyPlotBlockIterator.h
       vtkSpyPlotHistoryReaderPrivate.h

@@ -210,7 +210,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     this->Cache->GetProxyToRemove(proxy_ids);
     for (size_t cc=0; cc < proxy_ids.size(); cc++)
       {
-      vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
+      vtkObjectBase* arg = this->GetObjectBase(proxy_ids[cc]);
       if(arg != NULL)
         {
         stream << vtkClientServerStream::Invoke
@@ -230,7 +230,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
   this->Cache->GetProxyToAdd(proxy_ids);
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
-    vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
+    vtkObjectBase* arg = this->GetObjectBase(proxy_ids[cc]);
 
     if(arg != NULL || this->IsValidNull(proxy_ids[cc]))
       {
@@ -275,7 +275,7 @@ void vtkPMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //----------------------------------------------------------------------------
-vtkObjectBase* vtkPMProxyProperty::GetObject(vtkTypeUInt32 globalId)
+vtkObjectBase* vtkPMProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 {
   vtkPMProxy* pmProxy = NULL;
   switch(this->ArgumentType)

@@ -20,7 +20,7 @@
 #define __vtkPMDoubleVectorProperty_h
 
 #include "vtkPMVectorProperty.h"
-#include "vtkPMVectorPropertyTemplate.h"
+#include "vtkPMVectorPropertyTemplate.h" // real superclass
 
 #define vtkPMVectorProperty vtkPMVectorPropertyTemplate<double>
 class VTK_EXPORT vtkPMDoubleVectorProperty : public vtkPMVectorProperty

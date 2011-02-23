@@ -22,8 +22,7 @@
 
 #include "vtkSMUndoElement.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
-
-#include <vtkWeakPointer.h>
+#include "vtkWeakPointer.h" //  needed for vtkWeakPointer.
 
 class vtkSMStateLocator;
 

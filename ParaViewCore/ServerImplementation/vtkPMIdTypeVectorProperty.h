@@ -20,7 +20,7 @@
 #define __vtkPMIdTypeVectorProperty_h
 
 #include "vtkPMVectorProperty.h"
-#include "vtkPMVectorPropertyTemplate.h"
+#include "vtkPMVectorPropertyTemplate.h" // real superclass
 
 #define vtkPMVectorProperty vtkPMVectorPropertyTemplate<vtkIdType, bool>
 class VTK_EXPORT vtkPMIdTypeVectorProperty : public vtkPMVectorProperty

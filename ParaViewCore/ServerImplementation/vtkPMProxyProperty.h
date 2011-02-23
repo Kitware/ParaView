@@ -96,7 +96,7 @@ protected:
   TypeArg ArgumentType;
 
   // Base on the ArgumentType will return either the VTK object or the SMProxy object
-  vtkObjectBase* GetObject(vtkTypeUInt32 globalId);
+  vtkObjectBase* GetObjectBase(vtkTypeUInt32 globalId);
 
   // Allow to detect if a null argument is really meant to be null
   bool IsValidNull(vtkTypeUInt32 globalId);

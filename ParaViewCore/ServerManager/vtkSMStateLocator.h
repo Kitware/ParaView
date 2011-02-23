@@ -21,7 +21,7 @@
 #define __vtkSMStateLocator_h
 
 #include "vtkSMObject.h"
-#include "vtkSMMessageMinimal.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class VTK_EXPORT vtkSMStateLocator : public vtkSMObject
 {
@@ -29,7 +29,6 @@ public:
   static vtkSMStateLocator* New();
   vtkTypeMacro(vtkSMStateLocator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
 
   // Description:
   // Set/Get a parent locator to search which is used as a backup location

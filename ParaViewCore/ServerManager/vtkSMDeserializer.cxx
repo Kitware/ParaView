@@ -20,8 +20,10 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMDeserializer);
+vtkCxxSetObjectMacro(vtkSMDeserializer, Session, vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {

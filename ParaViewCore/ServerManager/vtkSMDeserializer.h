@@ -22,11 +22,11 @@
 #define __vtkSMDeserializer_h
 
 #include "vtkSMObject.h"
-#include "vtkSMSession.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMDeserializer : public vtkSMObject
 {
@@ -35,8 +35,10 @@ public:
   vtkTypeMacro(vtkSMDeserializer, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Get/Set the session.
   vtkGetObjectMacro(Session, vtkSMSession);
-  vtkSetObjectMacro(Session, vtkSMSession);
+  virtual void SetSession(vtkSMSession*);
 
 //BTX
 protected:

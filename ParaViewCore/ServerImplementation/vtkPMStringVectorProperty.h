@@ -21,11 +21,6 @@
 
 #include "vtkPMVectorProperty.h"
 
-//BTX
-#include <vtkstd/vector>
-#include <vtkstd/string>
-//ETX
-
 class VTK_EXPORT vtkPMStringVectorProperty : public vtkPMVectorProperty
 {
 public:
@@ -56,8 +51,11 @@ private:
   vtkPMStringVectorProperty(const vtkPMStringVectorProperty&); // Not implemented
   void operator=(const vtkPMStringVectorProperty&); // Not implemented
 
-  bool Push(const vtkstd::vector<vtkstd::string> &values);
-  vtkstd::vector<int> ElementTypes;
+  class vtkVectorOfStrings;
+  class vtkVectorOfInts;
+
+  bool Push(const vtkVectorOfStrings &values);
+  vtkVectorOfInts* ElementTypes;
 //ETX
 };
 

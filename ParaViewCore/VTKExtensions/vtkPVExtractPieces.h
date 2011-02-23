@@ -28,7 +28,8 @@
 #define __vtkPVExtractPieces_h
 
 #include "vtkPassInputTypeAlgorithm.h"
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+
 class VTK_EXPORT vtkPVExtractPieces : public vtkPassInputTypeAlgorithm
 {
 public:

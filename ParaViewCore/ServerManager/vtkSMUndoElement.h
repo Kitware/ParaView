@@ -23,7 +23,7 @@
 #define __vtkSMUndoElement_h
 
 #include "vtkUndoElement.h"
-#include "vtkWeakPointer.h"
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkSMSession;
 
