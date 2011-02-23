@@ -16,7 +16,7 @@ TARGET_LINK_LIBRARIES(TestSubProxy
 
 ################################################################################
 SET(ServersServerManager_SRCS
-  ServersServerManagerPrintSelf
+  ParaViewCoreServerManagerPrintSelf
   TestComparativeAnimationCueProxy 
   )
 

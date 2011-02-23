@@ -17,8 +17,6 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
-  vtkAllToNRedistributeCompositePolyData.cxx
-  vtkAllToNRedistributePolyData.cxx
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
@@ -27,7 +25,6 @@ SET (Kit_SRCS
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeDataToTableFilter.cxx
-  vtkBalancedRedistributePolyData.cxx
   vtkBlockDeliveryPreprocessor.cxx
   vtkBSPCutsGenerator.cxx
   vtkCacheSizeKeeper.cxx
@@ -164,7 +161,6 @@ SET (Kit_SRCS
   vtkQuerySelectionSource.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkRectilinearGridConnectivity.cxx
-  vtkRedistributePolyData.cxx
   vtkReductionFilter.cxx
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
@@ -206,13 +202,20 @@ SET (Kit_SRCS
   vtkUpdateSuppressorPipeline.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkVRMLSource.cxx
-  vtkWeightedRedistributePolyData.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
   vtkZlibImageCompressor.cxx
 )
 
 IF (VTK_USE_MPI)
+  SET (Kit_SRCS
+    ${Kit_SRCS}
+    vtkAllToNRedistributeCompositePolyData.cxx
+    vtkAllToNRedistributePolyData.cxx
+    vtkBalancedRedistributePolyData.cxx
+    vtkRedistributePolyData.cxx
+    vtkWeightedRedistributePolyData.cxx
+    )
   IF (PARAVIEW_USE_ICE_T)
     SET(Kit_SRCS
       ${Kit_SRCS}
@@ -425,3 +428,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       ${PV_INSTALL_INCLUDE_DIR}
       "*.h;*.hxx;*.txx")
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+
+IF (BUILD_TESTING)
+  SUBDIRS(Testing)
+ENDIF (BUILD_TESTING)

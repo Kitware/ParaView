@@ -1,0 +1,4 @@
+ADD_EXECUTABLE(ParaViewCoreCommonPrintSelf ParaViewCoreCommonPrintSelf.cxx)
+ADD_TEST(ParaViewCoreCommonPrintSelf
+  ${CXX_TEST_PATH}/ParaViewCoreCommonPrintSelf)
+TARGET_LINK_LIBRARIES(ParaViewCoreCommonPrintSelf vtkPVCommon)
