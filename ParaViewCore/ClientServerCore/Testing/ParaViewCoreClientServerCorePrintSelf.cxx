@@ -106,6 +106,8 @@
 #endif
 
 #define PRINT_SELF(classname)\
+  cout <<"------------------------------------" << endl;\
+  cout << "Class: " << #classname << endl;\
   c = classname::New(); c->Print(cout); c->Delete();
 
 
@@ -113,7 +115,7 @@ int main(int, char**)
 {
   vtkObject* c;
   PRINT_SELF(vtk3DWidgetRepresentation);
-  PRINT_SELF(vtkCaveSynchronizedRenderers);
+  //PRINT_SELF(vtkCaveSynchronizedRenderers);
   PRINT_SELF(vtkChartRepresentation);
   PRINT_SELF(vtkClientServerMoveData);
   PRINT_SELF(vtkCompleteArrays);
@@ -133,10 +135,10 @@ int main(int, char**)
   PRINT_SELF(vtkNetworkAccessManager);
   PRINT_SELF(vtkNetworkImageSource);
   PRINT_SELF(vtkOutlineRepresentation);
-  PRINT_SELF(vtkPV2DRenderView);
+  //PRINT_SELF(vtkPV2DRenderView);
   PRINT_SELF(vtkPVAlgorithmPortsInformation);
   PRINT_SELF(vtkPVArrayInformation);
-  PRINT_SELF(vtkPVBarChartView);
+  //PRINT_SELF(vtkPVBarChartView);
   PRINT_SELF(vtkPVCacheKeeper);
   PRINT_SELF(vtkPVCacheKeeperPipeline);
   PRINT_SELF(vtkPVCacheSizeInformation);
@@ -148,7 +150,7 @@ int main(int, char**)
   PRINT_SELF(vtkPVCompositeDataInformation);
   PRINT_SELF(vtkPVCompositeDataInformationIterator);
   PRINT_SELF(vtkPVCompositeRepresentation);
-  PRINT_SELF(vtkPVContextView);
+  //PRINT_SELF(vtkPVContextView);
   PRINT_SELF(vtkPVDataInformation);
   PRINT_SELF(vtkPVDataRepresentation);
   PRINT_SELF(vtkPVDataRepresentationPipeline);
@@ -163,11 +165,11 @@ int main(int, char**)
   PRINT_SELF(vtkPVImplicitPlaneRepresentation);
   PRINT_SELF(vtkPVInformation);
   PRINT_SELF(vtkPVLastSelectionInformation);
-  PRINT_SELF(vtkPVLineChartView);
+  //PRINT_SELF(vtkPVLineChartView);
   PRINT_SELF(vtkPVOpenGLExtensionsInformation);
   PRINT_SELF(vtkPVOptions);
   PRINT_SELF(vtkPVOptionsXMLParser);
-  PRINT_SELF(vtkPVParallelCoordinatesChartView);
+  //PRINT_SELF(vtkPVParallelCoordinatesChartView);
   PRINT_SELF(vtkPVParallelCoordinatesRepresentation);
   //PRINT_SELF(vtkPVPlugin);
   PRINT_SELF(vtkPVPluginInformation);
@@ -175,9 +177,9 @@ int main(int, char**)
   PRINT_SELF(vtkPVPluginTracker);
   PRINT_SELF(vtkPVPluginsInformation);
   PRINT_SELF(vtkPVProgressHandler);
-  PRINT_SELF(vtkPVPythonModule);
+  //PRINT_SELF(vtkPVPythonModule);
   //PRINT_SELF(vtkPVPythonPluginInterface);
-  PRINT_SELF(vtkPVRenderView);
+  //PRINT_SELF(vtkPVRenderView);
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVSILInformation);
   PRINT_SELF(vtkPVSelectionInformation);
@@ -185,12 +187,12 @@ int main(int, char**)
   //PRINT_SELF(vtkPVServerManagerPluginInterface);
   PRINT_SELF(vtkPVServerOptions);
   PRINT_SELF(vtkPVSession);
-  PRINT_SELF(vtkPVSynchronizedRenderWindows);
-  PRINT_SELF(vtkPVSynchronizedRenderer);
+  //PRINT_SELF(vtkPVSynchronizedRenderWindows);
+  //PRINT_SELF(vtkPVSynchronizedRenderer);
   PRINT_SELF(vtkPVTemporalDataInformation);
   PRINT_SELF(vtkPVTimerInformation);
-  PRINT_SELF(vtkPVView);
-  PRINT_SELF(vtkPVXYChartView);
+  //PRINT_SELF(vtkPVView);
+  //PRINT_SELF(vtkPVXYChartView);
   PRINT_SELF(vtkProcessModule);
   PRINT_SELF(vtkProcessModuleAutoMPI);
   PRINT_SELF(vtkSelectionDeliveryFilter);
@@ -198,7 +200,7 @@ int main(int, char**)
   PRINT_SELF(vtkSession);
   PRINT_SELF(vtkSessionIterator);
   PRINT_SELF(vtkSpreadSheetRepresentation);
-  PRINT_SELF(vtkSpreadSheetView);
+  //PRINT_SELF(vtkSpreadSheetView);
   PRINT_SELF(vtkTCPNetworkAccessManager);
   PRINT_SELF(vtkTextSourceRepresentation);
   PRINT_SELF(vtkUnstructuredDataDeliveryFilter);

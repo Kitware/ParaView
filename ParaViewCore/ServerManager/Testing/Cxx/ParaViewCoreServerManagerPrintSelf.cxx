@@ -139,6 +139,8 @@
 #include "vtkSMWriterProxy.h"
 
 #define PRINT_SELF(classname)\
+  cout <<"------------------------------------" << endl;\
+  cout << "Class: " << #classname << endl;\
   c = classname::New(); c->Print(cout); c->Delete();
 
 int main(int , char *[])
@@ -241,7 +243,7 @@ int main(int , char *[])
   PRINT_SELF(vtkSMRepresentationProxy);
   PRINT_SELF(vtkSMScalarBarWidgetRepresentationProxy);
   PRINT_SELF(vtkSMSelectionHelper);
-  PRINT_SELF(vtkSMSession);
+  //PRINT_SELF(vtkSMSession);
   PRINT_SELF(vtkSMSessionClient);
   PRINT_SELF(vtkSMSILDomain);
   PRINT_SELF(vtkSMSILModel);
