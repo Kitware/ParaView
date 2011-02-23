@@ -230,17 +230,19 @@ public:
   //-------------------------------------------------------------------------
   void GoToNextItem()
   {
-    if(!IsDoneWithCoreTraversal())
+    if(!this->IsDoneWithCoreTraversal())
       {
       this->NextCoreDefinition();
       }
-    else if(!IsDoneWithCustomTraversal())
+    else if(!this->IsDoneWithCustomTraversal())
       {
-      NextCustomDefinition();
+      this->NextCustomDefinition();
       }
     else
       {
-      while(IsDoneWithCoreTraversal() && IsDoneWithCustomTraversal() && !IsDoneWithGroupTraversal())
+      while( this->IsDoneWithCoreTraversal() &&
+             this->IsDoneWithCustomTraversal() &&
+             !this->IsDoneWithGroupTraversal() )
         {
         this->NextGroup();
         }
@@ -249,20 +251,20 @@ public:
   //-------------------------------------------------------------------------
   bool IsDoneWithTraversal()
   {
-    if(!Initialized)
+    if(!this->Initialized)
     {
-      GoToFirstItem();
+      this->GoToFirstItem();
     }
-    if( IsDoneWithCoreTraversal() && IsDoneWithCustomTraversal())
+    if( this->IsDoneWithCoreTraversal() && this->IsDoneWithCustomTraversal())
       {
-      if(IsDoneWithGroupTraversal())
+      if(this->IsDoneWithGroupTraversal())
         {
         return true;
         }
       else
         {
-        NextGroup();
-        return IsDoneWithTraversal();
+        this->NextGroup();
+        return this->IsDoneWithTraversal();
         }
       }
     return false;
@@ -310,11 +312,13 @@ public:
   void RegisterCoreDefinitionMap(StrToStrToXmlMap* map)
   {
     this->CoreDefinitionMap = map;
+    this->InvalidCoreIterator = true;
   }
   //-------------------------------------------------------------------------
   void RegisterCustomDefinitionMap(StrToStrToXmlMap* map)
   {
     this->CustomDefinitionMap = map;
+    this->InvalidCustomIterator = true;
   }
 
  //-------------------------------------------------------------------------
@@ -326,16 +330,21 @@ public:
 protected:
   vtkInternalDefinitionIterator()
   {
-    Initialized = false;
-    CoreDefinitionMap = 0;
-    CustomDefinitionMap = 0;
+    this->Initialized = false;
+    this->CoreDefinitionMap = NULL;
+    this->CustomDefinitionMap = 0;
+    this->InvalidCoreIterator = true;
+    this->InvalidCustomIterator = true;
   }
   ~vtkInternalDefinitionIterator(){}
 
   //-------------------------------------------------------------------------
   void Reset()
   {
-    Initialized = true;
+    this->Initialized = true;
+    this->InvalidCoreIterator = true;
+    this->InvalidCustomIterator = true;
+
     if(this->GroupNames.size() == 0)
       {
       // Look for all name available
@@ -363,7 +372,8 @@ protected:
         // TODO vtkErrorMacro("No definition available for that iterator.");
         return;
         }
-      Reset();
+      this->Initialized = false;
+      this->Reset();
       }
     else
       {
@@ -379,7 +389,7 @@ protected:
   //-------------------------------------------------------------------------
   bool IsDoneWithCoreTraversal()
   {
-    if(this->CoreDefinitionMap)
+    if(this->CoreDefinitionMap && !this->InvalidCoreIterator)
       {
       return this->CoreProxyIterator == this->CoreProxyIteratorEnd;
       }
@@ -388,7 +398,7 @@ protected:
   //-------------------------------------------------------------------------
   bool IsDoneWithCustomTraversal()
   {
-    if(this->CustomDefinitionMap)
+    if(this->CustomDefinitionMap && !this->InvalidCustomIterator)
       {
       return this->CustomProxyIterator == this->CustomProxyIteratorEnd;
       }
@@ -403,11 +413,13 @@ protected:
       {
       this->CoreProxyIterator    = (*CoreDefinitionMap)[this->CurrentGroupName].begin();
       this->CoreProxyIteratorEnd = (*CoreDefinitionMap)[this->CurrentGroupName].end();
+      this->InvalidCoreIterator = false;
       }
     if(this->CustomDefinitionMap)
       {
       this->CustomProxyIterator    = (*CustomDefinitionMap)[this->CurrentGroupName].begin();
       this->CustomProxyIteratorEnd = (*CustomDefinitionMap)[this->CurrentGroupName].end();
+      this->InvalidCustomIterator = false;
       }
   }
   //-------------------------------------------------------------------------
@@ -432,6 +444,8 @@ private:
   StrToStrToXmlMap* CustomDefinitionMap;
   vtkstd::set<vtkStdString> GroupNames;
   vtkstd::set<vtkStdString>::iterator GroupNameIterator;
+  bool InvalidCoreIterator;
+  bool InvalidCustomIterator;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkSMProxyDefinitionManager)
