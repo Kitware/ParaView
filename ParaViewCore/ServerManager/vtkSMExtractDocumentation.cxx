@@ -639,13 +639,52 @@ bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
   return domainWritten;
 }
 
-void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
+void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, vtkSMProxyManager* manager)
 {
   if (elem->GetNumberOfNestedElements() == 0)
     {
     char *elemName = elem->GetName();
     if (!strcmp(elemName, "Category"))
       {
+      return;
+      }
+    if (!strcmp(elemName, "ProxyManager"))
+      {
+#ifdef FIXME_COLLABORATION
+      cout << "Proxy manager tag was found..." << endl;
+      // Get list from ProxyManager
+      if (!strcmp(elem->GetAttribute("type"), "reader"))
+        {
+        int numberOfProxyToCheck = manager->GetNumberOfXMLProxies("sources");
+        for(int i=0;i<numberOfProxyToCheck;i++)
+          {
+          const char* proxyName = manager->GetXMLProxyName("sources", i);
+          vtkPVXMLElement* proxyDef = manager->GetProxyDefinition("sources", proxyName);
+          if(proxyDef)
+            {
+            vtkPVXMLElement* hints = proxyDef->FindNestedElementByName("Hints");
+            if(hints)
+              {
+              if(hints->FindNestedElementByName("ReaderFactory"))
+                {
+                vtkstd::pair<vtkstd::string, vtkstd::string> namePair(proxyName, "sources");
+                proxyNameList->insert(proxyNameList->end(), namePair);
+                }
+              }
+            }
+          }
+        }
+      else if (!strcmp(elem->GetAttribute("type"), "writer"))
+        {
+        int numberOfProxyToCheck = manager->GetNumberOfXMLProxies("writers");
+        for(int i=0;i<numberOfProxyToCheck;i++)
+          {
+          const char* proxyName = manager->GetXMLProxyName("writers", i);
+          vtkstd::pair<vtkstd::string, vtkstd::string> namePair(proxyName, "writers");
+          proxyNameList->insert(proxyNameList->end(), namePair);
+          }
+        }
+#endif
       return;
       }
     elemName[0] = tolower(elemName[0]);
@@ -671,7 +710,7 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
     unsigned int i;
     for (i = 0; i < elem->GetNumberOfNestedElements(); i++)
       {
-      ExtractProxyNames(elem->GetNestedElement(i), proxyNameList);
+      ExtractProxyNames(elem->GetNestedElement(i), proxyNameList, manager);
       }
     }
 }
@@ -1006,7 +1045,7 @@ int main(int argc, char *argv[])
   vtkSMSession* session = vtkSMSession::New();
   vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
   vtkStringPairList *proxyNameList = new vtkStringPairList;
-  ExtractProxyNames(rootElem, proxyNameList);
+  ExtractProxyNames(rootElem, proxyNameList, manager);
   proxyNameList->sort();
   proxyNameList->unique();
 

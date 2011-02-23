@@ -187,6 +187,11 @@ protected:
     vtkInformationVector**, vtkInformationVector*);
 
   // Description:
+  // Overridden to request correct ghost-level to avoid internal surfaces.
+  virtual int RequestUpdateExtent(vtkInformation* request,
+    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+
+  // Description:
   // Produce meta-data about this representation that the view may find useful.
   virtual bool GenerateMetaData(vtkInformation*, vtkInformation*);
 

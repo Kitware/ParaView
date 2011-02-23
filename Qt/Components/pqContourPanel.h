@@ -54,6 +54,9 @@ private slots:
   /// Called if the user rejects pending modifications
   void onRejected();
 
+  /// Called to update the enable state for certain widgets.
+  void updateEnableState();
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

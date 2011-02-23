@@ -1,4 +1,5 @@
 <ParaViewWriters>
+  <ProxyManager type="writer" />
   <Proxy group="writers" name="XMLPVDWriter" />
   <Proxy group="writers" name="XMLHyperOctreeWriter" />
   <Proxy group="writers" name="XMLPolyDataWriter" />

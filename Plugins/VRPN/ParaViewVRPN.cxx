@@ -39,8 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
+#include <pqDataRepresentation.h>
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 
 #include <vtkstd/vector>
 #include <iostream>
@@ -99,6 +105,7 @@ public:
   vrpn_Text_Receiver  *Text;
 
   t_user_callback *TC1;
+  t_user_callback *AC1;
 };
 
 void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
@@ -181,6 +188,172 @@ const vrpn_TRACKERCB t)
 }
 
 // ----------------------------------------------------------------------------
+vrpn_ANALOGCB AugmentChannelsToRetainLargestMagnitude(const vrpn_ANALOGCB t)
+{
+  vrpn_ANALOGCB at;
+  // Make a list of the magnitudes into at
+  for(int i=0;i<6;++i)
+    {
+      if(t.channel[i] < 0.0)
+        at.channel[i] = t.channel[i]*-1;
+      else
+        at.channel[i]= t.channel[i];
+    }
+
+  // Get the max value;
+  int max =0;
+  for(int i=1;i<6;++i)
+    {
+      if(at.channel[i] > at.channel[max])
+          max = i;
+    }
+
+  // copy the max value of t into at (rest are 0)
+  for (int i = 0; i < 6; ++i)
+    {
+      (i==max)?at.channel[i]=t.channel[i]:at.channel[i]=0.0;
+    }
+  return at;
+}
+
+void VRPN_CALLBACK handleAnalogPos(void *userdata,
+const vrpn_ANALOGCB t)
+{
+  t_user_callback *tData=static_cast<t_user_callback *>(userdata);
+
+  if ( tData->t_counts.size() == 0 )
+    {
+    tData->t_counts.push_back(0);
+    }
+
+  if ( tData->t_counts[0] == 1 )
+    {
+    tData->t_counts[0] = 0;
+
+    // printf("Rendering\n");
+    // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", t.channel[0],
+    //        t.channel[1], t.channel[2], t.channel[3], t.channel[4],
+    //        t.channel[5]);
+    vrpn_ANALOGCB at = AugmentChannelsToRetainLargestMagnitude(t);
+    // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],
+    //    at.channel[1], at.channel[2], at.channel[3], at.channel[4],
+    //    at.channel[5]);
+    // Apply up-down motion
+
+    pqDataRepresentation *data =0;
+    pqView *view = 0;
+
+    view = pqActiveObjects::instance().activeView();
+    data = pqActiveObjects::instance().activeRepresentation();
+
+    if(data)
+      {
+        vtkCamera* camera;
+        double pos[3], up[3], dir[3];
+        double orient[3];
+
+        vtkSMRenderViewProxy *viewProxy = 0;
+        vtkSMRepresentationProxy *repProxy = 0;
+        viewProxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+        repProxy = vtkSMRepresentationProxy::SafeDownCast(data->getProxy());
+
+        if ( repProxy && viewProxy )
+          {
+            vtkSMPropertyHelper(repProxy,"Position").Get(pos,3);
+            vtkSMPropertyHelper(repProxy,"Orientation").Get(orient,3);
+            camera = viewProxy->GetActiveCamera();
+            camera->GetDirectionOfProjection(dir);
+            camera->OrthogonalizeViewUp();
+            camera->GetViewUp(up);
+
+            for (int i = 0; i < 3; i++)
+              {
+                double dx = -0.01*at.channel[2]*up[i];
+                pos[i] += dx;
+              }
+
+            double r[3];
+            vtkMath::Cross(dir, up, r);
+
+            for (int i = 0; i < 3; i++)
+              {
+                double dx = 0.01*at.channel[0]*r[i];
+                pos[i] += dx;
+              }
+
+            for(int i=0;i<3;++i)
+              {
+                double dx = -0.01*at.channel[1]*dir[i];
+                pos[i] +=dx;
+              }
+
+
+            // pos[0] += at.channel[0];
+            // pos[1] += at.channel[1];
+            // pos[2] += at.channel[2];
+            orient[0] += 4.0*at.channel[3];
+            orient[1] += 4.0*at.channel[5];
+            orient[2] += 4.0*at.channel[4];
+            vtkSMPropertyHelper(repProxy,"Position").Set(pos,3);
+            vtkSMPropertyHelper(repProxy,"Orientation").Set(orient,3);
+            repProxy->UpdateVTKObjects();
+          }
+      }
+    else if ( view )
+      {
+        vtkSMRenderViewProxy *viewProxy = 0;
+        viewProxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+
+        if ( viewProxy )
+          {
+            vtkCamera* camera;
+            double pos[3], fp[3], up[3], dir[3];
+
+            camera = viewProxy->GetActiveCamera();
+            camera->GetPosition(pos);
+            camera->GetFocalPoint(fp);
+            camera->GetDirectionOfProjection(dir);
+            camera->OrthogonalizeViewUp();
+            camera->GetViewUp(up);
+
+            for (int i = 0; i < 3; i++)
+              {
+                double dx = 0.01*at.channel[2]*up[i];
+                pos[i] += dx;
+                fp[i]  += dx;
+              }
+
+            // Apply right-left motion
+            double r[3];
+            vtkMath::Cross(dir, up, r);
+
+            for (int i = 0; i < 3; i++)
+              {
+                double dx = -0.01*at.channel[0]*r[i];
+                pos[i] += dx;
+                fp[i]  += dx;
+              }
+
+            camera->SetPosition(pos);
+            camera->SetFocalPoint(fp);
+
+            camera->Dolly(pow(1.01,at.channel[1]));
+            camera->Elevation(  4.0*at.channel[3]);
+            camera->Azimuth(    4.0*at.channel[5]);
+            camera->Roll(       4.0*at.channel[4]);
+
+            viewProxy->GetRenderer()->ResetCameraClippingRange();
+            viewProxy->GetRenderWindow()->Render();
+          }
+      }
+    }
+  else
+    {
+      tData->t_counts[0]++;
+    }
+}
+
+// ----------------------------------------------------------------------------
 ParaViewVRPN::ParaViewVRPN()
 {
   this->Internals=new pqInternals();
@@ -240,6 +413,12 @@ void ParaViewVRPN::Init()
             sizeof(this->Internals->TC1->t_name));
     this->Internals->Tracker->register_change_handler(this->Internals->TC1,
                                                       handleTrackerPosQuat);
+
+    this->Internals->AC1=new t_user_callback;
+    strncpy(this->Internals->AC1->t_name, this->Name,
+            sizeof(this->Internals->AC1->t_name));
+    this->Internals->Analog->register_change_handler(this->Internals->AC1,
+                                                     handleAnalogPos);
     }
 }
 

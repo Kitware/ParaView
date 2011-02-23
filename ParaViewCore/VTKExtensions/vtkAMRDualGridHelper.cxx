@@ -15,14 +15,35 @@
 #include "vtkAMRDualGridHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkDummyController.h"
 #include "vtkImageData.h"
 #include "vtkUniformGrid.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkAMRBox.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
+#include "vtkCharArray.h"
+#include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkTimerLog.h"
+#include "vtkStdString.h"
+
+#include "vtkSmartPointer.h"
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+
+#include "vtkstd/list"
 #include "vtkstd/vector"
+
+#include "vtksys/SystemTools.hxx"
+
+// Determine if we can use the MPI controller for asynchronous communication.
+#include "vtkToolkits.h"
+#ifdef VTK_USE_MPI
+#define VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
+#include "vtkMPIController.h"
+#include "vtkMPICommunicator.h"
+#endif
 
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
@@ -33,6 +54,44 @@ class vtkAMRDualGridHelperSeed;
 //vtkIntArray* DebuggingAttributes;
 //static double DebuggingGlobalOrigin[3];
 //static double DebuggingRootSpacing[3];
+
+//=============================================================================
+// Tags used in communication.
+static const int DEGENERATE_REGION_TAG = 879015;
+
+//=============================================================================
+#if 0
+namespace {
+// A convienience class for marking the start and end of a function (or any
+// scope).  Simply declare the class at the start of the function and it will
+// automatically call vtkTimerLog::MarkStartEvent() at the beginning and
+// vtkTimerLog::MarkEndEvent() whenever it leaves regardless of where that
+// happens.
+class vtkTimerLogSmartMarkEvent
+{
+public:
+  vtkTimerLogSmartMarkEvent(const char *eventString,
+                            vtkMultiProcessController *controller = NULL) :
+    EventString(eventString),
+    Controller(controller)
+  {
+    if (this->Controller) this->Controller->Barrier();
+    vtkTimerLog::MarkStartEvent(this->EventString.c_str());
+  }
+  ~vtkTimerLogSmartMarkEvent()
+  {
+    if (this->Controller) this->Controller->Barrier();
+    vtkTimerLog::MarkEndEvent(this->EventString.c_str());
+  }
+private:
+  vtkStdString EventString;
+  vtkSmartPointer<vtkMultiProcessController> Controller;
+  vtkTimerLogSmartMarkEvent(const vtkTimerLogSmartMarkEvent &); // Not implemented
+  void operator=(const vtkTimerLogSmartMarkEvent &); // Not implemented
+};
+
+};
+#endif
 
 
 
@@ -65,7 +124,7 @@ public:
   void CreateBlockFaces(vtkAMRDualGridHelperBlock* block, int x, int y, int z);
   vtkstd::vector<vtkAMRDualGridHelperBlock*> Blocks;
 
-  // I need my own container because the 2D 
+  // I need my own container because the 2D
   // grid can expand in all directions.
   // the block in grid index 0,0 has its origin on the global origin.
   // I think I will make this grid temporary for initialization only.
@@ -101,6 +160,53 @@ vtkAMRDualGridHelperDegenerateRegion::vtkAMRDualGridHelperDegenerateRegion()
   this->ReceivingBlock = this->SourceBlock = 0;
   this->ReceivingArray = this->SourceArray = 0;
 }
+
+//-----------------------------------------------------------------------------
+// Simple containers for managing asynchronous communication.
+#ifdef VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
+struct vtkAMRDualGridHelperCommRequest
+{
+  vtkMPICommunicator::Request Request;
+  vtkSmartPointer<vtkCharArray> Buffer;
+  int SendProcess;
+  int ReceiveProcess;
+};
+
+// This class is a STL list of vtkAMRDualGridHelperCommRequest structs with some
+// helper methods added.
+class vtkAMRDualGridHelperCommRequestList
+  : public vtkstd::list<vtkAMRDualGridHelperCommRequest>
+{
+public:
+  // Description:
+  // Waits for all of the communication to complete.
+  void WaitAll()
+  {
+    for (iterator i = this->begin(); i != this->end(); i++) i->Request.Wait();
+  }
+  // Description:
+  // Waits for one of the communications to complete, removes it from the list,
+  // and returns it.
+  value_type WaitAny()
+  {
+    while (!this->empty())
+      {
+      for (iterator i = this->begin(); i != this->end(); i++)
+        {
+        if (i->Request.Test())
+          {
+          value_type retval = *i;
+          this->erase(i);
+          return retval;
+          }
+        }
+      vtksys::SystemTools::Delay(1);
+      }
+    vtkGenericWarningMacro(<< "Nothing to wait for.");
+    return value_type();
+  }
+};
+#endif //VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
 
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelperSeed::vtkAMRDualGridHelperSeed()
@@ -364,7 +470,7 @@ void vtkAMRDualGridHelperAddBackGhostValues(T *inPtr, int inDim[3],
   int inIncZ = inDim[0] * inDim[1];
   int inExt[6];
   int outExt[6];
-  
+
   // out always has ghost.
   outExt[0] = outExt[2] = outExt[4] = -1;
   outExt[1] = outExt[0] + outDim[0] - 1;
@@ -620,6 +726,7 @@ vtkAMRDualGridHelper::vtkAMRDualGridHelper()
   this->DataTypeSize = 8;
   this->ArrayName = 0;
   this->EnableDegenerateCells = 1;
+  this->EnableAsynchronousCommunication = 1;
   this->NumberOfBlocksInThisProcess = 0;
   for (ii = 0; ii < 3; ++ii)
     {
@@ -627,10 +734,16 @@ vtkAMRDualGridHelper::vtkAMRDualGridHelper()
     this->RootSpacing[ii] = 1.0;
     this->GlobalOrigin[ii] = 0.0;
     }
-  this->Controller = vtkMultiProcessController::GetGlobalController();
 
-  this->MessageBuffer  = 0;
-  this->MessageBufferLength  = 0;
+  this->Controller = vtkMultiProcessController::GetGlobalController();
+  if (this->Controller)
+    {
+    this->Controller->Register(this);
+    }
+  else
+    {
+    this->Controller = vtkDummyController::New();
+    }
 }
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
@@ -649,32 +762,49 @@ vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
   // Todo: See if we really need this.
   this->NumberOfBlocksInThisProcess = 0;
 
-  if (this->MessageBuffer)
-    {
-    delete [] this->MessageBuffer;
-    this->MessageBuffer  = 0;
-    this->MessageBufferLength  = 0;
-    }
-
   this->DegenerateRegionQueue.clear();
+
+  this->Controller->UnRegister(this);
+  this->Controller = NULL;
 }
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "SkipGhostCopy: " << this->SkipGhostCopy << endl;
+  os << indent << "EnableDegenerateCells: "
+     << this->EnableDegenerateCells << endl;
+  os << indent << "EnableAsynchronousCommunication: "
+     << this->EnableAsynchronousCommunication << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }
 
-//----------------------------------------------------------------------------
-void vtkAMRDualGridHelper::SetEnableMultiProcessCommunication(int v)
+//-----------------------------------------------------------------------------
+void vtkAMRDualGridHelper::SetController(vtkMultiProcessController *controller)
 {
-  if (v)
+  if (this->Controller == controller) return;
+
+  if (!controller)
     {
-    this->Controller = vtkMultiProcessController::GetGlobalController();
+    // It is common to use NULL for a multi process controller when no parallel
+    // communication is needed (for example, in a serial program).  Rather than
+    // have to constantly check for a NULL pointer, use a dummy controller
+    // so that we don't have to constantly check for it.
+    if (!this->Controller->IsA("vtkDummyController"))
+      {
+      this->SetController(vtkSmartPointer<vtkDummyController>::New());
+      }
+    return;
     }
-  else
-    {
-    this->Controller = 0;
-    }
+
+  // Controller is never NULL.
+  this->Controller->UnRegister(this);
+
+  this->Controller = controller;
+  controller->Register(this);
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -744,7 +874,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
   vtkAMRDualGridHelperBlock* block =
     this->Levels[level]->AddGridBlock(x, y, z, volume);
 
-  // We need to set this ivar here because we need to compute the index 
+  // We need to set this ivar here because we need to compute the index
   // from the global origin and root spacing.  The issue is that some blocks
   // may not ghost levels.  Everything would be easier if the
   // vtk spy reader did not strip off ghost cells of the outer blocks.
@@ -767,7 +897,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
   // This assumes 1 ghost layer (blocks are not completed yet so ....
   //block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
   //block->OriginIndex[1] = this->StandardBlockDimensions[1] * y - 1;
-  //block->OriginIndex[2] = this->StandardBlockDimensions[2] * z - 1; 
+  //block->OriginIndex[2] = this->StandardBlockDimensions[2] * z - 1;
 
   // Complete ghost levels if they have been stripped by the reader.
   block->AddBackGhostLevels(this->StandardBlockDimensions);
@@ -951,6 +1081,8 @@ void vtkAMRDualGridHelper::FindExistingFaces(
 // neighbor bits which indicate which cells/points become degenerate.
 void vtkAMRDualGridHelper::AssignSharedRegions()
 {
+//   vtkTimerLogSmartMarkEvent markevent("AssignSharedRegions", this->Controller);
+
   int* ext;
   int level, x,y,z;
   vtkAMRDualGridHelperBlock** blockPtr;
@@ -1233,6 +1365,53 @@ void vtkAMRDualGridHelper::QueueRegionRemoteCopy(
 static int vtkDualGridHelperCheckAssumption = 0;
 static int vtkDualGridHelperSkipGhostCopy = 0;
 
+// Given source and destination process ids, returns the buffer size, in bytes,
+// required to send the approprate degenerate cell information.  If 0 is
+// returned, it is not necessary to transfer any information, which is common.
+vtkIdType vtkAMRDualGridHelper::DegenerateRegionMessageSize(int srcProc,
+                                                            int destProc)
+{
+  vtkIdType messageLength = 0;
+
+  // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
+
+  // Note: In order to minimize communication, I am rellying heavily on the fact
+  // that the queue will be the same on all processes.  Message/region lengths
+  // are computed implicitely.
+
+  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
+  for (region = this->DegenerateRegionQueue.begin();
+       region != this->DegenerateRegionQueue.end(); region++)
+    {
+    if (   (region->SourceBlock->ProcessId == srcProc)
+        && (region->ReceivingBlock->ProcessId == destProc) )
+      {
+      // We are assuming that the queue is ordered consistently on all
+      // processes.  This avoids having to send the block indexes along with the
+      // data.  The extra memory is no big deal, but it is a pain to marshal
+      // integers into a single message.
+      vtkIdType regionSize = 1;
+      if (region->ReceivingRegion[0] == 0)
+        {
+        // Note:  In rare cases, level difference can be larger than 1.
+        // This will reserve too much memory with no real harm done.
+        // Half the root dimensions, ghost layers not included.
+        // Ghost layers are handled by separate edge and corner regions.
+        regionSize *= (this->StandardBlockDimensions[0] >> 1);
+        }
+      if (region->ReceivingRegion[1] == 0)
+        {
+        regionSize *= (this->StandardBlockDimensions[1] >> 1);
+        }
+      if (region->ReceivingRegion[2] == 0)
+        {
+        regionSize *= (this->StandardBlockDimensions[2] >> 1);
+        }
+      messageLength += regionSize * this->DataTypeSize;
+      }
+    }
+  return messageLength;
+}
 
 // The following three methods are all similar and should be reworked so that
 // the share more code.  One possibility to to have block to block copy
@@ -1394,14 +1573,14 @@ void* vtkDualGridHelperCopyBlockToMessage(T* messagePtr, T* lowerPtr,
   return messagePtr;
 }
 void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
-  vtkAMRDualGridHelperDegenerateRegion* region,
-  void* messagePtr)
+                             const vtkAMRDualGridHelperDegenerateRegion &region,
+                             void* messagePtr)
 {
-  int regionX = region->ReceivingRegion[0];
-  int regionY = region->ReceivingRegion[1];
-  int regionZ = region->ReceivingRegion[2];
-  vtkAMRDualGridHelperBlock* lowResBlock = region->SourceBlock;
-  vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
+  int regionX = region.ReceivingRegion[0];
+  int regionY = region.ReceivingRegion[1];
+  int regionZ = region.ReceivingRegion[2];
+  vtkAMRDualGridHelperBlock* lowResBlock = region.SourceBlock;
+  vtkAMRDualGridHelperBlock* highResBlock = region.ReceivingBlock;
 
   int levelDiff = highResBlock->Level - lowResBlock->Level;
   if (levelDiff < 0)
@@ -1410,9 +1589,9 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
     return messagePtr;
     }
   // Lower block pointer
-  if (region->SourceArray == 0) {return messagePtr;}
-  int daType = region->SourceArray->GetDataType();
-  void *lowerPtr = region->SourceArray->GetVoidPointer(0);
+  if (region.SourceArray == 0) {return messagePtr;}
+  int daType = region.SourceArray->GetDataType();
+  void *lowerPtr = region.SourceArray->GetVoidPointer(0);
 
   // Get the extent of the high-res region we are replacing with values from the neighbor.
   int ext[6];
@@ -1476,9 +1655,9 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
 
 // Take the low res message and copy to the high res block.
 template <class T>
-void* vtkDualGridHelperCopyMessageToBlock(T* ptr, T* messagePtr, 
+const void* vtkDualGridHelperCopyMessageToBlock(T* ptr, const T* messagePtr,
                                        int ext[6],int messageExt[6],int levelDiff,
-                                       int yInc, int zInc, 
+                                       int yInc, int zInc,
                                        int highResBlockOriginIndex[3],
                                        int lowResBlockOriginIndex[3],
                                        bool hackLevelFlag)
@@ -1520,16 +1699,16 @@ void* vtkDualGridHelperCopyMessageToBlock(T* ptr, T* messagePtr,
 }
 
 
-void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
-  vtkAMRDualGridHelperDegenerateRegion* region,
-  void* messagePtr,
+const void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
+  const vtkAMRDualGridHelperDegenerateRegion &region,
+  const void* messagePtr,
   bool hackLevelFlag) // Make levels absolute so we can get rid of this flag.
 {
-  int regionX = region->ReceivingRegion[0];
-  int regionY = region->ReceivingRegion[1];
-  int regionZ = region->ReceivingRegion[2];
-  vtkAMRDualGridHelperBlock* lowResBlock = region->SourceBlock;
-  vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
+  int regionX = region.ReceivingRegion[0];
+  int regionY = region.ReceivingRegion[1];
+  int regionZ = region.ReceivingRegion[2];
+  vtkAMRDualGridHelperBlock* lowResBlock = region.SourceBlock;
+  vtkAMRDualGridHelperBlock* highResBlock = region.ReceivingBlock;
 
   int levelDiff = highResBlock->Level - lowResBlock->Level;
   if (levelDiff < 0)
@@ -1540,9 +1719,9 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
 
   // Now copy low resolution into highresolution ghost layer.
   // For simplicity loop over all three axes (one will be degenerate).
-  if (region->ReceivingArray == 0) {return messagePtr;}
-  int daType = region->ReceivingArray->GetDataType();
-  void *ptr = region->ReceivingArray->GetVoidPointer(0);
+  if (region.ReceivingArray == 0) {return messagePtr;}
+  int daType = region.ReceivingArray->GetDataType();
+  void *ptr = region.ReceivingArray->GetVoidPointer(0);
 
   // Get the extent of the high-res region we are replacing with values from the neighbor.
   int ext[6];
@@ -1601,7 +1780,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
     {
     vtkTemplateMacro(messagePtr=vtkDualGridHelperCopyMessageToBlock(
                   static_cast<VTK_TT *>(ptr),
-                  static_cast<VTK_TT *>(messagePtr),
+                  static_cast<const VTK_TT *>(messagePtr),
                   ext, messageExt, levelDiff, yInc, zInc,
                   highResBlock->OriginIndex,
                   lowResBlock->OriginIndex,
@@ -1610,9 +1789,57 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
       vtkGenericWarningMacro("Execute: Unknown ScalarType");
       return messagePtr;
     }
-  return messagePtr;    
+  return messagePtr;
 }
 
+// Given a buffer (of size determined by DegenerateRegionMessageSize), fill it
+// with degenerate region information to be sent to the given process.
+void vtkAMRDualGridHelper::MarshalDegenerateRegionMessage(void *messagePtr,
+                                                          int destProc)
+{
+  int myProcId = this->Controller->GetLocalProcessId();
+
+  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
+  for (region = this->DegenerateRegionQueue.begin();
+       region != this->DegenerateRegionQueue.end(); region++)
+    {
+    if (   (region->ReceivingBlock->ProcessId == destProc)
+        && (region->SourceBlock->ProcessId == myProcId) )
+      {
+      messagePtr = this->CopyDegenerateRegionBlockToMessage(*region,messagePtr);
+      }
+    }
+}
+
+// Given a buffer (of size determined by DegenerateRegionMessageSize) filled
+// with degenerate region information received from the given processes, copy
+// the information to the local block data structures.
+void vtkAMRDualGridHelper::UnmarshalDegenerateRegionMessage(
+                                                         const void *messagePtr,
+                                                         int srcProc,
+                                                         bool hackLevelFlag)
+{
+  int myProcId = this->Controller->GetLocalProcessId();
+
+  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
+  for (region = this->DegenerateRegionQueue.begin();
+       region != this->DegenerateRegionQueue.end(); region++)
+    {
+    if (   (region->ReceivingBlock->ProcessId == myProcId)
+        && (region->SourceBlock->ProcessId == srcProc) )
+      {
+      if (region->ReceivingBlock->CopyFlag == 0)
+        { // We cannot modify our input.
+        vtkImageData* copy = vtkImageData::New();
+        copy->DeepCopy(region->ReceivingBlock->Image);
+        region->ReceivingBlock->Image = copy;
+        region->ReceivingBlock->CopyFlag = 1;
+        }
+      messagePtr = this->CopyDegenerateRegionMessageToBlock(*region, messagePtr,
+                                                            hackLevelFlag);
+      }
+    }
+}
 
 
 //----------------------------------------------------------------------------
@@ -1621,10 +1848,28 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
 // step of initialization.
 void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueue(bool hackLevelFlag)
 {
-  if (this->Controller == 0 || this->SkipGhostCopy)
+  if (this->SkipGhostCopy)
     {
     return;
     }
+
+#ifdef VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
+  if (   this->EnableAsynchronousCommunication
+      && this->Controller->IsA("vtkMPIController") )
+    {
+    this->ProcessRegionRemoteCopyQueueMPIAsynchronous(hackLevelFlag);
+    return;
+    }
+#endif //VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
+
+  this->ProcessRegionRemoteCopyQueueSynchronous(hackLevelFlag);
+}
+
+void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueueSynchronous(
+                                                             bool hackLevelFlag)
+{
+//   vtkTimerLogSmartMarkEvent markevent("ProcessRegionRemoteCopyQueueSynchronous", this->Controller);
+
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProc = this->Controller->GetLocalProcessId();
   int procIdx;
@@ -1636,158 +1881,198 @@ void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueue(bool hackLevelFlag)
     // Higher processes receive first and send second.
     if (procIdx < myProc)
       {
-      this->SendDegenerateRegionsFromQueue(procIdx, myProc);
-      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc, hackLevelFlag);
+      this->SendDegenerateRegionsFromQueueSynchronous(procIdx);
+      this->ReceiveDegenerateRegionsFromQueueSynchronous(procIdx,hackLevelFlag);
       }
     else if (procIdx > myProc)
       {
-      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc, hackLevelFlag);
-      this->SendDegenerateRegionsFromQueue(procIdx, myProc);
+      this->ReceiveDegenerateRegionsFromQueueSynchronous(procIdx,hackLevelFlag);
+      this->SendDegenerateRegionsFromQueueSynchronous(procIdx);
       }
     }
 }
 
 
 //----------------------------------------------------------------------------
-void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int localProc)
+void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueSynchronous(
+                                                                   int destProc)
 {
-  // Find the length of the message.
-  vtkAMRDualGridHelperDegenerateRegion* region;
-  int messageLength = 0;
-  int queueLength = (int)(this->DegenerateRegionQueue.size());
-  int queueIdx;
-  
-  // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
-
-  // Note: In order to minimize communication, I am rellying heavily on the fact 
-  // that the queue will be the same on all processes.  Message/region lengths
-  // are computed implicitely.
-
-  for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
-    {
-    region = &(this->DegenerateRegionQueue[queueIdx]);    
-    if ( region->ReceivingBlock->ProcessId == remoteProc &&
-         region->SourceBlock->ProcessId == localProc)
-      { // We are assuming that the queue is ordered consistently on all processes.
-      // This avoids having to send the block indexes along with the data.
-      // The extra memory is no big deal, but it is a pain to marshal integers
-      // into a single message.
-      int regionSize = 1;
-      int levelDiff = region->ReceivingBlock->Level - region->SourceBlock->Level;
-      if (region->ReceivingRegion[0] == 0)
-        {
-        regionSize *= (this->StandardBlockDimensions[0] >> levelDiff);
-        }
-      if (region->ReceivingRegion[1] == 0)
-        {
-        regionSize *= (this->StandardBlockDimensions[1] >> levelDiff);
-        }
-      if (region->ReceivingRegion[2] == 0)
-        {
-        regionSize *= (this->StandardBlockDimensions[2] >> levelDiff);
-        }
-      messageLength += regionSize * this->DataTypeSize;
-      }
-    }
+  vtkIdType messageLength = this->DegenerateRegionMessageSize(
+                               this->Controller->GetLocalProcessId(), destProc);
   if (messageLength == 0)
     { // Nothing to send.
     return;
     }
-  this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
-  // Now copy the layers into the message buffer.
-  void* messagePtr = (void*)(this->MessageBuffer);
-  for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
-    {
-    region = &(this->DegenerateRegionQueue[queueIdx]);
-    if ( region->ReceivingBlock->ProcessId == remoteProc &&
-         region->SourceBlock->ProcessId == localProc)
-      {
-      messagePtr = this->CopyDegenerateRegionBlockToMessage(
-                        region,
-                        messagePtr);
-      }
-    }
+
+  VTK_CREATE(vtkUnsignedCharArray, buffer);
+  buffer->SetNumberOfValues(messageLength);
+
+  this->MarshalDegenerateRegionMessage(buffer->GetPointer(0), destProc);
 
   // Send the message
-  this->Controller->Send(this->MessageBuffer, 
-                         messageLength, remoteProc, 879015);
+  this->Controller->Send(buffer->GetPointer(0),
+                         messageLength, destProc, DEGENERATE_REGION_TAG);
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc,
+void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueueSynchronous(
+                                                             int srcProc,
                                                              bool hackLevelFlag)
 {
-  // Find the length of the message.
-  vtkAMRDualGridHelperDegenerateRegion* region;
-  int messageLength = 0;
-  int queueLength = (int)(this->DegenerateRegionQueue.size());
-  int queueIdx;
-
-  // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
-
-  // Note: In order to minimize communication, I am rellying heavily on the fact 
-  // that the queue will be the same on all processes.  Message/region lengths
-  // are computed implicitely.
-
-  // Compute the message length we expect to receive.
-  for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
-    {
-    region = &(this->DegenerateRegionQueue[queueIdx]);
-    if ( region->ReceivingBlock->ProcessId == localProc &&
-         region->SourceBlock->ProcessId == remoteProc)
-      { // We are assuming that the queue is ordered consistently on all processes.
-      int regionSize = 1;
-      int levelDiff = region->ReceivingBlock->Level - region->SourceBlock->Level;
-      if (region->ReceivingRegion[0] == 0)
-        {
-        // Half the root dimensions, ghost layers not included.
-        // Ghost layers are handled by separate edge and corner regions.
-        regionSize *= (this->StandardBlockDimensions[0] >> levelDiff);
-        }
-      if (region->ReceivingRegion[1] == 0)
-        {
-        regionSize *= (this->StandardBlockDimensions[1] >> levelDiff);
-        }
-      if (region->ReceivingRegion[2] == 0)
-        {
-        regionSize *= (this->StandardBlockDimensions[2] >> levelDiff);
-        }
-      messageLength += regionSize * this->DataTypeSize;
-      }
-    }
+  vtkIdType messageLength = this->DegenerateRegionMessageSize(
+                                srcProc, this->Controller->GetLocalProcessId());
   if (messageLength == 0)
     { // Nothing to receive
     return;
     }
 
   // Receive the message.
-  this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
-  unsigned char* message = this->MessageBuffer;
-  this->Controller->Receive(message, messageLength, remoteProc, 879015);
+  VTK_CREATE(vtkUnsignedCharArray, buffer);
+  buffer->SetNumberOfValues(messageLength);
+  this->Controller->Receive(buffer->GetPointer(0), messageLength, srcProc,
+                            DEGENERATE_REGION_TAG);
 
-  // Now copy the regions in the message into thelocal blocks.
-  void* messagePtr = (void*)(this->MessageBuffer);
-  for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
-    {
-    region = &(this->DegenerateRegionQueue[queueIdx]);
-    if ( region->ReceivingBlock->ProcessId == localProc &&
-         region->SourceBlock->ProcessId == remoteProc)
-      {
-      if (region->ReceivingBlock->CopyFlag == 0)
-        { // We cannot modify our input.
-        vtkImageData* copy = vtkImageData::New();
-        copy->DeepCopy(region->ReceivingBlock->Image);
-        region->ReceivingBlock->Image = copy;
-        region->ReceivingBlock->CopyFlag = 1;
-        }
-
-      messagePtr = this->CopyDegenerateRegionMessageToBlock(
-                        region,
-                        messagePtr,
-                        hackLevelFlag);
-      }
-    }
+  this->UnmarshalDegenerateRegionMessage(buffer->GetPointer(0), srcProc,
+                                         hackLevelFlag);
 }
+
+#ifdef VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
+
+//-----------------------------------------------------------------------------
+void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueueMPIAsynchronous(
+                                                             bool hackLevelFlag)
+{
+//   vtkTimerLogSmartMarkEvent markevent("ProcessRegionRemoteCopyQueueMPIAsynchronous", this->Controller);
+
+  vtkMPIController *controller
+    = vtkMPIController::SafeDownCast(this->Controller);
+  if (!controller)
+    {
+    vtkErrorMacro("Internal error:"
+                  " ProcessRegionRemoteCopyQueueMPIAsynchronous called without"
+                  " MPI controller.");
+    return;
+    }
+
+  int numProcs = controller->GetNumberOfProcesses();
+  int myProc = controller->GetLocalProcessId();
+
+  vtkAMRDualGridHelperCommRequestList sendList;
+  vtkAMRDualGridHelperCommRequestList receiveList;
+
+  // First establish all receives.  MPI communication is more efficient if
+  // the receive is posted before the send.
+  for (int sendProc = 0; sendProc < numProcs; sendProc++)
+    {
+    if (sendProc == myProc) continue;
+    this->ReceiveDegenerateRegionsFromQueueMPIAsynchronous(sendProc,
+                                                           receiveList);
+    }
+
+  // Next initiate all sends.
+  for (int recvProc = 0; recvProc < numProcs; recvProc++)
+    {
+    if (recvProc == myProc) continue;
+    this->SendDegenerateRegionsFromQueueMPIAsynchronous(recvProc, sendList);
+    }
+
+  // Finally, finish all communications as they come in.
+  this->FinishDegenerateRegionsCommMPIAsynchronous(hackLevelFlag,
+                                                   sendList, receiveList);
+}
+
+void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
+                               int sendProc,
+                               vtkAMRDualGridHelperCommRequestList &receiveList)
+{
+  vtkMPIController *controller
+    = vtkMPIController::SafeDownCast(this->Controller);
+  if (!controller)
+    {
+    vtkErrorMacro("Internal error:"
+                  " ProcessRegionRemoteCopyQueueMPIAsynchronous called without"
+                  " MPI controller.");
+    return;
+    }
+  int myProc = controller->GetLocalProcessId();
+
+  vtkIdType messageLength
+    = this->DegenerateRegionMessageSize(sendProc, myProc);
+
+  if (messageLength == 0) return;
+
+  vtkAMRDualGridHelperCommRequest request;
+  request.SendProcess = sendProc;
+  request.ReceiveProcess = myProc;
+  request.Buffer = vtkSmartPointer<vtkCharArray>::New();
+  request.Buffer->SetNumberOfValues(messageLength);
+
+  // This static cast will cause big problems if we ever have a buffer
+  // larger than 2 GB.  Then again, we are unlikely to hit that without
+  // running out of memory anyway.
+  controller->NoBlockReceive(request.Buffer->GetPointer(0),
+                             static_cast<int>(messageLength),
+                             sendProc, DEGENERATE_REGION_TAG,
+                             request.Request);
+
+  receiveList.push_back(request);
+}
+
+void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueMPIAsynchronous(
+                                  int recvProc,
+                                  vtkAMRDualGridHelperCommRequestList &sendList)
+{
+  vtkMPIController *controller
+    = vtkMPIController::SafeDownCast(this->Controller);
+  if (!controller)
+    {
+    vtkErrorMacro("Internal error:"
+                  " ProcessRegionRemoteCopyQueueMPIAsynchronous called without"
+                  " MPI controller.");
+    return;
+    }
+  int myProc = controller->GetLocalProcessId();
+
+  vtkIdType messageLength
+    = this->DegenerateRegionMessageSize(myProc, recvProc);
+
+  if (messageLength == 0) return;
+
+  vtkAMRDualGridHelperCommRequest request;
+  request.SendProcess = myProc;
+  request.ReceiveProcess = recvProc;
+  request.Buffer = vtkSmartPointer<vtkCharArray>::New();
+  request.Buffer->SetNumberOfValues(messageLength);
+
+  this->MarshalDegenerateRegionMessage(request.Buffer->GetPointer(0), recvProc);
+
+  // This static cast will cause big problems if we ever have a buffer
+  // larger than 2 GB.  Then again, we are unlikely to hit that without
+  // running out of memory anyway.
+  controller->NoBlockSend(request.Buffer->GetPointer(0),
+                          static_cast<int>(messageLength),
+                          recvProc, DEGENERATE_REGION_TAG,
+                          request.Request);
+
+  sendList.push_back(request);
+}
+
+void vtkAMRDualGridHelper::FinishDegenerateRegionsCommMPIAsynchronous(
+                               bool hackLevelFlag,
+                               vtkAMRDualGridHelperCommRequestList &sendList,
+                               vtkAMRDualGridHelperCommRequestList &receiveList)
+{
+  while (!receiveList.empty())
+    {
+    vtkAMRDualGridHelperCommRequest request = receiveList.WaitAny();
+    this->UnmarshalDegenerateRegionMessage(request.Buffer->GetPointer(0),
+                                           request.SendProcess, hackLevelFlag);
+    }
+
+  sendList.WaitAll();
+}
+
+#endif // VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
 
 
 // We need to know:
@@ -1807,7 +2092,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
 // GlobalOrigin is choosen so that there are no negative extents and
-// base extents (without overlap/ghost buffer) lie on grid 
+// base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 // The array name is the cell array that is being processed by the filter.
 // Ghost values have to be modified at level changes.  It could be extended to
@@ -1815,6 +2100,8 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
 int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
                                      const char* arrayName)
 {
+//   vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Controller);
+
   int blockId, numBlocks;
   int numLevels = input->GetNumberOfLevels();
 
@@ -1851,10 +2138,10 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
 
   // Plan for meshing between blocks.
   this->AssignSharedRegions();
-  
+
   // Copy regions on level boundaries between processes.
   this->ProcessRegionRemoteCopyQueue(false);
-  
+
   // Setup faces for seeding connectivity between blocks.
   //this->CreateFaces();
 
@@ -1866,146 +2153,151 @@ void vtkAMRDualGridHelper::ClearRegionRemoteCopyQueue()
 }
 void vtkAMRDualGridHelper::ShareBlocks()
 {
-  if (this->Controller == 0 || this->Controller->GetNumberOfProcesses() == 1)
+//   vtkTimerLogSmartMarkEvent markevent("ShareBlocks", this->Controller);
+
+  if (this->Controller->GetNumberOfProcesses() == 1)
     {
     return;
     }
 
-  // I could use alltoN ....
-  // For now: collect to 0, and broadcast back.
-  int procIdx;
-  int myProc = this->Controller->GetLocalProcessId();
-  if (myProc == 0)
-    { // Collect / Receive blocs from all other processes.
-    int numProcs = this->Controller->GetNumberOfProcesses();
-    for (procIdx = 1; procIdx < numProcs; ++procIdx)
-      {
-      this->ReceiveBlocks(procIdx);
-      }
-    // Broadcast / send back.
-    for (procIdx = 1; procIdx < numProcs; ++procIdx)
-      {
-      this->SendBlocks(procIdx, myProc);
-      }
-    }
-  else
-    {
-    this->SendBlocks(0, myProc);
-    this->ReceiveBlocks(0);
-    }
-}
-void vtkAMRDualGridHelper::AllocateMessageBuffer(int maxSize)
-{
-  if (this->MessageBufferLength < maxSize)
-    {
-    if (this->MessageBuffer)
-      {
-      delete [] this->MessageBuffer;
-      }
-    }
-  this->MessageBufferLength = maxSize + 100; // Extra to avoid reallocating.
-  this->MessageBuffer = new unsigned char[this->MessageBufferLength];
-}
-void vtkAMRDualGridHelper::ReceiveBlocks(int remoteProc)
-{
-  int messageLength;
-  this->Controller->Receive(&messageLength, 1, remoteProc, 87344879);
-  this->AllocateMessageBuffer(messageLength*sizeof(int));
-  int* message = (int*)(this->MessageBuffer);
-  this->Controller->Receive(message, messageLength, remoteProc, 87344880);
-  
-  // Now read the message.
-  int x, y, z;
-  int blockProc = remoteProc;
-  int* messagePtr = message;
-  int numLevels = *messagePtr++;
-  for (int levelIdx = 0; levelIdx < numLevels; ++levelIdx)
-    {
-    int numBlocks = *messagePtr++;
-    vtkAMRDualGridHelperLevel* level;
-    level = this->Levels[levelIdx];
-    for (int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
-      {
-      x = *messagePtr++;
-      y = *messagePtr++;
-      z = *messagePtr++;
-      if (remoteProc == 0)
-        {
-        blockProc = *messagePtr++;
-        }
-      vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x,y,z, 0);
-      block->ProcessId = blockProc;
+  VTK_CREATE(vtkIntArray, sendBuffer);
+  VTK_CREATE(vtkIntArray, recvBuffer);
 
-      block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
-      block->OriginIndex[1] = this->StandardBlockDimensions[1] * y - 1;
-      block->OriginIndex[2] = this->StandardBlockDimensions[2] * z - 1;      
-      }
-    }
+  this->MarshalBlocks(sendBuffer);
+  this->Controller->AllGatherV(sendBuffer, recvBuffer);
+  this->UnmarshalBlocks(recvBuffer);
 }
-void vtkAMRDualGridHelper::SendBlocks(int remoteProc, int localProc)
+void vtkAMRDualGridHelper::MarshalBlocks(vtkIntArray *buffer)
 {
   // Marshal the procs.
-  // I will try to be as smart about reducing the message size.
-  // This is getting complex enough that I should have just used AllToN.
-  // locaProc != 0
-  // numlevels, level0NumBlocks,(gridx,gridy,gridz,...,level1NumBlocks,...)
-  // localProc == 0
-  // numlevels, level0NumBlocks,(gridx,gridy,gridz,proc,...,level1NumBlocks,...)
-  int numBlocks;
-  vtkAMRDualGridHelperBlock* block;
-  int messageLength = 1; // One int for the number of levels.
+  // numlevels, level0NumBlocks,(gridx,gridy,gridz,...),level1NumBlocks,(...)
+  vtkIdType messageLength = 1; // One int for the number of levels.
   int numLevels = this->GetNumberOfLevels();
   for (int levelIdx = 0; levelIdx < numLevels; ++levelIdx)
     {
     // One int for the number of blocks in this level.
     ++messageLength;
-    if (localProc == 0)
-      { // x,y,z,proc for each block.
-      messageLength += 4* (int)(this->Levels[levelIdx]->Blocks.size());
-      }
-    else
-      { // xyz for each block.
-      messageLength += 3* (int)(this->Levels[levelIdx]->Blocks.size());
-      }
+    messageLength += 3* (int)(this->Levels[levelIdx]->Blocks.size());
     }
 
-  this->AllocateMessageBuffer(messageLength * sizeof(int));
+  buffer->SetNumberOfValues(messageLength);
 
   // Now create the message.
-  int *message = (int*)(this->MessageBuffer);
-  int* messagePtr = message;
-  int* numBlocksPtr;
-  *messagePtr++ = numLevels;
-  for (int levelIdx = 0; levelIdx < numLevels; ++levelIdx)
+  vtkIdType i = 0;
+  buffer->SetValue(i++, numLevels);
+  for (int levelIdx = 0; levelIdx < numLevels; levelIdx++)
     {
-    int numBlocksSending = 0;
-    numBlocks = (int)(this->Levels[levelIdx]->Blocks.size());
-    // Fill in num blocks later.  Process 0 skips blocks sender already has.
-    numBlocksPtr = messagePtr++;
-    for (int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
+    vtkAMRDualGridHelperLevel *level = this->Levels[levelIdx];
+    int numBlocks = static_cast<int>(level->Blocks.size());
+    buffer->SetValue(i++, numBlocks);
+    for (int blockIdx =0; blockIdx < numBlocks; blockIdx++)
       {
-      block = this->Levels[levelIdx]->Blocks[blockIdx];
-      if (block->ProcessId != remoteProc)
+      vtkAMRDualGridHelperBlock* block = level->Blocks[blockIdx];
+      buffer->SetValue(i++, block->GridIndex[0]);
+      buffer->SetValue(i++, block->GridIndex[1]);
+      buffer->SetValue(i++, block->GridIndex[2]);
+      }
+    }
+
+  // Sanity check.
+  if (i != messageLength)
+    {
+    vtkErrorMacro(<< "Sanity check failed.  Expected message size of "
+                  << messageLength << ".  Got " << i);
+    }
+}
+void vtkAMRDualGridHelper::UnmarshalBlocks(vtkIntArray *buffer)
+{
+  // Unmarshal the procs.
+  // Each process sent a message of this form.
+  //
+  // numlevels, level0NumBlocks,(gridx,gridy,gridz,...),level1NumBlocks,(...)
+  //
+  // The messages from all processes are mashed together in buffer in order
+  // by process id.
+
+  int myProc = this->Controller->GetLocalProcessId();
+  int numProc = this->Controller->GetNumberOfProcesses();
+
+  vtkIdType i = 0;
+  for (int blockProc = 0; blockProc < numProc; blockProc++)
+    {
+    int numLevels = buffer->GetValue(i++);
+    for (int levelIdx = 0; levelIdx < numLevels; levelIdx++)
+      {
+      int numBlocks = buffer->GetValue(i++);
+      if (blockProc == myProc)
         {
-        ++numBlocksSending;
-        *messagePtr++ = block->GridIndex[0];
-        *messagePtr++ = block->GridIndex[1];
-        *messagePtr++ = block->GridIndex[2];
-        if (localProc == 0)
-          {
-          *messagePtr++ = block->ProcessId;
-          }
+        // Skip over my own blocks.
+        i += 3*numBlocks;
+        continue;
+        }
+      vtkAMRDualGridHelperLevel *level = this->Levels[levelIdx];
+      for (int blockIdx = 0; blockIdx < numBlocks; blockIdx++)
+        {
+        int x = buffer->GetValue(i++);
+        int y = buffer->GetValue(i++);
+        int z = buffer->GetValue(i++);
+
+        vtkAMRDualGridHelperBlock *block = level->AddGridBlock(x, y, z, NULL);
+        block->ProcessId = blockProc;
+
+        block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
+        block->OriginIndex[1] = this->StandardBlockDimensions[1] * y - 1;
+        block->OriginIndex[2] = this->StandardBlockDimensions[2] * z - 1;
         }
       }
-    // Now fill in the numBlocks in the message.
-    *numBlocksPtr = numBlocksSending;
     }
-  // Find the actual message length.
-  messageLength = messagePtr - message;
-
-  this->Controller->Send(&messageLength, 1, remoteProc, 87344879);
-  this->Controller->Send(message, messageLength, remoteProc, 87344880);
 }
+
+namespace {
+
+class vtkReduceMeta : public vtkCommunicator::Operation
+{
+  virtual void Function (const void *A, void *B,
+                         vtkIdType vtkNotUsed(length), int vtkNotUsed(datatype))
+
+    {
+    const double *dmsgA = reinterpret_cast<const double *>(A);
+    double *dmsgB = reinterpret_cast<double *>(B);
+    if (dmsgA[0] > dmsgB[0] /* || (dmsgA[0] == dmsgB[0] && dmsgA[7] < dmsgB[7]) */)
+      {
+      dmsgB[0] = dmsgA[0]; // largestNumCell
+      dmsgB[1] = dmsgA[1]; // largestDims 0
+      dmsgB[2] = dmsgA[2]; // largestDims 1
+      dmsgB[3] = dmsgA[3]; // largestDims 2
+      // dmsgB[4] = dmsgA[4]; // largestOrigin 0
+      // dmsgB[5] = dmsgA[5]; // largestOrigin 1
+      // dmsgB[6] = dmsgA[6]; // largestOrigin 2
+      // dmsgB[7] = dmsgA[7]; // largestSpacing 0
+      // dmsgB[8] = dmsgA[8]; // largestSpacing 1
+      // dmsgB[9] = dmsgA[9]; // largestSpacing 2
+      // dmsgB[10] = dmsgA[10]; // largestLevel
+      }
+    if (dmsgA[4] > dmsgB[4])
+      {
+      dmsgB[4] = dmsgA[4]; // lowestSpacing 0
+      dmsgB[5] = dmsgA[5]; // lowestSpacing 1
+      dmsgB[6] = dmsgA[6]; // lowestSpacing 2
+      dmsgB[7] = dmsgA[7]; // lowestLevel
+      // dmsgB[15] = dmsgA[15]; // lowestOrigin 0
+      // dmsgB[16] = dmsgA[16]; // lowestOrigin 1
+      // dmsgB[17] = dmsgA[17]; // lowestOrigin 2
+      // dmsgB[18] = dmsgA[18]; // lowestDims 0
+      // // dmsgB[19] = dmsgA[19]; // lowestDims 1
+      // dmsgB[20] = dmsgA[20]; // lowestDims 2
+      }
+    if (dmsgB[8] > dmsgA[8]) { dmsgB[8] = dmsgA[8]; } // globalBounds 0
+    // if (dmsgB[22] < dmsgA[22]) { dmsgB[22] = dmsgA[22]; } // globalBounds 1
+    if (dmsgB[9] > dmsgA[9]) { dmsgB[9] = dmsgA[9]; } // globalBounds 2
+    // if (dmsgB[24] < dmsgA[24]) { dmsgB[24] = dmsgA[24]; } // globalBounds 3
+    if (dmsgB[10] > dmsgA[10]) { dmsgB[10] = dmsgA[10]; } // globalBounds 4
+    // if (dmsgB[26] < dmsgA[26]) { dmsgB[26] = dmsgA[26]; } // globalBounds 5
+    }
+  virtual int Commutative () { return 1; }
+};
+
+};
 
 void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* input)
 {
@@ -2024,6 +2316,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
   // Save the largest block information.
   // Find the overall bounds of the data set.
   // Find one of the lowest level blocks to compute origin.
+//   vtkTimerLogSmartMarkEvent markevent("ComputeGlobalMetaData", this->Controller);
 
   int numLevels = input->GetNumberOfLevels();
   int numBlocks;
@@ -2107,86 +2400,78 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
   int numProcs = 1;
   int myId = 0;
 
-  double dMsg[18];
-  int    iMsg[9];
-  vtkMultiProcessController* controller = this->Controller;
-  if (controller)
+  const int REDUCE_MESSAGE_SIZE = 11;
+  double dMsg[REDUCE_MESSAGE_SIZE];
+  double dRcv[REDUCE_MESSAGE_SIZE];
+  if (this->Controller->GetNumberOfProcesses() > 1)
     {
-    numProcs = controller->GetNumberOfProcesses();
-    myId = controller->GetLocalProcessId();
-    if (myId > 0)
-      { // Send to process 0.
-      iMsg[0] = lowestLevel;
-      iMsg[1] = largestLevel;
-      iMsg[2] = largestNumCells;
-      for (int ii= 0; ii < 3; ++ii)
-        {
-        iMsg[3+ii] = lowestDims[ii];
-        iMsg[6+ii] = largestDims[ii];
-        dMsg[ii]   = lowestSpacing[ii];
-        dMsg[3+ii] = lowestOrigin[ii];
-        dMsg[6+ii] = largestOrigin[ii];
-        dMsg[9+ii] = largestSpacing[ii];
-        dMsg[12+ii] = globalBounds[ii];
-        dMsg[15+ii] = globalBounds[ii+3];
-        }
-      controller->Send(iMsg, 9, 0, 8973432);
-      controller->Send(dMsg, 15, 0, 8973432);
-      }
-    else
-      {
-      // Collect results from all processes.
-      for (int id = 1; id < numProcs; ++id)
-        {
-        controller->Receive(iMsg, 9, id, 8973432);
-        controller->Receive(dMsg, 18, id, 8973432);
-        numCells = iMsg[2];
-        cellDims[0] = iMsg[6];
-        cellDims[1] = iMsg[7];
-        cellDims[2] = iMsg[8];
-        if (numCells > largestNumCells)
-          {
-          largestDims[0] = cellDims[0];
-          largestDims[1] = cellDims[1];
-          largestDims[2] = cellDims[2];
-          largestNumCells = numCells;
-          largestOrigin[0] = dMsg[6];
-          largestOrigin[1] = dMsg[7];
-          largestOrigin[2] = dMsg[8];
-          largestSpacing[0] = dMsg[9];
-          largestSpacing[1] = dMsg[10];
-          largestSpacing[2] = dMsg[11];
-          largestLevel = iMsg[1];
-          }
-        // Find the lowest level block.
-        spacing[0] = dMsg[0];
-        spacing[1] = dMsg[1];
-        spacing[2] = dMsg[2];
-        if (spacing[0] > lowestSpacing[0]) // Only test axis 0. Assume others agree.
-          { // This is the lowest level block we have encountered.
-          lowestSpacing[0] = spacing[0];
-          lowestSpacing[1] = spacing[1];
-          lowestSpacing[2] = spacing[2];
-          lowestLevel = iMsg[0];
-          lowestOrigin[0] = dMsg[3];
-          lowestOrigin[1] = dMsg[4];
-          lowestOrigin[2] = dMsg[5];
-          lowestDims[0] = iMsg[6];
-          lowestDims[1] = iMsg[7];
-          lowestDims[2] = iMsg[8];
-          }
-        if (globalBounds[0] > dMsg[9])  {globalBounds[0] = dMsg[9];}
-        if (globalBounds[1] < dMsg[10]) {globalBounds[1] = dMsg[10];}
-        if (globalBounds[2] > dMsg[11]) {globalBounds[2] = dMsg[11];}
-        if (globalBounds[3] < dMsg[12]) {globalBounds[3] = dMsg[12];}
-        if (globalBounds[4] > dMsg[13]) {globalBounds[4] = dMsg[13];}
-        if (globalBounds[5] < dMsg[14]) {globalBounds[5] = dMsg[14];}
-        }
-      }
-    }
+    numProcs = this->Controller->GetNumberOfProcesses();
+    myId = this->Controller->GetLocalProcessId();
 
-  if (myId == 0)
-    {
+    dMsg[0] = largestNumCells;
+    dMsg[1] = largestDims[0];
+    dMsg[2] = largestDims[1];
+    dMsg[3] = largestDims[2];
+    // dMsg[4] = largestOrigin[0];
+    // dMsg[5] = largestOrigin[1];
+    // dMsg[6] = largestOrigin[2];
+    // dMsg[7] = largestSpacing[0];
+    // dMsg[8] = largestSpacing[1];
+    // dMsg[9] = largestSpacing[2];
+    // dMsg[10] = largestLevel;
+    dMsg[4] = lowestSpacing[0];
+    dMsg[5] = lowestSpacing[1];
+    dMsg[6] = lowestSpacing[2];
+    dMsg[7] = lowestLevel;
+    // dMsg[15] = lowestOrigin[0];
+    // dMsg[16] = lowestOrigin[1];
+    // dMsg[17] = lowestOrigin[2];
+    // dMsg[18] = lowestDims[0];
+    // dMsg[19] = lowestDims[1];
+    // dMsg[20] = lowestDims[2];
+    dMsg[8] = globalBounds[0];
+    // dMsg[22] = globalBounds[1];
+    dMsg[9] = globalBounds[2];
+    // dMsg[24] = globalBounds[3];
+    dMsg[10] = globalBounds[4];
+    // dMsg[26] = globalBounds[5];
+
+    vtkReduceMeta operation;
+    if (!this->Controller->AllReduce(dMsg, dRcv,
+                                     REDUCE_MESSAGE_SIZE, &operation))
+      {
+      vtkErrorMacro ("AllReduce failed");
+      }
+
+    largestNumCells = (int)dRcv[0];
+    largestDims[0] = (int)dRcv[1];
+    largestDims[1] = (int)dRcv[2];
+    largestDims[2] = (int)dRcv[3];
+    // largestOrigin[0] = dRcv[4];
+    // largestOrigin[1] = dRcv[5];
+    // largestOrigin[2] = dRcv[6];
+    // largestSpacing[0] = dRcv[7];
+    // largestSpacing[1] = dRcv[8];
+    // largestSpacing[2] = dRcv[9];
+    // largestLevel = (int)dRcv[10];
+    lowestSpacing[0] = dRcv[4];
+    lowestSpacing[1] = dRcv[5];
+    lowestSpacing[2] = dRcv[6];
+    lowestLevel = (int)dRcv[7];
+    // lowestOrigin[0] = dRcv[15];
+    // lowestOrigin[1] = dRcv[16];
+    // lowestOrigin[2] = dRcv[17];
+    // lowestDims[0] = (int)dRcv[18];
+    // lowestDims[1] = (int)dRcv[19];
+    // lowestDims[2] = (int)dRcv[20];
+    globalBounds[0] = dRcv[8];
+    // globalBounds[1] = dRcv[22];
+    globalBounds[2] = dRcv[9];
+    // globalBounds[3] = dRcv[24];
+    globalBounds[4] = dRcv[10];
+    // globalBounds[5] = dRcv[26];
+
+    }
     this->StandardBlockDimensions[0] = largestDims[0]-2;
     this->StandardBlockDimensions[1] = largestDims[1]-2;
     this->StandardBlockDimensions[2] = largestDims[2]-2;
@@ -2203,6 +2488,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
 //    DebuggingRootSpacing[1] = this->RootSpacing[1];
 //    DebuggingRootSpacing[2] = this->RootSpacing[2];
 
+#if 0
     // Find the grid for the largest block.  We assume this block has the
     // extra ghost layers.
     largestOrigin[0] = largestOrigin[0] + largestSpacing[0];
@@ -2212,14 +2498,19 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     largestSpacing[0] *= this->StandardBlockDimensions[0];
     largestSpacing[1] *= this->StandardBlockDimensions[1];
     largestSpacing[2] *= this->StandardBlockDimensions[2];
+
     // Find the point on the grid closest to the lowest level origin.
     // We do not know if this lowest level block has its ghost layers.
     // Even if the dims are one less that standard, which side is missing
     // the ghost layer!
     int idx[3];
-    idx[0] = (int)(floor(0.5 + (lowestOrigin[0]-largestOrigin[0]) / largestSpacing[0]));
-    idx[1] = (int)(floor(0.5 + (lowestOrigin[1]-largestOrigin[1]) / largestSpacing[1]));
-    idx[2] = (int)(floor(0.5 + (lowestOrigin[2]-largestOrigin[2]) / largestSpacing[2]));
+    idx[0] = (int)(floor(0.5 + (lowestOrigin[0]-largestOrigin[0]) / largestSpaci
+ng[0]));
+    idx[1] = (int)(floor(0.5 + (lowestOrigin[1]-largestOrigin[1]) / largestSpaci
+ng[1]));
+    idx[2] = (int)(floor(0.5 + (lowestOrigin[2]-largestOrigin[2]) / largestSpaci
+ng[2]));
+
     lowestOrigin[0] = largestOrigin[0] + (double)(idx[0])*largestSpacing[0];
     lowestOrigin[1] = largestOrigin[1] + (double)(idx[1])*largestSpacing[1];
     lowestOrigin[2] = largestOrigin[2] + (double)(idx[2])*largestSpacing[2];
@@ -2236,34 +2527,14 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     this->GlobalOrigin[0] = lowestOrigin[0] + (double)(idx[0])*lowestSpacing[0];
     this->GlobalOrigin[1] = lowestOrigin[1] + (double)(idx[1])*lowestSpacing[1];
     this->GlobalOrigin[2] = lowestOrigin[2] + (double)(idx[2])*lowestSpacing[2];
+#endif
+
+    // The above doesn't seem to account for some blocks being defined on ghost bounds
+    this->GlobalOrigin[0] = globalBounds[0];
+    this->GlobalOrigin[1] = globalBounds[2];
+    this->GlobalOrigin[2] = globalBounds[4];
 
 //    DebuggingGlobalOrigin[0] = this->GlobalOrigin[0];
 //    DebuggingGlobalOrigin[1] = this->GlobalOrigin[1];
 //    DebuggingGlobalOrigin[2] = this->GlobalOrigin[2];
-
-    // Now send these to all the other processes and we are done!
-    if (this->Controller)
-      {
-      for (int ii = 0; ii < 3; ++ii)
-        {
-        dMsg[ii] = this->GlobalOrigin[ii];
-        dMsg[ii+3] = this->RootSpacing[ii];
-        dMsg[ii+6] = (double)(this->StandardBlockDimensions[ii]);
-        }
-      for (int ii = 1; ii < numProcs; ++ii)
-        {
-        controller->Send(dMsg, 9, ii, 8973439);
-        }
-      }
-    }
-  else
-    {
-    controller->Receive(dMsg, 9, 0, 8973439);
-    for (int ii = 0; ii < 3; ++ii)
-      {
-      this->GlobalOrigin[ii] = dMsg[ii];
-      this->RootSpacing[ii] = dMsg[ii+3];
-      this->StandardBlockDimensions[ii] = (int)(dMsg[ii+6]);
-      }
-    }
 }

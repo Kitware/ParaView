@@ -185,9 +185,19 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
 
+  if(WIN32)
+    foreach(pluginname ${PARAVIEW_PLUGINLIST})
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/${pluginname}.dll")
+    endforeach(pluginname ${PARAVIEW_PLUGINLIST})
+  else()
+    foreach(pluginname ${PARAVIEW_PLUGINLIST})
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/lib${pluginname}.so")
+    endforeach(pluginname ${PARAVIEW_PLUGINLIST})
+  endif()
+
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
+fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)

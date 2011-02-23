@@ -679,12 +679,37 @@ def GetAnimationScene():
         raise servermanager.MissingProxy, "Could not locate global AnimationScene."
     return scene
 
-def WriteAnimation(filename):
-    """Helper to automate saving an animation."""
+def WriteAnimation(filename, **params):
+    """Writes the current animation as a file. Optionally one can specify
+    arguments that qualify the saved animation files as keyword arguments.
+    Accepted options are as follows:
+    * Magnification (integer) : set the maginification factor for the saved
+      animation.
+    * Quality (0 [worst] or 1 or 2 [best]) : set the quality of the generated
+      movie (if applicable).
+    * Subsampling (integer) : setting whether the movie encoder should use
+      subsampling of the chrome planes or not, if applicable. Since the human
+      eye is more sensitive to brightness than color variations, subsampling
+      can be useful to reduce the bitrate. Default value is 0.
+    * BackgroundColor (3-tuple of doubles) : set the RGB background color to
+      use to fill empty spaces in the image.
+    * FrameRate (double): set the frame rate (if applicable)."""
     scene = GetAnimationScene()
+    # ensures that the TimeKeeper track is created.
+    GetTimeTrack()
     iw = servermanager.vtkSMAnimationSceneImageWriter()
     iw.SetAnimationScene(scene.SMProxy)
     iw.SetFileName(filename)
+    if params.has_key("Magnification"):
+        iw.SetMagnification(int(params["Magnification"]))
+    if params.has_key("Quality"):
+        iw.SetQuality(int(params["Quality"]))
+    if params.has_key("Subsampling"):
+        iw.SetSubsampling(int(params["Subsampling"]))
+    if params.has_key("BackgroundColor"):
+        iw.SetBackgroundColor(params["BackgroundColor"])
+    if params.has_key("FrameRate"):
+        iw.SetFrameRate(float(params["FrameRate"]))
     iw.Save()
 
 def _GetRepresentationAnimationHelper(sourceproxy):
@@ -789,7 +814,8 @@ def GetTimeTrack():
     scene = GetAnimationScene()
     tk = scene.TimeKeeper
     for cue in scene.Cues:
-        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk:
+        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk\
+            and cue.AnimatedPropertyName == "Time":
             return cue
     # no cue was found, create a new one.
     cue = TimeAnimationCue()

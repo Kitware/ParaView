@@ -90,19 +90,21 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
   QList<pqPipelineSource*> sources;
   if (fileDialog.exec() == QDialog::Accepted)
     {
-    QList<QStringList> files = fileDialog.getAllSelectedFiles();
-    QStringList file;
-    foreach(file,files)
-      {
-      sources.append(
-        pqLoadDataReaction::loadData(file));
-      }
+    QList<QStringList> files = fileDialog.getAllSelectedFiles();    
+    pqLoadDataReaction::loadData(files);
     }
   return sources;
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
+{
+  QList<QStringList> f;
+  f.append(files);
+  return pqLoadDataReaction::loadData(f);
+}
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
 {
   if (files.empty())
     {
@@ -118,32 +120,74 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
 
   vtkSMReaderFactory* readerFactory =
     vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+  pqPipelineSource* reader = NULL;
 
-  // For performance, only check if the first file is readable.
-  for (int i=0; i < 1 /*files.size()*/; i++)
+  //Extension to ReaderType,ReaderGroup Hash table
+  QHash<QString,QPair<QString,QString> > extensionToReaderSelection;
+  QStringList file;
+  foreach(file,files)
     {
-    if (!readerFactory->TestFileReadability(files[i].toAscii().data(),
-        server->session()))
+    QPair<QString,QString> readerInfo; //type,group    
+    QString filename(file[0]);
+    QFileInfo fi(filename);
+
+    if (!pqLoadDataReaction::TestFileReadability(filename,server,readerFactory))
       {
-      qWarning() << "File '" << files[i] << "' cannot be read.";
-      return NULL;
+      qWarning() << "File '" << filename << "' cannot be read.";
+      continue;
       }
+    // Determine reader type based on if we have asked the user for this extension before
+    QHash<QString,QPair<QString,QString> >::const_iterator it = 
+      extensionToReaderSelection.find(fi.suffix());
+    if (it != extensionToReaderSelection.end())
+      {
+      readerInfo = it.value();
+      }
+    else
+      {
+      //Determine reader type based on the first file
+      bool valid = pqLoadDataReaction::DetermineFileReader(filename,server,readerFactory,readerInfo);
+      if ( valid == 0)
+        {
+        //no reader selected
+        continue;
+        }
+      }
+    //read the file
+    BEGIN_UNDO_SET("Create 'Reader'");
+    reader = pqLoadDataReaction::LoadFile(file,server,readerInfo);
+    END_UNDO_SET();
+
+    //add this extension to the hash set    
+    extensionToReaderSelection.insert(fi.suffix(),readerInfo);    
     }
+  return reader;
+}
 
-  // Determine reader type based on first file. For now, we are relying
-  // on the user to avoid mixing file types.
-  QString filename = files[0];
+//-----------------------------------------------------------------------------
+bool pqLoadDataReaction::TestFileReadability(
+  const QString& file,
+  pqServer *server,
+  vtkSMReaderFactory *factory)
+{
+  return factory->TestFileReadability(file.toAscii().data(), server->session());
+}
 
-  vtkStringList* list = readerFactory->GetReaders(filename.toAscii().data(),
-                                                  server->session());
-
-  QString readerType, readerGroup;
-
-  // If more than one readers found.
+//-----------------------------------------------------------------------------
+bool pqLoadDataReaction::DetermineFileReader(
+  const QString& filename, 
+  pqServer *server,
+  vtkSMReaderFactory *factory,
+  QPair<QString,QString>& readerInfo)
+{
+  QString readerType,readerGroup;
+  vtkStringList* list = factory->GetReaders(filename.toAscii().data(),
+    server->session());
   if(list->GetLength() > 3)
     {
+    // If more than one readers found.
     pqSelectReaderDialog prompt(filename, server,
-                                 list, pqCoreUtilities::mainWidget());
+      list, pqCoreUtilities::mainWidget());
     if (prompt.exec() == QDialog::Accepted)
       {
       readerType = prompt.getReader();
@@ -152,22 +196,22 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
     else
       {
       // User didn't choose any reader.
-      return NULL;
+      return false;
       }
-    }
-  else if (readerFactory->CanReadFile(filename.toAscii().data(),
-      server->session()))
+    }        
+  else if (factory->CanReadFile(filename.toAscii().data(),
+    server->session()))
     {
-    readerType = readerFactory->GetReaderName();
-    readerGroup = readerFactory->GetReaderGroup();
+    //reader knows the type
+    readerType = factory->GetReaderName();
+    readerGroup = factory->GetReaderGroup();
     }
   else
     {
     // The reader factory could not determine the type of reader to create for the
     // file. Ask the user.
     pqSelectReaderDialog prompt(filename, server,
-      readerFactory, pqCoreUtilities::mainWidget());
-
+      factory, pqCoreUtilities::mainWidget());
     if (prompt.exec() == QDialog::Accepted)
       {
       readerType = prompt.getReader();
@@ -176,15 +220,24 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
     else
       {
       // User didn't choose any reader.
-      return NULL;
+      return false;
       }
     }
+  readerInfo.first = readerType;
+  readerInfo.second = readerGroup;
+  return true;
+}
 
-  BEGIN_UNDO_SET("Create 'Reader'");
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqLoadDataReaction::LoadFile(
+  const QStringList& files,
+  pqServer *server,
+  const QPair<QString,QString>& readerInfo)
+{  
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
-  pqPipelineSource* reader = builder->createReader(readerGroup,
-    readerType, files, server);
+  pqPipelineSource* reader = builder->createReader(readerInfo.second,
+    readerInfo.first, files, server);
 
   if (reader)
     {
@@ -203,7 +256,6 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
     core->serverResources().add(resource);
     core->serverResources().save(*core->settings());
     }
-  END_UNDO_SET();
+  
   return reader;
 }
-

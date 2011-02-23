@@ -1,6 +1,8 @@
 # Script used to generate paraview.qhp file.
 
-file(GLOB files RELATIVE "${DOCUMENTATION_DIR}" "${DOCUMENTATION_DIR}/*.*")
+file(GLOB files RELATIVE "${DOCUMENTATION_DIR}" 
+  "${DOCUMENTATION_DIR}/*.*"
+  "${DOCUMENTATION_DIR}/Book/*.*")
 
 SET (DOCUMENTATION_FILES)
 

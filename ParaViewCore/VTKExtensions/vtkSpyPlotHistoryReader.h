@@ -65,18 +65,24 @@ protected:
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);
 
+  void FillCache();
   void ConstructTableColumns(vtkTable *table);
 
   char *FileName;
   char *CommentCharacter;
   char *Delimeter;
 
+private:
   // Description:
   //Private storage of time information
   class MetaInfo;
   MetaInfo *Info;
 
-private:
+  // Description:
+  //Private storage of cached output tables for each time step.
+  class CachedTables;
+  CachedTables *CachedOutput;
+
   vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&);  // Not implemented.
   void operator=(const vtkSpyPlotHistoryReader&);  // Not implemented.
 };

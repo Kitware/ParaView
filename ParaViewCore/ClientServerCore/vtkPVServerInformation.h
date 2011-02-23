@@ -118,8 +118,8 @@ public:
 
   // Description:
   // Coordinates of lower left corner of this cave display
-  void SetUpperLeft(unsigned int idx, double coord[3]);
-  double* GetUpperLeft(unsigned int idx) const;
+  void SetUpperRight(unsigned int idx, double coord[3]);
+  double* GetUpperRight(unsigned int idx) const;
 
   // Description:
   // Get the number of processes.

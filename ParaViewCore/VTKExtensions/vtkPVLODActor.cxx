@@ -57,7 +57,7 @@ vtkPVLODActor::~vtkPVLODActor()
 
 //----------------------------------------------------------------------------
 // We use points as the size of the data, because cells cqan mislead.
-// A good example is verts.  One cell can contain any number of verticies.
+// A good example is verts.  One cell can contain any number of vertices.
 vtkMapper *vtkPVLODActor::SelectMapper()
 {
   if (this->Mapper == NULL || this->Mapper->GetInputDataObject(0, 0) == NULL)

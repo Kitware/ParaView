@@ -628,6 +628,17 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_cave_mode && !this->RemoteRenderingAvailable)
+    {
+    static bool warned_once = false;
+    if (!warned_once)
+      {
+      vtkErrorMacro(
+        "In Cave mode and Display cannot be opened on server-side! "
+        "Ensure the environment is set correctly in the pvx file.");
+      in_cave_mode = true;
+      }
+    }
 
   // Decide if we are doing remote rendering or local rendering.
   bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();

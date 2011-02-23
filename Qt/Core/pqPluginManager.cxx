@@ -45,8 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 
-#include <QtDebug>
+#include <QCoreApplication>
 #include <QSet>
+#include <QtDebug>
 
 #include <vtksys/ios/sstream>
 class pqPluginManager::pqInternals
@@ -129,7 +130,8 @@ void pqPluginManager::onServerConnected(pqServer* server)
     // the server to parse it.
     pqSettings* settings = pqApplicationCore::instance()->settings();
     QString uri = server->getResource().schemeHostsPorts().toURI();
-    QString key = QString("/PluginsList/%1").arg(uri);
+    QString key = QString("/PluginsList/%1/%2").arg(uri).arg(
+      QCoreApplication::applicationFilePath());
     QString remote_plugin_config = settings->value(key).toString();
     // now pass this xml to the vtkPVPluginTracker on the remote
     // processes.
@@ -158,11 +160,14 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
     // locate the xml-config from settings associated with this server and ask
     // the server to parse it.
     QString uri = server->getResource().schemeHostsPorts().toURI();
-    QString key = QString("/PluginsList/%1").arg(uri);
+    QString key = QString("/PluginsList/%1/%2").arg(uri).arg(
+      QCoreApplication::applicationFilePath());
     settings->setValue(key,
       this->Internals->getXML(this->loadedExtensions(true), true));
     }
-  settings->setValue("/PluginsList/Local",
+  QString key = QString("/PluginsList/Local/%1").arg(
+    QCoreApplication::applicationFilePath());
+  settings->setValue(key,
     this->Internals->getXML(this->loadedExtensions(false), false));
 
   this->Internals->ActiveServer = NULL;

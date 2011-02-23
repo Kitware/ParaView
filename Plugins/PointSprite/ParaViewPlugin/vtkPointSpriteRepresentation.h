@@ -29,8 +29,10 @@ class vtk1DTransferFunctionChooser;
 class vtk1DTransferFunctionFilter;
 class vtkCellPointsFilter;
 class vtkDepthSortPainter;
+class vtkImageSpriteSource;
 class vtkPointSpriteDefaultPainter;
 class vtkPointSpriteProperty;
+class vtkTexture;
 class vtkTwoScalarsToColorsPainter;
 
 class VTK_EXPORT vtkPointSpriteRepresentation : public vtkGeometryRepresentation
@@ -39,6 +41,10 @@ public:
   static vtkPointSpriteRepresentation* New();
   vtkTypeMacro(vtkPointSpriteRepresentation, vtkGeometryRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Overridden to preserve the texture.
+  virtual void SetTexture(vtkTexture*);
+
 
   //***************************************************************************
   // Forwarded to ArrayToRadiusFilter and LODArrayToRadiusFilter
@@ -111,6 +117,11 @@ protected:
   vtkPointSpriteRepresentation();
   ~vtkPointSpriteRepresentation();
 
+  vtkImageSpriteSource* BlurSource;
+  vtkImageSpriteSource* SphereSource;
+  vtkTexture* BlurTexture;
+  vtkTexture* SphereTexture;
+
   vtkCellPointsFilter* PointsFilter;
   vtk1DTransferFunctionFilter* ArrayToRadiusFilter;
   vtk1DTransferFunctionFilter* LODArrayToRadiusFilter;
@@ -141,6 +152,11 @@ protected:
 private:
   vtkPointSpriteRepresentation(const vtkPointSpriteRepresentation&); // Not implemented
   void operator=(const vtkPointSpriteRepresentation&); // Not implemented
+
+  vtkTexture* TextureInternal;
+  void SetTextureInternal(vtkTexture*);
+  int RenderMode;
+
 //ETX
 };
 

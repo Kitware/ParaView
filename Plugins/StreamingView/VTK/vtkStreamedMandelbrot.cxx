@@ -296,7 +296,9 @@ int vtkStreamedMandelbrot::RequestData
      << range[0] << ".." << range[1] << " for "
      << P << "/" << NP << " @ " << this->Resolution << endl;
      );
-  this->RangeKeeper->Insert(P, NP, ext, range, this->Resolution);
+  this->RangeKeeper->Insert(P, NP, ext, this->Resolution,
+                            0, "Iterations", 0,
+                            range);
 
   return 1;
 }
@@ -379,46 +381,44 @@ int vtkStreamedMandelbrot::ProcessRequest(vtkInformation *request,
     {for (int i = 0; i < 6; i++) cerr << bounds[i] << " ";}
     cerr << endl;
 */
+    vtkInformationVector *miv = outInfo->Get(vtkDataObject::POINT_DATA_VECTOR());
+    vtkInformation *fInfo = miv->GetInformationObject(0);
+    if (!fInfo)
+      {
+      fInfo = vtkInformation::New();
+      miv->SetInformationObject(0, fInfo);
+      fInfo->Delete();
+      }
+    const char *name = "Iterations";
     double range[2];
     range[0] = 0;
     range[1] = -1;
-    if (this->RangeKeeper->Search(P, NP, ext, range))
+    if (this->RangeKeeper->Search(P, NP, ext,
+                                  0, name, 0,
+                                  range))
       {
       DEBUGPRINT_METAINFORMATION
         (
-         cerr << "Range for "
+         cerr << "Range for " << name << " "
          << P << "/" << NP << " "
          << ext[0] << "," << ext[1] << ","
          << ext[2] << "," << ext[3] << ","
          << ext[4] << "," << ext[5] << " is "
          << range[0] << " .. " << range[1] << endl;
          );
-      vtkInformation *fInfo =
-        vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-         vtkDataSetAttributes::SCALARS);
-      if (fInfo)
-        {
-        fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
-        }
+      fInfo->Set(vtkDataObject::FIELD_ARRAY_NAME(), name);
+      fInfo->Set(vtkDataObject::PIECE_FIELD_RANGE(), range, 2);
       }
     else
       {
       DEBUGPRINT_METAINFORMATION(
-      cerr << "No range for "
+      cerr << "No range for " << name << " "
            << ext[0] << "," << ext[1] << ","
            << ext[2] << "," << ext[3] << ","
            << ext[4] << "," << ext[5] << " yet" << endl;
                                  );
-      vtkInformation *fInfo =
-        vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
-         vtkDataSetAttributes::SCALARS);
-      if (fInfo)
-        {
-        fInfo->Remove(vtkDataObject::PIECE_FIELD_RANGE());
-        }
-
+      fInfo->Remove(vtkDataObject::FIELD_ARRAY_NAME());
+      fInfo->Remove(vtkDataObject::PIECE_FIELD_RANGE());
       }
     }
 

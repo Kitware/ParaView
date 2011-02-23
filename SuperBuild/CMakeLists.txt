@@ -231,11 +231,21 @@ endif()
 include(External_Boost)
 list(APPEND ParaView_dependencies Boost)
 
+# Build a common zlib used by several dependencies
 include(External_zlib)
+set(ZLIB_ARGS
+   -DVTK_USE_SYSTEM_ZLIB:BOOL=ON
+   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
 list(APPEND ParaView_dependencies zlib)
 list(APPEND png_dependencies zlib)
 
+# Build a common png used by several dependencies
 include(External_png)
+set(PNG_ARGS
+  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
 
 if(NOT WIN32 AND NOT APPLE)
@@ -283,6 +293,8 @@ ExternalProject_Add(${proj}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
+    # png
+    ${PNG_ARGS}
     # Python
     -DPARAVIEW_ENABLE_PYTHON:BOOL=ON
     -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
@@ -309,6 +321,8 @@ ExternalProject_Add(${proj}
     # Documentation
     # VisTrails
     ${VISTRAILS_ARGS}
+    # zlib
+    ${ZLIB_ARGS}
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )

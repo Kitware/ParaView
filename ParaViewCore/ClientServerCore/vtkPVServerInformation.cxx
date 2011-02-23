@@ -104,7 +104,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     this->SetEnvironment(idx, info->GetEnvironment(idx));
     this->SetLowerLeft(idx, info->GetLowerLeft(idx));
     this->SetLowerRight(idx, info->GetLowerRight(idx));
-    this->SetUpperLeft(idx, info->GetUpperLeft(idx));
+    this->SetUpperRight(idx, info->GetUpperRight(idx));
     }
   this->NumberOfProcesses = info->NumberOfProcesses;
 }
@@ -141,7 +141,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
       this->SetEnvironment(idx, serverOptions->GetDisplayName(idx));
       this->SetLowerLeft(idx, serverOptions->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
-      this->SetUpperLeft(idx, serverOptions->GetUpperLeft(idx));
+      this->SetUpperRight(idx, serverOptions->GetUpperRight(idx));
       }
     }
 }
@@ -198,7 +198,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->SetEnvironment(idx, serverInfo->GetEnvironment(idx));
       this->SetLowerLeft(idx, serverInfo->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
-      this->SetUpperLeft(idx, serverInfo->GetUpperLeft(idx));
+      this->SetUpperRight(idx, serverInfo->GetUpperRight(idx));
       }
 
     if (this->NumberOfProcesses < serverInfo->NumberOfProcesses)
@@ -232,8 +232,8 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
          << this->GetLowerLeft(idx)[2];
     *css << this->GetLowerRight(idx)[0] << this->GetLowerRight(idx)[1]
          << this->GetLowerRight(idx)[2];
-    *css << this->GetUpperLeft(idx)[0] << this->GetUpperLeft(idx)[1]
-         << this->GetUpperLeft(idx)[2];
+    *css << this->GetUpperRight(idx)[0] << this->GetUpperRight(idx)[1]
+         << this->GetUpperRight(idx)[2];
     }
   *css << vtkClientServerStream::End;
 }
@@ -336,11 +336,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
       return;
       }
     if (!css->GetArgument(0, 20 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperRight[0]) ||
         !css->GetArgument(0, 21 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperRight[1]) ||
         !css->GetArgument(0, 22 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2]))
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperRight[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");
       return;
@@ -452,7 +452,7 @@ double* vtkPVServerInformation::GetLowerRight(unsigned int idx) const
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerInformation::SetUpperLeft(unsigned int idx, double coord[3])
+void vtkPVServerInformation::SetUpperRight(unsigned int idx, double coord[3])
 {
   if (idx >= this->GetNumberOfMachines())
     {
@@ -464,17 +464,17 @@ void vtkPVServerInformation::SetUpperLeft(unsigned int idx, double coord[3])
       }
     }
 
-  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0] = coord[0];
-  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1] = coord[1];
-  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2] = coord[2];
+  this->MachinesInternals->MachineInformationVector[idx].UpperRight[0] = coord[0];
+  this->MachinesInternals->MachineInformationVector[idx].UpperRight[1] = coord[1];
+  this->MachinesInternals->MachineInformationVector[idx].UpperRight[2] = coord[2];
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVServerInformation::GetUpperLeft(unsigned int idx) const
+double* vtkPVServerInformation::GetUpperRight(unsigned int idx) const
 {
   if (idx >= this->GetNumberOfMachines())
     {
     return NULL;
     }
-  return this->MachinesInternals->MachineInformationVector[idx].UpperLeft;
+  return this->MachinesInternals->MachineInformationVector[idx].UpperRight;
 }

@@ -72,139 +72,33 @@ void vtkSMPointSpriteRepresentationProxy::InitializeDefaultValues(
   vtkSMPropertyHelper(proxy, "PointSpriteDefaultsInitialized").Set(1);
   proxy->GetProperty("ConstantRadius")->ResetToDefault();
   proxy->GetProperty("RadiusRange")->ResetToDefault();
-
-  // Initialize the Transfer functions if needed
-  int nop = vtkSMVectorProperty::SafeDownCast(proxy->GetProperty("OpacityTableValues"))->GetNumberOfElements();
-  if (nop == 0)
-    {
-    InitializeTableValues(proxy->GetProperty("OpacityTableValues"));
-    }
-
-  int nrad = vtkSMVectorProperty::SafeDownCast(proxy->GetProperty("RadiusTableValues"))->GetNumberOfElements();
-  if (nrad == 0)
-    {
-    InitializeTableValues(proxy->GetProperty("RadiusTableValues"));
-    }
-
-  InitializeSpriteTextures(proxy);
-
   proxy->UpdateVTKObjects();
 }
-
-void vtkSMPointSpriteRepresentationProxy::InitializeTableValues(vtkSMProperty* prop)
+namespace
 {
-  vtkSMDoubleVectorProperty* tableprop = vtkSMDoubleVectorProperty::SafeDownCast(prop);
-  tableprop->SetNumberOfElements(256);
-  double values[256];
-  for (int i = 0; i < 256; i++)
+  void vtkInitializeTableValues(vtkSMProperty* prop)
     {
-    values[i] = ((double) i) / 255.0;
+    vtkSMDoubleVectorProperty* tableprop = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+    tableprop->SetNumberOfElements(256);
+    double values[256];
+    for (int i = 0; i < 256; i++)
+      {
+      values[i] = ((double) i) / 255.0;
+      }
+    tableprop->SetElements(values);
     }
-  tableprop->SetElements(values);
 }
 
-void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures(
-  vtkSMProxy* repr)
+int vtkSMPointSpriteRepresentationProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
 {
-  vtkSMProxyIterator* proxyIter;
-  string texName;
-  bool created;
-  vtkSMProxy* texture;
-  int extent[6] = {0, 65, 0, 65, 0, 0};
-  vtkSMIntVectorProperty* extentprop;
-  vtkSMIntVectorProperty* maxprop;
-  vtkSMDoubleVectorProperty* devprop;
-  vtkSMIntVectorProperty* alphamethodprop;
-  vtkSMIntVectorProperty* alphathresholdprop;
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
-  texName = "Sphere";
-  created = false;
-  proxyIter = vtkSMProxyIterator::New();
-  proxyIter->SetModeToOneGroup();
-  for (proxyIter->Begin("textures"); !proxyIter->IsAtEnd(); proxyIter->Next())
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
     {
-    string name = proxyIter->GetKey();
-    if (name == texName)
-      {
-      created = true;
-      break;
-      }
+    return 0;
     }
-  proxyIter->Delete();
-
-  if (!created)
-    {
-    // create the texture proxy
-    texture = pxm->NewProxy("textures", "SpriteTexture");
-    texture->SetLocation(vtkProcessModule::CLIENT
-        | vtkProcessModule::RENDER_SERVER);
-    pxm->RegisterProxy("textures", texName.c_str(), texture);
-    texture->Delete();
-
-    // set the texture parameters
-    extentprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("WholeExtent"));
-    extentprop->SetNumberOfElements(6);
-    extentprop->SetElements(extent);
-    maxprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("Maximum"));
-    maxprop->SetElements1(255);
-    devprop = vtkSMDoubleVectorProperty::SafeDownCast(texture->GetProperty("StandardDeviation"));
-    devprop->SetElements1(0.3);
-    alphamethodprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaMethod"));
-    alphamethodprop->SetElements1(2);
-    alphathresholdprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaThreshold"));
-    alphathresholdprop->SetElements1(63);
-    texture->UpdateVTKObjects();
-
-    vtkSMProxyProperty* textureProperty = vtkSMProxyProperty::SafeDownCast(
-      repr->GetProperty("Texture"));
-    if(textureProperty->GetNumberOfProxies() == 0)
-      {
-      // set this texture as default texture
-      textureProperty->SetProxy(0, texture);
-      repr->UpdateVTKObjects();
-      }
-    }
-
-  texName = "Blur";
-  created = false;
-  proxyIter = vtkSMProxyIterator::New();
-  proxyIter->SetModeToOneGroup();
-  for (proxyIter->Begin("textures"); !proxyIter->IsAtEnd(); proxyIter->Next())
-    {
-    string name = proxyIter->GetKey();
-    if (name == texName)
-      {
-      created = true;
-      break;
-      }
-    }
-
-  if (!created)
-    {
-    // create the texture proxy
-    texture = pxm->NewProxy("textures", "SpriteTexture");
-    texture->SetLocation(vtkProcessModule::CLIENT
-        | vtkProcessModule::RENDER_SERVER);
-    pxm->RegisterProxy("textures", texName.c_str(), texture);
-
-    // set the texture parameters
-    extentprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("WholeExtent"));
-    extentprop->SetNumberOfElements(6);
-    extentprop->SetElements(extent);
-    maxprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("Maximum"));
-    maxprop->SetElements1(255);
-    devprop = vtkSMDoubleVectorProperty::SafeDownCast(texture->GetProperty("StandardDeviation"));
-    devprop->SetElements1(0.2);
-    alphamethodprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaMethod"));
-    alphamethodprop->SetElements1(1);
-
-    texture->UpdateVTKObjects();
-
-    texture->Delete();
-    }
-  proxyIter->Delete();
-
+  vtkInitializeTableValues(
+   this->GetProperty("OpacityTableValues"));
+  vtkInitializeTableValues(
+   this->GetProperty("RadiusTableValues"));
+  return 1;
 }
-

@@ -66,27 +66,27 @@ public:
     return this->Data[GLOBAL_ID];
   }
   // Comparison made by global id.
-  bool operator<(vtkMaterialInterfaceIdListItem &other)
+  bool operator<(const vtkMaterialInterfaceIdListItem &other) const
   {
     return this->GetGlobalId()<other.GetGlobalId();
   }
   // Comparison made by global id.
-  bool operator<=(vtkMaterialInterfaceIdListItem &other)
+  bool operator<=(const vtkMaterialInterfaceIdListItem &other) const
   {
     return this->GetGlobalId()<=other.GetGlobalId();
   }
   // Comparison made by global id.
-  bool operator>(vtkMaterialInterfaceIdListItem &other)
+  bool operator>(const vtkMaterialInterfaceIdListItem &other) const
   {
     return this->GetGlobalId()>other.GetGlobalId();
   }
   // Comparison made by global id.
-  bool operator>=(vtkMaterialInterfaceIdListItem &other)
+  bool operator>=(const vtkMaterialInterfaceIdListItem &other) const
   {
     return this->GetGlobalId()>=other.GetGlobalId();
   }
   // Comparison made by global id.
-  bool operator==(vtkMaterialInterfaceIdListItem &other)
+  bool operator==(const vtkMaterialInterfaceIdListItem &other) const
   {
     return this->GetGlobalId()==other.GetGlobalId();
   }

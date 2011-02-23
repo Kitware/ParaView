@@ -22,13 +22,16 @@
 #include "vtkCellPointsFilter.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkDepthSortPainter.h"
+#include "vtkImageSpriteSource.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointSpriteDefaultPainter.h"
 #include "vtkPointSpriteProperty.h"
 #include "vtkPVLODActor.h"
+#include "vtkTexture.h"
 #include "vtkTwoScalarsToColorsPainter.h"
 
 vtkStandardNewMacro(vtkPointSpriteRepresentation);
+vtkCxxSetObjectMacro(vtkPointSpriteRepresentation, TextureInternal, vtkTexture);
 //----------------------------------------------------------------------------
 vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
 {
@@ -151,6 +154,28 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
     this->LODArrayToRadiusFilter->GetOutputPort());
   this->LODMapper->SetInputConnection(
     this->LODArrayToOpacityFilter->GetOutputPort());
+
+  // Setup default textures.
+  this->SphereTexture = vtkTexture::New();
+  vtkImageSpriteSource* sphereSource = vtkImageSpriteSource::New();
+  sphereSource->SetWholeExtent(0, 65, 0, 65, 0, 0);
+  sphereSource->SetMaximum(255);
+  sphereSource->SetStandardDeviation(0.3);
+  sphereSource->SetAlphaMethod(2);
+  sphereSource->SetAlphaThreshold(63);
+  this->SphereTexture->SetInputConnection(sphereSource->GetOutputPort());
+  this->SphereSource = sphereSource;
+
+  this->BlurTexture = vtkTexture::New();
+  vtkImageSpriteSource* blurSource = vtkImageSpriteSource::New();
+  blurSource->SetWholeExtent(0, 65, 0, 65, 0, 0);
+  blurSource->SetStandardDeviation(0.2);
+  blurSource->SetAlphaMethod(1);
+  this->BlurTexture->SetInputConnection(blurSource->GetOutputPort());
+  this->BlurSource = blurSource;
+
+  this->TextureInternal = 0;
+  this->RenderMode = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -172,12 +197,30 @@ vtkPointSpriteRepresentation::~vtkPointSpriteRepresentation()
   this->OpacityTableTransferFunction->Delete();
   this->RadiusGaussianTransferFunction->Delete();
   this->OpacityGaussianTransferFunction->Delete();
+  this->BlurSource->Delete();
+  this->BlurTexture->Delete();
+  this->SphereSource->Delete();
+  this->SphereTexture->Delete();
+
+  this->SetTextureInternal(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPointSpriteRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPointSpriteRepresentation::SetTexture(vtkTexture* texture)
+{
+  this->SetTextureInternal(texture);
+  if (this->RenderMode == vtkPointSpriteProperty::TexturedSprite)
+    {
+    this->Superclass::SetTexture(texture);
+    }
+  // Don't override the this->Actor->Texture unless the user wants to use a
+  // custom texture.
 }
 
 //***************************************************************************
@@ -214,7 +257,27 @@ void vtkPointSpriteRepresentation::SetOpacityArrayToProcess(
 // Forwarded to PSProperty (vtkPointSpriteProperty).
 void vtkPointSpriteRepresentation::SetRenderMode(int val)
 {
-  this->PSProperty->SetRenderMode(val);
+  this->RenderMode = val;
+  if (val == vtkPointSpriteProperty::Quadrics ||
+    val == vtkPointSpriteProperty::TexturedSprite ||
+    val == vtkPointSpriteProperty::SimplePoint)
+    {
+    this->PSProperty->SetRenderMode(val);
+    if (val == vtkPointSpriteProperty::TexturedSprite)
+      {
+      this->Actor->SetTexture(this->TextureInternal);
+      }
+    }
+  if (val == 3) // SphereTexture
+    {
+    this->PSProperty->SetRenderMode(1);
+    this->Actor->SetTexture(this->SphereTexture);
+    }
+  else if (val == 4) // BlurTexture
+    {
+    this->PSProperty->SetRenderMode(1);
+    this->Actor->SetTexture(this->BlurTexture);
+    }
 }
 
 void vtkPointSpriteRepresentation::SetRadiusMode(int val)

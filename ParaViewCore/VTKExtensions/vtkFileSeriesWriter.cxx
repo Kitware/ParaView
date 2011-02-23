@@ -215,10 +215,6 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
     clone->GetInformation()->Set(
       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
     }
-  else
-    {
-    cerr << "COULD NOT FIND WHOLE EXTENT in input for file series writer\n";
-    }
   this->Writer->SetInputConnection(clone->GetProducerPort());
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();

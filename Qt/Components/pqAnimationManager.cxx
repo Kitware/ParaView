@@ -653,6 +653,9 @@ bool pqAnimationManager::saveAnimation()
 #endif
     }
 
+  // let the world know we are writing an animation.
+  emit this->writeAnimation(filename, magnification, dialogUI.frameRate->value());
+
   vtkSMAnimationSceneImageWriter* writer = pqAnimationSceneImageWriter::New();
   writer->SetFileName(filename.toAscii().data());
   writer->SetMagnification(magnification);

@@ -1,12 +1,12 @@
 """
 This module has utilities to benchmark paraview.
 
-First, when run standalone, this will do a simple rendering benchmark test. This
+First, when run standalone, this will do a simple rendering benchmark test. The
 test renders a sphere with various rendering settings and reports the rendering
 rate achieved in triangles/sec. run() is the entrypoint for that usage.
 
-Second, you can use this arbitrary pipelines and this module helps you obtain,
-interpret and report about information within ParaView's logs.
+Second, you can set up arbitrary pipelines and this module helps you obtain,
+interpret and report the information recorded by ParaView's logs.
 Do that like so:
 1) optionally, call maximize logs first
 2) setup and run your visualization pipeline (via GUI or script as you prefer)
@@ -16,29 +16,31 @@ or
 - call parse_logs() to let the script identify and report on per frame and per
 filter execution times
 
-WARNING: This was meant for server side rendering, but it could work resonably well
-when geometry is delivered to the client and rendered there if the script recognize
-MPIMoveData as end of frame and did something sensible on the server which has no
-other end of frame knowledge
+WARNING: This was meant for server side rendering, but it could work
+reasonably well when geometry is delivered to the client and rendered there
+if the script were changed to recognize MPIMoveData as end of frame and did
+something sensible on the server which has no other end of frame knowledge
 
 TODO: builtin mode shouldn't show server info, it is redundant
 TODO: this doesn't handle split render/data server mode
-
-TODO: the end of frame markers are heuristic, which might be buggy and generally
-could use some improvement
-
-TODO: import_logs should import saved logs from either paraview gui or the ones
-print_logs produces
+TODO: the end of frame markers are heuristic, likely buggy, and have not
+been tried since before 3.9's view restructuring
 """
 
 import time
 import sys
 from paraview.simple import *
 
+try:
+    import numpy
+    numpy_loaded = True
+except ImportError:
+    numpy_loaded = False
 
 import re
 import paraview
 import copy
+import pickle
 
 # a regular expression to parse filter execution time
 match_filter = re.compile(" *Execute (\w+) id: +(\d+), +(\d*.*\d+) +seconds")
@@ -46,7 +48,8 @@ match_vfilter = re.compile(" *Execute (\w+) +, +(\d*.*\d+) +seconds")
 
 # a regular expression to parse overall rendering time
 match_still_render = re.compile(" *(Still) Render, +(\d*.*\d+) +seconds")
-match_interactive_render = re.compile(" *(Interactive) Render, +(\d*.*\d+) +seconds")
+match_interactive_render = \
+re.compile(" *(Interactive) Render, +(\d*.*\d+) +seconds")
 match_render = re.compile(" *(\w+|\w+ Dev) Render, +(\d*.*\d+) +seconds")
 match_icetrender = re.compile("(IceT Dev) Render, +(\d*.*\d+) +seconds")
 
@@ -55,14 +58,18 @@ match_composite = re.compile(" *Compositing, +(\d*.*\d+) +seconds")
 match_send = re.compile(" *Sending, +(\d*.*\d+) +seconds")
 match_receive = re.compile(" *Receiving, +(\d*.*\d+) +seconds")
 
-match_comp_xmit = re.compile(" *TreeComp (Send|Receive) (\d+) (to|from) (\d+) uchar (\d+), +(\d*.*\d+) +seconds")
+match_comp_xmit = \
+re.compile(" *TreeComp (Send|Receive) (\d+) " + \
+           "(to|from) (\d+) uchar (\d+), +(\d*.*\d+) +seconds")
 match_comp_comp = re.compile(" *TreeComp composite, *(\d*.*\d+) +seconds")
 
 showparse = False
 
-#icet composite message comes after the render messages, where for bswap and manta
-#it comes before so we have to treat icet differently
+#icet composite message comes after the render messages,
+#where for bswap and manta it comes before so we have to treat icet differently
 icetquirk = False
+
+start_frame = 0
 
 class OneLog :
     def __init__(self):
@@ -111,13 +118,28 @@ def maximize_logs () :
     pm.SetLogThreshold(acid, 0x10, 0.0)
 
 
+def dump_logs( filename ) :
+    """
+    This saves off the logs we've gathered.
+    Ot allows you to run a benchmark somewhere, save off all of the details in
+    raw format, then load them somewhere else. You can then do a detailed
+    analysis and you always have the raw data to go back to.
+    """
+    global logs
+    f = open(filename, "w")
+    pickle.dump(logs, f)
+    f.close()
+
 def import_logs( filename ) :
     """
     This is for bringing in a saved log files and parse it after the fact.
+    TODO: add an option to load in raw parview logs in text format
     """
-    #TODO: Fill this in
     global logs
     logs = []
+    f = open(filename, "r")
+    logs = pickle.load(f)
+    f.close()
 
 def get_logs() :
     """
@@ -198,23 +220,21 @@ def __process_frame() :
     global filters
     global current_frames_records
     global frames
+    global start_frame
 
     max = len(current_frames_records)
-
-    #for x in xrange(0,max):
-    #    print current_frames_records[x]
 
     #determine ancestry of each record from order and indent
     #subtract only immediate children from each record
 
     #TODO: Make this an option
-    for x in xrange(0,max):
+    for x in xrange(max):
         indent = current_frames_records[x]['indent']
         minindent = 10000
         for y in xrange(x+1,max):
             indent2 = current_frames_records[y]['indent']
             if indent2<=indent:
-                #found a record which is not a decendent
+                #found a record which is not a descendant
                 break
             if indent2 < minindent:
                 minindent = indent2
@@ -225,17 +245,15 @@ def __process_frame() :
                 current_frames_records[x]['local_duration'] -\
                 current_frames_records[y]['duration']
 
-    #for x in xrange(0,max):
-    #    print current_frames_records[x]
-
-    for x in xrange(0,max):
+    for x in xrange(max):
         #keep global statics per filter
         record = current_frames_records[x]
         id = record['id']
         if id in filters:
             srecord = filters[id]
             srecord['duration'] = srecord['duration'] + record['duration']
-            srecord['local_duration'] = srecord['local_duration'] + record['local_duration']
+            srecord['local_duration'] = srecord['local_duration'] +\
+                                        record['local_duration']
             srecord['count'] = srecord['count'] + 1
             filters[id] = srecord
         else:
@@ -399,17 +417,17 @@ def __parse_line (line) :
 
     return
 
-def parse_logs(show_parse = False) :
+def parse_logs(show_parse = False, tabular = False) :
     """
     Parse the collected paraview log information.
     This prints out per frame, and aggregated per filter statistics.
 
-    If show_parse is true, debugging information is shown about the parsing process
-    that allows you to verify that the derived stats are correct.
+    If show_parse is true, debugging information is shown about the parsing
+    process that allows you to verify that the derived stats are correct.
     This includes each and echo of each log line collected, prepended by
     the token type and indent scanned in, or ???? if the line is unrecognized
-    and ignored. Frame boundaries are denoted by SOF, indicating the preceeding line
-    was determined to be the start of the next frame.
+    and ignored. Frame boundaries are denoted by SOF, indicating the preceeding
+    line was determined to be the start of the next frame.
     """
 
     global filters
@@ -417,6 +435,7 @@ def parse_logs(show_parse = False) :
     global frames
     global cnt
     global showparse
+    global start_frame
 
     showparse = show_parse
 
@@ -446,30 +465,68 @@ def parse_logs(show_parse = False) :
         __process_frame()
 
         #print out the gathered per frame information
-        print "#FRAME TIMINGS"
-        print "#filter id, filter type, inclusive duration, local duration"
-        for cnt in xrange(len(frames)):
-            print "#Frame ", cnt
-            for record in frames[cnt]:
-                if 'id' in record:
-                    print record['id'], ",",
-                    print record['name'], ",",
-                    print record['duration'], ",",
-                    print record['local_duration']
-        print
-        print
+        if tabular:
+            frecs = dict()
+            line = "#framenum, "
+            for x in filters:
+                line += filters[x]['name'] + ":" + filters[x]['id']  + ", "
+            #print line
+            for cnt in xrange(start_frame, len(frames)):
+                line = ""
+                line += str(cnt) + ", "
+                printed = dict()
+                for x in filters:
+                    id = filters[x]['id']
+                    name = filters[x]['name']
+                    found = False
+                    for record in frames[cnt]:
+                        if 'id' in record:
+                            if record['id'] == id and \
+                            record['name'] == name and \
+                            not id in printed:
+                                found = True
+                                printed[id] = 1
+                                line += str(record['local_duration']) + ", "
+                                if not id in frecs:
+                                    frecs[id] = []
+                                frecs[id].append(record['local_duration'])
+                    if not found:
+                        line += "0, "
+                #print line
+            #print
+            for x in frecs.keys():
+                v = frecs[x]
+                print "# ", x, len(v),
+                if numpy_loaded:
+                    print numpy.min(v), numpy.mean(v), numpy.max(v),
+                    print numpy.std(v)
+        else:
+            print "#FRAME TIMINGS"
+            print "#filter id, filter type, inclusive duration, local duration"
+            for cnt in xrange(start_frame, len(frames)):
+                print "#Frame ", cnt
+                for record in frames[cnt]:
+                    if 'id' in record:
+                        print record['id'], ",",
+                        print record['name'], ",",
+                        print record['duration'], ",",
+                        print record['local_duration']
+        #print
+        #print
 
-        #print out the gathered per filter information
-        print "#FILTER TIMINGS"
-        print "#filter id, filter type, count, sum inclusive duration, sum local duration"
-        for x in filters:
-            record = filters[x]
-            print record['id'], ",",
-            print record['name'], ",",
-            print record['count'], ",",
-            print record['duration'], ",",
-            print record['local_duration']
-        print
+        if not tabular:
+            #print out the gathered per filter information
+            print "#FILTER TIMINGS"
+            print "#filter id, filter type, count, "+\
+                  "sum inclusive duration, sum local duration"
+            for x in filters:
+                record = filters[x]
+                print record['id'], ",",
+                print record['name'], ",",
+                print record['count'], ",",
+                print record['duration'], ",",
+                print record['local_duration']
+            print
 
 def __render(ss, v, title, nframes):
     print '============================================================'
@@ -517,26 +574,16 @@ def run(filename=None, nframes=60):
 
     # Start with these defaults
     #v.RemoteRenderThreshold = 0
-    v.UseImmediateMode = 0
-    v.UseTriangleStrips = 0
+    obj = servermanager.misc.GlobalMapperProperties()
+    obj.GlobalImmediateModeRendering = 0
 
     # Test different configurations
-    v.UseImmediateMode = 0
     title = 'display lists, no triangle strips, solid color'
-    v.UseTriangleStrips = 0
+    obj.GlobalImmediateModeRendering = 0
     results.append(__render(ss, v, title, nframes))
 
-    title = 'display lists, triangle strips, solid color'
-    v.UseTriangleStrips = 1
-    results.append(__render(ss, v, title, nframes))
-
-    v.UseImmediateMode = 1
     title = 'no display lists, no triangle strips, solid color'
-    v.UseTriangleStrips = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, triangle strips, solid color'
-    v.UseTriangleStrips = 1
+    obj.GlobalImmediateModeRendering = 1
     results.append(__render(ss, v, title, nframes))
 
     # Color by normals
@@ -548,23 +595,12 @@ def run(filename=None, nframes=60):
     lt.ColorSpace = 'HSV'
     lt.VectorComponent = 0
 
-    v.UseImmediateMode = 0
     title = 'display lists, no triangle strips, color by array'
-    v.UseTriangleStrips = 0
+    obj.GlobalImmediateModeRendering = 0
     results.append(__render(ss, v, title, nframes))
 
-    title = 'display lists, triangle strips, color by array'
-    v.UseTriangleStrips = 1
-    results.append(__render(ss, v, title, nframes))
-    v.UseImmediateMode = 1
-
-    v.UseImmediateMode = 1
     title = 'no display lists, no triangle strips, color by array'
-    v.UseTriangleStrips = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, triangle strips, color by array'
-    v.UseTriangleStrips = 1
+    obj.GlobalImmediateModeRendering = 1
     results.append(__render(ss, v, title, nframes))
 
     if filename:
