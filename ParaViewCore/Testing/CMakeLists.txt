@@ -1,9 +1,10 @@
 # Exclude these
+set (sub_dirs Common VTKExtensions ClientServerCore ServerImplementation ServerManager)
 IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
-  FOREACH(part Common Filters ServerManager)
-    ADD_TEST(HeaderTesting-PVServer-${part} ${PYTHON_EXECUTABLE}
+  FOREACH(part ${sub_dirs})
+    ADD_TEST(HeaderTesting-PVCore-${part} ${PYTHON_EXECUTABLE}
       ${VTK_HEADER_TESTING_PY}
-      "${PVServer_SOURCE_DIR}/${part}"
+      "${ParaViewCore_SOURCE_DIR}/${part}"
       vtkAMRDualContour.h
       vtkAMRDualGridHelper.h
       vtkIceTConstants.h
@@ -47,18 +48,18 @@ ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 
 IF(TCL_TCLSH)
   IF(VTK_PRINT_SELF_CHECK_TCL)
-    FOREACH(part Common Filters ServerManager)
-      ADD_TEST(PrintSelf-PVServer-${part} ${TCL_TCLSH}
+    FOREACH(part ${sub_dirs})
+      ADD_TEST(PrintSelf-PVCore-${part} ${TCL_TCLSH}
         ${VTK_PRINT_SELF_CHECK_TCL}
-        ${PVServer_SOURCE_DIR}/${part})
+        ${ParaViewCore_SOURCE_DIR}/${part})
     ENDFOREACH(part)
   ENDIF(VTK_PRINT_SELF_CHECK_TCL)
 
   IF(VTK_FIND_STRING_TCL)
-    FOREACH(part Common Filters ServerManager)
-      ADD_TEST(TestSetObjectMacro-PVServer-${part} ${TCL_TCLSH}
+    FOREACH(part ${sub_dirs})
+      ADD_TEST(TestSetObjectMacro-PVCore-${part} ${TCL_TCLSH}
         ${VTK_FIND_STRING_TCL}
-        "${PVServer_SOURCE_DIR}/${part}/vtk\\\\*.h"
+        "${ParaViewCore_SOURCE_DIR}/${part}/vtk\\\\*.h"
         "vtkSetObjectMacro")
     ENDFOREACH(part)
   ENDIF(VTK_FIND_STRING_TCL)
