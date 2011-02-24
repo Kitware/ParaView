@@ -117,6 +117,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore all size_t to int conversion warnings.
   "conversion from 'size_t' to"
+
+  # ignore protobuf generated code warning
+  "vtkPVMessage.pb.h"
   )
 
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
