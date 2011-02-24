@@ -201,6 +201,10 @@ public:
     emit this->finishedAddingServer(server);
     }
 
+  /// Returns true while pqObjectBuilder is in createServer() call.
+  bool waitingForConnection() const
+    { return this->WaitingForConnection; }
+
 signals:
   
   /// Emitted after a new server connection is created
@@ -305,6 +309,8 @@ protected:
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
   void operator=(const pqObjectBuilder&); // Not implemented.
+
+  bool WaitingForConnection;
 };
 
 #endif

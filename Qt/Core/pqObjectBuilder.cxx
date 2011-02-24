@@ -94,6 +94,7 @@ namespace pqObjectBuilderNS
 pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :QObject(_parent)
 {
   this->NameGenerator = new pqNameCount();
+  this->WaitingForConnection = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -868,6 +869,7 @@ void pqObjectBuilder::abortPendingConnections()
 //-----------------------------------------------------------------------------
 pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
 {
+  this->WaitingForConnection = true;
   // TODO: we should have code to make all kinds of server connections in one
   // place.  Right now its split between here and pqComponents.
 
@@ -941,7 +943,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       emit this->finishedAddingServer(server);
       }
     }
-
+  this->WaitingForConnection = false;
   return server;
 }
 

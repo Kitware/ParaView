@@ -74,8 +74,7 @@ void pqAlwaysConnectedBehavior::serverCheck()
     {
     return;
     }
-  if (vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->
-     GetPendingConnectionsPresent())
+  if (core->getObjectBuilder()->waitingForConnection())
     {
     // Try again later, we are waiting for server to connect.
     this->delayedServerCheck();
