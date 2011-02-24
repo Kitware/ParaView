@@ -2004,7 +2004,7 @@ void vtkEnzoReader::GetBlockMetaData(
   vtkAMRBox myAmrBox(
     origin, boxOrigin, theBlock.NumberOfDimensions,
     spacings,
-    theBlock.BlockNodeDimensions,
+    theBlock.BlockCellDimensions,
     blockIdx,
     theBlock.Level,
     process );
@@ -2063,7 +2063,7 @@ void vtkEnzoReader::GetBlock(
       vtkAMRBox myAmrBox(
         origin, boxOrigin, theBlock.NumberOfDimensions,
         spacings,
-        theBlock.BlockNodeDimensions,
+        theBlock.BlockCellDimensions,
         blockIdx,
         theBlock.Level,
         process );
