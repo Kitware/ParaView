@@ -353,22 +353,13 @@ protected:
   ~vtkEnzoReader();
   
   // Description:
-  // Returns the refinement ratio at the user-supplied level.
-  // NOTE: the refinement ratio is defined as follows:
-  // refRatio( level ) = spacing( level ) / spacing( level+1 )
-  int GetRefinementRatio( const int level );
+  // Returns the origin of the entire data-set. For enzo data
+  // the Root block coverst the entire domain.
+  void GetDataSetOrigin( double origin[3] );
 
   // Description:
-  // Implements the extent calculator based on the root block at blockIdx 0.
-  // dims -- user-supplied buffer of size (3) of the block dimensions (in)
-  // blkorigin -- user-supplied buffer consisting of the block origin (in)
-  // spacing   -- user-supplied buffer consisting of the block spacing (in)
-  // ijkextent -- user-supplied buffer of size(6) to store the extent (out)
-  // NOTE: Computed ijk extent is indexed as follows:
-  //       ijkextent = { ilo,jlo,klo,ihi,jhi,khi };
-  void GetExtentBasedOnRootBlock(
-   const int *dims, const double *blkorigin,
-   const double *spacing, int *ijkextent );
+  // This function computes and sets the refinement ratio at each level.
+  void SetRefinementRatio( vtkHierarchicalBoxDataSet *hbds );
 
   // Description:
   // This function creates a rectilinear block (and loads the associated 
@@ -394,7 +385,7 @@ protected:
   // assigned to either cells of a rectilinear block or individual vertices / 
   // particles of a vtkPolyData) associated with a block given by 0-based 
   // blockIdx. The returned value indicates failure (0) or success (1).
-  int            LoadAttribute( const char * atribute, int blockIdx );
+  int LoadAttribute( const char * atribute, int blockIdx );
   
   // Description:
   // This function, called by GetBlock( ... ), loads from the file a cell data
@@ -402,20 +393,18 @@ protected:
   // by 0-based blockIdx and inserts it to an allocated vtkDataSet pDataSet 
   // (which is either vtkImageData or vtkRectilinearGrid). The returned value
   // indicates failure (0) or success (1).
-  int            GetBlockAttribute( const char * atribute, int blockIdx, 
-                                    vtkDataSet * pDataSet );
+  int GetBlockAttribute(
+      const char* atribute, int blockIdx,vtkDataSet* pDataSet );
                                     
   // Description:
   // This function, called by GetParticles( ... ), loads a data attribute (with
   // name atribute) associated with the particles falling within the scope of a
   // rectilinear block (specified by 0-based blockIdx) to a vtkPolyData.
-  int            GetParticlesAttribute( const char  * atribute, int blockIdx,
+  int GetParticlesAttribute( const char  * atribute, int blockIdx,
                                         vtkPolyData * polyData );
                                     
-  virtual int    FillOutputPortInformation( int port, vtkInformation * info );
-  int            RequestData( vtkInformation*,
-                              vtkInformationVector**,
-                              vtkInformationVector* );
+  virtual int FillOutputPortInformation(int port,vtkInformation *info);
+  int RequestData(vtkInformation*,vtkInformationVector**,vtkInformationVector*);
                               
 //BTX
   friend  class  vtkEnzoReaderInternal; // to call LoadAttribute()
