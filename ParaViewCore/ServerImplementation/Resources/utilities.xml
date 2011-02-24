@@ -630,8 +630,7 @@
         set_number_command="SetNumberOfConnections"
         element_types="0 0 2"
         number_of_elements_per_command="3"
-        repeat_command="1"
-        default_values="" >
+        repeat_command="1" >
       </StringVectorProperty>
     </Proxy>
   </ProxyGroup>
