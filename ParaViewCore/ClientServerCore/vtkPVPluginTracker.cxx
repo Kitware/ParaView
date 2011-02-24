@@ -284,7 +284,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         loader->LoadPlugin(plugin_filename.c_str());
         loader->Delete();
         }
-      (*this->PluginsList)[index].AutoLoad = auto_load;
+      (*this->PluginsList)[index].AutoLoad = (auto_load != 0);
       }
     }
 }

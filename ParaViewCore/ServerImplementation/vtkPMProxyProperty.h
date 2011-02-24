@@ -82,7 +82,7 @@ protected:
   // proxies in the property. Not used when CleanCommand or RemoveCommand is
   // set. Default is false.
   vtkSetMacro(NullOnEmpty, bool);
-  int NullOnEmpty;
+  bool NullOnEmpty;
 
 
   enum TypeArg {

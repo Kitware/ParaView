@@ -110,7 +110,7 @@ bool vtkPMStringVectorProperty::Pull(vtkSMMessage* message)
   int retVal = res.GetArgument(0, 0, &arg);
   var->add_txt(arg ? arg : "Invalid result");
 
-  return retVal;
+  return (retVal != 0);
 }
 
 //---------------------------------------------------------------------------

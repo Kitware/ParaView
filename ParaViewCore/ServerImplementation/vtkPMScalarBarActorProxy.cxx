@@ -53,7 +53,7 @@ bool vtkPMScalarBarActorProxy::CreateVTKObjects(vtkSMMessage* message)
            << vtkClientServerStream::End;
 
     // Execute
-    return this->Interpreter->ProcessStream(stream);
+    return (this->Interpreter->ProcessStream(stream) != 0);
     }
   return return_value;
 }

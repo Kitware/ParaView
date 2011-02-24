@@ -66,12 +66,12 @@ public:
   //-------------------------------------------------------------------------
   bool HasCoreDefinition( const char* groupName, const char* proxyName)
   {
-    return GetProxyElement(CoreDefinitions, groupName, proxyName);
+    return this->GetProxyElement(CoreDefinitions, groupName, proxyName) != NULL;
   }
   //-------------------------------------------------------------------------
   bool HasCustomDefinition( const char* groupName, const char* proxyName)
   {
-    return GetProxyElement(CustomsDefinitions, groupName, proxyName);
+    return this->GetProxyElement(CustomsDefinitions, groupName, proxyName) != NULL;
   }
   //-------------------------------------------------------------------------
   unsigned int GetNumberOfProxy(const char* groupName)

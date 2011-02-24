@@ -68,8 +68,8 @@ public:
   // This ivar is configured when the xml file is read and is mainly useful
   // to trigger a method call.
   // Internal properties are not saved in state
-  vtkSetMacro(IsInternal, int);
-  vtkGetMacro(IsInternal, int);
+  vtkSetMacro(IsInternal, bool);
+  vtkGetMacro(IsInternal, bool);
 
 //BTX
 protected:
