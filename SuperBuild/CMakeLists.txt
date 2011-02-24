@@ -248,6 +248,14 @@ set(PNG_ARGS
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
 
+list(APPEND HDF5_dependencies zlib)
+list(APPEND ParaView_dependencies HDF5)
+include(External_HDF5)
+
+list(APPEND Silo_dependencies zlib HDF5)
+list(APPEND ParaView_dependencies Silo)
+include(External_Silo)
+
 if(NOT WIN32 AND NOT APPLE)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
