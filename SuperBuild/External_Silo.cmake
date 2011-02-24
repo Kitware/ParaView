@@ -11,7 +11,7 @@ if(WIN32)
     set(silo_bin_dir SiloWindows/MSVC8/x64/DllwithHDF5_Release)
   else()
     set(silo_configuration "DllwithHDF5_Release|Win32")
-    set(silo_bin_dir SiloWindows/MSVC8/DllwithHDF5_Release)
+    set(silo_bin_dir SiloWindows/MSVC8/Win32/DllwithHDF5_Release)
   endif()
   
   configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_patch_step.cmake.in
