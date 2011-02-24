@@ -19,6 +19,8 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringListDomain.h"
@@ -650,16 +652,16 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, 
       }
     if (!strcmp(elemName, "ProxyManager"))
       {
-#ifdef FIXME_COLLABORATION
-      cout << "Proxy manager tag was found..." << endl;
       // Get list from ProxyManager
       if (!strcmp(elem->GetAttribute("type"), "reader"))
         {
-        int numberOfProxyToCheck = manager->GetNumberOfXMLProxies("sources");
-        for(int i=0;i<numberOfProxyToCheck;i++)
+        vtkSMProxyDefinitionIterator* iter =
+            manager->GetProxyDefinitionManager()->NewSingleGroupIterator("sources");
+
+        for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
           {
-          const char* proxyName = manager->GetXMLProxyName("sources", i);
-          vtkPVXMLElement* proxyDef = manager->GetProxyDefinition("sources", proxyName);
+          const char* proxyName = iter->GetProxyName();
+          vtkPVXMLElement* proxyDef = iter->GetProxyDefinition();
           if(proxyDef)
             {
             vtkPVXMLElement* hints = proxyDef->FindNestedElementByName("Hints");
@@ -673,18 +675,20 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, 
               }
             }
           }
+        iter->Delete();
         }
       else if (!strcmp(elem->GetAttribute("type"), "writer"))
         {
-        int numberOfProxyToCheck = manager->GetNumberOfXMLProxies("writers");
-        for(int i=0;i<numberOfProxyToCheck;i++)
+        vtkSMProxyDefinitionIterator* iter =
+            manager->GetProxyDefinitionManager()->NewSingleGroupIterator("writers");
+       for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
           {
-          const char* proxyName = manager->GetXMLProxyName("writers", i);
+          const char* proxyName = iter->GetProxyName();
           vtkstd::pair<vtkstd::string, vtkstd::string> namePair(proxyName, "writers");
           proxyNameList->insert(proxyNameList->end(), namePair);
           }
+       iter->Delete();
         }
-#endif
       return;
       }
     elemName[0] = tolower(elemName[0]);
