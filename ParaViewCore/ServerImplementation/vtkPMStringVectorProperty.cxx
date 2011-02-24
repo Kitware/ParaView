@@ -122,7 +122,7 @@ bool vtkPMStringVectorProperty::ReadXMLAttributes(
     return false;
     }
 
-  int number_of_elements = 0;
+  int number_of_elements = 1; // By default there must be at least one element
   int number_of_elements_per_command = 0;
   element->GetScalarAttribute("number_of_elements", &number_of_elements);
   number_of_elements_per_command = number_of_elements;

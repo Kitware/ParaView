@@ -40,6 +40,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
 #include <assert.h>
 
 //---------------------------------------------------------------------------
@@ -1376,6 +1377,9 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
     return 0;
     }
 
+  // Just build once
+  static vtksys::RegularExpression END_WITH_PROPERTY(".*Property$");
+
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);
@@ -1428,14 +1432,12 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
           }
         }
       }
-    else
+    else if ( END_WITH_PROPERTY.find(propElement->GetName()) &&
+              propElement->GetAttribute("name") )
       {
-      const char* name = propElement->GetAttribute("name");
-      vtkstd::string tagName = propElement->GetName();
-      if (name && tagName.find("Property") == (tagName.size()-8))
-        {
-        this->NewProperty(name, propElement);
-        }
+      // Make sure that attribute value won't get corrupted inside the comming call
+      vtkstd::string propName = propElement->GetAttribute("name");
+      this->NewProperty(propName.c_str(), propElement);
       }
     }
   return 1;
