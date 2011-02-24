@@ -1,7 +1,8 @@
 
+
 # The Silo external project for ParaView
 set(zlib_source "${CMAKE_CURRENT_BINARY_DIR}/zlib")
-set(zlib_binary "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
+set(zlib_build "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
 set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}/zlib-install")
 
 # If Windows we use CMake otherwise ./configure
@@ -24,6 +25,12 @@ if(WIN32)
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
+  
+  # the zlib library should be named zlib1.lib not zlib.lib
+  ExternalProject_Add_Step(zlib RenameLib
+    COMMAND ${CMAKE_COMMAND} -E copy ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} ${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}
+    DEPENDEES install
+    )
 
 else()
   ExternalProject_Add(zlib
@@ -42,8 +49,8 @@ endif()
 
 set(ZLIB_INCLUDE_DIR ${zlib_install}/include)
 
-if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
-  set(ZLIB_LIBRARY optimized ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} debug ${zlib_install}/lib/zlibd${_LINK_LIBRARY_SUFFIX})
+if(WIN32)
+  set(ZLIB_LIBRARY "${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}")
 else()
-  set(ZLIB_LIBRARY ${ZLIB_LIBRARY_PATH}/libz${_LINK_LIBRARY_SUFFIX})
+  set(ZLIB_LIBRARY ${zlib_install}/lib/libz${_LINK_LIBRARY_SUFFIX})
 endif()

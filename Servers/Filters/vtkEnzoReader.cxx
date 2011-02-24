@@ -1893,6 +1893,7 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
     } // END loop through all the blocks
 
+  this->SetRefinementRatio( output );
   myController->Barrier();
 
   if( this->GenerateIBLANK )
@@ -1907,69 +1908,76 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
   return 1;
 }
 
-// ----------------------------------------------------------------------------
-int vtkEnzoReader::GetRefinementRatio( const int level )
+//------------------------------------------------------------------------------
+void vtkEnzoReader::GetDataSetOrigin( double origin[3] )
 {
-  vtkAssertUtils::assertInRange(
-      level,0,this->GetNumberOfLevels(),__FILE__,__LINE__);
-  // TODO: Implement this
-  return 4;
-}
-
-// ----------------------------------------------------------------------------
-void vtkEnzoReader::GetExtentBasedOnRootBlock(
-    const int *dims, const double *blkorigin,
-    const double *spacing, int *ijkextent )
-{
-  vtkAssertUtils::assertNotNull( dims, __FILE__, __LINE__ );
-  vtkAssertUtils::assertNotNull( blkorigin, __FILE__, __LINE__ );
-  vtkAssertUtils::assertNotNull( spacing, __FILE__, __LINE__ );
-  vtkAssertUtils::assertNotNull( ijkextent, __FILE__, __LINE__ );
-  vtkAssertUtils::assertTrue(this->Internal->Blocks.size()>1,__FILE__,__LINE__);
-
-  ijkextent[0] = 0;
-  ijkextent[1] = 0;
-  ijkextent[2] = 0;
-  ijkextent[3] = 0;
-  ijkextent[4] = 0;
-  ijkextent[5] = 0;
-
+  origin[0] = origin[1] = origin[2] = 0.0;
   vtkEnzoReaderBlock *rootBlock = &(this->Internal->Blocks[0]);
-  assert( rootBlock != NULL );
+  vtkAssertUtils::assertNotNull( rootBlock, __FILE__, __LINE__ );
 
-  // Set min extent
-  ijkextent[0] = round((blkorigin[0]-rootBlock->MinBounds[0])/spacing[0]);
-  ijkextent[2] = round((blkorigin[1]-rootBlock->MinBounds[1])/spacing[1]);
-  ijkextent[4] = round((blkorigin[2]-rootBlock->MinBounds[2])/spacing[2]);
+  for( int i=0; i < 3; ++i )
+    origin[i] = rootBlock->MinBounds[i];
 
-  // Set max extent
-  ijkextent[1] = ijkextent[0]+dims[0];
-  ijkextent[3] = ijkextent[2]+dims[1];
-  ijkextent[5] = ijkextent[4]+dims[2];
 }
 
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void vtkEnzoReader::SetRefinementRatio( vtkHierarchicalBoxDataSet *hbds )
+{
+  vtkAssertUtils::assertNotNull( hbds, __FILE__, __LINE__ );
+
+  int numLevels = hbds->GetNumberOfLevels();
+
+  for( int level=1; level < numLevels; ++level )
+    {
+      int parentLevel = level-1;
+      vtkAssertUtils::assertTrue(
+       (hbds->GetNumberOfDataSets(parentLevel)>=1),__FILE__,__LINE__ );
+      vtkAssertUtils::assertTrue(
+       (hbds->GetNumberOfDataSets(level)>=1),__FILE__,__LINE__);
+
+      vtkAMRBox parentBox;
+      hbds->GetDataSet(parentLevel,0,parentBox);
+
+      vtkAMRBox myBox;
+      hbds->GetDataSet(level,0,myBox);
+
+      double parentSpacing[3];
+      parentBox.GetGridSpacing(parentSpacing);
+
+      double currentSpacing[3];
+      myBox.GetGridSpacing( currentSpacing );
+
+      // TODO: Note current implementation assumes uniform spacing
+      int ratio = round(parentSpacing[0]/currentSpacing[0]);
+
+      std::cout << "Ratio: " << ratio << std::endl;
+      std::cout.flush();
+
+      hbds->SetRefinementRatio(0,ratio);
+      hbds->SetRefinementRatio(level,ratio);
+
+    } // END for all hi-res levels
+
+
+}
+
+//------------------------------------------------------------------------------
 void vtkEnzoReader::GetBlockMetaData(
     int mapIndex, vtkHierarchicalBoxDataSet *hbds, std::vector<int> &idx )
 {
-  // Sanity check!
   vtkAssertUtils::assertNotNull( hbds,__FILE__,__LINE__ );
 
   this->Internal->ReadMetaData();
 
-  // Grab the controller
+  double origin[3];
+  this->GetDataSetOrigin( origin );
+
   vtkMultiProcessController *myController =
    vtkMultiProcessController::GetGlobalController();
-  vtkAssertUtils::assertNotNull( myController, __FILE__, __LINE__ );
-
+  vtkAssertUtils::assertNotNull( myController,__FILE__,__LINE__);
 
   int blockIdx = this->BlockMap[ mapIndex ];
   int process  = this->GetBlockProcessId( blockIdx );
-
-  vtkAssertUtils::assertInRange(
-      process,0,myController->GetNumberOfProcesses(),__FILE__,__LINE__);
-  vtkAssertUtils::assertNotEquals(
-   process,myController->GetLocalProcessId(),__FILE__, __LINE__);
 
   // this->Internal->Blocks includes a pseudo block --- the root as block #0
   vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
@@ -1978,77 +1986,195 @@ void vtkEnzoReader::GetBlockMetaData(
   vtkAssertUtils::assertInRange(
    level, 0, this->GetNumberOfLevels()-1,__FILE__,__LINE__ );
 
-
+  double boxOrigin[3];
   double blockMin[3];
   double blockMax[3];
   double spacings[3];
-
   for ( int i = 0; i < 3; i++ )
     {
-    blockMin[i] = theBlock.MinBounds[i];
-    blockMax[i] = theBlock.MaxBounds[i];
-    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
-                ? ( blockMax[i] - blockMin[i] ) /
-                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
-                :   1.0;
+      boxOrigin[i] = theBlock.MinBounds[i];
+      blockMin[i]  = theBlock.MinBounds[i];
+      blockMax[i]  = theBlock.MaxBounds[i];
+      spacings[i]  = ( theBlock.BlockNodeDimensions[i] > 1 )
+                   ? ( blockMax[i]-blockMin[i] ) /
+                     ( theBlock.BlockNodeDimensions[i]-1.0 )
+                   :   1.0;
     }
 
   vtkAMRBox myAmrBox(
-    theBlock.MinBounds,theBlock.NumberOfDimensions,
-    theBlock.BlockNodeDimensions,spacings, blockIdx,
-    theBlock.Level, process );
+    origin, boxOrigin, theBlock.NumberOfDimensions,
+    spacings,
+    theBlock.BlockCellDimensions,
+    blockIdx,
+    theBlock.Level,
+    process );
 
+//  hbds->SetRefinementRatio( level, this->GetRefinementRatio(level) );
   hbds->SetDataSet(level,idx[level],myAmrBox,NULL);
   idx[ level ]++;
+
 }
 
-// ----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void vtkEnzoReader::GetBlock(
- int mapIndex, vtkHierarchicalBoxDataSet *hbds,std::vector<int> &idxcounter)
+    int mapIndex, vtkHierarchicalBoxDataSet *hbds, std::vector<int> &idx )
 {
-  // Sanity Check!
-  vtkAssertUtils::assertNotNull(hbds,__FILE__,__LINE__);
+  vtkAssertUtils::assertNotNull( hbds,__FILE__,__LINE__);
 
-  int blockIdx = this->BlockMap[ mapIndex ];
-  vtkAssertUtils::assertInRange(
-   blockIdx,0,this->Internal->NumberOfBlocks,__FILE__,__LINE__);
   this->Internal->ReadMetaData();
 
+  double origin[3];
+  this->GetDataSetOrigin( origin );
+
+  vtkMultiProcessController *myController =
+   vtkMultiProcessController::GetGlobalController();
+  vtkAssertUtils::assertNotNull( myController,__FILE__,__LINE__);
 
   vtkUniformGrid *uniformGrid = vtkUniformGrid::New();
-  int bSuccess                = this->GetBlock(blockIdx,uniformGrid);
-  int process                 = this->GetBlockProcessId( blockIdx );
+  int blockIdx = this->BlockMap[ mapIndex ];
+  int bSuccess = this->GetBlock(blockIdx,uniformGrid);
+  int process  = this->GetBlockProcessId( blockIdx );
 
   // this->Internal->Blocks includes a pseudo block --- the root as block #0
   vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
 
   int level = theBlock.Level;
-  vtkAssertUtils::assertTrue((level>=0),__FILE__,__LINE__);
+  vtkAssertUtils::assertInRange(
+   level, 0, (this->GetNumberOfLevels()>0)?this->GetNumberOfLevels()-1:0,
+   __FILE__,__LINE__ );
 
+  double boxOrigin[3];
   double blockMin[3];
   double blockMax[3];
   double spacings[3];
   for ( int i = 0; i < 3; i++ )
     {
-    blockMin[i] = theBlock.MinBounds[i];
-    blockMax[i] = theBlock.MaxBounds[i];
-    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
-                ? ( blockMax[i] - blockMin[i] ) /
-                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
-                :   1.0;
+      boxOrigin[i] = theBlock.MinBounds[i];
+      blockMin[i]  = theBlock.MinBounds[i];
+      blockMax[i]  = theBlock.MaxBounds[i];
+      spacings[i]  = ( theBlock.BlockNodeDimensions[i] > 1 )
+                   ? ( blockMax[i]-blockMin[i] ) /
+                     ( theBlock.BlockNodeDimensions[i]-1.0 )
+                   :   1.0;
     }
 
   if( bSuccess )
     {
       vtkAMRBox myAmrBox(
-       theBlock.MinBounds,theBlock.NumberOfDimensions,
-       theBlock.BlockNodeDimensions,spacings, blockIdx,
-       theBlock.Level, process );
+        origin, boxOrigin, theBlock.NumberOfDimensions,
+        spacings,
+        theBlock.BlockCellDimensions,
+        blockIdx,
+        theBlock.Level,
+        process );
 
-      hbds->SetDataSet( level, idxcounter[level], myAmrBox, uniformGrid );
-      idxcounter[ level ]++;
+//      hbds->SetRefinementRatio( level, this->GetRefinementRatio(level) );
+      hbds->SetDataSet(level,idx[level],myAmrBox,uniformGrid);
+      idx[ level ]++;
     }
+
 }
+
+// ----------------------------------------------------------------------------
+//void vtkEnzoReader::GetBlockMetaData(
+//    int mapIndex, vtkHierarchicalBoxDataSet *hbds, std::vector<int> &idx )
+//{
+//  // Sanity check!
+//  vtkAssertUtils::assertNotNull( hbds,__FILE__,__LINE__ );
+//
+//  this->Internal->ReadMetaData();
+//
+//  // Grab the controller
+//  vtkMultiProcessController *myController =
+//   vtkMultiProcessController::GetGlobalController();
+//  vtkAssertUtils::assertNotNull( myController, __FILE__, __LINE__ );
+//
+//
+//  int blockIdx = this->BlockMap[ mapIndex ];
+//  int process  = this->GetBlockProcessId( blockIdx );//------------------------------------------------------------------------------
+//
+//  vtkAssertUtils::assertInRange(
+//      process,0,myController->GetNumberOfProcesses(),__FILE__,__LINE__);
+//  vtkAssertUtils::assertNotEquals(
+//   process,myController->GetLocalProcessId(),__FILE__, __LINE__);
+//
+//  // this->Internal->Blocks includes a pseudo block --- the root as block #0
+//  vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
+//
+//  int level = theBlock.Level;
+//  vtkAssertUtils::assertInRange(
+//   level, 0, this->GetNumberOfLevels()-1,__FILE__,__LINE__ );
+//
+//
+//  double blockMin[3];
+//  double blockMax[3];
+//  double spacings[3];
+//
+//  for ( int i = 0; i < 3; i++ )
+//    {
+//    blockMin[i] = theBlock.MinBounds[i];
+//    blockMax[i] = theBlock.MaxBounds[i];
+//    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
+//                ? ( blockMax[i] - blockMin[i] ) /
+//                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
+//                :   1.0;
+//    }
+//
+//  vtkAMRBox myAmrBox(
+//    theBlock.MinBounds,theBlock.NumberOfDimensions,
+//    theBlock.BlockNodeDimensions,spacings, blockIdx,
+//    theBlock.Level, process );
+//  hbds->SetDataSet(level,idx[level],myAmrBox,NULL);
+//  idx[ level ]++;
+//}
+//
+//// ----------------------------------------------------------------------------
+//void vtkEnzoReader::GetBlock(
+// int mapIndex, vtkHierarchicalBoxDataSet *hbds,std::vector<int> &idxcounter)
+//{
+//  // Sanity Check!
+//  vtkAssertUtils::assertNotNull(hbds,__FILE__,__LINE__);
+//
+//  int blockIdx = this->BlockMap[ mapIndex ];
+//  vtkAssertUtils::assertInRange(
+//   blockIdx,0,this->Internal->NumberOfBlocks,__FILE__,__LINE__);
+//  this->Internal->ReadMetaData();
+//
+//
+//  vtkUniformGrid *uniformGrid = vtkUniformGrid::New();
+//  int bSuccess                = this->GetBlock(blockIdx,uniformGrid);
+//  int process                 = this->GetBlockProcessId( blockIdx );
+//
+//  // this->Internal->Blocks includes a pseudo block --- the root as block #0
+//  vtkEnzoReaderBlock &theBlock = this->Internal->Blocks[ blockIdx + 1 ];
+//
+//  int level = theBlock.Level;
+//  vtkAssertUtils::assertTrue((level>=0),__FILE__,__LINE__);
+//
+//  double blockMin[3];
+//  double blockMax[3];
+//  double spacings[3];
+//  for ( int i = 0; i < 3; i++ )
+//    {
+//    blockMin[i] = theBlock.MinBounds[i];
+//    blockMax[i] = theBlock.MaxBounds[i];
+//    spacings[i] = ( theBlock.BlockNodeDimensions[i] > 1 )
+//                ? ( blockMax[i] - blockMin[i] ) /
+//                  ( theBlock.BlockNodeDimensions[i] - 1.0 )
+//                :   1.0;
+//    }
+//
+//  if( bSuccess )
+//    {
+//      vtkAMRBox myAmrBox(
+//       theBlock.MinBounds,theBlock.NumberOfDimensions,
+//       theBlock.BlockNodeDimensions,spacings, blockIdx,
+//       theBlock.Level, process );
+//
+//      hbds->SetDataSet( level, idxcounter[level], myAmrBox, uniformGrid );
+//      idxcounter[ level ]++;
+//    }
+//}
 
 
 
