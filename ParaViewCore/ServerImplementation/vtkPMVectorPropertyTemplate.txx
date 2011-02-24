@@ -285,7 +285,12 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
   vtkstd::vector<T> values;
 
   AppendValues<T, vtkstd::vector<T>, Variant, force_idtype>(values, *variant);
-  return this->Push(&values[0], static_cast<int>(values.size()));
+
+  if(values.size() > 0)
+    {
+    return this->Push(&values[0], static_cast<int>(values.size()));
+    }
+  return true;
 }
 
 //---------------------------------------------------------------------------
