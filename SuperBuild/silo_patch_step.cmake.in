@@ -1,0 +1,36 @@
+
+if(WIN32)
+
+  set(ENV{ZLIB_INC_DIR} "@zlib_install@/include")
+  set(ENV{ZLIB_LIB_DIR} "@zlib_install@/lib")
+  set(ENV{HDF5_INC_DIR} "@hdf5_install@/include")
+  set(ENV{HDF5_LIB_DIR} "@hdf5_install@/lib")
+
+  # we have copy in our own versions of these files which have x64 configurations added to them.
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/copysilo.bat.in" "@Silo_source@/SiloWindows/copysilo.bat"
+    )
+
+  # this file contains quotation patches to handle executing pdb_detect.exe when it in a directory with spaces.
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/pdb_detect.vcproj" "@Silo_source@/SiloWindows/MSVC8/pdb_detect/pdb_detect.vcproj"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/silex.vcproj" "@Silo_source@/SiloWindows/MSVC8/silex.vcproj"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/Silo.vcproj" "@Silo_source@/SiloWindows/MSVC8/Silo.vcproj"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/SiloWindows.sln" "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND copysilo.bat
+    WORKING_DIRECTORY "@Silo_source@/SiloWindows"
+    )
+
+endif()
