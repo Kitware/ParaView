@@ -43,10 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 
-#ifdef FIXME_COLLABORATION
-#include "vtkSMServerProxyManagerReviver.h"
-#endif
-
 #include <QIntValidator>
 #include <QFileInfo>
 #include <QMap>
@@ -635,22 +631,9 @@ bool pqAnimationManager::saveAnimation()
     pqSMAdaptor::setProxyProperty(cleaner->GetProperty("Writer"), writer);
     cleaner->UpdateVTKObjects();
 
-#ifdef FIXME_COLLABORATION
-    vtkSMServerProxyManagerReviver* reviver = 
-      vtkSMServerProxyManagerReviver::New();
-    int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
-    reviver->Delete();
-    emit this->endNonUndoableChanges();
-    pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
-    if (viewManager)
-      {
-      viewManager->finishedCapture();
-      }
-    emit this->disconnectServer();
-    return status;
-#else
+    qCritical("Saving animations after disconnecting from servers "
+      "is temporarily not supported.");
     return false;
-#endif
     }
 
   // let the world know we are writing an animation.
