@@ -14,10 +14,11 @@
 =========================================================================*/
 #include "vtkPVMPICommunicator.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPVProgressHandler.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkPVSession.h"
 
 #include "vtkMPI.h"
 
@@ -39,14 +40,10 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
   vtkMPICommunicatorReceiveDataInfo* info,
   int useCopy, int& senderId)
 {
-#ifndef FIXME_COLLABORATION
-    return this->Superclass::ReceiveDataInternal(
-      data, length, sizeoftype,
-      remoteProcessId, tag, info, useCopy, senderId);
-#else
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   vtkPVProgressHandler* progressHandler =
-    pm? pm->GetActiveProgressHandler() : 0;
+    session? session->GetProgressHandler() : NULL;
 
   if (!progressHandler || this->GetLocalProcessId() != 0 ||
     this->GetNumberOfProcesses() <= 1)
@@ -110,7 +107,6 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
     senderId = info->Status.MPI_SOURCE;
     }
   return retVal;
-#endif
 }
 
 
