@@ -68,7 +68,7 @@ bool vtkPMProperty::ReadXMLAttributes(
   int repeat_command;
   if (element->GetScalarAttribute("repeat_command", &repeat_command))
     {
-    this->Repeatable = repeat_command;
+    this->Repeatable = (repeat_command != 0);
     }
 
 
@@ -87,7 +87,7 @@ bool vtkPMProperty::ReadXMLAttributes(
   int is_internal;
   if (element->GetScalarAttribute("is_internal", &is_internal))
     {
-    this->SetIsInternal(is_internal);
+    this->SetIsInternal(is_internal != 0);
     }
 
   return true;

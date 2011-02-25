@@ -323,7 +323,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
   retVal = element->GetScalarAttribute("state_ignored", &state_ignored);
   if(retVal)
     {
-    this->SetStateIgnored( state_ignored );
+    this->SetStateIgnored( state_ignored != 0 );
     }
   else
     {

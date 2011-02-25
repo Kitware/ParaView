@@ -251,7 +251,7 @@ void vtkSMAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMAnimationScene::SetLoop(int val)
 {
-  this->AnimationPlayer->SetLoop(val);
+  this->AnimationPlayer->SetLoop(val != 0);
 }
 
 //----------------------------------------------------------------------------

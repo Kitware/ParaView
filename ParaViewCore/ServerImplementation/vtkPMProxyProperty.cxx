@@ -167,7 +167,7 @@ bool vtkPMProxyProperty::ReadXMLAttributes(
   int null_on_empty;
   if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
     {
-    this->SetNullOnEmpty(null_on_empty);
+    this->SetNullOnEmpty(null_on_empty != 0);
     }
 
   if (this->InformationOnly)

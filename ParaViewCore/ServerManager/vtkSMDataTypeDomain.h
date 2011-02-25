@@ -33,7 +33,7 @@
 
 class vtkSMSourceProxy;
 //BTX
-class vtkSMDataTypeDomainInternals;
+struct vtkSMDataTypeDomainInternals;
 //ETX
 
 class VTK_EXPORT vtkSMDataTypeDomain : public vtkSMDomain

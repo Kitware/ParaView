@@ -170,7 +170,7 @@ protected:
   virtual void RemoveAllProxies(int modify);
 
   friend class vtkSMProxy;
-  friend class vtkSMProxyPropertyInternals;
+  friend struct vtkSMProxyPropertyInternals;
 
   vtkSMProxyPropertyInternals* PPInternals;
 
