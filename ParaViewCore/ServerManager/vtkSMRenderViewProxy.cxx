@@ -809,18 +809,13 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   w2i->ShouldRerenderOff();
   w2i->FixBoundaryOn();
 
-#ifdef FIXME_COLLABORATION
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << w2i << "Update"
          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, vtkProcessModule::CLIENT, stream);
-#else
-  w2i->Update();
-#endif
+  this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
 
   this->GetRenderWindow()->SwapBuffersOn();
 
