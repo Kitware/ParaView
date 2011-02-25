@@ -43,16 +43,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
+#include <vtkDirectory.h>
 #include <vtkProcessModule.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
 #include <vtkSmartPointer.h>
+#include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkStringList.h>
-#include <vtkDirectory.h>
 
 #include "pqSMAdaptor.h"
 
@@ -609,36 +610,11 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
 
   if (this->Implementation->isRemote())
     {
-    // File system is on remote server.
-#ifdef FIXME_COLLABORATION
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                              vtkProcessModule::DATA_SERVER :
-                              vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-           << dirID << "MakeDirectory"
-           << dirPath.toAscii().data()
-           << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
-#endif
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->MakeDirectory(dirPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {
@@ -669,35 +645,11 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
 
   if (this->Implementation->isRemote())
     {
-#ifdef FIXME_COLLABORATION
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                           vtkProcessModule::DATA_SERVER :
-                           vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-          << dirID << "DeleteDirectory"
-          << dirPath.toAscii().data()
-          << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
-#endif
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->DeleteDirectory(dirPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {
@@ -750,36 +702,12 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
   if (this->Implementation->isRemote())
     {
-#ifdef FIXME_COLLABORATION
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                              vtkProcessModule::DATA_SERVER :
-                              vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-           << dirID << "Rename"
-           << oldPath.toAscii().data()
-           << newPath.toAscii().data()
-           << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
-#endif
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->Rename(
+      oldPath.toAscii().data(), newPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {

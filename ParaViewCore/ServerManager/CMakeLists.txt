@@ -53,6 +53,7 @@ SET (Kit_SRCS
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
   vtkSMDimensionsDomain.cxx
+  vtkSMDirectoryProxy.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx

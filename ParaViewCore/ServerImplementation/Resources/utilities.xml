@@ -1502,7 +1502,6 @@
           Set the filename whose information we need.
         </Documentation>
       </StringVectorProperty>
-
     </Proxy>
   </ProxyGroup>
 
@@ -1914,6 +1913,11 @@
   </ProxyGroup>
 
   <ProxyGroup name="misc">
+
+    <DirectoryProxy name="Directory" class="vtkDirectory"
+      processes="client|dataserver|renderserver" >
+    </DirectoryProxy>
+
     <Proxy name="FileInformationHelper" class="vtkPVFileInformationHelper">
 
       <StringVectorProperty name="Path" command="SetPath" />
