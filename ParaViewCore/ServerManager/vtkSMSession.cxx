@@ -174,18 +174,19 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
+  vtkPVRenderView::AllowRemoteRendering(true);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
 
   if(vtkSMSession::AutoMPI->IsPossible())
     {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
+    // Disable Remote-rendering
     sid = vtkSMSession::ConnectToRemote("localhost", port, false);
     vtkSMSession::SafeDownCast(pm->GetSession(sid))->IsAutoMPI = true;
     }
   else
     {
-    vtkPVRenderView::AllowRemoteRendering(true);
     vtkSMSession* session = vtkSMSession::New();
     sid = pm->RegisterSession(session);
     session->Delete();
@@ -195,8 +196,16 @@ vtkIdType vtkSMSession::ConnectToSelf()
 }
 
 //----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
+{
+  // By default we allow remote rendering.
+  // Only Auto-MPI has the right to disable it
+  return vtkSMSession::ConnectToRemote(hostname, port, true);
+}
+
+//----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
-                                        bool allowRemoteRendering /* = true */)
+                                        bool allowRemoteRendering)
 {
   vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
@@ -214,9 +223,9 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
-  const char* rshost, int rsport, bool allowRemoteRendering /* = true */)
+  const char* rshost, int rsport)
 {
-  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
+  vtkPVRenderView::AllowRemoteRendering(true);
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;

@@ -130,8 +130,7 @@ public:
   // sessions. They register the session with the process module and return the
   // session id. Returns 0 on failure.
   // This overload is used to create a client-server session on client.
-  static vtkIdType ConnectToRemote(const char* hostname, int port,
-                                   bool allowRemoteRendering = true);
+  static vtkIdType ConnectToRemote(const char* hostname, int port);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -150,7 +149,7 @@ public:
   // This overload is used to create a client-dataserver-renderserver session on
   // client.
   static vtkIdType ConnectToRemote(const char* dshost, int dsport,
-    const char* rshost, int rsport, bool allowRemoteRendering = true);
+    const char* rshost, int rsport);
 
   // Description:
   // Same as ConnectToRemote() except that it waits for a reverse connection.
@@ -175,6 +174,11 @@ protected:
   // has been created/setup correctly.
   vtkSMSession(bool initialize_during_constructor=true);
   ~vtkSMSession();
+
+  // Used by the Auto-MPI to prevent remote rendering, otherwise we should
+  // always allow it.
+  static vtkIdType ConnectToRemote(const char* hostname, int port,
+                                   bool allowRemoteRendering);
 
   // Description:
   // Initialize various internal classes after the session has been setup
