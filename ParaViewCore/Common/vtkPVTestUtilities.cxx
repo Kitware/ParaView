@@ -32,6 +32,8 @@ vtkStandardNewMacro(vtkPVTestUtilities);
 //-----------------------------------------------------------------------------
 void vtkPVTestUtilities::Initialize(int argc, char **argv)
 {
+  this->DataRoot = NULL;
+  this->TempRoot = NULL;
   this->Argc=argc;
   this->Argv=argv;
   if (!((argc==0)||(argv==0)))
@@ -141,7 +143,13 @@ void vtkPVTestUtilities::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "argc=" << this->Argc << endl;
   os << indent << "argv=" << this->Argv << endl;
-  os << indent << "DataRoot=" << this->DataRoot << endl;
-  os << indent << "TempRoot=" << this->TempRoot << endl;
+  if(this->DataRoot)
+    {
+    os << indent << "DataRoot=" << this->DataRoot << endl;
+    }
+  if(this->TempRoot)
+    {
+    os << indent << "TempRoot=" << this->TempRoot << endl;
+    }
 }
 
