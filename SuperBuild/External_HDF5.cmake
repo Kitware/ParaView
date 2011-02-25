@@ -41,6 +41,7 @@ else()
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
     CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    DEPENDS ${HDF5_dependencies}
   )
 
 endif()

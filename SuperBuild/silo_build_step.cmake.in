@@ -12,7 +12,12 @@ if(WIN32)
     )
 
   EXECUTE_PROCESS(
-    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build DLLwithHDF5_Release|x64 /project Silo
+    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project pdb_detect
+    WORKING_DIRECTORY "@Silo_source@"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project Silo
     WORKING_DIRECTORY "@Silo_source@"
     )
 
