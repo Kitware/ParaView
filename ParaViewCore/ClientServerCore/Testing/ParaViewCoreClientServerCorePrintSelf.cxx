@@ -58,7 +58,6 @@
 #include "vtkPVParallelCoordinatesChartView.h"
 #include "vtkPVParallelCoordinatesRepresentation.h"
 #include "vtkPVPlugin.h"
-#include "vtkPVPluginInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVPluginsInformation.h"
@@ -172,7 +171,6 @@ int main(int, char**)
   //PRINT_SELF(vtkPVParallelCoordinatesChartView);
   PRINT_SELF(vtkPVParallelCoordinatesRepresentation);
   //PRINT_SELF(vtkPVPlugin);
-  PRINT_SELF(vtkPVPluginInformation);
   PRINT_SELF(vtkPVPluginLoader);
   PRINT_SELF(vtkPVPluginTracker);
   PRINT_SELF(vtkPVPluginsInformation);

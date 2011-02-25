@@ -28,7 +28,6 @@
 
 class vtkIntArray;
 class vtkPVPlugin;
-class vtkPVPluginInformation;
 class vtkStringArray;
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject

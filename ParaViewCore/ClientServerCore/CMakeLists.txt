@@ -77,7 +77,6 @@ SET (Kit_SRCS
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlugin.cxx
-  vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginTracker.cxx
   vtkPVPluginsInformation.cxx
