@@ -99,10 +99,9 @@ vtkPVPluginLoader::vtkPVPluginLoader()
       paths += appDir;
       }
 
-    // FIXME_COLLABORATION
-    // Look at old pqPluginManager::pluginPaths(). It looks for plugins in far
-    // more locations than this code does. We need to support those extra
-    // locations as well.
+    // pqPluginManager::pluginPaths() used to automatically load plugins a host
+    // of locations. We no longer support that. It becomes less useful since we
+    // now list plugins in the plugin manager dialog.
     }
 
   this->SetSearchPaths(paths.c_str());
