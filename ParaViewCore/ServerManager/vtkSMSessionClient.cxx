@@ -214,11 +214,15 @@ bool vtkSMSessionClient::Connect(const char* url)
   if (dcontroller)
     {
     this->SetDataServerController(dcontroller);
+    dcontroller->GetCommunicator()->AddObserver(
+      vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
     dcontroller->Delete();
     }
   if (rcontroller)
     {
     this->SetRenderServerController(rcontroller);
+    rcontroller->GetCommunicator()->AddObserver(
+      vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
     rcontroller->Delete();
     }
 

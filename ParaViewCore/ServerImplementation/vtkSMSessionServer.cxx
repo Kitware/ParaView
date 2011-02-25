@@ -122,6 +122,8 @@ void vtkSMSessionServer::SetClientController(
       vtkCommand::StartEvent, this, &vtkSMSessionServer::Activate);
     this->DeActivateObserverId = this->ClientController->AddObserver(
       vtkCommand::EndEvent, this, &vtkSMSessionServer::DeActivate);
+    this->ClientController->GetCommunicator()->AddObserver(
+      vtkCommand::WrongTagEvent, this, &vtkSMSessionServer::OnWrongTagEvent);
     }
 }
 

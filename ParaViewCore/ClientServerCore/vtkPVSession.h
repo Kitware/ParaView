@@ -96,6 +96,16 @@ protected:
   vtkPVSession();
   ~vtkPVSession();
 
+  enum 
+    {
+    EXCEPTION_EVENT_TAG=31416
+    };
+
+  // Description:
+  // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
+  virtual void OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
+    void* calldata);
+
   // Description:
   // Virtual methods subclasses can override.
   virtual void PrepareProgressInternal();

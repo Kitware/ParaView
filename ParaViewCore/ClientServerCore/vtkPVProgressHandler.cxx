@@ -534,8 +534,7 @@ void vtkPVProgressHandler::SendProgressToClient(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::ReceiveProgressFromServer(
-  vtkMultiProcessController* controller)
+void vtkPVProgressHandler::ReceiveProgressFromServer(vtkMultiProcessController*)
 {
   // Nothing to do here. We cannot do non-block receive on SocketController.
   // All progress events from the server will be received as a consequence of
@@ -731,9 +730,8 @@ bool vtkPVProgressHandler::OnWrongTagEvent(void* calldata)
   const char* ptr = data;
   memcpy(&tag, ptr, sizeof(tag));
 
-  // FIXME_COLLABORATION
-  // we should leave the error reporting to the default handler.
-  // Also need to handle the ExceptionTag.
+  // We won't handle this event, let the default handler take care of it.
+  // Default handler is defined in vtkPVSession::OnWrongTagEvent().
   if ( tag != vtkPVProgressHandler::PROGRESS_EVENT_TAG)
     {
     return false;

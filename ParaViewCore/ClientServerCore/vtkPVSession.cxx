@@ -82,6 +82,33 @@ void vtkPVSession::CleanupPendingProgressInternal()
   this->ProgressHandler->CleanupPendingProgress();
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
+{
+  int tag = -1;
+  int len = -1;
+  const char* data = reinterpret_cast<const char*>(calldata);
+  const char* ptr = data;
+  memcpy(&tag, ptr, sizeof(tag));
+
+  if (tag == vtkPVSession::EXCEPTION_EVENT_TAG)
+    {
+    ptr += sizeof(tag);
+    memcpy(&len, ptr, sizeof(len));
+    ptr += sizeof(len);
+    vtkErrorMacro("Encountered Exception: " << ptr);
+    // this->OnSocketError();
+    }
+  else
+    {
+    vtkErrorMacro("Internal ParaView Error: "
+      "Socket Communicator received wrong tag: "
+      << tag);
+    // Treat as a socket error.
+    // this->OnSocketError();
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 {
