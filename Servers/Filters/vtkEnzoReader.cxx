@@ -1326,6 +1326,8 @@ void vtkEnzoReader::SetFileName( const char * fileName )
 
   this->Internal->ReadMetaData();
   this->SetUpDataArraySelections( );
+  this->CellDataArraySelection->DisableAllArrays();
+  this->PointDataArraySelection->DisableAllArrays();
   this->Modified( );
   return;
 }
