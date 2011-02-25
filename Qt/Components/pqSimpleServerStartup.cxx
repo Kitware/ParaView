@@ -195,8 +195,6 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
     return;
     }    
 
-  this->disconnectAllServers();
-
   // Branch based on the connection type - builtin, forward, or reverse ...
   if(startup.getServer().scheme() == "builtin")
     {
@@ -722,6 +720,8 @@ void pqSimpleServerStartup::startBuiltinConnection()
     new pqServerStartupDialog(this->Implementation->Server, false);
   this->Implementation->StartupDialog->show();
 
+  this->disconnectAllServers();
+
   pqServer* const server = pqApplicationCore::instance()->getObjectBuilder()->
     createServer(pqServerResource("builtin:"));
 
@@ -794,6 +794,8 @@ void pqSimpleServerStartup::startConnection()
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::connectServer()
 {
+  this->disconnectAllServers();
+
   pqServer* const server =
     pqApplicationCore::instance()->getObjectBuilder()->
     createServer(this->Implementation->Server);
