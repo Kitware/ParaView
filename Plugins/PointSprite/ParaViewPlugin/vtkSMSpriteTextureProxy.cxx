@@ -37,8 +37,8 @@
 #include "vtkImageData.h"
 
 #include "vtkSMSession.h"
-#include "vtkPMObject.h"
-#include "vtkPMProxy.h"
+#include "vtkSIObject.h"
+#include "vtkSIProxy.h"
 
 vtkStandardNewMacro(vtkSMSpriteTextureProxy);
 //----------------------------------------------------------------------------

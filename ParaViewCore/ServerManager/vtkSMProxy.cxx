@@ -21,7 +21,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
+#include "vtkSIProxy.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
@@ -97,7 +97,7 @@ vtkSMProxy::vtkSMProxy()
 {
   this->Internals = new vtkSMProxyInternals;
   this->KernelClassName = 0;
-  this->SetKernelClassName("vtkPMProxy");
+  this->SetKernelClassName("vtkSIProxy");
 
   // By default, all objects are created on data server.
   this->Location = vtkProcessModule::DATA_SERVER;
@@ -181,8 +181,8 @@ vtkObjectBase* vtkSMProxy::GetClientSideObject()
     this->CreateVTKObjects();
 
     vtkTypeUInt32 gid = this->GetGlobalID();
-    vtkPMProxy* pmproxy =
-      vtkPMProxy::SafeDownCast(this->Session->GetPMObject(gid));
+    vtkSIProxy* pmproxy =
+      vtkSIProxy::SafeDownCast(this->Session->GetPMObject(gid));
     if (pmproxy)
       {
       return pmproxy->GetVTKObject();

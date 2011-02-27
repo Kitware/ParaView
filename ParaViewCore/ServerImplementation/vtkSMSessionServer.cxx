@@ -21,7 +21,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
+#include "vtkSIProxy.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"

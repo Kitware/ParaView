@@ -19,35 +19,35 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
-  vtkPMArraySelectionProperty.cxx
-  vtkPMChartRepresentationProxy.cxx
-  vtkPMCompoundSourceProxy.cxx
-  vtkPMContextArraysProperty.cxx
-  vtkPMDataArrayProperty.cxx
-  vtkPMDoubleVectorProperty.cxx
-  vtkPMFileSeriesReaderProxy.cxx
-  vtkPMIdTypeVectorProperty.cxx
-  vtkPMImageTextureProxy.cxx
-  vtkPMInputProperty.cxx
-  vtkPMIntVectorProperty.cxx
-  vtkPMObject.cxx
-  vtkPMPVRepresentationProxy.cxx
-  vtkPMProperty.cxx
-  vtkPMProxy.cxx
-  vtkPMProxyProperty.cxx
-  vtkPMSILProperty.cxx
-  vtkPMScalarBarActorProxy.cxx
-  vtkPMSelectionRepresentationProxy.cxx
-  vtkPMSourceProxy.cxx
-  vtkPMStringVectorProperty.cxx
-  vtkPMTextSourceRepresentationProxy.cxx
-  vtkPMTimeRangeProperty.cxx
-  vtkPMTimeStepsProperty.cxx
-  vtkPMUniformGridVolumeRepresentationProxy.cxx
-  vtkPMUnstructuredGridVolumeRepresentationProxy.cxx
-  vtkPMVectorProperty.cxx
-  vtkPMWriterProxy.cxx
-  vtkPMXMLAnimationWriterRepresentationProperty.cxx
+  vtkSIArraySelectionProperty.cxx
+  vtkSIChartRepresentationProxy.cxx
+  vtkSICompoundSourceProxy.cxx
+  vtkSIContextArraysProperty.cxx
+  vtkSIDataArrayProperty.cxx
+  vtkSIDoubleVectorProperty.cxx
+  vtkSIFileSeriesReaderProxy.cxx
+  vtkSIIdTypeVectorProperty.cxx
+  vtkSIImageTextureProxy.cxx
+  vtkSIInputProperty.cxx
+  vtkSIIntVectorProperty.cxx
+  vtkSIObject.cxx
+  vtkSIPVRepresentationProxy.cxx
+  vtkSIProperty.cxx
+  vtkSIProxy.cxx
+  vtkSIProxyProperty.cxx
+  vtkSISILProperty.cxx
+  vtkSIScalarBarActorProxy.cxx
+  vtkSISelectionRepresentationProxy.cxx
+  vtkSISourceProxy.cxx
+  vtkSIStringVectorProperty.cxx
+  vtkSITextSourceRepresentationProxy.cxx
+  vtkSITimeRangeProperty.cxx
+  vtkSITimeStepsProperty.cxx
+  vtkSIUniformGridVolumeRepresentationProxy.cxx
+  vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSIVectorProperty.cxx
+  vtkSIWriterProxy.cxx
+  vtkSIXMLAnimationWriterRepresentationProperty.cxx
   vtkSMMessage.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
@@ -64,8 +64,8 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMProxyDefinitionIterator.cxx
-  vtkPMObject.cxx
-  vtkPMVectorProperty.cxx
+  vtkSIObject.cxx
+  vtkSIVectorProperty.cxx
   vtkSMSessionBase.cxx
   vtkSMMessage.cxx
   ABSTRACT)

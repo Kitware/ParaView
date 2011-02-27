@@ -163,7 +163,7 @@ void vtkSMSessionBase::DeletePMObject(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-vtkPMObject* vtkSMSessionBase::GetPMObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkSMSessionBase::GetPMObject(vtkTypeUInt32 globalid)
 {
   return this->SessionCore? this->SessionCore->GetPMObject(globalid) : NULL;
 }

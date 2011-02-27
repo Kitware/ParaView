@@ -25,7 +25,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
+#include "vtkSIProxy.h"
 #include "vtkPVSession.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
@@ -93,7 +93,7 @@ public:
       nbDelete = nbFound = 0;
       for(iter = this->PMObjectMap.begin();iter != this->PMObjectMap.end(); iter++)
         {
-        vtkPMObject* obj = iter->second;
+        vtkSIObject* obj = iter->second;
         if(obj)
           {
           nbFound++;
@@ -131,7 +131,7 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  vtkPMObject* GetPMObject(vtkTypeUInt32 globalUniqueId)
+  vtkSIObject* GetPMObject(vtkTypeUInt32 globalUniqueId)
     {
     PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
     if (iter != this->PMObjectMap.end())
@@ -178,7 +178,7 @@ public:
       }
     }
   //---------------------------------------------------------------------------
-  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkPMObject> >
+  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject> >
     PMObjectMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> >
     RemoteObjectMapType;
@@ -326,7 +326,7 @@ int vtkSMSessionCore::GetNumberOfProcesses()
 }
 
 //----------------------------------------------------------------------------
-vtkPMObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
 {
   return this->Internals->GetPMObject(globalid);
 }
@@ -368,7 +368,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 
   // When the control reaches here, we are assured that the PMObject needs be
   // created/exist on the local process.
-  vtkPMObject* obj = this->Internals->GetPMObject(globalId);
+  vtkSIObject* obj = this->Internals->GetPMObject(globalId);
   if (!obj)
     {
     if (!message->HasExtension(DefinitionHeader::server_class))
@@ -386,10 +386,10 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       vtkErrorMacro("Failed to instantiate " << classname.c_str());
       abort();
       }
-    obj = vtkPMObject::SafeDownCast(object);
+    obj = vtkSIObject::SafeDownCast(object);
     if (obj == NULL)
       {
-      vtkErrorMacro("Object must be a vtkPMObject subclass. "
+      vtkErrorMacro("Object must be a vtkSIObject subclass. "
         "Aborting for debugging purposes.");
       abort();
       }
@@ -485,7 +485,7 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
     << "----------------------------------------------------------------\n"
     << message->DebugString().c_str());
 
-  vtkPMObject* obj;
+  vtkSIObject* obj;
 
   if(message->global_id() < vtkPVSession::RESERVED_MAX_IDS)
     {
@@ -686,14 +686,14 @@ bool vtkSMSessionCore::GatherInformationInternal(
 
   // default is to gather information from VTKObject, if FromPMObject is true,
   // then gather from PMObject.
-  vtkPMObject* pmobject = this->GetPMObject(globalid);
+  vtkSIObject* pmobject = this->GetPMObject(globalid);
   if (!pmobject)
     {
     vtkErrorMacro("No object with global-id: " << globalid);
     return false;
     }
 
-  vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(pmobject);
+  vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(pmobject);
   if (pmproxy /*&& !information->GetUsePMObject()*/)
     {
     vtkObject* object = vtkObject::SafeDownCast(pmproxy->GetVTKObject());

@@ -679,7 +679,7 @@ protected:
 
 // This defines a manipulator for the vtkClientServerStream that can be used on
 // the to indicate to the interpreter that the placeholder is to be replaced by
-// the vtkPMProxy instance for the given vtkSMProxy instance.
+// the vtkSIProxy instance for the given vtkSMProxy instance.
 // e.g.
 // <code>
 // vtkClientServerStream stream;
@@ -688,7 +688,7 @@ protected:
 //        << "MethodName"
 //        << vtkClientServerStream::End;
 // </code>
-// Will result in calling the vtkPMProxy::MethodName() when the stream in
+// Will result in calling the vtkSIProxy::MethodName() when the stream in
 // interpreted.
 class VTK_EXPORT PMPROXY
 {

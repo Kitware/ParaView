@@ -19,7 +19,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkMaterialInterfaceProcessRing.h
       vtkMaterialInterfaceToProcMap.h
       vtkMemberFunctionCommand.h
-      vtkPMVectorPropertyTemplate.h
+      vtkSIVectorPropertyTemplate.h
       vtkPriorityHelper.h
       vtkProcessModuleConnectionManagerInternals.h
       vtkProcessModuleInternals.h

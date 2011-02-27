@@ -28,7 +28,7 @@ class vtkClientServerStream;
 class vtkCollection;
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
-class vtkPMObject;
+class vtkSIObject;
 class vtkPVInformation;
 class vtkSMProxyDefinitionManager;
 
@@ -76,8 +76,8 @@ public:
   //ETX
 
   // Description:
-  // Returns a vtkPMObject or subclass given its global id, if any.
-  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+  // Returns a vtkSIObject or subclass given its global id, if any.
+  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Return a vtkObject given its global id if any otherwise return NULL;

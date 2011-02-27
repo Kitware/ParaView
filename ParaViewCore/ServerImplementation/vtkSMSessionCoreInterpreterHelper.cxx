@@ -15,7 +15,7 @@
 #include "vtkSMSessionCoreInterpreterHelper.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
+#include "vtkSIProxy.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
@@ -39,7 +39,7 @@ void vtkSMSessionCoreInterpreterHelper::SetCore(vtkSMSessionCore* core)
 }
 
 //----------------------------------------------------------------------------
-vtkPMObject* vtkSMSessionCoreInterpreterHelper::GetPMObject(vtkTypeUInt32 gid)
+vtkSIObject* vtkSMSessionCoreInterpreterHelper::GetPMObject(vtkTypeUInt32 gid)
 {
   return this->Core->GetPMObject(gid);
 }
@@ -47,11 +47,11 @@ vtkPMObject* vtkSMSessionCoreInterpreterHelper::GetPMObject(vtkTypeUInt32 gid)
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
-  vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
+  vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(
     this->Core->GetPMObject(gid));
   if (!pmproxy)
     {
-    vtkErrorMacro("No vtkPMProxy for id : " << gid);
+    vtkErrorMacro("No vtkSIProxy for id : " << gid);
     return NULL;
     }
   return pmproxy->GetVTKObject();

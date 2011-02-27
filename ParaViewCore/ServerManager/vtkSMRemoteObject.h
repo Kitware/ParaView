@@ -115,7 +115,7 @@ protected:
   // - or when the RemoteObject is created by the ProcessModule remotely.
   vtkTypeUInt32 GlobalID;
 
-  // Location flag identify the processes on which the vtkPMObject
+  // Location flag identify the processes on which the vtkSIObject
   // corresponding to this vtkSMRemoteObject exist.
   vtkTypeUInt32 Location;
 

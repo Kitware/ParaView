@@ -1191,24 +1191,24 @@ void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
        || strcmp(informationHelper->GetName(),"DoubleArrayInformationHelper") == 0
        || strcmp(informationHelper->GetName(),"IntArrayInformationHelper") == 0 )
       {
-      propElement->SetAttribute("kernel_class", "vtkPMDataArrayProperty");
+      propElement->SetAttribute("kernel_class", "vtkSIDataArrayProperty");
       }
     else if (strcmp(informationHelper->GetName(),"TimeStepsInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkPMTimeStepsProperty");
+      propElement->SetAttribute("kernel_class", "vtkSITimeStepsProperty");
       }
     else if (strcmp(informationHelper->GetName(),"TimeRangeInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkPMTimeRangeProperty");
+      propElement->SetAttribute("kernel_class", "vtkSITimeRangeProperty");
       }
     else if (strcmp(informationHelper->GetName(),"SILInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkPMSILProperty");
+      propElement->SetAttribute("kernel_class", "vtkSISILProperty");
       propElement->SetAttribute("subtree", informationHelper->GetAttribute("subtree"));
       }
     else if (strcmp(informationHelper->GetName(),"ArraySelectionInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkPMArraySelectionProperty");
+      propElement->SetAttribute("kernel_class", "vtkSIArraySelectionProperty");
       propElement->SetAttribute("command", informationHelper->GetAttribute("attribute_name"));
       propElement->SetAttribute("number_of_elements_per_command", "2");
       }

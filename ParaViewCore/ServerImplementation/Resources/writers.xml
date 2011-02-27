@@ -1047,7 +1047,7 @@
         name="Representations"
         command="AddRepresentation"
         clean_command="RemoveAllRepresentations"
-        kernel_class="vtkPMXMLAnimationWriterRepresentationProperty"
+        kernel_class="vtkSIXMLAnimationWriterRepresentationProperty"
         repeat_command="1">
         <Documentation>
           The input filter/source whose output dataset is to written to the

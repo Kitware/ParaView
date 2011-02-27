@@ -1368,7 +1368,7 @@
      <StringVectorProperty
         name="ElementBlocksInfo"
         information_only="1"
-        kernel_class="vtkPMSILProperty"
+        kernel_class="vtkSISILProperty"
         subtree="Blocks"/>
 
     <IdTypeVectorProperty name="SILTimeStamp"
@@ -2548,7 +2548,7 @@
    <SourceProxy name="MetaImageReader"
                           class="vtkFileSeriesReader"
                           label="Meta File Series Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of meta images."
@@ -2604,7 +2604,7 @@
    <SourceProxy name="XMLMultiBlockDataReader"
                           class="vtkFileSeriesReader"
                           label="XML MultiBlock Data Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read VTK XML multi-block datasets."
@@ -2666,7 +2666,7 @@
    <SourceProxy name="XMLHierarchicalBoxDataReader"
                           class="vtkFileSeriesReader"
                           label="XML Hierarchical Box Data reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a VTK data file containing a hierarchical box dataset."
@@ -2726,7 +2726,7 @@
    <SourceProxy name="XMLPolyDataReader"
                           class="vtkFileSeriesReader"
                           label="XML PolyData Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML polydata files."
                     long_help="Read serial VTK XML polydata files.">
@@ -2782,7 +2782,7 @@
    <SourceProxy name="XMLUnstructuredGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Unstructured Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML unstructured grid data files."
                     long_help="Read serial VTK XML unstructured grid data files.">
@@ -2840,7 +2840,7 @@
    <SourceProxy name="XMLImageDataReader"
                           class="vtkFileSeriesReader"
                           label="XML Image Data Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML image data files."
                     long_help="Read serial VTK XML image data files.">
@@ -2898,7 +2898,7 @@
    <SourceProxy name="XMLStructuredGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Structured Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML structured grid data files."
                     long_help="Read serial VTK XML structured grid data files.">
@@ -2955,7 +2955,7 @@
    <SourceProxy name="XMLRectilinearGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Rectilinear Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML rectilinear grid data files."
                     long_help="Read serial VTK XML rectilinear grid data files.">
@@ -3012,7 +3012,7 @@
    <SourceProxy name="XMLPPolyDataReader"
                           class="vtkFileSeriesReader"
                           label="XML Partitioned Polydata Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML polydata files."
                     long_help="Read the summary file and the assicoated VTK XML polydata files.">
@@ -3069,7 +3069,7 @@
    <SourceProxy name="XMLPUnstructuredGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Partitioned Unstructured Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML unstructured grid data files."
                     long_help="Read the summary file and the associated VTK XML unstructured grid data files.">
@@ -3126,7 +3126,7 @@
    <SourceProxy name="XMLPImageDataReader"
                           class="vtkFileSeriesReader"
                           label="XML Partitioned Image Data Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML image data files."
                     long_help="Read the summary file and the associated VTK XML image data files.">
@@ -3184,7 +3184,7 @@
    <SourceProxy name="XMLPStructuredGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Partitioned Structured Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML structured grid data files."
                     long_help="Read the summary file and the associated VTK XML structured grid data files.">
@@ -3242,7 +3242,7 @@
    <SourceProxy name="XMLPRectilinearGridReader"
                           class="vtkFileSeriesReader"
                           label="XML Partitioned Rectilinear Grid Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML rectilinear grid data files."
                     long_help="Read the summary file and the associated VTK XML rectilinear grid data files.">
@@ -3352,7 +3352,7 @@
    <SourceProxy name="LegacyVTKFileReader"
                           class="vtkFileSeriesReader"
                           label="Legacy VTK Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read legacy VTK files."
@@ -3654,7 +3654,7 @@
   <SourceProxy name="SPCTHRestartReader"
                          class="vtkFileSeriesReader"
                          label="Restarted Sim Spy Plot Reader"
-                         kernel_class="vtkPMFileSeriesReaderProxy"
+                         kernel_class="vtkSIFileSeriesReaderProxy"
                          file_name_method="SetFileName">
     <Documentation short_help="Read SPCTH files from simulation restarts."
                    long_help="Read collections of SPCTH files from simulations that were restarted.">
@@ -4026,7 +4026,7 @@
    <SourceProxy name="stlreader"
                           class="vtkFileSeriesReader"
                           label="STL Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
          short_help="Read STL files."
@@ -4551,7 +4551,7 @@
    <SourceProxy name="PNGReader"
                           class="vtkFileSeriesReader"
                           label="PNG Series Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a PNG file."
@@ -4602,7 +4602,7 @@
    <SourceProxy name="JPEGSeriesReader"
                           class="vtkFileSeriesReader"
                           label="JPEG Series Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of JPEG files."
@@ -4653,7 +4653,7 @@
    <SourceProxy name="TIFFSeriesReader"
                           class="vtkFileSeriesReader"
                           label="TIFF Series Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of TIFF files."
@@ -4808,7 +4808,7 @@
 
      <StringVectorProperty name="GridInfo"
         information_only="1"
-        kernel_class="vtkPMSILProperty"
+        kernel_class="vtkSISILProperty"
         subtree="Blocks" />
 
     <IdTypeVectorProperty name="SILTimeStamp"
@@ -4860,7 +4860,7 @@
 
    <SourceProxy name="ExodusIIReader"
                           class="vtkExodusFileSeriesReader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read Exodus II files."
@@ -4994,7 +4994,7 @@
    <SourceProxy name="ExodusRestartReader"
                           class="vtkExodusFileSeriesReader"
                           label="Restarted Sim Exodus Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read Exodus files from simulation restarts."
                     long_help="Read collections of Exodus output files from simulations that were restarted.">
@@ -5111,7 +5111,7 @@
    <SourceProxy name="AVSucdSeriesReader"
                           class="vtkFileSeriesReader"
                           label="AVS UCD Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a dataset in AVS UCD format."
@@ -5921,7 +5921,7 @@
     <SourceProxy name="netCDFReader"
                            class="vtkFileSeriesReader"
                            label="NetCDF Reader"
-                           kernel_class="vtkPMFileSeriesReaderProxy"
+                           kernel_class="vtkSIFileSeriesReaderProxy"
                            file_name_method="SetFileName">
       <Documentation short_help="Read regular arrays from netCDF files."
                      long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
@@ -6103,7 +6103,7 @@
     <SourceProxy name="SLACParticleReader"
                            class="vtkFileSeriesReader"
                            label="SLAC Particle Data Reader"
-                           kernel_class="vtkPMFileSeriesReaderProxy"
+                           kernel_class="vtkSIFileSeriesReaderProxy"
                            file_name_method="SetFileName">
       <Documentation>
         The SLAC Particle data reader.
@@ -6146,7 +6146,7 @@
    <SourceProxy name="CSVReader"
                           class="vtkFileSeriesReader"
                           label="CSV Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
       <Documentation
         short_help="Read a comma-separated values file."
@@ -6217,7 +6217,7 @@
    <SourceProxy name="ParticleReader"
                           class="vtkFileSeriesReader"
                           label="Particles Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
       <Documentation short_help="Read particle data."
         long_help="Read particle data.">
@@ -6284,7 +6284,7 @@
    <SourceProxy name="TecplotReader"
                           class="vtkFileSeriesReader"
                           label="Tecplot Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read files in the Tecplot ASCII file format."
@@ -6626,7 +6626,7 @@
    <SourceProxy name="CosmoReader"
                           class="vtkFileSeriesReader"
                           label="COSMO Reader"
-                          kernel_class="vtkPMFileSeriesReaderProxy"
+                          kernel_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a cosmology file."
@@ -6887,7 +6887,7 @@
    <SourceProxy name="P3DReader"
                         class="vtkFileSeriesReader"
                         label="PLOT3D Reader"
-                        kernel_class="vtkPMFileSeriesReaderProxy"
+                        kernel_class="vtkSIFileSeriesReaderProxy"
                         file_name_method="SetQFileName">
    <Documentation
      short_help="Read PLOT3D files."

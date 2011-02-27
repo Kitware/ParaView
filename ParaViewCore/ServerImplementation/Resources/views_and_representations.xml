@@ -1059,7 +1059,7 @@
       <StringVectorProperty name="RepresentationTypesInfo"
         command="GetRepresentationTypes"
         information_only="1"
-        kernel_class="vtkPMDataArrayProperty">
+        kernel_class="vtkSIDataArrayProperty">
         <Documentation>
           Property that lists the available representation types. This is used
           by the domain for "Representation" to setup the list of types
@@ -1400,7 +1400,7 @@
     <!-- ================================================================== -->
     <RepresentationProxy name="UnstructuredGridVolumeRepresentation"
                          class="vtkUnstructuredGridVolumeRepresentation"
-                         kernel_class="vtkPMUnstructuredGridVolumeRepresentationProxy"
+                         kernel_class="vtkSIUnstructuredGridVolumeRepresentationProxy"
                          processes="client|renderserver|dataserver">
       <Documentation>
         Representation for rendering a vtkImageData as volume.
@@ -1635,7 +1635,7 @@
     <!-- ================================================================== -->
     <RepresentationProxy name="UniformGridVolumeRepresentation"
                           class="vtkImageVolumeRepresentation"
-                          kernel_class="vtkPMUniformGridVolumeRepresentationProxy"
+                          kernel_class="vtkSIUniformGridVolumeRepresentationProxy"
                           processes="client|renderserver|dataserver">
       <Documentation>
         Representation for rendering a vtkImageData as volume.
@@ -3210,7 +3210,7 @@
     <!-- ================================================================== -->
     <RepresentationProxy name="SelectionRepresentation"
       class="vtkSelectionRepresentation"
-      kernel_class="vtkPMSelectionRepresentationProxy"
+      kernel_class="vtkSISelectionRepresentationProxy"
       processes="client|renderserver|dataserver">
       <Documentation>
         Proxy to show a selection as geometry.
@@ -3471,7 +3471,7 @@
         number_of_elements_per_command="1"
         element_types="2"
         information_only="1"
-        kernel_class="vtkPMContextArraysProperty" >
+        kernel_class="vtkSIContextArraysProperty" >
         <Documentation>
           Property providing list of available series that can be plotted.
         </Documentation>
@@ -3912,7 +3912,7 @@
     <!-- =================================================================== -->
     <RepresentationProxy name="TextSourceRepresentation"
       class="vtkTextSourceRepresentation"
-      kernel_class="vtkPMTextSourceRepresentationProxy"
+      kernel_class="vtkSITextSourceRepresentationProxy"
       processes="client|dataserver|renderserver" >
       <Documentation>
         Representation proxy used to show text.

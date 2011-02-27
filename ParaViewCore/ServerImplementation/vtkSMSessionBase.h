@@ -24,7 +24,7 @@
 
 class vtkClientServerStream;
 class vtkCollection;
-class vtkPMObject;
+class vtkSIObject;
 class vtkPVInformation;
 class vtkPVServerInformation;
 class vtkSMProxyDefinitionManager;
@@ -110,8 +110,8 @@ public:
   vtkSMProxyDefinitionManager* GetProxyDefinitionManager();
 
   // Description:
-  // Returns a vtkPMObject or subclass given its global id, if any.
-  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+  // Returns a vtkSIObject or subclass given its global id, if any.
+  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid);
 
 //BTX
   // Description:

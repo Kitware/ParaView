@@ -24,7 +24,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkObject;
-class vtkPMObject;
+class vtkSIObject;
 class vtkPVProgressHandler;
 class vtkProcessModule;
 class vtkSMSessionCore;
@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkSMSessionCoreInterpreterHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkPMObject* GetPMObject(vtkTypeUInt32 gid);
+  vtkSIObject* GetPMObject(vtkTypeUInt32 gid);
   vtkObjectBase* GetVTKObject(vtkTypeUInt32 gid);
 
   vtkProcessModule* GetProcessModule();
