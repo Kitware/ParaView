@@ -406,14 +406,14 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   const char* name = propElement->GetAttribute("name");
   assert(name && this->GetSIProperty(name) == NULL);
 
-  // Patch XML to remove InformationHelper and set right kernel_class
+  // Patch XML to remove InformationHelper and set right si_class
   vtkSMProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkSmartPointer<vtkObject> object;
   vtkstd::string classname;
-  if (propElement->GetAttribute("kernel_class"))
+  if (propElement->GetAttribute("si_class"))
     {
-    classname = propElement->GetAttribute("kernel_class");
+    classname = propElement->GetAttribute("si_class");
     }
   else
     {

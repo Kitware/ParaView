@@ -1165,7 +1165,7 @@ void vtkSMProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
 }
 //---------------------------------------------------------------------------
 // For now we dynamically convert InformationHelper
-// into the correct kernel_class and attribute sets.
+// into the correct si_class and attribute sets.
 // THIS CODE MUST BE REMOVED once InformationHelper have been removed from
 // legacy XML
 void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
@@ -1191,24 +1191,24 @@ void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
        || strcmp(informationHelper->GetName(),"DoubleArrayInformationHelper") == 0
        || strcmp(informationHelper->GetName(),"IntArrayInformationHelper") == 0 )
       {
-      propElement->SetAttribute("kernel_class", "vtkSIDataArrayProperty");
+      propElement->SetAttribute("si_class", "vtkSIDataArrayProperty");
       }
     else if (strcmp(informationHelper->GetName(),"TimeStepsInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkSITimeStepsProperty");
+      propElement->SetAttribute("si_class", "vtkSITimeStepsProperty");
       }
     else if (strcmp(informationHelper->GetName(),"TimeRangeInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkSITimeRangeProperty");
+      propElement->SetAttribute("si_class", "vtkSITimeRangeProperty");
       }
     else if (strcmp(informationHelper->GetName(),"SILInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkSISILProperty");
+      propElement->SetAttribute("si_class", "vtkSISILProperty");
       propElement->SetAttribute("subtree", informationHelper->GetAttribute("subtree"));
       }
     else if (strcmp(informationHelper->GetName(),"ArraySelectionInformationHelper") == 0)
       {
-      propElement->SetAttribute("kernel_class", "vtkSIArraySelectionProperty");
+      propElement->SetAttribute("si_class", "vtkSIArraySelectionProperty");
       propElement->SetAttribute("command", informationHelper->GetAttribute("attribute_name"));
       propElement->SetAttribute("number_of_elements_per_command", "2");
       }

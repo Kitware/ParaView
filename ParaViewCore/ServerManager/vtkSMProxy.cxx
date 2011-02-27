@@ -96,8 +96,8 @@ vtkCxxSetObjectMacro(vtkSMProxy, Deprecated, vtkPVXMLElement);
 vtkSMProxy::vtkSMProxy()
 {
   this->Internals = new vtkSMProxyInternals;
-  this->KernelClassName = 0;
-  this->SetKernelClassName("vtkSIProxy");
+  this->SIClassName = 0;
+  this->SetSIClassName("vtkSIProxy");
 
   // By default, all objects are created on data server.
   this->Location = vtkProcessModule::DATA_SERVER;
@@ -151,7 +151,7 @@ vtkSMProxy::~vtkSMProxy()
   this->Documentation->Delete();
   this->SetHints(0);
   this->SetDeprecated(0);
-  this->SetKernelClassName(0);
+  this->SetSIClassName(0);
 
   if(this->State)
     {
@@ -678,12 +678,12 @@ void vtkSMProxy::CreateVTKObjects()
     }
 
   assert( "Test Proxy definition"
-          && this->GetClassName() && this->GetKernelClassName()
+          && this->GetClassName() && this->GetSIClassName()
           && this->GetXMLGroup()  && this->GetXMLName() );
 
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
-  message.SetExtension(DefinitionHeader::server_class, this->GetKernelClassName());
+  message.SetExtension(DefinitionHeader::server_class, this->GetSIClassName());
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
   if(this->XMLSubProxyName)
@@ -1229,7 +1229,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     return 0;
     }
 
-  // Patch XML to remove InformationHelper and set right kernel_class
+  // Patch XML to remove InformationHelper and set right si_class
   vtkSMProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkObject* object = 0;
@@ -1299,10 +1299,10 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     this->SetVTKClassName(className);
     }
 
-  const char* kernelClass = element->GetAttribute("kernel_class");
+  const char* kernelClass = element->GetAttribute("si_class");
   if (kernelClass)
     {
-    this->SetKernelClassName(kernelClass);
+    this->SetSIClassName(kernelClass);
     }
 
   const char* xmllabel = element->GetAttribute("label");

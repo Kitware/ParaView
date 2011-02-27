@@ -1357,7 +1357,7 @@
 
     <Proxy name="ScalarBarActor"
            class="vtkPVScalarBarActor"
-           kernel_class="vtkSIScalarBarActorProxy">
+           si_class="vtkSIScalarBarActorProxy">
       <ProxyProperty
         name="LookupTable"
         command="SetLookupTable"

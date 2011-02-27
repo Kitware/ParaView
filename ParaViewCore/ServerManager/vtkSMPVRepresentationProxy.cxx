@@ -30,7 +30,7 @@ vtkStandardNewMacro(vtkSMPVRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
-  this->SetKernelClassName("vtkSIPVRepresentationProxy");
+  this->SetSIClassName("vtkSIPVRepresentationProxy");
   this->RepresentationSubProxies = new vtkStringSet();
   this->InReadXMLAttributes = false;
 }

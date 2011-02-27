@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
-  this->SetKernelClassName("vtkSIChartRepresentationProxy");
+  this->SetSIClassName("vtkSIChartRepresentationProxy");
 }
 
 //----------------------------------------------------------------------------

@@ -621,10 +621,10 @@ protected:
   virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
 
   // Description:
-  // KernelClassName identifies the classname for the helper on the server side.
-  vtkSetStringMacro(KernelClassName);
-  vtkGetStringMacro(KernelClassName);
-  char* KernelClassName;
+  // SIClassName identifies the classname for the helper on the server side.
+  vtkSetStringMacro(SIClassName);
+  vtkGetStringMacro(SIClassName);
+  char* SIClassName;
 
 
   char* VTKClassName;

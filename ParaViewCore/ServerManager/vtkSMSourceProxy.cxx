@@ -87,7 +87,7 @@ struct vtkSMSourceProxyInternals
 //---------------------------------------------------------------------------
 vtkSMSourceProxy::vtkSMSourceProxy()
 {
-  this->SetKernelClassName("vtkSISourceProxy");
+  this->SetSIClassName("vtkSISourceProxy");
 
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->OutputPortsCreated = 0;

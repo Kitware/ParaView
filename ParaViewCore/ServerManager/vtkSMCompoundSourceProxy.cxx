@@ -81,7 +81,7 @@ vtkStandardNewMacro(vtkSMCompoundSourceProxy);
 vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 {
   this->CSInternals = new vtkInternals();
-  this->SetKernelClassName("vtkSICompoundSourceProxy");
+  this->SetSIClassName("vtkSICompoundSourceProxy");
 }
 
 //----------------------------------------------------------------------------

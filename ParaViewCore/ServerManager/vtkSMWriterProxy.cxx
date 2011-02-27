@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkSMWriterProxy);
 //-----------------------------------------------------------------------------
 vtkSMWriterProxy::vtkSMWriterProxy()
 {
-  this->SetKernelClassName("vtkSIWriterProxy");
+  this->SetSIClassName("vtkSIWriterProxy");
   this->SupportsParallel = 0;
   this->ParallelOnly = 0;
   this->FileNameMethod = 0;
