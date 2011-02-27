@@ -151,21 +151,21 @@ const vtkClientServerStream& vtkSMSessionBase::GetLastResult(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::DeletePMObject(vtkSMMessage* msg)
+void vtkSMSessionBase::DeleteSIObject(vtkSMMessage* msg)
 {
   this->Activate();
 
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
-  this->SessionCore->DeletePMObject(msg);
+  this->SessionCore->DeleteSIObject(msg);
 
   this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSMSessionBase::GetPMObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkSMSessionBase::GetSIObject(vtkTypeUInt32 globalid)
 {
-  return this->SessionCore? this->SessionCore->GetPMObject(globalid) : NULL;
+  return this->SessionCore? this->SessionCore->GetSIObject(globalid) : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void vtkSMSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 l
   vtkSMMessage deleteMsg;
   deleteMsg.set_global_id(gid);
   deleteMsg.set_location(location);
-  this->DeletePMObject(&deleteMsg);
+  this->DeleteSIObject(&deleteMsg);
 }
 
 //----------------------------------------------------------------------------

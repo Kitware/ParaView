@@ -43,7 +43,7 @@ bool vtkSISelectionRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
-  vtkSIProxy* label_repr = this->GetSubProxyHelper("LabelRepresentation");
+  vtkSIProxy* label_repr = this->GetSubSIProxy("LabelRepresentation");
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke

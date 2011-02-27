@@ -32,7 +32,7 @@ vtkSIChartRepresentationProxy::~vtkSIChartRepresentationProxy()
 //----------------------------------------------------------------------------
 void vtkSIChartRepresentationProxy::OnCreateVTKObjects()
 {
-  vtkSIProxy* optionsProxy = this->GetSubProxyHelper("PlotOptions");
+  vtkSIProxy* optionsProxy = this->GetSubSIProxy("PlotOptions");
   if (optionsProxy)
     {
     vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(

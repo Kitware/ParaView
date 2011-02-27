@@ -66,10 +66,10 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
   // Pass on the cube-axes and selection-represenations
   vtkCubeAxesRepresentation* cubeAxes =
     vtkCubeAxesRepresentation::SafeDownCast(
-      this->GetSubProxyHelper("CubeAxesRepresentation")->GetVTKObject());
+      this->GetSubSIProxy("CubeAxesRepresentation")->GetVTKObject());
   vtkSelectionRepresentation* selection =
     vtkSelectionRepresentation::SafeDownCast(
-      this->GetSubProxyHelper("SelectionRepresentation")->GetVTKObject());
+      this->GetSubSIProxy("SelectionRepresentation")->GetVTKObject());
   pvrepresentation->SetCubeAxesRepresentation(cubeAxes);
   pvrepresentation->SetSelectionRepresentation(selection);
 
@@ -86,7 +86,7 @@ bool vtkSIPVRepresentationProxy::ReadXMLAttributes(vtkPVXMLElement* element)
       strcmp(child->GetName(), "RepresentationType") == 0)
       {
       const char* name = child->GetAttribute("subproxy");
-      vtkSIProxy* subproxy = this->GetSubProxyHelper(name);
+      vtkSIProxy* subproxy = this->GetSubSIProxy(name);
       if (!subproxy)
         {
         vtkErrorMacro("Missing data representation subproxy '"

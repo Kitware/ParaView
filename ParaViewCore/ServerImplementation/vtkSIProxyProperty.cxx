@@ -44,7 +44,7 @@ public:
     for (int cc=0; cc < variant->proxy_global_id_size(); cc++)
       {
       this->VariantSet.insert( variant->proxy_global_id(cc) );
-      vtkSIObject* obj = this->Parent->GetPMObject(variant->proxy_global_id(cc));
+      vtkSIObject* obj = this->Parent->GetSIObject(variant->proxy_global_id(cc));
       if(obj)
         {
         this->Dependancy.push_back(obj);
@@ -281,18 +281,18 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
   switch(this->ArgumentType)
     {
     case VTK:
-      pmProxy = vtkSIProxy::SafeDownCast(this->GetPMObject(globalId));
+      pmProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
       return (pmProxy == NULL) ? NULL : pmProxy->GetVTKObject();
     case SMProxy:
-      return this->ProxyHelper->GetRemoteObject(globalId);
+      return this->SIProxy->GetRemoteObject(globalId);
     case Kernel:
-      return this->ProxyHelper->GetPMObject(globalId);
+      return this->SIProxy->GetSIObject(globalId);
     }
   return NULL;
 }
 //----------------------------------------------------------------------------
 bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
-  vtkSIProxy* pmProxy = vtkSIProxy::SafeDownCast(this->GetPMObject(globalId));
+  vtkSIProxy* pmProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
   return globalId? pmProxy->IsNullProxy() : true;
 }

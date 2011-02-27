@@ -41,25 +41,25 @@ void vtkSIUnstructuredGridVolumeRepresentationProxy::OnCreateVTKObjects()
          << self
          << "AddVolumeMapper"
          << "Projected tetra"
-         << this->GetSubProxyHelper("VolumePTMapper")->GetVTKObject()
+         << this->GetSubSIProxy("VolumePTMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << self
          << "AddVolumeMapper"
          << "HAVS"
-         << this->GetSubProxyHelper("VolumeHAVSMapper")->GetVTKObject()
+         << this->GetSubSIProxy("VolumeHAVSMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << self
          << "AddVolumeMapper"
          << "Z sweep"
-         << this->GetSubProxyHelper("VolumeZSweepMapper")->GetVTKObject()
+         << this->GetSubSIProxy("VolumeZSweepMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << self
          << "AddVolumeMapper"
          << "Bunyk ray cast"
-         << this->GetSubProxyHelper("VolumeBunykMapper")->GetVTKObject()
+         << this->GetSubSIProxy("VolumeBunykMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
 }

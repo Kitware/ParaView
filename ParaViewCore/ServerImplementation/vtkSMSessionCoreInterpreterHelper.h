@@ -37,7 +37,7 @@ public:
   vtkTypeMacro(vtkSMSessionCoreInterpreterHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkSIObject* GetPMObject(vtkTypeUInt32 gid);
+  vtkSIObject* GetSIObject(vtkTypeUInt32 gid);
   vtkObjectBase* GetVTKObject(vtkTypeUInt32 gid);
 
   vtkProcessModule* GetProcessModule();

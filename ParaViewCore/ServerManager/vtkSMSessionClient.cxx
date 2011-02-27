@@ -670,7 +670,7 @@ bool vtkSMSessionClient::GatherInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::DeletePMObject(vtkSMMessage* message)
+void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 {
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
@@ -704,7 +704,7 @@ void vtkSMSessionClient::DeletePMObject(vtkSMMessage* message)
 
   if  ( (location & vtkPVSession::CLIENT) != 0)
     {
-    this->Superclass::DeletePMObject(message);
+    this->Superclass::DeleteSIObject(message);
     }
 }
 

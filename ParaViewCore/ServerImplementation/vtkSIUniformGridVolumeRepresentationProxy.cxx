@@ -47,14 +47,14 @@ bool vtkSIUniformGridVolumeRepresentationProxy::CreateVTKObjects(
          << this->GetVTKObject()
          << "AddVolumeMapper"
          << "Fixed point"
-         << this->GetSubProxyHelper(
+         << this->GetSubSIProxy(
            "VolumeFixedPointRayCastMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << this->GetVTKObject()
          << "AddVolumeMapper"
          << "GPU"
-         << this->GetSubProxyHelper("VolumeGPURayCastMapper")->GetVTKObject()
+         << this->GetSubSIProxy("VolumeGPURayCastMapper")->GetVTKObject()
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
   return true;

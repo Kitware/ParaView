@@ -66,7 +66,7 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   vtkObjectBase* object = this->GetVTKObject();
-  vtkSIProxy* writerProxy = this->GetSubProxyHelper("Writer");
+  vtkSIProxy* writerProxy = this->GetSubSIProxy("Writer");
   if (writerProxy)
     {
     vtkClientServerStream stream;
@@ -86,7 +86,7 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     this->Interpreter->ProcessStream(stream);
     }
 
-  vtkSIProxy* helper = this->GetSubProxyHelper("PreGatherHelper");
+  vtkSIProxy* helper = this->GetSubSIProxy("PreGatherHelper");
   if (helper)
     {
     vtkClientServerStream stream;
@@ -97,7 +97,7 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     this->Interpreter->ProcessStream(stream);
     }
 
-  helper = this->GetSubProxyHelper("PostGatherHelper");
+  helper = this->GetSubSIProxy("PostGatherHelper");
   if (helper)
     {
     vtkClientServerStream stream;
@@ -155,7 +155,7 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
 void vtkSIWriterProxy::AddInput(
   int input_port, vtkAlgorithmOutput* connection, const char* method)
 {
-  vtkSIProxy* completeArraysPM = this->GetSubProxyHelper("CompleteArrays");
+  vtkSIProxy* completeArraysPM = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
     completeArraysPM? vtkCompleteArrays::SafeDownCast(
       completeArraysPM->GetVTKObject()) : NULL;
@@ -174,7 +174,7 @@ void vtkSIWriterProxy::AddInput(
 //----------------------------------------------------------------------------
 void vtkSIWriterProxy::CleanInputs(const char* method)
 {
-  vtkSIProxy* completeArraysPM = this->GetSubProxyHelper("CompleteArrays");
+  vtkSIProxy* completeArraysPM = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
     completeArraysPM? vtkCompleteArrays::SafeDownCast(
       completeArraysPM->GetVTKObject()) : NULL;

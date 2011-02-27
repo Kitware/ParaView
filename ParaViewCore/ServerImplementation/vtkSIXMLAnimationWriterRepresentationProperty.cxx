@@ -59,7 +59,7 @@ bool vtkSIXMLAnimationWriterRepresentationProperty::Push(
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
     vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(
-      this->GetPMObject(proxy_ids[cc]));
+      this->GetSIObject(proxy_ids[cc]));
 
     // Assign unique group name for each source.
     vtksys_ios::ostringstream groupname_str;

@@ -125,7 +125,7 @@ bool vtkSICompoundSourceProxy::CreateOutputPorts()
     for (int cc=0; cc < ports; cc++)
       {
       vtkSISourceProxy* subProxy = vtkSISourceProxy::SafeDownCast(
-        this->GetSubProxyHelper(
+        this->GetSubSIProxy(
           this->Internals->ExposedPorts[cc].ProxyName.c_str()));
       if (!subProxy)
         {

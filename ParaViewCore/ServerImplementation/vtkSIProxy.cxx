@@ -36,12 +36,12 @@ class vtkSIProxy::vtkInternals
 {
 public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProperty> >
-    PropertyHelpersMapType;
-  PropertyHelpersMapType PropertyHelpers;
+    SIPropertiesMapType;
+  SIPropertiesMapType SIProperties;
 
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
-    SubProxyHelpersMapType;
-  SubProxyHelpersMapType SubProxyHelpers;
+    SubSIProxiesMapType;
+  SubSIProxiesMapType SubSIProxies;
 };
 
 vtkStandardNewMacro(vtkSIProxy);
@@ -94,7 +94,7 @@ void vtkSIProxy::Push(vtkSMMessage* message)
       message->GetExtension(ProxyState::property, cc);
 
     // Convert state to interpretor stream
-    vtkSIProperty* prop = this->GetPropertyHelper(propMsg.name().c_str());
+    vtkSIProperty* prop = this->GetSIProperty(propMsg.name().c_str());
     if (prop)
       {
       if (prop->Push(message, cc) == false)
@@ -143,9 +143,9 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       }
     }
 
-  vtkInternals::PropertyHelpersMapType::iterator iter;
-  for (iter = this->Internals->PropertyHelpers.begin(); iter !=
-    this->Internals->PropertyHelpers.end(); ++iter)
+  vtkInternals::SIPropertiesMapType::iterator iter;
+  for (iter = this->Internals->SIProperties.begin(); iter !=
+    this->Internals->SIProperties.end(); ++iter)
     {
     if (prop_names.size() == 0 ||
       prop_names.find(iter->first) != prop_names.end())
@@ -175,11 +175,11 @@ vtkSMProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 }
 
 //----------------------------------------------------------------------------
-vtkSIProperty* vtkSIProxy::GetPropertyHelper(const char* name)
+vtkSIProperty* vtkSIProxy::GetSIProperty(const char* name)
 {
-  vtkInternals::PropertyHelpersMapType::iterator iter =
-    this->Internals->PropertyHelpers.find(name);
-  if (iter != this->Internals->PropertyHelpers.end())
+  vtkInternals::SIPropertiesMapType::iterator iter =
+    this->Internals->SIProperties.find(name);
+  if (iter != this->Internals->SIProperties.end())
     {
     return iter->second.GetPointer();
     }
@@ -187,9 +187,9 @@ vtkSIProperty* vtkSIProxy::GetPropertyHelper(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkSIProxy::AddPropertyHelper(const char* name, vtkSIProperty* property)
+void vtkSIProxy::AddSIProperty(const char* name, vtkSIProperty* property)
 {
-  this->Internals->PropertyHelpers[name] = property;
+  this->Internals->SIProperties[name] = property;
 }
 
 //----------------------------------------------------------------------------
@@ -269,7 +269,7 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
     const ProxyState_SubProxy& subproxyMsg =
       message->GetExtension(ProxyState::subproxy, cc);
     vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(
-      this->GetPMObject(subproxyMsg.global_id()));
+      this->GetSIObject(subproxyMsg.global_id()));
     if (subproxy == NULL)
       {
       // This code has been commented to support ImplicitPlaneWidgetRepresentation
@@ -285,7 +285,7 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
       }
     else
       {
-      this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
+      this->Internals->SubSIProxies[subproxyMsg.name()] = subproxy;
       }
     }
 
@@ -346,9 +346,9 @@ void vtkSIProxy::UpdateInformation()
     }
 
   // Call UpdateInformation() on all subproxies.
-  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
+  for (unsigned int cc=0; cc < this->GetNumberOfSubSIProxys(); cc++)
     {
-    vtkSIProxy* src = vtkSIProxy::SafeDownCast(this->GetSubProxyHelper(cc));
+    vtkSIProxy* src = vtkSIProxy::SafeDownCast(this->GetSubSIProxy(cc));
     if (src)
       {
       src->UpdateInformation();
@@ -404,7 +404,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   // Since the XML is "cleaned" out, we are assured that there are no duplicate
   // properties.
   const char* name = propElement->GetAttribute("name");
-  assert(name && this->GetPropertyHelper(name) == NULL);
+  assert(name && this->GetSIProperty(name) == NULL);
 
   // Patch XML to remove InformationHelper and set right kernel_class
   vtkSMProxyDefinitionManager::PatchXMLProperty(propElement);
@@ -441,33 +441,33 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
     return false;
     }
 
-  this->AddPropertyHelper(name, property);
+  this->AddSIProperty(name, property);
   return true;
 }
 
 //----------------------------------------------------------------------------
-vtkSIProxy* vtkSIProxy::GetSubProxyHelper(const char* name)
+vtkSIProxy* vtkSIProxy::GetSubSIProxy(const char* name)
 {
-  return this->Internals->SubProxyHelpers[name];
+  return this->Internals->SubSIProxies[name];
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSIProxy::GetNumberOfSubProxyHelpers()
+unsigned int vtkSIProxy::GetNumberOfSubSIProxys()
 {
-  return static_cast<unsigned int>(this->Internals->SubProxyHelpers.size());
+  return static_cast<unsigned int>(this->Internals->SubSIProxies.size());
 }
 //----------------------------------------------------------------------------
-vtkSIProxy* vtkSIProxy::GetSubProxyHelper(unsigned int cc)
+vtkSIProxy* vtkSIProxy::GetSubSIProxy(unsigned int cc)
 {
-  if (cc >= this->GetNumberOfSubProxyHelpers())
+  if (cc >= this->GetNumberOfSubSIProxys())
     {
     return NULL;
     }
 
   unsigned int index=0;
-  vtkInternals::SubProxyHelpersMapType::iterator iter;
-  for (iter = this->Internals->SubProxyHelpers.begin();
-    iter != this->Internals->SubProxyHelpers.end();
+  vtkInternals::SubSIProxiesMapType::iterator iter;
+  for (iter = this->Internals->SubSIProxies.begin();
+    iter != this->Internals->SubSIProxies.end();
     ++iter, ++index)
     {
     if (index == cc)

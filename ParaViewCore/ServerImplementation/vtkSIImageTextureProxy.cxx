@@ -43,7 +43,7 @@ bool vtkSIImageTextureProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   // Do the binding between the SubProxy source to the local input
-  vtkSIProxy* reader = this->GetSubProxyHelper("Source");
+  vtkSIProxy* reader = this->GetSubSIProxy("Source");
 
   if(reader)
     {

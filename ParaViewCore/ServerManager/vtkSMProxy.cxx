@@ -182,7 +182,7 @@ vtkObjectBase* vtkSMProxy::GetClientSideObject()
 
     vtkTypeUInt32 gid = this->GetGlobalID();
     vtkSIProxy* pmproxy =
-      vtkSIProxy::SafeDownCast(this->Session->GetPMObject(gid));
+      vtkSIProxy::SafeDownCast(this->Session->GetSIObject(gid));
     if (pmproxy)
       {
       return pmproxy->GetVTKObject();
@@ -1989,7 +1989,7 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke
             << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
-            << "GetPMObject"
+            << "GetSIObject"
             << manipulator.Reference->GetGlobalID()
             << vtkClientServerStream::End;
   stream << substream;

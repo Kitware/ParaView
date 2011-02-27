@@ -52,11 +52,11 @@ void vtkSIObject::Initialize(vtkSMSessionCore* session)
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSIObject::GetPMObject(vtkTypeUInt32 globalid) const
+vtkSIObject* vtkSIObject::GetSIObject(vtkTypeUInt32 globalid) const
 {
   if (this->SessionCore)
     {
-    return this->SessionCore->GetPMObject(globalid);
+    return this->SessionCore->GetSIObject(globalid);
     }
   return NULL;
 }

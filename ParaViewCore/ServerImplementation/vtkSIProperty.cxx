@@ -30,7 +30,7 @@ vtkSIProperty::vtkSIProperty()
   this->UpdateSelf = false;
   this->InformationOnly = false;
   this->Repeatable = false;
-  this->ProxyHelper = 0;
+  this->SIProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ vtkSIProperty::~vtkSIProperty()
 bool vtkSIProperty::ReadXMLAttributes(
   vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
 {
-  this->ProxyHelper = proxyhelper;
+  this->SIProxy = proxyhelper;
 
   const char* xmlname = element->GetAttribute("name");
   if(xmlname)
@@ -94,11 +94,11 @@ bool vtkSIProperty::ReadXMLAttributes(
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSIProperty::GetPMObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
 {
-  if (this->ProxyHelper)
+  if (this->SIProxy)
     {
-    return this->ProxyHelper->GetPMObject(globalid);
+    return this->SIProxy->GetSIObject(globalid);
     }
   return NULL;
 }
@@ -106,19 +106,19 @@ vtkSIObject* vtkSIProperty::GetPMObject(vtkTypeUInt32 globalid)
 //----------------------------------------------------------------------------
 bool vtkSIProperty::ProcessMessage(vtkClientServerStream& stream)
 {
-  if (this->ProxyHelper && this->ProxyHelper->GetVTKObject())
+  if (this->SIProxy && this->SIProxy->GetVTKObject())
     {
-    return this->ProxyHelper->GetInterpreter()->ProcessStream(stream) != 0;
+    return this->SIProxy->GetInterpreter()->ProcessStream(stream) != 0;
     }
-  return this->ProxyHelper ? true : false;
+  return this->SIProxy ? true : false;
 }
 
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSIProperty::GetVTKObject()
 {
-  if (this->ProxyHelper)
+  if (this->SIProxy)
     {
-    return this->ProxyHelper->GetVTKObject();
+    return this->SIProxy->GetVTKObject();
     }
   return NULL;
 }
@@ -126,9 +126,9 @@ vtkObjectBase* vtkSIProperty::GetVTKObject()
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkSIProperty::GetLastResult()
 {
-  if (this->ProxyHelper)
+  if (this->SIProxy)
     {
-    return this->ProxyHelper->GetInterpreter()->GetLastResult();
+    return this->SIProxy->GetInterpreter()->GetLastResult();
     }
 
   static vtkClientServerStream stream;

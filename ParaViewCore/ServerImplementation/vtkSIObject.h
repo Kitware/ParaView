@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Initializes the instance. Session is the session to which this instance
-  // belongs to. During initialization, the PMObject basically obtains ivars for
+  // belongs to. During initialization, the SIObject basically obtains ivars for
   // necessary components.
   virtual void Initialize(vtkSMSessionCore* session);
 
@@ -62,7 +62,7 @@ public:
 
   // Description:
   // Convenience method to obtain a vtkSIObject subclass given its global id.
-  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid) const;
+  vtkSIObject* GetSIObject(vtkTypeUInt32 globalid) const;
 
   // Description:
   // Convenience method to obtain a vtkObject subclass given its

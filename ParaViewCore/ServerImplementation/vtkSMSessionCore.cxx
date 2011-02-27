@@ -68,7 +68,7 @@ namespace
       break;
 
     case vtkSMSessionCore::DELETE_SI:
-      sessioncore->DeletePMObjectSatelliteCallback();
+      sessioncore->DeleteSIObjectSatelliteCallback();
       break;
       }
     }
@@ -84,14 +84,14 @@ public:
     }
   ~vtkInternals()
     {
-    // Remove PMObject left in the right order...
-    PMObjectMapType::iterator iter;
+    // Remove SIObject left in the right order...
+    SIObjectMapType::iterator iter;
     int nbFound, nbDelete;
     nbFound = nbDelete = 1;
     while(nbFound > 0)
       {
       nbDelete = nbFound = 0;
-      for(iter = this->PMObjectMap.begin();iter != this->PMObjectMap.end(); iter++)
+      for(iter = this->SIObjectMap.begin();iter != this->SIObjectMap.end(); iter++)
         {
         vtkSIObject* obj = iter->second;
         if(obj)
@@ -110,8 +110,8 @@ public:
   void Delete(vtkTypeUInt32 globalUniqueId)
     {
     // Remove PM
-    PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
-    if (iter != this->PMObjectMap.end())
+    SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
+    if (iter != this->SIObjectMap.end())
       {
       if(iter->second)
         {
@@ -131,10 +131,10 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  vtkSIObject* GetPMObject(vtkTypeUInt32 globalUniqueId)
+  vtkSIObject* GetSIObject(vtkTypeUInt32 globalUniqueId)
     {
-    PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
-    if (iter != this->PMObjectMap.end())
+    SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
+    if (iter != this->SIObjectMap.end())
       {
       return iter->second.GetPointer();
       }
@@ -179,10 +179,10 @@ public:
     }
   //---------------------------------------------------------------------------
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject> >
-    PMObjectMapType;
+    SIObjectMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> >
     RemoteObjectMapType;
-  PMObjectMapType PMObjectMap;
+  SIObjectMapType SIObjectMap;
   RemoteObjectMapType RemoteObjectMap;
   unsigned long InterpreterObserverID;
   vtkstd::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
@@ -326,9 +326,9 @@ int vtkSMSessionCore::GetNumberOfProcesses()
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkSMSessionCore::GetSIObject(vtkTypeUInt32 globalid)
 {
-  return this->Internals->GetPMObject(globalid);
+  return this->Internals->GetSIObject(globalid);
 }
 //----------------------------------------------------------------------------
 vtkObject* vtkSMSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
@@ -366,9 +366,9 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
     }
   // FIXME ----------------------------------------------------------
 
-  // When the control reaches here, we are assured that the PMObject needs be
+  // When the control reaches here, we are assured that the SIObject needs be
   // created/exist on the local process.
-  vtkSIObject* obj = this->Internals->GetPMObject(globalId);
+  vtkSIObject* obj = this->Internals->GetSIObject(globalId);
   if (!obj)
     {
     if (!message->HasExtension(DefinitionHeader::server_class))
@@ -395,14 +395,14 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       }
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
-    this->Internals->PMObjectMap[globalId] = obj; // WeakPointer map
+    this->Internals->SIObjectMap[globalId] = obj; // WeakPointer map
 
     LOG (
       << "----------------------------------------------------------------\n"
       << "New " << globalId << " : " << obj->GetClassName() <<"\n");
     }
 
-  // Push the message to the PMObject.
+  // Push the message to the SIObject.
   obj->Push(message);
 }
 
@@ -444,7 +444,7 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
       }
     }
 
-  // When the control reaches here, we are assured that the PMObject needs be
+  // When the control reaches here, we are assured that the SIObject needs be
   // created/exist on the local process.
   this->PushStateInternal(message);
 }
@@ -500,10 +500,10 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
         break;
       }
     }
-  else if(true &&  // FIXME make sure that the PMObject should be created here
-          (obj = this->Internals->GetPMObject(message->global_id())))
+  else if(true &&  // FIXME make sure that the SIObject should be created here
+          (obj = this->Internals->GetSIObject(message->global_id())))
     {
-    // Generic PMObject
+    // Generic SIObject
     obj->Pull(message);
     }
 
@@ -601,7 +601,7 @@ void vtkSMSessionCore::ExecuteStreamInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
+void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
@@ -639,11 +639,11 @@ void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
       }
     }
 
-  this->DeletePMObjectInternal(message);
+  this->DeleteSIObjectInternal(message);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeletePMObjectSatelliteCallback()
+void vtkSMSessionCore::DeleteSIObjectSatelliteCallback()
 {
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -658,13 +658,13 @@ void vtkSMSessionCore::DeletePMObjectSatelliteCallback()
     }
   else
     {
-    this->DeletePMObjectInternal(&message);
+    this->DeleteSIObjectInternal(&message);
     }
   delete [] raw_data;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeletePMObjectInternal(vtkSMMessage* message)
+void vtkSMSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
 {
   LOG(
     << "----------------------------------------------------------------\n"
@@ -684,9 +684,9 @@ bool vtkSMSessionCore::GatherInformationInternal(
     return true;
     }
 
-  // default is to gather information from VTKObject, if FromPMObject is true,
-  // then gather from PMObject.
-  vtkSIObject* pmobject = this->GetPMObject(globalid);
+  // default is to gather information from VTKObject, if FromSIObject is true,
+  // then gather from SIObject.
+  vtkSIObject* pmobject = this->GetSIObject(globalid);
   if (!pmobject)
     {
     vtkErrorMacro("No object with global-id: " << globalid);
@@ -694,14 +694,14 @@ bool vtkSMSessionCore::GatherInformationInternal(
     }
 
   vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(pmobject);
-  if (pmproxy /*&& !information->GetUsePMObject()*/)
+  if (pmproxy /*&& !information->GetUseSIObject()*/)
     {
     vtkObject* object = vtkObject::SafeDownCast(pmproxy->GetVTKObject());
     information->CopyFromObject(object);
     }
   else
     {
-    // gather information from PMObject itself.
+    // gather information from SIObject itself.
     information->CopyFromObject(pmobject);
     }
   return true;

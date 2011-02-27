@@ -60,7 +60,7 @@ public:
 
   // Description:
   // Provides access to the property helper.
-  vtkSIProperty* GetPropertyHelper(const char* name);
+  vtkSIProperty* GetSIProperty(const char* name);
 
   // Description:
   // Returns the VTKClassName.
@@ -86,12 +86,12 @@ protected:
 
   // Description:
   // Returns the subproxy helper for the subproxy with the given name, if any.
-  vtkSIProxy* GetSubProxyHelper(const char* name);
+  vtkSIProxy* GetSubSIProxy(const char* name);
 
   // Description:
   // API to iterate over subproxy helpers.
-  unsigned int GetNumberOfSubProxyHelpers();
-  vtkSIProxy* GetSubProxyHelper(unsigned int cc);
+  unsigned int GetNumberOfSubSIProxys();
+  vtkSIProxy* GetSubSIProxy(unsigned int cc);
 
   // Description:
   // Provides access to the vtkSMProxyDefinitionManager held by the session.
@@ -119,8 +119,8 @@ protected:
   virtual bool ReadXMLSubProxy(vtkPVXMLElement* subproxy_element);
 
   // Description:
-  // Adds a property helper.
-  void AddPropertyHelper(const char* name, vtkSIProperty*);
+  // Adds a vtkSMProperty's server-implementation.
+  void AddSIProperty(const char* name, vtkSIProperty*);
 
   vtkSetStringMacro(VTKClassName);
   vtkSetStringMacro(XMLGroup);

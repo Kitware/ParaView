@@ -16,7 +16,7 @@
 // parts on server as well as client processes.
 // .SECTION Description
 // Abstract class involved in ServerManager class hierarchy that has a
-// corresponding PMObject which can be local or remote.
+// corresponding SIObject which can be local or remote.
 
 #ifndef __vtkSMRemoteObject_h
 #define __vtkSMRemoteObject_h

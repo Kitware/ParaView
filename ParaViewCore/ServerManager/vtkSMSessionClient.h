@@ -131,8 +131,8 @@ protected:
   void SetupDataServerRenderServerConnection();
 
   // Description:
-  // Delete server side object. (PMObject)
-  virtual void DeletePMObject(vtkSMMessage* msg);
+  // Delete server side object. (SIObject)
+  virtual void DeleteSIObject(vtkSMMessage* msg);
 
   // Description:
   // Translates the location to a real location based on whether a separate

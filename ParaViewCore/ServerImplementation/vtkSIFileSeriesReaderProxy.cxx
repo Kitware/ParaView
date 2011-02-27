@@ -51,7 +51,7 @@ bool vtkSIFileSeriesReaderProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   // Connect reader and set filename method
-  vtkObjectBase *reader = this->GetSubProxyHelper("Reader")->GetVTKObject();
+  vtkObjectBase *reader = this->GetSubSIProxy("Reader")->GetVTKObject();
   if (!reader)
     {
     vtkErrorMacro("Missing subproxy: Reader");

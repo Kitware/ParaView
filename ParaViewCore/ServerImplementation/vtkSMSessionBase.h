@@ -111,12 +111,12 @@ public:
 
   // Description:
   // Returns a vtkSIObject or subclass given its global id, if any.
-  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid);
+  vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
 //BTX
   // Description:
-  // Delete server side object. (PMObject)
-  virtual void DeletePMObject(vtkSMMessage* msg);
+  // Delete server side object. (SIObject)
+  virtual void DeleteSIObject(vtkSMMessage* msg);
 //ETX
 
   // Description:

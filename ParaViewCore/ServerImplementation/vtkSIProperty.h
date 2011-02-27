@@ -80,7 +80,7 @@ protected:
 
   // Description:
   // Convenience method to obtain a vtkSIObject subclass given its global id.
-  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid);
+  vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Push a new state to the underneath implementation
@@ -110,7 +110,7 @@ protected:
   bool Repeatable;
   bool IsInternal;
 
-  vtkWeakPointer<vtkSIProxy> ProxyHelper;
+  vtkWeakPointer<vtkSIProxy> SIProxy;
 
 private:
   vtkSIProperty(const vtkSIProperty&); // Not implemented

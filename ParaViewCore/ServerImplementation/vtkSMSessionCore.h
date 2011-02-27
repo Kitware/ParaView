@@ -72,12 +72,12 @@ public:
 
   // Description:
   // Invoke a method remotely
-  virtual void DeletePMObject(vtkSMMessage* message);
+  virtual void DeleteSIObject(vtkSMMessage* message);
   //ETX
 
   // Description:
   // Returns a vtkSIObject or subclass given its global id, if any.
-  vtkSIObject* GetPMObject(vtkTypeUInt32 globalid);
+  vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Return a vtkObject given its global id if any otherwise return NULL;
@@ -121,7 +121,7 @@ public:
   void PushStateSatelliteCallback();
   void ExecuteStreamSatelliteCallback();
   void GatherInformationStatelliteCallback();
-  void DeletePMObjectSatelliteCallback();
+  void DeleteSIObjectSatelliteCallback();
 
   // Description:
   // Allow the user to fill its vtkCollection with all RemoteObject
@@ -141,7 +141,7 @@ protected:
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);
 
-  virtual void DeletePMObjectInternal(vtkSMMessage* message);
+  virtual void DeleteSIObjectInternal(vtkSMMessage* message);
 
   // Description:
   // Callback for reporting interpreter errors.

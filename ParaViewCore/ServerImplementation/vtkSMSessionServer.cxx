@@ -331,7 +331,7 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->DeletePMObject(&msg);
+      this->DeleteSIObject(&msg);
       }
     break;
 
