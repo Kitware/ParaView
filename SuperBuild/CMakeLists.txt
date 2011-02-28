@@ -248,10 +248,19 @@ set(PNG_ARGS
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
 
-if(NOT WIN32 AND NOT APPLE)
-  #include(External_Silo)
-  #list(APPEND ParaView_dependencies Silo)
+list(APPEND HDF5_dependencies zlib)
+list(APPEND ParaView_dependencies HDF5)
+include(External_HDF5)
 
+list(APPEND Silo_dependencies zlib HDF5)
+list(APPEND ParaView_dependencies Silo)
+include(External_Silo)
+set(Silo_ARGS
+  -DVISIT_BUILD_READER_Silo:BOOL=ON
+  -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
+  -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
+
+if(NOT WIN32 AND NOT APPLE)
   include(External_FFMPEG)
   set(FFMPEG_ARGS
     -DVTK_USE_FFMPEG_ENCODER:BOOL=ON
@@ -315,9 +324,7 @@ ExternalProject_Add(${proj}
     #-DVISIT_BUILD_READER_CGNS:BOOL=ON
     #-DCGNS_INCLUDE_DIR:PATH=
     #-DCGNS_LIBRARY:FILEPATH=
-    #-DVISIT_BUILD_READER_Silo:BOOL=ON
-    #-DSILO_INCLUDE_DIR:PATH=
-    #-DSILO_LIBRARY:FILEPATH=
+    ${Silo_ARGS}
     # Documentation
     # VisTrails
     ${VISTRAILS_ARGS}

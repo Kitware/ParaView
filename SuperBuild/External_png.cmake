@@ -1,7 +1,7 @@
 
 # The png external project for ParaView
 set(png_source "${CMAKE_CURRENT_BINARY_DIR}/png")
-set(png_binary "${CMAKE_CURRENT_BINARY_DIR}/png-build")
+set(png_build "${CMAKE_CURRENT_BINARY_DIR}/png-build")
 set(png_install "${CMAKE_CURRENT_BINARY_DIR}/png-install")
 
 # If Windows we use CMake otherwise ./configure
@@ -12,7 +12,7 @@ if(WIN32)
   URL_MD5 ${PNG_MD5}
   UPDATE_COMMAND ""
   SOURCE_DIR ${png_source}
-  BINARY_DIR ${png_binary}
+  BINARY_DIR ${png_build}
   INSTALL_DIR ${png_install}
   CMAKE_CACHE_ARGS
     -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}

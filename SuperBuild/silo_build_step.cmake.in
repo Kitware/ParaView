@@ -1,14 +1,24 @@
 
 if(WIN32)
 
-  set(ENV{ZLIB_INC_DIR} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
-  set(ENV{ZLIB_LIB_DIR} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
-  set(ENV{HDF5_INC_DIR} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
-  set(ENV{HDF5_LIB_DIR} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
+  set(ENV{ZLIB_INC_DIR} "\"@zlib_install@/include\"")
+  set(ENV{ZLIB_LIB_DIR} "\"@zlib_install@/lib\"")
+  set(ENV{HDF5_INC_DIR} "\"@hdf5_install@/include\"")
+  set(ENV{HDF5_LIB_DIR} "\"@hdf5_install@/lib\"")
 
   EXECUTE_PROCESS(
-    COMMAND ${CMAKE_BUILD_TOOL} @Silo_source@/SilowWindows/MSVC8/SiloWindows.sln /build DLLwithHDF5 /project Silo
-    WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@/@proj@-build"
+    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /Upgrade
+    WORKING_DIRECTORY "@Silo_source@"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project pdb_detect
+    WORKING_DIRECTORY "@Silo_source@"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project Silo
+    WORKING_DIRECTORY "@Silo_source@"
     )
 
 endif()
