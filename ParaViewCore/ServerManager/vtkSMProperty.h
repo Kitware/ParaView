@@ -99,15 +99,6 @@ public:
   vtkGetMacro(ImmediateUpdate, int);
 
   // Description:
-  // Advanced. If UpdateSelf is true, the property will be pushed
-  // by calling the method (Command) on the proxy instead of the
-  // VTK object. This is commonly used to implement more complicated
-  // functionality than can be obtained by calling a method on all
-  // server objects.
-  vtkSetMacro(UpdateSelf, int);
-  vtkGetMacro(UpdateSelf, int);
-
-  // Description:
   // Returns true if all values are in all domains, false otherwise.
   // The domains will check the unchecked values (SetUncheckedXXX()) 
   // instead of the actual values.
@@ -271,8 +262,7 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset),
-                        vtkSMStateLocator* vtkNotUsed(locator)) {};
+  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset)) {};
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -340,7 +330,6 @@ protected:
   vtkSMPropertyInternals* PInternals;
 
   int ImmediateUpdate;
-  int UpdateSelf;
   int Animateable;
   int IsInternal;
 

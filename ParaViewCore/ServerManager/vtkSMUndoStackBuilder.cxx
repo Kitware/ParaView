@@ -125,7 +125,7 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 }
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
-                                           vtkTypeUInt32 globalId,
+                                           vtkTypeUInt32 vtkNotUsed(globalId),
                                            const vtkSMMessage *previousState,
                                            const vtkSMMessage *newState)
 {

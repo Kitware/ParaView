@@ -1131,15 +1131,6 @@
          <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
-      <Property name="OnInteraction"
-        command="OnInteraction"
-        update_self="1">
-      </Property>
-
-      <Property name="OnEndInteraction"
-        command="OnEndInteraction"
-        update_self="1">
-      </Property>
     </ImplicitPlaneRepresentationProxy>
 
     <!-- ================================================================== -->

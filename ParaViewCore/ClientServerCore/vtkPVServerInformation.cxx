@@ -110,7 +110,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
+void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if(!pm)

@@ -63,8 +63,7 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
-                                      vtkSMStateLocator* locator)
+void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
 {
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();

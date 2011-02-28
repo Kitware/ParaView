@@ -342,10 +342,10 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       unsigned char* css_data = new unsigned char[size+1];
       this->ClientController->Receive(css_data, size, 1,
         vtkSMSessionServer::EXECUTE_STREAM_TAG);
-      vtkClientServerStream stream;
-      stream.SetData(css_data, size);
+      vtkClientServerStream cssStream;
+      cssStream.SetData(css_data, size);
       this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS,
-        stream, ignore_errors != 0);
+        cssStream, ignore_errors != 0);
       delete [] css_data;
       }
     break;

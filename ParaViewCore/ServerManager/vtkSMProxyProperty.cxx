@@ -385,8 +385,7 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
-                                  vtkSMStateLocator* locator)
+void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
 {
   // FIXME this method is REALLY close to its vtkSMInputProperty subClass
   // Please keep them in sync

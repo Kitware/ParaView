@@ -81,8 +81,7 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
-                                  vtkSMStateLocator* locator)
+void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
 {
   // --------------------------------------------------------------------------
   // WARNING: this method is REALLY close to its superclass: Please keep them

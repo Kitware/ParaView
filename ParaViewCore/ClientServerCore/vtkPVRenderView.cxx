@@ -911,8 +911,9 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
       {
       return true;
       }
+  default:
+    return false;
     }
-  return false;
 }
 
 //----------------------------------------------------------------------------

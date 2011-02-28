@@ -46,7 +46,6 @@ vtkSMProperty::vtkSMProperty()
   this->Command = 0;
   this->ImmediateUpdate = 0;
   this->Animateable = 2; // By default Animateable in advanced mode only.
-  this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
   this->XMLLabel = 0;
@@ -58,7 +57,7 @@ vtkSMProperty::vtkSMProperty()
   this->IsInternal = 0;
   this->Documentation = 0;
   this->Repeatable = 0;
-  
+
   this->Hints = 0;
   this->BlockModifiedEvents = false;
   this->PendingModifiedEvents = false;
@@ -291,18 +290,11 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
     }
 
   int repeatable;
-  int retVal = element->GetScalarAttribute("repeatable", &repeatable);
-  if(retVal) 
+  int retVal = 1;
+  if( element->GetScalarAttribute("repeatable", &repeatable) ||
+      element->GetScalarAttribute("repeat_command", &repeatable))
     { 
     this->Repeatable = repeatable;
-    }
-  else
-    {
-    int retVal = element->GetScalarAttribute("repeat_command", &repeatable);
-    if(retVal)
-      {
-      this->Repeatable = repeatable;
-      }
     }
 
   const char* information_property = 
@@ -330,13 +322,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
     this->StateIgnoredOff(); // Default value
     }
 
-  int update_self;
-  retVal = element->GetScalarAttribute("update_self", &update_self);
-  if(retVal) 
-    { 
-    this->SetUpdateSelf(update_self); 
-    }
-
   int information_only;
   retVal = element->GetScalarAttribute("information_only", &information_only);
   if(retVal) 
@@ -355,6 +340,18 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
   if (element->GetScalarAttribute("is_internal", &is_internal))
     {
     this->SetIsInternal(is_internal);
+    }
+
+  // Manage deprecated XML definition
+  int deprecated_attr_value;
+  if(element->GetScalarAttribute("update_self", &deprecated_attr_value))
+    {
+    vtksys_ios::ostringstream proxyXML;
+    element->GetParent()->PrintXML(proxyXML, vtkIndent(1));
+    vtkWarningMacro(<< "Attribute update_self is not managed anymore."
+                    << "It is deprecated. " << endl
+                    << "Please FIX the decalaration of the following Proxy."
+                    << endl << proxyXML.str().c_str());
     }
 
   // Read and create domains.
@@ -476,7 +473,6 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Command: " 
      << (this->Command ? this->Command : "(null)") << endl;
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
-  os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
   os << indent << "InformationOnly:" << this->InformationOnly << endl;
   os << indent << "XMLName:" 
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;

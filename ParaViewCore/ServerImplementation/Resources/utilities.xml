@@ -70,7 +70,6 @@
         name="ArrayName"
         command="SetArrayName"
         number_of_elements="1"
-        update_self="1"
         default_values="">
       </StringVectorProperty>
 
@@ -395,7 +394,6 @@
       <DoubleVectorProperty
          name="Origin"
          command="SetOrigin"
-         update_self="1"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
          <BoundsDomain name="range" mode="normal" default_mode="mid">
@@ -416,7 +414,6 @@
       <DoubleVectorProperty
          name="Offset"
          command="SetOffset"
-         update_self="1"
          number_of_elements="1"
          animateable="1"
          default_values="0.0" >
@@ -480,7 +477,6 @@
         name="Position"
         command="SetPosition"
         number_of_elements="3"
-        update_self="1"
         animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
@@ -489,7 +485,6 @@
         name="Rotation"
         command="SetRotation"
         number_of_elements="3"
-        update_self="1"
         animateable="1"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
@@ -499,7 +494,6 @@
         command="SetScale"
         number_of_elements="3"
         animateable="1"
-        update_self="1"
         default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
@@ -1380,7 +1374,6 @@
         name="Position"
         command="SetPosition"
         number_of_elements="2"
-        update_self="1"
         default_values="0.87 0.25"
         animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
@@ -1390,7 +1383,6 @@
         name="Position2"
         command="SetPosition2"
         number_of_elements="2"
-        update_self="1"
         default_values="0.13 0.5"
         animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
@@ -1850,7 +1842,6 @@
       name="Position"
       command="SetAbsolutePosition"
       number_of_elements="3"
-      update_self="1"
       label="Translate"
       information_property="PositionInfo"
       default_values="0.0 0.0 0.0" >
@@ -1867,7 +1858,6 @@
       name="Rotation"
       command="SetAbsoluteRotation"
       number_of_elements="3"
-      update_self="1"
       information_property="RotationInfo"
       label="Rotate"
       default_values="0.0 0.0 0.0" >
@@ -1884,7 +1874,6 @@
       name="Scale"
       command="SetAbsoluteScale"
       number_of_elements="3"
-      update_self="1"
       label="Scale"
       information_property="ScaleInfo"
       default_values="1.0 1.0 1.0" >

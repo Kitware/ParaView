@@ -534,7 +534,7 @@ void vtkPVProgressHandler::SendProgressToClient(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::ReceiveProgressFromServer(vtkMultiProcessController*)
+void vtkPVProgressHandler::ReceiveProgressFromServer(vtkMultiProcessController* vtkNotUsed(ctr))
 {
   // Nothing to do here. We cannot do non-block receive on SocketController.
   // All progress events from the server will be received as a consequence of

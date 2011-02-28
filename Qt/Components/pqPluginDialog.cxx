@@ -289,7 +289,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
 //----------------------------------------------------------------------------
 void pqPluginDialog::addInfoNodes(
   QTreeWidgetItem* pluginNode, vtkPVPluginsInformation* plInfo,
-  unsigned int index, bool remote)
+  unsigned int index, bool vtkNotUsed(remote))
 {
   Qt::ItemFlags infoFlags(Qt::ItemIsEnabled);
   

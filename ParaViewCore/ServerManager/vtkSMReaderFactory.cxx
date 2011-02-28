@@ -234,7 +234,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   const char* filename,
   const vtkstd::vector<vtkstd::string>& extensions,
-  vtkSMSession* session,
+  vtkSMSession* vtkNotUsed(session),
   bool skip_filename_test/*=false*/)
 {
   vtkSMProxyManager* pxm = this->GetProxyManager();
@@ -611,7 +611,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* session)
+bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* vtkNotUsed(session))
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
@@ -656,7 +656,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
-  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* session)
+  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* vtkNotUsed(session))
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );

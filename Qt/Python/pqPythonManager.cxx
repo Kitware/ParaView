@@ -175,22 +175,24 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-    pqServerResource serverRes = activeServer->getResource();
-    int reversed = (serverRes.scheme() == "csrc" ||
-      serverRes.scheme() == "cdsrsrc") ? 1 : 0;
-    QString dsHost(""), rsHost("");
-    int dsPort = 0, rsPort = 0;
-    QString strURI = serverRes.toURI();
-    if(strURI != "builtin:")
-      {
-      dsHost = serverRes.dataServerHost().isEmpty() ?
-        serverRes.host() : serverRes.dataServerHost();
-      dsPort = serverRes.dataServerPort() < 0 ? 
-        serverRes.port() : serverRes.dataServerPort();
-      rsHost = serverRes.renderServerHost();
-      rsPort = serverRes.renderServerPort() < 0 ? 
-        rsPort : serverRes.renderServerPort();
-      }
+
+    // Deprecated code...
+//    pqServerResource serverRes = activeServer->getResource();
+//    int reversed = (serverRes.scheme() == "csrc" ||
+//      serverRes.scheme() == "cdsrsrc") ? 1 : 0;
+//    QString dsHost(""), rsHost("");
+//    int dsPort = 0, rsPort = 0;
+//    QString strURI = serverRes.toURI();
+//    if(strURI != "builtin:")
+//      {
+//      dsHost = serverRes.dataServerHost().isEmpty() ?
+//        serverRes.host() : serverRes.dataServerHost();
+//      dsPort = serverRes.dataServerPort() < 0 ?
+//        serverRes.port() : serverRes.dataServerPort();
+//      rsHost = serverRes.renderServerHost();
+//      rsPort = serverRes.renderServerPort() < 0 ?
+//        rsPort : serverRes.renderServerPort();
+//      }
       
     QString initStr = QString(
       "import paraview\n"

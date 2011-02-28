@@ -68,8 +68,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqUndoStack::pqUndoStack(bool clientOnly, 
-  vtkSMUndoStackBuilder* builder,
+pqUndoStack::pqUndoStack( vtkSMUndoStackBuilder* builder,
   QObject* _parent/*=null*/) 
 :QObject(_parent)
 {

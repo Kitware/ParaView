@@ -267,11 +267,11 @@ struct vtkSMProxyManagerInternals
 
       if(!proxy)
         {
-        vtkSMProxy *proxy = this->ProxyManager->ReNewProxy(reg.global_id(), locator);
-        if(proxy)
+        vtkSMProxy *reNewProxy = this->ProxyManager->ReNewProxy(reg.global_id(), locator);
+        if(reNewProxy)
           {
-          newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
-          proxy->Delete();
+          newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), reNewProxy));
+          reNewProxy->Delete();
           }
         }
       else

@@ -411,7 +411,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 
   it->second.ModifiedFlag = flag;
 
-  if (flag && !this->DoNotUpdateImmediately && prop->GetImmediateUpdate())
+  if (flag && !this->DoNotUpdateImmediately)
     {
     this->UpdateProperty(it->first.c_str());
     }
@@ -1764,14 +1764,6 @@ int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
                            vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  int servers = 0;
-  // This overrides the location setup by the configuration when old state files
-  // are loaded causing issues.
-  // if (proxyElement->GetScalarAttribute("servers", &servers))
-  //   {
-  //   this->SetLocation(servers);
-  //   }
-
   for (unsigned int i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
@@ -1870,7 +1862,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
       it = this->Internals->Properties.find(pname);
       if (it != this->Internals->Properties.end())
         {
-        it->second.Property->ReadFrom(message, i, locator);
+        it->second.Property->ReadFrom(message, i);
         touchedProperties.push_back(it->second.Property.GetPointer());
         }
       }

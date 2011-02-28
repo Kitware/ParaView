@@ -58,7 +58,7 @@ void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-  vtkSMSession* session,
+  vtkSMSession* vtkNotUsed(session),
   vtkSelectionNode* selection,
   vtkSMProxy* selSource /*=NULL*/)
 {

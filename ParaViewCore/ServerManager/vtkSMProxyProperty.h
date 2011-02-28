@@ -164,8 +164,7 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset,
-                        vtkSMStateLocator* locator);
+  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset);
 
   virtual void RemoveAllProxies(int modify);
 

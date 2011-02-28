@@ -69,8 +69,7 @@ int vtkSMPropertyModificationUndoElement::RevertToState()
                               proxy->GetProperty(this->PropertyName) : NULL );
   if (property)
     {
-    // FIXME use the UndoSet locator...
-    property->ReadFrom(this->PropertyState, 0, proxy->GetSession()->GetStateLocator()); // 0 because only one
+    property->ReadFrom(this->PropertyState, 0); // 0 because only one
     proxy->UpdateProperty(this->PropertyName);
     }
   return 1;

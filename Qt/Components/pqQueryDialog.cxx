@@ -180,7 +180,6 @@ void pqQueryDialog::setupSpreadSheet()
     return;
     }
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkIdType cid = this->Internals->source->currentPort()->getServer()->GetConnectionID();
 
   vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
   // we always want to show all the blocks in the dataset, since we don't have a
