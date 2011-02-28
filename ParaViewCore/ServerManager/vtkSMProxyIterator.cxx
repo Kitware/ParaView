@@ -32,8 +32,8 @@ vtkSMProxyIterator::vtkSMProxyIterator()
 {
   this->Internals = new vtkSMProxyIteratorInternals;
   this->Mode = vtkSMProxyIterator::ALL;
-  this->Begin();
   this->SkipPrototypes = true;
+  this->Begin();
 }
 
 //---------------------------------------------------------------------------
