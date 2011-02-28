@@ -813,7 +813,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   // to be set during update since it may request re-renders if magnification >1.
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << w2i << "Update"
+         << w2i.GetPointer() << "Update"
          << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
 

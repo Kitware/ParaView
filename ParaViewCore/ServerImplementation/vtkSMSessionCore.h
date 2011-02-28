@@ -136,7 +136,7 @@ protected:
   // Description:
   virtual void PushStateInternal(vtkSMMessage*);
   virtual void ExecuteStreamInternal(
-    const unsigned char* raw_message, size_t size, bool ignore_errors);
+    const vtkClientServerStream& stream, bool ignore_errors);
   bool GatherInformationInternal(
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);

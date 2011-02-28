@@ -529,9 +529,6 @@ void vtkSMSessionCore::ExecuteStream(
     this->ParallelController->GetLocalProcessId() == 0 ||
     this->SymmetricMPIMode);
 
-  size_t byte_size;
-  const unsigned char *raw_data;
-  stream.GetData(&raw_data, &byte_size);
 
   if ( (location & vtkProcessModule::SERVERS) != 0 &&
     !this->SymmetricMPIMode)
@@ -544,6 +541,9 @@ void vtkSMSessionCore::ExecuteStream(
       {
       // Forward the message to the satellites if the object is expected to exist
       // on the satellites.
+      size_t byte_size;
+      const unsigned char *raw_data;
+      stream.GetData(&raw_data, &byte_size);
 
       // FIXME: There's one flaw in this logic. If a object is to be created on
       // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
@@ -562,7 +562,7 @@ void vtkSMSessionCore::ExecuteStream(
       }
     }
 
-  this->ExecuteStreamInternal(raw_data, byte_size, ignore_errors);
+  this->ExecuteStreamInternal(stream, ignore_errors);
 }
 
 //----------------------------------------------------------------------------
@@ -572,31 +572,28 @@ void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
   this->ParallelController->Broadcast(byte_size, 2, 0);
   unsigned char *raw_data = new unsigned char[byte_size[0] + 1];
   this->ParallelController->Broadcast(raw_data, byte_size[0], 0);
-  this->ExecuteStreamInternal(raw_data, byte_size[0], byte_size[1] != 0);
+
+  vtkClientServerStream stream;
+  stream.SetData(raw_data, byte_size[0]);
+  this->ExecuteStreamInternal(stream, byte_size[1] != 0);
   delete [] raw_data;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::ExecuteStreamInternal(
-  const unsigned char* raw_message, size_t size, bool ignore_errors)
+  const vtkClientServerStream& stream, bool ignore_errors)
 {
-  if (this->LogStream)
-    {
-    vtksys_ios::ostringstream log;
-    vtkClientServerStream temp;
-    temp.SetData(raw_message, size);
-    LOG(
-      << "----------------------------------------------------------------\n"
-      << "ExecuteStream  (" << size << " bytes)\n"
-      << temp.StreamToString()
-      << "----------------------------------------------------------------\n");
-    }
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "ExecuteStream\n"
+    << stream.StreamToString()
+    << "----------------------------------------------------------------\n");
 
   this->Interpreter->ClearLastResult();
 
   int temp = this->Interpreter->GetGlobalWarningDisplay();
   this->Interpreter->SetGlobalWarningDisplay(ignore_errors? 0 : 1);
-  this->Interpreter->ProcessStream(raw_message, size);
+  this->Interpreter->ProcessStream(stream);
   this->Interpreter->SetGlobalWarningDisplay(temp);
 }
 
