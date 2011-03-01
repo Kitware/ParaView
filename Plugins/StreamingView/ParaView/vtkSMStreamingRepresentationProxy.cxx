@@ -113,6 +113,38 @@ void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
     << VTKOBJECT(this)
     << "SetHarness"
     << VTKOBJECT(this->Harness)
+    << vtkClientServerStream::End
+
+    // Setup pipeline
+    // this->Harness->AddInput(0, this->PieceCache->GetOuputPort(0), "SetInputConnection")
+
+    << vtkClientServerStream::Invoke
+    << PMPROXY(this->PieceCache)
+    << "GetOutputPort"
+    << 0
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << PMPROXY(this->Harness)
+    << "AddInput"
+    << 0
+    << vtkClientServerStream::LastResult
+    << "SetInputConnection"
+    << vtkClientServerStream::End
+
+    // Setup pipeline
+    // this->AddInput(0, this->Harness->GetOuputPort(0), "SetInputConnection")
+
+    << vtkClientServerStream::Invoke
+    << PMPROXY(this->Harness)
+    << "GetOutputPort"
+    << 0
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << PMPROXY(this)
+    << "AddInput"
+    << 0
+    << vtkClientServerStream::LastResult
+    << "SetInputConnection"
     << vtkClientServerStream::End;
   this->ExecuteStream(stream, false, vtkPVSession::SERVERS);
 }

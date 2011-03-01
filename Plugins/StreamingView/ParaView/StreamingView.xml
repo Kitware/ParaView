@@ -536,6 +536,7 @@
     <StreamingRepresentationProxy
         name="StreamingRepresentation"
         class="vtkPVStreamingRepresentation"
+        input_subproxy="PieceCache"
         processes="client|renderserver|dataserver"
         base_proxygroup="representations"
         base_proxyname="GeometryRepresentation">
