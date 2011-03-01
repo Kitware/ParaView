@@ -68,6 +68,12 @@ else()
     get_filename_component(qt_bin_dir ${QT_QMAKE_EXECUTABLE} PATH)
     get_filename_component(qt_dir ${qt_bin_dir} PATH)
   endif()
+  
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake
+    @ONLY)
+
+  set(Silo_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake)
 
   ExternalProject_Add(Silo
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -77,7 +83,7 @@ else()
     URL_MD5 ${SILO_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND mkdir config-site && cp Makefile.in config-site/Makefile.in
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --disable-fortran --with-zlib=${ZLIB_INCLUDE_DIR},${zlib_install}/lib --with-hdf5=${HDF5_INCLUDE_DIR},${hdf5_install}/lib --with-qt=${qt_dir} --disable-silex --disable-static --enable-shared --disable-browser --without-readline
+    CONFIGURE_COMMAND ${Silo_CONFIGURE_COMMAND}
     DEPENDS ${Silo_dependencies}
   )
 
