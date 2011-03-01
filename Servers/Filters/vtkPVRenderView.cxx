@@ -497,8 +497,19 @@ void vtkPVRenderView::ResetCameraClippingRange()
   //  << this->LastComputedBounds[4] << ", "
   //  << this->LastComputedBounds[5] << endl;
 
-  this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
+  // LastComputedBounds never includes the center of rotation. However, that can
+  // result in the axes getting clipped (BUG #8752). Hence we include the center
+  // of rotation if visible.
+  vtkBoundingBox bbox (this->LastComputedBounds);
+  if (this->CenterAxes->GetVisibility())
+    {
+    bbox.AddBounds(this->CenterAxes->GetBounds());
+    }
+  double bounds[6];
+  bbox.GetBounds(bounds);
+
+  this->GetRenderer()->ResetCameraClippingRange(bounds);
+  this->GetNonCompositedRenderer()->ResetCameraClippingRange(bounds);
 }
 
 #define PRINT_BOUNDS(bds)\
