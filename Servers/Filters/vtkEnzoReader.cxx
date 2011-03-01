@@ -975,9 +975,14 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
                            theBlock.BlockCellDimensions[2];
 
 
-  // number of particles of the reference block, if any                         
+  // number of particles of the reference block, if any
+  std::cout << "Reference Block: " << this->ReferenceBlock << std::endl;
+  std::cout << "BlockIdx: " << this->ReferenceBlock - 1 << std::endl;
+  std::cout.flush();
+
   vtkPolyData * polyData = vtkPolyData::New();
   this->TheReader->GetParticles( this->ReferenceBlock - 1, polyData, 0, 0 );
+
   int           numbPnts = polyData->GetNumberOfPoints();
   polyData->Delete();
   polyData = NULL;
@@ -2582,7 +2587,7 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
                                   int beTracer, int           withAttr )
 {
   this->Internal->ReadMetaData();
-  
+
   if ( polyData == NULL || blockIdx < 0 ||
        blockIdx >= this->Internal->NumberOfBlocks )
     {
@@ -2601,8 +2606,7 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   {
     return 0;
   }
-    
-    
+
   // currently only the HDF5 file format is supported
   
 
@@ -2621,7 +2625,15 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   int     objIndex;
   hsize_t numbObjs;
   hid_t   rootIndx = H5Gopen( fileIndx, "/" );
+  if( rootIndx < 0 )
+    {
+      vtkErrorMacro( "Failed to open root node of particles file" );
+      return 0;
+    }
+
   H5Gget_num_objs( rootIndx, &numbObjs );
+
+  bool found = false;
   for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs );  
          objIndex ++  )
     {
@@ -2635,11 +2647,23 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
          )
         {
         rootIndx = H5Gopen( rootIndx, blckName ); // located the target block
+        if( rootIndx < 0 )
+          {
+            vtkErrorMacro( "Could not locate target block!\n" );
+            return 0;
+          }
+        found = true;
         break;
         }
       }
     }
     
+  if( !found )
+    {
+      vtkErrorMacro( "Could not locate target block!\n" );
+      return 0;
+    }
+
   // coordinate array names to be searched
   const char * xAryName = beTracer ? "tracer_particle_position_x" 
                                    : "particle_position_x" ;
@@ -2659,6 +2683,13 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   hid_t        yArayIdx = H5Dopen( rootIndx, yAryName );
   hid_t        zArayIdx = ( this->Internal->NumberOfDimensions == 3 )
                         ? H5Dopen( rootIndx, zAryName ) : -1;
+
+  if( (xArayIdx < 0) || (yArayIdx < 0) || (zArayIdx < 0) )
+    {
+      vtkErrorMacro(
+          "Cannot load particles xyz arrays!\n");
+      return 0;
+    }
   xAryName = NULL;
   yAryName = NULL;
   zAryName = NULL;
@@ -2682,6 +2713,7 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   hid_t        spaceIdx = H5Dget_space( xArayIdx );
   H5Sget_simple_extent_dims( spaceIdx, dimValus, NULL );
   int          numbPnts = dimValus[0];
+
 
   // allocate vtkPoints for the coordinates and init it
   int          i, j;
@@ -2722,15 +2754,16 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   tempBuff = NULL;
   arrayPtr = NULL;
 
-  H5Dclose( spaceIdx );
-  H5Dclose( xArayIdx );
-  H5Dclose( yArayIdx );
-  if ( this->Internal->NumberOfDimensions == 3 )
-    {
-    H5Dclose( zArayIdx );
-    }
-  H5Gclose( rootIndx );
-  H5Fclose( fileIndx );
+// This close statements cause a sefgault!
+//  H5Dclose( spaceIdx );
+//  H5Dclose( xArayIdx );
+//  H5Dclose( yArayIdx );
+//  if ( this->Internal->NumberOfDimensions == 3 )
+//    {
+//    H5Dclose( zArayIdx );
+//    }
+//  H5Gclose( rootIndx );
+//  H5Fclose( fileIndx );
     
   vtkCellArray * theVerts = vtkCellArray::New();
   for ( vtkIdType  cellPtId = 0; cellPtId < numbPnts; cellPtId ++ )

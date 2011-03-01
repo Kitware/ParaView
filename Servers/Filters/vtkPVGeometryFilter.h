@@ -28,6 +28,7 @@ class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
+class vtkUniformGrid;
 class vtkInformationIntegerVectorKey;
 class vtkInformationVector;
 class vtkMultiProcessController;
