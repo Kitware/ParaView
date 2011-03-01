@@ -42,21 +42,47 @@ if(WIN32)
     DEPENDS ${CGNS_dependencies}
     )
 
-else()
+elseif(APPLE)
+  # cgns only appears to build statically on mac.
+
+  # cgns install system sucks..
+  file(MAKE_DIRECTORY ${cgns_install}/lib)
+  file(MAKE_DIRECTORY ${cgns_install}/include)
 
   ExternalProject_Add(CGNS
-    DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${cgns_source}
     INSTALL_DIR ${cgns_install}
     URL ${CGNS_URL}/${CGNS_GZ}
     URL_MD5 ${CGNS_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --enable-64bit --without-fortran
+    DEPENDS ${CGNS_dependencies}
+  )
+
+else()
+
+  # cgns install system sucks..
+  file(MAKE_DIRECTORY ${cgns_install}/lib)
+  file(MAKE_DIRECTORY ${cgns_install}/include)
+
+  ExternalProject_Add(CGNS
+    SOURCE_DIR ${cgns_source}
+    INSTALL_DIR ${cgns_install}
+    URL ${CGNS_URL}/${CGNS_GZ}
+    URL_MD5 ${CGNS_MD5}
+    BUILD_IN_SOURCE 1
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-zlib=${ZLIB_LIBRARY} --with-hdf5=${hdf5_install} --enable-64bit --enable-shared=all --disable-static --without-fortran
     DEPENDS ${CGNS_dependencies}
   )
 
 endif()
 
 set(CGNS_INCLUDE_DIR ${cgns_install}/include)
-set(CGNS_LIBRARY ${cgns_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX})
+
+if(APPLE)
+  set(CGNS_LIBRARY ${cgns_install}/lib/libcgns.a)
+else()
+  set(CGNS_LIBRARY ${cgns_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX})
+endif()

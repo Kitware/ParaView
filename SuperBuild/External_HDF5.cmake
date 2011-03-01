@@ -3,12 +3,9 @@
 set(hdf5_source "${CMAKE_CURRENT_BINARY_DIR}/hdf5")
 set(hdf5_install "${CMAKE_CURRENT_BINARY_DIR}/hdf5-install")
 
-# If Windows we use CMake otherwise ./configure
-if(WIN32)
+set(hdf5_binary "${CMAKE_CURRENT_BINARY_DIR}/hdf5-build")
 
-  set(hdf5_binary "${CMAKE_CURRENT_BINARY_DIR}/hdf5-build")
-
-  ExternalProject_Add(HDF5
+ExternalProject_Add(HDF5
   URL ${HDF5_URL}/${HDF5_GZ}
   URL_MD5 ${HDF5_MD5}
   UPDATE_COMMAND ""
@@ -30,21 +27,6 @@ if(WIN32)
   DEPENDS ${HDF5_dependencies}
   )
 
-else()
-
-  ExternalProject_Add(HDF5
-    DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCE_DIR ${hdf5_source}
-    INSTALL_DIR ${hdf5_install}
-    URL ${HDF5_URL}/${HDF5_GZ}
-    URL_MD5 ${HDF5_MD5}
-    BUILD_IN_SOURCE 1
-    PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
-    DEPENDS ${HDF5_dependencies}
-  )
-
-endif()
 
 if(WIN32)
   set(HDF5_INCLUDE_DIR ${hdf5_install}/include)
