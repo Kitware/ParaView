@@ -54,6 +54,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
+#include "vtkUniformGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
@@ -945,7 +946,6 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
     output->SetLines(this->OutlineSource->GetOutput()->GetLines());
     }
 }
-
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
                                            vtkPolyData* output,
@@ -969,14 +969,22 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     }
 
   // If 2d then default to superclass behavior.
-//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
-//      !this->UseOutline)
+  //  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
+  //      !this->UseOutline)
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)
       {
-      this->DataSetSurfaceFilter->StructuredExecute(input,
-        output, input->GetExtent(), ext);
+        if( input->IsA("vtkUniformGrid") )
+          {
+            this->DataSetSurfaceFilter->UniformGridExecute(
+                input,output,input->GetExtent(),ext );
+          }
+        else
+          {
+            this->DataSetSurfaceFilter->StructuredExecute(input,
+              output, input->GetExtent(), ext);
+          }
       }
     this->OutlineFlag = 0;
     return;
