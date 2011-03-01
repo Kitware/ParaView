@@ -1,17 +1,17 @@
 
 # The HDF5 external project for ParaView
-set(hdf5_source "${CMAKE_CURRENT_BINARY_DIR}/hdf5")
-set(hdf5_install "${CMAKE_CURRENT_BINARY_DIR}/hdf5-install")
+set(HDF5_source "${CMAKE_CURRENT_BINARY_DIR}/HDF5")
+set(HDF5_install "${CMAKE_CURRENT_BINARY_DIR}/HDF5-install")
 
-set(hdf5_binary "${CMAKE_CURRENT_BINARY_DIR}/hdf5-build")
+set(HDF5_binary "${CMAKE_CURRENT_BINARY_DIR}/HDF5-build")
 
 ExternalProject_Add(HDF5
   URL ${HDF5_URL}/${HDF5_GZ}
   URL_MD5 ${HDF5_MD5}
   UPDATE_COMMAND ""
-  SOURCE_DIR ${hdf5_source}
-  BINARY_DIR ${hdf5_binary}
-  INSTALL_DIR ${hdf5_install}
+  SOURCE_DIR ${HDF5_source}
+  BINARY_DIR ${HDF5_binary}
+  INSTALL_DIR ${HDF5_install}
   CMAKE_CACHE_ARGS
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_TESTING:BOOL=OFF
@@ -29,9 +29,9 @@ ExternalProject_Add(HDF5
 
 
 if(WIN32)
-  set(HDF5_INCLUDE_DIR ${hdf5_install}/include)
-  set(HDF5_LIBRARY ${hdf5_install}/lib/hdf5dll${_LINK_LIBRARY_SUFFIX})
+  set(HDF5_INCLUDE_DIR ${HDF5_install}/include)
+  set(HDF5_LIBRARY ${HDF5_install}/lib/hdf5dll${_LINK_LIBRARY_SUFFIX})
 else()
-  set(HDF5_INCLUDE_DIR ${hdf5_install}/include)
-  set(HDF5_LIBRARY ${hdf5_install}/lib/libhdf5${_LINK_LIBRARY_SUFFIX})
+  set(HDF5_INCLUDE_DIR ${HDF5_install}/include)
+  set(HDF5_LIBRARY ${HDF5_install}/lib/libhdf5${_LINK_LIBRARY_SUFFIX})
 endif()
