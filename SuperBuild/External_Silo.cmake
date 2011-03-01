@@ -69,11 +69,11 @@ else()
     get_filename_component(qt_dir ${qt_bin_dir} PATH)
   endif()
   
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_configure_step.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake
     @ONLY)
 
-  set(Silo_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake)
+  set(Silo_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake)
 
   ExternalProject_Add(Silo
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
