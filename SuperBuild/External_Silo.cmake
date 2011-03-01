@@ -84,8 +84,12 @@ else()
 endif()
 
 set(SILO_INCLUDE_DIR ${Silo_install}/include)
-set(SILO_LIBRARY ${Silo_install}/lib/silohdf5${_LINK_LIBRARY_SUFFIX})
 
+if(WIN32)
+  set(SILO_LIBRARY ${Silo_install}/lib/silohdf5${_LINK_LIBRARY_SUFFIX})
+else()
+  set(SILO_LIBRARY ${Silo_install}/lib/libsiloh5${_LINK_LIBRARY_SUFFIX})
+endif()
 
 set(Silo_DIR "${Silo_binary}" CACHE PATH "Silo binary directory" FORCE)
 mark_as_advanced(Silo_DIR)
