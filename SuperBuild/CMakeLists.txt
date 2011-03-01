@@ -135,6 +135,7 @@ set(Manta_dependencies)
 set(OpenMPI_dependencies)
 set(ParaView_dependencies)
 
+set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 
 set(MPI_ARGS)
 
@@ -240,6 +241,13 @@ set(ZLIB_ARGS
 list(APPEND ParaView_dependencies zlib)
 list(APPEND png_dependencies zlib)
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${zlib_install}/bin)
+else()
+  get_filename_component(ZLIB_DIR "${ZLIB_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
+endif()
+
 # Build a common png used by several dependencies
 include(External_png)
 set(PNG_ARGS
@@ -247,6 +255,13 @@ set(PNG_ARGS
   -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+else()
+  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+endif()
 
 # Build HDF5
 list(APPEND HDF5_dependencies zlib)
@@ -259,6 +274,13 @@ set(HDF5_ARGS
   -DHDF5_LIBRARIES:FILEPATH=${HDF5_LIBRARY}
   -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY})
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${hdf5_install}/bin)
+else()
+  get_filename_component(HDF5_DIR "${HDF5_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
+endif()
+
 # Build Silo
 list(APPEND Silo_dependencies zlib HDF5)
 list(APPEND ParaView_dependencies Silo)
@@ -268,6 +290,13 @@ set(Silo_ARGS
   -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
   -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${Silo_install}/bin)
+else()
+  get_filename_component(SILO_DIR "${SILO_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${SILO_DIR})
+endif()
+
 # Build CGNS
 list(APPEND CGNS_dependencies zlib HDF5)
 list(APPEND ParaView_dependencies CGNS)
@@ -276,6 +305,13 @@ set(CGNS_ARGS
   -DVISIT_BUILD_READER_CGNS:BOOL=ON
   -DCGNS_INCLUDE_DIR:PATH=${CGNS_INCLUDE_DIR}
   -DCGNS_LIBRARY:FILEPATH=${CGNS_LIBRARY})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${cgns_install}/bin)
+else()
+  get_filename_component(CGNS_DIR "${CGNS_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
+endif()
 
 if(NOT WIN32 AND NOT APPLE)
   include(External_FFMPEG)
@@ -316,6 +352,7 @@ ExternalProject_Add(${proj}
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
+    -DPARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS:STRING=${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
