@@ -375,6 +375,31 @@ bool vtkSMProxy::UpdateProperty(const char* name, int force)
   it->second.ModifiedFlag = 0;
 
   vtkSMMessage message;
+
+  // Make sure the local state is updated as well
+  if(this->State)
+    {
+    vtkSMMessage oldState;
+    oldState.CopyFrom(*this->State);
+    this->State->ClearExtension(ProxyState::property);
+    int nbProps = oldState.ExtensionSize(ProxyState::property);
+    for(int cc=0; cc < nbProps; cc++)
+      {
+      const ProxyState_Property *oldProperty =
+          &oldState.GetExtension(ProxyState::property, cc);
+
+      if(oldProperty->name() == it->second.Property->GetXMLName())
+        {
+        it->second.Property->WriteTo(this->State);
+        }
+      else
+        {
+        ProxyState_Property *newProperty = this->State->AddExtension(ProxyState::property);
+        newProperty->CopyFrom(oldState.GetExtension(ProxyState::property, cc));
+        }
+      }
+    }
+
   it->second.Property->WriteTo(&message);
   this->PushState(&message);
 
@@ -411,7 +436,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 
   it->second.ModifiedFlag = flag;
 
-  if (flag && !this->DoNotUpdateImmediately)
+  if (flag && !this->DoNotUpdateImmediately && prop->GetImmediateUpdate())
     {
     this->UpdateProperty(it->first.c_str());
     }
