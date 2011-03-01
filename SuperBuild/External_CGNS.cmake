@@ -48,6 +48,18 @@ elseif(APPLE)
   # cgns install system sucks..
   file(MAKE_DIRECTORY ${cgns_install}/lib)
   file(MAKE_DIRECTORY ${cgns_install}/include)
+  
+  if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+    set(cgns_64 --enable-64bit)
+  else()
+    set(cgns_64)
+  endif()
+
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CGNS_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CGNS_configure_step.cmake
+    @ONLY)
+
+  set(CGNS_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/CGNS_configure_step.cmake)
 
   ExternalProject_Add(CGNS
     SOURCE_DIR ${cgns_source}
@@ -56,7 +68,7 @@ elseif(APPLE)
     URL_MD5 ${CGNS_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --enable-64bit --without-fortran
+    CONFIGURE_COMMAND ${CGNS_CONFIGURE_COMMAND}
     DEPENDS ${CGNS_dependencies}
   )
 
