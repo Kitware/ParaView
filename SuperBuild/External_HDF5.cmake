@@ -45,3 +45,11 @@ else()
   )
 
 endif()
+
+if(WIN32)
+  set(HDF5_INCLUDE_DIR ${hdf5_install}/include)
+  set(HDF5_LIBRARY ${hdf5_install}/lib/hdf5dll${_LINK_LIBRARY_SUFFIX})
+else()
+  set(HDF5_INCLUDE_DIR ${hdf5_install}/include)
+  set(HDF5_LIBRARY ${hdf5_install}/lib/libhdf5${_LINK_LIBRARY_SUFFIX})
+endif()
