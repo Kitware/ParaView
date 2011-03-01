@@ -179,9 +179,15 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
     set(_dir "bin")
   endif(WIN32)
 
-  set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${DIRS} CACHE STRING
+  if(NOT PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
+    set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${DIRS} CACHE STRING
       "Directories for FixupBundle to search for dependencies" FORCE)
+  endif()
   mark_as_advanced(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
+  
+  set(search_path ${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS})
+  list(APPEND search_path ${DIRS})
+  list(REMOVE_DUPLICATES search_path)
 
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
 
@@ -197,7 +203,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
+fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
