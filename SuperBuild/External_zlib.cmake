@@ -33,6 +33,13 @@ if(WIN32)
     )
 
 else()
+
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/zlib_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/zlib_configure_step.cmake
+    @ONLY)
+
+  set(zlib_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/zlib_configure_step.cmake)
+
   ExternalProject_Add(zlib
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${zlib_source}
@@ -42,7 +49,7 @@ else()
     PATCH_COMMAND ${CMAKE_COMMAND} -E remove <SOURCE_DIR>/zconf.h
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    CONFIGURE_COMMAND ${zlib_CONFIGURE_COMMAND}
   )
 
 endif()

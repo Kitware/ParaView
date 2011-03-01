@@ -1,0 +1,11 @@
+
+if(APPLE)
+  set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+  set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
+EXECUTE_PROCESS(
+  COMMAND sh configure --prefix=@CGNS_install@ --without-fortran @cgns_64@
+  WORKING_DIRECTORY "@cgns_source@"
+  )

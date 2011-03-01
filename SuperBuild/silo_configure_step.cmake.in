@@ -3,12 +3,24 @@ if(WIN32)
 
   set(ENV{ZLIB_INC_DIR} "@zlib_install@/include")
   set(ENV{ZLIB_LIB_DIR} "@zlib_install@/lib")
-  set(ENV{HDF5_INC_DIR} "@hdf5_install@/include")
-  set(ENV{HDF5_LIB_DIR} "@hdf5_install@/lib")
+  set(ENV{HDF5_INC_DIR} "@HDF5_install@/include")
+  set(ENV{HDF5_LIB_DIR} "@HDF5_install@/lib")
 
   EXECUTE_PROCESS(
     COMMAND copysilo.bat
     WORKING_DIRECTORY "@Silo_source@/SiloWindows"
+    )
+else()
+
+  if(APPLE)
+    set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+    set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+    set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+  endif()
+
+  EXECUTE_PROCESS(
+    COMMAND sh configure --prefix=@Silo_install@ --disable-fortran --with-zlib=@ZLIB_INCLUDE_DIR@,@zlib_install@/lib --with-hdf5=@HDF5_INCLUDE_DIR@,@HDF5_install@/lib --with-qt=@qt_dir@ --disable-silex --disable-static --enable-shared --disable-browser --without-readline
+    WORKING_DIRECTORY "@Silo_source@"
     )
 
 endif()
