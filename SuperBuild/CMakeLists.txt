@@ -248,10 +248,18 @@ set(PNG_ARGS
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
 
+# Build HDF5
 list(APPEND HDF5_dependencies zlib)
 list(APPEND ParaView_dependencies HDF5)
 include(External_HDF5)
+set(HDF5_ARGS
+  -DVTK_USE_SYSTEM_HDF5:BOOL=ON
+  -DHDF5_INCLUDE_DIRS:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_LIBRARIES:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY})
 
+# Build Silo
 list(APPEND Silo_dependencies zlib HDF5)
 list(APPEND ParaView_dependencies Silo)
 include(External_Silo)
@@ -259,6 +267,15 @@ set(Silo_ARGS
   -DVISIT_BUILD_READER_Silo:BOOL=ON
   -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
   -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
+
+# Build CGNS
+list(APPEND CGNS_dependencies zlib HDF5)
+list(APPEND ParaView_dependencies CGNS)
+include(External_CGNS)
+set(CGNS_ARGS
+  -DVISIT_BUILD_READER_CGNS:BOOL=ON
+  -DCGNS_INCLUDE_DIR:PATH=${CGNS_INCLUDE_DIR}
+  -DCGNS_LIBRARY:FILEPATH=${CGNS_LIBRARY})
 
 if(NOT WIN32 AND NOT APPLE)
   include(External_FFMPEG)
@@ -317,19 +334,21 @@ ExternalProject_Add(${proj}
     ${MANTA_ARGS}
     # FFMPEG
     ${FFMPEG_ARGS}
+    # HDF5
+    ${HDF5_ARGS}
     # EyeDome
     -DPARAVIEW_BUILD_PLUGIN_EyeDomeLighting:BOOL=ON
     # VisIt
     -DPARAVIEW_USE_VISITBRIDGE:BOOL=ON
-    #-DVISIT_BUILD_READER_CGNS:BOOL=ON
-    #-DCGNS_INCLUDE_DIR:PATH=
-    #-DCGNS_LIBRARY:FILEPATH=
+    # VisIt - CGNS
+    ${CGNS_ARGS}
+    # VisIt - Silo
     ${Silo_ARGS}
-    # Documentation
     # VisTrails
     ${VISTRAILS_ARGS}
     # zlib
     ${ZLIB_ARGS}
+    # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )
