@@ -129,7 +129,7 @@ void vtkSMGlobalPropertiesManager::RemoveGlobalPropertyLink(
   info.GlobalPropertyName = globalPropertyName;
   info.PropertyName = propname;
   info.Proxy = proxy;
-  this->InvokeEvent(vtkCommand::ModifiedEvent, &info);
+  this->InvokeEvent(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified, &info);
 }
 
 //----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void vtkSMGlobalPropertiesManager::SetGlobalPropertyLink(
   info.GlobalPropertyName = globalPropertyName;
   info.PropertyName = propname;
   info.Proxy = proxy;
-  this->InvokeEvent(vtkCommand::ModifiedEvent, &info);
+  this->InvokeEvent(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified, &info);
 }
 
 //----------------------------------------------------------------------------

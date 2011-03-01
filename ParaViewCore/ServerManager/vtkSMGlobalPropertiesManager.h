@@ -74,6 +74,11 @@ public:
     const char* PropertyName;
     };
 
+  enum Events
+    {
+    GlobalPropertyLinkModified=3000,
+    };
+
 protected:
   vtkSMGlobalPropertiesManager();
   ~vtkSMGlobalPropertiesManager();

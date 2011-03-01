@@ -1037,7 +1037,7 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         this->GetGlobalPropertiesManagerName(globalPropertiesManager);
     if( globalPropertiesManagerName               &&
         this->GetSession()->GetUndoStackBuilder() &&
-        event == vtkCommand::ModifiedEvent)
+        event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
       {
       vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
       modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
@@ -1544,7 +1544,7 @@ void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
   this->RemoveGlobalPropertiesManager(name);
   this->Internals->GlobalPropertiesManagers[name] = mgr;
   this->Internals->GlobalPropertiesManagersCallBackID[name] =
-      mgr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+      mgr->AddObserver(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified, this->Observer);
 
   RegisteredProxyInformation info;
   info.Proxy = mgr;
