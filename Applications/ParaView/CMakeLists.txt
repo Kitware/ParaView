@@ -193,13 +193,15 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   if(WIN32)
     foreach(pluginname ${PARAVIEW_PLUGINLIST})
-      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/${pluginname}.dll")
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/Release/${pluginname}.dll")
     endforeach(pluginname ${PARAVIEW_PLUGINLIST})
   else()
     foreach(pluginname ${PARAVIEW_PLUGINLIST})
       list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/lib${pluginname}.so")
     endforeach(pluginname ${PARAVIEW_PLUGINLIST})
   endif()
+  
+  message("plugin_libs ${plugin_libs}")
 
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
