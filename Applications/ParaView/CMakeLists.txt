@@ -200,8 +200,6 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/lib${pluginname}.so")
     endforeach(pluginname ${PARAVIEW_PLUGINLIST})
   endif()
-  
-  message("plugin_libs ${plugin_libs}")
 
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
