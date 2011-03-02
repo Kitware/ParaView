@@ -77,6 +77,9 @@ public:
     return this->GetProxyDefinition(group, name, true);
     }
 
+  // Description:
+  // Return true if the XML Definition was found
+  bool HasDefinition( const char* groupName, const char* proxyName);
 
   // Description:
   // Returns the same thing as GetProxyDefinition in a flatten manner.
@@ -199,6 +202,20 @@ public:
 protected:
   vtkSMProxyDefinitionManager();
   ~vtkSMProxyDefinitionManager();
+
+  // Description:
+  // Helper method that add a ShowInMenu Hint for a proxy definition.
+  void AttachShowInMenuHintsToProxy(vtkPVXMLElement* proxy);
+  // Description:
+  // Helper method that add a ShowInMenu Hint for any proxy definition that lie
+  // in a sources or filters group.
+  void AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root);
+
+  // Description:
+  // Loads server-manager configuration xml.
+  bool LoadConfigurationXML(const char* filename, bool attachShowInMenuHints);
+  bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
+  bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints);
 
   // Description:
   // Callback called when a plugin is loaded.

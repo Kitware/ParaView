@@ -33,6 +33,8 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
+#include "vtkNew.h"
+
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -302,6 +304,16 @@ public:
       {
       return this->CoreProxyIterator->second.GetPointer();
       }
+  }
+  //-------------------------------------------------------------------------
+  virtual vtkPVXMLElement* GetProxyHints()
+  {
+    vtkPVXMLElement* definition = this->GetProxyDefinition();
+    if(definition)
+      {
+      return definition->FindNestedElementByName("Hints");
+      }
+    return NULL;
   }
   //-------------------------------------------------------------------------
   void AddTraversalGroupName(const char* groupName)
@@ -580,12 +592,78 @@ void vtkSMProxyDefinitionManager::RemoveCustomProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::AttachShowInMenuHintsToProxy(vtkPVXMLElement* proxy)
+{
+  if(!proxy)
+    {
+    return;
+    }
+
+  vtkPVXMLElement* hints = proxy->FindNestedElementByName("Hints");
+  if(hints == NULL)
+    {
+    vtkNew<vtkPVXMLElement> hints;
+    hints->SetName("Hints");
+    vtkNew<vtkPVXMLElement> showInMenu;
+    showInMenu->SetName("ShowInMenu");
+    hints->AddNestedElement(showInMenu.GetPointer());
+    proxy->AddNestedElement(hints.GetPointer());
+    }
+  else if(hints->FindNestedElementByName("ShowInMenu") == NULL)
+    {
+    vtkNew<vtkPVXMLElement> showInMenu;
+    showInMenu->SetName("ShowInMenu");
+    hints->AddNestedElement(showInMenu.GetPointer());
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root)
+{
+  if(!root)
+    {
+    return;
+    }
+
+  if(!strcmp(root->GetName(), "ProxyGroup"))
+    {
+    if( !strcmp(root->GetAttribute("name"), "sources") ||
+        !strcmp(root->GetAttribute("name"), "filters"))
+      {
+      int size = root->GetNumberOfNestedElements();
+      for(int cc=0; cc < size; ++cc)
+        {
+        this->AttachShowInMenuHintsToProxy(root->GetNestedElement(cc));
+        }
+      }
+    }
+  else
+    {
+    vtkNew<vtkCollection> collection;
+    root->FindNestedElementByName("ProxyGroup", collection.GetPointer());
+    int size = collection->GetNumberOfItems();
+    for(int cc=0; cc < size; ++cc)
+      {
+      vtkPVXMLElement* group =
+          vtkPVXMLElement::SafeDownCast(collection->GetItemAsObject(cc));
+      this->AttachShowInMenuHintsToProxyFromProxyGroups(group);
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::AddCustomProxyDefinition(
   const char* groupName, const char* proxyName, vtkPVXMLElement* top)
 {
   if (!top)
     {
     return;
+    }
+
+  // Attach automatic hints so it will show up in the menu
+  if(!strcmp(groupName, "sources") || !strcmp(groupName, "filters"))
+    {
+    this->AttachShowInMenuHintsToProxy(top);
     }
 
   vtkPVXMLElement* currentCustomElement = this->Internals->GetProxyElement(
@@ -769,11 +847,17 @@ void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(const char* filenam
 //---------------------------------------------------------------------------
 bool vtkSMProxyDefinitionManager::LoadConfigurationXML(const char* filename)
 {
+  return this->LoadConfigurationXML(filename, false);
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyDefinitionManager::LoadConfigurationXML(const char* filename, bool attachHints)
+{
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
   if(parser->Parse())
     {
-    this->LoadConfigurationXML(parser->GetRootElement());
+    this->LoadConfigurationXML(parser->GetRootElement(), attachHints);
     parser->Delete();
     return true;
     }
@@ -786,10 +870,15 @@ bool vtkSMProxyDefinitionManager::LoadConfigurationXML(const char* filename)
 //---------------------------------------------------------------------------
 bool vtkSMProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent)
 {
+  return this->LoadConfigurationXMLFromString(xmlContent, false);
+}
+//---------------------------------------------------------------------------
+bool vtkSMProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent, bool attachHints)
+{
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   if(parser->Parse(xmlContent))
     {
-    this->LoadConfigurationXML(parser->GetRootElement());
+    this->LoadConfigurationXML(parser->GetRootElement(), attachHints);
     parser->Delete();
     return true;
     }
@@ -803,10 +892,21 @@ bool vtkSMProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xml
 //---------------------------------------------------------------------------
 bool vtkSMProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 {
+  return this->LoadConfigurationXML(root, false);
+}
+//---------------------------------------------------------------------------
+bool vtkSMProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bool attachHints)
+{
   if (!root)
     {
     vtkErrorMacro("Must parse a configuration before storing it.");
     return false;
+    }
+
+  // Attach ShowInMenu hints
+  if(attachHints)
+    {
+    this->AttachShowInMenuHintsToProxyFromProxyGroups(root);
     }
 
   // Loop over the top-level elements.
@@ -1159,10 +1259,18 @@ void vtkSMProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     smplugin->GetXMLs(xmls);
     for (size_t cc=0; cc < xmls.size(); cc++)
       {
-      this->LoadConfigurationXMLFromString(xmls[cc].c_str());
+      this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
       }
     }
 }
+//---------------------------------------------------------------------------
+bool vtkSMProxyDefinitionManager::HasDefinition( const char* groupName,
+                                                 const char* proxyName)
+{
+  return this->Internals->HasCustomDefinition(groupName, proxyName) ||
+      this->Internals->HasCoreDefinition(groupName, proxyName);
+}
+
 //---------------------------------------------------------------------------
 // For now we dynamically convert InformationHelper
 // into the correct si_class and attribute sets.

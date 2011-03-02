@@ -59,6 +59,10 @@ public:
   virtual bool IsDoneWithTraversal();
 
 
+  // ********* Configuration methods **********
+
+  virtual void AddTraversalGroupName(const char* groupName) = 0;
+
   // ********* Access methods **********
 
   // Access methods
@@ -70,6 +74,8 @@ public:
   virtual bool  IsCustom();
   /// Return the current XML proxy definition
   virtual vtkPVXMLElement* GetProxyDefinition();
+  /// Return the current XML proxy hints
+  virtual vtkPVXMLElement* GetProxyHints() = 0;
 
 protected:
   vtkSMProxyDefinitionIterator();

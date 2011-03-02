@@ -52,7 +52,6 @@ SET (MOC_HEADERS
   pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
-  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h
@@ -186,8 +185,6 @@ SET (SOURCE_FILES
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
-  pqUpdateProxyDefinitionsBehavior.cxx
-  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.cxx
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx

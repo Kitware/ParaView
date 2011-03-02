@@ -84,12 +84,28 @@ public:
   /// Returns the list of actions in a category.
   QList<QAction*> actions(const QString& category);
 
+  /// Attach an observer to proxy manager to monitor any proxy definition update
+  /// The detected proxy have to own a hint
+  ///     <ShowInMenu category=""/>
+  /// where those attribute are fully optional
+  void addProxyDefinitionUpdateListener(const QString& proxyGroupName);
+  void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
+
 public slots:
   /// Load a configuration XML. It will find the elements with resourceTagName
   /// in the XML and populate the menu accordingly. Applications do not need to
   /// call this method directly, it's by default connected to
   /// pqApplicationCore::loadXML()
   void loadConfiguration(vtkPVXMLElement*);
+
+  /// Look for new proxy definition to add inside the menu
+  void lookForNewDefinitions();
+
+  /// Remove all ProxyDefinitionUpdate observers to active server
+  void removeProxyDefinitionUpdateObservers();
+
+  /// Update the list of ProxyDefinitionUpdate observers to  server
+  void addProxyDefinitionUpdateObservers();
 
   /// Enable/disable the menu and the actions.
   void setEnabled(bool enable);
