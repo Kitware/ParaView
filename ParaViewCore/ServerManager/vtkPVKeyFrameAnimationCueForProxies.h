@@ -75,6 +75,7 @@ protected:
   vtkSMProxy* AnimatedProxy;
   char* AnimatedPropertyName;
   char* AnimatedDomainName;
+  int ValueIndexMax;
 
 private:
   vtkPVKeyFrameAnimationCueForProxies(const vtkPVKeyFrameAnimationCueForProxies&); // Not implemented

@@ -17,18 +17,19 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVKeyFrameAnimationCueForProxies);
 vtkCxxSetObjectMacro(vtkPVKeyFrameAnimationCueForProxies,
   AnimatedProxy, vtkSMProxy);
 //----------------------------------------------------------------------------
-vtkPVKeyFrameAnimationCueForProxies::vtkPVKeyFrameAnimationCueForProxies()
+vtkPVKeyFrameAnimationCueForProxies::vtkPVKeyFrameAnimationCueForProxies() :
+  AnimatedProxy(NULL),
+  AnimatedPropertyName(NULL),
+  AnimatedDomainName(NULL),
+  ValueIndexMax(-1)
 {
-  this->AnimatedProxy = 0;
-  this->AnimatedPropertyName = 0;
-  this->AnimatedDomainName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -78,6 +79,7 @@ vtkSMDomain* vtkPVKeyFrameAnimationCueForProxies::GetAnimatedDomain()
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameAnimationCueForProxies::BeginUpdateAnimationValues()
 {
+  this->ValueIndexMax = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -94,23 +96,28 @@ void vtkPVKeyFrameAnimationCueForProxies::SetAnimationValue(
     return;
     }
   domain->SetAnimationValue(property, index, value);
+  if (this->ValueIndexMax < index)
+    {
+    this->ValueIndexMax = index;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameAnimationCueForProxies::EndUpdateAnimationValues()
 {
-  // FIXME_COLLABORATION:
-  // How can the keyframe tell the cue that the property needs to be
-  // resized or not?
-  //vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
-  //if(vp)
-  //  {
-  //  vp->SetNumberOfElements(max);
-  //  }
+  vtkSMVectorProperty * vp =
+    vtkSMVectorProperty::SafeDownCast(this->GetAnimatedProperty());
+  if (vp && this->AnimatedElement == -1 && this->ValueIndexMax >= -1)
+    {
+    vp->SetNumberOfElements(static_cast<unsigned int>(
+        this->ValueIndexMax+1));
+    }
   if (this->AnimatedProxy)
     {
     this->AnimatedProxy->UpdateVTKObjects();
     }
+
+  this->ValueIndexMax = -1;
 }
 
 //----------------------------------------------------------------------------
