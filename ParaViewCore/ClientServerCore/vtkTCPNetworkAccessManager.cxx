@@ -15,13 +15,13 @@
 #include "vtkTCPNetworkAccessManager.h"
 
 #include "vtkClientSocket.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkServerSocket.h"
 #include "vtkSmartPointer.h"
-#include "vtkSocketController.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkSocketController.h"
 #include "vtkWeakPointer.h"
-#include "vtkCommand.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -47,6 +47,12 @@ vtkTCPNetworkAccessManager::vtkTCPNetworkAccessManager()
 {
   this->Internals = new vtkInternals();
   this->AbortPendingConnectionFlag = false;
+
+  // It's essential to initialize the socket controller to initialize sockets on
+  // Windows.
+  vtkSocketController* controller =  vtkSocketController::New();
+  controller->Initialize();
+  controller->Delete();
 }
 
 //----------------------------------------------------------------------------
