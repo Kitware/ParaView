@@ -29,6 +29,10 @@ if(WIN32)
     )
 
   EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/H5FDsilo.c" "@Silo_source@/src/hdf5_drv/H5FDsilo.c"
+    )
+
+  EXECUTE_PROCESS(
     COMMAND copysilo.bat
     WORKING_DIRECTORY "@Silo_source@/SiloWindows"
     )
