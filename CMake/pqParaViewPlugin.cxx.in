@@ -39,7 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  include "vtkClientServerInterpreterInitializer.h"
 #  include "vtkClientServerInterpreter.h"
 
-extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *);
+@PLUGIN_EXTRA_CS_INITS_EXTERNS@
+extern "C" void VTK_EXPORT @PLUGIN_NAME@_CombinedInitialize(
+  vtkClientServerInterpreter *interp)
+{
+  @PLUGIN_NAME@_Initialize(interp);
+
+  // Now initialize any extra kits as requested.
+  @PLUGIN_EXTRA_CS_INITS@
+}
 # endif
 #endif
 
@@ -61,7 +70,7 @@ vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 @PLUGIN_NAME@_Plugin::GetInitializeInterpreterCallback()
 {
 # ifdef INITIALIZE_WRAPPING
-  return @PLUGIN_NAME@_Initialize;
+  return @PLUGIN_NAME@_CombinedInitialize;
 # endif
   return NULL;
 }

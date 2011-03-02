@@ -69,7 +69,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkStreamingDriver.h"
-#include "vtkStreamLibraryWrapper.h"
 
 vtkStandardNewMacro(vtkPVStreamingView);
 
@@ -82,10 +81,6 @@ void vtkPVStreamingViewRenderLaterFunction(void *instance)
 //----------------------------------------------------------------------------
 vtkPVStreamingView::vtkPVStreamingView()
 {
-  vtkStreamLibraryWrapper* wrapper = vtkStreamLibraryWrapper::New();
-  wrapper->EnableWrapping();
-  wrapper->Delete();
-
   this->StreamDriver = NULL;
   this->IsDisplayDone = 1;
   vtkMath::UninitializeBounds(this->RunningBounds);
