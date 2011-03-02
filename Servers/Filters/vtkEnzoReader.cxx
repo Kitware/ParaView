@@ -2881,13 +2881,12 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
         if ( type == H5G_GROUP )
           {
             H5Gget_objname_by_idx( rootIndx, objIndex, blckName, 64 );
-            if (   (  sscanf( blckName, "Grid%d", &blckIndx )  ==  1  )  &&
-                 (  blckIndx  ==  blockIdx+1 ) // is this the target block?
-               )
+            if ( (  sscanf( blckName, "Grid%d", &blckIndx )  ==  1  )  &&
+                 (  (blckIndx  ==  blockIdx) || (blckIndx == blockIdx+1) ) )
               {
-              // located the target block
-              rootIndx = H5Gopen( rootIndx, blckName );
-              break;
+                // located the target block
+                rootIndx = H5Gopen( rootIndx, blckName );
+                break;
               }
           }
 
@@ -2903,7 +2902,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   hid_t        attrIndx = H5Dopen( rootIndx, atribute );
 
   H5Eset_auto( erorFunc, pContext );
-  pContext   = NULL;
+  pContext = NULL;
 
   // check if the data attribute exists
   if ( attrIndx < 0 )
@@ -2923,29 +2922,25 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   hsize_t numbDims = H5Sget_simple_extent_ndims( spaceIdx );
 
   // number of attribute tuples = number of cells (or particles)
-  int     numTupls = 0;
-  if ( numbDims == 1 )
+  int numTupls = 0;
+  switch( numbDims )
     {
-    numTupls = cellDims[0];
-    }
-  else 
-  if ( numbDims == 2 )
-    {
-    numTupls = cellDims[0] * cellDims[1];
-    }
-  else 
-  if ( numbDims == 3 )
-    {
-    numTupls = cellDims[0] * cellDims[1] * cellDims[2];
-    }
-  else
-    {
-    vtkErrorMacro( "Invalid variable " << atribute << endl );
-    H5Gclose( spaceIdx );
-    H5Fclose( attrIndx );
-    H5Gclose( rootIndx );
-    H5Fclose( fileIndx );
-    return 0;
+    case 1:
+      numTupls = cellDims[0];
+      break;
+    case 2:
+      numTupls = cellDims[0] * cellDims[1];
+      break;
+    case 3:
+      numTupls = cellDims[0] * cellDims[1] * cellDims[2];
+      break;
+    default:
+      vtkErrorMacro( "Invalid variable " << atribute << endl );
+      H5Gclose( spaceIdx );
+      H5Fclose( attrIndx );
+      H5Gclose( rootIndx );
+      H5Fclose( fileIndx );
+      return 0;
     }
 
   // determine the data type, load the values, and, if necessary, convert 
