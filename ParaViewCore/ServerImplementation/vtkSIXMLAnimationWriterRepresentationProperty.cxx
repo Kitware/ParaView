@@ -58,7 +58,7 @@ bool vtkSIXMLAnimationWriterRepresentationProperty::Push(
     }
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
-    vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(
+    vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(
       this->GetSIObject(proxy_ids[cc]));
 
     // Assign unique group name for each source.
@@ -67,7 +67,7 @@ bool vtkSIXMLAnimationWriterRepresentationProperty::Push(
     stream << vtkClientServerStream::Invoke
       << object
       << this->GetCommand()
-      << pmproxy->GetVTKObject()
+      << siProxy->GetVTKObject()
       << groupname_str.str().c_str()
       << vtkClientServerStream::End;
     }

@@ -690,10 +690,10 @@ bool vtkSMSessionCore::GatherInformationInternal(
     return false;
     }
 
-  vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(pmobject);
-  if (pmproxy /*&& !information->GetUseSIObject()*/)
+  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(pmobject);
+  if (siProxy /*&& !information->GetUseSIObject()*/)
     {
-    vtkObject* object = vtkObject::SafeDownCast(pmproxy->GetVTKObject());
+    vtkObject* object = vtkObject::SafeDownCast(siProxy->GetVTKObject());
     information->CopyFromObject(object);
     }
   else

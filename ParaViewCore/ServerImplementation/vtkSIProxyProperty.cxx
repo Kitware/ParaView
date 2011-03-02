@@ -277,12 +277,12 @@ void vtkSIProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 {
-  vtkSIProxy* pmProxy = NULL;
+  vtkSIProxy* siProxy = NULL;
   switch(this->ArgumentType)
     {
     case VTK:
-      pmProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
-      return (pmProxy == NULL) ? NULL : pmProxy->GetVTKObject();
+      siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
+      return (siProxy == NULL) ? NULL : siProxy->GetVTKObject();
     case SMProxy:
       return this->SIProxy->GetRemoteObject(globalId);
     case Kernel:
@@ -293,6 +293,6 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 //----------------------------------------------------------------------------
 bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
-  vtkSIProxy* pmProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
-  return globalId? pmProxy->IsNullProxy() : true;
+  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
+  return globalId ? siProxy->IsNullProxy() : true;
 }

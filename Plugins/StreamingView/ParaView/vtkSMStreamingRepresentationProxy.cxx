@@ -119,12 +119,12 @@ void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
     // this->Harness->AddInput(0, this->PieceCache->GetOuputPort(0), "SetInputConnection")
 
     << vtkClientServerStream::Invoke
-    << PMPROXY(this->PieceCache)
+    << SIPROXY(this->PieceCache)
     << "GetOutputPort"
     << 0
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << PMPROXY(this->Harness)
+    << SIPROXY(this->Harness)
     << "AddInput"
     << 0
     << vtkClientServerStream::LastResult
@@ -135,12 +135,12 @@ void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
     // this->AddInput(0, this->Harness->GetOuputPort(0), "SetInputConnection")
 
     << vtkClientServerStream::Invoke
-    << PMPROXY(this->Harness)
+    << SIPROXY(this->Harness)
     << "GetOutputPort"
     << 0
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << PMPROXY(this)
+    << SIPROXY(this)
     << "AddInput"
     << 0
     << vtkClientServerStream::LastResult
@@ -152,7 +152,7 @@ void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
 //------------------------------------------------------------------------------
 #ifdef FIXME_COLLABORATION
 // Looks like a filter is being inserted into the pipeline. Maybe we should do
-// this in a PMProxy subclass.
+// this in a SIProxy subclass.
 void vtkSMStreamingRepresentationProxy::AddInput
   (unsigned int inputPort,
    vtkSMSourceProxy *input,

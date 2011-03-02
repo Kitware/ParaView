@@ -181,11 +181,11 @@ vtkObjectBase* vtkSMProxy::GetClientSideObject()
     this->CreateVTKObjects();
 
     vtkTypeUInt32 gid = this->GetGlobalID();
-    vtkSIProxy* pmproxy =
+    vtkSIProxy* siProxy =
       vtkSIProxy::SafeDownCast(this->Session->GetSIObject(gid));
-    if (pmproxy)
+    if (siProxy)
       {
-      return pmproxy->GetVTKObject();
+      return siProxy->GetVTKObject();
       }
     }
   return NULL;
@@ -1956,7 +1956,7 @@ void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << PMPROXY(this)
+         << SIPROXY(this)
          << "SetVTKObject"
          << VTKOBJECT(fromP)
          << vtkClientServerStream::End;
@@ -2001,7 +2001,7 @@ void vtkSMProxy::UpdatePipelineInformation()
 
 //---------------------------------------------------------------------------
 vtkClientServerStream& operator<< (vtkClientServerStream& stream,
-  const PMPROXY& manipulator)
+  const SIPROXY& manipulator)
 {
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke

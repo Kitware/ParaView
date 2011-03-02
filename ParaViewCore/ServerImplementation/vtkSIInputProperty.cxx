@@ -93,10 +93,10 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
 
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
-    vtkSISourceProxy* pmproxy = vtkSISourceProxy::SafeDownCast(
+    vtkSISourceProxy* siProxy = vtkSISourceProxy::SafeDownCast(
       this->GetSIObject(proxy_ids[cc]));
     vtkAlgorithmOutput* input_connection =
-      (pmproxy? pmproxy->GetOutputPort(output_ports[cc]) : NULL);
+      (siProxy? siProxy->GetOutputPort(output_ports[cc]) : NULL);
     stream << vtkClientServerStream::Invoke
            << this->SIProxy
            << "AddInput"

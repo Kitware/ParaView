@@ -186,7 +186,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << PMPROXY(this)
+           << SIPROXY(this)
            << "UpdateInformation"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
@@ -489,10 +489,10 @@ void vtkSMSourceProxy::CreateSelectionProxies()
       // We don't use input property since that leads to reference loop cycles
       // and I don't feel like doing the garbage collection thing right now.
       stream << vtkClientServerStream::Invoke
-             << PMPROXY(this)
+             << SIPROXY(this)
              << "SetupSelectionProxy"
              << cc
-             << PMPROXY(esProxy)
+             << SIPROXY(esProxy)
              << vtkClientServerStream::End;
       }
 

@@ -684,23 +684,23 @@ protected:
 // <code>
 // vtkClientServerStream stream;
 // stream << vtkClientServerStream::Invoke
-//        << PMPROXY(proxyA)
+//        << SIPROXY(proxyA)
 //        << "MethodName"
 //        << vtkClientServerStream::End;
 // </code>
 // Will result in calling the vtkSIProxy::MethodName() when the stream in
 // interpreted.
-class VTK_EXPORT PMPROXY
+class VTK_EXPORT SIPROXY
 {
   vtkSMProxy* Reference;
   friend VTK_EXPORT vtkClientServerStream& operator<<(
-    vtkClientServerStream& stream, const PMPROXY& manipulator);
+    vtkClientServerStream& stream, const SIPROXY& manipulator);
 public:
-  PMPROXY(vtkSMProxy* proxy) : Reference(proxy) {}
+  SIPROXY(vtkSMProxy* proxy) : Reference(proxy) {}
 };
 
 VTK_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
-  const PMPROXY& manipulator);
+  const SIPROXY& manipulator);
 
 // This defines a manipulator for the vtkClientServerStream that can be used on
 // the to indicate to the interpreter that the placeholder is to be replaced by

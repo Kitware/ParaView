@@ -191,7 +191,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
   if (vtkSMOutputPort::UseStreaming)
     {
     stream << vtkClientServerStream::Invoke
-           << PMPROXY(this->SourceProxy)
+           << SIPROXY(this->SourceProxy)
            << "UpdateStreamingPipeline"
            << vtkSMOutputPort::DefaultPass //pass
            << vtkSMOutputPort::DefaultNumPasses //number of passes
@@ -202,7 +202,7 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
   else
     {
     stream << vtkClientServerStream::Invoke
-           << PMPROXY(this->SourceProxy)
+           << SIPROXY(this->SourceProxy)
            << "UpdatePipeline"
            << this->PortIndex << time << (doTime? 1 : 0)
            << vtkClientServerStream::End;

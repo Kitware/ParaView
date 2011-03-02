@@ -47,14 +47,14 @@ vtkSIObject* vtkSMSessionCoreInterpreterHelper::GetSIObject(vtkTypeUInt32 gid)
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
-  vtkSIProxy* pmproxy = vtkSIProxy::SafeDownCast(
+  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(
     this->Core->GetSIObject(gid));
-  if (!pmproxy)
+  if (!siProxy)
     {
     vtkErrorMacro("No vtkSIProxy for id : " << gid);
     return NULL;
     }
-  return pmproxy->GetVTKObject();
+  return siProxy->GetVTKObject();
 }
 
 //----------------------------------------------------------------------------
