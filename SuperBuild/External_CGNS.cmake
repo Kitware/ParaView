@@ -24,7 +24,7 @@ if(WIN32)
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # getting short path doesnt work on directories that dont exist
-  file(MAKE_DIRECTORY ${cgns_install})
+  file(MAKE_DIRECTORY ${CGNS_install})
   execute_process(
     COMMAND cscript /NoLogo ${CMAKE_CURRENT_SOURCE_DIR}/shortpath.vbs ${CGNS_install}
     OUTPUT_VARIABLE cgns_install_dos_short_path
