@@ -19,6 +19,7 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDomain.h"
 
 vtkStandardNewMacro(vtkSMComparativeAnimationCueProxy);
 //----------------------------------------------------------------------------
@@ -40,79 +41,33 @@ vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetCue()
     this->GetClientSideObject());
 }
 
-#ifdef FIXME_COLLABORATION
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMComparativeAnimationCueProxy::SaveState(
-  vtkPVXMLElement* root, vtkSMPropertyIterator *piter, int saveSubProxies)
+vtkPVXMLElement* vtkSMComparativeAnimationCueProxy::SaveXMLState(
+  vtkPVXMLElement* root, vtkSMPropertyIterator *piter)
 {
-  vtkPVXMLElement* proxyElem = this->Superclass::SaveState(
-    root, piter, saveSubProxies);
-  if (!proxyElem)
-    {
-    return NULL;
-    }
-
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
-  for (iter = this->Internals->CommandQueue.begin();
-    iter != this->Internals->CommandQueue.end(); ++iter)
-    {
-    vtkPVXMLElement* commandElem = iter->ToXML();
-    proxyElem->AddNestedElement(commandElem);
-    commandElem->Delete();
-    }
-  return proxyElem;
+  vtkPVComparativeAnimationCue* vtkClass =
+      vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
+  return vtkClass->AppendCommandInfo(this->Superclass::SaveXMLState(root, piter));
 }
 
 //----------------------------------------------------------------------------
-int vtkSMComparativeAnimationCueProxy::LoadState(
+int vtkSMComparativeAnimationCueProxy::LoadXMLState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
 {
-  if (!this->Superclass::LoadState(proxyElement, locator))
+  if (!this->Superclass::LoadXMLState(proxyElement, locator))
     {
     return 0;
     }
-
-  bool state_change_xml = (strcmp(proxyElement->GetName(), "StateChange") != 0);
-  if (state_change_xml)
-    {
-    // unless the state being loaded is a StateChange, we start from scratch.
-    this->Internals->CommandQueue.clear();
-    }
-
-  // NOTE: In case of state_change_xml,
-  // this assumes that all "removes" happen before any inserts which are
-  // always appends.
-  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
-    const char* name =  currentElement->GetName();
-    if (name && strcmp(name, "CueCommand") == 0)
-      {
-      vtkInternals::vtkCueCommand cmd;
-      if (cmd.FromXML(currentElement) == false)
-        {
-        vtkErrorMacro("Error when loading CueCommand.");
-        return 0;
-        }
-      int remove = 0;
-      if (state_change_xml &&
-        currentElement->GetScalarAttribute("remove", &remove) &&
-        remove != 0)
-        {
-        this->Internals->RemoveCommand(cmd);
-        }
-      else
-        {
-        this->Internals->CommandQueue.push_back(cmd);
-        }
-      }
-    }
+  vtkPVComparativeAnimationCue* vtkClass =
+      vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
+  vtkClass->LoadCommandInfo(proxyElement);
   this->Modified();
   return 1;
 }
 
 //----------------------------------------------------------------------------
+#ifdef FIXME_COLLABORATION
+
 int vtkSMComparativeAnimationCueProxy::RevertState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* vtkNotUsed(locator))
 {

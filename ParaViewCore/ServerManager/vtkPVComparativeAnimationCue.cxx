@@ -630,13 +630,9 @@ void vtkPVComparativeAnimationCue::UpdateAnimatedValue(
   proxy->UpdateVTKObjects();
 }
 
-#ifdef FIXME_COLLABORATION
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVComparativeAnimationCue::SaveState(
-  vtkPVXMLElement* root, vtkSMPropertyIterator *piter, int saveSubProxies)
+vtkPVXMLElement* vtkPVComparativeAnimationCue::AppendCommandInfo(vtkPVXMLElement* proxyElem)
 {
-  vtkPVXMLElement* proxyElem = this->Superclass::SaveState(
-    root, piter, saveSubProxies);
   if (!proxyElem)
     {
     return NULL;
@@ -654,14 +650,8 @@ vtkPVXMLElement* vtkPVComparativeAnimationCue::SaveState(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVComparativeAnimationCue::LoadState(
-  vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
+int vtkPVComparativeAnimationCue::LoadCommandInfo(vtkPVXMLElement* proxyElement)
 {
-  if (!this->Superclass::LoadState(proxyElement, locator))
-    {
-    return 0;
-    }
-
   bool state_change_xml = (strcmp(proxyElement->GetName(), "StateChange") != 0);
   if (state_change_xml)
     {
@@ -703,8 +693,7 @@ int vtkPVComparativeAnimationCue::LoadState(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVComparativeAnimationCue::RevertState(
-  vtkPVXMLElement* proxyElement, vtkSMProxyLocator* vtkNotUsed(locator))
+int vtkPVComparativeAnimationCue::RevertState(vtkPVXMLElement* proxyElement)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -737,7 +726,6 @@ int vtkPVComparativeAnimationCue::RevertState(
   this->Modified();
   return 1;
 }
-#endif
 //----------------------------------------------------------------------------
 void vtkPVComparativeAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {

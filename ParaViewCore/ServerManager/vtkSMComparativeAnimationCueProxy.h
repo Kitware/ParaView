@@ -39,17 +39,18 @@ public:
   // vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
   vtkPVComparativeAnimationCue* GetCue();
 
-#ifdef FIXME_COLLABORATION
   // Description:
-  // Saves the state of the proxy. 
-  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root)
-    { return this->Superclass::SaveState(root); }
-
+  // Saves the state of the proxy. This state can be reloaded
+  // to create a new proxy that is identical the present state of this proxy.
+  // The resulting proxy's XML hieratchy is returned, in addition if the root
+  // argument is not NULL then it's also inserted as a nested element.
+  // This call saves all a proxy's properties, including exposed properties
+  // and sub-proxies. More control is provided by the following overload.
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
+    { return this->Superclass::SaveXMLState(root); }
   // Description:
-  // Saves the state of the proxy.
-  // Overridden to add state for this proxy.
-  virtual vtkPVXMLElement* SaveState(
-    vtkPVXMLElement* root, vtkSMPropertyIterator *iter, int saveSubProxies);
+  // The iterator is use to filter the property available on the given proxy
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
 
   // Description:
   // Loads the proxy state from the XML element. Returns 0 on failure.
@@ -57,13 +58,7 @@ public:
   // state XML (which happens in case of properties of type vtkSMProxyProperty
   // or subclasses). If locator is NULL, then such properties are left
   // unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
-  // Description:
-  // Same as LoadState except that the proxy will try to undo the changes
-  // recorded in the state. 
-  virtual int RevertState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-#endif
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
 //BTX
 protected:

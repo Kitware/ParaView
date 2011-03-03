@@ -28,6 +28,7 @@
 class vtkSMDomain;
 class vtkSMProperty;
 class vtkSMProxy;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkPVComparativeAnimationCue : public vtkObject
 {
@@ -120,6 +121,10 @@ public:
   // NOTE: Returned values is only valid until the next call to this method.
   // Return value is only valid when numValues > 0.
   double* GetValues(int x, int y, int dx, int dy, unsigned int &numValues);
+
+  vtkPVXMLElement* AppendCommandInfo(vtkPVXMLElement* proxyElem);
+  int LoadCommandInfo(vtkPVXMLElement* proxyElement);
+  int RevertState(vtkPVXMLElement* proxyElement);
 
 //BTX
 protected:
