@@ -14,16 +14,16 @@ if(WIN32)
     set(silo_bin_dir SiloWindows/MSVC8/Win32/DllwithHDF5_Release)
   endif()
   
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_patch_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_patch_step.cmake
     @ONLY)
 
   # run's copysilo.bat which generates silo.h
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_configure_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_configure_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake
     @ONLY)
 
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_build_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_build_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_build_step.cmake
     @ONLY)
 
@@ -68,11 +68,16 @@ else()
     get_filename_component(qt_bin_dir ${QT_QMAKE_EXECUTABLE} PATH)
     get_filename_component(qt_dir ${qt_bin_dir} PATH)
   endif()
+
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_patch_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/silo_patch_step.cmake
+    @ONLY)
   
   configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_configure_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake
     @ONLY)
 
+  set(Silo_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/silo_patch_step.cmake)
   set(Silo_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake)
 
   ExternalProject_Add(Silo
@@ -82,7 +87,7 @@ else()
     URL ${SILO_URL}/${SILO_GZ}
     URL_MD5 ${SILO_MD5}
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND mkdir config-site && cp Makefile.in config-site/Makefile.in
+    PATCH_COMMAND ${Silo_PATCH_COMMAND}
     CONFIGURE_COMMAND ${Silo_CONFIGURE_COMMAND}
     DEPENDS ${Silo_dependencies}
   )
