@@ -52,7 +52,6 @@ vtkSIProxy::vtkSIProxy()
   this->VTKObject = NULL;
   this->ObjectsCreated = false;
 
-  this->InputSubProxy = 0;
   this->XMLGroup = 0;
   this->XMLName = 0;
   this->VTKClassName = 0;
@@ -68,7 +67,6 @@ vtkSIProxy::~vtkSIProxy()
   delete this->Internals;
   this->Internals = 0;
 
-  this->SetInputSubProxy(0);
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetVTKClassName(0);
@@ -363,7 +361,6 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
   // Add hook for post_push and post_creation
   this->SetPostPush(element->GetAttribute("post_push"));
   this->SetPostCreation(element->GetAttribute("post_creation"));
-  this->SetInputSubProxy(element->GetAttribute("input_subproxy"));
 
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
@@ -485,23 +482,16 @@ vtkSIProxy* vtkSIProxy::GetSubSIProxy(unsigned int cc)
 void vtkSIProxy::AddInput(
   int inputPort, vtkAlgorithmOutput* connection, const char* method)
 {
-  if(this->GetInputSubProxy())
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetVTKObject()
+         << method;
+  if (inputPort > 0)
     {
-    this->GetSubSIProxy(this->GetInputSubProxy())->AddInput(inputPort, connection, method);
+    stream << inputPort;
     }
-  else
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetVTKObject()
-           << method;
-    if (inputPort > 0)
-      {
-      stream << inputPort;
-      }
-    stream << connection << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
-    }
+  stream << connection << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
 }
 
 //----------------------------------------------------------------------------

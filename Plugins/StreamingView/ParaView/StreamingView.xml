@@ -533,10 +533,10 @@
 
   <ProxyGroup
       name="representations">
-    <StreamingRepresentationProxy
+    <PVRepresentationProxy
         name="StreamingRepresentation"
         class="vtkPVStreamingRepresentation"
-        input_subproxy="PieceCache"
+        si_class="vtkSIStreamingRepresentationProxy"
         processes="client|renderserver|dataserver"
         base_proxygroup="representations"
         base_proxyname="GeometryRepresentation">
@@ -559,7 +559,7 @@
         </ExposedProperties>
       </SubProxy>
 
-    </StreamingRepresentationProxy>
+    </PVRepresentationProxy>
   </ProxyGroup>
 
   <ProxyGroup

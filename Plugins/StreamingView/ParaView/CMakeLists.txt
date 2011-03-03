@@ -85,7 +85,8 @@ add_paraview_plugin(
     vtkPVStreamingRepresentation.cxx
     vtkPVStreamingView.cxx
     vtkPVStreamingParallelHelper.cxx
-    vtkSMStreamingRepresentationProxy.cxx
+# Should be removed    vtkSMStreamingRepresentationProxy.cxx
+    vtkSIStreamingRepresentationProxy.cxx
     vtkSMStreamingViewProxy.cxx
   SERVER_MANAGER_XML
     StreamingView.xml

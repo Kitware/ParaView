@@ -67,12 +67,6 @@ public:
   vtkGetStringMacro(VTKClassName);
 
   // Description:
-  // Returns the InputSubProxy name which allow to deferred the input method
-  // to a given SubProxy and use a dedicated internal pipeline setup in a
-  // declarative manner through XML.
-  vtkGetStringMacro(InputSubProxy);
-
-  // Description:
   // Return true if that Proxy is supposed to have NO vtk class, which means
   // its a NullProxy.
   bool IsNullProxy() { return (VTKClassName == NULL); };
@@ -133,14 +127,12 @@ protected:
   vtkSetStringMacro(XMLName);
   vtkSetStringMacro(PostPush);
   vtkSetStringMacro(PostCreation);
-  vtkSetStringMacro(InputSubProxy);
 
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
   char* PostPush;
   char* PostCreation;
-  char* InputSubProxy;
 
   vtkSmartPointer<vtkObjectBase> VTKObject;
   bool ObjectsCreated;
