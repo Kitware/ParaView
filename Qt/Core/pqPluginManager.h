@@ -72,11 +72,6 @@ public:
   /// or client plugins if NULL
   void loadExtensions(pqServer*);
 
-  /// Attempts to load all available plugins in the directory pointed by
-  /// \c path. If server is 0, it loads client plugins, else it loads server
-  /// plugins
-  void loadExtensions(const QString& path, pqServer* server);
-
   /// return all the plugins loaded on a server, or locally if NULL is passed in
   vtkPVPluginsInformation* loadedExtensions(bool remote);
 

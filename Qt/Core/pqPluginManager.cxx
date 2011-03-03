@@ -206,12 +206,6 @@ vtkPVPluginsInformation* pqPluginManager::loadedExtensions(bool remote)
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginManager::loadExtensions(const QString& vtkNotUsed(path), pqServer* vtkNotUsed(server))
-{
-  // FIXME_COLLABORATION: code that loads plugins from the path.
-}
-
-//-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   pqServer* server, const QString& lib, QString* vtkNotUsed(errorMsg), bool remote)
 {
