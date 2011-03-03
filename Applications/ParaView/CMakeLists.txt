@@ -105,6 +105,10 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
           DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
 
+  install(DIRECTORY ${QT_PLUGINS_DIR}/imageformats 
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)
+
   if(PARAVIEW_ENABLE_PYTHON)
     option(PARAVIEW_INSTALL_PYTHON "Install core python modules in ParaView." OFF)
     mark_as_advanced(PARAVIEW_INSTALL_PYTHON)
