@@ -85,32 +85,12 @@ namespace
 
     vtkSMPropertyHelper(view, "Representations").Add(repr);
     view->UpdateVTKObjects();
-#ifdef FIXME_COLLABORATION
-    // Not sure why we are using streams here and not properties.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << view->GetID() << "AddRepresentation" << repr->GetID()
-      << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      view->GetConnectionID(),
-      (view->GetServers() & repr->GetServers()), stream);
-#endif
     }
 
   static void vtkRemoveRepresentation(vtkSMProxy* view, vtkSMProxy* repr)
     {
-    vtkSMPropertyHelper(view, "Representations").Add(repr);
+    vtkSMPropertyHelper(view, "Representations").Remove(repr);
     view->UpdateVTKObjects();
-#ifdef FIXME_COLLABORATION
-    // Not sure why we are using streams here and not properties.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << view->GetID() << "RemoveRepresentation" << repr->GetID()
-      << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      view->GetConnectionID(),
-      (view->GetServers() & repr->GetServers()), stream);
-#endif
     }
 }
 
