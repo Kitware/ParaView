@@ -145,27 +145,6 @@ SET (Kit_SRCS
   vtkSMWriterProxy.cxx
 )
 
-IF (FIXME) #-------------------------------------------------------------- BEGIN
-SET(Kit_SRCS
-  #vtkSMApplication.cxx ----- Get the configuration parsing stuff -----
-  #vtkSMCaveRenderModuleProxy.cxx
-  #vtkSMCaveRenderViewProxy.cxx
-  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type to copy data ?
-#  vtkSMSelectionDeliveryRepresentationProxy.cxx
-
-  ## Animation part +++++++++++
-  vtkSMCameraManipulatorProxy.cxx
-  vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMServerSideAnimationPlayer.cxx
-  vtkSMTimeAnimationCueProxy.cxx
-  )
-
-SET( ServerManagerNonWrapped_SRCS
-  vtkPVBatchOptions.cxx
-  )
-ENDIF (FIXME) #------------------------------------------------------------- END
-
-
 SET( ServerManager_SRCS
   ${ServerManagerCS_SRCS}
   ${Kit_SRCS}
