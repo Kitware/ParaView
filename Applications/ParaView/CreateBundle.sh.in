@@ -53,6 +53,7 @@ mkdir -p "$FrameworksDir"
 mkdir -p "$LibrariesDir"
 mkdir -p "$PluginsDir"
 mkdir -p "$PluginsDir/sqldrivers"
+mkdir -p "$PluginsDir/imageformats"
 mkdir -p "$PythonDir"
 mkdir -p "$SupportDir"
 
@@ -91,7 +92,7 @@ done
 
 # Copy sqlite qt plugin
 cp -p "@QT_PLUGINS_DIR@/sqldrivers/libqsqlite.dylib" $PluginsDir/sqldrivers/
-
+cp -p "@QT_PLUGINS_DIR@/imageformats/libqjpeg.dylib" $PluginsDir/imageformats/
 
 # Remove unneeded build-byproduct files that were copied by the
 # above recursive directory copies:
