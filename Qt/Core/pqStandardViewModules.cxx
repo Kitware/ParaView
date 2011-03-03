@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "pqScatterPlotView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
-#include "pqTableView.h"
 #include "pqTextRepresentation.h"
 #include "pqTwoDRenderView.h"
 #include "pqXYBarChartView.h"
@@ -67,7 +66,6 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() <<
     pqRenderView::renderViewType() <<
     pqTwoDRenderView::twoDRenderViewType() <<
-    pqTableView::tableType() <<
     pqSpreadSheetView::spreadsheetViewType() <<
 //    pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
@@ -91,10 +89,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   if (type == pqRenderView::renderViewType())
     {
     return pqRenderView::renderViewTypeName();
-    }
-  else if(type == pqTableView::tableType())
-    {
-    return pqTableView::tableTypeName();
     }
   else if (type == pqComparativeRenderView::comparativeRenderViewType())
     {
@@ -165,10 +159,6 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
   else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
     {
     root_xmlname = "2DRenderView";
-    }
-  else if(viewtype == pqTableView::tableType())
-    {
-    root_xmlname = "TableView";
     }
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {

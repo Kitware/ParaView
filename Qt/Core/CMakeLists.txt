@@ -111,7 +111,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.h
-  pqTableView.h
   pqTextRepresentation.h
   pqTimeKeeper.h
   pqTwoDRenderView.h
@@ -347,8 +346,6 @@ ADD_LIBRARY(pqCore
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.cxx
   pqStandardViewModules.h
-  pqTableView.cxx
-  pqTableView.h
   pqTextRepresentation.cxx
   pqTextRepresentation.h
   pqTimeKeeper.cxx
