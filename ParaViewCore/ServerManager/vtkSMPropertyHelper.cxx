@@ -436,7 +436,16 @@ void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
   else if (this->Type == vtkSMPropertyHelper::INT)
     {
     // enumeration domain
-    vtkSMPropertyHelperWarningMacro("FIXME");
+    vtkSMEnumerationDomain* domain =
+        vtkSMEnumerationDomain::SafeDownCast(
+            this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if(domain != NULL && domain->HasEntryText(value))
+      {
+      vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
+          this->Property);
+      int valid; // We already know that the entry exist...
+      ivp->SetElement(index, domain->GetEntryValue(value, valid));
+      }
     }
   else
     {
