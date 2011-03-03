@@ -49,6 +49,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
+#include "vtkSMEnumerationDomain.h"
 
 #include <vtksys/ios/sstream>
 
@@ -455,7 +456,19 @@ const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
   else if (this->Type == vtkSMPropertyHelper::INT)
     {
     // enumeration domain
-    vtkSMPropertyHelperWarningMacro("FIXME");
+    vtkSMEnumerationDomain* domain =
+        vtkSMEnumerationDomain::SafeDownCast(
+            this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if(domain != NULL)
+      {
+      vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
+          this->Property);
+      const char* entry = domain->GetEntryTextForValue(ivp->GetElement(index));
+      if(entry)
+        {
+        return entry;
+        }
+      }
     }
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
