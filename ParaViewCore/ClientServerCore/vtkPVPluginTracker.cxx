@@ -69,6 +69,12 @@ namespace
 
   vtkstd::string vtkLocatePlugin(const char* plugin, bool add_extensions)
     {
+    // Make sure we can get the options before going further
+    if(vtkProcessModule::GetProcessModule() == NULL)
+      {
+      return vtkstd::string();
+      }
+
     bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
     vtkstd::string app_dir = options->GetApplicationPath();
