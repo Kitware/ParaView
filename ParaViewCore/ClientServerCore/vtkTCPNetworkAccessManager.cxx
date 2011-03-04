@@ -21,6 +21,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
+#include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
@@ -225,10 +226,36 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
 vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   const char* hostname, int port, const char* handshake)
 {
-  // TODO: Add retry mechanism similar to what Ken added in
-  // vtkProcessModuleConnectionManager::OpenConnection
+  
+  // Create client socket.
+  // Create a RemoteConnection (Server/Client)
+  // Set the client socket on its controller.
+  // Manage the client socket.
+  vtkSmartPointer<vtkClientSocket> cs = vtkSmartPointer<vtkClientSocket>::New();
+  vtkSmartPointer<vtkTimerLog> timer = vtkSmartPointer<vtkTimerLog>::New();
+  timer->StartTimer();
+  while (1)
+    {
+    if (cs->ConnectToServer(hostname, port) != -1)
+      {
+      break;
+      }
+    timer->StopTimer();
+    if (timer->GetElapsedTime() > 60.0)
+      {
+      vtkErrorMacro(<< "Connect timeout.");
+      return NULL;
+      }
+    vtkWarningMacro(<< "Connect failed.  Retrying for "
+      << (60.0 - timer->GetElapsedTime()) << " more seconds.");
+    vtksys::SystemTools::Delay(1000);
+    }
+
   vtkSocketController* controller = vtkSocketController::New();
-  if (!controller->ConnectTo(hostname, port) ||
+  vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
+    controller->GetCommunicator());
+  comm->SetSocket(cs);
+  if (!comm->Handshake() ||
     !this->ParaViewHandshake(controller, false, handshake))
     {
     controller->Delete();
