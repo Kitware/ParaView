@@ -320,7 +320,7 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
-ADD_LIBRARY(pqComponents
+VTK_ADD_LIBRARY(pqComponents
   pq3DWidget.cxx
   pq3DWidget.h
   pqAboutDialog.cxx
@@ -664,6 +664,7 @@ SET(dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/pqComponentsExport.h")
 
 INSTALL(TARGETS pqComponents
+  EXPORT ${PV_INSTALL_EXPORT_NAME}
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
