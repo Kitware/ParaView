@@ -1053,7 +1053,7 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(
         classHierarchy.pop_back();
         this->MergeProxyDefinition(currentElement, newElement);
         }
-      realDefinition->CopyAttributes(newElement);
+      realDefinition->CopyAttributesTo(newElement);
 
       // Remove parent declaration
       newElement->RemoveAttribute("base_proxygroup");
@@ -1154,7 +1154,7 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
     vtkPVXMLElement* child = element->GetNestedElement(cc);
     vtkSmartPointer<vtkPVXMLElement> newElement =
         vtkSmartPointer<vtkPVXMLElement>::New();
-    child->Copy(newElement);
+    child->CopyTo(newElement);
     elementToFill->AddNestedElement(newElement);
     }
 }

@@ -18,6 +18,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVComparativeView.h"
 #include "vtkPVSession.h"
+#include "vtkSMSession.h"
+#include "vtkSMUndoStackBuilder.h"
 
 #include <assert.h>
 
@@ -40,7 +42,20 @@ vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::Update()
 {
-  this->Superclass::Update();
+  // Make sure we don't track in Undo/Redo the proxy update that we have set in
+  // the comparative view
+  if(this->GetSession() && this->GetSession()->GetUndoStackBuilder())
+    {
+    bool prev = this->GetSession()->GetUndoStackBuilder()->GetIgnoreAllChanges();
+    this->GetSession()->GetUndoStackBuilder()->SetIgnoreAllChanges(true);
+    this->Superclass::Update();
+    this->GetSession()->GetUndoStackBuilder()->SetIgnoreAllChanges(prev);
+    }
+  else
+    {
+    // Simply update
+    this->Superclass::Update();
+    }
 
   // I can't remember where is this flag coming from. Keeping it as it was for
   // now.
@@ -103,7 +118,7 @@ void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == NULL)
     {
-    cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
+    //cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
     // The representation that gets added to this view is a consumer of it's
     // input. While this view is a consumer of the representation. So, when the
     // input source is modified, that call eventually leads to

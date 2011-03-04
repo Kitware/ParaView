@@ -109,19 +109,20 @@ void vtkSMUndoStackBuilder::InitializeUndoSet()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
+bool vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 {
   if (!element)
     {
-    return;
+    return false;
     }
 
   if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
     {
-    return;
+    return false;
     }
 
   this->UndoSet->AddElement(element);
+  return true;
 }
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,

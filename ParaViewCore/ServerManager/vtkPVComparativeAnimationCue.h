@@ -124,7 +124,6 @@ public:
 
   vtkPVXMLElement* AppendCommandInfo(vtkPVXMLElement* proxyElem);
   int LoadCommandInfo(vtkPVXMLElement* proxyElement);
-  int RevertState(vtkPVXMLElement* proxyElement);
 
 //BTX
 protected:

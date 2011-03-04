@@ -42,6 +42,7 @@ SET (Kit_SRCS
   vtkSMCameraProxy.cxx
   vtkSMChartRepresentationProxy.cxx
   vtkSMComparativeAnimationCueProxy.cxx
+  vtkSMComparativeAnimationCueUndoElement.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeTreeDomain.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx

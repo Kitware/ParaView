@@ -65,9 +65,22 @@ protected:
   vtkSMComparativeAnimationCueProxy();
   ~vtkSMComparativeAnimationCueProxy();
 
+  // Description:
+  // Given a class name (by setting VTKClassName) and server ids (by
+  // setting ServerIDs), this methods instantiates the objects on the
+  // server(s)
+  virtual void CreateVTKObjects();
+
+  // Method used to simplify the access to the concreate VTK class underneath
+  friend class vtkSMComparativeAnimationCueUndoElement;
+  vtkPVComparativeAnimationCue* GetComparativeAnimationCue();
+
 private:
   vtkSMComparativeAnimationCueProxy(const vtkSMComparativeAnimationCueProxy&); // Not implemented
   void operator=(const vtkSMComparativeAnimationCueProxy&); // Not implemented
+
+  class vtkInternal;
+  vtkInternal* Internals;
 //ETX
 };
 

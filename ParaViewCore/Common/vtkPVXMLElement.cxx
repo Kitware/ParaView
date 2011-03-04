@@ -680,7 +680,7 @@ void vtkPVXMLElement::Merge(vtkPVXMLElement* element, const char* attributeName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXMLElement::Copy(vtkPVXMLElement* other)
+void vtkPVXMLElement::CopyTo(vtkPVXMLElement* other)
 {
   other->SetName(GetName());
   other->SetId(GetId());
@@ -696,13 +696,13 @@ void vtkPVXMLElement::Copy(vtkPVXMLElement* other)
     {
     vtkSmartPointer<vtkPVXMLElement> newElement =
         vtkSmartPointer<vtkPVXMLElement>::New();
-    (*iter)->Copy(newElement);
+    (*iter)->CopyTo(newElement);
     other->AddNestedElement(newElement);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXMLElement::CopyAttributes(vtkPVXMLElement* other)
+void vtkPVXMLElement::CopyAttributesTo(vtkPVXMLElement* other)
 {
   other->SetName(GetName());
   other->SetId(GetId());

@@ -190,11 +190,11 @@ public:
 
   // Description:
   // Copy the current XML element content into the provided one
-  void Copy(vtkPVXMLElement* other);
+  void CopyTo(vtkPVXMLElement* other);
 
   // Description:
   // Copy the attributes from current XML element content into the provided one.
-  void CopyAttributes(vtkPVXMLElement* other);
+  void CopyAttributesTo(vtkPVXMLElement* other);
 
 protected:
   vtkPVXMLElement();

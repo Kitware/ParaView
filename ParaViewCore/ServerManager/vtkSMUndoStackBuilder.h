@@ -90,7 +90,8 @@ public:
   // One can add arbritary elements to the active undo set.
   // It is essential that the StateLoader on the UndoStack can handle the 
   // arbritary undo elements.
-  virtual void Add(vtkUndoElement* element);
+  // If that element has been escaped for any reason, the method will return false;
+  virtual bool Add(vtkUndoElement* element);
 
   // Description:
   // Get/Set the undo stack that this builder will build.

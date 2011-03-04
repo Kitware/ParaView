@@ -693,40 +693,6 @@ int vtkPVComparativeAnimationCue::LoadCommandInfo(vtkPVXMLElement* proxyElement)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVComparativeAnimationCue::RevertState(vtkPVXMLElement* proxyElement)
-{
-  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
-    const char* name =  currentElement->GetName();
-    if (name && strcmp(name, "CueCommand") == 0)
-      {
-      vtkInternals::vtkCueCommand cmd;
-      if (cmd.FromXML(currentElement) == false)
-        {
-        vtkErrorMacro("Error when loading CueCommand.");
-        return 0;
-        }
-
-      int remove = 0;
-      int position = -1;
-      currentElement->GetScalarAttribute("remove", &remove);
-      currentElement->GetScalarAttribute("position", &position);
-      if (remove)
-        {
-        this->Internals->InsertCommand(cmd, position);
-        }
-      else
-        {
-        this->Internals->RemoveCommand(cmd);
-        }
-      }
-    }
-  this->Modified();
-  return 1;
-}
-//----------------------------------------------------------------------------
 void vtkPVComparativeAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

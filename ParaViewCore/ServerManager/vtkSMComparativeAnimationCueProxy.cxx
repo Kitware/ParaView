@@ -20,17 +20,103 @@
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
+#include "vtkSMSession.h"
+#include "vtkSMUndoStackBuilder.h"
+#include "vtkSMComparativeAnimationCueUndoElement.h"
 
+//****************************************************************************
+//                         Internal classes
+//****************************************************************************
+class vtkSMComparativeAnimationCueProxy::vtkInternal
+{
+public:
+  vtkInternal(vtkSMComparativeAnimationCueProxy* parent)
+    {
+    this->Parent = parent;
+    this->UndoStackBuilder = NULL;
+    }
+
+  ~vtkInternal()
+    {
+    this->Parent = NULL;
+    this->UndoStackBuilder = NULL;
+    if(this->Observable)
+      {
+      this->Observable->RemoveObserver(this->CallbackID);
+      }
+    }
+
+  void CreateUndoElement(vtkObject *caller, unsigned long eventId, void *callData)
+    {
+    // Make sure an UndoStackBuilder is available
+    if(this->UndoStackBuilder == NULL)
+      {
+      this->UndoStackBuilder = this->Parent->GetSession()->GetUndoStackBuilder();
+      if(this->UndoStackBuilder == NULL)
+        {
+        return;
+        }
+      }
+
+    if(!this->Parent || !this->Parent->GetComparativeAnimationCue())
+      {
+      return; // This shouldn't be called with that state
+      }
+
+    // Create custom undoElement
+    vtkSMComparativeAnimationCueUndoElement* elem = vtkSMComparativeAnimationCueUndoElement::New();
+    vtkSmartPointer<vtkPVXMLElement> newState = vtkSmartPointer<vtkPVXMLElement>::New();
+    this->Parent->SaveXMLState(newState);
+    elem->SetXMLStates(this->Parent->GetGlobalID(), this->LastKnownState, newState);
+    elem->SetSession(this->Parent->GetSession());
+    if(this->UndoStackBuilder->Add(elem))
+      {
+      this->LastKnownState = vtkSmartPointer<vtkPVXMLElement>::New();
+      newState->CopyTo(this->LastKnownState);
+      this->UndoStackBuilder->PushToStack();
+      }
+    elem->Delete();
+    }
+
+  void AttachObserver(vtkObject* obj)
+    {
+    this->Observable = obj;
+    this->CallbackID = obj->AddObserver( vtkCommand::StateChangedEvent, this,
+                                         &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
+    }
+
+  vtkSMUndoStackBuilder* UndoStackBuilder;
+  vtkSMComparativeAnimationCueProxy* Parent;
+  vtkWeakPointer<vtkObject> Observable;
+  vtkSmartPointer<vtkPVXMLElement> LastKnownState;
+  unsigned long CallbackID;
+};
+//****************************************************************************
 vtkStandardNewMacro(vtkSMComparativeAnimationCueProxy);
 //----------------------------------------------------------------------------
 vtkSMComparativeAnimationCueProxy::vtkSMComparativeAnimationCueProxy()
 {
+  this->Internals = new vtkInternal(this);
   this->SetLocation(vtkPVSession::CLIENT);
 }
 
 //----------------------------------------------------------------------------
 vtkSMComparativeAnimationCueProxy::~vtkSMComparativeAnimationCueProxy()
 {
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::CreateVTKObjects()
+{
+  bool needToAttachObserver = !this->ObjectsCreated;
+  this->Superclass::CreateVTKObjects();
+  if(needToAttachObserver && this->GetClientSideObject())
+    {
+    this->Internals->AttachObserver(
+        vtkObject::SafeDownCast(this->GetClientSideObject()));
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -42,12 +128,17 @@ vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetCue()
 }
 
 //----------------------------------------------------------------------------
+vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetComparativeAnimationCue()
+{
+  return vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
+}
+
+//----------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMComparativeAnimationCueProxy::SaveXMLState(
   vtkPVXMLElement* root, vtkSMPropertyIterator *piter)
 {
-  vtkPVComparativeAnimationCue* vtkClass =
-      vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
-  return vtkClass->AppendCommandInfo(this->Superclass::SaveXMLState(root, piter));
+  return this->GetComparativeAnimationCue()->AppendCommandInfo(
+      this->Superclass::SaveXMLState(root, piter));
 }
 
 //----------------------------------------------------------------------------
@@ -58,9 +149,7 @@ int vtkSMComparativeAnimationCueProxy::LoadXMLState(
     {
     return 0;
     }
-  vtkPVComparativeAnimationCue* vtkClass =
-      vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
-  vtkClass->LoadCommandInfo(proxyElement);
+  this->GetComparativeAnimationCue()->LoadCommandInfo(proxyElement);
   this->Modified();
   return 1;
 }
