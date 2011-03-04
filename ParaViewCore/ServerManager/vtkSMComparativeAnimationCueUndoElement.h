@@ -19,8 +19,8 @@
 #define __vtkSMComparativeAnimationCueUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include <vtkWeakPointer.h>
-#include <vtkSmartPointer.h>
+#include <vtkWeakPointer.h> // needed for vtkWeakPointer.
+#include <vtkSmartPointer.h> // needed for vtkSmartPointer.
 
 class vtkPVXMLElement;
 
