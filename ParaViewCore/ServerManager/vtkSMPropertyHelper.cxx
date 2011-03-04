@@ -436,15 +436,19 @@ void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
   else if (this->Type == vtkSMPropertyHelper::INT)
     {
     // enumeration domain
-    vtkSMEnumerationDomain* domain =
-        vtkSMEnumerationDomain::SafeDownCast(
-            this->Property->FindDomain("vtkSMEnumerationDomain"));
-    if(domain != NULL && domain->HasEntryText(value))
+    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
+      this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if (domain != NULL && domain->HasEntryText(value))
       {
       vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
-          this->Property);
+        this->Property);
       int valid; // We already know that the entry exist...
       ivp->SetElement(index, domain->GetEntryValue(value, valid));
+      }
+    else
+      {
+      vtkSMPropertyHelperWarningMacro(
+        "'" << value <<"' could not be converted to int.");
       }
     }
   else
@@ -465,15 +469,14 @@ const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
   else if (this->Type == vtkSMPropertyHelper::INT)
     {
     // enumeration domain
-    vtkSMEnumerationDomain* domain =
-        vtkSMEnumerationDomain::SafeDownCast(
-            this->Property->FindDomain("vtkSMEnumerationDomain"));
-    if(domain != NULL)
+    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
+      this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if (domain != NULL)
       {
       vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
-          this->Property);
+        this->Property);
       const char* entry = domain->GetEntryTextForValue(ivp->GetElement(index));
-      if(entry)
+      if (entry)
         {
         return entry;
         }
