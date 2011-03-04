@@ -61,13 +61,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSIStreamingRepresentationProxy.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkAlgorithmOutput.h"
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSession.h"
 #include "vtkSISourceProxy.h"
-#include "vtkAlgorithmOutput.h"
-#include "vtkClientServerInterpreter.h"
-#include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSIStreamingRepresentationProxy);
 
@@ -131,33 +131,16 @@ void vtkSIStreamingRepresentationProxy::AddInput( int inputPort,
   vtkSISourceProxy* pieceCache =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("PieceCache"));
   vtkAlgorithmOutput* pieceOutput = pieceCache->GetOutputPort(0);
+  vtkAlgorithm* pieceCacheAlg = vtkAlgorithm::SafeDownCast(
+    pieceCache->GetVTKObject());
 
   vtkSISourceProxy* harness =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("Harness"));
   vtkAlgorithmOutput* harnessOutput = harness->GetOutputPort(0);
+  vtkAlgorithm* harnessAlg = vtkAlgorithm::SafeDownCast(
+    harness->GetVTKObject());
 
-  // Set the input to the Piece cache sub proxy
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pieceCache->GetVTKObject()
-         << method;
-  if (inputPort > 0)
-    {
-    stream << inputPort;
-    }
-  stream << connection
-         << vtkClientServerStream::End;
-
-  // Make sure the pipeline is properly set underneath
-  stream << vtkClientServerStream::Invoke
-         << harness->GetVTKObject()
-         << "SetInputConnection"
-         << pieceOutput
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->GetVTKObject()
-         << "SetInputConnection"
-         << harnessOutput
-         << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
+  pieceCacheAlg->SetInputConnection(0, connection);
+  harnessAlg->SetInputConnection(pieceOutput);
+  this->Superclass::AddInput(inputPort, harnessOutput, method);
 }

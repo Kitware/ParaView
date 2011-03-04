@@ -69,15 +69,15 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkSIStreamingRepresentationProxy_h
 #define __vtkSIStreamingRepresentationProxy_h
 
-#include "vtkSIProxy.h"
+#include "vtkSIPVRepresentationProxy.h"
 
 class VTK_EXPORT vtkSIStreamingRepresentationProxy :
-  public vtkSIProxy
+  public vtkSIPVRepresentationProxy
 {
 public:
   static vtkSIStreamingRepresentationProxy* New();
   vtkTypeMacro(vtkSIStreamingRepresentationProxy,
-               vtkSIProxy);
+               vtkSIPVRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
