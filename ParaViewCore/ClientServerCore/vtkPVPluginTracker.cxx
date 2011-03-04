@@ -48,7 +48,7 @@
 #define vtkPVPluginTrackerDebugMacro(x)\
 { if (debug_plugin) {\
   vtksys_ios::ostringstream vtkerror;\
-  vtkerror << x;\
+  vtkerror << x << endl;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
 namespace
@@ -67,13 +67,12 @@ namespace
       }
     };
 
-  vtkstd::string vtkLocatePlugin(const char* plugin)
+  vtkstd::string vtkLocatePlugin(const char* plugin, bool add_extensions)
     {
     bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
     vtkstd::string app_dir = options->GetApplicationPath();
     app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
-
 
     vtkstd::vector<vtkstd::string> paths_to_search;
     paths_to_search.push_back(app_dir);
@@ -84,14 +83,17 @@ namespace
 #endif
 
     vtkstd::string name = plugin;
-    vtkstd::string filename;
+    vtkstd::string filename = name;
+    if (add_extensions)
+      {
 #if defined(_WIN32) && !defined(__CYGWIN__)
-    filename = name + ".dll";
+      filename = name + ".dll";
 #elif defined(__APPLE__)
-    filename = "lib" + name + ".dylib";
+      filename = "lib" + name + ".dylib";
 #else
-    filename = "lib" + name + ".so";
+      filename = "lib" + name + ".so";
 #endif
+      }
     for (size_t cc=0; cc < paths_to_search.size(); cc++)
       {
       vtkstd::string path = paths_to_search[cc];
@@ -171,6 +173,21 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     vtkPVPluginTracker* mgr = vtkPVPluginTracker::New();
     vtkPVPluginTracker::Instance = mgr;
     mgr->FastDelete();
+
+    bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
+    vtkPVPluginTrackerDebugMacro("Locate and load distributed plugin list.");
+
+    // Locate ".plugins" file.
+    vtkstd::string _plugins = vtkLocatePlugin(".plugins", false);
+    if (!_plugins.empty())
+      {
+      mgr->LoadPluginConfigurationXML(_plugins.c_str());
+      }
+    else
+      {
+      vtkPVPluginTrackerDebugMacro(
+        "Could not find .plugins file for distributed plugins");
+      }
     }
 
   return vtkPVPluginTracker::Instance;
@@ -259,7 +276,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         }
       else
         {
-        plugin_filename = vtkLocatePlugin(name);
+        plugin_filename = vtkLocatePlugin(name, true);
         }
       if (plugin_filename.empty())
         {
