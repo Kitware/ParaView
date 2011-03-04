@@ -22,12 +22,16 @@ PURPOSE.  See the above copyright notice for more information.
 static bool RealMain(int argc, char* argv[],
   vtkProcessModule::ProcessTypes type)
 {
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  // Marking this static avoids the false leak messages from vtkDebugLeaks when
+  // using mpich. It appears that the root process which spawns all the
+  // main processes waits in MPI_Init() and calls exit() when
+  // the others are done, causing apparent memory leaks for any non-static objects
+  // created before MPI_Init().
+  static vtkSmartPointer<vtkPVServerOptions> options =
+    vtkSmartPointer<vtkPVServerOptions>::New();
 
   // Init current process type
   vtkInitializationHelper::Initialize( argc, argv, type, options );
-
-  options->Delete();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();

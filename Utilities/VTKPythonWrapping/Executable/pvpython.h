@@ -60,7 +60,13 @@ namespace ParaViewPython {
   int Run(int processType, int argc, char* argv[])
     {
     // Setup options
-    vtkPVPythonOptions* options = vtkPVPythonOptions::New();
+    // Marking this static avoids the false leak messages from vtkDebugLeaks when
+    // using mpich. It appears that the root process which spawns all the
+    // main processes waits in MPI_Init() and calls exit() when
+    // the others are done, causing apparent memory leaks for any non-static objects
+    // created before MPI_Init().
+    static vtkSmartPointer<vtkPVPythonOptions> options =
+      vtkSmartPointer<vtkPVPythonOptions>::New();
     vtkInitializationHelper::Initialize( argc, argv, processType, options );
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -98,7 +104,6 @@ namespace ParaViewPython {
       }
     // Exit application
     vtkInitializationHelper::Finalize();
-    options->Delete();
     return ret_val;
     }
 }
