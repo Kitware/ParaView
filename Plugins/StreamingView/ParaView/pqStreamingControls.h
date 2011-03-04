@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDockWidget>
 
-class vtkSMStreamingRepresentationProxy;
+class vtkSMPVRepresentationProxy;
 class pqDataRepresentation;
 class pqPipelineSource;
 class StreamingView;
@@ -99,7 +99,7 @@ private slots:
   void updateTrackedRepresentation();
 
 private:
-  vtkSMStreamingRepresentationProxy *currentRep;
+  vtkSMPVRepresentationProxy *currentRep;
   StreamingView *currentView;
 
   class pqInternals;

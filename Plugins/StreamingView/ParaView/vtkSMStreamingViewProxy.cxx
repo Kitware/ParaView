@@ -63,7 +63,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
 
-#include "vtkSMStreamingRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
