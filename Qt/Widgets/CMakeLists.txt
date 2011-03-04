@@ -180,7 +180,7 @@ SET(QT_WIDGETS_ALL_SRCS ${QtWidgets_SRCS} ${QtWidgets_MOC_SOURCES}
   ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
 
 ##########################################################################
-ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
+VTK_ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
 
 
 ## Widgets does not depend on VTK/ParaView. Only Qt.
@@ -206,6 +206,7 @@ SET(dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/QtWidgetsExport.h")
 
 INSTALL(TARGETS pqWidgets
+  EXPORT ${PV_INSTALL_EXPORT_NAME}
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
