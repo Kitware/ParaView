@@ -21,7 +21,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
 #include "vtkCollection.h"
-
+#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMComparativeAnimationCueUndoElement);
 //-----------------------------------------------------------------------------
@@ -52,6 +52,7 @@ int vtkSMComparativeAnimationCueUndoElement::Undo()
         vtkSMComparativeAnimationCueProxy::SafeDownCast(
             this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
     proxy->GetComparativeAnimationCue()->LoadCommandInfo(this->BeforeState->GetNestedElement(0));
+    proxy->InvokeEvent(vtkCommand::ModifiedEvent); // Will update the UI
     }
   return 1;
 }
@@ -82,6 +83,7 @@ int vtkSMComparativeAnimationCueUndoElement::Redo()
           vtkSMComparativeAnimationCueProxy::SafeDownCast(
               this->Session->GetRemoteObject(this->ComparativeAnimationCueID));
       proxy->GetComparativeAnimationCue()->LoadCommandInfo(this->AfterState->GetNestedElement(0));
+      proxy->InvokeEvent(vtkCommand::ModifiedEvent); // Will update the UI
       }
     }
   return 1;
