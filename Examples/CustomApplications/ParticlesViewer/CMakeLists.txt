@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 project(ParticlesViewer)
 
 FIND_PACKAGE(ParaView REQUIRED)
+FIND_PACKAGE(Qt4)
 INCLUDE(${PARAVIEW_USE_FILE})
 
 INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
@@ -53,4 +54,4 @@ build_paraview_client(particles_viewer
       ${CMAKE_CURRENT_SOURCE_DIR}/SupportedReader.xml
 )
 
-
+TARGET_LINK_LIBRARIES(particles_viewer ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommon vtkPVCommandOptions vtkPVServerCommon pqCore pqComponents)
