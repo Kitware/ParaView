@@ -80,7 +80,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
-  SET(QT_MIN_VERSION "4.5.0")
+  SET(QT_MIN_VERSION "4.6.0")
   SET(QT_OFFICIAL_VERSION "4.6")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
