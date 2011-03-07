@@ -201,6 +201,7 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 # with the other python extension modules ParaView creates.
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 SET (VTK_INSTALL_NO_QT_PLUGIN 1)
+SET (VTK_INSTALL_NO_LIBRARIES ${PV_INSTALL_NO_LIBRARIES})
 
 # KWCommon config
 #TODO move this stuff into /ParaView3/Common/CMakeLists.txt
