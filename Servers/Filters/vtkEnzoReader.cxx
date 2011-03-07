@@ -1898,7 +1898,9 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
     } // END loop through all the blocks
 
-  this->SetRefinementRatio( output );
+  if( this->SelectedBlockId == -1 )
+    this->SetRefinementRatio( output );
+
   myController->Barrier();
 
   if( this->GenerateIBLANK )
