@@ -30,7 +30,7 @@ vtkStandardNewMacro(vtkSMPipelineState);
 //----------------------------------------------------------------------------
 vtkSMPipelineState::vtkSMPipelineState()
 {
-  this->SetGlobalID(vtkPVSession::RESERVED_PROXY_MANAGER_ID);
+  this->SetGlobalID(vtkSMProxyManager::GetReservedGlobalID());
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
 }
 

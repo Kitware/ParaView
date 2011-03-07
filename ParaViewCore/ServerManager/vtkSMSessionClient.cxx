@@ -273,7 +273,7 @@ void vtkSMSessionClient::Initialize()
 
   // Update definition from server
   vtkSMMessage msg;
-  msg.set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
+  msg.set_global_id(this->GetProxyDefinitionManager()->GetReservedGlobalID());
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->PullState(&msg);
   this->GetProxyDefinitionManager()->LoadXMLDefinitionState(&msg);

@@ -27,6 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSIProxy.h"
 #include "vtkPVSession.h"
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
@@ -347,24 +348,21 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 
   vtkTypeUInt32 globalId = message->global_id();
 
-  // FIXME handle this part as well for collaboration
-  if(globalId < vtkPVSession::RESERVED_MAX_IDS)
+  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
+  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
     {
     // Special ParaView specific main components
-    switch(globalId)
+    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
       {
-      case vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID:
-        // Update custom definition
-        this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
-        break;
-      case vtkPVSession::RESERVED_PROXY_MANAGER_ID:
-        // TODO - FIXME: Forward registration proxy to other clients...
-        this->Internals->MessageCacheMap[vtkPVSession::RESERVED_PROXY_MANAGER_ID] = *message;
-        break;
+      // Update custom definition
+      this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
       }
+
+    // TODO - FIXME_COLLABORATION: Forward registration proxy to other clients
     return;
     }
-  // FIXME ----------------------------------------------------------
+
+  // Standard management of SIObject ---------------------------------------
 
   // When the control reaches here, we are assured that the SIObject needs be
   // created/exist on the local process.
@@ -374,7 +372,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
     if (!message->HasExtension(DefinitionHeader::server_class))
       {
       vtkErrorMacro("Message missing DefinitionHeader."
-        "Aborting for debugging purposes.");
+                    "Aborting for debugging purposes.");
       abort();
       }
     // Create the corresponding SI object.
@@ -390,7 +388,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
     if (obj == NULL)
       {
       vtkErrorMacro("Object must be a vtkSIObject subclass. "
-        "Aborting for debugging purposes.");
+                    "Aborting for debugging purposes.");
       abort();
       }
     obj->SetGlobalID(globalId);
@@ -410,12 +408,12 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 void vtkSMSessionCore::PushState(vtkSMMessage* message)
 {
   // This can only be called on the root node.
-  assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0 ||
-    this->SymmetricMPIMode);
+  assert( this->ParallelController == NULL ||
+          this->ParallelController->GetLocalProcessId() == 0 ||
+          this->SymmetricMPIMode);
 
   if ( (message->location() & vtkProcessModule::SERVERS) != 0 &&
-    !this->SymmetricMPIMode)
+       !this->SymmetricMPIMode)
     {
     // send message to satellites and then start processing.
 
@@ -486,22 +484,21 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
     << message->DebugString().c_str());
 
   vtkSIObject* obj;
+  vtkTypeUInt32 globalId = message->global_id();
 
-  if(message->global_id() < vtkPVSession::RESERVED_MAX_IDS)
+  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
+  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
     {
     // Special ParaView specific main components
-    switch(message->global_id())
+    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
       {
-      case vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID:
-        this->GetProxyDefinitionManager()->GetXMLDefinitionState(message);
-        break;
-      case vtkPVSession::RESERVED_PROXY_MANAGER_ID:
-        message->CopyFrom(this->Internals->MessageCacheMap[vtkPVSession::RESERVED_PROXY_MANAGER_ID]);
-        break;
+      // Update custom definition
+      this->ProxyDefinitionManager->GetXMLDefinitionState(message);
       }
+
+    // FIXME_COLLABORATION_2: Get the server state for ProxyManager
     }
-  else if(true &&  // FIXME make sure that the SIObject should be created here
-          (obj = this->Internals->GetSIObject(message->global_id())))
+  else if ( obj = this->Internals->GetSIObject(message->global_id()) )
     {
     // Generic SIObject
     obj->Pull(message);
@@ -515,9 +512,9 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::ExecuteStream(
-  vtkTypeUInt32 location, const vtkClientServerStream& stream,
-  bool ignore_errors/*=false*/)
+void vtkSMSessionCore::ExecuteStream( vtkTypeUInt32 location,
+                                      const vtkClientServerStream& stream,
+                                      bool ignore_errors/*=false*/)
 {
   if (stream.GetNumberOfMessages() == 0)
     {
@@ -525,19 +522,18 @@ void vtkSMSessionCore::ExecuteStream(
     }
 
   // This can only be called on the root node.
-  assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0 ||
-    this->SymmetricMPIMode);
-
+  assert( this->ParallelController == NULL ||
+          this->ParallelController->GetLocalProcessId() == 0 ||
+          this->SymmetricMPIMode );
 
   if ( (location & vtkProcessModule::SERVERS) != 0 &&
-    !this->SymmetricMPIMode)
+       !this->SymmetricMPIMode)
     {
     // send message to satellites and then start processing.
 
-    if (this->ParallelController &&
-      this->ParallelController->GetNumberOfProcesses() > 1 &&
-      this->ParallelController->GetLocalProcessId() == 0)
+    if ( this->ParallelController &&
+         this->ParallelController->GetNumberOfProcesses() > 1 &&
+         this->ParallelController->GetLocalProcessId() == 0 )
       {
       // Forward the message to the satellites if the object is expected to exist
       // on the satellites.
@@ -580,19 +576,18 @@ void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::ExecuteStreamInternal(
-  const vtkClientServerStream& stream, bool ignore_errors)
+void vtkSMSessionCore::ExecuteStreamInternal(const vtkClientServerStream& stream,
+                                             bool ignore_errors)
 {
-  LOG(
-    << "----------------------------------------------------------------\n"
-    << "ExecuteStream\n"
-    << stream.StreamToString()
-    << "----------------------------------------------------------------\n");
+  LOG( << "----------------------------------------------------------------\n"
+       << "ExecuteStream\n"
+       << stream.StreamToString()
+       << "----------------------------------------------------------------\n");
 
   this->Interpreter->ClearLastResult();
 
   int temp = this->Interpreter->GetGlobalWarningDisplay();
-  this->Interpreter->SetGlobalWarningDisplay(ignore_errors? 0 : 1);
+  this->Interpreter->SetGlobalWarningDisplay(ignore_errors ? 0 : 1);
   this->Interpreter->ProcessStream(stream);
   this->Interpreter->SetGlobalWarningDisplay(temp);
 }
@@ -601,9 +596,9 @@ void vtkSMSessionCore::ExecuteStreamInternal(
 void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
 {
   // This can only be called on the root node.
-  assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0 ||
-    this->SymmetricMPIMode);
+  assert( this->ParallelController == NULL ||
+          this->ParallelController->GetLocalProcessId() == 0 ||
+          this->SymmetricMPIMode);
 
   vtkTypeUInt32 location = message->location();
 
@@ -611,9 +606,9 @@ void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
     {
     // send message to satellites and then start processing.
 
-    if (this->ParallelController &&
-      this->ParallelController->GetNumberOfProcesses() > 1 &&
-      this->ParallelController->GetLocalProcessId() == 0)
+    if ( this->ParallelController &&
+         this->ParallelController->GetNumberOfProcesses() > 1 &&
+         this->ParallelController->GetLocalProcessId() == 0)
       {
       // Forward the message to the satellites if the object is expected to exist
       // on the satellites.
@@ -625,7 +620,7 @@ void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
       // and we should fix this.
       unsigned char type = DELETE_SI;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
-        ROOT_SATELLITE_RMI_TAG);
+                                                        ROOT_SATELLITE_RMI_TAG);
 
       int byte_size = message->ByteSize();
       unsigned char *raw_data = new unsigned char[byte_size + 1];
@@ -663,17 +658,16 @@ void vtkSMSessionCore::DeleteSIObjectSatelliteCallback()
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
 {
-  LOG(
-    << "----------------------------------------------------------------\n"
-    << "Delete ( " << message->ByteSize() << " bytes )\n"
-    << "----------------------------------------------------------------\n"
-    << message->DebugString().c_str());
+  LOG( << "----------------------------------------------------------------\n"
+       << "Delete ( " << message->ByteSize() << " bytes )\n"
+       << "----------------------------------------------------------------\n"
+       << message->DebugString().c_str() );
   this->Internals->Delete(message->global_id());
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::GatherInformationInternal(
-  vtkPVInformation* information, vtkTypeUInt32 globalid)
+bool vtkSMSessionCore::GatherInformationInternal( vtkPVInformation* information,
+                                                  vtkTypeUInt32 globalid)
 {
   if (globalid == 0)
     {
@@ -705,13 +699,14 @@ bool vtkSMSessionCore::GatherInformationInternal(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
-  vtkPVInformation* information, vtkTypeUInt32 globalid)
+bool vtkSMSessionCore::GatherInformation( vtkTypeUInt32 location,
+                                          vtkPVInformation* information,
+                                          vtkTypeUInt32 globalid)
 {
   // This can only be called on the root node.
-  assert(this->ParallelController == NULL ||
-    this->ParallelController->GetLocalProcessId() == 0 ||
-    this->SymmetricMPIMode);
+  assert( this->ParallelController == NULL ||
+          this->ParallelController->GetLocalProcessId() == 0 ||
+          this->SymmetricMPIMode);
 
   if (!this->GatherInformationInternal(information, globalid))
     {
@@ -725,10 +720,10 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
 
   // send message to satellites and then start processing.
 
-  if (this->ParallelController &&
-    this->ParallelController->GetNumberOfProcesses() > 1 &&
-    this->ParallelController->GetLocalProcessId() == 0 &&
-    !this->SymmetricMPIMode)
+  if ( this->ParallelController &&
+       this->ParallelController->GetNumberOfProcesses() > 1 &&
+       this->ParallelController->GetLocalProcessId() == 0 &&
+       !this->SymmetricMPIMode)
     {
     // Forward the message to the satellites if the object is expected to exist
     // on the satellites.
@@ -740,7 +735,7 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
     // and we should fix this.
     unsigned char type = GATHER_INFORMATION;
     this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
-      ROOT_SATELLITE_RMI_TAG);
+                                                      ROOT_SATELLITE_RMI_TAG);
 
     vtkMultiProcessStream stream;
     stream << information->GetClassName() << globalid;

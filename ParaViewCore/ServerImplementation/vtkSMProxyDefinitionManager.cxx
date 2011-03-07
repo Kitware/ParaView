@@ -32,6 +32,7 @@
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+#include "vtkReservedRemoteObjectIds.h"
 
 #include "vtkNew.h"
 
@@ -781,7 +782,7 @@ void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(vtkSMMessage* msg)
   // Reset message state content
   ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
   msg->Clear();
-  msg->set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
+  msg->set_global_id(vtkSMProxyDefinitionManager::GetReservedGlobalID());
   msg->set_location(vtkPVSession::SERVERS); // This should be send to servers
 
   // Fill the state with the locals custom definitions
@@ -1169,7 +1170,7 @@ void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
 {
   // Setup required message header
   msg->Clear();
-  msg->set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
+  msg->set_global_id(vtkSMProxyDefinitionManager::GetReservedGlobalID());
   msg->set_location(vtkPVSession::DATA_SERVER);
 
   // This is made in a naive way, but we are sure that at each request
@@ -1341,4 +1342,9 @@ void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
     // Remove InformationHelper from XML
     propElement->RemoveNestedElement(informationHelper);
     }
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMProxyDefinitionManager::GetReservedGlobalID()
+{
+  return vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID;
 }

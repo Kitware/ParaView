@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMProxyManager.h"
 
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkCollection.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkInstantiator.h"
@@ -162,6 +163,12 @@ vtkSMProxyManager::~vtkSMProxyManager()
     this->PipelineState->Delete();
     this->PipelineState = NULL;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMProxyManager::GetReservedGlobalID()
+{
+  return vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID;
 }
 
 //----------------------------------------------------------------------------
@@ -1638,7 +1645,7 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
 {
   if(!this->Internals->State.has_global_id())
     {
-    this->Internals->State.set_global_id(vtkPVSession::RESERVED_PROXY_MANAGER_ID);
+    this->Internals->State.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
     this->Internals->State.set_location(vtkProcessModule::PROCESS_DATA_SERVER);
     }
 
@@ -1708,7 +1715,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
 void vtkSMProxyManager::LoadXMLDefinitionFromServer()
 {
   vtkSMMessage msg;
-  msg.set_global_id(vtkPVSession::RESERVED_PROXY_DEFINITION_MANAGER_ID);
+  msg.set_global_id(vtkSMProxyDefinitionManager::GetReservedGlobalID());
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);

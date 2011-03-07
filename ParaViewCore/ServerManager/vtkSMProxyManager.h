@@ -65,6 +65,8 @@ struct vtkClientServerID;
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
+  static vtkTypeUInt32 GetReservedGlobalID();
+
   static vtkSMProxyManager* New();
   vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);

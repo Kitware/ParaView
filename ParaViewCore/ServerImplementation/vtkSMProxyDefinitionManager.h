@@ -57,6 +57,8 @@ struct RegisteredDefinitionInformation
 class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkObject
 {
 public:
+  static vtkTypeUInt32 GetReservedGlobalID();
+
   // FIXME COLLABORATION : For now we dynamically convert InformationHelper
   // into the correct si_class and attribute sets.
   // THIS CODE SHOULD BE REMOVED once InformationHelper have been removed from
