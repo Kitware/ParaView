@@ -263,7 +263,8 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
   // Not a huge fan of this iterator API. Need to make it more consistent with
   // VTK.
   vtkSMProxyDefinitionIterator* iter =
-    this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, 0);
+      this->ProxyDefinitionManager->NewSingleGroupIterator( groupName,
+                                                            vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
 
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
@@ -292,7 +293,7 @@ void vtkSMProxyManager::InstantiatePrototypes()
 {
   assert(this->ProxyDefinitionManager != 0);
   vtkSMProxyDefinitionIterator* iter =
-    this->ProxyDefinitionManager->NewIterator(0);
+    this->ProxyDefinitionManager->NewIterator(vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
 
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextGroup())

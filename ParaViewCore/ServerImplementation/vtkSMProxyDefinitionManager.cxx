@@ -785,7 +785,8 @@ void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(vtkSMMessage* msg)
   msg->set_location(vtkPVSession::SERVERS); // This should be send to servers
 
   // Fill the state with the locals custom definitions
-  vtkSMProxyDefinitionIterator* iter = this->NewIterator(2); // 2: Custom only
+  vtkSMProxyDefinitionIterator* iter =
+      this->NewIterator(vtkSMProxyDefinitionManager::CUSTOM_DEFINITIONS);
   while(!iter->IsDoneWithTraversal())
     {
     vtkPVXMLElement* elem = iter->GetProxyDefinition();
@@ -813,7 +814,8 @@ void vtkSMProxyDefinitionManager::SaveCustomProxyDefinitions(
     return;
     }
 
-  vtkSMProxyDefinitionIterator* iter = NewIterator(2); // 2: Custom only
+  vtkSMProxyDefinitionIterator* iter =
+      this->NewIterator(vtkSMProxyDefinitionManager::CUSTOM_DEFINITIONS);
   while(!iter->IsDoneWithTraversal())
     {
     vtkPVXMLElement* elem = iter->GetProxyDefinition();
@@ -946,15 +948,18 @@ vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewSingleGroupIterato
   return iterator;
 }
 //---------------------------------------------------------------------------
+// vtkSMProxyDefinitionManager::ALL_DEFINITIONS
+// vtkSMProxyDefinitionManager::CORE_DEFINITIONS
+// vtkSMProxyDefinitionManager::CUSTOM_DEFINITIONS
 vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewIterator(int scope)
 {
   vtkInternalDefinitionIterator* iterator = vtkInternalDefinitionIterator::New();
   switch(scope)
     {
-    case 1: // Core only
+    case vtkSMProxyDefinitionManager::CORE_DEFINITIONS: // Core only
       iterator->RegisterCoreDefinitionMap( & this->Internals->CoreDefinitions);
       break;
-    case 2: // Custom only
+    case vtkSMProxyDefinitionManager::CUSTOM_DEFINITIONS: // Custom only
       iterator->RegisterCustomDefinitionMap( & this->Internals->CustomsDefinitions);
       break;
     default: // Both
@@ -1176,7 +1181,7 @@ void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
   vtkSMProxyDefinitionIterator* iter;
 
   // Core Definition
-  iter = this->NewIterator(1);
+  iter = this->NewIterator(vtkSMProxyDefinitionManager::CORE_DEFINITIONS);
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
@@ -1193,7 +1198,7 @@ void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
   iter->Delete();
 
   // Custome Definition
-  iter = this->NewIterator(2);
+  iter = this->NewIterator(vtkSMProxyDefinitionManager::CUSTOM_DEFINITIONS);
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
@@ -1329,7 +1334,7 @@ void vtkSMProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
       }
     else
       {
-      cerr << "No PMProperty for the following information helper: "
+      cerr << "No SIProperty for the following information helper: "
            << informationHelper->GetName() << endl;
       }
 

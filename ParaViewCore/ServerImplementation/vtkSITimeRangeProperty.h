@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSITimeRangeProperty
 // .SECTION Description
-// PMProperty that deals with TimeRange on Algorithm object type
+// SIProperty that deals with TimeRange on Algorithm object type
 
 #ifndef __vtkSITimeRangeProperty_h
 #define __vtkSITimeRangeProperty_h

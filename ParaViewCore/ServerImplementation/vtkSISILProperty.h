@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSISILProperty
 // .SECTION Description
-// PMProperty that deals with SIL data extraction to get the property value
+// SIProperty that deals with SIL data extraction to get the property value
 
 #ifndef __vtkSISILProperty_h
 #define __vtkSISILProperty_h

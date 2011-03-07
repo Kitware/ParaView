@@ -155,10 +155,10 @@ bool vtkSIWriterProxy::CreateVTKObjects(vtkSMMessage* message)
 void vtkSIWriterProxy::AddInput(
   int input_port, vtkAlgorithmOutput* connection, const char* method)
 {
-  vtkSIProxy* completeArraysPM = this->GetSubSIProxy("CompleteArrays");
+  vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
-    completeArraysPM? vtkCompleteArrays::SafeDownCast(
-      completeArraysPM->GetVTKObject()) : NULL;
+      completeArraysSI ?
+      vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
   if (completeArrays)
     {
     completeArrays->SetInputConnection(connection);
@@ -174,10 +174,10 @@ void vtkSIWriterProxy::AddInput(
 //----------------------------------------------------------------------------
 void vtkSIWriterProxy::CleanInputs(const char* method)
 {
-  vtkSIProxy* completeArraysPM = this->GetSubSIProxy("CompleteArrays");
+  vtkSIProxy* completeArraysSI = this->GetSubSIProxy("CompleteArrays");
   vtkCompleteArrays* completeArrays =
-    completeArraysPM? vtkCompleteArrays::SafeDownCast(
-      completeArraysPM->GetVTKObject()) : NULL;
+      completeArraysSI ?
+      vtkCompleteArrays::SafeDownCast(completeArraysSI->GetVTKObject()) : NULL;
   if (completeArrays)
     {
     completeArrays->SetInputConnection(NULL);

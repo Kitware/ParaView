@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSIArraySelectionProperty
 // .SECTION Description
-// PMProperty that deals with ArraySelection object
+// SIProperty that deals with ArraySelection object
 
 #ifndef __vtkSIArraySelectionProperty_h
 #define __vtkSIArraySelectionProperty_h

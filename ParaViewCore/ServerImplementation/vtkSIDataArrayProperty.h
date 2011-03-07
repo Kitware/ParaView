@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSIDataArrayProperty
 // .SECTION Description
-// PMProperty that deals with vtkDataArray object type
+// SIProperty that deals with vtkDataArray object type
 
 #ifndef __vtkSIDataArrayProperty_h
 #define __vtkSIDataArrayProperty_h

@@ -109,7 +109,7 @@ public:
   //---------------------------------------------------------------------------
   void Delete(vtkTypeUInt32 globalUniqueId)
     {
-    // Remove PM
+    // Remove SI (ServerImplementation) object
     SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
     if (iter != this->SIObjectMap.end())
       {
@@ -377,7 +377,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
         "Aborting for debugging purposes.");
       abort();
       }
-    // Create the corresponding PM object.
+    // Create the corresponding SI object.
     vtkstd::string classname = message->GetExtension(DefinitionHeader::server_class);
     vtkObject* object;
     object = vtkInstantiator::CreateInstance(classname.c_str());
@@ -683,14 +683,14 @@ bool vtkSMSessionCore::GatherInformationInternal(
 
   // default is to gather information from VTKObject, if FromSIObject is true,
   // then gather from SIObject.
-  vtkSIObject* pmobject = this->GetSIObject(globalid);
-  if (!pmobject)
+  vtkSIObject* siObject = this->GetSIObject(globalid);
+  if (!siObject)
     {
     vtkErrorMacro("No object with global-id: " << globalid);
     return false;
     }
 
-  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(pmobject);
+  vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(siObject);
   if (siProxy /*&& !information->GetUseSIObject()*/)
     {
     vtkObject* object = vtkObject::SafeDownCast(siProxy->GetVTKObject());
@@ -699,7 +699,7 @@ bool vtkSMSessionCore::GatherInformationInternal(
   else
     {
     // gather information from SIObject itself.
-    information->CopyFromObject(pmobject);
+    information->CopyFromObject(siObject);
     }
   return true;
 }
