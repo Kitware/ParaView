@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 project(Clone2)
 
 FIND_PACKAGE(ParaView REQUIRED)
+FIND_PACKAGE(Qt4)
 INCLUDE(${PARAVIEW_USE_FILE})
 
 INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
@@ -49,3 +50,5 @@ build_paraview_client(paraview_revised_2
     ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
   SOURCES ${ParaView_SOURCE_FILES}
 )
+
+TARGET_LINK_LIBRARIES(paraview_revised_2 ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}  vtkCommon vtkPVCommandOptions vtkPVServerCommon pqCore pqComponents)
