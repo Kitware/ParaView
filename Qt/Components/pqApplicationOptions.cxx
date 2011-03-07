@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewModuleInterface.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxyManager.h"
 
 #include <QMenu>
@@ -209,9 +209,9 @@ void pqApplicationOptions::updatePalettes()
     << pqSetName("paletteMenu");
   this->Internal->Palette->setMenu(paletteMenu);
 
-  vtkSMProxyDefinitionIterator* iter =
+  vtkPVProxyDefinitionIterator* iter =
     pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("palettes",
-      vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
+      vtkPVProxyDefinitionManager::ALL_DEFINITIONS);
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",

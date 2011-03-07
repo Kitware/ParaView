@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyDefinitionManager.h
+  Module:    vtkPVProxyDefinitionManager.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,29 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyDefinitionManager - object responsible for managing XML proxies definitions
+// .NAME vtkPVProxyDefinitionManager - object responsible for managing XML proxies definitions
 // .SECTION Description
-// vtkSMProxyDefinitionManager is a class that manages XML proxies definition.
+// vtkPVProxyDefinitionManager is a class that manages XML proxies definition.
 // It maintains a map of XML elements (populated by the XML parser) from
 // which it can extract Hint, Documentation, Properties, Domains definition.
 //
 // Whenever the proxy definitions are updated, this class fires
-// vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
-// vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
+// vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
+// vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
 // when a compound proxy is registered, on CompoundProxyDefinitionsUpdated event
 // is fired.
 // .SECTION See Also
 // vtkSMXMLParser
 
-#ifndef __vtkSMProxyDefinitionManager_h
-#define __vtkSMProxyDefinitionManager_h
+#ifndef __vtkPVProxyDefinitionManager_h
+#define __vtkPVProxyDefinitionManager_h
 
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkPVPlugin;
 class vtkPVXMLElement;
-class vtkSMProxyDefinitionIterator;
+class vtkPVProxyDefinitionIterator;
 
 // Description:
 // Information object used in Event notification
@@ -54,7 +54,7 @@ struct RegisteredDefinitionInformation
       }
   };
 
-class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkObject
+class VTK_EXPORT vtkPVProxyDefinitionManager : public vtkObject
 {
 public:
   static vtkTypeUInt32 GetReservedGlobalID();
@@ -65,8 +65,8 @@ public:
   // legacy XML
   static void PatchXMLProperty(vtkPVXMLElement* propElement);
 
-  static vtkSMProxyDefinitionManager* New();
-  vtkTypeMacro(vtkSMProxyDefinitionManager, vtkObject);
+  static vtkPVProxyDefinitionManager* New();
+  vtkTypeMacro(vtkPVProxyDefinitionManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -184,7 +184,7 @@ public:
     CUSTOM_DEFINITIONS=2
     };
 
-  vtkSMProxyDefinitionIterator* NewIterator(int scope=ALL_DEFINITIONS);
+  vtkPVProxyDefinitionIterator* NewIterator(int scope=ALL_DEFINITIONS);
 
   // Description
   // Return a new configured iterator for traversing a set of proxy definition
@@ -193,7 +193,7 @@ public:
   // 0 : ALL (default in case)
   // 1 : CORE_DEFINITIONS
   // 2 : CUSTOM_DEFINITIONS
-  vtkSMProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
+  vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
     int scope=ALL_DEFINITIONS);
 
 //BTX
@@ -202,8 +202,8 @@ public:
   void LoadXMLDefinitionState(vtkSMMessage* msg);
 
 protected:
-  vtkSMProxyDefinitionManager();
-  ~vtkSMProxyDefinitionManager();
+  vtkPVProxyDefinitionManager();
+  ~vtkPVProxyDefinitionManager();
 
   // Description:
   // Helper method that add a ShowInMenu Hint for a proxy definition.
@@ -251,8 +251,8 @@ protected:
                                    const char* subProxyName);
 
 private:
-  vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented
-  void operator=(const vtkSMProxyDefinitionManager&); // Not implemented
+  vtkPVProxyDefinitionManager(const vtkPVProxyDefinitionManager&); // Not implemented
+  void operator=(const vtkPVProxyDefinitionManager&); // Not implemented
 
   bool TriggerNotificationEvent;
 

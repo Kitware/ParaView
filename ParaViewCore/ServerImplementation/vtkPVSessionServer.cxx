@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSessionServer.h"
+#include "vtkPVSessionServer.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
@@ -42,7 +42,7 @@ namespace
   void RMICallback(void *localArg,
     void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
     {
-    vtkSMSessionServer* self = reinterpret_cast<vtkSMSessionServer*>(localArg);
+    vtkPVSessionServer* self = reinterpret_cast<vtkPVSessionServer*>(localArg);
     self->OnClientServerMessageRMI(remoteArg, remoteArgLength);
     }
 
@@ -50,14 +50,14 @@ namespace
     void *vtkNotUsed(remoteArg), int vtkNotUsed(remoteArgLength),
     int vtkNotUsed(remoteProcessId))
     {
-    vtkSMSessionServer* self = reinterpret_cast<vtkSMSessionServer*>(localArg);
+    vtkPVSessionServer* self = reinterpret_cast<vtkPVSessionServer*>(localArg);
     self->OnCloseSessionRMI();
     }
 };
 
-vtkStandardNewMacro(vtkSMSessionServer);
+vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
-vtkSMSessionServer::vtkSMSessionServer()
+vtkPVSessionServer::vtkPVSessionServer()
 {
   this->ClientController = 0;
   this->ActivateObserverId = 0;
@@ -65,13 +65,13 @@ vtkSMSessionServer::vtkSMSessionServer()
 }
 
 //----------------------------------------------------------------------------
-vtkSMSessionServer::~vtkSMSessionServer()
+vtkPVSessionServer::~vtkPVSessionServer()
 {
   this->SetClientController(0);
 }
 
 //----------------------------------------------------------------------------
-vtkMultiProcessController* vtkSMSessionServer::GetController(ServerFlags processType)
+vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags processType)
 {
   switch (processType)
     {
@@ -87,7 +87,7 @@ vtkMultiProcessController* vtkSMSessionServer::GetController(ServerFlags process
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::SetClientController(
+void vtkPVSessionServer::SetClientController(
   vtkMultiProcessController* controller)
 {
   if (this->ClientController == controller)
@@ -98,9 +98,9 @@ void vtkSMSessionServer::SetClientController(
   if (this->ClientController)
     {
     this->ClientController->RemoveAllRMICallbacks(
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
     this->ClientController->RemoveAllRMICallbacks(
-      vtkSMSessionServer::CLOSE_SESSION);
+      vtkPVSessionServer::CLOSE_SESSION);
     this->ClientController->RemoveObserver(this->ActivateObserverId);
     this->ClientController->RemoveObserver(this->DeActivateObserverId);
     this->ActivateObserverId = 0;
@@ -114,21 +114,21 @@ void vtkSMSessionServer::SetClientController(
     {
     this->ClientController->AddRMICallback(
       &RMICallback, this,
-      vtkSMSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
     this->ClientController->AddRMICallback(
       &CloseSessionCallback, this,
-      vtkSMSessionServer::CLOSE_SESSION);
+      vtkPVSessionServer::CLOSE_SESSION);
     this->ActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::StartEvent, this, &vtkSMSessionServer::Activate);
+      vtkCommand::StartEvent, this, &vtkPVSessionServer::Activate);
     this->DeActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::EndEvent, this, &vtkSMSessionServer::DeActivate);
+      vtkCommand::EndEvent, this, &vtkPVSessionServer::DeActivate);
     this->ClientController->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this, &vtkSMSessionServer::OnWrongTagEvent);
+      vtkCommand::WrongTagEvent, this, &vtkPVSessionServer::OnWrongTagEvent);
     }
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionServer::Connect()
+bool vtkPVSessionServer::Connect()
 {
   vtksys_ios::ostringstream url;
 
@@ -159,7 +159,7 @@ bool vtkSMSessionServer::Connect()
     break;
 
   default:
-    vtkErrorMacro("vtkSMSessionServer cannot be created on this process type.");
+    vtkErrorMacro("vtkPVSessionServer cannot be created on this process type.");
     return false;
     }
 
@@ -168,7 +168,7 @@ bool vtkSMSessionServer::Connect()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionServer::Connect(const char* url)
+bool vtkPVSessionServer::Connect(const char* url)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm->GetPartitionId() > 0)
@@ -278,7 +278,7 @@ bool vtkSMSessionServer::Connect(const char* url)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionServer::GetIsAlive()
+bool vtkPVSessionServer::GetIsAlive()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm->GetPartitionId() > 0)
@@ -291,7 +291,7 @@ bool vtkSMSessionServer::GetIsAlive()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_length)
+void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_length)
 {
   vtkMultiProcessStream stream;
   stream.SetRawData( reinterpret_cast<const unsigned char*>(message),
@@ -300,7 +300,7 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
   stream >> type;
   switch (type)
     {
-  case vtkSMSessionServer::PUSH:
+  case vtkPVSessionServer::PUSH:
       {
       vtkstd::string string;
       stream >> string;
@@ -310,7 +310,7 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
-  case vtkSMSessionServer::PULL:
+  case vtkPVSessionServer::PULL:
       {
       vtkstd::string string;
       stream >> string;
@@ -321,11 +321,11 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       // Send the result back to client
       vtkMultiProcessStream css;
       css << msg.SerializeAsString();
-      this->ClientController->Send( css, 1, vtkSMSessionServer::REPLY_PULL);
+      this->ClientController->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
       }
     break;
 
-  case vtkSMSessionServer::DELETE_SI:
+  case vtkPVSessionServer::DELETE_SI:
       {
       vtkstd::string string;
       stream >> string;
@@ -335,13 +335,13 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
-  case vtkSMSessionServer::EXECUTE_STREAM:
+  case vtkPVSessionServer::EXECUTE_STREAM:
       {
       int ignore_errors, size;
       stream >> ignore_errors >> size;
       unsigned char* css_data = new unsigned char[size+1];
       this->ClientController->Receive(css_data, size, 1,
-        vtkSMSessionServer::EXECUTE_STREAM_TAG);
+        vtkPVSessionServer::EXECUTE_STREAM_TAG);
       vtkClientServerStream cssStream;
       cssStream.SetData(css_data, size);
       this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS,
@@ -350,13 +350,13 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
-  case vtkSMSessionServer::LAST_RESULT:
+  case vtkPVSessionServer::LAST_RESULT:
       {
       this->SendLastResultToClient();
       }
     break;
 
-  case vtkSMSessionServer::GATHER_INFORMATION:
+  case vtkPVSessionServer::GATHER_INFORMATION:
       {
       vtkstd::string classname;
       vtkTypeUInt32 location, globalid;
@@ -370,7 +370,7 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::SendLastResultToClient()
+void vtkPVSessionServer::SendLastResultToClient()
 {
   const vtkClientServerStream& reply = this->GetLastResult(
     vtkPVSession::CLIENT_AND_SERVERS);
@@ -382,13 +382,13 @@ void vtkSMSessionServer::SendLastResultToClient()
   size = static_cast<int>(size_size_t);
 
   this->ClientController->Send(&size, 1, 1,
-    vtkSMSessionServer::REPLY_LAST_RESULT);
+    vtkPVSessionServer::REPLY_LAST_RESULT);
   this->ClientController->Send(data, size, 1,
-    vtkSMSessionServer::REPLY_LAST_RESULT);
+    vtkPVSessionServer::REPLY_LAST_RESULT);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::GatherInformationInternal(
+void vtkPVSessionServer::GatherInformationInternal(
   vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid,
   vtkMultiProcessStream& stream)
 {
@@ -411,9 +411,9 @@ void vtkSMSessionServer::GatherInformationInternal(
     css.GetData(&data, &length);
     int len = static_cast<int>(length);
     this->ClientController->Send(&len, 1, 1,
-      vtkSMSessionServer::REPLY_GATHER_INFORMATION_TAG);
+      vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     this->ClientController->Send(const_cast<unsigned char*>(data),
-      length, 1, vtkSMSessionServer::REPLY_GATHER_INFORMATION_TAG);
+      length, 1, vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
   else
     {
@@ -421,12 +421,12 @@ void vtkSMSessionServer::GatherInformationInternal(
     // let client know that gather failed.
     int len = 0;
     this->ClientController->Send(&len, 1, 1,
-      vtkSMSessionServer::REPLY_GATHER_INFORMATION_TAG);
+      vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::OnCloseSessionRMI()
+void vtkPVSessionServer::OnCloseSessionRMI()
 {
   if (this->GetIsAlive())
     {
@@ -437,7 +437,7 @@ void vtkSMSessionServer::OnCloseSessionRMI()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionServer::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSessionServer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

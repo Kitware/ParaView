@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVSessionBase.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,12 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSessionBase
+// .NAME vtkPVSessionBase
 // .SECTION Description
 //
 
-#ifndef __vtkSMSessionBase_h
-#define __vtkSMSessionBase_h
+#ifndef __vtkPVSessionBase_h
+#define __vtkPVSessionBase_h
 
 #include "vtkPVSession.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
@@ -27,13 +27,13 @@ class vtkCollection;
 class vtkSIObject;
 class vtkPVInformation;
 class vtkPVServerInformation;
-class vtkSMProxyDefinitionManager;
-class vtkSMSessionCore;
+class vtkPVProxyDefinitionManager;
+class vtkPVSessionCore;
 
-class VTK_EXPORT vtkSMSessionBase : public vtkPVSession
+class VTK_EXPORT vtkPVSessionBase : public vtkPVSession
 {
 public:
-  vtkTypeMacro(vtkSMSessionBase, vtkPVSession);
+  vtkTypeMacro(vtkPVSessionBase, vtkPVSession);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 
@@ -59,7 +59,7 @@ public:
 
   // Description:
   // This is socket connection, if any to communicate between the data-server
-  // and render-server nodes. Forwarded for vtkSMSessionCore.
+  // and render-server nodes. Forwarded for vtkPVSessionCore.
   virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection();
 
   //---------------------------------------------------------------------------
@@ -97,17 +97,17 @@ public:
 //ETX
 
   //---------------------------------------------------------------------------
-  // API dealing with/forwarded to vtkSMSessionCore dealing with SIObjects and
+  // API dealing with/forwarded to vtkPVSessionCore dealing with SIObjects and
   // SMObjects.
   //---------------------------------------------------------------------------
 
   // Description:
   // Provides access to the session core.
-  vtkGetObjectMacro(SessionCore, vtkSMSessionCore);
+  vtkGetObjectMacro(SessionCore, vtkPVSessionCore);
 
   // Description:
   // Get the ProxyDefinitionManager.
-  vtkSMProxyDefinitionManager* GetProxyDefinitionManager();
+  vtkPVProxyDefinitionManager* GetProxyDefinitionManager();
 
   // Description:
   // Returns a vtkSIObject or subclass given its global id, if any.
@@ -132,8 +132,8 @@ public:
 
 //BTX
 protected:
-  vtkSMSessionBase();
-  ~vtkSMSessionBase();
+  vtkPVSessionBase();
+  ~vtkPVSessionBase();
 
   // Description:
   // Should be called to begin/end receiving progresses on this session.
@@ -151,11 +151,11 @@ protected:
   // Unregister a remote object
   void UnRegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location);
 
-  vtkSMSessionCore* SessionCore;
+  vtkPVSessionCore* SessionCore;
 
 private:
-  vtkSMSessionBase(const vtkSMSessionBase&); // Not implemented
-  void operator=(const vtkSMSessionBase&); // Not implemented
+  vtkPVSessionBase(const vtkPVSessionBase&); // Not implemented
+  void operator=(const vtkPVSessionBase&); // Not implemented
 
   vtkPVServerInformation* LocalServerInformation;
 //ETX

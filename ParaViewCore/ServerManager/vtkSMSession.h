@@ -19,7 +19,7 @@
 #ifndef __vtkSMSession_h
 #define __vtkSMSession_h
 
-#include "vtkSMSessionBase.h"
+#include "vtkPVSessionBase.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkSMPluginManager;
@@ -27,11 +27,11 @@ class vtkSMUndoStackBuilder;
 class vtkSMStateLocator;
 class vtkProcessModuleAutoMPI;
 
-class VTK_EXPORT vtkSMSession : public vtkSMSessionBase
+class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
 {
 public:
   static vtkSMSession* New();
-  vtkTypeMacro(vtkSMSession, vtkSMSessionBase);
+  vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //---------------------------------------------------------------------------

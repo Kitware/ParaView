@@ -30,7 +30,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -1255,7 +1255,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     }
 
   // Patch XML to remove InformationHelper and set right si_class
-  vtkSMProxyDefinitionManager::PatchXMLProperty(propElement);
+  vtkPVProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;

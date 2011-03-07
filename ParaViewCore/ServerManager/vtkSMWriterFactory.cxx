@@ -22,10 +22,10 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
-#include "vtkSMProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionManager.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>
@@ -165,7 +165,7 @@ void vtkSMWriterFactory::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
 {
-  vtkSMProxyDefinitionIterator* iter = NULL;
+  vtkPVProxyDefinitionIterator* iter = NULL;
   vtkSMProxyManager* pxm = this->GetProxyManager();
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup,0);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())

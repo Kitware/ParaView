@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionClient.h"

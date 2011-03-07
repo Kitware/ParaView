@@ -27,8 +27,8 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyDefinitionIterator.h"
-#include "vtkSMProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
@@ -173,7 +173,7 @@ vtkTypeUInt32 vtkSMProxyManager::GetReservedGlobalID()
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetProxyDefinitionManager(
-  vtkSMProxyDefinitionManager* mgr)
+  vtkPVProxyDefinitionManager* mgr)
 {
   if (this->ProxyDefinitionManager == mgr)
     {
@@ -185,16 +185,16 @@ void vtkSMProxyManager::SetProxyDefinitionManager(
     this->ProxyDefinitionManager->RemoveObserver(this->Observer);
     }
   vtkSetObjectBodyMacro(
-    ProxyDefinitionManager, vtkSMProxyDefinitionManager, mgr);
+    ProxyDefinitionManager, vtkPVProxyDefinitionManager, mgr);
   if (this->ProxyDefinitionManager)
     {
     this->ProxyDefinitionManager->AddObserver(
-      vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated, this->Forwarder);
+      vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated, this->Forwarder);
     this->ProxyDefinitionManager->AddObserver(
-      vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Forwarder);
+      vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Forwarder);
 
     this->ProxyDefinitionManager->AddObserver(
-        vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+        vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
         this->Observer);
     this->ProxyDefinitionManager->AddObserver(
         vtkCommand::RegisterEvent, this->Observer);
@@ -269,9 +269,9 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
 
   // Not a huge fan of this iterator API. Need to make it more consistent with
   // VTK.
-  vtkSMProxyDefinitionIterator* iter =
+  vtkPVProxyDefinitionIterator* iter =
       this->ProxyDefinitionManager->NewSingleGroupIterator( groupName,
-                                                            vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
+                                                            vtkPVProxyDefinitionManager::ALL_DEFINITIONS);
 
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
@@ -299,8 +299,8 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
 void vtkSMProxyManager::InstantiatePrototypes()
 {
   assert(this->ProxyDefinitionManager != 0);
-  vtkSMProxyDefinitionIterator* iter =
-    this->ProxyDefinitionManager->NewIterator(vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
+  vtkPVProxyDefinitionIterator* iter =
+    this->ProxyDefinitionManager->NewIterator(vtkPVProxyDefinitionManager::ALL_DEFINITIONS);
 
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextGroup())
@@ -1027,7 +1027,7 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
            this->InvokeEvent(event, &info);
            }
          break;
-      case vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated:
+      case vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated:
          // Forward the custom definition to the server side
          if(this->Session)
            {
@@ -1715,7 +1715,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
 void vtkSMProxyManager::LoadXMLDefinitionFromServer()
 {
   vtkSMMessage msg;
-  msg.set_global_id(vtkSMProxyDefinitionManager::GetReservedGlobalID());
+  msg.set_global_id(vtkPVProxyDefinitionManager::GetReservedGlobalID());
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);

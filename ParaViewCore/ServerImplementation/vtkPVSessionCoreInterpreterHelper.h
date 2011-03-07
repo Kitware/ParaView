@@ -12,13 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSessionCoreInterpreterHelper
+// .NAME vtkPVSessionCoreInterpreterHelper
 // .SECTION Description
-// vtkSMSessionCoreInterpreterHelper is used by vtkSMSessionCore to avoid a
-// circular reference between the vtkSMSessionCore instance and its Interpreter.
+// vtkPVSessionCoreInterpreterHelper is used by vtkPVSessionCore to avoid a
+// circular reference between the vtkPVSessionCore instance and its Interpreter.
 
-#ifndef __vtkSMSessionCoreInterpreterHelper_h
-#define __vtkSMSessionCoreInterpreterHelper_h
+#ifndef __vtkPVSessionCoreInterpreterHelper_h
+#define __vtkPVSessionCoreInterpreterHelper_h
 
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
@@ -27,14 +27,14 @@ class vtkObject;
 class vtkSIObject;
 class vtkPVProgressHandler;
 class vtkProcessModule;
-class vtkSMSessionCore;
+class vtkPVSessionCore;
 class vtkMPIMToNSocketConnection;
 
-class VTK_EXPORT vtkSMSessionCoreInterpreterHelper : public vtkObject
+class VTK_EXPORT vtkPVSessionCoreInterpreterHelper : public vtkObject
 {
 public:
-  static vtkSMSessionCoreInterpreterHelper* New();
-  vtkTypeMacro(vtkSMSessionCoreInterpreterHelper, vtkObject);
+  static vtkPVSessionCoreInterpreterHelper* New();
+  vtkTypeMacro(vtkPVSessionCoreInterpreterHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSIObject* GetSIObject(vtkTypeUInt32 gid);
@@ -48,17 +48,17 @@ public:
   // data-server and render-server.
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
 
-  void SetCore(vtkSMSessionCore*);
+  void SetCore(vtkPVSessionCore*);
 
 //BTX
 protected:
-  vtkSMSessionCoreInterpreterHelper();
-  ~vtkSMSessionCoreInterpreterHelper();
+  vtkPVSessionCoreInterpreterHelper();
+  ~vtkPVSessionCoreInterpreterHelper();
 
-  vtkWeakPointer<vtkSMSessionCore> Core;
+  vtkWeakPointer<vtkPVSessionCore> Core;
 private:
-  vtkSMSessionCoreInterpreterHelper(const vtkSMSessionCoreInterpreterHelper&); // Not implemented
-  void operator=(const vtkSMSessionCoreInterpreterHelper&); // Not implemented
+  vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
+  void operator=(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
 //ETX
 };
 

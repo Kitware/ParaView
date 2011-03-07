@@ -26,7 +26,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkClientServerInterpreter;
-class vtkSMSessionCore;
+class vtkPVSessionCore;
 
 class VTK_EXPORT vtkSIObject : public vtkObject
 {
@@ -38,7 +38,7 @@ public:
   // Initializes the instance. Session is the session to which this instance
   // belongs to. During initialization, the SIObject basically obtains ivars for
   // necessary components.
-  virtual void Initialize(vtkSMSessionCore* session);
+  virtual void Initialize(vtkPVSessionCore* session);
 
 //BTX
   // Description:
@@ -79,7 +79,7 @@ protected:
   virtual ~vtkSIObject();
 
   vtkWeakPointer<vtkClientServerInterpreter> Interpreter;
-  vtkWeakPointer<vtkSMSessionCore> SessionCore;
+  vtkWeakPointer<vtkPVSessionCore> SessionCore;
 
   vtkSMMessage* LastPushedMessage;
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVSessionBase.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSessionBase.h"
+#include "vtkPVSessionBase.h"
 
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
@@ -20,16 +20,16 @@
 #include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkSMSessionCore.h"
+#include "vtkPVSessionCore.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
 //----------------------------------------------------------------------------
-vtkSMSessionBase::vtkSMSessionBase()
+vtkPVSessionBase::vtkPVSessionBase()
 {
-  this->SessionCore = vtkSMSessionCore::New();
+  this->SessionCore = vtkPVSessionCore::New();
 
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
@@ -47,13 +47,13 @@ vtkSMSessionBase::vtkSMSessionBase()
     }
 
   controller->AddObserver(vtkCommand::StartEvent,
-    this, &vtkSMSessionBase::Activate);
+    this, &vtkPVSessionBase::Activate);
   controller->AddObserver(vtkCommand::EndEvent,
-    this, &vtkSMSessionBase::DeActivate);
+    this, &vtkPVSessionBase::DeActivate);
 }
 
 //----------------------------------------------------------------------------
-vtkSMSessionBase::~vtkSMSessionBase()
+vtkPVSessionBase::~vtkPVSessionBase()
 {
   this->SessionCore->Delete();
   this->SessionCore = NULL;
@@ -63,13 +63,13 @@ vtkSMSessionBase::~vtkSMSessionBase()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxyDefinitionManager* vtkSMSessionBase::GetProxyDefinitionManager()
+vtkPVProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
 {
   return this->SessionCore->GetProxyDefinitionManager();
 }
 
 //----------------------------------------------------------------------------
-vtkSMSessionBase::ServerFlags vtkSMSessionBase::GetProcessRoles()
+vtkPVSessionBase::ServerFlags vtkPVSessionBase::GetProcessRoles()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   assert(pm != NULL);
@@ -98,13 +98,13 @@ vtkSMSessionBase::ServerFlags vtkSMSessionBase::GetProcessRoles()
 }
 
 //----------------------------------------------------------------------------
-vtkPVServerInformation* vtkSMSessionBase::GetServerInformation()
+vtkPVServerInformation* vtkPVSessionBase::GetServerInformation()
 {
   return this->LocalServerInformation;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::PushState(vtkSMMessage* msg)
+void vtkPVSessionBase::PushState(vtkSMMessage* msg)
 {
   this->Activate();
 
@@ -116,7 +116,7 @@ void vtkSMSessionBase::PushState(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::PullState(vtkSMMessage* msg)
+void vtkPVSessionBase::PullState(vtkSMMessage* msg)
 {
   this->Activate();
 
@@ -128,7 +128,7 @@ void vtkSMSessionBase::PullState(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::ExecuteStream(
+void vtkPVSessionBase::ExecuteStream(
   vtkTypeUInt32 location, const vtkClientServerStream& stream,
   bool ignore_errors/*=false*/)
 {
@@ -142,7 +142,7 @@ void vtkSMSessionBase::ExecuteStream(
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkSMSessionBase::GetLastResult(
+const vtkClientServerStream& vtkPVSessionBase::GetLastResult(
   vtkTypeUInt32 vtkNotUsed(location))
 {
   // This class does not handle remote sessions, so all messages are directly
@@ -151,7 +151,7 @@ const vtkClientServerStream& vtkSMSessionBase::GetLastResult(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::DeleteSIObject(vtkSMMessage* msg)
+void vtkPVSessionBase::DeleteSIObject(vtkSMMessage* msg)
 {
   this->Activate();
 
@@ -163,17 +163,17 @@ void vtkSMSessionBase::DeleteSIObject(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSMSessionBase::GetSIObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkPVSessionBase::GetSIObject(vtkTypeUInt32 globalid)
 {
   return this->SessionCore? this->SessionCore->GetSIObject(globalid) : NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::PrepareProgressInternal()
+void vtkPVSessionBase::PrepareProgressInternal()
 {
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke
-            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
+            << vtkClientServerID(1) // ID for vtkPVSessionCore helper.
             << "GetActiveProgressHandler"
             << vtkClientServerStream::End;
   vtkClientServerStream stream;
@@ -188,11 +188,11 @@ void vtkSMSessionBase::PrepareProgressInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::CleanupPendingProgressInternal()
+void vtkPVSessionBase::CleanupPendingProgressInternal()
 {
   vtkClientServerStream substream;
   substream << vtkClientServerStream::Invoke
-            << vtkClientServerID(1) // ID for vtkSMSessionCore helper.
+            << vtkClientServerID(1) // ID for vtkPVSessionCore helper.
             << "GetActiveProgressHandler"
             << vtkClientServerStream::End;
   vtkClientServerStream stream;
@@ -206,26 +206,26 @@ void vtkSMSessionBase::CleanupPendingProgressInternal()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionBase::GatherInformation(vtkTypeUInt32 location,
+bool vtkPVSessionBase::GatherInformation(vtkTypeUInt32 location,
     vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
   return this->SessionCore->GatherInformation(location, information, globalid);
 }
 
 //----------------------------------------------------------------------------
-vtkObject* vtkSMSessionBase::GetRemoteObject(vtkTypeUInt32 globalid)
+vtkObject* vtkPVSessionBase::GetRemoteObject(vtkTypeUInt32 globalid)
 {
   return this->SessionCore->GetRemoteObject(globalid);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
+void vtkPVSessionBase::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
 {
   this->SessionCore->RegisterRemoteObject(gid, obj);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 location)
+void vtkPVSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 location)
 {
   this->SessionCore->UnRegisterRemoteObject(gid);
 
@@ -237,20 +237,19 @@ void vtkSMSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 l
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::GetAllRemoteObjects(vtkCollection* collection)
+void vtkPVSessionBase::GetAllRemoteObjects(vtkCollection* collection)
 {
   this->SessionCore->GetAllRemoteObjects(collection);
 }
 
 //----------------------------------------------------------------------------
-vtkMPIMToNSocketConnection* vtkSMSessionBase::GetMPIMToNSocketConnection()
+vtkMPIMToNSocketConnection* vtkPVSessionBase::GetMPIMToNSocketConnection()
 {
   return this->SessionCore->GetMPIMToNSocketConnection();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionBase::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSessionBase::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

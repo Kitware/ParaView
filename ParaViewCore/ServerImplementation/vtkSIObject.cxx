@@ -17,7 +17,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
-#include "vtkSMSessionCore.h"
+#include "vtkPVSessionCore.h"
 
 #include <assert.h>
 
@@ -44,7 +44,7 @@ void vtkSIObject::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkSIObject::Initialize(vtkSMSessionCore* session)
+void vtkSIObject::Initialize(vtkPVSessionCore* session)
 {
   assert(session != NULL);
   this->SessionCore = session;

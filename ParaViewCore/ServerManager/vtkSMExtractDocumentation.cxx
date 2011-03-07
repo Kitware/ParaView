@@ -19,8 +19,8 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringListDomain.h"
@@ -655,7 +655,7 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, 
       // Get list from ProxyManager
       if (!strcmp(elem->GetAttribute("type"), "reader"))
         {
-        vtkSMProxyDefinitionIterator* iter =
+        vtkPVProxyDefinitionIterator* iter =
             manager->GetProxyDefinitionManager()->NewSingleGroupIterator("sources");
 
         for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
@@ -679,7 +679,7 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, 
         }
       else if (!strcmp(elem->GetAttribute("type"), "writer"))
         {
-        vtkSMProxyDefinitionIterator* iter =
+        vtkPVProxyDefinitionIterator* iter =
             manager->GetProxyDefinitionManager()->NewSingleGroupIterator("writers");
        for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
           {

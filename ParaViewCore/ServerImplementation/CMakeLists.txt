@@ -49,12 +49,12 @@ SET (Kit_SRCS
   vtkSIWriterProxy.cxx
   vtkSIXMLAnimationWriterRepresentationProperty.cxx
   vtkSMMessage.cxx
-  vtkSMProxyDefinitionIterator.cxx
-  vtkSMProxyDefinitionManager.cxx
-  vtkSMSessionBase.cxx
-  vtkSMSessionCore.cxx
-  vtkSMSessionCoreInterpreterHelper.cxx
-  vtkSMSessionServer.cxx
+  vtkPVProxyDefinitionIterator.cxx
+  vtkPVProxyDefinitionManager.cxx
+  vtkPVSessionBase.cxx
+  vtkPVSessionCore.cxx
+  vtkPVSessionCoreInterpreterHelper.cxx
+  vtkPVSessionServer.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -63,10 +63,10 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMProxyDefinitionIterator.cxx
+  vtkPVProxyDefinitionIterator.cxx
   vtkSIObject.cxx
   vtkSIVectorProperty.cxx
-  vtkSMSessionBase.cxx
+  vtkPVSessionBase.cxx
   vtkSMMessage.cxx
   ABSTRACT)
 
@@ -154,7 +154,7 @@ SET (dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
 
 
-SET_SOURCE_FILES_PROPERTIES(vtkSMProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
+SET_SOURCE_FILES_PROPERTIES(vtkPVProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 

@@ -33,12 +33,12 @@
 #include "vtkSIWriterProxy.h"
 #include "vtkSIXMLAnimationWriterRepresentationProperty.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProxyDefinitionIterator.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMSessionBase.h"
-#include "vtkSMSessionCore.h"
-#include "vtkSMSessionCoreInterpreterHelper.h"
-#include "vtkSMSessionServer.h"
+#include "vtkPVProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVSessionBase.h"
+#include "vtkPVSessionCore.h"
+#include "vtkPVSessionCoreInterpreterHelper.h"
+#include "vtkPVSessionServer.h"
 
 
 int main(int, char**)
@@ -74,11 +74,11 @@ int main(int, char**)
   PRINT_SELF(vtkSIWriterProxy);
   PRINT_SELF(vtkSIXMLAnimationWriterRepresentationProperty);
   //PRINT_SELF(vtkSMMessage);
-  PRINT_SELF(vtkSMProxyDefinitionIterator);
-  PRINT_SELF(vtkSMProxyDefinitionManager);
-  PRINT_SELF(vtkSMSessionBase);
-  PRINT_SELF(vtkSMSessionCore);
-  PRINT_SELF(vtkSMSessionCoreInterpreterHelper);
-  PRINT_SELF(vtkSMSessionServer);
+  PRINT_SELF(vtkPVProxyDefinitionIterator);
+  PRINT_SELF(vtkPVProxyDefinitionManager);
+  PRINT_SELF(vtkPVSessionBase);
+  PRINT_SELF(vtkPVSessionCore);
+  PRINT_SELF(vtkPVSessionCoreInterpreterHelper);
+  PRINT_SELF(vtkPVSessionServer);
   return 0;
 }

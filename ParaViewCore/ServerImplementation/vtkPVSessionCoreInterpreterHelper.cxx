@@ -12,40 +12,40 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSessionCoreInterpreterHelper.h"
+#include "vtkPVSessionCoreInterpreterHelper.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkSIProxy.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
-#include "vtkSMSessionCore.h"
+#include "vtkPVSessionCore.h"
 
-vtkStandardNewMacro(vtkSMSessionCoreInterpreterHelper);
+vtkStandardNewMacro(vtkPVSessionCoreInterpreterHelper);
 //----------------------------------------------------------------------------
-vtkSMSessionCoreInterpreterHelper::vtkSMSessionCoreInterpreterHelper()
+vtkPVSessionCoreInterpreterHelper::vtkPVSessionCoreInterpreterHelper()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMSessionCoreInterpreterHelper::~vtkSMSessionCoreInterpreterHelper()
+vtkPVSessionCoreInterpreterHelper::~vtkPVSessionCoreInterpreterHelper()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCoreInterpreterHelper::SetCore(vtkSMSessionCore* core)
+void vtkPVSessionCoreInterpreterHelper::SetCore(vtkPVSessionCore* core)
 {
   this->Core = core;
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSMSessionCoreInterpreterHelper::GetSIObject(vtkTypeUInt32 gid)
+vtkSIObject* vtkPVSessionCoreInterpreterHelper::GetSIObject(vtkTypeUInt32 gid)
 {
   return this->Core->GetSIObject(gid);
 }
 
 //----------------------------------------------------------------------------
-vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
+vtkObjectBase* vtkPVSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)
 {
   vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(
     this->Core->GetSIObject(gid));
@@ -58,13 +58,13 @@ vtkObjectBase* vtkSMSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid
 }
 
 //----------------------------------------------------------------------------
-vtkProcessModule* vtkSMSessionCoreInterpreterHelper::GetProcessModule()
+vtkProcessModule* vtkPVSessionCoreInterpreterHelper::GetProcessModule()
 {
   return vtkProcessModule::GetProcessModule();
 }
 
 //----------------------------------------------------------------------------
-vtkPVProgressHandler* vtkSMSessionCoreInterpreterHelper::GetActiveProgressHandler()
+vtkPVProgressHandler* vtkPVSessionCoreInterpreterHelper::GetActiveProgressHandler()
 {
   vtkPVSession* session = vtkPVSession::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetActiveSession());
@@ -78,14 +78,14 @@ vtkPVProgressHandler* vtkSMSessionCoreInterpreterHelper::GetActiveProgressHandle
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCoreInterpreterHelper::SetMPIMToNSocketConnection(
+void vtkPVSessionCoreInterpreterHelper::SetMPIMToNSocketConnection(
   vtkMPIMToNSocketConnection* m2n)
 {
   this->Core->SetMPIMToNSocketConnection(m2n);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCoreInterpreterHelper::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSessionCoreInterpreterHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

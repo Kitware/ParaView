@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVServerOptions.h"
 #include "vtkProcessModule.h"
-#include "vtkSMSessionServer.h"
+#include "vtkPVSessionServer.h"
 
 static bool RealMain(int argc, char* argv[],
   vtkProcessModule::ProcessTypes type)
@@ -35,7 +35,7 @@ static bool RealMain(int argc, char* argv[],
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
-  vtkSMSessionServer* session = vtkSMSessionServer::New();
+  vtkPVSessionServer* session = vtkPVSessionServer::New();
   int process_id = controller->GetLocalProcessId();
   if (process_id == 0)
     {

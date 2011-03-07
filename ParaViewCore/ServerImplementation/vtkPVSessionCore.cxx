@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSessionCore.h"
+#include "vtkPVSessionCore.h"
 
 #include "vtkClientServerID.h"
 #include "vtkClientServerInterpreter.h"
@@ -32,8 +32,8 @@
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMSessionCoreInterpreterHelper.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVSessionCoreInterpreterHelper.h"
 #include "vtkSmartPointer.h"
 
 #include "assert.h"
@@ -52,23 +52,23 @@ namespace
   void RMICallback(void *localArg, void *remoteArg,
     int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
     {
-    vtkSMSessionCore* sessioncore = reinterpret_cast<vtkSMSessionCore*>(localArg);
+    vtkPVSessionCore* sessioncore = reinterpret_cast<vtkPVSessionCore*>(localArg);
     unsigned char type = *(reinterpret_cast<unsigned char*>(remoteArg));
     switch (type)
       {
-    case vtkSMSessionCore::PUSH_STATE:
+    case vtkPVSessionCore::PUSH_STATE:
       sessioncore->PushStateSatelliteCallback();
       break;
 
-    case vtkSMSessionCore::GATHER_INFORMATION:
+    case vtkPVSessionCore::GATHER_INFORMATION:
       sessioncore->GatherInformationStatelliteCallback();
       break;
 
-    case vtkSMSessionCore::EXECUTE_STREAM:
+    case vtkPVSessionCore::EXECUTE_STREAM:
       sessioncore->ExecuteStreamSatelliteCallback();
       break;
 
-    case vtkSMSessionCore::DELETE_SI:
+    case vtkPVSessionCore::DELETE_SI:
       sessioncore->DeleteSIObjectSatelliteCallback();
       break;
       }
@@ -77,7 +77,7 @@ namespace
 //****************************************************************************/
 //                        Internal Class
 //****************************************************************************/
-class vtkSMSessionCore::vtkInternals
+class vtkPVSessionCore::vtkInternals
 {
 public:
   vtkInternals()
@@ -190,17 +190,17 @@ public:
 };
 
 //****************************************************************************/
-vtkStandardNewMacro(vtkSMSessionCore);
+vtkStandardNewMacro(vtkPVSessionCore);
 //----------------------------------------------------------------------------
-vtkSMSessionCore::vtkSMSessionCore()
+vtkPVSessionCore::vtkPVSessionCore()
 {
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInterpreter();
   this->MPIMToNSocketConnection = NULL;
   this->SymmetricMPIMode = false;
 
-  vtkSMSessionCoreInterpreterHelper* helper =
-    vtkSMSessionCoreInterpreterHelper::New();
+  vtkPVSessionCoreInterpreterHelper* helper =
+    vtkPVSessionCoreInterpreterHelper::New();
   helper->SetCore(this);
 
   vtkClientServerStream stream;
@@ -213,14 +213,14 @@ vtkSMSessionCore::vtkSMSessionCore()
 
   this->Internals = new vtkInternals();
 
-  vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
-      vtkMemberFunctionCommand<vtkSMSessionCore>::New();
-  observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
+  vtkMemberFunctionCommand<vtkPVSessionCore>* observer =
+      vtkMemberFunctionCommand<vtkPVSessionCore>::New();
+  observer->SetCallback(*this, &vtkPVSessionCore::OnInterpreterError);
   this->Internals->InterpreterObserverID =
       this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
   observer->Delete();
 
-  this->ProxyDefinitionManager = vtkSMProxyDefinitionManager::New();
+  this->ProxyDefinitionManager = vtkPVProxyDefinitionManager::New();
 
   this->ParallelController = vtkMultiProcessController::GetGlobalController();
   if (this->ParallelController &&
@@ -253,7 +253,7 @@ vtkSMSessionCore::vtkSMSessionCore()
 }
 
 //----------------------------------------------------------------------------
-vtkSMSessionCore::~vtkSMSessionCore()
+vtkPVSessionCore::~vtkPVSessionCore()
 {
   LOG("Closing session");
 
@@ -284,7 +284,7 @@ vtkSMSessionCore::~vtkSMSessionCore()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::SetMPIMToNSocketConnection(
+void vtkPVSessionCore::SetMPIMToNSocketConnection(
   vtkMPIMToNSocketConnection* m2n)
 {
   vtkSetObjectBodyMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection, m2n);
@@ -295,7 +295,7 @@ void vtkSMSessionCore::SetMPIMToNSocketConnection(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::OnInterpreterError( vtkObject*, unsigned long,
+void vtkPVSessionCore::OnInterpreterError( vtkObject*, unsigned long,
                                            void* calldata)
 {
   if (!vtkProcessModule::GetProcessModule()->GetReportInterpreterErrors())
@@ -321,24 +321,24 @@ void vtkSMSessionCore::OnInterpreterError( vtkObject*, unsigned long,
 }
 
 //----------------------------------------------------------------------------
-int vtkSMSessionCore::GetNumberOfProcesses()
+int vtkPVSessionCore::GetNumberOfProcesses()
 {
   return this->ParallelController->GetNumberOfProcesses();
 }
 
 //----------------------------------------------------------------------------
-vtkSIObject* vtkSMSessionCore::GetSIObject(vtkTypeUInt32 globalid)
+vtkSIObject* vtkPVSessionCore::GetSIObject(vtkTypeUInt32 globalid)
 {
   return this->Internals->GetSIObject(globalid);
 }
 //----------------------------------------------------------------------------
-vtkObject* vtkSMSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
+vtkObject* vtkPVSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
 {
   return this->Internals->GetRemoteObject(globalid);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
+void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
 {
   LOG(
     << "----------------------------------------------------------------\n"
@@ -405,7 +405,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PushState(vtkSMMessage* message)
+void vtkPVSessionCore::PushState(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert( this->ParallelController == NULL ||
@@ -448,7 +448,7 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PushStateSatelliteCallback()
+void vtkPVSessionCore::PushStateSatelliteCallback()
 {
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -469,13 +469,13 @@ void vtkSMSessionCore::PushStateSatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSessionCore::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PullState(vtkSMMessage* message)
+void vtkPVSessionCore::PullState(vtkSMMessage* message)
 {
   LOG(
     << "----------------------------------------------------------------\n"
@@ -512,7 +512,7 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::ExecuteStream( vtkTypeUInt32 location,
+void vtkPVSessionCore::ExecuteStream( vtkTypeUInt32 location,
                                       const vtkClientServerStream& stream,
                                       bool ignore_errors/*=false*/)
 {
@@ -562,7 +562,7 @@ void vtkSMSessionCore::ExecuteStream( vtkTypeUInt32 location,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
+void vtkPVSessionCore::ExecuteStreamSatelliteCallback()
 {
   int byte_size[2] = {0, 0};
   this->ParallelController->Broadcast(byte_size, 2, 0);
@@ -576,7 +576,7 @@ void vtkSMSessionCore::ExecuteStreamSatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::ExecuteStreamInternal(const vtkClientServerStream& stream,
+void vtkPVSessionCore::ExecuteStreamInternal(const vtkClientServerStream& stream,
                                              bool ignore_errors)
 {
   LOG( << "----------------------------------------------------------------\n"
@@ -593,7 +593,7 @@ void vtkSMSessionCore::ExecuteStreamInternal(const vtkClientServerStream& stream
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
+void vtkPVSessionCore::DeleteSIObject(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert( this->ParallelController == NULL ||
@@ -635,7 +635,7 @@ void vtkSMSessionCore::DeleteSIObject(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeleteSIObjectSatelliteCallback()
+void vtkPVSessionCore::DeleteSIObjectSatelliteCallback()
 {
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -656,7 +656,7 @@ void vtkSMSessionCore::DeleteSIObjectSatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
+void vtkPVSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
 {
   LOG( << "----------------------------------------------------------------\n"
        << "Delete ( " << message->ByteSize() << " bytes )\n"
@@ -666,7 +666,7 @@ void vtkSMSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::GatherInformationInternal( vtkPVInformation* information,
+bool vtkPVSessionCore::GatherInformationInternal( vtkPVInformation* information,
                                                   vtkTypeUInt32 globalid)
 {
   if (globalid == 0)
@@ -699,7 +699,7 @@ bool vtkSMSessionCore::GatherInformationInternal( vtkPVInformation* information,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::GatherInformation( vtkTypeUInt32 location,
+bool vtkPVSessionCore::GatherInformation( vtkTypeUInt32 location,
                                           vtkPVInformation* information,
                                           vtkTypeUInt32 globalid)
 {
@@ -750,7 +750,7 @@ bool vtkSMSessionCore::GatherInformation( vtkTypeUInt32 location,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::GatherInformationStatelliteCallback()
+void vtkPVSessionCore::GatherInformationStatelliteCallback()
 {
   vtkMultiProcessStream stream;
   this->ParallelController->Broadcast(stream, 0);
@@ -777,7 +777,7 @@ void vtkSMSessionCore::GatherInformationStatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::CollectInformation(vtkPVInformation* info)
+bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
 {
   vtkMultiProcessController* controller = this->ParallelController;
   int myid = controller->GetLocalProcessId();
@@ -840,26 +840,26 @@ bool vtkSMSessionCore::CollectInformation(vtkPVInformation* info)
   return true;
 }
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
+void vtkPVSessionCore::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
 {
   assert (obj != NULL);
   this->Internals->RemoteObjectMap[gid] = obj;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::UnRegisterRemoteObject(vtkTypeUInt32 gid)
+void vtkPVSessionCore::UnRegisterRemoteObject(vtkTypeUInt32 gid)
 {
   this->Internals->DeleteRemoteObject(gid);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::GetAllRemoteObjects(vtkCollection* collection)
+void vtkPVSessionCore::GetAllRemoteObjects(vtkCollection* collection)
 {
   this->Internals->GetAllRemoteObjects(collection);
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkSMSessionCore::GetLastResult()
+const vtkClientServerStream& vtkPVSessionCore::GetLastResult()
 {
   return this->Interpreter->GetLastResult();
 }

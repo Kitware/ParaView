@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyDefinitionIterator.h
+  Module:    vtkPVProxyDefinitionIterator.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,29 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyDefinitionIterator - iterates over all proxy definitions
+// .NAME vtkPVProxyDefinitionIterator - iterates over all proxy definitions
 // that the proxy manager can create new proxies from. It can also iterate
 // over registered compound proxy definitions.
 // .SECTION Description
-// vtkSMProxyDefinitionIterator iterates over all proxy definitions known to
+// vtkPVProxyDefinitionIterator iterates over all proxy definitions known to
 // the proxy manager. The iterator defines mode in which it can be made to
 // iterate over definitions of a particular group alone. This iterator can
 // also be used to iterate over compound proxy definitions.
 // .SECTION See Also
 // vtkSMProxyManager
 
-#ifndef __vtkSMProxyDefinitionIterator_h
-#define __vtkSMProxyDefinitionIterator_h
+#ifndef __vtkPVProxyDefinitionIterator_h
+#define __vtkPVProxyDefinitionIterator_h
 
 #include "vtkObject.h"
 
 class vtkPVXMLElement;
-class vtkSMProxyDefinitionManager;
+class vtkPVProxyDefinitionManager;
 
-class VTK_EXPORT vtkSMProxyDefinitionIterator : public vtkObject
+class VTK_EXPORT vtkPVProxyDefinitionIterator : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkSMProxyDefinitionIterator, vtkObject);
+  vtkTypeMacro(vtkPVProxyDefinitionIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // ********* Iterator Commom methods **********
@@ -78,12 +78,12 @@ public:
   virtual vtkPVXMLElement* GetProxyHints() = 0;
 
 protected:
-  vtkSMProxyDefinitionIterator();
-  ~vtkSMProxyDefinitionIterator();
+  vtkPVProxyDefinitionIterator();
+  ~vtkPVProxyDefinitionIterator();
 
 private:
-  vtkSMProxyDefinitionIterator(const vtkSMProxyDefinitionIterator&); // Not implemented.
-  void operator=(const vtkSMProxyDefinitionIterator&); // Not implemented.
+  vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&); // Not implemented.
+  void operator=(const vtkPVProxyDefinitionIterator&); // Not implemented.
 };
 
 

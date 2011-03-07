@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
 
@@ -88,7 +88,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if (pxm->GetProxyDefinitionManager())
     {
-    vtkSMProxyDefinitionIterator* iter =
+    vtkPVProxyDefinitionIterator* iter =
       pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("palettes");
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {

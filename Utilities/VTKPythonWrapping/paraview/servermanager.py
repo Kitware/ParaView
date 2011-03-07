@@ -1639,9 +1639,9 @@ class PropertyIterator(object):
         return getattr(self.SMIterator, name)
 
 class ProxyDefinitionIterator(object):
-    """Wrapper for a vtkSMProxyDefinitionIterator class to satisfy
+    """Wrapper for a vtkPVProxyDefinitionIterator class to satisfy
        the python iterator protocol.
-       See the doxygen documentation of the vtkSMProxyDefinitionIterator
+       See the doxygen documentation of the vtkPVProxyDefinitionIterator
        C++ class for more information."""
     def __init__(self, iter):
         self.SMIterator = iter
@@ -1672,7 +1672,7 @@ class ProxyDefinitionIterator(object):
         return self.Group
 
     def __getattr__(self, name):
-        """returns attributes from the vtkSMProxyDefinitionIterator."""
+        """returns attributes from the vtkPVProxyDefinitionIterator."""
         return getattr(self.SMIterator, name)
 
 

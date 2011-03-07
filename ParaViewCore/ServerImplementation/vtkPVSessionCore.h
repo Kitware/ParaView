@@ -12,13 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSessionCore
+// .NAME vtkPVSessionCore
 // .SECTION Description
-// vtkSMSessionCore is used by vtkSMSession. In handles processing of
+// vtkPVSessionCore is used by vtkSMSession. In handles processing of
 // communication locally as well as with satellites (in case on MPI processes). 
 
-#ifndef __vtkSMSessionCore_h
-#define __vtkSMSessionCore_h
+#ifndef __vtkPVSessionCore_h
+#define __vtkPVSessionCore_h
 
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
@@ -30,13 +30,13 @@ class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
 class vtkSIObject;
 class vtkPVInformation;
-class vtkSMProxyDefinitionManager;
+class vtkPVProxyDefinitionManager;
 
-class VTK_EXPORT vtkSMSessionCore : public vtkObject
+class VTK_EXPORT vtkPVSessionCore : public vtkObject
 {
 public:
-  static vtkSMSessionCore* New();
-  vtkTypeMacro(vtkSMSessionCore, vtkObject);
+  static vtkPVSessionCore* New();
+  vtkTypeMacro(vtkPVSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
@@ -46,7 +46,7 @@ public:
 
   // Description:
   // Provides access to the proxy definition manager.
-  vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
 
   // Description:
   // Push the state message.
@@ -130,8 +130,8 @@ public:
   virtual void GetAllRemoteObjects(vtkCollection* collection);
 
 protected:
-  vtkSMSessionCore();
-  ~vtkSMSessionCore();
+  vtkPVSessionCore();
+  ~vtkPVSessionCore();
 
   // Description:
   virtual void PushStateInternal(vtkSMMessage*);
@@ -153,14 +153,14 @@ protected:
     ROOT_SATELLITE_INFO_TAG = 887823
     };
 
-  vtkSMProxyDefinitionManager* ProxyDefinitionManager;
+  vtkPVProxyDefinitionManager* ProxyDefinitionManager;
   vtkMultiProcessController* ParallelController;
   vtkClientServerInterpreter* Interpreter;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
 private:
-  vtkSMSessionCore(const vtkSMSessionCore&); // Not implemented
-  void operator=(const vtkSMSessionCore&);   // Not implemented
+  vtkPVSessionCore(const vtkPVSessionCore&); // Not implemented
+  void operator=(const vtkPVSessionCore&);   // Not implemented
 
   class vtkInternals;
   vtkInternals* Internals;

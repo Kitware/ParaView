@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkNew.h"
@@ -627,13 +627,13 @@ void pqProxyGroupMenuManager::addProxyDefinitionUpdateObservers()
 
   // Regular proxy
   unsigned long callbackID = pxm->AddObserver(
-      vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
+      vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
       this, &pqProxyGroupMenuManager::lookForNewDefinitions);
   this->Internal->CallBackIDs.insert(callbackID);
 
   // compound proxy
   callbackID = pxm->AddObserver(
-      vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+      vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
       this, &pqProxyGroupMenuManager::lookForNewDefinitions);
   this->Internal->CallBackIDs.insert(callbackID);
 
@@ -646,7 +646,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
 {
   // Look inside the group name that are tracked
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
+  vtkPVProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
 
   if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxdm == NULL)
     {
@@ -654,8 +654,8 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
     }
 
   // Setup definition iterator
-  vtkSmartPointer<vtkSMProxyDefinitionIterator> iter;
-  iter.TakeReference(pxdm->NewIterator(vtkSMProxyDefinitionManager::ALL_DEFINITIONS));
+  vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
+  iter.TakeReference(pxdm->NewIterator(vtkPVProxyDefinitionManager::ALL_DEFINITIONS));
   foreach(QString groupName, this->Internal->ProxyDefinitionGroupToListen)
     {
     iter->AddTraversalGroupName(groupName.toAscii().data());

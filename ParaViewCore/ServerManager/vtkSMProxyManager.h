@@ -27,7 +27,7 @@
 // definitions as well as registered proxies. When a new session is established
 // it updates the definitions and is the ready to create new proxies.
 // .SECTION See Also
-// vtkSMProxyDefinitionManager
+// vtkPVProxyDefinitionManager
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
@@ -43,7 +43,7 @@ class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
-class vtkSMProxyDefinitionManager;
+class vtkPVProxyDefinitionManager;
 class vtkSMProxyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManagerObserver;
@@ -434,7 +434,7 @@ public:
   // Get the proxy definition manager.
   // Proxy definition manager maintains all the information about proxy
   // definitions.
-  vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
 
 //BTX
 
@@ -480,7 +480,7 @@ protected:
 
   friend class vtkSMGlobalPropertiesManager;
   friend class vtkSMProxy;
-  friend class vtkSMProxyDefinitionIterator;
+  friend class vtkPVProxyDefinitionIterator;
   friend class vtkSMProxyIterator;
   friend class vtkSMProxyManagerObserver;
 
@@ -488,7 +488,7 @@ protected:
   // Set the proxy definition manager.
   // Proxy definition manager maintains all the information about proxy
   // definitions.
-  void SetProxyDefinitionManager(vtkSMProxyDefinitionManager*);
+  void SetProxyDefinitionManager(vtkPVProxyDefinitionManager*);
 
   // Description:
   // Given an XML element and group name create a proxy
@@ -535,7 +535,7 @@ protected:
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
-  vtkSMProxyDefinitionManager* ProxyDefinitionManager;
+  vtkPVProxyDefinitionManager* ProxyDefinitionManager;
   vtkSMSession* Session;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;

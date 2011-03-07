@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVSessionServer.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSessionServer
+// .NAME vtkPVSessionServer
 // .SECTION Description
 // vtkSMSessionServer is a session used on data and/or render servers. It's
 // designed for a process that works with a separate client process that acts as
@@ -20,19 +20,19 @@
 // .SECTION See Also
 // vtkSMSessionClient
 
-#ifndef __vtkSMSessionServer_h
-#define __vtkSMSessionServer_h
+#ifndef __vtkPVSessionServer_h
+#define __vtkPVSessionServer_h
 
-#include "vtkSMSessionBase.h"
+#include "vtkPVSessionBase.h"
 
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkSMSessionServer : public vtkSMSessionBase
+class VTK_EXPORT vtkPVSessionServer : public vtkPVSessionBase
 {
 public:
-  static vtkSMSessionServer* New();
-  vtkTypeMacro(vtkSMSessionServer, vtkSMSessionBase);
+  static vtkPVSessionServer* New();
+  vtkTypeMacro(vtkPVSessionServer, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -86,8 +86,8 @@ public:
   void OnCloseSessionRMI();
 
 protected:
-  vtkSMSessionServer();
-  ~vtkSMSessionServer();
+  vtkPVSessionServer();
+  ~vtkPVSessionServer();
 
   void SetClientController(vtkMultiProcessController*);
 
@@ -107,8 +107,8 @@ protected:
   unsigned long ActivateObserverId;
   unsigned long DeActivateObserverId;
 private:
-  vtkSMSessionServer(const vtkSMSessionServer&); // Not implemented
-  void operator=(const vtkSMSessionServer&); // Not implemented
+  vtkPVSessionServer(const vtkPVSessionServer&); // Not implemented
+  void operator=(const vtkPVSessionServer&); // Not implemented
 //ETX
 };
 

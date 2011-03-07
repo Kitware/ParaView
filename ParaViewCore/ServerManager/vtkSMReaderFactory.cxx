@@ -21,8 +21,8 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyDefinitionIterator.h"
-#include "vtkSMProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -298,7 +298,7 @@ void vtkSMReaderFactory::Initialize()
 void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
 {
   vtkSMProxyManager* pxm = this->Internals->GetProxyManager();
-  vtkSMProxyDefinitionIterator* iter;
+  vtkPVProxyDefinitionIterator* iter;
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup, 0);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {

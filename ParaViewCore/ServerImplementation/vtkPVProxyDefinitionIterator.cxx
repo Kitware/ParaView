@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyDefinitionIterator.cxx
+  Module:    vtkPVProxyDefinitionIterator.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,58 +12,58 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionIterator.h"
 
 #include "vtkObjectFactory.h"
 class vtkPVXMLElement;
 
 //-----------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator::vtkSMProxyDefinitionIterator()
+vtkPVProxyDefinitionIterator::vtkPVProxyDefinitionIterator()
 {
 }
 //---------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator::~vtkSMProxyDefinitionIterator()
+vtkPVProxyDefinitionIterator::~vtkPVProxyDefinitionIterator()
 {
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyDefinitionIterator::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVProxyDefinitionIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 //---------------------------------------------------------------------------
-bool vtkSMProxyDefinitionIterator::IsDoneWithTraversal()
+bool vtkPVProxyDefinitionIterator::IsDoneWithTraversal()
 {
   return true;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyDefinitionIterator::GoToNextItem()
+void vtkPVProxyDefinitionIterator::GoToNextItem()
 {
 }
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyDefinitionIterator::GetProxyDefinition()
+vtkPVXMLElement* vtkPVProxyDefinitionIterator::GetProxyDefinition()
 {
   return 0;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyDefinitionIterator::GoToFirstItem()
+void vtkPVProxyDefinitionIterator::GoToFirstItem()
 {
 }
 //---------------------------------------------------------------------------
-bool vtkSMProxyDefinitionIterator::IsCustom()
+bool vtkPVProxyDefinitionIterator::IsCustom()
 {
   return false;
 }
 //---------------------------------------------------------------------------
-const char* vtkSMProxyDefinitionIterator::GetGroupName()
+const char* vtkPVProxyDefinitionIterator::GetGroupName()
 {
   return 0;
 }
 //---------------------------------------------------------------------------
-const char* vtkSMProxyDefinitionIterator::GetProxyName()
+const char* vtkPVProxyDefinitionIterator::GetProxyName()
 {
   return 0;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyDefinitionIterator::GoToNextGroup()
+void vtkPVProxyDefinitionIterator::GoToNextGroup()
 {
 }
