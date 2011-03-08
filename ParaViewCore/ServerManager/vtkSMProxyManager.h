@@ -298,6 +298,10 @@ public:
   // Creates protytpes for all known proxy types.
   void InstantiatePrototypes();
 
+  // Description:
+  // Return true if the XML Definition was found by vtkPVProxyDefinitionManager
+  bool HasDefinition( const char* groupName, const char* proxyName );
+
 //BTX
   struct RegisteredProxyInformation
   {

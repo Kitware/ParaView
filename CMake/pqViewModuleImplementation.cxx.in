@@ -76,7 +76,7 @@ vtkSMProxy* @ARG_VIEW_TYPE@Implementation::createViewProxy(const QString& viewty
     {
     // See what happens if we augment the type with View, in case this is
     // how it is registered in XML.
-    if (pxm->ProxyElementExists("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View"))
+    if (pxm->HasDefinition("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View"))
       {
       return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View");
       }

@@ -1985,6 +1985,11 @@ void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
     vtkErrorMacro("Could not locate session to execute stream on.");
     }
 }
+//---------------------------------------------------------------------------
+const vtkClientServerStream& vtkSMProxy::GetLastResult(vtkTypeUInt32 location)
+{
+  return this->Session->GetLastResult(location);
+}
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdatePipelineInformation()

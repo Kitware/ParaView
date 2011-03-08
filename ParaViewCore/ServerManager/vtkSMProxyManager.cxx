@@ -1735,3 +1735,10 @@ vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
     }
   return NULL;
 }
+//---------------------------------------------------------------------------
+bool vtkSMProxyManager::HasDefinition( const char* groupName,
+                                       const char* proxyName )
+{
+  return this->ProxyDefinitionManager &&
+      this->ProxyDefinitionManager->HasDefinition(groupName, proxyName);
+}

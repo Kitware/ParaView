@@ -409,8 +409,14 @@ protected:
   // Description:
   // Invoke that takes a vtkClientServerStream as the argument.
   void ExecuteStream(const vtkClientServerStream& msg,
-    bool ignore_errors=false,
-    vtkTypeUInt32 location=0);
+                     bool ignore_errors = false,
+                     vtkTypeUInt32 location = 0);
+
+  // Description:
+  // Get the last result
+  const vtkClientServerStream& GetLastResult()
+    { this->GetLastResult(this->Location); }
+  const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
 
   // Description:
   // Add a property with the given key (name). The name can then
