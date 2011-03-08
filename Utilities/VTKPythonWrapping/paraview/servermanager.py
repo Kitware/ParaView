@@ -1552,9 +1552,10 @@ class ProxyManager(object):
            can create."""
         iter = None
         if groupname != None:
-            iter = ProxyDefinitionIterator(self.SMProxyManager.GetDefinitionManager().NewIterator(0))
+            iter = ProxyDefinitionIterator(self.GetProxyDefinitionManager().NewSingleGroupIterator(groupname,0))
         else:
-            iter = ProxyDefinitionIterator(self.SMProxyManager.GetDefinitionManager().NewIterator(groupname, 0))
+            iter = ProxyDefinitionIterator(self.GetProxyDefinitionManager().NewIterator(0))
+
         return iter
 
     def __ConvertArgumentsAndCall(self, *args):
@@ -1645,6 +1646,9 @@ class ProxyDefinitionIterator(object):
        C++ class for more information."""
     def __init__(self, iter):
         self.SMIterator = iter
+        if self.SMIterator:
+            self.SMIterator.UnRegister(None)
+            self.SMIterator.InitTraversal()
         self.Group = None
         self.Key = None
 
@@ -1652,7 +1656,7 @@ class ProxyDefinitionIterator(object):
         return self
 
     def next(self):
-        if self.SMIterator.IsAtEnd():
+        if self.SMIterator.IsDoneWithTraversal():
             self.Group = None
             self.Key = None
             raise StopIteration
@@ -1661,7 +1665,7 @@ class ProxyDefinitionIterator(object):
         self.SMIterator.GoToNextItem()
         return {"group": self.Group, "key":self.Key }
 
-    def GetKey(self):
+    def GetProxyName(self):
         """Returns the key for the proxy definition last returned by the call
         to 'next()' """
         return self.Key
@@ -2397,21 +2401,20 @@ def createModule(groupName, mdl=None):
     if not ActiveConnection:
       raise RuntimeError, "Please connect to a server using \"Connect\""
 
-    pxm = vtkSMObject.GetProxyManager()
+    pxm = ProxyManager()
     # Use prototypes to find all proxy types.
     pxm.InstantiateGroupPrototypes(groupName)
-    pxdm = pxm.GetProxyDefinitionManager()
 
     debug = False
     if not mdl:
         debug = True
         mdl = PVModule()
-    numProxies = pxdm.GetNumberOfXMLProxies(groupName)
-    for i in range(numProxies):
-        proxyName = pxdm.GetXMLProxyName(groupName, i)
+    definitionIter = pxm.NewDefinitionIterator(groupName)
+    for i in definitionIter:
+        proxyName = i['key']
         proto = pxm.GetPrototypeProxy(groupName, proxyName)
         if not proto:
-           print "Error while loading ", proxyName
+           print "Error while loading %s/%s %s"%(groupName, i['group'], proxyName)
            continue
         pname = proxyName
         if paraview.compatibility.GetVersion() >= 3.5 and\
