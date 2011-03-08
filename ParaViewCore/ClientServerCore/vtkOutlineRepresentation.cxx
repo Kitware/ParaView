@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkOutlineRepresentation.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

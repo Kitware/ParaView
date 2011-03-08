@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -24,27 +24,27 @@ vtkStandardNewMacro(vtkSIProperty);
 //----------------------------------------------------------------------------
 vtkSIProperty::vtkSIProperty()
 {
-  this->Command = 0;
-  this->XMLName = 0;
-  this->IsInternal = 0;
+  this->Command = NULL;
+  this->XMLName = NULL;
+  this->IsInternal = false;
   this->UpdateSelf = false;
   this->InformationOnly = false;
   this->Repeatable = false;
-  this->SIProxy = 0;
+  this->SIProxyObject = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSIProperty::~vtkSIProperty()
 {
-  this->SetCommand(0);
-  this->SetXMLName(0);
+  this->SetCommand(NULL);
+  this->SetXMLName(NULL);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSIProperty::ReadXMLAttributes(
   vtkSIProxy* proxyhelper, vtkPVXMLElement* element)
 {
-  this->SIProxy = proxyhelper;
+  this->SIProxyObject = proxyhelper;
 
   const char* xmlname = element->GetAttribute("name");
   if(xmlname)
@@ -96,9 +96,9 @@ bool vtkSIProperty::ReadXMLAttributes(
 //----------------------------------------------------------------------------
 vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
 {
-  if (this->SIProxy)
+  if (this->SIProxyObject)
     {
-    return this->SIProxy->GetSIObject(globalid);
+    return this->SIProxyObject->GetSIObject(globalid);
     }
   return NULL;
 }
@@ -106,19 +106,19 @@ vtkSIObject* vtkSIProperty::GetSIObject(vtkTypeUInt32 globalid)
 //----------------------------------------------------------------------------
 bool vtkSIProperty::ProcessMessage(vtkClientServerStream& stream)
 {
-  if (this->SIProxy && this->SIProxy->GetVTKObject())
+  if (this->SIProxyObject && this->SIProxyObject->GetVTKObject())
     {
-    return this->SIProxy->GetInterpreter()->ProcessStream(stream) != 0;
+    return this->SIProxyObject->GetInterpreter()->ProcessStream(stream) != 0;
     }
-  return this->SIProxy ? true : false;
+  return this->SIProxyObject ? true : false;
 }
 
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkSIProperty::GetVTKObject()
 {
-  if (this->SIProxy)
+  if (this->SIProxyObject)
     {
-    return this->SIProxy->GetVTKObject();
+    return this->SIProxyObject->GetVTKObject();
     }
   return NULL;
 }
@@ -126,9 +126,9 @@ vtkObjectBase* vtkSIProperty::GetVTKObject()
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkSIProperty::GetLastResult()
 {
-  if (this->SIProxy)
+  if (this->SIProxyObject)
     {
-    return this->SIProxy->GetInterpreter()->GetLastResult();
+    return this->SIProxyObject->GetInterpreter()->GetLastResult();
     }
 
   static vtkClientServerStream stream;

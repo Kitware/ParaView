@@ -40,6 +40,9 @@ protected:
   // Called in CreateVTKObjects() after the vtk-object has been created and
   // subproxy-information has been processed, but before the XML is parsed to
   // generate properties and initialize their values.
+  //
+  // This method is overriden here to set the VTK instance of the
+  // PlotOptions subProxy to the current VTK representation.
   virtual void OnCreateVTKObjects();
 
 private:

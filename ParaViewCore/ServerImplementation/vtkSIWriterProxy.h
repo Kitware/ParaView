@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIWriterProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSIWriterProxy
 // .SECTION Description
-//
+// ServerImplementation for WriterProxy
 
 #ifndef __vtkSIWriterProxy_h
 #define __vtkSIWriterProxy_h

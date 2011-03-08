@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSpreadSheetView.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME vtkSpreadSheetView
 // .SECTION Description
-// vtkSpreadSheetView is a vtkPVView subclass for a view used to show the
-// any data as a spreadsheet. This view can only show one representation at a
+// vtkSpreadSheetView is a vtkPVView subclass for a view used to show any data
+// as a spreadsheet. This view can only show one representation at a
 // time. If more than one representation is added to this view, only the first
 // visible representation will be shown.
 

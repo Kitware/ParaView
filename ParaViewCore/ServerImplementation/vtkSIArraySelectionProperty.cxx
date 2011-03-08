@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIArraySelectionProperty
+  Module:    vtkSIArraySelectionProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -72,9 +72,9 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
     // Get the number of arrays.
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-        << reader
-        << aname.str().c_str()
-        << vtkClientServerStream::End;
+           << reader
+           << aname.str().c_str()
+           << vtkClientServerStream::End;
 
     this->ProcessMessage(stream);
     stream.Reset();

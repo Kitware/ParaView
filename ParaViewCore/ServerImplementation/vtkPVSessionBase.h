@@ -14,7 +14,10 @@
 =========================================================================*/
 // .NAME vtkPVSessionBase
 // .SECTION Description
-//
+// Abstract class used to provide the main implementation of the ParaView
+// session methods for the following classes: vtkSMSession,
+//                                            vtkSMSessionClient,
+//                                            vtkSMSessionServer
 
 #ifndef __vtkPVSessionBase_h
 #define __vtkPVSessionBase_h
@@ -79,9 +82,9 @@ public:
   // Execute a command on the given processes. Use GetLastResult() to obtain the
   // last result after the command stream is evaluated. Once can set
   // \c ignore_errors to true, to ignore any interpreting errors.
-  virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignore_errors=false);
+  virtual void ExecuteStream( vtkTypeUInt32 location,
+                              const vtkClientServerStream& stream,
+                              bool ignore_errors = false );
 
   // Description:
   // Returns the response of the ExecuteStream() call from the location. Note if

@@ -12,17 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVProxyDefinitionManager - object responsible for managing XML proxies definitions
+// .NAME vtkPVProxyDefinitionManager - object responsible for managing XML
+// proxies definitions
 // .SECTION Description
 // vtkPVProxyDefinitionManager is a class that manages XML proxies definition.
-// It maintains a map of XML elements (populated by the XML parser) from
+// It maintains a map of vtkPVXMLElement (populated by the XML parser) from
 // which it can extract Hint, Documentation, Properties, Domains definition.
 //
 // Whenever the proxy definitions are updated, this class fires
 // vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
 // vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
-// when a compound proxy is registered, on CompoundProxyDefinitionsUpdated event
-// is fired.
+// when a compound proxy is registered, on CompoundProxyDefinitionsUpdated
+// event is fired.
 // .SECTION See Also
 // vtkSMXMLParser
 
@@ -61,8 +62,8 @@ public:
 
   // FIXME COLLABORATION : For now we dynamically convert InformationHelper
   // into the correct si_class and attribute sets.
-  // THIS CODE SHOULD BE REMOVED once InformationHelper have been removed from
-  // legacy XML
+  // THIS CODE SHOULD BE REMOVED once InformationHelper have been removed
+  // from legacy XML
   static void PatchXMLProperty(vtkPVXMLElement* propElement);
 
   static vtkPVProxyDefinitionManager* New();
@@ -70,18 +71,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns a registered proxy definition and return a NULL pointer if not found.
-  // Moreover, error can be throw if the definition was not found if the flag
-  // throwError is true.
-  vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name, bool throwError);
+  // Returns a registered proxy definition or return a NULL otherwise.
+  // Moreover, error can be throw if the definition was not found if the
+  // flag throwError is true.
+  vtkPVXMLElement* GetProxyDefinition( const char* group, const char* name,
+                                       bool throwError );
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name)
     {
+    // We do throw an error by default
     return this->GetProxyDefinition(group, name, true);
     }
 
   // Description:
   // Return true if the XML Definition was found
-  bool HasDefinition( const char* groupName, const char* proxyName);
+  bool HasDefinition( const char* groupName, const char* proxyName );
 
   // Description:
   // Returns the same thing as GetProxyDefinition in a flatten manner.
@@ -108,8 +111,8 @@ public:
   // For all practical purposes, there's no difference between a proxy
   // definition added using this method or by parsing a server manager
   // configuration file.
-  void AddCustomProxyDefinition(
-      const char* group, const char* name, vtkPVXMLElement* top);
+  void AddCustomProxyDefinition( const char* group, const char* name,
+                                 vtkPVXMLElement* top );
 
   // Description:
   // Given its name, remove a custom proxy definition.
@@ -142,11 +145,6 @@ public:
 //ETX
 
   // Description:
-  // Returns true if a proxy definition do exist for that given group name and
-  // proxy name, false otherwise.
-  bool ProxyElementExists(const char* groupName,  const char* proxyName);
-
-  // Description:
   // Loads server-manager configuration xml.
   bool LoadConfigurationXML(const char* filename);
   bool LoadConfigurationXML(vtkPVXMLElement* root);
@@ -168,26 +166,36 @@ public:
 
   enum
     {
-    ALL_DEFINITIONS=0,
-    CORE_DEFINITIONS=1,
-    CUSTOM_DEFINITIONS=2
+    ALL_DEFINITIONS    = 0,
+    CORE_DEFINITIONS   = 1,
+    CUSTOM_DEFINITIONS = 2
     };
 
-  vtkPVProxyDefinitionIterator* NewIterator(int scope=ALL_DEFINITIONS);
+  // Description:
+  // Return a NEW instance of vtkPVProxyDefinitionIterator configured to
+  // get through all the definition available for the requested scope.
+  // Possible scope defined as enum inside vtkPVProxyDefinitionManager:
+  //   ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
+  // Some extra restriction can be set directly on the iterator itself
+  // by setting a set of GroupName...
+  vtkPVProxyDefinitionIterator* NewIterator( int scope=ALL_DEFINITIONS );
 
   // Description
   // Return a new configured iterator for traversing a set of proxy definition
-  // for only one group name
-  // Scope values:
-  // 0 : ALL (default in case)
-  // 1 : CORE_DEFINITIONS
-  // 2 : CUSTOM_DEFINITIONS
+  // for only one GroupName.
+  // Possible scope defined as enum inside vtkPVProxyDefinitionManager:
+  //   ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
   vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
     int scope=ALL_DEFINITIONS);
 
 //BTX
 
+  // Description:
+  // Write into the provided message the whole state of the current object.
   void GetXMLDefinitionState(vtkSMMessage* msg);
+
+  // Description:
+  // Reset the local state and load the one provided inside the message.
   void LoadXMLDefinitionState(vtkSMMessage* msg);
 
 protected:
@@ -196,14 +204,23 @@ protected:
 
   // Description:
   // Helper method that add a ShowInMenu Hint for a proxy definition.
+  // This allow that given proxy to show up inside the Sources/Filters menu
+  // inside the UI.
   void AttachShowInMenuHintsToProxy(vtkPVXMLElement* proxy);
+
   // Description:
   // Helper method that add a ShowInMenu Hint for any proxy definition that lie
   // in a sources or filters group.
+  // @See method AttachShowInMenuHintsToProxy
   void AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root);
 
   // Description:
-  // Loads server-manager configuration xml.
+  // Loads server-manager configuration xml. Those method are protected
+  // as they allow to automatically add some extra hints for those loaded
+  // definition set. This is essentially used when proxy get loaded as
+  // legacy proxy don't have those expected Hints.
+  // FIXME: Once those pluging get updated, this extra hint attachement
+  //        might be removed.
   bool LoadConfigurationXML(const char* filename, bool attachShowInMenuHints);
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
   bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints);
@@ -225,6 +242,11 @@ protected:
   // a merged definition hierarchy, we should start from the root and go down.
   void MergeProxyDefinition(vtkPVXMLElement* element, vtkPVXMLElement* elementToFill);
 
+  // Description:
+  // Method used to clear the Flatten version of the definition. This will
+  // force its recomputation when needed. This should be called each time
+  // new definition get added. (Not the Custom one since those should NOT
+  // conflict with the core definitions.)
   void InvalidateCollapsedDefinition();
 
   // Description:
@@ -243,6 +265,7 @@ private:
   vtkPVProxyDefinitionManager(const vtkPVProxyDefinitionManager&); // Not implemented
   void operator=(const vtkPVProxyDefinitionManager&); // Not implemented
 
+  // Flag to disable during method calls notification calls.
   bool TriggerNotificationEvent;
 
   class vtkInternals;

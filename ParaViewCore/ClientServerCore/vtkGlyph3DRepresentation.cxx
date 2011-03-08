@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkGlyph3DRepresentation.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

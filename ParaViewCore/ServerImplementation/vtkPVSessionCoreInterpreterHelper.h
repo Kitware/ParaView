@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVSessionCoreInterpreterHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

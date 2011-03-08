@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkPVSILInformation
 // .SECTION Description
-//
+// Information object used to retreived the SIL graph from a file reader or
+// any compatible source.
 
 #ifndef __vtkPVSILInformation_h
 #define __vtkPVSILInformation_h

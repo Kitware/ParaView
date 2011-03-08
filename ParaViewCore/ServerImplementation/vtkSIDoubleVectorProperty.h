@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIDoubleVectorProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkSIDoubleVectorProperty
 // .SECTION Description
-//
+// Vector property that manage double value to be set through a method
+// on a vtkObject.
 
 #ifndef __vtkSIDoubleVectorProperty_h
 #define __vtkSIDoubleVectorProperty_h

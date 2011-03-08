@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIXMLAnimationWriterRepresentationProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

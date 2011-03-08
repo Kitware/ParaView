@@ -47,12 +47,12 @@ bool vtkSISelectionRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->GetVTKObject()
-    << "SetLabelRepresentation"
-    << label_repr->GetVTKObject()
-    << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
-  return true;
+         << this->GetVTKObject()
+         << "SetLabelRepresentation"
+         << label_repr->GetVTKObject()
+         << vtkClientServerStream::End;
+
+  return this->Interpreter->ProcessStream(stream);
 }
 
 //----------------------------------------------------------------------------

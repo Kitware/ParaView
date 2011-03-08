@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVBarChartView.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

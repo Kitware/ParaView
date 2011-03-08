@@ -1,5 +1,6 @@
 /*=========================================================================
 
+  Program:   ParaView
   Module:    vtkCommandOptionsXMLParser.cxx
 
   Copyright (c) Kitware, Inc.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIIntVectorProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkSIIntVectorProperty
 // .SECTION Description
-//
+// ServerSide Property use to set int array as method argument.
+
 
 #ifndef __vtkSIIntVectorProperty_h
 #define __vtkSIIntVectorProperty_h

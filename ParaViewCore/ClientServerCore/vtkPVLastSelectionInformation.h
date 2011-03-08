@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVLastSelectionInformation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

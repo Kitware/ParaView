@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVParallelCoordinatesChartView.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

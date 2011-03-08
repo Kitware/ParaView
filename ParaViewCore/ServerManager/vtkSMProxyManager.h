@@ -298,12 +298,6 @@ public:
   // Creates protytpes for all known proxy types.
   void InstantiatePrototypes();
 
-  // Description:
-  // Returns 1 if a proxy element of given group and exists, 0
-  // otherwise. If a proxy element does not exist, a call to
-  // NewProxy() will fail.
-  int ProxyElementExists(const char* groupName,  const char* proxyName);
-
 //BTX
   struct RegisteredProxyInformation
   {

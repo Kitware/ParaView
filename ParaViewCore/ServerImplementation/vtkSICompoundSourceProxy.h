@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSICompoundSourceProxy
+  Module:    vtkSICompoundSourceProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,9 +14,10 @@
 =========================================================================*/
 // .NAME vtkSICompoundSourceProxy
 // .SECTION Description
-// vtkSICompoundSourceProxy is the server-side helper for a vtkP=SMCompoundSourceProxy
-// It provide the mapping to the exposed output port to the underneath internal
-// sub-proxy.
+// vtkSICompoundSourceProxy is the server-side helper for a
+// vtkSMCompoundSourceProxy.
+// It provides the mapping to the exposed output port to the underneath
+// internal sub-proxy.
 
 #ifndef __vtkSICompoundSourceProxy_h
 #define __vtkSICompoundSourceProxy_h

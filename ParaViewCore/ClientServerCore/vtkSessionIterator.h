@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSessionIterator.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

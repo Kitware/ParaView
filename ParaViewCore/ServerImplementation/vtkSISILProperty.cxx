@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSISILProperty
+  Module:    vtkSISILProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

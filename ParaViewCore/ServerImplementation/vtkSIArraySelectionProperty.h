@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIArraySelectionProperty
+  Module:    vtkSIArraySelectionProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIArraySelectionProperty
+// .NAME vtkSIArraySelectionProperty - InformationOnly property
 // .SECTION Description
 // SIProperty that deals with ArraySelection object
 

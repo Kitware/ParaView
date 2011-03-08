@@ -14,9 +14,8 @@
 =========================================================================*/
 // .NAME vtkSIObject
 // .SECTION Description
-// Object that is managed by process module which wrap concrete class such as
+// Object that is managed by vtkPVSessionCore which wrap concrete class such as
 // the vtk ones.
-// FIXME: WE BADLY NEED TO FIND A GOOD NAME FOR THIS CLASS.
 
 #ifndef __vtkSIObject_h
 #define __vtkSIObject_h

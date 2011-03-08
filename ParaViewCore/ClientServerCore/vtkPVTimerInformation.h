@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVTimerInformation - Holds timer log for all processes.
 // .SECTION Description
-// I am using this infomration object to gather timer logs from all processes.
+// I am using this information object to gather timer logs from all processes.
 
 #ifndef __vtkPVTimerInformation_h
 #define __vtkPVTimerInformation_h

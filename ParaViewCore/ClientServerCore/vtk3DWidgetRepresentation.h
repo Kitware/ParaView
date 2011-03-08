@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtk3DWidgetRepresentation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

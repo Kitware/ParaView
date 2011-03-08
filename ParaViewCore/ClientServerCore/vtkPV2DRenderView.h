@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPV2DRenderView.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

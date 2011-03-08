@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSICompoundSourceProxy
+  Module:    vtkSICompoundSourceProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

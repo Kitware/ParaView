@@ -33,7 +33,6 @@
 #include "vtkSIWriterProxy.h"
 #include "vtkSIXMLAnimationWriterRepresentationProperty.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkPVSessionBase.h"
 #include "vtkPVSessionCore.h"
@@ -74,7 +73,6 @@ int main(int, char**)
   PRINT_SELF(vtkSIWriterProxy);
   PRINT_SELF(vtkSIXMLAnimationWriterRepresentationProperty);
   //PRINT_SELF(vtkSMMessage);
-  PRINT_SELF(vtkPVProxyDefinitionIterator);
   PRINT_SELF(vtkPVProxyDefinitionManager);
   PRINT_SELF(vtkPVSessionBase);
   PRINT_SELF(vtkPVSessionCore);

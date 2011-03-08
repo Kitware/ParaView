@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIProxyProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,11 @@
 =========================================================================*/
 // .NAME vtkSIProxyProperty
 // .SECTION Description
-//
+// ServerSide Property use to set Object array as method argument.
+// Those object could be either SMProxy instance or their SIProxy instance
+// or the VTK object managed by the SIProxy instance. The type of object is
+// specified inside the XML definition of the property with the attribute
+// argument_type=[VTK, SMProxy, SIProxy].
 
 #ifndef __vtkSIProxyProperty_h
 #define __vtkSIProxyProperty_h
@@ -86,13 +90,13 @@ protected:
 
 
   enum TypeArg {
-    VTK, SMProxy, Kernel
+    VTK, SMProxy, SIProxy
     };
 
   // Proxy type: VTK (default), SMProxy, Kernel,
   // In the XML we expect argument_type="VTK"     (default value if not set)
   //                      argument_type="SMProxy"
-  //                      argument_type="Kernel"
+  //                      argument_type="SIProxy"
   TypeArg ArgumentType;
 
   // Base on the ArgumentType will return either the VTK object or the SMProxy object

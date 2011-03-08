@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIIntVectorProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,7 +15,6 @@
 #include "vtkSIIntVectorProperty.h"
 #include "vtkSIVectorPropertyTemplate.txx"
 #include "vtkObjectFactory.h"
-
 
 vtkStandardNewMacro(vtkSIIntVectorProperty);
 //----------------------------------------------------------------------------

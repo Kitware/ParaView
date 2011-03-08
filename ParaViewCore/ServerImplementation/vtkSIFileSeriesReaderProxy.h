@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIFileSeriesReaderProxy
+  Module:    vtkSIFileSeriesReaderProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,10 +14,9 @@
 =========================================================================*/
 // .NAME vtkSIProxy
 // .SECTION Description
-// vtkSIProxy is the server-side helper for a vtkSMProxy that helps the
-// vtkSMProxy with manging/updating the VTK object.
+// vtkSIProxy is the server-implementation for a vtkSMProxy that helps the
+// vtkSMProxy with managing/updating VTK objects.
 
-// FIXME: NEED A BETTER NAME FOR THIS CLASS
 #ifndef __vtkSIProxy_h
 #define __vtkSIProxy_h
 

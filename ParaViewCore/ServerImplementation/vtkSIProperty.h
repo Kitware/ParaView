@@ -14,7 +14,9 @@
 =========================================================================*/
 // .NAME vtkSIProperty
 // .SECTION Description
-//
+// Basic ServerImplementation property used to call a method with no argument
+// on a VTK object. If overriden, we naturally allow to call a method either
+// to set or get a set of values.
 
 #ifndef __vtkSIProperty_h
 #define __vtkSIProperty_h
@@ -110,7 +112,7 @@ protected:
   bool Repeatable;
   bool IsInternal;
 
-  vtkWeakPointer<vtkSIProxy> SIProxy;
+  vtkWeakPointer<vtkSIProxy> SIProxyObject;
 
 private:
   vtkSIProperty(const vtkSIProperty&); // Not implemented

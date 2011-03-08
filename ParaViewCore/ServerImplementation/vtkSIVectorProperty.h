@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIVectorProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkSIVectorProperty
 // .SECTION Description
-//
+// Abstract class for SIProperty that hold an array of values.
+// Define the array management API
 
 #ifndef __vtkSIVectorProperty_h
 #define __vtkSIVectorProperty_h

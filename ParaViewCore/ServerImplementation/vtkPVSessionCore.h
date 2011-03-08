@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkPVSessionCore.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,8 +14,11 @@
 =========================================================================*/
 // .NAME vtkPVSessionCore
 // .SECTION Description
-// vtkPVSessionCore is used by vtkSMSession. In handles processing of
-// communication locally as well as with satellites (in case on MPI processes). 
+// vtkPVSessionCore is used by vtkSMSession.
+// vtkPVSessionCore handle the communication to MPI satellites and
+// ServerImplementation code instanciation and execution.
+// On the other hand, the vtkSMSession dispatch the request to the right
+// process and therefore to the right vtkPVSessionCore instance.
 
 #ifndef __vtkPVSessionCore_h
 #define __vtkPVSessionCore_h
@@ -50,19 +53,20 @@ public:
 
   // Description:
   // Push the state message.
+  // This might forward the message to the MPI statellites if needed.
   virtual void PushState(vtkSMMessage* message);
 
   // Description:
-  // Pull the state message.
+  // Pull the state message from the local SI object instances.
   virtual void PullState(vtkSMMessage* message);
 
   // Description:
   // Execute a command on the given processes. Use GetLastResult() to obtain the
   // last result after the command stream is evaluated. Once can set
   // \c ignore_errors to true, to ignore any interpreting errors.
-  virtual void ExecuteStream(
-    vtkTypeUInt32 location, const vtkClientServerStream& stream,
-    bool ignore_errors=false);
+  virtual void ExecuteStream( vtkTypeUInt32 location,
+                              const vtkClientServerStream& stream,
+                              bool ignore_errors = false );
 
   // Description:
   // Returns the response of the ExecuteStream() call from the location. Note if
@@ -71,12 +75,15 @@ public:
   virtual const vtkClientServerStream& GetLastResult();
 
   // Description:
-  // Invoke a method remotely
+  // Notify that the given SIObject is not used anymore .
+  // This does not necessary delete the SIObject specially if this one is
+  // used by other local SIObject. It only decrease its reference count.
   virtual void DeleteSIObject(vtkSMMessage* message);
   //ETX
 
   // Description:
-  // Returns a vtkSIObject or subclass given its global id, if any.
+  // Returns a vtkSIObject or subclass given its global id, if any otherwise
+  // return NULL;
   vtkSIObject* GetSIObject(vtkTypeUInt32 globalid);
 
   // Description:
@@ -94,8 +101,9 @@ public:
   // Description:
   // Gather information about an object referred by the \c globalid.
   // \c location identifies the processes to gather the information from.
-  virtual bool GatherInformation(vtkTypeUInt32 location,
-    vtkPVInformation* information, vtkTypeUInt32 globalid);
+  virtual bool GatherInformation( vtkTypeUInt32 location,
+                                  vtkPVInformation* information,
+                                  vtkTypeUInt32 globalid );
 
   // Description:
   // Returns the number of processes. This simply calls the
@@ -112,20 +120,21 @@ public:
 //BTX
   enum MessageTypes
     {
-    PUSH_STATE   = 12,
-    PULL_STATE   = 13,
-    EXECUTE_STREAM = 14,
+    PUSH_STATE         = 12,
+    PULL_STATE         = 13,
+    EXECUTE_STREAM     = 14,
     GATHER_INFORMATION = 15,
-    DELETE_SI=16
+    DELETE_SI          = 16
     };
+  // Methods used to managed MPI satellite
   void PushStateSatelliteCallback();
   void ExecuteStreamSatelliteCallback();
   void GatherInformationStatelliteCallback();
   void DeleteSIObjectSatelliteCallback();
 
   // Description:
-  // Allow the user to fill its vtkCollection with all RemoteObject
-  // This could be usefull when you want to hold a reference to them to
+  // Allow the user to fill a vtkCollection with all RemoteObjects
+  // This is usefull when you want to hold a reference to them to
   // prevent any deletion across several method call.
   virtual void GetAllRemoteObjects(vtkCollection* collection);
 
@@ -134,13 +143,30 @@ protected:
   ~vtkPVSessionCore();
 
   // Description:
+  // This will create a vtkSIObject and/or execute some update on the
+  // vtkObject that it own.
   virtual void PushStateInternal(vtkSMMessage*);
-  virtual void ExecuteStreamInternal(
-    const vtkClientServerStream& stream, bool ignore_errors);
-  bool GatherInformationInternal(
-    vtkPVInformation* information, vtkTypeUInt32 globalid);
+
+  // Description:
+  // This will execute localy the given vtkClientServerStream either by
+  // calling method on the vtkSIObject or its internal vtkObject.
+  virtual void ExecuteStreamInternal( const vtkClientServerStream& stream,
+                                      bool ignore_errors );
+
+  // Description:
+  // This will gather informations on the local vtkObjects
+  // through the local vtkSIObjects.
+  bool GatherInformationInternal( vtkPVInformation* information,
+                                  vtkTypeUInt32 globalid );
+
+  // Description:
+  // Gather informations across MPI satellites.
   bool CollectInformation(vtkPVInformation*);
 
+  // Description:
+  // Decrement reference count of a local vtkSIObject. This might not result
+  // in an actual deletion of the object if this one is used by another
+  // SIObject.
   virtual void DeleteSIObjectInternal(vtkSMMessage* message);
 
   // Description:

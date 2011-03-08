@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkProcessModuleAutoMPI.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

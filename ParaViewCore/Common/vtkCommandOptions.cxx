@@ -1,5 +1,6 @@
 /*=========================================================================
 
+  Program:   ParaView
   Module:    vtkCommandOptions.cxx
 
   Copyright (c) Kitware, Inc.

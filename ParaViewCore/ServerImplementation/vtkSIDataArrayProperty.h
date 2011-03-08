@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIDataArrayProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIDataArrayProperty
+// .NAME vtkSIDataArrayProperty - InformationOnly property
 // .SECTION Description
 // SIProperty that deals with vtkDataArray object type
 

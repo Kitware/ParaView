@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIIdTypeVectorProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSIIdTypeVectorProperty
 // .SECTION Description
-//
+// IdType ServerSide Property use to set IdType array as method parameter.
 
 #ifndef __vtkSIIdTypeVectorProperty_h
 #define __vtkSIIdTypeVectorProperty_h

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIProxyProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -111,17 +111,17 @@ vtkStandardNewMacro(vtkSIProxyProperty);
 vtkSIProxyProperty::vtkSIProxyProperty()
 {
   this->Cache = new InternalCache(this);
-  this->CleanCommand = 0;
-  this->RemoveCommand = 0;
-  this->ArgumentType = VTK;
+  this->CleanCommand = NULL;
+  this->RemoveCommand = NULL;
+  this->ArgumentType = vtkSIProxyProperty::VTK;
   this->NullOnEmpty = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSIProxyProperty::~vtkSIProxyProperty()
 {
-  this->SetCleanCommand(0);
-  this->SetRemoveCommand(0);
+  this->SetCleanCommand(NULL);
+  this->SetRemoveCommand(NULL);
   delete this->Cache;
 }
 
@@ -134,11 +134,9 @@ bool vtkSIProxyProperty::ReadXMLAttributes(
     return false;
     }
 
-  const char* clean_command = element->GetAttribute("clean_command");
-  this->SetCleanCommand(clean_command);
+  this->SetCleanCommand(element->GetAttribute("clean_command"));
 
-  const char* remove_command = element->GetAttribute("remove_command");
-  this->SetRemoveCommand(remove_command);
+  this->SetRemoveCommand(element->GetAttribute("remove_command"));
 
   // Allow to choose the kind of object to pass as argument based on
   // its global id.
@@ -153,9 +151,9 @@ bool vtkSIProxyProperty::ReadXMLAttributes(
       {
       this->ArgumentType = SMProxy;
       }
-    else if(strcmp(arg_type, "Kernel") == 0)
+    else if(strcmp(arg_type, "SIProxy") == 0)
       {
-      this->ArgumentType = Kernel;
+      this->ArgumentType = SIProxy;
       }
     }
   else
@@ -198,9 +196,9 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
     {
     this->Cache->CleanCommand();
     stream << vtkClientServerStream::Invoke
-      << object
-      << this->CleanCommand
-      << vtkClientServerStream::End;
+           << object
+           << this->CleanCommand
+           << vtkClientServerStream::End;
     }
   else if(this->RemoveCommand)
     {
@@ -250,10 +248,10 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
-      << object
-      << this->GetCommand()
-      << vtkClientServerID(0)
-      << vtkClientServerStream::End;
+           << object
+           << this->GetCommand()
+           << vtkClientServerID(0)
+           << vtkClientServerStream::End;
     }
 
   this->Cache->UpdateRegisteredProxy();
@@ -284,9 +282,9 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
       siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
       return (siProxy == NULL) ? NULL : siProxy->GetVTKObject();
     case SMProxy:
-      return this->SIProxy->GetRemoteObject(globalId);
-    case Kernel:
-      return this->SIProxy->GetSIObject(globalId);
+      return this->SIProxyObject->GetRemoteObject(globalId);
+    case SIProxy:
+      return this->SIProxyObject->GetSIObject(globalId);
     }
   return NULL;
 }

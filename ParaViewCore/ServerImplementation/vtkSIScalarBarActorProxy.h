@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIScalarBarActorProxy
+  Module:    vtkSIScalarBarActorProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

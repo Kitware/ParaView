@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIDoubleVectorProperty.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,7 +15,6 @@
 #include "vtkSIDoubleVectorProperty.h"
 #include "vtkSIVectorPropertyTemplate.txx"
 #include "vtkObjectFactory.h"
-
 
 vtkStandardNewMacro(vtkSIDoubleVectorProperty);
 //----------------------------------------------------------------------------

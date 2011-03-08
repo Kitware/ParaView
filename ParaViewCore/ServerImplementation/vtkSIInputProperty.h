@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIInputProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,9 @@
 =========================================================================*/
 // .NAME vtkSIInputProperty
 // .SECTION Description
-//
+// ServerSide Property use to set vtkOutputPort as method parameter.
+// For that we need the object on which we should get the Port and its port
+// number.
 
 #ifndef __vtkSIInputProperty_h
 #define __vtkSIInputProperty_h

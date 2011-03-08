@@ -395,15 +395,6 @@ vtkSMDocumentation* vtkSMProxyManager::GetPropertyDocumentation(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyManager::ProxyElementExists(const char* groupName,
-                                          const char* proxyName)
-{
-  assert(this->ProxyDefinitionManager != 0);
-  return this->ProxyDefinitionManager->ProxyElementExists(groupName, proxyName)?
-    1 : 0;
-}
-
-//---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
                                                     const char* proxyName,
                                                     const char* subProxyName)

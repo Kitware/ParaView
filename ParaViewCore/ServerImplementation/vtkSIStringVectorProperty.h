@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile$
+  Module:    vtkSIStringVectorProperty.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSIStringVectorProperty
 // .SECTION Description
-//
+// ServerImplementation Property to deal with String array as method arguments.
 
 #ifndef __vtkSIStringVectorProperty_h
 #define __vtkSIStringVectorProperty_h
