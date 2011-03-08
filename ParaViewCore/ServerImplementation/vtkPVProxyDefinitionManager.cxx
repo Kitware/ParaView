@@ -88,34 +88,6 @@ public:
     return nbProxy;
   }
   //-------------------------------------------------------------------------
-  const char* GetXMLProxyName(const char* groupName, unsigned int n)
-  {
-    StrToXmlMap::iterator it;
-    StrToXmlMap map = this->CoreDefinitions[groupName];
-    if(map.size() > n)
-      {
-      for (it = map.begin(); it != map.end(); it++)
-        {
-        if(n-- == 0)
-          {
-          return it->first.c_str();
-          }
-        }
-      }
-    map = this->CustomsDefinitions[groupName];
-    if(map.size() > n)
-      {
-      for (it = map.begin(); it != map.end(); it++)
-        {
-        if(n-- == 0)
-          {
-          return it->first.c_str();
-          }
-        }
-      }
-    return 0; // OutOfBounds
-  }
-  //-------------------------------------------------------------------------
   vtkPVXMLElement* GetProxyElement(const char* groupName,
                                    const char* proxyName)
   {
@@ -554,16 +526,6 @@ vtkPVXMLElement* vtkPVProxyDefinitionManager::GetProxyDefinition(
   return 0;
 }
 
-//---------------------------------------------------------------------------
-unsigned int vtkPVProxyDefinitionManager::GetNumberOfXMLProxies(const char* groupName)
-{
-  return this->Internals->GetNumberOfProxy(groupName);
-}
-//---------------------------------------------------------------------------
-const char* vtkPVProxyDefinitionManager::GetXMLProxyName(const char* groupName, unsigned int n)
-{
-  return this->Internals->GetXMLProxyName(groupName, n);
-}
 //---------------------------------------------------------------------------
 void vtkPVProxyDefinitionManager::ClearCustomProxyDefinition()
 {

@@ -141,17 +141,6 @@ public:
   void SaveCustomProxyDefinitions(vtkSMMessage* msg);
 //ETX
 
-
-  // Description:
-  // Returns the number of proxies under the group with \c groupName for which
-  // proxies can be created.
-  unsigned int GetNumberOfXMLProxies(const char* groupName);
-
-  // Description:
-  // Returns the name for the nth XML proxy element under the
-  // group with name \c groupName.
-  const char* GetXMLProxyName(const char* groupName, unsigned int n);
-
   // Description:
   // Returns true if a proxy definition do exist for that given group name and
   // proxy name, false otherwise.
