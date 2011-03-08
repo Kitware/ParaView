@@ -80,7 +80,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
-  SET(QT_MIN_VERSION "4.5.0")
+  SET(QT_MIN_VERSION "4.6.0")
   SET(QT_OFFICIAL_VERSION "4.6")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
@@ -336,10 +336,13 @@ IF (PARAVIEW_BUILD_QT_GUI)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 ####################################################################################
-# The ParaView library dependencies.
-SET(PARAVIEW_LIBRARY_DEPENDS_FILE
-  "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
-EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
+# Export Targets file.
+SET(PARAVIEW_TARGETS_FILE "${CMAKE_BINARY_DIR}/${PV_INSTALL_EXPORT_NAME}.cmake")
+
+GET_PROPERTY(VTK_TARGETS GLOBAL PROPERTY VTK_TARGETS)
+EXPORT(TARGETS ${VTK_TARGETS} FILE ${PARAVIEW_TARGETS_FILE})
+INSTALL(EXPORT ${PV_INSTALL_EXPORT_NAME} DESTINATION ${PV_INSTALL_LIB_DIR})
+
 
 #########################################################################
 # Configure the CoProcessing library
@@ -423,12 +426,10 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   # Re-configure for the install.
   SET(SOURCE_TREE                                  ${ParaView_SOURCE_DIR})
   SET(BUILD_TREE                                   ${ParaView_BINARY_DIR}) 
-  #SET(ParaView_SOURCE_DIR                         "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(ParaView_CMAKE_DIR                          "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(ParaView_BINARY_DIR                         "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}")
   SET(PARAVIEW_USE_FILE                           "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewUse.cmake")
   SET(PARAVIEW_VTK_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-#  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(VTK_WRAP_ClientServer_EXE_CONFIG            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
   SET(PARAVIEW_INCLUDE_DIRS                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(ParaView_QT_DIR                             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}/Qt")
@@ -447,7 +448,9 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
   SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewLibraryDepends.cmake")
+  SET(PARAVIEW_TARGETS_FILE                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/${PV_INSTALL_EXPORT_NAME}.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  
   
   set(REL_REF)
   IF(NOT WIN32)

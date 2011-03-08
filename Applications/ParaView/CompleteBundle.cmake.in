@@ -126,6 +126,7 @@ if(QT_QTCLUCENE_LIBRARY)
 endif()
  
 list(APPEND libs_path "@QT_PLUGINS_DIR@/sqldrivers")
+list(APPEND libs_path "@QT_PLUGINS_DIR@/imageformats")
 list(APPEND libs_path "@PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS@")
  
 list(REMOVE_DUPLICATES libs_path)

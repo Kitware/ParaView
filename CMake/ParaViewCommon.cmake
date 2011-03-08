@@ -153,11 +153,6 @@ IF(NOT PV_INSTALL_DOC_DIR)
   SET(PV_INSTALL_DOC_DIR doc)
 ENDIF(NOT PV_INSTALL_DOC_DIR)
 
-# Override QtTesting install variables
-SET(QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-SET(QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-SET(QtTesting_INSTALL_CMAKE_DIR ${PV_INSTALL_CMAKE_DIR})
-
 #########################################################################
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true.
@@ -206,6 +201,7 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 # with the other python extension modules ParaView creates.
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 SET (VTK_INSTALL_NO_QT_PLUGIN 1)
+SET (VTK_INSTALL_NO_LIBRARIES ${PV_INSTALL_NO_LIBRARIES})
 
 # KWCommon config
 #TODO move this stuff into /ParaView3/Common/CMakeLists.txt
@@ -229,6 +225,7 @@ SET(XDMF_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(XDMF_INSTALL_INCLUDE_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
 SET(XDMF_INSTALL_INCLUDE_VTK_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
 SET(XDMF_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+SET(XDMF_WRAP_PYTHON_INSTALL_DIR ${PV_INSTALL_LIB_DIR}/site-packages/Xdmf)
 
 #########################################################################
 # The client server wrapper macro needs this name for
@@ -448,6 +445,14 @@ IF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
     ${VTK_DIR}/GUISupport/Qt)
 ENDIF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
 
+# Override QtTesting install variables
+IF (PARAVIEW_BUILD_QT_GUI)
+  SET(QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+  SET(QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(QtTesting_INSTALL_CMAKE_DIR ${PV_INSTALL_CMAKE_DIR})
+  SET(QT_TESTING_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+  SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS QtTesting)
+ENDIF()
 
 #########################################################################
 # Configure Python wrapping
@@ -481,7 +486,8 @@ SET(XDMF_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
 SET(XDMF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(XDMF_REGENERATE_YACCLEX OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_REGENERATE_WRAPPERS OFF CACHE INTERNAL "" FORCE)
-#SET(XDMF_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
+# Xdmf needs packaging fixes for this to be enabled.
+SET(XDMF_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
 MARK_AS_ADVANCED(FORCE XDMF_WRAP_PYTHON XDMF_WRAP_CSHARP)
 MARK_AS_ADVANCED(XDMF_REGENERATE_WRAPPERS XDMF_REGENERATE_YACCLEX)
 
@@ -491,8 +497,13 @@ SET(XDMF_INCLUDE_DIRS
   "${ParaView_SOURCE_DIR}/Utilities/Xdmf2/vtk"
   "${ParaView_BINARY_DIR}/Utilities/Xdmf2/vtk")
 SET(PARAVIEW_LINK_XDMF ON)
-ADD_SUBDIRECTORY(Utilities/Xdmf2)
 
+SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS Xdmf)
+IF(XDMF_WRAP_PYTHON)
+  SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS _Xdmf)
+ENDIF()
+
+ADD_SUBDIRECTORY(Utilities/Xdmf2)
 
 #########################################################################
 # Configure mpeg2 encoding
