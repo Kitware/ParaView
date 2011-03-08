@@ -31,7 +31,7 @@ ADD_PARAVIEW_AUTO_START(
 )
 
 add_paraview_plugin(
-  RenderPassEyeDomeLightingView "1.0"
+  EyeDomeLightingView "1.0"
   REQUIRED_ON_SERVER
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_SOURCES
@@ -46,4 +46,4 @@ add_paraview_plugin(
     RegisterRenderPassViews.cxx
 )
 
-TARGET_LINK_LIBRARIES ( RenderPassEyeDomeLightingView OffscreenShading)
+TARGET_LINK_LIBRARIES ( EyeDomeLightingView OffscreenShading)
