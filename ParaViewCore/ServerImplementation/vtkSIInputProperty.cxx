@@ -85,7 +85,7 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
   if (this->CleanCommand)
     {
     stream << vtkClientServerStream::Invoke
-      << this->SIProxy
+      << this->SIProxyObject
       << "CleanInputs"
       << this->CleanCommand
       << vtkClientServerStream::End;
@@ -98,7 +98,7 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
     vtkAlgorithmOutput* input_connection =
       (siProxy? siProxy->GetOutputPort(output_ports[cc]) : NULL);
     stream << vtkClientServerStream::Invoke
-           << this->SIProxy
+           << this->SIProxyObject
            << "AddInput"
            << this->PortIndex
            << input_connection
@@ -109,7 +109,7 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
-           << this->SIProxy
+           << this->SIProxyObject
            << "AddInput"
            << this->PortIndex
            << static_cast<vtkObjectBase*>(NULL)

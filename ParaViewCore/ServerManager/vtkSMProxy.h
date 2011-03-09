@@ -414,9 +414,8 @@ protected:
 
   // Description:
   // Get the last result
-  const vtkClientServerStream& GetLastResult()
-    { this->GetLastResult(this->Location); }
-  const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
+  virtual const vtkClientServerStream& GetLastResult();
+  virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
 
   // Description:
   // Add a property with the given key (name). The name can then

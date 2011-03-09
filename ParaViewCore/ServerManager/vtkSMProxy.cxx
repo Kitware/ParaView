@@ -1986,6 +1986,12 @@ void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
     }
 }
 //---------------------------------------------------------------------------
+const vtkClientServerStream& vtkSMProxy::GetLastResult()
+{
+  return this->GetLastResult(this->Location);
+}
+
+//---------------------------------------------------------------------------
 const vtkClientServerStream& vtkSMProxy::GetLastResult(vtkTypeUInt32 location)
 {
   return this->Session->GetLastResult(location);
