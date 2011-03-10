@@ -409,6 +409,14 @@ void vtkCompositeRepresentation::SetActiveRepresentation(const char* key)
       newActive->SetVisibility(this->GetVisibility());
       }
     }
+
+  // Get some feedback if the Representation Key is invalid
+  // this might occur with char* keys...
+  if(!newActive && key && strlen(key))
+    {
+    vtkErrorMacro(<< "No representation was found with Name: " << key);
+    }
+
   this->Modified();
 }
 
