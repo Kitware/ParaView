@@ -139,6 +139,14 @@ class vtkSMProxyObserver;
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
 public:
+  // ----------- DEPRECATED API --------------
+  VTK_LEGACY(void SetServers(vtkTypeUInt32));
+  VTK_LEGACY(vtkTypeUInt32 GetServers());
+  VTK_LEGACY(vtkTypeUInt32 GetConnectionID());
+  VTK_LEGACY(void SetConnectionID(vtkTypeUInt32));
+  // ----------- DEPRECATED API --------------
+
+public:
   static vtkSMProxy* New();
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);

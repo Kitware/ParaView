@@ -2037,3 +2037,21 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   stream << substream;
   return stream;
 }
+//---------------------------------------------------------------------------
+//                          Deprecated API
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetServers(vtkTypeUInt32 server)
+{
+  this->SetLocation(server);
+}
+vtkTypeUInt32 vtkSMProxy::GetServers()
+{
+  return this->GetLocation();
+}
+void vtkSMProxy::SetConnectionID(vtkTypeUInt32 vtkNotUsed(id))
+{
+}
+vtkTypeUInt32 vtkSMProxy::GetConnectionID()
+{
+  return 0;
+}
