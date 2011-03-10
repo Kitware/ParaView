@@ -38,12 +38,6 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-      <DoubleVectorProperty
-        name="AutoScale"
-        command="SetAutoScale"
-        number_of_elements="3"
-        default_values="1 1 1">
-      </DoubleVectorProperty>
         default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>

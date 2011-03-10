@@ -20,8 +20,8 @@ vtkStandardNewMacro(vtkPrismView);
 //----------------------------------------------------------------------------
 vtkPrismView::vtkPrismView()
 {
-      this->Transform= vtkSmartPointer<vtkTransform>::New();
-      this->Transform->Scale(1,1,1);
+      //this->Transform= vtkSmartPointer<vtkTransform>::New();
+      //this->Transform->Scale(1,1,1);
 }
 
 //----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ vtkPrismView::~vtkPrismView()
 {
 }
 
-   void vtkPrismView::AddRepresentationInternal(vtkDataRepresentation* rep)
+ /*  void vtkPrismView::AddRepresentationInternal(vtkDataRepresentation* rep)
 {
     vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(rep);
     if(compositeRep)
@@ -64,34 +64,11 @@ vtkPrismView::~vtkPrismView()
       }
     }
 
-}
-
-
+}*/
 
 void vtkPrismView::Update()
 {
- /* int numReps=this->GetNumberOfRepresentations();
-
-  for(int i=0;i<numReps;i++)
-  {
-    vtkDataRepresentation* rep=this->GetRepresentation(i);
-    vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(rep);
-    if(compositeRep)
-    {
-      vtkPVDataRepresentation*pvDataRep= compositeRep->GetActiveRepresentation();
-      if(pvDataRep)
-      {
-        vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(pvDataRep);
-
-        if(prismRep)
-        {
-          prismRep->SetAutoScale(1,1,1);
-        }
-      }
-    }
-  }*/
-  vtkPVRenderView::Update();
-
+ this->Superclass::Update();
   double ranges[3];
   ranges[0]=0;
   ranges[1]=0;
@@ -124,10 +101,14 @@ void vtkPrismView::Update()
           double range[3];
           prismRep->GetPrismRange(range);
 
-          ranges[0]+=range[0];
-          ranges[1]+=range[1];
-          ranges[2]+=range[2];
-          numberRanges++;
+          if(range[0]>0)
+          {
+            //If the range is negative then the range isn't valid.
+            ranges[0]+=range[0];
+            ranges[1]+=range[1];
+            ranges[2]+=range[2];
+            numberRanges++;
+          }
         }
       }
     }
@@ -156,12 +137,38 @@ void vtkPrismView::Update()
       scale[1]=100/ranges[1];
       scale[2]=100/ranges[2];
 
-      this->Transform->Scale(scale);
+      int numReps=this->GetNumberOfRepresentations();
+      for(int i=0;i<numReps;i++)
+      {
+        vtkDataRepresentation* rep=this->GetRepresentation(i);
+        vtkPVCompositeRepresentation *compositeRep = vtkPVCompositeRepresentation::SafeDownCast(rep);
+        if(compositeRep && compositeRep->GetVisibility())
+        {
+          vtkPVDataRepresentation*pvDataRep= compositeRep->GetActiveRepresentation();
+          if(pvDataRep)
+          {
+            vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(pvDataRep);
+
+            if(prismRep && prismRep->GetVisibility())
+            {
+              double range[3];
+              prismRep->GetPrismRange(range);
+
+              if(range[0]>0)
+              {
+                prismRep->SetScaleFactor(scale);
+              }
+
+            }
+          }
+        }
+      }
 
 
 
   }
-      vtkPVRenderView::Update();
+
+      this->Superclass::Update();
 
 }
 

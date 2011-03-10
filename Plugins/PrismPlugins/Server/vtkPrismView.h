@@ -35,7 +35,7 @@ public:
   // Description:
   // Overridden to not call Update() directly on the input representations,
   // instead use ProcessViewRequest() for all vtkPVDataRepresentations.
-  virtual void Update();
+  void Update();
 
 
 
@@ -45,16 +45,14 @@ public:
 protected:
   vtkPrismView();
   ~vtkPrismView();
- // Subclass "hooks" for notifying subclasses of vtkView when representations are added
-  // or removed. Override these methods to perform custom actions.
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
-  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
+ //// Subclass "hooks" for notifying subclasses of vtkView when representations are added
+ // // or removed. Override these methods to perform custom actions.
+ // virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
+ // virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
 
 private:
   vtkPrismView(const vtkPrismView&); // Not implemented
   void operator=(const vtkPrismView&); // Not implemented
-  vtkSmartPointer<vtkTransform> Transform;
-
 
 //ETX
 

@@ -32,7 +32,7 @@ public:
   vtkTypeMacro(vtkPrismRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetTransform(vtkTransform*);
+  void SetScaleFactor(double scale[3]);
 
  void GetPrismRange(double range[3]);
 

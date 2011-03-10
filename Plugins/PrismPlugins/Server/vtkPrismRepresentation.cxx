@@ -40,13 +40,15 @@ namespace
     static vtkPrismTransform *New();
 
 
-
     vtkGetVectorMacro(PrismRange,double,3);
 
   protected:
 
     vtkPrismTransform()
     {
+      PrismRange[0]=-1;
+      PrismRange[1]=-1;
+      PrismRange[2]=-1;
 
 
     }
@@ -82,7 +84,6 @@ namespace
 
   private:
     double PrismRange[3];
-    double AutoScale[3];
 
     vtkPrismTransform(const vtkPrismTransform&);  // Not implemented.
     void operator=(const vtkPrismTransform&);  // Not implemented.
@@ -102,12 +103,17 @@ class vtkPrismRepresentation::MyInternal
     {
     public:
         vtkSmartPointer<vtkPrismTransform> ScaleTransform;
+        vtkSmartPointer<vtkTransform> Transform;
+
 
 
         MyInternal()
             {
 
               this->ScaleTransform= vtkSmartPointer<vtkPrismTransform>::New();
+              this->Transform= vtkSmartPointer<vtkTransform>::New();
+              this->Transform->Scale(1,1,1);
+              this->ScaleTransform->SetTransform(this->Transform);
 
             }
         ~MyInternal()
@@ -119,15 +125,6 @@ class vtkPrismRepresentation::MyInternal
 vtkPrismRepresentation::vtkPrismRepresentation()
 {
     this->Internal = new MyInternal();
-
-
-
-  //this->BackfaceMapper->SetInputConnection(
-  //  this->Mapper->GetInputConnection(0, 0));
-  //this->LODBackfaceMapper->SetInputConnection(
-  //  this->LODMapper->GetInputConnection(0, 0));
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -138,18 +135,18 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 
  void vtkPrismRepresentation::GetPrismRange(double* range)
 {
-//TODO Update
+  this->Internal->ScaleTransform->Update();
   this->Internal->ScaleTransform->GetPrismRange(range);
 
 }
-
-void vtkPrismRepresentation:: SetTransform(vtkTransform* transform)
-
-
+  void vtkPrismRepresentation::SetScaleFactor(double* scale)
 {
-  this->Internal->ScaleTransform->SetTransform(transform);
+  this->Internal->Transform->Scale(scale);
+
+  this->MarkModified();
 }
-//----------------------------------------------------------------------------
+
+
 int vtkPrismRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
