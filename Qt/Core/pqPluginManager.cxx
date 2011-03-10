@@ -210,7 +210,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   pqServer* server, const QString& lib, QString* vtkNotUsed(errorMsg), bool remote)
 {
   bool ret_val;
-  if (remote && server->isRemote())
+  if (remote && server && server->isRemote())
     {
     ret_val = this->Internals->SMPluginManager->LoadRemotePlugin(
       lib.toAscii().data());
