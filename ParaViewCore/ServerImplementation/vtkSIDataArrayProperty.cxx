@@ -88,6 +88,7 @@ bool vtkSIDataArrayProperty::Pull(vtkSMMessage* msgToFill)
   // Right now only those types are supported
   // - vtkDoubleArray
   // - vtkIntArray
+  // - vtkIdTypeArray
   // - vtkStringArray
   vtkIdType numValues = abstractArray->GetNumberOfComponents()
                         * abstractArray->GetNumberOfTuples();
@@ -95,6 +96,7 @@ bool vtkSIDataArrayProperty::Pull(vtkSMMessage* msgToFill)
     {
     vtkDoubleArray *dataDouble = NULL;
     vtkIntArray *dataInt = NULL;
+    vtkIdTypeArray *dataIdType = NULL;
     switch (dataArray->GetDataType())
       {
       case VTK_DOUBLE:
@@ -111,6 +113,14 @@ bool vtkSIDataArrayProperty::Pull(vtkSMMessage* msgToFill)
         for (vtkIdType cc=0; cc < numValues; cc++)
           {
           var->add_integer(dataInt->GetValue(cc));
+          }
+        break;
+      case VTK_ID_TYPE:
+        var->set_type(Variant::IDTYPE);
+        dataIdType = vtkIdTypeArray::SafeDownCast(dataArray);
+        for (vtkIdType cc=0; cc < numValues; cc++)
+          {
+          var->add_idtype(dataIdType->GetValue(cc));
           }
         break;
       default:

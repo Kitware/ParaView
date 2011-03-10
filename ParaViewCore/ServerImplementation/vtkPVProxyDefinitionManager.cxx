@@ -1255,7 +1255,8 @@ void vtkPVProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
     {
     if(  !strcmp(informationHelper->GetName(),"StringArrayHelper")
       || !strcmp(informationHelper->GetName(),"DoubleArrayInformationHelper")
-      || !strcmp(informationHelper->GetName(),"IntArrayInformationHelper"))
+      || !strcmp(informationHelper->GetName(),"IntArrayInformationHelper")
+      || !strcmp(informationHelper->GetName(),"IdTypeArrayInformationHelper"))
       {
       propElement->SetAttribute("si_class", "vtkSIDataArrayProperty");
       }
