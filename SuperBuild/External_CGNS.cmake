@@ -85,7 +85,7 @@ else()
     URL_MD5 ${CGNS_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-zlib=${ZLIB_LIBRARY} --with-hdf5=${HDF5_install} --enable-64bit --enable-shared=all --disable-static --without-fortran
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-zlib=${ZLIB_LIBRARY} --enable-64bit --enable-shared=all --disable-static --without-fortran
     DEPENDS ${CGNS_dependencies}
   )
 
