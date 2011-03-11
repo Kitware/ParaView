@@ -267,7 +267,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
       {
       vtkstd::string name = child->GetAttributeOrEmpty("name");
       int auto_load;
-      if (!name.empty() || !child->GetScalarAttribute("auto_load", &auto_load))
+      if (name.empty() || !child->GetScalarAttribute("auto_load", &auto_load))
         {
         vtkPVPluginTrackerDebugMacro(
           "Missing required attribute name or auto_load. Skipping element.");
