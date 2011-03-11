@@ -847,9 +847,13 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 //----------------------------------------------------------------------------
 double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 {
+  this->Session->Activate();
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
-  return rv? rv->GetZbufferDataAtPoint(x, y) : 1.0;
+  double result = rv? rv->GetZbufferDataAtPoint(x, y) : 1.0;
+  this->Session->DeActivate();
+
+  return result;
 }
 
 //----------------------------------------------------------------------------

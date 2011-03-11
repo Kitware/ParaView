@@ -38,6 +38,9 @@ protected:
   vtkSession();
   ~vtkSession();
 
+  // Needed when TileDisplay are retreived
+  friend class vtkSMRenderViewProxy;
+
   // Description:
   // Subclasses must call this to mark the session active. This sets the active
   // session pointer held by the vtkProcessModule, making it easier for filters
