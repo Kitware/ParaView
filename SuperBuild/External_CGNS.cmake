@@ -35,7 +35,7 @@ if(WIN32)
     URL_MD5 ${CGNS_MD5}
     SOURCE_DIR ${CGNS_source}
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CGNSPatches/cgnslib.h" "${cgns_source}/cgnslib.h"
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CGNSPatches/cgnslib.h" "${CGNS_source}/cgnslib.h"
     CONFIGURE_COMMAND configure -install ${cgns_install_dos_short_path} -dll ${cgns_64} -zlib ${zlib_dos_short_path}
     BUILD_COMMAND nmake
     INSTALL_COMMAND nmake install
@@ -85,7 +85,7 @@ else()
     URL_MD5 ${CGNS_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-zlib=${ZLIB_LIBRARY} --with-hdf5=${HDF5_install} --enable-64bit --enable-shared=all --disable-static --without-fortran
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --with-zlib=${ZLIB_LIBRARY} --enable-64bit --enable-shared=all --disable-static --without-fortran
     DEPENDS ${CGNS_dependencies}
   )
 
