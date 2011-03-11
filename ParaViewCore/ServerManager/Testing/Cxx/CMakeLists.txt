@@ -18,6 +18,7 @@ TARGET_LINK_LIBRARIES(TestSubProxy
 SET(ServersServerManager_SRCS
   ParaViewCoreServerManagerPrintSelf
   TestComparativeAnimationCueProxy 
+  TestXMLSaveLoadState
   )
 
 FOREACH(name ${ServersServerManager_SRCS})

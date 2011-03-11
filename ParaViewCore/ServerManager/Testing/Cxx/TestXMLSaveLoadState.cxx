@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPVXMLElement.h"
 
-#include "paraview.h"
-
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
@@ -40,7 +38,6 @@ int main(int argc, char* argv[])
   vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
   //---------------------------------------------------------------------------
   vtkSMSession* session = vtkSMSession::New();
-  session->Initialize();
   cout << "==== Starting ====" << endl;
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
