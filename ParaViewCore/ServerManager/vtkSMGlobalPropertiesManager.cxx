@@ -246,14 +246,14 @@ int vtkSMGlobalPropertiesManager::LoadLinkState(
       vtkWarningMacro("Invalid element in global link state. Ignoring.");
       continue;
       }
-    const char* global_name = child->GetAttribute("global_name");
-    const char* property = child->GetAttribute("property");
+    vtkstd::string global_name = child->GetAttributeOrEmpty("global_name");
+    vtkstd::string property = child->GetAttributeOrEmpty("property");
     int proxyid = 0;
     child->GetScalarAttribute("proxy", &proxyid);
     vtkSMProxy* proxy = locator->LocateProxy(proxyid);
-    if (global_name && property && proxy)
+    if (!global_name.empty() && !property.empty() && proxy)
       {
-      this->SetGlobalPropertyLink(global_name, proxy, property);
+      this->SetGlobalPropertyLink(global_name.c_str(), proxy, property.c_str());
       }
     }
 

@@ -49,8 +49,20 @@ public:
 
   // Description:
   // Get the attribute with the given name.  If it doesn't exist,
-  // returns 0. 
-  const char* GetAttribute(const char* name);
+  // returns NULL.
+  const char* GetAttribute(const char* name)
+    { return this->GetAttributeOrDefault(name, NULL); }
+
+  // Description:
+  // Get the attribute with the given name.  If it doesn't exist,
+  // returns "".
+  const char* GetAttributeOrEmpty(const char* name)
+    { return this->GetAttributeOrDefault(name, ""); }
+
+  // Description:
+  // Get the attribute with the given name.
+  // If it doesn't exist, returns the provided notFound value.
+  const char* GetAttributeOrDefault(const char* name, const char* notFound);
 
   // Description:
   // Get the character data for the element.

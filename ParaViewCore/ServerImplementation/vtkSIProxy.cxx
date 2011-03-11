@@ -403,8 +403,8 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 {
   // Since the XML is "cleaned" out, we are assured that there are no duplicate
   // properties.
-  const char* name = propElement->GetAttribute("name");
-  assert(name && this->GetSIProperty(name) == NULL);
+  vtkstd::string name = propElement->GetAttributeOrEmpty("name");
+  assert(!name.empty() && this->GetSIProperty(name.c_str()) == NULL);
 
   // Patch XML to remove InformationHelper and set right si_class
   vtkPVProxyDefinitionManager::PatchXMLProperty(propElement);
@@ -437,11 +437,11 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 
   if (!property->ReadXMLAttributes(this, propElement))
     {
-    vtkErrorMacro("Could not parse property: " << name);
+    vtkErrorMacro("Could not parse property: " << name.c_str());
     return false;
     }
 
-  this->AddSIProperty(name, property);
+  this->AddSIProperty(name.c_str(), property);
   return true;
 }
 

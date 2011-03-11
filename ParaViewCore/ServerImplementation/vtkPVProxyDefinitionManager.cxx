@@ -677,9 +677,9 @@ void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
     if ( currentElement->GetName() &&
          strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0 )
       {
-      const char* group = currentElement->GetAttribute("group");
-      const char* name = currentElement->GetAttribute("name");
-      if (name && group)
+      vtkstd::string group = currentElement->GetAttributeOrEmpty("group");
+      vtkstd::string name = currentElement->GetAttributeOrEmpty("name");
+      if (!name.empty() && !group.empty())
         {
         if (currentElement->GetNumberOfNestedElements() == 1)
           {
@@ -689,7 +689,7 @@ void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
             {
             // Register custom proxy definitions for all elements ending with
             // "Proxy".
-            this->AddCustomProxyDefinition(group, name, defElement);
+            this->AddCustomProxyDefinition(group.c_str(), name.c_str(), defElement);
             }
           }
         }
@@ -863,16 +863,17 @@ bool vtkPVProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
   for (unsigned int i=0; i < root->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* group = root->GetNestedElement(i);
-    const char* groupName = group->GetAttribute("name");
-    const char* proxyName = NULL;
+    vtkstd::string groupName = group->GetAttributeOrEmpty("name");
+    vtkstd::string proxyName;
 
     // Loop over the top-level elements.
     for(unsigned int cc=0; cc < group->GetNumberOfNestedElements(); ++cc)
       {
       vtkPVXMLElement* proxy = group->GetNestedElement(cc);
-      if (proxyName = proxy->GetAttribute("name"))
+      proxyName = proxy->GetAttributeOrEmpty("name");
+      if (!proxyName.empty())
         {
-        this->AddElement(groupName, proxyName, proxy);
+        this->AddElement(groupName.c_str(), proxyName.c_str(), proxy);
         }
       }
     }
@@ -984,21 +985,26 @@ vtkPVXMLElement* vtkPVProxyDefinitionManager::GetCollapsedProxyDefinition(
   if(originalDefinition)
     {
     vtkPVXMLElement* realDefinition = originalDefinition;
-    const char* base_group = originalDefinition->GetAttribute("base_proxygroup");
-    const char* base_name  = originalDefinition->GetAttribute("base_proxyname");
+    vtkstd::string base_group =
+        originalDefinition->GetAttributeOrEmpty("base_proxygroup");
+    vtkstd::string base_name =
+        originalDefinition->GetAttributeOrEmpty("base_proxyname");
 
-    if( base_group && base_name)
+    if( !base_group.empty() && !base_name.empty())
       {
       vtkstd::vector<vtkPVXMLElement*> classHierarchy;
       while(originalDefinition)
         {
         classHierarchy.push_back(originalDefinition);
-        if(base_group && base_name)
+        if(!base_group.empty() && !base_name.empty())
           {
-          originalDefinition =
-              this->GetProxyDefinition(base_group, base_name, throwError);
-          base_group = originalDefinition->GetAttribute("base_proxygroup");
-          base_name  = originalDefinition->GetAttribute("base_proxyname");
+          originalDefinition = this->GetProxyDefinition( base_group.c_str(),
+                                                         base_name.c_str(),
+                                                         throwError);
+          base_group =
+              originalDefinition->GetAttributeOrEmpty("base_proxygroup");
+          base_name  =
+              originalDefinition->GetAttributeOrEmpty("base_proxyname");
           }
         else
           {

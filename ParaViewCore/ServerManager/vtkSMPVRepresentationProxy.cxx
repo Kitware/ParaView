@@ -136,9 +136,9 @@ int vtkSMPVRepresentationProxy::ReadXMLAttributes(
   for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
     {
     vtkPVXMLElement* child = element->GetNestedElement(cc);
-    if (child->GetName() &&
-      strcmp(child->GetName(), "RepresentationType") == 0 &&
-      child->GetAttribute("subproxy") != NULL)
+    if ( child->GetName() &&
+         strcmp(child->GetName(), "RepresentationType") == 0 &&
+         child->GetAttribute("subproxy") != NULL )
       {
       this->RepresentationSubProxies->insert(child->GetAttribute("subproxy"));
       }

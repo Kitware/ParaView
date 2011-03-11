@@ -265,16 +265,16 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
     vtkPVXMLElement* child = root->GetNestedElement(cc);
     if (child && child->GetName() && strcmp(child->GetName(), "Plugin") == 0)
       {
-      const char* name=child->GetAttribute("name");
+      vtkstd::string name = child->GetAttributeOrEmpty("name");
       int auto_load;
-      if (!name || !child->GetScalarAttribute("auto_load", &auto_load))
+      if (!name.empty() || !child->GetScalarAttribute("auto_load", &auto_load))
         {
         vtkPVPluginTrackerDebugMacro(
           "Missing required attribute name or auto_load. Skipping element.");
         continue;
         }
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: "
-        << name);
+        << name.c_str());
       vtkstd::string plugin_filename;
       if (child->GetAttribute("filename"))
         {
@@ -282,7 +282,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         }
       else
         {
-        plugin_filename = vtkLocatePlugin(name, true);
+        plugin_filename = vtkLocatePlugin(name.c_str(), true);
         }
       if (plugin_filename.empty())
         {
@@ -291,11 +291,11 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         if (required)
           {
           vtkErrorMacro(
-            "Failed to locate required plugin: " << name << "\n"
+            "Failed to locate required plugin: " << name.c_str() << "\n"
             "Application may not work exactly as expected.");
           }
         vtkPVPluginTrackerDebugMacro("Failed to locate file plugin: "
-          << name);
+          << name.c_str());
         continue;
         }
       vtkPVPluginTrackerDebugMacro("--- Found " << plugin_filename);

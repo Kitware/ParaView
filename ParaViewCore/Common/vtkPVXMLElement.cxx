@@ -227,7 +227,8 @@ void vtkPVXMLElement::AddCharacterData(const char* data, int length)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVXMLElement::GetAttribute(const char* name)
+const char* vtkPVXMLElement::GetAttributeOrDefault( const char* name,
+                                                    const char* notFound )
 {
   size_t numAttributes = this->Internal->AttributeNames.size();
   size_t i;
@@ -238,9 +239,8 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
       return this->Internal->AttributeValues[i].c_str();
       }
     }
-  return 0;
+  return notFound;
 }
-
 //----------------------------------------------------------------------------
 const char* vtkPVXMLElement::GetCharacterData()
 {

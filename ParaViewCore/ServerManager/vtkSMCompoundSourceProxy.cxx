@@ -196,7 +196,7 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
 
   // Initialise sub-proxy by registering them as sub-proxy --------------------
   int currentId;
-  const char* compoundName;
+  vtkstd::string compoundName;
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i < numElems; i++)
     {
@@ -204,8 +204,8 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     if ( currentElement->GetName() &&
          strcmp(currentElement->GetName(), "Proxy") == 0)
       {
-      compoundName = currentElement->GetAttribute("compound_name");
-      if (compoundName && compoundName[0] != '\0')
+      compoundName = currentElement->GetAttributeOrEmpty("compound_name");
+      if (!compoundName.empty())
         {
         if (!currentElement->GetScalarAttribute("id", &currentId))
           {
@@ -214,7 +214,7 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
         vtkSMProxy* subProxy = locator->LocateProxy(currentId);
         if (subProxy)
           {
-          this->AddSubProxy(compoundName, subProxy);
+          this->AddSubProxy(compoundName.c_str(), subProxy);
           }
         }
       }
