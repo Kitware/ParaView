@@ -28,6 +28,64 @@
 // it updates the definitions and is the ready to create new proxies.
 // .SECTION See Also
 // vtkPVProxyDefinitionManager
+//
+// Basic XML Proxy definition documentation:
+//
+// ------------- Proxy definition -------------
+//  <SourceProxy                   => Will create vtkSM + SourceProxy class
+//         name="SphereSource"     => Key used to create the proxy
+//         class="vtkSphereSource" => Concreate vtkClass that do the real job
+//         label="Sphere">         => Nice name used in menu and python shell
+//
+// ----------- Property definition -----------
+//    <DoubleVectorProperty        => Will create vtkSM + DoubleVectorProperty
+//                                    and vtkSI + DoubleVectorProperty class by
+//                                    default.
+//         name="Center"           => Name of the property:
+//                                    vtkPropertyHelper(proxy, "Center").Set(0,1,2)
+//         command="SetCenter"     => Real method name that will be called on
+//                                    vtkObject when the property will be updated.
+//         number_of_elements="3"  => Size of the vector
+//         animateable="1"         => Tell the animation view that property
+//                                    can be used as an evolving property
+//         default_values="0 0 0"> => The value that will be set at the
+//    </DoubleVectorProperty>         construction to the VTK object
+//  </SourceProxy>
+//
+// For custom behaviour the user can add some extra attributes:
+//
+//  - We can specify a custom SIProperty class to handle in a custom way the
+//    data on the server.
+//      <StringVectorProperty          => vtkSMStringVectorProperty class
+//         name="ElementBlocksInfo"    => Property name
+//         information_only="1"        => Can only be used to fecth data
+//         si_class="vtkSISILProperty" => Class name to instanciate on the other side
+//         subtree="Blocks"/>          => Extra attribute used by vtkSISILProperty
+//
+//  - We can trigger after any update a command to be executed
+//      <Proxy name="LookupTable"
+//             class="vtkLookupTable"
+//             post_push="Build"       => The method Build() will be called each
+//                                        time a new property value is pushed to
+//                                        the VTK object.
+//             processes="dataserver|renderserver|client" >
+//
+//  - We can force any property to push its value as soon has it get changed
+//          <Property name="ResetFieldCriteria"
+//             command="ResetFieldCriteria"
+//             immediate_update="1">     => Modifying the property will result
+//                                          of a push of it and the execution
+//                                          of the command on the vtkObject.
+//
+//  - To show a source proxy or a filter inside the menu of ParaView we use a hint
+//       <SourceProxy ...>
+//           <Hints>
+//              <ShowInGUI                     => The category attribute allow to
+//                  category="PersoFilter"/>      specify in which sub-menu this
+//                                                proxy should be in.
+//           </Hints>
+//       </SourceProxy>
+
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
