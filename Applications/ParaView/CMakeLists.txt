@@ -169,13 +169,13 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
     option(PARAVIEW_INSTALL_MPIEXEC "Include the MPI executable in an installation." OFF)
     mark_as_advanced(PARAVIEW_INSTALL_MPIEXEC)
-    if(PARAVIEW_INSTALL_MPIEXEC)
+    if(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
       GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
       install(DIRECTORY ${mpi_bin_dir}/
         DESTINATION ${pv_runtime_dest}
         USE_SOURCE_PERMISSIONS
         COMPONENT Runtime)
-    endif(PARAVIEW_INSTALL_MPIEXEC)
+    endif(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
   endif(PARAVIEW_USE_MPI)
 
   set(_dir "${PV_INSTALL_LIB_DIR}")
