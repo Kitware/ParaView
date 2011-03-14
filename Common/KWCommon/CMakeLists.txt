@@ -10,7 +10,7 @@ PROJECT(KWCommon)
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
 
-SET(KWCommon_INCLUDE_PATH 
+SET(KWCommon_INCLUDE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}"
   CACHE INTERNAL "include paths for KWCommon"
   )
@@ -139,10 +139,8 @@ ENDIF(KWCommon_BUILD_SHARED_LIBS)
 # Sources
 
 SET(KWCommon_SRCS
-  vtkContainer.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRemoteExecute.cxx
-  vtkQueue.cxx
   )
 
 # --------------------------------------------------------------------------
@@ -175,7 +173,7 @@ EXPORT ${PV_INSTALL_EXPORT_NAME}
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
   ELSE(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL_TARGETS(${KWCommon_INSTALL_LIB_DIR} 
+    INSTALL_TARGETS(${KWCommon_INSTALL_LIB_DIR}
       RUNTIME_DIRECTORY ${KWCommon_INSTALL_BIN_DIR}
       ${KWCommon_LIBRARIES})
   ENDIF(PV_INSTALL_HAS_CMAKE_24)
@@ -187,8 +185,8 @@ ENDIF(NOT KWCommon_INSTALL_NO_LIBRARIES)
 FILE(GLOB templated_files "${CMAKE_CURRENT_SOURCE_DIR}/*.txx")
 
 IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .h 
-    ${KWCommon_SRCS} 
+  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .h
+    ${KWCommon_SRCS}
     ${templated_files})
   INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .txx ${templated_files})
 ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
@@ -203,8 +201,8 @@ SET(default_val 1)
 IF(DEFINED KWCommon_BUILD_TESTING_DEFAULT)
   SET(default_val ${KWCommon_BUILD_TESTING_DEFAULT})
 ENDIF(DEFINED KWCommon_BUILD_TESTING_DEFAULT)
-OPTION(KWCommon_BUILD_TESTING 
-  "Enable testing in KWCommon (if BUILD_TESTING is ON as well)." 
+OPTION(KWCommon_BUILD_TESTING
+  "Enable testing in KWCommon (if BUILD_TESTING is ON as well)."
   ${default_val})
 MARK_AS_ADVANCED(KWCommon_BUILD_TESTING)
 IF(BUILD_TESTING AND KWCommon_BUILD_TESTING)
@@ -245,7 +243,7 @@ IF(KWCOMMON_BUILD_PROCESSXML)
         ADD_DEPENDENCIES(${KWCOMMON_HOST_TOOLS_TARGET} kwProcessXML)
       ENDIF(KWCOMMON_HOST_TOOLS_TARGET)
       IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-        INSTALL(TARGETS kwProcessXML 
+        INSTALL(TARGETS kwProcessXML
           DESTINATION ${PV_INSTALL_BIN_DIR}
           COMPONENT Development)
       ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
@@ -263,7 +261,7 @@ IF(KWCOMMON_BUILD_PROCESSXML)
     IF(Temp_Using_Shared_Forwarding)
       SET(kwProcessXML_real_INSTALL_DIR ${PV_INSTALL_LIB_DIR})
     ENDIF(Temp_Using_Shared_Forwarding)
-    INSTALL(TARGETS kwProcessXML${KWCommon_EXE_SUFFIX} 
+    INSTALL(TARGETS kwProcessXML${KWCommon_EXE_SUFFIX}
       DESTINATION ${kwProcessXML_real_INSTALL_DIR}
       COMPONENT Development)
   ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
