@@ -64,6 +64,7 @@
 
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+#include "vtkWeakPointer.h" // needed for vtkweakPointer
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
@@ -236,8 +237,7 @@ public:
   // Get the proxy to which this property belongs. Note that is this property is
   // belong to a sub-proxy of a proxy, the returned value will indeed be that
   // sub-proxy (and not the outer container proxy).
-  vtkSMProxy* GetParent()
-    { return this->Proxy; }
+  vtkSMProxy* GetParent();
 
   // Flag used to ignore property when building Proxy state for Undo/Redo state.
   // The default value is false.
@@ -373,12 +373,9 @@ protected:
   vtkGetMacro(PendingModifiedEvents, bool);
 
   // Proxy is not reference-counted to avoid reference loops.
-  void SetParent(vtkSMProxy* proxy)
-    {
-    this->Proxy = proxy;
-    }
+  void SetParent(vtkSMProxy* proxy);
 
-  vtkSMProxy* Proxy;
+  vtkWeakPointer<vtkSMProxy> Proxy;
 
   // Flag used to ignore property when building Proxy state for Undo/Redo state.
   // The default value is false.

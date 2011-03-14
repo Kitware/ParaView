@@ -557,3 +557,13 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
     }
   return 1;
 }
+//---------------------------------------------------------------------------
+void vtkSMProperty::SetParent(vtkSMProxy *proxy)
+{
+this->Proxy = proxy;
+}
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProperty::GetParent()
+{
+  return this->Proxy.GetPointer();
+}
