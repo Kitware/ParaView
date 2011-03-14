@@ -323,7 +323,8 @@ void vtkIceTSynchronizedRenderers::HandleEndRender()
 
     // Write-back either the freshly rendered tile or what was most recently
     // rendered.
-    vtkTileDisplayHelper::GetInstance()->FlushTiles(this);
+    vtkTileDisplayHelper::GetInstance()->FlushTiles(this, 
+      this->Renderer->GetActiveCamera()->GetLeftEye());
     }
 }
 

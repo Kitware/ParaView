@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVContextView.h"
 
+#include "vtkCamera.h"
 #include "vtkContextView.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageData.h"
@@ -104,7 +105,8 @@ void vtkPVContextView::Render(bool interactive)
     // from the client-side.
     this->ContextView->GetRenderer()->EraseOff();
     this->ReceiveImageToFromClient();
-    vtkTileDisplayHelper::GetInstance()->FlushTiles(this);
+    vtkTileDisplayHelper::GetInstance()->FlushTiles(this, 
+      this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
     this->GetRenderWindow()->Frame();
     }
 }
