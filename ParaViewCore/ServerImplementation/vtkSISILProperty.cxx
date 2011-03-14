@@ -35,6 +35,7 @@
 #include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 class vtkSISILProperty::vtkIdTypeSet : public vtkstd::set<vtkIdType> {};
 
@@ -65,6 +66,13 @@ bool vtkSISILProperty::ReadXMLAttributes( vtkSIProxy* proxyhelper,
 
   // Parse extra attribute
   this->SetSubTree(element->GetAttribute("subtree")); // if none => set NULL
+  if(!this->SubTree)
+    {
+    vtksys_ios::ostringstream proxyDefinition;
+    element->PrintXML(proxyDefinition, vtkIndent(3));
+    vtkWarningMacro("No subtree attribute has been set in the following XML: "
+                    << proxyDefinition.str().c_str() );
+    }
 
   // If error we reset it to 0
   if(!element->GetScalarAttribute("output_port", &this->OutputPort))
