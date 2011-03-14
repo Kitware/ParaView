@@ -87,6 +87,8 @@ namespace
     paths_to_search.push_back(app_dir + "/../Plugins");
     paths_to_search.push_back(app_dir + "/../../..");
 #endif
+    // On windows configuration files are in the parent directory
+    paths_to_search.push_back(app_dir + "/../");
 
     vtkstd::string name = plugin;
     vtkstd::string filename = name;
