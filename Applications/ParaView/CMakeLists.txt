@@ -105,6 +105,10 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
           DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
 
+  install(DIRECTORY ${QT_PLUGINS_DIR}/imageformats 
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)
+
   if(PARAVIEW_ENABLE_PYTHON)
     option(PARAVIEW_INSTALL_PYTHON "Install core python modules in ParaView." OFF)
     mark_as_advanced(PARAVIEW_INSTALL_PYTHON)
@@ -165,13 +169,13 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
     option(PARAVIEW_INSTALL_MPIEXEC "Include the MPI executable in an installation." OFF)
     mark_as_advanced(PARAVIEW_INSTALL_MPIEXEC)
-    if(PARAVIEW_INSTALL_MPIEXEC)
+    if(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
       GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
       install(DIRECTORY ${mpi_bin_dir}/
         DESTINATION ${pv_runtime_dest}
         USE_SOURCE_PERMISSIONS
         COMPONENT Runtime)
-    endif(PARAVIEW_INSTALL_MPIEXEC)
+    endif(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
   endif(PARAVIEW_USE_MPI)
 
   set(_dir "${PV_INSTALL_LIB_DIR}")
@@ -179,15 +183,21 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
     set(_dir "bin")
   endif(WIN32)
 
-  set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${DIRS} CACHE STRING
+  if(NOT PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
+    set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${DIRS} CACHE STRING
       "Directories for FixupBundle to search for dependencies" FORCE)
+  endif()
   mark_as_advanced(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
+  
+  set(search_path ${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS})
+  list(APPEND search_path ${DIRS})
+  list(REMOVE_DUPLICATES search_path)
 
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
 
   if(WIN32)
     foreach(pluginname ${PARAVIEW_PLUGINLIST})
-      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/${pluginname}.dll")
+      list(APPEND plugin_libs "${EXECUTABLE_OUTPUT_PATH}/Release/${pluginname}.dll")
     endforeach(pluginname ${PARAVIEW_PLUGINLIST})
   else()
     foreach(pluginname ${PARAVIEW_PLUGINLIST})
@@ -197,7 +207,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}\")
+fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)

@@ -33,14 +33,14 @@ paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartRe
 paraview_build_optional_plugin(AdiosReader "Reader for *.bp files based on Adios" AdiosReader OFF)
 IF(PARAVIEW_BUILD_QT_GUI)
   paraview_build_optional_plugin(CoProcessingScriptGenerator "Plugin for creating python coprocessing scripts" CoProcessingScriptGenerator OFF)
+  
+  # We do not include VisTrails source in our repo for Licensing reasons. If the directory is manually copied into Plugins, build it.
+  IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
+    paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
+  ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analyze and NIfTI." AnalyzeNIfTIReaderWriter ON)
 paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
-
-# We do not include VisTrails source in our repo for Licensing reasons. If the directory is manually copied into Plugins, build it.
-IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
-  paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
-ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
 
 #------------------------------------------------------------------------
 # Build any plugins located outside of ParaView.

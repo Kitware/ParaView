@@ -135,6 +135,7 @@ set(Manta_dependencies)
 set(OpenMPI_dependencies)
 set(ParaView_dependencies)
 
+set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 
 set(MPI_ARGS)
 
@@ -240,6 +241,13 @@ set(ZLIB_ARGS
 list(APPEND ParaView_dependencies zlib)
 list(APPEND png_dependencies zlib)
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${zlib_install}/bin)
+else()
+  get_filename_component(ZLIB_DIR "${ZLIB_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
+endif()
+
 # Build a common png used by several dependencies
 include(External_png)
 set(PNG_ARGS
@@ -248,10 +256,32 @@ set(PNG_ARGS
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+else()
+  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+endif()
+
+# Build HDF5
 list(APPEND HDF5_dependencies zlib)
 list(APPEND ParaView_dependencies HDF5)
 include(External_HDF5)
+set(HDF5_ARGS
+  -DVTK_USE_SYSTEM_HDF5:BOOL=ON
+  -DHDF5_INCLUDE_DIRS:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
+  -DHDF5_LIBRARIES:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY})
 
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_install}/bin)
+else()
+  get_filename_component(HDF5_DIR "${HDF5_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
+endif()
+
+# Build Silo
 list(APPEND Silo_dependencies zlib HDF5)
 list(APPEND ParaView_dependencies Silo)
 include(External_Silo)
@@ -260,7 +290,30 @@ set(Silo_ARGS
   -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
   -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
 
-if(NOT WIN32 AND NOT APPLE)
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${Silo_install}/bin)
+else()
+  get_filename_component(SILO_DIR "${SILO_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${SILO_DIR})
+endif()
+
+# Build CGNS
+list(APPEND CGNS_dependencies zlib HDF5)
+list(APPEND ParaView_dependencies CGNS)
+include(External_CGNS)
+set(CGNS_ARGS
+  -DVISIT_BUILD_READER_CGNS:BOOL=ON
+  -DCGNS_INCLUDE_DIR:PATH=${CGNS_INCLUDE_DIR}
+  -DCGNS_LIBRARY:FILEPATH=${CGNS_LIBRARY})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_install}/lib)
+else()
+  get_filename_component(CGNS_DIR "${CGNS_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
+endif()
+
+if(NOT WIN32)
   include(External_FFMPEG)
   set(FFMPEG_ARGS
     -DVTK_USE_FFMPEG_ENCODER:BOOL=ON
@@ -299,6 +352,7 @@ ExternalProject_Add(${proj}
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
+    -DPARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS:STRING=${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
@@ -317,19 +371,21 @@ ExternalProject_Add(${proj}
     ${MANTA_ARGS}
     # FFMPEG
     ${FFMPEG_ARGS}
+    # HDF5
+    ${HDF5_ARGS}
     # EyeDome
     -DPARAVIEW_BUILD_PLUGIN_EyeDomeLighting:BOOL=ON
     # VisIt
     -DPARAVIEW_USE_VISITBRIDGE:BOOL=ON
-    #-DVISIT_BUILD_READER_CGNS:BOOL=ON
-    #-DCGNS_INCLUDE_DIR:PATH=
-    #-DCGNS_LIBRARY:FILEPATH=
+    # VisIt - CGNS
+    ${CGNS_ARGS}
+    # VisIt - Silo
     ${Silo_ARGS}
-    # Documentation
     # VisTrails
     ${VISTRAILS_ARGS}
     # zlib
     ${ZLIB_ARGS}
+    # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )

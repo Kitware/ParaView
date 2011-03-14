@@ -1,6 +1,6 @@
 
 
-# The Silo external project for ParaView
+# The zlib external project for ParaView
 set(zlib_source "${CMAKE_CURRENT_BINARY_DIR}/zlib")
 set(zlib_build "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
 set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}/zlib-install")
@@ -33,6 +33,13 @@ if(WIN32)
     )
 
 else()
+
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/zlib_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/zlib_configure_step.cmake
+    @ONLY)
+
+  set(zlib_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/zlib_configure_step.cmake)
+
   ExternalProject_Add(zlib
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${zlib_source}
@@ -42,7 +49,7 @@ else()
     PATCH_COMMAND ${CMAKE_COMMAND} -E remove <SOURCE_DIR>/zconf.h
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    CONFIGURE_COMMAND ${zlib_CONFIGURE_COMMAND}
   )
 
 endif()
@@ -52,5 +59,5 @@ set(ZLIB_INCLUDE_DIR ${zlib_install}/include)
 if(WIN32)
   set(ZLIB_LIBRARY "${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}")
 else()
-  set(ZLIB_LIBRARY ${zlib_install}/lib/libz${_LINK_LIBRARY_SUFFIX})
+  set(ZLIB_LIBRARY "${zlib_install}/lib/libz${_LINK_LIBRARY_SUFFIX}")
 endif()

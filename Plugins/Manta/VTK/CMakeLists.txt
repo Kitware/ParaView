@@ -315,7 +315,7 @@ IF (BUILD_AGAINST_PARAVIEW)
   #would be better if it was initialized automatically like plugin is
   INCLUDE ( ${VTKCS_SOURCE_DIR}/vtkClientServer.cmake )
   VTK_WRAP_ClientServer ( ${PROJECT_NAME}CS vtkMantaCS_SRCS "${HDRS}" )
-  ADD_LIBRARY ( ${PROJECT_NAME}CS SHARED ${vtkMantaCS_SRCS})
+  ADD_LIBRARY ( ${PROJECT_NAME}CS ${vtkMantaCS_SRCS})
   IF (PV_INSTALL_PLUGIN_DIR)
     INSTALL(TARGETS ${PROJECT_NAME}CS
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime

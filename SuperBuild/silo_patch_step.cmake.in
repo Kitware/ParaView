@@ -1,10 +1,15 @@
 
+# needs to happen regardless of platform.
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/SiloPatches/H5FDsilo.c" "@Silo_source@/src/hdf5_drv/H5FDsilo.c"
+  )
+
 if(WIN32)
 
   set(ENV{ZLIB_INC_DIR} "@zlib_install@/include")
   set(ENV{ZLIB_LIB_DIR} "@zlib_install@/lib")
-  set(ENV{HDF5_INC_DIR} "@hdf5_install@/include")
-  set(ENV{HDF5_LIB_DIR} "@hdf5_install@/lib")
+  set(ENV{HDF5_INC_DIR} "@HDF5_install@/include")
+  set(ENV{HDF5_LIB_DIR} "@HDF5_install@/lib")
 
   # we have copy in our own versions of these files which have x64 configurations added to them.
   EXECUTE_PROCESS(
@@ -31,6 +36,15 @@ if(WIN32)
   EXECUTE_PROCESS(
     COMMAND copysilo.bat
     WORKING_DIRECTORY "@Silo_source@/SiloWindows"
+    )
+else()
+
+  if(NOT EXISTS @Silo_source@/config-site)
+    file(MAKE_DIRECTORY @Silo_source@/config-site)
+  endif()
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@Silo_source@/Makefile.in" "@Silo_source@/config-site/Makefile.in"
     )
 
 endif()

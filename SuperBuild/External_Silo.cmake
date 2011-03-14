@@ -14,16 +14,16 @@ if(WIN32)
     set(silo_bin_dir SiloWindows/MSVC8/Win32/DllwithHDF5_Release)
   endif()
   
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_patch_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_patch_step.cmake
     @ONLY)
 
   # run's copysilo.bat which generates silo.h
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_configure_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_configure_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_configure_step.cmake
     @ONLY)
 
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/Silo_build_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_build_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Silo_build_step.cmake
     @ONLY)
 
@@ -64,6 +64,22 @@ if(WIN32)
 
 else()
 
+  if(QT_QMAKE_EXECUTABLE)
+    get_filename_component(qt_bin_dir ${QT_QMAKE_EXECUTABLE} PATH)
+    get_filename_component(qt_dir ${qt_bin_dir} PATH)
+  endif()
+
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_patch_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/silo_patch_step.cmake
+    @ONLY)
+  
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/silo_configure_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake
+    @ONLY)
+
+  set(Silo_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/silo_patch_step.cmake)
+  set(Silo_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/silo_configure_step.cmake)
+
   ExternalProject_Add(Silo
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${Silo_source}
@@ -71,16 +87,20 @@ else()
     URL ${SILO_URL}/${SILO_GZ}
     URL_MD5 ${SILO_MD5}
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    PATCH_COMMAND ${Silo_PATCH_COMMAND}
+    CONFIGURE_COMMAND ${Silo_CONFIGURE_COMMAND}
     DEPENDS ${Silo_dependencies}
   )
 
 endif()
 
 set(SILO_INCLUDE_DIR ${Silo_install}/include)
-set(SILO_LIBRARY ${Silo_install}/lib/silohdf5${_LINK_LIBRARY_SUFFIX})
 
+if(WIN32)
+  set(SILO_LIBRARY ${Silo_install}/lib/silohdf5${_LINK_LIBRARY_SUFFIX})
+else()
+  set(SILO_LIBRARY ${Silo_install}/lib/libsiloh5${_LINK_LIBRARY_SUFFIX})
+endif()
 
 set(Silo_DIR "${Silo_binary}" CACHE PATH "Silo binary directory" FORCE)
 mark_as_advanced(Silo_DIR)
