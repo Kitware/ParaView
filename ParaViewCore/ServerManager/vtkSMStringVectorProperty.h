@@ -125,8 +125,14 @@ protected:
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  virtual int ReadXMLAttributes(vtkSMProxy* parent,
-    vtkPVXMLElement* element);
+  // Description:
+  // Manage additional attribute from the XML
+  // -default_values_delimiter:
+  //    char used to split the "default_values" into a vector.
+  // -element_types:
+  //    StringVectorProperty may be used to store non homogeneous vector,
+  //    therefore we store for each element its type. [INT, DOUBLE, STRING]
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   // Description:
   // Let the property write its content into the stream

@@ -38,11 +38,6 @@ public:
   static vtkSMProxyManager* GetProxyManager();
   static void SetProxyManager(vtkSMProxyManager* pm);
 
-  //// Description:
-  //// Application singleton is used to initialize server manager
-  //// and manages global runtime information.
-  //static vtkSMApplication* GetApplication();
-
 protected:
   vtkSMObject();
   ~vtkSMObject();

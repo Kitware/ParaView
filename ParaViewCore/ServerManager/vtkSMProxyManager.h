@@ -80,9 +80,9 @@
 //  - To show a source proxy or a filter inside the menu of ParaView we use a hint
 //       <SourceProxy ...>
 //           <Hints>
-//              <ShowInGUI                     => The category attribute allow to
-//                  category="PersoFilter"/>      specify in which sub-menu this
-//                                                proxy should be in.
+//              <ShowInGUI                   => The category attribute allow to
+//                  category="PersoFilter"/>    specify in which sub-menu this
+//                                              proxy should be in. (optional)
 //           </Hints>
 //       </SourceProxy>
 
@@ -123,6 +123,8 @@ struct vtkClientServerID;
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
+  // Description:
+  // Return the GlobalID that should be used to refer to the ProxyManager state
   static vtkTypeUInt32 GetReservedGlobalID();
 
   static vtkSMProxyManager* New();
@@ -159,8 +161,8 @@ public:
   // for the proxy with given name and group name. Note that the name and group
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
-  vtkSMDocumentation* GetProxyDocumentation(const char* groupName,
-    const char* proxyName);
+  vtkSMDocumentation* GetProxyDocumentation( const char* groupName,
+                                             const char* proxyName );
 
   // Description:
   // Returns a vtkSMDocumentation object with the documentation
@@ -169,8 +171,9 @@ public:
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
   // Also, the property name is the name of an exposed property.
-  vtkSMDocumentation* GetPropertyDocumentation(const char* groupName,
-    const char* proxyName, const char* propertyName);
+  vtkSMDocumentation* GetPropertyDocumentation( const char* groupName,
+                                                const char* proxyName,
+                                                const char* propertyName );
 
   // Description:
   // Used to pass the control of the proxy to the manager. The user code can
@@ -584,8 +587,8 @@ protected:
   vtkPVXMLElement* AddInternalState(vtkPVXMLElement* parentElement);
 
   // Recursively collects all proxies referred by the proxy in the set.
-  void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies,
-    vtkSMProxy* proxy);
+  void CollectReferredProxies( vtkSMProxyManagerProxySet& setOfProxies,
+                               vtkSMProxy* proxy);
 
   int UpdateInputProxies;
 

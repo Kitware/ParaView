@@ -15,8 +15,10 @@
 // .NAME vtkSMPipelineState - class that manage the state of the processing
 // pipeline
 // .SECTION Description
-// This class allow to register and unregister proxy so those proxy can be
-// shared across the ParaView application.
+// This class is used to provide a RemoteObject API to the vtkSMProxyManager
+// which allow Undo/Redo and state sharing across several ParaView clients.
+// Basically, we expose the state management API of RemoteObject to handle
+// registration and unregistration of proxies.
 
 #ifndef __vtkSMPipelineState_h
 #define __vtkSMPipelineState_h

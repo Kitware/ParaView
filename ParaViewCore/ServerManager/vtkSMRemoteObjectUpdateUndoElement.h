@@ -14,8 +14,9 @@
 =========================================================================*/
 // .NAME vtkSMRemoteObjectUpdateUndoElement - vtkSMRemoteObject undo element.
 // .SECTION Description
-// This class keeps the before and after state of the RemoteObject in the vtkSMMessage
-// form.
+// This class keeps the before and after state of the RemoteObject in the
+// vtkSMMessage form. It works with any proxy and RemoteObject. It is a very
+// generic undoElement.
 
 #ifndef __vtkSMRemoteObjectUpdateUndoElement_h
 #define __vtkSMRemoteObjectUpdateUndoElement_h
@@ -43,6 +44,10 @@ public:
   // \return the status of the operation, 1 on success, 0 otherwise.
   virtual int Redo();
 
+  // Description:
+  // A specific StateLoctor can be used when the state gets loaded by the
+  // remote object. Otherwise we use the one that is available in the session
+  // that was used to create that undo element.
   virtual void SetStateLocator(vtkSMStateLocator* locator);
 
 //BTX

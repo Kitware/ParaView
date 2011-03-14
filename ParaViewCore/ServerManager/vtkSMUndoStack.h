@@ -70,40 +70,18 @@ public:
   // \returns the status of the operation.
   virtual int Redo();
 
-  // Description:
-  // Typically undo stacks have their state saved on the server. This may not 
-  // be necessary always. If this flag is set, the undo stack is kept only on
-  // the client. Off by default.
-//  vtkSetMacro(ClientOnly, int);
-//  vtkGetMacro(ClientOnly, int);
-//  vtkBooleanMacro(ClientOnly, int);
-
 //BTX
-
-  vtkUndoSet *getLastUndoSet(); //vistrails
-
 protected:
   vtkSMUndoStack();
   ~vtkSMUndoStack();
 
-   // Description:
-  // The method updates the client side stack. Client side stack merely contains the labels
-  // for the undo/redo states and which connection they are to be performed on.
-  // TODO: Eventually this method will be called as an effect of the PM telling the client
-  // that something has been pushed on the server side undo stack.
-  // As a consequence each client will update their undo stack status. Note,
-  // only the status is updated, the actual undo state is not sent to the client
-  // until it requests it. Ofcourse, this part is still not implemnted. For now,
-  // multiple clients are not supported.
-//  void PushUndoConnection(const char* label, vtkIdType id);
-
-//  void OnConnectionClosed(vtkIdType cid);
-
-//  friend class vtkSMUndoStackObserver;
-//  void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
-
-//  int ClientOnly;
-
+  // Helper method used to push all vtkSMRemoteObject to the collection of
+  // all the sessions that have been used across that undoset.
+  // (It is more than likely that only one session will be find but in case of
+  // collaboration, we might want to support a set of sessions.)
+  // This is usefull when we execute the undoset to prevent automatic
+  // object deletion between 2 undo element calls when a proxy registration
+  // is supposed to happen.
   void FillWithRemoteObjects( vtkUndoSet *undoSet, vtkCollection *collection);
 
 private:

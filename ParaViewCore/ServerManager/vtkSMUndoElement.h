@@ -16,8 +16,8 @@
 // elements.
 // .SECTION Description
 // Abstract superclass for Server Manager undo elements. 
-// This class keeps a ConnectionID, since every server manager undo/redo element
-// has to have a connection id.
+// This class keeps the session, so undoelement could work accross a set of
+// communication Sessions.
 
 #ifndef __vtkSMUndoElement_h
 #define __vtkSMUndoElement_h
@@ -33,7 +33,7 @@ public:
   vtkTypeMacro(vtkSMUndoElement, vtkUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Get/Set the Session.
+  // Get/Set the Session that has been used to generate that undoElement.
   virtual vtkSMSession* GetSession();
   virtual void SetSession(vtkSMSession*);
 
@@ -41,7 +41,7 @@ protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
 
-  // Identifies the session id to which this object is related.
+  // Identifies the session to which this object is related.
   vtkWeakPointer<vtkSMSession> Session;
 
 private:

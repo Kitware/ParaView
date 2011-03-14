@@ -196,9 +196,8 @@ protected:
   vtkSMStateLocator* StateLocator;
   bool StateManagement;
 
-  // FIXME_COLLABORATION should be managed smartly between client and server.
+  // GlobalID managed locally
   vtkTypeUInt32 LastGUID;
-
   bool IsAutoMPI;
 
 private:

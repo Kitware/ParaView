@@ -139,6 +139,7 @@ protected:
   virtual void ReadFrom(const vtkSMMessage*, int message_offset);
 
 
+  // Handle XML with int type for default values.
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 

@@ -14,7 +14,10 @@
 =========================================================================*/
 // .NAME vtkSMGlobalPropertiesLinkUndoElement
 // .SECTION Description
-//
+// This UndoElement is used to link or unlink GlobalPropertyManager property
+// to a property of an arbitrary Proxy.
+// This class is automatically build inside the vtkSMProxyManager when
+// GlobalPropertyLinks are changed.
 
 #ifndef __vtkSMGlobalPropertiesLinkUndoElement_h
 #define __vtkSMGlobalPropertiesLinkUndoElement_h
@@ -38,6 +41,8 @@ public:
   // Redo the operation encaspsulated by this element.
   virtual int Redo();
 
+  // Description:
+  // Provide the informations needed to restore the previous state
   void SetLinkState( const char* mgrname,
                      const char* globalpropname,
                      vtkSMProxy* proxy, const char* propname, bool isAddAction);

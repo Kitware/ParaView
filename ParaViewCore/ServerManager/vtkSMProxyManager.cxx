@@ -684,8 +684,6 @@ void vtkSMProxyManager::UnRegisterProxies()
   this->Internals->RegisteredProxyTuple.clear();
   this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
 
-  // FIXME_COLLABORATION ??? Is it normal that no notification is sent in that case ???
-
   // Push state for undo/redo BUT only if it is not a clean up before deletion.
   if(this->PipelineState->GetSession())
     {
@@ -985,7 +983,6 @@ void vtkSMProxyManager::UnRegisterLink(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterAllLinks()
 {
-  // FIXME: need to fire unregister events ?!?!?!
   this->Internals->RegisteredLinkMap.clear();
 }
 
