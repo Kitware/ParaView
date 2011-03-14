@@ -343,8 +343,6 @@ GET_PROPERTY(VTK_TARGETS GLOBAL PROPERTY VTK_TARGETS)
 # The PYTHON_ADD_MODULE macro stores the list of static modules in a global property
 GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
 EXPORT(TARGETS ${VTK_TARGETS} ${PY_STATIC_MODULES_LIST} FILE ${PARAVIEW_TARGETS_FILE})
-INSTALL(EXPORT ${PV_INSTALL_EXPORT_NAME} DESTINATION ${PV_INSTALL_LIB_DIR})
-
 
 #########################################################################
 # Configure the CoProcessing library
@@ -374,6 +372,9 @@ set(REL_REF "")
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   MESSAGE(STATUS "Configuring development install...")
 
+  # Install Targets export file.
+  INSTALL(EXPORT ${PV_INSTALL_EXPORT_NAME} DESTINATION ${PV_INSTALL_CMAKE_DIR})
+
   INSTALL(
       FILES ${dynamicHeaders} 
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
@@ -382,7 +383,6 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(cmakeDevFiles
       ${ParaView_CMAKE_DIR}/branded_splash.png
       ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
-      ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake
       ${ParaView_CMAKE_DIR}/ParaViewMacros.cmake
       ${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake
       ${ParaView_CMAKE_DIR}/ParaViewBranding.cmake
@@ -449,7 +449,6 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/smTestDriver${PV_EXE_SUFFIX}")
   SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
   SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
-  SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewLibraryDepends.cmake")
   SET(PARAVIEW_TARGETS_FILE                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/${PV_INSTALL_EXPORT_NAME}.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   
