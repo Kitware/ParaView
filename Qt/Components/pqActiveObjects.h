@@ -73,9 +73,9 @@ public:
     { return this->CachedRepresentation; }
 
 public slots:
-  void setActiveView(pqView*);
-  void setActiveSource(pqPipelineSource*);
-  void setActivePort(pqOutputPort*);
+  void setActiveView(pqView * view);
+  void setActiveSource(pqPipelineSource * source);
+  void setActivePort(pqOutputPort * port);
   void setActiveServer(pqServer*);
 
 signals:
