@@ -118,7 +118,6 @@ SET (Kit_SRCS
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExponentialKeyFrame.cxx
   vtkPVExtentTranslator.cxx
-  vtkPVExtractPieces.cxx
   vtkPVExtractSelection.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx

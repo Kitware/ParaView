@@ -16,17 +16,19 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIPVRepresentationProxy.h"
 #include "vtkPriorityHelper.h"
+#include "vtkProcessModule.h"
 #include "vtkPVExtentTranslator.h"
-#include "vtkPVExtractPieces.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSIPVRepresentationProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
@@ -41,7 +43,7 @@ class vtkSISourceProxy::vtkInternals
 {
 public:
   vtkstd::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
-  vtkstd::vector<vtkSmartPointer<vtkPVExtractPieces> > ExtractPieces;
+  vtkstd::vector<vtkSmartPointer<vtkAlgorithm> > ExtractPieces;
   vtkstd::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
 };
 
@@ -203,16 +205,94 @@ bool vtkSISourceProxy::CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port)
 }
 
 //----------------------------------------------------------------------------
-void vtkSISourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
+void vtkSISourceProxy::InsertExtractPiecesIfNecessary(
+  vtkAlgorithm*, int port)
 {
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  vtkPVExtractPieces* extractPieces = vtkPVExtractPieces::New();
+  vtkAlgorithmOutput* outputPort = this->Internals->OutputPorts[port];
+  vtkAlgorithm* algorithm = outputPort->GetProducer();
+  assert(algorithm != NULL);
+
+  algorithm->UpdateInformation();
+  vtkStreamingDemandDrivenPipeline* sddp =
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(
+      algorithm->GetExecutive());
+  vtkDataObject* outputDO = algorithm->GetOutputDataObject(outputPort->GetIndex());
+  if (outputDO == NULL || sddp == NULL)
+    {
+    vtkErrorMacro("Missing data information.");
+    return;
+    }
+
+  if (pm->GetNumberOfLocalPartitions() == 1)
+    {
+    // Don't add anything if we are only using one processes.
+    return;
+    }
+  if (sddp->GetMaximumNumberOfPieces(outputPort->GetIndex()) != 1)
+    {
+    // The source can already produce pieces.
+    return;
+    }
+
+  const char* extractPiecesClass  = 0;
+  if (outputDO->IsA("vtkPolyData"))
+    {
+    // Transmit is more efficient, but has the possiblity of hanging.
+    // It will hang if all procs do not  call execute.
+    if (getenv("PV_LOCK_SAFE") != NULL)
+      {
+      extractPiecesClass = "vtkExtractPolyDataPiece";
+      }
+    else
+      {
+      extractPiecesClass = "vtkTransmitPolyDataPiece";
+      }
+    }
+  else if (outputDO->IsA("vtkUnstructuredGrid"))
+    {
+    // Transmit is more efficient, but has the possiblity of hanging.
+    // It will hang if all procs do not  call execute.
+    if (getenv("PV_LOCK_SAFE") != NULL)
+      {
+      extractPiecesClass = "vtkExtractUnstructuredGridPiece";
+      }
+    else
+      {
+      extractPiecesClass = "vtkTransmitUnstructuredGridPiece";
+      }
+    }
+  else if (outputDO->IsA("vtkHierarchicalBoxDataSet") ||
+           outputDO->IsA("vtkMultiBlockDataSet"))
+    {
+    extractPiecesClass = "vtkExtractPiece";
+    }
+
+  // If no filter is to be inserted, just return.
+  if (extractPiecesClass == NULL)
+    {
+    return;
+    }
+
+  vtkAlgorithm* extractPieces = vtkAlgorithm::SafeDownCast(
+    this->GetInterpreter()->NewInstance(extractPiecesClass));
+  if (!extractPieces)
+    {
+    vtkErrorMacro("Failed to create " << extractPiecesClass);
+    return;
+    }
+
+  // Set the right executive
+  vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
+  extractPieces->SetExecutive(exec);
+  exec->FastDelete();
+
   this->Internals->ExtractPieces[port] = extractPieces;
   extractPieces->FastDelete();
+  extractPieces->SetInputConnection(outputPort);
 
-  extractPieces->SetInputConnection(this->Internals->OutputPorts[port]);
-
-  // update the OutputPorts so that the output port from vtkPVExtractPieces is
+  // update the OutputPorts so that the output port from extract-pieces is
   // now used as the output port from this proxy.
   this->Internals->OutputPorts[port] = extractPieces->GetOutputPort(0);
 }
@@ -254,7 +334,13 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   int numprocs =
     vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
 
-  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  // This will create the output ports if needed.
+  vtkAlgorithmOutput* output_port = this->GetOutputPort(port);
+  if (!output_port)
+    {
+    return;
+    }
+  vtkAlgorithm* algo = output_port->GetProducer();
   assert(algo);
 
   algo->UpdateInformation();
