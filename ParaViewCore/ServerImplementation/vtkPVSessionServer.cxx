@@ -35,8 +35,12 @@
 #include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>
+#include <vtkstd/string>
+#include <vtkstd/vector>
 
-
+//****************************************************************************/
+//                    Internal Classes and typedefs
+//****************************************************************************/
 namespace
 {
   void RMICallback(void *localArg,
@@ -54,20 +58,190 @@ namespace
     self->OnCloseSessionRMI();
     }
 };
+//****************************************************************************/
+class vtkPVSessionServer::vtkInternals
+{
+public:
+struct Controller
+{
+  Controller(vtkMultiProcessController* controller)
+    {
+    this->MultiProcessController = controller;
+    this->ActivateObserverId = 0;
+    this->DeActivateObserverId = 0;
+    this->ActivateControllerObserverId = 0;
+    }
 
+  unsigned long ActivateObserverId;
+  unsigned long ActivateControllerObserverId;
+  unsigned long DeActivateObserverId;
+  vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
+  };
+
+public:
+  vtkInternals(vtkPVSessionServer* owner)
+    {
+    this->Owner = owner;
+    this->ActiveController = NULL;
+    }
+  //-----------------------------------------------------------------
+  void RegisterController(vtkMultiProcessController* ctrl)
+    {
+    this->Controllers.push_back(Controller(ctrl));
+    this->ActiveController = &this->Controllers.back();
+    this->AttachCallBacks(this->ActiveController);
+    this->Owner->Modified();
+    }
+  //-----------------------------------------------------------------
+  void UnRegisterController(vtkMultiProcessController* ctrl)
+    {
+    vtkstd::vector<Controller>::iterator iter, iterToDel;
+    bool found = false;
+    for(iter = this->Controllers.begin(); iter != this->Controllers.end(); iter++)
+      {
+      if(iter->MultiProcessController.GetPointer() == ctrl)
+        {
+        if(this->GetActiveController() == ctrl)
+          {
+          this->ActiveController = NULL;
+          }
+        iterToDel = iter;
+        found = true;
+        break;
+        }
+      }
+    if(found)
+      {
+      this->DetachCallBacks(&(*iterToDel));
+      this->Controllers.erase(iterToDel);
+      }
+    }
+  //-----------------------------------------------------------------
+  Controller* FindControler(vtkMultiProcessController* ctrl)
+    {
+    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    while(iter != this->Controllers.end())
+      {
+      if(iter->MultiProcessController.GetPointer() == ctrl)
+        {
+        return &(*iter);
+        }
+      iter++;
+      }
+    return NULL;
+    }
+  //-----------------------------------------------------------------
+  vtkMultiProcessController* GetActiveController()
+    {
+    if(this->ActiveController)
+      {
+      return this->ActiveController->MultiProcessController;
+      }
+    return NULL;
+    }
+  //-----------------------------------------------------------------
+  void CloseActiveController()
+    {
+    if(this->ActiveController)
+      {
+      this->UnRegisterController(this->ActiveController->MultiProcessController);
+      }
+    // FIXME: Maybe we want to keep listening even if no more client is
+    // connected.
+    if(this->Controllers.size() == 0)
+      {
+      vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()
+          ->AbortPendingConnection();
+      }
+    }
+  //-----------------------------------------------------------------
+  void ActivateController(vtkObject* src, unsigned long event, void* data)
+    {
+    if(this->GetActiveController() != src)
+      {
+      this->ActiveController =
+          this->FindControler(vtkMultiProcessController::SafeDownCast(src));
+      }
+    }
+  //-----------------------------------------------------------------
+  void CreateController(vtkObject* src, unsigned long event, void* data)
+    {
+    vtkNetworkAccessManager* nam =
+        vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
+    vtkMultiProcessController* ccontroller =
+        nam->NewConnection(this->ClientURL.c_str());
+    if (ccontroller)
+      {
+      this->RegisterController(ccontroller);
+      ccontroller->FastDelete();
+      }
+    }
+  //-----------------------------------------------------------------
+  void AttachCallBacks(Controller* ctrl)
+    {
+    ctrl->MultiProcessController->AddRMICallback( &RMICallback, this->Owner,
+                                                  vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+
+    ctrl->MultiProcessController->AddRMICallback( &CloseSessionCallback, this->Owner,
+                                                  vtkPVSessionServer::CLOSE_SESSION);
+
+    ctrl->ActivateObserverId = ctrl->MultiProcessController->AddObserver(
+        vtkCommand::StartEvent, this->Owner,
+        &vtkPVSessionServer::Activate);
+
+    ctrl->DeActivateObserverId = ctrl->MultiProcessController->AddObserver(
+        vtkCommand::EndEvent, this->Owner,
+        &vtkPVSessionServer::DeActivate);
+
+    ctrl->ActivateControllerObserverId =
+        ctrl->MultiProcessController->AddObserver(
+            vtkCommand::StartEvent, this,
+        &vtkInternals::ActivateController);
+
+    ctrl->MultiProcessController->GetCommunicator()->AddObserver(
+        vtkCommand::WrongTagEvent, this->Owner,
+        &vtkPVSessionServer::OnWrongTagEvent);
+    }
+  //-----------------------------------------------------------------
+  void DetachCallBacks(Controller* ctrl)
+    {
+    ctrl->MultiProcessController->RemoveAllRMICallbacks(
+        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+    ctrl->MultiProcessController->RemoveAllRMICallbacks(
+        vtkPVSessionServer::CLOSE_SESSION);
+    ctrl->MultiProcessController->RemoveObserver(ctrl->ActivateObserverId);
+    ctrl->MultiProcessController->RemoveObserver(ctrl->ActivateControllerObserverId);
+    ctrl->MultiProcessController->RemoveObserver(ctrl->DeActivateObserverId);
+    ctrl->ActivateObserverId = 0;
+    ctrl->ActivateControllerObserverId = 0;
+    ctrl->DeActivateObserverId = 0;
+    }
+  //-----------------------------------------------------------------
+  void SetClientURL(const char* client_url)
+    {
+    this->ClientURL = client_url;
+    }
+
+private:
+  Controller* ActiveController;
+  vtkstd::vector<Controller> Controllers;
+  vtkWeakPointer<vtkPVSessionServer> Owner;
+  vtkstd::string ClientURL;
+};
+//****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
 vtkPVSessionServer::vtkPVSessionServer()
 {
-  this->ClientController = 0;
-  this->ActivateObserverId = 0;
-  this->DeActivateObserverId = 0;
+  this->Internal = new vtkInternals(this);
+  this->MultipleConnection = true; // By default we allow collaboration
 }
 
 //----------------------------------------------------------------------------
 vtkPVSessionServer::~vtkPVSessionServer()
 {
-  this->SetClientController(0);
+  delete this->Internal;
+  this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -76,7 +250,7 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
   switch (processType)
     {
   case CLIENT:
-    return this->ClientController;
+    return this->Internal->GetActiveController();
 
   default:
     // we shouldn't warn.
@@ -84,47 +258,6 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
     break;
     }
   return NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSessionServer::SetClientController(
-  vtkMultiProcessController* controller)
-{
-  if (this->ClientController == controller)
-    {
-    return;
-    }
-
-  if (this->ClientController)
-    {
-    this->ClientController->RemoveAllRMICallbacks(
-      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->ClientController->RemoveAllRMICallbacks(
-      vtkPVSessionServer::CLOSE_SESSION);
-    this->ClientController->RemoveObserver(this->ActivateObserverId);
-    this->ClientController->RemoveObserver(this->DeActivateObserverId);
-    this->ActivateObserverId = 0;
-    this->DeActivateObserverId = 0;
-    }
-
-  vtkSetObjectBodyMacro(
-    ClientController, vtkMultiProcessController, controller);
-
-  if (this->ClientController)
-    {
-    this->ClientController->AddRMICallback(
-      &RMICallback, this,
-      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->ClientController->AddRMICallback(
-      &CloseSessionCallback, this,
-      vtkPVSessionServer::CLOSE_SESSION);
-    this->ActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::StartEvent, this, &vtkPVSessionServer::Activate);
-    this->DeActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::EndEvent, this, &vtkPVSessionServer::DeActivate);
-    this->ClientController->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this, &vtkPVSessionServer::OnWrongTagEvent);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -176,7 +309,6 @@ bool vtkPVSessionServer::Connect(const char* url)
     return true;
     }
 
-
   vtkNetworkAccessManager* nam =
     vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
 
@@ -201,6 +333,7 @@ bool vtkPVSessionServer::Connect(const char* url)
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
+    stream << (this->MultipleConnection ? "&multiple=true" : "");
     client_url = stream.str();
     }
   else if (pvserver_reverse.find(url))
@@ -234,6 +367,7 @@ bool vtkPVSessionServer::Connect(const char* url)
       {
       vtksys_ios::ostringstream stream;
       stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
+      stream << (this->MultipleConnection ? "&multiple=true" : "");
       client_url = stream.str();
       }
     }
@@ -265,16 +399,25 @@ bool vtkPVSessionServer::Connect(const char* url)
     using_reverse_connect = true;
     }
 
+  cout << "URL used: " << client_url.c_str() << endl;
 
   vtkMultiProcessController* ccontroller =
     nam->NewConnection(client_url.c_str());
+  this->Internal->SetClientURL(client_url.c_str());
   if (ccontroller)
     {
-    this->SetClientController(ccontroller);
-    ccontroller->Delete();
+    this->Internal->RegisterController(ccontroller);
+    ccontroller->FastDelete();
     }
 
-  return (this->ClientController != NULL);
+  if(this->MultipleConnection && this->Internal->GetActiveController())
+    {
+    // Listen for new client controller creation
+    nam->AddObserver( vtkCommand::ConnectionCreatedEvent, this->Internal,
+                      &vtkInternals::CreateController);
+    }
+
+  return (this->Internal->GetActiveController() != NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -287,7 +430,7 @@ bool vtkPVSessionServer::GetIsAlive()
     }
 
   // TODO: check for validity
-  return (this->ClientController != NULL);
+  return (this->Internal->GetActiveController() != NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -321,7 +464,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       // Send the result back to client
       vtkMultiProcessStream css;
       css << msg.SerializeAsString();
-      this->ClientController->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
+      this->Internal->GetActiveController()->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
       }
     break;
 
@@ -340,7 +483,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       int ignore_errors, size;
       stream >> ignore_errors >> size;
       unsigned char* css_data = new unsigned char[size+1];
-      this->ClientController->Receive(css_data, size, 1,
+      this->Internal->GetActiveController()->Receive(css_data, size, 1,
         vtkPVSessionServer::EXECUTE_STREAM_TAG);
       vtkClientServerStream cssStream;
       cssStream.SetData(css_data, size);
@@ -381,9 +524,9 @@ void vtkPVSessionServer::SendLastResultToClient()
   reply.GetData(&data, &size_size_t);
   size = static_cast<int>(size_size_t);
 
-  this->ClientController->Send(&size, 1, 1,
+  this->Internal->GetActiveController()->Send(&size, 1, 1,
     vtkPVSessionServer::REPLY_LAST_RESULT);
-  this->ClientController->Send(data, size, 1,
+  this->Internal->GetActiveController()->Send(data, size, 1,
     vtkPVSessionServer::REPLY_LAST_RESULT);
 }
 
@@ -410,9 +553,9 @@ void vtkPVSessionServer::GatherInformationInternal(
     const unsigned char* data;
     css.GetData(&data, &length);
     int len = static_cast<int>(length);
-    this->ClientController->Send(&len, 1, 1,
+    this->Internal->GetActiveController()->Send(&len, 1, 1,
       vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
-    this->ClientController->Send(const_cast<unsigned char*>(data),
+    this->Internal->GetActiveController()->Send(const_cast<unsigned char*>(data),
       length, 1, vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
   else
@@ -420,7 +563,7 @@ void vtkPVSessionServer::GatherInformationInternal(
     vtkErrorMacro("Could not create information object.");
     // let client know that gather failed.
     int len = 0;
-    this->ClientController->Send(&len, 1, 1,
+    this->Internal->GetActiveController()->Send(&len, 1, 1,
       vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
 }
@@ -431,8 +574,8 @@ void vtkPVSessionServer::OnCloseSessionRMI()
   if (this->GetIsAlive())
     {
     vtkSocketCommunicator::SafeDownCast(
-      this->ClientController->GetCommunicator())->CloseConnection();
-    this->SetClientController(0);
+      this->Internal->GetActiveController()->GetCommunicator())->CloseConnection();
+    this->Internal->CloseActiveController();
     }
 }
 
