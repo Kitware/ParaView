@@ -178,7 +178,7 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       }
     }
 
-  if (size == 0)
+  if (size == 0 || this->AbortPendingConnectionFlag)
     {
     return -1;
     }

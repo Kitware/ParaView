@@ -36,8 +36,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns the controller used to communicate with the process. Value must be
-  // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
+  // Returns the active controller used to communicate with the process.
+  // Value must be DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
+  // But only the CLIENT do return something different than NULL;
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
   // Description:
@@ -80,6 +81,14 @@ public:
     EXECUTE_STREAM_TAG=55630,
   };
 
+  // Description:
+  // Enable or Disable multi-connection support.
+  // The MultipleConnection is only used inside the DATA_SERVER to support
+  // several clients to connect to it.
+  // By default we allow collaboration (this->MultipleConnection = true)
+  vtkBooleanMacro(MultipleConnection, bool);
+  vtkSetMacro(MultipleConnection, bool);
+  vtkGetMacro(MultipleConnection, bool);
 
 //BTX
   void OnClientServerMessageRMI(void* message, int message_length);
@@ -88,8 +97,6 @@ public:
 protected:
   vtkPVSessionServer();
   ~vtkPVSessionServer();
-
-  void SetClientController(vtkMultiProcessController*);
 
   // Description:
   // Called when client triggers GatherInformation().
@@ -101,11 +108,14 @@ protected:
   // Sends the last result to client.
   void SendLastResultToClient();
 
-  vtkMultiProcessController* ClientController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
-  unsigned long ActivateObserverId;
-  unsigned long DeActivateObserverId;
+  bool MultipleConnection;
+
+  class vtkInternals;
+  vtkInternals* Internal;
+  friend class vtkInternals;
+
 private:
   vtkPVSessionServer(const vtkPVSessionServer&); // Not implemented
   void operator=(const vtkPVSessionServer&); // Not implemented
