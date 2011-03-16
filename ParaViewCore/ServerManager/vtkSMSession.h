@@ -55,16 +55,6 @@ public:
   // Implementation provided simply returns the number of local processes.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
-  // Description:
-  // Provides a unique identifier across processes of that session. Default
-  // implementation simply uses a local variable to keep track of ids already
-  // assigned.
-  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier()
-    {
-    this->LastGUID++;
-    return this->LastGUID;
-    }
-
   //---------------------------------------------------------------------------
   // Undo/Redo related API.
   //---------------------------------------------------------------------------
@@ -196,8 +186,6 @@ protected:
   vtkSMStateLocator* StateLocator;
   bool StateManagement;
 
-  // GlobalID managed locally
-  vtkTypeUInt32 LastGUID;
   bool IsAutoMPI;
 
 private:

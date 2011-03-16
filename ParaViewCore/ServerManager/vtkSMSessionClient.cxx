@@ -47,6 +47,9 @@ vtkCxxSetObjectMacro(vtkSMSessionClient, DataServerController,
 vtkSMSessionClient::vtkSMSessionClient()
   : Superclass(false)
 {
+  // Init global Ids
+  this->LastGlobalID = this->LastGlobalIDAvailable = 0;
+
   // This session can only be created on the client.
   this->RenderServerController = NULL;
   this->DataServerController = NULL;
@@ -720,4 +723,17 @@ void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 void vtkSMSessionClient::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
+{
+  if(this->LastGlobalID == this->LastGlobalIDAvailable)
+    {
+    cout << "Request chunk from client " <<  this->LastGlobalID << " to " << this->LastGlobalIDAvailable << endl;
+    vtkTypeUInt32 chunkSizeRequest = 500;
+    this->LastGlobalID = this->GetNextChunkGlobalUniqueIdentifier(chunkSizeRequest);
+    this->LastGlobalIDAvailable = this->LastGlobalID + chunkSizeRequest;
+    cout << "Updated status: " <<  this->LastGlobalID << " to " << this->LastGlobalIDAvailable << endl;
+    }
+  return this->LastGlobalID++;
 }

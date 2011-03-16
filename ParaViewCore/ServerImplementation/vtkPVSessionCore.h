@@ -38,6 +38,7 @@ class vtkPVProxyDefinitionManager;
 class VTK_EXPORT vtkPVSessionCore : public vtkObject
 {
 public:
+  static vtkTypeUInt32 GetReservedGlobalID();
   static vtkPVSessionCore* New();
   vtkTypeMacro(vtkPVSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -117,7 +118,26 @@ public:
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
   vtkGetObjectMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
 
+  // Description:
+  // Provides the next available identifier. This implementation works locally.
+  // without any code distribution. To support the distributed architecture
+  // the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+  // vtkPVSessionBase instance.
+  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
+
+  // Description:
+  // Return the first Id of the requested chunk.
+  // 1 = ReverveNextIdChunk(10); | Reserved ids [1,2,3,4,5,6,7,8,9,10]
+  // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
+  // b = a + 10;
+  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
+
 //BTX
+
+  // Description:
+  // Return the first Id of the requested chunk inside a vtkSMMessage
+  virtual void GetNextChunkGID(vtkSMMessage* chunkRequest);
+
   enum MessageTypes
     {
     PUSH_STATE         = 12,
@@ -191,6 +211,9 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool SymmetricMPIMode;
+
+  // Local counter for global Ids
+  vtkTypeUInt32 LocalGlobalID;
 
   ostream *LogStream;
 //ETX

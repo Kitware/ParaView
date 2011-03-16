@@ -194,6 +194,8 @@ vtkStandardNewMacro(vtkPVSessionCore);
 //----------------------------------------------------------------------------
 vtkPVSessionCore::vtkPVSessionCore()
 {
+  this->LocalGlobalID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
+
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInterpreter();
   this->MPIMToNSocketConnection = NULL;
@@ -494,6 +496,11 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
       {
       // Update custom definition
       this->ProxyDefinitionManager->GetXMLDefinitionState(message);
+      }
+    else if(globalId == this->GetReservedGlobalID())
+      {
+      // Update chunks of GlobalID
+      this->GetNextChunkGID(message);
       }
 
     // FIXME_COLLABORATION_2: Get the server state for ProxyManager
@@ -862,4 +869,33 @@ void vtkPVSessionCore::GetAllRemoteObjects(vtkCollection* collection)
 const vtkClientServerStream& vtkPVSessionCore::GetLastResult()
 {
   return this->Interpreter->GetLastResult();
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionCore::GetNextChunkGID(vtkSMMessage* chunkRequest)
+{
+  vtkTypeUInt32 chunkSizeRequest =
+      chunkRequest->GetExtension(PullRequest::arguments,0).idtype(0);
+
+  chunkRequest->ClearExtension(PullRequest::arguments);
+  Variant* var = chunkRequest->AddExtension(PullRequest::arguments);
+  var->add_idtype(this->GetNextChunkGlobalUniqueIdentifier(chunkSizeRequest));
+  var->set_type(Variant_Type_IDTYPE);
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionCore::GetNextGlobalUniqueIdentifier()
+{
+  ++this->LocalGlobalID;
+  return this->LocalGlobalID;
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionCore::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize)
+{
+  vtkTypeUInt32 firstChunkId = this->LocalGlobalID + 1;
+  this->LocalGlobalID += chunkSize;
+  return firstChunkId;
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionCore::GetReservedGlobalID()
+{
+  return vtkReservedRemoteObjectIds::RESERVED_ID_COUNTER_ID;
 }
