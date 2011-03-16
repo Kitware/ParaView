@@ -120,6 +120,17 @@ public:
   // and 2 render-server nodes, then this method will return 3.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
+  //---------------------------------------------------------------------------
+  // API for GlobalId management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Provides the next available identifier. This implementation works locally.
+  // without any code distribution. To support the distributed architecture
+  // the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+  // vtkPVSessionBase instance.
+  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
+
 //BTX
 protected:
   vtkSMSessionClient();
@@ -155,6 +166,9 @@ protected:
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented
+
+  vtkTypeUInt32 LastGlobalID;
+  vtkTypeUInt32 LastGlobalIDAvailable;
 //ETX
 };
 

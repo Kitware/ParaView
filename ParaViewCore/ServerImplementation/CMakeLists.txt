@@ -19,6 +19,12 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
+  vtkPVProxyDefinitionIterator.cxx
+  vtkPVProxyDefinitionManager.cxx
+  vtkPVSessionBase.cxx
+  vtkPVSessionCore.cxx
+  vtkPVSessionCoreInterpreterHelper.cxx
+  vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
   vtkSICompoundSourceProxy.cxx
@@ -49,12 +55,6 @@ SET (Kit_SRCS
   vtkSIWriterProxy.cxx
   vtkSIXMLAnimationWriterRepresentationProperty.cxx
   vtkSMMessage.cxx
-  vtkPVProxyDefinitionIterator.cxx
-  vtkPVProxyDefinitionManager.cxx
-  vtkPVSessionBase.cxx
-  vtkPVSessionCore.cxx
-  vtkPVSessionCoreInterpreterHelper.cxx
-  vtkPVSessionServer.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

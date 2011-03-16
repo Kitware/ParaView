@@ -27,7 +27,6 @@
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkWeakPointer.h"
 #include "vtkPVRenderView.h"
-#include "vtkReservedRemoteObjectIds.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
@@ -48,9 +47,6 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
   this->PluginManager->SetSession(this);
   this->UndoStackBuilder = NULL;
   this->IsAutoMPI = false;
-
-  // Start after the reserved one
-  this->LastGUID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
 
   if (initialize_during_constructor)
     {

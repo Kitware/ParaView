@@ -253,3 +253,28 @@ void vtkPVSessionBase::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionBase::GetNextGlobalUniqueIdentifier()
+{
+  vtkTypeUInt32 id = this->SessionCore->GetNextGlobalUniqueIdentifier();
+  return id;
+}
+
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionBase::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize)
+{
+  // The DATA_SERVER_ROOT is the ONLY owner of the counter
+  vtkSMMessage request;
+  request.set_global_id(this->SessionCore->GetReservedGlobalID());
+  request.set_location(vtkPVSession::DATA_SERVER_ROOT);
+  Variant* var = request.AddExtension(PullRequest::arguments);
+  var->add_idtype(chunkSize);
+  var->set_type(Variant_Type_IDTYPE);
+
+  // Make the request
+  this->PullState(&request);
+
+  // Extract the first id of the new chunk
+  vtkTypeUInt32 id = request.GetExtension(PullRequest::arguments,0).idtype(0);
+  return id;
+}
