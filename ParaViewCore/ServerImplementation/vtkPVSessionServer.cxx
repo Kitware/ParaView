@@ -91,6 +91,7 @@ public:
     this->ActiveController = &this->Controllers.back();
     this->AttachCallBacks(this->ActiveController);
     this->Owner->Modified();
+    cout << "Active controller: " << this->GetActiveController() << endl;
     }
   //-----------------------------------------------------------------
   void UnRegisterController(vtkMultiProcessController* ctrl)
@@ -104,6 +105,7 @@ public:
         if(this->GetActiveController() == ctrl)
           {
           this->ActiveController = NULL;
+          cout << "No Active controller" << endl;
           }
         iterToDel = iter;
         found = true;
@@ -161,6 +163,7 @@ public:
       {
       this->ActiveController =
           this->FindControler(vtkMultiProcessController::SafeDownCast(src));
+      cout << "Active controller: " << this->GetActiveController() << endl;
       }
     }
   //-----------------------------------------------------------------
