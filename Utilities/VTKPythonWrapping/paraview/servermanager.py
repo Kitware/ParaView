@@ -1864,7 +1864,7 @@ def Disconnect(session=None):
     if fromGUI:
         raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
     if not session or session == ActiveConnection:
-        session = ActiveConnection
+        session = ActiveConnection.Session
         ActiveConnection = None
     if session:
       vtkProcessModule.GetProcessModule().UnRegisterSession(session)
