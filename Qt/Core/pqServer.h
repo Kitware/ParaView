@@ -49,6 +49,7 @@ class vtkSMSession;
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 #include <QPointer>
+#include <QTimer>
 
 /// pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
 /// subclass that represents a vtkSMSession. Besides providing API to access
@@ -158,6 +159,9 @@ protected slots:
   /// Called to send a heartbeat to the server.
   void heartBeat();
 
+  /// Called when idle to look for server notification for collaboration purpose
+  void processServerNotification();
+
 private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
@@ -171,6 +175,8 @@ private:
   // Each connection will eventually have a PVOptions object. 
   // For now, this is same as the vtkProcessModule::Options.
   vtkSmartPointer<vtkPVOptions> Options;
+
+  QTimer IdleCollaborationTimer;
 
   class pqInternals;
   pqInternals* Internals;

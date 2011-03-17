@@ -83,7 +83,7 @@ void vtkPVSession::CleanupPendingProgressInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
+bool vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
 {
   int tag = -1;
   int len = -1;
@@ -107,6 +107,7 @@ void vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
     // Treat as a socket error.
     // this->OnSocketError();
     }
+  return false;
 }
 
 //----------------------------------------------------------------------------

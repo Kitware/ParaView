@@ -95,7 +95,8 @@ protected:
 
   // Description:
   // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
-  virtual void OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
+  // Return true if the event was handle localy.
+  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
     void* calldata);
 
   // Description:

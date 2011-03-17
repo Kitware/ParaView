@@ -29,6 +29,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkReservedRemoteObjectIds.h"
 
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
@@ -223,6 +224,31 @@ public:
   void SetClientURL(const char* client_url)
     {
     this->ClientURL = client_url;
+    }
+  //-----------------------------------------------------------------
+  void NotifyOtherClients()
+    {
+    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    vtkstd::vector<vtkMultiProcessController*> controllersToNotify;
+    while(iter != this->Controllers.end())
+      {
+      if( iter->MultiProcessController.GetPointer() !=
+          this->ActiveController->MultiProcessController)
+        {
+        controllersToNotify.push_back(iter->MultiProcessController.GetPointer());
+        }
+      iter++;
+      }
+
+    // Do the notification now...
+    vtkstd::vector<vtkMultiProcessController*>::iterator iter2 =
+        controllersToNotify.begin();
+    while(iter2 != controllersToNotify.end())
+      {
+      (*iter2)->
+          TriggerRMI(1, vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+      iter2++;
+      }
     }
 
 private:
@@ -453,6 +479,12 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       vtkSMMessage msg;
       msg.ParseFromString(string);
       this->PushState(&msg);
+
+      // Notify when ProxyManager state has changed
+      if(msg.global_id() == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
+        {
+        this->Internal->NotifyOtherClients();
+        }
       }
     break;
 
