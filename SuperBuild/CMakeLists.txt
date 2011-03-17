@@ -250,19 +250,21 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
 endif()
 
-# Build a common png used by several dependencies
-include(External_png)
-set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
-  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-list(APPEND ParaView_dependencies png)
+if(NOT APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
-else()
-  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+  else()
+    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  endif()
 endif()
 
 # Build HDF5
