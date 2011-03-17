@@ -348,12 +348,13 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       algo->GetExecutive());
 
-  sddp->SetUpdateExtent(port, processid, numprocs, /*ghost level*/0);
+  int real_port = output_port->GetIndex();
+  sddp->SetUpdateExtent(real_port, processid, numprocs, /*ghost level*/0);
   if (doTime)
     {
-    sddp->SetUpdateTimeStep(port, time);
+    sddp->SetUpdateTimeStep(real_port, time);
     }
-  sddp->Update(port);
+  sddp->Update(real_port);
 }
 
 //----------------------------------------------------------------------------
