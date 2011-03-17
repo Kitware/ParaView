@@ -186,8 +186,10 @@ if(NOT APPLE)
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
     if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
       # Build SIP and PyQt for vistrails plugin.
+      set(SIP_dependencies python)
       include(External_SIP)
       list(APPEND PyQt_dependencies SIP)
+      set(PyQt_dependencies python SIP)
       include(External_PyQt)
       list(APPEND ParaView_dependencies PyQt)
 
