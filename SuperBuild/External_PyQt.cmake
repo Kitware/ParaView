@@ -8,5 +8,5 @@ ExternalProject_Add(PyQt
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND ${PYTHON_EXECUTABLE} configure.py -q ${QT_QMAKE_EXECUTABLE} --confirm-license
   DEPENDS
-    ${PYQT_dependencies}
+    ${PyQt_dependencies}
   )
