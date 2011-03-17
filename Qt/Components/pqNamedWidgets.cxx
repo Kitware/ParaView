@@ -1070,6 +1070,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
           {
           combo->setEnabled(false);
           }
+        row_streched = true;
         combo->setObjectName(propertyName);
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                          propertyLabel,
