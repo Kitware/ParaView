@@ -88,7 +88,8 @@ if(WIN32)
     )
 
 elseif(UNIX)
-  set(python_SOURCE_DIR python)
+  set(python_source ${CMAKE_CURRENT_BINARY_DIR}/python)
+  set(python_install ${CMAKE_CURRENT_BINARY_DIR}/python-install)
 
   configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake
@@ -106,21 +107,20 @@ elseif(UNIX)
     ${CMAKE_CURRENT_BINARY_DIR}/python_install_step.cmake
     @ONLY)
 
-  set(python_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake)
-  set(python_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_configure_step.cmake)
-  set(python_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_make_step.cmake)
+  #set(python_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake)
+  #set(python_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_configure_step.cmake)
+  #set(python_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_make_step.cmake)
   set(python_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_install_step.cmake)
 
-  ExternalProject_Add(${proj}
+  ExternalProject_Add(python
     URL ${PYTHON_URL}/${PYTHON_GZ}
     URL_MD5 ${PYTHON_MD5}
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCE_DIR ${python_SOURCE_DIR}
-    BUILD_IN_SOURCE ${python_BUILD_IN_SOURCE}
-    PATCH_COMMAND ${python_PATCH_COMMAND}
-    CONFIGURE_COMMAND ${python_CONFIGURE_COMMAND}
-    BUILD_COMMAND ${python_BUILD_COMMAND}
-    UPDATE_COMMAND ""
+    SOURCE_DIR ${python_source}
+    INSTALL_DIR ${python_install}
+    BUILD_IN_SOURCE 1
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --enable-shared --enable-unicode=ucs2
     INSTALL_COMMAND ${python_INSTALL_COMMAND}
     DEPENDS
       ${python_DEPENDENCIES}
@@ -139,16 +139,11 @@ set(PYTHON_SITE_PACKAGES ${CMAKE_BINARY_DIR}/python-build/lib/python${PYVER}/sit
 
 if(WIN32)
   set(PYTHON_INCLUDE_DIR ${python_build}/Include)
-  set(PYTHON_LIBRARY ${PythonPCBuildDir}/python${PYVER_SHORT}.lib)
+  set(PYTHON_LIBRARY ${PythonPCBuildDir}/python${PYVER_SHORT}${_LINK_LIBRARY_SUFFIX})
   set(PYTHON_EXECUTABLE ${PythonPCBuildDir}/python.exe)
-elseif(APPLE)
-  set(PYTHON_INCLUDE_DIR ${CMAKE_BINARY_DIR}/python-build/include/python${PYVER})
-  set(PYTHON_LIBRARY ${CMAKE_BINARY_DIR}/python-build/lib/libpython${PYVER}.dylib)
-  set(PYTHON_LIBRARY_DIR ${CMAKE_BINARY_DIR}/python-build/lib)
-  set(PYTHON_EXECUTABLE ${CMAKE_BINARY_DIR}/python-build/bin/python)
 else()
-  set(PYTHON_INCLUDE_DIR ${CMAKE_BINARY_DIR}/python-build/include/python${PYVER})
-  set(PYTHON_LIBRARY ${CMAKE_BINARY_DIR}/python-build/lib/libpython${PYVER}.so)
-  set(PYTHON_LIBRARY_DIR ${CMAKE_BINARY_DIR}/python-build/lib)
-  set(PYTHON_EXECUTABLE ${CMAKE_BINARY_DIR}/python-build/bin/python)
+  set(PYTHON_INCLUDE_DIR ${python_install}/include/python${PYVER})
+  set(PYTHON_LIBRARY ${python_install}/lib/libpython${PYVER}${_LINK_LIBRARY_SUFFIX})
+  set(PYTHON_LIBRARY_DIR ${python_install}/lib)
+  set(PYTHON_EXECUTABLE ${python_install}/bin/python)
 endif()

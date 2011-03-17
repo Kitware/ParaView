@@ -1,5 +1,5 @@
 message("Building NUMPY:\n@NUMPY_binary@")
-set(ENV{LD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
 if(APPLE)
