@@ -132,6 +132,8 @@ public:
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
 
 //BTX
+  void OnServerNotificationMessageRMI(void* message, int message_length);
+
 protected:
   vtkSMSessionClient();
   ~vtkSMSessionClient();
@@ -163,6 +165,13 @@ protected:
 
   bool AbortConnect;
   char* URI;
+
+  // Description:
+  // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
+  // Return true if the event was handle locally.
+  virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
+                                void* calldata);
+
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented

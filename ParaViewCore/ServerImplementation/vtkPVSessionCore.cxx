@@ -351,16 +351,14 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
   vtkTypeUInt32 globalId = message->global_id();
 
   // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
+  if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
     {
-    // Special ParaView specific main components
-    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-      {
-      // Update custom definition
-      this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
-      }
-
-    // TODO - FIXME_COLLABORATION: Forward registration proxy to other clients
+    // Update custom definition
+    this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
+    return;
+    }
+  else if(globalId == this->GetReservedGlobalID())
+    {
     return;
     }
 
@@ -489,21 +487,16 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
   vtkTypeUInt32 globalId = message->global_id();
 
   // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
+  // Special ParaView specific main components
+  if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
     {
-    // Special ParaView specific main components
-    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-      {
-      // Update custom definition
-      this->ProxyDefinitionManager->GetXMLDefinitionState(message);
-      }
-    else if(globalId == this->GetReservedGlobalID())
-      {
-      // Update chunks of GlobalID
-      this->GetNextChunkGID(message);
-      }
-
-    // FIXME_COLLABORATION_2: Get the server state for ProxyManager
+    // Update custom definition
+    this->ProxyDefinitionManager->GetXMLDefinitionState(message);
+    }
+  else if(globalId == this->GetReservedGlobalID())
+    {
+    // Update chunks of GlobalID
+    this->GetNextChunkGID(message);
     }
   else if ( obj = this->Internals->GetSIObject(message->global_id()) )
     {

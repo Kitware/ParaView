@@ -64,7 +64,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVProxyDefinitionIterator.cxx
-  vtkSIObject.cxx
   vtkSIVectorProperty.cxx
   vtkPVSessionBase.cxx
   vtkSMMessage.cxx

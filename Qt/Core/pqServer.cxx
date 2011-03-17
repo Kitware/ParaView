@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqTimeKeeper.h"
 #include "vtkClientServerStream.h"
-#include "vtkMapper.h"
+#include "vtkMapper.h"                 // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
+#include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
@@ -99,6 +100,12 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
     this, SLOT(heartBeat()));
 
   this->setHeartBeatTimeout(pqServer::getHeartBeatTimeoutSetting());
+
+  // Setup idle Timer for collaboration in order to get server notification
+  this->IdleCollaborationTimer.setInterval(0);
+  this->IdleCollaborationTimer.setSingleShot(false);
+  QObject::connect(&this->IdleCollaborationTimer, SIGNAL(timeout()),
+                   this, SLOT(processServerNotification()));
 }
 
 //-----------------------------------------------------------------------------
@@ -140,6 +147,11 @@ void pqServer::initialize()
   proxy->Delete();
 
   this->updateGlobalMapperProperties();
+
+  if(this->isRemote())
+    {
+    this->IdleCollaborationTimer.start();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -476,4 +488,10 @@ void pqServer::updateGlobalMapperProperties()
 vtkSMProxyManager* pqServer::proxyManager() const
 {
   return vtkSMObject::GetProxyManager();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::processServerNotification()
+{
+  vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100);
 }

@@ -30,6 +30,7 @@ class vtkPVSessionCore;
 class VTK_EXPORT vtkSIObject : public vtkObject
 {
 public:
+  static vtkSIObject* New();
   vtkTypeMacro(vtkSIObject,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 

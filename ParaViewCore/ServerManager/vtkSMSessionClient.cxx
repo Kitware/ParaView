@@ -31,21 +31,35 @@
 #include "vtkPVSessionServer.h"
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkSMServerStateLocator.h"
 
+#include <vtkNew.h>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>
 
+//****************************************************************************/
+//                    Internal Classes and typedefs
+//****************************************************************************/
+namespace
+{
+  void RMICallback(void *localArg,
+    void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+    {
+    vtkSMSessionClient* self = reinterpret_cast<vtkSMSessionClient*>(localArg);
+    self->OnServerNotificationMessageRMI(remoteArg, remoteArgLength);
+    }
+};
+//****************************************************************************/
 vtkStandardNewMacro(vtkSMSessionClient);
 vtkCxxSetObjectMacro(vtkSMSessionClient, RenderServerController,
   vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkSMSessionClient, DataServerController,
   vtkMultiProcessController);
 //----------------------------------------------------------------------------
-vtkSMSessionClient::vtkSMSessionClient()
-  : Superclass(false)
+vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
 {
   // Init global Ids
   this->LastGlobalID = this->LastGlobalIDAvailable = 0;
@@ -60,11 +74,21 @@ vtkSMSessionClient::vtkSMSessionClient()
   this->RenderServerInformation = vtkPVServerInformation::New();
   this->ServerInformation = vtkPVServerInformation::New();
   this->ServerLastInvokeResult = new vtkClientServerStream();
+
+  // Register server state locator for that specific session
+  vtkNew<vtkSMServerStateLocator> serverStateLocator;
+  serverStateLocator->SetSession(this);
+  this->GetStateLocator()->SetParentLocator(serverStateLocator.GetPointer());
 }
 
 //----------------------------------------------------------------------------
 vtkSMSessionClient::~vtkSMSessionClient()
 {
+  if(this->DataServerController)
+    {
+    this->DataServerController->RemoveAllRMICallbacks(
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+    }
   if (this->GetIsAlive())
     {
     this->CloseSession();
@@ -219,14 +243,16 @@ bool vtkSMSessionClient::Connect(const char* url)
     {
     this->SetDataServerController(dcontroller);
     dcontroller->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
+        vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
+    dcontroller->AddRMICallback( &RMICallback, this,
+                                 vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
     dcontroller->Delete();
     }
   if (rcontroller)
     {
     this->SetRenderServerController(rcontroller);
     rcontroller->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
+        vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
     rcontroller->Delete();
     }
 
@@ -736,4 +762,36 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
     cout << "Updated status: " <<  this->LastGlobalID << " to " << this->LastGlobalIDAvailable << endl;
     }
   return this->LastGlobalID++;
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
+{
+  cout << "Server notification..." << endl;
+  vtkSMMessage msg;
+  msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
+  msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
+  this->PullState(&msg);
+
+  // Register new proxy from remote
+//  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+//  pxm->LoadState(&msg, this->GetStateLocator(), false); // FIXME need more generic approach
+  cout << msg.DebugString().c_str();
+}
+//-----------------------------------------------------------------------------
+bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, void* calldata)
+{
+  int tag = -1;
+  const char* data = reinterpret_cast<const char*>(calldata);
+  const char* ptr = data;
+  memcpy(&tag, ptr, sizeof(tag));
+
+  if (vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI)
+    {
+    //this->OnServerNotificationMessageRMI(NULL, 0);
+    return true; // Abort, no need to go further, we handle it !
+    }
+
+  // We was not able to handle it localy
+  this->Superclass::OnWrongTagEvent(obj, event, calldata);
+  return false;
 }

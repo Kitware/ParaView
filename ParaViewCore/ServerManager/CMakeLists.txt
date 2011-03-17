@@ -117,6 +117,7 @@ SET (Kit_SRCS
   vtkSMRepresentationProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
+  vtkSMServerStateLocator.cxx
   vtkSMSession.cxx
   vtkSMSessionClient.cxx
   vtkSMSILDomain.cxx
