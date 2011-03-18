@@ -172,6 +172,8 @@ protected:
   virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
                                 void* calldata);
 
+  bool InServerNotificationCall;
+
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented

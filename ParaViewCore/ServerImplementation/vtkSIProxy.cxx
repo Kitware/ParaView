@@ -42,6 +42,7 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
+  vtkSMMessage ProxyDefinitionCache;
 };
 
 vtkStandardNewMacro(vtkSIProxy);
@@ -88,6 +89,10 @@ void vtkSIProxy::Push(vtkSMMessage* message)
     return;
     }
 
+  // Keep the definition and not the properties
+  this->Internals->ProxyDefinitionCache.CopyFrom(*message);
+  this->Internals->ProxyDefinitionCache.ClearExtension(ProxyState::property);
+
   for (int cc=0; cc<message->ExtensionSize(ProxyState::property); cc++)
     {
     const ProxyState_Property &propMsg =
@@ -129,8 +134,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   // Return a set of Pull only property (information_only props)
   // In fact Pushed Property can not be fetch at the same time as Pull
   // property with the current implementation
-  vtkSMMessage response = *message;
-  response.ClearExtension(PullRequest::arguments);
+  vtkSMMessage response = this->Internals->ProxyDefinitionCache;
 
   vtkstd::set<vtkstd::string> prop_names;
   if (message->ExtensionSize(PullRequest::arguments) > 0)

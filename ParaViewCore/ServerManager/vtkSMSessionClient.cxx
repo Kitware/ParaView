@@ -76,6 +76,7 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
   this->ServerLastInvokeResult = new vtkClientServerStream();
 
   // Register server state locator for that specific session
+  this->InServerNotificationCall = false;
   vtkNew<vtkSMServerStateLocator> serverStateLocator;
   serverStateLocator->SetSession(this);
   this->GetStateLocator()->SetParentLocator(serverStateLocator.GetPointer());
@@ -452,7 +453,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     {
     controllers[num_controllers++] = this->RenderServerController;
     }
-  if (num_controllers > 0)
+  if (!this->InServerNotificationCall && num_controllers > 0)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::PUSH);
@@ -766,16 +767,20 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
+  this->InServerNotificationCall = true;
+  vtkstd::string data;
+  data.append(reinterpret_cast<char*>(message), message_length);
+
+  vtkSMMessage state;
+  state.ParseFromString(data);
+
   cout << "Server notification..." << endl;
-  vtkSMMessage msg;
-  msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
-  msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
-  this->PullState(&msg);
 
   // Register new proxy from remote
-//  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-//  pxm->LoadState(&msg, this->GetStateLocator(), false); // FIXME need more generic approach
-  cout << msg.DebugString().c_str();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->LoadState(&state, this->GetStateLocator()); // FIXME need more generic approach
+//  cout << msg.DebugString().c_str();
+  this->InServerNotificationCall = false;
 }
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, void* calldata)

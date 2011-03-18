@@ -251,6 +251,23 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState = vtkSMPipelineState::New();
     this->PipelineState->SetSession(this->Session);
     this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
+
+    // For collaboration purpose at connection time we synchronize our
+    // ProxyManager state with the server
+    if(this->Session->IsA("vtkSMSessionClient"))
+      {
+      vtkSMMessage msg;
+      msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
+      msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
+      this->Session->PullState(&msg);
+      if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
+        {
+        cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
+        cout << msg.DebugString().c_str() << endl;
+        cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
+        this->LoadState(&msg, this->Session->GetStateLocator());
+        }
+      }
     }
 }
 
@@ -1635,6 +1652,11 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
     {
     this->Internals->State.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
     this->Internals->State.set_location(vtkProcessModule::PROCESS_DATA_SERVER);
+    this->Internals->State.SetExtension(DefinitionHeader::client_class, "");
+    this->Internals->State.SetExtension(DefinitionHeader::server_class, "vtkSIObject");
+    this->Internals->State.SetExtension(ProxyState::xml_group, "");
+    this->Internals->State.SetExtension(ProxyState::xml_name, "");
+
     }
 
   return &this->Internals->State;
@@ -1650,10 +1672,12 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   // Fill delta sets
   this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
 
+  cout << "LoadState >>>>>>>>>>>>>>>>>>>" << endl;
   // Register new ones
   iter = tuplesToRegister.begin();
   while( iter != tuplesToRegister.end() )
     {
+    cout << "Register: " << iter->Group.c_str()<< ", " << iter->Name.c_str() << endl;
     this->RegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
@@ -1662,9 +1686,12 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   iter = tuplesToUnregister.begin();
   while( iter != tuplesToUnregister.end() )
     {
+    cout << "Unregister: " << iter->Group.c_str()<< ", " << iter->Name.c_str() << endl;
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
+
+  cout << "LoadState <<<<<<<<<<<<<<<<<<<<<" << endl;
 }
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,

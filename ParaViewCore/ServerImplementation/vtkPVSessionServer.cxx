@@ -226,29 +226,49 @@ public:
     this->ClientURL = client_url;
     }
   //-----------------------------------------------------------------
-  void NotifyOtherClients()
+  void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
     {
     vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
     vtkstd::vector<vtkMultiProcessController*> controllersToNotify;
+    vtkstd::vector<vtkMultiProcessController*> controllersToDelete;
     while(iter != this->Controllers.end())
       {
       if( iter->MultiProcessController.GetPointer() !=
           this->ActiveController->MultiProcessController)
         {
-        controllersToNotify.push_back(iter->MultiProcessController.GetPointer());
+        vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
+            iter->MultiProcessController->GetCommunicator());
+        if(comm->GetIsConnected())
+          {
+          controllersToNotify.push_back(iter->MultiProcessController.GetPointer());
+          }
+        else
+          {
+          controllersToDelete.push_back(iter->MultiProcessController.GetPointer());
+          }
         }
       iter++;
       }
 
-    // Do the notification now...
+    // Clean up the invalid controllers
     vtkstd::vector<vtkMultiProcessController*>::iterator iter2 =
-        controllersToNotify.begin();
+        controllersToDelete.begin();
+    while(iter2 != controllersToDelete.end())
+      {
+      this->UnRegisterController(*iter2);
+      }
+
+    // Do the notification now...
+    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    iter2 = controllersToNotify.begin();
     while(iter2 != controllersToNotify.end())
       {
-      (*iter2)->
-          TriggerRMI(1, vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+      vtkMultiProcessController* ctrl = (*iter2);
+      ctrl->TriggerRMI(1, (void*)data.c_str(), data.size(),
+                       vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
       iter2++;
       }
+
     }
 
 private:
@@ -483,7 +503,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       // Notify when ProxyManager state has changed
       if(msg.global_id() == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
         {
-        this->Internal->NotifyOtherClients();
+        this->Internal->NotifyOtherClients(&msg);
         }
       }
     break;
