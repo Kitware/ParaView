@@ -163,6 +163,9 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       }
     }
 
+  // Only one client connected, so if it fails, just quit...
+  bool can_quit_if_error = (size == 1);
+
   // Now add server sockets.
   vtkInternals::MapToServerSockets::iterator iter2;
   for (iter2 = this->Internals->ServerSockets.begin();
@@ -211,12 +214,13 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       return 1;
       }
 
+    // Close cleanly the socket in error
     vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-      controller->GetCommunicator());
-    cout << "GetIsConnected " << comm->GetIsConnected() << endl;
-    // Processing error or connection was closed.
-    // TODO: handle this.
-    return -1;
+        controller->GetCommunicator());
+    comm->CloseConnection();
+
+    return can_quit_if_error ? -1 /* Quit */ :
+                                1 /* Pretend it's OK */;
     }
 
   return 0;
