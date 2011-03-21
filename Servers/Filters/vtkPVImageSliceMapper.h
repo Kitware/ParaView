@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkImageSliceMapper.h
+  Module:    vtkPVImageSliceMapper.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkImageSliceMapper - Mapper for vtkImagerData that renders the image
+// .NAME vtkPVImageSliceMapper - Mapper for vtkImageData that renders the image
 // using a texture applied to a quad.
 // .SECTION Description
-// vtkImageSliceMapper is a mapper for vtkImagerData that renders the image by
+// vtkPVImageSliceMapper is a mapper for vtkImageData that renders the image by
 // loading the image as a texture and then applying it to a quad. For 3D images,
 // this mapper only shows a single Z slice which can be choosen using SetZSlice.
 // By default, the image data scalars are rendering, however, this mapper
@@ -25,8 +25,8 @@
 // vtkPainterPolyDataMapper
 
 
-#ifndef __vtkImageSliceMapper_h
-#define __vtkImageSliceMapper_h
+#ifndef __vtkPVImageSliceMapper_h
+#define __vtkPVImageSliceMapper_h
 
 #include "vtkMapper.h"
 #include "vtkStructuredData.h" // needed for VTK_*_PLANE
@@ -35,11 +35,11 @@ class vtkImageData;
 class vtkRenderer;
 class vtkPainter;
 
-class VTK_EXPORT vtkImageSliceMapper : public vtkMapper
+class VTK_EXPORT vtkPVImageSliceMapper : public vtkMapper
 {
 public:
-  static vtkImageSliceMapper* New();
-  vtkTypeMacro(vtkImageSliceMapper, vtkMapper);
+  static vtkPVImageSliceMapper* New();
+  vtkTypeMacro(vtkPVImageSliceMapper, vtkMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -120,8 +120,8 @@ public:
 
 //BTX
 protected:
-  vtkImageSliceMapper();
-  ~vtkImageSliceMapper();
+  vtkPVImageSliceMapper();
+  ~vtkPVImageSliceMapper();
 
   // Tell the executive that we accept vtkImageData.
   virtual int FillInputPortInformation(int, vtkInformation*);
@@ -148,8 +148,8 @@ protected:
   int Slice;
   int UseXYPlane;
 private:
-  vtkImageSliceMapper(const vtkImageSliceMapper&); // Not implemented
-  void operator=(const vtkImageSliceMapper&); // Not implemented
+  vtkPVImageSliceMapper(const vtkPVImageSliceMapper&); // Not implemented
+  void operator=(const vtkPVImageSliceMapper&); // Not implemented
 
   class vtkObserver;
   vtkObserver* Observer;
@@ -157,4 +157,3 @@ private:
 };
 
 #endif
-

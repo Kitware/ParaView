@@ -27,8 +27,8 @@
 
 class vtkImageData;
 class vtkImageSliceDataDeliveryFilter;
-class vtkImageSliceMapper;
 class vtkPVCacheKeeper;
+class vtkPVImageSliceMapper;
 class vtkPVLODActor;
 class vtkScalarsToColors;
 
@@ -109,7 +109,7 @@ public:
   void SetOpacity(double val);
 
   //---------------------------------------------------------------------------
-  // Forwarded to vtkImageSliceMapper.
+  // Forwarded to vtkPVImageSliceMapper.
   void SetLookupTable(vtkScalarsToColors* val);
   void SetMapScalars(int val);
   void SetUseXYPlane(int val);
@@ -163,7 +163,7 @@ protected:
   int WholeExtent[6];
   vtkPVCacheKeeper* CacheKeeper;
   vtkImageSliceDataDeliveryFilter* DeliveryFilter;
-  vtkImageSliceMapper* SliceMapper;
+  vtkPVImageSliceMapper* SliceMapper;
   vtkPVLODActor* Actor;
   vtkImageData* SliceData;
 private:
