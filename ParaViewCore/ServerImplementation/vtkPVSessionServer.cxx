@@ -17,8 +17,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
+#include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
+#include "vtkNew.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkSIProxy.h"
@@ -30,12 +32,12 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkReservedRemoteObjectIds.h"
+#include "vtkSocketController.h"
 
+#include <assert.h>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
-
-#include <assert.h>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
@@ -63,108 +65,29 @@ namespace
 class vtkPVSessionServer::vtkInternals
 {
 public:
-struct Controller
-{
-  Controller(vtkMultiProcessController* controller)
-    {
-    this->MultiProcessController = controller;
-    this->ActivateObserverId = 0;
-    this->DeActivateObserverId = 0;
-    this->ActivateControllerObserverId = 0;
-    }
-
-  unsigned long ActivateObserverId;
-  unsigned long ActivateControllerObserverId;
-  unsigned long DeActivateObserverId;
-  vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
-  };
-
-public:
   vtkInternals(vtkPVSessionServer* owner)
     {
     this->Owner = owner;
-    this->ActiveController = NULL;
-    }
-  //-----------------------------------------------------------------
-  void RegisterController(vtkMultiProcessController* ctrl)
-    {
-    this->Controllers.push_back(Controller(ctrl));
-    this->ActiveController = &this->Controllers.back();
-    this->AttachCallBacks(this->ActiveController);
-    this->Owner->Modified();
-    cout << "Active controller: " << this->GetActiveController() << endl;
-    }
-  //-----------------------------------------------------------------
-  void UnRegisterController(vtkMultiProcessController* ctrl)
-    {
-    vtkstd::vector<Controller>::iterator iter, iterToDel;
-    bool found = false;
-    for(iter = this->Controllers.begin(); iter != this->Controllers.end(); iter++)
-      {
-      if(iter->MultiProcessController.GetPointer() == ctrl)
-        {
-        if(this->GetActiveController() == ctrl)
-          {
-          this->ActiveController = NULL;
-          cout << "No Active controller" << endl;
-          }
-        iterToDel = iter;
-        found = true;
-        break;
-        }
-      }
-    if(found)
-      {
-      this->DetachCallBacks(&(*iterToDel));
-      this->Controllers.erase(iterToDel);
-      }
-    }
-  //-----------------------------------------------------------------
-  Controller* FindControler(vtkMultiProcessController* ctrl)
-    {
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
-    while(iter != this->Controllers.end())
-      {
-      if(iter->MultiProcessController.GetPointer() == ctrl)
-        {
-        return &(*iter);
-        }
-      iter++;
-      }
-    return NULL;
-    }
-  //-----------------------------------------------------------------
-  vtkMultiProcessController* GetActiveController()
-    {
-    if(this->ActiveController)
-      {
-      return this->ActiveController->MultiProcessController;
-      }
-    return NULL;
+
+    // Attach callbacks
+    this->CompositeMultiProcessController->AddRMICallback(
+        &RMICallback, this->Owner,
+        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+
+    this->CompositeMultiProcessController->AddRMICallback(
+        &CloseSessionCallback, this->Owner,
+        vtkPVSessionServer::CLOSE_SESSION);
+
     }
   //-----------------------------------------------------------------
   void CloseActiveController()
     {
-    if(this->ActiveController)
-      {
-      this->UnRegisterController(this->ActiveController->MultiProcessController);
-      }
     // FIXME: Maybe we want to keep listening even if no more client is
     // connected.
-    if(this->Controllers.size() == 0)
+    if(this->CompositeMultiProcessController->UnRegisterActiveController() == 0)
       {
       vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()
           ->AbortPendingConnection();
-      }
-    }
-  //-----------------------------------------------------------------
-  void ActivateController(vtkObject* src, unsigned long event, void* data)
-    {
-    if(this->GetActiveController() != src)
-      {
-      this->ActiveController =
-          this->FindControler(vtkMultiProcessController::SafeDownCast(src));
-      cout << "Active controller: " << this->GetActiveController() << endl;
       }
     }
   //-----------------------------------------------------------------
@@ -172,53 +95,18 @@ public:
     {
     vtkNetworkAccessManager* nam =
         vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
-    vtkMultiProcessController* ccontroller =
-        nam->NewConnection(this->ClientURL.c_str());
+    vtkSocketController* ccontroller =
+        vtkSocketController::SafeDownCast(
+            nam->NewConnection(this->ClientURL.c_str()));
     if (ccontroller)
       {
-      this->RegisterController(ccontroller);
+      ccontroller->GetCommunicator()->AddObserver(
+          vtkCommand::WrongTagEvent, this->Owner,
+          &vtkPVSessionServer::OnWrongTagEvent);
+
+      this->CompositeMultiProcessController->RegisterController(ccontroller);
       ccontroller->FastDelete();
       }
-    }
-  //-----------------------------------------------------------------
-  void AttachCallBacks(Controller* ctrl)
-    {
-    ctrl->MultiProcessController->AddRMICallback( &RMICallback, this->Owner,
-                                                  vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-
-    ctrl->MultiProcessController->AddRMICallback( &CloseSessionCallback, this->Owner,
-                                                  vtkPVSessionServer::CLOSE_SESSION);
-
-    ctrl->ActivateObserverId = ctrl->MultiProcessController->AddObserver(
-        vtkCommand::StartEvent, this->Owner,
-        &vtkPVSessionServer::Activate);
-
-    ctrl->DeActivateObserverId = ctrl->MultiProcessController->AddObserver(
-        vtkCommand::EndEvent, this->Owner,
-        &vtkPVSessionServer::DeActivate);
-
-    ctrl->ActivateControllerObserverId =
-        ctrl->MultiProcessController->AddObserver(
-            vtkCommand::StartEvent, this,
-        &vtkInternals::ActivateController);
-
-    ctrl->MultiProcessController->GetCommunicator()->AddObserver(
-        vtkCommand::WrongTagEvent, this->Owner,
-        &vtkPVSessionServer::OnWrongTagEvent);
-    }
-  //-----------------------------------------------------------------
-  void DetachCallBacks(Controller* ctrl)
-    {
-    ctrl->MultiProcessController->RemoveAllRMICallbacks(
-        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    ctrl->MultiProcessController->RemoveAllRMICallbacks(
-        vtkPVSessionServer::CLOSE_SESSION);
-    ctrl->MultiProcessController->RemoveObserver(ctrl->ActivateObserverId);
-    ctrl->MultiProcessController->RemoveObserver(ctrl->ActivateControllerObserverId);
-    ctrl->MultiProcessController->RemoveObserver(ctrl->DeActivateObserverId);
-    ctrl->ActivateObserverId = 0;
-    ctrl->ActivateControllerObserverId = 0;
-    ctrl->DeActivateObserverId = 0;
     }
   //-----------------------------------------------------------------
   void SetClientURL(const char* client_url)
@@ -228,52 +116,19 @@ public:
   //-----------------------------------------------------------------
   void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
     {
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
-    vtkstd::vector<vtkMultiProcessController*> controllersToNotify;
-    vtkstd::vector<vtkMultiProcessController*> controllersToDelete;
-    while(iter != this->Controllers.end())
-      {
-      if( iter->MultiProcessController.GetPointer() !=
-          this->ActiveController->MultiProcessController)
-        {
-        vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-            iter->MultiProcessController->GetCommunicator());
-        if(comm->GetIsConnected())
-          {
-          controllersToNotify.push_back(iter->MultiProcessController.GetPointer());
-          }
-        else
-          {
-          controllersToDelete.push_back(iter->MultiProcessController.GetPointer());
-          }
-        }
-      iter++;
-      }
-
-    // Clean up the invalid controllers
-    vtkstd::vector<vtkMultiProcessController*>::iterator iter2 =
-        controllersToDelete.begin();
-    while(iter2 != controllersToDelete.end())
-      {
-      this->UnRegisterController(*iter2);
-      }
-
-    // Do the notification now...
     vtkstd::string data = msgToBroadcast->SerializeAsString();
-    iter2 = controllersToNotify.begin();
-    while(iter2 != controllersToNotify.end())
-      {
-      vtkMultiProcessController* ctrl = (*iter2);
-      ctrl->TriggerRMI(1, (void*)data.c_str(), data.size(),
-                       vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
-      iter2++;
-      }
-
+    this->CompositeMultiProcessController->TriggerRMI2NonActives(
+        1, (void*)data.c_str(), data.size(),
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+    }
+  //-----------------------------------------------------------------
+  vtkCompositeMultiProcessController* GetActiveController()
+    {
+    return this->CompositeMultiProcessController.GetPointer();
     }
 
 private:
-  Controller* ActiveController;
-  vtkstd::vector<Controller> Controllers;
+  vtkNew<vtkCompositeMultiProcessController> CompositeMultiProcessController;
   vtkWeakPointer<vtkPVSessionServer> Owner;
   vtkstd::string ClientURL;
 };
@@ -284,6 +139,10 @@ vtkPVSessionServer::vtkPVSessionServer()
 {
   this->Internal = new vtkInternals(this);
   this->MultipleConnection = true; // By default we allow collaboration
+
+  // On server side only one session is available so we just set it Active()
+  // forever
+  this->Activate();
 }
 
 //----------------------------------------------------------------------------
@@ -455,7 +314,7 @@ bool vtkPVSessionServer::Connect(const char* url)
   this->Internal->SetClientURL(client_url.c_str());
   if (ccontroller)
     {
-    this->Internal->RegisterController(ccontroller);
+    this->Internal->GetActiveController()->RegisterController(ccontroller);
     ccontroller->FastDelete();
     }
 
@@ -628,8 +487,6 @@ void vtkPVSessionServer::OnCloseSessionRMI()
 {
   if (this->GetIsAlive())
     {
-    vtkSocketCommunicator::SafeDownCast(
-      this->Internal->GetActiveController()->GetCommunicator())->CloseConnection();
     this->Internal->CloseActiveController();
     }
 }

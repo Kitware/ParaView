@@ -21,6 +21,7 @@
 #define __vtkSMServerStateLocator_h
 
 #include "vtkSMStateLocator.h"
+#include "vtkWeakPointer.h" // needed for the session ref
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkSMSession;
@@ -35,7 +36,7 @@ public:
   // Description:
   // Set/Get a parent locator to search which is used as a backup location
   // to search from if a given state was not found locally.
-  vtkGetObjectMacro(Session, vtkSMSession);
+  vtkSMSession* GetSession();
   void SetSession(vtkSMSession* session);
 
 //BTX
@@ -49,7 +50,7 @@ protected:
   vtkSMServerStateLocator();
   ~vtkSMServerStateLocator();
 
-  vtkSMSession* Session;
+  vtkWeakPointer<vtkSMSession> Session;
 private:
   vtkSMServerStateLocator(const vtkSMServerStateLocator&); // Not implemented
   void operator=(const vtkSMServerStateLocator&); // Not implemented

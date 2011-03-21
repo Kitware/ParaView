@@ -19,7 +19,6 @@
 #include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMServerStateLocator);
-vtkSetObjectImplementationMacro(vtkSMServerStateLocator, Session, vtkSMSession);
 //---------------------------------------------------------------------------
 vtkSMServerStateLocator::vtkSMServerStateLocator()
 {
@@ -55,4 +54,14 @@ bool vtkSMServerStateLocator::FindState(vtkTypeUInt32 globalID,
 
   // Not found
   return false;
+}
+//---------------------------------------------------------------------------
+vtkSMSession* vtkSMServerStateLocator::GetSession()
+{
+  return this->Session.GetPointer();
+}
+//---------------------------------------------------------------------------
+void vtkSMServerStateLocator::SetSession(vtkSMSession* session)
+{
+  this->Session = session;
 }

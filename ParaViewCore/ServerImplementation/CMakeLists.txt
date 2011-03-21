@@ -19,6 +19,7 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
+  vtkCompositeMultiProcessController.cxx
   vtkPVProxyDefinitionIterator.cxx
   vtkPVProxyDefinitionManager.cxx
   vtkPVSessionBase.cxx

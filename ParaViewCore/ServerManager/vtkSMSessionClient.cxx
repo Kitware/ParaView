@@ -767,20 +767,20 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
-  this->InServerNotificationCall = true;
-  vtkstd::string data;
-  data.append(reinterpret_cast<char*>(message), message_length);
+//  this->InServerNotificationCall = true;
+//  vtkstd::string data;
+//  data.append(reinterpret_cast<char*>(message), message_length);
 
-  vtkSMMessage state;
-  state.ParseFromString(data);
+//  vtkSMMessage state;
+//  state.ParseFromString(data);
 
-  cout << "Server notification..." << endl;
+//  cout << "Server notification..." << endl;
 
-  // Register new proxy from remote
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->LoadState(&state, this->GetStateLocator()); // FIXME need more generic approach
-//  cout << msg.DebugString().c_str();
-  this->InServerNotificationCall = false;
+//  // Register new proxy from remote
+//  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+//  pxm->LoadState(&state, this->GetStateLocator()); // FIXME need more generic approach
+////  cout << msg.DebugString().c_str();
+//  this->InServerNotificationCall = false;
 }
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, void* calldata)
