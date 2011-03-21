@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkImageSliceMapper.cxx
+  Module:    vtkPVImageSliceMapper.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkImageSliceMapper.h"
+#include "vtkPVImageSliceMapper.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkInformation.h"
@@ -25,7 +25,7 @@
 #include "vtkExecutive.h"
 #include "vtkDataArray.h"
 //-----------------------------------------------------------------------------
-class vtkImageSliceMapper::vtkObserver : public vtkCommand
+class vtkPVImageSliceMapper::vtkObserver : public vtkCommand
 {
 public:
   static vtkObserver* New()
@@ -43,12 +43,12 @@ public:
     {
     this->Target = 0;
     }
-  vtkImageSliceMapper* Target;
+  vtkPVImageSliceMapper* Target;
 };
 
-vtkStandardNewMacro(vtkImageSliceMapper);
+vtkStandardNewMacro(vtkPVImageSliceMapper);
 //----------------------------------------------------------------------------
-vtkImageSliceMapper::vtkImageSliceMapper()
+vtkPVImageSliceMapper::vtkPVImageSliceMapper()
 {
   this->Piece = 0;
   this->NumberOfPieces = 1;
@@ -70,7 +70,7 @@ vtkImageSliceMapper::vtkImageSliceMapper()
 }
 
 //----------------------------------------------------------------------------
-vtkImageSliceMapper::~vtkImageSliceMapper()
+vtkPVImageSliceMapper::~vtkPVImageSliceMapper()
 {
   this->SetPainter(NULL);
 
@@ -80,7 +80,7 @@ vtkImageSliceMapper::~vtkImageSliceMapper()
 }
 
 //-----------------------------------------------------------------------------
-void vtkImageSliceMapper::SetPainter(vtkPainter* p)
+void vtkPVImageSliceMapper::SetPainter(vtkPainter* p)
 {
   if (this->Painter)
     {
@@ -96,14 +96,14 @@ void vtkImageSliceMapper::SetPainter(vtkPainter* p)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::ReleaseGraphicsResources (vtkWindow *win)
+void vtkPVImageSliceMapper::ReleaseGraphicsResources (vtkWindow *win)
 {
   this->Painter->ReleaseGraphicsResources(win);
   this->Superclass::ReleaseGraphicsResources(win);
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
+void vtkPVImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
 {
   if (this->Static)
     {
@@ -127,19 +127,19 @@ void vtkImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::SetInput(vtkImageData* input)
+void vtkPVImageSliceMapper::SetInput(vtkImageData* input)
 {
   this->SetInputConnection(0, input? input->GetProducerPort(): NULL);
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkImageSliceMapper::GetInput()
+vtkImageData* vtkPVImageSliceMapper::GetInput()
 {
   return vtkImageData::SafeDownCast(this->GetExecutive()->GetInputData(0, 0));
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::Update()
+void vtkPVImageSliceMapper::Update()
 {
   if (this->Static)
     {
@@ -163,7 +163,7 @@ void vtkImageSliceMapper::Update()
 
 
 //----------------------------------------------------------------------------
-double* vtkImageSliceMapper::GetBounds()
+double* vtkPVImageSliceMapper::GetBounds()
 {
   static double bounds[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
   vtkImageData* input = this->GetInput();
@@ -220,9 +220,9 @@ double* vtkImageSliceMapper::GetBounds()
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::ShallowCopy(vtkAbstractMapper* mapper)
+void vtkPVImageSliceMapper::ShallowCopy(vtkAbstractMapper* mapper)
 {
-  vtkImageSliceMapper* idmapper = vtkImageSliceMapper::SafeDownCast(mapper);
+  vtkPVImageSliceMapper* idmapper = vtkPVImageSliceMapper::SafeDownCast(mapper);
   if (idmapper)
     {
     this->SetInput(idmapper->GetInput());
@@ -235,7 +235,7 @@ void vtkImageSliceMapper::ShallowCopy(vtkAbstractMapper* mapper)
 }
 
 //----------------------------------------------------------------------------
-int vtkImageSliceMapper::FillInputPortInformation(
+int vtkPVImageSliceMapper::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");
@@ -243,7 +243,7 @@ int vtkImageSliceMapper::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::UpdatePainterInformation()
+void vtkPVImageSliceMapper::UpdatePainterInformation()
 {
   vtkInformation* info = this->PainterInformation;
   info->Set(vtkPainter::STATIC_DATA(), this->Static);
@@ -292,7 +292,7 @@ void vtkImageSliceMapper::UpdatePainterInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
+void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 {
   vtkImageData* input = this->GetInput();
   //
@@ -354,7 +354,7 @@ void vtkImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceMapper::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVImageSliceMapper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
@@ -363,4 +363,3 @@ void vtkImageSliceMapper::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GhostLevel: " << this->GhostLevel << endl;
   os << indent << "Number of sub pieces: " << this->NumberOfSubPieces << endl;
 }
-
