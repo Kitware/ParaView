@@ -39,6 +39,7 @@ class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridGeometryFilter;
+class vtkAMRBox;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
@@ -134,6 +135,11 @@ protected:
   ~vtkPVGeometryFilter();
 
   // Description:
+  // A helper method which, given the AMR box of the data in question
+  // and the root AMR box, determines whether or not the block is visible.
+  bool IsAMRDataVisible( vtkAMRBox &amrBox, vtkAMRBox &rootBox );
+
+  // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
   virtual int RequestDataObject(vtkInformation*,
@@ -142,6 +148,9 @@ protected:
   virtual int RequestInformation(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
+  virtual int RequestAMRData(vtkInformation*  request,
+                             vtkInformationVector** inputVector,
+                             vtkInformationVector* outputVector );
   virtual int RequestCompositeData(vtkInformation* request,
                                    vtkInformationVector** inputVector,
                                    vtkInformationVector* outputVector);

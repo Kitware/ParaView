@@ -62,6 +62,7 @@
 #include "vtkUnstructuredGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiPieceDataSet.h"
+#include "vtkAMRBox.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -436,7 +437,14 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     {
     vtkGarbageCollector::DeferredCollectionPush();
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::RequestData");
-    this->RequestCompositeData(request, inputVector, outputVector);
+    if( input->IsA( "vtkHierarchicalBoxDataSet" ) )
+      {
+        this->RequestAMRData( request, inputVector, outputVector );
+      }
+    else
+      {
+        this->RequestCompositeData(request, inputVector, outputVector);
+      }
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
 
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
@@ -584,6 +592,147 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
   dsindex->FastDelete();
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeometryFilter::IsAMRDataVisible(
+    vtkAMRBox &amrBox, vtkAMRBox &rootBox )
+{
+  // Sanity check
+  assert( "pre: AMR box dimensionality must match!" &&
+          (amrBox.GetDimensionality() == rootBox.GetDimensionality() ) );
+  assert( "pre: AMR dimension out-of-bounds!"  &&
+          (amrBox.GetDimensionality() >= 1)    &&
+          (amrBox.GetDimensionality() <= 3) );
+
+  // STEP 0: If it's 2-D all blocks are visible
+  if( amrBox.GetDimensionality() <= 2)
+    return true;
+
+  // STEP 1: Check if the AMR box is on a lower boundary
+  if( (amrBox.GetLoCorner()[0] == 0) ||
+      (amrBox.GetLoCorner()[1] == 0) ||
+      (amrBox.GetLoCorner()[2] == 0) )
+      return true;
+
+  // STEP 2: Construct AMR box within the cartesian bounds of the rootbox,
+  // but, with the spacing of the box corresponding to the given data.
+
+  // -- Get the root cartesian box bounds
+  int ndim[3];
+  ndim[0]=ndim[1]=ndim[2]=0;
+  double min[3]; double max[3];
+  rootBox.GetMinBounds( min );
+  rootBox.GetMaxBounds( max );
+
+  // -- Get the data spacing
+  double spacing[3];
+  amrBox.GetGridSpacing( spacing );
+
+  // -- Compute the number of CELLS in tmpBox
+  for( int i=0; i < 3; ++i )
+   ndim[i] = (max[i]-min[i])/spacing[i] /*+1 gives the number of points!*/;
+
+  vtkAMRBox tmpBox(min,3,ndim,spacing,0,0,0);
+
+  // STEP 3: Check if amr box is within the tmpBox
+  if( (amrBox.GetHiCorner()[0] < tmpBox.GetHiCorner()[0]) &&
+      (amrBox.GetHiCorner()[1] < tmpBox.GetHiCorner()[1]) &&
+      (amrBox.GetHiCorner()[2] < tmpBox.GetHiCorner()[2]) )
+      return false;
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::RequestAMRData(
+    vtkInformation*, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector )
+{
+  vtkTimerLog::MarkStartEvent( "vtkPVGeometryFilter::RequestAMRData" );
+
+  // STEP 0: Acquire input & output object
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outputVector,0);
+  if( output == NULL )
+    {
+      vtkErrorMacro( "Output AMR multi-block dataset is NULL" );
+      return 0;
+    }
+
+  vtkHierarchicalBoxDataSet *input=
+      vtkHierarchicalBoxDataSet::GetData(inputVector[0], 0);
+  if( input == NULL )
+    {
+      vtkErrorMacro( "Input AMR composite dataset is NULL" );
+      return 0;
+    }
+
+  // STEP 1: Construct output object, i.e., a multiblock of multiple pieces
+  // that mirrors the vtkHierarchicalBoxDataSet
+  output->SetNumberOfBlocks( input->GetNumberOfLevels() );
+  unsigned int blockIdx = 0;
+  for( ; blockIdx < output->GetNumberOfBlocks(); ++blockIdx )
+    {
+      vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
+      mpds->SetNumberOfPieces( input->GetNumberOfDataSets( blockIdx ) );
+      output->SetBlock( blockIdx, mpds );
+      mpds->Delete();
+    }
+
+  // STEP 2: Check Attributes
+  vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
+  if( this->CheckAttributes(input) )
+    {
+      vtkErrorMacro( "CheckAttributes() failed!" );
+      return 0;
+    }
+  vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::CheckAttributes");
+
+  // STEP 3: Loop through data, determine if they are visible and call
+  // execute block to get the polydata to render.
+
+  // NOTE: We assume that the root node covers the entire domain & that it
+  // is stored @ (0,0)
+  vtkAMRBox rootAMRBox;
+  input->GetMetaData( 0, 0, rootAMRBox );
+
+  unsigned int level=0;
+  for( ; level < input->GetNumberOfLevels(); ++level )
+    {
+      unsigned int dataIdx=0;
+      for( ; dataIdx < input->GetNumberOfDataSets(level); ++dataIdx )
+        {
+
+          vtkUniformGrid *ug = input->GetDataSet( level, dataIdx );
+          vtkMultiPieceDataSet *mpds =
+           vtkMultiPieceDataSet::SafeDownCast( output->GetBlock( level ) );
+          assert( "pre: Multipiece dataset is NULL" && (mpds != NULL) );
+          if( ug == NULL )
+            {
+              mpds->SetPiece( dataIdx, NULL );
+            }
+          else
+            {
+              vtkAMRBox amrBox;
+              input->GetMetaData( level, dataIdx, amrBox );
+              if( this->IsAMRDataVisible( amrBox, rootAMRBox ) )
+                {
+                  vtkPolyData* tmpOut = vtkPolyData::New();
+                  this->ExecuteBlock(ug, tmpOut, 0, 0, 1, 0);
+                  this->ExecuteCellNormals(tmpOut, 0);
+                  this->RemoveGhostCells(tmpOut);
+                  this->AddCompositeIndex(
+                   tmpOut,input->GetFlatIndex(level,dataIdx));
+                  mpds->SetPiece( dataIdx, tmpOut );
+                  tmpOut->Delete();
+                }
+            }
+
+        } // END for all data
+    } // END for all levels
+
+  vtkTimerLog::MarkEndEvent( "vtkPVGeometryFilter::RequestAMRData" );
+  return 1;
 }
 
 //----------------------------------------------------------------------------
