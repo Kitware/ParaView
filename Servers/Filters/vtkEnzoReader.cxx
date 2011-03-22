@@ -66,6 +66,8 @@
 #include <cmath>
 #include "vtksys/SystemTools.hxx"
 
+#include "vtkAMRUtilities.h"
+
 #include <vtkstd/string>
 
 vtkStandardNewMacro( vtkEnzoReader );
@@ -1865,11 +1867,11 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
   this->GenerateBlockMap();
   
-  std::cout << "====================================\n";
-  std::cout << this->GetFileName() << " -- ";
-  std::cout << this->Internal->FileName << std::endl;
-  std::cout << "====================================\n";
-  std::cout.flush( );
+//  std::cout << "====================================\n";
+//  std::cout << this->GetFileName() << " -- ";
+//  std::cout << this->Internal->FileName << std::endl;
+//  std::cout << "====================================\n";
+//  std::cout.flush( );
 
   int nmblocks = static_cast < int > ( this->BlockMap.size() );
   for ( int i = 0; i < nmblocks; i ++ )
@@ -1882,26 +1884,24 @@ int vtkEnzoReader::RequestData( vtkInformation * vtkNotUsed( request ),
 
       if( this->IsBlockMine( i ) )
         {
-        std::cout << "Loading block " << i;
-        std::cout << "/" << this->GetNumberOfBlocks() << std::endl;
-        std::cout.flush();
+//        std::cout << "Loading block " << i;
+//        std::cout << "/" << this->GetNumberOfBlocks() << std::endl;
+//        std::cout.flush();
         this->GetBlock( i, output, idxcounter );
         }
-      else
-        {
-        std::cout << "Loding Metadata of block " << i << std::endl;
-        std::cout.flush( );
-        this->GetBlockMetaData(i,output,idxcounter );
-        }
+//      else
+//        {
+//        std::cout << "Loding Metadata of block " << i << std::endl;
+//        std::cout.flush( );
+//        this->GetBlockMetaData(i,output,idxcounter );
+//        }
 
       }
 
     } // END loop through all the blocks
 
-  if( this->SelectedBlockId == -1 )
-    this->SetRefinementRatio( output );
 
-  myController->Barrier();
+  vtkAMRUtilities::GenerateMetaData( output, myController );
 
   if( this->GenerateIBLANK )
     {
