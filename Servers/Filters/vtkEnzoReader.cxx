@@ -978,9 +978,9 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
 
 
   // number of particles of the reference block, if any
-  std::cout << "Reference Block: " << this->ReferenceBlock << std::endl;
-  std::cout << "BlockIdx: " << this->ReferenceBlock - 1 << std::endl;
-  std::cout.flush();
+//  std::cout << "Reference Block: " << this->ReferenceBlock << std::endl;
+//  std::cout << "BlockIdx: " << this->ReferenceBlock - 1 << std::endl;
+//  std::cout.flush();
 
   vtkPolyData * polyData = vtkPolyData::New();
   this->TheReader->GetParticles( this->ReferenceBlock - 1, polyData, 0, 0 );
