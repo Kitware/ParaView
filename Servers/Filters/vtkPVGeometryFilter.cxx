@@ -435,7 +435,6 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(input))
     {
-    vtkGarbageCollector::DeferredCollectionPush();
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::RequestData");
     if( input->IsA( "vtkHierarchicalBoxDataSet" ) )
       {
@@ -443,13 +442,13 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
       }
     else
       {
+        vtkGarbageCollector::DeferredCollectionPush();
         this->RequestCompositeData(request, inputVector, outputVector);
+        vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
+        vtkGarbageCollector::DeferredCollectionPop();
+        vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
       }
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
-
-    vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
-    vtkGarbageCollector::DeferredCollectionPop();
-    vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
     return 1;
     }
 
@@ -609,12 +608,6 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   if( amrBox.GetDimensionality() <= 2)
     return true;
 
-  // STEP 1: Check if the AMR box is on a lower boundary
-  if( (amrBox.GetLoCorner()[0] == 0) ||
-      (amrBox.GetLoCorner()[1] == 0) ||
-      (amrBox.GetLoCorner()[2] == 0) )
-      return true;
-
   // STEP 2: Construct AMR box within the cartesian bounds of the rootbox,
   // but, with the spacing of the box corresponding to the given data.
 
@@ -631,17 +624,40 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
 
   // -- Compute the number of CELLS in tmpBox
   for( int i=0; i < 3; ++i )
-   ndim[i] = (max[i]-min[i])/spacing[i] /*+1 gives the number of points!*/;
+   ndim[i] =(max[i]-min[i])/spacing[i];
 
-  vtkAMRBox tmpBox(min,3,ndim,spacing,0,0,0);
+  int lo[3];
+  lo[0]=lo[1]=lo[2]=0;
 
-  // STEP 3: Check if amr box is within the tmpBox
-  if( (amrBox.GetHiCorner()[0] < tmpBox.GetHiCorner()[0]) &&
-      (amrBox.GetHiCorner()[1] < tmpBox.GetHiCorner()[1]) &&
-      (amrBox.GetHiCorner()[2] < tmpBox.GetHiCorner()[2]) )
-      return false;
+  vtkAMRBox tmpBox;
+  tmpBox.SetDimensionality( 3 );
+  tmpBox.SetDataSetOrigin( min );
+  tmpBox.SetGridSpacing( spacing );
+  tmpBox.SetDimensions( lo, ndim );
+  tmpBox.SetLevel( 0 );
+  tmpBox.SetBlockId( 0 );
+  tmpBox.SetProcessId( -1 );
 
-  return true;
+  // STEP 3: Check if the box is on the boundary
+  for( int i=0; i < 3; ++i )
+    {
+      if( (amrBox.GetLoCorner()[i]==0) ||
+          (amrBox.GetHiCorner()[i]==tmpBox.GetHiCorner()[i]) )
+          return true;
+    }
+
+  if( (amrBox.GetLevel() == 2) && (amrBox.GetBlockId() == 197) )
+    {
+      rootBox.WriteToVtkFile( "ROOTBOX.vtk" );
+      amrBox.WriteToVtkFile( "MYBOXDATA.vtk" );
+      tmpBox.WriteToVtkFile( "TMPBOX.vtk" );
+      std::cout << "AMR BOX: "; amrBox.Print( std::cout );
+      std::cout << "\n\n";
+      std::cout << "TMP BOX: "; tmpBox.Print( std::cout );
+      std::cout << "\n\n";
+      std::cout.flush();
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -694,7 +710,7 @@ int vtkPVGeometryFilter::RequestAMRData(
   // NOTE: We assume that the root node covers the entire domain & that it
   // is stored @ (0,0)
   vtkAMRBox rootAMRBox;
-  input->GetMetaData( 0, 0, rootAMRBox );
+  input->GetRootAMRBox( rootAMRBox );
 
   unsigned int level=0;
   for( ; level < input->GetNumberOfLevels(); ++level )
