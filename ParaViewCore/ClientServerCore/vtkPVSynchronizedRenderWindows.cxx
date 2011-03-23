@@ -449,6 +449,11 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
   // triggers from the client.
   if (controller && this->Mode == RENDER_SERVER)
     {
+    // Only one RMICallback for PVSynchronizedRenderWindow can live at a time
+    controller->RemoveAllRMICallbacks(SYNC_MULTI_RENDER_WINDOW_TAG);
+    controller->RemoveAllRMICallbacks(GET_ZBUFFER_VALUE_TAG);
+
+    // Attach the one
     this->ClientServerRMITag =
       controller->AddRMICallback(::RenderRMI, this, SYNC_MULTI_RENDER_WINDOW_TAG);
     this->ClientServerGetZBufferValueRMITag =
@@ -941,7 +946,7 @@ void vtkPVSynchronizedRenderWindows::LoadWindowAndLayout(
     {
     vtkErrorMacro("Mismatch is render windows on different processes. "
       "Aborting for debugging purposes.");
-    abort();
+    //FIXME abort();
     }
 
   for (unsigned int cc=0; cc < number_of_windows; cc++)
