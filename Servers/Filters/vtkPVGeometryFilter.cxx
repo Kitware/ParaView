@@ -618,15 +618,17 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   rootBox.GetMinBounds( min );
   rootBox.GetMaxBounds( max );
 
-  std::cout << "Here is min: " << min[0] << " ";
-  std::cout << " " << min[1] << " ";
-  std::cout << min[2] << std::endl;
-  std::cout.flush();
-
-  std::cout << "Here is max: " << max[0] << " ";
-  std::cout << " " << max[1] << " ";
-  std::cout << max[2] << std::endl;
-  std::cout.flush();
+//  DEBUG
+//  std::cout << "Here is min: " << min[0] << " ";
+//  std::cout << " " << min[1] << " ";
+//  std::cout << min[2] << std::endl;
+//  std::cout.flush();
+//
+//  std::cout << "Here is max: " << max[0] << " ";
+//  std::cout << " " << max[1] << " ";
+//  std::cout << max[2] << std::endl;
+//  std::cout.flush();
+//  END DEBUG
 
   // -- Get the data spacing
   double spacing[3];
@@ -635,10 +637,10 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   // -- Compute the number of CELLS in tmpBox
   for( int i=0; i < 3; ++i )
     {
-      // Note -3 is subtracted here because the tmpBox
+      // Note -1 is subtracted here because the tmpBox
       // is cell-dimensioned and we downshift to number
       // from 0.
-      ndim[i] = floor( (max[i]-min[i])/spacing[i] )-3;
+      ndim[i] = round( (max[i]-min[i])/spacing[i] )-1;
     }
 
   int lo[3];
