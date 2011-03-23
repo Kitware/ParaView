@@ -2180,7 +2180,7 @@
            class="vtkPolyDataMapper"
            processes="client|renderserver">
       <Documentation>
-        This proxy is useful for changing gloabal mapper settings such as
+        This proxy is useful for changing global mapper settings such as
         the coincident topology resolution setting on all rendering proceses.
       </Documentation>
       <IntVectorProperty name="Mode"
