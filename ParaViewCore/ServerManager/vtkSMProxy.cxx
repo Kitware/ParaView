@@ -689,18 +689,11 @@ bool vtkSMProxy::ArePropertiesModified()
 //---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects()
 {
-  if (this->ObjectsCreated)
+  if (this->ObjectsCreated && this->State && this->Location == 0)
     {
     return;
     }
-  this->ObjectsCreated = 1;
   this->WarnIfDeprecated();
-
-  // If no location, it means no state...
-  if(this->Location == 0)
-    {
-    return;
-    }
 
   assert( "Test Proxy definition"
           && this->GetClassName() && this->GetSIClassName()
@@ -750,6 +743,18 @@ void vtkSMProxy::CreateVTKObjects()
         property->WriteTo(this->State);
         }
       }
+    }
+
+  // Even if the Proxy was marked as Created, we went so far to build correctly
+  // the state and this is the same case for prototype.
+  if(this->ObjectsCreated)
+    {
+    return;
+    }
+  this->ObjectsCreated = 1;
+  if(this->Location == 0)
+    {
+    return;
     }
 
   // Push the state
@@ -1835,6 +1840,23 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 {
   // Update globalId. This will fails if that one is already set with a different value
   this->SetGlobalID(message->global_id());
+  if(message->HasExtension(DefinitionHeader::server_class))
+    {
+    this->SetSIClassName(message->GetExtension(DefinitionHeader::server_class).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_group))
+    {
+    this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_name))
+    {
+    this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_sub_proxy_name))
+    {
+    this->SetXMLSubProxyName(message->GetExtension(ProxyState::xml_sub_proxy_name).c_str());
+    }
+
 
   // Manage its sub-proxy state
   int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);

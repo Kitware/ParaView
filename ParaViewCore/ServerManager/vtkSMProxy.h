@@ -458,8 +458,6 @@ protected:
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMSourceProxy;
   friend class vtkSMUndoRedoStateLoader;
-  // -- PVEE only
-  friend class vtkWSMApplication;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -638,7 +636,6 @@ protected:
   vtkSetStringMacro(SIClassName);
   vtkGetStringMacro(SIClassName);
   char* SIClassName;
-
 
   char* VTKClassName;
   char* XMLGroup;
