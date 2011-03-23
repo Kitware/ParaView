@@ -28,6 +28,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
@@ -74,13 +75,18 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
     }
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "Initialize"
-         << static_cast<int>(this->GetGlobalID())
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
+  // Skip synchronization of renderer in collaboration mode when the client
+  // get a previously created View.
+  if(this->Session->IsRemoteExecutionAllowed())
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "Initialize"
+           << static_cast<int>(this->GetGlobalID())
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+    }
 
   vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
     vtkPVView::ViewTimeChangedEvent,
