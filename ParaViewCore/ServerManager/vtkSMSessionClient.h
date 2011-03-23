@@ -25,6 +25,7 @@
 
 class vtkMultiProcessController;
 class vtkPVServerInformation;
+class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
 {
@@ -171,8 +172,6 @@ protected:
   // Return true if the event was handle locally.
   virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
                                 void* calldata);
-
-  bool InServerNotificationCall;
 
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented

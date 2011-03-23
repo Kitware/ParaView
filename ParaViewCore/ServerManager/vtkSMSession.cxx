@@ -148,7 +148,9 @@ void vtkSMSession::Initialize()
   if (this->GetProcessRoles() & vtkPVSession::CLIENT)
     {
     // Make sure that the client as the server XML definition
+    this->DisableRemoteExecution();
     vtkSMObject::GetProxyManager()->SetSession(this);
+    this->EnableRemoteExecution();
 
     this->PluginManager->SetSession(this);
     this->PluginManager->Initialize();
