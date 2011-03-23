@@ -140,12 +140,15 @@ void pqServer::initialize()
 
   // Create the GlobalMapperPropertiesProxy.
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
-  proxy->UpdateVTKObjects();
-  pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
+  vtkSMProxy* proxy = pxm->GetProxy("temp_prototypes", "GlobalMapperProperties");
+  if(proxy == NULL)
+    {
+    proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
+    proxy->UpdateVTKObjects();
+    pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
+    proxy->FastDelete();
+    }
   this->GlobalMapperPropertiesProxy = proxy;
-  proxy->Delete();
-
   this->updateGlobalMapperProperties();
 
   if(this->isRemote())
@@ -170,10 +173,14 @@ void pqServer::createTimeKeeper()
 {
   // Set Global Time keeper.
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
-  proxy->UpdateVTKObjects();
-  pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
-  proxy->Delete();
+  vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
+  if(proxy == NULL)
+    {
+    proxy = pxm->NewProxy("misc","TimeKeeper");
+    proxy->UpdateVTKObjects();
+    pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
+    proxy->FastDelete();
+    }
 
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
