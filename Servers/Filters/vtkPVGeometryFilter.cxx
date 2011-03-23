@@ -353,6 +353,42 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ExecuteAMRBlock(
+  vtkDataObject* input, vtkPolyData* output, int doCommunicate,
+  int updatePiece, int updateNumPieces, int updateGhosts, bool extractface[6] )
+{
+
+  if (this->UseOutline && this->MakeOutlineOfInput)
+  {
+    vtkAlgorithmOutput *pport = input->GetProducerPort();
+    vtkDataObject *insin = NULL;
+    if (pport)
+      {
+      vtkAlgorithm *alg = pport->GetProducer();
+      if (alg &&
+          alg->GetNumberOfInputPorts() &&
+          alg->GetNumberOfInputConnections(0))
+        {
+        insin = alg->GetInputDataObject(0,0);
+        }
+      }
+    if (insin)
+      {
+      input = insin;
+      }
+  }
+
+  if( !input->IsA("vtkImageData") )
+  {
+    vtkErrorMacro( "Input data must be vtkImageData for AMR!" );
+    return;
+  }
+
+
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
   int updatePiece, int updateNumPieces, int updateGhosts)
@@ -595,7 +631,7 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
 
 //----------------------------------------------------------------------------
 bool vtkPVGeometryFilter::IsAMRDataVisible(
-    vtkAMRBox &amrBox, vtkAMRBox &rootBox )
+    vtkAMRBox &amrBox, vtkAMRBox &rootBox, bool extractface[6] )
 {
   // Sanity check
   assert( "pre: AMR box dimensionality must match!" &&
@@ -604,7 +640,11 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
           (amrBox.GetDimensionality() >= 1)    &&
           (amrBox.GetDimensionality() <= 3) );
 
-  // STEP 0: If it's 2-D all blocks are visible
+  // STEP 0: By default all faces of the block are visible
+  for( int i=0; i < 6; ++i )
+    extractface[i]=true;
+
+  // STEP 1: If it's 2-D all blocks are visible
   if( amrBox.GetDimensionality() <= 2)
     return true;
 
@@ -617,18 +657,6 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   double min[3]; double max[3];
   rootBox.GetMinBounds( min );
   rootBox.GetMaxBounds( max );
-
-//  DEBUG
-//  std::cout << "Here is min: " << min[0] << " ";
-//  std::cout << " " << min[1] << " ";
-//  std::cout << min[2] << std::endl;
-//  std::cout.flush();
-//
-//  std::cout << "Here is max: " << max[0] << " ";
-//  std::cout << " " << max[1] << " ";
-//  std::cout << max[2] << std::endl;
-//  std::cout.flush();
-//  END DEBUG
 
   // -- Get the data spacing
   double spacing[3];
@@ -659,36 +687,14 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   // STEP 3: Check if the box is on the boundary
   for( int i=0; i < 3; ++i )
     {
+      // TODO: Set extractface bit vector accordingly
+      for( int j=1; j < 6; ++j )
+        extractface[ j ] = false;
+
       if( (amrBox.GetLoCorner()[i]==0) ||
           (amrBox.GetHiCorner()[i]==tmpBox.GetHiCorner()[i]) )
           return true;
     }
-
-// DEBUG
-//   std::ostringstream file;
-//   file.str("");
-//   file << "ROOTBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
-//   file << ".vtk";
-//   rootBox.WriteToVtkFile( file.str().c_str() );
-//
-//   file.str("");
-//   file << "AMRBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
-//   file << ".vtk";
-//   amrBox.WriteToVtkFile( file.str().c_str() );
-
-//   file.str("");
-//   file << "TMPBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
-//   file << ".vtk";
-//   amrBox.WriteToVtkFile( file.str().c_str() );
-//
-//  std::cout << "Root BOX: "; rootBox.Print( std::cout );
-//  std::cout << "\n\n";
-//  std::cout << "AMR BOX: "; amrBox.Print( std::cout );
-//  std::cout << "\n\n";
-//  std::cout << "TMP BOX: "; tmpBox.Print( std::cout );
-//  std::cout << "\n\n";
-//  std::cout.flush();
-// END DEBUG
 
   return false;
 }
@@ -764,7 +770,8 @@ int vtkPVGeometryFilter::RequestAMRData(
             {
               vtkAMRBox amrBox;
               input->GetMetaData( level, dataIdx, amrBox );
-              if( this->IsAMRDataVisible( amrBox, rootAMRBox ) )
+              bool extractface[6];
+              if( this->IsAMRDataVisible(amrBox,rootAMRBox,extractface) )
                 {
                   vtkPolyData* tmpOut = vtkPolyData::New();
                   this->ExecuteBlock(ug, tmpOut, 0, 0, 1, 0);
@@ -1173,16 +1180,8 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     {
     if (input->GetNumberOfCells() > 0)
       {
-        if( input->IsA("vtkUniformGrid") )
-          {
-            this->DataSetSurfaceFilter->UniformGridExecute(
-                input,output,input->GetExtent(),ext );
-          }
-        else
-          {
-            this->DataSetSurfaceFilter->StructuredExecute(input,
-              output, input->GetExtent(), ext);
-          }
+        this->DataSetSurfaceFilter->StructuredExecute(input,
+          output, input->GetExtent(), ext);
       }
     this->OutlineFlag = 0;
     return;

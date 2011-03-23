@@ -137,7 +137,9 @@ protected:
   // Description:
   // A helper method which, given the AMR box of the data in question
   // and the root AMR box, determines whether or not the block is visible.
-  bool IsAMRDataVisible( vtkAMRBox &amrBox, vtkAMRBox &rootBox );
+  bool IsAMRDataVisible( vtkAMRBox &amrBox,
+                         vtkAMRBox &rootBox,
+                         bool faceextract[6] );
 
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
@@ -160,6 +162,15 @@ protected:
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
+
+
+  void ExecuteAMRBlock(vtkDataObject* input,
+                      vtkPolyData* output,
+                      int doCommunicate,
+                      int updatePiece,
+                      int updateNumPieces,
+                      int updateGhosts,
+                      bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
                     vtkPolyData* output,
