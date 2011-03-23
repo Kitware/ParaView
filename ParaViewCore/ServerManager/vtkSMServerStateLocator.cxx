@@ -40,20 +40,32 @@ void vtkSMServerStateLocator::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSMServerStateLocator::FindState(vtkTypeUInt32 globalID,
                                         vtkSMMessage* stateToFill )
 {
-  if(!this->Superclass::FindState(globalID, stateToFill) && this->Session)
+  bool foundInCache = true;
+  if( !(foundInCache = this->Superclass::FindState(globalID, stateToFill)) &&
+      this->Session && stateToFill)
     {
     vtkSMMessage newState;
     newState.set_global_id(globalID);
     newState.set_location(vtkPVSession::DATA_SERVER_ROOT);
     this->Session->PullState(&newState);
-    this->RegisterState(&newState);
     stateToFill->Clear();
     stateToFill->CopyFrom(newState);
-    return newState.HasExtension(ProxyState::xml_group);
+    if(!newState.HasExtension(ProxyState::xml_group))
+      {
+      cout << "Failed in fetching " << globalID << endl
+           << stateToFill->DebugString().c_str() << endl
+           << "--------------------------------" << endl;
+      return false;
+      }
+    this->RegisterState(&newState);
+    cout << "Should have " << globalID << " by now." << endl
+         << stateToFill->DebugString().c_str() << endl
+         << "--------------------------------" << endl;
+    return true;
     }
 
-  // Not found
-  return false;
+  // Found in the cache ?
+  return foundInCache;
 }
 //---------------------------------------------------------------------------
 vtkSMSession* vtkSMServerStateLocator::GetSession()

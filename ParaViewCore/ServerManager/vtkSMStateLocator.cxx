@@ -73,11 +73,7 @@ void vtkSMStateLocator::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSMStateLocator::FindState(vtkTypeUInt32 globalID,
                                   vtkSMMessage* stateToFill )
 {
-  if(stateToFill == NULL)
-    {
-    return false;
-    }
-  else
+  if(stateToFill != NULL)
     {
     stateToFill->Clear();
     }
