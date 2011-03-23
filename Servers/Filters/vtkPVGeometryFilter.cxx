@@ -618,13 +618,28 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   rootBox.GetMinBounds( min );
   rootBox.GetMaxBounds( max );
 
+  std::cout << "Here is min: " << min[0] << " ";
+  std::cout << " " << min[1] << " ";
+  std::cout << min[2] << std::endl;
+  std::cout.flush();
+
+  std::cout << "Here is max: " << max[0] << " ";
+  std::cout << " " << max[1] << " ";
+  std::cout << max[2] << std::endl;
+  std::cout.flush();
+
   // -- Get the data spacing
   double spacing[3];
   amrBox.GetGridSpacing( spacing );
 
   // -- Compute the number of CELLS in tmpBox
   for( int i=0; i < 3; ++i )
-   ndim[i] =(max[i]-min[i])/spacing[i];
+    {
+      // Note -3 is subtracted here because the tmpBox
+      // is cell-dimensioned and we downshift to number
+      // from 0.
+      ndim[i] = floor( (max[i]-min[i])/spacing[i] )-3;
+    }
 
   int lo[3];
   lo[0]=lo[1]=lo[2]=0;
@@ -638,6 +653,7 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   tmpBox.SetBlockId( 0 );
   tmpBox.SetProcessId( -1 );
 
+
   // STEP 3: Check if the box is on the boundary
   for( int i=0; i < 3; ++i )
     {
@@ -646,17 +662,32 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
           return true;
     }
 
-  if( (amrBox.GetLevel() == 2) && (amrBox.GetBlockId() == 197) )
-    {
-      rootBox.WriteToVtkFile( "ROOTBOX.vtk" );
-      amrBox.WriteToVtkFile( "MYBOXDATA.vtk" );
-      tmpBox.WriteToVtkFile( "TMPBOX.vtk" );
-      std::cout << "AMR BOX: "; amrBox.Print( std::cout );
-      std::cout << "\n\n";
-      std::cout << "TMP BOX: "; tmpBox.Print( std::cout );
-      std::cout << "\n\n";
-      std::cout.flush();
-    }
+// DEBUG
+//   std::ostringstream file;
+//   file.str("");
+//   file << "ROOTBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
+//   file << ".vtk";
+//   rootBox.WriteToVtkFile( file.str().c_str() );
+//
+//   file.str("");
+//   file << "AMRBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
+//   file << ".vtk";
+//   amrBox.WriteToVtkFile( file.str().c_str() );
+
+//   file.str("");
+//   file << "TMPBOX_L" << amrBox.GetLevel() << "_B" << amrBox.GetBlockId();
+//   file << ".vtk";
+//   amrBox.WriteToVtkFile( file.str().c_str() );
+//
+//  std::cout << "Root BOX: "; rootBox.Print( std::cout );
+//  std::cout << "\n\n";
+//  std::cout << "AMR BOX: "; amrBox.Print( std::cout );
+//  std::cout << "\n\n";
+//  std::cout << "TMP BOX: "; tmpBox.Print( std::cout );
+//  std::cout << "\n\n";
+//  std::cout.flush();
+// END DEBUG
+
   return false;
 }
 
