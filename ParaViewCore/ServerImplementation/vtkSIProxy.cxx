@@ -89,10 +89,6 @@ void vtkSIProxy::Push(vtkSMMessage* message)
     return;
     }
 
-  // Keep the definition and not the properties
-  this->Internals->ProxyDefinitionCache.CopyFrom(*message);
-  this->Internals->ProxyDefinitionCache.ClearExtension(ProxyState::property);
-
   for (int cc=0; cc<message->ExtensionSize(ProxyState::property); cc++)
     {
     const ProxyState_Property &propMsg =
@@ -316,6 +312,10 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     }
+
+  // Keep the definition and not the properties
+  this->Internals->ProxyDefinitionCache.CopyFrom(*message);
+  this->Internals->ProxyDefinitionCache.ClearExtension(ProxyState::property);
 
   return true;
 }
