@@ -26,6 +26,10 @@
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMProxy
 {
 public:
+  // Description:
+  // Return the GlobalID that should be used to refer to the AnimationScene
+  static vtkTypeUInt32 GetReservedGlobalID();
+
   static vtkSMAnimationSceneProxy* New();
   vtkTypeMacro(vtkSMAnimationSceneProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);

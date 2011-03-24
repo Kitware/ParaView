@@ -40,6 +40,7 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtkstd/map>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -126,11 +127,37 @@ public:
     {
     return this->CompositeMultiProcessController.GetPointer();
     }
+  //-----------------------------------------------------------------
+  // Manage share_only message and return true if no processing should occurs
+  bool StoreShareOnly(vtkSMMessage* msg)
+    {
+    if(msg && msg->share_only())
+      {
+      vtkTypeUInt32 id = msg->global_id();
+      this->ShareOnlyCache[id].CopyFrom(*msg);
+      return true;
+      }
+    return false;
+    }
+  //-----------------------------------------------------------------
+  // Return true if the message was updated by the ShareOnlyCache
+  bool RetreiveShareOnly(vtkSMMessage* msg)
+    {
+    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter =
+        this->ShareOnlyCache.find(msg->global_id());
+    if(iter != this->ShareOnlyCache.end())
+      {
+      msg->CopyFrom(iter->second);
+      return true;
+      }
+    return false;
+    }
 
 private:
   vtkNew<vtkCompositeMultiProcessController> CompositeMultiProcessController;
   vtkWeakPointer<vtkPVSessionServer> Owner;
   vtkstd::string ClientURL;
+  vtkstd::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
@@ -357,13 +384,17 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
+
+      // Skip processing
+      if(this->Internal->StoreShareOnly(&msg))
+        {
+        return;
+        }
+
       this->PushState(&msg);
 
       // Notify when ProxyManager state has changed
-      if(msg.global_id() == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
-        {
-        this->Internal->NotifyOtherClients(&msg);
-        }
+      this->Internal->NotifyOtherClients(&msg);
       }
     break;
 
@@ -373,7 +404,12 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->PullState(&msg);
+
+      // Use cache or process the call
+      if(!this->Internal->RetreiveShareOnly(&msg))
+        {
+        this->PullState(&msg);
+        }
 
       // Send the result back to client
       vtkMultiProcessStream css;

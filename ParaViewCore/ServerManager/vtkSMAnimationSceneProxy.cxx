@@ -16,16 +16,24 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkReservedRemoteObjectIds.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
+  this->SetGlobalID(vtkSMAnimationSceneProxy::GetReservedGlobalID());
 }
 
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMAnimationSceneProxy::GetReservedGlobalID()
+{
+  return vtkReservedRemoteObjectIds::RESERVED_ANIMATION_SCENE_ID;
 }
 
 //----------------------------------------------------------------------------
