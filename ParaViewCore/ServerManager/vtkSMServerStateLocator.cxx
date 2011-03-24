@@ -52,15 +52,9 @@ bool vtkSMServerStateLocator::FindState(vtkTypeUInt32 globalID,
     stateToFill->CopyFrom(newState);
     if(!newState.HasExtension(ProxyState::xml_group))
       {
-      cout << "Failed in fetching " << globalID << endl
-           << stateToFill->DebugString().c_str() << endl
-           << "--------------------------------" << endl;
       return false;
       }
     this->RegisterState(&newState);
-    cout << "Should have " << globalID << " by now." << endl
-         << stateToFill->DebugString().c_str() << endl
-         << "--------------------------------" << endl;
     return true;
     }
 
