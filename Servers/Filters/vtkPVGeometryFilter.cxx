@@ -384,7 +384,9 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
     return;
   }
 
-
+  this->AMRGridExecute(
+   static_cast<vtkImageData*>( input ),output,
+   doCommunicate,updatePiece,extractface);
 
 }
 
@@ -640,13 +642,21 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
           (amrBox.GetDimensionality() >= 1)    &&
           (amrBox.GetDimensionality() <= 3) );
 
-  // STEP 0: By default all faces of the block are visible
-  for( int i=0; i < 6; ++i )
-    extractface[i]=true;
+
 
   // STEP 1: If it's 2-D all blocks are visible
   if( amrBox.GetDimensionality() <= 2)
-    return true;
+    {
+      for( int i=0; i < 6; ++i )
+        extractface[i]=true;
+      return true;
+    }
+  else
+    {
+      // By default none of the 6 block faces are visible.
+      for( int i=0; i < 6; ++i )
+       extractface[i]=false;
+    }
 
   // STEP 2: Construct AMR box within the cartesian bounds of the rootbox,
   // but, with the spacing of the box corresponding to the given data.
@@ -685,18 +695,24 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
 
 
   // STEP 3: Check if the box is on the boundary
+  bool render = false;
   for( int i=0; i < 3; ++i )
     {
-      // TODO: Set extractface bit vector accordingly
-      for( int j=1; j < 6; ++j )
-        extractface[ j ] = false;
 
-      if( (amrBox.GetLoCorner()[i]==0) ||
-          (amrBox.GetHiCorner()[i]==tmpBox.GetHiCorner()[i]) )
-          return true;
+      if( amrBox.GetLoCorner()[i] == 0 )
+        {
+          render           = true;
+          extractface[i*2] = true;
+        }
+      if( amrBox.GetHiCorner()[i] == tmpBox.GetHiCorner()[i] )
+        {
+          render             = true;
+          extractface[i*2+1] = true;
+        }
+
     }
 
-  return false;
+  return render;
 }
 
 //----------------------------------------------------------------------------
@@ -774,7 +790,8 @@ int vtkPVGeometryFilter::RequestAMRData(
               if( this->IsAMRDataVisible(amrBox,rootAMRBox,extractface) )
                 {
                   vtkPolyData* tmpOut = vtkPolyData::New();
-                  this->ExecuteBlock(ug, tmpOut, 0, 0, 1, 0);
+//                  this->ExecuteBlock(ug, tmpOut, 0, 0, 1, 0);
+                  this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0,extractface);
                   this->ExecuteCellNormals(tmpOut, 0);
                   this->RemoveGhostCells(tmpOut);
                   this->AddCompositeIndex(
@@ -1151,6 +1168,74 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
     output->SetLines(this->OutlineSource->GetOutput()->GetLines());
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AMRGridExecute(
+    vtkImageData* input,vtkPolyData* output,
+    int doCommunicate,int updatePiece, bool extractface[6] )
+{
+  double *spacing;
+  double *origin;
+  int    *ext;
+  double bounds[6];
+
+  if( doCommunicate )
+    {
+      ext = input->GetWholeExtent();
+    }
+  else
+    {
+      ext = input->GetExtent();
+    }
+
+  if( !this->UseOutline )
+    {
+      if( input->GetNumberOfCells() > 0 )
+        {
+          this->DataSetSurfaceFilter->UniformGridExecute(
+            input,output,input->GetExtent(),ext, extractface );
+        }
+      this->OutlineFlag = 0;
+      return;
+    }
+
+  this->OutlineFlag = 1;
+
+  //
+  // Otherwise, let OutlineSource do all the work
+  //
+
+  if (ext[1] >= ext[0] && ext[3] >= ext[2] && ext[5] >= ext[4] &&
+    (updatePiece == 0 || !doCommunicate))
+    {
+      spacing = input->GetSpacing();
+      origin = input->GetOrigin();
+
+      bounds[0] = spacing[0] * ((float)ext[0]) + origin[0];
+      bounds[1] = spacing[0] * ((float)ext[1]) + origin[0];
+      bounds[2] = spacing[1] * ((float)ext[2]) + origin[1];
+      bounds[3] = spacing[1] * ((float)ext[3]) + origin[1];
+      bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
+      bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
+
+      vtkOutlineSource *outline = vtkOutlineSource::New();
+      outline->SetBounds(bounds);
+      outline->Update();
+
+      output->SetPoints(outline->GetOutput()->GetPoints());
+      output->SetLines(outline->GetOutput()->GetLines());
+      output->SetPolys(outline->GetOutput()->GetPolys());
+      outline->Delete();
+    }
+  else
+    {
+      vtkPoints* pts = vtkPoints::New();
+      output->SetPoints(pts);
+      pts->Delete();
+    }
+
+}
+
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
                                            vtkPolyData* output,

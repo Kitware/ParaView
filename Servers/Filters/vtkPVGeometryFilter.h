@@ -183,6 +183,13 @@ protected:
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
+
+  void AMRGridExecute(vtkImageData* input,
+                      vtkPolyData* output,
+                      int doCommunicate,
+                      int updatePiece,
+                      bool extractface[6] );
+
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
                         int doCommunicate,
