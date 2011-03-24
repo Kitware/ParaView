@@ -495,6 +495,22 @@ public:
   // definitions.
   vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
 
+  // Description:
+  // Method used to fetch the last state of the ProxyManager from the pvserver.
+  // This is used in the collaboration context when the user connect to a remote
+  // server and wants to update it state before doing anything.
+  void UpdateFromRemote();
+
+  // Description:
+  // Those methods allow the user to make atomic change set in the notification
+  // collaboration in term of set of proxy registration.
+  // This allow us to prevent deletion on remote sites of proxies that
+  // will end up in the ProxyManager but have not been set into it yet.
+  bool IsStateUpdateNotificationEnabled();
+  void DisableStateUpdateNotification();
+  void EnableStateUpdateNotification();
+  void TriggerStateUpdate();
+
 //BTX
 
   // Description:
@@ -591,6 +607,7 @@ protected:
                                vtkSMProxy* proxy);
 
   int UpdateInputProxies;
+  bool StateUpdateNotification;
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;

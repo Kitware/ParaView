@@ -163,6 +163,7 @@ protected:
   virtual void CleanupPendingProgressInternal();
 
   friend class vtkSMRemoteObject;
+  friend class vtkSMProxyManager;
 
   // Description:
   // Methods used to enable/disable state/command to the remote location

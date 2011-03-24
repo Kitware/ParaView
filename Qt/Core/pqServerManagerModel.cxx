@@ -450,7 +450,11 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pqServer* server = new pqServer(id, pm->GetOptions(), this);
+
+  // Disable server notification for intermediate ProxyManager state
+  pxm->DisableStateUpdateNotification();
 
   emit this->preItemAdded(server);
   emit this->preServerAdded(server);
@@ -466,6 +470,13 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
 
   emit this->itemAdded(server);
   emit this->serverAdded(server);
+
+  // Update ProxyManager based on its remote state
+  pxm->UpdateFromRemote();
+
+  // Enable server notification + Send the last state of the ProxyManager
+  pxm->EnableStateUpdateNotification();
+  pxm->TriggerStateUpdate();
 }
 
 //-----------------------------------------------------------------------------

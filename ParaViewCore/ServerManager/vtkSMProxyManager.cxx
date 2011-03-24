@@ -109,6 +109,7 @@ vtkStandardNewMacro(vtkSMProxyManager);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
+  this->StateUpdateNotification = true;
   this->Session = NULL;
   this->PipelineState = NULL;
   this->UpdateInputProxies = 0;
@@ -251,7 +252,15 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState = vtkSMPipelineState::New();
     this->PipelineState->SetSession(this->Session);
     this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
-
+    }
+}
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::UpdateFromRemote()
+{
+  if (this->Session)
+    {
+    bool enableRemote = this->Session->IsRemoteExecutionAllowed();
+//    this->Session->DisableRemoteExecution();
     // For collaboration purpose at connection time we synchronize our
     // ProxyManager state with the server
     if(this->Session->IsA("vtkSMSessionClient"))
@@ -267,6 +276,10 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
         cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
         this->LoadState(&msg, this->Session->GetStateLocator());
         }
+      }
+    if(enableRemote)
+      {
+//      this->Session->EnableRemoteExecution();
       }
     }
 }
@@ -704,7 +717,7 @@ void vtkSMProxyManager::UnRegisterProxies()
   // Push state for undo/redo BUT only if it is not a clean up before deletion.
   if(this->PipelineState->GetSession())
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -730,7 +743,7 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
     this->UnMarkProxyAsModified(info.Proxy);
 
     // Push state for undo/redo
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -761,7 +774,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
   // Push new state only if changed occured
   if(entriesToRemove.size() > 0)
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -783,7 +796,7 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
   // Push new state only if changed occured
   if(tuplesToRemove.size() > 0)
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -846,7 +859,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     registration->set_global_id(proxy->GetGlobalID());
 
     // Push state for undo/redo
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -1656,7 +1669,6 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
     this->Internals->State.SetExtension(DefinitionHeader::server_class, "vtkSIObject");
     this->Internals->State.SetExtension(ProxyState::xml_group, "");
     this->Internals->State.SetExtension(ProxyState::xml_name, "");
-
     }
 
   return &this->Internals->State;
@@ -1686,7 +1698,8 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   iter = tuplesToUnregister.begin();
   while( iter != tuplesToUnregister.end() )
     {
-    cout << "Unregister: " << iter->Group.c_str()<< ", " << iter->Name.c_str() << endl;
+    cout << "Unregister: " << iter->Group.c_str()<< ", " << iter->Name.c_str()
+         << ": " << iter->Proxy->GetGlobalID() << endl;
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
@@ -1765,4 +1778,27 @@ bool vtkSMProxyManager::HasDefinition( const char* groupName,
 {
   return this->ProxyDefinitionManager &&
       this->ProxyDefinitionManager->HasDefinition(groupName, proxyName);
+}
+//---------------------------------------------------------------------------
+bool vtkSMProxyManager::IsStateUpdateNotificationEnabled()
+{
+  return this->StateUpdateNotification;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::DisableStateUpdateNotification()
+{
+  this->StateUpdateNotification = false;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::EnableStateUpdateNotification()
+{
+  this->StateUpdateNotification = true;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::TriggerStateUpdate()
+{
+  if(this->StateUpdateNotification)
+    {
+    this->PipelineState->ValidateState();
+    }
 }
