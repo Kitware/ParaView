@@ -86,13 +86,6 @@ vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
     this->GlobalID = this->GetSession()->GetNextGlobalUniqueIdentifier();
     // Register object
     this->Session->RegisterRemoteObject(this->GlobalID, this);
-
-    vtksys_ios::ostringstream cname;
-    cname << this->GlobalID;
-
-    delete [] this->GlobalIDString;
-    this->GlobalIDString = vtksys::SystemTools::DuplicateString(
-      cname.str().c_str());
     }
 
   return this->GlobalID;
@@ -103,7 +96,12 @@ const char* vtkSMRemoteObject::GetGlobalIDAsString()
 {
   if (!this->GlobalIDString)
     {
-    this->GetGlobalID();
+    vtksys_ios::ostringstream cname;
+    cname << this->GetGlobalID();
+
+    delete [] this->GlobalIDString;
+    this->GlobalIDString = vtksys::SystemTools::DuplicateString(
+      cname.str().c_str());
     }
 
   return this->GlobalIDString;
