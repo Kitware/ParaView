@@ -179,9 +179,6 @@ private:
 
   vtkTypeUInt32 LastGlobalID;
   vtkTypeUInt32 LastGlobalIDAvailable;
-
-  class vtkNetworkStateCache;
-  vtkNetworkStateCache* NetworkStateCache;
 //ETX
 };
 

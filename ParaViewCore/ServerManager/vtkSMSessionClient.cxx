@@ -55,62 +55,6 @@ namespace
     }
 };
 //****************************************************************************/
-class vtkSMSessionClient::vtkNetworkStateCache
-{
-public:
-  vtkNetworkStateCache(vtkSMSessionClient* sessionClient)
-    {
-    this->Session = sessionClient;
-    this->ActiveStateID = 0;
-    this->Flushing = false;
-    }
-  //-----------------------------------------------------------------
-  void Flush()
-    {
-    if(this->ActiveStateID != 0)
-      {
-      this->ActiveStateID = 0;
-      this->Flushing = true;
-//      cout << "<<<<<<<<<< FLUSHING >>>>>>>>>>>>" << endl;
-//      cout << this->Cache.DebugString().c_str() << endl;
-//      cout << "<<<<<<<<<<         >>>>>>>>>>>>" << endl;
-      this->Session->PushState(&this->Cache);
-      this->Flushing = false;
-      }
-    }
-  //-----------------------------------------------------------------
-  // Return true if flush occurs.
-  // Flush occurs if the state should be push to the server.
-  bool StoreOrFlush(vtkSMMessage* state)
-    {
-    if(!this->Flushing)
-      {
-      vtkTypeUInt32 gid = state->global_id();
-      if( gid == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID &&
-          (gid == this->ActiveStateID || this->ActiveStateID == 0))
-        {
-        if(gid == this->ActiveStateID)
-          {
-          cout << "Reduce network traffic..." << endl;
-          }
-        this->Cache.Clear();
-        this->Cache.CopyFrom(*state);
-        this->ActiveStateID = gid;
-        return false;
-        }
-      this->Flush();
-      }
-    return true;
-    }
-  //-----------------------------------------------------------------
-
-private:
-  vtkSMMessage Cache;
-  vtkTypeUInt32 ActiveStateID;
-  vtkWeakPointer<vtkSMSessionClient> Session;
-  bool Flushing;
-};
-//****************************************************************************/
 vtkStandardNewMacro(vtkSMSessionClient);
 vtkCxxSetObjectMacro(vtkSMSessionClient, RenderServerController,
                      vtkMultiProcessController);
@@ -121,9 +65,6 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
 {
   // Init global Ids
   this->LastGlobalID = this->LastGlobalIDAvailable = 0;
-
-  // Init Network cache
-  this->NetworkStateCache = new vtkNetworkStateCache(this);
 
   // This session can only be created on the client.
   this->RenderServerController = NULL;
@@ -163,9 +104,6 @@ vtkSMSessionClient::~vtkSMSessionClient()
 
   delete this->ServerLastInvokeResult;
   this->ServerLastInvokeResult = NULL;
-
-  delete this->NetworkStateCache;
-  this->NetworkStateCache = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -506,8 +444,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
   int num_controllers=0;
   vtkMultiProcessController* controllers[2] = {NULL, NULL};
 
-  if( this->IsRemoteExecutionAllowed() &&
-      this->NetworkStateCache->StoreOrFlush(message) )
+  if( this->IsRemoteExecutionAllowed() )
     {
     if ( (location &
           (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
@@ -582,7 +519,6 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::PullState(vtkSMMessage* message)
 {
-  this->NetworkStateCache->Flush();
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
 
@@ -635,7 +571,6 @@ void vtkSMSessionClient::ExecuteStream(
   vtkTypeUInt32 location, const vtkClientServerStream& cssstream,
   bool ignore_errors)
 {
-  this->NetworkStateCache->Flush();
   location = this->GetRealLocation(location);
 
   vtkMultiProcessController* controllers[2] = {NULL, NULL};
@@ -729,7 +664,6 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
 bool vtkSMSessionClient::GatherInformation(
   vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
-  this->NetworkStateCache->Flush();
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
@@ -812,7 +746,6 @@ bool vtkSMSessionClient::GatherInformation(
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 {
-  this->NetworkStateCache->Flush();
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
 
