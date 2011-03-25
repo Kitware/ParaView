@@ -157,33 +157,35 @@ struct vtkSMProxyManagerEntry
   }
 
   bool operator<(const vtkSMProxyManagerEntry &other) const {
-    if(this->Group < other.Group)
+    if(this->Proxy->GetGlobalID() < other.Proxy->GetGlobalID())
       {
       return true;
       }
-    else if (this->Group == other.Group && this->Name == other.Name)
-      {
-      return this->Proxy->GetGlobalID() < other.Proxy->GetGlobalID();
-      }
-    else if (this->Group == other.Group)
+    else if( this->Proxy->GetGlobalID() == other.Proxy->GetGlobalID() &&
+             this->Group == other.Group)
       {
       return this->Name < other.Name;
+      }
+    else if (this->Proxy->GetGlobalID() == other.Proxy->GetGlobalID())
+      {
+      return this->Group < other.Group;
       }
     return false;
   }
 
   bool operator>(const vtkSMProxyManagerEntry &other) const {
-    if(this->Group > other.Group)
+    if(this->Proxy->GetGlobalID() > other.Proxy->GetGlobalID())
       {
       return true;
       }
-    else if (this->Group == other.Group && this->Name == other.Name)
-      {
-      return this->Proxy->GetGlobalID() > other.Proxy->GetGlobalID();
-      }
-    else if (this->Group == other.Group)
+    else if( this->Proxy->GetGlobalID() == other.Proxy->GetGlobalID() &&
+             this->Group == other.Group)
       {
       return this->Name > other.Name;
+      }
+    else if (this->Proxy->GetGlobalID() == other.Proxy->GetGlobalID())
+      {
+      return this->Group > other.Group;
       }
     return false;
   }
