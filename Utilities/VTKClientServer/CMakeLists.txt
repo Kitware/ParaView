@@ -114,6 +114,7 @@ ADD_SUBDIRECTORY(Hybrid)
 ADD_SUBDIRECTORY(Parallel)
 ADD_SUBDIRECTORY(VolumeRendering)
 ADD_SUBDIRECTORY(Widgets)
+ADD_SUBDIRECTORY(AMR)
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
 IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
