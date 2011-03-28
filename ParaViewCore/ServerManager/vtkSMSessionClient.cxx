@@ -81,6 +81,9 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
   vtkNew<vtkSMServerStateLocator> serverStateLocator;
   serverStateLocator->SetSession(this);
   this->GetStateLocator()->SetParentLocator(serverStateLocator.GetPointer());
+
+  // Default value
+  this->NoMoreDelete = false;
 }
 
 //----------------------------------------------------------------------------
@@ -415,6 +418,11 @@ void vtkSMSessionClient::CloseSession()
     this->SetRenderServerController(0);
     }
 }
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::PreCollaborationSessionDisconnection()
+{
+  this->NoMoreDelete = true;
+}
 
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMSessionClient::GetRealLocation(vtkTypeUInt32 location)
@@ -746,6 +754,11 @@ bool vtkSMSessionClient::GatherInformation(
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 {
+  if(this->NoMoreDelete)
+    {
+    return;
+    }
+
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
 

@@ -122,6 +122,12 @@ public:
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
   //---------------------------------------------------------------------------
+  // API for Collaboration management
+  //---------------------------------------------------------------------------
+
+  virtual void PreCollaborationSessionDisconnection();
+
+  //---------------------------------------------------------------------------
   // API for GlobalId management
   //---------------------------------------------------------------------------
 
@@ -166,6 +172,12 @@ protected:
 
   bool AbortConnect;
   char* URI;
+
+  // This flag allow us to disable remote Object deletion in a collaboration
+  // context when a client is leaving a visalization session.
+  // Typically we don't want this client to broadcast to the other to delete all
+  // the proxy because it does not need them anymore as it is leaving...
+  bool NoMoreDelete;
 
   // Description:
   // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
