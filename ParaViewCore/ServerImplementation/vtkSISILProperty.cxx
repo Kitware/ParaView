@@ -97,14 +97,42 @@ bool vtkSISILProperty::Pull(vtkSMMessage* msgToFill)
     vtkWarningMacro("Could not get the reader.");
     return false;
     }
-  vtkInformation* info =
-      reader->GetExecutive()->GetOutputInformation(this->OutputPort);
-  if (!info || !info->Has(vtkDataObject::SIL()))
+
+  // Check if we should use the executive or a method to retreive the SIL
+  vtkSmartPointer<vtkGraph> graphSIL;
+  if(this->GetCommand())
     {
-    vtkWarningMacro("No SIL infornation on the reader.");
-    return false;
+    // Use method call
+    vtkClientServerStream css;
+    css << vtkClientServerStream::Invoke
+        << reader
+        << this->GetCommand()
+        << vtkClientServerStream::End;
+    if(this->ProcessMessage(css))
+      {
+      vtkObjectBase* graphResult;
+      this->GetLastResult().GetArgumentObject(0,0,&graphResult,"vtkGraph");
+      graphSIL = vtkGraph::SafeDownCast(graphResult);
+      }
+    else
+      {
+      vtkWarningMacro("No SIL infornation on the reader.");
+      return false;
+      }
     }
-  vtkSmartPointer<vtkGraph> graphSIL = vtkGraph::SafeDownCast(info->Get(vtkDataObject::SIL()));
+  else
+    {
+    // Use executive
+    vtkInformation* info =
+        reader->GetExecutive()->GetOutputInformation(this->OutputPort);
+    if (!info || !info->Has(vtkDataObject::SIL()))
+      {
+      vtkWarningMacro("No SIL infornation on the reader.");
+      return false;
+      }
+    graphSIL = vtkGraph::SafeDownCast(info->Get(vtkDataObject::SIL()));
+    }
+
 
   // Build the meta-data
   vtkIdType numVertices = graphSIL->GetNumberOfVertices();

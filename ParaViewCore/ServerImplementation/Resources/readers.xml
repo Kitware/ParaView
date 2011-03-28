@@ -1369,6 +1369,7 @@
         name="ElementBlocksInfo"
         information_only="1"
         si_class="vtkSISILProperty"
+        command="GetSIL"
         subtree="Blocks"/>
 
     <IdTypeVectorProperty name="SILTimeStamp"
@@ -4809,6 +4810,7 @@
      <StringVectorProperty name="GridInfo"
         information_only="1"
         si_class="vtkSISILProperty"
+        command="GetSIL"
         subtree="Blocks" />
 
     <IdTypeVectorProperty name="SILTimeStamp"
