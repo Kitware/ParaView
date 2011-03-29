@@ -298,7 +298,8 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkClientServer
   ${KWCommon_LIBRARIES}
   vtkCharts
-  vtkXdmfCS vtkXdmf)
+  vtkXdmfCS vtkXdmf
+  vtkAMRCS vtkAMR )
 
 IF(PARAVIEW_USE_VISITBRIDGE)
   TARGET_LINK_LIBRARIES(vtk${KIT}

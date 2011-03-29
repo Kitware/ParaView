@@ -69,6 +69,7 @@ extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkAMRCS_Initialize(vtkClientServerInterpreter *);
 
 #ifdef PARAVIEW_USE_VISITBRIDGE
 extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
@@ -216,6 +217,7 @@ void vtkInitializationHelperInit(vtkProcessModule* pm)
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
+  vtkAMRCS_Initialize( pm->GetInterpreter() );
 #ifdef PARAVIEW_USE_VISITBRIDGE
   vtkVisItAVTAlgorithmsCS_Initialize(pm->GetInterpreter());
   vtkVisItDatabasesCS_Initialize(pm->GetInterpreter());
