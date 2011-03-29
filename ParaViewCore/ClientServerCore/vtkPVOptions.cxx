@@ -52,6 +52,7 @@ vtkPVOptions::vtkPVOptions()
   this->TileMullions[1] = 0;
   this->ClientMode = 0;
   this->ServerMode = 0;
+  this->MultiClientMode = 0;
   this->RenderServerMode = 0;
   this->SymmetricMPIMode = 0;
 
@@ -152,6 +153,11 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--cslog", 0, &this->LogFileName,
                     "ClientServerStream log file.",
                     vtkPVOptions::ALLPROCESS);
+
+  this->AddBooleanArgument("--multi-clients", 0, &this->MultiClientMode,
+                           "Allow server to keep listening for serveral client to"
+                           "connect to it and share the same visualization session.",
+                           vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
 
   this->AddArgument("--data", 0, &this->ParaViewDataName,
                     "Load the specified data. "
@@ -439,7 +445,10 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Running as a client connected to a render server\n";
     }
 
-
+  if (this->MultiClientMode)
+    {
+    os << indent << "Allow several client to connect to that server.\n";
+    }
 
   if (this->RenderServerMode)
     {

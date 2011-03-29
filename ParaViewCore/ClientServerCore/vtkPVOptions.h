@@ -124,6 +124,12 @@ public:
   vtkGetMacro(ClientRenderServer, int);
 
   // Description:
+  // Is this server was started for collaboration meaning that it allow
+  // several clients to connect to the same server and share the same
+  // pipeline and visualization.
+  vtkGetMacro(MultiClientMode, int);
+
+  // Description:
   // Indicates if the application is in symmetric mpi mode.
   // This is applicable only to PVBATCH type of processes.
   // Typically, when set to true, the python script is run on satellites as
@@ -190,6 +196,7 @@ protected:
   int ServerMode;
   int ClientMode;
   int RenderServerMode;
+  int MultiClientMode;
 
   int SymmetricMPIMode;
 

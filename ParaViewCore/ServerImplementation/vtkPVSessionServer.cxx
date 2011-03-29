@@ -165,7 +165,9 @@ vtkStandardNewMacro(vtkPVSessionServer);
 vtkPVSessionServer::vtkPVSessionServer()
 {
   this->Internal = new vtkInternals(this);
-  this->MultipleConnection = true; // By default we allow collaboration
+
+  // By default we act as a server for a single client
+  this->MultipleConnection = false;
 
   // On server side only one session is available so we just set it Active()
   // forever
