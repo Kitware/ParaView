@@ -38,7 +38,7 @@ Ph.D. thesis of Christian BOUCHENY.
 #include "RegisterRenderPassViews.h"
 
 #include "pqApplicationCore.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqStandardViewModules.h"
 #include "vtkSMProxyManager.h"
 
@@ -98,7 +98,7 @@ RegisterRenderPassViews::~RegisterRenderPassViews()
 void RegisterRenderPassViews::startup()
 {
   // Register ParaView interfaces.
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
   // * adds support for standard paraview views.
   pgm->addInterface(new RenderPassViewsInterface(pgm));
