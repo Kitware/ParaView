@@ -35,7 +35,6 @@ struct VTK_EXPORT vtkReservedRemoteObjectIds
     RESERVED_ID_COUNTER_ID = 3,
     RESERVED_TIME_KEEPER_ID = 4,
     RESERVED_ANIMATION_SCENE_ID = 5,
-    RESERVED_ANIMATION_CUE_ID = 6, // FIXME still not sure what to do yet...
     RESERVED_MAX_IDS = 255
     };
 };

@@ -824,7 +824,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
 
-  cout << "Server notification... " << id << endl;
+  cout << "Server notification... " << id << " " << state.GetExtension(ProxyState::xml_name).c_str() << endl;
   vtkSMProxy* proxy =
       vtkSMProxy::SafeDownCast(this->GetRemoteObject(id));
 
@@ -834,8 +834,8 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     }
   else if(proxy == NULL)
     {
-    vtkWarningMacro("Impossible to find proxy with id " << id << " and state "
-                    << state.DebugString().c_str() << endl);
+//    vtkDebugMacro("Impossible to find proxy with id " << id << " and state "
+//                  << state.DebugString().c_str() << endl);
     }
   else
     {
