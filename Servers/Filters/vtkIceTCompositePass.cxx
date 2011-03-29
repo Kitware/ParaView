@@ -83,8 +83,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
 
   this->UseOrderedCompositing = false;
   this->DepthOnly=false;
-
-  this->StereoRender = false;
+  
   this->LastRenderedEyes[0] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedEyes[1] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedRGBAColors = this->LastRenderedEyes[0];
@@ -382,7 +381,7 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
   
-  if ( this->StereoRender )
+  if (render_state->GetRenderer()->GetRenderWindow()->GetStereoRender() == 1)
     {
     //if we are doing a stereo render we need to know
     //which stereo eye we are currently rendering. If we don't do this
@@ -508,9 +507,6 @@ void vtkIceTCompositePass::UpdateTileInformation(
   actual_size[0] = window->GetActualSize()[0];
   actual_size[1] = window->GetActualSize()[1];
 
-  //get if we are doing stereo rendering
-  this->StereoRender = 
-    render_state->GetRenderer()->GetRenderWindow()->GetStereoRender() == 1;
 
   double viewport[4] = {0, 0, 1, 1};
   if (render_state->GetFrameBuffer())

@@ -20,7 +20,6 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-#include <sstream>
 #include <vtkstd/map>
 
 class vtkTileDisplayHelper::vtkInternals
@@ -52,9 +51,6 @@ public:
       vtkRenderer* renderer = tile.Renderer;
       if (tile.TileImage.IsValid() && renderer)
         {
-        //std::ostringstream test;
-        //test << "E:/Work/image" << iter->first <<"_" <<leftEye<<".png";
-        //tile.TileImage.SaveAsPNG(test.str().c_str());
         double viewport[4];
         renderer->GetViewport(viewport);
         renderer->SetViewport(tile.PhysicalViewport);
