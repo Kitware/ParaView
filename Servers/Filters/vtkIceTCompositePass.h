@@ -203,8 +203,7 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
-
-  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
+  
   vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
@@ -214,6 +213,18 @@ protected:
   bool FixBackground;
   vtkTextureObject *BackgroundTexture;
   vtkTextureObject *IceTTexture;
+
+  //Stereo Render support requires us 
+  //to have to raw image one for each eye so that we 
+  //don't overwrite the left eye with the right eyes image
+  bool StereoRender;
+  
+  //will point at the last rendered eye
+  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
+
+  //actual rendered raw images for stereo. Left Eye is index 0
+  //and Right Eye is index 1
+  vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];  
 
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&); // Not implemented

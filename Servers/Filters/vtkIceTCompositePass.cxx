@@ -84,7 +84,11 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->UseOrderedCompositing = false;
   this->DepthOnly=false;
 
-  this->LastRenderedRGBAColors = new vtkSynchronizedRenderers::vtkRawImage();
+  this->StereoRender = false;
+  this->LastRenderedEyes[0] = new vtkSynchronizedRenderers::vtkRawImage();
+  this->LastRenderedEyes[1] = new vtkSynchronizedRenderers::vtkRawImage();
+  this->LastRenderedRGBAColors = this->LastRenderedEyes[0];
+    
   this->LastRenderedDepths = vtkFloatArray::New();
 
   this->PBO=0;
@@ -116,10 +120,13 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->SetController(0);
   this->IceTContext->Delete();
   this->IceTContext = 0;
-
-  delete this->LastRenderedRGBAColors;
+  
+  delete this->LastRenderedEyes[0];
+  delete this->LastRenderedEyes[1];
+  this->LastRenderedEyes[0] = NULL;
+  this->LastRenderedEyes[1] = NULL;
   this->LastRenderedRGBAColors = NULL;
-
+  
   this->LastRenderedDepths->Delete();
   this->LastRenderedDepths = NULL;
 
@@ -374,11 +381,21 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   IceTImage renderedImage = icetGLDrawFrame();
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
+  
+  if ( this->StereoRender )
+    {
+    //if we are doing a stereo render we need to know
+    //which stereo eye we are currently rendering. If we don't do this
+    //we will overwrite the left eye with the right eye image
+    int eyeIndex = 
+      render_state->GetRenderer()->GetActiveCamera()->GetLeftEye() == 1 ? 0 : 1;
+    this->LastRenderedRGBAColors = this->LastRenderedEyes[eyeIndex];
+    }
 
   // Capture image.
   vtkIdType numPixels = icetImageGetNumPixels(renderedImage);
   if (icetImageGetColorFormat(renderedImage) != ICET_IMAGE_COLOR_NONE)
-    {
+    {    
     this->LastRenderedRGBAColors->Resize(icetImageGetWidth(renderedImage),
       icetImageGetHeight(renderedImage), 4);
     icetImageCopyColorub(renderedImage,
@@ -490,6 +507,10 @@ void vtkIceTCompositePass::UpdateTileInformation(
   vtkWindow* window = render_state->GetRenderer()->GetVTKWindow();
   actual_size[0] = window->GetActualSize()[0];
   actual_size[1] = window->GetActualSize()[1];
+
+  //get if we are doing stereo rendering
+  this->StereoRender = 
+    render_state->GetRenderer()->GetRenderWindow()->GetStereoRender() == 1;
 
   double viewport[4] = {0, 0, 1, 1};
   if (render_state->GetFrameBuffer())
