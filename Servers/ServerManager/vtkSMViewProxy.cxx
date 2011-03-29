@@ -173,11 +173,13 @@ void vtkSMViewProxy::Update()
     {
     vtkClientServerStream stream;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->SendPrepareProgress(this->ConnectionID);
     stream << vtkClientServerStream::Invoke
       << this->GetID()
       << "Update"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
+    pm->SendCleanupPendingProgress(this->ConnectionID);
     }
 }
 
