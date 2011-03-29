@@ -7,31 +7,31 @@ IF ( NOT VTK_DATA_ROOT )
 ENDIF ( NOT VTK_DATA_ROOT )
 
 ADD_EXECUTABLE( colorMap colorMap.cxx )
-TARGET_LINK_LIBRARIES( colorMap vtkManta vtkRendering )
+TARGET_LINK_LIBRARIES( colorMap vtkManta vtkRendering vtkPVClientServerCore )
 ADD_TEST( ColorMapping ${EXECUTABLE_OUTPUT_PATH}/colorMap
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ColorMapping.png )
 
 ADD_EXECUTABLE( CreateOddWidthImages CreateOddWidthImages.cxx )
-TARGET_LINK_LIBRARIES( CreateOddWidthImages vtkManta vtkRendering vtkHybrid )
+TARGET_LINK_LIBRARIES( CreateOddWidthImages vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
 ADD_TEST( CreateOddWidthImages ${EXECUTABLE_OUTPUT_PATH}/CreateOddWidthImages
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/CreateOddWidthImages.png )
 
 ADD_EXECUTABLE( CreateDeleteObjects CreateDeleteObjects.cxx )
-TARGET_LINK_LIBRARIES( CreateDeleteObjects vtkManta vtkRendering vtkHybrid )
+TARGET_LINK_LIBRARIES( CreateDeleteObjects vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
 ADD_TEST( CreateDeleteObjects ${EXECUTABLE_OUTPUT_PATH}/CreateDeleteObjects
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/CreateDeleteObjects.png )
 
 ADD_EXECUTABLE( ToggleVisibility ToggleVisibility.cxx )
-TARGET_LINK_LIBRARIES( ToggleVisibility vtkManta vtkRendering vtkHybrid)
+TARGET_LINK_LIBRARIES( ToggleVisibility vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
 ADD_TEST( ToggleVisibility ${EXECUTABLE_OUTPUT_PATH}/ToggleVisibility
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ToggleVisibility.png )
 
 ADD_EXECUTABLE( multiRens multiRens.cxx )
-TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
+TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
 #Disable this test until we support intermixed renderers.
 #ADD_TEST( MultiLayerRendering ${EXECUTABLE_OUTPUT_PATH}/multiRens
 #          ${PROJECT_SOURCE_DIR}/examples/multiRensEvents.log
@@ -39,7 +39,7 @@ TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
 #          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MultiLayerRendering.png )
 
 ADD_EXECUTABLE( marching.timing marching.timing.cxx )
-TARGET_LINK_LIBRARIES( marching.timing vtkManta vtkHybrid vtkRendering )
+TARGET_LINK_LIBRARIES( marching.timing vtkManta vtkHybrid vtkRendering vtkPVClientServerCore )
 ADD_TEST( MarchingCubeTiming ${EXECUTABLE_OUTPUT_PATH}/marching.timing 2
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MarchingCubeTiming.png )
