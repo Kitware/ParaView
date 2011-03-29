@@ -21,12 +21,10 @@
 #include "vtkInitializationHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVMain.h"
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
-#include "vtkSMXMLParser.h"
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
