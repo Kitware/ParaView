@@ -42,7 +42,9 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
-  vtkSMMessage ProxyDefinitionCache;
+  vtkstd::string XMLGroupName;
+  vtkstd::string XMLProxyName;
+  vtkstd::string XMLSubProxyName;
 };
 
 vtkStandardNewMacro(vtkSIProxy);
@@ -130,7 +132,8 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   // Return a set of Pull only property (information_only props)
   // In fact Pushed Property can not be fetch at the same time as Pull
   // property with the current implementation
-  vtkSMMessage response = this->Internals->ProxyDefinitionCache;
+  vtkSMMessage response = *message;
+  response.ClearExtension(PullRequest::arguments);
 
   vtkstd::set<vtkstd::string> prop_names;
   if (message->ExtensionSize(PullRequest::arguments) > 0)
@@ -156,6 +159,14 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
         return;
         }
       }
+    }
+
+  // Add definition
+  response.SetExtension(ProxyState::xml_group, this->Internals->XMLGroupName);
+  response.SetExtension(ProxyState::xml_name, this->Internals->XMLProxyName);
+  if(!this->Internals->XMLSubProxyName.empty())
+    {
+    response.SetExtension(ProxyState::xml_sub_proxy_name, this->Internals->XMLSubProxyName);
     }
 
   message->CopyFrom(response);
@@ -209,13 +220,21 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
+  // Store definition informations
+  this->Internals->XMLGroupName = message->GetExtension(ProxyState::xml_group);
+  this->Internals->XMLProxyName = message->GetExtension(ProxyState::xml_name);
+  this->Internals->XMLSubProxyName =
+      message->HasExtension(ProxyState::xml_sub_proxy_name) ?
+      message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() : "";
+
   vtkPVProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
-  vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
-    message->GetExtension(ProxyState::xml_group).c_str(),
-    message->GetExtension(ProxyState::xml_name).c_str(),
-    (message->HasExtension(ProxyState::xml_sub_proxy_name) ?
-     message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() :
-     NULL));
+  vtkPVXMLElement* element =
+      pdm->GetCollapsedProxyDefinition( this->Internals->XMLGroupName.c_str(),
+                                        this->Internals->XMLProxyName.c_str(),
+                                        this->Internals->XMLSubProxyName.empty() ?
+                                        NULL :
+                                        this->Internals->XMLSubProxyName.c_str());
+
   if (!element)
     {
     vtkErrorMacro("Definition not found for xml_group: "
@@ -312,11 +331,6 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     }
-
-  // Keep the definition and not the properties
-  this->Internals->ProxyDefinitionCache.CopyFrom(*message);
-  this->Internals->ProxyDefinitionCache.ClearExtension(ProxyState::property);
-
   return true;
 }
 
