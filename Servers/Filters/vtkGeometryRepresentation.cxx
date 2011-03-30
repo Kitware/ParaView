@@ -88,40 +88,13 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->MultiBlockMaker = vtkGeometryRepresentationMultiBlockMaker::New();
   this->Decimator = vtkQuadricClustering::New();
-  this->Decimator->SetUseInputPoints(1);
-  this->Decimator->SetCopyCellData(1);
-  this->Decimator->SetUseInternalTriangles(0);
-  this->Decimator->SetNumberOfDivisions(10, 10, 10);
   this->Mapper = vtkCompositePolyDataMapper2::New();
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
-  //this->Property->SetOpacity(0.5);
   this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
-  this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
-                                             // connected to the LOD pipeline.
-
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughPointIds(1);
-
-  this->DeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-  this->LODDeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-
   this->Distributor = vtkOrderedCompositeDistributor::New();
-  this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
-  this->Distributor->SetInputConnection(0, this->DeliveryFilter->GetOutputPort());
-  this->Distributor->SetPassThrough(1);
-
-  this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
-  this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
-  this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
-  this->Mapper->SetInputConnection(this->Distributor->GetOutputPort());
-  this->LODMapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
-  this->Actor->SetMapper(this->Mapper);
-  this->Actor->SetLODMapper(this->LODMapper);
-  this->Actor->SetProperty(this->Property);
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = VTK_SCALAR_MODE_DEFAULT;
@@ -134,11 +107,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->DebugString = 0;
   this->SetDebugString(this->GetClassName());
 
-  // Not insanely thrilled about this API on vtkProp about properties, but oh
-  // well. We have to live with it.
-  vtkInformation* keys = vtkInformation::New();
-  this->Actor->SetPropertyKeys(keys);
-  keys->Delete();
+  this->SetupDefaults();
 }
 
 //----------------------------------------------------------------------------
@@ -160,31 +129,40 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetMapper(vtkMapper* mapper)
+void vtkGeometryRepresentation::SetupDefaults()
 {
-  if (this->Mapper != mapper)
-    {
-    vtkSetObjectBodyMacro(Mapper, vtkMapper, mapper);
-    if (mapper)
-      {
-      mapper->SetInputConnection(this->Distributor->GetOutputPort());
-      }
-    this->Actor->SetMapper(mapper);
-    }
-}
+  this->Decimator->SetUseInputPoints(1);
+  this->Decimator->SetCopyCellData(1);
+  this->Decimator->SetUseInternalTriangles(0);
+  this->Decimator->SetNumberOfDivisions(10, 10, 10);
+  this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
+                                             // connected to the LOD pipeline.
 
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetLODMapper(vtkMapper* mapper)
-{
-  if (this->LODMapper != mapper)
-    {
-    vtkSetObjectBodyMacro(LODMapper, vtkMapper, mapper);
-    if (mapper)
-      {
-      mapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
-      }
-    this->Actor->SetLODMapper(mapper);
-    }
+  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
+  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
+  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughPointIds(1);
+
+  this->DeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
+  this->LODDeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
+
+  this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
+  this->Distributor->SetInputConnection(0, this->DeliveryFilter->GetOutputPort());
+  this->Distributor->SetPassThrough(1);
+
+  this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
+  this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
+  this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
+  this->Mapper->SetInputConnection(this->Distributor->GetOutputPort());
+  this->LODMapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->Actor->SetMapper(this->Mapper);
+  this->Actor->SetLODMapper(this->LODMapper);
+  this->Actor->SetProperty(this->Property);
+
+  // Not insanely thrilled about this API on vtkProp about properties, but oh
+  // well. We have to live with it.
+  vtkInformation* keys = vtkInformation::New();
+  this->Actor->SetPropertyKeys(keys);
+  keys->Delete();
 }
 
 //----------------------------------------------------------------------------

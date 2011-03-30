@@ -21,19 +21,21 @@ vtkStandardNewMacro(vtkMySpecialRepresentation);
 //----------------------------------------------------------------------------
 vtkMySpecialRepresentation::vtkMySpecialRepresentation()
 {
-  this->MyMapper = vtkMySpecialPolyDataMapper::New();
-  this->MyLODMapper = vtkMySpecialPolyDataMapper::New();
-
   // Replace the mappers created by the superclass.
-  this->SetMapper(this->MyMapper);
-  this->SetLODMapper(this->MyLODMapper);
+  this->Mapper->Delete();
+  this->LODMapper->Delete();
+
+  this->Mapper = vtkMySpecialPolyDataMapper::New();
+  this->LODMapper = vtkMySpecialPolyDataMapper::New();
+
+  // Since we replaced the mappers, we need to call SetupDefaults() to ensure
+  // the pipelines are setup correctly.
+  this->SetupDefaults();
 }
 
 //----------------------------------------------------------------------------
 vtkMySpecialRepresentation::~vtkMySpecialRepresentation()
 {
-  this->MyLODMapper->Delete();
-  this->MyMapper->Delete();
 }
 
 //----------------------------------------------------------------------------

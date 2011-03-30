@@ -21,8 +21,6 @@
 
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class vtkMySpecialPolyDataMapper;
-
 class VTK_EXPORT vtkMySpecialRepresentation : public vtkGeometryRepresentationWithFaces
 {
 public:
@@ -35,8 +33,6 @@ protected:
   vtkMySpecialRepresentation();
   ~vtkMySpecialRepresentation();
 
-  vtkMySpecialPolyDataMapper* MyMapper;
-  vtkMySpecialPolyDataMapper* MyLODMapper;
 private:
   vtkMySpecialRepresentation(const vtkMySpecialRepresentation&); // Not implemented
   void operator=(const vtkMySpecialRepresentation&); // Not implemented
