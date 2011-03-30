@@ -215,6 +215,12 @@ protected:
   // Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
   virtual bool IsCached(double cache_key);
 
+  // Description:
+  // Subclasses can use these methods to replace the mappers in their
+  // constructors.
+  virtual void SetMapper(vtkMapper*);
+  virtual void SetLODMapper(vtkMapper*);
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;

@@ -162,6 +162,34 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMapper(vtkMapper* mapper)
+{
+  if (this->Mapper != mapper)
+    {
+    vtkSetObjectBodyMacro(Mapper, vtkMapper, mapper);
+    if (mapper)
+      {
+      mapper->SetInputConnection(this->Distributor->GetOutputPort());
+      }
+    this->Actor->SetMapper(mapper);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetLODMapper(vtkMapper* mapper)
+{
+  if (this->LODMapper != mapper)
+    {
+    vtkSetObjectBodyMacro(LODMapper, vtkMapper, mapper);
+    if (mapper)
+      {
+      mapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+      }
+    this->Actor->SetLODMapper(mapper);
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkGeometryRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
