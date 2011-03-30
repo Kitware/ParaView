@@ -259,8 +259,6 @@ void vtkSMProxyManager::UpdateFromRemote()
 {
   if (this->Session)
     {
-    bool enableRemote = this->Session->IsRemoteExecutionAllowed();
-//    this->Session->DisableRemoteExecution();
     // For collaboration purpose at connection time we synchronize our
     // ProxyManager state with the server
     if(this->Session->IsA("vtkSMSessionClient"))
@@ -276,10 +274,6 @@ void vtkSMProxyManager::UpdateFromRemote()
         cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
         this->LoadState(&msg, this->Session->GetStateLocator());
         }
-      }
-    if(enableRemote)
-      {
-//      this->Session->EnableRemoteExecution();
       }
     }
 }

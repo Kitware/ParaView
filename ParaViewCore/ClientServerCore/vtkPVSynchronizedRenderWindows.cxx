@@ -946,7 +946,7 @@ void vtkPVSynchronizedRenderWindows::LoadWindowAndLayout(
     {
     vtkErrorMacro("Mismatch is render windows on different processes. "
       "Aborting for debugging purposes.");
-    //FIXME abort();
+    abort();
     }
 
   for (unsigned int cc=0; cc < number_of_windows; cc++)

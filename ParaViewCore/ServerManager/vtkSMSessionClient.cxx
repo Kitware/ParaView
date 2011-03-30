@@ -854,6 +854,7 @@ bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, vo
 
   if (vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI)
     {
+    vtkWarningMacro("We are missing a notification here...");
     //this->OnServerNotificationMessageRMI(NULL, 0);
     return true; // Abort, no need to go further, we handle it !
     }
