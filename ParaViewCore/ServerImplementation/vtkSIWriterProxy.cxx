@@ -33,6 +33,7 @@ vtkSIWriterProxy::vtkSIWriterProxy()
 //----------------------------------------------------------------------------
 vtkSIWriterProxy::~vtkSIWriterProxy()
 {
+  this->SetFileNameMethod(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -189,5 +190,6 @@ void vtkSIWriterProxy::CleanInputs(const char* method)
 void vtkSIWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileNameMethod: " << this->FileNameMethod << endl;
+  os << indent << "FileNameMethod: "
+     << (this->FileNameMethod ? this->FileNameMethod : "(none)") << endl;
 }

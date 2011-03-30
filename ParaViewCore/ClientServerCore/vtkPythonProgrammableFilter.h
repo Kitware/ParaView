@@ -98,8 +98,7 @@ public:
   // Description:
   // Returns the Python interp that should be used by all pipeline objects.
   // The interp is created this first time this function is called and it
-  // is destroyed when vtkProcessModule invokes the ConnectionClosedEvent
-  // event.
+  // is destroyed when vtkPVSessionBase invokes the ExitEvent.
 //BTX
   static vtkPVPythonInterpretor* GetGlobalPipelineInterpretor();
 //ETX

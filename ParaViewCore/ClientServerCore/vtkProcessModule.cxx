@@ -176,6 +176,11 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::Finalize()
 {
+  if(vtkProcessModule::Singleton)
+    {
+    vtkProcessModule::Singleton->InvokeEvent(vtkCommand::ExitEvent);
+    }
+
   // destroy the process-module.
   vtkProcessModule::Singleton = NULL;
 
@@ -191,6 +196,7 @@ bool vtkProcessModule::Finalize()
     MPI_Finalize();
     }
 #endif
+
   return true;
 }
 

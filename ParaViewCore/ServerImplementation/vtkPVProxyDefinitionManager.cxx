@@ -1087,12 +1087,11 @@ void vtkPVProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
     vtkstd::string name = mapIter->first;
     if( propertiesSrc.find(name) != propertiesSrc.end())
       {
-      if (!propertiesSrc[name]->GetAttribute("override") )
+      if (!propertiesSrc[name]->GetAttribute("override") &&
+          !propertiesSrc[name]->GetParent()->GetParent()->FindNestedElementByName("Proxy")->GetAttribute("override"))
         {
-        vtkWarningMacro("#####################################" << endl
-                        << "Find conflict between 2 property name. ("
-                        << name.c_str() << ")" << endl
-                        << "#####################################" << endl);
+        vtkWarningMacro(<< "Find conflict between 2 property name. ("
+                        << name.c_str() << ")");
         return;
         }
       else

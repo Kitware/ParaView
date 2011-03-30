@@ -56,6 +56,11 @@ vtkPVSessionBase::vtkPVSessionBase()
 //----------------------------------------------------------------------------
 vtkPVSessionBase::~vtkPVSessionBase()
 {
+  if(vtkProcessModule::GetProcessModule())
+    {
+    vtkProcessModule::GetProcessModule()->InvokeEvent(vtkCommand::ExitEvent);
+    }
+
   this->SessionCore->Delete();
   this->SessionCore = NULL;
 

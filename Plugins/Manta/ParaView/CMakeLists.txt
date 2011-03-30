@@ -56,7 +56,6 @@ add_paraview_plugin(
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_SOURCES
     vtkPVMantaView.cxx
-    vtkServerSideFactory.cxx
     vtkSMMantaViewProxy.cxx
   SERVER_MANAGER_XML
     MantaView.xml
@@ -68,6 +67,8 @@ add_paraview_plugin(
     MantaView.cxx
     MantaDisplay.cxx
     MantaViewOptions.cxx
+  CS_KITS
+    vtkManta
 )
 
 TARGET_LINK_LIBRARIES ( MantaView vtkMantaCS )

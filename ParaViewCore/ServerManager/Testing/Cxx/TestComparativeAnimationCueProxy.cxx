@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
   //---------------------------------------------------------------------------
 
   vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy;
-  cueProxy = vtkSMComparativeAnimationCueProxy::SafeDownCast(
-      pxm->NewProxy("animation", "ComparativeAnimationCue"));
+  cueProxy.TakeReference(vtkSMComparativeAnimationCueProxy::SafeDownCast(
+      pxm->NewProxy("animation", "ComparativeAnimationCue")));
   vtkPVComparativeAnimationCue* cue = cueProxy->GetCue();
 
   // When no values are added to the cue, we still expect it to work.
