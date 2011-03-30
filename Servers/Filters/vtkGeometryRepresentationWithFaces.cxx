@@ -28,19 +28,12 @@ vtkGeometryRepresentationWithFaces::vtkGeometryRepresentationWithFaces()
 {
   this->BackfaceActor = vtkPVLODActor::New();
   this->BackfaceProperty = vtkProperty::New();
-
   this->BackfaceMapper = vtkCompositePolyDataMapper2::New();
   this->LODBackfaceMapper = vtkCompositePolyDataMapper2::New();
   this->BackfaceRepresentation = FOLLOW_FRONTFACE;
 
-  this->BackfaceActor->SetProperty(this->BackfaceProperty);
-  this->BackfaceActor->SetMapper(this->BackfaceMapper);
-  this->BackfaceActor->SetLODMapper(this->LODBackfaceMapper);
-
-  this->BackfaceMapper->SetInputConnection(
-    this->Mapper->GetInputConnection(0, 0));
-  this->LODBackfaceMapper->SetInputConnection(
-    this->LODMapper->GetInputConnection(0, 0));
+  // Since we are overriding SetupDefaults(), we need to call it again.
+  this->SetupDefaults();
 }
 
 //----------------------------------------------------------------------------
@@ -50,6 +43,21 @@ vtkGeometryRepresentationWithFaces::~vtkGeometryRepresentationWithFaces()
   this->BackfaceProperty->Delete();
   this->BackfaceMapper->Delete();
   this->LODBackfaceMapper->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentationWithFaces::SetupDefaults()
+{
+  this->Superclass::SetupDefaults();
+
+  this->BackfaceActor->SetProperty(this->BackfaceProperty);
+  this->BackfaceActor->SetMapper(this->BackfaceMapper);
+  this->BackfaceActor->SetLODMapper(this->LODBackfaceMapper);
+
+  this->BackfaceMapper->SetInputConnection(
+    this->Mapper->GetInputConnection(0, 0));
+  this->LODBackfaceMapper->SetInputConnection(
+    this->LODMapper->GetInputConnection(0, 0));
 }
 
 //----------------------------------------------------------------------------
