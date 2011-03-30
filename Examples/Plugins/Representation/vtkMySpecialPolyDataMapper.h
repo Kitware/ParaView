@@ -16,17 +16,20 @@
 // .SECTION Description
 // This is a place holder for a poly data mapper. This example simply uses the
 // standard polydata mapper
+// Note that it's essential that the mapper can handle composite datasets. If
+// your mapper cannot, then simply use an append filter internally to
+// merge the blocks into a single polydata. 
 
 #ifndef __vtkMySpecialPolyDataMapper_h
 #define __vtkMySpecialPolyDataMapper_h
 
-#include "vtkPainterPolyDataMapper.h"
+#include "vtkCompositePolyDataMapper2.h"
 
-class VTK_EXPORT vtkMySpecialPolyDataMapper : public vtkPainterPolyDataMapper
+class VTK_EXPORT vtkMySpecialPolyDataMapper : public vtkCompositePolyDataMapper2
 {
 public:
   static vtkMySpecialPolyDataMapper* New();
-  vtkTypeMacro(vtkMySpecialPolyDataMapper, vtkPainterPolyDataMapper);
+  vtkTypeMacro(vtkMySpecialPolyDataMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
