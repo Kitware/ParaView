@@ -43,7 +43,7 @@
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
-// #define PV_DISABLE_PROGRESS_HANDLING
+#define PV_DISABLE_PROGRESS_HANDLING
 
 inline const char* vtkGetProgressText(vtkObjectBase* o)
 {
