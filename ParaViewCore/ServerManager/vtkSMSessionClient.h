@@ -127,6 +127,20 @@ public:
 
   virtual void PreCollaborationSessionDisconnection();
 
+  // Description:
+  // Flag used to know if it is a good time to handle server notification.
+  virtual bool IsNotBusy();
+  // Description:
+  // BusyWork should be declared inside method that will request several
+  // network call that we don't want to interupt such as GatherInformation
+  // and Pull.
+  virtual void StartBusyWork();
+  // Description:
+  // BusyWork should be declared inside method that will request several
+  // network call that we don't want to interupt such as GatherInformation
+  // and Pull.
+  virtual void EndBusyWork();
+
   //---------------------------------------------------------------------------
   // API for GlobalId management
   //---------------------------------------------------------------------------
@@ -189,6 +203,7 @@ private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented
 
+  int NotBusy;
   vtkTypeUInt32 LastGlobalID;
   vtkTypeUInt32 LastGlobalIDAvailable;
 //ETX

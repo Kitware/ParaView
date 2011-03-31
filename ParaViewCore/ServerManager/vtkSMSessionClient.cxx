@@ -84,6 +84,7 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
 
   // Default value
   this->NoMoreDelete = false;
+  this->NotBusy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -527,6 +528,8 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::PullState(vtkSMMessage* message)
 {
+  this->StartBusyWork();
+  cout << ">>> PULL" << endl;
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
 
@@ -572,6 +575,8 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
     this->Superclass::PullState(message);
     // Everything is local no communication needed (Send/Reply)
     }
+  cout << "<<< PULL" << endl;
+  this->EndBusyWork();
 }
 
 //----------------------------------------------------------------------------
@@ -625,6 +630,7 @@ void vtkSMSessionClient::ExecuteStream(
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 location)
 {
+  this->StartBusyWork();
   location = this->GetRealLocation(location);
 
   vtkMultiProcessController* controller = NULL;
@@ -662,9 +668,11 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
     controller->Receive(raw_data, size, 1, vtkPVSessionServer::REPLY_LAST_RESULT);
     this->ServerLastInvokeResult->SetData(raw_data, size);
     delete [] raw_data;
+    this->EndBusyWork();
     return *this->ServerLastInvokeResult;
     }
 
+  this->EndBusyWork();
   return this->Superclass::GetLastResult(location);
 }
 
@@ -672,6 +680,8 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
 bool vtkSMSessionClient::GatherInformation(
   vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
+  this->StartBusyWork();
+  cout << ">>> GatherInformation... " << endl;
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
@@ -693,6 +703,8 @@ bool vtkSMSessionClient::GatherInformation(
       location, information, globalid);
     if (information->GetRootOnly())
       {
+      cout << "<<< GatherInformation... " << endl;
+      this->EndBusyWork();
       return ret_value;
       }
     }
@@ -732,6 +744,8 @@ bool vtkSMSessionClient::GatherInformation(
     if (length2 <= 0)
       {
       vtkErrorMacro("Server failed to gather information.");
+      cout << "<<< GatherInformation... " << endl;
+      this->EndBusyWork();
       return false;
       }
     unsigned char* data2 = new unsigned char[length2];
@@ -740,6 +754,8 @@ bool vtkSMSessionClient::GatherInformation(
       {
       vtkErrorMacro("Failed to receive information correctly.");
       delete [] data2;
+      cout << "<<< GatherInformation... " << endl;
+      this->EndBusyWork();
       return false;
       }
     vtkClientServerStream csstream;
@@ -747,7 +763,8 @@ bool vtkSMSessionClient::GatherInformation(
     information->CopyFromStream(&csstream);
     delete [] data2;
     }
-
+  cout << "<<< GatherInformation... " << endl;
+  this->EndBusyWork();
   return false;
 }
 
@@ -816,6 +833,7 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
+  cout << "Process RMI notification" << endl;
   this->DisableRemoteExecution();
   vtkstd::string data;
   data.append(reinterpret_cast<char*>(message), message_length);
@@ -824,9 +842,10 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
 
-  cout << "Server notification... " << id << " " << state.GetExtension(ProxyState::xml_name).c_str() << endl;
   vtkSMProxy* proxy =
       vtkSMProxy::SafeDownCast(this->GetRemoteObject(id));
+  cout << "Server notification... " << id << " " << state.GetExtension(ProxyState::xml_name).c_str()
+      << (proxy ? " got it" : " - NULL") << endl;
 
   if(id == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
     {
@@ -852,14 +871,36 @@ bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, vo
   const char* ptr = data;
   memcpy(&tag, ptr, sizeof(tag));
 
-  if (vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI)
+  // If RMI_TAG just buffer it
+  if (tag == vtkMultiProcessController::RMI_TAG || 23490 == tag) // 23490: MoveData
     {
-    vtkWarningMacro("We are missing a notification here...");
-    //this->OnServerNotificationMessageRMI(NULL, 0);
-    return true; // Abort, no need to go further, we handle it !
+    vtkSocketCommunicator::SafeDownCast(
+        this->DataServerController->GetCommunicator())->BufferCurrentMessage();
+    cout << "   >>> Buffer RMI call..." << endl;
+    return true; // Need to keep trying to receive.
     }
+
+  cout << "Wrong tag but don't know how to handle it... " << tag << endl;
 
   // We was not able to handle it localy
   this->Superclass::OnWrongTagEvent(obj, event, calldata);
   return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMSessionClient::IsNotBusy()
+{
+  return (this->NotBusy == 0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSessionClient::StartBusyWork()
+{
+  ++this->NotBusy;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSessionClient::EndBusyWork()
+{
+  --this->NotBusy;
 }

@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkToolkits.h"
 
 // Qt includes.
@@ -500,5 +501,9 @@ vtkSMProxyManager* pqServer::proxyManager() const
 //-----------------------------------------------------------------------------
 void pqServer::processServerNotification()
 {
-  vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100);
+  vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
+  if(sessionClient && sessionClient->IsNotBusy())
+    {
+    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100);
+    }
 }
