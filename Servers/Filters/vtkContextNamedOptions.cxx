@@ -170,6 +170,13 @@ void vtkContextNamedOptions::SetTable(vtkTable* table)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkContextNamedOptions::GetXSeriesName()
+{
+  return this->Internals->UseIndexForXAxis? NULL :
+    this->Internals->XSeriesName.c_str();
+}
+
+//----------------------------------------------------------------------------
 void vtkContextNamedOptions::SetXSeriesName(const char* name)
 {
   if (!name)
