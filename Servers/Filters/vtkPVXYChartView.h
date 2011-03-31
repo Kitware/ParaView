@@ -22,8 +22,9 @@
 
 #include "vtkPVContextView.h"
 
-class vtkChartView;
 class vtkChart;
+class vtkChartView;
+class vtkPVPlotTime;
 
 class VTK_EXPORT vtkPVXYChartView : public vtkPVContextView
 {
@@ -242,6 +243,7 @@ protected:
   // Description:
   // Pointer to the proxy's chart instance.
   vtkChart* Chart;
+  vtkPVPlotTime* PlotTime;
 
   void SelectionChanged();
 
