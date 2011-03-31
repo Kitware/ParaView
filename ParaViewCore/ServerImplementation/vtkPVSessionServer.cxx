@@ -171,7 +171,10 @@ vtkPVSessionServer::vtkPVSessionServer()
 
   // On server side only one session is available so we just set it Active()
   // forever
-  this->Activate();
+  if(vtkProcessModule::GetProcessModule())
+    {
+    this->Activate();
+    }
 }
 
 //----------------------------------------------------------------------------
