@@ -67,12 +67,12 @@ public:
   // Description:
   // Client-Server Communication tags.
   enum {
-    PUSH=1,
-    EXECUTE_STREAM=2,
-    PULL=3,
-    GATHER_INFORMATION=4,
-    DELETE_SI=5,
-    LAST_RESULT=6,
+    PUSH=10,
+    EXECUTE_STREAM=12,
+    PULL=13,
+    GATHER_INFORMATION=14,
+    DELETE_SI=15,
+    LAST_RESULT=16,
     SERVER_NOTIFICATION_MESSAGE_RMI=55624,
     CLIENT_SERVER_MESSAGE_RMI=55625,
     CLOSE_SESSION=55626,
