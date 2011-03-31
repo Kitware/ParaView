@@ -160,6 +160,7 @@ SET(Filters_SRCS
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
+  vtkPVPlotTime.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx

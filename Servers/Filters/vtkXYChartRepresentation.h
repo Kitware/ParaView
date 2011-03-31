@@ -37,6 +37,7 @@ public:
   // Description:
   // Set the series to use as the X-axis.
   void SetXAxisSeriesName(const char* name);
+  const char* GetXAxisSeriesName();
 
   // Description:
   // Set whether the index should be used for the x axis.

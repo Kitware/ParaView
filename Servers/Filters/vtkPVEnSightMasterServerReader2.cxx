@@ -368,7 +368,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
     return 0;
     }
 
-  if(this->Internal->TimeSetValues.size() > 1)
+  if(this->Internal->TimeSetValues.size() >= 1)
     {
     int nTimes = static_cast<int> (this->Internal->TimeSetValues.size());
     double timeRange[2];
