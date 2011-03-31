@@ -1839,7 +1839,14 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
                             vtkSMStateLocator* locator, bool definitionOnly)
 {
   // Update globalId. This will fails if that one is already set with a different value
-  this->SetGlobalID(message->global_id());
+  if(this->HasGlobalID() && this->GetGlobalID() != message->global_id())
+    {
+    vtkErrorMacro("Try to load a state on a proxy which has a different ID");
+    }
+  else
+    {
+    this->SetGlobalID(message->global_id());
+    }
   if(message->HasExtension(DefinitionHeader::server_class))
     {
     this->SetSIClassName(message->GetExtension(DefinitionHeader::server_class).c_str());
