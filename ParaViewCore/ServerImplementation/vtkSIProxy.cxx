@@ -132,9 +132,6 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   // Return a set of Pull only property (information_only props)
   // In fact Pushed Property can not be fetch at the same time as Pull
   // property with the current implementation
-  vtkSMMessage response = *message;
-  response.ClearExtension(PullRequest::arguments);
-
   vtkstd::set<vtkstd::string> prop_names;
   if (message->ExtensionSize(PullRequest::arguments) > 0)
     {
@@ -146,6 +143,8 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       }
     }
 
+  message->ClearExtension(PullRequest::arguments);
+
   vtkInternals::SIPropertiesMapType::iterator iter;
   for (iter = this->Internals->SIProperties.begin(); iter !=
     this->Internals->SIProperties.end(); ++iter)
@@ -153,7 +152,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
     if (prop_names.size() == 0 ||
       prop_names.find(iter->first) != prop_names.end())
       {
-      if (!iter->second->GetIsInternal() && !iter->second->Pull(&response))
+      if (!iter->second->GetIsInternal() && !iter->second->Pull(message))
         {
         vtkErrorMacro("Error pulling property state: " << iter->first);
         return;
@@ -162,14 +161,22 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
     }
 
   // Add definition
-  response.SetExtension(ProxyState::xml_group, this->Internals->XMLGroupName);
-  response.SetExtension(ProxyState::xml_name, this->Internals->XMLProxyName);
+  message->SetExtension(ProxyState::xml_group, this->Internals->XMLGroupName);
+  message->SetExtension(ProxyState::xml_name, this->Internals->XMLProxyName);
   if(!this->Internals->XMLSubProxyName.empty())
     {
-    response.SetExtension(ProxyState::xml_sub_proxy_name, this->Internals->XMLSubProxyName);
+    message->SetExtension(ProxyState::xml_sub_proxy_name, this->Internals->XMLSubProxyName);
     }
 
-  message->CopyFrom(response);
+  // Add subproxy information to the message.
+  vtkInternals::SubSIProxiesMapType::iterator it2 =
+    this->Internals->SubSIProxies.begin();
+  for( ; it2 != this->Internals->SubSIProxies.end(); it2++)
+    {
+    ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
+    subproxy->set_name(it2->first.c_str());
+    subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
+    }
 }
 
 //----------------------------------------------------------------------------

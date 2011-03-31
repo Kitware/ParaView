@@ -1864,7 +1864,6 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
     this->SetXMLSubProxyName(message->GetExtension(ProxyState::xml_sub_proxy_name).c_str());
     }
 
-
   // Manage its sub-proxy state
   int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);
   for(int idx=0; idx < nbSubProxy; idx++)
@@ -1916,6 +1915,11 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
       it = this->Internals->Properties.find(pname);
       if (it != this->Internals->Properties.end())
         {
+        if (it->second.Property->GetIsInternal())
+          {
+          // skip internal properties. Their state is never updated.
+          continue;
+          }
         it->second.Property->ReadFrom(message, i);
         touchedProperties.push_back(it->second.Property.GetPointer());
         }
