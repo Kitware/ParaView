@@ -47,6 +47,7 @@ bool vtkSMServerStateLocator::FindState(vtkTypeUInt32 globalID,
     vtkSMMessage newState;
     newState.set_global_id(globalID);
     newState.set_location(vtkPVSession::DATA_SERVER_ROOT);
+    newState.set_req_def(true);
     this->Session->PullState(&newState);
     stateToFill->Clear();
     stateToFill->CopyFrom(newState);

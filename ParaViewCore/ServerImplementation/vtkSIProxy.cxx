@@ -42,8 +42,6 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
-  vtkstd::string XMLGroupName;
-  vtkstd::string XMLProxyName;
   vtkstd::string XMLSubProxyName;
 };
 
@@ -57,6 +55,7 @@ vtkSIProxy::vtkSIProxy()
 
   this->XMLGroup = 0;
   this->XMLName = 0;
+  this->XMLSubProxyName = 0;
   this->VTKClassName = 0;
   this->PostPush = 0;
   this->PostCreation = 0;
@@ -72,6 +71,7 @@ vtkSIProxy::~vtkSIProxy()
 
   this->SetXMLGroup(0);
   this->SetXMLName(0);
+  this->SetXMLSubProxyName(0);
   this->SetVTKClassName(0);
   this->SetPostPush(0);
   this->SetPostCreation(0);
@@ -160,25 +160,27 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       }
     }
 
-  // Add definition
-  message->SetExtension(ProxyState::xml_group, this->Internals->XMLGroupName);
-  message->SetExtension(ProxyState::xml_name, this->Internals->XMLProxyName);
-  if(!this->Internals->XMLSubProxyName.empty())
+  if(message->req_def())
     {
-    message->SetExtension(ProxyState::xml_sub_proxy_name, this->Internals->XMLSubProxyName);
-    }
+    // Add definition
+    message->SetExtension(ProxyState::xml_group, this->XMLGroup);
+    message->SetExtension(ProxyState::xml_name, this->XMLName);
+    if(this->XMLSubProxyName)
+      {
+      message->SetExtension(ProxyState::xml_sub_proxy_name, this->XMLSubProxyName);
+      }
 
-  // Add subproxy information to the message.
-  vtkInternals::SubSIProxiesMapType::iterator it2 =
-    this->Internals->SubSIProxies.begin();
-  for( ; it2 != this->Internals->SubSIProxies.end(); it2++)
-    {
-    ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
-    subproxy->set_name(it2->first.c_str());
-    subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
+    // Add subproxy information to the message.
+    vtkInternals::SubSIProxiesMapType::iterator it2 =
+        this->Internals->SubSIProxies.begin();
+    for( ; it2 != this->Internals->SubSIProxies.end(); it2++)
+      {
+      ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
+      subproxy->set_name(it2->first.c_str());
+      subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
+      }
     }
 }
-
 //----------------------------------------------------------------------------
 vtkPVProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 {
@@ -228,16 +230,16 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   // Store definition informations
-  this->Internals->XMLGroupName = message->GetExtension(ProxyState::xml_group);
-  this->Internals->XMLProxyName = message->GetExtension(ProxyState::xml_name);
-  this->Internals->XMLSubProxyName =
+  this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
+  this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
+  this->SetXMLSubProxyName(
       message->HasExtension(ProxyState::xml_sub_proxy_name) ?
-      message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() : "";
+      message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() : NULL);
 
   vtkPVProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
   vtkPVXMLElement* element =
-      pdm->GetCollapsedProxyDefinition( this->Internals->XMLGroupName.c_str(),
-                                        this->Internals->XMLProxyName.c_str(),
+      pdm->GetCollapsedProxyDefinition( this->XMLGroup,
+                                        this->XMLName,
                                         this->Internals->XMLSubProxyName.empty() ?
                                         NULL :
                                         this->Internals->XMLSubProxyName.c_str());

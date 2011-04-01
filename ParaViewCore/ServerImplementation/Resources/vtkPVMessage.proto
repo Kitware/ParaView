@@ -40,13 +40,14 @@ message MessageCollection
   repeated Message item = 1;
 }
 
-// Generic message type ******************************************* [1-2 :> 10]
+// Generic message type ******************************************* [1-4 :> 10]
 
 message Message
 {
   required uint64 global_id  = 1;
   required uint32 location   = 2;
   optional bool   share_only = 3 [default = false];
+  optional bool   req_def    = 4 [default = false];
 
   extensions 10 to max;
 }

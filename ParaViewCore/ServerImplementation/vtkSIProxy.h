@@ -124,12 +124,14 @@ protected:
   vtkSetStringMacro(VTKClassName);
   vtkSetStringMacro(XMLGroup);
   vtkSetStringMacro(XMLName);
+  vtkSetStringMacro(XMLSubProxyName);
   vtkSetStringMacro(PostPush);
   vtkSetStringMacro(PostCreation);
 
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
+  char* XMLSubProxyName;
   char* PostPush;
   char* PostCreation;
 
