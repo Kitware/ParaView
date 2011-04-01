@@ -68,6 +68,8 @@ class vtkPVSessionServer::vtkInternals
 public:
   vtkInternals(vtkPVSessionServer* owner)
     {
+    this->SatelliteServerSession =
+        (vtkProcessModule::GetProcessModule()->GetPartitionId() > 0);
     this->Owner = owner;
 
     // Attach callbacks
@@ -125,6 +127,10 @@ public:
   //-----------------------------------------------------------------
   vtkCompositeMultiProcessController* GetActiveController()
     {
+    if(this->SatelliteServerSession)
+      {
+      return NULL;
+      }
     return this->CompositeMultiProcessController.GetPointer();
     }
   //-----------------------------------------------------------------
@@ -139,6 +145,12 @@ public:
       }
     return false;
     }
+  //-----------------------------------------------------------------
+  bool IsSatelliteSession()
+    {
+    return this->SatelliteServerSession;
+    }
+
   //-----------------------------------------------------------------
   // Return true if the message was updated by the ShareOnlyCache
   bool RetreiveShareOnly(vtkSMMessage* msg)
@@ -158,6 +170,7 @@ private:
   vtkWeakPointer<vtkPVSessionServer> Owner;
   vtkstd::string ClientURL;
   vtkstd::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
+  bool SatelliteServerSession;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
@@ -189,7 +202,7 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
 {
   switch (processType)
     {
-  case CLIENT:
+    case CLIENT:
     return this->Internal->GetActiveController();
 
   default:
@@ -207,7 +220,7 @@ bool vtkPVSessionServer::Connect()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (pm->GetPartitionId() > 0)
+  if (this->Internal->IsSatelliteSession())
     {
     return true;
     }
