@@ -199,6 +199,8 @@ public:
   // The collection is cleared before the proxies are added to it.
   void GetProxies(const char* groupname, const char* name,
     vtkCollection* collection);
+  void GetProxies(const char* groupname, vtkCollection* collection)
+    { this->GetProxies(groupname, NULL, collection); }
 
   // Description:
   // Returns the prototype proxy for the given type. This method may create

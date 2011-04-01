@@ -542,13 +542,34 @@ void vtkSMProxyManager::GetProxies(const char* group,
     this->Internals->RegisteredProxyMap.find(group);
   if(it != this->Internals->RegisteredProxyMap.end())
     {
-    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
-    if (it2 != it->second.end())
+    if(name == NULL)
       {
-      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
-      for (; it3 != it2->second.end(); ++it3)
+      vtkSMProxyManagerProxyMapType::iterator it2 =
+        it->second.begin();
+      vtkstd::set<vtkTypeUInt32> ids;
+      for (; it2 != it->second.end(); it2++)
         {
-        collection->AddItem(it3->GetPointer()->Proxy);
+        vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
+          {
+          if(ids.find(it3->GetPointer()->Proxy->GetGlobalID()) != ids.end())
+            {
+            ids.insert(it3->GetPointer()->Proxy->GetGlobalID());
+            collection->AddItem(it3->GetPointer()->Proxy);
+            }
+          }
+        }
+      }
+    else
+      {
+      vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
+      if (it2 != it->second.end())
+        {
+        vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
+          {
+          collection->AddItem(it3->GetPointer()->Proxy);
+          }
         }
       }
     }
