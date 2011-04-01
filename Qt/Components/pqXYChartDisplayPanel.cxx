@@ -108,6 +108,9 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
 
   this->Internal->SettingsModel = new pqPlotSettingsModel(this);
   this->Internal->SeriesList->setModel(this->Internal->SettingsModel);
+  QObject::connect(this->Internal->SeriesList->header(),
+    SIGNAL(checkStateChanged()),
+    this, SLOT(headerCheckStateChanged()));
 
   this->Internal->XAxisArrayAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XAxisArray);
@@ -449,4 +452,27 @@ void pqXYChartDisplayPanel::useDataArrayToggled(bool toggle)
 {
   this->Internal->UseArrayIndex->setChecked(!toggle);
   this->updateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqXYChartDisplayPanel::headerCheckStateChanged()
+{
+  // get current check state/
+  QHeaderView* header = this->Internal->SeriesList->header();
+  QAbstractItemModel* headerModel = header->model();
+  bool checkable = false;
+  int cs = headerModel->headerData(
+    0, header->orientation(), Qt::CheckStateRole).toInt(&checkable);
+  if (checkable)
+    {
+    if (cs ==  Qt::Checked)
+      {
+      cs = Qt::Unchecked;
+      }
+    else
+      {
+      cs = Qt::Checked;
+      }
+    headerModel->setHeaderData(0, header->orientation(), cs, Qt::CheckStateRole);
+    }
 }

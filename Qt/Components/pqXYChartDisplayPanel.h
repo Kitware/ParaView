@@ -73,6 +73,8 @@ protected slots:
 
   void useDataArrayToggled(bool);
 
+  void headerCheckStateChanged();
+
 private:
   pqXYChartDisplayPanel(const pqXYChartDisplayPanel&); // Not implemented.
   void operator=(const pqXYChartDisplayPanel&); // Not implemented.
