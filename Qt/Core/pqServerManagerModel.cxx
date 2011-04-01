@@ -314,7 +314,10 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
       // Attach proxy helpers, this will automatically update the domains
       QString proxyId = group.split(".").at(1);
       pqProxy* proxyThatNeedHelper = this->findItem<pqProxy*>(proxyId.toUInt());
-      proxyThatNeedHelper->addHelperProxy(name, proxy);
+      if(proxyThatNeedHelper)
+        {
+        proxyThatNeedHelper->addHelperProxy(name, proxy);
+        }
       }
     return;
     }
