@@ -26,6 +26,7 @@
 class vtkMultiProcessController;
 class vtkPVServerInformation;
 class vtkSMProxyManager;
+class vtkSMCollaborationCommunicator;
 
 class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
 {
@@ -141,6 +142,11 @@ public:
   // and Pull.
   virtual void EndBusyWork();
 
+  virtual vtkSMCollaborationCommunicator* GetvtkSMCollaborationCommunicator()
+    {
+    return this->CollaborationCommunicator;
+    }
+
   //---------------------------------------------------------------------------
   // API for GlobalId management
   //---------------------------------------------------------------------------
@@ -192,6 +198,9 @@ protected:
   // Typically we don't want this client to broadcast to the other to delete all
   // the proxy because it does not need them anymore as it is leaving...
   bool NoMoreDelete;
+
+  // Field used to communicate with other clients
+  vtkSMCollaborationCommunicator* CollaborationCommunicator;
 
   // Description:
   // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
