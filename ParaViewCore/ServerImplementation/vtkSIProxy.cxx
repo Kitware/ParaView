@@ -42,7 +42,6 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
-  vtkstd::string XMLSubProxyName;
 };
 
 vtkStandardNewMacro(vtkSIProxy);
@@ -253,9 +252,7 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
   vtkPVXMLElement* element =
       pdm->GetCollapsedProxyDefinition( this->XMLGroup,
                                         this->XMLName,
-                                        this->Internals->XMLSubProxyName.empty() ?
-                                        NULL :
-                                        this->Internals->XMLSubProxyName.c_str());
+                                        this->XMLSubProxyName);
 
   if (!element)
     {
