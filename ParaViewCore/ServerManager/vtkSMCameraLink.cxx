@@ -85,8 +85,11 @@ public:
       if (rmp)
         {
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
-        iren->RemoveObserver(this->Observer);
-        iren->RemoveObserver(this->Observer); 
+        if(iren)
+          {
+          iren->RemoveObserver(this->Observer);
+          iren->RemoveObserver(this->Observer);
+          }
         rmp->RemoveObserver(this->Observer);
         }
       }
