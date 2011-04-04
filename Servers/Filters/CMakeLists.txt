@@ -260,6 +260,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkMaterialInterfaceProcessRing.cxx
   vtkMaterialInterfaceToProcMap.cxx
   vtkPVMain.cxx
+  vtkPVPlotTime.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
