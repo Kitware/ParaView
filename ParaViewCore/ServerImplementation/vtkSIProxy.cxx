@@ -152,10 +152,23 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
     if (prop_names.size() == 0 ||
       prop_names.find(iter->first) != prop_names.end())
       {
-      if (!iter->second->GetIsInternal() && !iter->second->Pull(message))
+      if(!iter->second->GetIsInternal())
         {
-        vtkErrorMacro("Error pulling property state: " << iter->first);
-        return;
+        if(message->req_def())
+          {
+          // We just want the cached push property
+          if( !iter->second->GetInformationOnly() &&
+              !iter->second->Pull(message))
+            {
+            vtkErrorMacro("Error pulling property state: " << iter->first);
+            return;
+            }
+          }
+        else if (!iter->second->Pull(message))
+          {
+          vtkErrorMacro("Error pulling property state: " << iter->first);
+          return;
+          }
         }
       }
     }

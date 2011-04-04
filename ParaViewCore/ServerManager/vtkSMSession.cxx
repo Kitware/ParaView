@@ -111,7 +111,8 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
       newState.set_location(msg->location());
 
       // Store state in cache
-      bool createAction = !this->StateLocator->IsStateLocal(globalId);
+      vtkSMMessage oldState;
+      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
 
       // This is a filtering Hack, I don't like it. :-(
       if(newState.GetExtension(ProxyState::xml_name) != "Camera")
@@ -129,8 +130,6 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
         else
           {
           // Update
-          vtkSMMessage oldState;
-          this->StateLocator->FindState(globalId, &oldState);
           if(oldState.SerializeAsString() != newState.SerializeAsString())
             {
             this->UndoStackBuilder->OnStateChange( this, globalId,
