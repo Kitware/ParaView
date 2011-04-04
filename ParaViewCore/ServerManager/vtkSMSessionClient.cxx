@@ -71,6 +71,7 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
   this->RenderServerController = NULL;
   this->DataServerController = NULL;
   this->URI = NULL;
+  this->CollaborationCommunicator = NULL;
   this->AbortConnect = false;
 
   this->DataServerInformation = vtkPVServerInformation::New();
@@ -79,10 +80,13 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
   this->ServerLastInvokeResult = new vtkClientServerStream();
 
   // Collaboration communicator initialization
-  this->CollaborationCommunicator = vtkSMCollaborationCommunicator::New();
-  this->CollaborationCommunicator->SetSession(this);
-  this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
-                             this->CollaborationCommunicator);
+  if(vtkProcessModule::GetProcessModule())
+    {
+    this->CollaborationCommunicator = vtkSMCollaborationCommunicator::New();
+    this->CollaborationCommunicator->SetSession(this);
+    this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
+                               this->CollaborationCommunicator);
+    }
 
   // Register server state locator for that specific session
   vtkNew<vtkSMServerStateLocator> serverStateLocator;
@@ -111,7 +115,11 @@ vtkSMSessionClient::~vtkSMSessionClient()
   this->DataServerInformation->Delete();
   this->RenderServerInformation->Delete();
   this->ServerInformation->Delete();
-  this->CollaborationCommunicator->Delete();
+  if(this->CollaborationCommunicator)
+    {
+    this->CollaborationCommunicator->Delete();
+    this->CollaborationCommunicator = NULL;
+    }
   this->SetURI(0);
 
   delete this->ServerLastInvokeResult;
