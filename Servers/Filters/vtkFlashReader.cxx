@@ -1848,8 +1848,29 @@ void vtkFlashReader::SetFileName( const char * fileName )
     this->FileName[ strlen( fileName ) ] = '\0';
     
     this->Internal->SetFileName( this->FileName );
-    
+    this->SetUpDataArraySelections();
     this->Modified();
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+void vtkFlashReader::SetUpDataArraySelections()
+{
+  this->Internal->ReadMetaData();
+  this->Internal->ReadBlockStructures();
+  this->Internal->ReadDataAttributeNames();
+
+  int numAttrs = static_cast < int >( this->Internal->AttributeNames.size() );
+  std::cout << "numAttrs:";
+  std::cout << this->GetNumberOfCellArrays()<< std::endl;
+  std::cout.flush();
+  for( int i=0; i < this->GetNumberOfCellArrays(); i ++ )
+    {
+      std::cout << "Name: " << this->GetCellArrayName( i ) << std::endl;
+      std::cout.flush();
+      this->CellDataArraySelection->AddArray(
+          this->GetCellArrayName( i ) );
     }
 }
 

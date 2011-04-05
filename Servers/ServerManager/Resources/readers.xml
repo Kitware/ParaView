@@ -4105,9 +4105,10 @@
                 class="vtkFlashReader"
                 label="Flash Reader">
      <Documentation
-       short_help="Read multi-block dataset from a Flash file."
-       long_help="Read multi-block dataset from a Flash file.">
-         This Flash reader loads data stored in Flash format. The output of this reader is a multi-block dataset.
+       short_help="Read AMR dataset from a Flash file."
+       long_help="Read AMR dataset from a Flash file.">
+         This Flash reader loads data stored in Flash format. 
+         The output of this reader is an AMR dataset(vtkHierarchicalBoxDataset).
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -4144,6 +4145,51 @@
          Load particles when on.
        </Documentation>
      </IntVectorProperty>
+     
+      <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <!-- <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty> -->
+     
 
      <!--   <IntVectorProperty name="LoadMortonCurve"
        command="SetLoadMortonCurve"

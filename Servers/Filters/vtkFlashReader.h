@@ -374,6 +374,10 @@ protected:
   vtkFlashReader();
   ~vtkFlashReader();
   
+  // Description:
+  // Initializes the CellDataArraySelection
+  void SetUpDataArraySelections();
+
   // The file format stores a vector field as separated scalar component
   // fields. This method rebuilds the vector field from those scalar
   // component fields.
