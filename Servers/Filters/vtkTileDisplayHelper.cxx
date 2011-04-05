@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkTileDisplayHelper.h"
 
+#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkRenderer.h"
@@ -39,11 +40,12 @@ public:
     };
 
   typedef vtkstd::map<void*, vtkTile> TilesMapType;
-  TilesMapType TilesMap;
+  TilesMapType LeftEyeTilesMap;
+  TilesMapType RightEyeTilesMap;  
 
-  void FlushTile(const TilesMapType::iterator& iter)
+  void FlushTile(const TilesMapType::iterator& iter, const TilesMapType& TileMap, const int &leftEye)
     {
-    if (iter != this->TilesMap.end())
+    if (iter != TileMap.end())
       {
       vtkTile& tile = iter->second;
       vtkRenderer* renderer = tile.Renderer;
@@ -60,29 +62,29 @@ public:
 
   // Iterates over all valid tiles in the TilesMap and flush the images to the
   // screen.
-  void FlushTiles(void* current)
-    {
-    for (TilesMapType::iterator iter = this->TilesMap.begin();
-      iter != this->TilesMap.end(); ++iter)
+  void FlushTiles(void* current, const int &leftEye)
+    {    
+    TilesMapType *TileMap = NULL;
+    if ( leftEye )
+      {
+      TileMap = &this->LeftEyeTilesMap;
+      }
+    else
+      {
+      TileMap = &this->RightEyeTilesMap;
+      }    
+    for (TilesMapType::iterator iter = TileMap->begin();
+      iter !=TileMap->end(); ++iter)
       {
       if (iter->first != current)
-        {
-        this->FlushTile(iter);
+        {        
+        this->FlushTile(iter, *TileMap, leftEye);
         }
       }
     // Render the current tile last, this is done in case where user has
     // overlapping views. This ensures that active view is always rendered on
-    // top.
-    this->FlushTile(TilesMap.find(current));
-    }
-
-  void EraseTile(void* key)
-    {
-    TilesMapType::iterator iter = this->TilesMap.find(key);
-    if (iter != this->TilesMap.end())
-      {
-      this->TilesMap.erase(iter);
-      }
+    // top.        
+    this->FlushTile(TileMap->find(current),*TileMap, leftEye);
     }
 };
 
@@ -103,7 +105,7 @@ vtkTileDisplayHelper* vtkTileDisplayHelper::New()
 //----------------------------------------------------------------------------
 vtkTileDisplayHelper::vtkTileDisplayHelper()
 {
-  this->Internals = new vtkInternals();
+  this->Internals = new vtkInternals();  
 }
 
 //----------------------------------------------------------------------------
@@ -118,7 +120,7 @@ vtkTileDisplayHelper* vtkTileDisplayHelper::GetInstance()
   if (!vtkInternals::Instance)
     {
     vtkInternals::Instance.TakeReference(vtkTileDisplayHelper::New());
-    }
+    }  
   return vtkInternals::Instance;
 }
 
@@ -127,22 +129,32 @@ void vtkTileDisplayHelper::SetTile(void* key,
   double viewport[4], vtkRenderer* renderer,
   vtkSynchronizedRenderers::vtkRawImage& image)
 {
-  vtkInternals::vtkTile &tile = this->Internals->TilesMap[key];
-  memcpy(tile.PhysicalViewport, viewport, 4*sizeof(double));
-  tile.Renderer = renderer;
-  tile.TileImage = image;
+  vtkInternals::vtkTile *tile = NULL;
+  if ( renderer->GetActiveCamera()->GetLeftEye() )
+    {
+    tile = &this->Internals->LeftEyeTilesMap[key];
+    }
+  else
+    {
+    tile = &this->Internals->RightEyeTilesMap[key];
+    }
+   
+  memcpy(tile->PhysicalViewport, viewport, 4*sizeof(double));
+  tile->Renderer = renderer;  
+  tile->TileImage = image;
 }
 
 //----------------------------------------------------------------------------
 void vtkTileDisplayHelper::EraseTile(void* key)
 {
-  this->Internals->TilesMap.erase(key);
+  this->Internals->LeftEyeTilesMap.erase(key);
+  this->Internals->RightEyeTilesMap.erase(key);
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::FlushTiles(void* key)
+void vtkTileDisplayHelper::FlushTiles(void* key, int leftEye)
 {
-  this->Internals->FlushTiles(key);
+  this->Internals->FlushTiles(key,leftEye);
 }
 
 //----------------------------------------------------------------------------

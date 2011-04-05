@@ -53,7 +53,7 @@ public:
 
   // Description:
   // Flush the tiles.
-  void FlushTiles(void* key);
+  void FlushTiles(void* key, int leftEye);
 
 //BTX
 protected:
