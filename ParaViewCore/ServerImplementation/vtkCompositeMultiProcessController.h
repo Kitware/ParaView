@@ -88,11 +88,7 @@ public:
     this->RemoveAllRMICallbacks(tag);
     return 1;
     }
-  virtual void RemoveRMICallbacks(int tag)
-    {
-    vtkWarningMacro("RemoveRMICallbacks will remove all...");
-    this->RemoveAllRMICallbacks(tag);
-    }
+  virtual bool RemoveRMICallback(unsigned long observerTagId);
 
 protected:
   vtkCompositeMultiProcessController();

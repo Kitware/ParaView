@@ -35,21 +35,11 @@
 class vtkCompositeMultiProcessController::vtkCompositeInternals
 {
 public:
-struct Controller
-{
-  Controller(vtkMultiProcessController* controller)
-    {
-    this->MultiProcessController = controller;
-    this->ActivateObserverId = 0;
-    }
-
-  unsigned long ActivateObserverId;
-  vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
-};
 struct RMICallbackInfo
 {
-  RMICallbackInfo(vtkRMIFunctionType function, void* arg, int tag)
+  RMICallbackInfo(unsigned long observerTagID, vtkRMIFunctionType function, void* arg, int tag)
     {
+    this->RMIObserverID = observerTagID;
     this->Function = function;
     this->Arg = arg;
     this->Tag = tag;
@@ -58,11 +48,79 @@ struct RMICallbackInfo
   vtkRMIFunctionType Function;
   void* Arg;
   int Tag;
+  unsigned long RMIObserverID;
+};
+
+struct Controller
+{
+  Controller(vtkMultiProcessController* controller)
+    {
+    this->MultiProcessController = controller;
+    this->ActivateObserverId = 0;
+    }
+
+  void AddRMICallbacks(vtkstd::vector<RMICallbackInfo>& callbacks)
+    {
+    vtkstd::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+    while(iter != callbacks.end())
+      {
+      this->AddRMICallback(iter->RMIObserverID, iter->Function, iter->Arg , iter->Tag);
+      iter++;
+      }
+    }
+
+  void DetachCallBacks(vtkstd::vector<RMICallbackInfo>& callbacks)
+    {
+    // Remove activate observer
+    this->MultiProcessController->RemoveObserver(this->ActivateObserverId);
+    this->ActivateObserverId = 0;
+
+    // Remove all registered RMICallbacks
+    vtkstd::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+    while(iter != callbacks.end())
+      {
+      unsigned long rmiObserverID = iter->RMIObserverID;
+      vtkstd::vector<unsigned long>::iterator observerIdIter =
+          this->RMICallbackIdMapping[rmiObserverID].begin();
+      while(observerIdIter != this->RMICallbackIdMapping[rmiObserverID].end())
+        {
+        this->RemoveRMICallback(*observerIdIter);
+        observerIdIter++;
+        }
+      iter++;
+      }
+    }
+
+  void AddRMICallback(unsigned long observerTagId, vtkRMIFunctionType function, void *arg, int tag)
+    {
+    this->RMICallbackIdMapping[observerTagId].push_back(
+        this->MultiProcessController->AddRMICallback(function, arg, tag));
+    }
+
+  bool RemoveRMICallback(unsigned long observerTagId)
+    {
+    cout << "vtkComposite::RemoveRMICallback " << observerTagId << endl;
+    int size = this->RMICallbackIdMapping[observerTagId].size();
+    bool result = false;
+    for(int i=0;i<size;i++)
+      {
+      cout << " - removing inner tag: " << this->RMICallbackIdMapping[observerTagId][i] << endl;
+      result = this->MultiProcessController->RemoveRMICallback(
+          this->RMICallbackIdMapping[observerTagId][i]) || result;
+
+      }
+    return result;
+    }
+
+  unsigned long ActivateObserverId;
+  vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
+  vtkstd::map<unsigned long, vtkstd::vector<unsigned long> > RMICallbackIdMapping;
 };
 
 public:
   vtkCompositeInternals(vtkCompositeMultiProcessController* owner)
     {
+    this->RMICallbackIdCounter = 1;
     this->Owner = owner;
     this->NeedToInitializeControllers = false;
     }
@@ -80,13 +138,8 @@ public:
     this->ActiveController->ActivateObserverId = ctrl->AddObserver(
         vtkCommand::StartEvent, this, &vtkCompositeInternals::ActivateController);
 
-    // Attach RMICallback
-    vtkstd::vector<RMICallbackInfo>::iterator iter = this->RMICallbacks.begin();
-    while(iter != this->RMICallbacks.end())
-      {
-      ctrl->AddRMICallback(iter->Function, iter->Arg , iter->Tag);
-      iter++;
-      }
+    // Attach RMICallbacks
+    this->ActiveController->AddRMICallbacks(this->RMICallbacks);
 
     this->UpdateActiveCommunicator();
     }
@@ -111,7 +164,7 @@ public:
       }
     if(found)
       {
-      this->DetachCallBacks(&(*iterToDel));
+      iterToDel->DetachCallBacks(this->RMICallbacks);
       this->Controllers.erase(iterToDel);
       }
     }
@@ -149,21 +202,7 @@ public:
       }
     }
   //-----------------------------------------------------------------
-  void DetachCallBacks(Controller* controller)
-    {
-    vtkMultiProcessController* ctrl = controller->MultiProcessController;
-    // Remove activate observer
-    ctrl->RemoveObserver(controller->ActivateObserverId);
-    controller->ActivateObserverId = 0;
 
-    // Remove all registered RMICallbacks
-    vtkstd::vector<RMICallbackInfo>::iterator iter = this->RMICallbacks.begin();
-    while(iter != this->RMICallbacks.end())
-      {
-      ctrl->RemoveAllRMICallbacks(iter->Tag);
-      iter++;
-      }
-    }
   //-----------------------------------------------------------------
   void InitializeControllers()
     {
@@ -178,17 +217,20 @@ public:
       }
     }
   //-----------------------------------------------------------------
-  void AddRMICallback(vtkRMIFunctionType function, void* arg, int tag)
+  unsigned long AddRMICallback(vtkRMIFunctionType function, void* arg, int tag)
     {
+    // Save call back for new vtkMultiProcessController
+    this->RMICallbackIdCounter++;
+    this->RMICallbacks.push_back(RMICallbackInfo(this->RMICallbackIdCounter, function, arg, tag));
+
+    // Register it to the previously registered controllers
     vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
-      iter->MultiProcessController->AddRMICallback(function, arg, tag);
+      iter->AddRMICallback(this->RMICallbackIdCounter, function, arg, tag);
       iter++;
       }
-
-    // Save call back for new vtkMultiProcessController
-    this->RMICallbacks.push_back(RMICallbackInfo(function, arg, tag));
+    return this->RMICallbackIdCounter;
     }
   //-----------------------------------------------------------------
   void RemoveAllRMICallbacks(int tag)
@@ -225,6 +267,22 @@ public:
       ctrlIter++;
       }
     }
+
+  //-----------------------------------------------------------------
+  bool RemoveRMICallback(unsigned long observerTagId)
+    {
+    // Remove RMICallback on controllers
+    bool result = false;
+    vtkstd::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
+    while(ctrlIter != this->Controllers.end())
+      {
+      result = ctrlIter->RemoveRMICallback(observerTagId)
+               || result;
+      ctrlIter++;
+      }
+    return result;
+    }
+
   //-----------------------------------------------------------------
   int GetNumberOfRegisteredControllers()
     {
@@ -310,6 +368,7 @@ private:
   vtkstd::vector<RMICallbackInfo> RMICallbacks;
   vtkstd::vector<Controller> Controllers;
   bool NeedToInitializeControllers;
+  unsigned long RMICallbackIdCounter;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkCompositeMultiProcessController);
@@ -356,7 +415,7 @@ void vtkCompositeMultiProcessController::UnRegisterController(vtkMultiProcessCon
 unsigned long vtkCompositeMultiProcessController::AddRMICallback(
     vtkRMIFunctionType func, void* localArg, int tag)
 {
-  this->Internal->AddRMICallback(func, localArg, tag);
+  return this->Internal->AddRMICallback(func, localArg, tag);
 }
 
 //----------------------------------------------------------------------------
@@ -364,6 +423,12 @@ void vtkCompositeMultiProcessController::RemoveAllRMICallbacks(int tag)
 {
   this->Internal->RemoveAllRMICallbacks(tag);
 }
+//----------------------------------------------------------------------------
+bool vtkCompositeMultiProcessController::RemoveRMICallback(unsigned long observerTagId)
+{
+  return this->Internal->RemoveRMICallback(observerTagId);
+}
+
 //----------------------------------------------------------------------------
 int vtkCompositeMultiProcessController::UnRegisterActiveController()
 {
