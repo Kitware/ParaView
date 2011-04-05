@@ -162,8 +162,7 @@ void vtkPVSynchronizedRenderer::Initialize()
         pm->GetActiveRenderServerSocketController());
       }
 
-    // DONT BREAK
-    // break;
+    // DONT BREAK, server needs to setup everything in the BATCH case
 
   case BATCH:
     if (in_cave_mode)
