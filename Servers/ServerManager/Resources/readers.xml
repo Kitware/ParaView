@@ -4120,7 +4120,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty
+     <!--  <IntVectorProperty
        name="BlockOutputType"
        command="SetBlockOutputType"
        number_of_elements="1"
@@ -4133,7 +4133,7 @@
        <Documentation>
          The property indicates the output type of each block, either vtkImageData (by default) or vtkRectilinearGrid.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty> -->
 
      <IntVectorProperty name="LoadParticles"
        command="SetLoadParticles"
@@ -4145,7 +4145,7 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty name="LoadMortonCurve"
+     <!--   <IntVectorProperty name="LoadMortonCurve"
        command="SetLoadMortonCurve"
        number_of_elements="1"
        default_values="0">
@@ -4153,7 +4153,7 @@
        <Documentation>
          Generate morton curve when on.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty> -->
 
      <Hints>
       <ReaderFactory extensions="Flash flash"

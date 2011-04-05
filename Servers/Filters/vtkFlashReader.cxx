@@ -56,6 +56,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCallbackCommand.h"
+#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkUniformGrid.h"
+#include "vtkAMRUtilities.h"
 
 #include <hdf5.h>    // for the HDF data loading engine
 
@@ -64,6 +67,8 @@
 #include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+
+#include <cassert>
 
 vtkStandardNewMacro( vtkFlashReader );
 
@@ -1777,7 +1782,7 @@ vtkFlashReader::vtkFlashReader()
   this->Internal = new vtkFlashReaderInternal;
   this->MaximumNumberOfBlocks = -1;
   this->LoadParticles   = 1;
-  this->LoadMortonCurve = 0;
+//  this->LoadMortonCurve = 0;
   this->BlockOutputType = 0;
 
   
@@ -2311,7 +2316,7 @@ void vtkFlashReader::PrintSelf( ostream & os, vtkIndent indent )
 int vtkFlashReader::FillOutputPortInformation
   (  int vtkNotUsed( port ),  vtkInformation * info  )
 {
-  info->Set( vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet" );
+  info->Set( vtkDataObject::DATA_TYPE_NAME(), "vtkHierarchicalBoxDataSet" );
   return 1;
 }
 
@@ -2438,284 +2443,395 @@ void vtkFlashReader::AddBlockToMap(int globalId)
   this->ToGlobalBlockMap.push_back(globalId);
 }
 
-
 //-----------------------------------------------------------------------------
-int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
-  vtkInformationVector ** vtkNotUsed( inputVector ),
-  vtkInformationVector  * outputVector )
+int vtkFlashReader::RequestData(
+    vtkInformation * vtkNotUsed( request ),
+    vtkInformationVector ** vtkNotUsed( inputVector ),
+    vtkInformationVector * outputVector )
 {
-  vtkInformation *       outInf = outputVector->GetInformationObject( 0 );
-  vtkMultiBlockDataSet * output = vtkMultiBlockDataSet::SafeDownCast
-                         (  outInf->Get( vtkDataObject::DATA_OBJECT() )  );
-  
+  vtkInformation *outInf = outputVector->GetInformationObject( 0 );
+  assert( "pre: output information vector" && (outInf != NULL) );
+
+  vtkHierarchicalBoxDataSet *output =
+    vtkHierarchicalBoxDataSet::SafeDownCast(
+      outInf->Get( vtkDataObject::DATA_OBJECT() ) );
+  assert( "pre: output object is NULL" && (output != NULL) );
+
   this->Internal->ReadMetaData();
   this->GenerateBlockMap();
-  
-  // Save meta data from all blocks and a map from global to loaded ids.  
-  // I am saving global ids because I do not want to require that all ancestors
-  // of leaves have to be loaded.  However, I need ancestor meta data to traverse
-  // the tree.  We could change this so that pruned whole branches are not
-  // in the metadata. 
-  int numBlocks = this->Internal->NumberOfBlocks;
-  vtkIntArray* levelArray = vtkIntArray::New();
-  levelArray->SetName("BlockLevel");
-  levelArray->SetNumberOfTuples(numBlocks);
-  output->GetFieldData()->AddArray(levelArray);
-  vtkIntArray* parentArray = vtkIntArray::New();
-  parentArray->SetName("BlockParent");
-  parentArray->SetNumberOfTuples(numBlocks);
-  output->GetFieldData()->AddArray(parentArray);
-  vtkIntArray* childrenArray = vtkIntArray::New();
-  childrenArray->SetName("BlockChildren");
-  childrenArray->SetNumberOfComponents(8);
-  childrenArray->SetNumberOfTuples(numBlocks);
-  output->GetFieldData()->AddArray(childrenArray);
-  vtkIntArray* neighborArray = vtkIntArray::New();
-  neighborArray->SetName("BlockNeighbors");
-  neighborArray->SetNumberOfComponents(6);
-  neighborArray->SetNumberOfTuples(numBlocks);
-  output->GetFieldData()->AddArray(neighborArray);  
-  vtkIntArray* globalToLocalMapArray = vtkIntArray::New();
-  globalToLocalMapArray->SetName("GlobalToLocalMap");
-  globalToLocalMapArray->SetNumberOfTuples(numBlocks);
-  output->GetFieldData()->AddArray(globalToLocalMapArray);
-  vtkIntArray* localToGlobalMapArray = vtkIntArray::New();
-  localToGlobalMapArray->SetName("LocalToGlobalMap");
-  output->GetFieldData()->AddArray(localToGlobalMapArray);
-  for ( int j = 0; j < numBlocks; j++ )
-    {
-    globalToLocalMapArray->SetValue(j,-32);
-    levelArray->SetValue(j,this->GetBlockLevel(j));
-    parentArray->SetValue(j,this->GetBlockParentId(j));
-    int childrenIds[8];
-    this->GetBlockChildrenIds(j, childrenIds);
-    for (int i = 0; i < 8; ++i) 
-      {
-      if (childrenIds[i] > 0) {--childrenIds[i];}
-      } 
-    childrenArray->SetTupleValue(j,childrenIds);
-    int neighborIds[6];
-    this->GetBlockNeighborIds(j, neighborIds);
-    for (int i = 0; i < 6; ++i) 
-      {
-      if (neighborIds[i] > 0) {--neighborIds[i];}
-      }
-    neighborArray->SetTupleValue(j, neighborIds);
-    }
 
-  numBlocks = (int)(this->ToGlobalBlockMap.size());  
-  for ( int j = 0; j < numBlocks; j ++ )
+  int numLevels = this->Internal->NumberOfLevels;
+  int numBlocks = this->Internal->NumberOfBlocks;
+
+  for( int i=0; i < numBlocks; ++i )
     {
-    // Change GlobalToLocalMapArray to reflect this block was loaded.
-    int globalId = this->ToGlobalBlockMap[j];
-    globalToLocalMapArray->SetValue(globalId,j);
-    localToGlobalMapArray->InsertNextValue(globalId);
-    // blocks not loaded because they are ancestors will be marked with -1
-    while (globalId != 0) // root
-      {
-      globalId = parentArray->GetValue(globalId) - 1;
-      if (globalToLocalMapArray->GetValue(globalId) != -32)
-        {
-        break;
-        }
-      globalToLocalMapArray->SetValue(globalId, -1);
-      }
-    this->GetBlock( j, output );
-    }
-   
-  int   blockIdx = (int)(this->ToGlobalBlockMap.size());
-  if (this->LoadParticles)
-    {
-    this->GetParticles( blockIdx, output );
-    }
-  if (this->LoadMortonCurve)
-    {
-    this->GetMortonCurve( blockIdx, output );
-    }
-  outInf = NULL;
-  output = NULL;
-  levelArray->Delete();
-  levelArray = 0;
-  
+      this->GetBlock(i, output);
+    } // END for all blocks
+
+  vtkAMRUtilities::GenerateMetaData( output, NULL );
+  output->GenerateVisibilityArrays();
+
+  std::cout << "Number of levels:" << numLevels << std::endl;
+  std::cout << "Number of blocks:" << numBlocks << std::endl;
+  std::cout.flush();
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+//int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
+//  vtkInformationVector ** vtkNotUsed( inputVector ),
+//  vtkInformationVector  * outputVector )
+//{
+//  vtkInformation *       outInf = outputVector->GetInformationObject( 0 );
+////  vtkMultiBlockDataSet * output = vtkMultiBlockDataSet::SafeDownCast
+////                         (  outInf->Get( vtkDataObject::DATA_OBJECT() )  );
+//
+//  vtkHierarchicalBoxDataSet *output =
+//      vtkHierarchicalBoxDataSet::SafeDownCast(
+//          outInf->Get( vtkDataObject::DATA_OBJECT() ) );
+//
+//  this->Internal->ReadMetaData();
+//  this->GenerateBlockMap();
+//
+//  // Save meta data from all blocks and a map from global to loaded ids.
+//  // I am saving global ids because I do not want to require that all ancestors
+//  // of leaves have to be loaded.  However, I need ancestor meta data to traverse
+//  // the tree.  We could change this so that pruned whole branches are not
+//  // in the metadata.
+//  int numBlocks = this->Internal->NumberOfBlocks;
+//  vtkIntArray* levelArray = vtkIntArray::New();
+//  levelArray->SetName("BlockLevel");
+//  levelArray->SetNumberOfTuples(numBlocks);
+//  output->GetFieldData()->AddArray(levelArray);
+//  vtkIntArray* parentArray = vtkIntArray::New();
+//  parentArray->SetName("BlockParent");
+//  parentArray->SetNumberOfTuples(numBlocks);
+//  output->GetFieldData()->AddArray(parentArray);
+//  vtkIntArray* childrenArray = vtkIntArray::New();
+//  childrenArray->SetName("BlockChildren");
+//  childrenArray->SetNumberOfComponents(8);
+//  childrenArray->SetNumberOfTuples(numBlocks);
+//  output->GetFieldData()->AddArray(childrenArray);
+//  vtkIntArray* neighborArray = vtkIntArray::New();
+//  neighborArray->SetName("BlockNeighbors");
+//  neighborArray->SetNumberOfComponents(6);
+//  neighborArray->SetNumberOfTuples(numBlocks);
+//  output->GetFieldData()->AddArray(neighborArray);
+//  vtkIntArray* globalToLocalMapArray = vtkIntArray::New();
+//  globalToLocalMapArray->SetName("GlobalToLocalMap");
+//  globalToLocalMapArray->SetNumberOfTuples(numBlocks);
+//  output->GetFieldData()->AddArray(globalToLocalMapArray);
+//  vtkIntArray* localToGlobalMapArray = vtkIntArray::New();
+//  localToGlobalMapArray->SetName("LocalToGlobalMap");
+//  output->GetFieldData()->AddArray(localToGlobalMapArray);
+//  for ( int j = 0; j < numBlocks; j++ )
+//    {
+//    globalToLocalMapArray->SetValue(j,-32);
+//    levelArray->SetValue(j,this->GetBlockLevel(j));
+//    parentArray->SetValue(j,this->GetBlockParentId(j));
+//    int childrenIds[8];
+//    this->GetBlockChildrenIds(j, childrenIds);
+//    for (int i = 0; i < 8; ++i)
+//      {
+//      if (childrenIds[i] > 0) {--childrenIds[i];}
+//      }
+//    childrenArray->SetTupleValue(j,childrenIds);
+//    int neighborIds[6];
+//    this->GetBlockNeighborIds(j, neighborIds);
+//    for (int i = 0; i < 6; ++i)
+//      {
+//      if (neighborIds[i] > 0) {--neighborIds[i];}
+//      }
+//    neighborArray->SetTupleValue(j, neighborIds);
+//    }
+//
+//  numBlocks = (int)(this->ToGlobalBlockMap.size());
+//  for ( int j = 0; j < numBlocks; j ++ )
+//    {
+//    // Change GlobalToLocalMapArray to reflect this block was loaded.
+//    int globalId = this->ToGlobalBlockMap[j];
+//    globalToLocalMapArray->SetValue(globalId,j);
+//    localToGlobalMapArray->InsertNextValue(globalId);
+//    // blocks not loaded because they are ancestors will be marked with -1
+//    while (globalId != 0) // root
+//      {
+//      globalId = parentArray->GetValue(globalId) - 1;
+//      if (globalToLocalMapArray->GetValue(globalId) != -32)
+//        {
+//        break;
+//        }
+//      globalToLocalMapArray->SetValue(globalId, -1);
+//      }
+//    this->GetBlock( j, output );
+//    }
+//
+//  int   blockIdx = (int)(this->ToGlobalBlockMap.size());
+//  if (this->LoadParticles)
+//    {
+//    this->GetParticles( blockIdx, output );
+//    }
+//  if (this->LoadMortonCurve)
+//    {
+//    this->GetMortonCurve( blockIdx, output );
+//    }
+//  outInf = NULL;
+//  output = NULL;
+//  levelArray->Delete();
+//  levelArray = 0;
+//
+//  return 1;
+//}
+
 // ----------------------------------------------------------------------------
-void vtkFlashReader::GetBlock( int blockMapIdx, vtkMultiBlockDataSet * multiBlk )
+void vtkFlashReader::GetBlock(
+    int blockMapIdx, vtkHierarchicalBoxDataSet *amrds )
 {
   this->Internal->ReadMetaData();
-  int blockIdx = this->ToGlobalBlockMap[blockMapIdx];
-  bool processOwns = (this->MyProcessId == this->BlockProcess[blockMapIdx]);
-  
-  if ( multiBlk == NULL || blockIdx < 0 || 
-       blockIdx >= this->Internal->NumberOfBlocks )
+  int blockIdx = this->ToGlobalBlockMap[ blockMapIdx ];
+
+  vtkUniformGrid *ug = vtkUniformGrid::New();
+  assert( "pre: uniform grid is NULL" && (ug != NULL) );
+
+  int bSuccess = this->GetBlock( blockIdx, ug );
+  if( bSuccess )
     {
-    vtkDebugMacro( "Invalid block index or vtkMultiBlockDataSet NULL" << endl );
-    return;
+     // start numbering levels from 0
+     int l = this->Internal->Blocks[blockIdx].Level-1;
+     amrds->SetDataSet( l, blockIdx, ug );
     }
-  
-  int                  bSuccess = 0;
-  vtkDataSet         * pDataSet = NULL;
-  vtkImageData       * imagData = NULL;
-  vtkRectilinearGrid * rectGrid = NULL;
-  
-  if (processOwns)
+  else
     {
-    if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
-      {
-      imagData = vtkImageData::New();
-      pDataSet = imagData;
-      bSuccess = this->GetBlock( blockIdx, imagData );
-      }
-    else                              // take each clock as a vtkRectilinearGrid
-      {
-      rectGrid = vtkRectilinearGrid::New();
-      pDataSet = rectGrid;
-      bSuccess = this->GetBlock( blockIdx, rectGrid );
-      }
-    }
-  
-  if (  bSuccess == 1  )
-    {
-    char     blckName[100];
-    sprintf( blckName, "Block%03d_Level%d_Type%d", 
-             this->Internal->Blocks[blockIdx].Index, 
-             this->Internal->Blocks[blockIdx].Level, 
-             this->Internal->Blocks[blockIdx].Type );
-    multiBlk->SetBlock( blockMapIdx, pDataSet );
-    multiBlk->GetMetaData( blockMapIdx )
-            ->Set( vtkCompositeDataSet::NAME(), blckName );
-    }
-    
-  pDataSet = NULL;
-  
-  if ( imagData )
-    {
-    imagData->Delete();
-    imagData = NULL;
-    }
-  
-  if ( rectGrid )
-    {
-    rectGrid->Delete();
-    rectGrid = NULL;
+      vtkErrorMacro( "Cannot load block " << blockIdx );
     }
 }
 
 // ----------------------------------------------------------------------------
-int  vtkFlashReader::GetBlock( int blockIdx, vtkImageData * imagData )
+//void vtkFlashReader::GetBlock(
+//    int blockMapIdx, vtkHierarchicalBoxDataSet* multiBlk )
+//{
+//  this->Internal->ReadMetaData();
+//  int blockIdx = this->ToGlobalBlockMap[blockMapIdx];
+//  bool processOwns = (this->MyProcessId == this->BlockProcess[blockMapIdx]);
+//
+//  if ( multiBlk == NULL || blockIdx < 0 ||
+//       blockIdx >= this->Internal->NumberOfBlocks )
+//    {
+//    vtkDebugMacro( "Invalid block index or vtkMultiBlockDataSet NULL" << endl );
+//    return;
+//    }
+//
+//  int                  bSuccess = 0;
+////  vtkDataSet         * pDataSet = NULL;
+////  vtkImageData       * imagData = NULL;
+////  vtkRectilinearGrid * rectGrid = NULL;
+//
+//  if (processOwns)
+//    {
+////    if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+////      {
+////      imagData = vtkImageData::New();
+////      pDataSet = imagData;
+////      bSuccess = this->GetBlock( blockIdx, imagData );
+////      }
+////    else                              // take each clock as a vtkRectilinearGrid
+////      {
+////      rectGrid = vtkRectilinearGrid::New();
+////      pDataSet = rectGrid;
+////      bSuccess = this->GetBlock( blockIdx, rectGrid );
+////      }
+//    }
+//
+//  if (  bSuccess == 1  )
+//    {
+//    char     blckName[100];
+//    sprintf( blckName, "Block%03d_Level%d_Type%d",
+//             this->Internal->Blocks[blockIdx].Index,
+//             this->Internal->Blocks[blockIdx].Level,
+//             this->Internal->Blocks[blockIdx].Type );
+////    multiBlk->SetBlock( blockMapIdx, pDataSet );
+////    multiBlk->GetMetaData( blockMapIdx )
+////            ->Set( vtkCompositeDataSet::NAME(), blckName );
+//    }
+//
+////  pDataSet = NULL;
+////
+////  if ( imagData )
+////    {
+////    imagData->Delete();
+////    imagData = NULL;
+////    }
+////
+////  if ( rectGrid )
+////    {
+////    rectGrid->Delete();
+////    rectGrid = NULL;
+////    }
+//}
+
+// ----------------------------------------------------------------------------
+int vtkFlashReader::GetBlock( int blockIdx, vtkUniformGrid *ug )
 {
   this->Internal->ReadMetaData();
-  
-  if ( imagData == NULL || blockIdx < 0 || 
-       blockIdx >= this->Internal->NumberOfBlocks )
+
+  if( (ug == NULL) || (blockIdx < 0) ||
+      (blockIdx >= this->Internal->NumberOfBlocks) )
     {
-    vtkDebugMacro( "Invalid block index or vtkImageData NULL" << endl );
-    return 0;
+      vtkDebugMacro( "Invalid block index or uniform grid is NULL" << endl );
+      return 0;
     }
-  
+
   int     i;
   double  blockMin[3];
   double  blockMax[3];
   double  spacings[3];
-  
   for ( i = 0; i < 3; i ++ )
     {
-    blockMin[i] =   this->Internal->Blocks[ blockIdx ].MinBounds[i];
-    blockMax[i] =   this->Internal->Blocks[ blockIdx ].MaxBounds[i]; 
-    spacings[i] = ( this->Internal->BlockGridDimensions[i] > 1   )
-                ? ( blockMax[i] - blockMin[i] ) / 
-                  ( this->Internal->BlockGridDimensions[i] - 1.0 )
-                :   1.0;
-    }
-  
-  imagData->SetDimensions( this->Internal->BlockGridDimensions );
-  imagData->SetOrigin ( blockMin[0], blockMin[1], blockMin[2] );
-  imagData->SetSpacing( spacings[0], spacings[1], spacings[2] );
-  
-  // attach the data attributes to the grid
-  int   numAttrs = static_cast < int > 
-                   ( this->Internal->AttributeNames.size() );
-  for ( i = 0; i < numAttrs; i ++ )
-    {
-    const char* name = this->Internal->AttributeNames[i].c_str();
-    if (this->GetCellArrayStatus(name))
-      {
-      this->GetBlockAttribute(name, blockIdx, imagData );
-      }
+      blockMin[i] =   this->Internal->Blocks[ blockIdx ].MinBounds[i];
+      blockMax[i] =   this->Internal->Blocks[ blockIdx ].MaxBounds[i];
+      spacings[i] = ( this->Internal->BlockGridDimensions[i] > 1   )
+                  ? ( blockMax[i] - blockMin[i] ) /
+                    ( this->Internal->BlockGridDimensions[i] - 1.0 )
+                  :   1.0;
     }
 
-  // vectorize
-  if (this->MergeXYZComponents)
+  ug->SetDimensions( this->Internal->BlockGridDimensions );
+  ug->SetOrigin( blockMin[0], blockMin[1], blockMin[2] );
+  ug->SetSpacing( spacings );
+
+  // Read in attributes
+  int   numAttrs = static_cast < int >( this->Internal->AttributeNames.size() );
+  for ( i = 0; i < numAttrs; i ++ )
     {
-    this->MergeVectors(imagData->GetCellData()); 
+      const char* name = this->Internal->AttributeNames[i].c_str();
+      if( this->GetCellArrayStatus(name) )
+        {
+          this->GetBlockAttribute(name, blockIdx, ug );
+        }
+    } // END for all attributes
+
+  // vectorize
+  if( this->MergeXYZComponents )
+    {
+      this->MergeVectors( ug->GetCellData() );
     }
-    
+
   return 1;
 }
 
 // ----------------------------------------------------------------------------
-int vtkFlashReader::GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid )
-{
-  this->Internal->ReadMetaData();
-  
-  if ( rectGrid == NULL || blockIdx < 0 || 
-       blockIdx >= this->Internal->NumberOfBlocks )
-    {
-    vtkDebugMacro( "Invalid block index or vtkRectilinearGrid NULL" << endl );
-    return 0;
-    }
-  
-  int       i, j;
-  vtkDoubleArray * theCords[3] = { NULL, NULL, NULL };
-  
-  for ( j = 0; j < 3; j ++ )
-    {
-    theCords[j] = vtkDoubleArray::New();
-    theCords[j]->SetNumberOfTuples( this->Internal->BlockGridDimensions[j] );
-    
-    if ( this->Internal->BlockGridDimensions[j] == 1 )
-      {
-      // dimension degeneration
-      theCords[j]->SetComponent( 0, 0, 0.0 );
-      }
-    else
-      {  
-      // set the one-dimensional coordinates
-      double blockMin = this->Internal->Blocks[blockIdx].MinBounds[j];
-      double blockMax = this->Internal->Blocks[blockIdx].MaxBounds[j]; 
-      double cellSize = ( blockMax - blockMin ) / 
-                        ( this->Internal->BlockGridDimensions[j] - 1.0 );
-      for ( i = 0; i < this->Internal->BlockGridDimensions[j]; i ++ )
-        {
-        theCords[j]->SetComponent( i, 0, blockMin + i * cellSize );
-        }
-      }
-    }
-  
-  // link the coordinates to the rectilinear grid 
-  rectGrid->SetDimensions( this->Internal->BlockGridDimensions );
-  rectGrid->SetXCoordinates( theCords[0] );
-  rectGrid->SetYCoordinates( theCords[1] );
-  rectGrid->SetZCoordinates( theCords[2] );
-  theCords[0]->Delete();
-  theCords[1]->Delete();
-  theCords[2]->Delete();
-  theCords[0] = NULL;
-  theCords[1] = NULL;
-  theCords[2] = NULL;
-  
-  // attach the data attributes to the grid
-  int   numAttrs = static_cast < int > 
-                   ( this->Internal->AttributeNames.size() );
-  for ( i = 0; i < numAttrs; i ++ )
-    {
-    this->GetBlockAttribute( this->Internal->AttributeNames[i].c_str(), 
-                             blockIdx, rectGrid );
-    }
-    
-  return 1;
-}
+//int  vtkFlashReader::GetBlock( int blockIdx, vtkImageData * imagData )
+//{
+//  this->Internal->ReadMetaData();
+//
+//  if ( imagData == NULL || blockIdx < 0 ||
+//       blockIdx >= this->Internal->NumberOfBlocks )
+//    {
+//    vtkDebugMacro( "Invalid block index or vtkImageData NULL" << endl );
+//    return 0;
+//    }
+//
+//  int     i;
+//  double  blockMin[3];
+//  double  blockMax[3];
+//  double  spacings[3];
+//
+//  for ( i = 0; i < 3; i ++ )
+//    {
+//    blockMin[i] =   this->Internal->Blocks[ blockIdx ].MinBounds[i];
+//    blockMax[i] =   this->Internal->Blocks[ blockIdx ].MaxBounds[i];
+//    spacings[i] = ( this->Internal->BlockGridDimensions[i] > 1   )
+//                ? ( blockMax[i] - blockMin[i] ) /
+//                  ( this->Internal->BlockGridDimensions[i] - 1.0 )
+//                :   1.0;
+//    }
+//
+//  imagData->SetDimensions( this->Internal->BlockGridDimensions );
+//  imagData->SetOrigin ( blockMin[0], blockMin[1], blockMin[2] );
+//  imagData->SetSpacing( spacings[0], spacings[1], spacings[2] );
+//
+//  // attach the data attributes to the grid
+//  int   numAttrs = static_cast < int >
+//                   ( this->Internal->AttributeNames.size() );
+//  for ( i = 0; i < numAttrs; i ++ )
+//    {
+//    const char* name = this->Internal->AttributeNames[i].c_str();
+//    if (this->GetCellArrayStatus(name))
+//      {
+//      this->GetBlockAttribute(name, blockIdx, imagData );
+//      }
+//    }
+//
+//  // vectorize
+//  if (this->MergeXYZComponents)
+//    {
+//    this->MergeVectors(imagData->GetCellData());
+//    }
+//
+//  return 1;
+//}
+
+// ----------------------------------------------------------------------------
+//int vtkFlashReader::GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid )
+//{
+//  this->Internal->ReadMetaData();
+//
+//  if ( rectGrid == NULL || blockIdx < 0 ||
+//       blockIdx >= this->Internal->NumberOfBlocks )
+//    {
+//    vtkDebugMacro( "Invalid block index or vtkRectilinearGrid NULL" << endl );
+//    return 0;
+//    }
+//
+//  int       i, j;
+//  vtkDoubleArray * theCords[3] = { NULL, NULL, NULL };
+//
+//  for ( j = 0; j < 3; j ++ )
+//    {
+//    theCords[j] = vtkDoubleArray::New();
+//    theCords[j]->SetNumberOfTuples( this->Internal->BlockGridDimensions[j] );
+//
+//    if ( this->Internal->BlockGridDimensions[j] == 1 )
+//      {
+//      // dimension degeneration
+//      theCords[j]->SetComponent( 0, 0, 0.0 );
+//      }
+//    else
+//      {
+//      // set the one-dimensional coordinates
+//      double blockMin = this->Internal->Blocks[blockIdx].MinBounds[j];
+//      double blockMax = this->Internal->Blocks[blockIdx].MaxBounds[j];
+//      double cellSize = ( blockMax - blockMin ) /
+//                        ( this->Internal->BlockGridDimensions[j] - 1.0 );
+//      for ( i = 0; i < this->Internal->BlockGridDimensions[j]; i ++ )
+//        {
+//        theCords[j]->SetComponent( i, 0, blockMin + i * cellSize );
+//        }
+//      }
+//    }
+//
+//  // link the coordinates to the rectilinear grid
+//  rectGrid->SetDimensions( this->Internal->BlockGridDimensions );
+//  rectGrid->SetXCoordinates( theCords[0] );
+//  rectGrid->SetYCoordinates( theCords[1] );
+//  rectGrid->SetZCoordinates( theCords[2] );
+//  theCords[0]->Delete();
+//  theCords[1]->Delete();
+//  theCords[2]->Delete();
+//  theCords[0] = NULL;
+//  theCords[1] = NULL;
+//  theCords[2] = NULL;
+//
+//  // attach the data attributes to the grid
+//  int   numAttrs = static_cast < int >
+//                   ( this->Internal->AttributeNames.size() );
+//  for ( i = 0; i < numAttrs; i ++ )
+//    {
+//    this->GetBlockAttribute( this->Internal->AttributeNames[i].c_str(),
+//                             blockIdx, rectGrid );
+//    }
+//
+//  return 1;
+//}
 
 // ----------------------------------------------------------------------------
 void vtkFlashReader::GetBlockAttribute( const char * atribute, int blockIdx, 
@@ -3078,185 +3194,185 @@ void vtkFlashReader::GetParticlesAttribute( const char  * atribute,
 }
 
 // ----------------------------------------------------------------------------
-void vtkFlashReader::GetMortonCurve( int & blockIdx, 
-                                     vtkMultiBlockDataSet * multiBlk )
-{   
-  if ( blockIdx < 0 || !multiBlk )
-    {
-    vtkErrorMacro( "vtkMultiBlockDataSet NULL or an invalid block index " 
-                   << "assigned to the Morton curve." << endl );
-    return;
-    }
-    
-  vtkPolyData * polyData = vtkPolyData::New();
-  
-  if (  this->GetMortonCurve( polyData ) == 1  )
-    {
-    multiBlk->SetBlock( blockIdx, polyData );
-    multiBlk->GetMetaData( blockIdx )
-            ->Set( vtkCompositeDataSet::NAME(), "MortonCurve" );
-            
-    blockIdx ++;
-    }
-          
-  polyData->Delete();
-  polyData = NULL;
-}
+//void vtkFlashReader::GetMortonCurve( int & blockIdx,
+//                                     vtkMultiBlockDataSet * multiBlk )
+//{
+//  if ( blockIdx < 0 || !multiBlk )
+//    {
+//    vtkErrorMacro( "vtkMultiBlockDataSet NULL or an invalid block index "
+//                   << "assigned to the Morton curve." << endl );
+//    return;
+//    }
+//
+//  vtkPolyData * polyData = vtkPolyData::New();
+//
+//  if (  this->GetMortonCurve( polyData ) == 1  )
+//    {
+//    multiBlk->SetBlock( blockIdx, polyData );
+//    multiBlk->GetMetaData( blockIdx )
+//            ->Set( vtkCompositeDataSet::NAME(), "MortonCurve" );
+//
+//    blockIdx ++;
+//    }
+//
+//  polyData->Delete();
+//  polyData = NULL;
+//}
 
 // ----------------------------------------------------------------------------
-int vtkFlashReader::GetMortonCurve( vtkPolyData * polyData )
-{
-  this->Internal->ReadMetaData();
-  
-  if ( this->Internal->NumberOfBlocks < 1 || !polyData )
-    {
-    vtkErrorMacro( "no any block found or vtkPolyData NULL." << endl );
-    return 0;
-    }
-    
-  int            i;
-  int            bSuccess = 0;
-  int            numbPnts = 0;
-  vtkPoints    * curvePts = vtkPoints::New();
-  vtkCellArray * theLines = vtkCellArray::New();
-
-  // retrieve the center of each leaf block and duplicate it (except for the
-  // first leaf block) and then connect these centers successively, two points
-  // per line segment
-  for ( numbPnts = 0, i = 0; i < this->Internal->NumberOfBlocks; i ++ )
-    {
-    if ( this->Internal->Blocks[i].Type == FLASH_READER_LEAF_BLOCK )
-      {
-      curvePts->InsertPoint( numbPnts, this->Internal->Blocks[i].Center[0], 
-                                       this->Internal->Blocks[i].Center[1],
-                                       this->Internal->Blocks[i].Center[2] );
-      numbPnts ++;
-      
-      if ( numbPnts != 1 )
-        {
-        // duplicate each internal point beginning with the second point
-        curvePts->InsertPoint( numbPnts, this->Internal->Blocks[i].Center[0], 
-                                         this->Internal->Blocks[i].Center[1], 
-                                         this->Internal->Blocks[i].Center[2] );
-        numbPnts ++;
-        }
-      }
-    }
-    
-  // # ( numbPnts - 2 ) and # ( numbPnts - 1 ) refer to the very last point
-  // and hence the final connection occurs between # (numbPnts - 3 ) and
-  // # ( numbPnts - 2 ) 
-  for ( i = 0; i < numbPnts - 2; i += 2 )
-    {
-    theLines->InsertNextCell( 2 );
-    theLines->InsertCellPoint( i );
-    theLines->InsertCellPoint( i + 1 );
-    }
-
-  if ( numbPnts )
-    {
-    bSuccess = 1;
-    polyData->SetPoints( curvePts );
-    polyData->SetLines ( theLines );
-    }
-          
-  theLines->Delete();
-  curvePts->Delete();
-  theLines = NULL;
-  curvePts = NULL;
-  
-  return bSuccess;
-}
+//int vtkFlashReader::GetMortonCurve( vtkPolyData * polyData )
+//{
+//  this->Internal->ReadMetaData();
+//
+//  if ( this->Internal->NumberOfBlocks < 1 || !polyData )
+//    {
+//    vtkErrorMacro( "no any block found or vtkPolyData NULL." << endl );
+//    return 0;
+//    }
+//
+//  int            i;
+//  int            bSuccess = 0;
+//  int            numbPnts = 0;
+//  vtkPoints    * curvePts = vtkPoints::New();
+//  vtkCellArray * theLines = vtkCellArray::New();
+//
+//  // retrieve the center of each leaf block and duplicate it (except for the
+//  // first leaf block) and then connect these centers successively, two points
+//  // per line segment
+//  for ( numbPnts = 0, i = 0; i < this->Internal->NumberOfBlocks; i ++ )
+//    {
+//    if ( this->Internal->Blocks[i].Type == FLASH_READER_LEAF_BLOCK )
+//      {
+//      curvePts->InsertPoint( numbPnts, this->Internal->Blocks[i].Center[0],
+//                                       this->Internal->Blocks[i].Center[1],
+//                                       this->Internal->Blocks[i].Center[2] );
+//      numbPnts ++;
+//
+//      if ( numbPnts != 1 )
+//        {
+//        // duplicate each internal point beginning with the second point
+//        curvePts->InsertPoint( numbPnts, this->Internal->Blocks[i].Center[0],
+//                                         this->Internal->Blocks[i].Center[1],
+//                                         this->Internal->Blocks[i].Center[2] );
+//        numbPnts ++;
+//        }
+//      }
+//    }
+//
+//  // # ( numbPnts - 2 ) and # ( numbPnts - 1 ) refer to the very last point
+//  // and hence the final connection occurs between # (numbPnts - 3 ) and
+//  // # ( numbPnts - 2 )
+//  for ( i = 0; i < numbPnts - 2; i += 2 )
+//    {
+//    theLines->InsertNextCell( 2 );
+//    theLines->InsertCellPoint( i );
+//    theLines->InsertCellPoint( i + 1 );
+//    }
+//
+//  if ( numbPnts )
+//    {
+//    bSuccess = 1;
+//    polyData->SetPoints( curvePts );
+//    polyData->SetLines ( theLines );
+//    }
+//
+//  theLines->Delete();
+//  curvePts->Delete();
+//  theLines = NULL;
+//  curvePts = NULL;
+//
+//  return bSuccess;
+//}
 
 // ----------------------------------------------------------------------------
-int vtkFlashReader::GetMortonSegment( int blockIdx, vtkPolyData * polyData )
-{
-  this->Internal->ReadMetaData();
-  
-  // A morton curve is something like a z-order curve that connects leaf blocks
-  // by their centers successively. This function links the given leaf block,
-  // if so, with its neighboring leaf blocks using two line segments.
-  
-  if ( polyData == NULL || blockIdx < 0 )
-    {
-    vtkDebugMacro( "vtkPolyData NULL, unable to hold Morton curve." << endl );
-    return 0;
-    }
-  
-  vtkstd::vector< int >::iterator i = 
-                            find( this->Internal->LeafBlocks.begin(), 
-                                  this->Internal->LeafBlocks.end(), blockIdx );
-  if ( i == this->Internal->LeafBlocks.end() )
-    {
-    vtkDebugMacro( "A leaf block expected." << endl );
-    return 0;
-    }
-    
-  vtkPoints    * linePnts = vtkPoints::New();
-  vtkCellArray * theLines = vtkCellArray::New();
-  
-  if (  i == this->Internal->LeafBlocks.begin()  )
-    {
-    linePnts->InsertPoint(  0,  this->Internal->Blocks[  blockIdx  ].Center[0], 
-                                this->Internal->Blocks[  blockIdx  ].Center[1], 
-                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
-    linePnts->InsertPoint(  1,  this->Internal->Blocks[ *( i + 1 ) ].Center[0], 
-                                this->Internal->Blocks[ *( i + 1 ) ].Center[1], 
-                                this->Internal->Blocks[ *( i + 1 ) ].Center[2]  );
-                                
-    theLines->InsertNextCell ( 2 );
-    theLines->InsertCellPoint( 0 );
-    theLines->InsertCellPoint( 1 );
-    }
-  else 
-  if (  i == ( this->Internal->LeafBlocks.end() - 1 )  )
-    {
-    linePnts->InsertPoint(  0,  this->Internal->Blocks[ *( i - 1 ) ].Center[0], 
-                                this->Internal->Blocks[ *( i - 1 ) ].Center[1], 
-                                this->Internal->Blocks[ *( i - 1 ) ].Center[2]  );
-    linePnts->InsertPoint(  1,  this->Internal->Blocks[  blockIdx  ].Center[0], 
-                                this->Internal->Blocks[  blockIdx  ].Center[1], 
-                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
-                                
-    theLines->InsertNextCell ( 2 );
-    theLines->InsertCellPoint( 0 );
-    theLines->InsertCellPoint( 1 );
-    }
-  else
-    {
-    // duplicate internal points
-    linePnts->InsertPoint(  0,  this->Internal->Blocks[ *( i - 1 ) ].Center[0], 
-                                this->Internal->Blocks[ *( i - 1 ) ].Center[1], 
-                                this->Internal->Blocks[ *( i - 1 ) ].Center[2]  );
-    linePnts->InsertPoint(  1,  this->Internal->Blocks[  blockIdx  ].Center[0], 
-                                this->Internal->Blocks[  blockIdx  ].Center[1], 
-                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
-    linePnts->InsertPoint(  2,  this->Internal->Blocks[  blockIdx  ].Center[0], 
-                                this->Internal->Blocks[  blockIdx  ].Center[1], 
-                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
-    linePnts->InsertPoint(  3,  this->Internal->Blocks[ *( i + 1 ) ].Center[0], 
-                                this->Internal->Blocks[ *( i + 1 ) ].Center[1], 
-                                this->Internal->Blocks[ *( i + 1 ) ].Center[2]  );
-                                
-    theLines->InsertNextCell ( 2 );
-    theLines->InsertCellPoint( 0 );
-    theLines->InsertCellPoint( 1 );
-    
-    theLines->InsertNextCell ( 2 );
-    theLines->InsertCellPoint( 2 );
-    theLines->InsertCellPoint( 3 );
-    }
-
-  polyData->SetPoints(linePnts);
-  polyData->SetLines(theLines);
-  
-  theLines->Delete();
-  linePnts->Delete();
-  theLines = NULL;
-  linePnts = NULL;
-  
-  return 1;
-}
+//int vtkFlashReader::GetMortonSegment( int blockIdx, vtkPolyData * polyData )
+//{
+//  this->Internal->ReadMetaData();
+//
+//  // A morton curve is something like a z-order curve that connects leaf blocks
+//  // by their centers successively. This function links the given leaf block,
+//  // if so, with its neighboring leaf blocks using two line segments.
+//
+//  if ( polyData == NULL || blockIdx < 0 )
+//    {
+//    vtkDebugMacro( "vtkPolyData NULL, unable to hold Morton curve." << endl );
+//    return 0;
+//    }
+//
+//  vtkstd::vector< int >::iterator i =
+//                            find( this->Internal->LeafBlocks.begin(),
+//                                  this->Internal->LeafBlocks.end(), blockIdx );
+//  if ( i == this->Internal->LeafBlocks.end() )
+//    {
+//    vtkDebugMacro( "A leaf block expected." << endl );
+//    return 0;
+//    }
+//
+//  vtkPoints    * linePnts = vtkPoints::New();
+//  vtkCellArray * theLines = vtkCellArray::New();
+//
+//  if (  i == this->Internal->LeafBlocks.begin()  )
+//    {
+//    linePnts->InsertPoint(  0,  this->Internal->Blocks[  blockIdx  ].Center[0],
+//                                this->Internal->Blocks[  blockIdx  ].Center[1],
+//                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
+//    linePnts->InsertPoint(  1,  this->Internal->Blocks[ *( i + 1 ) ].Center[0],
+//                                this->Internal->Blocks[ *( i + 1 ) ].Center[1],
+//                                this->Internal->Blocks[ *( i + 1 ) ].Center[2]  );
+//
+//    theLines->InsertNextCell ( 2 );
+//    theLines->InsertCellPoint( 0 );
+//    theLines->InsertCellPoint( 1 );
+//    }
+//  else
+//  if (  i == ( this->Internal->LeafBlocks.end() - 1 )  )
+//    {
+//    linePnts->InsertPoint(  0,  this->Internal->Blocks[ *( i - 1 ) ].Center[0],
+//                                this->Internal->Blocks[ *( i - 1 ) ].Center[1],
+//                                this->Internal->Blocks[ *( i - 1 ) ].Center[2]  );
+//    linePnts->InsertPoint(  1,  this->Internal->Blocks[  blockIdx  ].Center[0],
+//                                this->Internal->Blocks[  blockIdx  ].Center[1],
+//                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
+//
+//    theLines->InsertNextCell ( 2 );
+//    theLines->InsertCellPoint( 0 );
+//    theLines->InsertCellPoint( 1 );
+//    }
+//  else
+//    {
+//    // duplicate internal points
+//    linePnts->InsertPoint(  0,  this->Internal->Blocks[ *( i - 1 ) ].Center[0],
+//                                this->Internal->Blocks[ *( i - 1 ) ].Center[1],
+//                                this->Internal->Blocks[ *( i - 1 ) ].Center[2]  );
+//    linePnts->InsertPoint(  1,  this->Internal->Blocks[  blockIdx  ].Center[0],
+//                                this->Internal->Blocks[  blockIdx  ].Center[1],
+//                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
+//    linePnts->InsertPoint(  2,  this->Internal->Blocks[  blockIdx  ].Center[0],
+//                                this->Internal->Blocks[  blockIdx  ].Center[1],
+//                                this->Internal->Blocks[  blockIdx  ].Center[2]  );
+//    linePnts->InsertPoint(  3,  this->Internal->Blocks[ *( i + 1 ) ].Center[0],
+//                                this->Internal->Blocks[ *( i + 1 ) ].Center[1],
+//                                this->Internal->Blocks[ *( i + 1 ) ].Center[2]  );
+//
+//    theLines->InsertNextCell ( 2 );
+//    theLines->InsertCellPoint( 0 );
+//    theLines->InsertCellPoint( 1 );
+//
+//    theLines->InsertNextCell ( 2 );
+//    theLines->InsertCellPoint( 2 );
+//    theLines->InsertCellPoint( 3 );
+//    }
+//
+//  polyData->SetPoints(linePnts);
+//  polyData->SetLines(theLines);
+//
+//  theLines->Delete();
+//  linePnts->Delete();
+//  theLines = NULL;
+//  linePnts = NULL;
+//
+//  return 1;
+//}
 
 /*/ ----------------------------------------------------------------------------
 void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx, 

@@ -44,7 +44,8 @@
 #ifndef __vtkFlashReader_h
 #define __vtkFlashReader_h
 
-#include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkHierarchicalBoxDataSetAlgorithm.h"
+//#include "vtkMultiBlockDataSetAlgorithm.h"
 #include <vtkstd/vector> // STL Header
 
 class    vtkDataSet;
@@ -56,12 +57,14 @@ class    vtkFlashReaderInternal;
 class    vtkDataArraySelection;
 class    vtkCallbackCommand;
 class    vtkDataSetAttributes;
+class    vtkUniformGrid;
+class    vtkHierarchicalBoxDataSet;
 
-class VTK_EXPORT vtkFlashReader : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkFlashReader : public vtkHierarchicalBoxDataSetAlgorithm
 {
 public:
   static vtkFlashReader * New();
-  vtkTypeMacro( vtkFlashReader, vtkMultiBlockDataSetAlgorithm );
+  vtkTypeMacro( vtkFlashReader, vtkHierarchicalBoxDataSetAlgorithm );
   void PrintSelf( ostream & os, vtkIndent indent );
 
   // Description:
@@ -122,9 +125,9 @@ public:
   
   // Description:
   // Load the morton curve.
-  vtkSetMacro( LoadMortonCurve, int );
-  vtkGetMacro( LoadMortonCurve, int );
-  vtkBooleanMacro( LoadMortonCurve, int );
+//  vtkSetMacro( LoadMortonCurve, int );
+//  vtkGetMacro( LoadMortonCurve, int );
+//  vtkBooleanMacro( LoadMortonCurve, int );
   
   // Description:
   // Load the particles.
@@ -303,16 +306,22 @@ public:
   int            IsParticleAttribute( const char * attrName );    
   
   // Description:
+  // This function fills an allocated vtkUniformGrid with a block specified by
+  // 0-based blockIdx and the loads the associated cell data attributes from the
+  // file. The returned value indicates failure (0) or success (1)
+  int GetBlock( int blockIdx, vtkUniformGrid *ug );
+
+  // Description:
   // This function fills an allocated vtkImageData with a block specified by
   // 0-based blockIdx and loads the associated cell data attributes from the
   // file. The returned value indicates failure (0) or success (1).
-  int            GetBlock( int blockIdx, vtkImageData * imagData );     
+//  int            GetBlock( int blockIdx, vtkImageData * imagData );
   
   // Description:
   // This function fills an allocated vtkImageData with a block specified
   // by 0-based blockIdx and loads the associated cell data attributes from the
   // file. The returned value indicates failure (0) or success (1).
-  int            GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid );
+//  int            GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid );
   
   // Description:
   // This function loads particles (and the associated data attributes) from the 
@@ -325,7 +334,7 @@ public:
   // all the leaf rectilinear blocks by their centers. This morton curve is then
   // stored in an allocated vtkPolyData. The returned value indicates failure (0)
   // or success (1).
-  int            GetMortonCurve( vtkPolyData * polyData );
+//  int            GetMortonCurve( vtkPolyData * polyData );
   
 
 
@@ -414,7 +423,9 @@ protected:
   // This function creates a vtkImageData block (and loads the associated 
   // cell data attributes from the file) specified by 0-based blockIdx and 
   // inserted it to an allocated vtkMultiBlockDataSet multiBlk.
-  void           GetBlock( int blockIdx, vtkMultiBlockDataSet * multiBlk );
+//  void           GetBlock( int blockIdx, vtkMultiBlockDataSet * multiBlk );
+
+  void GetBlock( int blockIdx, vtkHierarchicalBoxDataSet *amrds );
   
   // Description:
   // This function, called by GetBlock( ... ), loads from the file a cell data
@@ -442,14 +453,14 @@ protected:
   // all the leaf rectilinear blocks by their centers. This morton curve is 
   // inserted in the form of a vtkPolyData (with blockIdx as the assigned 0-based
   // block index) to an allocated vtkMultiBlockDataSet multiBlk.
-  void           GetMortonCurve( int & blockIdx, vtkMultiBlockDataSet * multiBlk );
+//  void           GetMortonCurve( int & blockIdx, vtkMultiBlockDataSet * multiBlk );
   
   // Description:
   // This function creates two line segments, as part of the morton curve, for
   // a leaf rectilinear block (specified by 0-based blockIdx) in relation with 
   // the two neighboring leaf rectilinear blocks. These two segments are stored
   // in an allocated vtkPolyData polyData.
-  int            GetMortonSegment( int blockIdx, vtkPolyData * polyData );
+//  int            GetMortonSegment( int blockIdx, vtkPolyData * polyData );
   
   virtual int    FillOutputPortInformation( int port, vtkInformation * info );
   int            RequestData( vtkInformation *,
@@ -463,7 +474,7 @@ protected:
   static int     NumberOfInstances;
   vtkFlashReaderInternal * Internal;
   int            BlockOutputType;
-  int            LoadMortonCurve;
+//  int            LoadMortonCurve;
   int            LoadParticles;
   int            MaximumNumberOfBlocks;
   
