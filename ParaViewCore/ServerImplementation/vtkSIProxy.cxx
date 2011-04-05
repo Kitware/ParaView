@@ -187,9 +187,12 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
         this->Internals->SubSIProxies.begin();
     for( ; it2 != this->Internals->SubSIProxies.end(); it2++)
       {
-      ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
-      subproxy->set_name(it2->first.c_str());
-      subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
+      if(it2->second.GetPointer() != NULL)
+        {
+        ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
+        subproxy->set_name(it2->first.c_str());
+        subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
+        }
       }
     }
 }
