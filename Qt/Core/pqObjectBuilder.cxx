@@ -624,9 +624,13 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
 //-----------------------------------------------------------------------------
 pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
 {
-  vtkSMProxy* proxy = 
-    this->createProxyInternal("animation", "AnimationScene", server,
-      "animation", QString(), QMap<QString,QVariant>());
+  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMProxy* proxy = pxm->GetProxy("animation", "AnimationScene");
+  if(proxy == NULL)
+    {
+    proxy = this->createProxyInternal("animation", "AnimationScene", server,
+                                      "animation", QString(), QMap<QString,QVariant>());
+    }
   if (proxy)
     {
     proxy->UpdateVTKObjects();

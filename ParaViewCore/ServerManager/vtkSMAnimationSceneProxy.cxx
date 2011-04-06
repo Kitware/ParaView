@@ -22,7 +22,6 @@ vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
-  this->SetGlobalID(vtkSMAnimationSceneProxy::GetReservedGlobalID());
 }
 
 //----------------------------------------------------------------------------
