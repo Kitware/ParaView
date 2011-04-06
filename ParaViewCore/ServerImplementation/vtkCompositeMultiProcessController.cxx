@@ -99,12 +99,10 @@ struct Controller
 
   bool RemoveRMICallback(unsigned long observerTagId)
     {
-    cout << "vtkComposite::RemoveRMICallback " << observerTagId << endl;
     int size = this->RMICallbackIdMapping[observerTagId].size();
     bool result = false;
     for(int i=0;i<size;i++)
       {
-      cout << " - removing inner tag: " << this->RMICallbackIdMapping[observerTagId][i] << endl;
       result = this->MultiProcessController->RemoveRMICallback(
           this->RMICallbackIdMapping[observerTagId][i]) || result;
 
@@ -202,8 +200,6 @@ public:
       }
     }
   //-----------------------------------------------------------------
-
-  //-----------------------------------------------------------------
   void InitializeControllers()
     {
     this->NeedToInitializeControllers = true;
@@ -211,7 +207,6 @@ public:
     while(iter != this->Controllers.end())
       {
       // CAUTION: This initialization only correct for vtkSocketController
-      cout << "Initialize " << iter->MultiProcessController << endl;
       iter->MultiProcessController->Initialize(0,0);
       iter++;
       }
