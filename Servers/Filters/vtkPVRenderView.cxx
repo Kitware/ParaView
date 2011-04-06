@@ -45,6 +45,7 @@
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballRotate.h"
+#include "vtkTrackballPan.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
@@ -179,6 +180,11 @@ vtkPVRenderView::vtkPVRenderView()
     manip2->SetButton(3);
     this->InteractorStyle->AddManipulator(manip2);
     manip2->Delete();
+
+    vtkTrackballPan* manip3 = vtkTrackballPan::New();
+    manip3->SetButton(2);
+    this->InteractorStyle->AddManipulator(manip3);
+    manip3->Delete();
 
     this->RubberBandStyle = vtkInteractorStyleRubberBand3D::New();
     this->RubberBandStyle->RenderOnMouseMoveOff();

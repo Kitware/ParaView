@@ -172,7 +172,8 @@ void vtkPVSynchronizedRenderer::Initialize()
         vtkMultiProcessController::GetGlobalController());
       this->ParallelSynchronizer->WriteBackImagesOn();
       }
-    else if (pm->GetNumberOfLocalPartitions() > 0)
+    else if (pm->GetNumberOfLocalPartitions() > 1 ||
+      (pm->GetNumberOfLocalPartitions() == 1 && in_tile_display_mode))        
       {
       //ICET now handles stereo properly, so use it no matter the number
       //of partitions
