@@ -162,8 +162,7 @@ void vtkPVOptions::Initialize()
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER|vtkPVOptions::PVBATCH);
 
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
-                           "Tell the application to enable stereo rendering"
-                           " (only when running on a single process).",
+                           "Tell the application to enable stereo rendering",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
   this->AddArgument("--stereo-type", 0, &this->StereoType,
                            "Specify the stereo type. This valid only when "
