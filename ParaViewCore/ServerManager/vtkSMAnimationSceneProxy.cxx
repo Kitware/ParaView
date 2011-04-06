@@ -56,3 +56,12 @@ void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMAnimationSceneProxy::GetGlobalID()
+{
+  if(!this->HasGlobalID())
+    {
+    this->SetGlobalID(vtkSMAnimationSceneProxy::GetReservedGlobalID());
+    }
+  return this->Superclass::GetGlobalID();
+}

@@ -28,7 +28,6 @@ vtkTypeUInt32 vtkSMTimeKeeperProxy::GetReservedGlobalID()
 //----------------------------------------------------------------------------
 vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
 {
-  this->SetGlobalID(vtkSMTimeKeeperProxy::GetReservedGlobalID());
 }
 
 //----------------------------------------------------------------------------
@@ -60,4 +59,13 @@ void vtkSMTimeKeeperProxy::CreateVTKObjects()
 void vtkSMTimeKeeperProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMTimeKeeperProxy::GetGlobalID()
+{
+  if(!this->HasGlobalID())
+    {
+    this->SetGlobalID(vtkSMTimeKeeperProxy::GetReservedGlobalID());
+    }
+  return this->Superclass::GetGlobalID();
 }

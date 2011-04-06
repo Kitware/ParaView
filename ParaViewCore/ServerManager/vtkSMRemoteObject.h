@@ -52,7 +52,7 @@ public:
   // Description:
   // Get the global unique id for this object. If none is set and the session is
   // valid, a new global id will be assigned automatically.
-  vtkTypeUInt32 GetGlobalID();
+  virtual vtkTypeUInt32 GetGlobalID();
   const char* GetGlobalIDAsString();
 
   // Description:
