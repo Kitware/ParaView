@@ -317,6 +317,19 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
 endif()
 
+# Build VRPN
+#list(APPEND VRPN_dependencies zlib HDF5)
+list(APPEND ParaView_dependencies VRPN)
+include(External_VRPN)
+set(VRPN_ARGS)
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
+else()
+  get_filename_component(CGNS_DIR "${VRPN_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
+endif()
+
 if(NOT WIN32)
   include(External_FFMPEG)
   set(FFMPEG_ARGS

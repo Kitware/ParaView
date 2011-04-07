@@ -325,6 +325,7 @@ def get_property_value_from_list_domain(proxyInfo, propInfo):
             info = proxy_trace_info(proxyPropertyValue, "helpers", pythonProp.Available[i])
           info.PyVariable = propInfo.PyVariable
           info.ParentProxyInfo = proxyInfo
+          info.ctor_traced = True
           trace_globals.registered_proxies.append(info)
 
           # If capture_all_properties, record all the properties of this proxy
@@ -620,15 +621,19 @@ def append_trace():
             propname = propNameValues.get_value("AnimatedPropertyName")
             propNameValues = propNameValues.purge("AnimatedPropertyName")
           if propNameValues.has_key("AnimatedElement"):
-            propname = propNameValues.get_value("AnimatedElement")
+            index = propNameValues.get_value("AnimatedElement")
             propNameValues = propNameValues.purge("AnimatedElement")
           propNameValues = propNameValues.purge("AnimatedProxy")
-          source_proxy_info = get_animated_proxy_info(info)
-          if source_proxy_info:
-            ensure_active_source(source_proxy_info)
+          animated_proxy_info = get_animated_proxy_info(info)
           ctorArgs.append(propname)
           if index != None:
             ctorArgs.append(index)
+          if animated_proxy_info:
+            if not animated_proxy_info.ParentProxyInfo:
+              ensure_active_source(animated_proxy_info)
+            else:
+              ctorArgs.append("proxy=%s.%s" % (animated_proxy_info.ParentProxyInfo.PyVariable,
+                                               animated_proxy_info.PyVariable))
           setPropertiesInCtor = False
         elif info.Proxy.GetXMLName() == "CameraAnimationCue":
           view_proxy_info = get_animated_proxy_info(info)
