@@ -182,6 +182,8 @@ void pqApplicationCore::constructor()
   QObject::connect(this->ServerManagerObserver,
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(onStateSaved(vtkPVXMLElement*)));
+  QObject::connect(QCoreApplication::instance(),SIGNAL(lastWindowClosed()),
+    this, SLOT(prepareForQuit()));
 }
 
 //-----------------------------------------------------------------------------
@@ -622,10 +624,10 @@ pqServer* pqApplicationCore::getActiveServer() const
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::quit()
+void pqApplicationCore::prepareForQuit()
 {
   // As tempting as it is to connect this slot to
-  // aboutToQuit() signal, it doesn;t work since that signal is not
+  // aboutToQuit() signal, it doesn't work since that signal is not
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
   QList<pqAnimationScene*> scenes =
@@ -634,6 +636,12 @@ void pqApplicationCore::quit()
     {
     scene->pause();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::quit()
+{
+  this->prepareForQuit();
   QCoreApplication::instance()->quit();
 }
 
