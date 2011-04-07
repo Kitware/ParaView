@@ -317,11 +317,14 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
 endif()
 
+
 # Build VRPN
-#list(APPEND VRPN_dependencies zlib HDF5)
 list(APPEND ParaView_dependencies VRPN)
 include(External_VRPN)
-set(VRPN_ARGS)
+set(VRPN_ARGS
+  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
+  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
@@ -400,6 +403,8 @@ ExternalProject_Add(${proj}
     ${Silo_ARGS}
     # VisTrails
     ${VISTRAILS_ARGS}
+    # VRPN Plugin
+    ${VRPN_ARGS}
     # zlib
     ${ZLIB_ARGS}
     # Documentation
