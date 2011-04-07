@@ -15,14 +15,40 @@
 #include "vtkCacheSizeKeeper.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
 
+//----------------------------------------------------------------------------
+// Can't use vtkStandardNewMacro since it adds the instantiator function which
+// does not compile since vtkClientServerInterpreterInitializer::New() is
+// protected.
+vtkCacheSizeKeeper* vtkCacheSizeKeeper::New()
+{
+  vtkObject* ret =
+    vtkObjectFactory::CreateInstance("vtkCacheSizeKeeper");
+  if (ret)
+    {
+    return static_cast<vtkCacheSizeKeeper*>(ret);
+    }
+  return new vtkCacheSizeKeeper;
+}
 
-vtkStandardNewMacro(vtkCacheSizeKeeper);
+//-----------------------------------------------------------------------------
+vtkCacheSizeKeeper* vtkCacheSizeKeeper::GetInstance()
+{
+  static vtkSmartPointer<vtkCacheSizeKeeper> Singleton;
+  if (Singleton.GetPointer() == NULL)
+    {
+    Singleton.TakeReference(vtkCacheSizeKeeper::New());
+    }
+  return Singleton.GetPointer();
+}
+
 //-----------------------------------------------------------------------------
 vtkCacheSizeKeeper::vtkCacheSizeKeeper()
 {
   this->CacheSize = 0;
   this->CacheFull = 0;
+  this->CacheLimit = 100*1024; // 100 MBs.
 }
 
 //-----------------------------------------------------------------------------
@@ -36,4 +62,5 @@ void vtkCacheSizeKeeper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "CacheSize: " << this->CacheSize << endl;
   os << indent << "CacheFull: " << this->CacheFull << endl;
+  os << indent << "CacheLimit: " << this->CacheLimit << endl;
 }

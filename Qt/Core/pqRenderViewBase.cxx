@@ -457,7 +457,6 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   };
 
 static const char* pqRenderViewModuleMiscSettings [] = {
-  "CacheLimit",
   "CameraParallelProjection",
   "CenterAxesVisibility",
   "OrientationAxesInteractivity",

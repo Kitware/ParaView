@@ -60,16 +60,16 @@ public:
   vtkGetMacro(CachingEnabled, bool);
   vtkBooleanMacro(CachingEnabled, bool);
 
+//BTX
+protected:
+  vtkPVCacheKeeper();
+  ~vtkPVCacheKeeper();
+
   // Description:
   // Get/Set the cache size keeper. The cacher
   // reports its cache size to this keeper, if any.
   void SetCacheSizeKeeper(vtkCacheSizeKeeper*);
   vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
-
-//BTX
-protected:
-  vtkPVCacheKeeper();
-  ~vtkPVCacheKeeper();
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
