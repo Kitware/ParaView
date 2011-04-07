@@ -207,6 +207,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
       item.RequiredPlugins = plugin->GetRequiredPlugins();
       item.RequiredOnClient = plugin->GetRequiredOnClient();
       item.RequiredOnServer = plugin->GetRequiredOnServer();
+      item.Version = plugin->GetPluginVersionString();
       }
     else
       {

@@ -35,6 +35,9 @@
   vtkerror << x;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
+#define vtkPVPluginLoaderErrorMacro(x)\
+  vtkErrorMacro(<< x); this->SetErrorString(x);
+
 namespace
 {
   // Cleans successfully opened libs when the application quits.
@@ -126,8 +129,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
     "Attempting to load " << file);
   if (!file || file[0] == '\0')
     {
-    vtkErrorMacro("Invalid filename");
-    this->SetErrorString("Invalid filename");
+    vtkPVPluginLoaderErrorMacro("Invalid filename");
     return false;
     }
 
@@ -138,8 +140,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
   if (!lib)
     {
     vtkPVPluginLoaderDebugMacro("Failed to load the shared library.");
-    this->SetErrorString(vtkDynamicLoader::LastError());
-    vtkPVPluginLoaderDebugMacro(this->GetErrorString());
+    vtkPVPluginLoaderErrorMacro(vtkDynamicLoader::LastError());
     return false;
     }
 
@@ -164,7 +165,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
       "\"pv_plugin_query_verification_data\" which is required to test the "
       "plugin signature. This may not be a ParaView plugin dll or maybe "
       "from a older version of ParaView when this function was not required.");
-    this->SetErrorString(
+    vtkPVPluginLoaderErrorMacro(
       "Not a ParaView Plugin since could not locate the plugin-verification function");
     vtkDynamicLoader::CloseLibrary(lib);
     return false;
@@ -183,8 +184,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
     error << "Mismatch in versions: \n" <<
       "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();
-    vtkErrorMacro(<< error.str().c_str());
-    this->SetErrorString(error.str().c_str());
+    vtkPVPluginLoaderErrorMacro(error.str().c_str());
     vtkDynamicLoader::CloseLibrary(lib);
     vtkPVPluginLoaderDebugMacro(
       "Mismatch in versions signifies that the plugin was built for "
@@ -206,10 +206,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
       "global function \"pv_plugin_instance\" which is required to locate the "
       "instance of the vtkPVPlugin class. Possibly the plugin shared library was "
       "not compiled properly.");
-    this->SetErrorString(
-      "Not a ParaView Plugin since could not locate the plugin-instance "
-      "function.");
-    vtkErrorMacro(
+    vtkPVPluginLoaderErrorMacro(
       "Not a ParaView Plugin since could not locate the plugin-instance "
       "function.");
     vtkDynamicLoader::CloseLibrary(lib);
