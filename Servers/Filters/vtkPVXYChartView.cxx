@@ -429,7 +429,7 @@ void vtkPVXYChartView::Render(bool interactive)
       {
       // The string was found - replace it and set the chart title.
       timeStream << this->GetViewTime();
-      title.replace(pos, pos+6, timeStream.str());
+      title.replace(pos, pos+7, timeStream.str());
       this->Chart->SetTitle(title.c_str());
       }
     }

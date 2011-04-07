@@ -50,6 +50,11 @@ public:
   // Paint event for the axis, called whenever the axis needs to be drawn
   virtual bool Paint(vtkContext2D *painter);
 
+  // Description:
+  // Get the bounds for this plot as (Xmin, Xmax, Ymin, Ymax).
+  virtual void GetBounds(double bounds[4])
+  { bounds[0] = bounds[2] = 1.0; bounds[1] = bounds[3] = -1.0;}
+
 //BTX
 protected:
   vtkPVPlotTime();

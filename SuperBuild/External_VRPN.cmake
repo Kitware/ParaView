@@ -5,7 +5,6 @@ set(VRPN_binary "${CMAKE_CURRENT_BINARY_DIR}/VRPN-build")
 set(VRPN_install "${CMAKE_CURRENT_BINARY_DIR}/VRPN-install")
 
 ExternalProject_Add(VRPN
-  DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${VRPN_source}
   BINARY_DIR ${VRPN_binary}
   INSTALL_DIR ${VRPN_install}
@@ -16,5 +15,9 @@ ExternalProject_Add(VRPN
     -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
     -DCMAKE_BUILD_TYPE:STRING=OFF
     ${pv_tpl_compiler_args}
+  CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
+
+set(VRPN_LIBRARY ${VRPN_install}/lib/vrpn${_LINK_LIBRARY_SUFFIX})
+set(VRPN_INCLUDE_DIR ${VRPN_install}/include)
