@@ -191,18 +191,18 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
     return -1;
     }
 
+  // Try to empty RMI buffered messages if any
+  if(ctrlWithBufferToEmpty && (ctrlWithBufferToEmpty->ProcessRMIs(0,1) ==
+                               vtkMultiProcessController::RMI_NO_ERROR))
+    {
+    return 1;
+    }
 
   int selected_index = -1;
   int result = vtkSocket::SelectSockets(sockets_to_select, size,
                                         timeout_msecs, &selected_index);
   if (result <= 0)
     {
-    // Try to empty RMI buffered messages
-    if(ctrlWithBufferToEmpty && (ctrlWithBufferToEmpty->ProcessRMIs(0,1) ==
-                                 vtkMultiProcessController::RMI_NO_ERROR))
-      {
-      return 1;
-      }
     return result;
     }
 
