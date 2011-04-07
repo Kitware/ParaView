@@ -100,7 +100,9 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
 
   // Load local plugins information and then load those plugins.
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString local_plugin_config = settings->value("/PluginsList/Local").toString();
+  QString key = QString("/PluginsList/Local/%1").arg(
+    QCoreApplication::applicationFilePath());
+  QString local_plugin_config = settings->value(key).toString();
   if (!local_plugin_config.isEmpty())
     {
     vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
@@ -180,6 +182,11 @@ void pqPluginManager::initialize(vtkSMPluginManager* mgr)
   this->Internals->SMPluginManager = mgr;
   mgr->AddObserver(vtkSMPluginManager::PluginLoadedEvent,
     this, &pqPluginManager::updatePluginLists);
+
+  // Validate plugins i.e. check plugins that are required on client and server
+  // are indeed present on both.
+  this->verifyPlugins();
+
   this->updatePluginLists();
 }
 
@@ -187,14 +194,6 @@ void pqPluginManager::initialize(vtkSMPluginManager* mgr)
 void pqPluginManager::updatePluginLists()
 {
   emit this->pluginsUpdated();
-}
-
-//-----------------------------------------------------------------------------
-void pqPluginManager::removePlugin(const QString& lib, bool remote)
-{
-  (void)lib;
-  (void)remote;
-  // not supporting "forget-plugin" for now.
 }
 
 //-----------------------------------------------------------------------------
@@ -250,4 +249,9 @@ bool pqPluginManager::isHidden(const QString& lib, bool remote)
   return remote?
     this->Internals->RemoteHiddenPlugins.contains(lib) :
     this->Internals->LocalHiddenPlugins.contains(lib);
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::verifyPlugins()
+{
 }
