@@ -141,6 +141,7 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
   int sockets_to_select[MAX_SOCKETS];
   vtkObject* controller_or_server_socket[MAX_SOCKETS];
 
+  vtkSocketController* ctrlWithBufferToEmpty = NULL;
   int size=0;
   vtkInternals::VectorOfControllers::iterator iter1;
   for (iter1 = this->Internals->Controllers.begin();
@@ -159,6 +160,10 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       {
       sockets_to_select[size] = socket->GetSocketDescriptor();
       controller_or_server_socket[size] = controller;
+      if(comm->HasBufferredMessages())
+        {
+        ctrlWithBufferToEmpty = controller;
+        }
       size++;
       }
     }
@@ -186,11 +191,18 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
     return -1;
     }
 
+
   int selected_index = -1;
   int result = vtkSocket::SelectSockets(sockets_to_select, size,
-    timeout_msecs, &selected_index);
+                                        timeout_msecs, &selected_index);
   if (result <= 0)
     {
+    // Try to empty RMI buffered messages
+    if(ctrlWithBufferToEmpty && (ctrlWithBufferToEmpty->ProcessRMIs(0,1) ==
+                                 vtkMultiProcessController::RMI_NO_ERROR))
+      {
+      return 1;
+      }
     return result;
     }
 

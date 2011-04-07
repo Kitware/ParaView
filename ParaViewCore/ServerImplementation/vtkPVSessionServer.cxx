@@ -403,13 +403,15 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       vtkSMMessage msg;
       msg.ParseFromString(string);
 
-      // Skip processing
-      if(this->Internal->StoreShareOnly(&msg))
-        {
-        return;
-        }
+//      cout << "=================================" << endl;
+//      msg.PrintDebugString();
+//      cout << "=================================" << endl;
 
-      this->PushState(&msg);
+      // Do we skip the processing ?
+      if(!this->Internal->StoreShareOnly(&msg))
+        {
+        this->PushState(&msg);
+        }
 
       // Notify when ProxyManager state has changed
       this->Internal->NotifyOtherClients(&msg);
