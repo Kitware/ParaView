@@ -245,10 +245,12 @@ public:
   /// Destructor.
   virtual ~pqApplicationCore();
 public slots:
-  /// Called QCoreApplication::quit().
-  /// Applications should use this method instead of directly
-  /// calling QCoreApplication::quit() since this ensures
+
+  /// Applications calls this to ensure
   /// that any cleanup is performed correctly.
+  void prepareForQuit();
+
+  /// Calls QCoreApplication::quit().
   void quit();
 
   /// Causes the output window to be shown.

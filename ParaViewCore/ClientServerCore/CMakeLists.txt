@@ -31,7 +31,7 @@ SET (Kit_SRCS
   vtkGeometryRepresentationWithFaces.cxx
   vtkGlyph3DRepresentation.cxx
   vtkImageSliceDataDeliveryFilter.cxx
-  vtkImageSliceMapper.cxx
+  vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
   vtkMPIMToNSocketConnection.cxx

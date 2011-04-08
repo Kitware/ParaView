@@ -367,9 +367,9 @@ void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
     center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
     // extended a bit
-    sz[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
-    sz[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
-    sz[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
+    sz[0] = fabs(input_bounds[1] - input_bounds[0]);
+    sz[1] = fabs(input_bounds[3] - input_bounds[2]);
+    sz[2] = fabs(input_bounds[5] - input_bounds[4]);
     }
   else if(this->Implementation->WidgetPoint1 &&
           this->Implementation->WidgetPoint2)

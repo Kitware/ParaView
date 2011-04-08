@@ -33,5 +33,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Point Sprite" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/pqPointSpriteDisplayPanelDecorator/RenderMode" command="set_string" arguments="Sphere (Texture)" />
   <pqevent object="pqSLACActionHolder/actionToggleBackgroundBW" command="activate" arguments="" />
 </pqevents>

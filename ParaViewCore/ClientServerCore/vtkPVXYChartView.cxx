@@ -14,16 +14,18 @@
 =========================================================================*/
 #include "vtkPVXYChartView.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkContextView.h"
-#include "vtkContextScene.h"
-#include "vtkChartXY.h"
-#include "vtkChartParallelCoordinates.h"
 #include "vtkAxis.h"
-#include "vtkPen.h"
-#include "vtkTextProperty.h"
+#include "vtkChartParallelCoordinates.h"
+#include "vtkChartXY.h"
+#include "vtkContextScene.h"
+#include "vtkContextView.h"
 #include "vtkDoubleArray.h"
+#include "vtkObjectFactory.h"
+#include "vtkPen.h"
+#include "vtkPVPlotTime.h"
 #include "vtkStringArray.h"
+#include "vtkTextProperty.h"
+#include "vtkXYChartRepresentation.h"
 
 #include "vtkstd/string"
 #include "vtksys/ios/sstream"
@@ -59,6 +61,7 @@ vtkPVXYChartView::vtkPVXYChartView()
   this->Chart = NULL;
   this->InternalTitle = NULL;
   this->Command = CommandImpl::New(this);
+  this->PlotTime = vtkPVPlotTime::New();
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
@@ -73,6 +76,9 @@ vtkPVXYChartView::~vtkPVXYChartView()
     this->Chart->Delete();
     this->Chart = NULL;
     }
+  this->PlotTime->Delete();
+  this->PlotTime = NULL;
+
   this->SetInternalTitle(NULL);
   this->Command->Delete();
 }
@@ -101,6 +107,7 @@ void vtkPVXYChartView::SetChartType(const char *type)
     // Default to empty axis titles
     this->SetAxisTitle(0, "");
     this->SetAxisTitle(1, "");
+    this->Chart->AddPlot(this->PlotTime);
 
     this->Chart->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
     this->ContextView->GetScene()->AddItem(this->Chart);
@@ -422,10 +429,33 @@ void vtkPVXYChartView::Render(bool interactive)
       {
       // The string was found - replace it and set the chart title.
       timeStream << this->GetViewTime();
-      title.replace(pos, pos+6, timeStream.str());
+      title.replace(pos, pos+7, timeStream.str());
       this->Chart->SetTitle(title.c_str());
       }
     }
+
+  this->PlotTime->SetTime(this->GetViewTime());
+  this->PlotTime->SetTimeAxisMode(vtkPVPlotTime::NONE);
+
+  // Decide if time is being shown on any of the axis.
+  // Iterate over all visible representations and check is they have the array
+  // named "Time" on either of the axes.
+  int num_reprs = this->GetNumberOfRepresentations();
+  for (int cc=0; cc < num_reprs; cc++)
+    {
+    vtkXYChartRepresentation * repr = vtkXYChartRepresentation::SafeDownCast(
+      this->GetRepresentation(cc));
+    if (repr && repr->GetVisibility())
+      {
+      if (repr->GetXAxisSeriesName() &&
+        strcmp(repr->GetXAxisSeriesName(), "Time") == 0)
+        {
+        this->PlotTime->SetTimeAxisMode(vtkPVPlotTime::X_AXIS);
+        break;
+        }
+      }
+    }
+  // For now we only handle X-axis time. If needed we can add support for Y-axis.
 
   this->Superclass::Render(interactive);
 }

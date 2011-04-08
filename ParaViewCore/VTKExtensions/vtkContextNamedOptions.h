@@ -53,6 +53,7 @@ public:
   // Set the X series to be used for the plots, if NULL then the index of the
   // y series should be used.
   void SetXSeriesName(const char* name);
+  const char* GetXSeriesName();
 
   // Description:
   // Set whether the index should be used for the x axis.

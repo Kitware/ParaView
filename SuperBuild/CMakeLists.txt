@@ -186,8 +186,10 @@ if(NOT APPLE)
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
     if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
       # Build SIP and PyQt for vistrails plugin.
+      set(SIP_dependencies python)
       include(External_SIP)
       list(APPEND PyQt_dependencies SIP)
+      set(PyQt_dependencies python SIP)
       include(External_PyQt)
       list(APPEND ParaView_dependencies PyQt)
 
@@ -248,19 +250,21 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
 endif()
 
-# Build a common png used by several dependencies
-include(External_png)
-set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
-  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-list(APPEND ParaView_dependencies png)
+if(NOT APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
-else()
-  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+  else()
+    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  endif()
 endif()
 
 # Build HDF5
@@ -311,6 +315,22 @@ if(WIN32)
 else()
   get_filename_component(CGNS_DIR "${CGNS_LIBRARY}" PATH)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
+endif()
+
+
+# Build VRPN
+list(APPEND ParaView_dependencies VRPN)
+include(External_VRPN)
+set(VRPN_ARGS
+  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
+  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
+else()
+  get_filename_component(CGNS_DIR "${VRPN_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
 endif()
 
 if(NOT WIN32)
@@ -383,6 +403,8 @@ ExternalProject_Add(${proj}
     ${Silo_ARGS}
     # VisTrails
     ${VISTRAILS_ARGS}
+    # VRPN Plugin
+    ${VRPN_ARGS}
     # zlib
     ${ZLIB_ARGS}
     # Documentation

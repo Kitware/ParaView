@@ -138,6 +138,7 @@ SET (Kit_SRCS
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
+  vtkPVPlotTime.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRampKeyFrame.cxx
@@ -247,12 +248,12 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkMaterialInterfaceProcessLoading.cxx
   vtkMaterialInterfaceProcessRing.cxx
   vtkMaterialInterfaceToProcMap.cxx
+  vtkPVPlotTime.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
-
   WRAP_EXCLUDE
   )
 

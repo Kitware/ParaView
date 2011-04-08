@@ -9,8 +9,6 @@ if(UNIX)
   EXECUTE_PROCESS(
     COMMAND ${cmd}
     WORKING_DIRECTORY "@python_base@"
-    RESULT_VARIABLE rv
-    OUTPUT_VARIABLE ov
     )
 
 endif()
