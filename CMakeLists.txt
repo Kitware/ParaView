@@ -451,7 +451,8 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(PARAVIEW_TARGETS_FILE                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/${PV_INSTALL_EXPORT_NAME}.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
-  
+  SET(VISITBRIDGE_CMAKE_DIR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  SET(VISITBRIDGE_USE_FILE                        "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/VisItBridgeUse.cmake")
   
   set(REL_REF)
   IF(NOT WIN32)
