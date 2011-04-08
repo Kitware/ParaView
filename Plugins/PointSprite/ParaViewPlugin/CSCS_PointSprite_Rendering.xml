@@ -64,7 +64,7 @@
 
       <IntVectorProperty name="RenderMode"
         command="SetRenderMode"
-        default_values="2"
+        default_values="3"
         number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Sphere"/>
