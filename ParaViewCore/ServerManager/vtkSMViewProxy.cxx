@@ -26,7 +26,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMUtilities.h"
 
@@ -178,7 +177,6 @@ void vtkSMViewProxy::Update()
            << "Update"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
-    this->GetSession()->CleanupPendingProgress();
     }
 }
 
