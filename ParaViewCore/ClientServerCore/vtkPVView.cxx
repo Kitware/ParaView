@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVView.h"
 
+#include "vtkCacheSizeKeeper.h"
 #include "vtkInformation.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
@@ -171,6 +172,19 @@ void vtkPVView::CleanupAfterScreenshot()
 //----------------------------------------------------------------------------
 void vtkPVView::Update()
 {
+  // Ensure that cache size if synchronized among the processes.
+  if (this->GetUseCache())
+    {
+    vtkCacheSizeKeeper* cacheSizeKeeper = vtkCacheSizeKeeper::GetInstance();
+    unsigned int cache_full = 0;
+    if (cacheSizeKeeper->GetCacheSize() > cacheSizeKeeper->GetCacheLimit())
+      {
+      cache_full = 1;
+      }
+    this->SynchronizedWindows->SynchronizeSize(cache_full);
+    cacheSizeKeeper->SetCacheFull(cache_full > 0);
+    }
+
   this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
     this->RequestInformation, this->ReplyInformationVector);
 }

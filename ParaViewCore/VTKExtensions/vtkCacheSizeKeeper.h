@@ -26,9 +26,12 @@
 class VTK_EXPORT vtkCacheSizeKeeper : public vtkObject
 {
 public:
-  static vtkCacheSizeKeeper* New();
   vtkTypeMacro(vtkCacheSizeKeeper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Returns the singleton.
+  static vtkCacheSizeKeeper* GetInstance();
 
   // Description:
   // Report increase in cache size (in kbytes).
@@ -56,6 +59,12 @@ public:
   // Get the size of cache reported to this keeper.
   vtkGetMacro(CacheSize, unsigned long);
 
+  // Description:
+  // Get/Set the cache size limit. One can set this separately on each
+  // processes. vtkPVView::Update ensures that the cache fullness state is
+  // synchronized among all participating processes. (in KBs)
+  vtkGetMacro(CacheLimit, unsigned long);
+  vtkSetMacro(CacheLimit, unsigned long);
 
   // Description:
   // Get/Set if the cache is full. 
@@ -63,10 +72,12 @@ public:
   vtkSetMacro(CacheFull, int);
 
 protected:
+  static vtkCacheSizeKeeper* New();
   vtkCacheSizeKeeper();
   ~vtkCacheSizeKeeper();
 
   unsigned long CacheSize;
+  unsigned long CacheLimit;
   int CacheFull;
 private:
   vtkCacheSizeKeeper(const vtkCacheSizeKeeper&); // Not implemented.

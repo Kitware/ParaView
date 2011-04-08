@@ -105,9 +105,6 @@ private:
   vtkPVPluginTracker(const vtkPVPluginTracker&); // Not implemented
   void operator=(const vtkPVPluginTracker&); // Not implemented
 
-  // Singleton instance.
-  static vtkSmartPointer<vtkPVPluginTracker> Instance;
-
   class vtkPluginsList;
   vtkPluginsList* PluginsList;
 //ETX

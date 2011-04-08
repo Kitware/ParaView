@@ -240,6 +240,7 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkAMRDualGridHelper.cxx
+  vtkCacheSizeKeeper.cxx
   vtkMaterialInterfaceCommBuffer.cxx
   vtkMaterialInterfaceIdList.cxx
   vtkMaterialInterfacePieceLoading.cxx
@@ -259,6 +260,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkAnimationPlayer.cxx
+  vtkCacheSizeKeeper.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCellIntegrator.cxx
   vtkImageCompressor.cxx

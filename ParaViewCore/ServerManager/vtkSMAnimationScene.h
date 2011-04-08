@@ -52,9 +52,14 @@ public:
 
   // Description:
   // Set if caching is enabled.
-  // This method synchronizes the cahcing flag on every cue.
+  // If Caching is true, then on every time-step, this will update the UseCache
+  // and CacheKey properties on each of the views.
   vtkSetMacro(Caching, bool);
   vtkGetMacro(Caching, bool);
+
+  // Description:
+  // Set the cache limit in KBs.
+  void SetCacheLimit(unsigned long kbs);
 
   // Description:
   // Set the time keeper. Time keeper is used to obtain the information about

@@ -25,6 +25,7 @@
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/Directory.hxx>
 #include <vtksys/ios/sstream>
 
 #include <cstdlib>
@@ -34,6 +35,9 @@
   vtksys_ios::ostringstream vtkerror;\
   vtkerror << x;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
+
+#define vtkPVPluginLoaderErrorMacro(x)\
+  if (!no_errors) {vtkErrorMacro(<< x);} this->SetErrorString(x);
 
 namespace
 {
@@ -118,7 +122,48 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadPlugin(const char* file)
+void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
+{
+  vtkPVPluginLoaderDebugMacro(
+    "Loading Plugins from standard PLUGIN_PATHS \n"
+    << this->SearchPaths);
+
+  vtkstd::vector<vtkstd::string> paths;
+  vtksys::SystemTools::Split(this->SearchPaths, paths, ';');
+  for (size_t cc=0; cc < paths.size(); cc++)
+    {
+    this->LoadPluginsFromPath(paths[cc].c_str());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
+{
+  vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path);
+  vtksys::Directory dir;
+  if (dir.Load(path) == false)
+    {
+    vtkPVPluginLoaderDebugMacro("Invalid directory: " << path);
+    return;
+    }
+
+  for (unsigned int cc=0; cc < dir.GetNumberOfFiles(); cc++)
+    {
+    vtkstd::string ext =
+      vtksys::SystemTools::GetFilenameLastExtension(dir.GetFile(cc));
+    if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".dylib" ||
+      ext == ".xml" || ext == ".sl")
+      {
+      vtkstd::string file = dir.GetPath();
+      file += "/";
+      file += dir.GetFile(cc);
+      this->LoadPluginSilently(file.c_str());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 {
   this->Loaded = false;
   vtkPVPluginLoaderDebugMacro(
@@ -126,8 +171,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
     "Attempting to load " << file);
   if (!file || file[0] == '\0')
     {
-    vtkErrorMacro("Invalid filename");
-    this->SetErrorString("Invalid filename");
+    vtkPVPluginLoaderErrorMacro("Invalid filename");
     return false;
     }
 
@@ -137,9 +181,9 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
   if (!lib)
     {
+    vtkPVPluginLoaderErrorMacro(vtkDynamicLoader::LastError());
     vtkPVPluginLoaderDebugMacro("Failed to load the shared library.");
-    this->SetErrorString(vtkDynamicLoader::LastError());
-    vtkPVPluginLoaderDebugMacro(this->GetErrorString());
+    vtkPVPluginLoaderDebugMacro(this->ErrorString);
     return false;
     }
 
@@ -164,7 +208,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
       "\"pv_plugin_query_verification_data\" which is required to test the "
       "plugin signature. This may not be a ParaView plugin dll or maybe "
       "from a older version of ParaView when this function was not required.");
-    this->SetErrorString(
+    vtkPVPluginLoaderErrorMacro(
       "Not a ParaView Plugin since could not locate the plugin-verification function");
     vtkDynamicLoader::CloseLibrary(lib);
     return false;
@@ -183,8 +227,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
     error << "Mismatch in versions: \n" <<
       "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();
-    vtkErrorMacro(<< error.str().c_str());
-    this->SetErrorString(error.str().c_str());
+    vtkPVPluginLoaderErrorMacro(error.str().c_str());
     vtkDynamicLoader::CloseLibrary(lib);
     vtkPVPluginLoaderDebugMacro(
       "Mismatch in versions signifies that the plugin was built for "
@@ -206,10 +249,7 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
       "global function \"pv_plugin_instance\" which is required to locate the "
       "instance of the vtkPVPlugin class. Possibly the plugin shared library was "
       "not compiled properly.");
-    this->SetErrorString(
-      "Not a ParaView Plugin since could not locate the plugin-instance "
-      "function.");
-    vtkErrorMacro(
+    vtkPVPluginLoaderErrorMacro(
       "Not a ParaView Plugin since could not locate the plugin-instance "
       "function.");
     vtkDynamicLoader::CloseLibrary(lib);
