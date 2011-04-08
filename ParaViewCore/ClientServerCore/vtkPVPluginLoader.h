@@ -40,13 +40,24 @@ public:
   // Description:
   // Tries to the load the plugin given the path to the plugin file.
   // FIXME: Add support to load an XML.
-  bool LoadPlugin(const char* filename);
+  bool LoadPlugin(const char* filename)
+    { return this->LoadPluginInternal(filename, false); }
+  bool LoadPluginSilently(const char* filename)
+    { return this->LoadPluginInternal(filename, true); }
 
   // Description:
   // Simply forwards the call to
   // vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
   // configuration xml.
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
+
+  // Description:
+  // Loads all plugins under the directories mentioned in the SearchPaths.
+  void LoadPluginsFromPluginSearchPath();
+
+  // Description:
+  // Loads all plugin libraries at a path.
+  void LoadPluginsFromPath(const char* path);
 
   // Description:
   // Returns the full filename for the plugin attempted to load most recently
@@ -81,6 +92,8 @@ public:
 protected:
   vtkPVPluginLoader();
   ~vtkPVPluginLoader();
+
+  bool LoadPluginInternal(const char* filename, bool no_errors);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);

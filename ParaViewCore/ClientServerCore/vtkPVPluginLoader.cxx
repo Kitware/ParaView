@@ -25,6 +25,7 @@
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/Directory.hxx>
 #include <vtksys/ios/sstream>
 
 #include <cstdlib>
@@ -36,7 +37,7 @@
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
 #define vtkPVPluginLoaderErrorMacro(x)\
-  vtkErrorMacro(<< x); this->SetErrorString(x);
+  if (!no_errors) {vtkErrorMacro(<< x);} this->SetErrorString(x);
 
 namespace
 {
@@ -121,7 +122,48 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadPlugin(const char* file)
+void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
+{
+  vtkPVPluginLoaderDebugMacro(
+    "Loading Plugins from standard PLUGIN_PATHS \n"
+    << this->SearchPaths);
+
+  vtkstd::vector<vtkstd::string> paths;
+  vtksys::SystemTools::Split(this->SearchPaths, paths, ';');
+  for (size_t cc=0; cc < paths.size(); cc++)
+    {
+    this->LoadPluginsFromPath(paths[cc].c_str());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
+{
+  vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path);
+  vtksys::Directory dir;
+  if (dir.Load(path) == false)
+    {
+    vtkPVPluginLoaderDebugMacro("Invalid directory: " << path);
+    return;
+    }
+
+  for (unsigned int cc=0; cc < dir.GetNumberOfFiles(); cc++)
+    {
+    vtkstd::string ext =
+      vtksys::SystemTools::GetFilenameLastExtension(dir.GetFile(cc));
+    if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".dylib" ||
+      ext == ".xml" || ext == ".sl")
+      {
+      vtkstd::string file = dir.GetPath();
+      file += "/";
+      file += dir.GetFile(cc);
+      this->LoadPluginSilently(file.c_str());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 {
   this->Loaded = false;
   vtkPVPluginLoaderDebugMacro(
@@ -139,8 +181,9 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
   if (!lib)
     {
-    vtkPVPluginLoaderDebugMacro("Failed to load the shared library.");
     vtkPVPluginLoaderErrorMacro(vtkDynamicLoader::LastError());
+    vtkPVPluginLoaderDebugMacro("Failed to load the shared library.");
+    vtkPVPluginLoaderDebugMacro(this->ErrorString);
     return false;
     }
 
