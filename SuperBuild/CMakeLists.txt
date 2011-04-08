@@ -329,7 +329,7 @@ set(VRPN_ARGS
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
 else()
-  get_filename_component(CGNS_DIR "${VRPN_LIBRARY}" PATH)
+  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
 endif()
 
