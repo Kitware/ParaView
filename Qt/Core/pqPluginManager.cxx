@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -93,7 +94,8 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
 
-  QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
+  QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
+    SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerConnected(pqServer*)));
   QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));
@@ -182,12 +184,11 @@ void pqPluginManager::initialize(vtkSMPluginManager* mgr)
   this->Internals->SMPluginManager = mgr;
   mgr->AddObserver(vtkSMPluginManager::PluginLoadedEvent,
     this, &pqPluginManager::updatePluginLists);
+  this->updatePluginLists();
 
   // Validate plugins i.e. check plugins that are required on client and server
   // are indeed present on both.
   this->verifyPlugins();
-
-  this->updatePluginLists();
 }
 
 //-----------------------------------------------------------------------------
@@ -254,4 +255,18 @@ bool pqPluginManager::isHidden(const QString& lib, bool remote)
 //-----------------------------------------------------------------------------
 void pqPluginManager::verifyPlugins()
 {
+  pqServer* activeServer = this->Internals->ActiveServer;
+  if (!activeServer  || !activeServer->isRemote())
+    {
+    // no verification needed for non-remote servers.
+    return;
+    }
+
+  vtkPVPluginsInformation* local_info = this->loadedExtensions(false);
+  vtkPVPluginsInformation* remote_info = this->loadedExtensions(true);
+  if (!vtkPVPluginsInformation::PluginRequirementsSatisfied(
+      local_info, remote_info))
+    {
+    emit this->requiredPluginsNotLoaded();
+    }
 }

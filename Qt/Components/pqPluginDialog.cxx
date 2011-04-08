@@ -296,26 +296,15 @@ void pqPluginDialog::addInfoNodes(
   // set icon hint
   if (plInfo->GetPluginLoaded(index))
     {
-    //pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGreen.png"));
     pluginNode->setText(ValueCol, "Loaded");
+    if (plInfo->GetPluginStatusMessage(index))
+      {
+      pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/warning.png"));
+      }
     }
   else 
     {
     pluginNode->setText(ValueCol, "Not Loaded");
-#ifdef FIXME_COLLABORATION
-    // currently we don't have any mechanism to get the plugin loading error
-    // message.
-    if(!plInfo->GetLoaded() && !plInfo->GetError() )
-      {
-//    pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGray.png"));
-      pluginNode->setText(ValueCol, "Not Loaded");
-      }
-    else
-      {
-      pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/warning.png"));
-      pluginNode->setText(ValueCol, "Error");
-      }
-#endif
     }
 
   QStringList infoText;
@@ -351,13 +340,10 @@ void pqPluginDialog::addInfoNodes(
   infoText <<  this->getStatusText(plInfo, index);
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-#ifdef FIXME_COLLABORATION
-  // We are not providing any plugin loading error message currently
-  if(plInfo->GetError())
+  if(plInfo->GetPluginStatusMessage(index) != NULL)
     {
-    infoNode->setToolTip(ValueCol, tr(plInfo->GetError()));
+    infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginStatusMessage(index)));
     }
-#endif
 
   // AutoLoad setting
   infoText.clear();
@@ -500,14 +486,11 @@ QString pqPluginDialog::getStatusText(vtkPVPluginsInformation* plInfo,
   unsigned int cc)
 {
   QString text;
-#ifdef FIXME_COLLABORATION
-  if(plInfo->GetError())
+  if (plInfo->GetPluginStatusMessage(cc))
     {
-    text = plInfo->GetLoaded() ? QString("Loaded, but ") : QString("Load Error, ") ;
-    text.append(plInfo->GetError());
+    text = plInfo->GetPluginStatusMessage(cc);
     }
   else
-#endif
     {
     text = plInfo->GetPluginLoaded(cc) ? "Loaded" : "Not Loaded";
     }
