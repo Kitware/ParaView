@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidgetItem>
 
 // SM
-#include "vtkPVPluginInformation.h"
+#include "vtkPVPluginsInformation.h"
 
 // pqCore
 #include "pqPluginManager.h"
@@ -83,25 +83,25 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     {
     this->remoteGroup->setEnabled(false);
     helpText = "Local plugins are automatically searched for in %1.";
-    QStringList serverPaths = pm->pluginPaths(NULL);
+    QStringList serverPaths = pm->pluginPaths(false);
     helpText = helpText.arg(serverPaths.join(", "));
     }
   else
     {
     helpText = "Remote plugins are automatically searched for in %1.\n"
                "Local plugins are automatically searched for in %2.";
-    QStringList serverPaths = pm->pluginPaths(server);
+    QStringList serverPaths = pm->pluginPaths(true);
     helpText = helpText.arg(serverPaths.join(", "));
-    QStringList localPaths = pm->pluginPaths(NULL);
+    QStringList localPaths = pm->pluginPaths(false);
     helpText = helpText.arg(localPaths.join(", "));
     }
 
   this->HelpText->setText(helpText);
   
-  QObject::connect(pm, SIGNAL(serverManagerExtensionLoaded()),
+  QObject::connect(pm, SIGNAL(pluginsUpdated()),
     this, SLOT(onRefresh()));
-  QObject::connect(pm, SIGNAL(pluginInfoUpdated()),
-    this, SLOT(refresh()));
+  //QObject::connect(pm, SIGNAL(pluginInfoUpdated()),
+  //  this, SLOT(refresh()));
 
   QObject::connect(this->loadSelected_Remote, SIGNAL(clicked(bool)),
     this, SLOT(onLoadSelectedRemotePlugin()));
@@ -111,7 +111,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     this, SLOT(onRemoveSelectedRemotePlugin()));
   QObject::connect(this->removeLocal, SIGNAL(clicked(bool)),
     this, SLOT(onRemoveSelectedLocalPlugin()));
-  
+
   this->LoadingMultiplePlugins = false;
   this->refresh();
 }
@@ -119,31 +119,22 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
 //----------------------------------------------------------------------------
 pqPluginDialog::~pqPluginDialog()
 {
-  pqApplicationCore::instance()->getPluginManager()->savePluginSettings(false);
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadRemotePlugin()
 {
-  QString plugin = this->loadPlugin(this->Server, true);
-  if(!plugin.isEmpty())
-    {
-    this->refresh();
-    }
+  this->loadPlugin(this->Server, true);
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadLocalPlugin()
 {
-  QString plugin = this->loadPlugin(this->Server, false);
-  if(!plugin.isEmpty())
-    {
-    this->refresh();
-    }
+  this->loadPlugin(this->Server, false);
 }
 
 //----------------------------------------------------------------------------
-QString pqPluginDialog::loadPlugin(pqServer* server, bool remote)
+void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
 {
   pqFileDialog fd(remote? server: NULL,
                   this, "Load Plugin", QString(), 
@@ -151,45 +142,41 @@ QString pqPluginDialog::loadPlugin(pqServer* server, bool remote)
                   "Client Resource Files (*.bqrc)\n"
                   "Server Manager XML (*.xml)\n"
                   "All Files (*)");
-  QString plugin;
   if(fd.exec() == QDialog::Accepted)
     {
-    plugin = fd.getSelectedFiles()[0];
-    plugin = this->loadPlugin(server, plugin, remote);
+    QString plugin = fd.getSelectedFiles()[0];
+    this->loadPlugin(server, plugin, remote);
     }
-  return plugin;
 }
 
 //----------------------------------------------------------------------------
-QString pqPluginDialog::loadPlugin(pqServer* server, 
-  const QString& plugin, bool remote)
+void pqPluginDialog::loadPlugin(
+  pqServer* server, const QString& plugin, bool remote)
 {
   QString error;
-  QString ret = plugin;
   // now pass it off to the plugin manager to load everything that this 
   // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pqPluginManager::LoadStatus loadresult = pm->loadExtension(server, plugin, &error, remote);
-  
+
   if (loadresult == pqPluginManager::NOTLOADED)
     {
 //    QMessageBox::information(NULL, "Plugin Load Failed", error);
-    ret = QString();
+//    ret = QString();
     }
 
   if (loadresult != pqPluginManager::LOADED)
     {
-    ret = QString();
+//    ret = QString();
     }
-  return ret;
 }
 
 //----------------------------------------------------------------------------
-void pqPluginDialog::removePlugin(pqServer* server, 
+void pqPluginDialog::removePlugin(pqServer*,
                                   const QString& plugin, bool remote)
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pm->removePlugin(server, plugin, remote);
+  pm->hidePlugin(plugin, remote);
 }
 
 //----------------------------------------------------------------------------
@@ -212,7 +199,7 @@ void pqPluginDialog::refresh()
 void pqPluginDialog::refreshLocal()
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  QList< vtkPVPluginInformation* > extensions = pm->loadedExtensions(NULL);
+  vtkPVPluginsInformation* extensions = pm->loadedExtensions(false);
   this->populatePluginTree(this->localPlugins, extensions, false);
   this->localPlugins->resizeColumnToContents(ValueCol);  
 }
@@ -223,9 +210,8 @@ void pqPluginDialog::refreshRemote()
   if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-    QList< vtkPVPluginInformation* > extensions = pm->loadedExtensions(this->Server);
-    this->populatePluginTree(this->remotePlugins, 
-      extensions, true);
+    vtkPVPluginsInformation* extensions = pm->loadedExtensions(true);
+    this->populatePluginTree(this->remotePlugins, extensions, true);
     this->remotePlugins->resizeColumnToContents(ValueCol);  
     }
 }
@@ -241,7 +227,7 @@ void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 
   pluginTree->setHeaderLabels(
     QStringList() << tr("Name") << tr("Property"));
-        
+
   QObject::connect(pluginTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(onPluginItemChanged(QTreeWidgetItem*, int))/*, Qt::QueuedConnection*/);
   QObject::connect(pluginTree, SIGNAL(itemExpanded(QTreeWidgetItem*)),
@@ -252,144 +238,137 @@ void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::populatePluginTree(QTreeWidget* pluginTree,
-  QList< vtkPVPluginInformation* >& pluginList, bool remote)
+  vtkPVPluginsInformation* pluginList, bool remote)
 {
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pluginTree->blockSignals(true);
   pluginTree->clear();
-  foreach(vtkPVPluginInformation* plInfo, pluginList)
+  for (unsigned int cc=0; cc < pluginList->GetNumberOfPlugins(); ++cc)
     {
-    this->createPluginNode(pluginTree, plInfo, remote);
+    if (pm->isHidden(pluginList->GetPluginFileName(cc), remote))
+      {
+      continue;
+      }
+    QTreeWidgetItem* mNode = new QTreeWidgetItem(
+      pluginTree, QTreeWidgetItem::UserType);
+    QVariant vdata;
+    vdata.setValue(cc);
+    mNode->setData(NameCol, Qt::UserRole, vdata);
+
+    Qt::ItemFlags parentFlags(
+      Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    mNode->setText(NameCol, pluginList->GetPluginName(cc));
+    mNode->setFlags(parentFlags);
+    mNode->setChildIndicatorPolicy(
+      QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    this->addInfoNodes(mNode, pluginList, cc, remote);
     }
   pluginTree->blockSignals(false);
 }
 
 //----------------------------------------------------------------------------
-void pqPluginDialog::createPluginNode(
-  QTreeWidget* pluginTree, vtkPVPluginInformation* pluginInfo, bool remote)
+vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
+  QTreeWidgetItem* pluginNode, unsigned int &index)
 {
-  QTreeWidgetItem* mNode = new QTreeWidgetItem(
-    pluginTree, QTreeWidgetItem::UserType);
-  
-  QVariant vdata;
-  vdata.setValue((void*)pluginInfo);
-  mNode->setData(NameCol, Qt::UserRole, vdata);
-  this->addPluginInfo(mNode, remote);
-}
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  vtkPVPluginsInformation* info = pm->loadedExtensions(
+    (pluginNode->treeWidget() == this->remotePlugins)?
+    true : false);
 
-//----------------------------------------------------------------------------
-vtkPVPluginInformation* pqPluginDialog::getPluginInfo(
-  QTreeWidgetItem* pluginNode)
-{
-  return (pluginNode && pluginNode->type() == QTreeWidgetItem::UserType) ? 
-    static_cast<vtkPVPluginInformation*>(
-    pluginNode->data(NameCol,Qt::UserRole).value<void *>()) : NULL;
-}
+  index = (pluginNode && pluginNode->type() == QTreeWidgetItem::UserType) ?
+    pluginNode->data(NameCol,Qt::UserRole).toUInt() : 0;
 
-//----------------------------------------------------------------------------
-void pqPluginDialog::addPluginInfo(QTreeWidgetItem* pluginNode, bool remote)
-{
-  vtkPVPluginInformation* plInfo = this->getPluginInfo(pluginNode);
-  if(!plInfo)
+  if (info && info->GetNumberOfPlugins() > index)
     {
-    return;
+    return info;
     }
-    
-  Qt::ItemFlags parentFlags(
-    Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-  pluginNode->setText(NameCol, plInfo->GetPluginName());
-  pluginNode->setFlags(parentFlags);
-  pluginNode->setChildIndicatorPolicy(
-    QTreeWidgetItem::DontShowIndicatorWhenChildless);
-  
-  this->addInfoNodes(pluginNode, plInfo, remote);  
+  index = 0;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::addInfoNodes(
-  QTreeWidgetItem* pluginNode, vtkPVPluginInformation* plInfo, bool remote)
+  QTreeWidgetItem* pluginNode, vtkPVPluginsInformation* plInfo,
+  unsigned int index, bool vtkNotUsed(remote))
 {
   Qt::ItemFlags infoFlags(Qt::ItemIsEnabled);
   
   // set icon hint
-  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager(); 
-  if(pm->isPluginFunctional(plInfo, remote))
+  if (plInfo->GetPluginLoaded(index))
     {
-    //pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGreen.png"));
     pluginNode->setText(ValueCol, "Loaded");
+    if (plInfo->GetPluginStatusMessage(index))
+      {
+      pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/warning.png"));
+      }
     }
   else 
     {
-    if(!plInfo->GetLoaded() && !plInfo->GetError() )
-      {
-//    pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGray.png"));
-      pluginNode->setText(ValueCol, "Not Loaded");
-      }
-    else
-      {
-      pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/warning.png"));
-      pluginNode->setText(ValueCol, "Error");
-      }
+    pluginNode->setText(ValueCol, "Not Loaded");
     }
-    
+
   QStringList infoText;
   //Version
-  infoText << tr("Version") <<  tr(plInfo->GetPluginVersion()); 
+  infoText << tr("Version") <<  tr(plInfo->GetPluginVersion(index));
   QTreeWidgetItem* infoNode = new QTreeWidgetItem(
     pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-  
+
   // Location
   infoText.clear();
-  infoText << tr("Location") <<  tr(plInfo->GetFileName()); 
+  infoText << tr("Location") <<  tr(plInfo->GetPluginFileName(index));
   infoNode = new QTreeWidgetItem(
     pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-  infoNode->setToolTip(ValueCol, tr(plInfo->GetFileName()));
-  
+  infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginFileName(index)));
+
   // Depended Plugins
-  if(plInfo->GetRequiredPlugins())
+  if (plInfo->GetRequiredPlugins(index))
     {
     infoText.clear();
     infoText << tr("Required Plugins");
-    infoText <<  tr(plInfo->GetRequiredPlugins()); 
+    infoText <<  tr(plInfo->GetRequiredPlugins(index));
     infoNode = new QTreeWidgetItem(
       pluginNode, infoText);
     infoNode->setFlags(infoFlags);
-    infoNode->setToolTip(ValueCol, tr(plInfo->GetRequiredPlugins()));
+    infoNode->setToolTip(ValueCol, tr(plInfo->GetRequiredPlugins(index)));
     }
-    
+
   // Load status
   infoText.clear();
   infoText << tr("Status");
-  infoText <<  this->getStatusText(plInfo);
-  infoNode = new QTreeWidgetItem(
-    pluginNode, infoText);
+  infoText <<  this->getStatusText(plInfo, index);
+  infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
-  if(plInfo->GetError())
+  if(plInfo->GetPluginStatusMessage(index) != NULL)
     {
-    infoNode->setToolTip(ValueCol, tr(plInfo->GetError()));
+    infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginStatusMessage(index)));
     }
-  
+
   // AutoLoad setting
   infoText.clear();
-  infoText << tr("Auto Load") <<  tr(""); 
+  infoText << tr("Auto Load") <<  tr("");
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags | Qt::ItemIsUserCheckable);
-  infoNode->setCheckState(ValueCol, plInfo->GetAutoLoad() ? Qt::Checked : Qt::Unchecked);
+  infoNode->setCheckState(ValueCol,
+    plInfo->GetAutoLoad(index) ? Qt::Checked : Qt::Unchecked);
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onPluginItemChanged(QTreeWidgetItem* item, int col)
 {
+  // Called when user toggles the checkbox for auto-load.
   if(item && col == ValueCol)
     {
-    vtkPVPluginInformation* plInfo = this->getPluginInfo(
-      static_cast<QTreeWidgetItem*>(item->parent()));
-    if(plInfo)
+    unsigned int index=0;
+    vtkPVPluginsInformation* plInfo = this->getPluginInfo(
+      static_cast<QTreeWidgetItem*>(item->parent()), index);
+    if (plInfo)
       {
-      pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-      int autoLoad = item->checkState(col)==Qt::Checked ? 1 : 0;
-      pm->updatePluginAutoLoadState(plInfo, autoLoad);
+      bool autoLoad = item->checkState(col)==Qt::Checked;
+      // the vtkSMPluginManager ensures that the auto-load flag is preserved
+      // even when the plugininfo is updated as new plugins are loaded.
+      plInfo->SetAutoLoad(index, autoLoad);
       }
     }
 }
@@ -400,12 +379,15 @@ void pqPluginDialog::loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
 {
   this->LoadingMultiplePlugins = true;
   for (int i=0;i<selItems.count();i++)
+  foreach (QTreeWidgetItem* item, selItems)
     {
-    vtkPVPluginInformation* plInfo = this->getPluginInfo(selItems.value(i));
-    if(plInfo && plInfo->GetFileName() && !plInfo->GetLoaded())
+    unsigned int index=0;
+    vtkPVPluginsInformation* plInfo = this->getPluginInfo(item, index);
+    if (plInfo && plInfo->GetPluginFileName(index) &&
+      !plInfo->GetPluginLoaded(index))
       {
-      this->loadPlugin(server, QString(plInfo->GetFileName()), remote);
-      }     
+      this->loadPlugin(server, QString(plInfo->GetPluginFileName(index)), remote);
+      }
     }
   this->LoadingMultiplePlugins = false;
   this->refresh();
@@ -416,7 +398,6 @@ void pqPluginDialog::onLoadSelectedRemotePlugin()
 {
   this->loadSelectedPlugins(this->remotePlugins->selectedItems(), 
     this->Server, true);
-  this->refresh();
 }
 
 //----------------------------------------------------------------------------
@@ -424,7 +405,6 @@ void pqPluginDialog::onLoadSelectedLocalPlugin()
 {
   this->loadSelectedPlugins(this->localPlugins->selectedItems(), 
     this->Server, false);
-  this->refresh();
 }
 
 //----------------------------------------------------------------------------
@@ -433,11 +413,14 @@ void pqPluginDialog::removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
 {
   for (int i=0;i<selItems.count();i++)
     {
-    vtkPVPluginInformation* plInfo = this->getPluginInfo(selItems.value(i));
-    if(plInfo && plInfo->GetFileName())
+    unsigned int index=0;
+    vtkPVPluginsInformation* plInfo = this->getPluginInfo(
+      selItems.value(i), index);
+    if (plInfo && plInfo->GetPluginFileName(index))
       {
-      this->removePlugin(server, QString(plInfo->GetFileName()), remote);
-      }     
+      this->removePlugin(
+        server, QString(plInfo->GetPluginFileName(index)), remote);
+      }
     }
   this->refresh();
 }
@@ -479,8 +462,9 @@ void pqPluginDialog::updateEnableState(
   for (int i=0;i<num;i++)
     {
     QTreeWidgetItem* pluginNode = pluginTree->selectedItems().value(i);
-    vtkPVPluginInformation* plInfo = this->getPluginInfo(pluginNode);
-    if(plInfo && !plInfo->GetLoaded())
+    unsigned int index=0;
+    vtkPVPluginsInformation* plInfo = this->getPluginInfo(pluginNode, index);
+    if (plInfo && !plInfo->GetPluginLoaded(index))
       {
       shouldEnableLoad = true;
       break;
@@ -498,17 +482,17 @@ void pqPluginDialog::resizeColumn(QTreeWidgetItem* item)
 }
 
 //----------------------------------------------------------------------------
-QString pqPluginDialog::getStatusText(vtkPVPluginInformation* plInfo)
+QString pqPluginDialog::getStatusText(vtkPVPluginsInformation* plInfo,
+  unsigned int cc)
 {
   QString text;
-  if(plInfo->GetError())
+  if (plInfo->GetPluginStatusMessage(cc))
     {
-    text = plInfo->GetLoaded() ? QString("Loaded, but ") : QString("Load Error, ") ;
-    text.append(plInfo->GetError());
+    text = plInfo->GetPluginStatusMessage(cc);
     }
   else
     {
-    text = plInfo->GetLoaded() ? "Loaded" : "Not Loaded";
+    text = plInfo->GetPluginLoaded(cc) ? "Loaded" : "Not Loaded";
     }
   return text;
 }

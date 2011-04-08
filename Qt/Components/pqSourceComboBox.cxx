@@ -92,8 +92,8 @@ void pqSourceComboBox::populateComboBox()
   for (int i = this->count() - 1; i >= 0; --i)
     {
     QVariant _data = this->itemData(i);
-    vtkClientServerID cid (_data.value<vtkTypeUInt32>());
-    pqPipelineSource* source = smm->findItem<pqPipelineSource*>(cid);
+    vtkTypeUInt32 globalid = _data.value<vtkTypeUInt32>();
+    pqPipelineSource* source = smm->findItem<pqPipelineSource*>(globalid);
     bool shouldBeIn = false;
     if (source)
       {
@@ -119,7 +119,7 @@ void pqSourceComboBox::populateComboBox()
     {
     pqPipelineSource* source = sources[i];
     vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    QVariant _data = QVariant(proxy->GetSelfID().ID);
+    QVariant _data = QVariant(proxy->GetGlobalID());
     if (this->findData(_data) == -1)
       {
       bool shouldBeIn = this->AllowedDataType.length() == 0 || (
@@ -139,7 +139,7 @@ void pqSourceComboBox::populateComboBox()
 //-----------------------------------------------------------------------------
 void pqSourceComboBox::removeSource(pqPipelineSource* source)
 {
-  int index = this->findData(QVariant(source->getProxy()->GetSelfID().ID));
+  int index = this->findData(QVariant(source->getProxy()->GetGlobalID()));
   if (index != -1)
     {
     this->removeItem(index);
@@ -154,7 +154,7 @@ void pqSourceComboBox::nameChanged(pqServerManagerModelItem* item)
   pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
   if (src)
     {
-    QVariant _data = QVariant(src->getProxy()->GetSelfID().ID);
+    QVariant _data = QVariant(src->getProxy()->GetGlobalID());
     int index = this->findData(_data);
     if ((index != -1) && (src->getSMName() != this->itemText(index)))
       {
@@ -175,10 +175,10 @@ pqPipelineSource* pqSourceComboBox::currentSource() const
   if (index != -1)
     {
     QVariant _data = this->itemData(index);
-    vtkClientServerID cid (_data.value<vtkTypeUInt32>());
+    vtkTypeUInt32 gid = _data.value<vtkTypeUInt32>();
     pqServerManagerModel* smmodel = 
       pqApplicationCore::instance()->getServerManagerModel();
-    source = smmodel->findItem<pqPipelineSource*>(cid);
+    source = smmodel->findItem<pqPipelineSource*>(gid);
     }
   return source;
 }
@@ -188,7 +188,7 @@ void pqSourceComboBox::setCurrentSource(pqPipelineSource* source)
 {
   if (source)
     {
-    QVariant _data = QVariant(source->getProxy()->GetSelfID().ID);
+    QVariant _data = QVariant(source->getProxy()->GetGlobalID());
     int index = this->findData(_data);
     this->setCurrentIndex(index);
     }
@@ -199,7 +199,7 @@ void pqSourceComboBox::setCurrentSource(vtkSMProxy* source)
 {
   if (source)
     {
-    QVariant _data = QVariant(source->GetSelfID().ID);
+    QVariant _data = QVariant(source->GetGlobalID());
     int index = this->findData(_data);
     this->setCurrentIndex(index);
     }
@@ -222,7 +222,7 @@ void pqSourceComboBox::onCurrentChanged(pqServerManagerModelItem* item)
     return;
     }
 
-  QVariant _data = QVariant(src->getProxy()->GetSelfID().ID);
+  QVariant _data = QVariant(src->getProxy()->GetGlobalID());
   int index = this->findData(_data);
   if (index != -1)
     {

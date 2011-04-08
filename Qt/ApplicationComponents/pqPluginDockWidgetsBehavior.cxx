@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPluginDockWidgetsBehavior.h"
 
-#include "pqPluginManager.h"
 #include "pqApplicationCore.h"
 #include "pqDockWindowInterface.h"
+#include "pqInterfaceTracker.h"
 
 #include <QDockWidget>
 #include <QMainWindow>
@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPluginDockWidgetsBehavior::pqPluginDockWidgetsBehavior(QMainWindow* parentObject)
   : Superclass(parentObject)
 {
-  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  QObject::connect(pm, SIGNAL(guiInterfaceLoaded(QObject*)),
+  pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
+  QObject::connect(pm, SIGNAL(interfaceRegistered(QObject*)),
     this, SLOT(addPluginInterface(QObject*)));
   foreach (QObject* iface, pm->interfaces())
     {

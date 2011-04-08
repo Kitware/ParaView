@@ -32,15 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMUndoRedoStateLoader.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
-#include "vtkPVXMLElement.h"  // vistrails
-#include "vtkSMIdBasedProxyLocator.h"  // vistrails
+
+#include "vtkUndoSet.h"
+#include "vtkSMUndoElement.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
 
 
 #include <QtDebug>
@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqProxyModifiedStateUndoElement.h"
-#include "pqProxyUnRegisterUndoElement.h"
 #include "pqServer.h"
 
 //-----------------------------------------------------------------------------
@@ -63,21 +62,18 @@ public:
   vtkSmartPointer<vtkSMUndoStack> UndoStack;
   vtkSmartPointer<vtkSMUndoStackBuilder> UndoStackBuilder;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
-  vtkSmartPointer<vtkSMUndoRedoStateLoader> StateLoader;
 
   QList<bool> IgnoreAllChangesStack;
   int NestedCount;
 };
 
 //-----------------------------------------------------------------------------
-pqUndoStack::pqUndoStack(bool clientOnly, 
-  vtkSMUndoStackBuilder* builder,
+pqUndoStack::pqUndoStack( vtkSMUndoStackBuilder* builder,
   QObject* _parent/*=null*/) 
 :QObject(_parent)
 {
   this->Implementation = new pqImplementation();
   this->Implementation->UndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
-  this->Implementation->UndoStack->SetClientOnly(clientOnly);
 
   if (builder)
     {
@@ -93,23 +89,6 @@ pqUndoStack::pqUndoStack(bool clientOnly,
 
   builder->SetUndoStack(this->Implementation->UndoStack);
 
-  vtkSMUndoRedoStateLoader* loader = vtkSMUndoRedoStateLoader::New();
-  vtkSMUndoElement* elem = pqHelperProxyRegisterUndoElement::New();
-  loader->RegisterElement(elem);
-  elem->Delete();
-
-  elem = pqProxyUnRegisterUndoElement::New();
-  loader->RegisterElement(elem);
-  elem->Delete();
-
-  elem = pqProxyModifiedStateUndoElement::New();
-  loader->RegisterElement(elem);
-  elem->Delete();
-
-  this->Implementation->UndoStack->SetStateLoader(loader);
-  this->Implementation->StateLoader = loader;
-  loader->Delete();
-
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onStackChanged()), NULL, 1.0);
@@ -119,6 +98,12 @@ pqUndoStack::pqUndoStack(bool clientOnly,
 pqUndoStack::~pqUndoStack()
 {
   delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMUndoStackBuilder* pqUndoStack::GetUndoStackBuilder()
+{
+  return this->Implementation->UndoStackBuilder;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,24 +137,12 @@ const QString pqUndoStack::redoLabel()
 //-----------------------------------------------------------------------------
 void pqUndoStack::addToActiveUndoSet(vtkUndoElement* element)
 {
-  if (this->Implementation->UndoStackBuilder->GetConnectionID() 
-    == vtkProcessModuleConnectionManager::GetNullConnectionID())
-    {
-    return;
-    }
-
   if (this->ignoreAllChanges())
     {
     return;
     }
 
   this->Implementation->UndoStackBuilder->Add(element);
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStack::registerElementForLoader(vtkSMUndoElement* elem )
-{
-  this->Implementation->StateLoader->RegisterElement(elem);
 }
 
 //-----------------------------------------------------------------------------
@@ -197,30 +170,9 @@ void pqUndoStack::onStackChanged()
   emit this->redoLabelChanged(redo_label);
 }
 
-//begin vistrails
-vtkUndoSet* pqUndoStack::getLastUndoSet() {
-    return this->Implementation->UndoStack->getLastUndoSet();
-}
-
-vtkUndoSet* pqUndoStack::getUndoSetFromXML(vtkPVXMLElement *root) {
-  vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
-  locator->SetConnectionID(this->Implementation->UndoStackBuilder->GetConnectionID());
-  locator->SetDeserializer(this->Implementation->StateLoader);
-  vtkUndoSet* undoSet = this->Implementation->StateLoader->LoadUndoRedoSet(root, locator);
-  locator->Delete();
-
-  return undoSet;
-}
-//end vistrails
-
 //-----------------------------------------------------------------------------
 void pqUndoStack::beginUndoSet(QString label)
 {
-  if (this->Implementation->UndoStackBuilder->GetConnectionID() 
-    == vtkProcessModuleConnectionManager::GetNullConnectionID())
-    {
-    return;
-    }
   if(this->Implementation->NestedCount == 0)
     {
     this->Implementation->UndoStackBuilder->Begin(label.toAscii().data());
@@ -232,11 +184,6 @@ void pqUndoStack::beginUndoSet(QString label)
 //-----------------------------------------------------------------------------
 void pqUndoStack::endUndoSet()
 {
-  if (this->Implementation->UndoStackBuilder->GetConnectionID() 
-    == vtkProcessModuleConnectionManager::GetNullConnectionID())
-    {
-    return;
-    }
   if(this->Implementation->NestedCount == 0)
     {
     qDebug() << "endUndoSet called without a beginUndoSet.";
@@ -255,7 +202,6 @@ void pqUndoStack::undo()
 {
   this->beginNonUndoableChanges();
   this->Implementation->UndoStack->Undo();
-  this->endNonUndoableChanges();
 
   // Update of proxies have to happen in order.
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("sources", 1);
@@ -263,28 +209,19 @@ void pqUndoStack::undo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("representations", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+
+  this->endNonUndoableChanges();
+
   pqApplicationCore::instance()->render();
+
   emit this->undone();
 }
-
-
-// vistrails begin
-void pqUndoStack::Push(const char *label, vtkUndoSet *set) {
-  this->beginNonUndoableChanges();
-  this->Implementation->UndoStack->Push(
-    this->Implementation->UndoStackBuilder->GetConnectionID(), label, set);
-  this->endNonUndoableChanges();
-}
-// vistrails end
-
-
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::redo()
 {
   this->beginNonUndoableChanges();
   this->Implementation->UndoStack->Redo();
-  this->endNonUndoableChanges();
 
   // Update of proxies have to happen in order.
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("sources", 1);
@@ -292,7 +229,11 @@ void pqUndoStack::redo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("representations", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+
+  this->endNonUndoableChanges();
+
   pqApplicationCore::instance()->render();
+
   emit this->redone();
 }
 
@@ -334,14 +275,10 @@ void pqUndoStack::setActiveServer(pqServer* server)
 {
   if (server)
     {
-    this->Implementation->UndoStackBuilder->SetConnectionID(
-      server->GetConnectionID());
     this->endNonUndoableChanges();
     }
   else
     {
-    this->Implementation->UndoStackBuilder->SetConnectionID(
-      vtkProcessModuleConnectionManager::GetNullConnectionID());
     this->beginNonUndoableChanges();
     }
 }

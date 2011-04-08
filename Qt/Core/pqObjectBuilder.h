@@ -76,6 +76,9 @@ public:
   
   /// Create a server connection give a server resource
   pqServer* createServer(const pqServerResource& resource);
+
+  /// Closes any open connections for reverse-connection.
+  void abortPendingConnections();
  
   /// Destroy a server connection 
   void removeServer(pqServer *server);
@@ -198,6 +201,10 @@ public:
     emit this->finishedAddingServer(server);
     }
 
+  /// Returns true while pqObjectBuilder is in createServer() call.
+  bool waitingForConnection() const
+    { return this->WaitingForConnection; }
+
 signals:
   
   /// Emitted after a new server connection is created
@@ -302,6 +309,8 @@ protected:
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
   void operator=(const pqObjectBuilder&); // Not implemented.
+
+  bool WaitingForConnection;
 };
 
 #endif

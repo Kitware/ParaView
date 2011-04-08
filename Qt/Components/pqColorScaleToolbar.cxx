@@ -184,10 +184,9 @@ void pqColorScaleToolbar::changeColor()
           {
           // based on representation type, we are either changing the diffuse
           // color or the solid color.
-          int reprType = pr->getRepresentationType();
-          if (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
-            reprType == vtkSMPVRepresentationProxy::POINTS ||
-            reprType == vtkSMPVRepresentationProxy::OUTLINE)
+          QString reprType = pr->getRepresentationType();
+          if (reprType == "Wireframe" ||
+            reprType == "Points" || reprType == "Outline")
             {
             pname = "AmbientColor";
             }

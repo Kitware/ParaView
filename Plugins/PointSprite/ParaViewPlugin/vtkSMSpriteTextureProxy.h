@@ -53,8 +53,6 @@ protected:
   vtkSMSpriteTextureProxy();
   ~vtkSMSpriteTextureProxy();
 
-  virtual void CreateVTKObjects();
-
 private:
   vtkSMSpriteTextureProxy(const vtkSMSpriteTextureProxy&); // Not implemented
   void operator=(const vtkSMSpriteTextureProxy&); // Not implemented

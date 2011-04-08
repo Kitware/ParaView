@@ -43,16 +43,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
+#include <vtkDirectory.h>
 #include <vtkProcessModule.h>
 #include <vtkPVFileInformation.h>
 #include <vtkPVFileInformationHelper.h>
 #include <vtkSmartPointer.h>
+#include <vtkSMDirectoryProxy.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkStringList.h>
-#include <vtkDirectory.h>
 
 #include "pqSMAdaptor.h"
 
@@ -245,12 +246,10 @@ public:
     // if we are doing remote browsing
     if(server)
       {
-      vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+      vtkSMProxyManager* pxm = server->proxyManager();
 
       vtkSMProxy* helper = pxm->NewProxy("misc", "FileInformationHelper");
       this->FileInformationHelperProxy = helper;
-      helper->SetConnectionID(server->GetConnectionID());
-      helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
       helper->Delete();
       helper->UpdateVTKObjects();
       helper->UpdatePropertyInformation();
@@ -315,11 +314,8 @@ public:
 
       // get data from server
       this->FileInformation->Initialize();
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      pm->GatherInformation(this->FileInformationHelperProxy->GetConnectionID(),
-        vtkProcessModule::DATA_SERVER,
-        this->FileInformation,
-        this->FileInformationHelperProxy->GetID());
+      this->FileInformationHelperProxy->GatherInformation(
+        this->FileInformation);
       }
     else
       {
@@ -614,34 +610,11 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
 
   if (this->Implementation->isRemote())
     {
-    // File system is on remote server.
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                              vtkProcessModule::DATA_SERVER :
-                              vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-           << dirID << "MakeDirectory"
-           << dirPath.toAscii().data()
-           << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->MakeDirectory(dirPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {
@@ -672,33 +645,11 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
 
   if (this->Implementation->isRemote())
     {
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                           vtkProcessModule::DATA_SERVER :
-                           vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-          << dirID << "DeleteDirectory"
-          << dirPath.toAscii().data()
-          << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->DeleteDirectory(dirPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {
@@ -751,34 +702,12 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
   if (this->Implementation->isRemote())
     {
-    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-    vtkTypeUInt32 servers = this->Implementation->isRemote() ?
-                              vtkProcessModule::DATA_SERVER :
-                              vtkProcessModule::CLIENT;
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-           << dirID << "Rename"
-           << oldPath.toAscii().data()
-           << newPath.toAscii().data()
-           << vtkClientServerStream::End;
-    pm->SendStream(conn, servers, stream);
-
-    vtkClientServerStream result = pm->GetLastResult(conn, servers);
-    if(result.GetNumberOfMessages() == 1 &&
-       result.GetNumberOfArguments(0) == 1)
-      {
-      int tmp;
-      if(result.GetArgument(0, 0, &tmp) && tmp)
-        {
-        ret = true;
-        }
-      }
-
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(conn, servers, stream);
+    vtkSMDirectoryProxy* dirProxy =  vtkSMDirectoryProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "Directory"));
+    ret = dirProxy->Rename(
+      oldPath.toAscii().data(), newPath.toAscii().data(),
+      vtkProcessModule::DATA_SERVER);
+    dirProxy->Delete();
     }
   else
     {

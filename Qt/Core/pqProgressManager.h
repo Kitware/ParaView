@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 
 class vtkEventQtSlotConnect;
-
+class vtkObject;
+class pqServer;
 /// pqProgressManager is progress manager. It centralizes progress raising/
 /// handling. Provides ability for any object to lock progress so that
 /// only progress fired by itself will be notified to the rest of the world.
@@ -111,7 +112,8 @@ protected slots:
   /// callbacks for signals fired from vtkProcessModule.
   void onStartProgress();
   void onEndProgress();
-  void onProgress();
+  void onProgress(vtkObject*);
+  void onServerAdded(pqServer*);
 
 protected:
   QPointer<QObject> Lock;

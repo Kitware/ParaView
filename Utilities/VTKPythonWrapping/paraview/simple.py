@@ -39,12 +39,13 @@ paraview.compatibility.minor = 5
 import servermanager
 
 def _disconnect():
-    servermanager.ProxyManager().UnRegisterProxies()
-    active_objects.view = None
-    active_objects.source = None
-    import gc
-    gc.collect()
-    servermanager.Disconnect()
+    if servermanager.ActiveConnection:
+        servermanager.ProxyManager().UnRegisterProxies()
+        active_objects.view = None
+        active_objects.source = None
+        import gc
+        gc.collect()
+        servermanager.Disconnect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage:
@@ -52,23 +53,26 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     _disconnect()
-    cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    _add_functions(globals())
+
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return cid
+    return session
 
 def ReverseConnect(port=11111):
     """Create a reverse connection to a server.  Listens on port and waits for
     an incoming connection from the server."""
     _disconnect()
-    cid = servermanager.ReverseConnect(port)
+    session = servermanager.ReverseConnect(port)
+    _add_functions(globals())
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return cid
+    return session
 
 def _create_view(view_xml_name):
     "Creates and returns a 3D render view."
@@ -77,7 +81,7 @@ def _create_view(view_xml_name):
       "my_view%d" % _funcs_internals.view_counter, view)
     active_objects.view = view
     _funcs_internals.view_counter += 1
-    
+
     tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
     views = tk.Views
     if not view in views:
@@ -115,13 +119,13 @@ def OpenDataFile(filename, **extraArgs):
     reader_factor = servermanager.ProxyManager().GetReaderFactory()
     if  reader_factor.GetNumberOfRegisteredPrototypes() == 0:
       reader_factor.RegisterPrototypes("sources")
-    cid = servermanager.ActiveConnection.ID
+    session = servermanager.ActiveConnection.Session
     first_file = filename
     if type(filename) == list:
         first_file = filename[0]
-    if not reader_factor.TestFileReadability(first_file, cid):
+    if not reader_factor.TestFileReadability(first_file, session):
         raise RuntimeError, "File not readable: %s " % first_file
-    if not reader_factor.CanReadFile(first_file, cid):
+    if not reader_factor.CanReadFile(first_file, session):
         raise RuntimeError, "File not readable. No reader found for '%s' " % first_file
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
@@ -342,7 +346,7 @@ def Delete(proxy=None):
         if listdomain:
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 continue
-            group = "pq_helper_proxies." + proxy.GetSelfIDAsString()
+            group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
             for i in xrange(listdomain.GetNumberOfProxies()):
                 pm = servermanager.ProxyManager()
                 iproxy = listdomain.GetProxy(i)
@@ -722,7 +726,7 @@ def _GetRepresentationAnimationHelper(sourceproxy):
     proxy = servermanager.misc.RepresentationAnimationHelper(
       Source=sourceproxy)
     servermanager.ProxyManager().RegisterProxy(
-      "pq_helper_proxies.%s" % sourceproxy.GetSelfIDAsString(),
+      "pq_helper_proxies.%s" % sourceproxy.GetGlobalIDAsString(),
       "RepresentationAnimationHelper", proxy)
     return proxy
 
@@ -988,8 +992,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
-_add_functions(globals())
-active_objects = ActiveObjects()
-
 if not servermanager.ActiveConnection:
     Connect()
+
+active_objects = ActiveObjects()

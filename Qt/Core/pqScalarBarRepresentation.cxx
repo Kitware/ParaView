@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
-#include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUndoElement.h"
+#include "vtkSMPropertyModificationUndoElement.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqScalarsToColors.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -214,7 +215,6 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
 {\
   vtkSMPropertyModificationUndoElement* elem =\
   vtkSMPropertyModificationUndoElement::New();\
-  elem->SetConnectionID(proxy->GetConnectionID());\
   elem->ModifiedProperty(proxy, name);\
   emit this->addToActiveUndoSet(elem);\
   elem->Delete();\
@@ -224,7 +224,7 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
 void pqScalarBarRepresentation::startInteraction()
 {
   emit this->begin("Move Color Legend");
-  
+
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
@@ -238,7 +238,6 @@ void pqScalarBarRepresentation::endInteraction()
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
-
   emit this->end();
 }
 

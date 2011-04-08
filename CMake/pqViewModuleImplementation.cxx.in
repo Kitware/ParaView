@@ -74,22 +74,14 @@ vtkSMProxy* @ARG_VIEW_TYPE@Implementation::createViewProxy(const QString& viewty
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if(viewtype == "@ARG_VIEW_TYPE@")
     {
-    // First, see if there is a render view specific to the server
-    QString xmlname
-      = QString("@ARG_VIEW_XML_NAME@%1").arg(server->getRenderViewXMLName());
-    if (pxm->ProxyElementExists("@ARG_VIEW_XML_GROUP@", xmlname.toAscii().data()))
-      {
-      return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", xmlname.toAscii().data());
-      }
-
-    // Next, see what happens if we augment the type with View, in case this is
+    // See what happens if we augment the type with View, in case this is
     // how it is registered in XML.
-    if (pxm->ProxyElementExists("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View"))
+    if (pxm->HasDefinition("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View"))
       {
       return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View");
       }
 
-    // Last, just return whatever objectis registered under the view name.
+    // Just return whatever objectis registered under the view name.
     return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@");
     }
 
@@ -104,9 +96,7 @@ pqView* @ARG_VIEW_TYPE@Implementation::createView(const QString& viewtype,
                                                 QObject* p)
 {
   if(   (viewtype == "@ARG_VIEW_TYPE@")
-     || (viewtype == "@ARG_VIEW_XML_NAME@")
-     || (viewtype == QString("@ARG_VIEW_XML_NAME@%1")
-                                         .arg(server->getRenderViewXMLName())) )
+     || (viewtype == "@ARG_VIEW_XML_NAME@"))
     {
     return new @ARG_VIEW_TYPE@("@ARG_VIEW_TYPE@", group, viewname, viewmodule, server, p);
     }

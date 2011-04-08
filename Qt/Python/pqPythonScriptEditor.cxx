@@ -150,11 +150,13 @@ bool pqPythonScriptEditor::save()
 bool pqPythonScriptEditor::saveAsMacro()
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
+
   QDir existCheck(userMacroDir);
   if(!existCheck.exists(userMacroDir))
     {
     existCheck.mkdir(userMacroDir);
     }
+
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save Macro"),
     userMacroDir, tr("Python script (*.py)"));
   if (fileName.isEmpty())

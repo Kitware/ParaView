@@ -38,7 +38,6 @@ set(CoProcessor_SRCS
 IF (PARAVIEW_ENABLE_PYTHON)
   set(CoProcessor_SRCS
     ${CoProcessor_SRCS}
-    vtkCPProcessModulePythonHelper.cxx
     vtkCPPythonHelper.cxx
     vtkCPPythonScriptPipeline.cxx
   )
@@ -57,7 +56,7 @@ add_library(vtkCoProcessor ${CoProcessor_SRCS})
 set(CoProcessor_LIBS
   vtkCommon
   vtkFiltering
-  vtkPVFilters
+  vtkPVVTKExtensions
   vtkPVServerManager
   )
 IF (PARAVIEW_ENABLE_PYTHON)

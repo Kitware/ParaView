@@ -537,12 +537,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
   int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
   int newNumber = this->Internal->Model.rowCount();
 
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-
-  if(stack)
-    {
-    stack->beginUndoSet("Edit Keyframes");
-    }
+  BEGIN_UNDO_SET("Edit Keyframes");
 
   if(camera)
     {
@@ -630,11 +625,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
 
   this->Internal->Cue->blockSignals(prev);
   this->Internal->Cue->triggerKeyFramesModified();
-
-  if(stack)
-    {
-    stack->endUndoSet();
-    }
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

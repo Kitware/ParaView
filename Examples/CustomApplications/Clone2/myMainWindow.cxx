@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqDefaultViewBehavior.h"
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqDeleteBehavior.h"
@@ -133,7 +133,7 @@ myMainWindow::myMainWindow()
 #if 0
   new pqParaViewBehaviors(this, this);
 #else
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
   pgm->addInterface(new pqStandardViewModules(pgm));
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);

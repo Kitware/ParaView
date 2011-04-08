@@ -119,10 +119,11 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
 
     vtkSMProxy* tempClone = vtkSMProxyManager::GetProxyManager()->NewProxy(
       group, type);
-    tempClone->SetConnectionID(0);
+    tempClone->SetLocation(0);
+    tempClone->SetSession(NULL);
 
     // makes it easier to determine current values for filenames.
-    tempClone->LoadState(proxyXML, NULL);
+    tempClone->LoadXMLState(proxyXML, NULL);
 
     int proxyid = QString(proxyXML->GetAttribute("id")).toInt();
     // iterate over all property xmls in the proxyXML and add those xmls which

@@ -39,53 +39,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
+#include "vtkSMSession.h"
+#include "vtkSMRemoteObject.h"
 
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
-
-#include "pqProxyUnRegisterUndoElement.h"
 
 vtkStandardNewMacro(pqUndoStackBuilder);
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::pqUndoStackBuilder()
 {
   this->IgnoreIsolatedChanges = false;
-
-  vtkMemberFunctionCommand<pqUndoStackBuilder>* observer = 
-    vtkMemberFunctionCommand<pqUndoStackBuilder>::New();
-  observer->SetCallback(*this, &pqUndoStackBuilder::OnStartEvent);
-  this->StartObserver = observer;
-
-  observer = vtkMemberFunctionCommand<pqUndoStackBuilder>::New();
-  observer->SetCallback(*this, &pqUndoStackBuilder::OnEndEvent);
-  this->EndObserver = observer;
-
   this->UndoRedoing = false;
 }
 
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::~pqUndoStackBuilder()
 {
-  if (this->UndoStack)
-    {
-    this->UndoStack->RemoveObserver(this->StartObserver);
-    this->UndoStack->RemoveObserver(this->EndObserver);
-    }
-
-  this->StartObserver->Delete();
-  this->EndObserver->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnStartEvent()
-{
-  this->UndoRedoing = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnEndEvent()
-{
-  this->UndoRedoing = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,154 +66,55 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
     return;
     }
 
-  if (this->UndoStack)
-    {
-    this->UndoStack->RemoveObserver(this->StartObserver);
-    this->UndoStack->RemoveObserver(this->EndObserver);
-    }
-
   this->Superclass::SetUndoStack(stack);
-
-  if (this->UndoStack)
-    {
-    this->UndoStack->AddObserver(vtkCommand::StartEvent, this->StartObserver);
-    this->UndoStack->AddObserver(vtkCommand::EndEvent, this->EndObserver);
-    }
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::ExecuteEvent(vtkObject* caller, unsigned long eventid, 
-  void* data)
+bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 {
-  if (this->GetIgnoreAllChanges() || this->HandleChangeEvents() || 
-    eventid != vtkCommand::PropertyModifiedEvent)
-    {
-    this->Superclass::ExecuteEvent(caller, eventid, data);
-    return;
-    }
+  vtkSMRemoteObject* proxy = vtkSMRemoteObject::SafeDownCast(
+    session->GetRemoteObject(globalId));
 
-  // Property modification events are automatically added to stack
-  // under certain conditions even when the undo stack builder is not building an 
-  // active undo element.
-  if (!this->IgnoreIsolatedChanges && !this->UndoRedoing)
+  // We filter proxy type that must not be involved in undo/redo state.
+  // The property themselves are already filtered based on a flag in the XML.
+  // XML Flag: state_ignored="1"
+  if( !proxy || (proxy && (
+      proxy->IsA("vtkSMCameraProxy") ||
+      proxy->IsA("vtkSMTimeKeeperProxy") ||
+      proxy->IsA("vtkSMAnimationScene") ||
+      proxy->IsA("vtkSMAnimationSceneProxy") ||
+      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
+      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
     {
-    vtkSMProxyManager::ModifiedPropertyInformation &info =*(reinterpret_cast<
-      vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
-    this->OnPropertyModified(info.Proxy, info.PropertyName);
+    return true;
     }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnUnRegisterProxy(const char* group,
-  const char* name, vtkSMProxy* proxy)
+void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
+                                        vtkTypeUInt32 globalId,
+                                        const vtkSMMessage *oldState,
+                                        const vtkSMMessage *newState)
 {
-  // proxies registered as prototypes don't participate in
-  // undo/redo.
-  vtksys::RegularExpression prototypesRe("_prototypes$");
-
-  if (!proxy || (group && prototypesRe.find(group) != 0))
+  if(this->Filter(session, globalId))
     {
     return;
     }
 
-  vtkSMProxyUnRegisterUndoElement* elem =
-    pqProxyUnRegisterUndoElement::New();
-  elem->SetConnectionID(this->ConnectionID);
-  elem->ProxyToUnRegister(group, name, proxy);
-  this->UndoSet->AddElement(elem);
-  elem->Delete();
-
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy, 
-  const char* pname)
-{
-  if (proxy->IsA("vtkSMViewProxy"))
-    {
-    if (strcmp(pname, "GUISize" )== 0)
-      {
-      // GUISize is updated by the GUI.
-      return;
-      }
-
-    if (strcmp(pname, "WindowPosition") == 0)
-      {
-      // WindowPosition is updated by the GUI.
-      return;
-      }
-
-    if (strcmp(pname, "ViewTime") == 0)
-      {
-      // Render module's ViewTime is controlled by the GUI.
-      return;
-      }
-    }
-
-  if (proxy->IsA("vtkSMAnimationSceneProxy") && 
-    strcmp(pname, "ViewModules") == 0)
-    {
-    // ViewModules are updated by the GUI automatically
-    // as view modules are addeed, removed.
-    return;
-    }
-
-  if (proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))
-    {
-    // For scalar bar, we don't want the position changes to get recorded in the
-    // undo-stack automatically.
-    vtkSMProperty* prop = proxy->GetProperty(pname);
-    if (prop && prop->GetInformationProperty())
-      {
-      return;
-      }
-    }
-  else if (proxy->IsA("vtkSMNewWidgetRepresentationProxy"))
-    {
-    // We don't record 3D widget changes.
-    return;
-    }
-
-  if (proxy->IsA("vtkSMTimeKeeperProxy") &&
-    strcmp(pname, "Views") == 0)
-    {
-    // Views are updated by the GUI automatically.
-    return;
-    }
-
-  bool auto_element = this->GetEnableMonitoring()==0 && 
+  bool auto_element = !this->IgnoreAllChanges &&
     !this->IgnoreIsolatedChanges && !this->UndoRedoing;
-
-  if (/*auto_element && */proxy->IsA("vtkSMViewProxy"))
-    {
-    // Ignore interaction changes.
-    const char* names[] = {
-      "CameraPosition", "CameraFocalPoint", 
-      "CameraViewAngle",
-      "CameraParallelScale",
-      "CameraViewUp", "CameraClippingRange", "CenterOfRotation", 0};
-    for (int cc=0; names[cc]; cc++)
-      {
-      if (strcmp(pname, names[cc]) == 0)
-        {
-        return;
-        }
-      }
-    }
 
   if (auto_element)
     {
+    vtkSMRemoteObject* proxy =
+      vtkSMRemoteObject::SafeDownCast(session->GetRemoteObject(globalId));
     vtksys_ios::ostringstream stream;
-    vtkSMProperty* prop = proxy->GetProperty(pname);
-    if (prop->GetInformationOnly() || prop->GetIsInternal())
-      {
-      return;
-      }
-    stream << "Changed '" << prop->GetXMLLabel() <<"'";
+    stream << "Changed '" << proxy->GetClassName() <<"'";
     this->Begin(stream.str().c_str());
     }
 
-  this->Superclass::OnPropertyModified(proxy, pname);
+  this->Superclass::OnStateChange(session, globalId, oldState, newState);
 
  if (auto_element)
     {

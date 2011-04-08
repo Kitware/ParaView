@@ -36,8 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QMouseEvent>
 
+#include "pqApplicationCore.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
 //-----------------------------------------------------------------------------
@@ -53,20 +57,28 @@ pqProgressManager::pqProgressManager(QObject* _parent)
   this->LastProgressTime = 0;
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  this->VTKConnect->Connect(pm, vtkCommand::StartEvent,
-    this, SLOT(onStartProgress()));
-  this->VTKConnect->Connect(pm, vtkCommand::EndEvent,
-    this, SLOT(onEndProgress()));
-  this->VTKConnect->Connect(pm, vtkCommand::ProgressEvent,
-    this, SLOT(onProgress()));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(onServerAdded(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
 pqProgressManager::~pqProgressManager()
 {
   this->VTKConnect->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqProgressManager::onServerAdded(pqServer* server)
+{
+  this->VTKConnect->Disconnect();
+  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
+    vtkCommand::StartEvent, this, SLOT(onStartProgress()));
+  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
+  vtkCommand::EndEvent, this, SLOT(onEndProgress()));
+  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
+    vtkCommand::ProgressEvent, this, SLOT(onProgress(vtkObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -200,10 +212,11 @@ void pqProgressManager::onEndProgress()
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressManager::onProgress()
+void pqProgressManager::onProgress(vtkObject* caller)
 {
-  int oldProgress = vtkProcessModule::GetProcessModule()->GetLastProgress();
-  QString text = vtkProcessModule::GetProcessModule()->GetLastProgressName();
+  vtkPVProgressHandler* handler = vtkPVProgressHandler::SafeDownCast(caller);
+  int oldProgress = handler->GetLastProgress();
+  QString text = handler->GetLastProgressText();
 
   // forgive those who don't call SendPrepareProgress beforehand
   if (this->EnableProgress == false &&

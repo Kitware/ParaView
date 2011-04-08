@@ -69,13 +69,6 @@ public slots:
   /// turn visibility on which entails creating a new representation.
   void setRepresentation(pqRepresentation*);
 
-signals:
-  /// Fired when the browser begins performing an undoable change.
-  void beginUndo(const QString& label);
-
-  /// Fired when the browser is finished with the undoable change.
-  void endUndo();
-
 protected slots:
   void onVisibilityChanged(bool);
 

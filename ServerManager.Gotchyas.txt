@@ -1,0 +1,79 @@
+--------------------------------------------------------------------------------
+Plugin that use SMProxy have to be linked with the Protobuf library
+
+
+--------------------------------------------------------------------------------
+virtual vtkSMObject* vtkSMOutputPort::GetDataObjectProxy(int recheck) is no
+longer available. Do we need it?
+
+--------------------------------------------------------------------------------
+Fix progress related things in vtkSMSourceProxy and vtkSMOutputPort.
+
+--------------------------------------------------------------------------------
+Need a centralized/clean stream processing error capture mechanisms for protobuf
+messages.
+
+--------------------------------------------------------------------------------
+vtkSMProxyListDomain and state save/restore.
+
+--------------------------------------------------------------------------------
+vtkSMWriterProxy needs a ErrorCode information property.
+
+--------------------------------------------------------------------------------
+Fix progress related stuff in vtkSMWriterProxy.
+* vtkPVMPICommunicator::ReceiveDataInternal
+
+--------------------------------------------------------------------------------
+Fix error-reporting-disabling in vtkPMWriterProxy::CreateVTKObjects
+
+--------------------------------------------------------------------------------
+Fix extract selection proxies in source proxy and representations. We will now
+have a separate manager that deals with showing selections
+
+--------------------------------------------------------------------------------
+Fix AutoMPI
+
+--------------------------------------------------------------------------------
+vtkPVTimerInformation::CopyFromObject
+
+--------------------------------------------------------------------------------
+Interaction undo stacks in pqRenderView -- these are silly. Do we need to
+support them?
+
+--------------------------------------------------------------------------------
+Fix PluginManager (both SM and Qt).
+
+Need to fix loading of server-side XML when a remote plugin is loaded.
+
+Add support to load xml plugins in vtkPVPluginLoader::LoadPlugin.
+
+--------------------------------------------------------------------------------
+pqServerManagerSelectionModel::getProxy
+--------------------------------------------------------------------------------
+pqProgressManager
+
+
+************** FIXED ***********************************************************
+--------------------------------------------------------------------------------
+vtkSMSourceProxy::CreatePorts() had following code. That needs to handled correctly.
+  if (this->DoInsertExtractPieces)
+    {
+    for(; it != this->PInternals->OutputPorts.end(); it++)
+      {
+      it->Port.GetPointer()->CreateTranslatorIfNecessary();
+      if (strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") != 0  &&
+        this->GetNumberOfAlgorithmRequiredInputPorts() == 0)
+        {
+        it->Port.GetPointer()->InsertExtractPiecesIfNecessary();
+        }
+      }
+    }
+*** RESOLUTION: Handled in vtkPMSourceProxy.
+
+--------------------------------------------------------------------------------
+vtkSMOutputPort::GatherClassNameInformation() needs to be fixed.
+** FIXED.
+
+--------------------------------------------------------------------------------
+Need to catch interpreter error and abort as was done earlier.
+** FIXED in vtkSMSessionCore.

@@ -187,8 +187,8 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
 
   // Now layout the views.
   int dimensions[2];
-  compView->GetDimensions(dimensions);
-  if (compView->GetOverlayAllComparisons())
+  vtkSMPropertyHelper(compView, "Dimensions").Get(dimensions, 2);
+  if (vtkSMPropertyHelper(compView, "OverlayAllComparisons").GetAsInt() !=0)
     {
     dimensions[0] = dimensions[1] = 1;
     }
@@ -249,11 +249,12 @@ vtkImageData* pqComparativeRenderView::captureImage(int magnification)
 
   // Get the collection of view proxies
   int dimensions[2];
-  vtkCollection* currentViews =  vtkCollection::New();
-  this->getComparativeRenderViewProxy()->GetViews(currentViews);
-  this->getComparativeRenderViewProxy()->GetDimensions(dimensions);
+  vtkSMComparativeViewProxy* compView = this->getComparativeRenderViewProxy();
 
-  if (this->getComparativeRenderViewProxy()->GetOverlayAllComparisons())
+  vtkCollection* currentViews =  vtkCollection::New();
+  compView->GetViews(currentViews);
+  vtkSMPropertyHelper( compView, "Dimensions").Get(dimensions, 2);
+  if (vtkSMPropertyHelper(compView, "OverlayAllComparisons").GetAsInt() !=0)
     {
     dimensions[0] = dimensions[1] = 1;
     }
@@ -274,12 +275,11 @@ vtkImageData* pqComparativeRenderView::captureImage(int magnification)
         currentViews->GetItemAsObject(index));
       if (view)
         {
-#ifdef FIXME
         // There seems to be a bug where offscreen rendering
         // does not work with comparative view screenshots, so we
         // will force offscreen rendering off... FIXME!
-        view->SetUseOffscreenRenderingForScreenshots(0);
-#endif
+        vtkSMPropertyHelper(view, "UseOffscreenRenderingForScreenshots").Set(0);
+
         // Capture the image
         vtkImageData * image = view->CaptureWindow(magnification);
 

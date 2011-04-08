@@ -17,7 +17,6 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSynchronousMPISelfConnection.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>

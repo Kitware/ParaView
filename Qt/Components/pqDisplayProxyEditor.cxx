@@ -47,19 +47,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
+#include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkLabeledDataMapper.h"
 #include "vtkMaterialLibrary.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMLookupTableProxy.h"
+#include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMCompositeTreeDomain.h"
-#include "vtkSMIntVectorProperty.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -645,41 +645,31 @@ void pqDisplayProxyEditor::setupGUIConnections()
   /// sure that the undo-element for setting up of the "global property" link
   /// gets added in the same set in which the solid/edge color is changed.
   this->Internal->ColorActorColor->setUndoLabel("Change Solid Color");
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this->Internal->ColorActorColor,
-      SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->ColorActorColor,
-      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
+  QObject::connect(this->Internal->ColorActorColor,
+    SIGNAL(beginUndo(const QString&)),
+    this, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(this->Internal->ColorActorColor,
+    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 
   this->Internal->EdgeColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->EdgeColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Internal->EdgeColor->setUndoLabel("Change Edge Color");
-  if (stack)
-    {
-    QObject::connect(this->Internal->EdgeColor,
-      SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->EdgeColor,
-      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
+  QObject::connect(this->Internal->EdgeColor,
+    SIGNAL(beginUndo(const QString&)),
+    this, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(this->Internal->EdgeColor,
+    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 
   this->Internal->AmbientColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->AmbientColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Internal->AmbientColor->setUndoLabel("Change Ambient Color");
-  if (stack)
-    {
-    QObject::connect(this->Internal->AmbientColor,
-      SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->AmbientColor,
-      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
+  QObject::connect(this->Internal->AmbientColor,
+    SIGNAL(beginUndo(const QString&)),
+    this, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(this->Internal->AmbientColor,
+    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
@@ -706,16 +696,11 @@ void pqDisplayProxyEditor::setupGUIConnections()
                    this, SLOT(setBackfaceSolidColor(const QColor&)));
 
   this->Internal->BackfaceActorColor->setUndoLabel("Change Backface Solid Color");
-  stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this->Internal->BackfaceActorColor,
-                     SIGNAL(beginUndo(const QString&)),
-                     stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->BackfaceActorColor,
-                     SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
-
+  QObject::connect(this->Internal->BackfaceActorColor,
+    SIGNAL(beginUndo(const QString&)),
+    this, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(this->Internal->BackfaceActorColor,
+    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 
   QObject::connect(this->Internal->AutoAdjustSampleDistances,
                    SIGNAL(toggled(bool)),
@@ -726,14 +711,14 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateEnableState()
 {
-  int reprType = this->Internal->Representation->getRepresentationType();
+  QString reprType = this->Internal->Representation->getRepresentationType();
 
   if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
     {
     this->Internal->ColorInterpolateScalars->setEnabled(false);
-    if (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
-      reprType == vtkSMPVRepresentationProxy::POINTS ||
-      reprType == vtkSMPVRepresentationProxy::OUTLINE)
+    if (reprType == "Wireframe" ||
+      reprType == "Points" ||
+      reprType == "Outline")
       {
       this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->AmbientColorPage);
@@ -761,11 +746,11 @@ void pqDisplayProxyEditor::updateEnableState()
 
 
   this->Internal->EdgeStyleGroup->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
+    reprType == "Surface With Edges");
 
   this->Internal->SliceGroup->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::SLICE);
-  if (reprType == vtkSMPVRepresentationProxy::SLICE)
+    reprType == "Slice" );
+  if (reprType == "Slice")
     {
     // every time the user switches to Slice mode we update the domain for the
     // slider since the domain depends on the input to the image mapper which
@@ -775,19 +760,19 @@ void pqDisplayProxyEditor::updateEnableState()
 
   this->Internal->compositeTree->setVisible(
    this->Internal->CompositeTreeAdaptor &&
-   (reprType == vtkSMPVRepresentationProxy::VOLUME));
+   (reprType == "Volume"));
 
   this->Internal->SelectMapper->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::VOLUME
+    reprType == "Volume"
     && this->Internal->Representation->getProxy()->GetProperty("SelectMapper"));
 
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
   if (   !backfaceRepProperty
-      || (   (reprType != vtkSMPVRepresentationProxy::POINTS)
-          && (reprType != vtkSMPVRepresentationProxy::WIREFRAME)
-          && (reprType != vtkSMPVRepresentationProxy::SURFACE)
-          && (reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ) )
+      || (   (reprType != "Points")
+          && (reprType != "Wireframe")
+          && (reprType != "Surface")
+          && (reprType != "Surface With Edges") ) )
     {
     this->Internal->BackfaceStyleGroup->setEnabled(false);
     }
@@ -798,9 +783,9 @@ void pqDisplayProxyEditor::updateEnableState()
       = pqSMAdaptor::getElementProperty(backfaceRepProperty).toInt();
 
     bool backFollowsFront
-      = (   (backRepType == vtkSMPVRepresentationProxy::FOLLOW_FRONTFACE)
-         || (backRepType == vtkSMPVRepresentationProxy::CULL_BACKFACE)
-         || (backRepType == vtkSMPVRepresentationProxy::CULL_FRONTFACE) );
+      = (   (backRepType == vtkGeometryRepresentationWithFaces::FOLLOW_FRONTFACE)
+         || (backRepType == vtkGeometryRepresentationWithFaces::CULL_BACKFACE)
+         || (backRepType == vtkGeometryRepresentationWithFaces::CULL_FRONTFACE) );
 
     this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
     }
@@ -1104,4 +1089,16 @@ void pqDisplayProxyEditor::selectedMapperChanged()
     {
       // Do nothing.
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::beginUndoSet(const QString& str)
+{
+  BEGIN_UNDO_SET(str.toAscii().data());
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::endUndoSet()
+{
+  END_UNDO_SET();
 }

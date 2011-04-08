@@ -230,8 +230,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
       {
       if (first)
         {
-        this->Filter->SetConnectionID(source->getProxy()->GetConnectionID());
-        this->Filter->SetServers(source->getProxy()->GetServers());
+        this->Filter->SetSession(source->getProxy()->GetSession());
+        this->Filter->SetLocation(source->getProxy()->GetLocation());
         first = false;
         }
       this->Filter->AddProxy(source->getSMName().toAscii().data(),
@@ -335,7 +335,7 @@ void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
   foreach(vtkSMProxy* proxy, autoIncludeSet)
     {
     QString name = "auto_";
-    name += proxy->GetSelfIDAsString();
+    name += proxy->GetGlobalIDAsString();
     this->Filter->AddProxy(name.toAscii().data(), proxy);
     }
 }

@@ -1,0 +1,63 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+   <SourceProxy name="PacMan" class="vtkSphereSource" label="PacMan">
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the 3D coordinates for the center of the sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ThetaResolution"
+         command="SetThetaResolution"
+         number_of_elements="1"
+         default_values="60" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions between Start Theta and End Theta around the sphere. (See the Start Theta and End Theta properties.) The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="StartTheta"
+         command="SetStartTheta"
+         number_of_elements="1"
+         animateable="1"
+         default_values="30" >
+        <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Theta property should be 360 degrees. The value of this property can be adjusted to form only a portion of a sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="EndTheta"
+         command="SetEndTheta"
+         number_of_elements="1"
+         animateable="1"
+         default_values="330" >
+        <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          The value of this property can be adjusted to form only a portion of a sphere. This value is measured in degrees.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="PhiResolution"
+         command="SetPhiResolution"
+         number_of_elements="1"
+         default_values="60" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions between Start Phi and End Phi on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar to latitude lines on the earth.
+        </Documentation>
+      </IntVectorProperty>
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

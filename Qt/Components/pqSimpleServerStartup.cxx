@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSettings.h>
 
 #include <vtkProcessModule.h>
-#include <vtkProcessModuleConnectionManager.h>
 #include <vtkMath.h>
 #include <vtkTimerLog.h>
 #include <vtkPVXMLElement.h>
@@ -99,26 +98,10 @@ public:
 
     delete this->StartupDialog;
     this->StartupDialog = 0;
-    
-    if(this->PortID)
-      {
-      vtkProcessModule::GetProcessModule()->StopAcceptingConnections(
-        this->PortID);
-      this->PortID = 0;
-      }
-    if(this->DataServerPortID)
-      {
-      vtkProcessModule::GetProcessModule()->StopAcceptingConnections(
-        this->DataServerPortID);
-      this->DataServerPortID = 0;
-      }
-    if(this->RenderServerPortID)
-      {
-      vtkProcessModule::GetProcessModule()->StopAcceptingConnections(
-        this->RenderServerPortID);
-      this->RenderServerPortID = 0;
-      }
-    
+    this->PortID =0;
+    this->DataServerPortID = 0;
+    this->RenderServerPortID = 0;
+    pqApplicationCore::instance()->getObjectBuilder()->abortPendingConnections();
     this->Options.clear();
     this->Server = pqServerResource();
   }
@@ -149,11 +132,6 @@ pqSimpleServerStartup::pqSimpleServerStartup(QObject* p) :
   Superclass(p),
   Implementation(new pqImplementation())
 {
-  QObject::connect(
-    &this->Implementation->Timer,
-    SIGNAL(timeout()),
-    this,
-    SLOT(monitorReverseConnections()));
   this->IgnoreConnectIfAlreadyConnected = true;
 }
 
@@ -217,8 +195,6 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
     return;
     }    
 
-  this->disconnectAllServers();
-
   // Branch based on the connection type - builtin, forward, or reverse ...
   if(startup.getServer().scheme() == "builtin")
     {
@@ -226,11 +202,11 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
     }
   else if(startup.getServer().scheme() == "cs" || startup.getServer().scheme() == "cdsrs")
     {
-    this->startForwardConnection();
+    this->startConnection();
     }
   else if(startup.getServer().scheme() == "csrc" || startup.getServer().scheme() == "cdsrsrc")
     {
-    this->startReverseConnection();
+    this->startConnection();
     }
   else
     {
@@ -338,11 +314,6 @@ void pqSimpleServerStartup::reset()
     QObject::disconnect(this->Implementation->Startup, 0, this, 0);
     }
   this->Implementation->reset();
-  QObject::disconnect(
-    pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(serverAdded(pqServer*)),
-    this,
-    SLOT(finishReverseConnection(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -749,6 +720,8 @@ void pqSimpleServerStartup::startBuiltinConnection()
     new pqServerStartupDialog(this->Implementation->Server, false);
   this->Implementation->StartupDialog->show();
 
+  this->disconnectAllServers();
+
   pqServer* const server = pqApplicationCore::instance()->getObjectBuilder()->
     createServer(pqServerResource("builtin:"));
 
@@ -765,24 +738,25 @@ void pqSimpleServerStartup::startBuiltinConnection()
 }
 
 //-----------------------------------------------------------------------------
-void pqSimpleServerStartup::startForwardConnection()
+void pqSimpleServerStartup::startConnection()
 {
+  bool reverse = (this->Implementation->Server.scheme() == "csrc" ||
+    this->Implementation->Server.scheme() == "cdsrsrc");
   this->Implementation->StartupDialog =
-    new pqServerStartupDialog(this->Implementation->Server, false);
+    new pqServerStartupDialog(this->Implementation->Server, reverse);
   this->Implementation->StartupDialog->show();
   
   QObject::connect(
     this->Implementation->Startup,
     SIGNAL(succeeded()),
     this,
-    SLOT(forwardConnectServer()));
-    
+    SLOT(connectServer()),
+    Qt::QueuedConnection);
+
   QObject::connect(
-    this->Implementation->Startup,
-    SIGNAL(succeeded()),
-    this->Implementation->StartupDialog,
-    SLOT(hide()));
-    
+    this->Implementation->StartupDialog, SIGNAL(rejected()),
+    this, SLOT(cancelled()));
+
   QObject::connect(
     this->Implementation->Startup,
     SIGNAL(failed()),
@@ -818,8 +792,10 @@ void pqSimpleServerStartup::startForwardConnection()
 }
 
 //-----------------------------------------------------------------------------
-void pqSimpleServerStartup::forwardConnectServer()
+void pqSimpleServerStartup::connectServer()
 {
+  this->disconnectAllServers();
+
   pqServer* const server =
     pqApplicationCore::instance()->getObjectBuilder()->
     createServer(this->Implementation->Server);
@@ -844,117 +820,3 @@ void pqSimpleServerStartup::disconnectAllServers()
     core->getObjectBuilder()->removeServer(smModel->getItemAtIndex<pqServer*>(0));
     }
 }
-
-//-----------------------------------------------------------------------------
-void pqSimpleServerStartup::startReverseConnection()
-{
-  vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
-  
-  QObject::connect(
-    pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(serverAdded(pqServer*)),
-    this,
-    SLOT(finishReverseConnection(pqServer*)));
-  
-  if(this->Implementation->Server.scheme() == "csrc")
-    {
-    this->Implementation->PortID = process_module->AcceptConnectionsOnPort(
-      this->Implementation->Server.port(11111));
-    }
-  else if(this->Implementation->Server.scheme() == "cdsrsrc")
-    {
-    process_module->AcceptConnectionsOnPort(
-      this->Implementation->Server.dataServerPort(11111),
-      this->Implementation->Server.renderServerPort(22221),
-      this->Implementation->DataServerPortID,
-      this->Implementation->RenderServerPortID);
-    }
-    
-  this->Implementation->StartupDialog =
-    new pqServerStartupDialog(this->Implementation->Server, true);
-  this->Implementation->StartupDialog->show();
-
-  QObject::connect(
-    this->Implementation->StartupDialog,
-    SIGNAL(rejected()),
-    this,
-    SLOT(cancelled()));
-
-  QObject::connect(
-    this->Implementation->Startup,
-    SIGNAL(succeeded()),
-    &this->Implementation->Timer,
-    SLOT(start()));
-    
-  QObject::connect(
-    this->Implementation->Startup,
-    SIGNAL(failed()),
-    this,
-    SLOT(failed()));
-  
-  QObject::connect(
-    this->Implementation->Startup,
-    SIGNAL(failed()),
-    this->Implementation->StartupDialog,
-    SLOT(hide()));
-
-  QObject::connect(
-    this->Implementation->Startup,
-    SIGNAL(failed()),
-    &this->Implementation->Timer,
-    SLOT(stop()));
-
-  // Special-case: ensure that PV_CONNECT_ID is propagated to the global
-  // options object, so it is used by the connection
-  if(pqOptions* const options =
-    pqOptions::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetOptions()))
-    {
-    if(this->Implementation->Options.contains("PV_CONNECT_ID"))
-      {
-      options->SetConnectID(
-        this->Implementation->Options["PV_CONNECT_ID"].toInt());
-      }
-    else
-      {
-      // If no connection id is specified in the connection options,
-      // don't change the command line connection id.
-      // options->SetConnectID(0);
-      }
-    }
-  
-  this->Implementation->Startup->execute(this->Implementation->Options);
-}
-
-//-----------------------------------------------------------------------------
-void pqSimpleServerStartup::monitorReverseConnections()
-{
-  vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
-  if(-1 == process_module->MonitorConnections(10))
-    {
-    this->Implementation->Timer.stop();
-    this->Implementation->StartupDialog->hide();
-    this->failed();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
-{
-  QObject::disconnect(
-    pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(serverAdded(pqServer*)),
-    this,
-    SLOT(finishReverseConnection(pqServer*)));
-
-  server->setResource(this->Implementation->Server);
-
-  this->Implementation->Timer.stop();
-  this->Implementation->StartupDialog->hide();
-
-  // It is essential that pqApplicationCore fires the finishedAddingServer()
-  // signal on server creation. Make it fire explicitly.
-  pqApplicationCore::instance()->getObjectBuilder()->fireFinishedAddingServer(server);
-  this->started(server);
-}
-

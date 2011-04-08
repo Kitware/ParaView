@@ -32,17 +32,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 
 #include "pqPVApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
+#include "vtkCollection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 
+#include "vtkSmartPointer.h"
+#include "vtkNew.h"
+
+#include <QDebug>
 #include <QMenu>
 #include <QMap>
 #include <QPointer>
 #include <QPair>
+#include <QSet>
 
 class pqProxyGroupMenuManager::pqInternal
 {
@@ -87,10 +96,7 @@ public:
     if (!pname.isEmpty() && !pgroup.isEmpty())
       {
       QPair<QString, QString> pair(pgroup, pname);
-      if (this->Proxies.contains(pair) )
-        {
-        this->Proxies.remove(pair);
-        }
+      this->Proxies.remove(pair);
       }
     }
  
@@ -98,6 +104,8 @@ public:
   ProxyInfoMap Proxies;
   CategoryInfoMap Categories;
   QList<QPair<QString, QString> > RecentlyUsed;
+  QSet<QString> ProxyDefinitionGroupToListen;
+  QSet<unsigned long> CallBackIDs;
   QWidget Widget;
 };
 
@@ -113,11 +121,20 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(loadXML(vtkPVXMLElement*)),
     this, SLOT(loadConfiguration(vtkPVXMLElement*)));
+
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverRemoved(pqServer*)),
+    this, SLOT(removeProxyDefinitionUpdateObservers()));
+
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(addProxyDefinitionUpdateObservers()));
 }
 
 //-----------------------------------------------------------------------------
 pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
 {
+  this->removeProxyDefinitionUpdateObservers();
   delete this->Internal;
   this->Internal = 0;
 }
@@ -206,8 +223,8 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
     if (strcmp(curElem->GetName(), "Category") == 0 &&
       curElem->GetAttribute("name"))
       {
-      // We need to ascertain if this group is for the elements we are concerned
-      // with. i.e. is there atleast one element with tag "Proxy" in this
+      // We need to be certain if this group is for the elements we are concerned
+      // with. i.e. is there at least one element with tag "Proxy" in this
       // category?
       if (!curElem->FindNestedElementByName("Proxy"))
         {
@@ -576,4 +593,121 @@ void pqProxyGroupMenuManager::setEnabled(bool enable)
 {
   this->Enabled = enable;
   this->menu()->setEnabled(enable);
+}
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::addProxyDefinitionUpdateListener(const QString& proxyGroupName)
+{
+  this->Internal->ProxyDefinitionGroupToListen.insert(proxyGroupName);
+  this->removeProxyDefinitionUpdateObservers();
+  this->addProxyDefinitionUpdateObservers();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::removeProxyDefinitionUpdateListener(const QString& proxyGroupName)
+{
+  this->Internal->ProxyDefinitionGroupToListen.remove(proxyGroupName);
+  this->removeProxyDefinitionUpdateObservers();
+  this->addProxyDefinitionUpdateObservers();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::removeProxyDefinitionUpdateObservers()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  foreach(unsigned long callbackID, this->Internal->CallBackIDs)
+    {
+    pxm->RemoveObserver(callbackID);
+    }
+  this->Internal->CallBackIDs.clear();
+}
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::addProxyDefinitionUpdateObservers()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Regular proxy
+  unsigned long callbackID = pxm->AddObserver(
+      vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
+      this, &pqProxyGroupMenuManager::lookForNewDefinitions);
+  this->Internal->CallBackIDs.insert(callbackID);
+
+  // compound proxy
+  callbackID = pxm->AddObserver(
+      vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+      this, &pqProxyGroupMenuManager::lookForNewDefinitions);
+  this->Internal->CallBackIDs.insert(callbackID);
+
+  // Look inside the definition
+  this->lookForNewDefinitions();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::lookForNewDefinitions()
+{
+  // Look inside the group name that are tracked
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkPVProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
+
+  if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxdm == NULL)
+    {
+    return; // Nothing to look into...
+    }
+
+  // Setup definition iterator
+  vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
+  iter.TakeReference(pxdm->NewIterator(vtkPVProxyDefinitionManager::ALL_DEFINITIONS));
+  foreach(QString groupName, this->Internal->ProxyDefinitionGroupToListen)
+    {
+    iter->AddTraversalGroupName(groupName.toAscii().data());
+    }
+
+  // Loop over proxy that should be inserted inside the UI
+  QSet<QPair<QString, QString> > definitionSet;
+  for(iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    const char* group = iter->GetGroupName();
+    const char* name = iter->GetProxyName();
+    vtkPVXMLElement* hints = iter->GetProxyHints();
+    if(hints != NULL)
+      {
+      vtkNew<vtkCollection> collection;
+      hints->FindNestedElementByName("ShowInMenu", collection.GetPointer());
+      int size = collection->GetNumberOfItems();
+      vtkPVXMLElement* hint = NULL;
+      for(int i=0; i<size; i++)
+        {
+        hint = vtkPVXMLElement::SafeDownCast(collection->GetItemAsObject(i));
+        const char* categoryName = hint->GetAttribute("category");
+
+        definitionSet.insert(QPair<QString, QString>(group, name));
+        this->Internal->addProxy(group, name, NULL);
+        if(categoryName != NULL && this->Internal->Categories.contains(categoryName))
+          {
+          pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
+          if(!category.Proxies.contains(QPair<QString, QString>(group, name)))
+            {
+            category.Proxies.push_back(QPair<QString, QString>(group, name));
+            }
+          }
+        }
+      }
+    }
+
+  // Removing old definitions that don't exist anymore.
+  QSet<QPair<QString, QString> > setToRemove = this->Internal->Proxies.keys().toSet();
+  setToRemove.subtract(definitionSet);
+  QPair<QString,QString> key;
+  foreach(key, setToRemove)
+    {
+    // This extra test should be removed once the main definition has been updated
+    // with the Hints/ShowInMenu...
+    if(!pxdm->HasDefinition( key.first.toAscii().data(),
+                             key.second.toAscii().data()))
+      {
+      this->Internal->removeProxy(key.first, key.second);
+      }
+    }
+
+  // Update the menu with the current definition
+  this->populateMenu();
 }

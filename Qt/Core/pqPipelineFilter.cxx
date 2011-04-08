@@ -475,9 +475,9 @@ void pqPipelineFilter::hideInputIfRequired(pqView* view)
           {
           // Conditionally turn off the input. The input should be turned
           // off if the representation is surface and the opacity is 1.
-          int reprType = sourceDisp->getRepresentationType();
-          if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
-              reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
+          QString reprType = sourceDisp->getRepresentationType();
+          if ((reprType != "Surface" &&
+              reprType != "Surface With Edges") ||
             sourceDisp->getOpacity() < 1.0)
             {
             continue;

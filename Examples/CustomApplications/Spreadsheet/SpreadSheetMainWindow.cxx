@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqSpreadSheetViewDecorator.h"
 #include "pqSpreadSheetView.h"
 #include "pqStandardViewModules.h"
@@ -56,7 +56,7 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,
   ui.setupUi(this);
 
   // Register ParaView interfaces.
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));

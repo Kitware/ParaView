@@ -101,18 +101,16 @@ public:
 
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
-
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
 
   bool InitializedWidgets;
   pqInternal()
     {
-    this->UpdatingStack = false;
     this->InitializedWidgets = false;
-
+    this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
-    this->InteractionUndoStack->SetClientOnly(true);
+    // FIXME this->InteractionUndoStack->SetClientOnly(true);
     this->UndoStackBuilder = 
       vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
     this->UndoStackBuilder->SetUndoStack(

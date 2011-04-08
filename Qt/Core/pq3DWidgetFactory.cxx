@@ -79,8 +79,8 @@ vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString&
   for (; iter != this->Internal->Widgets.end(); iter++)
     {
     vtkSMNewWidgetRepresentationProxy* proxy = iter->GetPointer();
-    if (proxy && proxy->GetConnectionID() == server->GetConnectionID()
-      && name == proxy->GetXMLName())
+    if (proxy && proxy->GetSession() == server->session() &&
+      name == proxy->GetXMLName())
       {
       this->Internal->WidgetsInUse.push_back(proxy);
       this->Internal->Widgets.erase(iter);

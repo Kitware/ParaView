@@ -225,36 +225,43 @@
       <RepresentationType
         subproxy="OutlineRepresentation" text="Outline"/>
       <RepresentationType
-        subproxy="SurfaceRepresentation" text="Points" subtype="0" />
+        subproxy="SurfaceRepresentation" text="Points" subtype="Points" />
       <RepresentationType
-        subproxy="SurfaceRepresentation" text="Wireframe" subtype="1" />
+        subproxy="SurfaceRepresentation" text="Wireframe" subtype="Wireframe" />
       <RepresentationType
-        subproxy="SurfaceRepresentation" text="Surface" subtype="2" />
+        subproxy="SurfaceRepresentation" text="Surface" subtype="Surface" />
       <RepresentationType
-        subproxy="SurfaceRepresentation" text="Surface With Edges" subtype="3" />
+        subproxy="SurfaceRepresentation" text="Surface With Edges"
+        subtype="Surface With Edges" />
       <RepresentationType
-        subproxy="Glyph3DRepresentation" text="3D Glyphs" subtype="2" />
+        subproxy="Glyph3DRepresentation" text="3D Glyphs" subtype="Surface" />
 
-      <IntVectorProperty
+
+      <StringVectorProperty name="RepresentationTypesInfo"
+        command="GetRepresentationTypes"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty">
+        <Documentation>
+          Property that lists the available representation types. This is used
+          by the domain for "Representation" to setup the list of types
+          available correctly.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
         name="Representation"
-        command="SetRepresentation"
+        command="SetActiveRepresentation"
         number_of_elements="1"
-        default_values="2"
-        update_self="1">
+        default_values="Surface">
         <Documentation>
           Choose the type for the representation.
         </Documentation>
-        <EnumerationDomain name="enum">
-          <!-- this domain is automatically populated using RepresentationType
-               elements in the definition for this proxy.
-          <Entry value="3" text="Outline" />
-          <Entry value="0" text="Points" />
-          <Entry value="1" text="Wireframe" />
-          <Entry value="2" text="Surface" />
-          <Entry value="3" text="Surface With Edges" />
-          -->
-        </EnumerationDomain>
-      </IntVectorProperty>
+        <StringListDomain name="list">
+          <RequiredProperties>
+            <Property name="RepresentationTypesInfo" function="StringList" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
 
       <StringVectorProperty name="SelectionCellFieldDataArrayName"
         command="SetCellFieldDataArrayName"

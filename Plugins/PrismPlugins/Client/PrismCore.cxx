@@ -815,7 +815,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
 
 
-    pxm->UnRegisterLink(prismP->GetSelfIDAsString());//TODO we need a unique id that represents the connection.
+    pxm->UnRegisterLink(prismP->GetGlobalIDAsString());//TODO we need a unique id that represents the connection.
     //Otherwise we geometry in multiple SESAME views and vise versa.
 
 
@@ -837,7 +837,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
     link->AddLinkedProperty(selPrism,
       "IDs",
       vtkSMLink::OUTPUT);
-    pxm->RegisterLink(prismP->GetSelfIDAsString(), link);
+    pxm->RegisterLink(prismP->GetGlobalIDAsString(), link);
     link->Delete();
 
 
@@ -935,7 +935,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
 
 
-    pxm->UnRegisterLink(prismP->GetSelfIDAsString());//TODO we need a unique id that represents the connection.
+    pxm->UnRegisterLink(prismP->GetGlobalIDAsString());//TODO we need a unique id that represents the connection.
     //Otherwise we geometry in multiple SESAME views and vise versa.
 
 
@@ -956,7 +956,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
     link->AddLinkedProperty(selSource,
       "IDs",
       vtkSMLink::OUTPUT);
-    pxm->RegisterLink(prismP->GetSelfIDAsString(), link);
+    pxm->RegisterLink(prismP->GetGlobalIDAsString(), link);
     link->Delete();
 
 

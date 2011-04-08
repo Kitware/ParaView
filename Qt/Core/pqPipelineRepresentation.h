@@ -137,11 +137,12 @@ public:
   /// Set representation on the proxy.
   /// If representation is changed to volume, this method ensures that the
   /// scalar array is initialized.
-  void setRepresentation(int type);
+  void setRepresentation(const QString& repr);
 
-  /// Returns the type of representation currently used i.e.
-  //SURFACE/POINTS/VOLUME etc.
-  int getRepresentationType() const;
+  /// Returns the type of representation currently used. Representation type is
+  /// a string as defined by the string-list for the domain for the property
+  /// 'Representation' e.g. Surface, Volume etc.
+  QString getRepresentationType() const;
 
   /// Returns the opacity.
   double getOpacity() const;

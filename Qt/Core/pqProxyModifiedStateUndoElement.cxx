@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyLocator.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(pqProxyModifiedStateUndoElement);
 //----------------------------------------------------------------------------
@@ -34,51 +34,25 @@ pqProxyModifiedStateUndoElement::~pqProxyModifiedStateUndoElement()
 }
 
 //----------------------------------------------------------------------------
-bool pqProxyModifiedStateUndoElement::CanLoadState(vtkPVXMLElement* elem)
-{
-  return (elem && elem->GetName() && 
-    strcmp(elem->GetName(), "ProxyModifiedState") == 0);
-}
-
-//----------------------------------------------------------------------------
 void pqProxyModifiedStateUndoElement::MadeUnmodified(pqProxy* source)
 {
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("ProxyModifiedState");
-  elem->AddAttribute("id", source->getProxy()->GetSelfIDAsString());
-  elem->AddAttribute("reverse", 0);
-  this->SetXMLElement(elem);
-  elem->Delete();
+  this->ProxySourceGlobalId = source->getProxy()->GetGlobalID();
+  this->Reverse = false;
 }
 
 //----------------------------------------------------------------------------
 void pqProxyModifiedStateUndoElement::MadeUninitialized(pqProxy* source)
 {
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("ProxyModifiedState");
-  elem->AddAttribute("id", source->getProxy()->GetSelfIDAsString());
-  elem->AddAttribute("reverse", 1);
-  this->SetXMLElement(elem);
-  elem->Delete();
+  this->ProxySourceGlobalId = source->getProxy()->GetGlobalID();
+  this->Reverse = true;
 }
 
 //----------------------------------------------------------------------------
 bool pqProxyModifiedStateUndoElement::InternalUndoRedo(bool undo)
 {
-  vtkPVXMLElement* element = this->XMLElement;
-  int id = 0;
-  element->GetScalarAttribute("id",&id);
-  if (!id)
-    {
-    vtkErrorMacro("Failed to locate proxy id.");
-    return false;
-    }
-
-  int reverse = 0;
-  element->GetScalarAttribute("reverse", &reverse);
-
-  vtkSMProxyLocator* locator = this->GetProxyLocator();
-  vtkSMProxy* proxy = locator->LocateProxy(id);
+  vtkSMProxy* proxy =
+      vtkSMProxy::SafeDownCast(
+          this->GetSession()->GetRemoteObject(this->ProxySourceGlobalId));
 
   if (!proxy)
     {
@@ -89,12 +63,12 @@ bool pqProxyModifiedStateUndoElement::InternalUndoRedo(bool undo)
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smModel = core->getServerManagerModel();
   pqProxy* pqproxy = smModel->findItem<pqProxy*>(proxy);
-  if (pqproxy && !reverse)
+  if (pqproxy && !this->Reverse)
     {
     pqproxy->setModifiedState(undo? pqProxy::UNINITIALIZED :
       pqProxy::UNMODIFIED);
     }
-  else if (pqproxy && reverse)
+  else if (pqproxy && this->Reverse)
     {
     pqproxy->setModifiedState(undo? pqProxy::UNMODIFIED:
       pqProxy::UNINITIALIZED);

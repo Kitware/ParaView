@@ -79,14 +79,6 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->Color, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
-  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
-  if (ustack)
-    {
-    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
-      ustack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(endUndo()),
-      ustack, SLOT(endUndoSet()));
-    }
   QObject::connect(this->Internal->Ok, SIGNAL(clicked()),
     this, SLOT(accept()), Qt::QueuedConnection);
   QObject::connect(this->Internal->Cancel, SIGNAL(clicked()),
@@ -206,9 +198,9 @@ void pqCubeAxesEditorDialog::done(int res)
 {
   if (res == QDialog::Accepted && this->Internal->PropertyManager->isModified())
     {
-    emit this->beginUndo("Cube Axes Parameters");
+    BEGIN_UNDO_SET("Cube Axes Parameters");
     this->Internal->PropertyManager->accept();
-    emit this->endUndo();
+    END_UNDO_SET();
     }
   this->Superclass::done(res);
 }

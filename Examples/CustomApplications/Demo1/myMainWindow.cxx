@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_myMainWindow.h"
 
 #include "pqApplicationCore.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqStandardViewModules.h"
 #include "pqRenderView.h"
 #include "pqActiveObjects.h"
@@ -48,7 +48,7 @@ myMainWindow::myMainWindow(QWidget* parentObject,
   ui.setupUi(this);
 
   // Get access to the for standard paraview views.
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
   pgm->addInterface(new pqStandardViewModules(pgm));
 
   // Make a connection to the builtin server

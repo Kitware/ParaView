@@ -97,17 +97,6 @@ void vtkSMMantaViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkSMMantaViewProxy::CreateVTKObjects()
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  vtkClientServerID id = pm->NewStreamObject("vtkServerSideFactory", stream);
-  stream << vtkClientServerStream::Invoke
-         << id << "EnableFactory"
-         << vtkClientServerStream::End;
-  pm->DeleteStreamObject(id, stream);
-  pm->SendStream(this->GetConnectionID(),
-                 vtkProcessModule::CLIENT_AND_SERVERS,
-                 stream);
-
   this->Superclass::CreateVTKObjects();
 
   vtkSMPropertyHelper(this, "UseLight").Set(0);

@@ -58,11 +58,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoxWidget.h"
 #include "pqDistanceWidget.h"
 #include "pqImplicitPlaneWidget.h"
+#include "pqInterfaceTracker.h"
 #include "pqLineSourceWidget.h"
 #include "pqPickHelper.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
@@ -186,7 +186,7 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
   QList<pq3DWidget*> widgets;
 
   QList<pq3DWidgetInterface*> interfaces =
-    pqApplicationCore::instance()->getPluginManager()->findInterfaces<pq3DWidgetInterface*>();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces<pq3DWidgetInterface*>();
 
   vtkPVXMLElement* hints = pxy->GetHints();
   unsigned int max = hints->GetNumberOfNestedElements();

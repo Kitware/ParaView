@@ -1,0 +1,4306 @@
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="views">
+
+    <!-- ================================================================== -->
+    <Proxy name="ViewBase" class="vtkPVView"
+      processes="client|renderserver|dataserver">
+
+      <DoubleVectorProperty name="ViewTime"
+        command="SetViewTime"
+        number_of_elements="1"
+        state_ignored="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The pipeline update time for this view.
+          This gets passed to all representations added to this view.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CacheKey"
+        command="SetCacheKey"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This is the cache key used to indentify which cache entry to use for
+          rendering when caching is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseCache"
+        command="SetUseCache"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates whether to use cache for subsequent renderings.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ViewPosition"
+        command="SetPosition"
+        number_of_elements="2"
+        default_values="0 0">
+        <Documentation>
+          Set the position on this view in the multiview configuration.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ViewSize"
+        command="SetSize"
+        number_of_elements="2"
+        state_ignored="1"
+        default_values="400 400" >
+        <Documentation>
+          Set the size of this view in the multiview configuration.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="Representations"
+        command="AddRepresentation"
+        remove_command="RemoveRepresentation"
+        repeatable="1">
+        <Documentation>
+          Representations in this view.
+        </Documentation>
+      </ProxyProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <RenderViewProxy name="RenderView" class="vtkPVRenderView"
+           processes="client|renderserver|dataserver"
+           base_proxygroup="views" base_proxyname="ViewBase" >
+      <Documentation>
+        View proxy for a 3D interactive render view.
+      </Documentation>
+
+      <IntVectorProperty name="UseOffscreenRendering"
+        command="SetUseOffscreenRendering"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to use offscreen rendering.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
+        command="SetUseOffscreenRenderingForScreenshots"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether offscreen rendering should be used during
+          CaptureWindow calls.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseInteractiveRenderingForSceenshots"
+        command="SetUseInteractiveRenderingForSceenshots"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether InteractiveRender() should be used during
+          CaptureWindow calls. Default is to use StillRender().
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InteractionMode"
+        command="SetInteractionMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="3D" value="0" />
+          <Entry text="2D" value="1" />
+          <Entry text="Selection" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="StillRenderImageReductionFactor"
+        command="SetStillRenderImageReductionFactor"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" max="20" />
+        <Documentation>
+          Get/Set the reduction-factor to use when for StillRender(). This is
+          typically set to 1, but in some cases with terrible connectivity or
+          really large displays, one may want to use a sub-sampled image even
+          for StillRender(). This is set it number of pixels to be sub-sampled
+          by.  Note that image reduction factors have no effect when in built-in
+          mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CollectGeometryThreshold"
+        command="SetClientOutlineThreshold"
+        number_of_elements="1"
+        default_values="100.0">
+        <Documentation>
+          Select the threshold under which any geometry is collected on the
+          client.  When the data size exceeds the threshold, the client shows
+          outlines instead of actual data. Size is in kilobytes.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetInteractiveRenderImageReductionFactor"
+        number_of_elements="1"
+        default_values="2">
+        <IntRangeDomain name="range" min="1" max="20" />
+        <Documentation>
+          Get/Set the reduction-factor to use when for InteractiveRender(). This
+          is set it number of pixels to be sub-sampled by. Note that image
+          reduction factors have no effect when in built-in mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RemoteRenderThreshold"
+        command="SetRemoteRenderingThreshold"
+        number_of_elements="1"
+        default_values="20.0">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+           The threshold used to determine if the compositing should be used
+           for rendering. The value is rendering-geometry size in MBs.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LODThreshold"
+        command="SetLODRenderingThreshold"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively. The value is rendering-geometry size in MBs.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LODResolution"
+        command="SetLODResolution"
+        number_of_elements="1"
+        default_values="0.5">
+        <DoubleRangeDomain name="range" min="0" max="1.0" />
+        <Documentation>
+          Set the LOD resolution. 0 implies lowest level or detail, while 1
+          implies maximum level of detail.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="CompressorConfig"
+        command="ConfigureCompressor"
+        number_of_elements="1"
+        default_values="vtkSquirtCompressor 0 3">
+        <Documentation>
+          Used to configure the image compression used for client-server image
+          transfer when doing interactive renders.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseLight"
+        command="SetUseLightKit"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Enable/Disable the LightKit.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LightSwitch"
+        command="SetLightSwitch"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Turn on/off the default light in the 3D renderer.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CenterAxesVisibility"
+          command="SetCenterAxesVisibility"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle the visibility of the axes showing the center of rotation in
+          the scene.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OrientationAxesInteractivity"
+          command="SetOrientationAxesInteractivity"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OrientationAxesVisibility"
+          command="SetOrientationAxesVisibility"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="OrientationAxesLabelColor"
+          command="SetOrientationAxesLabelColor"
+          number_of_elements="3"
+          default_values="1 1 1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OrientationAxesOutlineColor"
+          command="SetOrientationAxesOutlineColor"
+          number_of_elements="3"
+          default_values="1 1 1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CenterOfRotation"
+        command="SetCenterOfRotation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>
+          Center of rotation for the interactor.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NonInteractiveRenderDelay"
+        command="SetNonInteractiveRenderDelay"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Set the delay (in seconds) after an interactive render before
+          switching to a full-rese render.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="CameraManipulators"
+        command="AddManipulator"
+        clean_command="RemoveAllManipulators"
+        is_internal="1"
+        repeatable="1">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files.
+        Eventually, we need to take out all the interaction related code from
+        the server manager -->
+        <ProxyGroupDomain name="groups">
+          <Group name="cameramanipulators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <!-- Key Light -->
+      <DoubleVectorProperty name="KeyLightWarmth"
+        command="SetKeyLightWarmth"
+        number_of_elements="1"
+        default_values="0.60" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="KeyLightIntensity"
+        command="SetKeyLightIntensity"
+        number_of_elements="1"
+        default_values="0.75" >
+        <DoubleRangeDomain name="range" min="0" max="2" resolution="0.05"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="KeyLightElevation"
+        command="SetKeyLightElevation"
+        number_of_elements="1"
+        default_values="50.0" >
+        <DoubleRangeDomain name="range" min="0" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="KeyLightAzimuth"
+        command="SetKeyLightAzimuth"
+        number_of_elements="1"
+        default_values="10.0" >
+        <DoubleRangeDomain name="range" min="-90" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <!-- Fill Light -->
+      <DoubleVectorProperty name="FillLightWarmth"
+        command="SetFillLightWarmth"
+        number_of_elements="1"
+        default_values="0.40" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FillLightK:F Ratio"
+        command="SetKeyToFillRatio"
+        number_of_elements="1"
+        default_values="3.0" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FillLightElevation"
+        command="SetFillLightElevation"
+        number_of_elements="1"
+        default_values="-75.0" >
+        <DoubleRangeDomain name="range" min="-90" max="10" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FillLightAzimuth"
+        command="SetFillLightAzimuth"
+        number_of_elements="1"
+        default_values="-10.0" >
+        <DoubleRangeDomain name="range" min="-90" max="90" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <!-- Back Light -->
+      <DoubleVectorProperty name="BackLightWarmth"
+        command="SetBackLightWarmth"
+        number_of_elements="1"
+        default_values="0.50" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackLightK:B Ratio"
+        command="SetKeyToBackRatio"
+        number_of_elements="1"
+        default_values="3.5" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackLightElevation"
+        command="SetBackLightElevation"
+        number_of_elements="1"
+        default_values="0.0" >
+        <DoubleRangeDomain name="range" min="-45" max="45" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackLightAzimuth"
+        command="SetBackLightAzimuth"
+        number_of_elements="1"
+        default_values="110.0" >
+        <DoubleRangeDomain name="range" min="60" max="170" resolution="1"/>
+      </DoubleVectorProperty>
+
+      <!-- Head Light -->
+      <DoubleVectorProperty name="HeadLightWarmth"
+        command="SetHeadLightWarmth"
+        number_of_elements="1"
+        default_values="0.50" >
+        <DoubleRangeDomain name="range" min="0" max="1" resolution="0.01"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HeadLightK:H Ratio"
+        command="SetKeyToHeadRatio"
+        number_of_elements="1"
+        default_values="3.0" >
+        <DoubleRangeDomain name="range" min="1" max="15" resolution="0.1"/>
+      </DoubleVectorProperty>
+
+      <!-- Maintain Luminance -->
+     <IntVectorProperty name="MaintainLuminance"
+        command="SetMaintainLuminance"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="DepthPeeling"
+       command="SetUseDepthPeeling"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="MaximumNumberOfPeels"
+       command="SetMaximumNumberOfPeels"
+       number_of_elements="1"
+       default_values="4">
+       <Documentation>
+         In case of depth peeling, define the maximum number of peeling layers.
+         Initial value is 4. A special value of 0 means no maximum limit. It
+         has to be a positive value.
+       </Documentation>
+       <IntRangeDomain name="range" min="0" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="Background"
+       command="SetBackground"
+       number_of_elements="3"
+       default_values="0 0 0" >
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="Background2"
+       command="SetBackground2"
+       number_of_elements="3"
+       default_values="0 0 0.165" >
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+     </DoubleVectorProperty>
+
+     <ProxyProperty name="BackgroundTexture"
+       command="SetBackgroundTexture">
+       <ProxyGroupDomain name="groups">
+         <Group name="textures"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <IntVectorProperty name="UseGradientBackground"
+       command="SetGradientBackground"
+       number_of_elements="1"
+       default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="UseTexturedBackground"
+       command="SetTexturedBackground"
+       number_of_elements="1"
+       default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="LightAmbientColor"
+       command="SetAmbientColor"
+       number_of_elements="3"
+       default_values="1.0 1.0 1.0">
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="LightSpecularColor"
+       command="SetSpecularColor"
+       number_of_elements="3"
+       default_values="1.0 1.0 1.0">
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="LightDiffuseColor"
+       command="SetDiffuseColor"
+       number_of_elements="3"
+       default_values="1.0 1.0 1.0">
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="LightIntensity"
+       command="SetIntensity"
+       number_of_elements="1"
+       default_values="1.0">
+       <DoubleRangeDomain name="range" min="0" max="1" />
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="LightType"
+       command="SetLightType"
+       number_of_elements="1"
+       default_values="1">
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="HeadLight" />
+         <Entry value="2" text="CameraLight" />
+         <Entry value="3" text="SceneLight" />
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="StereoCapableWindow"
+       command="SetStereoCapableWindow"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="StereoRender"
+       command="SetStereoRender"
+       number_of_elements="1"
+       default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="StereoType"
+       command="SetStereoType"
+       number_of_elements="1"
+       default_values="2">
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="Crystal Eyes" />
+         <Entry value="2" text="Red-Blue" />
+         <Entry value="3" text="Interlaced" />
+         <Entry value="4" text="Left" />
+         <Entry value="5" text="Right" />
+         <Entry value="6" text="Dresden" />
+         <Entry value="7" text="Anaglyph" />
+         <Entry value="8" text="Checkerboard" />
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="MultiSamples"
+       command="SetMultiSamples"
+       number_of_elements="1"
+       default_values="0">
+     </IntVectorProperty>
+
+     <IntVectorProperty name="AlphaBitPlanes"
+       command="SetAlphaBitPlanes"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="StencilCapable"
+       command="SetStencilCapable"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <ProxyProperty name="HiddenRepresentations"
+       command="AddRepresentation"
+       remove_command="RemoveRepresentation"
+       is_internal="1"
+       repeatable="1">
+       <Documentation>
+         This property is meant for adding/removing representation secretly.
+         e.g. 3D widgets etc. This property is not saved in states nor it
+         recorded by undo-redo.
+       </Documentation>
+     </ProxyProperty>
+
+     <ProxyProperty name="HiddenProps"
+       command="AddPropToRenderer"
+       remove_command="RemovePropFromRenderer"
+       is_internal="1"
+       repeatable="1">
+       <Documentation>
+         This property is meant for adding/removing props secretly.
+         e.g. 3D widgets etc. This property is not saved in states nor it
+         recorded by undo-redo.
+       </Documentation>
+     </ProxyProperty>
+
+     <Property name="ResetCamera" command="ResetCamera" />
+
+     <SubProxy>
+       <Proxy name="ActiveCamera" proxyname="Camera" proxygroup="camera">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CameraPositionInfo" />
+         <Property name="CameraPosition" />
+         <Property name="CameraFocalPointInfo" />
+         <Property name="CameraFocalPoint" />
+         <Property name="CameraViewUpInfo" />
+         <Property name="CameraViewUp" />
+         <Property name="CameraViewAngle" />
+         <Property name="CameraClippingRangeInfo" />
+         <Property name="CameraClippingRange" />
+         <Property name="CameraParallelScale" />
+         <Property name="CameraParallelScaleInfo" />
+         <Property name="CameraParallelProjection" />
+         <Property name="EyeAngle" />
+	 <Property name="HeadPose" />
+       </ExposedProperties>
+     </SubProxy>
+    </RenderViewProxy>
+
+    <!-- ================================================================== -->
+    <TwoDRenderViewProxy name="2DRenderView"
+                         class="vtkPV2DRenderView"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="views"
+                         base_proxyname="RenderView" >
+      <Documentation>
+        2D render view. Currently this view can only show image slices.
+      </Documentation>
+
+      <IntVectorProperty name="AxesVisibility"
+        command="SetAxisVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility of the 2D overlay axes.
+        </Documentation>
+      </IntVectorProperty>
+
+    </TwoDRenderViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy name="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      processes="client|renderserver|dataserver"
+                      base_proxygroup="views"
+                      base_proxyname="ViewBase" >
+      <Documentation>
+        This is the base proxy for XY chart views.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartTitle"
+        command="SetTitle"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="ChartTitleFont"
+        command="SetTitleFont"
+        number_of_elements="4"
+        element_types="2 0 0 0"
+        default_values_delimiter=";"
+        default_values="Arial;14;0;0" >
+        <Documentation>
+          Set the chart title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ChartTitleColor"
+        command="SetTitleColor"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ChartTitleAlignment"
+        command="SetTitleAlignment"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowLegend"
+        command="SetLegendVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxis"
+        command="SetAxisVisibility"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLogScale"
+        command="SetAxisLogScale"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisGrid"
+        command="SetGridVisibility"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisColor"
+        command="SetAxisColor"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        use_index="1"
+        number_of_elements="12"
+        default_values=
+          "0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisGridColor"
+        command="SetGridColor"
+        use_index="1"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values=
+          "0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisLabels"
+        command="SetAxisLabelVisibility"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="AxisLabelFont"
+        command="SetAxisLabelFont"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0"
+        number_of_elements="16"
+        default_values_delimiter=";"
+        default_values="Arial;12;0;0;Arial;12;0;0;Arial;12;0;0;Arial;12;0;0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelColor"
+        command="SetAxisLabelColor"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values="0 0 0   0 0 0   0 0 0   0 0 0" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelNotation"
+        command="SetAxisLabelNotation"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelPrecision"
+        command="SetAxisLabelPrecision"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="2 2 2 2">
+        <IntRangeDomain name="range" min="0" max="6" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisBehavior"
+        command="SetAxisBehavior"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisRange"
+        command="SetAxisRange"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="2"
+        number_of_elements="8"
+        default_values="0 1 0 1 0 1 0 1">
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitle"
+        command="SetAxisTitle"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitleFont"
+        command="SetAxisTitleFont"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0"
+        number_of_elements="16"
+        default_values_delimiter=";"
+        default_values="Arial;12;1;0;Arial;12;1;0;Arial;12;1;0;Arial;12;1;0">
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisTitleColor"
+        command="SetAxisTitleColor"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsLeft"
+        command="SetAxisLabelsLeft"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsLeftNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsBottom"
+        command="SetAxisLabelsBottom"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsBottomNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsRight"
+        command="SetAxisLabelsRight"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsRightNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsTop"
+        command="SetAxisLabelsTop"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsTopNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+    </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy name="XYChartView"
+      base_proxygroup="views"
+      base_proxyname="XYChartViewBase"
+      class="vtkPVLineChartView"
+      processes="client|renderserver|dataserver"
+      representation_name="XYChartRepresentation">
+      <Documentation>
+        This is the proxy for the XY line chart view.
+      </Documentation>
+
+    </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy name="XYBarChartView"
+      base_proxygroup="views"
+      base_proxyname="XYChartViewBase"
+      class="vtkPVBarChartView"
+      processes="client|renderserver|dataserver"
+      representation_name="XYBarChartRepresentation">
+      <Documentation>
+        This is the proxy for bar chart view.
+      </Documentation>
+
+    </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy name="ParallelCoordinatesChartView"
+      base_proxygroup="views"
+      base_proxyname="ViewBase"
+      class="vtkPVParallelCoordinatesChartView"
+      processes="client|renderserver|dataserver"
+      representation_name="ParallelCoordinatesRepresentation">
+      <Documentation>
+        This is the proxy for parallel coordinates chart view.
+      </Documentation>
+
+    </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <ViewProxy name="SpreadSheetView"
+      base_proxygroup="views"
+      base_proxyname="ViewBase"
+      class="vtkSpreadSheetView"
+      processes="client|dataserver|renderserver"
+      representation_name="SpreadSheetRepresentation">
+
+      <IntVectorProperty name="SelectionOnly"
+        command="SetShowExtractedSelection"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          When set to 1, this representations shows only the selected cells (or
+          points). The change will effect only after calling Update().
+          Note that changing this will clean all cache.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColumnToSort"
+        command="SetColumnNameToSort">
+      </StringVectorProperty>
+
+       <IntVectorProperty name="SelectedComponent"
+         command="SetComponentToSort"
+         number_of_elements="1"
+         default_values="-1">
+         <IntRangeDomain name="range" />
+       </IntVectorProperty>
+
+       <IntVectorProperty name="InvertOrder"
+         command="SetInvertSortOrder"
+         number_of_elements="1"
+         default_values="0">
+         <BooleanDomain name="bool"/>
+       </IntVectorProperty>
+
+       <IdTypeVectorProperty name="BlockSize"
+         command="SetBlockSize"
+         number_of_elements="1"
+         default_values="1024">
+         <Documentation>
+           Get/Set the number of rows that fit within one block. The output of
+           this filter will have at most BlockSize rows.
+         </Documentation>
+       </IdTypeVectorProperty>
+
+      <!-- End of SpreadSheetView -->
+    </ViewProxy>
+
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="representations">
+
+    <PVRepresentationProxy name="PVRepresentationBase"
+                               class="vtkPVCompositeRepresentation"
+                               processes="client|renderserver|dataserver">
+      <Documentation>
+        ParaView's default representation for showing any type of dataset in the
+        render view.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SelectionVisibility"
+        command="SetSelectionVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the selection, if any.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CubeAxesVisibility"
+        command="SetCubeAxesVisibility"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the cube axes.
+        </Documentation>
+      </IntVectorProperty>
+
+      <RepresentationType
+        subproxy="OutlineRepresentation" text="Outline"/>
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Points" subtype="Points" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Wireframe" subtype="Wireframe" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface" subtype="Surface" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface With Edges"
+        subtype="Surface With Edges" />
+      <RepresentationType
+        subproxy="Glyph3DRepresentation" text="3D Glyphs" subtype="Surface" />
+
+      <StringVectorProperty name="RepresentationTypesInfo"
+        command="GetRepresentationTypes"
+        information_only="1"
+        si_class="vtkSIDataArrayProperty">
+        <Documentation>
+          Property that lists the available representation types. This is used
+          by the domain for "Representation" to setup the list of types
+          available correctly.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="Representation"
+        command="SetActiveRepresentation"
+        number_of_elements="1"
+        default_values="Surface">
+        <Documentation>
+          Choose the type for the representation.
+        </Documentation>
+        <StringListDomain name="list">
+          <RequiredProperties>
+            <Property name="RepresentationTypesInfo" function="StringList" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SelectionCellFieldDataArrayName"
+        command="SetCellFieldDataArrayName"
+        number_of_elements="1"
+        default_values="vtkOriginalCellIds" >
+        <ArrayListDomain name="array_list" input_domain_name="input_array_cell">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SelectionPointFieldDataArrayName"
+        command="SetPointFieldDataArrayName"
+        number_of_elements="1"
+        default_values="vtkOriginalPointIds" >
+        <ArrayListDomain name="array_list" input_domain_name="input_array_point">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SurfaceRepresentation"
+          proxygroup="representations"
+          proxyname="SurfaceRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="BackfaceAmbientColor" />
+          <Property name="BackfaceDiffuseColor" />
+          <Property name="BackfaceOpacity" />
+          <Property name="BackfaceRepresentation" />
+          <Property name="ColorArrayName" />
+          <Property name="ColorAttributeType" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="LookupTable" />
+          <Property name="MapScalars" />
+          <Property name="Opacity" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="PointSize" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+          <Property name="StaticMode" />
+          <Property name="SuppressLOD" />
+          <Property name="Texture" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="OutlineRepresentation"
+          proxygroup="representations" proxyname="OutlineRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Glyph3DRepresentation"
+          proxygroup="representations" proxyname="Glyph3DRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Masking" />
+          <Property name="MeshVisibility" />
+          <Property name="Orient" />
+          <Property name="OrientationMode" />
+          <Property name="ScaleFactor" />
+          <Property name="ScaleMode" />
+          <Property name="Scaling" />
+          <Property name="SelectMaskArray" />
+          <Property name="SelectOrientationVectors" />
+          <Property name="SelectScaleArray" />
+          <Property name="Source" />
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CubeAxesRepresentation"
+          proxygroup="representations"
+          proxyname="CubeAxesRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property exposed_name="CubeAxesColor" name="Color" />
+          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia" name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+		  <Property name="DataBounds" />
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="SelectionRepresentation"
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+          <Exception name="Color" />
+          <Exception name="LineWidth" />
+          <Exception name="Opacity" />
+          <Exception name="PointSize" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="CellLabelBold" exposed_name="SelectionCellLabelBold" />
+          <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
+          <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />
+          <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
+          <Property name="CellLabelFormat" exposed_name="SelectionCellLabelFormat" />
+          <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" />
+          <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" />
+          <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
+          <Property name="CellLabelShadow" exposed_name="SelectionCellLabelShadow" />
+          <Property name="CellLabelVisibility" exposed_name="SelectionCellLabelVisibility" />
+          <Property name="Color" exposed_name="SelectionColor" />
+          <Property name="LineWidth" exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" exposed_name="SelectionOpacity" />
+          <Property name="PointLabelBold" exposed_name="SelectionPointLabelBold" />
+          <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
+          <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
+          <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" />
+          <Property name="PointLabelFormat" exposed_name="SelectionPointLabelFormat" />
+          <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" />
+          <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" />
+          <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
+          <Property name="PointLabelShadow" exposed_name="SelectionPointLabelShadow" />
+          <Property name="PointLabelVisibility" exposed_name="SelectionPointLabelVisibility" />
+          <Property name="PointSize" exposed_name="SelectionPointSize" />
+          <Property name="Representation" exposed_name="SelectionRepresentation" />
+          <Property name="UseOutline" exposed_name="SelectionUseOutline"/>
+        </ExposedProperties>
+      </SubProxy>
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy name="GeometryRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           processes="client|renderserver|dataserver"
+                           base_proxygroup="representations"
+                           base_proxyname="PVRepresentationBase">
+      <Documentation>
+        ParaView's default representation for showing any type of dataset in the
+        render view.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_cell" attribute_type="cell"
+          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain name="input_array_point" attribute_type="point"
+          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <!-- End of GeometryRepresentation -->
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <PVRepresentationProxy name="UnstructuredGridRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           processes="client|renderserver|dataserver"
+                           base_proxygroup="representations"
+                           base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show unstructured grid as
+        Surface/Outline/Points/Wireframe/Volume
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_cell" attribute_type="cell"
+          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain name="input_array_point" attribute_type="point"
+          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+          proxygroup="representations"
+          proxyname="UnstructuredGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityFunction" />
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ExtractedBlockIndex" />
+          <Property name="SelectMapper" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of UnstructuredGridRepresentation -->
+    </PVRepresentationProxy>
+
+    <PVRepresentationProxy name="UniformGridRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           processes="client|renderserver|dataserver"
+                           base_proxygroup="representations"
+                           base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show image data as
+        Surface/Outline/Points/Wireframe/Volume/Slice.
+      </Documentation>
+
+      <!-- this adds to the types already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
+      <RepresentationType subproxy="SliceRepresentation" text="Slice"/>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_cell" attribute_type="cell"
+          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain name="input_array_point" attribute_type="point"
+          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+          proxygroup="representations"
+          proxyname="UniformGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="LockSampleDistanceToInputSpacing" />
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityFunction" />
+          <Property name="SelectMapper" />
+          <Property name="BlendMode"/>
+          <Property name="AutoAdjustSampleDistances"/>
+          <Property name="SampleDistance"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="SliceRepresentation"
+          proxygroup="representations"
+          proxyname="ImageSliceRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation" >
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="Slice" />
+          <Property name="SliceMode" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of UniformGridRepresentation -->
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="UnstructuredGridVolumeRepresentation"
+                         class="vtkUnstructuredGridVolumeRepresentation"
+                         si_class="vtkSIUnstructuredGridVolumeRepresentationProxy"
+                         processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation for rendering a vtkImageData as volume.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ExtractedBlockIndex"
+        command="SetExtractedBlockIndex"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of multiblock datasets, choose the flat index of the dataset to
+          volume render. The flat index must point to an unstructured grid dataset.
+          If the input is not a multiblock dataset then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InterpolationType"
+        command="SetInterpolationType"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Nearest" />
+          <Entry value="1" text="Linear" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <ProxyProperty name="LookupTable"
+        command="SetColor">
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty name="ScalarOpacityFunction"
+        command="SetScalarOpacity">
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty name="SelectMapper"
+        command="SetActiveVolumeMapper"
+        number_of_elements="1"
+        default_values="Projected tetra">
+        <Documentation>
+          Select the volume mapper to use for Volume rendering.
+        </Documentation>
+        <StringListDomain name="list">
+          <String value="Projected tetra" />
+          <String value="HAVS" />
+          <String value="Z sweep" />
+          <String value="Bunyk ray cast" />
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="ScalarOpacityUnitDistance"
+        command="SetScalarOpacityUnitDistance"
+        number_of_elements="1"
+        default_values="1">
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeDummyMapper"
+               proxygroup="mappers"
+               proxyname="DummyVolumeMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="RayCastFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeBunykMapper"
+          proxygroup="mappers"
+          proxyname="UnstructuredGridVolumeRayCastMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeDummyMapper">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeZSweepMapper"
+          proxygroup="mappers"
+          proxyname="UnstructuredGridVolumeZSweepMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeDummyMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumePTMapper"
+          proxygroup="mappers"
+          proxyname="ProjectedTetrahedraMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeDummyMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeHAVSMapper"
+          proxygroup="mappers"
+          proxyname="HAVSVolumeMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeDummyMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- end of UnstructuredGridVolumeRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="UniformGridVolumeRepresentation"
+                          class="vtkImageVolumeRepresentation"
+                          si_class="vtkSIUniformGridVolumeRepresentationProxy"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation for rendering a vtkImageData as volume.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InterpolationType"
+        command="SetInterpolationType"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Nearest" />
+          <Entry value="1" text="Linear" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <ProxyProperty name="LookupTable"
+        command="SetColor">
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty name="ScalarOpacityFunction"
+        command="SetScalarOpacity">
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty name="SelectMapper"
+        command="SetActiveVolumeMapper"
+        number_of_elements="1"
+        default_values="Fixed point">
+        <Documentation>
+          Select the volume mapper to use for Volume rendering.
+        </Documentation>
+        <StringListDomain name="list">
+          <String value="Fixed point" />
+          <String value="GPU" />
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="ScalarOpacityUnitDistance"
+        command="SetScalarOpacityUnitDistance"
+        number_of_elements="1"
+        default_values="1">
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeFixedPointRayCastMapper"
+          proxygroup="mappers" proxyname="FixedPointVolumeRayCastMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LockSampleDistanceToInputSpacing" />
+          <Property name="BlendMode"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeGPURayCastMapper"
+          proxygroup="mappers" proxyname="GPUVolumeRayCastMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeFixedPointRayCastMapper">
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="AutoAdjustSampleDistances"/>
+          <Property name="SampleDistance"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- end of UniformGridVolumeRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="OutlineRepresentation"
+                          class="vtkOutlineRepresentation"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation for showing an outline for any dataset.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Get/Set the visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="LookupTable"
+        command="SetLookupTable">
+        <Documentation>
+          Set the lookup-table to use to map data array to colors. Lookuptable
+          is only used with MapScalars to ON.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="MapScalars"
+        command="SetMapScalars"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, LookupTable will always be used for scalar mapping
+          even when scalars are unsigned chars. Otherwise, when upto 4 component
+          unsigned chars are present, they will be directly used as colors.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InterpolateScalarsBeforeMapping"
+        command="SetInterpolateScalarsBeforeMapping"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="StaticMode"
+        command="SetStatic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- end of OutlineRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="ImageSliceRepresentation"
+                          class="vtkImageSliceRepresentation"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation to show 2D images. If the input image has 3D extents,
+        then this representation shows a single Z slice.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <Documentation>
+          Set the input to the representation. Must be a vtkImageData producer.
+        </Documentation>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_any" attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Select the attribute type from where the scalars array is used. The
+          scalar array name is specified using ColorArrayName. Note that if the
+          indicated scalar array is not available, then the image data scalars
+          are used.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by.
+          If no array name is set, or choosen array is not available, then the
+          image scalars are used by default.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="Slice"
+        command="SetSlice"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the current slice number. Slice number is used to load a 2D slice
+          from a 3D input image. If the input image is 2D, then the slice number
+          if ignored. The direction of the slice is determined by SliceMode.
+        </Documentation>
+        <DimensionsDomain name="dims">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SliceMode" function="Direction"/>
+          </RequiredProperties>
+        </DimensionsDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SliceMode"
+        command="SetSliceMode"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Determines the direction of slicing to obtain a 2D slice from a 3D
+          image.
+        </Documentation>
+        <EnumerationDomain name="enum" >
+          <Entry text="XY Plane" value="5" />
+          <Entry text="YZ Plane" value="6" />
+          <Entry text="XZ Plane" value="7" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MapScalars"
+        command="SetMapScalars"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, LookupTable will always be used for scalar mapping
+          even when scalars are unsigned chars. Otherwise, when upto 4 component
+          unsigned chars are present, they will be directly used as colors.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="LookupTable" command="SetLookupTable">
+        <Documentation>
+          Set the lookup table to use for scalar mapping.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="UseXYPlane"
+        command="SetUseXYPlane"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the image slice is always rendered in the XY plane (Z==0)
+          irrespective of the image bounds. Default if Off.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <!-- End of ImageSliceRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="SurfaceRepresentationBase"
+                          class="vtkGeometryRepresentation"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation to show any dataset in a 3D render view.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Get/Set the visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="Surface">
+        <StringListDomain name="string_list">
+          <String value="Points" />
+          <String value="Wireframe" />
+          <String value="Surface" />
+          <String value="Surface With Edges" />
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SuppressLOD"
+        command="SetSuppressLOD"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="AmbientColor"
+        command="SetAmbientColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DiffuseColor"
+        command="SetDiffuseColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SpecularColor"
+        command="SetSpecularColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PointSize"
+        command="SetPointSize"
+        number_of_elements="1"
+        default_values="2.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Interpolation"
+        command="SetInterpolation"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Flat" />
+          <Entry value="1" text="Gouraud" />
+          <!--<Entry value="2" text="Phong" />-->
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SpecularPower"
+        command="SetSpecularPower"
+        number_of_elements="1"
+        default_values="100.0">
+        <DoubleRangeDomain name="range" min="0" max="100" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EdgeColor"
+        command="SetEdgeColor"
+        number_of_elements="3"
+        default_values="0 0 0.5">
+        <Documentation>
+          Set the edge color. This color is used to draw the edge for the
+          polygonal data when EdgeVisibility is on.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
+
+      <ProxyProperty name="Texture"
+        command="SetTexture"
+        null_on_empty="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty name="LookupTable"
+        command="SetLookupTable">
+        <Documentation>
+          Set the lookup-table to use to map data array to colors. Lookuptable
+          is only used with MapScalars to ON.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="MapScalars"
+        command="SetMapScalars"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, LookupTable will always be used for scalar mapping
+          even when scalars are unsigned chars. Otherwise, when upto 4 component
+          unsigned chars are present, they will be directly used as colors.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InterpolateScalarsBeforeMapping"
+        command="SetInterpolateScalarsBeforeMapping"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="StaticMode"
+        command="SetStatic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- End of SurfaceRepresentationBase -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="SurfaceRepresentation"
+                          class="vtkGeometryRepresentationWithFaces"
+                          processes="client|renderserver|dataserver"
+                          base_proxygroup="representations"
+                          base_proxyname="SurfaceRepresentationBase">
+      <Documentation>
+        Representation to show any dataset in a 3D render view.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="BackfaceRepresentation"
+        command="SetBackfaceRepresentation"
+        number_of_elements="1"
+        default_values="400">
+        <Documentation>
+          Choose the representation type for the backface.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Surface With Edges" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="BackfaceOpacity"
+        command="SetBackfaceOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackfaceAmbientColor"
+        command="SetBackfaceAmbientColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackfaceDiffuseColor"
+        command="SetBackfaceDiffuseColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="Glyph3DRepresentation"
+                          class="vtkGlyph3DRepresentation"
+                          processes="client|renderserver|dataserver"
+                          base_proxygroup="representations"
+                          base_proxyname="SurfaceRepresentationBase" >
+      <Documentation>
+        Representation to show any dataset in a 3D render view.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty name="Source" command="SetInputConnection"
+        port_index="1"
+        label="Glyph Type">
+        <Documentation>
+          Specify the source objects.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="sources" name="ArrowSource" />
+          <Proxy group="sources" name="ConeSource" />
+          <Proxy group="sources" name="CubeSource" />
+          <Proxy group="sources" name="CylinderSource" />
+          <Proxy group="sources" name="LineSource" />
+          <Proxy group="sources" name="SphereSource" />
+          <Proxy group="sources" name="GlyphSource2D" />
+        </ProxyListDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="MeshVisibility"
+        command="SetMeshVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Get/Set the visibility of the original mesh.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SelectMaskArray"
+        command="SetMaskArray"
+        number_of_elements="1"
+        default_values=""
+        label="Mask Array">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SelectScaleArray"
+        command="SetScaleArray"
+        number_of_elements="1"
+        default_values=""
+        label="Scale" >
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SelectOrientationVectors"
+        command="SetOrientationArray"
+        number_of_elements="1"
+        default_values=""
+        label="Orientation Vectors">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="Scaling"
+        command="SetScaling"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable scaling of source geometry.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScaleMode"
+        command="SetScaleMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="No Data Scaling Off" value="0" />
+          <Entry text="Magnitude" value="1" />
+          <Entry text="Vector Components" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.0" >
+        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+             <Property name="SelectInputScalars" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <ArrayRangeDomain name="vector_range">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+             <Property name="SelectInputVectors" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          The value of this property will be used as a multiplier for scaling
+          the glyphs before adding them to the output.
+        </Documentation>
+     </DoubleVectorProperty>
+
+      <IntVectorProperty name="Orient"
+        command="SetOrient"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, the glyphs will be oriented based on the
+          selected orientation vector array.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OrientationMode"
+        command="SetOrientationMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Direction" value="0" />
+          <Entry text="Rotation" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Orientation mode indicates if the OrientationArray provides the
+          direction vector for the orientation or the rotations around each
+          axes.  Default is DIRECTION.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Masking"
+        command="SetMasking"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Tells the mapper to skip glyphing input points that haves false values
+          in the mask array. If there is no mask array (id access mode is set
+          and there is no such id, or array name access mode is set and
+          the there is no such name), masking is silently ignored.
+          A mask array is a vtkBitArray with only one component.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- end of Glyph3DRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="CubeAxesRepresentation"
+                          class="vtkCubeAxesRepresentation"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        CubeAxesRepresentation is a representation for any dataobject which
+        simply shows an axes along the bounding box of the dataobject.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+	  <DoubleVectorProperty
+        name="DataBounds"
+        command="GetDataBounds"
+		information_only="1"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+		<SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CustomBounds"
+        command="SetCustomBounds"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="CustomBoundsActive"
+        command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FlyMode"
+        command="SetFlyMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Outer Edges" value="0" />
+          <Entry text="Closest Triad" value="1" />
+          <Entry text="Furthest Triad" value="2" />
+          <Entry text="Static Triad" value="3" />
+          <Entry text="Static Edges" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify a mode to control how the axes are drawn: either static,
+          closest triad, furthest triad or outer edges in relation to the
+          camera position.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Inertia"
+        command="SetInertia"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the inertial factor that controls how often (i.e, how
+          many renders) the axes can switch position (jump from one axes
+          to another).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CornerOffset"
+        command="SetCornerOffset"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify an offset value to "pull back" the axes from the corner at
+          which they are joined to avoid overlap of axes labels. The
+          "CornerOffset" is the fraction of the axis length to pull back.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="XTitle"
+        command="SetXTitle"
+        number_of_elements="1"
+        default_values="X-Axis">
+        <Documentation>
+          Set the title for the X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YTitle"
+        command="SetYTitle"
+        number_of_elements="1"
+        default_values="Y-Axis">
+        <Documentation>
+          Set the title for the Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZTitle"
+        command="SetZTitle"
+        number_of_elements="1"
+        default_values="Z-Axis">
+        <Documentation>
+          Set the title for the Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty  name="XAxisVisibility"
+        command="SetXAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if X axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisVisibility"
+        command="SetYAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Y axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisVisibility"
+        command="SetZAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Z axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisTickVisibility"
+        command="SetXAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisTickVisibility"
+        command="SetYAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisTickVisibility"
+        command="SetZAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisMinorTickVisibility"
+        command="SetXAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisMinorTickVisibility"
+        command="SetYAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisMinorTickVisibility"
+        command="SetZAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XGridLines"
+        command="SetDrawXGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="YGridLines"
+        command="SetDrawYGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ZGridLines"
+        command="SetDrawZGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TickLocation"
+        command="SetTickLocation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Inside" value="0" />
+          <Entry text="Outside" value="1" />
+          <Entry text="Both" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the location of tick marks.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of CubeAxesRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="DataLabelRepresentation"
+                          class="vtkDataLabelRepresentation"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation used to add labels to points/cells of any dataset.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+        name="PointLabelColor"
+        command="SetPointLabelColor"
+        number_of_elements="3"
+        default_values="0.5 0.5 0.5">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="PointLabelOpacity"
+        command="SetPointLabelOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="PointLabelFontFamily"
+        command="SetPointLabelFontFamily"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PointLabelBold"
+        command="SetPointLabelBold"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PointLabelItalic"
+        command="SetPointLabelItalic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PointLabelShadow"
+        command="SetPointLabelShadow"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PointLabelFontSize"
+        command="SetPointLabelFontSize"
+        number_of_elements="1"
+        default_values="18">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="PointLabelFormat"
+        command="SetPointLabelFormat"
+        number_of_elements="1"
+        default_values="">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="PointLabelJustification"
+        command="SetPointLabelJustification"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Left"/>
+          <Entry value="1" text="Center"/>
+          <Entry value="2" text="Right"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PointLabelVisibility"
+        command="SetPointLabelVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PointLabelMode"
+        command="SetPointLabelMode"
+        number_of_elements="1"
+        default_values="6">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="IDs" />
+          <Entry value="1" text="Scalars" />
+          <Entry value="2" text="Vectors" />
+          <Entry value="3" text="Normals" />
+          <Entry value="4" text="TCoords" />
+          <Entry value="5" text="Tensors" />
+          <Entry value="6" text="FieldData" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="PointFieldDataArrayName"
+        command="SetPointFieldDataArrayName"
+        number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_array">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="CellLabelColor"
+        command="SetCellLabelColor"
+        number_of_elements="3"
+        default_values="0.0 1.0 0.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CellLabelOpacity"
+        command="SetCellLabelOpacity"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelFontFamily"
+        command="SetCellLabelFontFamily"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Arial"/>
+          <Entry value="1" text="Courier"/>
+          <Entry value="2" text="Times"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelBold"
+        command="SetCellLabelBold"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelItalic"
+        command="SetCellLabelItalic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelShadow"
+        command="SetCellLabelShadow"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelFontSize"
+        command="SetCellLabelFontSize"
+        number_of_elements="1"
+        default_values="18">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="CellLabelFormat"
+        command="SetCellLabelFormat"
+        number_of_elements="1"
+        default_values="">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="CellLabelJustification"
+        command="SetCellLabelJustification"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Left"/>
+          <Entry value="1" text="Center"/>
+          <Entry value="2" text="Right"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CellLabelVisibility"
+        command="SetCellLabelVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CellLabelMode"
+        command="SetCellLabelMode"
+        number_of_elements="1"
+        default_values="6">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="IDs" />
+          <Entry value="1" text="Scalars" />
+          <Entry value="2" text="Vectors" />
+          <Entry value="3" text="Normals" />
+          <Entry value="4" text="TCoords" />
+          <Entry value="5" text="Tensors" />
+          <Entry value="6" text="FieldData" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CellFieldDataArrayName"
+        command="SetCellFieldDataArrayName"
+        number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="input_array">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+    <!-- End of DataLabelRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="SelectionRepresentation"
+      class="vtkSelectionRepresentation"
+      si_class="vtkSISelectionRepresentationProxy"
+      processes="client|renderserver|dataserver">
+      <Documentation>
+        Proxy to show a selection as geometry.
+      </Documentation>
+
+      <InputProperty name="Input"
+        command="SetInputConnection">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Get/Set the visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 0.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="2.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PointSize"
+        command="SetPointSize"
+        number_of_elements="1"
+        default_values="5.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseOutline"
+        command="SetUseOutline"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="LabelRepresentation"
+          proxygroup="representations"
+          proxyname="DataLabelRepresentation" />
+        <ExposedProperties>
+          <Property name="PointFieldDataArrayName" />
+          <Property name="PointLabelBold" />
+          <Property name="PointLabelColor" />
+          <Property name="PointLabelFontFamily" />
+          <Property name="PointLabelFontSize" />
+          <Property name="PointLabelFormat" />
+          <Property name="PointLabelItalic" />
+          <Property name="PointLabelJustification" />
+          <Property name="PointLabelOpacity" />
+          <Property name="PointLabelShadow" />
+          <Property name="PointLabelVisibility" />
+
+          <Property name="CellFieldDataArrayName" />
+          <Property name="CellLabelBold" />
+          <Property name="CellLabelColor" />
+          <Property name="CellLabelFontFamily" />
+          <Property name="CellLabelFontSize" />
+          <Property name="CellLabelFormat" />
+          <Property name="CellLabelItalic" />
+          <Property name="CellLabelJustification" />
+          <Property name="CellLabelOpacity" />
+          <Property name="CellLabelShadow" />
+          <Property name="CellLabelVisibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+    <!-- End of SelectionRepresentation -->
+    </RepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy name="XYChartRepresentationBase"
+      base_proxygroup="representations"
+      class="vtkXYChartRepresentation"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation used by XYChartView.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="AttributeType"
+        command="SetFieldAssociation"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <FieldDataDomain name="enum"
+           enable_field_data="1"
+           disable_update_domain_entries="1" >
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompositeDataSetIndex"
+        command="SetCompositeDataSetIndex"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to
+          pass. The flat index must point to a non-empty, non-composite dataset
+          for anything to be passed through. If the input is not a composite
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        information_only="1"
+        si_class="vtkSIContextArraysProperty" >
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+        command="SetXAxisSeriesName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on X axis. This is used only when
+          UseIndexForXAxis is set to 0.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseIndexForXAxis"
+        command="SetUseIndexForXAxis"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the array index will be used for X axis, otherwise the array
+          identified by XArrayName will be used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PlotOptions"
+          proxygroup="options"
+          proxyname="PlotOptionsBase">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="Color" exposed_name="SeriesColor" />
+          <Property name="LineThickness" exposed_name="SeriesLineThickness" />
+          <Property name="LineStyle" exposed_name="SeriesLineStyle" />
+          <Property name="Label" exposed_name="SeriesLabel" />
+          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
+          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
+
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
+          <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
+          <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
+          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
+          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
+          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <InputProperty name="InternalInput1"
+        command="SetInputConnection"
+        port_index="1"
+        is_internal="1">
+        <Documentation>
+          Internal property. Please don't touch this.
+        </Documentation>
+      </InputProperty>
+
+      <!-- End of XYChartRepresentationBase -->
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ParallelCoordinatesRepresentationProxy name="ParallelCoordinatesRepresentation"
+      class="vtkPVParallelCoordinatesRepresentation"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation used by ParallelCoordinatesChartView.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+        command="SetFieldAssociation"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <FieldDataDomain name="enum"
+           enable_field_data="1"
+           disable_update_domain_entries="1" >
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompositeDataSetIndex"
+        command="SetCompositeDataSetIndex"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to
+          pass. The flat index must point to a non-empty, non-composite dataset
+          for anything to be passed through. If the input is not a composite
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SeriesVisibilityInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of visibility for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesVisibility"
+        command="SetSeriesVisibility"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="SeriesVisibilityInfo" >
+        <Documentation>
+          Set the series visibility.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThicknessInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line thickness for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThickness"
+        command="SetLineThickness"
+        number_of_elements_per_command="1"
+        element_types="0"
+        repeat_command="1"
+        information_property="LineThicknessInfo" >
+        <Documentation>
+          Set the series line thickness.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyleInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyle"
+        command="SetLineStyle"
+        number_of_elements_per_command="1"
+        element_types="0"
+        repeat_command="1"
+        information_property="LineStyleInfo">
+        <Documentation>
+          Set the series line style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabelInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of labels for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabel"
+        command="SetLabel"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1"
+        information_property="LabelInfo">
+        <Documentation>
+          Set the series labels.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ColorInfo"
+        number_of_elements_per_command="3"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements_per_command="3"
+        element_types="1 1 1"
+        repeat_command="1"
+        information_property="ColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="OpacityInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Opacity"
+        command="SetOpacity"
+        number_of_elements_per_command="1"
+        element_types="1"
+        repeat_command="1"
+        information_property="OpacityInfo" >
+        <Documentation>
+          Set the opacity of the lines.
+        </Documentation>
+      </StringVectorProperty>
+
+      <InputProperty name="InternalInput1"
+        command="SetInputConnection"
+        port_index="1"
+        is_internal="1">
+        <Documentation>
+          Internal property. Please don't touch this.
+        </Documentation>
+      </InputProperty>
+
+    </ParallelCoordinatesRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <!-- New representation for ContextView based charts. -->
+    <ChartRepresentationProxy name="XYChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="XYChartRepresentationBase"
+      class="vtkXYChartRepresentation"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation used by XYChartView.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        number_of_elements="1"
+        default_values="Line" >
+      </StringVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <!-- New representation for ContextView based charts. -->
+    <ChartRepresentationProxy name="XYBarChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="XYChartRepresentationBase"
+      class="vtkXYChartRepresentation"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation used by XYBarChartView.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        number_of_elements="1"
+        default_values="Bar" >
+      </StringVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <SpreadSheetRepresentationProxy name="SpreadSheetRepresentation"
+      class="vtkSpreadSheetRepresentation"
+      processes="client|dataserver|renderserver" >
+
+      <InputProperty name="Input" command="SetInputConnection" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+         command="SetFieldAssociation"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Select the attribute data to pass.
+         </Documentation>
+         <FieldDataDomain name="enum"
+            enable_field_data="1" force_point_cell_data="1">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </FieldDataDomain>
+       </IntVectorProperty>
+
+       <IntVectorProperty name="CompositeDataSetIndex"
+         command="SetCompositeDataSetIndex"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           In case of Composite datasets, set the flat index of the dataset to
+           pass. The flat index must point to a non-empty, non-composite dataset
+           for anything to be passed through. If the input is not a composite
+           dataset, then this index is ignored.
+         </Documentation>
+         <CompositeTreeDomain name="tree" mode="leaves">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+        </CompositeTreeDomain>
+       </IntVectorProperty>
+
+      <InputProperty name="InternalInput1"
+        command="SetInputConnection"
+        port_index="1"
+        is_internal="1">
+        <Documentation>
+          Internal property. Please don't touch this.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty name="InternalInput2"
+        command="SetInputConnection"
+        port_index="2"
+        is_internal="1">
+        <Documentation>
+          Internal property. Please don't touch this.
+        </Documentation>
+      </InputProperty>
+
+       <!-- end of SpreadSheetRepresentation -->
+    </SpreadSheetRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <RepresentationProxy name="TextSourceRepresentation"
+      class="vtkTextSourceRepresentation"
+      si_class="vtkSITextSourceRepresentationProxy"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation proxy used to show text.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Interactivity"
+        command="SetInteractivity"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="TextWidgetRepresentation"
+          proxygroup="representations" proxyname="TextWidgetRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+          <Property name="WindowLocation" />
+
+          <Property name="TextScaleMode"/>
+          <Property name="Resizable"/>
+
+          <!-- properties for Text -->
+          <Property name="Justification"/>
+          <Property name="Orientation"/>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of TextSourceRepresentation -->
+    </RepresentationProxy>
+
+    <Proxy name="FrustumWidget" class="vtkPVFrustumActor"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation for a frustum
+      </Documentation>
+
+      <DoubleVectorProperty name="Frustum"
+         command="SetFrustum"
+         number_of_elements="24"
+         argument_is_array="1"
+         default_values="0 0 0 1 0 0 0 1 0 1 1 0 0 0 1 1 0 1 0 1 1 1 1 1" >
+         <Documentation>
+          Specify the corners of the outline when in Oriented mode, the values
+          are supplied as 8*3 double values.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="0.5 0.5 0.5">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LineWidth"
+        command="SetLineWidth"
+        number_of_elements="1"
+        default_values="3.0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <!-- End of FrustumWidget -->
+    </Proxy>
+
+
+  </ProxyGroup>
+
+  <ProxyGroup name="views">
+    <!-- ================================================================== -->
+    <Proxy name="ComparativeViewBase">
+
+      <DoubleVectorProperty name="ViewTime"
+        command="SetViewTime"
+        number_of_elements="1"
+        state_ignored="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The pipeline update time for this view.
+          This gets passed to all representations added to this view.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CacheKey"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This is the cache key used to indentify which cache entry to use for
+          rendering when caching is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseCache"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates whether to use cache for subsequent renderings.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ViewPosition"
+        command="SetViewPosition"
+        number_of_elements="2"
+        default_values="0 0">
+        <Documentation>
+          Set the position on this view in the multiview configuration.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ViewSize"
+        command="SetViewSize"
+        number_of_elements="2"
+        state_ignored="1"
+        default_values="400 400" >
+        <Documentation>
+          Set the size of this view in the multiview configuration.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Dimensions"
+        command="Build"
+        number_of_elements="2"
+        default_values="2 2">
+        <IntRangeDomain name="range" min="1 1" max="10 10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OverlayAllComparisons"
+        command="SetOverlayAllComparisons"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Spacing"
+        command="SetSpacing"
+        number_of_elements="2"
+        default_values="1 1">
+        <IntRangeDomain name="range" min="0 0" max="10 10" />
+      </IntVectorProperty>
+
+      <ProxyProperty name="Representations"
+        command="AddRepresentation"
+        remove_command="RemoveRepresentation"
+        argument_type="SMProxy"
+        repeatable="1">
+        <Documentation>
+          Representations in this view.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty name="Cues"
+        command="AddCue"
+        remove_command="RemoveCue"
+        argument_type="SMProxy">
+        <Documentation>
+          Animation cues for changing parameters.
+        </Documentation>
+      </ProxyProperty>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <ComparativeViewProxy name="ComparativeRenderView"
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
+      <Documentation>
+        The is comparative view comprising of individual "RenderView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" proxygroup="views" proxyname="RenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="BackgroundTexture" />
+          <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeRenderView -->
+    </ComparativeViewProxy>
+
+    <!-- ================================================================== -->
+    <ComparativeViewProxy name="ComparativeXYChartView"
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
+      <Documentation>
+        The is comparative view comprising of individual "XYChartView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" proxygroup="views" proxyname="XYChartView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ChartTitle"/>
+          <Property name="ChartTitleFont" />
+          <Property name="ChartTitleColor" />
+          <Property name="ChartTitleAlignment" />
+          <Property name="ShowLegend" />
+          <Property name="ShowAxis" />
+          <Property name="AxisLogScale" />
+          <Property name="ShowAxisGrid" />
+          <Property name="AxisColor" />
+          <Property name="AxisGridColor" />
+          <Property name="ShowAxisLabels" />
+          <Property name="AxisLabelFont" />
+          <Property name="AxisLabelColor" />
+          <Property name="AxisLabelNotation" />
+          <Property name="AxisLabelPrecision" />
+          <Property name="AxisBehavior" />
+          <Property name="AxisRange" />
+          <Property name="AxisTitle" />
+          <Property name="AxisTitleFont" />
+          <Property name="AxisTitleColor" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeXYChartView -->
+    </ComparativeViewProxy>
+
+    <!-- ================================================================== -->
+    <ComparativeViewProxy name="ComparativeXYBarChartView"
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
+      <Documentation>
+        The is comparative view comprising of individual "XYBarChartView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" proxygroup="views" proxyname="XYBarChartView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ChartTitle"/>
+          <Property name="ChartTitleFont" />
+          <Property name="ChartTitleColor" />
+          <Property name="ChartTitleAlignment" />
+          <Property name="ShowLegend" />
+          <Property name="ShowAxis" />
+          <Property name="AxisLogScale" />
+          <Property name="ShowAxisGrid" />
+          <Property name="AxisColor" />
+          <Property name="AxisGridColor" />
+          <Property name="ShowAxisLabels" />
+          <Property name="AxisLabelFont" />
+          <Property name="AxisLabelColor" />
+          <Property name="AxisLabelNotation" />
+          <Property name="AxisLabelPrecision" />
+          <Property name="AxisBehavior" />
+          <Property name="AxisRange" />
+          <Property name="AxisTitle" />
+          <Property name="AxisTitleFont" />
+          <Property name="AxisTitleColor" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeXYBarChartView -->
+    </ComparativeViewProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

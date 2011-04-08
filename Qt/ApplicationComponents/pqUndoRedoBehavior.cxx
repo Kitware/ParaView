@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoRedoBehavior.h"
 
 #include "pqApplicationCore.h"
-#include "pqCloseViewUndoElement.h"
-#include "pqSplitViewUndoElement.h"
 #include "pqUndoStackBuilder.h"
 #include "pqUndoStack.h"
 #include "pqActiveObjects.h"
 #include "pqServerManagerModel.h"
+
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
 #include <QDebug>
 
@@ -54,18 +55,10 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
 
   // setup Undo Stack.
   pqUndoStackBuilder* builder = pqUndoStackBuilder::New();
-  pqUndoStack* stack = new pqUndoStack(false, builder, this);
+  pqUndoStack* stack = new pqUndoStack(builder, this);
+  vtkSMProxyManager::GetProxyManager()->GetSession()->SetUndoStackBuilder(builder);
   builder->Delete();
-
-  // TODO: I don't know how to handle the registering of undo-elements.
-
-  pqSplitViewUndoElement* svu_elem = pqSplitViewUndoElement::New();
-  stack->registerElementForLoader(svu_elem);
-  svu_elem->Delete();
-
-  pqCloseViewUndoElement* cvu_elem = pqCloseViewUndoElement::New();
-  stack->registerElementForLoader(cvu_elem);
-  cvu_elem->Delete();
+  core->setUndoStack(stack);
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
@@ -85,14 +78,13 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
     SIGNAL(finishedRemovingServer()),
     stack, SLOT(clear()));
 
-  // FIXME QObject::connect(
-  // FIXME   &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
-  // FIXME   this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  // FIXME QObject::connect(
-  // FIXME   &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
-  // FIXME   this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
-
-  core->setUndoStack(stack);
+  // FIXME disable undo when VCR is used
+//  QObject::connect(
+//      &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
+//      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+//  QObject::connect(
+//      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
+//      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 }
 
 

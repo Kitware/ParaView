@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+class pqPipelineSource;
+
 /// @ingroup Reactions
 /// Reaction to save data files.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
@@ -56,6 +58,8 @@ public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
   void updateEnableState();
+  /// Triggered when a source became valid
+  void dataUpdated(pqPipelineSource* source);
 
 protected:
   /// Called when the action is triggered.

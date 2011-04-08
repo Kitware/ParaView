@@ -230,11 +230,8 @@ void pqExodusIIPanel::updateSIL()
   if (stamp != this->UI->SILUpdateStamp)
     {
     this->UI->SILUpdateStamp = stamp;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkPVSILInformation* info = vtkPVSILInformation::New();
-    pm->GatherInformation(reader->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, info,
-      reader->GetID());
+    reader->GatherInformation(info);
     this->UI->SILModel.update(info->GetSIL());
 
     this->UI->Blocks->expandAll();

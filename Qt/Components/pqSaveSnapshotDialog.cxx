@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
 
@@ -85,18 +86,22 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
     this, SLOT(updateSize()));
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  iter->SetModeToOneGroup();
-  for (iter->Begin("palettes"); !iter->IsAtEnd(); iter->Next())
+  if (pxm->GetProxyDefinitionManager())
     {
-    vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetKey());
-    if (prototype)
+    vtkPVProxyDefinitionIterator* iter =
+      pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("palettes");
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-      this->Internal->palette->addItem(prototype->GetXMLLabel(),
-        prototype->GetXMLName());
+      vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
+        iter->GetProxyName());
+      if (prototype)
+        {
+        this->Internal->palette->addItem(prototype->GetXMLLabel(),
+          prototype->GetXMLName());
+        }
       }
+    iter->Delete();
     }
-  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------

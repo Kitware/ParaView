@@ -111,7 +111,7 @@ public:
   // Returns the callback function to call to initialize the interpretor for the
   // new vtk/server-manager classes added by this plugin. Returning NULL is
   // perfectly valid.
-   virtual vtkProcessModule::InterpreterInitializationCallback 
+   virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
     GetInitializeInterpreterCallback();
 #endif
 

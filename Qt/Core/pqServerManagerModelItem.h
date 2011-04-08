@@ -29,10 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqServerManagerModelItem.h
-/// \date 4/14/2006
-
 #ifndef _pqServerManagerModelItem_h
 #define _pqServerManagerModelItem_h
 
@@ -41,6 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class vtkEventQtSlotConnect;
+
+/// pqServerManagerModelItem is a element maintained by pqServerManagerModel.
+/// pqServerManagerModel creates instances of pqServerManagerModelItem (and its
+/// subclasses) for every signification Server-Manager object such as a session
+/// (pqServer), source proxy (pqPipelineSource), filter proxy
+/// (pqPipelineFilter), view proxy (pqView) and so on.
 class PQCORE_EXPORT pqServerManagerModelItem : public QObject
 {
   Q_OBJECT
@@ -56,8 +58,8 @@ protected:
   vtkEventQtSlotConnect* getConnector();
 
 protected slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
+  /// called when input property on display changes. We must detect if
+  /// (and when) the display is connected to a new proxy.
   virtual void onInputChanged() { };
 private:
   vtkEventQtSlotConnect* Connector;

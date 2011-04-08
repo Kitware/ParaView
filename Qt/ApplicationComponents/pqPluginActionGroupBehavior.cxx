@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPluginActionGroupBehavior.h"
 
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqApplicationCore.h"
 #include "pqActionGroupInterface.h"
 
@@ -76,8 +76,8 @@ namespace
 pqPluginActionGroupBehavior::pqPluginActionGroupBehavior(QMainWindow* parentObject)
   : Superclass(parentObject)
 {
-  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  QObject::connect(pm, SIGNAL(guiInterfaceLoaded(QObject*)),
+  pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
+  QObject::connect(pm, SIGNAL(interfaceRegistered(QObject*)),
     this, SLOT(addPluginInterface(QObject*)));
   foreach (QObject* iface, pm->interfaces())
     {

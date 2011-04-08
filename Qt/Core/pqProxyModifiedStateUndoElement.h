@@ -45,8 +45,6 @@ public:
     return this->InternalUndoRedo(false)? 1 : 0;
     }
 
-  virtual bool CanLoadState(vtkPVXMLElement*);
-
   /// Use this to initialize the element if the pqProxy was marked as
   /// UNMODIFIED.
   void MadeUnmodified(pqProxy*);
@@ -61,6 +59,8 @@ protected:
   ~pqProxyModifiedStateUndoElement();
 
   bool InternalUndoRedo(bool undo);
+  vtkTypeUInt32 ProxySourceGlobalId;
+  bool Reverse;
 private:
   pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&); // Not implemented
   void operator=(const pqProxyModifiedStateUndoElement&); // Not implemented

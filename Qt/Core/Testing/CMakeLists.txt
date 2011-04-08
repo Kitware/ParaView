@@ -15,14 +15,6 @@ IF(PARAVIEW_DATA_ROOT)
 ENDIF(PARAVIEW_DATA_ROOT)
 
 ################################################################################
-ADD_EXECUTABLE(TestPVSynchronizedRenderWindows
-  TestPVSynchronizedRenderWindows.cxx)
-
-TARGET_LINK_LIBRARIES(TestPVSynchronizedRenderWindows
-  pqCore
-  )
-
-################################################################################
 IF(QT_TESTING_WITH_PYTHON)
 
   # Reduce the number of dirs that get included on moc command line
