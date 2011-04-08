@@ -70,8 +70,9 @@ void vtkSMStateLocator::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //---------------------------------------------------------------------------
-bool vtkSMStateLocator::FindState(vtkTypeUInt32 globalID,
-                                  vtkSMMessage* stateToFill )
+bool vtkSMStateLocator::FindState( vtkTypeUInt32 globalID,
+                                   vtkSMMessage* stateToFill,
+                                   bool useParent /*=true*/ )
 {
   if(stateToFill != NULL)
     {
@@ -82,7 +83,7 @@ bool vtkSMStateLocator::FindState(vtkTypeUInt32 globalID,
     {
     return true;
     }
-  if(this->ParentLocator)
+  if(useParent && this->ParentLocator)
     {
     return this->ParentLocator->FindState(globalID, stateToFill);
     }

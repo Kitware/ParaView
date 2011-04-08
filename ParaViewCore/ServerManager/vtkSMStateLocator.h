@@ -41,7 +41,10 @@ public:
   // Fill the provided State message with the state found inside the current
   // locator or one of its parent. The method return true if the state was
   // successfully filled.
-  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill);
+  // The "useParent" flag allow to disable parent lookup but by default it
+  // is set to true.
+  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill,
+                         bool useParent = true );
 
   // Description:
   // Register the given state in the current locator. If a previous state was

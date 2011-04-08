@@ -112,7 +112,8 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
       // Store state in cache
       vtkSMMessage oldState;
-      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
+      bool createAction = !this->StateLocator->FindState( globalId, &oldState,
+      /* We want only a local lookup => false */          false );
 
       // This is a filtering Hack, I don't like it. :-(
       if(newState.GetExtension(ProxyState::xml_name) != "Camera")
