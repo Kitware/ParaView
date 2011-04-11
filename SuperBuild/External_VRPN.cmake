@@ -19,5 +19,10 @@ ExternalProject_Add(VRPN
     -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
 
-set(VRPN_LIBRARY ${VRPN_install}/lib/vrpn${_LINK_LIBRARY_SUFFIX})
+if(WIN32)
+  set(VRPN_LIBRARY ${VRPN_install}/lib/vrpn${_LINK_LIBRARY_SUFFIX})
+else()
+  set(VRPN_LIBRARY ${VRPN_install}/lib/libvrpn.a)
+endif()
+
 set(VRPN_INCLUDE_DIR ${VRPN_install}/include)
