@@ -43,9 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
+#include "pqInterfaceTracker.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineRepresentation.h"
-#include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
@@ -71,7 +71,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
 {
   QString xml_type = proxy->GetXMLName();
 
-  pqPluginManager* pluginMgr = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pluginMgr =
+    pqApplicationCore::instance()->interfaceTracker();
   if (group == "views")
     {
     QObjectList ifaces = pluginMgr->interfaces();
@@ -148,21 +149,16 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     }
   else if (group == "animation")
     {
-    if (proxy->IsA("vtkSMAnimationSceneProxy"))
+    if (xml_type == "AnimationScene")
       {
       return new pqAnimationScene(group, name, proxy, server, 0);
       }
-    else if (proxy->IsA("vtkSMAnimationCueProxy"))
+    else if (xml_type == "KeyFrameAnimationCue" ||
+      xml_type == "CameraAnimationCue" ||
+      xml_type == "TimeAnimationCue")
       {
       return new pqAnimationCue(group, name, proxy, server, 0);
       }
-    }
-
-  if (proxy->IsA("vtkSMAnimationCueProxy"))
-    {
-    // pqAnimationCue is created for all cues (even internal ones that get
-    // created for comparative vis).
-    return new pqAnimationCue(group, name, proxy, server, 0);
     }
 
   // qDebug() << "Could not determine pqProxy type: " << proxy->GetXMLName() << endl;

@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QDebug>
 
-#include "vtkSMCompositeKeyFrameProxy.h"
-#include "vtkSmartPointer.h"
-
-#include "pqPropertyLinks.h"
 #include "pqKeyFrameTypeWidget.h"
+#include "pqPropertyLinks.h"
+#include "vtkPVCompositeKeyFrame.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 
 class pqSignalAdaptorKeyFrameType::pqInternals
 {
@@ -84,7 +84,7 @@ void pqSignalAdaptorKeyFrameType::setKeyFrameProxy(vtkSMProxy* proxy)
 
   this->Internals->Links->removeAllPropertyLinks();
 
-  if (proxy && proxy->IsA("vtkSMCompositeKeyFrameProxy"))
+  if (proxy && strcmp(proxy->GetXMLName(), "CompositeKeyFrame") == 0)
     {
     // connect the combo box
     this->Internals->Links->addPropertyLink(
@@ -125,14 +125,14 @@ vtkSMProxy* pqSignalAdaptorKeyFrameType::getKeyFrameProxy() const
 void pqSignalAdaptorKeyFrameType::onTypeChanged()
 {
   QString text = this->currentData().toString();
-  int type = vtkSMCompositeKeyFrameProxy::GetTypeFromString(text.toAscii().data());
-  if (type == vtkSMCompositeKeyFrameProxy::NONE)
+  int type = vtkPVCompositeKeyFrame::GetTypeFromString(text.toAscii().data());
+  if (type == vtkPVCompositeKeyFrame::NONE)
     {
     qDebug() << "Unknown type choosen in the combox: " << text;
     return;
     }
 
-  if (type == vtkSMCompositeKeyFrameProxy::SINUSOID && this->Internals->ValueLabel)
+  if (type == vtkPVCompositeKeyFrame::SINUSOID && this->Internals->ValueLabel)
     {
     this->Internals->ValueLabel->setText("Amplitude");
     }

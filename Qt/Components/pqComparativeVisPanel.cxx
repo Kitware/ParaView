@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
-#include "vtkSMAnimationCueProxy.h"
+#include "vtkPVComparativeAnimationCue.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMComparativeViewProxy.h"
@@ -143,7 +143,6 @@ namespace pqComparativeVisPanelNS
 
     // Create a new cueProxy.
     vtkSMProxy* cueProxy = pxm->NewProxy("animation", "ComparativeAnimationCue");
-    cueProxy->SetConnectionID(activeServer->GetConnectionID());
 
     vtkSMPropertyHelper(cueProxy, "AnimatedPropertyName").Set(pname);
     vtkSMPropertyHelper(cueProxy, "AnimatedElement").Set(index);
@@ -175,7 +174,7 @@ namespace pqComparativeVisPanelNS
         maxValue = domain[1].toDouble();
         }
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->UpdateWholeRange(minValue, maxValue);
+        cueProxy)->GetCue()->UpdateWholeRange(minValue, maxValue);
       }
     if (!proxy)
       {
@@ -184,10 +183,11 @@ namespace pqComparativeVisPanelNS
       // this is a "Time" animation cue. Use the range provided by the time
       // keeper.
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->UpdateWholeRange(range.first, range.second);
+        cueProxy)->GetCue()->UpdateWholeRange(range.first, range.second);
       }
     cueProxy->UpdateVTKObjects();
-    pxm->RegisterProxy("comparative_cues", cueProxy->GetSelfIDAsString(), cueProxy);
+    pxm->RegisterProxy("comparative_cues",
+      cueProxy->GetGlobalIDAsString(), cueProxy);
     return cueProxy;
     }
 };

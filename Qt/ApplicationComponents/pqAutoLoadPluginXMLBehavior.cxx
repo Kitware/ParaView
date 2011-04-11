@@ -65,10 +65,7 @@ pqAutoLoadPluginXMLBehavior::pqAutoLoadPluginXMLBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(guiExtensionLoaded()),
-    this, SLOT(updateResources()));
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(serverManagerExtensionLoaded()),
+    SIGNAL(pluginsUpdated()),
     this, SLOT(updateResources()));
   this->updateResources();
 }

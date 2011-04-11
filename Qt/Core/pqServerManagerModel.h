@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include "pqCoreExport.h"
 #include "vtkType.h" // for vtkIdType.
-#include "vtkClientServerID.h" // for vtkClientServerID
 
 class pqPipelineSource;
 class pqProxy;
@@ -47,8 +46,10 @@ class pqServerManagerObserver;
 class pqServerResource;
 class pqView;
 class vtkPVXMLElement;
+class vtkSession;
 class vtkSMProxy;
 class vtkSMProxyLocator;
+class vtkSMSession;
 
 //BTX
 class pqServerManagerModel;
@@ -62,7 +63,7 @@ template <class T> inline T pqFindItem(
 template <class T> inline T pqFindItem(
   const pqServerManagerModel* const model, vtkSMProxy* proxy);
 template <class T> inline T pqFindItem(
-  const pqServerManagerModel* const model, vtkClientServerID id);
+  const pqServerManagerModel* const model, vtkTypeUInt32 id);
 template <class T> inline int pqGetNumberOfItems(
   const pqServerManagerModel* const model);
 template <class T> inline T pqGetItemAtIndex(
@@ -87,9 +88,14 @@ public:
     QObject* parent=0);
   ~pqServerManagerModel();
 
-  /// Given a connection Id, returns the pqServer instance for that connection,
+  /// Given a session Id, returns the pqServer instance for that session,
   /// if any.
   pqServer* findServer(vtkIdType cid) const;
+
+  /// Given a vtkSession*, returns the pqServer instance for that session, if
+  /// any.
+  pqServer* findServer(vtkSession*) const;
+  pqServer* findServer(vtkSMSession*) const;
 
   /// Given a server resource, locates the pqServer instance for it, if any.
   pqServer* findServer(const pqServerResource& resource) const;
@@ -105,11 +111,11 @@ public:
       {
       return ::pqFindItem<T>(this, proxy);
       }
-  
-  /// Given a self id for a proxy, 
+
+  /// Given the gloabal id for a proxy,
   /// locates a pqServerManagerModelItem subclass for the proxy.
   template<class T>
-    T findItem(vtkClientServerID id) const
+    T findItem(vtkTypeUInt32 id) const
       {
       return ::pqFindItem<T>(this, id);
       }
@@ -165,7 +171,7 @@ public:
 
   /// Internal method.
   static pqServerManagerModelItem* findItemHelper(const pqServerManagerModel* const model, 
-    const QMetaObject& mo, vtkClientServerID id);
+    const QMetaObject& mo, vtkTypeUInt32 id);
 
   /// Internal method.
   static pqServerManagerModelItem* findItemHelper(const pqServerManagerModel* const model, 
@@ -304,7 +310,7 @@ inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 template <class T> 
 inline T pqFindItem(const pqServerManagerModel* const model, 
-  vtkClientServerID id)
+  vtkTypeUInt32 id)
 {
   return qobject_cast<T>(
     pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, id));

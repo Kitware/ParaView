@@ -101,21 +101,29 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqRepresentation* d
   this->setDisplay(display);
 
   this->Internal->buttonColor->setUndoLabel("Change Color");
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this->Internal->buttonColor,
-      SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->buttonColor,
-      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
+  QObject::connect(this->Internal->buttonColor,
+    SIGNAL(beginUndo(const QString&)),
+    this, SLOT(beginUndoSet(const QString&)));
+  QObject::connect(this->Internal->buttonColor,
+    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 }
 
 //-----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::~pqTextDisplayPropertiesWidget()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqTextDisplayPropertiesWidget::beginUndoSet(const QString& str)
+{
+  BEGIN_UNDO_SET(str);
+}
+
+//-----------------------------------------------------------------------------
+void pqTextDisplayPropertiesWidget::endUndoSet()
+{
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

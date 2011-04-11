@@ -1,0 +1,134 @@
+// ****************************************************************************
+//                    vtkInternalDataStreamIO.proto
+// ****************************************************************************
+package paraview_protobuf;
+
+// Type of generated code : [SPEED, CODE_SIZE, LITE_RUNTIME]
+//option optimize_for = LITE_RUNTIME;
+
+// Variant type ***************************************************************
+
+message Variant {
+  enum Type
+    {
+    INT     = 0;
+    FLOAT64 = 1;
+    IDTYPE  = 2;
+    STRING  = 3;
+    PROXY   = 4; // proxy_global_id + port_number
+    INPUT   = 5; // proxy_global_id + port_number
+    }
+
+  required Type    type            = 1;
+  repeated sint64  idtype          = 3;
+  repeated sint32  integer         = 4;
+  repeated double  float64         = 5;
+  repeated uint64  proxy_global_id = 6;
+  repeated int32   port_number     = 7;
+  repeated string  txt             = 8;
+}
+
+message VariantList {
+  repeated Variant variant = 1;
+}
+
+// Generic message Collection type ********************************************
+
+message MessageCollection
+{
+  // This defines an item in the collection.
+  repeated Message item = 1;
+}
+
+// Generic message type ******************************************* [1-2 :> 10]
+
+message Message
+{
+  required uint64 global_id = 1;
+  required uint32 location  = 2;
+
+  extensions 10 to max;
+}
+
+// Extension DefinitionHeader ***************************************** [10-11]
+
+message DefinitionHeader
+{
+  extend Message {
+    // The classname for the driver process i.e. the client, typically
+    required string client_class = 10;
+
+    // The classname for the process where the processing occurs
+    required string server_class = 11;
+  }
+}
+
+// Extension ProxyState *********************************************** [20-24]
+
+message ProxyState
+{
+  message Property
+    {
+    required string  name  = 1;
+    optional Variant value = 2;
+    }
+
+  message SubProxy
+    {
+    required string name = 1;
+    required uint32 global_id = 2;
+    }
+
+  extend Message {
+    required string   xml_group           = 20;
+    required string   xml_name            = 21;
+    optional string   xml_sub_proxy_name  = 22;
+    repeated Property property            = 23;
+    repeated SubProxy subproxy            = 24;
+  }
+}
+
+// Extension ProxyManagerState ******************************************* [30]
+
+message ProxyManagerState
+{
+  message ProxyRegistrationInfo
+    {
+    required string group     = 1;
+    required string name      = 2;
+    required uint64 global_id = 3;
+    }
+
+  extend Message {
+    repeated ProxyRegistrationInfo registered_proxy = 30;
+  }
+}
+
+// Extension ProxyDefinitionState ************************************* [31-32]
+
+message ProxyDefinitionState
+{
+  message ProxyXMLDefinition
+    {
+    required string group = 1;
+    required string name  = 2;
+    required string xml   = 3;
+    }
+
+  extend Message {
+    repeated ProxyXMLDefinition xml_definition_proxy        = 31;
+    repeated ProxyXMLDefinition xml_custom_definition_proxy = 32;
+  }
+}
+
+// Extension PullRequest ************************************************* [40]
+
+message PullRequest {
+  extend Message {
+    repeated Variant arguments = 40;
+  }
+}
+
+
+
+// End of Messages definitions ************************************************

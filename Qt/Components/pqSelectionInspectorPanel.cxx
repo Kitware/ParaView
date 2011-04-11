@@ -759,6 +759,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->SelectionColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
     gpm, gpm->GetProperty("SelectionColor"));
+
   // We also need to save the color change in the settings so that it's
   // preserved across sessions.
   QObject::connect(
@@ -1537,11 +1538,6 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
     {
     if (selSource != curSelSource)
       {
-      if (!selSource->GetObjectsCreated())
-        {
-        selSource->SetServers(vtkProcessModule::DATA_SERVER);
-        selSource->SetConnectionID(port->getServer()->GetConnectionID());
-        }
       selSource->UpdateVTKObjects();
       port->setSelectionInput(selSource, 0);
       }
@@ -1755,8 +1751,6 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* repr = pxm->NewProxy("representations", "FrustumWidget");
     this->Implementation->FrustumWidget.TakeReference(repr);
-    repr->SetConnectionID(
-      this->Implementation->ActiveView->getServer()->GetConnectionID());
     repr->UpdateVTKObjects();
     }
 

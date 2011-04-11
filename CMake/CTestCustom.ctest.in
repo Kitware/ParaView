@@ -83,7 +83,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ".include.QtCore"
   "include/features.h"
   "Qt/Python/pqPythonStream"
-  "python.+/pyconfig.h"
+  "ython.+/pyconfig.h"
   "vtkfreetype.src"
   "vtkfreetype.include"
   "OSServices.framework"
@@ -115,8 +115,15 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # suppress warning from H5Part library.
   ".H5Part.src"
 
+  # suppress warning from MPI library.
+  "/mpicxx.h:"
+
   # ignore all size_t to int conversion warnings.
   "conversion from 'size_t' to"
+
+  # ignore protobuf generated code warning
+  "vtkPVMessage.pb.h"
+  "/google/protobuf/"
   )
 
 SET(CTEST_CUSTOM_WARNING_EXCEPTION

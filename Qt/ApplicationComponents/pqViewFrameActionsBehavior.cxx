@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrameActionsBehavior.h"
 
 #include "pqApplicationCore.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqStandardViewFrameActionGroup.h"
 #include "pqViewFrameActionGroupInterface.h"
 
@@ -43,14 +43,14 @@ pqViewFrameActionsBehavior::pqViewFrameActionsBehavior(QObject* parentObject)
   this->Interface = new pqViewFrameActionsBehaviorInterface();
   Q_ASSERT(qobject_cast<pqViewFrameActionGroupInterface*>(this->Interface));
   this->Interface->Group = new pqStandardViewFrameActionGroup(this);
-  pqApplicationCore::instance()->getPluginManager()->addInterface(
+  pqApplicationCore::instance()->interfaceTracker()->addInterface(
     this->Interface);
 }
 
 //-----------------------------------------------------------------------------
 pqViewFrameActionsBehavior::~pqViewFrameActionsBehavior()
 {
-  pqApplicationCore::instance()->getPluginManager()->removeInterface(
+  pqApplicationCore::instance()->interfaceTracker()->removeInterface(
     this->Interface);
   delete this->Interface;
 }

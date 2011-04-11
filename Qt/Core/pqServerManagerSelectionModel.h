@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
 
+class pqServer;
 class pqServerManagerModel;
 class pqServerManagerModelItem;
 class pqServerManagerSelection;
@@ -56,6 +57,9 @@ class vtkSMProxy;
 /// with the proxy manager under the name "ActiveSources" to keep track for the
 /// selection/current proxy. This makes it possible to synchronize proxy
 /// selections with python shell.
+/// .SECTION Caveats
+/// Assumes that there's only 1 pqServer connected at any give time. Once we
+/// supporting multiple servers this will have to change.
 
 class PQCORE_EXPORT pqServerManagerSelectionModel : public QObject
 {
@@ -126,6 +130,9 @@ private slots:
   /// called when vtkSMProxySelectionModel's current changes.
   void smCurrentChanged();
 
+  /// called when a new session is created/closed.
+  void onSessionCreated(pqServer*);
+  void onSessionClosed(pqServer*);
 private:
   pqServerManagerSelectionModelInternal* Internal;
 };

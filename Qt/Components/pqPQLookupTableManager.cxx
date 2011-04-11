@@ -245,7 +245,7 @@ void pqPQLookupTableManager::saveLUTAsDefault(pqScalarsToColors* lut)
     lutProxy->GetProperty("ScalarRangeInitialized")).toBool();
   pqSMAdaptor::setElementProperty(
     lutProxy->GetProperty("ScalarRangeInitialized"), false);
-  this->Internal->DefaultLUTElement.TakeReference(lutProxy->SaveState(0));
+  this->Internal->DefaultLUTElement.TakeReference(lutProxy->SaveXMLState(0));
   pqSMAdaptor::setElementProperty(
     lutProxy->GetProperty("ScalarRangeInitialized"), old_value);
 
@@ -272,7 +272,7 @@ void pqPQLookupTableManager::saveOpacityFunctionAsDefault(
     }
 
   this->Internal->DefaultOpacityElement.TakeReference(
-    opf->getProxy()->SaveState(0));
+    opf->getProxy()->SaveXMLState(0));
 
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
@@ -305,7 +305,7 @@ void pqPQLookupTableManager::setLUTDefaultState(vtkSMProxy* lutProxy)
 
   if (this->Internal->DefaultLUTElement)
     {
-    lutProxy->LoadState(this->Internal->DefaultLUTElement, NULL);
+    lutProxy->LoadXMLState(this->Internal->DefaultLUTElement, NULL);
     }
 
   lutProxy->UpdateVTKObjects();
@@ -319,7 +319,6 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* lutProxy =
     pxm->NewProxy("lookup_tables", "PVLookupTable");
-  lutProxy->SetConnectionID(server->GetConnectionID());
   QString name = this->Internal->getRegistrationName(
     QString(lutProxy->GetXMLName()),
     arrayname, number_of_components, component);
@@ -391,7 +390,6 @@ pqScalarOpacityFunction* pqPQLookupTableManager::createOpacityFunction(
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* opacityFunction = 
     pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
-  opacityFunction->SetConnectionID(server->GetConnectionID());
   //opacityFunction->UpdateVTKObjects();
 
   QString name = this->Internal->getRegistrationName(
@@ -460,7 +458,7 @@ void pqPQLookupTableManager::setOpacityFunctionDefaultState(
 
   if (this->Internal->DefaultOpacityElement)
     {
-    opFuncProxy->LoadState(this->Internal->DefaultOpacityElement, NULL);
+    opFuncProxy->LoadXMLState(this->Internal->DefaultOpacityElement, NULL);
     }
 
   opFuncProxy->UpdateVTKObjects();

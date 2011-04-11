@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqApplicationOptions.h"
 #include "pqGlobalRenderViewOptions.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqViewOptionsInterface.h"
   
 //-----------------------------------------------------------------------------
@@ -57,13 +57,14 @@ pqApplicationOptionsDialog::pqApplicationOptionsDialog(QWidget* p)
     }
 
   /// Add panes as plugins are loaded.
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(guiInterfaceLoaded(QObject*)),
+  pqInterfaceTracker* tracker =
+    pqApplicationCore::instance()->interfaceTracker();
+  QObject::connect(tracker,
+    SIGNAL(interfaceRegistered(QObject*)),
     this, SLOT(pluginLoaded(QObject*)));
 
   // Load panes from already loaded plugins.
-  foreach (QObject* plugin_interface,
-    pqApplicationCore::instance()->getPluginManager()->interfaces())
+  foreach (QObject* plugin_interface, tracker->interfaces())
     {
     this->pluginLoaded(plugin_interface);
     }

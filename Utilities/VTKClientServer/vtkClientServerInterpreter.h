@@ -106,6 +106,10 @@ public:
   int NewInstance(vtkObjectBase* obj, vtkClientServerID id);
 
   // Description:
+  // Creates a new instance for the class specified using the interpreter.
+  vtkObjectBase* NewInstance(const char* classname);
+
+  // Description:
   // Called by generated code to add an observer to a wrapped object.
   // Do not call directly.
   int NewObserver(vtkObject* obj, const char* event,

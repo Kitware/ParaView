@@ -58,10 +58,6 @@ public:
   virtual int Redo();
 
   // Description:
-  // Returns if this element can load the xml state for the given element.
-  virtual bool CanLoadState(vtkPVXMLElement*);
-
-  // Description:
   // Creates the undo element for the split operation.
   void SplitView(
     const pqMultiView::Index& index, Qt::Orientation orientation, 
@@ -73,6 +69,14 @@ protected:
 
   int UndoInternal();
   int RedoInternal();
+
+  vtkSetStringMacro(Index);
+  vtkSetStringMacro(ChildIndex);
+
+  char* Index;
+  char* ChildIndex;
+  int Orientation;
+  float Percent;
 
 private:
   pqSplitViewUndoElement(const pqSplitViewUndoElement&); // Not implemented.

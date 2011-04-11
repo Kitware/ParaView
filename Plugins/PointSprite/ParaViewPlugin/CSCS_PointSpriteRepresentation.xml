@@ -7,7 +7,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
-        subtype="0" />
+        subtype="Points" />
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"
@@ -61,7 +61,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
-        subtype="0" />
+        subtype="Points" />
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"
@@ -115,7 +115,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
-        subtype="0"/>
+        subtype="Points"/>
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"

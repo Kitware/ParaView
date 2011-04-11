@@ -46,7 +46,7 @@ void MyView::onRepresentationAdded(pqRepresentation* d)
 {
   // add a label with the display id
   QLabel* l = new QLabel(
-    QString("Display (%1)").arg(d->getProxy()->GetSelfIDAsString()), 
+    QString("Display (%1)").arg(d->getProxy()->GetGlobalIDAsString()),
     this->MyWidget);
   this->MyWidget->layout()->addWidget(l);
   this->Labels.insert(d, l);

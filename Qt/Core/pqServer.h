@@ -29,7 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqServer_h
 #define _pqServer_h
 
@@ -37,10 +36,12 @@ class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
 class vtkPVServerInformation;
+class vtkPVXMLElement;
 class vtkSMApplication;
 class vtkSMProxy;
 class vtkSMProxyManager;
 class vtkSMRenderViewProxy;
+class vtkSMSession;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
@@ -49,8 +50,10 @@ class vtkSMRenderViewProxy;
 #include "vtkWeakPointer.h"
 #include <QPointer>
 
-/// Abstracts the concept of a "server connection" so that ParaView clients may: 
-/// have more than one connect at a time / open and close connections at-will
+/// pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
+/// subclass that represents a vtkSMSession. Besides providing API to access
+/// vtkSMSession, it also performs some initialization of session-related
+/// proxies such as time-keeper and global-mapper-properties proxies.
 class PQCORE_EXPORT pqServer : public pqServerManagerModelItem 
 {
   Q_OBJECT
@@ -61,8 +64,14 @@ public:
   const pqServerResource& getResource();
   void setResource(const pqServerResource &server_resource);
 
+  /// Returns the session instance which the pqServer represents.
+  vtkSMSession* session() const;
+
   /// Returns the connection id for the server connection.
   vtkIdType GetConnectionID() const;
+
+  /// Returns the proxy manager for this session.
+  vtkSMProxyManager* proxyManager() const;
 
   /// Return the number of data server partitions on this 
   /// server connection. A convenience method.
@@ -72,21 +81,16 @@ public:
   /// server or a built-in server.
   bool isRemote() const;
 
+  /// Returns true is this connection has a separate render-server and
+  /// data-server.
+  bool isRenderServerSeparate();
+
   /// Returns the time keeper for this connection.
   pqTimeKeeper* getTimeKeeper() const;
 
   /// Initializes the pqServer, must be called as soon as pqServer 
   /// is created.
   void initialize();
-
-  /// Every server can potentially be compiled with different compile time options
-  /// while could lead to certain filters/sources/writers being non-instantiable
-  /// on that server. For all proxies in the \c xmlgroup that the client 
-  /// server manager is aware of, this method populates \c names with only the names
-  /// for those proxies that can be instantiated on the given \c server.
-  /// \todo Currently, this method does not actually validate if the server
-  /// can instantiate the proxies.
-  void getSupportedProxies(const QString& xmlgroup, QList<QString>& names);
 
   /// Returns the PVOptions for this connection. These are client side options.
   vtkPVOptions* getOptions() const;
@@ -116,9 +120,6 @@ public:
   static void setGlobalImmediateModeRenderingSetting(bool val);
   static bool globalImmediateModeRenderingSetting();
 
-  /// Convenience method to obtain the renderview xml name for the given
-  /// connection type. This is deprecated and will soon be removed.
-  QString getRenderViewXMLName() const;
 
 signals:
   /// Fired when the name of the proxy is changed.
@@ -164,6 +165,7 @@ private:
   pqServerResource Resource;
   vtkIdType ConnectionID;
   vtkWeakPointer<vtkSMProxy> GlobalMapperPropertiesProxy;
+  vtkWeakPointer<vtkSMSession> Session;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

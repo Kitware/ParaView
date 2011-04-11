@@ -210,7 +210,7 @@
 
   <!--======================================================================-->
   <ProxyGroup name="textures">
-    <SpriteTextureProxy name="SpriteTexture" class="vtkTexture">
+    <SpriteTextureProxy name="SpriteTexture" class="vtkTexture" kernel_class="vtkSIImageTextureProxy">
       <Documentation>
         This is a proxy for a vtkTexture which also includes an image sprite source.
       </Documentation>

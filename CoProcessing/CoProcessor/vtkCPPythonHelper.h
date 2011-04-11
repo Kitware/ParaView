@@ -18,8 +18,6 @@
 #include "vtkCPPipeline.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 
-class vtkCPProcessModulePythonHelper;
-class vtkPVMain;
 class vtkPVPythonOptions;
 class vtkPVPythonInterpretor;
 
@@ -43,9 +41,8 @@ private:
   vtkCPPythonHelper(const vtkCPPythonHelper&); // Not implemented
   void operator=(const vtkCPPythonHelper&); // Not implemented
 
-  vtkCPProcessModulePythonHelper* ProcessModuleHelper;
-  vtkPVMain* PVMain;
   vtkPVPythonOptions* PythonOptions;
+  vtkPVPythonInterpretor* PythonInterpretor;
 
   /// The singleton instance of the class.
   static vtkCPPythonHelper* Instance;

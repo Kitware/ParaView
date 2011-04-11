@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMStreamingViewProxy.h"
-#include "vtkSMStreamingRepresentationProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 class pqStreamingControls::pqInternals
   : public Ui::pqStreamingControls
@@ -331,8 +331,8 @@ void pqStreamingControls::updateTrackedRepresentation()
     pqActiveObjects::instance().activeRepresentation();
   if (rep)
     {
-    vtkSMStreamingRepresentationProxy *sRepProxy =
-      vtkSMStreamingRepresentationProxy::SafeDownCast(rep->getProxy());
+    vtkSMPVRepresentationProxy *sRepProxy =
+      vtkSMPVRepresentationProxy::SafeDownCast(rep->getProxy());
     if (!sRepProxy)
       {
       return;

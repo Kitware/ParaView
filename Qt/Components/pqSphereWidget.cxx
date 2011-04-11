@@ -100,7 +100,7 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(smmodel->findServer(refProxy->GetConnectionID()));
+  this->createWidget(smmodel->findServer(refProxy->GetSession()));
 
   // by default, we don't use this widget for direction.
   this->enableDirection(false);

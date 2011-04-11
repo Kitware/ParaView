@@ -1339,7 +1339,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
-      chooser->setServer(m->findServer(pxy->GetConnectionID()));
+      chooser->setServer(m->findServer(pxy->GetSession()));
       chooser->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                        propertyLabel,
@@ -1387,7 +1387,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
         SMProperty->GetDomain("array_list"));
 
       pqSILWidget* tree = new pqSILWidget( 
-        silDomain->GetSubtree(), panelLayout->parentWidget());
+        silDomain->GetSubTree(), panelLayout->parentWidget());
       tree->setObjectName(propertyName);
       
       pqSILModel* silModel = new pqSILModel(tree);

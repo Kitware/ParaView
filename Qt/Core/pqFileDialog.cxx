@@ -436,9 +436,9 @@ void pqFileDialog::onCreateNewFolder()
 {
   // Add a directory entry with a default name to the model
   // This actually creates a directory with the given name,
-  //   but this temporary direectory will be deleted and a new one created
+  //   but this temporary directory will be deleted and a new one created
   //   once the user provides a new name for it.
-  //   FIXME: I guess we could insert an item into the model without
+  //   TODO: I guess we could insert an item into the model without
   //    actually creating a new directory but this way I could reuse code.
   QString dirName = QString("New Folder");
   int i=0;

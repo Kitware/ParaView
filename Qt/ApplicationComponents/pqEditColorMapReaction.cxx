@@ -79,10 +79,10 @@ void pqEditColorMapReaction::editColorMap()
     vtkSMProxy *proxy = repr->getProxy();
     vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
-    int reprType = repr->getRepresentationType();
-    bool use_ambient = (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
-      reprType == vtkSMPVRepresentationProxy::POINTS ||
-      reprType == vtkSMPVRepresentationProxy::OUTLINE);
+    QString reprType = repr->getRepresentationType();
+    bool use_ambient = (reprType == "Wireframe" ||
+      reprType == "Points"||
+      reprType == "Outline");
     if (diffuse && ambient)
       {
       // Get the current color from the property.

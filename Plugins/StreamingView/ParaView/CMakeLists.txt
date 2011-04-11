@@ -85,9 +85,8 @@ add_paraview_plugin(
     vtkPVStreamingRepresentation.cxx
     vtkPVStreamingView.cxx
     vtkPVStreamingParallelHelper.cxx
-    vtkSMStreamingRepresentationProxy.cxx
+    vtkSIStreamingRepresentationProxy.cxx
     vtkSMStreamingViewProxy.cxx
-    vtkStreamLibraryWrapper.cxx
   SERVER_MANAGER_XML
     StreamingView.xml
   GUI_RESOURCE_FILES
@@ -115,6 +114,7 @@ add_paraview_plugin(
     PrioritizingView.cxx
     RefiningView.cxx
     pqStreamingControls.cxx
+  CS_KITS vtkStreaming
 )
 
 TARGET_LINK_LIBRARIES ( StreamingView vtkStreamingCS )

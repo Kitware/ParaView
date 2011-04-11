@@ -68,6 +68,7 @@ protected slots:
   void onChartNewHiddenSeries();
   void onChartDeleteHiddenSeries();
   void onChartResetHiddenSeries();
+  void updatePalettes();
 
 private:
   class pqInternal;

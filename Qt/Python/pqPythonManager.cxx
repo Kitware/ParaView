@@ -112,7 +112,7 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
   // Start StatusBar message update timer
   connect( &this->Internal->StatusBarUpdateTimer, SIGNAL(timeout()),
            this, SLOT(updateStatusMessage()));
-  this->Internal->StatusBarUpdateTimer.start(5000); // 1 second
+  this->Internal->StatusBarUpdateTimer.start(5000); // 5 second
 }
 
 //-----------------------------------------------------------------------------
@@ -175,41 +175,34 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-    int cid = static_cast<int>(activeServer->GetConnectionID());
-    pqServerResource serverRes = activeServer->getResource();
-    int reversed = (serverRes.scheme() == "csrc" ||
-      serverRes.scheme() == "cdsrsrc") ? 1 : 0;
-    QString dsHost(""), rsHost("");
-    int dsPort = 0, rsPort = 0;
-    QString strURI = serverRes.toURI();
-    if(strURI != "builtin:")
-      {
-      dsHost = serverRes.dataServerHost().isEmpty() ?
-        serverRes.host() : serverRes.dataServerHost();
-      dsPort = serverRes.dataServerPort() < 0 ? 
-        serverRes.port() : serverRes.dataServerPort();
-      rsHost = serverRes.renderServerHost();
-      rsPort = serverRes.renderServerPort() < 0 ? 
-        rsPort : serverRes.renderServerPort();
-      }
+
+    // Deprecated code...
+//    pqServerResource serverRes = activeServer->getResource();
+//    int reversed = (serverRes.scheme() == "csrc" ||
+//      serverRes.scheme() == "cdsrsrc") ? 1 : 0;
+//    QString dsHost(""), rsHost("");
+//    int dsPort = 0, rsPort = 0;
+//    QString strURI = serverRes.toURI();
+//    if(strURI != "builtin:")
+//      {
+//      dsHost = serverRes.dataServerHost().isEmpty() ?
+//        serverRes.host() : serverRes.dataServerHost();
+//      dsPort = serverRes.dataServerPort() < 0 ?
+//        serverRes.port() : serverRes.dataServerPort();
+//      rsHost = serverRes.renderServerHost();
+//      rsPort = serverRes.renderServerPort() < 0 ?
+//        rsPort : serverRes.renderServerPort();
+//      }
       
     QString initStr = QString(
       "import paraview\n"
       "paraview.compatibility.major = 3\n"
       "paraview.compatibility.minor = 5\n"
       "from paraview import servermanager\n"
-      "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
-      "servermanager.ActiveConnection.SetHost(\"%2\", %3, \"%4\", %5, %6)\n"
-      "servermanager.ToggleProgressPrinting()\n"
-      "servermanager.fromGUI = True\n"
+      "servermanager.InitFromGUI()\n"
       "from paraview.simple import *\n"
-      "active_objects.view = servermanager.GetRenderView()")
-      .arg(cid)
-      .arg(dsHost)
-      .arg(dsPort)
-      .arg(rsHost)
-      .arg(rsPort)
-      .arg(reversed);
+      "active_objects.view = servermanager.GetRenderView()\n"
+      "paraview.simple._add_functions(globals())");
     this->Internal->PythonDialog->print(
       "from paraview.simple import *");
     this->Internal->PythonDialog->runString(initStr);

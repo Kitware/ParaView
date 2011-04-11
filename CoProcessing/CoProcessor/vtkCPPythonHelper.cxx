@@ -15,26 +15,23 @@
 #include "vtkCPPythonHelper.h"
 
 #include "CPSystemInformation.h"
-#include "vtkCPProcessModulePythonHelper.h"
 #include "vtkInitializationHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVMain.h"
+#include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
-#include "vtkSMXMLParser.h"
+#include "pvpython.h"
+#include "vtkSMProperty.h"
+
+#define EXCLUDE_LOAD_ALL_FUNCTION
+#include "cppythonmodules.h"
 
 #include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-
-static void ParaViewInitializeInterpreter(vtkProcessModule* pm)
-{
-  // Initialize built-in wrapper modules.
-  vtkInitializationHelper::InitializeInterpretor(pm);
-}
 
 //----------------------------------------------------------------------------
 // Needed when we don't use the vtkStandardNewMacro.
@@ -46,30 +43,24 @@ vtkCPPythonHelper* vtkCPPythonHelper::Instance = 0;
 //----------------------------------------------------------------------------
 vtkCPPythonHelper::vtkCPPythonHelper()
 {
-  this->PVMain = 0;
-  this->ProcessModuleHelper = 0;
   this->PythonOptions = 0;
+  this->PythonInterpretor = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkCPPythonHelper::~vtkCPPythonHelper()
 {
-  if(this->ProcessModuleHelper)
-    {
-    this->ProcessModuleHelper->Delete();
-    this->ProcessModuleHelper = 0;
-    }
-  if(this->PVMain)
-    {
-    this->PVMain->Delete();
-    this->PVMain = 0;
-    vtkPVMain::Finalize();
-    }
   if(this->PythonOptions)
     {
     this->PythonOptions->Delete();
     this->PythonOptions = 0;
     }
+  if(this->PythonInterpretor)
+    {
+    this->PythonInterpretor->Delete();
+    this->PythonInterpretor = 0;
+    }
+  vtkInitializationHelper::Finalize();
 }
 
 //----------------------------------------------------------------------------
@@ -86,8 +77,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
       vtkCPPythonHelper::Instance = new vtkCPPythonHelper;
       }
 
-    vtkPVMain::SetUseMPI(1);
-    int argc = 0;
+    int argc = 1;
     char** argv = new char*[1];
     argv[0] = new char[200];
     std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
@@ -96,29 +86,37 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
 #else
     strcpy(argv[0], CWD.c_str());
 #endif
-    vtkPVMain::Initialize(&argc, &argv);
-    vtkCPPythonHelper::Instance->PVMain = vtkPVMain::New();
+
     vtkCPPythonHelper::Instance->PythonOptions = vtkPVPythonOptions::New();
-    vtkCPPythonHelper::Instance->PythonOptions->SetProcessType(vtkPVOptions::PVBATCH);
     vtkCPPythonHelper::Instance->PythonOptions->SetSymmetricMPIMode(1);
-    vtkCPPythonHelper::Instance->ProcessModuleHelper = vtkCPProcessModulePythonHelper::New();
-    vtkCPPythonHelper::Instance->ProcessModuleHelper->SetDisableConsole(true);
-    int ret = vtkCPPythonHelper::Instance->PVMain->Initialize(
-      vtkCPPythonHelper::Instance->PythonOptions, 
-      vtkCPPythonHelper::Instance->ProcessModuleHelper, 
-      ParaViewInitializeInterpreter, argc, argv);
+    vtkCPPythonHelper::Instance->PythonOptions->SetProcessType(vtkProcessModule::PROCESS_BATCH);
+
+    vtkInitializationHelper::Initialize(
+        argc, argv, vtkProcessModule::PROCESS_BATCH,
+        vtkCPPythonHelper::Instance->PythonOptions);
+
+
+    vtkSMProperty::SetCheckDomains(0);
+
+    // Do static initialization of python libraries
+    cppythonmodules_h_LoadAllPythonModules();
+
+    // Initialize the sub-interpreter because that is where RunSimpleString
+    // works.
+    vtkCPPythonHelper::Instance->PythonInterpretor = vtkPVPythonInterpretor::New();
+    int interpOk =
+        vtkCPPythonHelper::Instance->PythonInterpretor->InitializeSubInterpretor(1, argv);
+
     delete []argv[0];
     delete []argv;
-    if (ret)
-      {
-      vtkGenericWarningMacro("Problem with vtkPVMain::Initialize()");
-      return 0;
-      }
-    // Tell process module that we support Multiple connections.
-    // This must be set before starting the event loop.
-    vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOff();
-    ret = vtkCPPythonHelper::Instance->ProcessModuleHelper->Run(
-      vtkCPPythonHelper::Instance->PythonOptions);
+
+  #ifdef PARAVIEW_INSTALL_DIR
+    vtkCPPythonHelper::Instance->PythonInterpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/bin/" COPROCESSOR_BUILD_DIR);
+    vtkCPPythonHelper::Instance->PythonInterpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/Utilities/VTKPythonWrapping");
+  #else
+    vtkErrorMacro("ParaView install directory is undefined.");
+    return 0;
+  #endif
 
     vtksys_ios::ostringstream loadPythonModules;
     loadPythonModules
@@ -126,10 +124,9 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
       << "from paraview.simple import *\n"
       << "import vtkCoProcessorPython\n";
 
-    vtkCPPythonHelper::Instance->ProcessModuleHelper->GetInterpretor()->
-      RunSimpleString(loadPythonModules.str().c_str());
-    vtkCPPythonHelper::Instance->ProcessModuleHelper->GetInterpretor()->
-      FlushMessages();
+    vtkCPPythonHelper::Instance->PythonInterpretor->RunSimpleString(
+        loadPythonModules.str().c_str());
+    vtkCPPythonHelper::Instance->PythonInterpretor->FlushMessages();
     }
   
   return vtkCPPythonHelper::Instance;
@@ -138,7 +135,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
 //----------------------------------------------------------------------------
 vtkPVPythonInterpretor* vtkCPPythonHelper::GetPythonInterpretor()
 {
-  return this->ProcessModuleHelper->GetInterpretor();
+  return this->PythonInterpretor;
 }
 
 

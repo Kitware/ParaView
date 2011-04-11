@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationCue;
 class QSize;
 class vtkObject;
-class vtkSMAnimationSceneProxy;
 
 /// pqAnimationScene is a representation for a vtkSMAnimationScene
 /// proxy. It provides API to access AnimationCues in the scene.
@@ -51,9 +50,6 @@ public:
   pqAnimationScene(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
   virtual ~pqAnimationScene();
-
-  /// returns the vtkSMAnimationSceneProxy.
-  vtkSMAnimationSceneProxy* getAnimationSceneProxy() const;
 
   /// Returns the cue that animates the given 
   /// \c index of the given \c property on the given \c proxy, in this scene,

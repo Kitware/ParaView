@@ -82,6 +82,7 @@ private:
   pqTimerLogDisplay(const pqTimerLogDisplay &); // Not implemented
   void operator=(const pqTimerLogDisplay &);    // Not implemented
 
+  double LogThreshold;
   pqTimerLogDisplayUi *ui;
 };
 

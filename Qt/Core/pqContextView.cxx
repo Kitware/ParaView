@@ -115,9 +115,9 @@ pqContextView::pqContextView(
 : Superclass(type, group, name, viewProxy, server, parentObject)
 {
   this->Internal = new pqContextView::pqInternal();
-  viewProxy->GetID(); // this results in calling CreateVTKObjects().
+  viewProxy->UpdateVTKObjects(); // this results in calling CreateVTKObjects().
   this->Command = command::New(*this);
-  viewProxy->GetClientSideView()->AddObserver(
+  vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
 }
 
@@ -411,11 +411,9 @@ void pqContextView::selectionChanged()
 
   if (!selectionSource)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = this->proxyManager();
     selectionSource =
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
-    selectionSource->SetConnectionID(pqRepr->getServer()->GetConnectionID());
-    selectionSource->SetServers(vtkProcessModule::DATA_SERVER);
     vtkSMPropertyHelper(selectionSource, "FieldType").Set(selectionType);
     selectionSource->UpdateVTKObjects();
     }

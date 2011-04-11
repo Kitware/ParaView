@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMUndoStackBuilder.h"
 #include "pqComponentsExport.h"
+#include "vtkSMMessageMinimal.h"
 
 class vtkCommand;
 
@@ -85,34 +86,25 @@ public:
   /// Overridden to add observers to not record changes when the
   /// stack is being undone/redone.
   virtual void SetUndoStack(vtkSMUndoStack*);
+
+  /// Overridden to filter unwanted event and manage auto undoset creation
+  virtual void OnStateChange(vtkSMSession *session, vtkTypeUInt32 globalId,
+                             const vtkSMMessage *previousState,
+                             const vtkSMMessage *newState);
+
 protected:
   pqUndoStackBuilder();
   ~pqUndoStackBuilder();
 
-  virtual void ExecuteEvent(vtkObject* caller, unsigned long eventid, 
-    void* data);
+  /// Return false if this state should be escaped.
+  bool Filter(vtkSMSession* session, vtkTypeUInt32 globalId);
 
   bool IgnoreIsolatedChanges;
   bool UndoRedoing;
 
-  void OnStartEvent();
-  void OnEndEvent();
-
-  // Added to ignore property changes we are told to ignore.
-  virtual void OnPropertyModified(vtkSMProxy* proxy, 
-    const char* propname);
-
-  // Added to create pqProxyUnRegisterUndoElement which handles
-  // helper proxies as well.
-  virtual void OnUnRegisterProxy(const char* group, const char* name,
-    vtkSMProxy*);
-
 private:
   pqUndoStackBuilder(const pqUndoStackBuilder&); // Not implemented.
   void operator=(const pqUndoStackBuilder&); // Not implemented.
-
-  vtkCommand* StartObserver;
-  vtkCommand* EndObserver;
 };
 
 #endif

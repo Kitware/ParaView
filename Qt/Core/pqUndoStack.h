@@ -57,7 +57,7 @@ class PQCORE_EXPORT pqUndoStack : public QObject
 public:
   /// If no \c builder is provided a default vtkSMUndoStackBuilder object
   /// will be created.
-  pqUndoStack(bool clientOnly, vtkSMUndoStackBuilder* builder=0, QObject* parent=NULL);
+  pqUndoStack(vtkSMUndoStackBuilder* builder=0, QObject* parent=NULL);
   virtual ~pqUndoStack();
 
   /// returns if it's possible to undo.
@@ -89,6 +89,8 @@ public:
   vtkUndoSet* getLastUndoSet(); //vistrails
   vtkUndoSet* getUndoSetFromXML(vtkPVXMLElement *root); //vistrails
 
+  /// Get the UndoStackBuilder that is used with that UndoStack
+  vtkSMUndoStackBuilder* GetUndoStackBuilder();
 
 public slots:
   void beginUndoSet(QString label);

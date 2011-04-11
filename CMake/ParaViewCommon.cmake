@@ -501,9 +501,17 @@ SET(PARAVIEW_LINK_XDMF ON)
 SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS Xdmf)
 IF(XDMF_WRAP_PYTHON)
   SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS _Xdmf)
-ENDIF()
+Endif()
 
 ADD_SUBDIRECTORY(Utilities/Xdmf2)
+
+#########################################################################
+# Configure protobuf
+SET (PROTOBUF_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+SET (PROTOBUF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+SET (PROTOBUF_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS protobuf)
+ADD_SUBDIRECTORY(Utilities/protobuf)
 
 #########################################################################
 # Configure mpeg2 encoding
@@ -618,18 +626,6 @@ SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   )
 ADD_SUBDIRECTORY(Utilities/VTKClientServer)
-
-#########################################################################
-# Configure Tcl Wraping.
-# We can't remove this from ParaViewCommon.cmake since it must be
-# included after VTK has been included but before ServerManager.
-IF (PARAVIEW_BUILD_GUI)
-  ADD_SUBDIRECTORY(Utilities/VTKTclWrapping)
-  SET(VTKTclWrapping_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-  SET(VTKTclWrapping_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-  SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
 # Import external projects, such as SAF.
@@ -764,22 +760,12 @@ ENDIF(PARAVIEW_USE_AMRCTH OR AMRCTH_SOURCE_DIR)
 
 #########################################################################
 # Configure Server
-SET(PVFILTERS_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  ${ParaView_BINARY_DIR}/Servers/Filters)
-SET(PVSERVERMANAGER_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/ServerManager
-  ${ParaView_BINARY_DIR}/Servers/ServerManager)
-SET(PVSERVERCOMMON_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Servers/Common
-  ${ParaView_BINARY_DIR}/Servers/Common)
-
 IF(PARAVIEW_USE_VISITBRIDGE)
   PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES(${VISITBRIDGE_READERS_XML_FILE})
   PARAVIEW_INCLUDE_GUI_RESOURCES(${VISITBRIDGE_READERS_GUI_XML_FILE})
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
-ADD_SUBDIRECTORY(Servers)
+ADD_SUBDIRECTORY(ParaViewCore)
 
 #########################################################################
 # Configure Python executable
@@ -797,8 +783,9 @@ IF(PARAVIEW_MINIMAL_BUILD)
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 #########################################################################
-# Configure Servers executables
-ADD_SUBDIRECTORY(Servers/Executables)
+# Add command line executables.
+ADD_SUBDIRECTORY(CommandLineExecutables)
+
 
 
 #########################################################################
@@ -807,21 +794,25 @@ CONFIGURE_FILE(${ParaView_CMAKE_DIR}/CTestCustom.ctest.in
 
 #########################################################################
 SET(PARAVIEW_INCLUDE_DIRS
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${HDF5_INCLUDE_DIR}
   ${KWCommon_INCLUDE_PATH}
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  ${ParaView_SOURCE_DIR}/Servers/ServerManager
-  ${ParaView_SOURCE_DIR}/Servers/Common
-  ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
-  ${ParaView_SOURCE_DIR}/VTK/Wrapping
-  ${ParaView_BINARY_DIR}/VTK/Wrapping
+  ${PVClientServerCore_BINARY_DIR}
+  ${PVClientServerCore_SOURCE_DIR}
+  ${PVCommon_BINARY_DIR}
+  ${PVCommon_SOURCE_DIR}
+  ${PVServerImplementation_BINARY_DIR}
+  ${PVServerImplementation_SOURCE_DIR}
+  ${PVServerManager_BINARY_DIR}
+  ${PVServerManager_SOURCE_DIR}
+  ${PVVTKExtensions_BINARY_DIR}
+  ${PVVTKExtensions_SOURCE_DIR}
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Servers/Filters
-  ${ParaView_BINARY_DIR}/Servers/ServerManager
-  ${ParaView_BINARY_DIR}/Servers/Common
+  ${ParaView_BINARY_DIR}/VTK/Wrapping
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
+  ${ParaView_SOURCE_DIR}/VTK/Wrapping
   ${XDMF_INCLUDE_DIRS}
-  ${HDF5_INCLUDE_DIR}
   )
 
 IF(PARAVIEW_USE_VISITBRIDGE)

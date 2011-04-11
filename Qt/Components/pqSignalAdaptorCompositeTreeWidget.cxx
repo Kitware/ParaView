@@ -849,6 +849,7 @@ void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
     {
     return;
     }
+
   vtkPVDataInformation* info = sourceProxy->GetSelectionOutput(
     this->Internal->Domain->GetSourcePort())->GetDataInformation();
 

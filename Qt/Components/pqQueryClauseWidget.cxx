@@ -556,7 +556,6 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
   vtkSMProxy* selSource =
     vtkSMProxyManager::GetProxyManager()->NewProxy("sources",
       "SelectionQuerySource");
-  selSource->SetConnectionID(this->producer()->getServer()->GetConnectionID());
 
   // * Determine FieldType.
   int field_type = 0;

@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqPropertyLinks.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
@@ -192,15 +192,6 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
 
   this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
   l->addWidget(this->Internal->DisplayPanel);
-
-  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
-  if (ustack)
-    {
-    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
-      ustack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(endUndo()),
-      ustack, SLOT(endUndoSet()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -238,12 +229,12 @@ void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
     return;
     }
 
-  emit this->beginUndo(QString("Change Visibility of %1").arg(
+  BEGIN_UNDO_SET(QString("Change Visibility of %1").arg(
       this->Internal->Source->getSMName()));
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
   pqRepresentation* disp = policy->setRepresentationVisibility(
     this->Internal->OutputPort, this->Internal->View, state);
-  emit this->endUndo();
+  END_UNDO_SET();
 
   if (disp)
     {
@@ -277,7 +268,7 @@ void pqDisplayProxyEditorWidget::updatePanel()
   pqRepresentation* repr = this->Internal->Representation;
 
   // search for a custom panels
-  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
   QObjectList ifaces = pm->interfaces();
   foreach(QObject* iface, ifaces)
     {

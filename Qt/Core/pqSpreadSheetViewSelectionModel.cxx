@@ -277,11 +277,9 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     }
   else
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = repr->getProxy()->GetProxyManager();
     selsource = 
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", proxyname));
-    selsource->SetConnectionID(repr->getServer()->GetConnectionID());
-    selsource->SetServers(vtkProcessModule::DATA_SERVER);
     pqSMAdaptor::setElementProperty(
       selsource->GetProperty("FieldType"), selection_field_type);
     selsource->UpdateVTKObjects();

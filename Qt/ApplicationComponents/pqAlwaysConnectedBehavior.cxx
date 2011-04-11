@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule.h"
 
 //-----------------------------------------------------------------------------
@@ -73,7 +74,7 @@ void pqAlwaysConnectedBehavior::serverCheck()
     {
     return;
     }
-  if (vtkProcessModule::GetProcessModule()->IsAcceptingConnections())
+  if (core->getObjectBuilder()->waitingForConnection())
     {
     // Try again later, we are waiting for server to connect.
     this->delayedServerCheck();

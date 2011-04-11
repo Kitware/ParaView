@@ -109,19 +109,13 @@ public:
 
   if(server)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();  
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = server->proxyManager();
 
     vtkSMProxy* helper = pxm->NewProxy("misc","FileInformationHelper");
-    helper->SetConnectionID(server->GetConnectionID());
-    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
     pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"),
                                     true);
     helper->UpdateVTKObjects();
-
-    pm->GatherInformation(server->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, information, helper->GetID());
-
+    helper->GatherInformation(information);
     helper->Delete();
     }
   else

@@ -45,7 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
+#include "vtkSMCacheBasedProxyLocator.h"
 
 // Qt includes.
 #include <QAction>
@@ -76,7 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
@@ -228,7 +232,7 @@ void pqViewManager::buildConvertMenu()
 
   // Create actions for converting view types.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
@@ -408,14 +412,12 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
 void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 {
   this->onFrameRemovedInternal(frame);
-
   if (this->Internal->CloseFrameUndoElement)
     {
     ADD_UNDO_ELEM(this->Internal->CloseFrameUndoElement);
     this->Internal->CloseFrameUndoElement = 0;
     END_UNDO_SET();
     }
-
   // Now activate some frame, so that we have an active view.
   if (this->Internal->Frames.size() > 0)
     {
@@ -441,12 +443,19 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   this->saveState(state);
 
   pqMultiView::Index index = this->indexOf(frame);
-
   pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
   elem->CloseView(index, state->GetNestedElement(0));
   this->Internal->CloseFrameUndoElement = elem;
-  elem->Delete();
-  state->Delete();
+  elem->FastDelete();
+  state->FastDelete();
+
+  // Fill with the views states
+  pqInternals::FrameMapType::Iterator iter = this->Internal->Frames.begin();
+  for(; iter != this->Internal->Frames.end(); ++iter)
+    {
+    pqView* view = iter.value();
+    elem->GetViewStateCache()->StoreProxyState(view->getProxy());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -501,7 +510,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
   // Search for view frame action group plugins and allow them to decide whether
   // to add their actions to this view type's frame or not.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewFrameActionGroupInterface* agi = qobject_cast<pqViewFrameActionGroupInterface*>(iface);
@@ -535,7 +544,7 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
   // Search for view frame action group plugins and have them remove their
   // actions for this view's frame if need be.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewFrameActionGroupInterface* agi =
@@ -721,10 +730,7 @@ void pqViewManager::onConvertToButtonClicked()
 void pqViewManager::onConvertToTriggered(QAction* action)
 {
   QString type = action->data().toString();
-
-  // FIXME: We may want to fix this to use the active server instead.
-  pqServer* server= pqApplicationCore::instance()->
-    getServerManagerModel()->getItemAtIndex<pqServer*>(0);
+  pqServer* server= pqActiveObjects::instance().activeServer();
   if (!server)
     {
     qDebug() << "No server present cannot convert view.";
@@ -866,7 +872,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
     vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
     frameElem->SetName("Frame");
     frameElem->AddAttribute("index", index.getString().toAscii().data());
-    frameElem->AddAttribute("view_module", view->getProxy()->GetSelfIDAsString());
+    frameElem->AddAttribute("view_module", view->getProxy()->GetGlobalIDAsString());
     rwRoot->AddNestedElement(frameElem);
     frameElem->Delete();
     }
@@ -883,8 +889,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
     }
   if (strcmp(rwRoot->GetName(), "ViewManager") != 0)
     {
-    return this->loadState(rwRoot->FindNestedElementByName("ViewManager"),
-      locator);
+    return this->loadState(rwRoot->FindNestedElementByName("ViewManager"), locator);
     }
 
   // When state is loaded by the server manager,
@@ -925,21 +930,37 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       index.setFromString(index_string);
       int id = 0;
       elem->GetScalarAttribute("view_module", &id);
-      vtkSmartPointer<vtkSMProxy> viewModule;
-      viewModule = locator->LocateProxy(id);
-      if (!viewModule.GetPointer())
-        {
-        qCritical() << "Failed to locate view module mentioned in state!";
-        return false;
-        }
 
-      pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
-        findItem<pqView*>(viewModule);
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        this->widgetOfIndex(index));
-      if (frame && view)
+      // Do we have a View to bind to that frame ?
+      if(id != 0)
         {
-        this->connect(frame, view);
+        vtkSmartPointer<vtkSMProxy> viewModule;
+        viewModule = locator->LocateProxy(id);
+        if (!viewModule.GetPointer())
+          {
+          qCritical() << "Failed to locate view module mentioned in state! (view id: " << id << ")";
+          return false;
+          }
+
+        pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
+                       findItem<pqView*>(viewModule);
+        pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+            this->widgetOfIndex(index));
+        if (frame && view)
+          {
+          this->connect(frame, view);
+          }
+        else
+          {
+          // If we didn't managed to connect the view yet, we just tell that the
+          // next registered view will be linked to that pending frame. This is
+          // tipically the case for undoCloseView because the given view is not
+          // registered yet inside the proxy manager.
+          // CAUTION: This can only work if one view as been close at a time,
+          //          otherwise we don't have any waranty that the view will get
+          //          back into their original frame.
+          this->Internal->PendingFrames.push_front(frame);
+          }
         }
       }
     }
@@ -1087,7 +1108,6 @@ void pqViewManager::onSplittingView(const Index& index,
   Qt::Orientation orientation, float fraction, const Index& childIndex)
 {
   BEGIN_UNDO_SET("Split View");
-
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
   elem->SplitView(index, orientation, fraction, childIndex);
   ADD_UNDO_ELEM(elem);

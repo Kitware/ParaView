@@ -605,6 +605,26 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
         out << this->LastResultMessage->GetArgument(0, b);
         }
       }
+    else if (in.GetArgumentType(inIndex, a) ==
+             vtkClientServerStream::stream_value)
+      {
+      // Evaluate the expression and insert the result.
+      vtkClientServerStream *lastResult = this->LastResultMessage;
+      this->LastResultMessage = new vtkClientServerStream();
+      vtkClientServerStream substream;
+      in.GetArgument(inIndex, a, &substream);
+      if (this->ProcessStream(substream))
+        {
+        // Insert the last result value.
+        for(int b=0; b < this->LastResultMessage->GetNumberOfArguments(0); ++b)
+          {
+          out << this->LastResultMessage->GetArgument(0, b);
+          }
+        }
+      // restore last-result
+      delete this->LastResultMessage;
+      this->LastResultMessage = lastResult;
+      }
     else
       {
       // Just copy the argument.
@@ -904,4 +924,15 @@ void vtkClientServerInterpreter::ClearLastResult()
 vtkClientServerID vtkClientServerInterpreter::GetNextAvailableId()
 {
   return vtkClientServerID(++this->NextAvailableId);
+}
+
+//----------------------------------------------------------------------------
+vtkObjectBase* vtkClientServerInterpreter::NewInstance(const char* classname)
+{
+  if (vtkClientServerNewInstanceFunction n =
+    this->Internal->NewInstanceFunctions[classname])
+    {
+    return n();
+    }
+  return NULL;
 }

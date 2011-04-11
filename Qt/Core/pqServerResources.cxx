@@ -186,11 +186,7 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
         {
         pqApplicationCore* core = pqApplicationCore::instance();
         pqObjectBuilder* builder = core->getObjectBuilder();
-        pqUndoStack* ustack = core->getUndoStack(); 
-        if (ustack)
-          {
-          ustack->beginUndoSet("Create Reader");
-          }
+        BEGIN_UNDO_SET("Create Reader");
         QStringList files;
         files.push_back(resource.path());
         QString extrafilesCount = resource.data("extrafilesCount");
@@ -207,10 +203,7 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
           }
         reader = builder->createReader(
           readerGroup, readerName, files, server);
-        if (ustack)
-          {
-          ustack->endUndoSet();
-          }
+        END_UNDO_SET();
         }
       else
         {

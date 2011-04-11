@@ -36,42 +36,21 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkImageData.h"
 
+#include "vtkSMSession.h"
+#include "vtkSIObject.h"
+#include "vtkSIProxy.h"
+
 vtkStandardNewMacro(vtkSMSpriteTextureProxy);
 //----------------------------------------------------------------------------
 vtkSMSpriteTextureProxy::vtkSMSpriteTextureProxy()
 {
-  this->SetServers(vtkProcessModule::CLIENT
-    | vtkProcessModule::RENDER_SERVER);
+  this->SetLocation( vtkProcessModule::CLIENT |
+                     vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
 vtkSMSpriteTextureProxy::~vtkSMSpriteTextureProxy()
 {
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSpriteTextureProxy::CreateVTKObjects()
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
-  this->Superclass::CreateVTKObjects();
-
-  vtkSMProxy* reader = this->GetSubProxy("Source");
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << reader->GetID()
-          << "GetOutputPort"
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << this->GetID()
-          << "SetInputConnection"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-    this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------

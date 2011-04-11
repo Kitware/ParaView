@@ -105,7 +105,7 @@ pqBoxWidget::pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _parent
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(smmodel->findServer(refProxy->GetConnectionID()));
+  this->createWidget(smmodel->findServer(refProxy->GetSession()));
 }
 
 //-----------------------------------------------------------------------------

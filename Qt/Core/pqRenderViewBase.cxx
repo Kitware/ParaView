@@ -386,15 +386,13 @@ vtkSMProxy* pqRenderViewBase::createCameraManipulator(
     strManipName = "None";
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkIdType cid = this->getServer()->GetConnectionID();
+  vtkSMProxyManager* pxm = this->proxyManager();
   vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", 
     strManipName.toAscii().data());
   if(!manip)
     {
     return NULL;
     }
-  manip->SetConnectionID(cid);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), mouse);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), shift);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), control);
@@ -459,7 +457,6 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   };
 
 static const char* pqRenderViewModuleMiscSettings [] = {
-  "CacheLimit",
   "CameraParallelProjection",
   "CenterAxesVisibility",
   "OrientationAxesInteractivity",

@@ -51,15 +51,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyListDomain.h"
 
 // pqCore includes
-#include "pqServerManagerModel.h"
-#include "pqRenderView.h"
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
+#include "pqRenderView.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 
 class pqLinksModel::pqInternal : public vtkCommand
 {
 public:
   pqLinksModel* Model;
+  QPointer<pqServer> Server;
   static pqInternal* New() { return new pqInternal; }
   static const char* columnHeaders[];
 
@@ -79,7 +81,7 @@ public:
     if(eid == vtkCommand::RegisterEvent)
       {
       this->LinkObjects.append(
-        new pqLinksModelObject(linkName, this->Model));
+        new pqLinksModelObject(linkName, this->Model, this->Server));
       this->Model->reset();
       }
     else if(eid == vtkCommand::UnRegisterEvent)
@@ -126,17 +128,34 @@ pqLinksModel::pqLinksModel(QObject *p)
 {
   this->Internal = pqInternal::New();
   this->Internal->Model = this;
-  vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
-  pxm->AddObserver(vtkCommand::RegisterEvent, this->Internal);
-  pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Internal);
+
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(onSessionCreated(pqServer*)));
+  QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
+    this, SLOT(onSessionRemoved(pqServer*)));
 }
 
 /// destruct a links model
 pqLinksModel::~pqLinksModel()
 {
-  vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
-  pxm->RemoveObserver(this->Internal);
+  this->Internal->Model = NULL;
   this->Internal->Delete();
+}
+
+void pqLinksModel::onSessionCreated(pqServer* server)
+{
+  this->Internal->Server = server;
+  vtkSMProxyManager* pxm = server->proxyManager();
+  pxm->AddObserver(vtkCommand::RegisterEvent, this->Internal);
+  pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Internal);
+}
+
+void pqLinksModel::onSessionRemoved(pqServer* server)
+{
+  vtkSMProxyManager* pxm = server->proxyManager();
+  pxm->RemoveObserver(this->Internal);
 }
 
 static vtkSMProxy* getProxyFromLink(vtkSMProxyLink* link, int desiredDir)
@@ -236,7 +255,8 @@ QString pqLinksModel::getProperty2(const QModelIndex& idx) const
 // implementation to satisfy api
 int pqLinksModel::rowCount(const QModelIndex&) const
 {
-  return vtkSMProxy::GetProxyManager()->GetNumberOfLinks();
+  return this->Internal->Server?
+    this->Internal->Server->proxyManager()->GetNumberOfLinks() : 0;
 }
 
 int pqLinksModel::columnCount(const QModelIndex&) const
@@ -347,9 +367,13 @@ QVariant pqLinksModel::headerData(int section, Qt::Orientation orient,
 
 QString pqLinksModel::getLinkName(const QModelIndex& idx) const
 {
-  vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
-  QString linkName = pxm->GetLinkName(idx.row());
-  return linkName;
+  if (this->Internal->Server)
+    {
+    vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
+    QString linkName = pxm->GetLinkName(idx.row());
+    return linkName;
+    }
+  return QString();
 }
 
 QModelIndex pqLinksModel::findLink(vtkSMLink* link) const
@@ -368,9 +392,13 @@ QModelIndex pqLinksModel::findLink(vtkSMLink* link) const
 
 vtkSMLink* pqLinksModel::getLink(const QString& name) const
 {
-  vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
-  vtkSMLink* link = pxm->GetRegisteredLink(name.toAscii().data());
-  return link;
+  if (this->Internal->Server)
+    {
+    vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
+    vtkSMLink* link = pxm->GetRegisteredLink(name.toAscii().data());
+    return link;
+    }
+  return NULL;
 }
 
 vtkSMLink* pqLinksModel::getLink(const QModelIndex& idx) const
@@ -549,6 +577,7 @@ vtkSMProxyListDomain* pqLinksModel::proxyListDomain(
 class pqLinksModelObject::pqInternal
 {
 public:
+  QPointer<pqServer> Server;
   // a list of proxies involved in the link
   QList<pqProxy*> OutputProxies;
   QList<pqProxy*> InputProxies;
@@ -560,13 +589,15 @@ public:
 };
 
 
-pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p)
+pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p,
+  pqServer* server)
   : QObject(p)
 {
   this->Internal = new pqInternal;
   this->Internal->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->Server = server;
   this->Internal->Name = linkName;
-  vtkSMProxyManager* pxm = vtkSMProxy::GetProxyManager();
+  vtkSMProxyManager* pxm = server->proxyManager();
   this->Internal->Link = pxm->GetRegisteredLink(linkName.toAscii().data());
   this->Internal->Setting = false;
   this->Internal->Connection->Connect(this->Internal->Link, 
@@ -628,7 +659,7 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
 
 void pqLinksModelObject::remove()
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
   pxm->UnRegisterLink(this->name().toAscii().data());
 }
 

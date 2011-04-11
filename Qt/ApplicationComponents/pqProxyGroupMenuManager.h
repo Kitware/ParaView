@@ -77,16 +77,19 @@ public:
   /// Provides mechanism to explicitly remove a proxy to the menu.
   void removeProxy(const QString& xmlgroup, const QString& xmlname);
 
-  /// Forces a re-population of the menu. Any need to call this only after
-  /// addProxy() has been used to explicitly add entries.
-  void populateMenu();
-
   /// Returns a list of categories that have the "show_in_toolbar" attribute set
   /// to 1.
   QStringList getToolbarCategories() const;
 
   /// Returns the list of actions in a category.
   QList<QAction*> actions(const QString& category);
+
+  /// Attach an observer to proxy manager to monitor any proxy definition update
+  /// The detected proxy have to own a hint
+  ///     <ShowInMenu category=""/>
+  /// where those attribute are fully optional
+  void addProxyDefinitionUpdateListener(const QString& proxyGroupName);
+  void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 
 public slots:
   /// Load a configuration XML. It will find the elements with resourceTagName
@@ -95,8 +98,21 @@ public slots:
   /// pqApplicationCore::loadXML()
   void loadConfiguration(vtkPVXMLElement*);
 
+  /// Look for new proxy definition to add inside the menu
+  void lookForNewDefinitions();
+
+  /// Remove all ProxyDefinitionUpdate observers to active server
+  void removeProxyDefinitionUpdateObservers();
+
+  /// Update the list of ProxyDefinitionUpdate observers to  server
+  void addProxyDefinitionUpdateObservers();
+
   /// Enable/disable the menu and the actions.
   void setEnabled(bool enable);
+
+  /// Forces a re-population of the menu. Any need to call this only after
+  /// addProxy() has been used to explicitly add entries.
+  void populateMenu();
 
 signals:
   void triggered(const QString& group, const QString& name);

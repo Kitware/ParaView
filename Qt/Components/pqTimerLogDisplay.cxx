@@ -29,24 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqTimerLogDisplay.h"
+#include "ui_pqTimerLogDisplay.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 #include "pqSettings.h"
-
-#include "vtkClientServerStream.h"
-#include "vtkProcessModule.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVTimerInformation.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
 #include "QFile"
 #include "QPair"
 #include "QTextStream"
+#include <QtDebug>
 
-#include "ui_pqTimerLogDisplay.h"
 class pqTimerLogDisplayUi : public Ui::pqTimerLogDisplay {};
 
 //-----------------------------------------------------------------------------
@@ -110,6 +112,7 @@ pqTimerLogDisplay::pqTimerLogDisplay(QWidget *p)
   connect(this->ui->saveButton, SIGNAL(clicked(bool)),
           this, SLOT(save()));
 
+  this->LogThreshold = 0.0;
   this->setTimeThreshold(0.01f);
   this->setBufferLength(500);
   this->setEnable(true);
@@ -127,28 +130,29 @@ void pqTimerLogDisplay::refresh()
 {
   this->ui->log->clear();
 
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (!server)
+    {
+    qWarning() << "No active server located. Cannot refresh timer-log.";
+    return;
+    }
   vtkSmartPointer<vtkPVTimerInformation> timerInfo
     = vtkSmartPointer<vtkPVTimerInformation>::New();
 
   // Get information about the local process.
-  timerInfo->CopyFromObject(pm);
+  timerInfo->SetLogThreshold(this->LogThreshold);
+  timerInfo->CopyFromObject(NULL);
   this->addToLog("Local Process", timerInfo);
 
   // Get information about servers.
-  if (pm->GetClientMode())
+  if (server->isRemote())
     {
-    // TODO: When ParaView supports connections to multiple servers, we should
-    // report timing on all of them.
-    vtkIdType connectionId =
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID();
-
     // Clear out information by creating a new info object.
     timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
-    pm->GatherInformation(connectionId, vtkProcessModule::RENDER_SERVER,
-                          timerInfo, pm->GetProcessModuleID());
-    if (!pm->GetRenderClientMode(connectionId))
+    timerInfo->SetLogThreshold(this->LogThreshold);
+    server->session()->GatherInformation(
+      vtkPVSession::RENDER_SERVER, timerInfo, 0);
+    if (server->isRenderServerSeparate())
       {
       this->addToLog("Server", timerInfo);
       }
@@ -158,8 +162,9 @@ void pqTimerLogDisplay::refresh()
 
       // We just reported on the render server.  Now report on the data server.
       timerInfo = vtkSmartPointer<vtkPVTimerInformation>::New();
-      pm->GatherInformation(connectionId, vtkProcessModule::DATA_SERVER,
-                            timerInfo, pm->GetProcessModuleID());
+      timerInfo->SetLogThreshold(this->LogThreshold);
+      server->session()->GatherInformation(vtkPVSession::DATA_SERVER,
+        timerInfo, 0);
       this->addToLog("Data Server", timerInfo);
       }
     }
@@ -190,14 +195,18 @@ void pqTimerLogDisplay::addToLog(const QString &source,
 //-----------------------------------------------------------------------------
 void pqTimerLogDisplay::clear()
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "ResetLog"
-         << vtkClientServerStream::End;
-  // TODO: Reset timer on all servers.
-  pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (!server)
+    {
+    return;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
+  proxy->UpdateVTKObjects();
+  proxy->InvokeCommand("ResetLog");
+  proxy->Delete();
+
   this->refresh();
 }
 
@@ -222,19 +231,8 @@ void pqTimerLogDisplay::setTimeThreshold(float value)
 
 void pqTimerLogDisplay::setTimeThresholdById(int id)
 {
-
   this->ui->timeThreshold->setCurrentIndex(id);
-
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID()
-         << "SetLogThreshold" << ThresholdChoices[id].value
-         << vtkClientServerStream::End;
-  // TODO: Set value on all servers
-  pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
+  this->LogThreshold = ThresholdChoices[id].value;
   this->refresh();
 }
 
@@ -261,15 +259,18 @@ void pqTimerLogDisplay::setBufferLengthById(int id)
 {
   this->ui->bufferLength->setCurrentIndex(id);
 
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID()
-         << "SetLogBufferLength" << 2*LengthChoices[id].value
-         << vtkClientServerStream::End;
-  // TODO: Set value on all servers
-  pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (!server)
+    {
+    return;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
+  vtkSMPropertyHelper(proxy, "MaxEntries").Set(
+    2*LengthChoices[id].value);
+  proxy->UpdateVTKObjects();
+  proxy->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -282,14 +283,17 @@ void pqTimerLogDisplay::setEnable(bool state)
 {
   this->ui->enable->setChecked(state);
 
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "SetEnableLog" << (int)state
-         << vtkClientServerStream::End;
-  // TODO: Set value on all servers
-  pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (!server)
+    {
+    return;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
+  vtkSMPropertyHelper(proxy, "Enable").Set(state? 1:0);
+  proxy->UpdateVTKObjects();
+  proxy->Delete();
 }
 
 //-----------------------------------------------------------------------------

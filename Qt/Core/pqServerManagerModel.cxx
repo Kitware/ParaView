@@ -31,12 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqServerManagerModel.h"
 
-// Server Manager Includes.
-#include "vtkProcessModuleConnectionManager.h"
+#include "pqApplicationCore.h"
+#include "pqHelperProxyStateLoader.h"
+#include "pqInterfaceTracker.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
+#include "pqProxy.h"
+#include "pqRepresentation.h"
+#include "pqServer.h"
+#include "pqServerManagerModelInterface.h"
+#include "pqServerManagerObserver.h"
+#include "pqView.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
@@ -45,19 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QMap>
 #include <QtDebug>
-
-// ParaView Includes.
-#include "pqApplicationCore.h"
-#include "pqHelperProxyStateLoader.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqPluginManager.h"
-#include "pqProxy.h"
-#include "pqRepresentation.h"
-#include "pqServer.h"
-#include "pqServerManagerModelInterface.h"
-#include "pqServerManagerObserver.h"
-#include "pqView.h"
 
 //-----------------------------------------------------------------------------
 class pqServerManagerModel::pqInternal
@@ -102,6 +99,20 @@ pqServerManagerModel::pqServerManagerModel(
 pqServerManagerModel::~pqServerManagerModel()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::findServer(vtkSession* session) const
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return this->findServer(pm->GetSessionID(session));
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::findServer(vtkSMSession* session) const
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return this->findServer(pm->GetSessionID(session));
 }
 
 //-----------------------------------------------------------------------------
@@ -163,16 +174,19 @@ pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
 
 //-----------------------------------------------------------------------------
 pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
-  const pqServerManagerModel* const model, const QMetaObject& mo, 
-  vtkClientServerID id)
+  const pqServerManagerModel* const model,
+  const QMetaObject& mo, vtkTypeUInt32 id)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-    pm->GetObjectFromID(id));
-  if (proxy)
+  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
     {
-    return pqServerManagerModel::findItemHelper(
-      model, mo, proxy);
+    if (item && mo.cast(item))
+      {
+      pqProxy* proxy = qobject_cast<pqProxy*>(item);
+      if (proxy && proxy->getProxy()->GetGlobalID() == id)
+        {
+        return proxy;
+        }
+      }
     }
 
   return 0;
@@ -228,7 +242,7 @@ void pqServerManagerModel::findItemsHelper(const pqServerManagerModel *const mod
 void pqServerManagerModel::onProxyRegistered(const QString& group,
   const QString& name, vtkSMProxy* proxy)
 {
-  if (group.endsWith("_prototypes"))
+  if (group.endsWith("_prototypes") || proxy->GetSession() == NULL)
     {
     // Ignore prototype proxies.
     return;
@@ -244,12 +258,11 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     return;
     }
 
-  pqServer* server = this->findServer(proxy->GetConnectionID());
+  pqServer* server = this->findServer(proxy->GetSession());
 
-  // Warn and return if the server can't be found and connection ID is not null.
-  // If connection ID is null, then it must have been set explicitly by the user.
-  if (!server && 
-    proxy->GetConnectionID() != vtkProcessModuleConnectionManager::GetNullConnectionID())
+  // Warn and return if the server can't be found. This indicates some logic error in
+  // the application.
+  if (!server)
     {
     qDebug() << "Failed to locate server for newly registered proxy ("
       << group << ", " << name << ")";
@@ -265,7 +278,7 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
   pqProxy* item = 0;
 
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqServerManagerModelInterface* smi = 
@@ -371,7 +384,7 @@ void pqServerManagerModel::onProxyUnRegistered(const QString& group,
   // Verify if the proxy is registered under a different name in the same group.
   // If so, we are simply renaming the proxy.
   vtkSmartPointer<vtkStringList> names = vtkSmartPointer<vtkStringList>::New();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = proxy->GetProxyManager();
   pxm->GetProxyNames(group.toAscii().data(), proxy, names);
   for (int cc=0; cc < names->GetLength(); cc++)
     {

@@ -219,13 +219,12 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkIdType connId)
+vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkIdType vtkNotUsed(connId))
 {
   // Create a selection source proxy
   vtkSMProxyManager* pm = vtkSMProxyManager::GetProxyManager();
   vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
     pm->NewProxy("sources", "PedigreeIDSelectionSource"));
-  selectionSource->SetConnectionID(connId);
 
   // Fill the selection source with the selection
   vtkSMStringVectorProperty* p = vtkSMStringVectorProperty::SafeDownCast(
