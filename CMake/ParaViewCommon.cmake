@@ -150,7 +150,7 @@ IF(NOT PV_INSTALL_CMAKE_DIR)
   SET(PV_INSTALL_CMAKE_DIR ${PV_INSTALL_LIB_DIR}/CMake)
 ENDIF(NOT PV_INSTALL_CMAKE_DIR)
 IF(NOT PV_INSTALL_DOC_DIR)
-  SET(PV_INSTALL_DOC_DIR doc)
+  SET(PV_INSTALL_DOC_DIR share/doc/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DOC_DIR)
 
 #########################################################################
