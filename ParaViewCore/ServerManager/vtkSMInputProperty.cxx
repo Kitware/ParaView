@@ -95,7 +95,7 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
     assert(value->proxy_global_id_size() == value->port_number_size());
     int nbProxies = value->proxy_global_id_size();
     vtkstd::set<vtkTypeUInt32> newProxyIdList;
-    vtkstd::set<vtkTypeUInt32>::const_iterator proxyIdIter;
+    vtkstd::set<vtkTypeUInt32>::iterator proxyIdIter;
     vtkstd::map<vtkTypeUInt32,int> proxyIdPortMap;
 
     // Fill indexed proxy id list
