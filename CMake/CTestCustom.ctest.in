@@ -123,6 +123,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore protobuf generated code warning
   "vtkPVMessage.pb.h"
+  "vtkSMMessage.h*pragma GCC diagnostic"
   "/google/protobuf/"
   )
 
