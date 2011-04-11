@@ -106,6 +106,12 @@ public:
   int IsInDomains();
 
   // Description:
+  // Overload of IsInDomains() that provides a mechanism to return the first
+  // domain that fails the check. \c domain is set to NULL when all domain
+  // checks pass.
+  int IsInDomains(vtkSMDomain** domain);
+
+  // Description:
   // Overloaded to break the reference loop caused by the 
   // internal domain iterator.
   virtual void UnRegister(vtkObjectBase* obj);

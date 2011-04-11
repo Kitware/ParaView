@@ -100,11 +100,21 @@ void vtkSMProperty::UnRegister(vtkObjectBase* obj)
 //---------------------------------------------------------------------------
 int vtkSMProperty::IsInDomains()
 {
+  return this->IsInDomains(NULL);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::IsInDomains(vtkSMDomain** ptr)
+{
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
     if (!this->DomainIterator->GetDomain()->IsInDomain(this))
       {
+      if (ptr)
+        {
+        *ptr = this->DomainIterator->GetDomain();
+        }
       return 0;
       }
     this->DomainIterator->Next();
