@@ -670,6 +670,11 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
     vtkPVXMLElement* hints = iter->GetProxyHints();
     if(hints != NULL)
       {
+      if (hints->FindNestedElementByName("ReaderFactory") != NULL)
+        {
+        // skip readers.
+        continue;
+        }
       vtkNew<vtkCollection> collection;
       hints->FindNestedElementByName("ShowInMenu", collection.GetPointer());
       int size = collection->GetNumberOfItems();
