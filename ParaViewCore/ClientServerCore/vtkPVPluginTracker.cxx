@@ -466,7 +466,7 @@ bool vtkPVPluginTracker::GetPluginLoaded(unsigned int index)
 if (index >= this->GetNumberOfPlugins())
     {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return false;
     }
   return (*this->PluginsList)[index].Plugin != NULL;
 }
@@ -477,7 +477,11 @@ bool vtkPVPluginTracker::GetPluginAutoLoad(unsigned int index)
   if (index >= this->GetNumberOfPlugins())
     {
     vtkWarningMacro("Invalid index: " << index);
+<<<<<<< HEAD
     return NULL;
+=======
+    return false;
+>>>>>>> origin/master
     }
   return (*this->PluginsList)[index].AutoLoad;
 }

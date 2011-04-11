@@ -40,7 +40,20 @@ struct vtkSMDataTypeDomainInternals
 //*****************************************************************************
 namespace vtkSMDataTypeDomainCache
 {
+  static int ReferenceCount = 0;
   static vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
+  static void AddReference()
+    {
+    ReferenceCount++;
+    }
+  static void RemoveReference()
+    {
+    ReferenceCount--;
+    if (ReferenceCount==0)
+      {
+      DataObjectMap.clear();
+      }
+    }
 
   // Only instanciate classes once and use cache after...
   static vtkDataObject* GetDataObjectOfType(const char* classname)
@@ -96,12 +109,20 @@ vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
   this->DTInternals = new vtkSMDataTypeDomainInternals;
   this->CompositeDataSupported = 1;
+<<<<<<< HEAD
+=======
+  vtkSMDataTypeDomainCache::AddReference();
+>>>>>>> origin/master
 }
 
 //---------------------------------------------------------------------------
 vtkSMDataTypeDomain::~vtkSMDataTypeDomain()
 {
   delete this->DTInternals;
+<<<<<<< HEAD
+=======
+  vtkSMDataTypeDomainCache::RemoveReference();
+>>>>>>> origin/master
 }
 
 //---------------------------------------------------------------------------

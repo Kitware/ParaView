@@ -206,6 +206,7 @@ protected:
   vtkIdType MaxSessionId;
 
   class vtkInternals;
+protected:
   vtkInternals* Internals;
 
   // vtkSessionIterator needs access to vtkInternals to be able to iterate over

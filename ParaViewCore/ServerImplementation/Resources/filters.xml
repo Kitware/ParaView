@@ -2214,29 +2214,6 @@ attributes of the fragments.
     </SourceProxy>-->
 
     <!-- ==================================================================== -->
-   <SourceProxy name="AMRDualMeshExtractor" class="vtkAMRDualMeshExtractor" 
-        label="Extract AMR Dual-Mesh" >
-        <Documentation 
-          short_help="Extracts the dual of the AMR dataset."
-          long_help="Extracts the dual of the AMR dataset." >       
-        </Documentation>
-        <InputProperty
-          name="Input"
-          command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources" />
-            <Group name="filters" />
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkHierarchicalBoxDataSet"/>
-          </DataTypeDomain>
-         <Documentation>
-            This property specifies the input of the filter.
-         </Documentation>
-        </InputProperty>
-   </SourceProxy>
-   
-    <!-- ==================================================================== -->
     <SourceProxy name="AMRDualClip" class="vtkPVAMRDualClip" label="AMR Dual Clip">
       <Documentation
         short_help="Clip with decimation."

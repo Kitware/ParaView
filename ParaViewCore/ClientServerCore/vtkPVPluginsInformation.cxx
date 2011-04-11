@@ -310,7 +310,7 @@ bool vtkPVPluginsInformation::GetPluginLoaded(unsigned int cc)
     {
     return (*this->Internals)[cc].Loaded;
     }
-  return NULL;
+  return false;
 }
 
 //----------------------------------------------------------------------------

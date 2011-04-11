@@ -294,7 +294,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
 
   while (this->AbortPendingConnectionFlag == false && controller == NULL)
     {
-    vtkClientSocket* client_socket;
+    vtkClientSocket* client_socket = NULL;
     if (nonblocking)
       {
       client_socket = server_socket->WaitForConnection(100);
