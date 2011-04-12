@@ -986,7 +986,7 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
       updateExtent);
     outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
       wholeExtent);
-    double res = 1.0;
+    double res = this->Resolution;
     if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
       {
       res = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
