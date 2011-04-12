@@ -1,6 +1,120 @@
 <ServerManagerConfiguration>
 
   <ProxyGroup name="internal_sources">
+  
+  
+   <!-- ENZO AMR Core Reader definition -->
+  <SourceProxy name="EnzoReaderCore" 
+                class="vtkAMREnzoReader"
+                label="Enzo AMR Reader">
+      <Documentation
+          short_help="Read hierarchical box dataset from an Enzo file."
+          long_help="Read hierarchical box dataset from an Enzo file.">
+          This Enzo reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+   
+      <!-- Define Enzo Filename -->   
+      <StringVectorProperty
+          name="FileName"
+          command="SetFileName"
+          animateable="0" 
+          number_of_elements="1">
+          
+          <FileListDomain name="files" />
+          <Documentation>
+            This property specifies the Enzo file name
+          </Documentation>        
+     </StringVectorProperty>
+  
+     <!--  Define MaxLevel property -->
+     <IntVectorProperty
+        name="Level"
+        command="SetMaxLevel"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          This property specifies the desired level of
+          resolution that will be visible.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Set whether or not Particles are loaded -->
+     <IntVectorProperty
+        name="LoadParticles"
+        command="SetLoadParticles"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether or not particles
+          are loaded
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Cell"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="PointArrays">
+       <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList" />
+        </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+          This property lists which node-based arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+     
+     <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="AMR Enzo Files" />
+     </Hints>
+     
+   </SourceProxy>
+   <!-- END ENZO AMR Core Reader definition -->
+  
+   
    <SourceProxy name="AVSucdReader"
                 class="vtkAVSucdReader"
                 label="AVS UCD Reader">
@@ -2484,6 +2598,71 @@
 
   <ProxyGroup name="sources">
 
+   <!-- Enzo Reader  -->
+   <SourceProxy name="EnzoReader"
+        class="vtkFileSeriesReader"
+        label="Enzo Reader"
+        file_name_method="SetFileName"
+        si_class="vtkSIFileSeriesReaderProxy" >
+       
+       <Documentation
+          short_help="Read hierarchical box dataset from an Enzo file."
+          long_help="Read hierarchical box dataset from an Enzo file.">
+          This Enzo reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+      
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LoadParticles" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+        
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="AMR Enzo Files" />
+    </Hints>
+     
+  </SourceProxy>
+  <!--  END Enzo Reader -->
+  
    <SourceProxy name="DEMReader"
                 class="vtkDEMReader"
                 label="DEM Reader">
@@ -3903,66 +4082,6 @@
      </Hints>
    </SourceProxy>
 
-   <SourceProxy name="EnzoReader"
-                class="vtkEnzoReader"
-                label="Enzo Reader">
-     <Documentation
-       short_help="Read multi-block dataset from an Enzo file."
-       long_help="Read multi-block dataset from an Enzo file.">
-         This Enzo reader loads data stored in Enzo format. The output of this reader is a multi-block dataset.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-            This property specifies the file name for the Enzo reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-       name="BlockOutputType"
-       command="SetBlockOutputType"
-       number_of_elements="1"
-       default_values="0"
-       animateable="0">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Image Data"/>
-         <Entry value="1" text="Rectilinear Grid"/>
-       </EnumerationDomain>
-       <Documentation>
-         The property indicates the output type of each block, either vtkImageData (by default) or vtkRectilinearGrid.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-       name="MaxLevel"
-       command="SetMaxLevel"
-       number_of_elements="1"
-       default_values="100" >
-       <IntRangeDomain name="range"/>
-       <Documentation>
-         Do not blocks above this level.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="LoadParticles"
-       command="SetLoadParticles"
-       number_of_elements="1"
-       default_values="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-         Load particles when on.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="boundary hierarchy"
-          file_description="Enzo Files" />
-     </Hints>
-   </SourceProxy>
 
    <SourceProxy name="FlashReader"
                 class="vtkFlashReader"

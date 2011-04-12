@@ -403,6 +403,8 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkViewsCS
   vtkCharts
   vtkChartsCS
+  vtkAMR
+  vtkAMRCS
   KWCommon
   vtksys
   ${KIT_LIBS}

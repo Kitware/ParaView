@@ -289,7 +289,7 @@ SET(GUI_CONFIG_FILES
 IF(NOT CMAKE_CROSSCOMPILING)
   add_executable_with_forwarding(PV_EXE_SUFFIX
     vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
-  TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager)
+  TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager )
   EXPORT(TARGETS vtkSMExtractDocumentation${PV_EXE_SUFFIX} FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
 ENDIF(NOT CMAKE_CROSSCOMPILING)
 
