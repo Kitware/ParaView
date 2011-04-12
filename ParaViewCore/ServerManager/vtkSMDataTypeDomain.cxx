@@ -109,20 +109,14 @@ vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
   this->DTInternals = new vtkSMDataTypeDomainInternals;
   this->CompositeDataSupported = 1;
-<<<<<<< HEAD
-=======
   vtkSMDataTypeDomainCache::AddReference();
->>>>>>> origin/master
 }
 
 //---------------------------------------------------------------------------
 vtkSMDataTypeDomain::~vtkSMDataTypeDomain()
 {
   delete this->DTInternals;
-<<<<<<< HEAD
-=======
   vtkSMDataTypeDomainCache::RemoveReference();
->>>>>>> origin/master
 }
 
 //---------------------------------------------------------------------------
