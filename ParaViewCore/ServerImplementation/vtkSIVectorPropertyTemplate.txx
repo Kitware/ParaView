@@ -245,14 +245,14 @@ namespace
 #endif
 
   // This absurdity is needed for cases where vtkIdType == int.
-  template <class T, class TARG1, class TARG2, class force_idtype>
-  void AppendValues(TARG1& arg1, const TARG2& arg2)
+  template <class TARG1, class TARG2, class force_idtype>
+  void AppendValues(TARG1& arg1, const TARG2& arg2, const force_idtype&)
     {
     arg1 << arg2;
     }
 
-  template <class T, class TARG1, class TARG2, bool>
-  void AppendValues(TARG1& arg1, const TARG2& arg2)
+  template<class TARG1, class TARG2>
+  void AppendValues(TARG1& arg1, const TARG2& arg2, const bool&)
     {
     OperatorIdType(arg1, arg2);
     }
@@ -284,7 +284,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
   const Variant *variant = &prop->value();
   vtkstd::vector<T> values;
 
-  AppendValues<T, vtkstd::vector<T>, Variant, force_idtype>(values, *variant);
+  AppendValues(values, *variant, force_idtype());
 
   if(values.size() > 0)
     {
@@ -334,15 +334,13 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Pull(vtkSMMessage* message)
     }
 
   vtkstd::vector<T> values;
-  AppendValues<T, vtkstd::vector<T>, vtkClientServerStream, force_idtype>(
-    values, res);
+  AppendValues(values, res, force_idtype());
 
   // now add 'values' to the message.
   ProxyState_Property *prop = message->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
 
-  AppendValues<T, Variant, vtkstd::vector<T>, force_idtype>(
-    *prop->mutable_value(), values);
+  AppendValues(*prop->mutable_value(), values, force_idtype());
   return true;
 }
 
