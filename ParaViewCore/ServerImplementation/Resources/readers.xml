@@ -2,7 +2,117 @@
 
   <ProxyGroup name="internal_sources">
   
+   <!-- FLASH AMR Core Reader definition -->
+   <SourceProxy name="FlashReaderCore" 
+                class="vtkAMRFlashReader"
+                label="Flash AMR Reader">
+      <Documentation
+          short_help="Read hierarchical box dataset from a Flash dataset."
+          long_help="Read hierarchical box dataset from a Flash dataset.">
+          This Flash reader loads data stored in Flash format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+   
+      <!-- Define Flas Filename -->   
+      <StringVectorProperty
+          name="FileName"
+          command="SetFileName"
+          animateable="0" 
+          number_of_elements="1">
+          
+          <FileListDomain name="files" />
+          <Documentation>
+            This property specifies the Flash file name
+          </Documentation>        
+     </StringVectorProperty>
   
+     <!--  Define MaxLevel property -->
+     <IntVectorProperty
+        name="Level"
+        command="SetMaxLevel"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          This property specifies the desired level of
+          resolution that will be visible.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Set whether or not Particles are loaded -->
+     <IntVectorProperty
+        name="LoadParticles"
+        command="SetLoadParticles"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether or not particles
+          are loaded
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Cell"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="PointArrays">
+       <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList" />
+        </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+          This property lists which node-based arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+     
+     <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="AMR Flash dataset" />
+     </Hints>
+     
+   </SourceProxy>
+   <!-- FLASH AMR Core Reader definition -->
+   
    <!-- ENZO AMR Core Reader definition -->
   <SourceProxy name="EnzoReaderCore" 
                 class="vtkAMREnzoReader"
@@ -2597,7 +2707,72 @@
   </ProxyGroup>
 
   <ProxyGroup name="sources">
-
+  
+   <!--  Flash Reader -->
+   <SourceProxy name="FlashReader"
+        class="vtkFileSeriesReader"
+        label="Flash Reader"
+        file_name_method="SetFileName"
+        si_class="vtkSIFileSeriesReaderProxy" >
+       
+       <Documentation
+          short_help="Read hierarchical box dataset from a Flash dataset."
+          long_help="Read hierarchical box dataset from a Flash dataset.">
+          This Flash reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+      
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FlashReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LoadParticles" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+        
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="AMR Flash Files" />
+    </Hints>
+     
+  </SourceProxy>
+   <!--  END Flash Reader -->
+   
    <!-- Enzo Reader  -->
    <SourceProxy name="EnzoReader"
         class="vtkFileSeriesReader"
@@ -4083,7 +4258,7 @@
    </SourceProxy>
 
 
-   <SourceProxy name="FlashReader"
+   <SourceProxy name="FlashReader2"
                 class="vtkFlashReader"
                 label="Flash Reader">
      <Documentation
