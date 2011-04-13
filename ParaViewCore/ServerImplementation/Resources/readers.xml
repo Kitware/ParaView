@@ -32,7 +32,7 @@
         name="Level"
         command="SetMaxLevel"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <IntRangeDomain name="range" min="0" max="100" />
         <Documentation>
           This property specifies the desired level of
