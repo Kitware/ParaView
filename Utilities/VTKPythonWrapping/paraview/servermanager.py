@@ -2014,7 +2014,7 @@ def LoadPlugin(filename,  remote=True, session=None):
         session = ActiveConnection
     if not session:
         raise RuntimeError, "Cannot load a plugin without a session."
-    plm = session.GetSession().GetPluginManager()
+    plm = session.Session.GetPluginManager()
 
     if remote:
         status = plm.LoadRemotePlugin(filename)

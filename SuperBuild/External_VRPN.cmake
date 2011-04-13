@@ -13,11 +13,17 @@ ExternalProject_Add(VRPN
   CMAKE_CACHE_ARGS
     -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
-    -DCMAKE_BUILD_TYPE:STRING=OFF
+    -DBUILD_SHARED_LIBS:BOOL=OFF
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     ${pv_tpl_compiler_args}
   CMAKE_ARGS
     -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
 
-set(VRPN_LIBRARY ${VRPN_install}/lib/vrpn${_LINK_LIBRARY_SUFFIX})
+if(WIN32)
+  set(VRPN_LIBRARY ${VRPN_install}/lib/vrpn${_LINK_LIBRARY_SUFFIX})
+else()
+  set(VRPN_LIBRARY ${VRPN_install}/lib/libvrpn.a)
+endif()
+
 set(VRPN_INCLUDE_DIR ${VRPN_install}/include)

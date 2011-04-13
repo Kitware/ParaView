@@ -150,7 +150,7 @@ IF(NOT PV_INSTALL_CMAKE_DIR)
   SET(PV_INSTALL_CMAKE_DIR ${PV_INSTALL_LIB_DIR}/CMake)
 ENDIF(NOT PV_INSTALL_CMAKE_DIR)
 IF(NOT PV_INSTALL_DOC_DIR)
-  SET(PV_INSTALL_DOC_DIR doc)
+  SET(PV_INSTALL_DOC_DIR share/doc/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DOC_DIR)
 
 #########################################################################
@@ -195,12 +195,12 @@ SET(VTK_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 # This will disable installing of vtkpython executable and the vtk python
 # module. This is essential since we don't want to conflict with kosher VTK
 # installations.
-SET (VTK_INSTALL_NO_PYTHON 1)
-SET (VTK_INSTALL_NO_VTKPYTHON 1)
+SET (VTK_INSTALL_NO_PYTHON ON)
+SET (VTK_INSTALL_NO_VTKPYTHON ON)
 # Tell VTK to install python extension modules using CMake so they get installed
 # with the other python extension modules ParaView creates.
-SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
-SET (VTK_INSTALL_NO_QT_PLUGIN 1)
+SET (VTK_INSTALL_PYTHON_USING_CMAKE ON)
+SET (VTK_INSTALL_NO_QT_PLUGIN ON)
 SET (VTK_INSTALL_NO_LIBRARIES ${PV_INSTALL_NO_LIBRARIES})
 
 # KWCommon config
