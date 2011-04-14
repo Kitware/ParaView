@@ -78,6 +78,8 @@ public:
   /// remove an extra interface
   void removeInterface(QObject* iface);
 
+  /// initializes the tracker using existing plugins.
+  void initialize();
 signals:
   /// fired every time an interface is registered either from a plugin on
   /// manually.
