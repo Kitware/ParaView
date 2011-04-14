@@ -41,9 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqInterfaceTracker::pqInterfaceTracker(QObject* parentObject)
   : Superclass(parentObject)
 {
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+
   // Register with vtkPVPluginTracker so that when new plugin is loaded, we can
   // locate and load any Qt-interface implementations provided by the plugin.
-  this->ObserverID = vtkPVPluginTracker::GetInstance()->AddObserver(
+  this->ObserverID = tracker->AddObserver(
     vtkCommand::RegisterEvent, this, &pqInterfaceTracker::onPluginLoaded);
 }
 
@@ -70,6 +72,19 @@ pqInterfaceTracker::~pqInterfaceTracker()
     }
 
   vtkPVPluginTracker::GetInstance()->RemoveObserver(this->ObserverID);
+}
+
+//-----------------------------------------------------------------------------
+void pqInterfaceTracker::initialize()
+{
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+
+  // Process any already loaded plugins. These are typically the plugins that
+  // got autoloaded when the application started.
+  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
+    {
+    this->onPluginLoaded(NULL, 0, tracker->GetPlugin(cc));
+    }
 }
 
 //-----------------------------------------------------------------------------
