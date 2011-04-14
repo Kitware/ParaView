@@ -1,23 +1,22 @@
-// given .vtk files as arguments, loads the meshes and puts them in a scene
+// given .vtk polydata files as arguments, loads the meshes and puts them in a scene
 // rendered using Manta
 
 #include <stdlib.h>
 
 // include the required header files for the VTK classes we are using.
-#include "vtkPolyDataMapper.h"
-#include "vtkRenderWindow.h"
-#include "vtkCamera.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkPolyDataReader.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkLight.h"
-#include "vtkRegularPolygonSource.h"
-#include "vtkSphereSource.h"
-
+#include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaLight.h"
 #include "vtkMantaProperty.h"
+#include "vtkMantaRenderer.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkPolyDataReader.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 
-#include <Engine/Control/RTRT.h>
+//#include <Engine/Control/RTRT.h>
 
 
 #define NUM_COLORS 2
@@ -33,82 +32,17 @@ double banana[] = {0.8900, 0.8100, 0.3400};
 double slate_grey[] = {0.4392, 0.5020, 0.5647};
 double lamp_black[] = {0.1800, 0.2800, 0.2300};
 
-void addCheckerboard(vtkRenderer* renderer)
-{
-    double center[3] = {0.5, 0.0, 0.5};
-    int numSquares = 20;
-    double length = 0.25;
-    double start_x = center[0] - length*numSquares / 2.0;
-    double start_z = center[2] - length*numSquares / 2.0;
-    double orig_z = start_z;
-    int i, j;
-
-    for(i=0; i<numSquares; i++)
-    {
-        for(j=0; j<numSquares; j++)
-        {
-            vtkRegularPolygonSource* poly = vtkRegularPolygonSource::New();
-            poly->SetNumberOfSides(4);
-            poly->SetCenter(start_x+length/2.0, 0.3, start_z+length/2.0);
-            poly->SetNormal(0, 1, 0);
-            poly->SetRadius(0.7071*length);
-
-            vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-            mapper->SetInputConnection(poly->GetOutputPort());
-            vtkActor* actor = vtkActor::New();
-            actor->SetMapper(mapper);
-            actor->SetOrigin(actor->GetCenter());
-            actor->RotateY(45);
-
-            actor->GetProperty()->SetOpacity(1.0);
-            actor->GetProperty()->SetSpecularPower(100);
-
-            int k = (i+j) % 2;
-            actor->GetProperty()->SetDiffuseColor(checkerColors[k][0],
-                                                  checkerColors[k][1],
-                                                  checkerColors[k][2]);
-
-            renderer->AddActor(actor);
-
-            start_z += length;
-        }
-        start_x += length;
-        start_z = orig_z;
-    }
-}
-
-void addSphere(vtkRenderer* renderer)
-{
-    vtkSphereSource* sphere = vtkSphereSource::New();
-    sphere->SetRadius(0.2);
-    sphere->SetThetaResolution(100);
-    sphere->SetPhiResolution(100);
-
-    vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-    mapper->SetInputConnection(sphere->GetOutputPort());
-    vtkActor* actor = vtkActor::New();
-    actor->SetMapper(mapper);
-
-    vtkMantaProperty* property = vtkMantaProperty::SafeDownCast(
-                                                         actor->GetProperty());
-    property->SetDiffuseColor(0.9, 0.9, 0.9);
-    property->SetOpacity(0.5);
-    property->SetMaterialType("thindielectric");
-
-    renderer->AddActor(actor);
-}
-
 int main(int argc, char** argv)
 {
     int i;
 
     if(argc < 2)
-    {
-        printf("usage: isosurface <file1> <file2> ...\n");
-        printf("Only .vtk files are supported\n");
-        printf("exiting...\n");
-        exit(-1);
-    }
+      {
+      printf("usage: %s <file1> <file2> ...\n", argv[0]);
+      printf("Only .vtk polygonal files are supported\n");
+      printf("exiting...\n");
+      exit(-1);
+      }
 
     // all arguments should be filenames to .vtk files
     int numInputs = argc - 1;
@@ -121,28 +55,28 @@ int main(int argc, char** argv)
     }
 
     // load the .vtk files containing geometry information
-    vtkPolyDataReader** readers = (vtkPolyDataReader**)malloc(
-                                        sizeof(vtkPolyDataReader*)*numInputs);
+    vtkPolyDataReader** readers = (vtkPolyDataReader**)malloc
+      (sizeof(vtkPolyDataReader*)*numInputs);
     for(i=0; i<numInputs; i++)
     {
         readers[i] = vtkPolyDataReader::New();
         readers[i]->SetFileName(filenames[i]);
     }
 
-    vtkPolyDataMapper** dataMappers =
-             (vtkPolyDataMapper**)malloc(sizeof(vtkPolyDataMapper*)*numInputs);
+    vtkMantaPolyDataMapper** dataMappers =
+      (vtkMantaPolyDataMapper**)malloc(sizeof(vtkMantaPolyDataMapper*)*numInputs);
     for(i=0; i<numInputs; i++)
     {
-        dataMappers[i] = vtkPolyDataMapper::New();
+        dataMappers[i] = vtkMantaPolyDataMapper::New();
         dataMappers[i]->SetInputConnection(readers[i]->GetOutputPort());
         dataMappers[i]->ScalarVisibilityOff();
     }
 
     // create actors for each file
-    vtkActor** actors=(vtkActor**)malloc(sizeof(vtkActor*)*numInputs);
+    vtkMantaActor** actors=(vtkMantaActor**)malloc(sizeof(vtkMantaActor*)*numInputs);
     for(i=0; i<numInputs; i++)
     {
-        actors[i] = vtkActor::New();
+        actors[i] = vtkMantaActor::New();
         actors[i]->SetMapper(dataMappers[i]);
 
         // the index of the color to use
@@ -163,24 +97,20 @@ int main(int argc, char** argv)
     }
 
     // create the renderer
-    vtkRenderer *renderer = vtkRenderer::New();
+    vtkMantaRenderer *renderer = vtkMantaRenderer::New();
     for(i=0; i<numInputs; i++)
     {
         renderer->AddActor(actors[i]);
     }
 
-    // add checkerboard
-    //addCheckerboard(renderer);
-    //addSphere(renderer);
+    renderer->SetBackground(slate_grey[0], slate_grey[1], slate_grey[2]);
 
-    renderer->SetBackground(slate_grey);
-
-    vtkCamera *cam = vtkCamera::New();
+    vtkMantaCamera *cam = vtkMantaCamera::New();
     renderer->SetActiveCamera(cam);
     renderer->ResetCamera();
 
     // create lights
-    vtkLight *light1 = vtkLight::New();
+    vtkMantaLight *light1 = vtkMantaLight::New();
     light1->PositionalOn();
     light1->SetPosition(renderer->GetActiveCamera()->GetPosition());
     light1->SetFocalPoint(renderer->GetActiveCamera()->GetFocalPoint());
@@ -189,7 +119,7 @@ int main(int argc, char** argv)
     renderer->SetLightFollowCamera(1);
     renderer->AddLight(light1);
 
-    vtkLight *light2 = vtkLight::New();
+    vtkMantaLight *light2 = vtkMantaLight::New();
     light2->PositionalOn();
     light2->SetPosition(1, 1, 0);
     light2->SetFocalPoint(0, 0, 0);
