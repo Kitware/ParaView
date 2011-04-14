@@ -58,4 +58,4 @@ IF ( VTK_USE_MPI )
     -T ${PROJECT_BINARY_DIR}/Testing/Temporary
     -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MantaBenchmark.png )
 
-ENDIF (VTK_USE_PARALLEL)
+ENDIF (VTK_USE_MPI)
