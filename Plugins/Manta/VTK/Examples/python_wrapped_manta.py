@@ -1,8 +1,8 @@
 # This example demonstrates the python wrapping of vtkManta classes.
-# In order to run this example, first be sure that the python wrapping 
-# of VTK is working, either using vtkpython or the vanilla python interpreter. 
-# Then you must set the 'PYTHONPATH' environment variable to where the 
-# library files (libvtkMantaPythonD.so, libvtkMantaPython.so, and 
+# In order to run this example, first be sure that the python wrapping
+# of VTK is working, either using vtkpython or the vanilla python interpreter.
+# Then you must set the 'PYTHONPATH' environment variable to where the
+# library files (libvtkMantaPythonD.so, libvtkMantaPython.so, and
 # libvtkManta.so) are located.
 from vtk import *
 from libvtkMantaPython import *

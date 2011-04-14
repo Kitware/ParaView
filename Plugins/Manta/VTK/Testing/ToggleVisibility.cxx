@@ -1,3 +1,5 @@
+// this program tests toggling visibility of objects
+
 #include "vtkActor.h"
 #include "vtkConeSource.h"
 #include "vtkCylinderSource.h"
@@ -10,8 +12,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSphereSource.h"
-
-// this program tests toggling visibility of objects
 
 bool useGL = false;
 
@@ -140,6 +140,8 @@ int main( int argc, char* argv[] )
     renWin->Render();
     }
 
+  int retVal = vtkRegressionTestImage( renWin );
+
   cone->Delete();
   coneMapper->Delete();
   coneActor->Delete();
@@ -155,5 +157,5 @@ int main( int argc, char* argv[] )
   renderer->Delete();
   renWin->Delete();
 
-  return 0;
+  return !retVal;
 }

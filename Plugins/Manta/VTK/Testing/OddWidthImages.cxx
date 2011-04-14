@@ -1,9 +1,13 @@
+/*
+Tests whether we can give manta non aligned image sizes without getting staircases back.
+*/
+
 #include "vtkConeSource.h"
 #include "vtkSphereSource.h"
 #include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkRenderer.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRegressionTestImage.h"
@@ -27,10 +31,10 @@ int main( int argc, char* argv[] )
   cone->SetHeight( objRad * 2 );
   cone->SetResolution( objRes );
 
-  vtkPolyDataMapper * coneMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * coneMapper = vtkMantaPolyDataMapper::New();
   coneMapper->SetInputConnection( cone->GetOutputPort() );
   
-  vtkActor * coneActor = vtkActor::New();
+  vtkMantaActor * coneActor = vtkMantaActor::New();
   coneActor->SetMapper( coneMapper );
   coneActor->AddPosition( -objRad * 3.0, 0.0, 0.0 );
   coneActor->RotateZ( 90.0 );
@@ -42,10 +46,10 @@ int main( int argc, char* argv[] )
   sphere->SetThetaResolution( objRes );
   sphere->SetPhiResolution  ( objRes );
 
-  vtkPolyDataMapper * sphereMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * sphereMapper = vtkMantaPolyDataMapper::New();
   sphereMapper->SetInputConnection( sphere->GetOutputPort() );
   
-  vtkActor * sphereActor = vtkActor::New();
+  vtkMantaActor * sphereActor = vtkMantaActor::New();
   sphereActor->SetMapper( sphereMapper );
   
   // cylinder
@@ -55,13 +59,13 @@ int main( int argc, char* argv[] )
   cylinder->SetHeight( objRad * 2 );
   cylinder->SetResolution( objRes );
 
-  vtkPolyDataMapper * cylinderMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * cylinderMapper = vtkMantaPolyDataMapper::New();
   cylinderMapper->SetInputConnection( cylinder->GetOutputPort() );
   
-  vtkActor * cylinderActor = vtkActor::New();
+  vtkMantaActor * cylinderActor = vtkMantaActor::New();
   cylinderActor->SetMapper( cylinderMapper );
   
-  vtkRenderer * renderer = vtkRenderer::New();
+  vtkMantaRenderer * renderer = vtkMantaRenderer::New();
   renderer->SetBackground( 0.0, 0.0, 1.0 );
   renderer->AddActor( coneActor );
   renderer->AddActor( sphereActor );

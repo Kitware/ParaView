@@ -6,7 +6,7 @@ wishing to create their own VTK classes locally.
 #define __@PROJECT_NAME@Configure_h
 
 // Define @PROJECT_NAME@_SHARED if the library was built shared.
-#if @VTKMANTA_BUILD_SHARED_LIBS_CONFIG@
+#if @BUILD_SHARED_LIBS@
 # define @PROJECT_NAME@_SHARED
 #endif
 

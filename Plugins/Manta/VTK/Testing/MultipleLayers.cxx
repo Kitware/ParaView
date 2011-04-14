@@ -6,12 +6,12 @@
 
 #include "vtkPolyData.h"
 #include "vtkAppendPolyData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkProperty.h"
-#include "vtkCamera.h"
-#include "vtkLight.h"
-#include "vtkRenderer.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaProperty.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaLight.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorEventRecorder.h"
@@ -24,11 +24,6 @@
 // * rendering of hybrid vertices+lines vtkpolyData objects
 //
 // * image compositing between multiple renderers on one or two layers
-//   and the following #define _MULTI_RENDERS_ needs to be turned ON
-
-//#define _RECORD_EVENTS_ // ON only for initial recording and OFF for formal testing
-//#define _VTKMANTA_MODE_ // OFF for pure OpenGL rendering
-#define _MULTI_RENDERS_
 
 double blue[]   = { 0.0000, 0.0000, 0.8000 };
 double black[]  = { 0.0000, 0.0000, 0.0000 };
@@ -60,7 +55,7 @@ int main( int argc, char* argv[] )
 
   if ( invalidCmd )
     {
-    cerr << "multiRens ${vtkManta_source_directory}"
+    cerr << argv[0] << " ${vtkManta_source_directory}"
          << "/examples/multiRensEvents.log [-I]" << endl;
     return 1;
     }
@@ -188,10 +183,10 @@ int main( int argc, char* argv[] )
   apend->AddInput( lines );
 
   // hybrid mapper and actor
-  vtkPolyDataMapper* hybridMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper* hybridMapper = vtkMantaPolyDataMapper::New();
   hybridMapper->SetInputConnection( apend->GetOutputPort() );
   hybridMapper->ScalarVisibilityOff();
-  vtkActor* hybridActor = vtkActor::New();
+  vtkMantaActor* hybridActor = vtkMantaActor::New();
   hybridActor->SetMapper( hybridMapper );
   hybridActor->GetProperty()->SetDiffuseColor( tomato );
   hybridActor->GetProperty()->SetSpecular( 0.4 );
@@ -200,10 +195,10 @@ int main( int argc, char* argv[] )
   hybridActor->GetProperty()->SetPointSize( 32.0 );
 
   // cube mapper and actor
-  vtkPolyDataMapper* cubeMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper* cubeMapper = vtkMantaPolyDataMapper::New();
   cubeMapper->SetInput( cube );
   cubeMapper->ScalarVisibilityOff();
-  vtkActor* cubeActor = vtkActor::New();
+  vtkMantaActor* cubeActor = vtkMantaActor::New();
   cubeActor->SetMapper( cubeMapper );
   cubeActor->GetProperty()->SetDiffuseColor( banana );
   cubeActor->GetProperty()->SetSpecular( 0.4 );
@@ -211,39 +206,26 @@ int main( int argc, char* argv[] )
   cubeActor->GetProperty()->SetOpacity( 1.0 );
 
   // add a light for shadows
-  vtkLight*    light   = vtkLight::New();
+  vtkMantaLight*    light   = vtkMantaLight::New();
   light->SetLightTypeToCameraLight();
-  vtkCamera*   camera  = vtkCamera::New();
-  vtkRenderer* cubeRen = vtkRenderer::New();
+  vtkMantaCamera*   camera  = vtkMantaCamera::New();
+  vtkMantaRenderer* cubeRen = vtkMantaRenderer::New();
 
-# ifdef _MULTI_RENDERS_
-
-  // renderer #0
-  vtkRenderer* hybridRen = vtkRenderer::New();
+  vtkMantaRenderer* hybridRen = vtkMantaRenderer::New();
   hybridRen->SetViewport( 0.0, 0.0, 1.0, 1.0 );
   hybridRen->SetLayer( 0);
-  hybridRen->SetBackground( blue );
+  hybridRen->SetBackground( blue[0], blue[1], blue[2] );
   hybridRen->AddActor( hybridActor );
-    
-  // renderer #1 --- to emulate an annotation layer
+
   cubeRen->SetViewport( 0.0, 0.0, 0.6, 1.0 );
   cubeRen->SetLayer( 1 );
   cubeRen->InteractiveOff();
-  cubeRen->SetBackground( black );
+  cubeRen->SetBackground( black[0], black[1], black[2] );
   cubeRen->AddActor( cubeActor );
-
-# else // _MULTI_RENDERS_
-
-  cubeRen->SetBackground( black );
-  cubeRen->AddActor( cubeActor );
-  cubeRen->AddActor( hybridActor );
-
-# endif // _MULTI_RENDERS_
 
   cubeRen->SetLightFollowCamera( 1 );
   cubeRen->AddLight( light );
   cubeRen->SetActiveCamera( camera );
-    
   cubeRen->ResetCameraClippingRange();
   cubeRen->GetActiveCamera()->Dolly( 1.2 );
   cubeRen->GetActiveCamera()->Azimuth( 30 );
@@ -252,10 +234,8 @@ int main( int argc, char* argv[] )
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
 
-# ifdef _MULTI_RENDERS_
   renWin->SetNumberOfLayers( 2 );
   renWin->AddRenderer( hybridRen );
-# endif
 
   renWin->AddRenderer( cubeRen );
   renWin->SetSize( 800, 400 );
@@ -272,7 +252,7 @@ int main( int argc, char* argv[] )
     }
   else
     {
-    vtkInteractorEventRecorder * recorder 
+    vtkInteractorEventRecorder * recorder
       = vtkInteractorEventRecorder::New();
     recorder->SetInteractor( interactor );
     recorder->SetFileName( argv[1] );
@@ -289,7 +269,7 @@ int main( int argc, char* argv[] )
     retVal = vtkRegressionTestImage( renWin );
     recorder->Off();
     #endif
-  
+
     recorder->Delete();
     }
 
@@ -307,25 +287,12 @@ int main( int argc, char* argv[] )
   light->Delete();
   camera->Delete();
 
-  // These following two lines are MUST for MANTA-VTK. otherwise 
-  // there would be segfaults even no any user interaction is performed. 
-  //
-  // However, they MUST be turned OFF if the program runs in pure
-  // VTK mode, otherwise there would be a severe crash.
-  //
-  // In other words, if _VTKMANTA_MODE_ and _MULTI_RENDERS_ are both ON in
-  // pure OpenGL mode (actually the former should NOT be on in this mode),
-  // a crash will occur.
-# if defined( _VTKMANTA_MODE_ ) && defined( _MULTI_RENDERS_ )
   renWin->RemoveRenderer( cubeRen );
   renWin->RemoveRenderer( hybridRen );
-# endif
 
   cubeRen->Delete();
 
-# ifdef _MULTI_RENDERS_
   hybridRen->Delete();
-# endif
 
   renWin->Delete();
   interactor->Delete();

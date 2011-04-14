@@ -1,3 +1,5 @@
+// this program tests creating and deleting objects
+
 #include "vtkActor.h"
 #include "vtkConeSource.h"
 #include "vtkCylinderSource.h"
@@ -11,8 +13,6 @@
 #include "vtkSphereSource.h"
 
 #include <unistd.h>
-
-// this program tests creating and deleting objects
 
 bool useGL = false;
 
