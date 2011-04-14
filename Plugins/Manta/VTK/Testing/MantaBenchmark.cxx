@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// This test covers the shadow map render pass.
+// This test covers the manta vs openGL render speed
 
 //TODO: Measure pipeline change and render setup time
 //TODO: Make it run and compile without MPI
@@ -206,7 +206,7 @@ void MyProcess::Execute()
   bool changeCamera = true;
   int screensize = 400;
   int triangles = 100000;
-  double fuzziness = 0.001;
+  double fuzziness = 0.0;
   int AStype = 0;
   int threads = 1;
   int processes = numProcs;
@@ -313,8 +313,7 @@ void MyProcess::Execute()
   vtkCompositeRenderManager *prm = vtkCompositeRenderManager::New();   
 
   vtkRenderWindowInteractor *iren=NULL;
-  vtkRenderWindow *renWin = NULL;
-  vtkRenderWindow *mRenWin = vtkRenderWindow::New();
+  vtkRenderWindow *renWin = vtkRenderWindow::New();
   renWin->SetMultiSamples(0);
   if(me==0)
     {

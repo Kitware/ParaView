@@ -12,6 +12,12 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.py
   )
 
+IF(PARAVIEW_BUILD_PLUGIN_Manta)
+  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/MantaTest.py
+    )
+ENDIF(PARAVIEW_BUILD_PLUGIN_Manta)
+
 # Disable client test, only for remote connections.
 SET (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 SET (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
@@ -23,6 +29,10 @@ SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
 set (RenderNan_BREAK TRUE)
+
+# TODO: load the plugin on both sides and reenable these
+set (MantaTest_DISABLE_CRS TRUE)
+set (MantaTest_DISABLE_CS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)

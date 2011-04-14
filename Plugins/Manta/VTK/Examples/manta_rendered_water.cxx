@@ -5,13 +5,13 @@
 #include <string.h>
 
 // include the required header files for the VTK classes we are using.
-#include "vtkActor.h"
-#include "vtkLight.h"
-#include "vtkRenderer.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaLight.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkCamera.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaPolyDataMapper.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkPoints.h"
 #include "vtkTransformFilter.h"
@@ -59,8 +59,8 @@ int hillResolution = 100;
 int main(int argc, char** argv)
 {
     // create renderer and add objects
-    vtkRenderer *renderer = vtkRenderer::New();
-    renderer->SetBackground(slate_grey);
+    vtkMantaRenderer *renderer = vtkMantaRenderer::New();
+    renderer->SetBackground(slate_grey[0], slate_grey[1], slate_grey[2]);
 
     // add the objects in the scene
     addBox(renderer);
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     addLowerWater(renderer);
     addUpperWater(renderer);
 
-    vtkCamera *camera = vtkCamera::New();
+    vtkMantaCamera *camera = vtkMantaCamera::New();
     renderer->SetActiveCamera(camera);
     renderer->ResetCamera();
 
@@ -140,9 +140,9 @@ void addBox(vtkRenderer* renderer)
     polys->Delete();
 
     // Now we'll look at it.
-    vtkPolyDataMapper *cubeMapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper *cubeMapper = vtkMantaPolyDataMapper::New();
     cubeMapper->SetInput(cube);
-    vtkActor *cubeActor = vtkActor::New();
+    vtkMantaActor *cubeActor = vtkMantaActor::New();
     cubeActor->SetMapper(cubeMapper);
 
     vtkMantaProperty* property = vtkMantaProperty::SafeDownCast(
@@ -181,10 +181,10 @@ void addHills(vtkRenderer* renderer)
     vtkTransformPolyDataFilter* transformFilter = transformHill(hillsource);
 
     // do the usual mapping
-    vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper* mapper = vtkMantaPolyDataMapper::New();
     mapper->SetInputConnection(transformFilter->GetOutputPort());
 
-    vtkActor* actor = vtkActor::New();
+    vtkMantaActor* actor = vtkMantaActor::New();
     actor->SetMapper(mapper);
 
     vtkMantaProperty* property = vtkMantaProperty::SafeDownCast(
@@ -245,7 +245,7 @@ void addLowerWater(vtkRenderer* renderer)
 
     for(i=0; i<4; i++)
     {
-        vtkActor* actor = vtkActor::New();
+        vtkMantaActor* actor = vtkMantaActor::New();
         actor->SetMapper(mapper[i]);
 
         vtkMantaProperty* property = vtkMantaProperty::SafeDownCast(
@@ -325,7 +325,7 @@ void addUpperWater(vtkRenderer* renderer)
 
     for(i=0; i<4; i++)
     {
-        vtkActor* actor = vtkActor::New();
+        vtkMantaActor* actor = vtkMantaActor::New();
         actor->SetMapper(mapper[i]);
 
         vtkMantaProperty* property = vtkMantaProperty::SafeDownCast(
@@ -500,7 +500,7 @@ vtkMapper* generateSidePolygon(vtkParametricFunctionSource* source,
     newPoly->SetPoints(points);
     newPoly->SetPolys(polys);
 
-    vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper *mapper = vtkMantaPolyDataMapper::New();
     mapper->SetInput(newPoly);
 
     return mapper;
@@ -509,7 +509,7 @@ vtkMapper* generateSidePolygon(vtkParametricFunctionSource* source,
 void addLights(vtkRenderer* renderer)
 {
     // light in front of camera
-    vtkLight *light1 = vtkLight::New();
+    vtkMantaLight *light1 = vtkMantaLight::New();
     light1->PositionalOn();
     light1->SetPosition(renderer->GetActiveCamera()->GetPosition());
     light1->SetFocalPoint(renderer->GetActiveCamera()->GetFocalPoint());
@@ -519,7 +519,7 @@ void addLights(vtkRenderer* renderer)
     renderer->AddLight(light1);
 
     // light in upper right
-    vtkLight *light2 = vtkLight::New();
+    vtkMantaLight *light2 = vtkMantaLight::New();
     light2->PositionalOn();
     light2->SetPosition(5, 5, 5);
     light2->SetColor(1.0, 1.0, 1.0);
@@ -528,7 +528,7 @@ void addLights(vtkRenderer* renderer)
     renderer->AddLight(light2);
 
     // light straight up, looking down
-    vtkLight *light3 = vtkLight::New();
+    vtkMantaLight *light3 = vtkMantaLight::New();
     light3->PositionalOn();
     light3->SetPosition(0.5, 5, 0.5);
     light3->SetFocalPoint(0, 0, 0);
@@ -537,4 +537,3 @@ void addLights(vtkRenderer* renderer)
     renderer->SetLightFollowCamera(1);
     renderer->AddLight(light3);
 }
-

@@ -2,13 +2,13 @@
 #include "vtkSphereSource.h"
 #include "vtkCylinderSource.h"
 #include "vtkPolyDataNormals.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkMantaPolyDataMapper.h"
 #include "vtkLookupTable.h"
 #include "vtkScalarsToColors.h"
-#include "vtkProperty.h"
-#include "vtkActor.h"
-#include "vtkCamera.h"
-#include "vtkRenderer.h"
+#include "vtkMantaProperty.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
@@ -107,17 +107,17 @@ int main( int argc, char* argv[] )
   DumpAttributeInfo( sphereNormals->GetOutput(), "Sphere" );
 # endif
 
-  vtkPolyDataMapper * sphereMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * sphereMapper = vtkMantaPolyDataMapper::New();
   sphereMapper->SetInputConnection( sphereNormals->GetOutputPort() );
   
   vtkLookupTable * sphereLUT = vtkLookupTable::New();
   sphereMapper->SetLookupTable( sphereLUT );
   
-  vtkActor * sphereActor = vtkActor::New();
+  vtkMantaActor * sphereActor = vtkMantaActor::New();
   sphereActor->SetMapper( sphereMapper );
   sphereActor->RotateY( SPHERE_ROTATE );
 
-  vtkProperty * sphereProperty = vtkProperty::New();
+  vtkMantaProperty * sphereProperty = vtkMantaProperty::New();
   sphereActor->SetProperty( sphereProperty );
   
   ConfigureMapper( sphereMapper,
@@ -181,18 +181,18 @@ int main( int argc, char* argv[] )
   DumpAttributeInfo( coneNormals->GetOutput(), "Cone" );
   #endif
 
-  vtkPolyDataMapper * coneMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * coneMapper = vtkMantaPolyDataMapper::New();
   coneMapper->SetInputConnection( coneNormals->GetOutputPort() );
 
   vtkLookupTable * coneLUT = vtkLookupTable::New();
   coneMapper->SetLookupTable( coneLUT );
   
-  vtkActor * coneActor = vtkActor::New();
+  vtkMantaActor * coneActor = vtkMantaActor::New();
   coneActor->SetMapper( coneMapper );
   coneActor->AddPosition( 0.0, OBJECT_RADIUS * 4, 0.0 );
   coneActor->RotateZ( 90.0 );
 
-  vtkProperty * coneProperty = vtkProperty::New();
+  vtkMantaProperty * coneProperty = vtkMantaProperty::New();
   coneActor->SetProperty( coneProperty );
   
   ConfigureMapper( coneMapper,
@@ -254,16 +254,16 @@ int main( int argc, char* argv[] )
   DumpAttributeInfo( cylinderNormals->GetOutput(), "Cylinder" );
   #endif
 
-  vtkPolyDataMapper * cylinderMapper = vtkPolyDataMapper::New();
+  vtkMantaPolyDataMapper * cylinderMapper = vtkMantaPolyDataMapper::New();
   cylinderMapper->SetInputConnection( cylinderNormals->GetOutputPort() );
 
   vtkLookupTable * cylinderLUT = vtkLookupTable::New();
   cylinderMapper->SetLookupTable( cylinderLUT );
 
-  vtkActor * cylinderActor = vtkActor::New();
+  vtkMantaActor * cylinderActor = vtkMantaActor::New();
   cylinderActor->SetMapper( cylinderMapper );
 
-  vtkProperty * cylinderProperty = vtkProperty::New();
+  vtkMantaProperty * cylinderProperty = vtkMantaProperty::New();
   cylinderActor->SetProperty( cylinderProperty );
   
   ConfigureMapper( cylinderMapper,
@@ -308,7 +308,7 @@ int main( int argc, char* argv[] )
 
   // ---------
   // rendering
-  vtkRenderer * renderer= vtkRenderer::New();
+  vtkMantaRenderer * renderer= vtkMantaRenderer::New();
   renderer->SetBackground( 0.1, 0.2, 0.3 );
   renderer->AddActor( sphereActor );
 # ifdef _MULTI_OBJECTS_
@@ -316,7 +316,7 @@ int main( int argc, char* argv[] )
   renderer->AddActor( cylinderActor );
 # endif
 
-  vtkCamera * camera = vtkCamera::New();
+  vtkMantaCamera * camera = vtkMantaCamera::New();
   renderer->SetActiveCamera( camera );
   renderer->ResetCamera();
 

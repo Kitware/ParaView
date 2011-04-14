@@ -187,6 +187,11 @@ void pqApplicationCore::constructor()
     this, SLOT(onStateSaved(vtkPVXMLElement*)));
   QObject::connect(QCoreApplication::instance(),SIGNAL(lastWindowClosed()),
     this, SLOT(prepareForQuit()));
+
+  // this has to happen after the construction of pqInterfaceTracker since if
+  // the plugin initialization code itself may request access to  the interface
+  // tracker.
+  this->InterfaceTracker->initialize();
 }
 
 //-----------------------------------------------------------------------------

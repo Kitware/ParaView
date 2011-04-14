@@ -26,11 +26,6 @@ INCLUDE ( ${VTK_USE_FILE} )
 SET ( EXES_LIBS_EXPORT_DIR ${VTK_DIR} )
 MARK_AS_ADVANCED ( EXES_LIBS_EXPORT_DIR )
 
-# Give user option of building shared or static libraries.
-# Default to the choice made for VTK.
-OPTION ( MANTA_BUILD_SHARED_LIBS "Build vtkManta with shared libraries." 
-  ${VTK_BUILD_SHARED_LIBS} )
-
 # Set specific VTK libraries to link against
 SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics)
 IF ( VTK_USE_PARALLEL )
@@ -105,14 +100,6 @@ SET ( MANTA_LINK_LIBRARIES
 IF (NOT BUILD_AGAINST_PARAVIEW)
   SET ( BUILD_AGAINST_PARAVIEW 0 )
 ENDIF (NOT BUILD_AGAINST_PARAVIEW)
-
-# Set VTKMANTA_BUILD_SHARED_LIBS to 1 or 0 for safe keeping in 
-#vtkMantaConfigure.h
-IF ( MANTA_BUILD_SHARED_LIBS )
-  SET ( VTKMANTA_BUILD_SHARED_LIBS_CONFIG 1 )
-ELSE ( MANTA_BUILD_SHARED_LIBS )
-  SET( VTKMANTA_BUILD_SHARED_LIBS_CONFIG 0 )
-ENDIF ( MANTA_BUILD_SHARED_LIBS )
 
 # setup include paths
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
@@ -329,19 +316,15 @@ IF (BUILD_AGAINST_PARAVIEW)
 ENDIF (BUILD_AGAINST_PARAVIEW)
 
 #Examples ####################################################################
-OPTION ( MANTA_BUILD_EXAMPLES "Build vtkManta example applications" 
-  ${VTK_BUILD_EXAMPLES} )
-IF ( MANTA_BUILD_EXAMPLES )
+IF ( BUILD_EXAMPLES )
   ADD_SUBDIRECTORY(Examples)
-ENDIF ( MANTA_BUILD_EXAMPLES )
+ENDIF ( BUILD_EXAMPLES )
  
 #Tests #######################################################################
 #TODO: Make these tests meaningful and cdash them regularly
-OPTION ( MANTA_BUILD_TESTING "Build vtkManta examples applications" 
-  ${VTK_BUILD_TESTING} )
-IF ( MANTA_BUILD_TESTING )
+IF ( BUILD_TESTING )
   ENABLE_TESTING()
   INCLUDE( CTest )
   ADD_SUBDIRECTORY(Testing)
-ENDIF ( MANTA_BUILD_TESTING )
+ENDIF ( BUILD_TESTING )
 

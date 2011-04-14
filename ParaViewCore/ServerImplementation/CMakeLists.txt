@@ -85,10 +85,19 @@ INCLUDE_DIRECTORIES(
 
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
-set (protobuf_generated_files)
-protobuf_generate(
-  protobuf_generated_files
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto)
+ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+           ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
+    COMMAND protoc_compiler
+      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
+      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+)
+
+add_custom_target(
+  protobuf_code_generation ALL
+  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+)
 #------------------------------------------------------------------------------
 
 SET(resourceFiles
@@ -221,9 +230,7 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${KIT_LIBS}
   protobuf
 )
-
-SET_SOURCE_FILES_PROPERTIES(vtkSMMessage.cxx PROPERTIES OBJECT_DEPENDS
-  ${protobuf_generated_files})
+add_dependencies(vtk${KIT} protobuf_code_generation)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL
