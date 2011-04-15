@@ -8,26 +8,22 @@
 // discontinuous.
 
 // include the required header files for the VTK classes we are using.
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
-#include "vtkRenderWindow.h"
-#include "vtkCamera.h"
-#include "vtkActor.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkLight.h"
-#include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkConeSource.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaProperty.h"
+#include "vtkMantaRenderer.h"
+#include "vtkMantaLight.h"
+#include "vtkPoints.h"
+#include "vtkRegressionTestImage.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkStripper.h"
 
-#define USE_MANTA
 #define NUM_CONE_SIDES 50
-
-#ifdef USE_MANTA
-    #include "vtkMantaProperty.h"
-#endif
 
 void addWalls(vtkRenderer* renderer);
 void addCone(vtkRenderer* renderer);
@@ -37,42 +33,48 @@ double slate_grey[] = {0.4392, 0.5020, 0.5647};
 
 int main(int argc, char** argv)
 {
-    // create renderer
-    vtkRenderer *renderer = vtkRenderer::New();
-    renderer->SetBackground(slate_grey);
+  // create renderer
+  vtkMantaRenderer *renderer = vtkMantaRenderer::New();
+  renderer->SetBackground(slate_grey[0], slate_grey[1], slate_grey[2]);
 
-    // add the objects in the scene
-    addWalls(renderer);
-    addCone(renderer);
-    addLights(renderer);
+  // add the objects in the scene
+  addWalls(renderer);
+  addCone(renderer);
+  addLights(renderer);
 
-    // setup camera
-    renderer->ResetCamera();
-    vtkCamera* cam = renderer->GetActiveCamera();
-    cam->Zoom(1.7);
+  // setup camera
+  renderer->ResetCamera();
+  vtkCamera* cam = renderer->GetActiveCamera();
+  cam->Zoom(1.7);
 
-    // create other rendering stuff
-    vtkRenderWindow *renWin = vtkRenderWindow::New();
-    renWin->AddRenderer(static_cast<vtkRenderer*>(renderer));
-    renWin->SetSize(400, 400);
+  // create other rendering stuff
+  vtkRenderWindow *renWin = vtkRenderWindow::New();
+  renWin->AddRenderer(static_cast<vtkRenderer*>(renderer));
+  renWin->SetSize(400, 400);
 
-    vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-    iren->SetRenderWindow(renWin);
+  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+  iren->SetRenderWindow(renWin);
 
-    // set interaction it to trackball style
-    vtkInteractorStyleTrackballCamera *style =
-                                vtkInteractorStyleTrackballCamera::New();
-    iren->SetInteractorStyle(style);
+  renWin->Render();
 
+  // set interaction it to trackball style
+  vtkInteractorStyleTrackballCamera *style =
+    vtkInteractorStyleTrackballCamera::New();
+  iren->SetInteractorStyle(style);
+
+  int retVal = vtkRegressionTestImage( renWin );
+  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
+    {
     iren->Start();
+    }
 
-    // clean up
-    renderer->Delete();
-    renWin->Delete();
-    iren->Delete();
-    style->Delete();
+  // clean up
+  renderer->Delete();
+  renWin->Delete();
+  iren->Delete();
+  style->Delete();
 
-    return 1;
+  return !retVal;
 }
 
 void addWalls(vtkRenderer* renderer)
@@ -127,20 +129,18 @@ void addWalls(vtkRenderer* renderer)
     polys->Delete();
 
     // Now we'll look at it.
-    vtkPolyDataMapper *cubeMapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper *cubeMapper = vtkMantaPolyDataMapper::New();
     cubeMapper->SetInput(cube);
-    vtkActor *cubeActor = vtkActor::New();
+    vtkMantaActor *cubeActor = vtkMantaActor::New();
     cubeActor->SetMapper(cubeMapper);
 
     vtkProperty* property = cubeActor->GetProperty();
     property->SetDiffuseColor(box_color);
     property->SetSpecularColor(box_color);
 
-#ifdef USE_MANTA
     vtkMantaProperty* mantaProperty = vtkMantaProperty::SafeDownCast(
                                                      cubeActor->GetProperty());
     mantaProperty->SetMaterialType(material);
-#endif
 
     renderer->AddActor(cubeActor);
 }
@@ -157,10 +157,10 @@ void addCone(vtkRenderer* renderer)
     vtkStripper* strip = vtkStripper::New();
     strip->SetInputConnection(cone->GetOutputPort());
 
-    vtkPolyDataMapper *coneMapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper *coneMapper = vtkMantaPolyDataMapper::New();
     coneMapper->SetInputConnection(strip->GetOutputPort());
 
-    vtkActor *coneActor = vtkActor::New();
+    vtkMantaActor *coneActor = vtkMantaActor::New();
     coneActor->SetMapper(coneMapper);
 
     vtkProperty *coneProperty = coneActor->GetProperty();
@@ -170,13 +170,11 @@ void addCone(vtkRenderer* renderer)
     coneProperty->SetSpecularPower(20);
     coneActor->SetProperty(coneProperty);
 
-#ifdef USE_MANTA
-    vtkMantaProperty* mantaProperty = vtkMantaProperty::SafeDownCast(
-                                                                  coneProperty);
+    vtkMantaProperty* mantaProperty = vtkMantaProperty::SafeDownCast
+      (coneProperty);
     mantaProperty->SetMaterialType("dielectric");
     mantaProperty->SetN(1.0);
     mantaProperty->SetNt(1.3);
-#endif
 
     renderer->AddActor(coneActor);
 }
@@ -184,7 +182,7 @@ void addCone(vtkRenderer* renderer)
 void addLights(vtkRenderer* renderer)
 {
     // light in front of camera
-    vtkLight *light1 = vtkLight::New();
+    vtkMantaLight *light1 = vtkMantaLight::New();
     light1->PositionalOn();
     light1->SetPosition(renderer->GetActiveCamera()->GetPosition());
     light1->SetFocalPoint(renderer->GetActiveCamera()->GetFocalPoint());
@@ -194,7 +192,7 @@ void addLights(vtkRenderer* renderer)
     renderer->AddLight(light1);
 
     // light in upper right
-    vtkLight *light2 = vtkLight::New();
+    vtkMantaLight *light2 = vtkMantaLight::New();
     light2->PositionalOn();
     light2->SetPosition(5, 5, 5);
     light2->SetColor(0.5, 0.5, 0.5);
@@ -203,7 +201,7 @@ void addLights(vtkRenderer* renderer)
     renderer->AddLight(light2);
 
     // light straight up, looking down
-    vtkLight *light3 = vtkLight::New();
+    vtkMantaLight *light3 = vtkMantaLight::New();
     light3->PositionalOn();
     light3->SetPosition(0.5, 5, 0.5);
     light3->SetFocalPoint(0, 0, 0);
@@ -213,7 +211,7 @@ void addLights(vtkRenderer* renderer)
     renderer->AddLight(light3);
 
     // light looking down the z-axis
-    vtkLight *light4 = vtkLight::New();
+    vtkMantaLight *light4 = vtkMantaLight::New();
     light4->PositionalOn();
     light4->SetPosition(-5, 0, 0);
     light4->SetFocalPoint(0, 0, 0);
@@ -222,4 +220,3 @@ void addLights(vtkRenderer* renderer)
     renderer->SetLightFollowCamera(1);
     renderer->AddLight(light4);
 }
-
