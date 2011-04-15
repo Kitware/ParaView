@@ -269,9 +269,6 @@ void vtkSMProxyManager::UpdateFromRemote()
       this->Session->PullState(&msg);
       if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
         {
-        cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
-        cout << msg.DebugString().c_str() << endl;
-        cout << "<<<<<<<<< LOAD SERVER STATE >>>>>>>>>>>>>>>>" << endl;
         this->LoadState(&msg, this->Session->GetStateLocator());
         }
       }
@@ -1699,12 +1696,10 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   // Fill delta sets
   this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
 
-  cout << "LoadState >>>>>>>>>>>>>>>>>>>" << endl;
   // Register new ones
   iter = tuplesToRegister.begin();
   while( iter != tuplesToRegister.end() )
     {
-    cout << "Register: " << iter->Group.c_str()<< ", " << iter->Name.c_str() << endl;
     this->RegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
@@ -1713,13 +1708,10 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   iter = tuplesToUnregister.begin();
   while( iter != tuplesToUnregister.end() )
     {
-    cout << "Unregister: " << iter->Group.c_str()<< ", " << iter->Name.c_str()
-         << ": " << iter->Proxy->GetGlobalID() << endl;
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
 
-  cout << "LoadState <<<<<<<<<<<<<<<<<<<<<" << endl;
 }
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
@@ -1775,6 +1767,9 @@ vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
   if(locator && locator->FindState(globalId, &proxyState))
     {
     // Only create proxy and sub-proxies
+//    cout << "ReNewProxy: " << globalId << endl;
+//    cout << proxyState.DebugString().c_str();
+//    cout << "=========================" << endl;
     vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, true);
     if(proxy)
       {
