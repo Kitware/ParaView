@@ -193,7 +193,7 @@ public:
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)
     {
-    if(QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
+    if(cue && QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
       {
       return true;
       }

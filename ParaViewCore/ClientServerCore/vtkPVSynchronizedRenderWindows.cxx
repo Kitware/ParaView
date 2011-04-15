@@ -644,6 +644,11 @@ void vtkPVSynchronizedRenderWindows::SetWindowSize(unsigned int id,
 {
   this->Internals->RenderWindows[id].Size[0] = width;
   this->Internals->RenderWindows[id].Size[1] = height;
+
+  // Make sure none of the dimension is 0
+  width = width ? width : 10;
+  height = height ? height : 10;
+
   if (this->Mode == BUILTIN || this->Mode == CLIENT)
     {
     vtkRenderWindow* window = this->GetRenderWindow(id);
