@@ -32,6 +32,11 @@ static bool RealMain(int argc, char* argv[],
 
   // Init current process type
   vtkInitializationHelper::Initialize( argc, argv, type, options );
+  if (options->GetTellVersion() || options->GetHelpSelected())
+    {
+    vtkInitializationHelper::Finalize();
+    return 1;
+    }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
