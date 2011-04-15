@@ -587,21 +587,12 @@ void MyProcess::Execute()
       iren->Start();
       }
     else
-      {    
-      //Do an image comparison of last image instead
-      if (testing->IsValidImageSpecified())
-        {
-        renWin->Render();        
-        //TODO: Compare final image against known correct result
-        /*
-        vtkImageData *testImage=renWin->Get>?;
-        retVal=testing->RegressionTest(testImage,thresh);
-        */
-        }
-      else
-        {
-        retVal=vtkTesting::NOT_RUN;
-        }
+      {
+      //the purpose of this test is to measure timing
+      //image comparisons are not needed for that
+      //flaws will show up when speed is drastically faster/slower than before
+      retVal=1;
+      renWin->Render();
       }
 
     prm->StopServices(); // tells satellites to stop listening.
