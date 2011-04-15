@@ -80,13 +80,15 @@ vtkSMSessionClient::vtkSMSessionClient() : Superclass(false)
   this->ServerLastInvokeResult = new vtkClientServerStream();
 
   // Collaboration communicator initialization
-  if(vtkProcessModule::GetProcessModule())
-    {
-    this->CollaborationCommunicator = vtkSMCollaborationCommunicator::New();
-    this->CollaborationCommunicator->SetSession(this);
-    this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
-                               this->CollaborationCommunicator);
-    }
+
+  // WE HAVE a issue here related to global ids...
+//  if(vtkProcessModule::GetProcessModule())
+//    {
+//    this->CollaborationCommunicator = vtkSMCollaborationCommunicator::New();
+//    this->CollaborationCommunicator->SetSession(this);
+//    this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
+//                               this->CollaborationCommunicator);
+//    }
 
   // Register server state locator for that specific session
   vtkNew<vtkSMServerStateLocator> serverStateLocator;

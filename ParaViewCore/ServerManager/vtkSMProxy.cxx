@@ -1021,6 +1021,7 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 {
+  //cout << this->XMLName << this << ".AddConsumer(" << proxy->XMLName << proxy <<")" << endl;
   int found=0;
   vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
     this->Internals->Consumers.begin();
@@ -1044,6 +1045,7 @@ void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy*)
 {
+  //cout << this->XMLName << this << ".RemoveConsumer(" << property->GetParent()->GetXMLName() << property->GetParent() << ")" << endl;
   vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
     this->Internals->Consumers.begin();
   for(; i != this->Internals->Consumers.end(); i++)
@@ -1873,19 +1875,31 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
         &message->GetExtension(ProxyState::subproxy, idx);
     vtkSMProxy* subProxy = this->GetSubProxy(subProxyMsg->name().c_str());
 
-    // Make sure the subproxy is not still around with its GlobalId if that
-    // subproxy is not already alive with a valid GlobalId
-    if(!(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+    if(subProxy == NULL)
       {
-      vtkErrorMacro("SubProxy has no global ID but its old instance is still arround. "
-                    << subProxyMsg->global_id() << endl
+      vtkWarningMacro("State provide a sub-proxy information althoug the proxy"
+                      << "does not find that sub-proxy."
+                      << " - Proxy: "
+                      << this->XMLGroup << " - " << this->XMLName << endl
+                      << " - Sub-Proxy: " << subProxyMsg->name().c_str()
+                      << " " << subProxyMsg->global_id());
+      continue;
+      }
+
+    // Make sure we do not try to load a state to a proxy that has already
+    // sub-proxy with IDs that defer from the message state
+    if(subProxy->HasGlobalID() &&
+       (subProxy->GlobalID != subProxyMsg->global_id() ||
+       !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+      {
+      vtkErrorMacro("Invalid Proxy for message"
                     << "Parent Proxy - Group: " << this->XMLGroup
                     << " - Name: " << this->XMLName << endl
                     << "SubProxy - XMLName: " << subProxy->GetXMLName()
                     << " - SubProxyName: " << subProxyMsg->name().c_str()
-                    << endl);
+                    << " - Id: " << subProxy->GlobalID << endl
+                    << message->DebugString().c_str() << endl);
       }
-    assert(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id()));
 
     vtkSMMessage subProxyState;
     if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
