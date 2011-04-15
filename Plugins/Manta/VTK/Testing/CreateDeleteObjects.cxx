@@ -58,7 +58,7 @@ vtkRenderWindow *makeRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-int main( int argc, char* argv[] )
+int CreateDeleteObjects( int argc, char* argv[] )
 {
   int     objRes = 12;
   double  objRad = 0.075;
@@ -199,5 +199,7 @@ int main( int argc, char* argv[] )
   renderer->Delete();
   renWin->Delete();
 
+  //if vtkManta isn't deallocating Manta objects safely,
+  //we would have crashed before now.
   return 0;
 }
