@@ -18,6 +18,12 @@ IF(PARAVIEW_BUILD_PLUGIN_Manta)
     )
 ENDIF(PARAVIEW_BUILD_PLUGIN_Manta)
 
+IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
+  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingTest.py
+    )
+ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
+
 # Disable client test, only for remote connections.
 SET (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 SET (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
@@ -33,6 +39,8 @@ set (RenderNan_BREAK TRUE)
 # TODO: load the plugin on both sides and reenable these
 set (MantaTest_DISABLE_CRS TRUE)
 set (MantaTest_DISABLE_CS TRUE)
+set (StreamingTest_DISABLE_CRS TRUE)
+set (StreamingTest_DISABLE_CS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
