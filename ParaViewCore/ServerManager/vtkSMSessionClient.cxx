@@ -853,18 +853,29 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
 
-  cout << "Server notification... " << id << endl;
+  //cout << "Server notification... " << id << endl;
 
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
   if(id == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
     {
     pxm->LoadState(&state, this->GetStateLocator());
+    pxm->UpdateRegisteredProxies(1);
     }
   else if(remoteObj == NULL)
     {
 //    vtkDebugMacro("Impossible to find proxy with id " << id << " and state "
 //                  << state.DebugString().c_str() << endl);
+    }
+  else if(proxy)
+    {
+    proxy->LoadState(&state, this->GetStateLocator(), false);
+    if(proxy->GetLocation() & vtkPVSession::CLIENT)
+      {
+      // Only update proxy that have local VTK objects
+      proxy->UpdateVTKObjects();
+      }
     }
   else
     {
@@ -874,7 +885,8 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   this->EnableRemoteExecution();
 }
 //-----------------------------------------------------------------------------
-bool vtkSMSessionClient::OnWrongTagEvent(vtkObject* obj, unsigned long event, void* calldata)
+bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,
+                                          void* calldata )
 {
   int tag = -1;
   const char* data = reinterpret_cast<const char*>(calldata);
