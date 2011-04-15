@@ -142,10 +142,10 @@ public:
   // and Pull.
   virtual void EndBusyWork();
 
-  virtual vtkSMCollaborationCommunicator* GetvtkSMCollaborationCommunicator()
-    {
-    return this->CollaborationCommunicator;
-    }
+  // Description:
+  // Return the instance of vtkSMCollaborationCommunicator that will be
+  // lazy created at the first call.
+  virtual vtkSMCollaborationCommunicator* GetCollaborationCommunicator();
 
   //---------------------------------------------------------------------------
   // API for GlobalId management

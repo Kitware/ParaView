@@ -51,3 +51,12 @@ void vtkSMCollaborationCommunicator::LoadState( const vtkSMMessage* msg,
 {
 
 }
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMCollaborationCommunicator::GetGlobalID()
+{
+  if(!this->HasGlobalID())
+    {
+    this->SetGlobalID(vtkSMCollaborationCommunicator::GetReservedGlobalID());
+    }
+  return this->Superclass::GetGlobalID();
+}

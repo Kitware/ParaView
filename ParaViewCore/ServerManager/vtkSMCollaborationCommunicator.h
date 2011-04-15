@@ -37,6 +37,11 @@ public:
   vtkTypeMacro(vtkSMCollaborationCommunicator,vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Get the global unique id for this object. If none is set and the session is
+  // valid, a new global id will be assigned automatically.
+  virtual vtkTypeUInt32 GetGlobalID();
+
 //BTX
 
   // Description:
