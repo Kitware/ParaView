@@ -107,7 +107,11 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       tr("Internal Open File"), QString(),
       QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
-    dialog.selectFile(options->GetParaViewDataName());
+    if (!dialog.selectFile(options->GetParaViewDataName()))
+      {
+      qCritical() << "Cannot open data file \""
+        << options->GetParaViewDataName() << "\"";
+      }
     QList<QStringList> files = dialog.getAllSelectedFiles();
     QStringList file;
     foreach(file,files)
