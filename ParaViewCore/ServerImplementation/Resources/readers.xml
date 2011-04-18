@@ -3756,10 +3756,11 @@
      </DoubleVectorProperty>
 
       <Hints>
-       <ReaderFactory extensions="hscth"
-           file_description="Spy Plot History Files" />
+       <ReaderFactory
+       extensions="hscth"
+       filename_patterns="*hscth*"
+       file_description="Spy Plot History Files" />
       </Hints>
-
       <!-- End of SPCTHHistoryReader -->
    </SourceProxy>
 
