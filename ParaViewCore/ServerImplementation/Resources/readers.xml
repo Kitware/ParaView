@@ -3758,7 +3758,7 @@
       <Hints>
        <ReaderFactory
        extensions="hscth"
-       filename_patterns="*hscth*"
+       filename_patterns="*hsct*"
        file_description="Spy Plot History Files" />
       </Hints>
       <!-- End of SPCTHHistoryReader -->
