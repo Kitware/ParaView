@@ -48,7 +48,7 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
   gridLayout->setMargin(0);
   gridLayout->setObjectName("gridLayout");
 
-  this->ProgressBar = new pqProgressBar(this);
+  this->ProgressBar = new QProgressBar(this);
   this->ProgressBar->setObjectName("ProgressBar");
   this->ProgressBar->setOrientation(Qt::Horizontal);
   gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
@@ -83,10 +83,15 @@ void pqProgressWidget::setProgress(const QString& message, int value)
   if (this->PendingEnableProgress &&
     this->EnableTime.elapsed() >= 100)
     {
-    this->PendingEnableProgress = false;
-    this->ProgressBar->enableProgress(true);
+    this->PendingEnableProgress = false;    
     }
-  this->ProgressBar->setProgress(message, value);
+  this->ProgressBar->setEnabled(!this->PendingEnableProgress);
+
+  if (!this->PendingEnableProgress)
+    {
+    this->ProgressBar->setValue(value);
+    this->ProgressBar->setFormat(QString("%1: %p").arg(message));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -102,7 +107,8 @@ void pqProgressWidget::enableProgress(bool enabled)
     }
   else
     {
-    this->ProgressBar->enableProgress(false);
+    this->ProgressBar->reset();
+    this->ProgressBar->setEnabled(false);
     this->PendingEnableProgress = false;
     }
 }
