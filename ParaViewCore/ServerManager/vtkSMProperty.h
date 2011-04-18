@@ -152,6 +152,12 @@ public:
   vtkGetMacro(InformationOnly, int);
 
   // Description:
+  // If IgnoreSynchronization is set to true, this property is used to
+  // prevent that property from beeing updated when changed remotely by another
+  // collaborative client.
+  vtkGetMacro(IgnoreSynchronization, int);
+
+  // Description:
   // Get the associated information property. This allows applications
   // to have access to both the in and out properties. The information
   // property has to be specified in the xml configuration file.
@@ -343,6 +349,9 @@ protected:
 
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;
+
+  vtkSetMacro(IgnoreSynchronization, int);
+  int IgnoreSynchronization;
 
   vtkSMInformationHelper* InformationHelper;
 

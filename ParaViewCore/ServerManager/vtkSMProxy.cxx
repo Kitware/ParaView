@@ -28,6 +28,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkPVProxyDefinitionManager.h"
@@ -42,6 +43,7 @@
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
+#include <vtkNew.h>
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -563,7 +565,9 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
   this->PullState(&message);
 
   // Update internal values
-  this->LoadState(&message, this->Session->GetStateLocator());
+  vtkNew<vtkSMLoadStateContext> ctx;
+  ctx->SetRequestOrigin(vtkSMLoadStateContext::UPDATE_INFORMATION_PROPERTIES);
+  this->LoadState(&message, this->Session->GetStateLocator(), ctx.GetPointer());
 }
 
 //---------------------------------------------------------------------------
@@ -1838,7 +1842,7 @@ const vtkSMMessage* vtkSMProxy::GetFullState()
 }
 //---------------------------------------------------------------------------
 void vtkSMProxy::LoadState( const vtkSMMessage* message,
-                            vtkSMStateLocator* locator, bool definitionOnly)
+                            vtkSMStateLocator* locator, vtkSMLoadStateContext* ctx)
 {
   // Update globalId. This will fails if that one is already set with a different value
   if(this->HasGlobalID() && this->GetGlobalID() != message->global_id())
@@ -1904,7 +1908,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
     vtkSMMessage subProxyState;
     if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
       {
-      subProxy->LoadState(&subProxyState, locator, definitionOnly);
+      subProxy->LoadState(&subProxyState, locator, ctx);
       subProxy->MarkDirty(NULL);
       }
     else if(!subProxy->HasGlobalID())
@@ -1918,7 +1922,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
     }
 
   // Manage properties
-  if(!definitionOnly)
+  if(!ctx->GetLoadDefinitionOnly())
     {
     vtkSMProxyInternals::PropertyInfoMap::iterator it;
     vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
@@ -1935,6 +1939,17 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
           // skip internal properties. Their state is never updated.
           continue;
           }
+
+        // Some view properties need some special treatment and some
+        // of there properties MUST NOT be updated in case of collaborative
+        // notification.
+        if( ctx->GetRequestOrigin() == vtkSMLoadStateContext::COLLABORATION_NOTIFICATION
+            &&
+            it->second.Property->GetIgnoreSynchronization() )
+          {
+          continue;
+          }
+
         it->second.Property->ReadFrom(message, i);
         touchedProperties.push_back(it->second.Property.GetPointer());
         }

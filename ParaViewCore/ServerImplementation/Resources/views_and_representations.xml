@@ -165,6 +165,7 @@
       <DoubleVectorProperty name="RemoteRenderThreshold"
         command="SetRemoteRenderingThreshold"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="20.0">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>

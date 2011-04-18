@@ -28,6 +28,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkPVSessionServer.h"
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkSocketCommunicator.h"
@@ -833,6 +834,10 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
+  // Setup load state context
+  vtkNew<vtkSMLoadStateContext> ctx;
+  ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
+
   this->DisableRemoteExecution();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkstd::string data;
@@ -849,7 +854,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
   if(id == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
     {
-    pxm->LoadState(&state, this->GetStateLocator());
+    pxm->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
     pxm->UpdateRegisteredProxies(1);
     }
   else if(remoteObj == NULL)
@@ -859,7 +864,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     }
   else if(proxy)
     {
-    proxy->LoadState(&state, this->GetStateLocator(), false);
+    proxy->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
     if(proxy->GetLocation() & vtkPVSession::CLIENT)
       {
       // Only update proxy that have local VTK objects
@@ -868,7 +873,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     }
   else
     {
-    remoteObj->LoadState(&state, this->GetStateLocator(), false);
+    remoteObj->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
     }
 
   this->EnableRemoteExecution();

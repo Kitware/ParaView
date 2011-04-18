@@ -45,9 +45,11 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
   return vtkSMObject::GetProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
-void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator, bool vtkNotUsed(definitionOnly))
+void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
+                                    vtkSMStateLocator* locator,
+                                    vtkSMLoadStateContext* ctx )
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
+  vtkSMObject::GetProxyManager()->LoadState(msg, locator, ctx);
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()

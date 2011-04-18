@@ -18,6 +18,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkReservedRemoteObjectIds.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -47,7 +48,7 @@ void vtkSMCollaborationCommunicator::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 void vtkSMCollaborationCommunicator::LoadState( const vtkSMMessage* msg,
                                                 vtkSMStateLocator* locator,
-                                                bool definitionOnly)
+                                                vtkSMLoadStateContext* ctx)
 {
 
 }

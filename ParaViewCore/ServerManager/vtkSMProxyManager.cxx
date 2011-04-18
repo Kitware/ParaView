@@ -29,6 +29,7 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVProxyDefinitionManager.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
@@ -51,6 +52,7 @@
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
+#include <vtkNew.h>
 
 #include "vtkSMProxyManagerInternals.h"
 
@@ -269,7 +271,9 @@ void vtkSMProxyManager::UpdateFromRemote()
       this->Session->PullState(&msg);
       if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
         {
-        this->LoadState(&msg, this->Session->GetStateLocator());
+        vtkNew<vtkSMLoadStateContext> ctx;
+        ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
+        this->LoadState(&msg, this->Session->GetStateLocator(), ctx.GetPointer());
         }
       }
     }
@@ -1686,7 +1690,8 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
   return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
+void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator,
+                                  vtkSMLoadStateContext* ctx)
 {
   // Need to compute differences and just call Register/UnRegister for those items
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
@@ -1716,7 +1721,7 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
                                          vtkSMStateLocator* locator,
-                                         bool definitionOnly)
+                                         vtkSMLoadStateContext* ctx)
 {
   if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
       msg->HasExtension(ProxyState::xml_name))
@@ -1727,7 +1732,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
 
     // Then load the state for the current proxy
     // (This do not include the exposed properties)
-    proxy->LoadState(msg, locator, definitionOnly);
+    proxy->LoadState(msg, locator, ctx);
 
     // FIXME in collaboration mode we shouldn't push the state if it already come
     // from the server side
@@ -1770,11 +1775,15 @@ vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
 //    cout << "ReNewProxy: " << globalId << endl;
 //    cout << proxyState.DebugString().c_str();
 //    cout << "=========================" << endl;
-    vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, true);
+    vtkNew<vtkSMLoadStateContext> ctx;
+    ctx->SetRequestOrigin(vtkSMLoadStateContext::RE_NEW_PROXY);
+    ctx->SetLoadDefinitionOnly(true);
+    vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, ctx.GetPointer());
     if(proxy)
       {
       // Update properties now that SubProxy are properly set...
-      proxy->LoadState(&proxyState, locator, false);
+      ctx->SetLoadDefinitionOnly(false);
+      proxy->LoadState(&proxyState, locator, ctx.GetPointer());
       proxy->MarkDirty(NULL);
       proxy->UpdateVTKObjects();
       }

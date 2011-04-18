@@ -16,12 +16,15 @@
 
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
+
+#include <vtkNew.h>
 
 vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
 //-----------------------------------------------------------------------------
@@ -72,11 +75,13 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
+      vtkNew<vtkSMLoadStateContext> ctx;
+      ctx->SetRequestOrigin(vtkSMLoadStateContext::UNDO_REDO);
       remoteObj->LoadState(state,
                            this->Locator.GetPointer() ?
                                  this->Locator.GetPointer() :
                                  this->Session->GetStateLocator(),
-                           false);
+                           ctx.GetPointer());
       }
     }
   return 1; // OK, we say that everything is fine.

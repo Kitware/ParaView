@@ -128,6 +128,7 @@ struct vtkSMProxyInternals;
 //ETX
 class vtkClientServerStream;
 class vtkPVInformation;
+class vtkSMLoadStateContext;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
@@ -408,7 +409,7 @@ public:
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly = false);
+                          vtkSMLoadStateContext* ctx);
 
 protected:
   vtkSMProxy();

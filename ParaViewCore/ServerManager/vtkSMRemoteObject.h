@@ -27,6 +27,7 @@
 
 class vtkSMSession;
 class vtkSMStateLocator;
+class vtkSMLoadStateContext;
 
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
 {
@@ -83,7 +84,7 @@ public:
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly ) = 0;
+                          vtkSMLoadStateContext* ctx ) = 0;
 
 protected:
   // Description:

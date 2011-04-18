@@ -99,6 +99,7 @@ class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
 class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
+class vtkSMLoadStateContext;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkPVProxyDefinitionManager;
@@ -524,7 +525,8 @@ public:
 
   // Description:
   // This method is used to initialise the ProxyManager to the given state
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator,
+                         vtkSMLoadStateContext* ctx);
 
   // Description:
   // This metod allow the creation of a proxy based on its full state.
@@ -539,7 +541,7 @@ public:
 
   virtual vtkSMProxy* NewProxy( const vtkSMMessage* msg,
                                 vtkSMStateLocator* locator,
-                                bool definitionOnly = false);
+                                vtkSMLoadStateContext* ctx );
 
   // Description:
   // Re-New a proxy based on its ID and its previous state.

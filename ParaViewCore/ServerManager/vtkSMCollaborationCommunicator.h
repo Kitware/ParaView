@@ -26,6 +26,8 @@
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
+class vtkSMLoadStateContext;
+
 class VTK_EXPORT vtkSMCollaborationCommunicator : public vtkSMRemoteObject
 {
 public:
@@ -54,7 +56,7 @@ public:
   // Description:
   // This method is used IN THAT SPECIAL CASE to notify external listeners
   virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly = false);
+                          vtkSMLoadStateContext* ctx);
 
 protected:
   // Description:

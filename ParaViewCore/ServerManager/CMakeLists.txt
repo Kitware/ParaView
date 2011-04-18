@@ -77,6 +77,7 @@ SET (Kit_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
+  vtkSMLoadStateContext.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNullProxy.cxx
