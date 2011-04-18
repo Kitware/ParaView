@@ -37,6 +37,7 @@ TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRendering)
 
 IF ( VTK_USE_MPI )
 
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
   ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
   TARGET_LINK_LIBRARIES( MantaBenchmark vtkManta vtkHybrid vtkRendering vtkParallel )
   ADD_TEST( Manta-TestBenchmark ${EXECUTABLE_OUTPUT_PATH}/MantaBenchmark
