@@ -16,14 +16,9 @@
 
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
-#include "vtkSocketCommunicator.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkPVSessionServer.h"
-
-#include <vtkstd/string>
-#include <vtksys/ios/sstream>
-#include <vtksys/RegularExpression.hxx>
+#include "vtkSmartPointer.h"
+#include "vtkSocketCommunicator.h"
 
 #include <assert.h>
 #include <vtkstd/vector>
@@ -442,6 +437,5 @@ void vtkCompositeMultiProcessController::TriggerRMI2NonActives(int remote,
                                                                int tag)
 {
   this->Internal->CleanNonConnectedControllers();
-  this->Internal->TriggerRMI2NonActives(
-      1, data, length, vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+  this->Internal->TriggerRMI2NonActives(1, data, length, tag);
 }

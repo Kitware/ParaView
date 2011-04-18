@@ -36,6 +36,7 @@ SET (Kit_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
+  vtkCompositeMultiProcessController.cxx
   vtkContextNamedOptions.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
