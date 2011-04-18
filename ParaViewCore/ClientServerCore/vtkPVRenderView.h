@@ -492,6 +492,10 @@ protected:
   // displaying an image in a viewport.
   bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
 
+  // Description:
+  // Synchronizes core ivars for multi-client setups.
+  virtual void SynchronizeForCollaboration();
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;

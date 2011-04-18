@@ -585,6 +585,46 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SynchronizeForCollaboration()
+{
+  vtkMultiProcessController* p_controller =
+    this->SynchronizedWindows->GetParallelController();
+  vtkMultiProcessController* d_controller = 
+    this->SynchronizedWindows->GetClientDataServerController();
+  vtkMultiProcessController* r_controller =
+    this->SynchronizedWindows->GetClientServerController();
+
+  if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
+    {
+    if (d_controller)
+      {
+      d_controller->Send(&this->RemoteRenderingThreshold, 1, 1, 41000);
+      }
+    if (r_controller)
+      {
+      r_controller->Send(&this->RemoteRenderingThreshold, 1, 1, 41000);
+      }
+    }
+  else
+    {
+    if (d_controller)
+      {
+      d_controller->Receive(&this->RemoteRenderingThreshold, 1, 1, 41000);
+      }
+    if (r_controller)
+      {
+      r_controller->Receive(&this->RemoteRenderingThreshold, 1, 1, 41000);
+      }
+    }
+  if (p_controller)
+    {
+    p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
+    }
+  cout << "Current RemoteRenderingThreshold: " << this->RemoteRenderingThreshold
+    << endl;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::StillRender()
 {
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -605,6 +645,8 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
+  this->SynchronizeForCollaboration();
+
   if (!interactive)
     {
     // Update all representations.
