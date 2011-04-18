@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProgressBar>
 #include <QToolButton>
 
+#include <iostream>
+
 
 //-----------------------------------------------------------------------------
 pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
@@ -51,6 +53,7 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
   this->ProgressBar = new QProgressBar(this);
   this->ProgressBar->setObjectName("ProgressBar");
   this->ProgressBar->setOrientation(Qt::Horizontal);
+  this->ProgressBar->setEnabled(true);
   gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
 
   this->AbortButton = new QToolButton(this);
@@ -85,8 +88,7 @@ void pqProgressWidget::setProgress(const QString& message, int value)
     {
     this->PendingEnableProgress = false;    
     }
-  this->ProgressBar->setEnabled(!this->PendingEnableProgress);
-
+  std::cerr << "SetProgess " << message.toStdString() << ":" << value << std::endl;
   if (!this->PendingEnableProgress)
     {
     this->ProgressBar->setValue(value);
@@ -102,6 +104,7 @@ void pqProgressWidget::enableProgress(bool enabled)
     if (!this->PendingEnableProgress)
       {
       this->PendingEnableProgress = true;
+      this->ProgressBar->setEnabled(true);
       this->EnableTime.start();
       }
     }

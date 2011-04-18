@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QToolButton>
 
+#include <iostream>
+
 //-----------------------------------------------------------------------------
 pqStatusBar::pqStatusBar(QWidget* parentObject)
   : Superclass(parentObject)
@@ -50,7 +52,7 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   QHBoxLayout* hbox = new QHBoxLayout(widget);
   hbox->setMargin(0);
   hbox->setSpacing(0);
-
+  std::cerr << "Connecting up the progress status bar" << std::endl;
   pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
 
@@ -74,6 +76,7 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   // Final ui setup
   hbox->addWidget(progress_bar);
   this->addPermanentWidget(widget);
+  widget->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
