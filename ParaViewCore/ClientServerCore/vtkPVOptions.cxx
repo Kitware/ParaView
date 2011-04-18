@@ -384,7 +384,7 @@ int vtkPVOptions::WrongArgument(const char* argument)
     return 1;
     }
 
-  if (this->ParaViewDataName == NULL)
+  if (this->ParaViewDataName == NULL && this->GetProcessType() == PVCLIENT)
     {
     // BUG #11199. Assume it's a data file.
     this->SetParaViewDataName(argument);

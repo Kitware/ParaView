@@ -82,7 +82,7 @@ void DumpColorMapInfo( vtkPolyDataMapper * mapper, vtkProperty * property,
                        int vectorByVTKmapper );
 
 //----------------------------------------------------------------------------
-int main( int argc, char* argv[] )
+int ColorMap( int argc, char* argv[] )
 {
   // ------
   // sphere
@@ -480,7 +480,12 @@ int main( int argc, char* argv[] )
   renWin->Delete();
   iren->Delete();
 
-  return !retVal;
+  if (!retVal)
+    {
+    //work around manta return code hijacking
+    _exit(-1);
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

@@ -1,5 +1,19 @@
 INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
+# We setup the standard include directories that would be needed by all plugins
+# anyways.
+INCLUDE_DIRECTORIES(
+  ${VTK_INCLUDE_DIR}
+  ${PARAVIEW_INCLUDE_DIRS}
+  ${PARAVIEW_GUI_INCLUDE_DIRS})
+IF (PARAVIEW_BUILD_QT_GUI)
+  INCLUDE(${QT_USE_FILE})
+  INCLUDE_DIRECTORIES(
+    ${VTK_INCLUDE_DIR}
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${PARAVIEW_GUI_INCLUDE_DIRS})
+ENDIF()
+
 MACRO(paraview_build_optional_plugin name comment subdirectory default)
   OPTION(PARAVIEW_BUILD_PLUGIN_${name} "Build ${comment}" ${default})
   MARK_AS_ADVANCED(PARAVIEW_BUILD_PLUGIN_${name})
@@ -42,7 +56,8 @@ paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analy
 paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
 
 #------------------------------------------------------------------------
-# Build any plugins located outside of ParaView.
+# Build any plugins located outside of ParaView. This mechanism makes it
+# possible to add a directory containing additions plugins to ParaView.
 SET (PARAVIEW_EXTERNAL_PLUGINS_FILE "" CACHE FILEPATH
   "Path to a cmake file containing calls to build additional plugins external to ParaView.")
 
@@ -51,3 +66,17 @@ MARK_AS_ADVANCED(PARAVIEW_EXTERNAL_PLUGINS_FILE)
 IF (EXISTS "${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
   INCLUDE("${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
 ENDIF (EXISTS "${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
+
+#------------------------------------------------------------------------
+# Added additional external plugins to ParaView's build process.
+# Note that all external plugins added in such a way are enabled by default.
+SET (PARAVIEW_EXTERNAL_PLUGIN_DIRS "" CACHE STRING
+  "';' separated paths to additional plugin directories to be included in build process.")
+MARK_AS_ADVANCED(PARAVIEW_EXTERNAL_PLUGIN_DIRS)
+  
+FOREACH (external_plugin_dir ${PARAVIEW_EXTERNAL_PLUGIN_DIRS})
+  set (plugin_name)
+  get_filename_component(plugin_name ${external_plugin_dir} NAME)
+  paraview_build_optional_plugin(${plugin_name}
+    "${plugin_name} (External Plugin)" ${external_plugin_dir} ON)
+ENDFOREACH () 

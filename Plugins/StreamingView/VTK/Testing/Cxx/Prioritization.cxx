@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    Test_StreamRefinement.cxx
+  Module:    Test_StreamPrioritization.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,14 +13,15 @@
 
 =========================================================================*/
 
-// Tests that multiresolution streaming works as expected.
+// Tests that the prioritized streaming works as expected.
 
 #include "vtkActor.h"
 #include "vtkCamera.h"
 #include "vtkContourFilter.h"
 #include "vtkDataSetMapper.h"
-#include "vtkMultiResolutionStreamer.h"
 #include "vtkPieceCacheFilter.h"
+#include "vtkPrioritizedStreamer.h"
+#include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -29,8 +30,10 @@
 #include "vtkStreamingHarness.h"
 #include "vtkTesting.h"
 
+#include "vtksys/SystemTools.hxx"
+
 //---------------------------------------------------------------------------
-int main(int , char **)
+int Prioritization(int argc, char **argv)
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =
@@ -71,10 +74,9 @@ int main(int , char **)
   vtkSmartPointer<vtkStreamingHarness> harness=
     vtkSmartPointer<vtkStreamingHarness>::New();
   harness->SetInputConnection(pcf->GetOutputPort());
-  harness->SetNumberOfPieces(1);
+  harness->SetNumberOfPieces(16);
   harness->SetPiece(0);
-  harness->SetResolution(0.0);
-  harness->SetCacheFilter(pcf);
+  harness->SetResolution(1.0);
 
   vtkSmartPointer<vtkDataSetMapper> map1 =
     vtkSmartPointer<vtkDataSetMapper>::New();
@@ -84,17 +86,18 @@ int main(int , char **)
   act1->SetMapper(map1);
   renderer->AddActor(act1);
 
-  vtkSmartPointer<vtkMultiResolutionStreamer> sd =
-    vtkSmartPointer<vtkMultiResolutionStreamer>::New();
+  vtkSmartPointer<vtkPrioritizedStreamer> sd =
+    vtkSmartPointer<vtkPrioritizedStreamer>::New();
   sd->SetRenderWindow(renWin);
   sd->SetRenderer(renderer);
   sd->AddHarness(harness);
-  sd->SetProgressionMode(vtkMultiResolutionStreamer::AUTOMATIC);
-  sd->SetRefinementDepth(3);
 
   renWin->Render();
 
-  iren->Start();
-
-  return 0;
+  int retVal = vtkRegressionTestImage( renWin );
+  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
+    {
+    iren->Start();
+    }
+  return !retVal;
 }
