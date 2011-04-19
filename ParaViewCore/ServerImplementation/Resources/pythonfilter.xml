@@ -109,7 +109,7 @@
                  <Group name="filters"/>
                </ProxyGroupDomain>
                <DataTypeDomain name="input_type">
-                 <DataType value="vtkDataSet"/>
+                 <DataType value="vtkDataObject"/>
                </DataTypeDomain>       
                <Documentation>
                 This property specifies the input(s) to the programmable filter.
