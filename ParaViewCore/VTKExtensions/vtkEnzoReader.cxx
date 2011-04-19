@@ -2008,16 +2008,16 @@ void vtkEnzoReader::GetBlockMetaData(
                    :   1.0;
     }
 
-  vtkAMRBox myAmrBox(
-    origin, boxOrigin, theBlock.NumberOfDimensions,
-    spacings,
-    theBlock.BlockCellDimensions,
-    blockIdx,
-    theBlock.Level,
-    process );
+//  vtkAMRBox myAmrBox(
+//    origin, boxOrigin, theBlock.NumberOfDimensions,
+//    spacings,
+//    theBlock.BlockCellDimensions,
+//    blockIdx,
+//    theBlock.Level,
+//    process );
 
 //  hbds->SetRefinementRatio( level, this->GetRefinementRatio(level) );
-  hbds->SetDataSet(level,idx[level],myAmrBox,NULL);
+//  hbds->SetDataSet(level,idx[level],myAmrBox,NULL);
   idx[ level ]++;
 
 }
@@ -2067,16 +2067,16 @@ void vtkEnzoReader::GetBlock(
 
   if( bSuccess )
     {
-      vtkAMRBox myAmrBox(
-        origin, boxOrigin, theBlock.NumberOfDimensions,
-        spacings,
-        theBlock.BlockCellDimensions,
-        blockIdx,
-        theBlock.Level,
-        process );
+//      vtkAMRBox myAmrBox(
+//        origin, boxOrigin, theBlock.NumberOfDimensions,
+//        spacings,
+//        theBlock.BlockCellDimensions,
+//        blockIdx,
+//        theBlock.Level,
+//        process );
 
 //      hbds->SetRefinementRatio( level, this->GetRefinementRatio(level) );
-      hbds->SetDataSet(level,idx[level],myAmrBox,uniformGrid);
+//      hbds->SetDataSet(level,idx[level],myAmrBox,uniformGrid);
       idx[ level ]++;
     }
 
