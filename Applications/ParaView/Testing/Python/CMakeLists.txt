@@ -14,7 +14,7 @@ SET (TESTS_WITH_BASELINES
 
 IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingView.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingTest.py
     )
 ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
 
@@ -35,12 +35,12 @@ SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
 set (RenderNan_BREAK TRUE)
-
-# TODO: load the plugin on both sides and reenable these
 set (MantaTest_DISABLE_CRS TRUE)
-set (MantaTest_DISABLE_CS TRUE)
-set (StreamingView_DISABLE_CRS TRUE)
-set (StreamingView_DISABLE_CS TRUE)
+SET (MantaTest_BREAK TRUE)
+set (StreamingTest_DISABLE_CRS TRUE)
+
+# TODO: fix this mode and enable test
+set (StreamingTest_DISABLE_CS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
