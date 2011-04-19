@@ -52,7 +52,6 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   QHBoxLayout* hbox = new QHBoxLayout(widget);
   hbox->setMargin(0);
   hbox->setSpacing(0);
-  std::cerr << "Connecting up the progress status bar" << std::endl;
   pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
 

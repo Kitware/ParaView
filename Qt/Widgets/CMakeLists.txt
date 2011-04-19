@@ -56,9 +56,6 @@ SET(QtWidgets_SRCS
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
-  pqProgressBar.cxx
-  pqProgressBar.h
-  pqProgressBarHelper.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
@@ -96,12 +93,6 @@ SET(QtWidgets_SRCS
   QtWidgetsPlugin.h
 )
 
-IF(Q_WS_MAC)
-  SET(QtWidgets_SRCS ${QtWidgets_SRCS} pqProgressBarHelper.mm)
-ELSE(Q_WS_MAC)
-  SET(QtWidgets_SRCS ${QtWidgets_SRCS} pqProgressBarHelper.cxx)
-ENDIF(Q_WS_MAC)
-
 ##########################################################################
 ## Add the header files that need to moc processed.
 
@@ -128,7 +119,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
-  pqProgressBar.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
   pqSectionVisibilityContextMenu.h
