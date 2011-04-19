@@ -33,7 +33,7 @@
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSMServerStateLocator.h"
-#include "vtkSMCollaborationCommunicator.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkReservedRemoteObjectIds.h"
 
 #include <vtkNew.h>
@@ -922,11 +922,11 @@ void vtkSMSessionClient::EndBusyWork()
   --this->NotBusy;
 }
 //-----------------------------------------------------------------------------
-vtkSMCollaborationCommunicator* vtkSMSessionClient::GetCollaborationCommunicator()
+vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationCommunicator()
 {
   if(this->CollaborationCommunicator == NULL)
     {
-    this->CollaborationCommunicator = vtkSMCollaborationCommunicator::New();
+    this->CollaborationCommunicator = vtkSMCollaborationManager::New();
     this->CollaborationCommunicator->SetSession(this);
     this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
                                this->CollaborationCommunicator);

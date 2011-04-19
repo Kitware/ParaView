@@ -30,7 +30,6 @@
 
 class vtkSMSession;
 class vtkSMStateLocator;
-struct vtkLoadStateContext;
 
 class VTK_EXPORT vtkSMLoadStateContext : public vtkSMObject
 {

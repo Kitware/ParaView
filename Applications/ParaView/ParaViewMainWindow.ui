@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -153,6 +153,15 @@
    </attribute>
    <widget class="pqComparativeVisPanel" name="comparativeVisPanel"/>
   </widget>
+  <widget class="QDockWidget" name="collaborationPanelDock">
+   <property name="windowTitle">
+    <string>Collaboration Panel</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqCollaborationPanel" name="collaborationPanel"/>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -200,6 +209,12 @@
    <class>pqComparativeVisPanel</class>
    <extends>QWidget</extends>
    <header>pqComparativeVisPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqCollaborationPanel</class>
+   <extends>QWidget</extends>
+   <header>pqCollaborationPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

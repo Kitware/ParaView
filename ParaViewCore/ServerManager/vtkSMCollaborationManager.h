@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMCollaborationCommunicator.h
+  Module:    vtkSMCollaborationManager.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCollaborationCommunicator - Class used to broadcast message from
+// .NAME vtkSMCollaborationManager - Class used to broadcast message from
 // one client to the others.
 // .SECTION Description
 // This class allow to trigger protobuf messages on all the clients that are
@@ -20,23 +20,23 @@
 // handle those message in the way they want.
 // The message sender do not receive its message again, only other clients do.
 
-#ifndef __vtkSMCollaborationCommunicator_h
-#define __vtkSMCollaborationCommunicator_h
+#ifndef __vtkSMCollaborationManager_h
+#define __vtkSMCollaborationManager_h
 
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMLoadStateContext;
 
-class VTK_EXPORT vtkSMCollaborationCommunicator : public vtkSMRemoteObject
+class VTK_EXPORT vtkSMCollaborationManager : public vtkSMRemoteObject
 {
 public:
   // Description:
   // Return the GlobalID that should be used to refer to the TimeKeeper
   static vtkTypeUInt32 GetReservedGlobalID();
 
-  static vtkSMCollaborationCommunicator* New();
-  vtkTypeMacro(vtkSMCollaborationCommunicator,vtkSMRemoteObject);
+  static vtkSMCollaborationManager* New();
+  vtkTypeMacro(vtkSMCollaborationManager,vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -45,12 +45,17 @@ public:
   virtual vtkTypeUInt32 GetGlobalID();
 
 //BTX
+  enum EventType
+    {
+    CollaborationNotification = 12345
+    };
 
   // Description:
-  // This method return the full object state that can be used to create that
-  // object from scratch.
-  // This method will be used to fill the undo stack.
-  // If not overriden this will return NULL.
+  // Send message to other clients which will trigger Observer
+  void SendToOtherClients(vtkSMMessage* msg);
+
+  // Description:
+  // This method return NULL because that class have no state.
   virtual const vtkSMMessage* GetFullState() { return NULL; };
 
   // Description:
@@ -61,16 +66,15 @@ public:
 protected:
   // Description:
   // Default constructor.
-  vtkSMCollaborationCommunicator();
+  vtkSMCollaborationManager();
 
   // Description:
   // Destructor.
-  virtual ~vtkSMCollaborationCommunicator();
+  virtual ~vtkSMCollaborationManager();
 
 private:
-  vtkSMCollaborationCommunicator(const vtkSMCollaborationCommunicator&); // Not implemented
-  void operator=(const vtkSMCollaborationCommunicator&);       // Not implemented
+  vtkSMCollaborationManager(const vtkSMCollaborationManager&); // Not implemented
+  void operator=(const vtkSMCollaborationManager&);       // Not implemented
 //ETX
 };
-
-#endif // #ifndef __vtkSMCollaborationCommunicator_h
+#endif // #ifndef __vtkSMCollaborationManager_h

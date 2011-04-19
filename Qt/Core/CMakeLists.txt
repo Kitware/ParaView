@@ -27,6 +27,7 @@ IF(QT_TESTING_WITH_PYTHON)
   )
 INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
+  ${protobuf_SOURCE_DIR}/src
 )
 ENDIF(QT_TESTING_WITH_PYTHON)
 
@@ -397,6 +398,7 @@ TARGET_LINK_LIBRARIES(pqCore
   QVTK
   vtkCharts
   vtkPVServerManager
+  protobuf
 )
 
 IF(VTK_USE_INFOVIS)

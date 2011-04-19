@@ -101,7 +101,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
     //cout << "UpdateStateHistory: " << globalId << endl;
 
-    if(remoteObj && !remoteObj->IsPrototype())
+    if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
       {
       vtkSMMessage newState;
       newState.CopyFrom(*remoteObj->GetFullState());

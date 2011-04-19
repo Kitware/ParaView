@@ -32,6 +32,7 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
 )
 
 SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_INCLUDE_DIR})
@@ -66,6 +67,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
   pqClipPanel.h
+  pqCollaborationPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -214,6 +216,7 @@ SET(UI_FORMS
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqChangeInputDialog.ui
+  Resources/UI/pqCollaborationPanel.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
@@ -376,6 +379,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
   pqCloseViewUndoElement.h
+  pqCollaborationPanel.cxx
+  pqCollaborationPanel.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx

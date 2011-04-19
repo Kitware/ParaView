@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -51,6 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
 #include "vtkToolkits.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
+#include "vtkSMMessage.h"
 
 // Qt includes.
 #include <QColor>
@@ -66,6 +70,8 @@ public:
   // inactivity timeouts.
   QTimer HeartbeatTimer;
 
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
+  vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
@@ -155,6 +161,16 @@ void pqServer::initialize()
   if(this->isRemote())
     {
     this->IdleCollaborationTimer.start();
+    vtkSMSessionClient* session = vtkSMSessionClient::SafeDownCast(this->session());
+    if(session)
+      {
+      this->Internals->CollaborationCommunicator = session->GetCollaborationCommunicator();
+      this->Internals->VTKConnect->Connect(
+          session->GetCollaborationCommunicator(),
+          vtkSMCollaborationManager::CollaborationNotification,
+          this,
+          SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
+      }
     }
 }
 
@@ -505,5 +521,19 @@ void pqServer::processServerNotification()
   if(sessionClient && sessionClient->IsNotBusy())
     {
     vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqServer::onCollaborationCommunication(vtkObject* src, unsigned long event, void* method, void* data)
+{
+  vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
+  emit sentFromOtherClient(msg);
+}
+//-----------------------------------------------------------------------------
+void pqServer::sendToOtherClients(vtkSMMessage* msg)
+{
+  if(this->Internals->CollaborationCommunicator)
+    {
+    this->Internals->CollaborationCommunicator->SendToOtherClients(msg);
     }
 }

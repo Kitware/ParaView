@@ -131,6 +131,13 @@ message PullRequest {
   }
 }
 
+// Extension Collaboration Communication ****************************** [50-51]
 
+message ChatMessage {
+  extend Message {
+    required uint64 user = 50;
+    required string txt  = 51;
+  }
+}
 
 // End of Messages definitions ************************************************

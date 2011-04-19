@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServer_h
 #define _pqServer_h
 
+class vtkObject;
 class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
@@ -47,6 +48,7 @@ class vtkSMSession;
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessageMinimal.h"
 #include "vtkWeakPointer.h"
 #include <QPointer>
 #include <QTimer>
@@ -155,12 +157,29 @@ protected:
   // updates all servers with the current settings.
   static void updateGlobalMapperProperties();
 
+  // ---- Collaboration client-to-clients communication mechanisme ----
+
+signals:
+  /// Allow user to listen messages from other clients
+  void sentFromOtherClient(vtkSMMessage* msg);
+
+public slots:
+  /// Allow user to broadcast to other client a given message
+  void sendToOtherClients(vtkSMMessage* msg);
+
+  // ---- Collaboration client-to-clients communication mechanisme ----
+
 protected slots:
   /// Called to send a heartbeat to the server.
   void heartBeat();
 
   /// Called when idle to look for server notification for collaboration purpose
   void processServerNotification();
+
+  /// Called by vtkSMCollaborationManager when associated message happen.
+  /// This will convert the given parameter into vtkSMMessage and
+  /// emit sentFromOtherClient(vtkSMMessage*) signal.
+  void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
 
 private:
   pqServer(const pqServer&);  // Not implemented.
