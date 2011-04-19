@@ -31,7 +31,7 @@
 #include "vtkTesting.h"
 
 //---------------------------------------------------------------------------
-int Refinement(int argc, char **argv)
+int Refinement(int argc, char *argv[])
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =

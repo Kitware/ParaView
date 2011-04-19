@@ -38,7 +38,7 @@
 #include "vtksys/SystemTools.hxx"
 
 //---------------------------------------------------------------------------
-int Source(int argc, char **argv)
+int Source(int argc, char *argv[])
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =
