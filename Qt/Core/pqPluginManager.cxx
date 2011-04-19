@@ -99,17 +99,6 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
     this, SLOT(onServerConnected(pqServer*)));
   QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));
-
-  // Load local plugins information and then load those plugins.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QString("/PluginsList/Local/%1").arg(
-    QCoreApplication::applicationFilePath());
-  QString local_plugin_config = settings->value(key).toString();
-  if (!local_plugin_config.isEmpty())
-    {
-    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-      local_plugin_config.toAscii().data());
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -120,6 +109,21 @@ pqPluginManager::~pqPluginManager()
     this->onServerDisconnected(this->Internals->ActiveServer);
     }
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::loadPluginsFromSettings()
+{
+  // Load local plugins information and then load those plugins.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QString key = QString("/PluginsList/Local/%1").arg(
+    QCoreApplication::applicationFilePath());
+  QString local_plugin_config = settings->value(key).toString();
+  if (!local_plugin_config.isEmpty())
+    {
+    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
+      local_plugin_config.toAscii().data());
+    }
 }
 
 //-----------------------------------------------------------------------------

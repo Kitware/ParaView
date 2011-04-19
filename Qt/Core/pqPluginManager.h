@@ -58,6 +58,10 @@ public:
   pqPluginManager(QObject* p = 0);
   ~pqPluginManager();
 
+  /// Called during application initialization to load plugins from settings.
+  /// This only loads "local" plugins.
+  void loadPluginsFromSettings();
+
   enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
 
   /// attempt to load an extension on a server
