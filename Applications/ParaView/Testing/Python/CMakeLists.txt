@@ -12,6 +12,12 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.py
   )
 
+IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
+  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingView.py
+    )
+ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
+
 IF(PARAVIEW_BUILD_PLUGIN_Manta)
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/MantaTest.py
@@ -33,6 +39,8 @@ set (RenderNan_BREAK TRUE)
 # TODO: load the plugin on both sides and reenable these
 set (MantaTest_DISABLE_CRS TRUE)
 set (MantaTest_DISABLE_CS TRUE)
+set (StreamingView_DISABLE_CRS TRUE)
+set (StreamingView_DISABLE_CS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
