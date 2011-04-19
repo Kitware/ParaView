@@ -1906,7 +1906,7 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
-      <DoubleVectorProperty name="Color"
+      <DoubleVectorProperty name="AmbientColor"
         command="SetColor"
         number_of_elements="3"
         default_values="1.0 1.0 1.0">
