@@ -435,9 +435,9 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       inputScalars[2] = outPD->GetScalars( this->GetZAxisVarName() );
 
 
-      newPt[0] = inputScalars[0]->GetTuple1( cellId );
-      newPt[1] = inputScalars[1]->GetTuple1( cellId );
-      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
+      newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
+      newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
       newIDs[0] = newPoints->InsertNextPoint( newPt );
 
 
@@ -485,9 +485,9 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       }
 
 
-      newPt[0] = inputScalars[0]->GetTuple1( cellId );
-      newPt[1] = inputScalars[1]->GetTuple1( cellId );
-      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
+      newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
+      newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
       newIDs[0] = newPoints->InsertNextPoint( newPt );
 
 
