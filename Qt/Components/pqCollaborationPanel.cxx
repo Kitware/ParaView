@@ -43,6 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqServer.h"
 #include "vtkSMMessage.h"
+#include "vtkPVServerInformation.h"
+#include "vtkstd/map"
+#include "vtkstd/string"
+#include <vtksys/ios/sstream>
 
 //#include "pqApplicationCore.h"
 //#include "pqSignalAdaptors.h"
@@ -67,20 +71,63 @@ public:
 
   void validateEntry()
     {
-    this->addEntry(this->userID++, this->message->text());
+    this->addEntry(this->userID, this->message->text());
     this->message->clear();
     }
 
   void addEntry(int userId, const QString& txt)
     {
-    QString message = QString("<table bgcolor='%2' width='100\%'><tr><td>%1</td></tr></table>").arg(txt,this->userPalette.at(userId%this->userPalette.size()));
+    //QString message = QString("<table bgcolor='%2' width='100\%'><tr><td>%1</td></tr></table>").arg(txt,this->userPalette.at(userId%this->userPalette.size()));
+    QString message = QString("<b>%1:</b> %2 <br/>\n\n").arg(this->getUserName(userId), txt.trimmed());
     this->content->textCursor().atEnd();
     this->content->insertHtml(message);
     this->content->textCursor().atEnd();
+    this->content->textCursor().movePosition(QTextCursor::End);
     this->content->ensureCursorVisible();
     }
 
+  const char* getUserName()
+    {
+    return this->getUserName(this->userID);
+    }
+
+  const char* getUserName(int id)
+    {
+    vtkstd::map<int, vtkstd::string>::iterator iter = this->userMap.find(id);
+    if(iter != this->userMap.end())
+      {
+      return iter->second.c_str();
+      }
+    vtksys_ios::ostringstream name;
+    name << "User " << id;
+    this->userMap[id] = name.str().c_str();
+    return name.str().c_str();
+    }
+
+  void updateUserName(int id, const char* name)
+    {
+    this->userMap[id] = name;
+    }
+
+  void broadcastUserName(bool requestUpdate)
+    {
+    vtkSMMessage updateMsg;
+    updateMsg.SetExtension(ClientInformation::req_update, requestUpdate);
+    this->sendToOtherClients(&updateMsg);
+    }
+
+  void sendToOtherClients(vtkSMMessage* msg)
+    {
+    if(!this->server.isNull())
+      {
+      msg->SetExtension(ClientInformation::user, this->userID);
+      msg->SetExtension(ClientInformation::name, this->getUserName());
+      this->server->sendToOtherClients(msg);
+      }
+    }
+
   int userID;
+  vtkstd::map<int, vtkstd::string> userMap;
   QList<QString> userPalette;
   QPointer<pqServer> server;
 };
@@ -95,7 +142,7 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
                     this, SLOT(setServer(pqServer*)));
 
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
-                    this, SLOT(onUserMessageAvailable()));
+                    this, SLOT(onUserMessage()));
 }
 
 //-----------------------------------------------------------------------------
@@ -104,31 +151,65 @@ pqCollaborationPanel::~pqCollaborationPanel()
   if(this->Internal->server)
     {
     QObject::disconnect(this->Internal->server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this, SLOT(onChatMessage(vtkSMMessage*)));
+                        this, SLOT(onClientMessage(vtkSMMessage*)));
     }
   delete this->Internal;
   this->Internal = 0;
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::onUserMessageAvailable()
+void pqCollaborationPanel::onUserInformationUpdate()
+{
+  // TODO send local user name
+  if(!this->Internal->server.isNull())
+    {
+    this->Internal->broadcastUserName(false);
+    }
+  // TODO need to know when it is worth requesting user name update...
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::onUserMessage()
   {
+  if(this->Internal->message->text().trimmed().length() == 0)
+    {
+    return;
+    }
+
   if(!this->Internal->server.isNull())
     {
     vtkSMMessage msg;
     msg.SetExtension(ChatMessage::txt, this->Internal->message->text().toStdString());
-    msg.SetExtension(ChatMessage::user, this->Internal->userID);
-    this->Internal->server->sendToOtherClients(&msg);
+    this->Internal->sendToOtherClients(&msg);
     }
   this->Internal->validateEntry();
   }
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::onChatMessage(vtkSMMessage* msg)
+void pqCollaborationPanel::onClientMessage(vtkSMMessage* msg)
 {
-  if(msg->HasExtension(ChatMessage::txt) && msg->HasExtension(ChatMessage::user))
+  if(msg->HasExtension(ClientInformation::user))
     {
-    this->Internal->addEntry( msg->GetExtension(ChatMessage::user),
-                              msg->GetExtension(ChatMessage::txt).c_str());
+    // Handle client informations of the message
+    int userId = msg->GetExtension(ClientInformation::user);
+    vtkstd::string userName;
+    if(msg->HasExtension(ClientInformation::name))
+      {
+      userName = msg->GetExtension(ClientInformation::name);
+      this->Internal->updateUserName(userId, userName.c_str());
+      }
+
+    // Chat message detected... Just publish it in the UI
+    if(msg->HasExtension(ChatMessage::txt))
+      {
+      this->Internal->addEntry( userId,
+                                msg->GetExtension(ChatMessage::txt).c_str());
+      }
+
+    // Notify other client about your local name
+    if(msg->GetExtension(ClientInformation::req_update))
+      {
+      this->Internal->broadcastUserName(false);
+      }
     }
 }
 
@@ -140,12 +221,13 @@ void pqCollaborationPanel::setServer(pqServer* server)
   if(this->Internal->server)
     {
     QObject::disconnect(this->Internal->server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this, SLOT(onChatMessage(vtkSMMessage*)));
+                        this, SLOT(onClientMessage(vtkSMMessage*)));
     }
   this->Internal->server = server;
   if(server)
     {
+    this->Internal->userID = server->getServerInformation()->GetClientId();
     QObject::connect(server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                     this, SLOT(onChatMessage(vtkSMMessage*)));
+                     this, SLOT(onClientMessage(vtkSMMessage*)));
     }
 }

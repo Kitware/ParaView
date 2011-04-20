@@ -37,6 +37,17 @@ public:
   //  --------------------- Composite API -------------------------------
 
   // Description:
+  // Return a unique identifier for the given selected controller.
+  // This is only used as information to id which client is currently talking
+  // to the server. In fact it is used inside vtkPVServerInformation so the client
+  // could know what is its unique ID in respect to the server.
+  int GetActiveControllerID();
+
+  // Description:
+  // Return the number of currently connected controllers.
+  int GetNumberOfControllers();
+
+  // Description:
   // Append the given controller to the composite set.
   // We focus on vtkSocketController because most of the API method are empty
   void RegisterController(vtkMultiProcessController* controller);

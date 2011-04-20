@@ -48,8 +48,9 @@ struct RMICallbackInfo
 
 struct Controller
 {
-  Controller(vtkMultiProcessController* controller)
+  Controller(int id, vtkMultiProcessController* controller)
     {
+    this->Id = id;
     this->MultiProcessController = controller;
     this->ActivateObserverId = 0;
     }
@@ -106,6 +107,7 @@ struct Controller
     }
 
   unsigned long ActivateObserverId;
+  int Id;
   vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
   vtkstd::map<unsigned long, vtkstd::vector<unsigned long> > RMICallbackIdMapping;
 };
@@ -113,6 +115,7 @@ struct Controller
 public:
   vtkCompositeInternals(vtkCompositeMultiProcessController* owner)
     {
+    this->ControllerID = 1;
     this->RMICallbackIdCounter = 1;
     this->Owner = owner;
     this->NeedToInitializeControllers = false;
@@ -126,7 +129,7 @@ public:
       // CAUTION: This initialization is only correct for vtkSocketController
       ctrl->Initialize(0,0);
       }
-    this->Controllers.push_back(Controller(ctrl));
+    this->Controllers.push_back(Controller(this->ControllerID++, ctrl));
     this->ActiveController = &this->Controllers.back();
     this->ActiveController->ActivateObserverId = ctrl->AddObserver(
         vtkCommand::StartEvent, this, &vtkCompositeInternals::ActivateController);
@@ -183,6 +186,15 @@ public:
       return this->ActiveController->MultiProcessController;
       }
     return NULL;
+    }
+  //-----------------------------------------------------------------
+  int GetActiveControllerID()
+    {
+    if(this->ActiveController)
+      {
+      return this->ActiveController->Id;
+      }
+    return 0;
     }
   //-----------------------------------------------------------------
   void ActivateController(vtkObject* src, unsigned long event, void* data)
@@ -351,8 +363,13 @@ public:
       }
     }
   //-----------------------------------------------------------------
+  int GetNumberOfControllers()
+    {
+    return this->Controllers.size();
+    }
 
 private:
+  int ControllerID;
   Controller* ActiveController;
   vtkWeakPointer<vtkCompositeMultiProcessController> Owner;
   vtkstd::vector<RMICallbackInfo> RMICallbacks;
@@ -438,4 +455,14 @@ void vtkCompositeMultiProcessController::TriggerRMI2NonActives(int remote,
 {
   this->Internal->CleanNonConnectedControllers();
   this->Internal->TriggerRMI2NonActives(1, data, length, tag);
+}
+//----------------------------------------------------------------------------
+int vtkCompositeMultiProcessController::GetActiveControllerID()
+{
+  return this->Internal->GetActiveControllerID();
+}
+//----------------------------------------------------------------------------
+int vtkCompositeMultiProcessController::GetNumberOfControllers()
+{
+  return this->Internal->GetNumberOfControllers();
 }

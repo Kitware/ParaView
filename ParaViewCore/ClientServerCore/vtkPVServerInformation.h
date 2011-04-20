@@ -124,6 +124,15 @@ public:
   // Description:
   // Get the number of processes.
   vtkGetMacro(NumberOfProcesses, int);
+
+  // Description:
+  // Get the id that correspond to the current client
+  vtkGetMacro(ClientId, int);
+
+  // Description:
+  // Return the number of connected clients
+  vtkGetMacro(NumberOfClients, int);
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
@@ -137,6 +146,8 @@ protected:
   int Timeout;
   int UseIceT;
   int UseOffscreenRendering;
+  int ClientId;
+  int NumberOfClients;
   char* RenderModuleName;
 
   vtkPVServerOptionsInternals* MachinesInternals;

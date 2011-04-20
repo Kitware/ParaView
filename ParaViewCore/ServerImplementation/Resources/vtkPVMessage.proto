@@ -131,12 +131,19 @@ message PullRequest {
   }
 }
 
-// Extension Collaboration Communication ****************************** [50-51]
+// Extension Collaboration Communication ****************************** [50-54]
+
+message ClientInformation {
+  extend Message {
+    required uint64 user     = 50;
+    optional string name     = 51;
+    optional bool req_update = 52 [default = false];
+  }
+}
 
 message ChatMessage {
   extend Message {
-    required uint64 user = 50;
-    required string txt  = 51;
+    required string txt  = 53;
   }
 }
 

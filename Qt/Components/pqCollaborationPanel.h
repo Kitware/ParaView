@@ -54,8 +54,9 @@ public slots:
   void setServer(pqServer* server);
 
 protected slots:
-  void onUserMessageAvailable();
-  void onChatMessage(vtkSMMessage* msg);
+  void onUserMessage();
+  void onUserInformationUpdate();
+  void onClientMessage(vtkSMMessage* msg);
 
 protected:
   pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
