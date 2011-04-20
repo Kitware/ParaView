@@ -103,6 +103,59 @@
 
   <ProxyGroup name="filters">
 
+   <!-- ==================================================================== -->
+   <SourceProxy name="AMRSlice" class="vtkAMRSliceFilter"
+                label="Slice AMR data" >
+      <Documentation
+        short_help="Slices AMR Data"
+        long_help="Slices AMR Data">
+        This filter slices AMR data.
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+      </InputProperty>
+
+      
+      <DoubleVectorProperty
+        name="OffSet"
+        command="SetOffSetFromOrigin"
+        number_of_elements="1"
+        default_values="1.0" >
+       <DoubleRangeDomain name="range" min="0"/>
+       <Documentation>
+        Set's the offset from the origin of the data-set
+       </Documentation>
+     </DoubleVectorProperty>
+     
+     <IntVectorProperty
+        name="Normal"
+        command="SetNormal"
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="X-Normal"/>
+         <Entry value="2" text="Y-Normal"/>
+         <Entry value="3" text="Z-Normal"/>
+       </EnumerationDomain>
+       <Documentation>
+	  This property sets the normal of the slice.
+       </Documentation>
+     </IntVectorProperty>
+
+   </SourceProxy>
+   
     <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkPExtractArraysOverTime"
       label="Plot Selection Over Time">

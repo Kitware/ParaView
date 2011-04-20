@@ -64,9 +64,12 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
     return 1;
     }
 
-  this->Superclass::WrongArgument(argument);
   // All arguments are simply passed to the python interpretor.
-  return 1;
+  // Returning 0 tells CommandLineArguments that the "argument" was not a
+  // handled and hence it leaves it in the "remaining arguments" collection. We
+  // query the remaining arguments and simply pass them to the python
+  // interpretor.
+  return 0;
 }
 
 //----------------------------------------------------------------------------

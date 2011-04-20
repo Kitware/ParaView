@@ -21,6 +21,7 @@
 #include "vtkDataSetMapper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkPrioritizedStreamer.h"
+#include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -32,7 +33,7 @@
 #include "vtksys/SystemTools.hxx"
 
 //---------------------------------------------------------------------------
-int main(int , char **)
+int Prioritization(int argc, char *argv[])
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =
@@ -93,7 +94,10 @@ int main(int , char **)
 
   renWin->Render();
 
-  iren->Start();
-
-  return 0;
+  int retVal = vtkRegressionTestImage( renWin );
+  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
+    {
+    iren->Start();
+    }
+  return !retVal;
 }

@@ -6,9 +6,8 @@ import QtTestingImage
 #TODO fix test recording so that it actually records these events
 #most of which I had to hack in by hand
 
-#TODO: test both server and client side rendering modes
+#TODO: test both server and client side rendering
 #turn on server side rendering
-#TODO: server side rendering breaks in playback, but works in practice
 #object2 = 'pqClientMainWindow/menubar/menu_Edit'
 #QtTesting.playCommand(object2, 'activate', 'actionEditSettings')
 #objectb2 = 'pqClientMainWindow/ApplicationSettings/PageNames'
@@ -20,27 +19,27 @@ import QtTestingImage
 #objectb4 = 'pqClientMainWindow/ApplicationSettings/CloseButton'
 #QtTesting.playCommand(objectb4, 'activate', '')
 
-#load manta plugin on client and server sides
+#load streaming view plugin on client and server sides
 hack1='pqClientMainWindow/menubar'
 QtTesting.playCommand(hack1, 'activate', 'menuTools')
 hack2='pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(hack2, 'activate', 'actionManage_Plugins')
 object1 = 'pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins'
-QtTesting.playCommand(object1, 'setCurrent', 'MantaView')
+QtTesting.playCommand(object1, 'setCurrent', 'StreamingView')
 object2 = 'pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local'
 QtTesting.playCommand(object2, 'activate', '')
 objecta1 = 'pqClientMainWindow/PluginManagerDialog/remoteGroup/remotePlugins'
-QtTesting.playCommand(objecta1, 'setCurrent', 'MantaView')
+QtTesting.playCommand(objecta1, 'setCurrent', 'StreamingView')
 objecta2 = 'pqClientMainWindow/PluginManagerDialog/remoteGroup/loadSelected_Remote'
 QtTesting.playCommand(objecta2, 'activate', '')
 object3 = 'pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object3, 'activate', '')
 
-#close the 3D view and make a manta view
+#close the 3D view and make a streaming view
 object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object4, 'activate', '')
 #TODO: make view selection by name, test will fail if view list contents change
-object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton0'
+object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2'
 QtTesting.playCommand(object5, 'activate', '')
 
 #show something
@@ -57,4 +56,4 @@ QtTesting.playCommand(object7, 'mouseRelease', '(0.605413,0.271942,1,0,0)')
 
 # Image comparison
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTestingImage.compareImage(snapshotWidget, 'MantaImage.png', 300, 300);
+QtTestingImage.compareImage(snapshotWidget, 'StreamingImage.png', 300, 300);

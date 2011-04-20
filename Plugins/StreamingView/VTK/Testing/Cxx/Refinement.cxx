@@ -21,6 +21,7 @@
 #include "vtkDataSetMapper.h"
 #include "vtkMultiResolutionStreamer.h"
 #include "vtkPieceCacheFilter.h"
+#include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -30,7 +31,7 @@
 #include "vtkTesting.h"
 
 //---------------------------------------------------------------------------
-int main(int , char **)
+int Refinement(int argc, char *argv[])
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =
@@ -94,7 +95,10 @@ int main(int , char **)
 
   renWin->Render();
 
-  iren->Start();
-
-  return 0;
+  int retVal = vtkRegressionTestImage( renWin );
+  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
+    {
+    iren->Start();
+    }
+  return !retVal;
 }

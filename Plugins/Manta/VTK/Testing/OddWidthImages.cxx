@@ -20,7 +20,7 @@ Tests whether we can give manta non aligned image sizes without getting staircas
 // this program tests creating odd-width images
 
 //----------------------------------------------------------------------------
-int main( int argc, char* argv[] )
+int OddWidthImages( int argc, char* argv[] )
 {
   int     objRes = 12;
   double  objRad = 0.075;
@@ -115,5 +115,12 @@ int main( int argc, char* argv[] )
   renWin->Delete();
   interactor->Delete();
 
-  return !retVal;
+  if (retVal == 0)
+    {
+    //someone is intercepting the return value which prevents any failures
+    cerr << "FAILURE" << endl;
+    _exit(1);
+    }
+  cerr << "SUCCESS" << endl;
+  return 0;
 }
