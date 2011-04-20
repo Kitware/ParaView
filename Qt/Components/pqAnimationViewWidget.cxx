@@ -442,6 +442,10 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   // add new tracks
   foreach(pqAnimationCue* cue, cues)
     {
+    if(cue == NULL)
+      {
+      continue;
+      }
     QString completeName = this->Internal->cueName(cue);
 
     iter = this->Internal->TrackMap.find(cue);
