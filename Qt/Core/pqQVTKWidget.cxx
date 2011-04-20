@@ -31,21 +31,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQVTKWidget.h"
 
-#include <QResizeEvent>
-#include <QMoveEvent>
 #include "pqUndoStack.h"
+#include <QMoveEvent>
+#include <QResizeEvent>
+#include <QTimer>
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
-  : Superclass(parentObject, f)
+  : Superclass(parentObject, f),
+  ResizeTimer(new QTimer(this))
 {
+  QObject::connect(this->ResizeTimer, SIGNAL(timeout()),
+    this, SLOT(updateSizeProperties()));
+  this->ResizeTimer->setSingleShot(true);
+  this->ResizeTimer->setInterval(700); // 2 seconds.
 }
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::~pqQVTKWidget()
 {
+  this->ResizeTimer->stop();
+  delete this->ResizeTimer;
 }
 
 //----------------------------------------------------------------------------
@@ -68,11 +76,16 @@ QWidget* pqQVTKWidget::positionReference() const
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
   this->Superclass::resizeEvent(e);
+  this->ResizeTimer->start();
+}
 
+//----------------------------------------------------------------------------
+void pqQVTKWidget::updateSizeProperties()
+{
   BEGIN_UNDO_EXCLUDE();
   int view_size[2];
-  view_size[0] = e->size().width();
-  view_size[1] = e->size().height();
+  view_size[0] = this->size().width();
+  view_size[1] = this->size().height();
   vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
 
   QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
@@ -84,6 +97,9 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* e)
   this->ViewProxy->UpdateProperty("ViewSize");
   this->ViewProxy->UpdateProperty("ViewPosition");
   END_UNDO_EXCLUDE();
+
+  // need to request a render after the "resizing" is done.
+  this->update();
 }
 
 //----------------------------------------------------------------------------

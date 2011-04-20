@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 class vtkSMProxy;
+class QTimer;
 
 /// pqQVTKWidget extends QVTKWidget to add awareness for view proxies. The
 /// advantage of doing that is that pqQVTKWidget can automatically update the
@@ -73,10 +74,15 @@ protected:
   /// overloaded move handler
   virtual void moveEvent(QMoveEvent* event);
 
+private slots:
+  void updateSizeProperties();
+
 private:
   Q_DISABLE_COPY(pqQVTKWidget)
   vtkSmartPointer<vtkSMProxy> ViewProxy;
   QPointer<QWidget> PositionReference;
+  /// used to collapse multiple resize events.
+  QTimer* ResizeTimer;
 };
 
 #endif
