@@ -108,7 +108,7 @@ public:
     return elementToReturn;
   }
   //-------------------------------------------------------------------------
-  vtkPVXMLElement* GetProxyElement( const StrToStrToXmlMap map,
+  vtkPVXMLElement* GetProxyElement( const StrToStrToXmlMap& map,
                                     const char* firstStr,
                                     const char* secondStr)
   {
