@@ -131,9 +131,11 @@ public:
   void SetThresholdYBetween(double lower, double upper);
 
  virtual double *GetXThresholdBetween();
- virtual void GetXThresholdBetween (double &_arg1, double &_arg2);
  virtual void GetXThresholdBetween (double _arg[2]);
+ virtual void GetXThresholdBetween (double &_arg1, double &_arg2);
+ 
 
+  //vtkGetVector2Macro(XThresholdBetween,double);
   vtkGetVector2Macro(YThresholdBetween,double);
 
 

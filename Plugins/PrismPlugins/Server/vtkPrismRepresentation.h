@@ -33,8 +33,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetScaleFactor(double scale[3]);
+  
+  virtual double *GetPrismRange();
+  virtual void GetPrismRange(double &_arg1, double &_arg2, double &_arg3);
+  virtual void GetPrismRange(double range[3]);
 
- void GetPrismRange(double range[3]);
 
 //BTX
 protected:

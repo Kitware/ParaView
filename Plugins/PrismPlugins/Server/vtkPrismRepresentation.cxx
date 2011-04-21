@@ -40,7 +40,7 @@ namespace
     static vtkPrismTransform *New();
 
 
-    vtkGetVectorMacro(PrismRange,double,3);
+    vtkGetVector3Macro(PrismRange,double);
 
   protected:
 
@@ -133,12 +133,26 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
   delete this->Internal;
 }
 
- void vtkPrismRepresentation::GetPrismRange(double* range)
+double* vtkPrismRepresentation::GetPrismRange()
 {
   this->Internal->ScaleTransform->Update();
-  this->Internal->ScaleTransform->GetPrismRange(range);
+  return this->Internal->ScaleTransform->GetPrismRange();
+}
+
+ void vtkPrismRepresentation::GetPrismRange(double range[3])
+{
+  this->GetPrismRange(range[0],range[1],range[2]);
 
 }
+
+  void vtkPrismRepresentation::GetPrismRange(
+    double &_arg1, double &_arg2, double &_arg3)
+{
+  this->Internal->ScaleTransform->Update();
+  this->Internal->ScaleTransform->GetPrismRange(_arg1,_arg2,_arg3);
+
+}
+
   void vtkPrismRepresentation::SetScaleFactor(double* scale)
 {
   this->Internal->Transform->Scale(scale);
