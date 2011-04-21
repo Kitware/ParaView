@@ -718,6 +718,6 @@ pqTestUtility* pqApplicationCore::testUtility()
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadDistributedPlugins(const char* filename)
+void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
 {
 }
