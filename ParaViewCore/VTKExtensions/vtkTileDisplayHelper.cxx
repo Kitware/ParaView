@@ -43,7 +43,7 @@ public:
   TilesMapType LeftEyeTilesMap;
   TilesMapType RightEyeTilesMap;  
 
-  void FlushTile(const TilesMapType::iterator& iter, const TilesMapType& TileMap, const int &leftEye)
+  void FlushTile(const TilesMapType::iterator& iter, const TilesMapType& TileMap, const int &vtkNotUsed(leftEye))
     {
     if (iter != TileMap.end())
       {

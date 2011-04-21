@@ -46,7 +46,9 @@ public:
       }
     }
 
-  void CreateUndoElement(vtkObject *caller, unsigned long eventId, void *callData)
+  void CreateUndoElement(vtkObject *vtkNotUsed(caller),
+                         unsigned long vtkNotUsed(eventId),
+                         void *vtkNotUsed(callData))
     {
     // Make sure an UndoStackBuilder is available
     if(this->UndoStackBuilder == NULL)
