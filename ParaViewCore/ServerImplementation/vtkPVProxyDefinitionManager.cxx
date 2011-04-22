@@ -108,7 +108,7 @@ public:
     return elementToReturn;
   }
   //-------------------------------------------------------------------------
-  vtkPVXMLElement* GetProxyElement( const StrToStrToXmlMap map,
+  vtkPVXMLElement* GetProxyElement( const StrToStrToXmlMap& map,
                                     const char* firstStr,
                                     const char* secondStr)
   {
@@ -566,12 +566,12 @@ void vtkPVProxyDefinitionManager::AttachShowInMenuHintsToProxy(vtkPVXMLElement* 
   vtkPVXMLElement* hints = proxy->FindNestedElementByName("Hints");
   if(hints == NULL)
     {
-    vtkNew<vtkPVXMLElement> hints;
-    hints->SetName("Hints");
+    vtkNew<vtkPVXMLElement> madehints;
+    madehints->SetName("Hints");
     vtkNew<vtkPVXMLElement> showInMenu;
     showInMenu->SetName("ShowInMenu");
-    hints->AddNestedElement(showInMenu.GetPointer());
-    proxy->AddNestedElement(hints.GetPointer());
+    madehints->AddNestedElement(showInMenu.GetPointer());
+    proxy->AddNestedElement(madehints.GetPointer());
     }
   else if(hints->FindNestedElementByName("ShowInMenu") == NULL)
     {

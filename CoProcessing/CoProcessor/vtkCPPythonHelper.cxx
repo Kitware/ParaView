@@ -104,8 +104,8 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     // Initialize the sub-interpreter because that is where RunSimpleString
     // works.
     vtkCPPythonHelper::Instance->PythonInterpretor = vtkPVPythonInterpretor::New();
-    int interpOk =
-        vtkCPPythonHelper::Instance->PythonInterpretor->InitializeSubInterpretor(1, argv);
+    //int interpOk =
+    vtkCPPythonHelper::Instance->PythonInterpretor->InitializeSubInterpretor(1, argv);
 
     delete []argv[0];
     delete []argv;
