@@ -20,6 +20,8 @@ foreach (test ${TestsToRun})
     -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
     -V ${PARAVIEW_DATA_ROOT}/Baseline/StreamingTest${TName}.png
     )
+  set_property(TEST Streaming-Test${TName}
+    PROPERTY FAIL_REGULAR_EXPRESSION "not working")
 endforeach()
 TARGET_LINK_LIBRARIES( StreamingCxxTests
   vtkStreaming
