@@ -285,8 +285,9 @@
       <DoubleVectorProperty
         name="PrismRange"
         command="GetPrismRange"
-        information_only="1">
-        <DoubleArrayInformationHelper/>
+        information_only="1"
+        number_of_elements="3"
+        default_values="1 1 1">
       </DoubleVectorProperty>
 
     </RepresentationProxy>

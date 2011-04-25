@@ -141,7 +141,7 @@ double* vtkPrismRepresentation::GetPrismRange()
 
  void vtkPrismRepresentation::GetPrismRange(double range[3])
 {
-  this->GetPrismRange(range[0],range[1],range[2]);
+  return this->GetPrismRange(range[0],range[1],range[2]);
 
 }
 
@@ -149,7 +149,7 @@ double* vtkPrismRepresentation::GetPrismRange()
     double &_arg1, double &_arg2, double &_arg3)
 {
   this->Internal->ScaleTransform->Update();
-  this->Internal->ScaleTransform->GetPrismRange(_arg1,_arg2,_arg3);
+  return this->Internal->ScaleTransform->GetPrismRange(_arg1,_arg2,_arg3);
 
 }
 
