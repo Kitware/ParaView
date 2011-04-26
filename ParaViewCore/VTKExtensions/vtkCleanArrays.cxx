@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkDataSet.h"
+#include "vtkDataArray.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/set>

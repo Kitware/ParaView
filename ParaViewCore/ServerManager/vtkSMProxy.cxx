@@ -2040,6 +2040,7 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
 //---------------------------------------------------------------------------
 //                          Deprecated API
 //---------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 void vtkSMProxy::SetServers(vtkTypeUInt32 server)
 {
   this->SetLocation(server);
@@ -2055,3 +2056,4 @@ vtkTypeUInt32 vtkSMProxy::GetConnectionID()
 {
   return 0;
 }
+#endif

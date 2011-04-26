@@ -20,6 +20,7 @@
 #include "vtkDataSet.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkFieldData.h"
+#include "vtkDataArray.h"
 #include "vtkInteractorStyleTransferFunctionEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
