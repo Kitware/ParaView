@@ -92,6 +92,8 @@ private:
   class pqInternal;
   pqInternal* Internal;
 
+  bool InOnActivate;
+
 };
 
 #endif
