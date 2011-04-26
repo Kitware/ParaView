@@ -79,8 +79,8 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
 
     int argc = 1;
     char** argv = new char*[1];
-    argv[0] = new char[200];
     std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
+    argv[0] = new char[CWD.size()+1];
 #ifdef COPROCESSOR_WIN32_BUILD
     strcpy_s(argv[0], strlen(CWD.c_str()), CWD.c_str());
 #else
