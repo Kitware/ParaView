@@ -6,6 +6,7 @@ Module:    vtkPrismFilter.cxx
 
 =========================================================================*/
 #include "vtkPrismFilter.h"
+#include "vtkPrismPrivate.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -410,6 +411,11 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     return 0;
   }
 
+  const int tableId = this->GetTable();
+  bool scalingEnabled[3] = {this->GetSESAMEXLogScaling(),
+                            this->GetSESAMEYLogScaling(),
+                            this->GetSESAMEZLogScaling()};
+
   if(!isCellData[0] && !isCellData[1] && !isCellData[2])
   {
     //All Point Data.
@@ -457,6 +463,7 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
       newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
       newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
+      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
 
 
@@ -507,8 +514,8 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
       newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
       newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
+      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
-
 
       polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
     }
@@ -524,84 +531,6 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
 
   vtkIdType pointId;
   vtkIdType numberPts = newPoints->GetNumberOfPoints();
-
-
-  for(pointId=0;pointId<numberPts;pointId++)
-  {
-
-    double coords[3];
-
-    newPoints->GetPoint(pointId,coords);
-
-
-    int tID=this->GetTable();
-    if(tID==502 ||
-      tID==503 ||
-      tID==504 ||
-      tID==505 ||
-      tID==601 ||
-      tID==602 ||
-      tID==603 ||
-      tID==604 ||
-      tID==605)
-    {
-      if(!this->GetSESAMEXLogScaling())
-      {
-      coords[0]=pow(10.0,coords[0]);
-      }
-
-      if(!this->GetSESAMEYLogScaling())
-      {
-        coords[1]=pow(10.0,coords[1]);
-      }
-
-      if(!this->GetSESAMEZLogScaling())
-      {
-        coords[2]=pow(10.0,coords[2]);
-      }
-    }
-    else
-    {
-      if(this->GetSESAMEXLogScaling())
-      {
-        if(coords[0]>0)
-        {
-          coords[0]=log(coords[0]);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-      }
-
-      if(this->GetSESAMEYLogScaling())
-      {
-        if(coords[1]>0)
-        {
-          coords[1]=log(coords[1]);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-      }
-
-      if(this->GetSESAMEZLogScaling())
-      {
-        if(coords[2]>0)
-        {
-          coords[2]=log(coords[2]);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-      }
-    }
-
-    newPoints->InsertPoint(pointId,coords);
-
-  }
 
   polydata->SetPoints( newPoints );
   newPoints->Delete();
