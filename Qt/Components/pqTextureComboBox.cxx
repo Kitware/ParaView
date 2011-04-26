@@ -100,6 +100,7 @@ namespace
 pqTextureComboBox::pqTextureComboBox(QWidget* _parent):Superclass(_parent)
 {
   this->Internal = new pqInternal();
+  this->InOnActivate = false;
 
   QObject::connect(this, SIGNAL(currentIndexChanged(int)),
     this, SLOT(onActivated(int)));
@@ -285,6 +286,10 @@ void pqTextureComboBox::reload()
 //-----------------------------------------------------------------------------
 void pqTextureComboBox::onActivated(int index)
 {
+  if (this->InOnActivate)
+    {
+    return;
+    }
   QVariant _data = this->itemData(index);
 
   vtkSMProxy* proxy (0);
@@ -310,8 +315,10 @@ void pqTextureComboBox::onActivated(int index)
   if (_data.toString() == "NONE")
     {
     BEGIN_UNDO_SET("Texture Change");
+    this->InOnActivate = true;
     vtkSMProxyProperty::SafeDownCast(textureProperty)->RemoveAllProxies();
     proxy->UpdateVTKObjects();
+    this->InOnActivate = false;
     if(this->Internal->Representation)
       {
       this->Internal->Representation->renderView(false);
@@ -340,8 +347,10 @@ void pqTextureComboBox::onActivated(int index)
       return;
       }
     BEGIN_UNDO_SET("Texture Change");
+    this->InOnActivate = true;
     pqSMAdaptor::setProxyProperty(textureProperty, textureProxy);
     proxy->UpdateVTKObjects();
+    this->InOnActivate = false;
     END_UNDO_SET();
 
     if(this->Internal->Representation)
