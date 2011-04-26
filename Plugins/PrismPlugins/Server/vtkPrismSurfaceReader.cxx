@@ -205,65 +205,6 @@ int vtkSESAMEConversionFilter::RequestData(
           }
      }
 
-
-
-     //vtkStringArray* xName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("XAxisName"));
-     //vtkStringArray* yName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("YAxisName"));
-
-
-
-    //vtkSmartPointer<vtkFloatArray> xArray= vtkSmartPointer<vtkFloatArray>::New();
-    //xArray->SetNumberOfComponents(1);
-    //xArray->Allocate(numPts);
-    //if(xName)
-    //{
-    //  xArray->SetName(xName->GetValue(0).c_str());
-    //}
-    //else
-    //{
-    //  xArray->SetName("Density");
-    //}
-    //xArray->SetNumberOfTuples(numPts);
-
-    //vtkSmartPointer<vtkFloatArray> yArray= vtkSmartPointer<vtkFloatArray>::New();
-    //yArray->SetNumberOfComponents(1);
-    //yArray->Allocate(numPts);
-    //if(yName)
-    //{
-    //  yArray->SetName(yName->GetValue(0).c_str());
-    //}
-    //else
-    //{
-    //  yArray->SetName("Temperature");
-    //}
-    //yArray->SetNumberOfTuples(numPts);
-
-
-    //vtkSmartPointer<vtkPoints> newPts = vtkSmartPointer<vtkPoints>::New();
-    //newPts->SetNumberOfPoints(numPts);
-    //localOutput->SetPoints(newPts);
-
-
-    //double conversionValues[2];
-    //conversionValues[0]=1.0;
-    //conversionValues[0]=1.0;
-    //if(this->VariableConversionValues->GetNumberOfTuples()>=2)
-    //{
-    //  conversionValues[0]=this->VariableConversionValues->GetValue(0);
-    //  conversionValues[1]=this->VariableConversionValues->GetValue(1);
-    //}
-    //for(ptId=0;ptId<numPts;ptId++)
-    //{
-    //  double coords[3];
-    //  inPts->GetPoint(ptId,coords);
-    //  xArray->InsertValue(ptId,coords[0]*conversionValues[0]);
-    //  yArray->InsertValue(ptId,coords[1]*conversionValues[1]);
-    //}
-
-    //localOutput->GetPointData()->AddArray(xArray);
-    //localOutput->GetPointData()->AddArray(yArray);
-
-
     Output->ShallowCopy(localOutput);
     return 1;
 
