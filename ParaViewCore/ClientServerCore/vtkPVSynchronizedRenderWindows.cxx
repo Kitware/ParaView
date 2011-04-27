@@ -283,7 +283,11 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Enabled = true;
-  this->RenderEventPropagation = true;
+
+  // we no longer support render even propagation. This leads to unnecessary
+  // complications since it results in code have different paths on client and
+  // servers.
+  this->RenderEventPropagation = false;
   this->RenderOneViewAtATime = false;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -824,7 +828,7 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
   // smart about it?
   this->SaveWindowAndLayout(renWin, stream);
 
-  this->ClientServerController->Broadcast(stream, 0);
+  this->ClientServerController->Send(stream, 1, 22222);
 
   this->UpdateWindowLayout();
 
@@ -844,7 +848,7 @@ void vtkPVSynchronizedRenderWindows::RootStartRender(vtkRenderWindow* renWin)
     {
     // * Get window layout from the server. $CODE_GET_LAYOUT_AND_UPDATE$
     vtkMultiProcessStream stream;
-    this->ClientServerController->Broadcast(stream, 1);
+    this->ClientServerController->Receive(stream, 1, 22222);
 
     // Load the layout for all the windows from the client.
     this->LoadWindowAndLayout(renWin, stream);

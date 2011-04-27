@@ -395,9 +395,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->MakingSelection = true;
 
-  bool render_event_propagation =
-    this->SynchronizedWindows->GetRenderEventPropagation();
-  this->SynchronizedWindows->RenderEventPropagationOff();
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
@@ -428,7 +425,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     {
     vtkErrorMacro("Failed to capture selection.");
     }
-  this->SynchronizedWindows->SetRenderEventPropagation(render_event_propagation);
 
   this->MakingSelection = false;
 }
@@ -620,8 +616,8 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     {
     p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
     }
-  cout << "Current RemoteRenderingThreshold: " << this->RemoteRenderingThreshold
-    << endl;
+  //cout << "Current RemoteRenderingThreshold: " << this->RemoteRenderingThreshold
+  //  << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -652,7 +648,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     // Update all representations.
     // This should update mostly just the inputs to the representations, and maybe
     // the internal geometry filter.
-    this->Update();
+    // this->Update();
 
     // Do the vtkView::REQUEST_INFORMATION() pass.
     this->GatherRepresentationInformation();
@@ -787,6 +783,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Call Render() on local render window only if
   // 1: Local process is the driver OR
   // 2: RenderEventPropagation is Off and we are doing distributed rendering.
+  // Note, ParaView no longer has RenderEventPropagation ON. It's set to off
+  // always.
   if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
     (!this->SynchronizedWindows->GetRenderEventPropagation() &&
      use_distributed_rendering))
