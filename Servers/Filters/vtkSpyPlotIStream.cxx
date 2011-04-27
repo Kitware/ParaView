@@ -1,6 +1,11 @@
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 
+#include <string>
+#include <sstream>
+#include <vtksys/SystemTools.hxx>
+#include "vtkMultiProcessController.h"
+
 int vtkSpyPlotIStream::ReadString(char* str, size_t len)
 {
   this->IStream->read(str, len);
@@ -8,6 +13,7 @@ int vtkSpyPlotIStream::ReadString(char* str, size_t len)
     {
     return 0;
     }
+  this->debug();
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -18,6 +24,7 @@ int vtkSpyPlotIStream::ReadString(unsigned char* str, size_t len)
     {
     return 0;
     }
+  this->debug();
   return 1;
 }
 
@@ -40,6 +47,7 @@ int vtkSpyPlotIStream::ReadInt32s(int* val, int num)
     }
     cout << " ]" << endl;
   */
+  this->debug();
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -57,6 +65,7 @@ int vtkSpyPlotIStream::ReadInt64s(vtkTypeInt64* val, int num)
     *val = static_cast<vtkTypeInt64>(d);
     val ++;
     }
+  this->debug();
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -78,19 +87,21 @@ int vtkSpyPlotIStream::ReadDoubles(double* val, int num)
     }
     cout << " ]" << endl;
   */
+  this->debug();
   return 1;
 }
 
 void vtkSpyPlotIStream::Seek(vtkTypeInt64 offset, bool rel)
 {
   if (rel)
-    {
+    {    
     this->IStream->seekg(offset, ios::cur);
     }
   else
     {
     this->IStream->seekg(offset);
     }
+  this->debug();
 }
 
 vtkTypeInt64 vtkSpyPlotIStream::Tell()
@@ -100,10 +111,29 @@ vtkTypeInt64 vtkSpyPlotIStream::Tell()
 
 void vtkSpyPlotIStream::SetStream(istream *ist)
 {
+  cerr << "Set Stream up" << endl;
   this->IStream = ist;
 }
 
 vtkSpyPlotIStream::vtkSpyPlotIStream()
   : IStream(0)
 {
+  int myGlobalProcId = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  int count = 0;
+  while(true)
+    {
+    std::stringstream buff;
+    buff << "E:/Work/spcthLog" << myGlobalProcId << "_" << count << ".log";
+    if (!vtksys::SystemTools::FileExists(buff.str().c_str()) )
+      {
+      this->DebugLog = fstream(buff.str(), ios::out);
+      break;
+      }
+    ++count;
+    }
+}
+
+void vtkSpyPlotIStream::debug()
+{
+  this->DebugLog << "Current Poisition is: " << this->IStream->tellg() << endl;
 }
