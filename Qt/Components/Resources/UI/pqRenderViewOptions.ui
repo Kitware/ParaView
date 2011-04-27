@@ -1214,6 +1214,17 @@
   <tabstop>OrientationAxesOutlineColor</tabstop>
   <tabstop>OrientationAxesLabelColor</tabstop>
   <tabstop>CenterAxesVisibility</tabstop>
+  <tabstop>solidColor</tabstop>
+  <tabstop>gradientColor</tabstop>
+  <tabstop>image</tabstop>
+  <tabstop>parallelProjection</tabstop>
+  <tabstop>Texture</tabstop>
+  <tabstop>backgroundColor</tabstop>
+  <tabstop>restoreDefault</tabstop>
+  <tabstop>gradientColor1</tabstop>
+  <tabstop>restoreDefaultGradColor1</tabstop>
+  <tabstop>gradientColor2</tabstop>
+  <tabstop>restoreDefaultGradColor2</tabstop>
  </tabstops>
  <resources/>
  <connections>
