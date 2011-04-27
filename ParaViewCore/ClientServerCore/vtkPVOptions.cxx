@@ -16,7 +16,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkParallelRenderManager.h"
 #include "vtkProcessModule.h"
 
 #include <vtksys/CommandLineArguments.hxx>
@@ -368,12 +367,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     }
 #endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
 
-  if (this->GetSymmetricMPIMode())
-    {
-    // Disable render event propagation since satellites are no longer doing
-    // ProcessRMIs() since symmetric script processing is enabled.
-    vtkParallelRenderManager::SetDefaultRenderEventPropagation(false);
-    }
   return 1;
 }
 
