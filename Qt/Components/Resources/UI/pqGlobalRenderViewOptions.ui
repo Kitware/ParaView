@@ -1368,6 +1368,59 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>immediateModeRendering</tabstop>
+  <tabstop>enableLOD</tabstop>
+  <tabstop>lodThreshold</tabstop>
+  <tabstop>lodResolution</tabstop>
+  <tabstop>outlineThreshold</tabstop>
+  <tabstop>renderingInterrupts</tabstop>
+  <tabstop>depthPeeling</tabstop>
+  <tabstop>topologyMode</tabstop>
+  <tabstop>offsetFactor</tabstop>
+  <tabstop>offsetUnits</tabstop>
+  <tabstop>offsetFaces</tabstop>
+  <tabstop>zshift</tabstop>
+  <tabstop>useOffscreenRenderingForScreenshots</tabstop>
+  <tabstop>comboBoxCamera3D</tabstop>
+  <tabstop>comboBoxCamera3D_4</tabstop>
+  <tabstop>comboBoxCamera3D_7</tabstop>
+  <tabstop>comboBoxCamera3D_2</tabstop>
+  <tabstop>comboBoxCamera3D_5</tabstop>
+  <tabstop>comboBoxCamera3D_8</tabstop>
+  <tabstop>comboBoxCamera3D_3</tabstop>
+  <tabstop>comboBoxCamera3D_6</tabstop>
+  <tabstop>comboBoxCamera3D_9</tabstop>
+  <tabstop>comboBoxCamera2D</tabstop>
+  <tabstop>comboBoxCamera2D_4</tabstop>
+  <tabstop>comboBoxCamera2D_7</tabstop>
+  <tabstop>comboBoxCamera2D_2</tabstop>
+  <tabstop>comboBoxCamera2D_5</tabstop>
+  <tabstop>comboBoxCamera2D_8</tabstop>
+  <tabstop>comboBoxCamera2D_3</tabstop>
+  <tabstop>comboBoxCamera2D_6</tabstop>
+  <tabstop>comboBoxCamera2D_9</tabstop>
+  <tabstop>resetCameraDefault</tabstop>
+  <tabstop>enableCompositing</tabstop>
+  <tabstop>compositeThreshold</tabstop>
+  <tabstop>enableClientCollect</tabstop>
+  <tabstop>clientCollect</tabstop>
+  <tabstop>orderedCompositing</tabstop>
+  <tabstop>enableSubsampling</tabstop>
+  <tabstop>subsamplingRate</tabstop>
+  <tabstop>CompressorGroup</tabstop>
+  <tabstop>squirtEnable</tabstop>
+  <tabstop>squirtColorspaceSlider</tabstop>
+  <tabstop>zlibEnable</tabstop>
+  <tabstop>zlibCompressionLevel</tabstop>
+  <tabstop>zlibColorspaceSlider</tabstop>
+  <tabstop>zlibStripAlpha</tabstop>
+  <tabstop>CompressorBWOpt</tabstop>
+  <tabstop>enableStillRenderSubsampleRate</tabstop>
+  <tabstop>stillRenderSubsampleRate</tabstop>
+  <tabstop>enableTileDisplayCompositing</tabstop>
+  <tabstop>tileDisplayCompositeThreshold</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
