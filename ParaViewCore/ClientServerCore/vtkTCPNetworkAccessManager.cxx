@@ -27,9 +27,13 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 #include <vtkstd/map>
 
+// set this to 1 if you want to generate a log file with all the raw socket
+// communication.
+#define GENERATE_DEBUG_LOG 0
 
 class vtkTCPNetworkAccessManager::vtkInternals
 {
@@ -270,6 +274,11 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   vtkSocketController* controller = vtkSocketController::New();
   vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
     controller->GetCommunicator());
+#if GENERATE_DEBUG_LOG
+  vtksys_ios::ostringstream mystr;
+  mystr << "/tmp/client."<< getpid() << ".log";
+  comm->LogToFile(mystr.str().c_str());
+#endif
   comm->SetSocket(cs);
   if (!comm->Handshake() ||
     !this->ParaViewHandshake(controller, false, handshake))

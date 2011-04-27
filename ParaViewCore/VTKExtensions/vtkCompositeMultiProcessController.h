@@ -25,7 +25,6 @@
 #define __vtkCompositeMultiProcessController_h
 
 #include "vtkMultiProcessController.h"
-#include "vtkWeakPointer.h" // Use to keep Active vtkMultiProcessController
 
 class VTK_EXPORT vtkCompositeMultiProcessController : public vtkMultiProcessController
 {
@@ -60,6 +59,10 @@ public:
   // Remove the active controller and return the number of registered controler
   // left.
   int UnRegisterActiveController();
+
+  // Description:
+  // Provides access to the active controller.
+  vtkMultiProcessController* GetActiveController();
 
   // Description:
   // Allow server to broadcast to connected client some data but it skip
@@ -112,8 +115,6 @@ private:
   class vtkCompositeInternals;
   vtkCompositeInternals* Internal;
   friend class vtkCompositeInternals;
-
-  vtkWeakPointer<vtkMultiProcessController> ActiveController;
 //ETX
 };
 

@@ -19,10 +19,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkWeakPointer.h"
 
 #include <assert.h>
 #include <vtkstd/vector>
 #include <vtkstd/map>
+
+#define GENERATE_DEBUG_LOG 0
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -30,6 +33,9 @@
 class vtkCompositeMultiProcessController::vtkCompositeInternals
 {
 public:
+#if GENERATE_DEBUG_LOG
+  ofstream LogFile;
+#endif
 struct RMICallbackInfo
 {
   RMICallbackInfo(unsigned long observerTagID, vtkRMIFunctionType function, void* arg, int tag)
@@ -131,6 +137,10 @@ public:
       }
     this->Controllers.push_back(Controller(this->ControllerID++, ctrl));
     this->ActiveController = &this->Controllers.back();
+#if GENERATE_DEBUG_LOG
+    this->LogFile << endl << "---- Making Active: " << ctrl << endl;
+#endif
+
     this->ActiveController->ActivateObserverId = ctrl->AddObserver(
         vtkCommand::StartEvent, this, &vtkCompositeInternals::ActivateController);
 
@@ -196,11 +206,16 @@ public:
       }
     return 0;
     }
+
   //-----------------------------------------------------------------
-  void ActivateController(vtkObject* src, unsigned long event, void* data)
+  void ActivateController(vtkObject* src,
+    unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
     {
     if(this->GetActiveController() != src)
       {
+#if GENERATE_DEBUG_LOG
+      this->LogFile << endl << "---- Making Active: " << src << endl;
+#endif
       this->ActiveController =
           this->FindController(vtkMultiProcessController::SafeDownCast(src));
       this->UpdateActiveCommunicator();
@@ -383,6 +398,9 @@ vtkStandardNewMacro(vtkCompositeMultiProcessController);
 vtkCompositeMultiProcessController::vtkCompositeMultiProcessController()
 {
   this->Internal = new vtkCompositeInternals(this);
+#if GENERATE_DEBUG_LOG
+  this->Internal->LogFile.open("/tmp/server.log");
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -409,6 +427,10 @@ void vtkCompositeMultiProcessController::RegisterController(vtkMultiProcessContr
 {
   assert(controller->IsA("vtkSocketController"));
   this->Internal->RegisterController(controller);
+#if GENERATE_DEBUG_LOG
+  vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator())->SetLogStream(
+    &this->Internal->LogFile);
+#endif
 }
 //----------------------------------------------------------------------------
 void vtkCompositeMultiProcessController::UnRegisterController(vtkMultiProcessController* controller)
@@ -442,6 +464,12 @@ int vtkCompositeMultiProcessController::UnRegisterActiveController()
   this->UnRegisterController(this->Internal->GetActiveController());
   return this->Internal->GetNumberOfRegisteredControllers();
 }
+
+vtkMultiProcessController* vtkCompositeMultiProcessController::GetActiveController()
+{
+  return this->Internal->GetActiveController();
+}
+
 //----------------------------------------------------------------------------
 vtkCommunicator* vtkCompositeMultiProcessController::GetCommunicator()
 {
