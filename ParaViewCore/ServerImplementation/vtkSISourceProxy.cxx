@@ -394,6 +394,29 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
 }
 
 //----------------------------------------------------------------------------
+void vtkSISourceProxy::UpdatePipelineInformation()
+{
+  if (this->GetVTKObject())
+    {
+    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+    if(algo)
+      {
+      algo->UpdateInformation();
+      }
+    }
+
+  // Call UpdatePipelineInformation() on all subproxies.
+  for (unsigned int cc=0; cc < this->GetNumberOfSubSIProxys(); cc++)
+    {
+    vtkSISourceProxy* src = vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy(cc));
+    if (src)
+      {
+      src->UpdatePipelineInformation();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelection)
 {
   vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(

@@ -187,7 +187,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
            << SIPROXY(this)
-           << "UpdateInformation"
+           << "UpdatePipelineInformation"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
     }
