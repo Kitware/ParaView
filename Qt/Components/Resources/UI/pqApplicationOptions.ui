@@ -515,6 +515,31 @@ p, li { white-space: pre-wrap; }
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>DefaultViewType</tabstop>
+  <tabstop>DefaultTimeStepMode</tabstop>
+  <tabstop>RescaleDataRangeMode</tabstop>
+  <tabstop>HeartBeatTimeout</tabstop>
+  <tabstop>AutoAccept</tabstop>
+  <tabstop>AutoConvertProperties</tabstop>
+  <tabstop>CrashRecovery</tabstop>
+  <tabstop>AutoMPI</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>ForegroundColor</tabstop>
+  <tabstop>BackgroundColor</tabstop>
+  <tabstop>SurfaceColor</tabstop>
+  <tabstop>TextAnnotationColor</tabstop>
+  <tabstop>SelectionColor</tabstop>
+  <tabstop>EdgeColor</tabstop>
+  <tabstop>Palette</tabstop>
+  <tabstop>ResetColorsToDefault</tabstop>
+  <tabstop>AnimationCacheGeometry</tabstop>
+  <tabstop>AnimationCacheLimit</tabstop>
+  <tabstop>ChartNewHiddenSeries</tabstop>
+  <tabstop>ChartDeleteHiddenSeries</tabstop>
+  <tabstop>ChartHiddenSeries</tabstop>
+  <tabstop>ChartResetHiddenSeries</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <designerdata>
