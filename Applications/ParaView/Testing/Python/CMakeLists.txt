@@ -15,6 +15,7 @@ SET (TESTS_WITH_BASELINES
 IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/StreamingTest.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingServerSideTest.py
     )
 ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
 
@@ -40,9 +41,8 @@ set (MantaServerSideTest_DISABLE_C TRUE)
 set (MantaServerSideTest_DISABLE_CRS TRUE)
 SET (MantaTest_BREAK TRUE)
 set (StreamingTest_DISABLE_CRS TRUE)
-
-# TODO: fix this mode and enable test
-set (StreamingTest_DISABLE_CS TRUE)
+set (StreamingServerSideTest_DISABLE_C TRUE)
+set (StreamingServerSideTest_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
