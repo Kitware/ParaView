@@ -160,7 +160,15 @@ protected:
   // ---- Collaboration client-to-clients communication mechanisme ----
 
 signals:
-  /// Allow user to listen messages from other clients
+  /// Allow user to listen messages from other clients.
+  /// But if you plan to push some state by for example calling
+  /// the sendToOtherClients(vtkSMMessage*) slot, you MUST queued your slot.
+  /// Otherwise your communication will not be sent to the server.
+  /// Here is a code sample on how to connect to that signal:
+  ///
+  ///    QObject::connect( server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+  ///                      this,   SLOT(onClientMessage(vtkSMMessage*)),
+  ///                      Qt::QueuedConnection);
   void sentFromOtherClient(vtkSMMessage* msg);
 
 public slots:

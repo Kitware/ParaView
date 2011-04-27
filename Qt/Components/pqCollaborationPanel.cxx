@@ -48,11 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkstd/string"
 #include <vtksys/ios/sstream>
 
-//#include "pqApplicationCore.h"
-//#include "pqSignalAdaptors.h"
-//#include "pqSMProxy.h"
-//#include "pqView.h"
-
 //-----------------------------------------------------------------------------
 #include "ui_pqCollaborationPanel.h"
 class pqCollaborationPanel::pqInternal : public Ui::pqCollaborationPanel
@@ -93,6 +88,10 @@ public:
 
   const char* getUserName(int id)
     {
+    if(id == 0)
+      {
+      return "Nobody";
+      }
     vtkstd::map<int, vtkstd::string>::iterator iter = this->userMap.find(id);
     if(iter != this->userMap.end())
       {
@@ -101,12 +100,17 @@ public:
     vtksys_ios::ostringstream name;
     name << "User " << id;
     this->userMap[id] = name.str().c_str();
-    return name.str().c_str();
+    return this->userMap[id].c_str();
     }
 
   void updateUserName(int id, const char* name)
     {
+    if(this->userMap[id] == name)
+      {
+      return;
+      }
     this->userMap[id] = name;
+    this->updateMembers();
     }
 
   void broadcastUserName(bool requestUpdate)
@@ -126,6 +130,41 @@ public:
       }
     }
 
+  void updateMembers()
+    {
+    this->members->setRowCount(this->userMap.size());
+    vtkstd::map<int, vtkstd::string>::iterator iter = this->userMap.begin();
+    for(unsigned int cc = 0; iter != this->userMap.end(); iter++, cc++)
+      {
+      QTableWidgetItem* item = new QTableWidgetItem(iter->second.c_str());
+      item->setData(Qt::UserRole, iter->first);
+      if(iter->first == this->userID)
+        {
+        item->setFlags( item->flags() | Qt::ItemIsEditable );
+        QFont font = item->font();
+        font.setBold(true);
+        font.setItalic(true);
+        item->setFont(font);
+        }
+      else
+        {
+        item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+        }
+      this->members->setItem(cc, 0, item);
+
+      // Disable other column editing
+      item = new QTableWidgetItem("");
+      item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+      this->members->setItem(cc, 1, item);
+
+      item = new QTableWidgetItem("");
+      item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+      this->members->setItem(cc, 2, item);
+      }
+
+    this->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
+    }
+
   int userID;
   vtkstd::map<int, vtkstd::string> userMap;
   QList<QString> userPalette;
@@ -143,6 +182,9 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
 
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
                     this, SLOT(onUserMessage()));
+
+  QObject::connect(this->Internal->members, SIGNAL(itemChanged(QTableWidgetItem*)),
+                   this, SLOT(itemChanged(QTableWidgetItem*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -150,22 +192,12 @@ pqCollaborationPanel::~pqCollaborationPanel()
 {
   if(this->Internal->server)
     {
-    QObject::disconnect(this->Internal->server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this, SLOT(onClientMessage(vtkSMMessage*)));
+    QObject::disconnect( this->Internal->server,
+                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+                         this, SLOT(onClientMessage(vtkSMMessage*)));
     }
   delete this->Internal;
   this->Internal = 0;
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationPanel::onUserInformationUpdate()
-{
-  // TODO send local user name
-  if(!this->Internal->server.isNull())
-    {
-    this->Internal->broadcastUserName(false);
-    }
-  // TODO need to know when it is worth requesting user name update...
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +211,8 @@ void pqCollaborationPanel::onUserMessage()
   if(!this->Internal->server.isNull())
     {
     vtkSMMessage msg;
-    msg.SetExtension(ChatMessage::txt, this->Internal->message->text().toStdString());
+    msg.SetExtension( ChatMessage::txt,
+                      this->Internal->message->text().toStdString());
     this->Internal->sendToOtherClients(&msg);
     }
   this->Internal->validateEntry();
@@ -205,7 +238,7 @@ void pqCollaborationPanel::onClientMessage(vtkSMMessage* msg)
                                 msg->GetExtension(ChatMessage::txt).c_str());
       }
 
-    // Notify other client about your local name
+    // Notify other client about your local name (if requested)
     if(msg->GetExtension(ClientInformation::req_update))
       {
       this->Internal->broadcastUserName(false);
@@ -220,14 +253,31 @@ void pqCollaborationPanel::setServer(pqServer* server)
 {
   if(this->Internal->server)
     {
-    QObject::disconnect(this->Internal->server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this, SLOT(onClientMessage(vtkSMMessage*)));
+    QObject::disconnect( this->Internal->server,
+                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+                         this, SLOT(onClientMessage(vtkSMMessage*)));
     }
   this->Internal->server = server;
   if(server)
     {
     this->Internal->userID = server->getServerInformation()->GetClientId();
-    QObject::connect(server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                     this, SLOT(onClientMessage(vtkSMMessage*)));
+    QObject::connect( server,
+                      SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+                      this, SLOT(onClientMessage(vtkSMMessage*)),
+                      Qt::QueuedConnection);
+    this->Internal->broadcastUserName(true);
     }
 }
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
+  {
+  if(item->column() == 0)
+    {
+    int id = item->data(Qt::UserRole).toInt();
+    if(this->Internal->userID == id)
+      {
+      this->Internal->updateUserName(id, item->text().toAscii().data());
+      this->Internal->broadcastUserName(true);
+      }
+    }
+  }

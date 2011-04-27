@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMessageMinimal.h"
 
 class pqServer;
+class QTableWidgetItem;
 
 /// pqCollaborationPanel is a properties page for the collaborative session. It
 /// allows the user to change its name and manage leadership of the session.
@@ -55,8 +56,10 @@ public slots:
 
 protected slots:
   void onUserMessage();
-  void onUserInformationUpdate();
   void onClientMessage(vtkSMMessage* msg);
+
+  // Triggered when the user change its name
+  void itemChanged(QTableWidgetItem* item);
 
 protected:
   pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
