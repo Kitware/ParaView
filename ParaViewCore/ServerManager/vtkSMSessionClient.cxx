@@ -865,11 +865,11 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   else if(proxy)
     {
     proxy->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
-    if(proxy->GetLocation() & vtkPVSession::CLIENT)
-      {
-      // Only update proxy that have local VTK objects
-      proxy->UpdateVTKObjects();
-      }
+    // essential to call this, since even though the values are not pushed to
+    // the server, there are several proxy-level flags that are not updated
+    // until the UpdateVTKObjects() such as marking dependent proxies modified
+    // etc.
+    proxy->UpdateVTKObjects();
     }
   else
     {

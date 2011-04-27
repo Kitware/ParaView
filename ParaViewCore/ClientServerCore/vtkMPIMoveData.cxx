@@ -723,7 +723,10 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input,
   int numProcs= this->Controller->GetNumberOfProcesses();
   if (numProcs == 1)
     {
-    output->ShallowCopy(input);
+    if (input)
+      {
+      output->ShallowCopy(input);
+      }
     return;
     }
 

@@ -24,6 +24,12 @@
 // lookup keys in the information object and update its state as needed to
 // ensure that the data is available in the form/shape requested on the
 // rendering nodes.
+// .SECTION Implementation Details
+// This filter uses two internal vtkMPIMoveData filters. The first one manages
+// the movement across MPI processes and render-server (if applicable) while the
+// second one manages the movement across client-server. That makes it possible
+// to minimize interprocess data transfers whenever possible with multi-client
+// configurations.
 // .SECTION See Also
 // vtkImageSliceDataDeliveryFilter
 
@@ -83,13 +89,31 @@ protected:
   // overridden to mark input as optional.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  vtkMPIMoveData* MoveData;
+  vtkMPIMoveData* PassThroughMoveData;
+  vtkMPIMoveData* ServerMoveData;
+  vtkMPIMoveData* ClientMoveData;
+
   int OutputDataType;
   bool LODMode;
+  bool UsePassThrough;
+
+  // flag that keeps track of where the data has been "moved" since the last
+  // Modified.
+  int DataMoveState;
+
+  enum
+    {
+    NO_WHERE = 0,
+    PASS_THROUGH = 0x01,
+    COLLECT_TO_ROOT = 0x02,
+    };
 
 private:
   vtkUnstructuredDataDeliveryFilter(const vtkUnstructuredDataDeliveryFilter&); // Not implemented
   void operator=(const vtkUnstructuredDataDeliveryFilter&); // Not implemented
+
+  class VoidPtrSet;
+  VoidPtrSet* HandledClients;
 //ETX
 };
 

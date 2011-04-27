@@ -57,6 +57,7 @@ public:
   void SetController(vtkMultiProcessController* controller);
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
   void SetClientDataServerSocketController(vtkMultiProcessController*);
+  vtkGetObjectMacro(ClientDataServerSocketController, vtkMultiProcessController);
   
   // Description:
   // Tell the object on which client/server it resides.
