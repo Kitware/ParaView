@@ -84,15 +84,32 @@ void vtkPVPythonOptions::Synchronize()
     vtkMultiProcessStream stream;
     if (controller->GetLocalProcessId() == 0)
       {
-      stream << this->PythonScriptName << this->GetSymmetricMPIMode();
+      if(this->PythonScriptName)
+        {
+        stream << (int)1 << this->PythonScriptName << this->GetSymmetricMPIMode();
+        }
+      else
+        {
+        stream << (int)0 << this->GetSymmetricMPIMode();
+        }
       controller->Broadcast(stream, 0);
       }
     else
       {
       controller->Broadcast(stream, 0);
-      vtkstd::string name;
-      stream >> name >> this->SymmetricMPIMode;
-      this->SetPythonScriptName(name.c_str());
+      int hasScriptName;
+      stream >> hasScriptName;
+      if(hasScriptName == 0)
+        {
+        this->SetPythonScriptName(NULL);
+        }
+      else
+        {
+        std::string name;
+        stream >> name;
+        this->SetPythonScriptName(name.c_str());
+        }
+      stream >> this->SymmetricMPIMode;
       }
     }
 }
