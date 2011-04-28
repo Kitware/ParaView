@@ -26,6 +26,7 @@
 #include "vtkPythonProgrammableFilter.h"
 #include "vtkCellData.h"
 #include "vtkProcessModule.h"
+#include "vtkDataArray.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/algorithm>
@@ -33,8 +34,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPythonCalculator);
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkPythonCalculator::vtkPythonCalculator()
