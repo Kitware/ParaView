@@ -1782,9 +1782,8 @@ def LoadState(filename, connection=None):
         connection = ActiveConnection
     if not connection:
         raise RuntimeError, "Cannot load state without a connection"
-    loader = vtkSMPQStateLoader()
     pm = ProxyManager()
-    pm.LoadState(filename, loader)
+    pm.LoadState(filename, None)
     views = GetRenderViews()
     for view in views:
         # Make sure that the client window size matches the
