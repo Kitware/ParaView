@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
 #include "vtkProcessModuleAutoMPI.h"
+#include "vtkPVConfig.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkPVProxyDefinitionIterator.h"
