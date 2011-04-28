@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ZColumn" command="set_string" arguments="ZPOSITION" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalAction" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/3D View" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,14,/0:0/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,14,/0:0/0:0/0:1" />
