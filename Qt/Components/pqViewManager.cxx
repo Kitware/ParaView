@@ -360,6 +360,7 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   foreach (QAction* action, convertActions)
     {
     QPushButton* button = new QPushButton(action->text(), frame);
+    button->setObjectName(action->text());
     ui.ConvertActionsFrame->layout()->addWidget(button);
     button->addAction(action);
     QObject::connect(button, SIGNAL(clicked()),

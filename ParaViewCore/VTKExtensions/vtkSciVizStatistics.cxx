@@ -20,6 +20,7 @@
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariantArray.h"
+#include "vtkDataArray.h"
 
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>

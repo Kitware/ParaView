@@ -41,8 +41,7 @@ QtTesting.playCommand(object3, 'activate', '')
 #close the 3D view and make a streaming view
 object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object4, 'activate', '')
-#TODO: make view selection by name, test will fail if view list contents change
-object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2'
+object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Refining View'
 QtTesting.playCommand(object5, 'activate', '')
 
 #show something

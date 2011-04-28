@@ -112,6 +112,11 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>backgroundColor</tabstop>
+  <tabstop>restoreDefault</tabstop>
+  <tabstop>showAxes</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

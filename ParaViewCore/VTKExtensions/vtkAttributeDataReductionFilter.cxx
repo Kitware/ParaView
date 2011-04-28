@@ -23,6 +23,7 @@
 #include "vtkPointData.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+#include "vtkDataArray.h"
 
 #include <vtkstd/vector>
 
