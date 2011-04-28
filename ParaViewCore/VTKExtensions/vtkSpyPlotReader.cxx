@@ -198,7 +198,6 @@ int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
     return 0;
     }
   char buffer[8];
-  cerr << "read first 7 bits" << endl;
   if(!ifs.read(buffer,7))
     {
     vtkErrorMacro("Problem reading header of file: " << this->FileName);
@@ -311,7 +310,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
   while ( 1 )
     {
     sprintf(buffer, "%s/%s.%d",filePath.c_str(), fileNoExt.c_str(), idx);
-    cerr << "buffer1 == " << buffer << endl;
+    // cerr << "buffer1 == " << buffer << endl;
     if ( !vtksys::SystemTools::FileExists(buffer) )
       {
       int next = idx;
@@ -339,7 +338,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
   while ( 1 )
     {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    cerr << "buffer2 == " << buffer << endl;
+    // cerr << "buffer2 == " << buffer << endl;
     if ( !vtksys::SystemTools::FileExists(buffer) )
       {
       int next = idx;
@@ -364,7 +363,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
   for ( idx = minimum; idx <= maximum; ++ idx )
     {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    cerr << "buffer3 == " << buffer << endl;
+    // cerr << "buffer3 == " << buffer << endl;
     this->Map->Files[buffer]=0;
     vtkDebugMacro( << __LINE__ << " Create new uni reader: " 
                    << this->Map->Files[buffer] );
