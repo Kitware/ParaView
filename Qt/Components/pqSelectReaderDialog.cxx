@@ -70,6 +70,10 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
   for (int cc=0; (cc+2) < readers->GetNumberOfStrings(); cc+=3)
     {
     QString desc = readers->GetString(cc+2);
+    //We want the first character to always be uppercase so:
+    //1 the list looks nicer
+    //2 the list case sensitive sort works "better"
+    desc.replace(0,1,desc.at(0).toUpper());
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
     item->setData(Qt::UserRole, readers->GetString(cc+0));
     item->setData(Qt::UserRole+1, readers->GetString(cc+1));
@@ -97,6 +101,10 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
   for (int cc=0; (cc+2) < list->GetNumberOfStrings(); cc+=3)
     {
     QString desc = list->GetString(cc+2);
+    //We want the first character to always be uppercase so:
+    //1 the list looks nicer
+    //2 the list case sensitive sort works "better"
+    desc.replace(0,1,desc.at(0).toUpper());
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
     item->setData(Qt::UserRole, list->GetString(cc+0));
     item->setData(Qt::UserRole+1, list->GetString(cc+1));
