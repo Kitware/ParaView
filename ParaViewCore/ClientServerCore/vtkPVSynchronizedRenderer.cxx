@@ -32,6 +32,7 @@
 #ifdef PARAVIEW_USE_ICE_T
 # include "vtkIceTSynchronizedRenderers.h"
 #endif
+#include "vtkCompositedSynchronizedRenderers.h"
 
 #include <assert.h>
 
@@ -178,7 +179,7 @@ void vtkPVSynchronizedRenderer::Initialize()
 #ifdef PARAVIEW_USE_ICE_T
       if (this->DisableIceT)
         {
-        this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
         }
       else
         {

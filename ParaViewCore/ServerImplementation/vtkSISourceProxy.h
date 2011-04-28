@@ -40,6 +40,10 @@ public:
   virtual vtkAlgorithmOutput* GetOutputPort(int port);
 
   // Description:
+  // Triggers UpdateInformation() on vtkObject if possible.
+  virtual void UpdatePipelineInformation();
+
+  // Description:
   // Triggers UpdatePipeline().
   // Called from client.
   virtual void UpdatePipeline(int port, double time, bool doTime);
