@@ -145,6 +145,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqDeleteReaction(ui.actionDelete);
   new pqDeleteReaction(ui.actionDelete_All, true);
   new pqCopyReaction(ui.actionCopy);
+  new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqViewSettingsReaction(ui.actionEditViewSettings);
   new pqDataQueryReaction(ui.actionQuery);
@@ -283,6 +284,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
   new pqDeleteReaction(ui.actionPBDelete);
   new pqCopyReaction(ui.actionPBCopy);
+  new pqCopyReaction(ui.actionPBPaste, true);
 }
 
 //-----------------------------------------------------------------------------

@@ -30,23 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCopyReaction.h"
-#include "ui_pqCopyReactionDialog.h"
 
 #include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqOutputPort.h"
-#include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "pqActiveObjects.h"
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
-pqCopyReaction::pqCopyReaction(QAction* parentObject)
-  : Superclass(parentObject)
+pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode)
+  : Superclass(parentObject), Paste(paste_mode)
 {
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(sourceChanged(pqPipelineSource*)),
@@ -62,62 +55,52 @@ pqCopyReaction::~pqCopyReaction()
 //-----------------------------------------------------------------------------
 void pqCopyReaction::updateEnableState()
 {
-  this->parentAction()->setEnabled(
-    pqActiveObjects::instance().activeSource() != NULL);
+  if (this->Paste)
+    {
+    QObject* clipboard = pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD");
+    pqPipelineSource* active = pqActiveObjects::instance().activeSource();
+    this->parentAction()->setEnabled(
+      clipboard != NULL && active != clipboard);
+    }
+  else
+    {
+    this->parentAction()->setEnabled(
+      pqActiveObjects::instance().activeSource() != NULL);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqCopyReaction::copy()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  pqPipelineSource* activeSource =
-    qobject_cast<pqPipelineSource*>(selModel->currentItem());
-  pqOutputPort* activePort = qobject_cast<pqOutputPort*>(
-    selModel->currentItem());
-  if (activePort)
-    {
-    activeSource = activePort->getSource();
-    }
+  pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
   if (!activeSource)
     {
     qDebug("Could not find an active source to copy to.");
     return;
     }
 
-  QDialog dialog(pqCoreUtilities::mainWidget());
-  dialog.setObjectName("CopyProperties");
-  Ui::pqCopyReactionDialog ui;
-  ui.setupUi(&dialog);
-  pqServerManagerModel *smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineModel model(*smModel);
-  model.setEditable(false);
-  ui.pipelineView->setModel(&model);
-  ui.pipelineView->setSelectionMode(pqFlatTreeView::SingleSelection);
-  ui.pipelineView->getHeader()->hide();
-  // don't show the visibility icons.
-  ui.pipelineView->getHeader()->hideSection(1);
-  ui.pipelineView->setRootIndex(
-    model.getIndexFor(activeSource->getServer()));
-  if (dialog.exec() != QDialog::Accepted)
+  // since pqApplicationCore uses QPointer for the managers, we don't have to
+  // worry about unregistering the source when it is deleted.
+  pqApplicationCore* appCore = pqApplicationCore::instance();
+  // need to remove any previous SOURCE_ON_CLIPBOARD else pqApplicationCore
+  // warns.
+  appCore->unRegisterManager("SOURCE_ON_CLIPBOARD");
+  appCore->registerManager("SOURCE_ON_CLIPBOARD", activeSource);
+}
+
+//-----------------------------------------------------------------------------
+void pqCopyReaction::paste()
+{
+  pqPipelineSource* activeSource = pqActiveObjects::instance().activeSource();
+  pqPipelineSource* clipboard = qobject_cast<pqPipelineSource*>(
+    pqApplicationCore::instance()->manager("SOURCE_ON_CLIPBOARD"));
+  if (!clipboard)
     {
+    qDebug("No source on clipboard to copy from.");
     return;
     }
-  QModelIndexList indexes =
-    ui.pipelineView->getSelectionModel()->selectedIndexes();
-  if (indexes.size() == 1)
-    {
-    pqServerManagerModelItem* item = model.getItemFor(indexes[0]);
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
-    if (port)
-      {
-      source = port->getSource();
-      }
-    pqCopyReaction::copy(activeSource->getProxy(), source->getProxy(),
-      ui.copyInputs->isChecked());
-    }
+  pqCopyReaction::copy(activeSource->getProxy(), clipboard->getProxy(), true);
+  activeSource->renderAllViews();
 }
 
 //-----------------------------------------------------------------------------
