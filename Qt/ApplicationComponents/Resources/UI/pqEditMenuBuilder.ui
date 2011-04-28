@@ -83,10 +83,23 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;Copy Properties</string>
+    <string>&amp;Copy</string>
    </property>
    <property name="statusTip">
     <string>Copy properties</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Paste</string>
+   </property>
+   <property name="statusTip">
+    <string>Paste copied properties</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -160,6 +173,7 @@
   <addaction name="actionQuery" />
   <addaction name="actionChangeInput"/>
   <addaction name="actionCopy"/>
+  <addaction name="actionPaste"/>
   <addaction name="actionIgnoreTime"/>
   <addaction name="actionDelete"/>
   <addaction name="actionDelete_All"/>
