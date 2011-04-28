@@ -38,6 +38,8 @@ public:
   void Seek(vtkTypeInt64 offset, bool rel = false);
   vtkTypeInt64 Tell();
 protected:
+  void debug();
+  fstream DebugLog;
   istream *IStream;
 };
 
