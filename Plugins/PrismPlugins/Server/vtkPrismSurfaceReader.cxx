@@ -1308,7 +1308,7 @@ int vtkPrismSurfaceReader::RequestData(
 
 }
 
-    //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 {
   vtkSmartPointer<vtkPolyData> resultPd[5];
@@ -1458,72 +1458,17 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
 
-
+        bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
         double coords[3];
         for(ptId=0;ptId<numPts;ptId++)
         {
-          if(xArray[v])
-          {
-            coords[0]=xArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-
-          if(yArray[v])
-          {
-            coords[1]=yArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-
-          if(zArray[v])
-          {
-            coords[2]=zArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-
-          if(this->GetXLogScaling())
-          {
-            if(coords[0]>0)
-            {
-              coords[0]=log(coords[0]);
-            }
-            else
-            {
-              coords[0]=0.0;
-            }
-          }
-
-          if(this->GetYLogScaling())
-          {
-            if(coords[1]>0)
-            {
-              coords[1]=log(coords[1]);
-            }
-            else
-            {
-              coords[1]=0.0;
-            }
-          }
-
-          if(this->GetZLogScaling())
-          {
-            if(coords[2]>0)
-            {
-              coords[2]=log(coords[2]);
-            }
-            else
-            {
-              coords[2]=0.0;
-            }
-          }
+          coords[0] = (xArray[v]) ? xArray[v]->GetValue(ptId) : 0.0;
+          coords[1] = (yArray[v]) ? yArray[v]->GetValue(ptId) : 0.0;
+          coords[2] = (zArray[v]) ? zArray[v]->GetValue(ptId) : 0.0;
+          vtkPrismCommon::logScale(coords,scalingEnabled);
+          
           newPts->InsertPoint(ptId,coords);
         }
 
@@ -1676,72 +1621,17 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       newPts->SetNumberOfPoints(numPts);
       localOutput->SetPoints(newPts);
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
-      {
-        if(xArray)
         {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
+          
         newPts->InsertPoint(ptId,coords);
       }
 
@@ -1898,72 +1788,17 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       localOutput->SetPoints(newPts);
 
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
-      {
-        if(xArray)
         {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
+          
         newPts->InsertPoint(ptId,coords);
       }
 
@@ -2103,72 +1938,17 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       localOutput->SetPoints(newPts);
 
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
       {
-        if(xArray)
-        {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
 
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
         newPts->InsertPoint(ptId,coords);
       }
 
