@@ -47,6 +47,10 @@ public:
   int GetNumberOfControllers();
 
   // Description:
+  // Return the id of the nth controller.
+  int GetControllerId(int idx);
+
+  // Description:
   // Append the given controller to the composite set.
   // We focus on vtkSocketController because most of the API method are empty
   void RegisterController(vtkMultiProcessController* controller);

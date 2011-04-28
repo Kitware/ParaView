@@ -130,8 +130,17 @@ public:
   vtkGetMacro(ClientId, int);
 
   // Description:
+  // Return the client id of the nth connected client.
+  // idx < NumberOfClients
+  int GetClientId(int idx);
+
+  // Description:
   // Return the number of connected clients
   vtkGetMacro(NumberOfClients, int);
+
+  // Description:
+  // Return true if the server allow server client to connect to itself
+  bool IsMultiClientEnabled();
 
 protected:
   vtkPVServerInformation();
@@ -147,6 +156,7 @@ protected:
   int UseIceT;
   int UseOffscreenRendering;
   int ClientId;
+  int* ClientIds;
   int NumberOfClients;
   char* RenderModuleName;
 

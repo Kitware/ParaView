@@ -131,7 +131,7 @@ message PullRequest {
   }
 }
 
-// Extension Collaboration Communication ****************************** [50-54]
+// Extension Collaboration Communication ****************************** [50-55]
 
 message ClientInformation {
   extend Message {
@@ -144,6 +144,22 @@ message ClientInformation {
 message ChatMessage {
   extend Message {
     required string txt  = 53;
+  }
+}
+
+message QtEvent {
+  enum QtEventType {
+    RENDER              = 0;
+    FOCUS_PROPERTY      = 1;
+    FOCUS_DISPLAY       = 2;
+    FOCUS_INFORMATION   = 3;
+    ACTIVE_SOURCE       = 4;
+    PROXY_STATE_INVALID = 5;
+  }
+
+  extend Message {
+    required QtEventType type  = 54;
+    required uint32      proxy = 55;
   }
 }
 

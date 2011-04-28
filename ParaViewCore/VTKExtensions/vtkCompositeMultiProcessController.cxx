@@ -382,6 +382,11 @@ public:
     {
     return this->Controllers.size();
     }
+  //-----------------------------------------------------------------
+  int GetControllerId(int idx)
+    {
+    return this->Controllers.at(idx).Id;
+    }
 
 private:
   int ControllerID;
@@ -493,4 +498,9 @@ int vtkCompositeMultiProcessController::GetActiveControllerID()
 int vtkCompositeMultiProcessController::GetNumberOfControllers()
 {
   return this->Internal->GetNumberOfControllers();
+}
+//----------------------------------------------------------------------------
+int vtkCompositeMultiProcessController::GetControllerId(int idx)
+{
+  return this->Internal->GetControllerId(idx);
 }

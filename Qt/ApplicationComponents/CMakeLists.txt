@@ -35,6 +35,7 @@ SET (MOC_HEADERS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqColorToolbar.h
+  pqCollaborationBehavior.h
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
@@ -149,6 +150,8 @@ SET (SOURCE_FILES
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
   pqChangePipelineInputReaction.h
+  pqCollaborationBehavior.cxx
+  pqCollaborationBehavior.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx

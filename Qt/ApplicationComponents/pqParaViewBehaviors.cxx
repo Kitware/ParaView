@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
+#include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
 #include "pqCrashRecoveryBehavior.h"
 #include "pqDataTimeStepBehavior.h"
@@ -91,6 +92,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqObjectPickingBehavior(this);
+  new pqCollaborationBehavior(this);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
