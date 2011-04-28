@@ -179,11 +179,16 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                    SIGNAL(clicked(bool)),
                    this, SLOT(onChartResetHiddenSeries()));
 
+#if defined(PARAVIEW_USE_MPI)
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(serverChanged(pqServer*)),
     this, SLOT(updatePalettes()));
   vtkProcessModuleAutoMPI::
     SetUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
+#else
+  this->Internal->LabelMultiCore->setEnabled(false);
+  this->Internal->AutoMPI->setEnabled(false);
+#endif
 
   this->updatePalettes();
 }
@@ -280,9 +285,11 @@ void pqApplicationOptions::applyChanges()
   bool crashRecovery = this->Internal->CrashRecovery->isChecked();
   settings->setValue("crashRecovery",crashRecovery);
 
+#if defined(PARAVIEW_USE_MPI)
   bool autoMPI = this->Internal->AutoMPI->isChecked();
   settings->setValue("autoMPI",autoMPI);
   vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(autoMPI);
+#endif
 
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
@@ -344,10 +351,12 @@ void pqApplicationOptions::resetChanges()
   this->Internal->CrashRecovery->setChecked(
     settings->value("crashRecovery", false).toBool());
 
+#if defined(PARAVIEW_USE_MPI)
   this->Internal->AutoMPI->setChecked(
     settings->value("autoMPI", false).toBool());
   vtkProcessModuleAutoMPI::
     SetUseMulticoreProcessors(this->Internal->AutoMPI->isTristate());
+#endif
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",
