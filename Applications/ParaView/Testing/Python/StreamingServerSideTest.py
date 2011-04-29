@@ -1,24 +1,27 @@
 #/usr/bin/env python
 
+#Tests streaming server side rendering for CS mode
+#StreamingTest.py tests client side rendering in builtin and CS mode
+
 import QtTesting
 import QtTestingImage
 
 #TODO fix test recording so that it actually records these events
 #most of which I had to hack in by hand
 
-#TODO: test both server and client side rendering
-#turn on server side rendering
-#object2 = 'pqClientMainWindow/menubar/menu_Edit'
-#QtTesting.playCommand(object2, 'activate', 'actionEditSettings')
-#objectb2 = 'pqClientMainWindow/ApplicationSettings/PageNames'
-#QtTesting.playCommand(objectb2, 'setCurrent', '4.0')
-#QtTesting.playCommand(objectb2, 'expand', '4.0')
-#QtTesting.playCommand(objectb2, 'setCurrent', '4.0.2.0')
-#objectb3 = 'pqClientMainWindow/ApplicationSettings/Stack/pqGlobalRenderViewOptions/stackedWidget/Server/compositingParameters/compositeThreshold'
-#QtTesting.playCommand(objectb3, 'set_int', '0')
-#objectb4 = 'pqClientMainWindow/ApplicationSettings/CloseButton'
-#QtTesting.playCommand(objectb4, 'activate', '')
+#force server side rendering by setting threshold to 0
+object2 = 'pqClientMainWindow/menubar/menu_Edit'
+QtTesting.playCommand(object2, 'activate', 'actionEditSettings')
+objectb2 = 'pqClientMainWindow/ApplicationSettings/PageNames'
+QtTesting.playCommand(objectb2, 'setCurrent', '4.0')
+QtTesting.playCommand(objectb2, 'expand', '4.0')
+QtTesting.playCommand(objectb2, 'setCurrent', '4.0.2.0')
+objectb3 = 'pqClientMainWindow/ApplicationSettings/Stack/pqGlobalRenderViewOptions/stackedWidget/Server/compositingParameters/compositeThreshold'
+QtTesting.playCommand(objectb3, 'set_int', '0')
+objectb4 = 'pqClientMainWindow/ApplicationSettings/CloseButton'
+QtTesting.playCommand(objectb4, 'activate', '')
 
+#TODO: execfile StreamingTest.py instead of using copy below
 #load streaming view plugin on client and server sides
 hack1='pqClientMainWindow/menubar'
 QtTesting.playCommand(hack1, 'activate', 'menuTools')

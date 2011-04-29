@@ -42,13 +42,15 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCopyReaction : public pqReaction
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqCopyReaction(QAction* parent);
+  pqCopyReaction(QAction* parent, bool paste_mode=false);
   virtual ~pqCopyReaction();
 
   /// Copy all properties from source to dest. Uses the property names as the
   /// key for matching properties.
   static void copy(vtkSMProxy* dest, vtkSMProxy* source, bool skip_inputs);
+
   static void copy();
+  static void paste();
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
@@ -59,8 +61,16 @@ protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
     {
-    pqCopyReaction::copy();
+    if (this->Paste)
+      {
+      pqCopyReaction::paste();
+      }
+    else
+      {
+      pqCopyReaction::copy();
+      }
     }
+  bool Paste;
 private:
   Q_DISABLE_COPY(pqCopyReaction)
 };

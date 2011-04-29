@@ -224,4 +224,15 @@
     <header>pqPluginTreeWidget.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>remotePlugins</tabstop>
+  <tabstop>loadRemote</tabstop>
+  <tabstop>loadSelected_Remote</tabstop>
+  <tabstop>removeRemote</tabstop>
+  <tabstop>localPlugins</tabstop>
+  <tabstop>loadLocal</tabstop>
+  <tabstop>loadSelected_Local</tabstop>
+  <tabstop>removeLocal</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
 </ui>

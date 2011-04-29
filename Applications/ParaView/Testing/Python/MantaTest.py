@@ -1,24 +1,13 @@
 #/usr/bin/env python
 
+#Tests manta client side rendering for both builtin and CS mode
+#MantaServerSideTest.py tests server side rendering in CS mode
+
 import QtTesting
 import QtTestingImage
 
 #TODO fix test recording so that it actually records these events
 #most of which I had to hack in by hand
-
-#TODO: test both server and client side rendering modes
-#turn on server side rendering
-#TODO: server side rendering breaks in playback, but works in practice
-#object2 = 'pqClientMainWindow/menubar/menu_Edit'
-#QtTesting.playCommand(object2, 'activate', 'actionEditSettings')
-#objectb2 = 'pqClientMainWindow/ApplicationSettings/PageNames'
-#QtTesting.playCommand(objectb2, 'setCurrent', '4.0')
-#QtTesting.playCommand(objectb2, 'expand', '4.0')
-#QtTesting.playCommand(objectb2, 'setCurrent', '4.0.2.0')
-#objectb3 = 'pqClientMainWindow/ApplicationSettings/Stack/pqGlobalRenderViewOptions/stackedWidget/Server/compositingParameters/compositeThreshold'
-#QtTesting.playCommand(objectb3, 'set_int', '0')
-#objectb4 = 'pqClientMainWindow/ApplicationSettings/CloseButton'
-#QtTesting.playCommand(objectb4, 'activate', '')
 
 #load manta plugin on client and server sides
 hack1='pqClientMainWindow/menubar'
@@ -39,8 +28,7 @@ QtTesting.playCommand(object3, 'activate', '')
 #close the 3D view and make a manta view
 object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object4, 'activate', '')
-#TODO: make view selection by name, test will fail if view list contents change
-object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton0'
+object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Manta'
 QtTesting.playCommand(object5, 'activate', '')
 
 #show something
