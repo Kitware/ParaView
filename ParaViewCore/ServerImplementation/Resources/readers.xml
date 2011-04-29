@@ -4844,7 +4844,7 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
-   <SourceProxy name="PNGReader"
+   <SourceProxy name="PNGSeriesReader"
                           class="vtkFileSeriesReader"
                           label="PNG Series Reader"
                           si_class="vtkSIFileSeriesReaderProxy"
