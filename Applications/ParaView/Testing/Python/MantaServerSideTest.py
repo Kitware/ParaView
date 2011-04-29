@@ -21,7 +21,6 @@ QtTesting.playCommand(objectb3, 'set_int', '0')
 objectb4 = 'pqClientMainWindow/ApplicationSettings/CloseButton'
 QtTesting.playCommand(objectb4, 'activate', '')
 
-#TODO: execfile MantaTest.py instead of using copy below
 #load manta plugin on client and server sides
 hack1='pqClientMainWindow/menubar'
 QtTesting.playCommand(hack1, 'activate', 'menuTools')
@@ -51,6 +50,11 @@ hack4 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(hack4, 'activate', 'SphereSource')
 object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object6, 'activate', '')
+
+#test sphere 'glyphs' while we are at it
+objectfoo = 'pqClientMainWindow/representationToolbar/displayRepresentation/comboBox'
+QtTesting.playCommand(objectfoo, 'set_string', 'Points')
+
 object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
 QtTesting.playCommand(object7, 'mousePress', '(0.719373,0.369784,1,1,0)')
 QtTesting.playCommand(object7, 'mouseMove', '(0.605413,0.271942,1,0,0)')
@@ -58,4 +62,4 @@ QtTesting.playCommand(object7, 'mouseRelease', '(0.605413,0.271942,1,0,0)')
 
 # Image comparison
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTestingImage.compareImage(snapshotWidget, 'MantaImage.png', 300, 300);
+QtTestingImage.compareImage(snapshotWidget, 'MantaSSImage.png', 300, 300);
