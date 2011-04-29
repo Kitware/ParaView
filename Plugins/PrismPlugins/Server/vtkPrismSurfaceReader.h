@@ -15,6 +15,9 @@
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 
+class vtkSESAMEConversionFilter;
+class vtkPrismSESAMEReader;
+
 class VTK_EXPORT vtkPrismSurfaceReader : public vtkPolyDataAlgorithm 
 {
 public:
@@ -189,6 +192,7 @@ protected:
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   //int FillOutputPortInformation(int port, vtkInformation* info);
   int RequestCurveData(vtkPointSet *curveOutput);
+
 private:
   vtkPrismSurfaceReader(const vtkPrismSurfaceReader&);  // Not implemented.
   void operator=(const vtkPrismSurfaceReader&);  // Not implemented.

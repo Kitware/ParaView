@@ -22,7 +22,7 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
 #include "vtkPrismSESAMEReader.h"
-//#include "vtkRectilinearGridGeometryFilter.h"
+#include "vtkSESAMEConversionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
 #include "vtkStringArray.h"
@@ -42,184 +42,12 @@ Module:    vtkPrismSurfaceReader.cxx
 
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
-namespace
-{
-class vtkSESAMEConversionFilter : public vtkPolyDataAlgorithm
-{
-public:
-  vtkTypeRevisionMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Construct with initial extent (0,100, 0,100, 0,0) (i.e., a k-plane).
-  static vtkSESAMEConversionFilter *New();
- // void SetConversions(double density,double temperature,double pressure,double energy);
-
-
-  void SetVariableConversionValues(int i, double value);
-  void SetNumberOfVariableConversionValues(int);
-  double GetVariableConversionValue(int i);
-
-  void AddVariableConversionNames( char*  value);
-  void RemoveAllVariableConversionNames();
-  const char * GetVariableConversionName(int i);
-
-
-
-
-
-
-
-protected:
-  vtkSESAMEConversionFilter();
-  ~vtkSESAMEConversionFilter() {};
-
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
- // virtual int FillInputPortInformation(int port, vtkInformation *info);
-
-
-
-  vtkSmartPointer<vtkStringArray> VariableConversionNames;
-  vtkSmartPointer<vtkDoubleArray> VariableConversionValues;
-
-private:
-  vtkSESAMEConversionFilter(const vtkSESAMEConversionFilter&);  // Not implemented.
-  void operator=(const vtkSESAMEConversionFilter&);  // Not implemented.
-};
-}
-vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.11");
-vtkStandardNewMacro(vtkSESAMEConversionFilter);
-
-//----------------------------------------------------------------------------
-vtkSESAMEConversionFilter::vtkSESAMEConversionFilter()
-{
-
-
-
-  this->VariableConversionNames = vtkSmartPointer<vtkStringArray>::New();
-  this->VariableConversionValues = vtkSmartPointer<vtkDoubleArray>::New();
-
-
-
-
-    this->SetNumberOfInputPorts(1);
-    this->SetNumberOfOutputPorts(1);
-}
-
-void vtkSESAMEConversionFilter::SetVariableConversionValues(int i, double value)
-{
-  this->VariableConversionValues->SetValue(i,value);
-  this->Modified();
-}
-void vtkSESAMEConversionFilter::SetNumberOfVariableConversionValues(int v)
-{
-  this->VariableConversionValues->SetNumberOfValues(v);
-}
-double vtkSESAMEConversionFilter::GetVariableConversionValue(int i)
-{
-  return this->VariableConversionValues->GetValue(i);
-}
-
-void vtkSESAMEConversionFilter::AddVariableConversionNames(char*  value)
-{
-  this->VariableConversionNames->InsertNextValue(value);
-    this->Modified();
-}
-void vtkSESAMEConversionFilter::RemoveAllVariableConversionNames()
-{
-  this->VariableConversionNames->Reset();
-    this->Modified();
-}
-const char * vtkSESAMEConversionFilter::GetVariableConversionName(int i)
-{
-  return this->VariableConversionNames->GetValue(i).c_str();
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkSESAMEConversionFilter::PrintSelf(ostream& os, vtkIndent indent)
-    {
-    this->Superclass::PrintSelf(os,indent);
-
-    os << indent << "Not Implemented: " << "\n";
-
-    }
-
-//----------------------------------------------------------------------------
-int vtkSESAMEConversionFilter::RequestData(
-                                       vtkInformation *vtkNotUsed(request),
-                                       vtkInformationVector **inputVector,
-                                       vtkInformationVector *outputVector)
-    {
-
-
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkPolyData *input = vtkPolyData::SafeDownCast(
-        inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if ( !input ) 
-    {
-        vtkDebugMacro( << "No input found." );
-        return 0;
-    }
-
-    vtkInformation *OutInfo = outputVector->GetInformationObject(0);
-    vtkPointSet *Output = vtkPointSet::SafeDownCast(
-        OutInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-
-    vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
-
-
-    vtkPoints *inPts;
-    vtkPointData *pd;
-
-    vtkIdType ptId, numPts;
-
-    localOutput->ShallowCopy(input);
-    localOutput->GetPointData()->DeepCopy(input->GetPointData());
-
-    inPts = localOutput->GetPoints();
-    pd = localOutput->GetPointData();
-
-    numPts = inPts->GetNumberOfPoints();
-
-   vtkIdType numArrays=localOutput->GetPointData()->GetNumberOfArrays();
-    vtkSmartPointer<vtkFloatArray> convertArray;
-
-    double conversion;
-    for(int i=0;i<numArrays;i++)
-    {
-      convertArray= vtkFloatArray::SafeDownCast(localOutput->GetPointData()->GetArray(i));
-      if(i<this->VariableConversionValues->GetNumberOfTuples())
-      {
-        conversion = this->VariableConversionValues->GetValue(i);
-      }
-      else
-      {
-        conversion=1.0;
-      }
-
-          for(ptId=0;ptId<numPts;ptId++)
-          {
-            convertArray->SetValue(ptId,convertArray->GetValue(ptId)*conversion);
-          }
-     }
-
-    Output->ShallowCopy(localOutput);
-    return 1;
-
-    }
-
 
 //---------------------------------------------------
-
-
-
 class vtkPrismSurfaceReader::MyInternal
     {
     public:
-         vtkSmartPointer<vtkPrismSESAMEReader> Reader;
+        vtkSmartPointer<vtkPrismSESAMEReader> Reader;
         vtkSmartPointer<vtkSESAMEConversionFilter> ConversionFilter;
 
         vtkSmartPointer<vtkPrismSESAMEReader> VaporizationReader;
@@ -1682,8 +1510,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
     }
   }
-
-
 
   if(this->Internal->ShowSolidMelt)
   {
