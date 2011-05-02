@@ -93,6 +93,7 @@ void pqProgressWidget::setProgress(const QString& message, int value)
     {
     this->ProgressBar->setValue(value);
     this->ProgressBar->setFormat(QString("%1: %p").arg(message));
+    QApplication::processEvents();
     }
 }
 
