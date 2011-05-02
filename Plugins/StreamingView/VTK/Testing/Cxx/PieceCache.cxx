@@ -13,7 +13,11 @@
 
 =========================================================================*/
 
-// Tests that the prioritized streaming works as expected.
+// Tests that the piece cache filter does what it needs to do.
+// It must prevent pipeline updates when pieces are re-requested
+// It must not prevent updates when the data is changed
+// It has to be able to append all of the cached pieces into a single large
+// piece for single pass rendering if and once everything visible is cached.
 
 #include "vtkActor.h"
 #include "vtkCamera.h"
@@ -116,8 +120,6 @@ int PieceCache(int argc, char *argv[])
 
   cerr << "ASK FOR 0/16" << endl;
   harness->Update();
-  int npts_p0 = vtkPolyData::SafeDownCast(harness->GetOutput())->GetNumberOfPoints();
-  cerr << "0/16 has " << npts_p0 << " points" << endl;
   cerr << "VERIFY IN CACHE" << endl;
   p0c = pcf->InCache(0, 16, 1.0);
   p1c = pcf->InCache(1, 16, 1.0);
@@ -138,8 +140,6 @@ int PieceCache(int argc, char *argv[])
   cerr << "ASK FOR 1/16" << endl;
   harness->SetPiece(1);
   harness->Update();
-  int npts_p1 = vtkPolyData::SafeDownCast(harness->GetOutput())->GetNumberOfPoints();
-  cerr << "1/16 has " << npts_p1 << " points" << endl;
   cerr << "VERIFY IN CACHE" << endl;
   p0c = pcf->InCache(0, 16, 1.0);
   p1c = pcf->InCache(1, 16, 1.0);
@@ -214,6 +214,30 @@ int PieceCache(int argc, char *argv[])
          << " test failed because pipeline isn't prevented from updating" << endl;
     failed = true;
     }
+
+  cerr << "CHANGE UPSTREAM PIPELINE" << endl;
+  contour->SetValue(0,10.0);
+  harness->Update();
+  if (execount != 4)
+    {
+    cerr << execount
+         << " test failed because pipeline prevented update it shouldn't have" << endl;
+    failed = true;
+    }
+  int npts_p0 = vtkPolyData::SafeDownCast(harness->GetOutput())->GetNumberOfPoints();
+  cerr << "0/16 has " << npts_p0 << " points" << endl;
+  cerr << "ASK FOR 1/16" << endl;
+  harness->SetPiece(1);
+  harness->Update();
+  int npts_p1 = vtkPolyData::SafeDownCast(harness->GetOutput())->GetNumberOfPoints();
+  cerr << "1/16 has " << npts_p1 << " points" << endl;
+  if (execount != 5)
+    {
+    cerr << execount
+         << " test failed because pipeline prevented update it shouldn't have" << endl;
+    failed = true;
+    }
+
   cerr << "TEST APPEND" << endl;
   cerr << "VERIFY NOTHING IN APPEND" << endl;
   p0c = pcf->InAppend(0, 16, 1.0);
