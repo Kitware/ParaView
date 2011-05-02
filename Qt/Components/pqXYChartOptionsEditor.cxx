@@ -237,6 +237,8 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   //this->Internal->Form->UseFixedInterval->setHidden(true);
   this->Internal->Form->label_12->setHidden(true);
   this->Internal->Form->AxisTitleAlignment->setHidden(true);
+  this->Internal->Form->label_7->setHidden(true);
+  this->Internal->Form->LegendFlow->setHidden(true);
 
   // Connect up some of the form elements
   QObject::connect(this->Internal->Form->ChartTitleFontButton,
@@ -462,6 +464,11 @@ void pqXYChartOptionsEditor::connectGUI()
                                      "checked",
                                      SIGNAL(toggled(bool)),
                                      proxy, proxy->GetProperty("ShowLegend"));
+  this->Internal->Links.registerLink(this->Internal->Form->LegendLocation,
+                                     "currentIndex",
+                                     SIGNAL(currentIndexChanged(int)),
+                                     proxy,
+                                     proxy->GetProperty("LegendLocation"));
 
   this->updateOptions();
 

@@ -672,6 +672,14 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+        name="LegendLocation"
+        command="SetLegendLocation"
+        number_of_elements="1"
+        default_values="2">
+        <IntRangeDomain name="range" min="0" max="4" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="ShowAxis"
         command="SetAxisVisibility"
         repeat_command="1"
@@ -4240,6 +4248,7 @@
           <Property name="ChartTitleColor" />
           <Property name="ChartTitleAlignment" />
           <Property name="ShowLegend" />
+          <Property name="LegendLocation" />
           <Property name="ShowAxis" />
           <Property name="AxisLogScale" />
           <Property name="ShowAxisGrid" />
