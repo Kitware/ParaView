@@ -32,12 +32,9 @@ public:
   vtkTypeMacro(vtkPrismRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetScaleFactor(double scale[3]);
-  
-  virtual double *GetPrismRange();
-  virtual void GetPrismRange(double &_arg1, double &_arg2, double &_arg3);
-  virtual void GetPrismRange(double range[3]);
+  vtkSetVector3Macro(ScaleFactor,double);
 
+  vtkGetVector3Macro(PrismRange,double);
 
 //BTX
 protected:
@@ -57,10 +54,11 @@ protected:
     vtkInformationVector**, vtkInformationVector*);
 
 
-  class MyInternal;
-  MyInternal* Internal;
+  virtual bool AddToView(vtkView *view);
+  virtual bool RemoveFromView(vtkView *view);
 
-
+  double PrismRange[3];
+  double ScaleFactor[3];
 private:
   vtkPrismRepresentation(const vtkPrismRepresentation&); // Not implemented
   void operator=(const vtkPrismRepresentation&); // Not implemented

@@ -24,6 +24,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 
+class vtkInformationDoubleVectorKey;
+
 class VTK_EXPORT vtkPrismView : public vtkPVRenderView
 {
   //*****************************************************************
@@ -33,11 +35,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Overridden to not call Update() directly on the input representations,
-  // instead use ProcessViewRequest() for all vtkPVDataRepresentations.
-  void Update();
+  // Scaling that should be applied to each object
+  // to have it corr
+  static vtkInformationDoubleVectorKey* PRISM_WORLD_SCALE();
 
-
+  // Description:
+  // Calls vtkView::REQUEST_INFORMATION() on all representations
+  void GatherRepresentationInformation();
 
 public:
 
@@ -45,10 +49,6 @@ public:
 protected:
   vtkPrismView();
   ~vtkPrismView();
- //// Subclass "hooks" for notifying subclasses of vtkView when representations are added
- // // or removed. Override these methods to perform custom actions.
- // virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
- // virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
 
 private:
   vtkPrismView(const vtkPrismView&); // Not implemented

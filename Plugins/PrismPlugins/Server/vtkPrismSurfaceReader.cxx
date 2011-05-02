@@ -1034,8 +1034,7 @@ int vtkPrismSurfaceReader::RequestData(
   this->AspectScale[2]=100/delta[2];
 
   vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-//  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
-  transform->Scale(1.0,1.0,1.0);
+  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
 
   this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
   this->Internal->ScaleTransform->SetTransform(transform);
