@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "pqCoreExport.h"
 #include "vtkSmartPointer.h"
+#include "vtkSynchronizedRenderers.h" // needed for vtkRawImage;
 #include <QPointer>
 
 class vtkSMProxy;
@@ -44,6 +45,10 @@ class QTimer;
 /// advantage of doing that is that pqQVTKWidget can automatically update the
 /// "ViewPosition" and "ViewSize" properties on the view proxy whenever the
 /// widget's size/position changes.
+///
+/// pqQVTKWidget also enables image caching by default. Additionally, it does
+/// some extra tricks to optimize the use of the cache when doing transient
+/// actions such as resizing.
 class PQCORE_EXPORT pqQVTKWidget : public QVTKWidget
 {
   Q_OBJECT
@@ -74,6 +79,10 @@ protected:
   /// overloaded move handler
   virtual void moveEvent(QMoveEvent* event);
 
+  // method called in paintEvent() to render the image cache on to the device.
+  // return false, if cache couldn;t be used for painting. In that case, the
+  // paintEvent() method will continue with the default painting code.
+  virtual bool paintCachedImage();
 private slots:
   void updateSizeProperties();
 
@@ -83,6 +92,8 @@ private:
   QPointer<QWidget> PositionReference;
   /// used to collapse multiple resize events.
   QTimer* ResizeTimer;
+  vtkSynchronizedRenderers::vtkRawImage *ResizingImage;
+  bool Resizing;
 };
 
 #endif
