@@ -6,6 +6,7 @@ create_test_sourcelist(STREAMINGTESTS
   StreamingCxxTests.cxx
   Source.cxx
   Harness.cxx
+  PieceCache.cxx
   Iteration.cxx
   Prioritization.cxx
   Refinement.cxx
