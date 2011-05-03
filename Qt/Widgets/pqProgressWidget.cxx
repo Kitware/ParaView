@@ -30,13 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressWidget.h"
+#include "pqProgressBar.h"
 
 #include <QApplication>
 #include <QGridLayout>
-#include <QProgressBar>
 #include <QToolButton>
-
-#include <iostream>
 
 
 //-----------------------------------------------------------------------------
@@ -48,9 +46,8 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
   gridLayout->setMargin(0);
   gridLayout->setObjectName("gridLayout");
 
-  this->ProgressBar = new QProgressBar(this);
+  this->ProgressBar = new pqProgressBar(this);
   this->ProgressBar->setObjectName("ProgressBar");
-  this->ProgressBar->setOrientation(Qt::Horizontal);
   gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
 
   this->AbortButton = new QToolButton(this);
@@ -87,10 +84,8 @@ void pqProgressWidget::setProgress(const QString& message, int value)
     }
   if (!this->PendingEnableProgress)
     {
-    this->ProgressBar->setValue(value);
-    this->ProgressBar->setFormat(QString("%1: %p").arg(message));
-    //request the application to redraw the progressbar
-    QApplication::processEvents();
+    this->ProgressBar->setProgress(message,value);
+
     }
 }
 

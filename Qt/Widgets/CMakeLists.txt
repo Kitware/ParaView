@@ -56,6 +56,8 @@ SET(QtWidgets_SRCS
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
+  pqProgressBar.cxx
+  pqProgressBar.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
@@ -119,6 +121,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
+  pqProgressBar.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
   pqSectionVisibilityContextMenu.h

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqProgressWidget.h
+   Module:    pqProgressBar.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,53 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqProgressWidget_h
-#define __pqProgressWidget_h
+#ifndef __pqProgressBar_h
+#define __pqProgressBar_h
 
-
-#include <QWidget>
-#include <QTime>
 #include "QtWidgetsExport.h"
+#include <QWidget>
 
-class pqProgressBar;
-class QToolButton;
+class pqProgressBarHelper;
+class QProgressBar;
+class QLabel;
 
-class QTWIDGETS_EXPORT pqProgressWidget : public QWidget
+//lightweight widget that has a progress bar and label.
+//this gives us a consitent progress bar no matter the OS
+//mainly because everyone wants to see what is "working" on OSX
+class QTWIDGETS_EXPORT pqProgressBar : public QWidget
 {
   Q_OBJECT
 public:
-  pqProgressWidget(QWidget* parent=0);
-  virtual ~pqProgressWidget();
+  pqProgressBar(QWidget* _p);
+  virtual ~pqProgressBar();
 
-  QToolButton* getAbortButton() const
-    {
-    return this->AbortButton;
-    }
 public slots:
-  /// Set the progress.
+  void reset();
   void setProgress(const QString& message, int value);
 
-  /// Enabled/Disable the progress. This is different from 
-  /// enabling/disabling the widget itself. This shows/hides
-  /// the progress part of the widget.
-  void enableProgress(bool enabled);
-
-  /// Enable/Disable the abort button.
-  void enableAbort(bool enabled);
-
-signals:
-  void abortPressed();
-
 protected:
-  pqProgressBar* ProgressBar;
-  QToolButton* AbortButton;
-  bool PendingEnableProgress;
-  QTime EnableTime;
-
-private:
-  pqProgressWidget(const pqProgressWidget&); // Not implemented.
-  void operator=(const pqProgressWidget&); // Not implemented.
+  QProgressBar* ProgressBar;
+  QLabel* ProgressLabel;
 };
 
 #endif
-
