@@ -6561,16 +6561,56 @@
       </Hints>
 
    </SourceProxy>
-
    <!-- End WindBladeReader -->
+
+   <SourceProxy name="NetCDFCAMReader"
+                class="vtkNetCDFCAMReader"
+                label="NetCDF CAM reader">
+     <Documentation
+        short_help="Read unstructured grid NetCDF files in CAM format."
+        long_help="Read unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName.">
+       This reader reads in unstructured grid data from a NetCDF file.  The grid data is in a set of planes
+       as quadrilateral cells.  The reader creates hex cells in order to create a volumetric grid.
+     </Documentation>
+
+     <StringVectorProperty
+        name="ConnectivityFileName"
+        animateable="0"
+        command="SetConnectivityFileName"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read for the grid connectivity.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointsFileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read for the points and field information.
+       </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="nc ncdf"
+                      file_description="CAM NetCDF (Unstructured)" />
+     </Hints>
+
+   </SourceProxy>
+   <!-- End NetCDFCAMReader -->
+
    <SourceProxy name="NetCDFPOPReader"
               class="vtkNetCDFPOPReader"
               label="NetCDF POP reader">
-   <Documentation
-     short_help="Read raw regular rectilinear grid data from a file."
-     long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
-     The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
-   </Documentation>
+     <Documentation
+        short_help="Read rectilinear grid data from a NetCDF file in the POP format."
+        long_help="Read rectilinear grid data from a NetCDF POP file.">
+       The reader reads regular rectilinear grid (image/volume) data from a NetCDF file.
+     </Documentation>
 
      <StringVectorProperty
         name="FileName"
@@ -6583,27 +6623,27 @@
         </Documentation>
      </StringVectorProperty>
 
-    <StringVectorProperty name="VariableArrayInfo"
-                          information_only="1">
-      <ArraySelectionInformationHelper attribute_name="Variable"/>
-    </StringVectorProperty>
-    <StringVectorProperty name="VariableArrayStatus"
-                          command="SetVariableArrayStatus"
-                          number_of_elements="0"
-                          repeat_command="1"
-                          number_of_elements_per_command="2"
-                          element_types="2 0"
-                          information_property="VariableArrayInfo"
-                          label="Variables">
-      <ArraySelectionDomain name="array_list">
-        <RequiredProperties>
-          <Property name="VariableArrayInfo" function="ArrayList" />
-        </RequiredProperties>
-      </ArraySelectionDomain>
-      <Documentation>
-        This property lists which netCDF variables to load.
-      </Documentation>
-    </StringVectorProperty>
+     <StringVectorProperty name="VariableArrayInfo"
+                           information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Variable"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="VariableArrayStatus"
+                           command="SetVariableArrayStatus"
+                           number_of_elements="0"
+                           repeat_command="1"
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
+                           information_property="VariableArrayInfo"
+                           label="Variables">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="VariableArrayInfo" function="ArrayList" />
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which netCDF variables to load.
+       </Documentation>
+     </StringVectorProperty>
 
      <IntVectorProperty
         name="Stride"
@@ -6611,17 +6651,17 @@
         number_of_elements="3"
         default_values="1 1 1"
         animateable="0">
-        <IntRangeDomain name="range" min="1 1 1" />
-        <Documentation>
+       <IntRangeDomain name="range" min="1 1 1" />
+       <Documentation>
          This property indicate the number of indices per dimension (i,j,k) to skip between each point included
          in this output.
-        </Documentation>
+       </Documentation>
      </IntVectorProperty>
 
-    <Hints>
-      <ReaderFactory extensions="pop.ncdf pop.nc"
-          file_description="POP Ocean NetCDF (Rectilinear)" />
-    </Hints>
+     <Hints>
+       <ReaderFactory extensions="pop.ncdf pop.nc"
+                      file_description="POP Ocean NetCDF (Rectilinear)" />
+     </Hints>
 
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
