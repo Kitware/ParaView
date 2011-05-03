@@ -55,6 +55,7 @@ pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p)
   gridLayout->addWidget(this->ProgressBar, 0, 0);
   gridLayout->addWidget(this->ProgressLabel, 0, 1);
 
+  this->setLayout(gridLayout);
 }
 
 
@@ -71,10 +72,8 @@ void pqProgressBar::setProgress(const QString& message, int value)
   this->ProgressBar->setValue(value);
   QString msg = QString("%1: %2").arg(message, QString::number(value));
   this->ProgressLabel->setText(msg);
-  
 
-  //request the application to redraw the progressbar
-  QCoreApplication::processEvents();
+  //QCoreApplication::processEvents(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents);
 }
 
 //-----------------------------------------------------------------------------
