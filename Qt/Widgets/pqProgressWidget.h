@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTime>
 #include "QtWidgetsExport.h"
 
-class QProgressBar;
+class pqProgressBar;
 class QToolButton;
 
 class QTWIDGETS_EXPORT pqProgressWidget : public QWidget
@@ -67,7 +67,7 @@ signals:
   void abortPressed();
 
 protected:
-  QProgressBar* ProgressBar;
+  pqProgressBar* ProgressBar;
   QToolButton* AbortButton;
   bool PendingEnableProgress;
   QTime EnableTime;
