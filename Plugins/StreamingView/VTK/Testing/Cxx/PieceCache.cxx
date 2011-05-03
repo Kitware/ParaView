@@ -39,14 +39,14 @@
 
 int execount = 0;
 
-void WatchPipeline(void *arg)
+void WatchPipeline(void *)
 {
   cerr << "Pipeline is executing for the "<< execount << "'th time" << endl;
   execount ++;
 }
 
 //---------------------------------------------------------------------------
-int PieceCache(int argc, char *argv[])
+int PieceCache(int , char *[])
 {
   bool failed = false;
 
