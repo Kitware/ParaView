@@ -1,4 +1,4 @@
-## Thanks to John Bidiscombe of
+## Thanks to John Biddiscombe of
 ## CSCS - Swiss National Supercomputing Centre for creating and contributing
 ## this plugin.
   
