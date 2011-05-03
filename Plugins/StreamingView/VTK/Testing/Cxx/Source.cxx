@@ -33,7 +33,6 @@
 #include "vtkStreamedMandelbrot.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTesting.h"
-#include "vtkXMLImageDataWriter.h"
 
 #include "vtksys/SystemTools.hxx"
 
@@ -57,8 +56,13 @@ int Source(int argc, char *argv[])
   // create a streaming capable source.
   // it provides data and meta data (including world space bounds and
   // possibly scalar ranges) for any requested piece at any requested resolution
+#if 0
+  vtkSmartPointer<vtkImageMandelbrotSource> sms =
+    vtkSmartPointer<vtkImageMandelbrotSource>::New();
+#else
   vtkSmartPointer<vtkStreamedMandelbrot> sms =
     vtkSmartPointer<vtkStreamedMandelbrot>::New();
+#endif
   sms->SetWholeExtent(0,127,0,127,0,127);
   sms->SetOriginCX(-1.75,-1.25,0,0);
 
@@ -67,46 +71,55 @@ int Source(int argc, char *argv[])
   vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast
     (vtkExecutive::PRODUCER()->GetExecutive(info));
-  sddp->SetUpdateResolution(info, 0.3);
-  sddp->SetUpdateExtent(info, 4, 8, 0);
-/*
-  //why isn't this equivalent to above?
-  vtkStreamingDemandDrivenPipeline* sddp =
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(sms->GetExecutive());
-  sddp->SetUpdateResolution(0, 0.0);
-  sddp->SetUpdateExtent(0, 0, 1, 0);
-*/
-  double priority = sddp->ComputePriority();
-  cerr << "PRIORITY IS " << priority << endl;
-  //TODO: why does this need to be respecified?
-  sddp->SetUpdateExtent(info, 4, 8, 0);
-  input->Update();
 
-  vtkSmartPointer<vtkImageData> id = vtkSmartPointer<vtkImageData>::New();
-  id->ShallowCopy(input);
-//  id->PrintSelf(cerr, vtkIndent(0));
+  //test source by asking it to produce different pieces...
+  const int numers[5] = {0, 0, 1, 1, 3};
+  const int denoms[5] = {1, 2, 2, 4, 4};
+  int i = -1, j = -1;
+  for (int pieceChoice = 0; pieceChoice < 5; pieceChoice++)
+    {
+    i++;
+    j = -1;
 
-  vtkSmartPointer<vtkXMLImageDataWriter> writer =
-    vtkSmartPointer<vtkXMLImageDataWriter>::New();
-  writer->SetFileName("/tmp/foo.vti");
-  writer->SetInput(id);
-  //writer->SetInputConnection(sms->GetOutputPort());
-  //writer->Write();
+    //...at different resolutions
+    for (double res = 0.0; res < 1.0; res+=0.4)
+      {
+      j++;
 
-  // Set up a sample pipeline containing filters that pass meta info downstream
-  vtkSmartPointer<vtkContourFilter> contour =
-    vtkSmartPointer<vtkContourFilter>::New();
-  contour->SetInput(id);
-  contour->SetValue(0,50.0);
+      //TODO: Fix the pipeline bug or pipeline cache mode that causes the need
+      //to update twice. It is needed even without res
+      sms->Modified();
+      sddp->SetUpdateResolution(info, res);
+      sddp->SetUpdateExtent(info, numers[pieceChoice], denoms[pieceChoice], 0);
+      input->Update();
+      sms->Modified();
+      sddp->SetUpdateResolution(info, res);
+      sddp->SetUpdateExtent(info, numers[pieceChoice], denoms[pieceChoice], 0);
+      input->Update();
 
-  vtkSmartPointer<vtkDataSetMapper> map1 =
-    vtkSmartPointer<vtkDataSetMapper>::New();
-  map1->SetInputConnection(contour->GetOutputPort());
+      //don't let contour request entire extent
+      vtkSmartPointer<vtkImageData> id = vtkSmartPointer<vtkImageData>::New();
+      id->ShallowCopy(input);
 
-  vtkSmartPointer<vtkActor> act1 = vtkSmartPointer<vtkActor>::New();
-  act1->SetMapper(map1);
-  renderer->AddActor(act1);
+      vtkSmartPointer<vtkContourFilter> contour =
+        vtkSmartPointer<vtkContourFilter>::New();
+      contour->SetInput(id);
+      contour->SetValue(0,50.0);
+      contour->Update();
 
+      vtkSmartPointer<vtkDataSetMapper> map1 =
+        vtkSmartPointer<vtkDataSetMapper>::New();
+      map1->SetInputConnection(contour->GetOutputPort());
+
+      vtkSmartPointer<vtkActor> act1 = vtkSmartPointer<vtkActor>::New();
+      act1->SetMapper(map1);
+      act1->SetPosition(i*2.0, j*2.0, 0.0);
+      renderer->AddActor(act1);
+      }
+    }
+
+  renWin->Render();
+  renderer->ResetCamera();
   renWin->Render();
 
   int retVal = vtkRegressionTestImage( renWin );

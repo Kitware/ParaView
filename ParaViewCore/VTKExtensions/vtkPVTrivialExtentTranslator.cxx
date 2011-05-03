@@ -57,15 +57,15 @@ int vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
   // this is really only meant for topologically structured grids
   if (vtkImageData* id = vtkImageData::SafeDownCast(dataSet))
     {
-    memcpy(resultExtent, id->GetExtent(), sizeof(int)*6);
+    id->GetExtent(resultExtent);
     }
   else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(dataSet))
     {
-    memcpy(resultExtent, sd->GetExtent(), sizeof(int)*6);
+    sd->GetExtent(resultExtent);
     }
   else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(dataSet))
     {
-    memcpy(resultExtent, rd->GetExtent(), sizeof(int)*6);
+    rd->GetExtent(resultExtent);
     }
   else
     {

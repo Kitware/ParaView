@@ -32,6 +32,17 @@
 
 #include "vtksys/SystemTools.hxx"
 
+struct pieceRecord //used to store piece specifier, query result for the test
+{
+  int p;
+  int n;
+  double r;
+  double bounds[6];
+  double gconf;
+  double range[2];
+  double aconf;
+};
+
 //---------------------------------------------------------------------------
 int Harness(int argc, char *argv[])
 {
@@ -62,23 +73,47 @@ int Harness(int argc, char *argv[])
   // downstream
   vtkSmartPointer<vtkContourFilter> contour =
     vtkSmartPointer<vtkContourFilter>::New();
-  //contour->SetInput(id);
   contour->SetInputConnection(sms->GetOutputPort());
-  contour->SetValue(0,0.0);
+  contour->SetValue(0,50.0);
 
   // An access point to inject resolution into the pipeline
   vtkSmartPointer<vtkStreamingHarness> harness=
     vtkSmartPointer<vtkStreamingHarness>::New();
   harness->SetInputConnection(contour->GetOutputPort());
   harness->SetNumberOfPieces(16);
-  harness->SetPiece(0);
-  harness->SetResolution(0.0);
+  harness->SetResolution(0.8);
 
-  //cerr << "PRIORITY IS" << harness->ComputePiecePriority(0, 4, 0) << endl;
-  harness->Update();
+  for (int p = 0; p < 16; p++)
+    {
+    if (harness->ComputePiecePriority(p, 16, 0.8) != 1.0)
+      {
+      cerr
+        << "Without precomputed meta information, nothing can be "
+        << "rejected by value before first update." << endl;
+      return -1;
+      }
+    }
 
-  //cerr << "PRIORITY NOW" << harness->ComputePiecePriority(0, 4, 0) << endl;
-  contour->SetValue(0,50.0);
+  for (int p = 0; p < 16; p++)
+    {
+    harness->SetPiece(p);
+    harness->Update();
+    }
+
+  for (int p = 0; p < 16; p++)
+    {
+    double priority = harness->ComputePiecePriority(p, 16, 0.8);
+    if ((p == 11 || p == 15) && priority > 0.5)
+      {
+      cerr << "This piece should have been rejected " << priority << endl;
+      return -1;
+      }
+    if ((p != 11 && p != 15) && priority != 1.0)
+      {
+      cerr << "This piece should not have been rejected" << endl;
+      return -1;
+      }
+    }
 
   double bounds[6];
   double gconf;
@@ -86,70 +121,59 @@ int Harness(int argc, char *argv[])
   double max;
   double aconf;
 
-  harness->ComputePieceMetaInformation(0,16,0.0,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
-    {
-    cerr << bounds[i] << ",";
-    }
-  cerr << gconf << "\n " << min << " to " << max << " " << aconf << endl;
+  const pieceRecord pRecs[6] =
+  {
+    {0,16,0.0, {-1.75,-0.470472,-1.25,0.0295276,0,0.551181}, 1, {1.86486,100}, 1},
+    {0,16,1.0, {-1.75,-0.490157,-1.25,0.00984252,0,0.503937}, 1, {1.86486,100}, 1},
+    {0,4,0.5, {-1.75,0.67126,-1.25,-0.00984252,0,0.992126}, 1, {0,-1}, 0},
+    {1,4,0.5, {-1.75,0.67126,-0.127953,1.17126,0,0.992126}, 1, {0,-1}, 0},
+    {0,4,0.8, {-1.75,0.67126,-1.25,-0.00984252,0,1.00787}, 1, {0,-1}, 0},
+    {1,4,0.8, {-1.75,0.67126,-0.127953,1.17126,0,1.00787}, 1, {0,-1}, 0}
+  };
 
-  harness->ComputePieceMetaInformation(0,16,1.0,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
+  for (int p = 0; p < 6; p++)
     {
-    cerr << bounds[i] << ",";
+    harness->ComputePieceMetaInformation(pRecs[p].p, pRecs[p].n, pRecs[p].r,
+                                         bounds, gconf,
+                                         min, max, aconf);
+    if (gconf != pRecs[p].gconf)
+      {
+      cerr << "Got wrong geometric confidence ";
+      cerr << p << " " << gconf << "!=" << pRecs[p].gconf << endl;
+      return -1;
+      }
+    for (int i = 0; i < 6; i++)
+      {
+      if (fabs(bounds[i]-pRecs[p].bounds[i]) > 0.001)
+        {
+        cerr << "Got wrong bounds ";
+        cerr << p << " " << i << " "
+             << bounds[i] << "!= " << pRecs[p].bounds[i] << endl;
+        return -1;
+        }
+      }
+    if (aconf != pRecs[p].aconf)
+      {
+      cerr << "Got wrong attribute confidence ";
+      cerr << p << " " << aconf << "!=" << pRecs[p].aconf << endl;
+      return -1;
+      }
+    if ((fabs(min - pRecs[p].range[0]) > 0.001) ||
+        (fabs(max - pRecs[p].range[1]) > 0.001))
+      {
+      cerr << "Got wrong data range ";
+      cerr << p << " "
+           << min << "!=" << pRecs[p].range[0] << " or "
+           << max << "!=" << pRecs[p].range[1] << " or " << endl;
+      return -1;
+      }
     }
-  cerr << gconf << "\n " << min << " to " << max << " " << aconf << endl;
 
-  harness->ComputePieceMetaInformation(0,4,0.5,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
-    {
-    cerr << bounds[i] << ",";
-    }
-  cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
-
-  harness->ComputePieceMetaInformation(1,4,0.5,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
-    {
-    cerr << bounds[i] << ",";
-    }
-  cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
-
+  //test simply using harness to specify a piece and showing that
   harness->SetNumberOfPieces(4);
   harness->SetPiece(1);
   harness->SetResolution(0.5);
   harness->Update();
-
-  harness->ComputePieceMetaInformation(0,4,0.5,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
-    {
-    cerr << bounds[i] << ",";
-    }
-  cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
-
-  harness->ComputePieceMetaInformation(1,4,0.5,
-                                       bounds, gconf,
-                                       min, max, aconf);
-  cerr << "META INFO IS ";
-  for (int i = 0; i < 6; i++)
-    {
-    cerr << bounds[i] << ",";
-    }
-  cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
 
   vtkSmartPointer<vtkDataSetMapper> map1 =
     vtkSmartPointer<vtkDataSetMapper>::New();

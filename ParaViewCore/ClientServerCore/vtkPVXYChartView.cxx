@@ -17,6 +17,7 @@
 #include "vtkAxis.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkChartXY.h"
+#include "vtkChartLegend.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkDoubleArray.h"
@@ -169,6 +170,35 @@ void vtkPVXYChartView::SetLegendVisibility(int visible)
   if (this->Chart)
     {
     this->Chart->SetShowLegend(visible? true : false);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendLocation(int location)
+{
+  if (this->Chart)
+    {
+    vtkChartLegend *legend = this->Chart->GetLegend();
+    legend->SetInline(false);
+    switch(location)
+      {
+      case 0: // LEFT
+        legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
+        legend->SetVerticalAlignment(vtkChartLegend::CENTER);
+        break;
+      case 1: // TOP
+        legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
+        legend->SetVerticalAlignment(vtkChartLegend::TOP);
+        break;
+      case 2: // RIGHT
+        legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        legend->SetVerticalAlignment(vtkChartLegend::CENTER);
+        break;
+      case 3: // BOTTOM
+        legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
+        legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
+        break;
+      }
     }
 }
 
