@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
-  : QWidget(_parent)
+  : QWidget(_parent,Qt::FramelessWindowHint)
 {
   QGridLayout *gridLayout = new QGridLayout(this);
-  gridLayout->setSpacing(4);
+  gridLayout->setSpacing(0);
   gridLayout->setMargin(0);
   gridLayout->setObjectName("gridLayout");
 
