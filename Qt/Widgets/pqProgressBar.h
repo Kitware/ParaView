@@ -33,14 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqProgressBar_h
 
 #include "QtWidgetsExport.h"
-#include <QProgressBar>
+#include <QWidget>
 
 class pqProgressBarHelper;
+class QProgressBar;
+class QLabel;
 
-// QProgressBar shows a text on the progress bar which is string 
-// for the current progress value. This class makes it possible
-// to attach a string prefix to the value shown. 
-class QTWIDGETS_EXPORT pqProgressBar : public QProgressBar
+//lightweight widget that has a progress bar and label.
+//this gives us a consitent progress bar no matter the OS
+//mainly because everyone wants to see what is "working" on OSX
+class QTWIDGETS_EXPORT pqProgressBar : public QWidget
 {
   Q_OBJECT
 public:
@@ -48,17 +50,12 @@ public:
   virtual ~pqProgressBar();
 
 public slots:
+  void reset();
   void setProgress(const QString& message, int value);
-  void enableProgress(bool);
 
-private slots:
-  void cleanup();
-
-private:
-  bool CleanUp;
-  pqProgressBarHelper* Helper;
-
+protected:
+  QProgressBar* ProgressBar;
+  QLabel* ProgressLabel;
 };
 
 #endif
-
