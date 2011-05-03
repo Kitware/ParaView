@@ -50,7 +50,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
   : Superclass(parentObject, f),
   ResizeTimer(new QTimer(this))
 {
-  this->setAutomaticImageCacheEnabled(true);
+  this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
 
   this->ResizingImage = new vtkSynchronizedRenderers::vtkRawImage();
 
@@ -99,11 +99,19 @@ QWidget* pqQVTKWidget::positionReference() const
 //----------------------------------------------------------------------------
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
-  this->Resizing = true;
-  bool old_cache_state = this->cachedImageCleanFlag;
-  this->Superclass::resizeEvent(e);
-  this->cachedImageCleanFlag = old_cache_state;
-  this->ResizeTimer->start();
+  if (!this->isAutomaticImageCacheEnabled())
+    {
+    this->Superclass::resizeEvent(e);
+    this->updateSizeProperties();
+    }
+  else
+    {
+    this->Resizing = true;
+    bool old_cache_state = this->cachedImageCleanFlag;
+    this->Superclass::resizeEvent(e);
+    this->cachedImageCleanFlag = old_cache_state;
+    this->ResizeTimer->start();
+    }
 }
 
 //----------------------------------------------------------------------------
