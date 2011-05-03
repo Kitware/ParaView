@@ -30,57 +30,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressBar.h"
-#include "pqProgressBarHelper.h"
-#include <QTimer>
-#include <QHBoxLayout>
+
+#include <QCoreApplication>
+#include <QGridLayout>
+#include <QLabel>
+#include <QProgressBar>
+#include <QString>
 
 //-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
+pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p)
 {
-  this->Helper = new pqProgressBarHelper(this);
-  this->Helper->enableProgress(false);
-  this->CleanUp = false;
+
+  QGridLayout *gridLayout = new QGridLayout(this);
+  gridLayout->setSpacing(0);
+  gridLayout->setContentsMargins(0,0,4,0);
+  gridLayout->setObjectName("gridLayout");
+
+  this->ProgressBar = new QProgressBar(this);
+  this->ProgressBar->setRange(0,100);
+  this->ProgressBar->setValue(0);
+  this->ProgressBar->setTextVisible(false);
+  this->ProgressLabel = new QLabel(this);
+
+  gridLayout->addWidget(this->ProgressBar, 0, 0);
+  gridLayout->addWidget(this->ProgressLabel, 0, 1);
+
 }
 
 
 //-----------------------------------------------------------------------------
 pqProgressBar::~pqProgressBar()
 {
+  delete this->ProgressBar;
+  delete this->ProgressLabel;
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressBar::setProgress(const QString& message, int _value)
+void pqProgressBar::setProgress(const QString& message, int value)
 {
-  if(this->Helper->progressEnabled())
-    {
-    this->Helper->setFormat(QString("%1: %p").arg(message));
-    this->Helper->setProgress(_value);
-    }
+  this->ProgressBar->setValue(value);
+  QString msg = QString("%1: %2").arg(message, QString::number(value));
+  this->ProgressLabel->setText(msg);
+  
+
+  //request the application to redraw the progressbar
+  QCoreApplication::processEvents();
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressBar::enableProgress(bool e)
+void pqProgressBar::reset()
 {
-  if(e && !this->Helper->progressEnabled())
-    {
-    this->Helper->enableProgress(true);
-    }
-  else if(!e && this->Helper->progressEnabled())
-    {
-    this->Helper->setProgress(100);
-    if(!this->CleanUp)
-      {
-      this->CleanUp = true;
-      QTimer::singleShot(0, this, SLOT(cleanup()));
-      }
-    }
+  this->ProgressBar->reset();
+  this->ProgressLabel->setText("");
 }
-
-//-----------------------------------------------------------------------------
-void pqProgressBar::cleanup()
-{
-  this->CleanUp = false;
-  this->Helper->enableProgress(false);
-}
-
-
