@@ -179,22 +179,38 @@ void vtkPVXYChartView::SetLegendLocation(int location)
   if (this->Chart)
     {
     vtkChartLegend *legend = this->Chart->GetLegend();
-    legend->SetInline(false);
+    legend->SetInline(location < 4);
     switch(location)
       {
-      case 0: // LEFT
+      case 0: // TOP-LEFT
+        legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
+        legend->SetVerticalAlignment(vtkChartLegend::TOP);
+        break;
+      case 1: // TOP-RIGHT
+        legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        legend->SetVerticalAlignment(vtkChartLegend::TOP);
+        break;
+      case 2: // BOTTOM-RIGHT
+        legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
+        break;
+      case 3: // BOTTOM-LEFT
+        legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
+        legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
+        break;
+      case 4: // LEFT
         legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
         legend->SetVerticalAlignment(vtkChartLegend::CENTER);
         break;
-      case 1: // TOP
+      case 5: // TOP
         legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
         legend->SetVerticalAlignment(vtkChartLegend::TOP);
         break;
-      case 2: // RIGHT
+      case 6: // RIGHT
         legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
         legend->SetVerticalAlignment(vtkChartLegend::CENTER);
         break;
-      case 3: // BOTTOM
+      case 7: // BOTTOM
         legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
         legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
         break;
