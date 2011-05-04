@@ -131,21 +131,42 @@ message PullRequest {
   }
 }
 
-// Extension Collaboration Communication ****************************** [50-55]
+// Extension Collaboration Communication ****************************** [50-58]
+
+message ActiveSelectionMessage {
+
+  // This enum should be in sync
+  // with vtkSMProxySelectionModel
+
+  enum SelectionFlag {
+    NO_UPDATE        = 0;
+    CLEAR            = 1;
+    SELECT           = 2;
+    CLEAR_AND_SELECT = 3;
+    DESELECT         = 4;
+}
+
+  extend Message {
+    required string name        = 50;
+    required SelectionFlag type = 51;
+    repeated uint32 proxy       = 52;
+  }
+}
 
 message ClientInformation {
   extend Message {
-    required uint64 user     = 50;
-    optional string name     = 51;
-    optional bool req_update = 52 [default = false];
+    required uint64 user     = 53;
+    optional string name     = 54;
+    optional bool req_update = 55 [default = false];
   }
 }
 
 message ChatMessage {
   extend Message {
-    required string txt  = 53;
+    required string txt  = 56;
   }
 }
+
 
 message QtEvent {
   enum QtEventType {
@@ -159,8 +180,8 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 54;
-    optional uint32      proxy = 55 [default = 0];
+    required QtEventType type  = 57;
+    optional uint32      proxy = 58 [default = 0];
   }
 }
 

@@ -19,6 +19,19 @@
 // connected to the server. Those clients can attach listeners and
 // handle those message in the way they want.
 // The message sender do not receive its message again, only other clients do.
+//
+// To listen collaboration notification messages you should have a code
+// that look like that:
+//
+// collaborationManager->AddObserver(
+//          vtkSMCollaborationManager::CollaborationNotification,
+//          callback);
+//
+// void callback(vtkObject* src, unsigned long event, void* method, void* data)
+// {
+//   vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
+//   => do what you want with the message
+// }
 
 #ifndef __vtkSMCollaborationManager_h
 #define __vtkSMCollaborationManager_h

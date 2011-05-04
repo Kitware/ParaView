@@ -17,7 +17,9 @@
 #define __vtkSMProxyManagerInternals_h
 
 #include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMMessage.h"
@@ -25,12 +27,14 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <vtkNew.h>
 
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
@@ -191,6 +195,124 @@ struct vtkSMProxyManagerEntry
   }
 };
 //-----------------------------------------------------------------------------
+class vtkSMProxyManagerSelectionObserver : public vtkCommand
+{
+public:
+  static vtkSMProxyManagerSelectionObserver* New()
+    { return new vtkSMProxyManagerSelectionObserver(); }
+
+  void SetTarget(vtkSMProxyManager* t)
+    {
+    this->Target = t;
+    }
+
+  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+    {
+    vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
+    if(msg->HasExtension(ActiveSelectionMessage::name))
+      {
+      const char* name = msg->GetExtension(ActiveSelectionMessage::name).c_str();
+
+      vtkSMProxySelectionModel* model = this->Target->GetSelectionModel(name);
+      if(model)
+        {
+        vtkSMSession* session = this->Target->GetSession();
+
+        int cmd = msg->GetExtension(ActiveSelectionMessage::type);
+        vtkNew<vtkCollection> proxyCollection;
+        int nbProxy = msg->ExtensionSize(ActiveSelectionMessage::proxy);
+        for(int cc=0; cc < nbProxy; ++cc)
+          {
+          proxyCollection->AddItem(
+              session->GetRemoteObject(
+                  msg->GetExtension(ActiveSelectionMessage::proxy, cc)));
+          }
+
+        model->Select(proxyCollection.GetPointer(), cmd);
+        }
+      }
+    }
+
+protected:
+  vtkWeakPointer<vtkSMProxyManager> Target;
+};
+//-----------------------------------------------------------------------------
+class vtkSMProxySelectionModelObserver : public vtkCommand
+{
+public:
+  static vtkSMProxySelectionModelObserver* New()
+    { return new vtkSMProxySelectionModelObserver(); }
+
+  void SetTarget(vtkSMProxyManager* t)
+    {
+    this->Target = t;
+    }
+
+  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+    {
+    if (this->Target)
+      {
+      vtkSMSessionClient* sessionClient =
+          vtkSMSessionClient::SafeDownCast(this->Target->GetSession());
+      if(sessionClient)
+        {
+        vtkSMCollaborationManager* collaborationManager =
+            sessionClient->GetCollaborationManager();
+        if(collaborationManager)
+          {
+          vtkSMProxySelectionModel* model = vtkSMProxySelectionModel::SafeDownCast(obj);
+          if(model)
+            {
+            vtkSMMessage selectionMessage;
+            selectionMessage.SetExtension( ActiveSelectionMessage::name,
+                                           this->Target->GetSelectionModelName(model));
+
+            switch(*reinterpret_cast<int*>(data))
+              {
+              case vtkSMProxySelectionModel::NO_UPDATE:
+                selectionMessage.SetExtension(ActiveSelectionMessage::type,
+                                              ActiveSelectionMessage::NO_UPDATE);
+                break;
+
+              case vtkSMProxySelectionModel::CLEAR:
+                selectionMessage.SetExtension(ActiveSelectionMessage::type,
+                                              ActiveSelectionMessage::CLEAR);
+                break;
+
+              case vtkSMProxySelectionModel::SELECT:
+                selectionMessage.SetExtension(ActiveSelectionMessage::type,
+                                              ActiveSelectionMessage::SELECT);
+                break;
+
+              case vtkSMProxySelectionModel::DESELECT:
+                selectionMessage.SetExtension(ActiveSelectionMessage::type,
+                                              ActiveSelectionMessage::DESELECT);
+                break;
+
+              case vtkSMProxySelectionModel::CLEAR_AND_SELECT:
+                selectionMessage.SetExtension(ActiveSelectionMessage::type,
+                                              ActiveSelectionMessage::CLEAR_AND_SELECT);
+                break;
+                }
+
+            unsigned int nbProxies = model->GetNumberOfSelectedProxies();
+            for(unsigned int idx = 0; idx < nbProxies; idx++)
+              {
+              selectionMessage.AddExtension(ActiveSelectionMessage::proxy,
+                                            model->GetSelectedProxy(idx)->GetGlobalID());
+              }
+
+            collaborationManager->SendToOtherClients(&selectionMessage);
+            }
+          }
+        }
+      }
+    }
+
+protected:
+  vtkWeakPointer<vtkSMProxyManager> Target;
+};
+//-----------------------------------------------------------------------------
 struct vtkSMProxyManagerInternals
 {
   // This data structure stores actual proxy instances grouped in
@@ -219,6 +341,11 @@ struct vtkSMProxyManagerInternals
     SelectionModelsType;
   SelectionModelsType SelectionModels;
 
+  // Data structure for selection models.
+  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModelObserver> >
+    SelectionModelObserversType;
+  SelectionModelObserversType SelectionModelObservers;
+
   // Data structure for storing GlobalPropertiesManagers.
   typedef vtkstd::map<vtkstd::string,
           vtkSmartPointer<vtkSMGlobalPropertiesManager> >
@@ -234,6 +361,9 @@ struct vtkSMProxyManagerInternals
 
   // Keep ref to the proxyManager to access the session
   vtkSMProxyManager *ProxyManager;
+
+  // Keep ref to the proxyManager collaboration observer
+  vtkNew<vtkSMProxyManagerSelectionObserver> CollaborationObserver;
 
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,

@@ -113,7 +113,7 @@ protected:
   ~vtkSMProxySelectionModel();
 
   void InvokeCurrentChanged(vtkSMProxy*  proxy);
-  void InvokeSelectionChanged();
+  void InvokeSelectionChanged(int selectionFlag);
   
   vtkCollection* NewlySelected;
   vtkCollection* NewlyDeselected;

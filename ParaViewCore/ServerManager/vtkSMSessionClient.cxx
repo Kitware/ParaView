@@ -944,7 +944,7 @@ void vtkSMSessionClient::EndBusyWork()
   --this->NotBusy;
 }
 //-----------------------------------------------------------------------------
-vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationCommunicator()
+vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationManager()
 {
   if(this->CollaborationCommunicator == NULL)
     {

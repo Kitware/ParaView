@@ -45,6 +45,9 @@
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMUndoStackBuilder.h"
 
+#include "vtkSMSessionClient.h"
+#include "vtkSMCollaborationManager.h"
+
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
@@ -105,7 +108,6 @@ protected:
     }
   vtkSMProxyManager* Target;
 };
-
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
 //---------------------------------------------------------------------------
@@ -116,6 +118,7 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->PipelineState = NULL;
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
+  this->Internals->CollaborationObserver->SetTarget(this);
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
 #if 0 // for debugging
@@ -244,6 +247,18 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->SetProxyDefinitionManager(NULL);
     this->PipelineState->Delete();
     this->PipelineState = NULL;
+
+    // Deal with collaboration with SelectionModels
+    vtkSMSessionClient* sClient = vtkSMSessionClient::SafeDownCast(this->Session);
+    if(sClient)
+      {
+      vtkSMCollaborationManager* collabManager = sClient->GetCollaborationManager();
+      if(collabManager)
+        {
+        collabManager->RemoveObserver(
+            this->Internals->CollaborationObserver.GetPointer());
+        }
+      }
     }
 
   this->Session = session;
@@ -254,6 +269,19 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState = vtkSMPipelineState::New();
     this->PipelineState->SetSession(this->Session);
     this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
+
+    // Deal with collaboration with SelectionModels
+    vtkSMSessionClient* sClient = vtkSMSessionClient::SafeDownCast(this->Session);
+    if(sClient)
+      {
+      vtkSMCollaborationManager* collabManager = sClient->GetCollaborationManager();
+      if(collabManager)
+        {
+        collabManager->AddObserver(
+            vtkSMCollaborationManager::CollaborationNotification,
+            this->Internals->CollaborationObserver.GetPointer());
+        }
+      }
     }
 }
 //----------------------------------------------------------------------------
@@ -1552,11 +1580,28 @@ void vtkSMProxyManager::RegisterSelectionModel(
     vtkWarningMacro("Replacing existing selection model: " << name);
     }
   this->Internals->SelectionModels[name] = model;
+
+  // Attach collaborative observer
+  vtkSMProxySelectionModelObserver* obs = vtkSMProxySelectionModelObserver::New();
+  obs->SetTarget(this);
+  this->Internals->SelectionModelObservers[name] = obs;
+  model->AddObserver(vtkCommand::SelectionChangedEvent, obs);
+  obs->FastDelete();
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterSelectionModel( const char* name)
 {
+  // Detatch collaborative observer
+  vtkSMProxySelectionModelObserver* obs = this->Internals->SelectionModelObservers[name];
+  vtkSMProxySelectionModel* model = this->Internals->SelectionModels[name];
+  if(model && obs)
+    {
+    model->RemoveObserver(obs);
+    }
+  this->Internals->SelectionModelObservers.erase(name);
+
+  // Remove selection model
   this->Internals->SelectionModels.erase(name);
 }
 
@@ -1572,6 +1617,24 @@ vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
     }
 
   return iter->second;
+}
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetSelectionModelName(vtkSMProxySelectionModel* model)
+{
+  if(model)
+    {
+    vtkSMProxyManagerInternals::SelectionModelsType::iterator iter;
+    for( iter = this->Internals->SelectionModels.begin();
+         iter != this->Internals->SelectionModels.end();
+         iter++)
+      {
+      if (iter->second == model)
+        {
+        return iter->first.c_str();
+        }
+      }
+    }
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

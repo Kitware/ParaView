@@ -162,7 +162,7 @@ void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
 
   if (changed)
     {
-    this->InvokeSelectionChanged();
+    this->InvokeSelectionChanged(command);
     }
 
   this->NewlyDeselected->RemoveAllItems();
@@ -176,9 +176,9 @@ void vtkSMProxySelectionModel::InvokeCurrentChanged(vtkSMProxy*  proxy)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxySelectionModel::InvokeSelectionChanged()
+void vtkSMProxySelectionModel::InvokeSelectionChanged(int selectionFlag)
 {
-  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent, (void*)&selectionFlag);
 }
 
 //-----------------------------------------------------------------------------

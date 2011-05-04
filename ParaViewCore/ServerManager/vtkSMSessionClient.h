@@ -147,7 +147,7 @@ public:
   // Description:
   // Return the instance of vtkSMCollaborationManager that will be
   // lazy created at the first call.
-  virtual vtkSMCollaborationManager* GetCollaborationCommunicator();
+  virtual vtkSMCollaborationManager* GetCollaborationManager();
 
   //---------------------------------------------------------------------------
   // API for GlobalId management

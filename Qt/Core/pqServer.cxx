@@ -164,9 +164,9 @@ void pqServer::initialize()
     vtkSMSessionClient* session = vtkSMSessionClient::SafeDownCast(this->session());
     if(session)
       {
-      this->Internals->CollaborationCommunicator = session->GetCollaborationCommunicator();
+      this->Internals->CollaborationCommunicator = session->GetCollaborationManager();
       this->Internals->VTKConnect->Connect(
-          session->GetCollaborationCommunicator(),
+          session->GetCollaborationManager(),
           vtkSMCollaborationManager::CollaborationNotification,
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
