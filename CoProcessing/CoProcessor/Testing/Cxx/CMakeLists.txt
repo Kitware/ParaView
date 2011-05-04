@@ -44,10 +44,10 @@ IF (PARAVIEW_DATA_ROOT)
       CoProcessingPythonScriptPressurePlot PROPERTIES RUN_SERIAL ON)
     IF (VTK_MPIRUN_EXE)
       ADD_TEST(PCoProcessingPythonScriptGridPlot
-        ${EXECUTABLE_OUTPUT_PATH}/CoProcessingCompareImagesTester ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPGrid0.png 20 -V ${PARAVIEW_DATA_ROOT}/Baseline/PCPGrid0.png -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
+        ${EXECUTABLE_OUTPUT_PATH}/CoProcessingCompareImagesTester ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPGrid0.png 20 -V ${PARAVIEW_DATA_ROOT}/Baseline/CPGrid0.png -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
 
       ADD_TEST(PCoProcessingPythonScriptPressurePlot
-        ${EXECUTABLE_OUTPUT_PATH}/CoProcessingCompareImagesTester ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPPressure0.png 20 -V ${PARAVIEW_DATA_ROOT}/Baseline/PCPPressure0.png -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
+        ${EXECUTABLE_OUTPUT_PATH}/CoProcessingCompareImagesTester ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPPressure0.png 20 -V ${PARAVIEW_DATA_ROOT}/Baseline/CPPressure0.png -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
     ENDIF (VTK_MPIRUN_EXE)
 
   ENDIF (PARAVIEW_ENABLE_PYTHON)

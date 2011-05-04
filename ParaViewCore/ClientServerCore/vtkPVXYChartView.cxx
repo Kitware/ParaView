@@ -452,15 +452,16 @@ void vtkPVXYChartView::Render(bool interactive)
     }
   if (this->InternalTitle)
     {
-    vtksys_ios::ostringstream timeStream;
+    vtksys_ios::ostringstream new_title;
     vtkstd::string title(this->InternalTitle);
     size_t pos = title.find("${TIME}");
     if (pos != vtkstd::string::npos)
       {
       // The string was found - replace it and set the chart title.
-      timeStream << this->GetViewTime();
-      title.replace(pos, pos+7, timeStream.str());
-      this->Chart->SetTitle(title.c_str());
+      new_title << title.substr(0, pos)
+                << this->GetViewTime()
+                << title.substr(pos + strlen("${TIME}"));
+      this->Chart->SetTitle(new_title.str().c_str());
       }
     }
 
