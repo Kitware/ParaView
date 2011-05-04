@@ -47,7 +47,7 @@ set(CMAKE_MODULE_PATH
 INCLUDE(ExternalProject)
 
 #-----------------------------------------------------------------------------
-# Git protocole option
+# Git protocol option
 #-----------------------------------------------------------------------------
 
 option(GIT_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON)
@@ -182,7 +182,7 @@ if(NOT APPLE)
   include(External_NUMPY)
 
   if(NOT WIN32)
-    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Depenednecies for VisTrails" FALSE)
+    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Dependencies for VisTrails" FALSE)
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
     if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
       # Build SIP and PyQt for vistrails plugin.
