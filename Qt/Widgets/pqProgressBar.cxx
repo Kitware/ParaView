@@ -38,24 +38,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 //-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p)
+pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p), PreviousMessage("")
 {
 
-  QGridLayout *gridLayout = new QGridLayout(this);
-  gridLayout->setSpacing(0);
-  gridLayout->setContentsMargins(0,0,4,0);
-  gridLayout->setObjectName("gridLayout");
+  QGridLayout *layout = new QGridLayout(this);
+  layout->setSpacing(0);
+  layout->setContentsMargins(0,0,4,0);
 
   this->ProgressBar = new QProgressBar(this);
   this->ProgressBar->setRange(0,100);
   this->ProgressBar->setValue(0);
   this->ProgressBar->setTextVisible(false);
+  this->ProgressBar->setMinimumWidth(200);
+  this->ProgressBar->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Fixed);
+
   this->ProgressLabel = new QLabel(this);
+  this->ProgressLabel->setMinimumWidth(100);
+  this->ProgressLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
 
-  gridLayout->addWidget(this->ProgressBar, 0, 0);
-  gridLayout->addWidget(this->ProgressLabel, 0, 1);
+  layout->addWidget(this->ProgressBar,0,0);
+  layout->addWidget(this->ProgressLabel,0,1);
+  this->setLayout(layout);
 
-  this->setLayout(gridLayout);
+
+  this->reset();
 }
 
 
@@ -71,14 +77,25 @@ void pqProgressBar::setProgress(const QString& message, int value)
 {
   this->ProgressBar->setValue(value);
   QString msg = QString("%1: %2").arg(message, QString::number(value));
+  if ( msg.length() > this->PreviousMessage.length() )
+    {
+    //we need to get the label to be resized correctly so it fits
+    //this is trickier than it seems. By hiding it and than calling show
+    //we invalidate numerous flags which causes an ensurePolished and
+    // it also FORCES a updateGeometry. If you now a cleaner way, please
+    //change this
+    this->ProgressLabel->hide();
+    }
   this->ProgressLabel->setText(msg);
-
-  //QCoreApplication::processEvents(QEventLoop::ExcludeSocketNotifiers | QEventLoop::ExcludeUserInputEvents);
+  this->ProgressLabel->show();
+    
+  this->PreviousMessage = msg;
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressBar::reset()
 {
   this->ProgressBar->reset();
-  this->ProgressLabel->setText("");
+  this->ProgressLabel->hide();
+  this->PreviousMessage = "";
 }
