@@ -218,6 +218,26 @@
         <widget class="QComboBox" name="LegendLocation" >
          <item>
           <property name="text" >
+           <string>Top-left (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Top-right (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Bottom-right (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Bottom-left (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
            <string>Left</string>
           </property>
          </item>
@@ -234,6 +254,11 @@
          <item>
           <property name="text" >
            <string>Bottom</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>Custom</string>
           </property>
          </item>
         </widget>
