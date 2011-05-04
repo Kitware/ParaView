@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServer.h"
 #include "pqView.h"
+#include "pqPipelineSource.h"
 
 #include "vtkPVServerInformation.h"
 #include "vtkSMMessage.h"
@@ -221,8 +222,10 @@ pqCollaborationManager::pqCollaborationManager(QObject* parent) :
   this->Internals = new pqInternals(this);
   pqApplicationCore* core = pqApplicationCore::instance();
 
-  // View management
+  // Signal mappers
   this->viewsSignalMapper = new QSignalMapper(this);
+
+  // View management
   QObject::connect(this->viewsSignalMapper, SIGNAL(mapped(int)),
                    this, SIGNAL(triggerRender(int)));
   QObject::connect(this, SIGNAL(triggerRender(int)),
@@ -232,6 +235,7 @@ pqCollaborationManager::pqCollaborationManager(QObject* parent) :
   QObject::connect(core->getServerManagerModel(), SIGNAL(viewRemoved(pqView*)),
                    this, SLOT(removeCollaborationEventManagement(pqView*)));
 
+  // Chat management + User list panel
   QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
                     this,        SLOT(onChatMessage(int,QString&)));
   QObject::connect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
@@ -244,16 +248,19 @@ pqCollaborationManager::pqCollaborationManager(QObject* parent) :
 pqCollaborationManager::~pqCollaborationManager()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
+  // View management
   QObject::disconnect(core->getServerManagerModel(),
                       SIGNAL(viewAdded(pqView*)),
                       this, SLOT(addCollaborationEventManagement(pqView*)));
   QObject::disconnect(core->getServerManagerModel(),
                       SIGNAL(viewRemoved(pqView*)),
                       this, SLOT(removeCollaborationEventManagement(pqView*)));
+
+  // Chat management + User list panel
   QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
-                       this,        SLOT(onChatMessage(int,QString&)));
+                       this, SLOT(onChatMessage(int,QString&)));
   QObject::disconnect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
-                       this,        SLOT(onUpdateUser(int,QString&,bool)));
+                       this, SLOT(onUpdateUser(int,QString&,bool)));
 
   delete this->Internals;
 
@@ -279,6 +286,9 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
       case QtEvent::FOCUS_INFORMATION:
         break;
       case QtEvent::ACTIVE_SOURCE:
+        emit triggerActiveSourceChanged(
+            pqApplicationCore::instance()->getServerManagerModel()->
+            findItem<pqPipelineSource*>(proxyId));
         break;
       case QtEvent::PROXY_STATE_INVALID:
         break;
@@ -368,6 +378,20 @@ void pqCollaborationManager::onUpdateUser( int userId, QString& userName,
       emit triggerUpdateUserList();
       }
     }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onActiveSourceChanged(pqPipelineSource* source)
+{
+  ReturnIfNotValidServer();
+  vtkSMMessage activeSourceMsg;
+  activeSourceMsg.SetExtension(QtEvent::type, QtEvent::ACTIVE_SOURCE);
+  if(source)
+    {
+    vtkTypeUInt32 proxyId = source->getProxy()->GetGlobalID();
+    activeSourceMsg.SetExtension(QtEvent::proxy, proxyId);
+    }
+
+  this->Internals->server()->sendToOtherClients(&activeSourceMsg);
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::refreshUserList()

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 class pqView;
+class pqPipelineSource;
 class QSignalMapper;
 
 /// pqCollaborationManager is a QObject that aims to handle the collaboration
@@ -92,6 +93,9 @@ signals:
   /// really changed
   void triggerUpdateUserList();
 
+  /// This will be triggered when a remote client has changed its active source
+  void triggerActiveSourceChanged(pqPipelineSource*);
+
 public slots:
 
   /// This will update the user information based on the latest server status
@@ -112,6 +116,10 @@ public slots:
   /// to do the same or not
   void onUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
 
+  /// This should is connected from pqActiveObjects itself
+  /// so the informations can be sent to other clients.
+  void onActiveSourceChanged(pqPipelineSource*);
+
 private slots:
   /// Called when a message has been sent by another client
   /// This method will trigger signals that will be used by other Qt classes
@@ -122,7 +130,8 @@ private slots:
   /// broadcast to other client a render request
   void onTriggerRender(int viewId);
 
-  /// This will call force render on all the renderer that needs to be render
+
+  /// This will call force render on all the renderer that needs to be rendered
   void render();
 
 private:
