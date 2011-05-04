@@ -283,11 +283,6 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         // We use proxyId as holder of tab index
         emit triggerInspectorSelectedTabChanged(proxyId);;
         break;
-      case QtEvent::ACTIVE_SOURCE:
-        emit triggerActiveSourceChanged(
-            pqApplicationCore::instance()->getServerManagerModel()->
-            findItem<pqPipelineSource*>(proxyId));
-        break;
       case QtEvent::PROXY_STATE_INVALID:
         break;
       case QtEvent::USER:
@@ -376,20 +371,6 @@ void pqCollaborationManager::onUpdateUser( int userId, QString& userName,
       emit triggerUpdateUserList();
       }
     }
-}
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::onActiveSourceChanged(pqPipelineSource* source)
-{
-  ReturnIfNotValidServer();
-  vtkSMMessage activeSourceMsg;
-  activeSourceMsg.SetExtension(QtEvent::type, QtEvent::ACTIVE_SOURCE);
-  if(source)
-    {
-    vtkTypeUInt32 proxyId = source->getProxy()->GetGlobalID();
-    activeSourceMsg.SetExtension(QtEvent::proxy, proxyId);
-    }
-
-  this->Internals->server()->sendToOtherClients(&activeSourceMsg);
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onInspectorSelectedTabChanged(int tabIndex)

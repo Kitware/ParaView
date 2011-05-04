@@ -172,10 +172,9 @@ message QtEvent {
   enum QtEventType {
     RENDER              = 0;
     INSPECTOR_TAB       = 1;
-    ACTIVE_SOURCE       = 2;
-    PROXY_STATE_INVALID = 3;
-    USER                = 4;
-    CHAT                = 5;
+    PROXY_STATE_INVALID = 2;
+    USER                = 3;
+    CHAT                = 4;
     OTHER               = 15;
   }
 

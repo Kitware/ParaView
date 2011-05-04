@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqView.h"
-#include "pqCollaborationManager.h"
 
 #include <QDebug>
 
@@ -119,24 +118,6 @@ void pqActiveObjects::onServerChanged()
     {
     this->CachedServer = server;
     emit this->serverChanged(server);
-    }
-
-  // If collaboration manager available, connect ourself to it
-  pqCollaborationManager* collabManager =
-      qobject_cast<pqCollaborationManager*>(
-          pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
-  if(collabManager)
-    {
-    QObject::connect(this,
-                     SIGNAL(sourceChanged(pqPipelineSource*)),
-                     collabManager,
-                     SLOT(onActiveSourceChanged(pqPipelineSource*)));
-    QObject::connect(collabManager,
-                     SIGNAL(triggerActiveSourceChanged(pqPipelineSource*)),
-                     this,
-                     SLOT(setActiveSource(pqPipelineSource*)));
-    // The diconnect should automatically happen when collab get deleted
-    // by the deleteLater.
     }
 }
 
