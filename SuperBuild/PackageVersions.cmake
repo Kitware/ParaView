@@ -135,11 +135,11 @@ set(ZLIB_MD5 c735eab2d659a96e5a594c9e8541ad63)
 
 set(PNG_MAJOR 1)
 set(PNG_MINOR 5)
-set(PNG_PATCH 1)
+set(PNG_PATCH 2)
 set(PNG_VERSION ${PNG_MAJOR}.${PNG_MINOR}.${PNG_PATCH})
 set(PNG_URL ftp://ftp.simplesystems.org/pub/libpng/png/src)
 set(PNG_GZ libpng-${PNG_VERSION}.tar.gz)
-set(PNG_MD5 220035f111ea045a51e290906025e8b5)
+set(PNG_MD5 31d448eb93a1646359a23f1b23434ab3)
 
 if(WIN32)
   set(VRPN_MAJOR 4)
