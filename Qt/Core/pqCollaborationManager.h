@@ -96,6 +96,10 @@ signals:
   /// This will be triggered when a remote client has changed its active source
   void triggerActiveSourceChanged(pqPipelineSource*);
 
+  /// This will be triggered when a remote client has changed its selected tab
+  /// inside the inspector panel.
+  void triggerInspectorSelectedTabChanged(int);
+
 public slots:
 
   /// This will update the user information based on the latest server status
@@ -116,9 +120,13 @@ public slots:
   /// to do the same or not
   void onUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
 
-  /// This should is connected from pqActiveObjects itself
-  /// so the informations can be sent to other clients.
+  /// This is connected from pqActiveObjects itself
+  /// so the informations can be sent to the other clients if any.
   void onActiveSourceChanged(pqPipelineSource*);
+
+  /// This is connected from pqProxyTabWidget itself so the selected tab information
+  /// can be sent to the other clients if any.
+  void onInspectorSelectedTabChanged(int tabIndex);
 
 private slots:
   /// Called when a message has been sent by another client

@@ -279,11 +279,9 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
       case QtEvent::RENDER:
         this->Internals->Render(proxyId);
         break;
-      case QtEvent::FOCUS_PROPERTY:
-        break;
-      case QtEvent::FOCUS_DISPLAY:
-        break;
-      case QtEvent::FOCUS_INFORMATION:
+      case QtEvent::INSPECTOR_TAB:
+        // We use proxyId as holder of tab index
+        emit triggerInspectorSelectedTabChanged(proxyId);;
         break;
       case QtEvent::ACTIVE_SOURCE:
         emit triggerActiveSourceChanged(
@@ -392,6 +390,17 @@ void pqCollaborationManager::onActiveSourceChanged(pqPipelineSource* source)
     }
 
   this->Internals->server()->sendToOtherClients(&activeSourceMsg);
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onInspectorSelectedTabChanged(int tabIndex)
+{
+  ReturnIfNotValidServer();
+  vtkSMMessage activeTab;
+  activeTab.SetExtension(QtEvent::type, QtEvent::INSPECTOR_TAB);
+  // We use proxyId as holder of tab index
+  activeTab.SetExtension(QtEvent::proxy, tabIndex);
+
+  this->Internals->server()->sendToOtherClients(&activeTab);
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::refreshUserList()

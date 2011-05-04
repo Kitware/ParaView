@@ -150,13 +150,11 @@ message ChatMessage {
 message QtEvent {
   enum QtEventType {
     RENDER              = 0;
-    FOCUS_PROPERTY      = 1;
-    FOCUS_DISPLAY       = 2;
-    FOCUS_INFORMATION   = 3;
-    ACTIVE_SOURCE       = 4;
-    PROXY_STATE_INVALID = 5;
-    USER                = 6;
-    CHAT                = 7;
+    INSPECTOR_TAB       = 1;
+    ACTIVE_SOURCE       = 2;
+    PROXY_STATE_INVALID = 3;
+    USER                = 4;
+    CHAT                = 5;
     OTHER               = 15;
   }
 

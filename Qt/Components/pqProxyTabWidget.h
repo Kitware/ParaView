@@ -105,6 +105,10 @@ public slots:
     this->setCurrentIndex(pqProxyTabWidget::PROPERTIES);
     }
 
+private slots:
+  void connectToCollaborationManager();
+  void disconnectToCollaborationManager();
+
 protected:
   /// Set the display whose properties we want to edit. 
   void setProxy(pqPipelineSource* source);
