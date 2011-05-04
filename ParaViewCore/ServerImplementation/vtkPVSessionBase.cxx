@@ -108,6 +108,13 @@ vtkPVServerInformation* vtkPVSessionBase::GetServerInformation()
 {
   return this->LocalServerInformation;
 }
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::UpdateServerInformation()
+{
+  this->LocalServerInformation->Delete();
+  this->LocalServerInformation = vtkPVServerInformation::New();
+  this->LocalServerInformation->CopyFromObject(NULL);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSessionBase::PushState(vtkSMMessage* msg)

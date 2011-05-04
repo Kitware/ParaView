@@ -59,6 +59,7 @@ public:
   // Overridden to provide support for non-remote-server case. We simply read
   // the local process information and return it.
   virtual vtkPVServerInformation* GetServerInformation();
+  virtual void UpdateServerInformation();
 
   // Description:
   // This is socket connection, if any to communicate between the data-server

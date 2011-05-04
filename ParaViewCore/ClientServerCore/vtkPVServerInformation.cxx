@@ -266,6 +266,14 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       {
       this->ClientId = serverInfo->ClientId;
       }
+    if(this->ClientIds == NULL && serverInfo->ClientIds)
+      {
+      this->ClientIds = new int[serverInfo->NumberOfClients];
+      for(int cc=0; cc < serverInfo->NumberOfClients; cc++)
+        {
+        this->ClientIds[cc] = serverInfo->ClientIds[cc];
+        }
+      }
     }
 }
 
@@ -300,7 +308,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->NumberOfClients;
   for(int cc=0; cc < this->NumberOfClients; cc++)
     {
-    *css << this->ClientIds[cc];
+    *css << this->GetClientId(cc);
     }
   *css << vtkClientServerStream::End;
 }
@@ -578,7 +586,7 @@ int vtkPVServerInformation::GetClientId(int idx)
   // Invalid internal data
   if(this->ClientIds == NULL || !(idx < this->NumberOfClients && idx >= 0))
     {
-    return -1;
+    return this->ClientId;
     }
 
   return this->ClientIds[idx];
