@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //// ParaView Includes.
-#include "pqActiveObjects.h"
+#include "pqCollaborationManager.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqServer.h"
 #include "vtkSMMessage.h"
 #include "vtkPVServerInformation.h"
@@ -51,151 +53,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 #include "ui_pqCollaborationPanel.h"
 class pqCollaborationPanel::pqInternal : public Ui::pqCollaborationPanel
-{
-public:
-  pqInternal()
-    {
-    this->userID = 0;
-    this->userPalette.append("#CC1010");
-    this->userPalette.append("#10CC10");
-    this->userPalette.append("#1010CC");
-    this->userPalette.append("#AABBCC");
-    this->userPalette.append("#FF00FF");
-    this->userPalette.append("#AACCAA");
-    }
-
-  void validateEntry()
-    {
-    this->addEntry(this->userID, this->message->text());
-    this->message->clear();
-    }
-
-  void addEntry(int userId, const QString& txt)
-    {
-    //QString message = QString("<table bgcolor='%2' width='100\%'><tr><td>%1</td></tr></table>").arg(txt,this->userPalette.at(userId%this->userPalette.size()));
-    QString message = QString("<b>%1:</b> %2 <br/>\n\n").arg(this->getUserName(userId), txt.trimmed());
-    this->content->textCursor().atEnd();
-    this->content->insertHtml(message);
-    this->content->textCursor().atEnd();
-    this->content->textCursor().movePosition(QTextCursor::End);
-    this->content->ensureCursorVisible();
-    }
-
-  const char* getUserName()
-    {
-    return this->getUserName(this->userID);
-    }
-
-  const char* getUserName(int id)
-    {
-    if(id == 0)
-      {
-      return "Nobody";
-      }
-    vtkstd::map<int, vtkstd::string>::iterator iter = this->userMap.find(id);
-    if(iter != this->userMap.end())
-      {
-      return iter->second.c_str();
-      }
-    vtksys_ios::ostringstream name;
-    name << "User " << id;
-    this->userMap[id] = name.str().c_str();
-    return this->userMap[id].c_str();
-    }
-
-  void updateUserName(int id, const char* name)
-    {
-    if(this->userMap[id] == name)
-      {
-      return;
-      }
-    this->userMap[id] = name;
-    this->updateMembers();
-    }
-
-  void broadcastUserName(bool requestUpdate)
-    {
-    vtkSMMessage updateMsg;
-    updateMsg.SetExtension(ClientInformation::req_update, requestUpdate);
-    this->sendToOtherClients(&updateMsg);
-    }
-
-  void sendToOtherClients(vtkSMMessage* msg)
-    {
-    if(!this->server.isNull())
-      {
-      msg->SetExtension(ClientInformation::user, this->userID);
-      msg->SetExtension(ClientInformation::name, this->getUserName());
-      this->server->sendToOtherClients(msg);
-      }
-    }
-
-  void updateMembers()
-    {
-    this->members->setRowCount(this->userMap.size());
-    vtkstd::map<int, vtkstd::string>::iterator iter = this->userMap.begin();
-    for(unsigned int cc = 0; iter != this->userMap.end(); iter++, cc++)
-      {
-      QTableWidgetItem* item = new QTableWidgetItem(iter->second.c_str());
-      item->setData(Qt::UserRole, iter->first);
-      if(iter->first == this->userID)
-        {
-        item->setFlags( item->flags() | Qt::ItemIsEditable );
-        QFont font = item->font();
-        font.setBold(true);
-        font.setItalic(true);
-        item->setFont(font);
-        }
-      else
-        {
-        item->setFlags( item->flags() & ~Qt::ItemIsEditable );
-        }
-      this->members->setItem(cc, 0, item);
-
-      // Disable other column editing
-      item = new QTableWidgetItem("");
-      item->setFlags( item->flags() & ~Qt::ItemIsEditable );
-      this->members->setItem(cc, 1, item);
-
-      item = new QTableWidgetItem("");
-      item->setFlags( item->flags() & ~Qt::ItemIsEditable );
-      this->members->setItem(cc, 2, item);
-      }
-
-    this->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
-    }
-
-  int userID;
-  vtkstd::map<int, vtkstd::string> userMap;
-  QList<QString> userPalette;
-  QPointer<pqServer> server;
-};
+{};
 //-----------------------------------------------------------------------------
 pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
 
-  QObject::connect( &pqActiveObjects::instance(),
-                    SIGNAL(serverChanged(pqServer*)),
-                    this, SLOT(setServer(pqServer*)));
-
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
                     this, SLOT(onUserMessage()));
 
   QObject::connect(this->Internal->members, SIGNAL(itemChanged(QTableWidgetItem*)),
                    this, SLOT(itemChanged(QTableWidgetItem*)));
+
+  QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
+                    this,   SLOT(writeChatMessage(int,QString&)));
+
+  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                    SIGNAL(serverAdded(pqServer*)),
+                    this, SLOT(connectLocalSlots()));
+
+  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                    SIGNAL(aboutToRemoveServer(pqServer*)),
+                    this, SLOT(disconnectLocalSlots()));
 }
 
 //-----------------------------------------------------------------------------
 pqCollaborationPanel::~pqCollaborationPanel()
 {
-  if(this->Internal->server)
-    {
-    QObject::disconnect( this->Internal->server,
-                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                         this, SLOT(onClientMessage(vtkSMMessage*)));
-    }
+  QObject::disconnect( this->Internal->message, SIGNAL(returnPressed()),
+                       this, SLOT(onUserMessage()));
+
+  QObject::disconnect( this->Internal->members,
+                       SIGNAL(itemChanged(QTableWidgetItem*)),
+                       this,
+                       SLOT(itemChanged(QTableWidgetItem*)));
+
+  QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
+                       this,   SLOT(writeChatMessage(int,QString&)));
+  QObject::disconnect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                       this,   SLOT(onUserUpdate()));
+
+  QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
+                       SIGNAL(serverAdded(pqServer*)),
+                       this, SLOT(connectLocalSlots()));
+
+  QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
+                       SIGNAL(aboutToRemoveServer(pqServer*)),
+                       this, SLOT(disconnectLocalSlots()));
+
   delete this->Internal;
   this->Internal = 0;
 }
@@ -208,76 +114,140 @@ void pqCollaborationPanel::onUserMessage()
     return;
     }
 
-  if(!this->Internal->server.isNull())
+  pqCollaborationManager* collab = getCollaborationManager();
+  if(collab)
     {
-    vtkSMMessage msg;
-    msg.SetExtension( ChatMessage::txt,
-                      this->Internal->message->text().toStdString());
-    this->Internal->sendToOtherClients(&msg);
+    int userId = collab->userId();
+    QString msg = this->Internal->message->text();
+    emit triggerChatMessage( userId, msg);
+    this->Internal->message->clear();
     }
-  this->Internal->validateEntry();
   }
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::onClientMessage(vtkSMMessage* msg)
-{
-  if(msg->HasExtension(ClientInformation::user))
-    {
-    // Handle client informations of the message
-    int userId = msg->GetExtension(ClientInformation::user);
-    vtkstd::string userName;
-    if(msg->HasExtension(ClientInformation::name))
-      {
-      userName = msg->GetExtension(ClientInformation::name);
-      this->Internal->updateUserName(userId, userName.c_str());
-      }
+void pqCollaborationPanel::writeChatMessage(int userId, QString& txt)
+  {
+  QString message = QString("<b>%1:</b> %2 <br/>\n\n").
+                    arg( this->getCollaborationManager()->getUserName(userId),
+                         txt.trimmed());
 
-    // Chat message detected... Just publish it in the UI
-    if(msg->HasExtension(ChatMessage::txt))
-      {
-      this->Internal->addEntry( userId,
-                                msg->GetExtension(ChatMessage::txt).c_str());
-      }
-
-    // Notify other client about your local name (if requested)
-    if(msg->GetExtension(ClientInformation::req_update))
-      {
-      this->Internal->broadcastUserName(false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Set the active server. We need the active server only to determine if this is
-// a multiprocess server connection or not.
-void pqCollaborationPanel::setServer(pqServer* server)
-{
-  if(this->Internal->server)
-    {
-    QObject::disconnect( this->Internal->server,
-                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                         this, SLOT(onClientMessage(vtkSMMessage*)));
-    }
-  this->Internal->server = server;
-  if(server)
-    {
-    this->Internal->userID = server->getServerInformation()->GetClientId();
-    QObject::connect( server,
-                      SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                      this, SLOT(onClientMessage(vtkSMMessage*)),
-                      Qt::QueuedConnection);
-    this->Internal->broadcastUserName(true);
-    }
-}
+  this->Internal->content->textCursor().atEnd();
+  this->Internal->content->insertHtml(message);
+  this->Internal->content->textCursor().atEnd();
+  this->Internal->content->textCursor().movePosition(QTextCursor::End);
+  this->Internal->content->ensureCursorVisible();
+  }
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
-  {
+{
   if(item->column() == 0)
     {
-    int id = item->data(Qt::UserRole).toInt();
-    if(this->Internal->userID == id)
+    pqCollaborationManager* collab = this->getCollaborationManager();
+    if(collab)
       {
-      this->Internal->updateUserName(id, item->text().toAscii().data());
-      this->Internal->broadcastUserName(true);
+      int id = item->data(Qt::UserRole).toInt();
+      if(collab->userId() == id)
+        {
+        QString userName = item->text();
+        if(userName != collab->getUserName(id))
+          {
+          emit triggerUpdateUser(id, userName, true);
+          }
+        }
       }
     }
-  }
+}
+//-----------------------------------------------------------------------------
+pqCollaborationManager* pqCollaborationPanel::getCollaborationManager()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  return qobject_cast<pqCollaborationManager*>(core->manager("COLLABORATION_MANAGER"));
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::onUserUpdate()
+{
+  pqCollaborationManager* collab = this->getCollaborationManager();
+  if(!collab)
+    {
+    return;
+    }
+  int nbUsers = collab->getNumberOfUsers();
+  int userId;
+  QString userName;
+  this->Internal->members->setRowCount(nbUsers);
+  for(int cc = 0; cc < nbUsers; cc++)
+    {
+    userId = collab->getUserId(cc);
+    userName = collab->getUserName(userId);
+
+    QTableWidgetItem* item = new QTableWidgetItem(userName);
+    item->setData(Qt::UserRole, userId);
+    if(userId == collab->userId())
+      {
+      item->setFlags( item->flags() | Qt::ItemIsEditable );
+      QFont font = item->font();
+      font.setBold(true);
+      font.setItalic(true);
+      item->setFont(font);
+      }
+    else
+      {
+      item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+      }
+    this->Internal->members->setItem(cc, 0, item);
+
+    // Disable other column editing
+    item = new QTableWidgetItem("");
+    item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+    this->Internal->members->setItem(cc, 1, item);
+
+    item = new QTableWidgetItem("");
+    item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+    this->Internal->members->setItem(cc, 2, item);
+    }
+
+  this->Internal->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::connectLocalSlots()
+{
+  pqCollaborationManager* collab = this->getCollaborationManager();
+  if(collab)
+    {
+    QObject::connect( collab, SIGNAL(triggerChatMessage(int,QString&)),
+                      this,   SLOT(writeChatMessage(int,QString&)));
+    QObject::connect( collab, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                      this,   SLOT(onUserUpdate()));
+    QObject::connect( collab, SIGNAL(triggerUpdateUserList()),
+                      this,   SLOT(onUserUpdate()));
+
+    QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
+                      collab, SLOT(onChatMessage(int,QString&)));
+    QObject::connect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                      collab, SLOT(onUpdateUser(int,QString&,bool)));
+
+    // Update the graphical panel
+    QString userName = collab->getUserName(collab->userId());
+    emit triggerUpdateUser( collab->userId(), userName, true);
+    onUserUpdate(); // This may be called twice (one here + one from emit)
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::disconnectLocalSlots()
+{
+  pqCollaborationManager* collab = this->getCollaborationManager();
+  if(collab)
+    {
+    QObject::disconnect( collab, SIGNAL(triggerChatMessage(int,QString&)),
+                         this,   SLOT(writeChatMessage(int,QString&)));
+    QObject::disconnect( collab, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                         this,   SLOT(onUserUpdate()));
+    QObject::disconnect( collab, SIGNAL(triggerUpdateUserList()),
+                         this,   SLOT(onUserUpdate()));
+
+    QObject::disconnect( this,   SIGNAL(triggerChatMessage(int,QString&)),
+                         collab, SLOT(onChatMessage(int,QString&)));
+    QObject::disconnect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                         collab, SLOT(onUpdateUser(int,QString&,bool)));
+    }
+}

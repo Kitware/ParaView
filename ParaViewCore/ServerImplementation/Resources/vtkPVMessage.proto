@@ -155,11 +155,14 @@ message QtEvent {
     FOCUS_INFORMATION   = 3;
     ACTIVE_SOURCE       = 4;
     PROXY_STATE_INVALID = 5;
+    USER                = 6;
+    CHAT                = 7;
+    OTHER               = 15;
   }
 
   extend Message {
     required QtEventType type  = 54;
-    required uint32      proxy = 55;
+    optional uint32      proxy = 55 [default = 0];
   }
 }
 

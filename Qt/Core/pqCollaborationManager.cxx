@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVServerInformation.h"
 #include "vtkSMMessage.h"
+#include "vtkSMSession.h"
 #include "vtkSMProxy.h"
 
 #include <vtkstd/set>
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 #include <QPointer>
+#include <QMap>
 #include <QSignalMapper>
 
 #define ReturnIfNotValidServer() \
@@ -70,6 +72,12 @@ public:
     this->RenderTimer.start(1000);
     QObject::connect( &this->RenderTimer, SIGNAL(timeout()),
                       this->Owner, SLOT(render()));
+
+    this->UpdateUserListTimer.setSingleShot(false);
+    this->UpdateUserListTimer.setInterval(5000); // 5s
+    this->UpdateUserListTimer.start(5000); // 5s
+    QObject::connect( &this->UpdateUserListTimer, SIGNAL(timeout()),
+                      this->Owner, SLOT(refreshUserList()));
     }
   //-------------------------------------------------
   void setServer(pqServer* server)
@@ -87,6 +95,7 @@ public:
                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
                         this->Owner, SLOT(onClientMessage(vtkSMMessage*)),
                         Qt::QueuedConnection);
+      refreshInformations();
       }
     }
   //-------------------------------------------------
@@ -95,23 +104,39 @@ public:
     return this->Server.data();
     }
   //-------------------------------------------------
-  void refreshInformations()
+  bool refreshInformations()
     {
     if(!this->Server.isNull())
       {
+      this->Server->session()->UpdateServerInformation();
       vtkPVServerInformation* serverInfo = this->Server->getServerInformation();
 
       // General collaboration information
-      this->ClientID = serverInfo->GetClientId();
+      this->UserID = serverInfo->GetClientId();
       this->NumberOfConnectedClients = serverInfo->GetNumberOfClients();
+
+      // Local var to detect diff if any
+      bool foundDifference = false;
+      int currentUserId = -1;
+      vtkstd::set<int> userListCopy = this->ConnectedClients;
 
       // Update connected clients informations
       this->ConnectedClients.clear();
       for(int cc=0; cc < this->NumberOfConnectedClients; ++cc)
         {
-        this->ConnectedClients.insert(serverInfo->GetClientId(cc));
+        currentUserId = serverInfo->GetClientId(cc);
+        foundDifference = foundDifference ||
+                          (userListCopy.find(currentUserId) == userListCopy.end());
+        this->ConnectedClients.insert(currentUserId);
         }
+      foundDifference = foundDifference || // Some client may have disapeared
+                        (userListCopy.size() != this->ConnectedClients.size());
+
+      // Return if diff were found
+      return foundDifference;
       }
+
+    return false;
     }
   //-------------------------------------------------
   bool CanTriggerRender()
@@ -156,13 +181,36 @@ public:
     }
 
   //-------------------------------------------------
-private:
+  int GetClientId(int idx)
+    {
+    if(this->NumberOfConnectedClients != static_cast<int>(this->ConnectedClients.size()))
+      {
+      this->refreshInformations();
+      }
+    if(idx >= 0 && idx < this->NumberOfConnectedClients)
+      {
+      vtkstd::set<int>::iterator iter = this->ConnectedClients.begin();
+      while(idx != 0)
+        {
+        idx--;
+        iter++;
+        }
+      return *iter;
+      }
+    return -1;
+    }
+
+public:
   bool RenderingFromNotification;
-  int ClientID;
+  int UserID;
   int NumberOfConnectedClients;
+  QMap<int, QString> UserNameMap;
+
+protected:
   vtkstd::set<int> ConnectedClients;
   vtkstd::set<vtkTypeUInt32> ViewToRender;
   QTimer RenderTimer;
+  QTimer UpdateUserListTimer;
   QPointer<pqServer> Server;
   QPointer<pqCollaborationManager> Owner;
 };
@@ -184,6 +232,11 @@ pqCollaborationManager::pqCollaborationManager(QObject* parent) :
   QObject::connect(core->getServerManagerModel(), SIGNAL(viewRemoved(pqView*)),
                    this, SLOT(removeCollaborationEventManagement(pqView*)));
 
+  QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
+                    this,        SLOT(onChatMessage(int,QString&)));
+  QObject::connect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                    this,        SLOT(onUpdateUser(int,QString&,bool)));
+
   core->registerManager("COLLABORATION_MANAGER", this);
 }
 
@@ -197,6 +250,10 @@ pqCollaborationManager::~pqCollaborationManager()
   QObject::disconnect(core->getServerManagerModel(),
                       SIGNAL(viewRemoved(pqView*)),
                       this, SLOT(removeCollaborationEventManagement(pqView*)));
+  QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
+                       this,        SLOT(onChatMessage(int,QString&)));
+  QObject::disconnect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+                       this,        SLOT(onUpdateUser(int,QString&,bool)));
 
   delete this->Internals;
 
@@ -206,12 +263,46 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
 {
   if(msg->HasExtension(QtEvent::type))
     {
-    pqApplicationCore* core = pqApplicationCore::instance();
+    int userId = 0;
+    QString userName;
+    QString chatMsg;
     vtkTypeUInt32 proxyId = msg->GetExtension(QtEvent::proxy);
     switch(msg->GetExtension(QtEvent::type))
       {
       case QtEvent::RENDER:
         this->Internals->Render(proxyId);
+        break;
+      case QtEvent::FOCUS_PROPERTY:
+        break;
+      case QtEvent::FOCUS_DISPLAY:
+        break;
+      case QtEvent::FOCUS_INFORMATION:
+        break;
+      case QtEvent::ACTIVE_SOURCE:
+        break;
+      case QtEvent::PROXY_STATE_INVALID:
+        break;
+      case QtEvent::USER:
+        userId = msg->GetExtension(ClientInformation::user);
+        userName = msg->GetExtension(ClientInformation::name).c_str();
+        emit triggerUpdateUser(userId, userName, false);
+        if(msg->GetExtension(ClientInformation::req_update))
+          {
+          userId = this->userId();
+          userName = this->getUserName(userId);
+          this->onUpdateUser(userId, userName, false);
+          }
+        break;
+      case QtEvent::CHAT:
+        userId = msg->GetExtension(ClientInformation::user);
+        userName = msg->GetExtension(ClientInformation::name).c_str();
+        chatMsg =  msg->GetExtension(ChatMessage::txt).c_str();
+        emit triggerUpdateUser(userId, userName, false);
+        emit triggerChatMessage(userId, chatMsg);
+        break;
+      case QtEvent::OTHER:
+        // Custom handling
+        break;
       }
     }
 }
@@ -229,6 +320,61 @@ void pqCollaborationManager::onTriggerRender(int viewId)
 
     // Broadcast the message
     this->Internals->server()->sendToOtherClients(&msg);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
+{
+  ReturnIfNotValidServer();
+
+  // Broadcast to others only if its our message
+  if(userId == this->Internals->UserID)
+    {
+    vtkSMMessage chatMsg;
+    chatMsg.SetExtension(QtEvent::type, QtEvent::CHAT);
+    chatMsg.SetExtension( ClientInformation::user, userId );
+    chatMsg.SetExtension( ClientInformation::name,
+                          this->getUserName(userId).toStdString() );
+    chatMsg.SetExtension( ChatMessage::txt, msgContent.toStdString() );
+
+    this->Internals->server()->sendToOtherClients(&chatMsg);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onUpdateUser( int userId, QString& userName,
+                                           bool requestUpdateFromOthers)
+{
+  // UserId can be equal to -1 when we want to invalidate the user list
+  if(userId > 0)
+    {
+    bool nameChanged = (this->Internals->UserNameMap[userId] != userName);
+    this->Internals->UserNameMap[userId] = userName;
+    if(userId == this->Internals->UserID)
+      {
+      // Only us should broadcast our name...
+      vtkSMMessage userMsg;
+      userMsg.SetExtension(QtEvent::type, QtEvent::USER);
+      userMsg.SetExtension(ClientInformation::user, userId);
+      userMsg.SetExtension(ClientInformation::name, userName.toStdString());
+      userMsg.SetExtension(ClientInformation::req_update, requestUpdateFromOthers);
+
+      this->Internals->server()->sendToOtherClients(&userMsg);
+      }
+
+    // Notify that the user model as change
+    if(nameChanged)
+      {
+      this->Internals->refreshInformations();
+      emit triggerUpdateUserList();
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::refreshUserList()
+{
+  if(this->Internals->refreshInformations())
+    {
+    emit triggerUpdateUserList();
     }
 }
 
@@ -251,6 +397,8 @@ void pqCollaborationManager::removeCollaborationEventManagement(pqView* view)
 void pqCollaborationManager::setServer(pqServer* server)
 {
   this->Internals->setServer(server);
+  QString userName = this->getUserName(this->userId());
+  this->onUpdateUser(this->userId(), userName, true);
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::render()
@@ -262,4 +410,43 @@ void pqCollaborationManager::render()
     view->forceRender();
     this->Internals->StopRendering();
     }
+}
+//-----------------------------------------------------------------------------
+int pqCollaborationManager::userId()
+{
+  return this->Internals->UserID;
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::updateUserList()
+{
+  this->Internals->refreshInformations();
+}
+
+//-----------------------------------------------------------------------------
+int pqCollaborationManager::getNumberOfUsers()
+{
+  return this->Internals->NumberOfConnectedClients;
+}
+
+//-----------------------------------------------------------------------------
+QString pqCollaborationManager::getUserName(int userId)
+{
+  if(userId == -1)
+    {
+    return QString("Invalid user name");
+    }
+  QString name = this->Internals->UserNameMap[userId];
+  if(name.isEmpty())
+    {
+    name = "User ";
+    name+= QString::number(userId);
+    this->Internals->UserNameMap[userId] = name;
+    }
+  return name;
+}
+//-----------------------------------------------------------------------------
+int pqCollaborationManager::getUserId(int idx)
+{
+  return this->Internals->GetClientId(idx);
 }

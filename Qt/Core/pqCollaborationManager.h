@@ -58,12 +58,59 @@ public:
   virtual ~pqCollaborationManager();
   void setServer(pqServer*);
 
+  /// Return your userId regarding your server connection
+  int userId();
+
+  /// Request the server to provide the list of user ids connected to the server
+  /// as well as requesting to the clients their names.
+  void updateUserList();
+
+  /// Return the number of connected users to the server
+  int getNumberOfUsers();
+
+  /// Return the name of a given user based on its id
+  QString getUserName(int userId);
+
+  /// Return the idx connected userId
+  int getUserId(int idx);
+
 signals:
+  /// This will be triggered locally to broadcast the request
   void triggerRender(int viewId);
 
+  /// This will be triggered by the remote clients to update any interessting
+  /// components. This should be triggered by local client to broadcast to
+  /// the other clients
+  void triggerChatMessage(int userId, QString& msgContent);
+
+  /// This will be triggered by remote clients as well as local clients.
+  /// It is triggered by local clients in order to notify the remote ones
+  /// with our current last user name.
+  void triggerUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
+
+  /// This will be triggered after each refreshUserList() if the user list has
+  /// really changed
+  void triggerUpdateUserList();
+
 public slots:
+
+  /// This will update the user information based on the latest server status
+  /// This slot is called internally every 5s
+  void refreshUserList();
+
+  /// This will attach to the provided view the necessary listeners to share
+  /// collaborative actions such as rendering decision, ...
   void addCollaborationEventManagement(pqView*);
   void removeCollaborationEventManagement(pqView*);
+
+  /// This will be triggered by the triggerChatMessage() signal and will
+  /// broadcast to other client a chat message
+  void onChatMessage(int userId, QString& msgContent);
+
+  /// This will be triggered by the updateParticipant() signal and will
+  /// broadcast to other client the current user name and if we expect other
+  /// to do the same or not
+  void onUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
 
 private slots:
   /// Called when a message has been sent by another client
@@ -71,7 +118,8 @@ private slots:
   /// to synchronize their state.
   void onClientMessage(vtkSMMessage* msg);
 
-  /// This will be triggered by the triggerRender(int) signal
+  /// This will be triggered by the triggerRender(int) signal and will
+  /// broadcast to other client a render request
   void onTriggerRender(int viewId);
 
   /// This will call force render on all the renderer that needs to be render

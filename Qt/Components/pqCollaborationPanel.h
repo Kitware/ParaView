@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMessageMinimal.h"
 
 class pqServer;
+class pqCollaborationManager;
 class QTableWidgetItem;
 
 /// pqCollaborationPanel is a properties page for the collaborative session. It
@@ -49,23 +50,40 @@ public:
   pqCollaborationPanel(QWidget* parent=0);
   ~pqCollaborationPanel();
 
+signals:
+  /// Emitting this signal will result by adding the message into the UI and
+  /// if the user is the local one, the message will be broadcasted to the
+  /// other clients.
+  void triggerChatMessage(int userId, QString& msgContent);
+
+  /// This signal is directly connected to the active collaboration manager
+  void triggerUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
+
 public slots:
-  /// Called when active server changes. We make the decision if process id
-  /// needs to be shown for the server connection.
-  void setServer(pqServer* server);
+  /// Called by pqCollaborationManager when a message is received
+  void writeChatMessage(int userId, QString& txt);
+  /// Called by pqCollaborationManager when a user name update occurs
+  /// (this invalidate the table model)
+  void onUserUpdate();
 
 protected slots:
+  /// Called when user hit enter in the input line of chat message
   void onUserMessage();
-  void onClientMessage(vtkSMMessage* msg);
 
-  // Triggered when the user change its name
+  /// Called when we change pqServer so we can connect to the
+  /// right pqCollaborationManager
+  void connectLocalSlots();
+  void disconnectLocalSlots();
+
+  /// Called when the user change its name
+  /// (double click in the table on his name)
   void itemChanged(QTableWidgetItem* item);
 
 protected:
   pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
   void operator=(const pqCollaborationPanel&); // Not implemented.
 
-  void notificationCallBack(unsigned long msgType, const char* content, unsigned long length);
+  pqCollaborationManager* getCollaborationManager();
 
   class pqInternal;
   pqInternal* Internal;
