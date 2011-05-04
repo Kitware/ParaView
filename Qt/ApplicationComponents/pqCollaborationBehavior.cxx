@@ -70,7 +70,7 @@ void pqCollaborationBehavior::onServerRemoved(pqServer* server)
 {
   if(this->CollaborationManager)
     {
-    delete this->CollaborationManager;
+    this->CollaborationManager->deleteLater();
     this->CollaborationManager = NULL;
     }
 }
