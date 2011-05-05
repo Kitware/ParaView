@@ -297,12 +297,22 @@ void vtkSMProxyManager::UpdateFromRemote()
       msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
       msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
       this->Session->PullState(&msg);
+      cout << "##########     Server Update    ##########" << endl;
+      msg.PrintDebugString();
+      cout << "###################################################" << endl;
       if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
         {
         vtkNew<vtkSMLoadStateContext> ctx;
         ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
+
+        // fixme this->Session->DisableRemoteExecution();
         this->LoadState(&msg, this->Session->GetStateLocator(), ctx.GetPointer());
+
+        // fixme // Make sure all fetched proxy have pushed their state localy
+        // fixme this->UpdateRegisteredProxies(0);
+        // fixme this->Session->EnableRemoteExecution();
         }
+
       }
     }
 }
