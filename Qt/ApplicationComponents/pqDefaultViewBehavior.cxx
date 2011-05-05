@@ -71,17 +71,24 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
       QMessageBox::Ok);
     }
   di->Delete();
-  pqSettings* settings = core->settings();
-  QString curView = settings->value("/defaultViewType",
-    pqRenderView::renderViewType()).toString();
-  if (curView != "None" && !curView.isEmpty()) 
-    {
-    // When a server is created, we create a new render view for it.
-    if (pqView* view = core->getObjectBuilder()->createView(curView, server))
-      {
-      view->render();
-      }
-    }
+
+  // FIXME: Need to detect if a view already exist to know if we should create
+  // one by default or not
+
+//  pqSettings* settings = core->settings();
+//  QString curView = settings->value("/defaultViewType",
+//    pqRenderView::renderViewType()).toString();
+//  if (curView != "None" && !curView.isEmpty())
+//    {
+//    // When a server is created, we create a new render view for it.
+//    if (pqView* view = core->getObjectBuilder()->createView(curView, server))
+//      {
+//      view->render();
+//      }
+//    }
+
+  // FIXME: Need to detect if a view already exist to know if we should create
+  // one by default or not
 
   // Show warning dialogs before server times out.
   QObject::connect(server, SIGNAL(fiveMinuteTimeoutWarning()), 

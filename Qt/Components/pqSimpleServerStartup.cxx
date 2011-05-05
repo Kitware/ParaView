@@ -795,6 +795,7 @@ void pqSimpleServerStartup::startConnection()
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::connectServer()
 {
+  cout << "pqSimpleServerStartup::connectServer" << endl;
   this->disconnectAllServers();
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
@@ -804,9 +805,6 @@ void pqSimpleServerStartup::connectServer()
   pqServer* const server =
     pqApplicationCore::instance()->getObjectBuilder()->
     createServer(this->Implementation->Server);
-
-  // Update ProxyManager based on its remote state
-  pxm->UpdateFromRemote();
 
   // Enable server notification + Send the last state of the ProxyManager
   pxm->EnableStateUpdateNotification();

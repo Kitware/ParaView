@@ -139,6 +139,11 @@ pqServer::~pqServer()
 //-----------------------------------------------------------------------------
 void pqServer::initialize()
 {
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  // Update ProxyManager based on its remote state
+  pxm->UpdateFromRemote();
+
+  cout << "pqServer::initialize" << endl;
   // Setup the Connection TimeKeeper.
   // Currently, we are keeping seperate times per connection. Once we start
   // supporting multiple connections, we may want to the link the
@@ -146,7 +151,6 @@ void pqServer::initialize()
   this->createTimeKeeper();
 
   // Create the GlobalMapperPropertiesProxy.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxy* proxy = pxm->GetProxy("temp_prototypes", "GlobalMapperProperties");
   if(proxy == NULL)
     {
@@ -158,12 +162,15 @@ void pqServer::initialize()
   this->GlobalMapperPropertiesProxy = proxy;
   this->updateGlobalMapperProperties();
 
-  if(this->isRemote())
+  // In case of Multi-clients connection, the client has to listen
+  // server notification so collaboration could happen
+  if(this->session()->GetServerInformation()->GetMultiClientsEnable())
     {
     this->IdleCollaborationTimer.start();
     vtkSMSessionClient* session = vtkSMSessionClient::SafeDownCast(this->session());
     if(session)
       {
+      // Initialise the CollaborationManager to listen server notification
       this->Internals->CollaborationCommunicator = session->GetCollaborationManager();
       this->Internals->VTKConnect->Connect(
           session->GetCollaborationManager(),
@@ -177,6 +184,15 @@ void pqServer::initialize()
 //-----------------------------------------------------------------------------
 pqTimeKeeper* pqServer::getTimeKeeper() const
 {
+  if(!this->Internals->TimeKeeper)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
+    pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+    this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
+    }
+
   return this->Internals->TimeKeeper;
 }
 
@@ -188,20 +204,18 @@ vtkSMSession* pqServer::session() const
 //-----------------------------------------------------------------------------
 void pqServer::createTimeKeeper()
 {
-  // Set Global Time keeper.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
-  if(proxy == NULL)
+  // Set Global Time keeper if needed.
+  if(this->getTimeKeeper() == NULL)
     {
-    proxy = pxm->NewProxy("misc","TimeKeeper");
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
     proxy->UpdateVTKObjects();
     pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
     proxy->FastDelete();
+    pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+    this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
     }
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
 }
 
 //-----------------------------------------------------------------------------
