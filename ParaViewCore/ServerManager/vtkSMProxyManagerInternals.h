@@ -425,7 +425,7 @@ struct vtkSMProxyManagerInternals
       if(this->RegisteredProxyTuple.find(*iter) == this->RegisteredProxyTuple.end())
         {
         toRegister.insert(*iter);
-        //cout << "+++ Register " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
+        cout << "+++ Register " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
         }
       iter++;
       }
@@ -439,7 +439,7 @@ struct vtkSMProxyManagerInternals
           !prototypesRe.find(iter->Group.c_str()))
         {
         toUnregister.insert(*iter);
-        //cout << "--- UnRegister " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
+        cout << "--- UnRegister " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
         }
       iter++;
       }

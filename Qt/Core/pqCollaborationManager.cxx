@@ -276,7 +276,7 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
     switch(msg->GetExtension(QtEvent::type))
       {
       case QtEvent::RENDER:
-        this->Internals->Render(proxyId);
+        //this->Internals->Render(proxyId);
         break;
       case QtEvent::INSPECTOR_TAB:
         // We use proxyId as holder of tab index
