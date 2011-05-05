@@ -675,7 +675,7 @@
         name="LegendLocation"
         command="SetLegendLocation"
         number_of_elements="1"
-        default_values="2">
+        default_values="1">
         <IntRangeDomain name="range" min="0" max="4" />
       </IntVectorProperty>
 

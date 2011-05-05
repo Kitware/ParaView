@@ -179,22 +179,38 @@ void vtkPVXYChartView::SetLegendLocation(int location)
   if (this->Chart)
     {
     vtkChartLegend *legend = this->Chart->GetLegend();
-    legend->SetInline(false);
+    legend->SetInline(location < 4);
     switch(location)
       {
-      case 0: // LEFT
+      case 0: // TOP-LEFT
+        legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
+        legend->SetVerticalAlignment(vtkChartLegend::TOP);
+        break;
+      case 1: // TOP-RIGHT
+        legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        legend->SetVerticalAlignment(vtkChartLegend::TOP);
+        break;
+      case 2: // BOTTOM-RIGHT
+        legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
+        break;
+      case 3: // BOTTOM-LEFT
+        legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
+        legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
+        break;
+      case 4: // LEFT
         legend->SetHorizontalAlignment(vtkChartLegend::LEFT);
         legend->SetVerticalAlignment(vtkChartLegend::CENTER);
         break;
-      case 1: // TOP
+      case 5: // TOP
         legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
         legend->SetVerticalAlignment(vtkChartLegend::TOP);
         break;
-      case 2: // RIGHT
+      case 6: // RIGHT
         legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
         legend->SetVerticalAlignment(vtkChartLegend::CENTER);
         break;
-      case 3: // BOTTOM
+      case 7: // BOTTOM
         legend->SetHorizontalAlignment(vtkChartLegend::CENTER);
         legend->SetVerticalAlignment(vtkChartLegend::BOTTOM);
         break;
@@ -452,15 +468,16 @@ void vtkPVXYChartView::Render(bool interactive)
     }
   if (this->InternalTitle)
     {
-    vtksys_ios::ostringstream timeStream;
+    vtksys_ios::ostringstream new_title;
     vtkstd::string title(this->InternalTitle);
     size_t pos = title.find("${TIME}");
     if (pos != vtkstd::string::npos)
       {
       // The string was found - replace it and set the chart title.
-      timeStream << this->GetViewTime();
-      title.replace(pos, pos+7, timeStream.str());
-      this->Chart->SetTitle(title.c_str());
+      new_title << title.substr(0, pos)
+                << this->GetViewTime()
+                << title.substr(pos + strlen("${TIME}"));
+      this->Chart->SetTitle(new_title.str().c_str());
       }
     }
 
