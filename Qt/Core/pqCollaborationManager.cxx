@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqPipelineSource.h"
 
-#include "vtkPVServerInformation.h"
+#include "vtkPVMultiClientsInformation.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxy.h"
@@ -109,8 +109,7 @@ public:
     {
     if(!this->Server.isNull())
       {
-      this->Server->session()->UpdateServerInformation();
-      vtkPVServerInformation* serverInfo = this->Server->getServerInformation();
+      vtkPVMultiClientsInformation* serverInfo = this->Server->session()->GetMultiClientsInformation();
 
       // General collaboration information
       this->UserID = serverInfo->GetClientId();

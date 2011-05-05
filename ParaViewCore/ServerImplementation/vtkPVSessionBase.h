@@ -29,8 +29,9 @@ class vtkClientServerStream;
 class vtkCollection;
 class vtkSIObject;
 class vtkPVInformation;
-class vtkPVServerInformation;
+class vtkPVMultiClientsInformation;
 class vtkPVProxyDefinitionManager;
+class vtkPVServerInformation;
 class vtkPVSessionCore;
 
 class VTK_EXPORT vtkPVSessionBase : public vtkPVSession
@@ -59,7 +60,12 @@ public:
   // Overridden to provide support for non-remote-server case. We simply read
   // the local process information and return it.
   virtual vtkPVServerInformation* GetServerInformation();
-  virtual void UpdateServerInformation();
+
+  // Description:
+  // vtkMultiClientsInformation is an information-object that provides information
+  // about the clients that are currently connected on the server processes.
+  // These include their number, their ids and which is your id as client.
+  virtual vtkPVMultiClientsInformation* GetMultiClientsInformation();
 
   // Description:
   // This is socket connection, if any to communicate between the data-server
@@ -189,6 +195,7 @@ private:
   void operator=(const vtkPVSessionBase&); // Not implemented
 
   vtkPVServerInformation* LocalServerInformation;
+  vtkPVMultiClientsInformation* LocalMultiClientsInformationCache;
 //ETX
 };
 

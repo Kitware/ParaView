@@ -18,6 +18,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVMultiClientsInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkPVSessionCore.h"
@@ -35,6 +36,9 @@ vtkPVSessionBase::vtkPVSessionBase()
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
   this->LocalServerInformation->CopyFromObject(NULL);
+
+  this->LocalMultiClientsInformationCache = vtkPVMultiClientsInformation::New();
+  this->LocalMultiClientsInformationCache->CopyFromObject(NULL);
 
   // This ensure that whenever a message is received on  the parallel
   // controller, this session is marked active. This is essential for
@@ -66,6 +70,9 @@ vtkPVSessionBase::~vtkPVSessionBase()
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = NULL;
+
+  this->LocalMultiClientsInformationCache->Delete();
+  this->LocalMultiClientsInformationCache = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -109,11 +116,10 @@ vtkPVServerInformation* vtkPVSessionBase::GetServerInformation()
   return this->LocalServerInformation;
 }
 //----------------------------------------------------------------------------
-void vtkPVSessionBase::UpdateServerInformation()
+vtkPVMultiClientsInformation* vtkPVSessionBase::GetMultiClientsInformation()
 {
-  this->LocalServerInformation->Delete();
-  this->LocalServerInformation = vtkPVServerInformation::New();
-  this->LocalServerInformation->CopyFromObject(NULL);
+  this->GatherInformation(DATA_SERVER_ROOT, this->LocalMultiClientsInformationCache, 0);
+  return this->LocalMultiClientsInformationCache;
 }
 
 //----------------------------------------------------------------------------

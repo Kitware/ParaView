@@ -126,21 +126,8 @@ public:
   vtkGetMacro(NumberOfProcesses, int);
 
   // Description:
-  // Get the id that correspond to the current client
-  vtkGetMacro(ClientId, int);
-
-  // Description:
-  // Return the client id of the nth connected client.
-  // idx < NumberOfClients
-  int GetClientId(int idx);
-
-  // Description:
-  // Return the number of connected clients
-  vtkGetMacro(NumberOfClients, int);
-
-  // Description:
   // Return true if the server allow server client to connect to itself
-  bool IsMultiClientEnabled();
+  vtkGetMacro(MultiClientsEnable, int);
 
 protected:
   vtkPVServerInformation();
@@ -155,9 +142,7 @@ protected:
   int Timeout;
   int UseIceT;
   int UseOffscreenRendering;
-  int ClientId;
-  int* ClientIds;
-  int NumberOfClients;
+  int MultiClientsEnable;
   char* RenderModuleName;
 
   vtkPVServerOptionsInternals* MachinesInternals;

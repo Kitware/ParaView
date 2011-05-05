@@ -71,6 +71,7 @@ SET (Kit_SRCS
   vtkPVInformation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMultiClientsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx

@@ -58,7 +58,7 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
   // Clean-up previous instance if needed
   this->onServerRemoved(NULL);
 
-  if(server->getServerInformation()->IsMultiClientEnabled())
+  if(server->getServerInformation()->GetMultiClientsEnable())
     {
     this->CollaborationManager = new pqCollaborationManager(this);
     this->CollaborationManager->setServer(server);

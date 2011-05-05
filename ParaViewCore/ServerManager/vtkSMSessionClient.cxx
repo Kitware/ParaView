@@ -327,28 +327,6 @@ void vtkSMSessionClient::Initialize()
     this->SetupDataServerRenderServerConnection();
     }
 }
-//----------------------------------------------------------------------------
-void vtkSMSessionClient::UpdateServerInformation()
-{
-  this->ServerInformation->Delete();
-  this->DataServerInformation->Delete();
-  this->RenderServerInformation->Delete();
-
-  this->ServerInformation = vtkPVServerInformation::New();
-  this->DataServerInformation = vtkPVServerInformation::New();
-  this->RenderServerInformation = vtkPVServerInformation::New();
-
-  this->GatherInformation(vtkPVSession::DATA_SERVER_ROOT,
-    this->DataServerInformation, 0);
-  this->GatherInformation(vtkPVSession::RENDER_SERVER_ROOT,
-    this->RenderServerInformation, 0);
-
-  // Keep the combined server information to return when
-  // GetServerInformation() is called.
-  this->ServerInformation->AddInformation(this->RenderServerInformation);
-  this->ServerInformation->AddInformation(this->DataServerInformation);
-}
-
 
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::SetupDataServerRenderServerConnection()

@@ -30,12 +30,10 @@ vtkStandardNewMacro(vtkPVServerInformation);
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
-  this->ClientIds = NULL;
+  this->MultiClientsEnable = 0;
   this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
                             vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() :
                             1;
-  this->ClientId = 0;
-  this->NumberOfClients = 1;
   this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
@@ -69,11 +67,6 @@ vtkPVServerInformation::vtkPVServerInformation()
 //----------------------------------------------------------------------------
 vtkPVServerInformation::~vtkPVServerInformation()
 {
-  if(this->ClientIds)
-    {
-    delete[] this->ClientIds;
-    this->ClientIds = NULL;
-    }
   this->SetRenderModuleName(NULL);
   delete this->MachinesInternals;
 }
@@ -95,28 +88,13 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AVISupport: " << this->AVISupport << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
-  os << indent << "ClientId: " << this->ClientId << endl;
-  os << indent << "NumberOfClients: " << this->NumberOfClients << endl;
+  os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 {
-  this->ClientId = info->GetClientId();
-  this->NumberOfClients = info->GetNumberOfClients();
-  if(this->ClientIds)
-    {
-    delete[] this->ClientIds;
-    this->ClientIds = NULL;
-    }
-  if(info->ClientIds)
-    {
-    this->ClientIds = new int[this->NumberOfClients];
-    for(int cc=0; cc<this->NumberOfClients; cc++)
-      {
-      this->ClientIds[cc] = info->GetClientId(cc);
-      }
-    }
+  this->MultiClientsEnable = info->GetMultiClientsEnable();
   this->RemoteRendering = info->GetRemoteRendering();
   info->GetTileDimensions(this->TileDimensions);
   info->GetTileMullions(this->TileMullions);
@@ -146,35 +124,8 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     return;
     }
 
-  // Retreive the current client connection ID
-  vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetSession());
-  vtkCompositeMultiProcessController* ctrl;
-  if(this->ClientIds)
-    {
-    delete[] this->ClientIds;
-    this->ClientIds = NULL;
-    }
-  if( session && (ctrl =
-                  vtkCompositeMultiProcessController::SafeDownCast(session->GetController(vtkPVSession::CLIENT))))
-    {
-    this->ClientId = ctrl->GetActiveControllerID();
-    this->NumberOfClients = ctrl->GetNumberOfControllers();
-    this->ClientIds = new int[this->NumberOfClients];
-    for(int cc=0; cc<this->NumberOfClients; cc++)
-      {
-      this->ClientIds[cc] = ctrl->GetControllerId(cc);
-      }
-    }
-  else
-    {
-    this->ClientId = 0;
-    this->NumberOfClients = 1;
-    }
-
-
+  // Options
   vtkPVOptions* options = pm->GetOptions();
-  vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
-
   options->GetTileDimensions(this->TileDimensions);
   options->GetTileMullions(this->TileMullions);
 #if !defined(__APPLE__)
@@ -185,8 +136,11 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->Timeout = options->GetTimeout();
   this->SetRenderModuleName(options->GetRenderModuleName());
 
+  // Server options
+  vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
   if (serverOptions)
     {
+    this->MultiClientsEnable = serverOptions->GetMultiClientMode();
     this->SetNumberOfMachines(serverOptions->GetNumberOfMachines());
     unsigned int idx;
     for (idx = 0; idx < serverOptions->GetNumberOfMachines(); idx++)
@@ -258,21 +212,9 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       {
       this->NumberOfProcesses = serverInfo->NumberOfProcesses;
       }
-    if (this->NumberOfClients < serverInfo->NumberOfClients)
+    if (this->MultiClientsEnable < serverInfo->MultiClientsEnable)
       {
-      this->NumberOfClients = serverInfo->NumberOfClients;
-      }
-    if (this->ClientId < serverInfo->ClientId)
-      {
-      this->ClientId = serverInfo->ClientId;
-      }
-    if(this->ClientIds == NULL && serverInfo->ClientIds)
-      {
-      this->ClientIds = new int[serverInfo->NumberOfClients];
-      for(int cc=0; cc < serverInfo->NumberOfClients; cc++)
-        {
-        this->ClientIds[cc] = serverInfo->ClientIds[cc];
-        }
+      this->MultiClientsEnable = serverInfo->MultiClientsEnable;
       }
     }
 }
@@ -304,12 +246,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
     *css << this->GetUpperRight(idx)[0] << this->GetUpperRight(idx)[1]
          << this->GetUpperRight(idx)[2];
     }
-  *css << this->ClientId;
-  *css << this->NumberOfClients;
-  for(int cc=0; cc < this->NumberOfClients; cc++)
-    {
-    *css << this->GetClientId(cc);
-    }
+  *css << this->MultiClientsEnable;
   *css << vtkClientServerStream::End;
 }
 
@@ -421,32 +358,10 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
       return;
       }
     }
-  if(!css->GetArgument(0, 23 + (numMachines-1)*10, &this->ClientId))
+  if(!css->GetArgument(0, 23 + (numMachines-1)*10, &this->MultiClientsEnable))
     {
-    vtkErrorMacro("Error parsing ClientId from message.");
+    vtkErrorMacro("Error parsing MultiClientsEnable from message.");
     return;
-    }
-  if(!css->GetArgument(0, 24 + (numMachines-1)*10, &this->NumberOfClients))
-    {
-    vtkErrorMacro("Error parsing NumberOfClients from message.");
-    return;
-    }
-  if(this->ClientId != 0)
-    {
-    if(this->ClientIds)
-      {
-      delete[] this->ClientIds;
-      this->ClientIds = NULL;
-      }
-    this->ClientIds = new int[this->NumberOfClients];
-    for (int cc = 0; cc < this->NumberOfClients; cc++)
-      {
-      if(!css->GetArgument(0, 25 + (numMachines-1)*10 + cc, &this->ClientIds[cc]))
-        {
-        vtkErrorMacro("Error parsing ClientIds from message.");
-        return;
-        }
-      }
     }
 }
 
@@ -579,20 +494,4 @@ double* vtkPVServerInformation::GetUpperRight(unsigned int idx) const
     return NULL;
     }
   return this->MachinesInternals->MachineInformationVector[idx].UpperRight;
-}
-//----------------------------------------------------------------------------
-int vtkPVServerInformation::GetClientId(int idx)
-{
-  // Invalid internal data
-  if(this->ClientIds == NULL || !(idx < this->NumberOfClients && idx >= 0))
-    {
-    return this->ClientId;
-    }
-
-  return this->ClientIds[idx];
-}
-//----------------------------------------------------------------------------
-bool vtkPVServerInformation::IsMultiClientEnabled()
-{
-  return true; // FIXME
 }
