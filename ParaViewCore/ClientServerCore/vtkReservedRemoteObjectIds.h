@@ -33,9 +33,7 @@ struct VTK_EXPORT vtkReservedRemoteObjectIds
     RESERVED_PROXY_MANAGER_ID              = 1,
     RESERVED_PROXY_DEFINITION_MANAGER_ID   = 2,
     RESERVED_ID_COUNTER_ID                 = 3,
-    RESERVED_TIME_KEEPER_ID                = 4,
-    RESERVED_ANIMATION_SCENE_ID            = 5,
-    RESERVED_COLLABORATION_COMMUNICATOR_ID = 6,
+    RESERVED_COLLABORATION_COMMUNICATOR_ID = 4,
     RESERVED_MAX_IDS                       = 255
     };
 };

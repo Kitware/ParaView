@@ -25,18 +25,9 @@
 class VTK_EXPORT vtkSMTimeKeeperProxy : public vtkSMProxy
 {
 public:
-  // Description:
-  // Return the GlobalID that should be used to refer to the TimeKeeper
-  static vtkTypeUInt32 GetReservedGlobalID();
-
   static vtkSMTimeKeeperProxy* New();
   vtkTypeMacro(vtkSMTimeKeeperProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get the global unique id for this object. If none is set and the session is
-  // valid, a new global id will be assigned automatically.
-  virtual vtkTypeUInt32 GetGlobalID();
 
 //BTX
 protected:

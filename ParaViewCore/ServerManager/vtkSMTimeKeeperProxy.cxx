@@ -16,15 +16,8 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMTimeKeeper.h"
-#include "vtkReservedRemoteObjectIds.h"
 
 vtkStandardNewMacro(vtkSMTimeKeeperProxy);
-//----------------------------------------------------------------------------
-vtkTypeUInt32 vtkSMTimeKeeperProxy::GetReservedGlobalID()
-{
-  return vtkReservedRemoteObjectIds::RESERVED_TIME_KEEPER_ID;
-}
-
 //----------------------------------------------------------------------------
 vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
 {
@@ -59,13 +52,4 @@ void vtkSMTimeKeeperProxy::CreateVTKObjects()
 void vtkSMTimeKeeperProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-//----------------------------------------------------------------------------
-vtkTypeUInt32 vtkSMTimeKeeperProxy::GetGlobalID()
-{
-  if(!this->HasGlobalID())
-    {
-    this->SetGlobalID(vtkSMTimeKeeperProxy::GetReservedGlobalID());
-    }
-  return this->Superclass::GetGlobalID();
 }
