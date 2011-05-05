@@ -896,14 +896,19 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     {
     proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
 
-    ProxyManagerState_ProxyRegistrationInfo *registration =
-        this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
-    registration->set_group(groupname);
-    registration->set_name(name);
-    registration->set_global_id(proxy->GetGlobalID());
+    // Do not put prototype groups in state
+    vtksys::RegularExpression prototypesRe("_prototypes$");
+    if (!prototypesRe.find(groupname))
+      {
+      ProxyManagerState_ProxyRegistrationInfo *registration =
+          this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
+      registration->set_group(groupname);
+      registration->set_name(name);
+      registration->set_global_id(proxy->GetGlobalID());
 
-    // Push state for undo/redo
-    this->TriggerStateUpdate();
+      // Push state for undo/redo
+      this->TriggerStateUpdate();
+      }
     }
 }
 

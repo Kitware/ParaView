@@ -34,6 +34,7 @@
 #include <vtkstd/set>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
 #include <vtkNew.h>
 
 // Sub-classed to avoid symbol length explosion.
@@ -424,17 +425,21 @@ struct vtkSMProxyManagerInternals
       if(this->RegisteredProxyTuple.find(*iter) == this->RegisteredProxyTuple.end())
         {
         toRegister.insert(*iter);
+        //cout << "+++ Register " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
         }
       iter++;
       }
 
     // Look for proxy to Unregister
     iter = this->RegisteredProxyTuple.begin();
+    vtksys::RegularExpression prototypesRe("_prototypes$");
     while(iter != this->RegisteredProxyTuple.end())
       {
-      if(newStateContent.find(*iter) == newStateContent.end())
+      if( newStateContent.find(*iter) == newStateContent.end() &&
+          !prototypesRe.find(iter->Group.c_str()))
         {
         toUnregister.insert(*iter);
+        //cout << "--- UnRegister " << iter->Group.c_str() << " - " << iter->Name.c_str() << endl;
         }
       iter++;
       }
@@ -491,7 +496,6 @@ struct vtkSMProxyManagerInternals
     }
 
 
-
   void RemoveTuples(const char* group, const char* name,
                     vtkstd::set<vtkSMProxyManagerEntry> &removedEntries,
                     bool doMapOnly)
@@ -537,7 +541,8 @@ struct vtkSMProxyManagerInternals
       }
 
     // Deal with state
-    if(!doMapOnly)
+    vtksys::RegularExpression prototypesRe("_prototypes$");
+    if(!doMapOnly && !prototypesRe.find(group))
       {
       vtkSMMessage backup;
       backup.CopyFrom(this->State);
@@ -549,7 +554,7 @@ struct vtkSMProxyManagerInternals
         const ProxyManagerState_ProxyRegistrationInfo *reg =
             &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
 
-        if( reg->group() != groupString && reg->name() != nameString ) // Keep it
+        if( reg->group() != groupString || reg->name() != nameString ) // Keep it
           {
           this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
           }
@@ -592,27 +597,31 @@ struct vtkSMProxyManagerInternals
       }
 
     // Deal with state
-    vtkSMMessage backup;
-    backup.CopyFrom(this->State);
-
-    int nbRegisteredProxy = this->State.ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State.ClearExtension(ProxyManagerState::registered_proxy);
-
-
-    for(int cc=0; cc < nbRegisteredProxy; ++cc)
+    vtksys::RegularExpression prototypesRe("_prototypes$");
+    if (!prototypesRe.find(group))
       {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+      vtkSMMessage backup;
+      backup.CopyFrom(this->State);
 
-      if( reg->group() ==  groupString && reg->name() == nameString
-          && reg->global_id() == proxy->GetGlobalID() )
+      int nbRegisteredProxy = this->State.ExtensionSize(ProxyManagerState::registered_proxy);
+      this->State.ClearExtension(ProxyManagerState::registered_proxy);
+
+
+      for(int cc=0; cc < nbRegisteredProxy; ++cc)
         {
-        // Do not keep it
-        }
-      else
-        {
-        // Keep it
-        this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+        const ProxyManagerState_ProxyRegistrationInfo *reg =
+            &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+
+        if( reg->group() ==  groupString && reg->name() == nameString
+            && reg->global_id() == proxy->GetGlobalID() )
+          {
+          // Do not keep it
+          }
+        else
+          {
+          // Keep it
+          this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+          }
         }
       }
 
