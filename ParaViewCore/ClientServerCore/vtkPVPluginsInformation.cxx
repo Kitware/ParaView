@@ -35,10 +35,20 @@ namespace
     vtkstd::string RequiredPlugins;
     vtkstd::string Version;
     vtkstd::string StatusMessage;
+    bool AutoLoadForce;
     bool AutoLoad;
     bool Loaded;
     bool RequiredOnClient;
     bool RequiredOnServer;
+
+    vtkItem():
+      AutoLoadForce(false),
+      AutoLoad(false),
+      Loaded(false),
+      RequiredOnClient(false),
+      RequiredOnServer(false)
+      {
+      }
 
     bool Load(const vtkClientServerStream& stream, int &offset)
       {
@@ -208,6 +218,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     item.Name = tracker->GetPluginName(cc);
     item.FileName = tracker->GetPluginFileName(cc);
     item.AutoLoad = tracker->GetPluginAutoLoad(cc);
+    item.AutoLoadForce = false;
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
     item.Loaded = plugin != NULL;
@@ -244,8 +255,12 @@ void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
         other_iter->FileName == self_iter->FileName)
         {
         bool prev_autoload = self_iter->AutoLoad;
+        bool auto_load_force = self_iter->AutoLoadForce;
         (*self_iter) = (*other_iter);
-        self_iter->AutoLoad = prev_autoload;
+        if (auto_load_force)
+          {
+          self_iter->AutoLoad = prev_autoload;
+          }
         break;
         }
       }
@@ -355,6 +370,21 @@ void vtkPVPluginsInformation::SetAutoLoad(unsigned int cc, bool val)
     vtkWarningMacro("Invalid index: " << cc);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVPluginsInformation::SetAutoLoadAndForce(unsigned int cc, bool val)
+{
+  if (cc < this->GetNumberOfPlugins())
+    {
+    (*this->Internals)[cc].AutoLoad = val;
+    (*this->Internals)[cc].AutoLoadForce = true;
+    }
+  else
+    {
+    vtkWarningMacro("Invalid index: " << cc);
+    }
+}
+
 
 //----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetAutoLoad(unsigned int cc)

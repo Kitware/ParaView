@@ -52,6 +52,15 @@ public:
   void SetAutoLoad(unsigned int cc, bool);
 
   // Description:
+  // This is a hack. When the user sets an auto-load option from  the GUI to
+  // avoid that choice being overwritten as the information object is updated
+  // over time as new plugins are loaded/unloaded, the pqPluginDialog uses this
+  // method to set the auto-load flag. This flag is not communicated across
+  // processes, but when called, GetAutoLoad() will return the value set using
+  // this method.
+  void SetAutoLoadAndForce(unsigned int cc, bool);
+
+  // Description:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
