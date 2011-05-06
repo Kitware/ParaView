@@ -368,7 +368,7 @@ void pqPluginDialog::onPluginItemChanged(QTreeWidgetItem* item, int col)
       bool autoLoad = item->checkState(col)==Qt::Checked;
       // the vtkSMPluginManager ensures that the auto-load flag is preserved
       // even when the plugininfo is updated as new plugins are loaded.
-      plInfo->SetAutoLoad(index, autoLoad);
+      plInfo->SetAutoLoadAndForce(index, autoLoad);
       }
     }
 }
