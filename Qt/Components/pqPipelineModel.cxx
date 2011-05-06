@@ -1031,13 +1031,15 @@ void pqPipelineModel::addConnection(pqPipelineSource *source,
     return;
     }
 
-  // Note: this slot is invoked after the connection has been set,
+  // Note: this slot is invoked after the connection has been set.
 
-  // The only decision we need to make here is whether the sink
-  // fanIn > 1.
   // If fanIn == 1, take the sink form the server list
   // and put it under the source.
-  // If fanIn > 1, -- we will deal with this later :).
+  // If fanIn == 2, take the sink from  the under the source that it was put
+  //  when fanIn == 1, replace that with a link. Add a new link for the new
+  //  connection and put the source under the server list.
+  // If fanIn > 2, just create a link for this new connection. We have already
+  //  flagged it as a link when fanIn == 2.
 
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(sink);
   if (!filter)
@@ -1065,7 +1067,7 @@ void pqPipelineModel::addConnection(pqPipelineSource *source,
   // sources/filters -- think of change input dialog to know why.
 
   pqPipelineModelDataItem* currentParent = sinkItem->Parent;
-  if (currentParent->Type != pqPipelineModel::Server &&
+  if (currentParent->Type == pqPipelineModel::Server &&
     sinkItem->Links.size() > 0)
     {
     // sink has previously been identified as a "fan-in". We simply, create a
