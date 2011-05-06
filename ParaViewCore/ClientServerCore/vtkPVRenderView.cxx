@@ -282,7 +282,10 @@ void vtkPVRenderView::Initialize(unsigned int id)
   // Synchronize this among all processes involved.
   unsigned int cannot_render = (this->RemoteRenderingAvailable &&
                                 vtkPVRenderView::IsRemoteRenderingAllowed()) ? 0 : 1;
-  this->SynchronizeSize(cannot_render);
+
+  // FIXME should be fixed by Utkarsh
+  //this->SynchronizeSize(cannot_render);
+
   this->RemoteRenderingAvailable = cannot_render == 0;
 }
 
