@@ -6,7 +6,7 @@
       -->
       <!-- this adds to what is already defined in base -->
       <RepresentationType subproxy="SurfaceLICRepresentation"
-        text="Surface LIC" subtype="2" />
+        text="Surface LIC" subtype="Surface" />
 
       <SubProxy>
         <Proxy name="SurfaceLICRepresentation"
@@ -33,7 +33,7 @@
            standard ParaView servermanager xml 
       -->
       <RepresentationType subproxy="SurfaceLICRepresentation"
-        subtype="2" text="Surface LIC" />
+        subtype="Surface" text="Surface LIC" />
 
       <SubProxy>
         <Proxy name="SurfaceLICRepresentation"
@@ -60,7 +60,7 @@
            standard ParaView servermanager xml 
       -->
       <RepresentationType subproxy="SurfaceLICRepresentation"
-          subtype="2" text="Surface LIC" />
+          subtype="Surface" text="Surface LIC" />
       
       <SubProxy>
         <Proxy name="SurfaceLICRepresentation"
