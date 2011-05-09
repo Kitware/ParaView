@@ -15,6 +15,7 @@
 #include "vtkPVPluginLoader.h"
 
 #include "vtkDynamicLoader.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
@@ -22,6 +23,7 @@
 #include "vtkPVPluginTracker.h"
 #include "vtkPVPythonPluginInterface.h"
 #include "vtkPVServerManagerPluginInterface.h"
+#include "vtkPVXMLParser.h"
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -41,16 +43,103 @@
 
 namespace
 {
+  // This is an helper class used for plugins constructed from XMLs.
+  class vtkPVXMLOnlyPlugin : public vtkPVPlugin,
+                           public vtkPVServerManagerPluginInterface
+  {
+  vtkstd::string PluginName;
+  vtkstd::string XML;
+  vtkPVXMLOnlyPlugin(){};
+  vtkPVXMLOnlyPlugin(const vtkPVXMLOnlyPlugin& other);
+  void operator=(const vtkPVXMLOnlyPlugin& other);
+public:
+  static vtkPVXMLOnlyPlugin* Create(const char* xmlfile)
+    {
+    vtkNew<vtkPVXMLParser> parser;
+    parser->SetFileName(xmlfile);
+    if (!parser->Parse())
+      {
+      return NULL;
+      }
+
+    vtkPVXMLOnlyPlugin* instance = new vtkPVXMLOnlyPlugin();
+    instance->PluginName  =
+      vtksys::SystemTools::GetFilenameWithoutExtension(xmlfile);
+
+    ifstream is;
+    is.open(xmlfile, ios::binary);
+    // get length of file:
+    is.seekg (0, ios::end);
+    size_t length = is.tellg();
+    is.seekg (0, ios::beg);
+
+    // allocate memory:
+    char* buffer = new char [length + 1];
+
+    // read data as a block:
+    is.read (buffer,length);
+    is.close();
+    buffer[length] = 0;
+    instance->XML = buffer;
+    delete [] buffer;
+    return instance;
+    }
+
+  // Description:
+  // Returns the name for this plugin.
+  virtual const char* GetPluginName()
+    { return this->PluginName.c_str(); }
+
+  // Description:
+  // Returns the version for this plugin.
+  virtual const char* GetPluginVersionString()
+    { return "1.0"; }
+
+  // Description:
+  // Returns true if this plugin is required on the server.
+  virtual bool GetRequiredOnServer()
+    { return true; }
+
+  // Description:
+  // Returns true if this plugin is required on the client.
+  virtual bool GetRequiredOnClient()
+    { return false; }
+
+  // Description:
+  // Returns a ';' separated list of plugin names required by this plugin.
+  virtual const char* GetRequiredPlugins()
+    { return ""; }
+
+  // Description:
+  // Obtain the server-manager configuration xmls, if any.
+  virtual void GetXMLs(vtkstd::vector<vtkstd::string>& xmls)
+    {
+    xmls.push_back(this->XML);
+    }
+
+  // Description:
+  // Returns the callback function to call to initialize the interpretor for the
+  // new vtk/server-manager classes added by this plugin. Returning NULL is
+  // perfectly valid.
+  virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+    GetInitializeInterpreterCallback()
+      { return NULL; }
+  };
+
   // Cleans successfully opened libs when the application quits.
   // BUG # 10293
   class vtkPVPluginLoaderCleaner
     {
     vtkstd::vector<vtkLibHandle> Handles;
-
+    vtkstd::vector<vtkPVXMLOnlyPlugin*> XMLPlugins;
   public:
     void Register(vtkLibHandle &handle)
       {
       this->Handles.push_back(handle);
+      }
+    void Register(vtkPVXMLOnlyPlugin* plugin)
+      {
+      this->XMLPlugins.push_back(plugin);
       }
 
     ~vtkPVPluginLoaderCleaner()
@@ -59,6 +148,13 @@ namespace
         iter != this->Handles.end(); ++iter)
         {
         vtkDynamicLoader::CloseLibrary(*iter);
+        }
+
+      for (vtkstd::vector<vtkPVXMLOnlyPlugin*>::iterator iter =
+        this->XMLPlugins.begin();
+        iter != this->XMLPlugins.end(); ++iter)
+        {
+        delete *iter;
         }
       }
     };
@@ -178,6 +274,22 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   this->SetFileName(file);
   vtkstd::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
+
+
+  if (vtksys::SystemTools::GetFilenameLastExtension(file) == ".xml")
+    {
+    vtkPVPluginLoaderDebugMacro("Loading XML plugin");
+    vtkPVXMLOnlyPlugin* plugin = vtkPVXMLOnlyPlugin::Create(file);
+    if (plugin)
+      {
+      ::LibCleaner.Register(plugin);
+      return this->LoadPlugin(file, plugin);
+      }
+    vtkPVPluginLoaderErrorMacro(
+      "Failed to load XML plugin. Not a valid XML or file could not be read.");
+    return false;
+    }
+
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
   if (!lib)
     {
@@ -307,6 +419,12 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     }
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
+  return this->LoadPlugin(file, plugin);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::LoadPlugin(const char* file, vtkPVPlugin* plugin)
+{
   this->SetPluginName(plugin->GetPluginName());
   this->SetPluginVersion(plugin->GetPluginVersionString());
 
