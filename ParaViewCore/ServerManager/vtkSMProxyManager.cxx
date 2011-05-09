@@ -297,22 +297,23 @@ void vtkSMProxyManager::UpdateFromRemote()
       msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
       msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
       this->Session->PullState(&msg);
-      cout << "##########     Server Update    ##########" << endl;
-      msg.PrintDebugString();
-      cout << "###################################################" << endl;
       if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
         {
         vtkNew<vtkSMLoadStateContext> ctx;
         ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
 
-        // fixme this->Session->DisableRemoteExecution();
-        this->LoadState(&msg, this->Session->GetStateLocator(), ctx.GetPointer());
-
-        // fixme // Make sure all fetched proxy have pushed their state localy
-        // fixme this->UpdateRegisteredProxies(0);
-        // fixme this->Session->EnableRemoteExecution();
+        // We take the parent locator to always refer to the server while loading
+        // the state. This prevent us from getting a creation state instead of
+        // full update state when we split the creation/update action in 2
+        // separate call.
+        // Moreover, we don't want any existing states to be pushed again to
+        // the server.
+        this->Session->DisableRemoteExecution();
+        this->LoadState( &msg,
+                         this->Session->GetStateLocator()->GetParentLocator(),
+                         ctx.GetPointer());
+        this->Session->EnableRemoteExecution();
         }
-
       }
     }
 }
@@ -1776,6 +1777,13 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToRegister;
   vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
 
+  // Create Only proxy that we receive
+  vtkNew<vtkCollection> proxyHolder;
+  vtkstd::set<vtkTypeUInt32> globalIds;
+  this->Internals->ExtractProxyInvolved(msg, globalIds, locator);
+  this->Internals->CreateOnly(globalIds, locator, proxyHolder.GetPointer());
+  this->Internals->UpdateOnly(locator, proxyHolder.GetPointer());
+
   // Fill delta sets
   this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
 
@@ -1794,7 +1802,6 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
-
 }
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,

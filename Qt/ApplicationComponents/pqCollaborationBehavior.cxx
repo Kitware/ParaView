@@ -45,8 +45,7 @@ pqCollaborationBehavior::pqCollaborationBehavior(QObject* parentObject)
   this->CollaborationManager = NULL;
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(preServerAdded(pqServer*)),
-                    this, SLOT(onServerAdded(pqServer*)),
-                    Qt::QueuedConnection);
+                    this, SLOT(onServerAdded(pqServer*)));
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(aboutToRemoveServer(pqServer*)),
                     this, SLOT(onServerRemoved(pqServer*)));
