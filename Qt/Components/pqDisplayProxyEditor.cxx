@@ -981,7 +981,10 @@ void pqDisplayProxyEditor::editCubeAxes()
 {
   pqCubeAxesEditorDialog dialog(this);
   dialog.setRepresentationProxy(this->Internal->Representation->getProxy());
-  dialog.exec();
+  if (dialog.exec() == QDialog::Accepted)
+    {
+    this->Internal->Representation->renderViewEventually();
+    }
 }
 //----------------------------------------------------------------------------
 bool pqDisplayProxyEditor::isCubeAxesVisible()
