@@ -149,6 +149,10 @@ int vtkQuerySelectionSource::RequestData(
     }
 
   vtkInformation* props = selNode->GetProperties();
+  if (this->Inverse)
+    {
+    props->Set(vtkSelectionNode::INVERSE(), 1);
+    }
 
   // Add qualifiers.
   if (this->CompositeIndex >= 0)
