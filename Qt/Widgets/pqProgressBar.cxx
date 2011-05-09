@@ -31,7 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqProgressBar.h"
 
-#include <QCoreApplication>
+#include "pqEventDispatcher.h"
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QProgressBar>
@@ -90,6 +91,8 @@ void pqProgressBar::setProgress(const QString& message, int value)
   this->ProgressLabel->show();
     
   this->PreviousMessage = msg;
+
+  pqEventDispatcher::processEvents();
 }
 
 //-----------------------------------------------------------------------------
