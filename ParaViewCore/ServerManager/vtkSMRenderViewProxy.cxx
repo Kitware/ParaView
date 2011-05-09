@@ -123,6 +123,11 @@ bool vtkSMRenderViewProxy::LastRenderWasInteractive()
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::IsSelectionAvailable()
 {
+  // FIXME: We disable selection in collaboration mode (Utkarsh)
+  if(this->GetSession()->GetServerInformation()->GetMultiClientsEnable())
+    {
+    return false;
+    }
   const char* msg = this->IsSelectVisibleCellsAvailable();
   if (msg)
     {
@@ -137,6 +142,12 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkSMSession* session = this->GetSession();
+
+  // FIXME: We disable selection in collaboration mode (Utkarsh)
+  if(session->GetServerInformation()->GetMultiClientsEnable())
+    {
+    return "Cannot support selection in multi-client mode";
+    }
 
   if (session->GetIsAutoMPI())
     {
