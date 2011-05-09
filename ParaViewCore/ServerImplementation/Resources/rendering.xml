@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="camera">
     <CameraProxy name="Camera" class="vtkCamera"
-      processes="client|dataserver|renderserver" >
+      processes="client" > <!-- |dataserver|renderserver -->
       <DoubleVectorProperty
         name="CameraPositionInfo"
         command="GetPosition"
