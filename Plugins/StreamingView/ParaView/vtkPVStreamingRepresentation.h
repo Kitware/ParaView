@@ -95,10 +95,16 @@ public:
   // Overridden to make sure that the upstream filters flow when we do
   void MarkModified();
 
-  // Desctiption:
+  // Description:
   // Overridden to take the streaming harness out of consideration when the rep is
   // not shown.
   virtual void SetVisibility(bool val);
+
+  // Description:
+  // Overridden to disable selection representation.
+  // ID selection won't work with multires, and the way PV sets up this proxy
+  // precludes adding the harness in front of it in order to force streamed updates.
+  virtual void SetSelectionVisibility(bool visible);
 
 //BTX
 protected:

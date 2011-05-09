@@ -62,7 +62,7 @@ public:
   virtual void SetVisibility(bool visible);
 
   void SetCubeAxesVisibility(bool visible);
-  void SetSelectionVisibility(bool visible);
+  virtual void SetSelectionVisibility(bool visible);
 
   // Description:
   // Passed on to internal representations as well.

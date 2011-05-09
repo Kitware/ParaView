@@ -29,6 +29,7 @@
 class vtkIntArray;
 class vtkPVPlugin;
 class vtkStringArray;
+class vtkPVPlugin;
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
@@ -39,7 +40,6 @@ public:
 
   // Description:
   // Tries to the load the plugin given the path to the plugin file.
-  // FIXME: Add support to load an XML.
   bool LoadPlugin(const char* filename)
     { return this->LoadPluginInternal(filename, false); }
   bool LoadPluginSilently(const char* filename)
@@ -94,6 +94,11 @@ protected:
   ~vtkPVPluginLoader();
 
   bool LoadPluginInternal(const char* filename, bool no_errors);
+
+  // Description:
+  // Called by LoadPluginInternal() to do the final steps in loading of a
+  // plugin.
+  bool LoadPlugin(const char*file, vtkPVPlugin* plugin);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);
