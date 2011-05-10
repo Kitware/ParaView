@@ -134,6 +134,7 @@ protected:
   // Description:
   // Subclasses should override this method to do the actual image capture.
   virtual vtkImageData* CaptureWindowInternal(int magnification);
+  virtual void CaptureWindowInternalRender();
 
   bool SelectFrustumInternal(int region[4],
     vtkCollection* selectedRepresentations,
