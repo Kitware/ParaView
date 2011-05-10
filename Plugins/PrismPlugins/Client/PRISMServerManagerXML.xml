@@ -190,7 +190,6 @@
           <Property name="StaticMode" />
           <Property name="SuppressLOD" />
           <Property name="Texture" />
-          <Property name="PrismRange" />
         </ExposedProperties>
       </SubProxy>
 
@@ -281,14 +280,6 @@
       <Documentation>
         Adds linked auto scaling between Prism Filters
       </Documentation>
-
-      <DoubleVectorProperty
-        name="PrismRange"
-        command="GetPrismRange"
-        information_only="1"
-        number_of_elements="3"
-        default_values="1 1 1">
-      </DoubleVectorProperty>
 
     </RepresentationProxy>
     <PrismCubeAxesRepresentationProxy name="PrismCubeAxesRepresentation"

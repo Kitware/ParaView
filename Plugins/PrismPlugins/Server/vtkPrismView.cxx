@@ -41,6 +41,7 @@ vtkPrismView::~vtkPrismView()
 void vtkPrismView::GatherRepresentationInformation()
 {
   this->Superclass::GatherRepresentationInformation();
+
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   vtkBoundingBox worldBounds;
   int numPrismBoundsFound = 0;
@@ -72,29 +73,25 @@ void vtkPrismView::GatherRepresentationInformation()
       {
       vtkInformation* info =
         this->ReplyInformationVector->GetInformationObject(cc);
-      if (info->Has(vtkPrismView::PRISM_GEOMETRY_BOUNDS()))
-        {
-        vtkDataRepresentation *repr = this->GetRepresentation(cc);
-        vtkCompositeRepresentation *compositeRep =
-          vtkCompositeRepresentation::SafeDownCast(repr);
-        if(compositeRep)
-          {
-          vtkGeometryRepresentation *geomRep = vtkGeometryRepresentation::SafeDownCast(
-            compositeRep->GetActiveRepresentation());
-          if (geomRep)
-            {
-            geomRep->SetScale(scale[0],scale[1],scale[2]);
 
-            //set the center
-            double center[3];
-            worldBounds.GetMinPoint(center[0], center[1], center[2]);
-            geomRep->SetOrigin(center[0],center[1],center[2]);
-            }
+      vtkDataRepresentation *repr = this->GetRepresentation(cc);
+      vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
+      if(compositeRep)
+        {
+        vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
+          compositeRep->GetActiveRepresentation());
+        if (prismRep)
+          {
+          prismRep->SetScale(scale[0],scale[1],scale[2]);
+
+          //set the center
+          double center[3];
+          worldBounds.GetMinPoint(center[0], center[1], center[2]);
+          prismRep->SetOrigin(center[0],center[1],center[2]);
           }
         }
       }
-    }
-  this->Superclass::GatherRepresentationInformation();
+    }  
 }
 
 

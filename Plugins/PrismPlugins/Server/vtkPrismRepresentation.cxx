@@ -28,13 +28,7 @@ vtkStandardNewMacro(vtkPrismRepresentation);
 //----------------------------------------------------------------------------
 vtkPrismRepresentation::vtkPrismRepresentation()
 {
-  this->PrismRange[0] = 0;
-  this->PrismRange[1] = 0;
-  this->PrismRange[2] = 0;
 
-  this->ScaleFactor[0] = 1;
-  this->ScaleFactor[1] = 1;
-  this->ScaleFactor[2] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -60,7 +54,7 @@ bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *, vtkInformation* 
         ps->GetBounds(bounds);
         outInfo->Set(vtkPrismView::PRISM_GEOMETRY_BOUNDS(), bounds, 6);
         }
-      }
+      }    
     }
   return true;
 }
@@ -68,9 +62,5 @@ bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *, vtkInformation* 
 //----------------------------------------------------------------------------
 void vtkPrismRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "PrismRange: " << this->PrismRange[0] << ",";
-    os << this->PrismRange[1] << "," << this->PrismRange[2] << endl;
-  os << indent << "ScaleFactor: " << this->ScaleFactor[0] << ",";
-    os << this->ScaleFactor[1] << "," << this->ScaleFactor[2] << endl;  
   this->Superclass::PrintSelf(os, indent);
 }

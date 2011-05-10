@@ -29,19 +29,12 @@ public:
   vtkTypeMacro(vtkPrismRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkSetVector3Macro(ScaleFactor,double);
-
-  vtkGetVector3Macro(PrismRange,double);
-
 //BTX
 protected:
   vtkPrismRepresentation();
   ~vtkPrismRepresentation();
 
   virtual bool GenerateMetaData(vtkInformation*, vtkInformation* outInfo);
-
-  double PrismRange[3];
-  double ScaleFactor[3];
 private:
   vtkPrismRepresentation(const vtkPrismRepresentation&); // Not implemented
   void operator=(const vtkPrismRepresentation&); // Not implemented
