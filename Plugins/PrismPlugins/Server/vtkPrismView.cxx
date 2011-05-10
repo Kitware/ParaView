@@ -15,6 +15,7 @@
 #include "vtkPrismView.h"
 
 #include "vtkBoundingBox.h"
+#include "vtkCubeAxesRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationObjectBaseKey.h"
@@ -96,6 +97,20 @@ void vtkPrismView::GatherRepresentationInformation()
           worldBounds.GetMinPoint(center[0], center[1], center[2]);
           prismRep->SetOrigin(center[0],center[1],center[2]);
           }
+        }
+      else
+        {
+        vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
+        if ( cubeAxes )
+          {
+          //set the positon
+          double pos[3];
+          worldBounds.GetMinPoint(pos[0], pos[1], pos[2]);
+          cubeAxes->SetPosition(pos[0],pos[1],pos[2]);
+
+          cubeAxes->SetScale(scale[0],scale[1],scale[2]);
+          }
+
         }
       }
     }  
