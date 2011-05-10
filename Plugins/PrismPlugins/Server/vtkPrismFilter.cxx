@@ -16,7 +16,6 @@ Module:    vtkPrismFilter.cxx
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPolyData.h"
-#include "vtkTransform.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h" 
@@ -27,8 +26,6 @@ Module:    vtkPrismFilter.cxx
 #include "vtkPoints.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkTransformFilter.h"
-#include "vtkTransform.h"
 #include "vtkExtractGeometry.h"
 #include "vtkBox.h"
 #include "vtkDataObject.h"
@@ -45,7 +42,6 @@ public:
 
     vtkSmartPointer<vtkExtractGeometry > ExtractGeometry;
     vtkSmartPointer<vtkBox> Box;
-    vtkSmartPointer<vtkTransformFilter> TransformFilter;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
     vtkstd::string AxisVarName[3];
@@ -61,9 +57,6 @@ public:
         this->AxisVarName[0]      = "none";
         this->AxisVarName[1]      = "none";
         this->AxisVarName[2]      = "none";
-
-        this->TransformFilter=vtkSmartPointer<vtkTransformFilter>::New(); 
-
 
         this->ExtractGeometry=vtkSmartPointer<vtkExtractGeometry >::New();
 
@@ -537,20 +530,6 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
   polydata->Squeeze();
   cellPts->Delete();
   delete [] weights;
-
-
-  this->Internal->TransformFilter->SetInput(polydata);
-
-
-
-  double scale[3];
-  this->Internal->Reader->GetAspectScale(scale);
-  vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-  transform->Scale(scale);
-  this->Internal->TransformFilter->SetTransform(transform);
-  this->Internal->TransformFilter->Update();
-
-  polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
 
   output->SetBlock(index,polydata);
 

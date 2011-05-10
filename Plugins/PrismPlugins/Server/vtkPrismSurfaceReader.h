@@ -164,16 +164,11 @@ public:
 
  void GetRanges(vtkDoubleArray* RangeArray);
 
-  vtkGetVectorMacro(AspectScale,double,3);
-
 
 protected:
   vtkPrismSurfaceReader();
   ~vtkPrismSurfaceReader();
 
-
-  double AspectScale[3];
-  //double Range[6];
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];

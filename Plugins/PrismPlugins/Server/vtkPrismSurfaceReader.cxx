@@ -30,8 +30,6 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkExtractPolyDataGeometry.h"
 #include "vtkBox.h"
 #include "vtkCleanPolyData.h"
-#include "vtkTransformFilter.h"
-#include "vtkTransform.h"
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -66,8 +64,6 @@ class vtkPrismSurfaceReader::MyInternal
         vtkSmartPointer<vtkBox> Box;
 
         vtkSmartPointer<vtkCleanPolyData> CleanPolyData;
-        vtkSmartPointer<vtkTransformFilter> ScaleTransform;
-        vtkSmartPointer<vtkTransformFilter> ContourScaleTransform;
         vtkstd::string AxisVarName[3];
         vtkSmartPointer<vtkStringArray> ArrayNames;
 
@@ -115,10 +111,6 @@ class vtkPrismSurfaceReader::MyInternal
             this->YRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
              this->ZRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
            this->CRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
-
-           this->ScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
-           this->ContourScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
-
 
             this->XRangeArray->Initialize();
             this->XRangeArray->SetNumberOfComponents(1);
@@ -1007,39 +999,8 @@ int vtkPrismSurfaceReader::RequestData(
   {
     newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
   }
-  double scaleBounds[6];
-  this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
-
-  double delta[3] = {
-    scaleBounds[1] - scaleBounds[0],
-    scaleBounds[3] - scaleBounds[2],
-    scaleBounds[5] - scaleBounds[4]
-  };
-
-  if(delta[0]<=1e-6)
-  {
-    delta[0]=100;
-  }
-  if(delta[1]<=1e-6)
-  {
-    delta[1]=100;
-  }
-  if(delta[2]<=1e-6)
-  {
-    delta[2]=100;
-  }
-
-  this->AspectScale[0]=100/delta[0];
-  this->AspectScale[1]=100/delta[1];
-  this->AspectScale[2]=100/delta[2];
-
-  vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
-
-  this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-  this->Internal->ScaleTransform->SetTransform(transform);
-  this->Internal->ScaleTransform->Update();
-  surfaceOutput->ShallowCopy(this->Internal->ScaleTransform->GetOutput());
+ 
+  surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
 
   if(newXArray)
   {
@@ -1103,11 +1064,8 @@ int vtkPrismSurfaceReader::RequestData(
 
       this->Internal->ContourFilter->SetInputArrayToProcess(
         0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
-      this->Internal->ContourFilter->Update();
-      this->Internal->ContourScaleTransform->SetInput(this->Internal->ContourFilter->GetOutput());
-      this->Internal->ContourScaleTransform->SetTransform(transform);
-      this->Internal->ContourScaleTransform->Update();
-      contourOutput->ShallowCopy(this->Internal->ContourScaleTransform->GetOutput());
+      this->Internal->ContourFilter->Update();      
+      contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
 
     }
   }
@@ -1302,15 +1260,10 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
         this->Internal->ExtractGeometry->SetInput(localOutput);
         this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-//        this->Internal->CleanPolyData->Update();
-
-        this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-        this->Internal->ScaleTransform->Update();
-
-
+        this->Internal->CleanPolyData->Update();
 
         vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-        output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+        output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
         resultPd[v]=output;
 
 
@@ -1467,14 +1420,10 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-   //   this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
-
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[2]=output;
 
 
@@ -1630,14 +1579,10 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-   //   this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
-
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[3]=output;
 
       vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
@@ -1779,13 +1724,10 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-  //    this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[4]=output;
 
 
