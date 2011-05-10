@@ -41,6 +41,11 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *, vtkInformation* outInfo)
 {
   //generate the bounds of this data object
+
+  //This currently is working because the SESAME Surface, Curve and Contour
+  //are all polydata while the simulation data is not. That way the simulation
+  //data is forced into the same scaled space. I expect we need to move to the
+  //data set have a field array specifying it should be used for bound collection.
   if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
     {
     vtkDataObject* geom = this->GeometryFilter->GetOutputDataObject(0);

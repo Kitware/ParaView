@@ -45,6 +45,13 @@ void vtkPrismView::GatherRepresentationInformation()
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   vtkBoundingBox worldBounds;
   int numPrismBoundsFound = 0;
+  
+
+  //This is what we want to do:
+  //go through all the reps with the prism bounds key and determine what the world space
+  //apply this scaling to everything in the view. 
+  //Note we have a work around where the simulation data is not adding its bounds
+  //to the prism geom bounds, while it is being scaled by those bounds. This is intended!
 
   for (int cc=0; cc < num_reprs; cc++)
     {
@@ -64,9 +71,9 @@ void vtkPrismView::GatherRepresentationInformation()
     {
     //now calculate out the scale of each object
     double scale[3];
-    scale[0] = 100 / worldBounds.GetLength(0);
-    scale[1] = 100 / worldBounds.GetLength(1);
-    scale[2] = 100 / worldBounds.GetLength(2);
+    scale[0] = 100.0 / worldBounds.GetLength(0);
+    scale[1] = 100.0 / worldBounds.GetLength(1);
+    scale[2] = 100.0 / worldBounds.GetLength(2);
 
     //now set the scale and center on each item
     for (int cc=0; cc < num_reprs; cc++)
