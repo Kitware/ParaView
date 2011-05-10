@@ -25,17 +25,20 @@ QtTesting.playCommand(object1, 'activate', 'menuTools')
 object2 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object2, 'activate', 'actionManage_Plugins')
 object3 = 'pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins'
-QtTesting.playCommand(object3, 'setCurrent', 'MantaView')
 QtTesting.playCommand(object3, 'setCurrent', 'StreamingView')
 object4 = 'pqClientMainWindow/PluginManagerDialog/localGroup'
 QtTesting.playCommand(object4, 'mousePress', '1,1,0,152,504')
 QtTesting.playCommand(object4, 'mouseRelease', '1,0,0,152,504')
 object5 = 'pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local'
 QtTesting.playCommand(object5, 'activate', '')
+objectR1 = 'pqClientMainWindow/PluginManagerDialog/remoteGroup/remotePlugins'
+QtTesting.playCommand(objectR1, 'setCurrent', 'StreamingView')
+objectR2 = 'pqClientMainWindow/PluginManagerDialog/remoteGroup/loadSelected_Remote'
+QtTesting.playCommand(objectR2, 'activate', '')
 object6 = 'pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object6, 'activate', '')
 
-# Test the iterating view by rendering the first 7 pieces
+# Test the iterating view
 object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object7, 'activate', '')
 object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Iterating View'
@@ -44,8 +47,6 @@ object9 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/
 QtTesting.playCommand(object9, 'set_string', 'no')
 object9_5 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/streaming_controls/number_of_passes'
 QtTesting.playCommand(object9_5, 'set_int', '32')
-object10 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/streaming_controls/last_pass'
-QtTesting.playCommand(object10, 'set_int', '7')
 QtTesting.playCommand(object1, 'activate', 'menuSources')
 object11 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object11, 'activate', 'StreamingSource')
@@ -61,15 +62,14 @@ object21 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/Mult
 QtTesting.playCommand(object21, 'mousePress', '(0.529061,0.519763,1,1,0)')
 QtTesting.playCommand(object21, 'mouseMove', '(0.71237,0.632411,1,0,0)')
 QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
-test_compare_image('IteratingImage.png');
+test_compare_image('CSStreamingImage.png')
 
-# Test the prioritizing view by making sure the 7 pieces rendered are always nearest camera
+# Test the prioritizing view
 QtTesting.playCommand(object7, 'activate', '')
 object15 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Prioritizing View'
 QtTesting.playCommand(object15, 'activate', '')
 QtTesting.playCommand(object9, 'set_string', 'no')
 QtTesting.playCommand(object9_5, 'set_int', '32')
-QtTesting.playCommand(object10, 'set_int', '7')
 object16 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
 QtTesting.playCommand(object16, 'mousePress', '1,1,0,12,13,/0:0/0:0/0:1')
 QtTesting.playCommand(object16, 'mouseRelease', '1,0,0,12,13,/0:0/0:0/0:1')
@@ -85,7 +85,7 @@ object21 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/Mult
 QtTesting.playCommand(object21, 'mousePress', '(0.529061,0.519763,1,1,0)')
 QtTesting.playCommand(object21, 'mouseMove', '(0.71237,0.632411,1,0,0)')
 QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
-test_compare_image('PrioritizingImage.png');
+test_compare_image('CSStreamingImage.png')
 
 # Test the refining view by refining and coarsening
 QtTesting.playCommand(object7, 'activate', '')
@@ -104,9 +104,9 @@ QtTesting.playCommand(object16, 'mouseRelease', '1,0,0,12,13,/0:0/0:0/0:1')
 object34 = 'pqClientMainWindow/cameraToolbar/actionPositiveZ'
 QtTesting.playCommand(object34, 'activate', '')
 object35 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTesting.playCommand(object35, 'mousePress', '(0.298063,0.367589,1,1,0)')
-QtTesting.playCommand(object35, 'mouseMove', '(0.374069,0.436759,1,0,0)')
-QtTesting.playCommand(object35, 'mouseRelease', '(0.374069,0.436759,1,0,0)')
+QtTesting.playCommand(object35, 'mousePress', '(0.529061,0.519763,1,1,0)')
+QtTesting.playCommand(object35, 'mouseMove', '(0.71237,0.632411,1,0,0)')
+QtTesting.playCommand(object35, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
 object36 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/refinement_controls'
 QtTesting.playCommand(object36, 'mousePress', '1,1,0,240,52')
 QtTesting.playCommand(object36, 'mouseMove', '1,0,0,243,71')
@@ -119,5 +119,4 @@ QtTesting.playCommand(object37, 'activate', '')
 QtTesting.playCommand(object37, 'activate', '')
 object38 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/refinement_controls/coarsen'
 QtTesting.playCommand(object38, 'activate', '')
-QtTesting.playCommand(object37, 'activate', '')
-test_compare_image('RefiningImage.png');
+test_compare_image('CSRefiningImage.png')

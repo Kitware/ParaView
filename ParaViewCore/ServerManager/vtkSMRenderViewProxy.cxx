@@ -775,10 +775,27 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
+void vtkSMRenderViewProxy::CaptureWindowInternalRender()
 {
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  if (view->GetUseInteractiveRenderingForSceenshots())
+    {
+    this->InteractiveRender();
+    }
+  else
+    {
+    this->StillRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
+{
+#if !defined(__APPLE__)
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+#endif
 
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
@@ -792,14 +809,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 
   this->GetRenderWindow()->SwapBuffersOff();
 
-  if (view->GetUseInteractiveRenderingForSceenshots())
-    {
-    this->InteractiveRender();
-    }
-  else
-    {
-    this->StillRender();
-    }
+  this->CaptureWindowInternalRender();
 
   vtkSmartPointer<vtkWindowToImageFilter> w2i =
     vtkSmartPointer<vtkWindowToImageFilter>::New();
