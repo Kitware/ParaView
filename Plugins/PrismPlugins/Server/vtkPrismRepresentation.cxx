@@ -14,19 +14,14 @@
 =========================================================================*/
 #include "vtkPrismRepresentation.h"
 
-#include "vtkCompositePolyDataMapper2.h"
+#include "vtkAlgorithmOutput.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
-#include "vtkProperty.h"
-#include "vtkRenderer.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProperty.h"
-#include "vtkPVCacheKeeper.h"
+#include "vtkPointSet.h"
+#include "vtkPrismView.h"
 #include "vtkPVGeometryFilter.h"
-#include "vtkPVRenderView.h"
-#include "vtkQuadricClustering.h"
-#include "vtkRenderer.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 
 vtkStandardNewMacro(vtkPrismRepresentation);
 
@@ -49,28 +44,33 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPrismRepresentation::AddToView(vtkView* view)
+bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *, vtkInformation* outInfo)
 {
-  return this->Superclass::AddToView(view);
+  //generate the bounds of this data object
+  if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
+    {
+    vtkDataObject* geom = this->GeometryFilter->GetOutputDataObject(0);
+    if (geom)
+      {
+      vtkPointSet *ps = vtkPointSet::SafeDownCast(geom);
+      if ( ps && ps->GetNumberOfPoints() > 0 )
+        {
+        //for now lets send bounds without talking to other processes
+        double bounds[6];
+        ps->GetBounds(bounds);
+        outInfo->Set(vtkPrismView::PRISM_GEOMETRY_BOUNDS(), bounds, 6);
+        }
+      }
+    }
+  return true;
 }
-
-//----------------------------------------------------------------------------
-bool vtkPrismRepresentation::RemoveFromView(vtkView* view)
-{
-  return this->Superclass::RemoveFromView(view);
-}
-
-//----------------------------------------------------------------------------
-int vtkPrismRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  return this->Superclass::RequestData(request, inputVector, outputVector);
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPrismRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
+  os << indent << "PrismRange: " << this->PrismRange[0] << ",";
+    os << this->PrismRange[1] << "," << this->PrismRange[2] << endl;
+  os << indent << "ScaleFactor: " << this->ScaleFactor[0] << ",";
+    os << this->ScaleFactor[1] << "," << this->ScaleFactor[2] << endl;  
   this->Superclass::PrintSelf(os, indent);
 }

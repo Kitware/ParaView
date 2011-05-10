@@ -21,9 +21,6 @@
 #define __vtkPrismRepresentation_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
-#include "vtkTransformFilter.h"
-#include "vtkTransform.h"
-#include "vtkSmartPointer.h"
 
 class VTK_EXPORT vtkPrismRepresentation : public vtkGeometryRepresentationWithFaces
 {
@@ -41,21 +38,7 @@ protected:
   vtkPrismRepresentation();
   ~vtkPrismRepresentation();
 
-  // Description:
-  // Subclasses should override this to connect inputs to the internal pipeline
-  // as necessary. Since most representations are "meta-filters" (i.e. filters
-  // containing other filters), you should create shallow copies of your input
-  // before connecting to the internal pipeline. The convenience method
-  // GetInternalOutputPort will create a cached shallow copy of a specified
-  // input for you. The related helper functions GetInternalAnnotationOutputPort,
-  // GetInternalSelectionOutputPort should be used to obtain a selection or
-  // annotation port whose selections are localized for a particular input data object.
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
-
-
-  virtual bool AddToView(vtkView *view);
-  virtual bool RemoveFromView(vtkView *view);
+  virtual bool GenerateMetaData(vtkInformation*, vtkInformation* outInfo);
 
   double PrismRange[3];
   double ScaleFactor[3];

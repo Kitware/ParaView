@@ -37,7 +37,7 @@ public:
   // Description:
   // Scaling that should be applied to each object
   // to have it corr
-  static vtkInformationDoubleVectorKey* PRISM_WORLD_SCALE();
+  static vtkInformationDoubleVectorKey* PRISM_GEOMETRY_BOUNDS();
 
   // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations

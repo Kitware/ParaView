@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPrismView.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationObjectBaseKey.h"
@@ -23,10 +24,8 @@
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/set>
-
 vtkStandardNewMacro(vtkPrismView);
-vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_WORLD_SCALE, DoubleVector,3);
+vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
 //----------------------------------------------------------------------------
 vtkPrismView::vtkPrismView()
 {
@@ -42,17 +41,60 @@ vtkPrismView::~vtkPrismView()
 void vtkPrismView::GatherRepresentationInformation()
 {
   this->Superclass::GatherRepresentationInformation();
-  vtkstd::set<void*> current_producers;
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
+  vtkBoundingBox worldBounds;
+  int numPrismBoundsFound = 0;
+
   for (int cc=0; cc < num_reprs; cc++)
     {
     vtkInformation* info =
       this->ReplyInformationVector->GetInformationObject(cc);
-    if (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+    if (info->Has(vtkPrismView::PRISM_GEOMETRY_BOUNDS()))
       {
-      current_producers.insert(info->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()));
+      //collect all the bounds of the world
+      vtkBoundingBox repBounds;
+      repBounds.AddBounds(info->Get(vtkPrismView::PRISM_GEOMETRY_BOUNDS()));
+      worldBounds.AddBox(repBounds);
+      ++numPrismBoundsFound;
       }
     }
+
+  if ( numPrismBoundsFound > 0 )
+    {
+    //now calculate out the scale of each object
+    double scale[3];
+    scale[0] = 100 / worldBounds.GetLength(0);
+    scale[1] = 100 / worldBounds.GetLength(1);
+    scale[2] = 100 / worldBounds.GetLength(2);
+
+    //now set the scale and center on each item
+    for (int cc=0; cc < num_reprs; cc++)
+      {
+      vtkInformation* info =
+        this->ReplyInformationVector->GetInformationObject(cc);
+      if (info->Has(vtkPrismView::PRISM_GEOMETRY_BOUNDS()))
+        {
+        vtkDataRepresentation *repr = this->GetRepresentation(cc);
+        vtkCompositeRepresentation *compositeRep =
+          vtkCompositeRepresentation::SafeDownCast(repr);
+        if(compositeRep)
+          {
+          vtkGeometryRepresentation *geomRep = vtkGeometryRepresentation::SafeDownCast(
+            compositeRep->GetActiveRepresentation());
+          if (geomRep)
+            {
+            geomRep->SetScale(scale[0],scale[1],scale[2]);
+
+            //set the center
+            double center[3];
+            worldBounds.GetMinPoint(center[0], center[1], center[2]);
+            geomRep->SetOrigin(center[0],center[1],center[2]);
+            }
+          }
+        }
+      }
+    }
+  this->Superclass::GatherRepresentationInformation();
 }
 
 
