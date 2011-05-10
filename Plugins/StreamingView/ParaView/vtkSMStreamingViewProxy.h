@@ -104,6 +104,11 @@ protected:
   ~vtkSMStreamingViewProxy();
 
   // Description:
+  // Overridden to tun through the full set of passes and to grab the front buffer
+  // so the saved image corresponds to what is shown on screen.
+  virtual void CaptureWindowInternalRender();
+
+  // Description:
   // Overridden to initialize the CS wrapped VTK streaming library and
   // expose the streaming driver proxy.
   virtual void CreateVTKObjects();

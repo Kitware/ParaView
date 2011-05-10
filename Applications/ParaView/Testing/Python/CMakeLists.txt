@@ -15,6 +15,7 @@ SET (TESTS_WITH_BASELINES
 IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/StreamingTest.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingClientSideTest.py
     ${CMAKE_CURRENT_SOURCE_DIR}/StreamingServerSideTest.py
     )
 ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
@@ -40,8 +41,13 @@ set (RenderNan_BREAK TRUE)
 set (MantaServerSideTest_DISABLE_C TRUE)
 set (MantaServerSideTest_DISABLE_CRS TRUE)
 SET (MantaTest_BREAK TRUE)
-#set (StreamingTest_DISABLE_CS TRUE)
+
+# Don't test in cli/serv since number of pieces is function of number of processors.
+set (StreamingTest_DISABLE_CS TRUE)
 set (StreamingTest_DISABLE_CRS TRUE)
+
+# Use these tests to verify that cli/serv mode works
+set (StreamingClientSideTest_DISABLE_CRS TRUE)
 set (StreamingServerSideTest_DISABLE_C TRUE)
 set (StreamingServerSideTest_DISABLE_CRS TRUE)
 
@@ -72,4 +78,3 @@ IF (PARAVIEW_DATA_ROOT)
 # TODO: remote rendering tests and reverse connect tests.
 
 ENDIF (PARAVIEW_DATA_ROOT)
-

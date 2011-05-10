@@ -60,9 +60,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkSMStreamingViewProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkClientServerStream.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -158,4 +158,16 @@ bool vtkSMStreamingViewProxy::IsDisplayDone()
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMStreamingViewProxy::CaptureWindowInternalRender()
+{
+  bool done = false;
+  this->InteractiveRender(); //doing this to force it to restart
+  while (!done)
+    {
+    this->StillRender();
+    done = this->IsDisplayDone();
+    }
 }
