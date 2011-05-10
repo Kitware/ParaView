@@ -69,4 +69,5 @@
   <Proxy group="sources" name="NetCDFCAMReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
   <Proxy group="sources" name="MPASReader" />
+  <Proxy group="sources" name="EnzoParticlesReader" />
 </ParaViewReaders>

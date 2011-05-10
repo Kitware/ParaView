@@ -2,6 +2,81 @@
 
   <ProxyGroup name="internal_sources">
   
+   <!--  ENZO AMR Particles Reader -->
+   <SourceProxy name="EnzoParticlesReaderCore"
+                class="vtkAMREnzoParticlesReader"
+                label="Enzo Particles AMR Reader" >
+    <Documentation short_help="Reads AMR particles from an ENZO dataset"
+                   long_help="Reads AMR particles from an ENZO dataset">
+       The Enzo particles reader loads particle simulation data stored in
+       Enzo HDF5 format. The output of this reader is MultiBlock dataset
+       where each block is a vtkPolyData that holds the particles (points)
+       and corresponding particle data.
+    </Documentation>
+    
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="0"
+                           number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the Enzo file name
+        </Documentation>         
+    </StringVectorProperty>
+    
+    <IntVectorProperty name="Frequency"
+                       command="SetFrequency"
+                       number_of_elements="1"
+                       default_values="1" >
+       <IntRangeDomain name="range" />
+       <Documentation>
+         This property sets the frequency interval for loading particles.
+       </Documentation>
+    </IntVectorProperty>
+    
+    <IntVectorProperty name="FilterLocation"
+                       command="SetFilterLocation"
+                       number_of_elements="1"
+                       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+          Turns on filtering of particles by location
+       </Documentation>
+    </IntVectorProperty>
+    
+    <DoubleVectorProperty name="MinLocation"
+                          command="SetMinLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+                                          
+     <DoubleVectorProperty name="MaxLocation"
+                          command="SetMaxLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+    
+    
+     <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="Enzo AMR Particles dataset" />
+     </Hints>
+     
+   </SourceProxy>
+   
    <!-- FLASH AMR Core Reader definition -->
    <SourceProxy name="FlashReaderCore" 
                 class="vtkAMRFlashReader"
@@ -2708,6 +2783,71 @@
 
   <ProxyGroup name="sources">
   
+   <!--  Enzo Particles Reader -->
+   <SourceProxy name="EnzoParticlesReader"
+                class="vtkFileSeriesReader"
+                label="ENZO AMR Particles Reader"
+                file_name_method="SetFileName"
+                si_class="vtkSIFileSeriesReaderProxy" >
+       <Documentation
+            short_help="Reads AMR particles from an ENZO dataset"
+            long_help="Reads AMR particles from an ENZO dataset" >
+            The Enzo particles reader loads particle simulation data stored in
+            Enzo HDF5 format. The output of this reader is MultiBlock dataset
+            where each block is a vtkPolyData that holds the particles (points)
+            and corresponding particle data.
+       </Documentation>
+
+       <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoParticlesReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Frequency" />
+          <Property name="FilterLocation" />
+          <Property name="MinLocation" />
+          <Property name="MaxLocation" />
+        </ExposedProperties>
+      </SubProxy>
+      
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="ENZO AMR Particles Reader" />
+    </Hints>
+     
+   </SourceProxy>
+   
    <!--  Flash Reader -->
    <SourceProxy name="FlashReader"
         class="vtkFileSeriesReader"
