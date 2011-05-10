@@ -72,23 +72,23 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
     }
   di->Delete();
 
-  // FIXME: Need to detect if a view already exist to know if we should create
-  // one by default or not
-
-//  pqSettings* settings = core->settings();
-//  QString curView = settings->value("/defaultViewType",
-//    pqRenderView::renderViewType()).toString();
-//  if (curView != "None" && !curView.isEmpty())
-//    {
-//    // When a server is created, we create a new render view for it.
-//    if (pqView* view = core->getObjectBuilder()->createView(curView, server))
-//      {
-//      view->render();
-//      }
-//    }
-
-  // FIXME: Need to detect if a view already exist to know if we should create
-  // one by default or not
+  // See if some view are already present. This allow us to create one by
+  // default if needed and use the existing one if a client connect to a
+  // collaborative visualization server.
+  if(core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0)
+    {
+    pqSettings* settings = core->settings();
+    QString curView = settings->value("/defaultViewType",
+                                      pqRenderView::renderViewType()).toString();
+    if (curView != "None" && !curView.isEmpty())
+      {
+      // When a server is created, we create a new render view for it.
+      if (pqView* view = core->getObjectBuilder()->createView(curView, server))
+        {
+        view->render();
+        }
+      }
+    }
 
   // Show warning dialogs before server times out.
   QObject::connect(server, SIGNAL(fiveMinuteTimeoutWarning()), 
