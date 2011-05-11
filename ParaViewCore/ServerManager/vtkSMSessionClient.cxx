@@ -846,9 +846,9 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
 
-  cout << "##########     Server notification    ##########" << id << endl;
-  state.PrintDebugString();
-  cout << "###################################################" << endl;
+//  cout << "##########     Server notification    ##########" << id << endl;
+//  state.PrintDebugString();
+//  cout << "###################################################" << endl;
 
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));

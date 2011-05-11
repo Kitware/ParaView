@@ -60,9 +60,9 @@ bool vtkSMServerStateLocator::FindState(vtkTypeUInt32 globalID,
 //      cout << "---------------------------------------------------" << endl;
       return false;
       }
-    cout << "--------- State fetch from the server -------------" << endl;
-    stateToFill->PrintDebugString();
-    cout << "---------------------------------------------------" << endl;
+//    cout << "--------- State fetch from the server -------------" << endl;
+//    stateToFill->PrintDebugString();
+//    cout << "---------------------------------------------------" << endl;
     //this->RegisterState(&newState);
     return true;
     }
