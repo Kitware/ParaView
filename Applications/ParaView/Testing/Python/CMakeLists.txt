@@ -45,11 +45,16 @@ SET (MantaTest_BREAK TRUE)
 # Don't test in cli/serv since number of pieces is function of number of processors.
 set (StreamingTest_DISABLE_CS TRUE)
 set (StreamingTest_DISABLE_CRS TRUE)
+#serializing streaming tests to better tell what breaks where
+SET (StreamingTest_BREAK TRUE)
 
 # Use these tests to verify that cli/serv mode works
 set (StreamingClientSideTest_DISABLE_CRS TRUE)
+SET (StreamingClientSideTest_BREAK TRUE)
+
 set (StreamingServerSideTest_DISABLE_C TRUE)
 set (StreamingServerSideTest_DISABLE_CRS TRUE)
+SET (StreamingServerSideTest_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
