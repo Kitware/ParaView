@@ -118,7 +118,7 @@ protected:
   ~vtkCubeAxesRepresentation();
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
-  int RequestData(vtkInformation*,
+  virtual int RequestData(vtkInformation*,
     vtkInformationVector** inputVector, vtkInformationVector*);
 
   virtual void UpdateBounds();
