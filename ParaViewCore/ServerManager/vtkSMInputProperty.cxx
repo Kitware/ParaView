@@ -133,10 +133,9 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
       vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
       vtkSMProxy* proxy;
-      if(locator && true) // FIXME true should be replaced by something else... enable/disable proxy creation from property
+      if(locator && vtkSMProxyProperty::CanCreateProxy())
         {
         proxy = locator->LocateProxy(*proxyIdIter);
-        cout << "InputProperty: Locator was used to create " << *proxyIdIter << (proxy?" OK":" NULL") << endl;
         }
       else
         {

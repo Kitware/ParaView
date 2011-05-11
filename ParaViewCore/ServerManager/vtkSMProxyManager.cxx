@@ -316,8 +316,10 @@ void vtkSMProxyManager::UpdateFromRemote()
         serverLocator->SetDeserializer(deserializer.GetPointer());
 
         // Load and update
+        vtkSMProxyProperty::EnableProxyCreation();
         this->LoadState( &msg, serverLocator.GetPointer());
         this->UpdateRegisteredProxies(0);
+        vtkSMProxyProperty::DisableProxyCreation();
 
         this->Session->EnableRemoteExecution();
         }
