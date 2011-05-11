@@ -1037,6 +1037,20 @@ int vtkPrismSurfaceReader::RequestData(
     surfaceOutput->GetFieldData()->AddArray(zRangeArray);
   }
 
+  
+  //add on the flag to the surface, curves and contours that they
+  //should be used to compute the world bounds.
+  vtkDoubleArray *prismBounds = vtkDoubleArray::New();
+  prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
+  prismBounds->SetNumberOfValues(6);  
+  this->GetRanges(prismBounds); //copy the bounds into the prismBounds array
+
+  surfaceOutput->GetFieldData()->AddArray(prismBounds);
+  curveOutput->GetFieldData()->AddArray(prismBounds);
+  contourOutput->GetFieldData()->AddArray(prismBounds);
+  prismBounds->FastDelete();
+
+
   if(this->Internal->DisplayContours)
   {
     vtkIdType numberArrays=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetNumberOfArrays();
@@ -1085,8 +1099,6 @@ int vtkPrismSurfaceReader::RequestData(
     vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
     curveOutput->SetPoints(newCurvePts);
   }
-
-
   return 1;
 
 

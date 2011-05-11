@@ -551,6 +551,18 @@ int vtkPrismFilter::RequestGeometryData(
     vtkInformation *info = outputVector->GetInformationObject(3);
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         info->Get(vtkDataObject::DATA_OBJECT()));
+
+    //give it the same prism world bounds as the surface
+    //this way we don't scale the world with the points which will cause
+    //the reference surface to change size on each time step
+    vtkDoubleArray *prismBounds = vtkDoubleArray::New();
+    prismBounds->SetNumberOfValues(6);
+    prismBounds->DeepCopy(this->GetRanges()); //copy the bounds into the prismBounds array
+    //than make sure the field name is set to the key properly
+    prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
+    output->GetFieldData()->AddArray(prismBounds);
+    prismBounds->FastDelete();
+
     if ( !output ) 
     {
         vtkDebugMacro( << "No output found." );

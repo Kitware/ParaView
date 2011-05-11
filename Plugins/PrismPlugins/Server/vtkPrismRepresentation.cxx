@@ -14,12 +14,14 @@
 =========================================================================*/
 #include "vtkPrismRepresentation.h"
 
-#include "vtkAlgorithmOutput.h"
+#include "vtkDoubleArray.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointSet.h"
+#include "vtkMath.h"
 #include "vtkPrismView.h"
 #include "vtkPVGeometryFilter.h"
 
@@ -38,28 +40,26 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *, vtkInformation* outInfo)
+bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInformation* outInfo)
 {
-  //generate the bounds of this data object
+  this->Superclass::GenerateMetaData(inInfo, outInfo);
 
-  //This currently is working because the SESAME Surface, Curve and Contour
-  //are all polydata while the simulation data is not. That way the simulation
-  //data is forced into the same scaled space. I expect we need to move to the
-  //data set have a field array specifying it should be used for bound collection.
-  if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
+  //we need to verify the input object has the correct field data "key"
+  //Only those with the key are valid items to be used to determine
+  //the prism world bound size and resulting scale in vtkPrismView.
+  vtkDataObject* input = this->GeometryFilter->GetOutputDataObject(0);
+  if (!input->GetFieldData()->HasArray("PRISM_GEOMETRY_BOUNDS") )
     {
-    vtkDataObject* geom = this->GeometryFilter->GetOutputDataObject(0);
-    if (geom)
-      {
-      vtkPointSet *ps = vtkPointSet::SafeDownCast(geom);
-      if ( ps && ps->GetNumberOfPoints() > 0 )
-        {
-        //for now lets send bounds without talking to other processes
-        double bounds[6];
-        ps->GetBounds(bounds);
-        outInfo->Set(vtkPrismView::PRISM_GEOMETRY_BOUNDS(), bounds, 6);
-        }
-      }    
+    //object doesn't have the key, no need to do anything else
+    return true;
+    }
+  
+  vtkDoubleArray *b = vtkDoubleArray::SafeDownCast(
+      input->GetFieldData()->GetArray("PRISM_GEOMETRY_BOUNDS"));
+  double *bounds = b->GetPointer(0);
+  if (vtkMath::AreBoundsInitialized(bounds))
+    {
+    outInfo->Set(vtkPrismView::PRISM_GEOMETRY_BOUNDS(), bounds, 6);
     }
   return true;
 }
