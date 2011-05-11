@@ -18,7 +18,6 @@
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkReservedRemoteObjectIds.h"
 
 vtkStandardNewMacro(vtkSMCollaborationManager);

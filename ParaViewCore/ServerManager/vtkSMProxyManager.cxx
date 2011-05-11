@@ -29,7 +29,6 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVProxyDefinitionManager.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
@@ -301,9 +300,6 @@ void vtkSMProxyManager::UpdateFromRemote()
       this->Session->PullState(&msg);
       if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
         {
-        vtkNew<vtkSMLoadStateContext> ctx;
-        ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
-
         // We take the parent locator to always refer to the server while loading
         // the state. This prevent us from getting a creation state instead of
         // full update state when we split the creation/update action in 2

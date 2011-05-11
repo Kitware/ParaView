@@ -28,7 +28,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkPVProxyDefinitionManager.h"

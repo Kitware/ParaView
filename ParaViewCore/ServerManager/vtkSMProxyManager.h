@@ -99,7 +99,6 @@ class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
 class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
-class vtkSMLoadStateContext;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkPVProxyDefinitionManager;

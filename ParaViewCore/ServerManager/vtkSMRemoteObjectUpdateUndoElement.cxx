@@ -16,7 +16,6 @@
 
 #include "vtkCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"

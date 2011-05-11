@@ -29,7 +29,6 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
 #include "vtkSMCollaborationManager.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"

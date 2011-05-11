@@ -26,7 +26,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMLoadStateContext.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMProxyLocator.h"
