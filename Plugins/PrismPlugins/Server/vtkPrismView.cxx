@@ -50,10 +50,7 @@ void vtkPrismView::GatherRepresentationInformation()
 
   //This is what we want to do:
   //go through all the reps with the prism bounds key and determine what the world space
-  //apply this scaling to everything in the view. 
-  //Note we have a work around where the simulation data is not adding its bounds
-  //to the prism geom bounds, while it is being scaled by those bounds. This is intended!
-
+  //apply this scaling to everything in the view. Handle the cube axis as a special case
   for (int cc=0; cc < num_reprs; cc++)
     {
     vtkInformation* info =
@@ -84,6 +81,7 @@ void vtkPrismView::GatherRepresentationInformation()
 
       vtkDataRepresentation *repr = this->GetRepresentation(cc);
       vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
+      vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
       if(compositeRep)
         {
         vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
@@ -91,26 +89,11 @@ void vtkPrismView::GatherRepresentationInformation()
         if (prismRep)
           {
           prismRep->SetScale(scale[0],scale[1],scale[2]);
-
-          //set the center
-          double center[3];
-          worldBounds.GetMinPoint(center[0], center[1], center[2]);
-          prismRep->SetOrigin(center[0],center[1],center[2]);
           }
         }
-      else
+      else if (cubeAxes)
         {
-        vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
-        if ( cubeAxes )
-          {
-          //set the positon
-          double pos[3];
-          worldBounds.GetMinPoint(pos[0], pos[1], pos[2]);
-          cubeAxes->SetPosition(pos[0],pos[1],pos[2]);
-
-          cubeAxes->SetScale(scale[0],scale[1],scale[2]);
-          }
-
+        cubeAxes->SetScale(scale[0],scale[1],scale[2]);
         }
       }
     }  
