@@ -27,12 +27,17 @@ GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h PrismCubeAxesEditorDialog.h PrismView.h )
+QT4_WRAP_CPP(MOC_SRCS 
+  PrismToolBarActions.h
+  PrismCore.h
+  PrismMenuActions.h
+  PrismObjectPanelsImplementation.h
+  PrismSurfacePanel.h
+  PrismPanel.h
+  PrismView.h )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui
-    Resources/UI/PrismDisplayProxyEditor.ui
-    Resources/UI/PrismCubeAxesEditorDialog.ui
     Resources/UI/PrismPanelWidget.ui)
 
 SET(UI_RESOURCES
@@ -72,15 +77,12 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     SERVER_MANAGER_XML PRISMServerManagerXML.xml
-                    GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels
+                    GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} PrismObjectPanels
                     SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx vtkSMPrismDoubleRangeDomain.cxx vtkSMPrismViewProxy.cxx
                     GUI_SOURCES
                     PrismToolBarActions.cxx
                     PrismCore.cxx
                     PrismMenuActions.cxx
-                    PrismDisplayProxyEditor.cxx
-                    PrismCubeAxesEditorDialog.cxx
-                    PrismDisplayPanelsImplementation.cxx
                     PrismObjectPanelsImplementation.cxx
                     PrismSurfacePanel.cxx
                     PrismPanel.cxx

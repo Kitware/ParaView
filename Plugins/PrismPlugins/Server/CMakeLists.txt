@@ -4,7 +4,6 @@ INCLUDE_DIRECTORIES(
 )
 
 set(SOURCES
-  vtkPrismCubeAxesActor.cxx
   vtkPrismCubeAxesRepresentation.cxx
   vtkPrismFilter.cxx
   vtkPrismRepresentation.cxx

@@ -196,7 +196,7 @@
       <SubProxy>
         <Proxy name="CubeAxesRepresentation"
           proxygroup="representations"
-          proxyname="CubeAxesRepresentation">
+          proxyname="PrismCubeAxesRepresentation">
         </Proxy>
         <ExposedProperties>
           <Property exposed_name="CubeAxesColor" name="Color" />
