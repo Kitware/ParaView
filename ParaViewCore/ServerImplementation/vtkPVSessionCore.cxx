@@ -318,7 +318,9 @@ void vtkPVSessionCore::OnInterpreterError( vtkObject*, unsigned long,
     error << ends;
     vtkErrorMacro(<< errorMessage << error.str().c_str());
     vtkErrorMacro("Aborting execution for debugging purposes.");
-    abort();
+    cout << "############ ABORT #############" << endl;
+    return;
+    //abort();
     }
 }
 
@@ -373,7 +375,11 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
       {
       vtkErrorMacro("Message missing DefinitionHeader."
                     "Aborting for debugging purposes.");
-      abort();
+
+      message->PrintDebugString();
+      cout << "############ ABORT #############" << endl;
+      return;
+      //abort();
       }
     // Create the corresponding SI object.
     vtkstd::string classname = message->GetExtension(DefinitionHeader::server_class);
@@ -382,14 +388,20 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
     if (!object)
       {
       vtkErrorMacro("Failed to instantiate " << classname.c_str());
-      abort();
+      message->PrintDebugString();
+      cout << "############ ABORT #############" << endl;
+      return;
+      //abort();
       }
     obj = vtkSIObject::SafeDownCast(object);
     if (obj == NULL)
       {
       vtkErrorMacro("Object must be a vtkSIObject subclass. "
                     "Aborting for debugging purposes.");
-      abort();
+      message->PrintDebugString();
+      cout << "############ ABORT #############" << endl;
+      return;
+      //abort();
       }
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
