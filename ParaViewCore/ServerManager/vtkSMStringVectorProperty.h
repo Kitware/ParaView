@@ -140,7 +140,7 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*);
 
   // Save concrete property values into the XML state property declaration
   virtual void SaveStateValues(vtkPVXMLElement* propElement);

@@ -46,10 +46,9 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
-                                    vtkSMStateLocator* locator,
-                                    vtkSMLoadStateContext* ctx )
+                                    vtkSMProxyLocator* locator)
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg, locator, ctx);
+  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()

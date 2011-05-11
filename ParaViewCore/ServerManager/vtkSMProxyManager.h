@@ -530,33 +530,7 @@ public:
 
   // Description:
   // This method is used to initialise the ProxyManager to the given state
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                         vtkSMLoadStateContext* ctx);
-
-  // Description:
-  // This metod allow the creation of a proxy based on its full state.
-  // Used in Undo/Redo to bring back a proxy to life or in collaboration mode,
-  // where the message come from the server and the purpose is to create the SM
-  // side when the PM side has already been created.
-  // The User MUST delete the provided proxy otherwise it will live forever.
-  // If the definitionOnly Flag is set to True the proxy won't load the
-  // properties values and just setup the new proxy hierarchy with all subproxy
-  // globalID set. This allow to split the load process in 2 step to prevent
-  // invalid state when property refere to a sub-proxy that does not exist yet.
-
-  virtual vtkSMProxy* NewProxy( const vtkSMMessage* msg,
-                                vtkSMStateLocator* locator,
-                                vtkSMLoadStateContext* ctx );
-
-  // Description:
-  // Re-New a proxy based on its ID and its previous state.
-  // This means that it will create a new vtkSMProxy or will
-  // return NULL if that one already exist.
-  //
-  // WARNING:
-  // - It is at the responsability at the caller to delete the proxy.
-  virtual vtkSMProxy* ReNewProxy(vtkTypeUInt32 globalId,
-                                 vtkSMStateLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxyManager();

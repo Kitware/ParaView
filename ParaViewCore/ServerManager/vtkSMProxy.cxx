@@ -565,9 +565,7 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
   this->PullState(&message);
 
   // Update internal values
-  vtkNew<vtkSMLoadStateContext> ctx;
-  ctx->SetRequestOrigin(vtkSMLoadStateContext::UPDATE_INFORMATION_PROPERTIES);
-  this->LoadState(&message, this->Session->GetStateLocator(), ctx.GetPointer());
+  this->LoadState(&message, this->Session->GetProxyLocator());
 }
 
 //---------------------------------------------------------------------------
@@ -1797,7 +1795,7 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root,
 }
 //---------------------------------------------------------------------------
 int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
-                           vtkSMProxyLocator* locator)
+                              vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -1842,7 +1840,7 @@ const vtkSMMessage* vtkSMProxy::GetFullState()
 }
 //---------------------------------------------------------------------------
 void vtkSMProxy::LoadState( const vtkSMMessage* message,
-                            vtkSMStateLocator* locator, vtkSMLoadStateContext* ctx)
+                            vtkSMProxyLocator* locator )
 {
   // Update globalId. This will fails if that one is already set with a different value
   if(this->HasGlobalID() && this->GetGlobalID() != message->global_id())
@@ -1905,62 +1903,55 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
                     << message->DebugString().c_str() << endl);
       }
 
-    vtkSMMessage subProxyState;
-    if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
+    // Update sub-proxy state if possible
+    if(!subProxy->HasGlobalID())
       {
-      subProxy->LoadState(&subProxyState, locator, ctx);
-      subProxy->MarkDirty(NULL);
-      }
-    else if(!subProxy->HasGlobalID())
-      {
-      if(strcmp(subProxy->GetXMLName(),"Camera"))
-        {
-        vtkErrorMacro("### Warning !!! : set subproxy global ID without state. " << subProxyMsg->global_id());
-        }
+      vtkSMMessage subProxyState;
       subProxy->SetGlobalID(subProxyMsg->global_id());
+      if(this->GetSession()->GetStateLocator()->FindState(
+          subProxy->GetGlobalID(), &subProxyState))
+        {
+        subProxy->LoadState(&subProxyState, locator);
+        }
       }
     }
 
   // Manage properties
-  if(!ctx->GetLoadDefinitionOnly())
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
+  for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
     {
-    vtkSMProxyInternals::PropertyInfoMap::iterator it;
-    vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
-    for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
+    const ProxyState_Property *prop_message =
+        &message->GetExtension(ProxyState::property, i);
+    const char* pname = prop_message->name().c_str();
+    it = this->Internals->Properties.find(pname);
+    if (it != this->Internals->Properties.end())
       {
-      const ProxyState_Property *prop_message =
-          &message->GetExtension(ProxyState::property, i);
-      const char* pname = prop_message->name().c_str();
-      it = this->Internals->Properties.find(pname);
-      if (it != this->Internals->Properties.end())
+      if (it->second.Property->GetIsInternal())
         {
-        if (it->second.Property->GetIsInternal())
-          {
-          // skip internal properties. Their state is never updated.
-          continue;
-          }
-
-        // Some view properties need some special treatment and some
-        // of there properties MUST NOT be updated in case of collaborative
-        // notification.
-        if( ctx->GetRequestOrigin() == vtkSMLoadStateContext::COLLABORATION_NOTIFICATION
-            &&
-            it->second.Property->GetIgnoreSynchronization() )
-          {
-          continue;
-          }
-
-        it->second.Property->ReadFrom(message, i);
-        touchedProperties.push_back(it->second.Property.GetPointer());
+        // skip internal properties. Their state is never updated.
+        continue;
         }
-      }
 
-    // Make sure all dependent domains are updated. UpdateInformation()
-    // might have produced new information that invalidates the domains.
-    for (int i=0, nb=touchedProperties.size(); i < nb; i++)
-      {
-      touchedProperties[i]->UpdateDependentDomains();
+      // Some view properties need some special treatment and some
+      // of there properties MUST NOT be updated in case of collaborative
+      // notification.
+      if( this->Session->IsProcessingRemoteNotification() &&
+          it->second.Property->GetIgnoreSynchronization() )
+        {
+        continue;
+        }
+
+      it->second.Property->ReadFrom(message, i, locator);
+      touchedProperties.push_back(it->second.Property.GetPointer());
       }
+    }
+
+  // Make sure all dependent domains are updated. UpdateInformation()
+  // might have produced new information that invalidates the domains.
+  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+    {
+    touchedProperties[i]->UpdateDependentDomains();
     }
 }
 //---------------------------------------------------------------------------

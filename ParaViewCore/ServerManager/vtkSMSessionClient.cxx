@@ -21,20 +21,21 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
-#include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+#include "vtkPVProxyDefinitionManager.h"
+#include "vtkPVServerInformation.h"
+#include "vtkPVSessionServer.h"
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
+#include "vtkSMCollaborationManager.h"
+#include "vtkSMLoadStateContext.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMLoadStateContext.h"
-#include "vtkPVSessionServer.h"
-#include "vtkPVProxyDefinitionManager.h"
-#include "vtkSocketCommunicator.h"
 #include "vtkSMServerStateLocator.h"
-#include "vtkSMCollaborationManager.h"
-#include "vtkReservedRemoteObjectIds.h"
+#include "vtkSocketCommunicator.h"
 
 #include <vtkNew.h>
 #include <vtkstd/string>
@@ -835,9 +836,7 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
   // Setup load state context
-  vtkNew<vtkSMLoadStateContext> ctx;
-  ctx->SetRequestOrigin(vtkSMLoadStateContext::COLLABORATION_NOTIFICATION);
-
+  this->StartProcessingRemoteNotification();
   this->DisableRemoteExecution();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkstd::string data;
@@ -856,7 +855,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
   if(id == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
     {
-    pxm->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
+    pxm->LoadState(&state, this->GetProxyLocator());
     pxm->UpdateRegisteredProxies(1);
     }
   else if(remoteObj == NULL)
@@ -866,7 +865,7 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     }
   else if(proxy)
     {
-    proxy->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
+    proxy->LoadState(&state, this->GetProxyLocator());
     // essential to call this, since even though the values are not pushed to
     // the server, there are several proxy-level flags that are not updated
     // until the UpdateVTKObjects() such as marking dependent proxies modified
@@ -875,10 +874,14 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     }
   else
     {
-    remoteObj->LoadState(&state, this->GetStateLocator(), ctx.GetPointer());
+    remoteObj->LoadState(&state, this->GetProxyLocator());
     }
 
+  // Clear proxy locator cache
+  this->GetProxyLocator()->Clear();
+
   this->EnableRemoteExecution();
+  this->StopProcessingRemoteNotification();
 }
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,

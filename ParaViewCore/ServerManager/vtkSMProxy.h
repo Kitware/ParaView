@@ -408,8 +408,7 @@ public:
   // properties values and just setup the new proxy hierarchy with all subproxy
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          vtkSMLoadStateContext* ctx);
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxy();
@@ -459,6 +458,7 @@ protected:
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMSourceProxy;
   friend class vtkSMUndoRedoStateLoader;
+  friend class vtkSMDeserializerProtobuf;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML

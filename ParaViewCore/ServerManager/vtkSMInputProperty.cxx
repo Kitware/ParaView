@@ -81,7 +81,8 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
+void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
+                                  vtkSMProxyLocator* locator)
 {
   // --------------------------------------------------------------------------
   // WARNING: this method is REALLY close to its superclass: Please keep them
@@ -130,8 +131,20 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
       {
       // Get the proxy from proxy manager
       vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+
+      vtkSMProxy* proxy;
+      if(locator && true) // FIXME true should be replaced by something else... enable/disable proxy creation from property
+        {
+        proxy = locator->LocateProxy(*proxyIdIter);
+        cout << "InputProperty: Locator was used to create " << *proxyIdIter << (proxy?" OK":" NULL") << endl;
+        }
+      else
+        {
+        proxy =
+            vtkSMProxy::SafeDownCast(
+                pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+        }
+
       if(proxy)
         {
         this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);

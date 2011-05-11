@@ -28,8 +28,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkSMSession;
-class vtkSMStateLocator;
-class vtkSMLoadStateContext;
+class vtkSMProxyLocator;
 
 class VTK_EXPORT vtkSMPipelineState : public vtkSMRemoteObject
 {
@@ -52,8 +51,7 @@ public:
 
   // Description:
   // This method is used to initialise the object to the given state
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          vtkSMLoadStateContext* ctx);
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
   void ValidateState();
 

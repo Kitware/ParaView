@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiView.h"
 #include <vtkSmartPointer.h>
 
-class vtkSMCacheBasedProxyLocator;
+class vtkSMProxyLocator;
+class vtkSMDeserializerXMLCache;
+class vtkSMProxy;
 
 /// pqCloseViewUndoElement is undo element used to undo the closing
 /// of a view frame.
@@ -61,16 +63,16 @@ public:
   /// We make the pqProxy aware of its helper proxies.
   virtual int Redo();
 
-  // Description:
-  // Creates the undo element for the split operation.
-  // \c invert flag inverts the operation of this undo element. When true,
-  // Undo() does with Redo() would when invert=false, and vice-versa.
+  /// Description:
+  /// Creates the undo element for the split operation.
+  /// \c invert flag inverts the operation of this undo element. When true,
+  /// Undo() does with Redo() would when invert=false, and vice-versa.
   void CloseView(pqMultiView::Index frameIndex, vtkPVXMLElement* state);
 
-  // Description:
-  // Get CacheBasedProxyLocator in order to register proxy that we are
-  // interessted in.
-  vtkGetObjectMacro(ViewStateCache, vtkSMCacheBasedProxyLocator);
+  /// Description:
+  /// Store the XML state of the given proxy so we can use that state to revert
+  /// to a given state.
+  void StoreProxyState(vtkSMProxy* proxy);
 
 protected:
   pqCloseViewUndoElement();
@@ -79,7 +81,8 @@ protected:
   vtkSetStringMacro(Index);
   char* Index;
   vtkSmartPointer<vtkPVXMLElement> State;
-  vtkSMCacheBasedProxyLocator* ViewStateCache;
+  vtkSMProxyLocator*               ProxyLocator;
+  vtkSMDeserializerXMLCache*       CacheDeserializer;
 
 private:
   pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.

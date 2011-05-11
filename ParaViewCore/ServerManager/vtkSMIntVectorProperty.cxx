@@ -63,7 +63,8 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                      vtkSMProxyLocator*)
 {
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();

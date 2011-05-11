@@ -36,17 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyLocator.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMCacheBasedProxyLocator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMDeserializerXMLCache.h"
 
 #include "pqApplicationCore.h"
 #include "pqViewManager.h"
+
 
 vtkStandardNewMacro(pqCloseViewUndoElement);
 //----------------------------------------------------------------------------
 pqCloseViewUndoElement::pqCloseViewUndoElement()
 {
   this->Index = NULL;
-  this->ViewStateCache = vtkSMCacheBasedProxyLocator::New();
+  this->ProxyLocator = vtkSMProxyLocator::New();
+  this->CacheDeserializer = vtkSMDeserializerXMLCache::New();
+  this->ProxyLocator->SetDeserializer(this->CacheDeserializer);
+  this->ProxyLocator->UseSessionToLocateProxy(true);
+
   this->SetSession(NULL); // Maybe keep the one use to create the Element for state loading...
 }
 
@@ -54,7 +60,12 @@ pqCloseViewUndoElement::pqCloseViewUndoElement()
 pqCloseViewUndoElement::~pqCloseViewUndoElement()
 {
   this->SetIndex(NULL);
-  this->ViewStateCache->Delete();
+
+  this->ProxyLocator->Delete();
+  this->ProxyLocator = NULL;
+
+  this->CacheDeserializer->Delete();
+  this->CacheDeserializer = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -76,9 +87,9 @@ int pqCloseViewUndoElement::Undo()
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
-  manager->loadState(this->State, this->ViewStateCache);
-  this->ViewStateCache->GetLocatedProxies(this->UndoSetWorkingContext);
-  this->ViewStateCache->Clear();
+  manager->loadState(this->State, this->ProxyLocator);
+  this->ProxyLocator->GetLocatedProxies(this->UndoSetWorkingContext);
+  this->ProxyLocator->Clear();
   return 1;
 }
 
@@ -104,6 +115,14 @@ int pqCloseViewUndoElement::Redo()
 void pqCloseViewUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void pqCloseViewUndoElement::StoreProxyState(vtkSMProxy* proxy)
+{
+  vtkPVXMLElement* elem = proxy->SaveXMLState(NULL);
+  this->CacheDeserializer->CacheXMLProxyState(proxy->GetGlobalID(), elem);
+  elem->FastDelete();
 }
 
 

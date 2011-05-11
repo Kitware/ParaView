@@ -158,6 +158,8 @@ public:
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
   virtual bool IsRemoteExecutionAllowed() {return this->RemoteExecutionAllowed;}
+  virtual bool IsProcessingRemoteNotification() {return this->ProcessingRemoteNotification;}
+
 //BTX
 protected:
   vtkPVSessionBase();
@@ -173,12 +175,20 @@ protected:
   friend class vtkSMProxyManager;
 
   // Description:
-  // Methods used to enable/disable state/command to the remote location
+  // Methods used to enable/disable state push to the remote location
   // this as no effect on built-in mode. Only vtkSMSessionClient use the
-  // flag to prevent message to be send to the server.
+  // flag to prevent message to be sent to the server.
   virtual void EnableRemoteExecution(){this->RemoteExecutionAllowed = true;}
   virtual void DisableRemoteExecution(){this->RemoteExecutionAllowed = false;}
   bool RemoteExecutionAllowed;
+
+  // Description:
+  // Methods used to monitor if we are currently processing a server notification
+  // Only vtkSMSessionClient use the flag to disable ignore_synchronization
+  // properties from beeing updated.
+  virtual void StartProcessingRemoteNotification(){this->ProcessingRemoteNotification = true;}
+  virtual void StopProcessingRemoteNotification(){this->ProcessingRemoteNotification = false;}
+  bool ProcessingRemoteNotification;
 
   // Description:
   // Register a remote object

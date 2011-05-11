@@ -25,8 +25,9 @@
 
 class vtkMultiProcessController;
 class vtkPVServerInformation;
-class vtkSMProxyManager;
 class vtkSMCollaborationManager;
+class vtkSMProxyLocator;
+class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
 {

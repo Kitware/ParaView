@@ -22,7 +22,7 @@
 #ifndef __vtkSMStateLoader_h
 #define __vtkSMStateLoader_h
 
-#include "vtkSMDeserializer.h"
+#include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -32,11 +32,11 @@ class vtkSMProxyLocator;
 struct vtkSMStateLoaderInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializer
+class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializerXML
 {
 public:
   static vtkSMStateLoader* New();
-  vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializerXML);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -27,8 +27,12 @@
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkWeakPointer.h"
 #include "vtkPVRenderView.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMDeserializerProtobuf.h"
+#include "vtkSMProxyLocator.h"
 
 #include <vtksys/ios/sstream>
+#include <vtkNew.h>
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -52,6 +56,17 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
     {
     this->Initialize();
     }
+
+  // Create and setup deserializer for the local ProxyLocator
+  vtkNew<vtkSMDeserializerProtobuf> deserializer;
+  deserializer->SetStateLocator(this->StateLocator);
+  deserializer->SetSession(this);
+
+  // Create and setup proxy locator
+  this->ProxyLocator = vtkSMProxyLocator::New();
+  this->ProxyLocator->SetDeserializer(deserializer.GetPointer());
+  this->ProxyLocator->UseSessionToLocateProxy(true);
+  this->ProxyLocator->SetSession(this);
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +80,7 @@ vtkSMSession::~vtkSMSession()
   this->PluginManager = NULL;
   this->SetUndoStackBuilder(0);
   this->StateLocator->Delete();
+  this->ProxyLocator->Delete();
 }
 
 //----------------------------------------------------------------------------

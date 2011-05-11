@@ -130,10 +130,9 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*);
 
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   int ArgumentIsArray;
 

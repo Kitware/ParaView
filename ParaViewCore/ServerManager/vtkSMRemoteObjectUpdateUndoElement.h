@@ -44,12 +44,6 @@ public:
   // \return the status of the operation, 1 on success, 0 otherwise.
   virtual int Redo();
 
-  // Description:
-  // A specific StateLoctor can be used when the state gets loaded by the
-  // remote object. Otherwise we use the one that is available in the session
-  // that was used to create that undo element.
-  virtual void SetStateLocator(vtkSMStateLocator* locator);
-
 //BTX
 
   // Description:
@@ -69,8 +63,6 @@ protected:
 
   // Internal method used to update proxy state based on the state info
   int UpdateState(const vtkSMMessage* state);
-
-  vtkWeakPointer<vtkSMStateLocator> Locator;
 
 private:
   vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.

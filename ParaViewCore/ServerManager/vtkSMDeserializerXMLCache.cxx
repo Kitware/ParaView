@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMDeserializer.cxx
+  Module:    vtkSMDeserializerXMLCache.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMDeserializer.h"
+#include "vtkSMDeserializerXMLCache.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -22,41 +22,45 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 
-//----------------------------------------------------------------------------
-vtkSMDeserializer::vtkSMDeserializer()
+#include <vtkstd/map>
+#include <vtkSmartPointer.h>
+
+//*****************************************************************************
+//                     Internal class definition
+//*****************************************************************************
+class vtkSMDeserializerXMLCache::vtkInternal
 {
-  this->Session = 0;
+public:
+  vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement> > XMLCacheMap;
+};
+//*****************************************************************************
+vtkStandardNewMacro(vtkSMDeserializerXMLCache);
+//----------------------------------------------------------------------------
+vtkSMDeserializerXMLCache::vtkSMDeserializerXMLCache()
+{
+  this->Internals = new vtkInternal;
 }
 
 //----------------------------------------------------------------------------
-vtkSMDeserializer::~vtkSMDeserializer()
+vtkSMDeserializerXMLCache::~vtkSMDeserializerXMLCache()
 {
-  this->SetSession(0);
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
-                                           const char* xmlname,
-                                           const char* subname)
+vtkPVXMLElement* vtkSMDeserializerXMLCache::LocateProxyElement(vtkTypeUInt32 id)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subname);
-  return proxy;
+  return this->Internals->XMLCacheMap[id].GetPointer();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDeserializer::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMDeserializerXMLCache::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-vtkSMSession* vtkSMDeserializer::GetSession()
+void vtkSMDeserializerXMLCache::CacheXMLProxyState(vtkTypeUInt32 id, vtkPVXMLElement *xml)
 {
-  return this->Session.GetPointer();
-}
-//----------------------------------------------------------------------------
-void vtkSMDeserializer::SetSession(vtkSMSession* s)
-{
-  this->Session = s;
+  this->Internals->XMLCacheMap[id] = xml;
 }

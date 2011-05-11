@@ -35,7 +35,6 @@ SET (Kit_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxRepresentationProxy.cxx
-  vtkSMCacheBasedProxyLocator.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraLink.cxx
@@ -54,6 +53,9 @@ SET (Kit_SRCS
   vtkSMCSVExporterProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
+  vtkSMDeserializerProtobuf.cxx
+  vtkSMDeserializerXML.cxx
+  vtkSMDeserializerXMLCache.cxx
   vtkSMDimensionsDomain.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMDocumentation.cxx
@@ -77,7 +79,6 @@ SET (Kit_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
-  vtkSMLoadStateContext.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNullProxy.cxx
@@ -161,6 +162,7 @@ SET( ServerManager_SRCS
 SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
   vtkSMAnimationSceneWriter.cxx
+  vtkSMDeserializer.cxx
   vtkSMDomain.cxx
   vtkSMExporterProxy.cxx
   vtkSMLink.cxx

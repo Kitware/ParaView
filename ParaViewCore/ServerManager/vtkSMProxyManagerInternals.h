@@ -29,7 +29,7 @@
 #include "vtkSMLoadStateContext.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
-#include "vtkSMStateLocator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/map>
@@ -390,113 +390,8 @@ struct vtkSMProxyManagerInternals
     }
 
   // --------------------------------------------------------------------------
-  void UpdateOnly( vtkSMStateLocator* locator, vtkCollection* proxyToUpdate)
-    {
-    int size = proxyToUpdate->GetNumberOfItems();
-    vtkNew<vtkSMLoadStateContext> ctx;
-    ctx->SetRequestOrigin(vtkSMLoadStateContext::UNDEFINED);
-    vtkSMMessage proxyState;
-    for(int i=0; i < size; i++)
-      {
-      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(proxyToUpdate->GetItemAsObject(i));
-      if(locator && locator->FindState(proxy->GetGlobalID(), &proxyState))
-        {
-        proxy->LoadState(&proxyState, locator, ctx.GetPointer());
-        proxy->UpdateVTKObjects();
-        }
-      }
-    }
-
-  // --------------------------------------------------------------------------
-  void ExtractProxyInvolved(const vtkSMMessage* msg,
-                            vtkstd::set<vtkTypeUInt32>& globalIdList,
-                            vtkSMStateLocator* locator)
-    {
-    vtkstd::set<vtkTypeUInt32> localDiscovery;
-    int idx, size;
-
-    // Manage ProxyManager registration informations
-    size = msg->ExtensionSize(ProxyManagerState::registered_proxy);
-    for(idx=0; idx < size; ++idx)
-      {
-      localDiscovery.insert(msg->GetExtension(ProxyManagerState::registered_proxy, idx).global_id());
-      }
-    // Manage SubProxy informations
-    size = msg->ExtensionSize(ProxyState::subproxy);
-    for(idx=0; idx < size; ++idx)
-      {
-      localDiscovery.insert(msg->GetExtension(ProxyState::subproxy, idx).global_id());
-      }
-    // Manage Property informations
-    size = msg->ExtensionSize(ProxyState::property);
-    for(idx=0; idx < size; ++idx)
-      {
-      const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, idx);
-      const Variant *value = &prop->value();
-      int nbProxies = value->proxy_global_id_size();
-      for(int i=0; i < nbProxies; ++i)
-        {
-        localDiscovery.insert(value->proxy_global_id(i));
-        }
-      }
-
-    // Remove local proxy that have been examine
-    vtkstd::set<vtkTypeUInt32>::iterator iter;
-    for(iter = globalIdList.begin(); iter != globalIdList.end(); iter++)
-      {
-      localDiscovery.erase(*iter);
-      }
-
-    // Add local discovery to global and inspect local ones
-    globalIdList.insert(localDiscovery.begin(),localDiscovery.end());
-    if(locator)
-      {
-      vtkSMMessage tmp;
-      for(iter = localDiscovery.begin(); iter != localDiscovery.end(); iter++)
-        {
-        if(locator->FindState(*iter, &tmp))
-          {
-          this->ExtractProxyInvolved(&tmp, globalIdList, locator);
-          }
-        }
-      }
-    }
-
-  // --------------------------------------------------------------------------
-  void CreateOnly( vtkstd::set<vtkTypeUInt32>& globalIdList, vtkSMStateLocator* locator,
-                   vtkCollection* createdProxyHolder)
-    {
-    vtkstd::set<vtkTypeUInt32>::iterator iter = globalIdList.begin();
-    for(; iter != globalIdList.end(); iter++)
-      {
-      vtkTypeUInt32 globalId = *iter;
-      vtkSMProxy *proxy =
-          vtkSMProxy::SafeDownCast(
-              this->ProxyManager->GetSession()->GetRemoteObject(globalId));
-
-      if(!proxy)
-        {
-        vtkSMMessage proxyState;
-        if(locator && locator->FindState(globalId, &proxyState))
-          {
-          vtkNew<vtkSMLoadStateContext> ctx;
-          ctx->SetRequestOrigin(vtkSMLoadStateContext::RE_NEW_PROXY);
-          ctx->SetLoadDefinitionOnly(true); // CreateOnly
-          vtkSMProxy* reNewProxy = this->ProxyManager->NewProxy( &proxyState, locator, ctx.GetPointer());
-          if(reNewProxy)
-            {
-            createdProxyHolder->AddItem(reNewProxy);
-            cout << "Create: " << reNewProxy->GetClassName() << " " << reNewProxy->GetGlobalIDAsString() << endl;
-            reNewProxy->FastDelete();
-            }
-          }
-        }
-      }
-    }
-
-  // --------------------------------------------------------------------------
   void ComputeDelta(const vtkSMMessage* newState,
-                    vtkSMStateLocator* locator,
+                    vtkSMProxyLocator* locator,
                     vtkstd::set<vtkSMProxyManagerEntry> &toRegister,
                     vtkstd::set<vtkSMProxyManagerEntry> &toUnregister)
     {
@@ -507,20 +402,8 @@ struct vtkSMProxyManagerInternals
       {
       ProxyManagerState_ProxyRegistrationInfo reg =
           newState->GetExtension(ProxyManagerState::registered_proxy, cc);
-      vtkSMProxy *proxy =
-          vtkSMProxy::SafeDownCast(
-              this->ProxyManager->GetSession()->GetRemoteObject(reg.global_id()));
-
-      if(!proxy)
-        {
-        vtkSMProxy *reNewProxy = this->ProxyManager->ReNewProxy(reg.global_id(), locator);
-        if(reNewProxy)
-          {
-          newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), reNewProxy));
-          reNewProxy->Delete();
-          }
-        }
-      else
+      vtkSMProxy *proxy = locator->LocateProxy(reg.global_id());
+      if(proxy)
         {
         newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
         }

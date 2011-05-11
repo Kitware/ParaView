@@ -75,13 +75,7 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      vtkNew<vtkSMLoadStateContext> ctx;
-      ctx->SetRequestOrigin(vtkSMLoadStateContext::UNDO_REDO);
-      remoteObj->LoadState(state,
-                           this->Locator.GetPointer() ?
-                                 this->Locator.GetPointer() :
-                                 this->Session->GetStateLocator(),
-                           ctx.GetPointer());
+      remoteObj->LoadState(state, this->Session->GetProxyLocator());
       }
     }
   return 1; // OK, we say that everything is fine.
@@ -108,9 +102,4 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
 vtkTypeUInt32 vtkSMRemoteObjectUpdateUndoElement::GetGlobalId()
 {
   return this->BeforeState->global_id();
-}
-//-----------------------------------------------------------------------------
-void vtkSMRemoteObjectUpdateUndoElement::SetStateLocator(vtkSMStateLocator* locator)
-{
-  this->Locator = locator;
 }

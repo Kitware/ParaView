@@ -26,13 +26,14 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkSMSession;
-class vtkSMStateLocator;
+class vtkSMProxyLocator;
 class vtkSMLoadStateContext;
 
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
 {
 // My friends are...
-  friend class vtkSMStateHelper; // To pull state
+  friend class vtkSMStateHelper;          // To pull state
+  friend class vtkSMDeserializerProtobuf; // To set GlobalId
 
 public:
   vtkTypeMacro(vtkSMRemoteObject,vtkSMObject);
@@ -83,8 +84,7 @@ public:
   // properties values and just setup the new proxy hierarchy with all subproxy
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          vtkSMLoadStateContext* ctx ) = 0;
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator) = 0;
 
 protected:
   // Description:

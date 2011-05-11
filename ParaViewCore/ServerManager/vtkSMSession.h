@@ -26,6 +26,7 @@ class vtkSMPluginManager;
 class vtkSMUndoStackBuilder;
 class vtkSMStateLocator;
 class vtkProcessModuleAutoMPI;
+class vtkSMProxyLocator;
 
 class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
 {
@@ -54,6 +55,12 @@ public:
   // and 2 render-server nodes, then this method will return 3.
   // Implementation provided simply returns the number of local processes.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
+
+  //---------------------------------------------------------------------------
+  // API for Proxy Finder/ReNew
+  //---------------------------------------------------------------------------
+
+  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
   //---------------------------------------------------------------------------
   // Undo/Redo related API.
@@ -184,6 +191,7 @@ protected:
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
   vtkSMStateLocator* StateLocator;
+  vtkSMProxyLocator* ProxyLocator;
   bool StateManagement;
 
   bool IsAutoMPI;

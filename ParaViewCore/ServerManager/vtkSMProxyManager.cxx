@@ -44,6 +44,8 @@
 #include "vtkProcessModule.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkSMDeserializerProtobuf.h"
+#include "vtkSMProxyLocator.h"
 
 #include "vtkSMSessionClient.h"
 #include "vtkSMCollaborationManager.h"
@@ -309,9 +311,18 @@ void vtkSMProxyManager::UpdateFromRemote()
         // Moreover, we don't want any existing states to be pushed again to
         // the server.
         this->Session->DisableRemoteExecution();
-        this->LoadState( &msg,
-                         this->Session->GetStateLocator()->GetParentLocator(),
-                         ctx.GetPointer());
+
+        // Setup server only state/proxy Locator
+        vtkNew<vtkSMDeserializerProtobuf> deserializer;
+        deserializer->SetStateLocator(this->Session->GetStateLocator()->GetParentLocator());
+        deserializer->SetSession(this->Session);
+        vtkNew<vtkSMProxyLocator> serverLocator;
+        serverLocator->SetDeserializer(deserializer.GetPointer());
+
+        // Load and update
+        this->LoadState( &msg, serverLocator.GetPointer());
+        this->UpdateRegisteredProxies(0);
+
         this->Session->EnableRemoteExecution();
         }
       }
@@ -1769,20 +1780,12 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
   return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                                  vtkSMLoadStateContext* ctx)
+void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   // Need to compute differences and just call Register/UnRegister for those items
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToRegister;
   vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
-
-  // Create Only proxy that we receive
-  vtkNew<vtkCollection> proxyHolder;
-  vtkstd::set<vtkTypeUInt32> globalIds;
-  this->Internals->ExtractProxyInvolved(msg, globalIds, locator);
-  this->Internals->CreateOnly(globalIds, locator, proxyHolder.GetPointer());
-  this->Internals->UpdateOnly(locator, proxyHolder.GetPointer());
 
   // Fill delta sets
   this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
@@ -1803,38 +1806,6 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
     iter++;
     }
 }
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
-                                         vtkSMStateLocator* locator,
-                                         vtkSMLoadStateContext* ctx)
-{
-  if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
-      msg->HasExtension(ProxyState::xml_name))
-    {
-    vtkSMProxy *proxy =
-        this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
-                        msg->GetExtension(ProxyState::xml_name).c_str(), NULL);
-
-    // Then load the state for the current proxy
-    // (This do not include the exposed properties)
-    proxy->LoadState(msg, locator, ctx);
-
-    // FIXME in collaboration mode we shouldn't push the state if it already come
-    // from the server side
-    proxy->Modified();
-    proxy->UpdateVTKObjects();
-    return proxy;
-    }
-  else if(msg)
-    {
-    vtkErrorMacro("Invalid msg while creating a new Proxy: \n" << msg->DebugString());
-    }
-  else
-    {
-    vtkErrorMacro("Invalid msg while creating a new Proxy: NULL");
-    }
-  return NULL;
-}
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadXMLDefinitionFromServer()
@@ -1844,37 +1815,6 @@ void vtkSMProxyManager::LoadXMLDefinitionFromServer()
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
-}
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
-                                          vtkSMStateLocator* locator)
-{
-  if(this->Session->GetRemoteObject(globalId))
-    {
-    return NULL; // The given proxy already exist, DO NOT create a new one
-    }
-  vtkSMMessage proxyState;
-  if(locator && locator->FindState(globalId, &proxyState))
-    {
-    // Only create proxy and sub-proxies
-//    cout << "ReNewProxy: " << globalId << endl;
-//    cout << proxyState.DebugString().c_str();
-//    cout << "=========================" << endl;
-    vtkNew<vtkSMLoadStateContext> ctx;
-    ctx->SetRequestOrigin(vtkSMLoadStateContext::RE_NEW_PROXY);
-    ctx->SetLoadDefinitionOnly(true);
-    vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, ctx.GetPointer());
-    if(proxy)
-      {
-      // Update properties now that SubProxy are properly set...
-      ctx->SetLoadDefinitionOnly(false);
-      proxy->LoadState(&proxyState, locator, ctx.GetPointer());
-      proxy->MarkDirty(NULL);
-      proxy->UpdateVTKObjects();
-      }
-    return proxy;
-    }
-  return NULL;
 }
 //---------------------------------------------------------------------------
 bool vtkSMProxyManager::HasDefinition( const char* groupName,

@@ -133,7 +133,6 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   for (unsigned int cc=0; cc < this->Internal->HelperList.size(); cc++)
     {
     HelperProxy item = this->Internal->HelperList[cc];
@@ -146,7 +145,7 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
     // otherwise it will be automatically removed.
     if(this->UndoSetWorkingContext && !helper)
       {
-      helper = pxm->ReNewProxy(item.Id, proxy->GetSession()->GetStateLocator());
+      helper = proxy->GetSession()->GetProxyLocator()->LocateProxy(item.Id);
       this->UndoSetWorkingContext->AddItem(helper);
       helper->Delete();
       }
@@ -158,6 +157,10 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
       }
     pq_proxy->addHelperProxy(item.Name, helper);
     }
+
+  // Released cached proxy
+  proxy->GetSession()->GetProxyLocator()->Clear();
+
   return 1;
 }
 
