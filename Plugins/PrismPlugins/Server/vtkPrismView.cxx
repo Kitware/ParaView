@@ -23,7 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPrismRepresentation.h"
 #include "vtkPVCompositeRepresentation.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkSelectionRepresentation.h"
 
 vtkStandardNewMacro(vtkPrismView);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
@@ -82,6 +82,7 @@ void vtkPrismView::GatherRepresentationInformation()
       vtkDataRepresentation *repr = this->GetRepresentation(cc);
       vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
       vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
+      vtkSelectionRepresentation *selection = vtkSelectionRepresentation::SafeDownCast(repr);
       if(compositeRep)
         {
         vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
@@ -94,6 +95,10 @@ void vtkPrismView::GatherRepresentationInformation()
       else if (cubeAxes)
         {
         cubeAxes->SetScale(scale[0],scale[1],scale[2]);
+        }
+      else if (selection)
+        {
+        selection->SetScale(scale[0],scale[1],scale[2]);
         }
       }
     }  
