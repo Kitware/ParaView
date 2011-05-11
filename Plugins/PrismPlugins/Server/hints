@@ -1,4 +1,3 @@
 vtkPrismFilter GetSESAMEXThresholdBetween 307 2
 vtkPrismFilter GetSESAMEYThresholdBetween 307 2
-vtkPrismRepresentation GetPrismRange 307 3
 vtkPrismSurfaceReader GetXThresholdBetween 307 2
