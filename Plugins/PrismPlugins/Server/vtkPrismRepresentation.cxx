@@ -16,7 +16,6 @@
 
 #include "vtkDoubleArray.h"
 #include "vtkDataObject.h"
-#include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
