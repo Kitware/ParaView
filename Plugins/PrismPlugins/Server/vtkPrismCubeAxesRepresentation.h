@@ -29,13 +29,14 @@ public:
   vtkTypeMacro(vtkPrismCubeAxesRepresentation, vtkCubeAxesRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetLabelRanges(
-    double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
-
 //BTX
 protected:
   vtkPrismCubeAxesRepresentation();
   ~vtkPrismCubeAxesRepresentation();
+
+  virtual int RequestData(vtkInformation*,
+    vtkInformationVector** inputVector, vtkInformationVector*);
+
 private:
   vtkPrismCubeAxesRepresentation(const vtkPrismCubeAxesRepresentation&); // Not implemented
   void operator=(const vtkPrismCubeAxesRepresentation&); // Not implemented

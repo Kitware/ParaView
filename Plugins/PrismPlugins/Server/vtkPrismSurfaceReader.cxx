@@ -1002,6 +1002,8 @@ int vtkPrismSurfaceReader::RequestData(
  
   surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
 
+
+  //add the arrays needed by the custom cube axes representation
   if(newXArray)
   {
     vtkSmartPointer<vtkFloatArray> xRangeArray= vtkSmartPointer<vtkFloatArray>::New();
@@ -1012,6 +1014,12 @@ int vtkPrismSurfaceReader::RequestData(
     xRangeArray->InsertNextValue(rdb[0]);
     xRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(xRangeArray);
+
+    vtkSmartPointer<vtkStringArray> xNameArray = vtkSmartPointer<vtkStringArray>::New();
+    xNameArray->SetName("XTitle");
+    xNameArray->SetNumberOfValues(1);
+    xNameArray->SetValue(0,xArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(xNameArray);
   }
   if(newYArray)
   {
@@ -1023,6 +1031,12 @@ int vtkPrismSurfaceReader::RequestData(
     yRangeArray->InsertNextValue(rdb[0]);
     yRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(yRangeArray);
+
+    vtkSmartPointer<vtkStringArray> yNameArray = vtkSmartPointer<vtkStringArray>::New();
+    yNameArray->SetName("YTitle");
+    yNameArray->SetNumberOfValues(1);
+    yNameArray->SetValue(0,yArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(yNameArray);
   }
 
   if(newZArray)
@@ -1035,6 +1049,12 @@ int vtkPrismSurfaceReader::RequestData(
     zRangeArray->InsertNextValue(rdb[0]);
     zRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(zRangeArray);
+
+    vtkSmartPointer<vtkStringArray> zNameArray = vtkSmartPointer<vtkStringArray>::New();
+    zNameArray->SetName("ZTitle");
+    zNameArray->SetNumberOfValues(1);
+    zNameArray->SetValue(0,zArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(zNameArray);
   }
 
   
