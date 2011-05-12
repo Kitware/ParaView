@@ -78,7 +78,7 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     SERVER_MANAGER_XML PRISMServerManagerXML.xml
                     GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} PrismObjectPanels
-                    SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx vtkSMPrismDoubleRangeDomain.cxx vtkSMPrismViewProxy.cxx
+                    SERVER_MANAGER_SOURCES vtkSMPrismDoubleRangeDomain.cxx vtkSMPrismViewProxy.cxx
                     GUI_SOURCES
                     PrismToolBarActions.cxx
                     PrismCore.cxx

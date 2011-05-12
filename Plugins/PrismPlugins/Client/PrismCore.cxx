@@ -2,7 +2,6 @@
 
 #include "PrismCore.h"
 #include "pqApplicationCore.h"
-#include "vtkSMPrismCubeAxesRepresentationProxy.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -210,21 +209,6 @@ PrismCore::PrismCore(QObject* p)
 
     this->connect(model, SIGNAL(connectionAdded(pqPipelineSource*,pqPipelineSource*, int)),
         this, SLOT(onConnectionAdded(pqPipelineSource*,pqPipelineSource*)));
-    //this->connect(model, SIGNAL(viewAdded(pqView*)),
-    //    this, SLOT(onViewAdded(pqView*)));
-    //this->connect(model, SIGNAL(preViewRemoved(pqView*)),
-    //    this, SLOT(onViewRemoved(pqView*)));
-
-    //this->connect(model, SIGNAL(preRepresentationRemoved(pqRepresentation*)),
-    //    this, SLOT(onPreRepresentationRemoved(pqRepresentation*)));
-
-    QList<pqView*> views=model->findItems<pqView*>();
-
-    for(int i=0;i<views.count();i++)
-    {
-      pqView *view=views.at(i);
-      this->onViewAdded(view);
-    }
 
     this->setParent(model);
 
@@ -247,30 +231,9 @@ PrismCore::PrismCore(QObject* p)
     }
 
 PrismCore::~PrismCore()
-    {
-      //QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*>::iterator viter;
-      //for(viter=this->CubeAxesViewMap.begin();viter!=this->CubeAxesViewMap.end();viter++)
-      //{
-      //  pqRenderView* view=viter.value();
-      //  vtkSMViewProxy* renv= view->getViewProxy();
-      //  vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(viter.key());
-      //}
-//      this->CubeAxesViewMap.clear();
-
-      QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
-      for(iter=this->CubeAxesRepMap.begin();iter!=this->CubeAxesRepMap.end();iter++)
-      {
-
-          vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-          pxm->UnRegisterProxy(iter.value()->GetXMLGroup(),iter.value()->GetClassName(),iter.value());
-      }
-      this->CubeAxesRepMap.clear();
-
-    Instance=NULL;
-    }
-
-
-
+{
+  Instance=NULL;
+}
 
 //-----------------------------------------------------------------------------
 PrismCore* PrismCore::instance()
@@ -560,184 +523,10 @@ void PrismCore::onConnectionAdded(pqPipelineSource* source,
   }
 }
 
-
-
-
-void PrismCore::onViewAdded(pqView* view)
-{
-  //For 3D Views we need to listen for repr added.
-  if(view->getViewType()=="RenderView")
-  {
-    this->connect(view, SIGNAL(representationAdded(pqRepresentation*)),
-        this, SLOT(onViewRepresentationAdded(pqRepresentation*)));
-
-    this->connect(view, SIGNAL(representationRemoved(pqRepresentation*)),
-        this, SLOT(onViewRepresentationRemoved(pqRepresentation*)));
-  }
-
-}
-void PrismCore::onViewRemoved(pqView* view)
-{
-  QList<pqRepresentation*> reps=view->getRepresentations();
-  for(int i=0;i<reps.count();i++)
-  {
-    pqRepresentation* rep=reps.at(i);
-    pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(rep);
-    if(dataRepr)
-    {
-      QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
-      iter=this->CubeAxesRepMap.find(dataRepr);
-      if(iter!=this->CubeAxesRepMap.end())
-      {
-        vtkSMViewProxy* renv= view->getViewProxy();
-        vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(iter.value());
-        this->CubeAxesViewMap.remove(iter.value());
-      }
-    }
-  }
-}
-void PrismCore::onViewRepresentationAdded(pqRepresentation* repr)
-{
-  //If the Rep is for a Prism filter then we need to add the Cube Axes rep to the same view.
-  pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(repr);
-  if(dataRepr)
-  {
-    pqPipelineSource* input = dataRepr->getInput();
-    QString name=input->getProxy()->GetXMLName();
-    if(name=="PrismFilter" || name=="PrismSurfaceReader")
-    {
-      QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
-      iter=this->CubeAxesRepMap.find(dataRepr);
-      if(iter!=this->CubeAxesRepMap.end())
-      {
-
-        pqRenderView * view= qobject_cast<pqRenderView*>(dataRepr->getView());
-        if(view)
-        {
-          vtkSMViewProxy* renv= view->getViewProxy();
-          vtkSMPropertyHelper(renv, "HiddenRepresentations").Add(iter.value());
-          this->CubeAxesViewMap[iter.value()]=view;
-          renv->UpdateVTKObjects();
-          view->render();
-        }
-      }
-    }
-  }
-}
-void PrismCore::onViewRepresentationRemoved(pqRepresentation* repr)
-{
-  //If the rep is for a Prism filter than we need to remove the cube axes from the same view.
-  pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(repr);
-  if(dataRepr)
-  {
-    pqPipelineSource* input = dataRepr->getInput();
-    QString name=input->getProxy()->GetXMLName();
-    if(name=="PrismFilter" || name=="PrismSurfaceReader")
-    {
-      QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
-      iter=this->CubeAxesRepMap.find(dataRepr);
-      if(iter!=this->CubeAxesRepMap.end())
-      {
-        QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*>::iterator vIter;
-        vIter=this->CubeAxesViewMap.find(iter.value());
-        if(vIter!=this->CubeAxesViewMap.end())
-        {
-          pqRenderView * view= vIter.value();
-          if(view)
-          {
-            vtkSMViewProxy* renv= view->getViewProxy();
-            vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(iter.value());
-            this->CubeAxesViewMap.erase(vIter);
-            renv->UpdateVTKObjects();
-            view->render();
-          }
-        }
-      }
-    }
-  }
-}
-
-void PrismCore::onPreRepresentationRemoved(pqRepresentation* repr)
-{
-  //If the rep is for a Prism filter we need to remove the cube axes from its view and dekete it,
-  pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(repr);
-  if(dataRepr)
-  {
-    pqPipelineSource* input = dataRepr->getInput();
-    QString name=input->getProxy()->GetXMLName();
-    if(name=="PrismFilter" || name=="PrismSurfaceReader")
-    {
-      QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
-      iter=this->CubeAxesRepMap.find(dataRepr);
-      if(iter!=this->CubeAxesRepMap.end())
-      {
-        vtkSMPrismCubeAxesRepresentationProxy* cubeAxes=iter.value();
-        QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*>::iterator vIter;
-        vIter=this->CubeAxesViewMap.find(cubeAxes);
-        if(vIter!=this->CubeAxesViewMap.end())
-        {
-          pqRenderView * view=vIter.value();
-          if(view)
-          {
-            vtkSMViewProxy* renv= view->getViewProxy();
-            vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(iter.value());
-            this->CubeAxesViewMap.erase(vIter);
-            renv->UpdateVTKObjects();
-            view->render();
-          }
-        }
-        vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-        pxm->UnRegisterProxy(iter.value()->GetXMLGroup(),iter.value()->GetClassName(),iter.value());
-        this->CubeAxesRepMap.erase(iter);
-      }
-    }
-  }
-}
-
 void PrismCore::onPrismRepresentationAdded(pqPipelineSource* source,
                                            pqDataRepresentation* repr,
                                            int srcOutputPort)
 {
-/*
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();
-  pqServer* server = 0;
-
-  server = source->getServer();
-  if(!server)
-  {
-    qDebug() << "No active server selected.";
-  }
-
-  vtkSMPrismCubeAxesRepresentationProxy* cubeAxesActor=vtkSMPrismCubeAxesRepresentationProxy::SafeDownCast(builder->createProxy("props",
-    "PrismCubeAxesRepresentation", server,
-    "props"));
-
-  this->CubeAxesRepMap[repr]=cubeAxesActor;
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    cubeAxesActor->GetProperty("Input"));
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-  if (!pp)
-  {
-    vtkErrorWithObjectMacro(cubeAxesActor,"Failed to locate property " << "Input"
-      << " on the consumer " <<  (cubeAxesActor->GetXMLName()));
-    return;
-  }
-
-  if (ip)
-  {
-    ip->RemoveAllProxies();
-    ip->AddInputConnection(source->getProxy(),0);
-  }
-  else
-  {
-    pp->RemoveAllProxies();
-    pp->AddProxy(source->getProxy());
-  }
-  cubeAxesActor->UpdateProperty("Input");
-
-*/
   if(srcOutputPort==0)
   {
     pqSMAdaptor::setElementProperty(repr->getProxy()->GetProperty("Pickable"),0);
