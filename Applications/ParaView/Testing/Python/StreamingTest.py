@@ -5,6 +5,7 @@ import QtTestingImage
 
 def test_compare_image(name):
   #save image the old fashioned way to make sure we loop
+  print "comparing "+name
   object1009 = 'pqClientMainWindow/menubar/menu_File'
   QtTesting.playCommand(object1009, 'activate', 'actionFileSaveScreenshot')
   object1010 = 'pqClientMainWindow/SaveSnapshotDialog/width'
@@ -20,6 +21,7 @@ def test_compare_image(name):
   QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/'+name, name);
 
 #load streaming view plugin on client and server sides
+print "loading plugin"
 object1 = 'pqClientMainWindow/menubar'
 QtTesting.playCommand(object1, 'activate', 'menuTools')
 object2 = 'pqClientMainWindow/menubar/menuTools'
@@ -36,6 +38,7 @@ object6 = 'pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object6, 'activate', '')
 
 # Test the iterating view by rendering the first 7 pieces
+print "opening iterating view"
 object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
 QtTesting.playCommand(object7, 'activate', '')
 object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Iterating View'
@@ -64,6 +67,7 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
 test_compare_image('IteratingImage.png');
 
 # Test the prioritizing view by making sure the 7 pieces rendered are always nearest camera
+print "opening prioritizing view"
 QtTesting.playCommand(object7, 'activate', '')
 object15 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Prioritizing View'
 QtTesting.playCommand(object15, 'activate', '')
@@ -88,6 +92,7 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
 test_compare_image('PrioritizingImage.png');
 
 # Test the refining view by refining and coarsening
+print "opening refining view"
 QtTesting.playCommand(object7, 'activate', '')
 object27 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Refining View'
 QtTesting.playCommand(object27, 'activate', '')
@@ -121,3 +126,4 @@ object38 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea
 QtTesting.playCommand(object38, 'activate', '')
 QtTesting.playCommand(object37, 'activate', '')
 test_compare_image('RefiningImage.png');
+print "test done"
