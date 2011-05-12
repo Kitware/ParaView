@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkEventQtSlotConnect.h"
@@ -147,7 +148,8 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     return;
     }
   this->InUpdate = true;
-  emit this->progress(message, progress_val);
+  pqCoreUtilities::processEvents();
+  emit this->progress(message, progress_val);  
   this->InUpdate = false;
 }
 
