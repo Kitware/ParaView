@@ -306,7 +306,7 @@ void vtkSMProxyManager::UpdateFromRemote()
         // separate call.
         // Moreover, we don't want any existing states to be pushed again to
         // the server.
-        this->Session->DisableRemoteExecution();
+        this->Session->StartProcessingRemoteNotification();
 
         // Setup server only state/proxy Locator
         vtkNew<vtkSMDeserializerProtobuf> deserializer;
@@ -321,7 +321,7 @@ void vtkSMProxyManager::UpdateFromRemote()
         this->UpdateRegisteredProxies(0);
         vtkSMProxyProperty::DisableProxyCreation();
 
-        this->Session->EnableRemoteExecution();
+        this->Session->StopProcessingRemoteNotification();
         }
       }
     }

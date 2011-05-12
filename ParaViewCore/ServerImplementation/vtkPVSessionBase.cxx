@@ -30,7 +30,6 @@
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase()
 {
-  this->RemoteExecutionAllowed = true;
   this->SessionCore = vtkPVSessionCore::New();
 
   // initialize local process information.

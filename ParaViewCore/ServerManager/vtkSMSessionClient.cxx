@@ -44,6 +44,10 @@
 #include <assert.h>
 #include <vtkstd/set>
 
+#define UPDATE_VTK_OBJECTS(object)                               \
+  if(vtkSMProxy::SafeDownCast(object))                           \
+    vtkSMProxy::SafeDownCast(object)->UpdateVTKObjects();
+
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
@@ -461,31 +465,28 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
   int num_controllers=0;
   vtkMultiProcessController* controllers[2] = {NULL, NULL};
 
-  if( this->IsRemoteExecutionAllowed() )
+  if ( (location &
+        (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
     {
-    if ( (location &
-          (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
+    controllers[num_controllers++] = this->DataServerController;
+    }
+  if ((location &
+       (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->RenderServerController;
+    }
+  if (num_controllers > 0)
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(vtkPVSessionServer::PUSH);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    for (int cc=0; cc < num_controllers; cc++)
       {
-      controllers[num_controllers++] = this->DataServerController;
-      }
-    if ((location &
-         (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
-      {
-      controllers[num_controllers++] = this->RenderServerController;
-      }
-    if (num_controllers > 0)
-      {
-      vtkMultiProcessStream stream;
-      stream << static_cast<int>(vtkPVSessionServer::PUSH);
-      stream << message->SerializeAsString();
-      vtkstd::vector<unsigned char> raw_message;
-      stream.GetRawData(raw_message);
-      for (int cc=0; cc < num_controllers; cc++)
-        {
-        controllers[cc]->TriggerRMIOnAllChildren(
-            &raw_message[0], static_cast<int>(raw_message.size()),
-            vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-        }
+      controllers[cc]->TriggerRMIOnAllChildren(
+          &raw_message[0], static_cast<int>(raw_message.size()),
+          vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
       }
     }
 
@@ -495,7 +496,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 
     // For collaboration purpose we might need to share the proxy state with
     // other clients
-    if(this->IsRemoteExecutionAllowed() && num_controllers == 0 )
+    if( num_controllers == 0 )
       {
       vtkSMProxy* proxy =
           vtkSMProxy::SafeDownCast(this->GetRemoteObject(message->global_id()));
@@ -507,7 +508,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
                          << ") does not support properly GetFullState() so no "
                          << "collaboration mechanisme could be applied to it.");
         }
-      else
+      else if(!proxy->IsLocalPushOnly())
         {
         msg.CopyFrom( proxy ? *proxy->GetFullState(): *message);
         msg.set_share_only(true);
@@ -605,7 +606,7 @@ void vtkSMSessionClient::ExecuteStream(
     controllers[num_controllers++] = this->RenderServerController;
     }
 
-  if (this->IsRemoteExecutionAllowed() && num_controllers > 0)
+  if ( num_controllers > 0)
     {
     const unsigned char* data;
     size_t size;
@@ -835,9 +836,6 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
   // Setup load state context
-  this->StartProcessingRemoteNotification();
-  this->DisableRemoteExecution();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkstd::string data;
   data.append(reinterpret_cast<char*>(message), message_length);
 
@@ -851,36 +849,19 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
 
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
-  if(id == vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID)
+
+  if(remoteObj)
     {
-    pxm->LoadState(&state, this->GetProxyLocator());
-    pxm->UpdateRegisteredProxies(1);
-    }
-  else if(remoteObj == NULL)
-    {
-//    vtkDebugMacro("Impossible to find proxy with id " << id << " and state "
-//                  << state.DebugString().c_str() << endl);
-    }
-  else if(proxy)
-    {
-    proxy->LoadState(&state, this->GetProxyLocator());
-    // essential to call this, since even though the values are not pushed to
-    // the server, there are several proxy-level flags that are not updated
-    // until the UpdateVTKObjects() such as marking dependent proxies modified
-    // etc.
-    proxy->UpdateVTKObjects();
-    }
-  else
-    {
+    this->StartProcessingRemoteNotification();
+    remoteObj->EnableLocalPushOnly();
     remoteObj->LoadState(&state, this->GetProxyLocator());
+    UPDATE_VTK_OBJECTS(remoteObj); // If SMProxy will call UpdateVTKObjects()
+    remoteObj->DisableLocalPushOnly();
+    this->StopProcessingRemoteNotification();
+
+    // Clear cache of loaded proxy
+    this->GetProxyLocator()->Clear();
     }
-
-  // Clear proxy locator cache
-  this->GetProxyLocator()->Clear();
-
-  this->EnableRemoteExecution();
-  this->StopProcessingRemoteNotification();
 }
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,

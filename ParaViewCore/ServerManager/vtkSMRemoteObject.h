@@ -86,6 +86,24 @@ public:
   // invalid state when property refere to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator) = 0;
 
+  // Description:
+  // Allow to switch off any push of state change to the server for that
+  // particular object.
+  // This is used when we load a state based on a server notification. In that
+  // particular case, the server is already aware of that new state, so we keep
+  // those changes local.
+  virtual void EnableLocalPushOnly();
+
+  // Description:
+  // Enable the given remote object to communicate its state normaly to the
+  // server location.
+  virtual void DisableLocalPushOnly();
+
+  // Description:
+  // Let the session be aware that even if the Location is client only,
+  // the message should not be send to the server for a general broadcast
+  virtual bool IsLocalPushOnly() { return this->ClientOnlyLocationFlag; }
+
 protected:
   // Description:
   // Default constructor.
@@ -126,6 +144,13 @@ protected:
   // Allow remote object to be discard for any state management such as
   // Undo/Redo, Register/UnRegister (in ProxyManager) and so on...
   bool Prototype;
+
+  // Field that store the Disable/EnableLocalPushOnly() state information
+  bool ClientOnlyLocationFlag;
+
+  // Convenient method used to return either the local Location or a filtered
+  // version of it based on the ClientOnlyLocationFlag
+  vtkTypeUInt32 GetFilteredLocation();
 
 private:
   vtkSMRemoteObject(const vtkSMRemoteObject&); // Not implemented

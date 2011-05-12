@@ -48,7 +48,17 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
 void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
                                     vtkSMProxyLocator* locator)
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if(this->ClientOnlyLocationFlag)
+    {
+    pxm->DisableStateUpdateNotification();
+    pxm->LoadState(msg, locator);
+    pxm->EnableStateUpdateNotification();
+    }
+  else
+    {
+    pxm->LoadState(msg, locator);
+    }
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()

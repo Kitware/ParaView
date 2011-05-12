@@ -24,6 +24,10 @@
 #include "vtkSMStateLocator.h"
 #include "vtkSMMessage.h"
 
+#define BEFORE_LOAD(proxy) if(this->Session->IsProcessingRemoteNotification()) proxy->EnableLocalPushOnly();
+#define AFTER_LOAD(proxy)  if(this->Session->IsProcessingRemoteNotification()) proxy->DisableLocalPushOnly();
+
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMDeserializerProtobuf);
 vtkCxxSetObjectMacro(vtkSMDeserializerProtobuf, StateLocator, vtkSMStateLocator);
 //----------------------------------------------------------------------------
@@ -60,7 +64,10 @@ vtkSMProxy* vtkSMDeserializerProtobuf::NewProxy(vtkTypeUInt32 id, vtkSMProxyLoca
     {
     if(this->StateLocator->FindState(id, &msg))
       {
+      BEFORE_LOAD(proxy)
       proxy->LoadState(&msg, locator);
+      proxy->UpdateVTKObjects();
+      AFTER_LOAD(proxy)
       }
     return proxy;
     }
@@ -91,8 +98,10 @@ vtkSMProxy* vtkSMDeserializerProtobuf::NewProxy(vtkTypeUInt32 id, vtkSMProxyLoca
     }
 
   // Load the state of the proxy now
+  BEFORE_LOAD(proxy)
   proxy->LoadState(&msg, locator);
   proxy->UpdateVTKObjects();
+  AFTER_LOAD(proxy)
 
   return proxy;
 }

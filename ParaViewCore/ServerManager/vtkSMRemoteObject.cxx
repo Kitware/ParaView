@@ -30,6 +30,7 @@ vtkSMRemoteObject::vtkSMRemoteObject()
   this->Location = 0;
   this->Session = NULL;
   this->Prototype = false;
+  this->ClientOnlyLocationFlag = false;
 }
 
 //----------------------------------------------------------------------------
@@ -136,7 +137,8 @@ void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
 //---------------------------------------------------------------------------
 void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
 {
-  if(this->Location == 0)
+  vtkTypeUInt32 filteredLocation = this->GetFilteredLocation();
+  if(filteredLocation == 0)
     {
     return; // This object is a prototype and has no location
     }
@@ -144,7 +146,7 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
   // Check if a GUID has been assigned to that object otherwise assign a new one
   vtkTypeUInt32 gid = this->GetGlobalID();
   msg->set_global_id(gid);
-  msg->set_location(this->Location);
+  msg->set_location(filteredLocation);
   if (this->GetSession())
     {
     this->GetSession()->PushState(msg);
@@ -177,4 +179,28 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
     return false;
     }
   return true; // Successful call
+}
+//---------------------------------------------------------------------------
+void vtkSMRemoteObject::EnableLocalPushOnly()
+{
+  this->ClientOnlyLocationFlag = true;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMRemoteObject::DisableLocalPushOnly()
+{
+  this->ClientOnlyLocationFlag = false;
+}
+
+//---------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMRemoteObject::GetFilteredLocation()
+{
+  if(this->ClientOnlyLocationFlag)
+    {
+    return (this->Location & vtkPVSession::CLIENT);
+    }
+  else
+    {
+    return this->Location;
+    }
 }
