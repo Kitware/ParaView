@@ -6,6 +6,7 @@ Module:    vtkPrismFilter.cxx
 
 =========================================================================*/
 #include "vtkPrismFilter.h"
+#include "vtkPrismPrivate.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -15,7 +16,6 @@ Module:    vtkPrismFilter.cxx
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPolyData.h"
-#include "vtkTransform.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h" 
@@ -26,8 +26,6 @@ Module:    vtkPrismFilter.cxx
 #include "vtkPoints.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkTransformFilter.h"
-#include "vtkTransform.h"
 #include "vtkExtractGeometry.h"
 #include "vtkBox.h"
 #include "vtkDataObject.h"
@@ -44,7 +42,6 @@ public:
 
     vtkSmartPointer<vtkExtractGeometry > ExtractGeometry;
     vtkSmartPointer<vtkBox> Box;
-    vtkSmartPointer<vtkTransformFilter> TransformFilter;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
     vtkstd::string AxisVarName[3];
@@ -60,9 +57,6 @@ public:
         this->AxisVarName[0]      = "none";
         this->AxisVarName[1]      = "none";
         this->AxisVarName[2]      = "none";
-
-        this->TransformFilter=vtkSmartPointer<vtkTransformFilter>::New(); 
-
 
         this->ExtractGeometry=vtkSmartPointer<vtkExtractGeometry >::New();
 
@@ -92,22 +86,26 @@ vtkPrismFilter::vtkPrismFilter()
     this->SetNumberOfOutputPorts(4);
 
 }
+//----------------------------------------------------------------------------
 vtkPrismFilter::~vtkPrismFilter()
 {
   delete this->Internal;
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSimulationDataThreshold(bool b)
 {
     this->Internal->SimulationDataThreshold=b;
     this->Modified();
 }
 
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetSimulationDataThreshold()
 {
     return this->Internal->SimulationDataThreshold;
 }
 
+//----------------------------------------------------------------------------
 unsigned long vtkPrismFilter::GetMTime()
 {
     unsigned long time = this->Superclass::GetMTime();
@@ -115,6 +113,7 @@ unsigned long vtkPrismFilter::GetMTime()
     return time > readertime ? time : readertime;
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::IsValidFile()
 {
     if(!this->Internal->Reader)
@@ -126,6 +125,7 @@ int vtkPrismFilter::IsValidFile()
 
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetFileName(const char* file)
 {
     if(!this->Internal->Reader)
@@ -136,6 +136,7 @@ void vtkPrismFilter::SetFileName(const char* file)
     this->Internal->Reader->SetFileName(file);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetFileName()
 {
     if(!this->Internal->Reader)
@@ -145,6 +146,7 @@ const char* vtkPrismFilter::GetFileName()
     return this->Internal->Reader->GetFileName();
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::GetNumberOfTableIds()
 {
     if(!this->Internal->Reader)
@@ -155,6 +157,7 @@ int vtkPrismFilter::GetNumberOfTableIds()
     return this->Internal->Reader->GetNumberOfTableIds();
 }
 
+//----------------------------------------------------------------------------
 int* vtkPrismFilter::GetTableIds()
 {
     if(!this->Internal->Reader)
@@ -165,6 +168,7 @@ int* vtkPrismFilter::GetTableIds()
     return this->Internal->Reader->GetTableIds();
 }
 
+//----------------------------------------------------------------------------
 vtkIntArray* vtkPrismFilter::GetTableIdsAsArray()
 {
     if(!this->Internal->Reader)
@@ -175,6 +179,7 @@ vtkIntArray* vtkPrismFilter::GetTableIdsAsArray()
     return this->Internal->Reader->GetTableIdsAsArray();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetTable(int tableId)
 {
     if(!this->Internal->Reader)
@@ -185,6 +190,7 @@ void vtkPrismFilter::SetTable(int tableId)
     this->Internal->Reader->SetTable(tableId);
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::GetTable()
 {
     if(!this->Internal->Reader)
@@ -195,6 +201,7 @@ int vtkPrismFilter::GetTable()
     return this->Internal->Reader->GetTable();
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::GetNumberOfTableArrayNames()
 {
     if(!this->Internal->Reader)
@@ -205,6 +212,7 @@ int vtkPrismFilter::GetNumberOfTableArrayNames()
     return this->Internal->Reader->GetNumberOfTableArrayNames();
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetTableArrayName(int index)
 {
     if(!this->Internal->Reader)
@@ -216,6 +224,7 @@ const char* vtkPrismFilter::GetTableArrayName(int index)
 
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetTableArrayToProcess(const char* name)
 {
     if(!this->Internal->Reader)
@@ -236,6 +245,7 @@ void vtkPrismFilter::SetTableArrayToProcess(const char* name)
         name );
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetTableArrayNameToProcess()
 {
     int numberOfArrays;
@@ -253,6 +263,7 @@ const char* vtkPrismFilter::GetTableArrayNameToProcess()
     return NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetTableArrayStatus(const char* name, int flag)
 {
     if(!this->Internal->Reader)
@@ -263,6 +274,7 @@ void vtkPrismFilter::SetTableArrayStatus(const char* name, int flag)
     return this->Internal->Reader->SetTableArrayStatus(name , flag);
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::GetTableArrayStatus(const char* name)
 {
     if(!this->Internal->Reader)
@@ -327,6 +339,7 @@ int vtkPrismFilter::RequestSESAMEData(
     return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
                                    unsigned int index,
                                    vtkMultiBlockDataSet *output)
@@ -391,6 +404,11 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     return 0;
   }
 
+  const int tableId = this->GetTable();
+  bool scalingEnabled[3] = {this->GetSESAMEXLogScaling(),
+                            this->GetSESAMEYLogScaling(),
+                            this->GetSESAMEZLogScaling()};
+
   if(!isCellData[0] && !isCellData[1] && !isCellData[2])
   {
     //All Point Data.
@@ -435,9 +453,10 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       inputScalars[2] = outPD->GetScalars( this->GetZAxisVarName() );
 
 
-      newPt[0] = inputScalars[0]->GetTuple1( cellId );
-      newPt[1] = inputScalars[1]->GetTuple1( cellId );
-      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
+      newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
+      newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
+      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
 
 
@@ -485,11 +504,11 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       }
 
 
-      newPt[0] = inputScalars[0]->GetTuple1( cellId );
-      newPt[1] = inputScalars[1]->GetTuple1( cellId );
-      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
+      newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
+      newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
+      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
-
 
       polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
     }
@@ -506,108 +525,18 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
   vtkIdType pointId;
   vtkIdType numberPts = newPoints->GetNumberOfPoints();
 
-
-  for(pointId=0;pointId<numberPts;pointId++)
-  {
-
-    double coords[3];
-
-    newPoints->GetPoint(pointId,coords);
-
-
-    int tID=this->GetTable();
-    if(tID==502 ||
-      tID==503 ||
-      tID==504 ||
-      tID==505 ||
-      tID==601 ||
-      tID==602 ||
-      tID==603 ||
-      tID==604 ||
-      tID==605)
-    {
-      if(!this->GetSESAMEXLogScaling())
-      {
-      coords[0]=pow(10.0,coords[0]);
-      }
-
-      if(!this->GetSESAMEYLogScaling())
-      {
-        coords[1]=pow(10.0,coords[1]);
-      }
-
-      if(!this->GetSESAMEZLogScaling())
-      {
-        coords[2]=pow(10.0,coords[2]);
-      }
-    }
-    else
-    {
-      if(this->GetSESAMEXLogScaling())
-      {
-        if(coords[0]>0)
-        {
-          coords[0]=log(coords[0]);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-      }
-
-      if(this->GetSESAMEYLogScaling())
-      {
-        if(coords[1]>0)
-        {
-          coords[1]=log(coords[1]);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-      }
-
-      if(this->GetSESAMEZLogScaling())
-      {
-        if(coords[2]>0)
-        {
-          coords[2]=log(coords[2]);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-      }
-    }
-
-    newPoints->InsertPoint(pointId,coords);
-
-  }
-
   polydata->SetPoints( newPoints );
   newPoints->Delete();
   polydata->Squeeze();
   cellPts->Delete();
   delete [] weights;
 
-
-  this->Internal->TransformFilter->SetInput(polydata);
-
-
-
-  double scale[3];
-  this->Internal->Reader->GetAspectScale(scale);
-  vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-  transform->Scale(scale);
-  this->Internal->TransformFilter->SetTransform(transform);
-  this->Internal->TransformFilter->Update();
-
-  polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
-
   output->SetBlock(index,polydata);
 
   return 1;
 }
+
+//----------------------------------------------------------------------------
 int vtkPrismFilter::RequestGeometryData(
                                         vtkInformation *vtkNotUsed(request),
                                         vtkInformationVector **inputVector,
@@ -622,6 +551,18 @@ int vtkPrismFilter::RequestGeometryData(
     vtkInformation *info = outputVector->GetInformationObject(3);
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         info->Get(vtkDataObject::DATA_OBJECT()));
+
+    //give it the same prism world bounds as the surface
+    //this way we don't scale the world with the points which will cause
+    //the reference surface to change size on each time step
+    vtkDoubleArray *prismBounds = vtkDoubleArray::New();
+    prismBounds->SetNumberOfValues(6);
+    prismBounds->DeepCopy(this->GetRanges()); //copy the bounds into the prismBounds array
+    //than make sure the field name is set to the key properly
+    prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
+    output->GetFieldData()->AddArray(prismBounds);
+    prismBounds->FastDelete();
+
     if ( !output ) 
     {
         vtkDebugMacro( << "No output found." );
@@ -670,7 +611,7 @@ int vtkPrismFilter::RequestGeometryData(
 }
 
 
-
+//----------------------------------------------------------------------------
 vtkDoubleArray* vtkPrismFilter::GetRanges()
 {
   this->Internal->Reader->GetRanges(this->Internal->RangeArray);
@@ -679,35 +620,44 @@ vtkDoubleArray* vtkPrismFilter::GetRanges()
 }
 
 
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetXAxisVarName( const char *name )
 {
     this->Internal->AxisVarName[0]=name;
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetYAxisVarName( const char *name )
 {
     this->Internal->AxisVarName[1]=name;
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetZAxisVarName( const char *name )
 {
     this->Internal->AxisVarName[2]=name;
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 const char * vtkPrismFilter::GetXAxisVarName()
 {
     return this->Internal->AxisVarName[0].c_str();
 }
+
+//----------------------------------------------------------------------------
 const char * vtkPrismFilter::GetYAxisVarName()
 {
     return this->Internal->AxisVarName[1].c_str();
 }
+
+//----------------------------------------------------------------------------
 const char * vtkPrismFilter::GetZAxisVarName()
 {
     return this->Internal->AxisVarName[2].c_str();
 }
-
 
 //----------------------------------------------------------------------------
 int vtkPrismFilter::FillOutputPortInformation(
@@ -752,252 +702,291 @@ void vtkPrismFilter::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Not Implemented: " << "\n";
 }
 
-
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEXAxisVarName( const char *name )
 {
     this->Internal->Reader->SetXAxisVarName(name);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEYAxisVarName( const char *name )
 {
     this->Internal->Reader->SetYAxisVarName(name);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEZAxisVarName( const char *name )
 {
     this->Internal->Reader->SetZAxisVarName(name);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetSESAMEXAxisVarName()
 {
     return this->Internal->Reader->GetXAxisVarName();
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetSESAMEYAxisVarName()
 {
     return this->Internal->Reader->GetYAxisVarName();
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetSESAMEZAxisVarName()
 {
     return this->Internal->Reader->GetZAxisVarName();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetShowCold(bool b)
 {
   this->Internal->Reader->SetShowCold(b);
   this->Modified();
-
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetShowVaporization(bool b)
 {
   this->Internal->Reader->SetShowVaporization(b);
   this->Modified();
-
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetShowSolidMelt(bool b)
 {
   this->Internal->Reader->SetShowSolidMelt(b);
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetShowLiquidMelt(bool b)
 {
   this->Internal->Reader->SetShowLiquidMelt(b);
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetShowCold()
 {
   return this->Internal->Reader->GetShowCold();
 }
+
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetShowVaporization()
 {
   return this->Internal->Reader->GetShowVaporization();
 }
+
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetShowSolidMelt()
 {
   return this->Internal->Reader->GetShowSolidMelt();
-
 }
+
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetShowLiquidMelt()
 {
   return this->Internal->Reader->GetShowLiquidMelt();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEXLogScaling(bool b)
 {
     this->Internal->Reader->SetXLogScaling(b);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEYLogScaling(bool b)
 {
     this->Internal->Reader->SetYLogScaling(b);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEZLogScaling(bool b)
 {
     this->Internal->Reader->SetZLogScaling(b);
 }
 
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetSESAMEXLogScaling()
 {
     return this->Internal->Reader->GetXLogScaling();
 }
 
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetSESAMEYLogScaling()
 {
     return this->Internal->Reader->GetYLogScaling();
 }
 
+//----------------------------------------------------------------------------
 bool vtkPrismFilter::GetSESAMEZLogScaling()
 {
     return this->Internal->Reader->GetZLogScaling();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEVariableConversionValues(int i, double value)
 {
   this->Internal->Reader->SetVariableConversionValues(i,value);
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetNumberOfSESAMEVariableConversionValues(int v)
 {
   this->Internal->Reader->SetNumberOfVariableConversionValues(v);
 }
+
+//----------------------------------------------------------------------------
 double vtkPrismFilter::GetSESAMEVariableConversionValue(int i)
 {
   return this->Internal->Reader->GetVariableConversionValue(i);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::AddSESAMEVariableConversionNames(char*  value)
 {
   this->Internal->Reader->AddVariableConversionNames(value);
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 void vtkPrismFilter::RemoveAllSESAMEVariableConversionNames()
 {
   this->Internal->Reader->RemoveAllVariableConversionNames();
     this->Modified();
 }
+
+//----------------------------------------------------------------------------
 const char * vtkPrismFilter::GetSESAMEVariableConversionName(int i)
 {
   return this->Internal->Reader->GetVariableConversionName(i);
 }
 
+//----------------------------------------------------------------------------
 vtkDoubleArray* vtkPrismFilter:: GetSESAMEXRange()
 {
     return this->Internal->Reader->GetXRange();
 }
 
+//----------------------------------------------------------------------------
 vtkDoubleArray* vtkPrismFilter:: GetSESAMEYRange()
 {
     return this->Internal->Reader->GetYRange();
 }
 
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetThresholdSESAMEXBetween(double lower, double upper)
 {
     this->Internal->Reader->SetThresholdXBetween(lower,upper);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetThresholdSESAMEYBetween(double lower, double upper)
 {
     this->Internal->Reader->SetThresholdYBetween(lower,upper);
 }
 
-
+//----------------------------------------------------------------------------
 double* vtkPrismFilter::GetSESAMEXThresholdBetween()
 {
     return this->Internal->Reader->GetXThresholdBetween();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::GetSESAMEXThresholdBetween (double &_arg1, double &_arg2)
 {
     return this->Internal->Reader->GetXThresholdBetween(_arg1,_arg2);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::GetSESAMEXThresholdBetween (double _arg[2])
 {
     this->Internal->Reader->GetXThresholdBetween(_arg);
 }
 
-
+//----------------------------------------------------------------------------
 double* vtkPrismFilter::GetSESAMEYThresholdBetween()
 {
     return this->Internal->Reader->GetYThresholdBetween();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::GetSESAMEYThresholdBetween (double &_arg1, double &_arg2)
 {
     return this->Internal->Reader->GetYThresholdBetween(_arg1,_arg2);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::GetSESAMEYThresholdBetween (double _arg[2])
 {
     this->Internal->Reader->GetYThresholdBetween(_arg);
 }
 
-
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetWarpSESAMESurface(bool b)
 {
     this->Internal->Reader->SetWarpSurface(b);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetDisplaySESAMEContours(bool b)
 {
     this->Internal->Reader->SetDisplayContours(b);
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEContourVarName( const char *name )
 {
     this->Internal->Reader->SetContourVarName(name);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPrismFilter::GetSESAMEContourVarName()
 {
     return this->Internal->Reader->GetContourVarName();
 }
 
+//----------------------------------------------------------------------------
 vtkDoubleArray* vtkPrismFilter:: GetSESAMEContourVarRange()
 {
     return this->Internal->Reader->GetContourVarRange();
 }
 
-
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetSESAMEContourValue(int i, double value)
 {
     this->Internal->Reader->SetContourValue(i,value);
 }
 
+//----------------------------------------------------------------------------
 double vtkPrismFilter::GetSESAMEContourValue(int i)
 {
     return this->Internal->Reader->GetContourValue(i);
 }
 
-
+//----------------------------------------------------------------------------
 double* vtkPrismFilter::GetSESAMEContourValues()
 {
     return this->Internal->Reader->GetContourValues();
 }
 
+//----------------------------------------------------------------------------
 void vtkPrismFilter::GetSESAMEContourValues(double *contourValues)
 {
     this->Internal->Reader->GetContourValues(contourValues);
 }
 
-
+//----------------------------------------------------------------------------
 void vtkPrismFilter::SetNumberOfSESAMEContours(int i)
 {
     this->Internal->Reader->SetNumberOfContours(i);
 }
 
-
-
+//----------------------------------------------------------------------------
 vtkStringArray* vtkPrismFilter:: GetSESAMEAxisVarNames()
 {
     return this->Internal->Reader->GetAxisVarNames();
 }
-
-
-

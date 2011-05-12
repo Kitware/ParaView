@@ -18,7 +18,6 @@ class vtkEventQtSlotConnect;
 class pqDataRepresentation;
 class QAction;
 class QActionGroup;
-class vtkSMPrismCubeAxesRepresentationProxy;
 class pqRenderView;
 
 class PrismCore : public QObject
@@ -32,8 +31,6 @@ public:
 
   void  createActions(QActionGroup*);
   void createMenuActions(QActionGroup*);
-  QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*> CubeAxesRepMap;
-  QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*> CubeAxesViewMap;
 
 public slots:
   void onSESAMEFileOpen();
@@ -48,13 +45,6 @@ private slots:
   void onPrismRepresentationAdded(pqPipelineSource* source,pqDataRepresentation* repr, int srcOutputPort);
 
  void onConnectionAdded(pqPipelineSource* source,pqPipelineSource* consumer);
-
- void onViewAdded(pqView* view);
- void onViewRemoved(pqView* view);
- void onViewRepresentationAdded(pqRepresentation*);
- void onViewRepresentationRemoved(pqRepresentation*);
-
- void onPreRepresentationRemoved(pqRepresentation*);
 
 private:
   pqPipelineSource *getActiveSource() const;
