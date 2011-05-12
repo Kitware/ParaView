@@ -612,7 +612,6 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
   // Handle selection proxy if any
   if(!this->SelectionProxiesCreated)
     {
-    this->CreateOutputPorts();
     int size = message->ExtensionSize(ProxyState::selection_proxy);
     if(size > 0)
       {
