@@ -1851,6 +1851,9 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
     {
     this->SetGlobalID(message->global_id());
     }
+
+  // We try to extract some message informations that we might not get from
+  // proxy definition in the XML. This is specially true in collaboration.
   if(message->HasExtension(DefinitionHeader::server_class))
     {
     this->SetSIClassName(message->GetExtension(DefinitionHeader::server_class).c_str());
