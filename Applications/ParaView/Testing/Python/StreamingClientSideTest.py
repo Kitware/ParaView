@@ -6,6 +6,7 @@ import QtTestingImage
 def test_compare_image(name):
   #save image the old fashioned way to make sure we loop
   print "comparing "+name
+  QtTesting.playCommand(object1008, 'pause', '2000')
   object1009 = 'pqClientMainWindow/menubar/menu_File'
   QtTesting.playCommand(object1009, 'activate', 'actionFileSaveScreenshot')
   object1010 = 'pqClientMainWindow/SaveSnapshotDialog/width'
@@ -18,7 +19,11 @@ def test_compare_image(name):
   QtTesting.playCommand(object1014, 'remove',
                         '$PARAVIEW_TEST_ROOT/'+name)
   QtTesting.playCommand(object1014, 'filesSelected', '$PARAVIEW_TEST_ROOT/'+name)
+  QtTesting.playCommand(object1008, 'pause', '2000')
   QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/'+name, name);
+
+#using this to put 'barriers' in to deal with streaming and testing asynchrony
+object1008 = 'pqClientMainWindow'
 
 #load streaming view plugin on client and server sides
 print "loading plugin"
@@ -125,4 +130,6 @@ QtTesting.playCommand(object37, 'activate', '')
 object38 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/refinement_controls/coarsen'
 QtTesting.playCommand(object38, 'activate', '')
 test_compare_image('CSRefiningImage.png')
+
+QtTesting.playCommand(object1008, 'pause', '2000')
 print "test done"
