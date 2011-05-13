@@ -50,7 +50,29 @@ def DoCoProcessing(datadescription):
   pressureimagefilename = 'PCPPressure'+str(timestep) + '.png'
   WriteImage(pressureimagefilename)
 
+  # explicitly delete the proxies -- may have to do this multiple times
+  tobedeleted = GetProxiesToDelete()
+  while len(tobedeleted) > 0:
+    Delete(tobedeleted[0])
+    tobedeleted = GetProxiesToDelete()
+
   return
+
+def GetProxiesToDelete():
+    iter = servermanager.vtkSMProxyIterator()
+    iter.Begin()
+    tobedeleted = []
+    while not iter.IsAtEnd():
+      if iter.GetGroup().find("prototypes") != -1:
+         iter.Next()
+         continue
+      proxy = servermanager._getPyProxy(iter.GetProxy())
+      proxygroup = iter.GetGroup()
+      iter.Next()
+      if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
+          tobedeleted.append(proxy)
+
+    return tobedeleted
 
 def RequestDataDescription(datadescription):
   time = datadescription.GetTime()
