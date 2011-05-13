@@ -147,4 +147,5 @@ QtTesting.playCommand(object38, 'activate', '')
 #test_compare_image('CSRefiningImage.png')
 
 QtTesting.playCommand(object1008, 'pause', '2000')
+QtTesting.playCommand(object7, 'activate', '')
 print "test done"
