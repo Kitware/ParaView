@@ -190,13 +190,13 @@ protected:
   void UnRegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location);
 
   vtkPVSessionCore* SessionCore;
+  vtkPVMultiClientsInformation* LocalMultiClientsInformationCache;
 
 private:
   vtkPVSessionBase(const vtkPVSessionBase&); // Not implemented
   void operator=(const vtkPVSessionBase&); // Not implemented
 
   vtkPVServerInformation* LocalServerInformation;
-  vtkPVMultiClientsInformation* LocalMultiClientsInformationCache;
 //ETX
 };
 

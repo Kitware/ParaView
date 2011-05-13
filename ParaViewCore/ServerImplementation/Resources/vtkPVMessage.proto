@@ -40,7 +40,7 @@ message MessageCollection
   repeated Message item = 1;
 }
 
-// Generic message type ******************************************* [1-4 :> 10]
+// Generic message type ******************************************* [1-5 :> 10]
 
 message Message
 {
@@ -48,6 +48,7 @@ message Message
   required uint32 location   = 2;
   optional bool   share_only = 3 [default = false];
   optional bool   req_def    = 4 [default = false];
+  optional uint32 client_id  = 5 [default = 0];
 
   extensions 10 to max;
 }

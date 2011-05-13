@@ -23,6 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkPVMultiClientsInformation.h"
 #include "vtkPVProxyDefinitionManager.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
@@ -511,9 +512,12 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
       else if(!proxy->IsLocalPushOnly())
         {
         msg.CopyFrom( proxy ? *proxy->GetFullState(): *message);
-        msg.set_share_only(true);
         msg.set_global_id(message->global_id());
         msg.set_location(message->location());
+
+        // Add extra-informations
+        msg.set_share_only(true);
+        msg.set_client_id(this->LocalMultiClientsInformationCache->GetClientId());
 
         vtkMultiProcessStream stream;
         stream << static_cast<int>(vtkPVSessionServer::PUSH);
