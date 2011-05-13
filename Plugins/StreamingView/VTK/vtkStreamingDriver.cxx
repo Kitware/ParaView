@@ -43,7 +43,10 @@ public:
     this->RenderLaterArgument = NULL;
     //auxilliary functionality, that help view sorting sublasses
     this->ViewSorter = vtkVisibilityPrioritizer::New();
-    this->CameraTime = 0;
+    for (int i = 0; i < 9; i++)
+      {
+      this->LastCamera[i] = 0;
+      }
     this->PixelArray = NULL;
     this->ParallelHelper = NULL;
   }
@@ -78,7 +81,8 @@ public:
   vtkParallelStreamHelper *ParallelHelper;
   //auxilliary functionality, that help view sorting sublasses
   vtkVisibilityPrioritizer *ViewSorter;
-  unsigned long CameraTime;
+  double LastCamera[9];
+
 };
 
 static void VTKSD_RenderEvent(vtkObject *vtkNotUsed(caller),
@@ -288,16 +292,22 @@ bool vtkStreamingDriver::HasCameraMoved()
     return false;
     }
 
-  unsigned long mtime = cam->GetMTime();
-  if (mtime > this->Internal->CameraTime)
+
+  double camState[9];
+  cam->GetPosition(&camState[0]);
+  cam->GetViewUp(&camState[3]);
+  cam->GetFocalPoint(&camState[6]);
+  bool changed = false;
+  for (int i = 0; i < 9; i++)
     {
-    this->Internal->CameraTime = mtime;
-
-    double camState[9];
-    cam->GetPosition(&camState[0]);
-    cam->GetViewUp(&camState[3]);
-    cam->GetFocalPoint(&camState[6]);
-
+    if (this->Internal->LastCamera[i] != camState[i])
+      {
+      changed = true;
+      }
+    this->Internal->LastCamera[i] = camState[i];
+    }
+  if (changed)
+    {
     //convert screen rectangle to world frustum
     const double HALFEXT=1.0; //1.0 means all way to edge of screen
     const double XMAX=HALFEXT;
