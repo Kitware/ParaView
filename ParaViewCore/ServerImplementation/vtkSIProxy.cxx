@@ -32,6 +32,19 @@
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
+//****************************************************************************
+struct SubProxyInfo
+{
+  SubProxyInfo(vtkstd::string name, vtkTypeUInt32 id)
+    {
+    this->Name = name;
+    this->GlobalID = id;
+    }
+
+  vtkstd::string Name;
+  vtkTypeUInt32 GlobalID;
+};
+//****************************************************************************
 class vtkSIProxy::vtkInternals
 {
 public:
@@ -42,8 +55,11 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
-};
 
+  typedef vtkstd::vector<SubProxyInfo> SubProxiesVectorType;
+  SubProxiesVectorType SubProxyInfoVector;
+};
+//****************************************************************************
 vtkStandardNewMacro(vtkSIProxy);
 //----------------------------------------------------------------------------
 vtkSIProxy::vtkSIProxy()
@@ -183,16 +199,13 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       }
 
     // Add subproxy information to the message.
-    vtkInternals::SubSIProxiesMapType::iterator it2 =
-        this->Internals->SubSIProxies.begin();
-    for( ; it2 != this->Internals->SubSIProxies.end(); it2++)
+    vtkInternals::SubProxiesVectorType::iterator it2 =
+        this->Internals->SubProxyInfoVector.begin();
+    for( ; it2 != this->Internals->SubProxyInfoVector.end(); it2++)
       {
-      if(it2->second.GetPointer() != NULL)
-        {
-        ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
-        subproxy->set_name(it2->first.c_str());
-        subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
-        }
+      ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
+      subproxy->set_name(it2->Name.c_str());
+      subproxy->set_global_id(it2->GlobalID);
       }
     }
 }
@@ -311,6 +324,8 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
       message->GetExtension(ProxyState::subproxy, cc);
     vtkSIProxy* subproxy = vtkSIProxy::SafeDownCast(
       this->GetSIObject(subproxyMsg.global_id()));
+    this->Internals->SubProxyInfoVector.push_back(
+        SubProxyInfo(subproxyMsg.name(), subproxyMsg.global_id()));
     if (subproxy == NULL)
       {
       // This code has been commented to support ImplicitPlaneWidgetRepresentation
