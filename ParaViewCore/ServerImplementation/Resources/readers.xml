@@ -69,6 +69,33 @@
     </DoubleVectorProperty>
     
     
+    <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="ParticleArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Particle"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="ParticleArrayStatus"
+        command="SetParticleArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ParticleArrayInfo"
+        label="Particle Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="ParticleArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which particle arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+    
      <Hints>
        <ReaderFactory 
             extensions="boundary hierarchy"
@@ -2808,6 +2835,7 @@
           <Property name="FilterLocation" />
           <Property name="MinLocation" />
           <Property name="MaxLocation" />
+          <Property name="ParticleArrayStatus" />
         </ExposedProperties>
       </SubProxy>
       
