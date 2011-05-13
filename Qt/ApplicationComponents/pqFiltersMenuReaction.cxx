@@ -167,8 +167,8 @@ void pqFiltersMenuReaction::updateEnableState()
         // we listen to state change so that we can update enable state when the
         // proxy gets initialized.
         QObject::connect(source,
-          SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-          this, SLOT(onModifiedStateChanged()));
+          SIGNAL(dataUpdated(pqPipelineSource*)),
+          this, SLOT(ondataUpdated()));
         break;
         }
       outputPorts.append(opPort);
@@ -258,7 +258,7 @@ void pqFiltersMenuReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqFiltersMenuReaction::onModifiedStateChanged()
+void pqFiltersMenuReaction::ondataUpdated()
 {
   QObject::disconnect(this->sender(), 0, this, 0);
   this->Timer.start(10);
