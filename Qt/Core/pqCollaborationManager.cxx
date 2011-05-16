@@ -307,6 +307,10 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         break;
       }
     }
+  else
+    {
+    emit triggerStateClientOnlyMessage(msg);
+    }
 }
 
 //-----------------------------------------------------------------------------

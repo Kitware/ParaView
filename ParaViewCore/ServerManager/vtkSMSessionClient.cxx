@@ -862,10 +862,16 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     UPDATE_VTK_OBJECTS(remoteObj); // If SMProxy will call UpdateVTKObjects()
     remoteObj->DisableLocalPushOnly();
     this->StopProcessingRemoteNotification();
-
-    // Clear cache of loaded proxy
-    this->GetProxyLocator()->Clear();
     }
+
+  // Maybe that "share_only" message could be useful for collaboration
+  if(remoteObj != this->GetCollaborationManager() && state.share_only())
+    {
+    this->GetCollaborationManager()->LoadState(&state, this->GetProxyLocator());
+    }
+
+  // Clear cache of loaded proxy
+  this->GetProxyLocator()->Clear();
 }
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,

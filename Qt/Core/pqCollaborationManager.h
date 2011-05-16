@@ -97,6 +97,9 @@ signals:
   /// inside the inspector panel.
   void triggerInspectorSelectedTabChanged(int);
 
+  /// that was not found localy
+  void triggerStateClientOnlyMessage(vtkSMMessage* msg);
+
 public slots:
 
   /// This will update the user information based on the latest server status

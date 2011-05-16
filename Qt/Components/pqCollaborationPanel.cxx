@@ -43,28 +43,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationManager.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
+#include "pqView.h"
 #include "pqServer.h"
+
+#include "vtkEventQtSlotConnect.h"
 #include "vtkSMMessage.h"
+#include "vtkSMSession.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVServerInformation.h"
-#include "vtkstd/map"
-#include "vtkstd/string"
+
+#include "vtkCommand.h"
+#include <vtkNew.h>
+#include <vtkstd/map>
+#include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
-//-----------------------------------------------------------------------------
+//*****************************************************************************
 #include "ui_pqCollaborationPanel.h"
 class pqCollaborationPanel::pqInternal : public Ui::pqCollaborationPanel
-{};
+{
+public:
+  int CameraToFollowOfUserId;
+  vtkNew<vtkEventQtSlotConnect> VTKConnector;
+};
 //-----------------------------------------------------------------------------
 pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->CameraToFollowOfUserId = -1;
 
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
                     this, SLOT(onUserMessage()));
 
   QObject::connect(this->Internal->members, SIGNAL(itemChanged(QTableWidgetItem*)),
                    this, SLOT(itemChanged(QTableWidgetItem*)));
+
+  QObject::connect(this->Internal->members, SIGNAL(cellDoubleClicked(int,int)),
+                   this, SLOT(cellDoubleClicked(int,int)));
 
   QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
                     this,   SLOT(writeChatMessage(int,QString&)));
@@ -76,6 +95,13 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(aboutToRemoveServer(pqServer*)),
                     this, SLOT(disconnectLocalSlots()));
+
+  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                    SIGNAL(viewAdded(pqView*)),
+                    this, SLOT(connectViewLocalSlots(pqView*)));
+  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                    SIGNAL(preViewRemoved(pqView*)),
+                    this, SLOT(disconnectViewLocalSlots(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -88,6 +114,9 @@ pqCollaborationPanel::~pqCollaborationPanel()
                        SIGNAL(itemChanged(QTableWidgetItem*)),
                        this,
                        SLOT(itemChanged(QTableWidgetItem*)));
+  QObject::disconnect( this->Internal->members,
+                       SIGNAL(cellDoubleClicked(int,int)),
+                       this, SLOT(cellDoubleClicked(int,int)));
 
   QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
                        this,   SLOT(writeChatMessage(int,QString&)));
@@ -157,6 +186,53 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
     }
 }
 //-----------------------------------------------------------------------------
+void pqCollaborationPanel::cellDoubleClicked(int row, int col)
+{
+  int userId = this->Internal->members->item(row, 0)->data(Qt::UserRole).toInt();
+  switch(col)
+    {
+    case 1: // Camera Link
+      this->setCameraSynchronizationToUser(userId);
+      break;
+    case 2: // 3D Pointer
+      break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
+{
+  if(this->Internal->CameraToFollowOfUserId == userId)
+    {
+    return;
+    }
+
+  // Update user Camera to follow
+  if(this->getCollaborationManager()->userId() == userId)
+    {
+    this->Internal->CameraToFollowOfUserId = 0; // Looking at our local camera
+    }
+  else
+    {
+    this->Internal->CameraToFollowOfUserId = userId;
+    }
+
+  // Update the UI
+  int nbRows = this->Internal->members->rowCount();
+  for(int i=0; i < nbRows; i++)
+    {
+    if(userId == this->Internal->members->item(i, 0)->data(Qt::UserRole).toInt())
+      {
+      this->Internal->members->item(i, 1)->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball16.png"));
+      }
+    else
+      {
+      this->Internal->members->item(i, 1)->setIcon(QIcon());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqCollaborationManager* pqCollaborationPanel::getCollaborationManager()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -198,6 +274,10 @@ void pqCollaborationPanel::onUserUpdate()
     // Disable other column editing
     item = new QTableWidgetItem("");
     item->setFlags( item->flags() & ~Qt::ItemIsEditable );
+    if(userId == this->Internal->CameraToFollowOfUserId)
+      {
+      item->setIcon(QIcon(":/pqWidgets/Icons/pqEyeball16.png"));
+      }
     this->Internal->members->setItem(cc, 1, item);
 
     item = new QTableWidgetItem("");
@@ -219,6 +299,8 @@ void pqCollaborationPanel::connectLocalSlots()
                       this,   SLOT(onUserUpdate()));
     QObject::connect( collab, SIGNAL(triggerUpdateUserList()),
                       this,   SLOT(onUserUpdate()));
+    QObject::connect( collab, SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
+                      this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
 
     QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                       collab, SLOT(onChatMessage(int,QString&)));
@@ -238,16 +320,77 @@ void pqCollaborationPanel::disconnectLocalSlots()
   pqCollaborationManager* collab = this->getCollaborationManager();
   if(collab)
     {
+    // If we disconnect, this means a new session has been created so all
+    // objects that we observed have been deleted
     QObject::disconnect( collab, SIGNAL(triggerChatMessage(int,QString&)),
                          this,   SLOT(writeChatMessage(int,QString&)));
     QObject::disconnect( collab, SIGNAL(triggerUpdateUser(int,QString&,bool)),
                          this,   SLOT(onUserUpdate()));
     QObject::disconnect( collab, SIGNAL(triggerUpdateUserList()),
                          this,   SLOT(onUserUpdate()));
+    QObject::disconnect( collab, SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
+                         this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
 
     QObject::disconnect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                          collab, SLOT(onChatMessage(int,QString&)));
     QObject::disconnect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
                          collab, SLOT(onUpdateUser(int,QString&,bool)));
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::connectViewLocalSlots(pqView* view)
+{
+  vtkSMRenderViewProxy* viewProxy =
+      vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+  if(viewProxy)
+    {
+    this->Internal->VTKConnector->Connect( viewProxy->GetInteractor(),
+                                           vtkCommand::StartInteractionEvent,
+                                           this, SLOT(stopFollowingCamera()));
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::disconnectViewLocalSlots(pqView* view)
+{
+  vtkSMRenderViewProxy* viewProxy =
+      vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+  if(viewProxy)
+    {
+    this->Internal->VTKConnector->Disconnect( viewProxy->GetInteractor(),
+                                              vtkCommand::StartInteractionEvent,
+                                              this, SLOT(stopFollowingCamera()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::stopFollowingCamera()
+{
+  this->setCameraSynchronizationToUser(-1);
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
+{
+  // Check if its camera update
+  if(msg->HasExtension(DefinitionHeader::client_class) &&
+     msg->GetExtension(DefinitionHeader::client_class) == "vtkSMCameraProxy")
+    {
+    if(this->Internal->CameraToFollowOfUserId == static_cast<int>(msg->client_id()))
+      {
+      vtkTypeUInt32 cameraId = msg->global_id();
+      pqApplicationCore* core = pqApplicationCore::instance();
+      vtkSMProxyLocator* locator =
+          core->getActiveServer()->session()->GetProxyLocator();
+      vtkSMProxy* proxy = locator->LocateProxy(cameraId);
+      if(proxy)
+        {
+        // Update Proxy
+        proxy->EnableLocalPushOnly();
+        proxy->LoadState(msg, locator);
+        proxy->UpdateVTKObjects();
+        proxy->DisableLocalPushOnly();
+        core->render();
+        }
+      }
     }
 }

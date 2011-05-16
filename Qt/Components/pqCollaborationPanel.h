@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMessageMinimal.h"
 
 class pqServer;
+class pqView;
 class pqCollaborationManager;
 class QTableWidgetItem;
 
@@ -70,16 +71,31 @@ protected slots:
   /// Called when user hit enter in the input line of chat message
   void onUserMessage();
 
+  /// Called when client receive message state that are tagged "share_only"
+  void onShareOnlyMessage(vtkSMMessage* msg);
+
   /// Called when we change pqServer so we can connect to the
   /// right pqCollaborationManager
   void connectLocalSlots();
   void disconnectLocalSlots();
 
+  /// Called when pqView are added/removed so we can listen user interaction
+  void connectViewLocalSlots(pqView*);
+  void disconnectViewLocalSlots(pqView*);
+  void stopFollowingCamera();
+
   /// Called when the user change its name
   /// (double click in the table on his name)
   void itemChanged(QTableWidgetItem* item);
 
+  /// Called when the user double click on any cell
+  void cellDoubleClicked(int, int);
+
 protected:
+
+  /// Activate camera synchronization
+  void setCameraSynchronizationToUser(int userId);
+
   pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
   void operator=(const pqCollaborationPanel&); // Not implemented.
 
