@@ -173,7 +173,7 @@ void ParaViewVRPN::terminate()
   vtkThread::terminate();
 }
 
-void ParaViewVRPN::SetQueue( vtkVRPNQueue* queue )
+void ParaViewVRPN::SetQueue( vtkVRQueue* queue )
 {
   this->EventQueue = queue;
 }
@@ -181,30 +181,42 @@ void ParaViewVRPN::SetQueue( vtkVRPNQueue* queue )
 
 void ParaViewVRPN::NewAnalogValue(vrpn_ANALOGCB data)
 {
-  vtkVRPNEventData temp;
+  vtkVREventData temp;
   temp.connId = this->Name;
   temp.eventType = ANALOG_EVENT;
-  temp.data.analog = data;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
+  temp.data.analog.num_channel = data.num_channel;
+  for ( int i=0 ; i<data.num_channel ;++i )
+    {
+    temp.data.analog.channel[i] = data.channel[i];
+    }
   this->EventQueue->enqueue( temp );
 }
 
 void ParaViewVRPN::NewButtonValue(vrpn_BUTTONCB data)
 {
-  vtkVRPNEventData temp;
+  vtkVREventData temp;
   temp.connId = this->Name;
   temp.eventType = BUTTON_EVENT;
-  temp.data.button = data;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
+  temp.data.button.button = data.button;
+  temp.data.button.state = data.state;
   this->EventQueue->enqueue( temp );
 }
 
 void ParaViewVRPN::NewTrackerValue(vrpn_TRACKERCB data )
 {
-  vtkVRPNEventData temp;
+  vtkVREventData temp;
   temp.connId = this->Name;
   temp.eventType = TRACKER_EVENT;
-  temp.data.tracker = data;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
+  temp.data.tracker.sensor = data.sensor;
+  temp.data.tracker.pos[0] = data.pos[0];
+  temp.data.tracker.pos[1] = data.pos[1];
+  temp.data.tracker.pos[2] = data.pos[2];
+  temp.data.tracker.quat[0] = data.quat[0];
+  temp.data.tracker.quat[1] = data.quat[1];
+  temp.data.tracker.quat[2] = data.quat[2];
+  temp.data.tracker.quat[3] = data.quat[3];
   this->EventQueue->enqueue( temp );
 }

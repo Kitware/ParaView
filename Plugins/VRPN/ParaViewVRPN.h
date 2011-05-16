@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Analog.h>
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
-#include "vtkVRPNQueue.h"
+#include "vtkVRQueue.h"
 
 
 typedef QThread vtkThread;
@@ -70,7 +70,7 @@ public:
 
   // Description:
   // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRPNQueue* queue );
+  void SetQueue( vtkVRQueue* queue );
 
  protected slots:
   void run();
@@ -89,7 +89,7 @@ protected:
   bool Initialized;
   bool _Stop;
 
-  vtkVRPNQueue* EventQueue;
+  vtkVRQueue* EventQueue;
 
   class pqInternals;
   pqInternals* Internals;

@@ -42,10 +42,10 @@ INCLUDE_DIRECTORIES(
 
 SET( VRPN_SOURCE_FILES
   ParaViewVRPN.cxx
-#  ParaViewVRPN.h
+
   vtkVRPNCallBackHandlers.cxx
   pqRenderLoopEvent.cxx
-#  vtkVRPNCallBackHandlers.h
+  vtkVRQueue.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRPNStarter
