@@ -48,10 +48,14 @@ set (StreamingTest_DISABLE_CRS TRUE)
 #serializing streaming tests to better tell what breaks where
 SET (StreamingTest_BREAK TRUE)
 
-# Use these tests to verify that cli/serv mode works
+# This tests verifies that cli/serv mode works
+set (StreamingClientSideTest_DISABLE_CS TRUE) #just to save time
 set (StreamingClientSideTest_DISABLE_CRS TRUE)
 SET (StreamingClientSideTest_BREAK TRUE)
+#loosen tolerance since viewpoint and thus images differ dependent on num processes
+SET (StreamingClientSideTest_THRESHOLD 1000)
 
+# This test verifies that serv side rendering works
 set (StreamingServerSideTest_DISABLE_C TRUE)
 set (StreamingServerSideTest_DISABLE_CRS TRUE)
 SET (StreamingServerSideTest_BREAK TRUE)

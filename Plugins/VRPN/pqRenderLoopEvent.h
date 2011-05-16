@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    ParaViewVRPN.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,39 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#ifndef __pqRenderLoopEvent_h_
+#define __pqRenderLoopEvent_h_
 
 #include <QObject>
 #include "vtkVRQueue.h"
 
-class QTimer;
-class ParaViewVRPN;
-class pqRenderLoopEvent;
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
 
-class pqVRPNStarter : public QObject
+class pqRenderLoopEvent : public QObject
 {
-  Q_OBJECT
-  typedef QObject Superclass;
+Q_OBJECT
+
 public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+  pqRenderLoopEvent();
+  ~pqRenderLoopEvent();
 
-  // Callback for shutdown.
-  void onShutdown();
+  // Description:
+  // Sets the Event Queue into which the vrpn data needs to be written
+  void SetQueue( vtkVRQueue* queue );
 
-  // Callback for startup.
-  void onStartup();
-
+protected slots:
+  void Handle();
+  void HandleButton ( const vtkVREventData& data );
+  void HandleAnalog ( const vtkVREventData& data );
+  void HandleTracker( const vtkVREventData& data );
+  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
+                                  vtkSMDoubleVectorProperty** prop);
+  bool SetHeadPoseProperty( vtkVREventData data );
+  bool UpdateNRenderWithHeadPose();
+  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 protected:
-  QTimer *VRPNTimer;
-  ParaViewVRPN *InputDevice;
-  pqRenderLoopEvent* RenderLoop;
-  vtkVRQueue* EventQueue;
-
-private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  vtkVRQueue *EventQueue;
 };
 
-#endif
+#endif //__pqRenderLoopEvent.h_
