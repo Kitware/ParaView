@@ -14,20 +14,21 @@
 =========================================================================*/
 #include "vtkAttributeDataToTableFilter.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkGraph.h"
-#include "vtkTable.h"
-#include "vtkDataSet.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkInformation.h"
 #include "vtkCellData.h"
+#include "vtkCharArray.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkDataSet.h"
+#include "vtkGraph.h"
+#include "vtkIdTypeArray.h"
+#include "vtkImageData.h"
+#include "vtkInformation.h"
+#include "vtkIntArray.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
-#include "vtkIdTypeArray.h"
-#include "vtkImageData.h"
-#include "vtkIntArray.h"
+#include "vtkTable.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
 //----------------------------------------------------------------------------
@@ -82,6 +83,26 @@ int vtkAttributeDataToTableFilter::RequestData(
     else
       {
       output->GetRowData()->ShallowCopy(fieldData);
+      if (this->FieldAssociation ==
+        vtkDataObject::FIELD_ASSOCIATION_CELLS)
+        {
+        // BUG #6830. Add cell-type array.
+        vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
+        if (ds)
+          {
+          vtkCharArray* celltypes = vtkCharArray::New();
+          celltypes->SetName("Cell Type");
+          vtkIdType numcells = ds->GetNumberOfCells();
+          celltypes->SetNumberOfTuples(numcells);
+          char* ptr = celltypes->GetPointer(0);
+          for (vtkIdType cc=0; cc < numcells; cc++)
+            {
+            ptr[cc] = static_cast<char>(ds->GetCellType(cc));
+            }
+          output->GetRowData()->AddArray(celltypes);
+          celltypes->Delete();
+          }
+        }
       }
 
     // Clear any attribute markings from the output. This resolves the problem

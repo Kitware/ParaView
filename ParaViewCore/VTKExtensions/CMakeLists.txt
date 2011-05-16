@@ -139,6 +139,7 @@ SET (Kit_SRCS
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
+  vtkPVPlotTime.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRampKeyFrame.cxx
@@ -240,6 +241,7 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkAMRDualGridHelper.cxx
+  vtkCacheSizeKeeper.cxx
   vtkMaterialInterfaceCommBuffer.cxx
   vtkMaterialInterfaceIdList.cxx
   vtkMaterialInterfacePieceLoading.cxx
@@ -248,17 +250,18 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkMaterialInterfaceProcessLoading.cxx
   vtkMaterialInterfaceProcessRing.cxx
   vtkMaterialInterfaceToProcMap.cxx
+  vtkPVPlotTime.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
-
   WRAP_EXCLUDE
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkAnimationPlayer.cxx
+  vtkCacheSizeKeeper.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCellIntegrator.cxx
   vtkImageCompressor.cxx
@@ -347,10 +350,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
   SET(KIT_PYTHON_DEPS)
-  SET(VTK_INSTALL_NO_LIBRARIES 1)
-  IF(VTKPythonWrapping_INSTALL_BIN_DIR)
-    SET(VTK_INSTALL_NO_LIBRARIES)
-  ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
 
   SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
   SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")

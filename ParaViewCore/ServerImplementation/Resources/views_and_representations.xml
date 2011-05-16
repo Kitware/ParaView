@@ -503,7 +503,7 @@
      <IntVectorProperty name="StereoCapableWindow"
        command="SetStereoCapableWindow"
        number_of_elements="1"
-       default_values="0">
+       default_values="1">
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -670,6 +670,14 @@
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LegendLocation"
+        command="SetLegendLocation"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="4" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -1907,7 +1915,7 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
-      <DoubleVectorProperty name="Color"
+      <DoubleVectorProperty name="AmbientColor"
         command="SetColor"
         number_of_elements="3"
         default_values="1.0 1.0 1.0">
@@ -4241,6 +4249,7 @@
           <Property name="ChartTitleColor" />
           <Property name="ChartTitleAlignment" />
           <Property name="ShowLegend" />
+          <Property name="LegendLocation" />
           <Property name="ShowAxis" />
           <Property name="AxisLogScale" />
           <Property name="ShowAxisGrid" />

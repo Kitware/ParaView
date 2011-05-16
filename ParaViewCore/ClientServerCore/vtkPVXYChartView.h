@@ -22,8 +22,9 @@
 
 #include "vtkPVContextView.h"
 
-class vtkChartView;
 class vtkChart;
+class vtkChartView;
+class vtkPVPlotTime;
 
 class VTK_EXPORT vtkPVXYChartView : public vtkPVContextView
 {
@@ -70,6 +71,13 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetLegendVisibility(int visible);
+
+  // Description:
+  // Set the legend location.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetLegendLocation(int location);
 
   // Description:
   // Sets whether or not the given axis is visible.
@@ -242,6 +250,7 @@ protected:
   // Description:
   // Pointer to the proxy's chart instance.
   vtkChart* Chart;
+  vtkPVPlotTime* PlotTime;
 
   void SelectionChanged();
 

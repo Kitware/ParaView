@@ -189,3 +189,9 @@ void vtkPVStreamingRepresentation::SetVisibility(bool val)
     this->Harness->SetEnabled(val);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVStreamingRepresentation::SetSelectionVisibility(bool vtkNotUsed(vis))
+{
+  this->Superclass::SetSelectionVisibility(false);
+}

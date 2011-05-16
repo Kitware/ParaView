@@ -231,7 +231,6 @@ int main(int , char *[])
   PRINT_SELF(vtkAttributeDataToTableFilter);
   PRINT_SELF(vtkBlockDeliveryPreprocessor);
   PRINT_SELF(vtkBSPCutsGenerator);
-  PRINT_SELF(vtkCacheSizeKeeper);
   PRINT_SELF(vtkCameraInterpolator2);
   PRINT_SELF(vtkCameraManipulator);
   PRINT_SELF(vtkCameraManipulatorGUIHelper);

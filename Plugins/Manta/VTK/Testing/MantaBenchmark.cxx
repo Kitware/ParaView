@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// This test covers the shadow map render pass.
+// This test covers the manta vs openGL render speed
 
 //TODO: Measure pipeline change and render setup time
 //TODO: Make it run and compile without MPI
@@ -206,7 +206,7 @@ void MyProcess::Execute()
   bool changeCamera = true;
   int screensize = 400;
   int triangles = 100000;
-  double fuzziness = 0.001;
+  double fuzziness = 0.0;
   int AStype = 0;
   int threads = 1;
   int processes = numProcs;
@@ -313,8 +313,7 @@ void MyProcess::Execute()
   vtkCompositeRenderManager *prm = vtkCompositeRenderManager::New();   
 
   vtkRenderWindowInteractor *iren=NULL;
-  vtkRenderWindow *renWin = NULL;
-  vtkRenderWindow *mRenWin = vtkRenderWindow::New();
+  vtkRenderWindow *renWin = vtkRenderWindow::New();
   renWin->SetMultiSamples(0);
   if(me==0)
     {
@@ -588,21 +587,12 @@ void MyProcess::Execute()
       iren->Start();
       }
     else
-      {    
-      //Do an image comparison of last image instead
-      if (testing->IsValidImageSpecified())
-        {
-        renWin->Render();        
-        //TODO: Compare final image against known correct result
-        /*
-        vtkImageData *testImage=renWin->Get>?;
-        retVal=testing->RegressionTest(testImage,thresh);
-        */
-        }
-      else
-        {
-        retVal=vtkTesting::NOT_RUN;
-        }
+      {
+      //the purpose of this test is to measure timing
+      //image comparisons are not needed for that
+      //flaws will show up when speed is drastically faster/slower than before
+      retVal=1;
+      renWin->Render();
       }
 
     prm->StopServices(); // tells satellites to stop listening.

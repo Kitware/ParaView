@@ -282,12 +282,26 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     return;
     }
 
+
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
 
-  vtkCamera* camera = vtkCamera::SafeDownCast(
-    this->GetSubProxy("ActiveCamera")->GetClientSideObject());
-  rv->SetActiveCamera(camera);
+#if 0
+  vtkCamera* camera = vtkCamera::SafeDownCast(this
+                                              ->GetSubProxy( "ActiveCamera" )
+                                              ->GetClientSideObject() );
+  rv->SetActiveCamera( camera );
+#else
+  vtkSMProxy* cameraProxy = this->GetSubProxy("ActiveCamera");
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "SetActiveCamera"
+         << VTKOBJECT(cameraProxy)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+#endif
 
   if (rv->GetInteractor())
     {
@@ -786,10 +800,27 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
+void vtkSMRenderViewProxy::CaptureWindowInternalRender()
 {
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  if (view->GetUseInteractiveRenderingForSceenshots())
+    {
+    this->InteractiveRender();
+    }
+  else
+    {
+    this->StillRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
+{
+#if !defined(__APPLE__)
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+#endif
 
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
@@ -803,14 +834,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 
   this->GetRenderWindow()->SwapBuffersOff();
 
-  if (view->GetUseInteractiveRenderingForSceenshots())
-    {
-    this->InteractiveRender();
-    }
-  else
-    {
-    this->StillRender();
-    }
+  this->CaptureWindowInternalRender();
 
   vtkSmartPointer<vtkWindowToImageFilter> w2i =
     vtkSmartPointer<vtkWindowToImageFilter>::New();

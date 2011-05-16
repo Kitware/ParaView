@@ -64,9 +64,12 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
     return 1;
     }
 
-  this->Superclass::WrongArgument(argument);
   // All arguments are simply passed to the python interpretor.
-  return 1;
+  // Returning 0 tells CommandLineArguments that the "argument" was not a
+  // handled and hence it leaves it in the "remaining arguments" collection. We
+  // query the remaining arguments and simply pass them to the python
+  // interpretor.
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -81,15 +84,32 @@ void vtkPVPythonOptions::Synchronize()
     vtkMultiProcessStream stream;
     if (controller->GetLocalProcessId() == 0)
       {
-      stream << this->PythonScriptName << this->GetSymmetricMPIMode();
+      if(this->PythonScriptName)
+        {
+        stream << (int)1 << this->PythonScriptName << this->GetSymmetricMPIMode();
+        }
+      else
+        {
+        stream << (int)0 << this->GetSymmetricMPIMode();
+        }
       controller->Broadcast(stream, 0);
       }
     else
       {
       controller->Broadcast(stream, 0);
-      vtkstd::string name;
-      stream >> name >> this->SymmetricMPIMode;
-      this->SetPythonScriptName(name.c_str());
+      int hasScriptName;
+      stream >> hasScriptName;
+      if(hasScriptName == 0)
+        {
+        this->SetPythonScriptName(NULL);
+        }
+      else
+        {
+        std::string name;
+        stream >> name;
+        this->SetPythonScriptName(name.c_str());
+        }
+      stream >> this->SymmetricMPIMode;
       }
     }
 }

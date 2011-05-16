@@ -35,10 +35,6 @@ public:
   vtkTypeMacro(vtkSIProxy, vtkSIObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Triggers UpdateInformation() on vtkObject if possible.
-  virtual void UpdateInformation();
-
 //BTX
   // Description:
   // Push a new state to the underneath implementation
@@ -77,6 +73,11 @@ public:
   virtual void AddInput(int input_port,
     vtkAlgorithmOutput* connection, const char* method);
   virtual void CleanInputs(const char* method);
+
+  // Description:
+  // Triggers UpdateInformation() on vtkObject if possible.
+  // Default implementation does pretty much nothing.
+  virtual void UpdatePipelineInformation() { }
 
 //BTX
 protected:

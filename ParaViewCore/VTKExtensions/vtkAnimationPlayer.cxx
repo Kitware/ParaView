@@ -122,6 +122,7 @@ void vtkAnimationPlayer::Stop()
 //----------------------------------------------------------------------------
 void vtkAnimationPlayer::GoToFirst()
 {
+  this->Stop();
   if (this->AnimationScene)
     {
     this->AnimationScene->SetSceneTime(
@@ -132,6 +133,7 @@ void vtkAnimationPlayer::GoToFirst()
 //----------------------------------------------------------------------------
 void vtkAnimationPlayer::GoToLast()
 {
+  this->Stop();
   if (this->AnimationScene)
     {
     this->AnimationScene->SetSceneTime(
@@ -143,6 +145,7 @@ void vtkAnimationPlayer::GoToLast()
 //----------------------------------------------------------------------------
 void vtkAnimationPlayer::GoToNext()
 {
+  this->Stop();
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
   double time = this->GoToNext(starttime, endtime, 
@@ -161,6 +164,7 @@ void vtkAnimationPlayer::GoToNext()
 //----------------------------------------------------------------------------
 void vtkAnimationPlayer::GoToPrevious()
 {
+  this->Stop();
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
   double time = this->GoToPrevious(starttime, endtime, 

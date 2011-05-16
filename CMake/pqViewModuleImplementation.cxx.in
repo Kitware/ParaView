@@ -69,7 +69,7 @@ bool @ARG_VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
 }
 
 vtkSMProxy* @ARG_VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype,
-                                                       pqServer *server)
+                                                           pqServer * /*server*/)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if(viewtype == "@ARG_VIEW_TYPE@")

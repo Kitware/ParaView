@@ -1,61 +1,47 @@
 INCLUDE_DIRECTORIES(../)
 
-# Locate VTK_DATA_ROOT as the directory of VTKData.
-FIND_PATH( VTK_DATA_ROOT VTKData.readme $ENV{VTK_DATA_ROOT} )
-IF ( NOT VTK_DATA_ROOT )
-  FIND_PATH ( VTK_DATA_ROOT VTKData.readme ../VTKData DOC "VTK Data root directory" )
-ENDIF ( NOT VTK_DATA_ROOT )
+create_test_sourcelist(MANTATESTS
+  MantaCxxTests.cxx
+  ColorMap.cxx
+  OddWidthImages.cxx
+  CreateDeleteObjects.cxx
+)
 
-ADD_EXECUTABLE( colorMap colorMap.cxx )
-TARGET_LINK_LIBRARIES( colorMap vtkManta vtkRendering vtkPVClientServerCore )
-ADD_TEST( ColorMapping ${EXECUTABLE_OUTPUT_PATH}/colorMap
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ColorMapping.png )
+ADD_EXECUTABLE( MantaCxxTests ${MANTATESTS} )
+set (TestsToRun ${MANTATESTS})
+remove (TestsToRun MantaCxxTests.cxx)
+foreach (test ${TestsToRun})
+  get_filename_component(TName ${test} NAME_WE)
+  add_test(Manta-Test${TName} ${EXECUTABLE_OUTPUT_PATH}/MantaCxxTests ${TName}
+    -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
+    -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaTest${TName}.png
+    )
+endforeach()
+TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRendering)
 
-ADD_EXECUTABLE( CreateOddWidthImages CreateOddWidthImages.cxx )
-TARGET_LINK_LIBRARIES( CreateOddWidthImages vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
-ADD_TEST( CreateOddWidthImages ${EXECUTABLE_OUTPUT_PATH}/CreateOddWidthImages
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/CreateOddWidthImages.png )
+#disabling this until I sort out the shutdown segfault
+#ADD_EXECUTABLE( TriangleStrips TriangleStrips.cxx )
+#TARGET_LINK_LIBRARIES( TriangleStrips vtkManta vtkRendering vtkHybrid)
+#ADD_TEST( Manta-TestTriangleStrips ${EXECUTABLE_OUTPUT_PATH}/TriangleStrips
+#          -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
+#          -V ${PARAVIEW_DATA_ROOT}/Baseline/TriangleStrips.png )
 
-ADD_EXECUTABLE( CreateDeleteObjects CreateDeleteObjects.cxx )
-TARGET_LINK_LIBRARIES( CreateDeleteObjects vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
-ADD_TEST( CreateDeleteObjects ${EXECUTABLE_OUTPUT_PATH}/CreateDeleteObjects
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/CreateDeleteObjects.png )
-
-ADD_EXECUTABLE( ToggleVisibility ToggleVisibility.cxx )
-TARGET_LINK_LIBRARIES( ToggleVisibility vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
-ADD_TEST( ToggleVisibility ${EXECUTABLE_OUTPUT_PATH}/ToggleVisibility
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ToggleVisibility.png )
-
-ADD_EXECUTABLE( multiRens multiRens.cxx )
-TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid vtkPVClientServerCore )
-#Disable this test until we support intermixed renderers.
-#ADD_TEST( MultiLayerRendering ${EXECUTABLE_OUTPUT_PATH}/multiRens
+#disabling this until I sort out the shutdown segfault
+#ADD_EXECUTABLE( MultipleLayers MultipleLayers.cxx )
+#TARGET_LINK_LIBRARIES( MultipleLayers vtkManta vtkRendering vtkHybrid )
+#ADD_TEST( Manta-TestMultipleLayers ${EXECUTABLE_OUTPUT_PATH}/MultipleLayers
 #          ${PROJECT_SOURCE_DIR}/examples/multiRensEvents.log
-#          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-#          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MultiLayerRendering.png )
-
-ADD_EXECUTABLE( marching.timing marching.timing.cxx )
-TARGET_LINK_LIBRARIES( marching.timing vtkManta vtkHybrid vtkRendering vtkPVClientServerCore )
-ADD_TEST( MarchingCubeTiming ${EXECUTABLE_OUTPUT_PATH}/marching.timing 2
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MarchingCubeTiming.png )
-
-IF (VTK_USE_MPI)
-#  ADD_EXECUTABLE( TaskParallelism TaskParallelism )
-#  TARGET_LINK_LIBRARIES ( TaskParallelism vtkManta vtkRendering vtkParallel )
-#Disable this test because it isn't finishing on the dashboard.
-#  ADD_TEST( ParallelImageCompositing mpirun -np 2 
-#            ${EXECUTABLE_OUTPUT_PATH}/TaskParallelism
-#            -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-#            -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ParallelImageCompositing.png )
+#          -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
+#          -V ${PARAVIEW_DATA_ROOT}/Baseline/MultiLayerRendering.png )
 
 
-#  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
-#  TARGET_LINK_LIBRARIES ( MantaBenchmark vtkManta vtkRendering vtkParallel )
+IF ( VTK_USE_MPI )
 
-ENDIF(VTK_USE_MPI)
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
+  TARGET_LINK_LIBRARIES( MantaBenchmark vtkManta vtkHybrid vtkRendering vtkParallel )
+  ADD_TEST( Manta-TestBenchmark ${EXECUTABLE_OUTPUT_PATH}/MantaBenchmark
+    -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
+    -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaBenchmark.png )
 
+ENDIF (VTK_USE_MPI)

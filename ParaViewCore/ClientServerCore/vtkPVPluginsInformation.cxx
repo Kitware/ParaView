@@ -20,8 +20,10 @@
 #include "vtkPVPluginTracker.h"
 #include "vtkClientServerStream.h"
 
+#include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtkstd/iterator>
 
 namespace
 {
@@ -32,10 +34,21 @@ namespace
     vtkstd::string FileName;
     vtkstd::string RequiredPlugins;
     vtkstd::string Version;
+    vtkstd::string StatusMessage;
+    bool AutoLoadForce;
     bool AutoLoad;
     bool Loaded;
     bool RequiredOnClient;
     bool RequiredOnServer;
+
+    vtkItem():
+      AutoLoadForce(false),
+      AutoLoad(false),
+      Loaded(false),
+      RequiredOnClient(false),
+      RequiredOnServer(false)
+      {
+      }
 
     bool Load(const vtkClientServerStream& stream, int &offset)
       {
@@ -80,7 +93,13 @@ namespace
         {
         return false;
         }
+      this->StatusMessage.clear();
       return true;
+      }
+
+    bool operator()(const vtkItem& s1, const vtkItem& s2) const
+      {
+      return s1.Name < s2.Name;
       }
     };
 
@@ -199,6 +218,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     item.Name = tracker->GetPluginName(cc);
     item.FileName = tracker->GetPluginFileName(cc);
     item.AutoLoad = tracker->GetPluginAutoLoad(cc);
+    item.AutoLoadForce = false;
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
     item.Loaded = plugin != NULL;
@@ -207,6 +227,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
       item.RequiredPlugins = plugin->GetRequiredPlugins();
       item.RequiredOnClient = plugin->GetRequiredOnClient();
       item.RequiredOnServer = plugin->GetRequiredOnServer();
+      item.Version = plugin->GetPluginVersionString();
       }
     else
       {
@@ -234,8 +255,12 @@ void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
         other_iter->FileName == self_iter->FileName)
         {
         bool prev_autoload = self_iter->AutoLoad;
+        bool auto_load_force = self_iter->AutoLoadForce;
         (*self_iter) = (*other_iter);
-        self_iter->AutoLoad = prev_autoload;
+        if (auto_load_force)
+          {
+          self_iter->AutoLoad = prev_autoload;
+          }
         break;
         }
       }
@@ -258,6 +283,18 @@ const char* vtkPVPluginsInformation::GetPluginName(unsigned int cc)
     {
     return (*this->Internals)[cc].Name.c_str();
     }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPluginsInformation::GetPluginStatusMessage(unsigned int cc)
+{
+  if (cc < this->GetNumberOfPlugins())
+    {
+    const char* reply = (*this->Internals)[cc].StatusMessage.c_str();
+    return (strlen(reply) ==0? NULL : reply);
+    }
+
   return NULL;
 }
 
@@ -288,7 +325,7 @@ bool vtkPVPluginsInformation::GetPluginLoaded(unsigned int cc)
     {
     return (*this->Internals)[cc].Loaded;
     }
-  return NULL;
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -335,6 +372,21 @@ void vtkPVPluginsInformation::SetAutoLoad(unsigned int cc, bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPluginsInformation::SetAutoLoadAndForce(unsigned int cc, bool val)
+{
+  if (cc < this->GetNumberOfPlugins())
+    {
+    (*this->Internals)[cc].AutoLoad = val;
+    (*this->Internals)[cc].AutoLoadForce = true;
+    }
+  else
+    {
+    vtkWarningMacro("Invalid index: " << cc);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetAutoLoad(unsigned int cc)
 {
   if (cc < this->GetNumberOfPlugins())
@@ -342,4 +394,49 @@ bool vtkPVPluginsInformation::GetAutoLoad(unsigned int cc)
     return (*this->Internals)[cc].AutoLoad;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
+    vtkPVPluginsInformation* client_plugins,
+    vtkPVPluginsInformation* server_plugins)
+{
+  vtkstd::set<vtkItem, vtkItem> client_set;
+  vtkstd::set<vtkItem, vtkItem> server_set;
+  vtkstd::copy(client_plugins->Internals->begin(), client_plugins->Internals->end(),
+    vtkstd::inserter(client_set, client_set.begin()));
+  vtkstd::copy(server_plugins->Internals->begin(), server_plugins->Internals->end(),
+    vtkstd::inserter(server_set, server_set.begin()));
+
+  bool all_requirements_are_met = true;
+  vtkstd::vector<vtkItem>::iterator iter;
+  for (iter = client_plugins->Internals->begin();
+    iter != client_plugins->Internals->end(); ++iter)
+    {
+    if (iter->RequiredOnServer)
+      {
+      vtkstd::set<vtkItem, vtkItem>::iterator iter2 = server_set.find(*iter);
+      if (iter2 == server_set.end() || iter2->Loaded == false)
+        {
+        all_requirements_are_met = false;
+        iter->StatusMessage = "Must be loaded on Server as well";
+        }
+      }
+    }
+
+  for (iter = server_plugins->Internals->begin();
+    iter != server_plugins->Internals->end(); ++iter)
+    {
+    if (iter->RequiredOnServer)
+      {
+      vtkstd::set<vtkItem, vtkItem>::iterator iter2 = client_set.find(*iter);
+      if (iter2 == client_set.end() || iter2->Loaded == false)
+        {
+        all_requirements_are_met = false;
+        iter->StatusMessage = "Must be loaded on Client as well";
+        }
+      }
+    }
+
+  return all_requirements_are_met;
 }

@@ -54,6 +54,12 @@ vtkChartXY* vtkXYChartRepresentation::GetChart()
 }
 
 //----------------------------------------------------------------------------
+const char* vtkXYChartRepresentation::GetXAxisSeriesName()
+{
+  return this->Options? this->Options->GetXSeriesName() : NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetXAxisSeriesName(const char* name)
 {
   this->Options->SetXSeriesName(name);

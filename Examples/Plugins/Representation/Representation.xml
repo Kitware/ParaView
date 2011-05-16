@@ -1,14 +1,8 @@
 <ServerManaerConfiguration>
-  <ProxyGroup name="mappers">
-    <SourceProxy name="MySpecialPolyDataMapper"
-      class="vtkMySpecialPolyDataMapper"
-      base_proxygroup="mappers" base_proxyname="PolyDataMapper">
-      <!-- And any extra properties for this mapper -->
-    </SourceProxy>
-  </ProxyGroup>
-
   <ProxyGroup name="representations">
-    <SurfaceRepresentationProxy name="MySpecialRepresentation" 
+    <RepresentationProxy name="MySpecialRepresentation"
+      class="vtkMySpecialRepresentation"
+      processes="client|renderserver|dataserver"
       base_proxygroup="representations"
       base_proxyname="SurfaceRepresentation">
       <Documentation>
@@ -17,40 +11,8 @@
         our mapper.
       </Documentation>
       
-      <InputProperty name="Input" 
-        command="NotUsed">
-        <InputArrayDomain name="input_array_any"
-          attribute_type="any">
-        </InputArrayDomain>
-      </InputProperty>
-
-      <SubProxy>
-        <Proxy name="Mapper" proxygroup="mappers"
-               proxyname="MySpecialPolyDataMapper"
-               override="1" />
-        <ExposedProperties>
-          <Property name="LookupTable" />
-          <Property name="MapScalars" />
-          <Property name="ImmediateModeRendering" />
-          <Property name="InterpolateScalarsBeforeMapping" />
-          <Property name="UseLookupTableScalarRange" />
-          <Property name="ClippingPlanes" />
-          <Property name="NumberOfSubPieces" />
-          <Property name="StaticMode" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="LODMapper" 
-          proxygroup="mappers"
-          proxyname="MySpecialPolyDataMapper" override="1"/>
-        <ShareProperties subproxy="Mapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-    <!-- End of SurfaceRepresentation -->
-    </SurfaceRepresentationProxy>
+    <!-- End of MySpecialRepresentation -->
+    </RepresentationProxy>
 
     <Extension name="GeometryRepresentation">
       <Documentation>

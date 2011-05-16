@@ -32,6 +32,7 @@
 #ifdef PARAVIEW_USE_ICE_T
 # include "vtkIceTSynchronizedRenderers.h"
 #endif
+#include "vtkCompositedSynchronizedRenderers.h"
 
 #include <assert.h>
 
@@ -165,8 +166,7 @@ void vtkPVSynchronizedRenderer::Initialize()
         activeSession->GetController(vtkPVSession::CLIENT));
       }
 
-    // DONT BREAK
-    // break;
+    // DONT BREAK, server needs to setup everything in the BATCH case
 
   case BATCH:
     if (in_cave_mode)
@@ -176,12 +176,15 @@ void vtkPVSynchronizedRenderer::Initialize()
         vtkMultiProcessController::GetGlobalController());
       this->ParallelSynchronizer->WriteBackImagesOn();
       }
-    else if (pm->GetNumberOfLocalPartitions() > 1)
+    else if (pm->GetNumberOfLocalPartitions() > 1 ||
+      (pm->GetNumberOfLocalPartitions() == 1 && in_tile_display_mode))        
       {
+      //ICET now handles stereo properly, so use it no matter the number
+      //of partitions
 #ifdef PARAVIEW_USE_ICE_T
       if (this->DisableIceT)
         {
-        this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
         }
       else
         {

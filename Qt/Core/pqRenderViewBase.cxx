@@ -180,7 +180,10 @@ QWidget* pqRenderViewBase::createWidget()
 #if defined(__APPLE__)
   if (this->AllowCaching)
     {
-    vtkwidget->setAutomaticImageCacheEnabled(true);
+    // Don't override the caching flag here. It is set correctly by
+    // pqQVTKWidget.  I don't know why this explicit marking cached dirty was
+    // done. But in case it's needed for streaming view, I am letting it be.
+    // vtkwidget->setAutomaticImageCacheEnabled(true);
 
     // help the QVTKWidget know when to clear the cache
     this->getConnector()->Connect(
@@ -457,7 +460,6 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   };
 
 static const char* pqRenderViewModuleMiscSettings [] = {
-  "CacheLimit",
   "CameraParallelProjection",
   "CenterAxesVisibility",
   "OrientationAxesInteractivity",

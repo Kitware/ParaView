@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewVRPN.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkVRPNQueue.h"
+#include "pqRenderLoopEvent.h"
 
 //-----------------------------------------------------------------------------
 pqVRPNStarter::pqVRPNStarter(QObject* p/*=0*/)
@@ -56,26 +58,47 @@ pqVRPNStarter::~pqVRPNStarter()
 //-----------------------------------------------------------------------------
 void pqVRPNStarter::onStartup()
 {
-  qWarning() << "Message from pqVRPNStarter: Application Started";
+  //qWarning() << "Message from pqVRPNStarter: Application Started";
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions *options = (vtkPVOptions*)pm->GetOptions();
   if(options->GetUseVRPN())
     {
-    // VRPN input events.
-    this->VRPNTimer=new QTimer(this);
-    this->VRPNTimer->setInterval(40); // in ms
-    // to define: obj and callback()
+    // Create VRPN event queue
+    this->EventQueue = new vtkVRPNQueue;
+
+    // Create vrpn client to read device information
     this->InputDevice=new ParaViewVRPN;
+    this->InputDevice->SetQueue( this->EventQueue );
     this->InputDevice->SetName(options->GetVRPNAddress());
     this->InputDevice->Init();
+    this->InputDevice->start();
+
+    // // Create vrpn client to read device information
+    // this->InputDevice=new ParaViewVRPN;
+    // this->InputDevice->SetQueue( this->EventQueue );
+    // this->InputDevice->SetName("device0@localhost");
+    // this->InputDevice->Init();
+    // this->InputDevice->start();
+
+    // Create the render loop and pass the queue to recieve data from vrpn
+    this->VRPNTimer=new QTimer(this);
+    this->VRPNTimer->setInterval(0); // in ms
+    this->RenderLoop = new pqRenderLoopEvent();
+    this->RenderLoop->SetQueue(this->EventQueue);
     connect(this->VRPNTimer,SIGNAL(timeout()),
-            this->InputDevice,SLOT(callback()));
+            this->RenderLoop,SLOT(Handle()));
     this->VRPNTimer->start();
     }
 }
 
+
 //-----------------------------------------------------------------------------
 void pqVRPNStarter::onShutdown()
 {
-  qWarning() << "Message from pqVRPNStarter: Application Shutting down";
+  this->InputDevice->terminate();
+  delete( this->RenderLoop );
+  delete( this->VRPNTimer );
+  delete( this->InputDevice );
+  delete( this->EventQueue );
+  // qWarning() << "Message from pqVRPNStarter: Application Shutting down";
 }

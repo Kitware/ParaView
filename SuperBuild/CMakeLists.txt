@@ -47,7 +47,7 @@ set(CMAKE_MODULE_PATH
 INCLUDE(ExternalProject)
 
 #-----------------------------------------------------------------------------
-# Git protocole option
+# Git protocol option
 #-----------------------------------------------------------------------------
 
 option(GIT_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON)
@@ -182,12 +182,14 @@ if(NOT APPLE)
   include(External_NUMPY)
 
   if(NOT WIN32)
-    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Depenednecies for VisTrails" FALSE)
+    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Dependencies for VisTrails" FALSE)
     mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
     if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
       # Build SIP and PyQt for vistrails plugin.
+      set(SIP_dependencies python)
       include(External_SIP)
       list(APPEND PyQt_dependencies SIP)
+      set(PyQt_dependencies python SIP)
       include(External_PyQt)
       list(APPEND ParaView_dependencies PyQt)
 
@@ -248,19 +250,21 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
 endif()
 
-# Build a common png used by several dependencies
-include(External_png)
-set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
-  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-list(APPEND ParaView_dependencies png)
+if(NOT APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
-else()
-  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+  else()
+    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  endif()
 endif()
 
 # Build HDF5
@@ -313,6 +317,22 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
 endif()
 
+
+# Build VRPN
+list(APPEND ParaView_dependencies VRPN)
+include(External_VRPN)
+set(VRPN_ARGS
+  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
+  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
+else()
+  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
+endif()
+
 if(NOT WIN32)
   include(External_FFMPEG)
   set(FFMPEG_ARGS
@@ -328,11 +348,17 @@ endif()
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
 set(DOC_ARGS)
 if(ParaView_BUILD_DOCUMENTATION)
+
+  set(USERS_GUIDE_FILE "ParaView User's Guide.pdf")
+  find_file(PARAVIEW_USERS_GUIDE ${USERS_GUIDE_FILE})
+  mark_as_advanced(PARAVIEW_USERS_GUIDE)
+
   set(DOC_ARGS
     -DBUILD_DOCUMENTATION:BOOL=ON
     -DPARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
     -DGENERATE_FILTERS_DOCUMENTATION:BOOL=ON
     -DDOCUMENTATION_HTML_HELP:BOOL=ON
+    -DPARAVIEW_USERS_GUIDE:FILEPATH=${PARAVIEW_USERS_GUIDE}
   )
 endif()
 
@@ -383,6 +409,8 @@ ExternalProject_Add(${proj}
     ${Silo_ARGS}
     # VisTrails
     ${VISTRAILS_ARGS}
+    # VRPN Plugin
+    ${VRPN_ARGS}
     # zlib
     ${ZLIB_ARGS}
     # Documentation

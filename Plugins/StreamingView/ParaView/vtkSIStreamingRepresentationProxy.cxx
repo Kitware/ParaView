@@ -66,6 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVSession.h"
 #include "vtkSISourceProxy.h"
 
@@ -99,25 +100,31 @@ bool vtkSIStreamingRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
-  vtkSISourceProxy* pieceCache =
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession *pvses = vtkPVSession::SafeDownCast(pm->GetSession());
+  if (pvses->GetProcessRoles() & vtkPVSession::SERVERS)
+    {
+    //in c/s mode, client will not have the subproxies, thus the guard above
+    vtkSISourceProxy* pieceCache =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("PieceCache"));
 
-  vtkSISourceProxy* harness =
+    vtkSISourceProxy* harness =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("Harness"));
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetVTKObject()
-         << "SetPieceCache"
-         << pieceCache->GetVTKObject()
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->GetVTKObject()
-         << "SetHarness"
-         << harness->GetVTKObject()
-         << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetVTKObject()
+           << "SetPieceCache"
+           << pieceCache->GetVTKObject()
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetVTKObject()
+           << "SetHarness"
+           << harness->GetVTKObject()
+           << vtkClientServerStream::End;
 
+    this->Interpreter->ProcessStream(stream);
+    }
   // OK
   return true;
 }
@@ -127,20 +134,31 @@ void vtkSIStreamingRepresentationProxy::AddInput( int inputPort,
                                                   vtkAlgorithmOutput* connection,
                                                   const char* method)
 {
-  // Get objects
-  vtkSISourceProxy* pieceCache =
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession *pvses = vtkPVSession::SafeDownCast(pm->GetSession());
+
+  if (pvses->GetProcessRoles() & vtkPVSession::SERVERS)
+    {
+    //in c/s mode, client will not have the subproxies, thus the guard above
+    // Get objects
+    vtkSISourceProxy* pieceCache =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("PieceCache"));
-  vtkAlgorithmOutput* pieceOutput = pieceCache->GetOutputPort(0);
-  vtkAlgorithm* pieceCacheAlg = vtkAlgorithm::SafeDownCast(
-    pieceCache->GetVTKObject());
+    vtkAlgorithmOutput* pieceOutput = pieceCache->GetOutputPort(0);
+    vtkAlgorithm* pieceCacheAlg = vtkAlgorithm::SafeDownCast
+      (pieceCache->GetVTKObject());
 
-  vtkSISourceProxy* harness =
+    vtkSISourceProxy* harness =
       vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy("Harness"));
-  vtkAlgorithmOutput* harnessOutput = harness->GetOutputPort(0);
-  vtkAlgorithm* harnessAlg = vtkAlgorithm::SafeDownCast(
-    harness->GetVTKObject());
+    vtkAlgorithmOutput* harnessOutput = harness->GetOutputPort(0);
+    vtkAlgorithm* harnessAlg = vtkAlgorithm::SafeDownCast
+      (harness->GetVTKObject());
 
-  pieceCacheAlg->SetInputConnection(0, connection);
-  harnessAlg->SetInputConnection(pieceOutput);
-  this->Superclass::AddInput(inputPort, harnessOutput, method);
+    pieceCacheAlg->SetInputConnection(0, connection);
+    harnessAlg->SetInputConnection(pieceOutput);
+    this->Superclass::AddInput(inputPort, harnessOutput, method);
+    }
+  else
+    {
+    this->Superclass::AddInput(inputPort, connection, method);
+    }
 }

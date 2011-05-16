@@ -348,8 +348,12 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       {
       // Use slice representation by default for 2D image data.
       int* ext = dataInfo->GetExtent();
-      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+      if (
+        (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5]) &&
+        /* slice not supported for composite datasets */
+        (dataInfo->GetCompositeDataSetType()==-1 ))
         {
+
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
           "Slice");
         }

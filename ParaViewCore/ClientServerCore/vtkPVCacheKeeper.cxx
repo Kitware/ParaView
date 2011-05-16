@@ -50,20 +50,8 @@ vtkPVCacheKeeper::vtkPVCacheKeeper()
   this->CacheTime = 0.0;
   this->CachingEnabled = true; 
   this->CacheSizeKeeper = 0;
+  this->SetCacheSizeKeeper(vtkCacheSizeKeeper::GetInstance());
 
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-//  if (pm)
-//    {
-//    this->SetCacheSizeKeeper(
-//      vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
-//    }
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
 }
 
@@ -181,19 +169,19 @@ int vtkPVCacheKeeper::RequestData(vtkInformation* vtkNotUsed(reqInfo),
     if (this->IsCached(this->CacheTime))
       {
       output->ShallowCopy((*this->Cache)[this->CacheTime]);
-      // cout << this << " using Cache: " << this->CacheTime << endl;
+      //cout << this << " using Cache: " << this->CacheTime << endl;
       }
     else
       {
       output->ShallowCopy(input);
       this->SaveData(output);
-      // cout << this << " Saving cache: " << this->CacheTime << endl;
+      //cout << this << " Saving cache: " << this->CacheTime << endl;
       }
     }
   else
     {
     output->ShallowCopy(input);
-    // cout << this << " Not using cache" << endl;
+    //cout << this << " Not using cache" << endl;
     }
   return 1;
 }

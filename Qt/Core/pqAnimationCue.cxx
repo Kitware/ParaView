@@ -401,9 +401,13 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
     keyTime = (prev_time + next_time)/2.0;
     }
 
-  pqSMAdaptor::setElementProperty(kf->GetProperty("KeyTime"), keyTime);
+  // Register the proxy
   kf->UpdateVTKObjects();
   this->addKeyFrameInternal(kf);
+
+  // Set the KeyTime property
+  pqSMAdaptor::setElementProperty(kf->GetProperty("KeyTime"), keyTime);
+  kf->UpdateVTKObjects();
 
   vtkSMProxyProperty* pp =vtkSMProxyProperty::SafeDownCast(
     this->Internal->Manipulator->GetProperty("KeyFrames"));

@@ -158,7 +158,6 @@ public:
     }
 };
 
-vtkSmartPointer<vtkPVPluginTracker> vtkPVPluginTracker::Instance;
 vtkStandardNewMacro(vtkPVPluginTracker);
 //----------------------------------------------------------------------------
 vtkPVPluginTracker::vtkPVPluginTracker()
@@ -176,16 +175,19 @@ vtkPVPluginTracker::~vtkPVPluginTracker()
 //----------------------------------------------------------------------------
 vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
 {
-  if (vtkPVPluginTracker::Instance.GetPointer() == NULL)
+  static vtkSmartPointer<vtkPVPluginTracker> Instance;
+  if (Instance.GetPointer() == NULL)
     {
     vtkPVPluginTracker* mgr = vtkPVPluginTracker::New();
-    vtkPVPluginTracker::Instance = mgr;
+    Instance = mgr;
     mgr->FastDelete();
 
     bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
     vtkPVPluginTrackerDebugMacro("Locate and load distributed plugin list.");
 
-    // Locate ".plugins" file.
+    // Locate ".plugins" file and process it.
+    // This will setup the distributed-list of plugins. Also it will load any
+    // auto-load plugins.
     vtkstd::string _plugins = vtkLocatePlugin(".plugins", false);
     if (!_plugins.empty())
       {
@@ -196,9 +198,15 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
       vtkPVPluginTrackerDebugMacro(
         "Could not find .plugins file for distributed plugins");
       }
+
+    // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
+    // These are always loaded (not merely located).
+    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+    loader->LoadPluginsFromPluginSearchPath();
+    loader->Delete();
     }
 
-  return vtkPVPluginTracker::Instance;
+  return Instance;
 }
 
 //----------------------------------------------------------------------------
@@ -278,7 +286,8 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: "
         << name.c_str());
       vtkstd::string plugin_filename;
-      if (child->GetAttribute("filename"))
+      if (child->GetAttribute("filename") &&
+        vtksys::SystemTools::FileExists(child->GetAttribute("filename"), true))
         {
         plugin_filename = child->GetAttribute("filename");
         }
@@ -457,7 +466,7 @@ bool vtkPVPluginTracker::GetPluginLoaded(unsigned int index)
 if (index >= this->GetNumberOfPlugins())
     {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return false;
     }
   return (*this->PluginsList)[index].Plugin != NULL;
 }
@@ -468,7 +477,7 @@ bool vtkPVPluginTracker::GetPluginAutoLoad(unsigned int index)
   if (index >= this->GetNumberOfPlugins())
     {
     vtkWarningMacro("Invalid index: " << index);
-    return NULL;
+    return false;
     }
   return (*this->PluginsList)[index].AutoLoad;
 }

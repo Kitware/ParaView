@@ -58,6 +58,10 @@ public:
   pqPluginManager(QObject* p = 0);
   ~pqPluginManager();
 
+  /// Called during application initialization to load plugins from settings.
+  /// This only loads "local" plugins.
+  void loadPluginsFromSettings();
+
   enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
 
   /// attempt to load an extension on a server
@@ -78,10 +82,6 @@ public:
   /// Return all the paths that plugins will be searched for.
   QStringList pluginPaths(bool remote);
 
-  /// exclude an extension from being remembered. This does not actually unload
-  /// the plugin, just forgets about it.
-  void removePlugin(const QString& lib, bool remote=true);
-
   /// simply adds the plugin to the ignore list, so when this class tries to
   /// serialize the plugin information, it skips the indicated plugin.
   void hidePlugin(const QString& lib, bool remote);
@@ -97,6 +97,10 @@ signals:
 
 protected:
   void initialize(vtkSMPluginManager*);
+
+  /// ensures that plugins required on client and server are present on both.
+  /// Fires requiredPluginsNotLoaded() signal if any mismatch is found.
+  void verifyPlugins();
 
 protected slots:
   void onServerConnected(pqServer*);

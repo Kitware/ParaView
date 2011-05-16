@@ -59,6 +59,13 @@ protected:
   ~vtkGeometryRepresentationWithFaces();
 
   // Description:
+  // This method is called in the constructor. If the subclasses override any of
+  // the iVar vtkObject's of this class e.g. the Mappers, GeometryFilter etc.,
+  // they should call this method again in their constructor. It must be totally
+  // safe to call this method repeatedly.
+  virtual void SetupDefaults();
+
+  // Description:
   // Adds the representation to the view.  This is called from
   // vtkView::AddRepresentation().  Subclasses should override this method.
   // Returns true if the addition succeeds.

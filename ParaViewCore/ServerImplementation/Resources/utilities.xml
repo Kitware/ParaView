@@ -2246,6 +2246,22 @@
       <!-- End of GlobalMapperProperties -->
     </Proxy>
 
+    <Proxy name="GlobalAnimationProperties" class="vtkSMAnimationScene"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        Proxy used to update animation related settings on all processes.
+      </Documentation>
+      <IntVectorProperty name="CacheLimit"
+        command="SetCacheLimit"
+        number_of_elements="1"
+        default_values="none">
+        <Documentation>
+         Set the cache limit in KiloBytes.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of GlobalAnimationProperties-->
+    </Proxy>
+
     <Proxy name="TimerLog" class="vtkTimerLog"
            processes="client|dataserver|renderserver">
       <Documentation>

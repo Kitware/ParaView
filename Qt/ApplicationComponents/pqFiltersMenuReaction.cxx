@@ -44,11 +44,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMDataTypeDomain.h"
+#include "vtkSMInputArrayDomain.h"
+
 
 #include <QMap>
 #include <QDebug>
@@ -68,6 +72,38 @@ static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 
   propIter->Delete();
   return prop;
+}
+
+namespace
+{
+  QString getDomainDisplayText(vtkSMDomain* domain, vtkSMInputProperty*)
+    {
+    if (domain->IsA("vtkSMDataTypeDomain"))
+      {
+      QStringList types;
+      vtkSMDataTypeDomain* dtd = static_cast<vtkSMDataTypeDomain*>(domain);
+      for (unsigned int cc=0; cc < dtd->GetNumberOfDataTypes(); cc++)
+        {
+        types << dtd->GetDataType(cc);
+        }
+
+      return QString("Input data must be %1").arg(
+        types.join(" or "));
+      }
+    else if (domain->IsA("vtkSMInputArrayDomain"))
+      {
+      vtkSMInputArrayDomain* iad = static_cast<vtkSMInputArrayDomain*>(domain);
+      QString txt = (iad->GetAttributeType() == vtkSMInputArrayDomain::ANY?
+        QString("Requires an attribute array") :
+        QString("Requires a %1 attribute array").arg(iad->GetAttributeTypeAsString()));
+      if (iad->GetNumberOfComponents() > 0)
+        {
+        txt += QString(" with %1 component(s)").arg(iad->GetNumberOfComponents());
+        }
+      return txt;
+      }
+    return QString("Requirements not met");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -153,6 +189,7 @@ void pqFiltersMenuReaction::updateEnableState()
     if (!prototype || !enabled)
       {
       action->setEnabled(false);
+      action->setStatusTip("Requires an input");
       continue;
       }
 
@@ -165,6 +202,14 @@ void pqFiltersMenuReaction::updateEnableState()
       // Skip single process filters when running in multiprocesses and vice
       // versa.
       action->setEnabled(false);
+      if (numProcs > 1)
+        {
+        action->setStatusTip("Not supported in parallel");
+        }
+      else
+        {
+        action->setStatusTip("Supported only in parallel");
+        }
       continue;
       }
 
@@ -175,6 +220,7 @@ void pqFiltersMenuReaction::updateEnableState()
       if(!input->GetMultipleInput() && outputPorts.size() > 1)
         {
         action->setEnabled(false);
+        action->setStatusTip("Multiple inputs not support");
         continue;
         }
 
@@ -186,14 +232,20 @@ void pqFiltersMenuReaction::updateEnableState()
           port->getSource()->getProxy(), port->getPortNumber());
         }
 
-      if(input->IsInDomains())
+      vtkSMDomain* domain = NULL;
+      if (input->IsInDomains(&domain))
         {
         action->setEnabled(true);
         some_enabled = true;
+        const char* help = prototype->GetDocumentation()->GetShortHelp();
+        action->setStatusTip(help? help : "");
         }
       else
         {
         action->setEnabled(false);
+        // Here we need to go to the domain that returned false and find out why
+        // it said the domain criteria wasn't met.
+        action->setStatusTip(::getDomainDisplayText(domain, input));
         }
       input->RemoveAllUncheckedProxies();
       }

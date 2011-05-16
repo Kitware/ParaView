@@ -31,21 +31,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQVTKWidget.h"
 
-#include <QResizeEvent>
 #include <QMoveEvent>
+#include <QResizeEvent>
+#include <QTimer>
+
 #include "pqUndoStack.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkUnsignedCharArray.h"
+
+#include "vtkgl.h"
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
-  : Superclass(parentObject, f)
+  : Superclass(parentObject, f),
+  ResizeTimer(new QTimer(this))
 {
+  this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
+
+  this->ResizingImage = new vtkSynchronizedRenderers::vtkRawImage();
+
+  // We tried using the most recent rendered image when resizing, but the
+  // scaling of the image looks terrible. Showing a fixed color image is much
+  // better.
+  this->ResizingImage->Resize(32, 32, 3);
+  vtkUnsignedCharArray* data = this->ResizingImage->GetRawPtr();
+  memset(data->GetVoidPointer(0), 0x064, 32*32*3);
+  this->ResizingImage->MarkValid();
+
+  QObject::connect(this->ResizeTimer, SIGNAL(timeout()),
+    this, SLOT(updateSizeProperties()));
+  this->ResizeTimer->setSingleShot(true);
+  this->ResizeTimer->setInterval(700); // 2 seconds.
+
+  this->Resizing = false;
 }
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::~pqQVTKWidget()
 {
+  delete this->ResizingImage;
+  this->ResizingImage = NULL;
+
+  this->ResizeTimer->stop();
+  delete this->ResizeTimer;
 }
 
 //----------------------------------------------------------------------------
@@ -67,12 +99,28 @@ QWidget* pqQVTKWidget::positionReference() const
 //----------------------------------------------------------------------------
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
-  this->Superclass::resizeEvent(e);
+  if (!this->isAutomaticImageCacheEnabled())
+    {
+    this->Superclass::resizeEvent(e);
+    this->updateSizeProperties();
+    }
+  else
+    {
+    this->Resizing = true;
+    bool old_cache_state = this->cachedImageCleanFlag;
+    this->Superclass::resizeEvent(e);
+    this->cachedImageCleanFlag = old_cache_state;
+    this->ResizeTimer->start();
+    }
+}
 
+//----------------------------------------------------------------------------
+void pqQVTKWidget::updateSizeProperties()
+{
   BEGIN_UNDO_EXCLUDE();
   int view_size[2];
-  view_size[0] = e->size().width();
-  view_size[1] = e->size().height();
+  view_size[0] = this->size().width();
+  view_size[1] = this->size().height();
   vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
 
   QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
@@ -84,6 +132,13 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* e)
   this->ViewProxy->UpdateProperty("ViewSize");
   this->ViewProxy->UpdateProperty("ViewPosition");
   END_UNDO_EXCLUDE();
+
+  this->Resizing = false;
+  this->markCachedImageAsDirty();
+
+  // need to request a render after the "resizing" is done.
+  this->update();
+
 }
 
 //----------------------------------------------------------------------------
@@ -98,4 +153,29 @@ void pqQVTKWidget::moveEvent(QMoveEvent* e)
 void pqQVTKWidget::setViewProxy(vtkSMProxy* view)
 {
   this->ViewProxy = view;
+}
+
+//----------------------------------------------------------------------------
+bool pqQVTKWidget::paintCachedImage()
+{
+  if (this->cachedImageCleanFlag && this->Resizing)
+    {
+    static int cc=0;
+    cc++;
+    this->GetRenderWindow()->MakeCurrent();
+    const int* window_size = this->GetRenderWindow()->GetActualSize();
+    glDisable(GL_SCISSOR_TEST);
+    glViewport(
+      static_cast<GLint>(0), static_cast<GLint>(0),
+      static_cast<GLsizei>(window_size[0]), static_cast<GLsizei>(window_size[1]));
+    glClearColor(0.4, 0.4, 0.4, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    this->GetRenderWindow()->Frame();
+    return true;
+    }
+
+  // In future we can update this code to ensure that view->Render() is never
+  // called from the pqQVTKWidget. For now, we are letting the default path
+  // execute when not resizing.
+  return this->Superclass::paintCachedImage();
 }

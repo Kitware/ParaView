@@ -362,6 +362,10 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
   int pass, int num_of_passes, double resolution,
   int port, double time, bool doTime)
 {
+  vtkAlgorithm* algo = this->GetOutputPort(port)->GetProducer();
+  assert(algo);
+  algo->UpdateInformation();
+
   int processid =
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
   int numprocs =
@@ -378,8 +382,6 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
     resolution //resolution
   );
 
-  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-  assert(algo);
   algo->UpdateInformation();
   if (doTime)
     {
@@ -389,6 +391,29 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
     }
   helper->Update();
   helper->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSISourceProxy::UpdatePipelineInformation()
+{
+  if (this->GetVTKObject())
+    {
+    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+    if(algo)
+      {
+      algo->UpdateInformation();
+      }
+    }
+
+  // Call UpdatePipelineInformation() on all subproxies.
+  for (unsigned int cc=0; cc < this->GetNumberOfSubSIProxys(); cc++)
+    {
+    vtkSISourceProxy* src = vtkSISourceProxy::SafeDownCast(this->GetSubSIProxy(cc));
+    if (src)
+      {
+      src->UpdatePipelineInformation();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

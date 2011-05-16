@@ -389,28 +389,6 @@ vtkObjectBase* vtkSIProxy::GetVTKObject()
 }
 
 //----------------------------------------------------------------------------
-void vtkSIProxy::UpdateInformation()
-{
-  if (this->GetVTKObject())
-    {
-    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-    if(algo)
-      {
-      algo->UpdateInformation();
-      }
-    }
-
-  // Call UpdateInformation() on all subproxies.
-  for (unsigned int cc=0; cc < this->GetNumberOfSubSIProxys(); cc++)
-    {
-    vtkSIProxy* src = vtkSIProxy::SafeDownCast(this->GetSubSIProxy(cc));
-    if (src)
-      {
-      src->UpdateInformation();
-      }
-    }
-}
-//----------------------------------------------------------------------------
 bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   // Add hook for post_push and post_creation

@@ -18,13 +18,13 @@
 #include "vtkExtractVOI.h"
 #include "vtkImageData.h"
 #include "vtkImageSliceDataDeliveryFilter.h"
-#include "vtkImageSliceMapper.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 #include "vtkPVCacheKeeper.h"
+#include "vtkPVImageSliceMapper.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
@@ -42,7 +42,7 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
   this->CacheKeeper->SetInput(this->SliceData);
 
   this->DeliveryFilter = vtkImageSliceDataDeliveryFilter::New();
-  this->SliceMapper = vtkImageSliceMapper::New();
+  this->SliceMapper = vtkPVImageSliceMapper::New();
   this->Actor = vtkPVLODActor::New();
   this->Actor->SetMapper(this->SliceMapper);
 }

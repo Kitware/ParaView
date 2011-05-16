@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMAnimationScene.h"
 
+#include "vtkCacheSizeKeeper.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkObjectFactory.h"
@@ -226,6 +227,10 @@ vtkSMViewProxy* vtkSMAnimationScene::GetViewProxy(unsigned int cc)
 void vtkSMAnimationScene::TickInternal(
   double currenttime, double deltatime, double clocktime)
 {
+  // We see that here we don't check if the cache is full at all. Views have
+  // logic in them to periodically check and synchronize the "fullness" of cache
+  // among all participating processes. So we don't have to manage that here at
+  // all.
   if (this->Caching)
     {
     this->Internals->PassUseCache(true);
@@ -317,4 +322,14 @@ void vtkSMAnimationScene::SetDuration(int val)
 void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::SetCacheLimit(unsigned long kbs)
+{
+  // Note since vtkSMAnimationScene is created on the client alone this will
+  // affect only the client-side setting. To get around this problem, we create
+  // a special "GlobalAnimationProperties" that we use to change this setting on
+  // all processes.
+  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(kbs);
 }

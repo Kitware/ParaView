@@ -84,10 +84,19 @@ INCLUDE_DIRECTORIES(
 
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
-set (protobuf_generated_files)
-protobuf_generate(
-  protobuf_generated_files
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto)
+ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+           ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
+    COMMAND protoc_compiler
+      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
+      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+)
+
+add_custom_target(
+  protobuf_code_generation ALL
+  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+)
 #------------------------------------------------------------------------------
 
 SET(resourceFiles
@@ -194,10 +203,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
   SET(KIT_PYTHON_DEPS)
-  SET(VTK_INSTALL_NO_LIBRARIES 1)
-  IF(VTKPythonWrapping_INSTALL_BIN_DIR)
-    SET(VTK_INSTALL_NO_LIBRARIES)
-  ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
 
   SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
   SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
@@ -220,9 +225,7 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${KIT_LIBS}
   protobuf
 )
-
-SET_SOURCE_FILES_PROPERTIES(vtkSMMessage.cxx PROPERTIES OBJECT_DEPENDS
-  ${protobuf_generated_files})
+add_dependencies(vtk${KIT} protobuf_code_generation)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL

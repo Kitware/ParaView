@@ -30,27 +30,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqProgressWidget.h"
-
 #include "pqProgressBar.h"
 
 #include <QApplication>
 #include <QGridLayout>
-#include <QProgressBar>
 #include <QToolButton>
 
 
 //-----------------------------------------------------------------------------
 pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
-  : QWidget(_parent)
+  : QWidget(_parent,Qt::FramelessWindowHint)
 {
   QGridLayout *gridLayout = new QGridLayout(this);
-  gridLayout->setSpacing(4);
+  gridLayout->setSpacing(0);
   gridLayout->setMargin(0);
   gridLayout->setObjectName("gridLayout");
 
   this->ProgressBar = new pqProgressBar(this);
   this->ProgressBar->setObjectName("ProgressBar");
-  this->ProgressBar->setOrientation(Qt::Horizontal);
   gridLayout->addWidget(this->ProgressBar, 0, 1, 1, 1);
 
   this->AbortButton = new QToolButton(this);
@@ -83,10 +80,13 @@ void pqProgressWidget::setProgress(const QString& message, int value)
   if (this->PendingEnableProgress &&
     this->EnableTime.elapsed() >= 100)
     {
-    this->PendingEnableProgress = false;
-    this->ProgressBar->enableProgress(true);
+    this->PendingEnableProgress = false;    
     }
-  this->ProgressBar->setProgress(message, value);
+  if (!this->PendingEnableProgress)
+    {
+    this->ProgressBar->setProgress(message,value);
+
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -97,12 +97,14 @@ void pqProgressWidget::enableProgress(bool enabled)
     if (!this->PendingEnableProgress)
       {
       this->PendingEnableProgress = true;
+      this->ProgressBar->setEnabled(true);
       this->EnableTime.start();
       }
     }
   else
     {
-    this->ProgressBar->enableProgress(false);
+    this->ProgressBar->reset();
+    this->ProgressBar->setEnabled(false);
     this->PendingEnableProgress = false;
     }
 }

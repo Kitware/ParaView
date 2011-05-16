@@ -31,7 +31,7 @@ SET (Kit_SRCS
   vtkGeometryRepresentationWithFaces.cxx
   vtkGlyph3DRepresentation.cxx
   vtkImageSliceDataDeliveryFilter.cxx
-  vtkImageSliceMapper.cxx
+  vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
   vtkMPIMToNSocketConnection.cxx
@@ -239,10 +239,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
   SET(KIT_PYTHON_DEPS)
-  SET(VTK_INSTALL_NO_LIBRARIES 1)
-  IF(VTKPythonWrapping_INSTALL_BIN_DIR)
-    SET(VTK_INSTALL_NO_LIBRARIES)
-  ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
 
   SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
   SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")

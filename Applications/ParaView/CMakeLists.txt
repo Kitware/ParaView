@@ -294,6 +294,9 @@ if(WIN32 AND NOT UNIX)
     set(CPACK_NSIS_MODIFY_PATH OFF)
     set(CPACK_NSIS_MUI_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
     set(CPACK_NSIS_MUI_UNIICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
+    
+    get_filename_component(users_guide_file ${PARAVIEW_USERS_GUIDE} NAME)
+    set(CPACK_NSIS_MENU_LINKS ${PV_INSTALL_DOC_DIR}/${users_guide_file} "ParaView User's Guide")
   
 endif(WIN32 AND NOT UNIX)
 

@@ -87,6 +87,9 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
     }
+
+  // We don't report the error here if ret_val == false since vtkPVPluginLoader
+  // already reports those errors using vtkErrorMacro.
   return ret_val;
 }
 

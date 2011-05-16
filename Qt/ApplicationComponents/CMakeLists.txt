@@ -105,7 +105,6 @@ SET (UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorToolbar.ui
-  Resources/UI/pqCopyReactionDialog.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui

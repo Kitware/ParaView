@@ -1782,9 +1782,8 @@ def LoadState(filename, connection=None):
         connection = ActiveConnection
     if not connection:
         raise RuntimeError, "Cannot load state without a connection"
-    loader = vtkSMPQStateLoader()
     pm = ProxyManager()
-    pm.LoadState(filename, loader)
+    pm.LoadState(filename, None)
     views = GetRenderViews()
     for view in views:
         # Make sure that the client window size matches the
@@ -1996,13 +1995,8 @@ class _ModuleLoader(object):
         return module
 
 def LoadXML(xmlstring):
-    """Given a server manager XML as a string, parse and process it."""
-    parser = vtkPVXMLParser()
-    if not parser.Parse(xmlstring):
-        raise RuntimeError, "Problem parsing XML string."
-    ProxyManager().GetProxyDefinitionManager().LoadConfigurationXML(parser.GetRootElement())
-    # Update the modules
-    updateModules()
+    """DEPRECATED. Given a server manager XML as a string, parse and process it."""
+    raise RuntimeError, "Deprecated. Use LoadPlugin(...) instead."
 
 
 def LoadPlugin(filename,  remote=True, session=None):
@@ -2014,7 +2008,7 @@ def LoadPlugin(filename,  remote=True, session=None):
         session = ActiveConnection
     if not session:
         raise RuntimeError, "Cannot load a plugin without a session."
-    plm = session.GetSession().GetPluginManager()
+    plm = session.Session.GetPluginManager()
 
     if remote:
         status = plm.LoadRemotePlugin(filename)
@@ -2023,15 +2017,7 @@ def LoadPlugin(filename,  remote=True, session=None):
 
     # shouldn't the extension check happend before attempting to load the plugin?
     if not status:
-        if os.path.splitext(filename)[1].lower() == ".xml":
-            # Assume that it is an xml file
-            f = open(filename, 'r')
-            try:
-                LoadXML(f.read())
-            except RuntimeError:
-                raise RuntimeError, "Problem loading plugin %s" % (filename)
-        else:
-            raise RuntimeError, "Problem loading plugin %s" % (filename)
+        raise RuntimeError, "Problem loading plugin %s" % (filename)
     else:
         # we should never have to call this. The modules should update automatically.
         updateModules()

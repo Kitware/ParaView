@@ -43,8 +43,22 @@ public:
   bool GetAutoLoad(unsigned int);
 
   // Description:
+  // Note that unlike other properties, this one is updated as a consequence of
+  // calling PluginRequirementsSatisfied().
+  const char* GetPluginStatusMessage(unsigned int);
+
+  // Description:
   // API to change auto-load status.
   void SetAutoLoad(unsigned int cc, bool);
+
+  // Description:
+  // This is a hack. When the user sets an auto-load option from  the GUI to
+  // avoid that choice being overwritten as the information object is updated
+  // over time as new plugins are loaded/unloaded, the pqPluginDialog uses this
+  // method to set the auto-load flag. This flag is not communicated across
+  // processes, but when called, GetAutoLoad() will return the value set using
+  // this method.
+  void SetAutoLoadAndForce(unsigned int cc, bool);
 
   // Description:
   // Transfer information about a single object into this object.
@@ -69,6 +83,15 @@ public:
   // Description:
   // Get the plugin search path.
   vtkGetStringMacro(SearchPaths);
+
+  // Description:
+  // Method to validate if the plugin requirements are met across processes.
+  // This also updated the "StatusMessage" for all the plugins. If StatusMessage
+  // is empty for a loaded plugin, it implies that everything is fine. If some
+  // requirement is not met, the StatusMessage includes the error message.
+  static bool PluginRequirementsSatisfied(
+    vtkPVPluginsInformation* client_plugins,
+    vtkPVPluginsInformation* server_plugins);
 //BTX
 protected:
   vtkPVPluginsInformation();

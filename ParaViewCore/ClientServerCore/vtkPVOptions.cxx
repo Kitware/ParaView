@@ -195,8 +195,7 @@ void vtkPVOptions::Initialize()
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER|vtkPVOptions::PVBATCH);
 
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
-                           "Tell the application to enable stereo rendering"
-                           " (only when running on a single process).",
+                           "Tell the application to enable stereo rendering",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
   this->AddArgument("--stereo-type", 0, &this->StereoType,
                            "Specify the stereo type. This valid only when "
@@ -384,7 +383,7 @@ int vtkPVOptions::WrongArgument(const char* argument)
     return 1;
     }
 
-  if (this->ParaViewDataName == NULL)
+  if (this->ParaViewDataName == NULL && this->GetProcessType() == PVCLIENT)
     {
     // BUG #11199. Assume it's a data file.
     this->SetParaViewDataName(argument);
