@@ -29,75 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewVRPN_h
-#define __ParaViewVRPN_h
+#ifndef __pqRenderLoopEvent_h_
+#define __pqRenderLoopEvent_h_
 
-#include <QThread>
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
+#include <QObject>
 #include "vtkVRPNQueue.h"
 
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
 
-typedef QThread vtkThread;
-
-/// Callback to listen to VRPN events
-class ParaViewVRPN : public vtkThread
+class pqRenderLoopEvent : public QObject
 {
-  Q_OBJECT
+Q_OBJECT
+
 public:
-  ParaViewVRPN();
-  ~ParaViewVRPN();
-
-  // Description:
-  // Name of the device. For example, "Tracker0@localhost"
-  // Initial value is a NULL pointer.
-  void SetName(std::string name);
-
-  // Description:
-  // Initialize the device with the name.
-  void Init();
-
-  // Description:
-  // Tell if Init() was called succesfully
-  bool GetInitialized() const;
-
-  // Description:
-  // Terminate the thread
-  void terminate();
+  pqRenderLoopEvent();
+  ~pqRenderLoopEvent();
 
   // Description:
   // Sets the Event Queue into which the vrpn data needs to be written
   void SetQueue( vtkVRPNQueue* queue );
 
- protected slots:
-  void run();
-
-
+protected slots:
+  void Handle();
+  void HandleButton ( const vtkVRPNEventData& data );
+  void HandleAnalog ( const vtkVRPNEventData& data );
+  void HandleTracker( const vtkVRPNEventData& data );
+  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
+                                  vtkSMDoubleVectorProperty** prop);
+  bool SetHeadPoseProperty( vtkVRPNEventData data );
+  bool UpdateNRenderWithHeadPose();
+  void HandleSpaceNavigatorAnalog( const vtkVRPNEventData& data );
 protected:
-  void NewAnalogValue(vrpn_ANALOGCB data);
-  void NewButtonValue(vrpn_BUTTONCB data);
-  void NewTrackerValue(vrpn_TRACKERCB data );
-
-  friend void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
-  friend void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
-  friend void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
-
-  std::string Name;
-  bool Initialized;
-  bool _Stop;
-
-  vtkVRPNQueue* EventQueue;
-
-  class pqInternals;
-  pqInternals* Internals;
-
-
-private:
-  ParaViewVRPN(const ParaViewVRPN&); // Not implemented.
-  void operator=(const ParaViewVRPN&); // Not implemented.
+  vtkVRPNQueue *EventQueue;
 };
 
-#endif
+#endif //__pqRenderLoopEvent.h_
