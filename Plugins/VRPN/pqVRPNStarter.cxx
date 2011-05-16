@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewVRPN.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-#include "vtkVRPNQueue.h"
+#include "vtkVRQueue.h"
 #include "pqRenderLoopEvent.h"
 
 //-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void pqVRPNStarter::onStartup()
   if(options->GetUseVRPN())
     {
     // Create VRPN event queue
-    this->EventQueue = new vtkVRPNQueue;
+    this->EventQueue = new vtkVRQueue;
 
     // Create vrpn client to read device information
     this->InputDevice=new ParaViewVRPN;

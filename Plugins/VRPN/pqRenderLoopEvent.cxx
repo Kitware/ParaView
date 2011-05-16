@@ -1,5 +1,5 @@
 #include "pqRenderLoopEvent.h"
-#include "vtkVRPNQueue.h"
+#include "vtkVRQueue.h"
 #include "vtkMath.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
@@ -24,7 +24,7 @@ pqRenderLoopEvent::~pqRenderLoopEvent()
 
 }
 
-void pqRenderLoopEvent::SetQueue( vtkVRPNQueue* queue )
+void pqRenderLoopEvent::SetQueue( vtkVRQueue* queue )
 {
   this->EventQueue = queue;
 }
@@ -33,7 +33,7 @@ void pqRenderLoopEvent::SetQueue( vtkVRPNQueue* queue )
 // This handler currently only get the
 void pqRenderLoopEvent::Handle()
 {
-  vtkVRPNEventData data;
+  vtkVREventData data;
   // Invoke the respective event handlers
   while ( this->EventQueue->tryDequeue( data ) )
     {
@@ -54,7 +54,7 @@ void pqRenderLoopEvent::Handle()
   this->UpdateNRenderWithHeadPose();
 }
 
-void pqRenderLoopEvent::HandleTracker( const vtkVRPNEventData& data )
+void pqRenderLoopEvent::HandleTracker( const vtkVREventData& data )
 {
   if ( data.data.tracker.sensor == 0 // Head from Kinect
        || data.data.tracker.sensor == 13 ) // Hand from Kinect
@@ -62,9 +62,6 @@ void pqRenderLoopEvent::HandleTracker( const vtkVRPNEventData& data )
     std::cout  << "(Tracker" << "\n"
                << "  :from  " << data.connId <<"\n"
                << "  :time  " << data.timeStamp << "\n"
-               << "  :msgTime  '( "
-               << data.data.tracker.msg_time.tv_sec << " "
-               << data.data.tracker.msg_time.tv_usec << " )" << "\n"
                << "  :id    " << data.data.tracker.sensor << "\n"
                << "  :pos   '( "
                << data.data.tracker.pos[0] << " "
@@ -83,26 +80,20 @@ void pqRenderLoopEvent::HandleTracker( const vtkVRPNEventData& data )
 }
 
 
-void pqRenderLoopEvent::HandleButton( const vtkVRPNEventData& data )
+void pqRenderLoopEvent::HandleButton( const vtkVREventData& data )
 {
   std::cout << "(Button" << "\n"
             << "  :from  " << data.connId <<"\n"
             << "  :time  " << data.timeStamp << "\n"
-            << "  :msgTime  '( "
-            << data.data.button.msg_time.tv_sec << " "
-            << data.data.button.msg_time.tv_usec << " )" << "\n"
             << "  :id    " << data.data.button.button << "\n"
             << "  :state " << data.data.button.state << " )" << "\n";
 }
 
-void pqRenderLoopEvent::HandleAnalog( const vtkVRPNEventData& data )
+void pqRenderLoopEvent::HandleAnalog( const vtkVREventData& data )
 {
   std::cout << "(Analog" << "\n"
             << "  :from  " << data.connId <<"\n"
             << "  :time  " << data.timeStamp << "\n"
-            << "  :msgTime  '( "
-            << data.data.analog.msg_time.tv_sec << " "
-            << data.data.analog.msg_time.tv_usec << " )" << "\n"
             << "  :channel '(" ;
   for ( int i =0 ; i<data.data.analog.num_channel; i++ )
     {
@@ -140,7 +131,7 @@ bool pqRenderLoopEvent::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outPro
   return false;
 }
 
-bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVRPNEventData data )
+bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVREventData data )
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
@@ -187,9 +178,9 @@ bool pqRenderLoopEvent::UpdateNRenderWithHeadPose()
 }
 
 // -------------------------------------------------------------------------fun
-vrpn_ANALOGCB AugmentChannelsToRetainLargestMagnitude(const vrpn_ANALOGCB t)
+vtkAnalog AugmentChannelsToRetainLargestMagnitude(const vtkAnalog t)
 {
-  vrpn_ANALOGCB at;
+  vtkAnalog at;
   // Make a list of the magnitudes into at
   for(int i=0;i<6;++i)
     {
@@ -215,9 +206,9 @@ vrpn_ANALOGCB AugmentChannelsToRetainLargestMagnitude(const vrpn_ANALOGCB t)
   return at;
 }
 
-void pqRenderLoopEvent::HandleSpaceNavigatorAnalog( const vtkVRPNEventData& data )
+void pqRenderLoopEvent::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
 {
-  vrpn_ANALOGCB at = AugmentChannelsToRetainLargestMagnitude(data.data.analog);
+  vtkAnalog at = AugmentChannelsToRetainLargestMagnitude(data.data.analog);
   // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],
   //    at.channel[1], at.channel[2], at.channel[3], at.channel[4],
   //    at.channel[5]);

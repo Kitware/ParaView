@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderLoopEvent_h_
 
 #include <QObject>
-#include "vtkVRPNQueue.h"
+#include "vtkVRQueue.h"
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
@@ -48,20 +48,20 @@ public:
 
   // Description:
   // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRPNQueue* queue );
+  void SetQueue( vtkVRQueue* queue );
 
 protected slots:
   void Handle();
-  void HandleButton ( const vtkVRPNEventData& data );
-  void HandleAnalog ( const vtkVRPNEventData& data );
-  void HandleTracker( const vtkVRPNEventData& data );
+  void HandleButton ( const vtkVREventData& data );
+  void HandleAnalog ( const vtkVREventData& data );
+  void HandleTracker( const vtkVREventData& data );
   bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
                                   vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty( vtkVRPNEventData data );
+  bool SetHeadPoseProperty( vtkVREventData data );
   bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVRPNEventData& data );
+  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 protected:
-  vtkVRPNQueue *EventQueue;
+  vtkVRQueue *EventQueue;
 };
 
 #endif //__pqRenderLoopEvent.h_
