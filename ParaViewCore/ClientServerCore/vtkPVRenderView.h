@@ -437,7 +437,7 @@ protected:
 
   // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
-  void GatherRepresentationInformation();
+  virtual void GatherRepresentationInformation();
 
   // Description:
   // Sychronizes the geometry size information on all nodes.

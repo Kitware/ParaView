@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqVRPNStarter_h
 
 #include <QObject>
-#include "vtkVRPNQueue.h"
+#include "vtkVRQueue.h"
 
 class QTimer;
 class ParaViewVRPN;
@@ -57,7 +57,7 @@ protected:
   QTimer *VRPNTimer;
   ParaViewVRPN *InputDevice;
   pqRenderLoopEvent* RenderLoop;
-  vtkVRPNQueue* EventQueue;
+  vtkVRQueue* EventQueue;
 
 private:
   pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
