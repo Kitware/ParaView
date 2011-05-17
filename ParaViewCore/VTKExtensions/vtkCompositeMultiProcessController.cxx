@@ -59,6 +59,7 @@ struct Controller
     this->Id = id;
     this->MultiProcessController = controller;
     this->ActivateObserverId = 0;
+    this->IsMaster = false;
     }
 
   void AddRMICallbacks(vtkstd::vector<RMICallbackInfo>& callbacks)
@@ -114,6 +115,7 @@ struct Controller
 
   unsigned long ActivateObserverId;
   int Id;
+  bool IsMaster;
   vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
   vtkstd::map<unsigned long, vtkstd::vector<unsigned long> > RMICallbackIdMapping;
 };
@@ -388,6 +390,64 @@ public:
     return this->Controllers.at(idx).Id;
     }
 
+  //-----------------------------------------------------------------
+  void SetMasterController(int controllerId)
+    {
+    bool found = false;
+    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    while(iter != this->Controllers.end())
+      {
+      iter->IsMaster = (iter->Id == controllerId);
+      found = found || iter->IsMaster;
+      iter++;
+      }
+
+    // If not found try to elect a new master
+    if(!found)
+      {
+      int newMaster = this->ElectNewMaster();
+      if(newMaster != -1)
+        {
+        this->SetMasterController(newMaster);
+        }
+      }
+    }
+  //-----------------------------------------------------------------
+  int GetMasterController()
+    {
+    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    while(iter != this->Controllers.end())
+      {
+      if(iter->IsMaster)
+        {
+        return iter->Id;
+        }
+      iter++;
+      }
+    int electedMaster = this->ElectNewMaster();
+    if(electedMaster != -1)
+      {
+      this->SetMasterController(electedMaster);
+      }
+    return electedMaster;
+    }
+  //-----------------------------------------------------------------
+  int ElectNewMaster()
+    {
+    if(this->ActiveController)
+      {
+      return this->ActiveController->Id;
+      }
+    else if(this->Controllers.begin() != this->Controllers.end())
+      {
+      return this->Controllers.begin()->Id;
+      }
+    else
+      {
+      return -1;
+      }
+    }
+
 private:
   int ControllerID;
   Controller* ActiveController;
@@ -503,4 +563,14 @@ int vtkCompositeMultiProcessController::GetNumberOfControllers()
 int vtkCompositeMultiProcessController::GetControllerId(int idx)
 {
   return this->Internal->GetControllerId(idx);
+}
+//----------------------------------------------------------------------------
+void vtkCompositeMultiProcessController::SetMasterController(int id)
+{
+  this->Internal->SetMasterController(id);
+}
+//----------------------------------------------------------------------------
+int vtkCompositeMultiProcessController::GetMasterController()
+{
+  return this->Internal->GetMasterController();
 }

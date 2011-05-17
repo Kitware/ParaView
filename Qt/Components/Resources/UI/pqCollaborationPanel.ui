@@ -41,7 +41,7 @@
       <number>1</number>
      </property>
      <property name="columnCount">
-      <number>3</number>
+      <number>2</number>
      </property>
      <attribute name="horizontalHeaderVisible">
       <bool>true</bool>
@@ -82,39 +82,29 @@
       <property name="toolTip">
        <string/>
       </property>
+      <property name="textAlignment">
+       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+      </property>
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Viewpoint</string>
       </property>
       <property name="font">
        <font>
-        <kerning>false</kerning>
+        <kerning>true</kerning>
        </font>
       </property>
       <property name="textAlignment">
        <set>AlignHCenter|AlignVCenter|AlignCenter</set>
       </property>
-      <property name="icon">
-       <iconset resource="../pqComponents.qrc">
-        <normaloff>:/pqWidgets/Icons/pqEyeball16.png</normaloff>:/pqWidgets/Icons/pqEyeball16.png</iconset>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="textAlignment">
-       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-      </property>
-      <property name="icon">
-       <iconset resource="../pqComponents.qrc">
-        <normaloff>:/pqWidgets/Icons/pqMousePick15.png</normaloff>:/pqWidgets/Icons/pqMousePick15.png</iconset>
-      </property>
      </column>
      <item row="0" column="0">
       <property name="text">
        <string>I'm alone</string>
+      </property>
+      <property name="flags">
+       <set>ItemIsEnabled</set>
       </property>
      </item>
     </widget>
@@ -146,9 +136,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../pqComponents.qrc"/>
-  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -75,6 +75,12 @@ public:
   /// Return the idx connected userId
   int getUserId(int idx);
 
+  /// Return the id of the current master user
+  int masterUserId();
+
+  /// Return true if current user is the master
+  bool isMaster();
+
 signals:
   /// This will be triggered locally to broadcast the request
   void triggerRender(int viewId);
@@ -97,8 +103,12 @@ signals:
   /// inside the inspector panel.
   void triggerInspectorSelectedTabChanged(int);
 
-  /// that was not found localy
+  /// This will forward client_only message to anyone that may interessted when
+  /// not managed locally
   void triggerStateClientOnlyMessage(vtkSMMessage* msg);
+
+  /// This notify the application who is the new master
+  void triggerElectedMaster(int);
 
 public slots:
 
@@ -123,6 +133,10 @@ public slots:
   /// This is connected from pqProxyTabWidget itself so the selected tab information
   /// can be sent to the other clients if any.
   void onInspectorSelectedTabChanged(int tabIndex);
+
+  /// This will send a message to the server and other clients to promote a new
+  /// master
+  void promoteNewMaster(int masterId);
 
 private slots:
   /// Called when a message has been sent by another client

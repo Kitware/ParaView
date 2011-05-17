@@ -133,7 +133,7 @@ message PullRequest {
   }
 }
 
-// Extension Collaboration Communication ****************************** [50-58]
+// Extension Collaboration Communication ****************************** [50-60]
 
 message ActiveSelectionMessage {
 
@@ -157,7 +157,7 @@ message ActiveSelectionMessage {
 
 message ClientInformation {
   extend Message {
-    required uint64 user     = 53;
+    required uint32 user     = 53;
     optional string name     = 54;
     optional bool req_update = 55 [default = false];
   }
@@ -166,6 +166,13 @@ message ClientInformation {
 message ChatMessage {
   extend Message {
     required string txt  = 56;
+  }
+}
+
+message MasterSlaveMessage {
+  extend Message {
+    required uint32 previous_master = 57;
+    required uint32 next_master     = 58;
   }
 }
 
@@ -181,8 +188,8 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 57;
-    optional uint32      proxy = 58 [default = 0];
+    required QtEventType type  = 59;
+    optional uint32      proxy = 60 [default = 0];
   }
 }
 

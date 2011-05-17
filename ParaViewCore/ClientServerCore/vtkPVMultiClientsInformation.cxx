@@ -33,6 +33,7 @@ vtkPVMultiClientsInformation::vtkPVMultiClientsInformation()
   this->MultiClientEnable = 0;
   this->ClientIds = NULL;
   this->ClientId = 0;
+  this->MasterId = 0;
   this->NumberOfClients = 1;
 }
 
@@ -52,6 +53,7 @@ void vtkPVMultiClientsInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Multi-client: " << this->MultiClientEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
+  os << indent << "MasterId: " << this->MasterId << endl;
   os << indent << "NumberOfClients: " << this->NumberOfClients << endl;
   os << indent << "Client list: ";
   for(int i=0;i<this->NumberOfClients;i++)
@@ -66,6 +68,7 @@ void vtkPVMultiClientsInformation::DeepCopy(vtkPVMultiClientsInformation *info)
 {
   this->MultiClientEnable = info->MultiClientEnable;
   this->ClientId = info->GetClientId();
+  this->MasterId = info->GetMasterId();
   this->NumberOfClients = info->GetNumberOfClients();
   if(this->ClientIds)
     {
@@ -108,6 +111,7 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
                   vtkCompositeMultiProcessController::SafeDownCast(session->GetController(vtkPVSession::CLIENT))))
     {
     this->ClientId = ctrl->GetActiveControllerID();
+    this->MasterId = ctrl->GetMasterController();
     this->NumberOfClients = ctrl->GetNumberOfControllers();
     this->ClientIds = new int[this->NumberOfClients];
     for(int cc=0; cc<this->NumberOfClients; cc++)
@@ -118,6 +122,7 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   else
     {
     this->ClientId = 0;
+    this->MasterId = 0;
     this->NumberOfClients = 1;
     this->MultiClientEnable = false;
     }
@@ -140,6 +145,10 @@ void vtkPVMultiClientsInformation::AddInformation(vtkPVInformation* info)
       {
       this->ClientId = serverInfo->ClientId;
       }
+    if (this->MasterId < serverInfo->MasterId)
+      {
+      this->MasterId = serverInfo->MasterId;
+      }
     if(this->ClientIds == NULL && serverInfo->ClientIds)
       {
       this->ClientIds = new int[serverInfo->NumberOfClients];
@@ -158,6 +167,7 @@ void vtkPVMultiClientsInformation::CopyToStream(vtkClientServerStream* css)
   *css << vtkClientServerStream::Reply;
   *css << this->MultiClientEnable;
   *css << this->ClientId;
+  *css << this->MasterId;
   *css << this->NumberOfClients;
   for(int cc=0; cc < this->NumberOfClients; cc++)
     {
@@ -179,7 +189,12 @@ void vtkPVMultiClientsInformation::CopyFromStream(const vtkClientServerStream* c
     vtkErrorMacro("Error parsing ClientId from message.");
     return;
     }
-  if(!css->GetArgument(0, 2, &this->NumberOfClients))
+  if(!css->GetArgument(0, 2, &this->MasterId))
+    {
+    vtkErrorMacro("Error parsing MasterId from message.");
+    return;
+    }
+  if(!css->GetArgument(0, 3, &this->NumberOfClients))
     {
     vtkErrorMacro("Error parsing NumberOfClients from message.");
     return;
@@ -194,7 +209,7 @@ void vtkPVMultiClientsInformation::CopyFromStream(const vtkClientServerStream* c
     this->ClientIds = new int[this->NumberOfClients];
     for (int cc = 0; cc < this->NumberOfClients; cc++)
       {
-      if(!css->GetArgument(0, 3 + cc, &this->ClientIds[cc]))
+      if(!css->GetArgument(0, 4 + cc, &this->ClientIds[cc]))
         {
         vtkErrorMacro("Error parsing ClientIds from message.");
         return;

@@ -194,7 +194,8 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
     case 1: // Camera Link
       this->setCameraSynchronizationToUser(userId);
       break;
-    case 2: // 3D Pointer
+    case 0: // Master user
+      this->promoteToMaster(userId);
       break;
     }
 }
@@ -233,6 +234,44 @@ void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
 }
 
 //-----------------------------------------------------------------------------
+void pqCollaborationPanel::onNewMaster(int masterId)
+{
+  // When a new master is elected, we just by default get our camera synch to his
+  this->setCameraSynchronizationToUser(masterId);
+
+  // Update the UI
+  int nbRows = this->Internal->members->rowCount();
+  for(int i=0; i < nbRows; i++)
+    {
+    if(masterId == this->Internal->members->item(i, 0)->data(Qt::UserRole).toInt())
+      {
+      this->Internal->members->item(i, 0)->setIcon(QIcon(":/pqWidgets/Icons/pqMousePick15.png"));
+      }
+    else
+      {
+      this->Internal->members->item(i, 0)->setIcon(QIcon());
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::promoteToMaster(int masterId)
+{
+  if(this->getCollaborationManager())
+    {
+    pqCollaborationManager* collabManager = this->getCollaborationManager();
+    collabManager->refreshUserList();
+    if(collabManager->masterUserId() == collabManager->userId())
+      {
+      // We tell everyone, who's the new master
+      collabManager->promoteNewMaster(masterId);
+
+      // We update our local UI
+      this->onNewMaster(masterId);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqCollaborationManager* pqCollaborationPanel::getCollaborationManager()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -257,6 +296,8 @@ void pqCollaborationPanel::onUserUpdate()
 
     QTableWidgetItem* item = new QTableWidgetItem(userName);
     item->setData(Qt::UserRole, userId);
+
+    // Add local user decoration
     if(userId == collab->userId())
       {
       item->setFlags( item->flags() | Qt::ItemIsEditable );
@@ -269,6 +310,17 @@ void pqCollaborationPanel::onUserUpdate()
       {
       item->setFlags( item->flags() & ~Qt::ItemIsEditable );
       }
+
+    // Add master decoration
+    if(userId == collab->masterUserId())
+      {
+      item->setIcon(QIcon(":/pqWidgets/Icons/pqMousePick15.png"));
+      }
+    else
+      {
+      item->setIcon(QIcon());
+      }
+
     this->Internal->members->setItem(cc, 0, item);
 
     // Disable other column editing
@@ -307,6 +359,9 @@ void pqCollaborationPanel::connectLocalSlots()
     QObject::connect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
                       collab, SLOT(onUpdateUser(int,QString&,bool)));
 
+    QObject::connect( collab, SIGNAL(triggerElectedMaster(int)),
+                      this,   SLOT(onNewMaster(int)));
+
     // Update the graphical panel
     QString userName = collab->getUserName(collab->userId());
     emit triggerUpdateUser( collab->userId(), userName, true);
@@ -335,6 +390,9 @@ void pqCollaborationPanel::disconnectLocalSlots()
                          collab, SLOT(onChatMessage(int,QString&)));
     QObject::disconnect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
                          collab, SLOT(onUpdateUser(int,QString&,bool)));
+
+    QObject::disconnect( collab, SIGNAL(triggerElectedMaster(int)),
+                         this,   SLOT(onNewMaster(int)));
     }
 }
 //-----------------------------------------------------------------------------

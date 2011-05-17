@@ -113,6 +113,7 @@ public:
 
       // General collaboration information
       this->UserID = serverInfo->GetClientId();
+      this->MasterID = serverInfo->GetMasterId();
       this->NumberOfConnectedClients = serverInfo->GetNumberOfClients();
 
       // Local var to detect diff if any
@@ -203,6 +204,7 @@ public:
 public:
   bool RenderingFromNotification;
   int UserID;
+  int MasterID;
   int NumberOfConnectedClients;
   QMap<int, QString> UserNameMap;
 
@@ -307,6 +309,10 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         break;
       }
     }
+  else if(msg->HasExtension(MasterSlaveMessage::next_master))
+    {
+    emit triggerElectedMaster(msg->GetExtension(MasterSlaveMessage::next_master));
+    }
   else
     {
     emit triggerStateClientOnlyMessage(msg);
@@ -386,6 +392,17 @@ void pqCollaborationManager::onInspectorSelectedTabChanged(int tabIndex)
 
   this->Internals->server()->sendToOtherClients(&activeTab);
 }
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::promoteNewMaster(int masterId)
+{
+  ReturnIfNotValidServer();
+  vtkSMMessage promoteNewMaster;
+  promoteNewMaster.SetExtension(MasterSlaveMessage::previous_master, this->userId());
+  promoteNewMaster.SetExtension(MasterSlaveMessage::next_master, masterId);
+
+  this->Internals->server()->sendToOtherClients(&promoteNewMaster);
+}
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::refreshUserList()
 {
@@ -432,6 +449,16 @@ void pqCollaborationManager::render()
 int pqCollaborationManager::userId()
 {
   return this->Internals->UserID;
+}
+//-----------------------------------------------------------------------------
+int pqCollaborationManager::masterUserId()
+{
+  return this->Internals->MasterID;
+}
+//-----------------------------------------------------------------------------
+bool pqCollaborationManager::isMaster()
+{
+  return (this->userId() == this->masterUserId());
 }
 
 //-----------------------------------------------------------------------------

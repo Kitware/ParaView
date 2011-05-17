@@ -64,6 +64,10 @@ public:
   // Return 1 if the server allow server client to connect to itself
   vtkGetMacro(MultiClientEnable, int);
 
+  // Description:
+  // Return the Id of the client that has been elected as master
+  vtkGetMacro(MasterId, int);
+
 protected:
   vtkPVMultiClientsInformation();
   ~vtkPVMultiClientsInformation();
@@ -72,6 +76,7 @@ protected:
   int* ClientIds;
   int NumberOfClients;
   int MultiClientEnable;
+  int MasterId;
 
   vtkPVMultiClientsInformation(const vtkPVMultiClientsInformation&); // Not implemented
   void operator=(const vtkPVMultiClientsInformation&); // Not implemented

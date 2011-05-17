@@ -66,6 +66,8 @@ public slots:
   /// Called by pqCollaborationManager when a user name update occurs
   /// (this invalidate the table model)
   void onUserUpdate();
+  /// Called when a new master has been promoted
+  void onNewMaster(int);
 
 protected slots:
   /// Called when user hit enter in the input line of chat message
@@ -95,6 +97,9 @@ protected:
 
   /// Activate camera synchronization
   void setCameraSynchronizationToUser(int userId);
+
+  /// Promote a new master
+  void promoteToMaster(int masterId);
 
   pqCollaborationPanel(const pqCollaborationPanel&); // Not implemented.
   void operator=(const pqCollaborationPanel&); // Not implemented.

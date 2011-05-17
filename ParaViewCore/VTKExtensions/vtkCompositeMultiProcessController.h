@@ -51,6 +51,19 @@ public:
   int GetControllerId(int idx);
 
   // Description:
+  // Promote the given controller (ID) to be the next master controller.
+  // Making a controller to be the master one, doesn't change anything on the
+  // controller itself. It is just a meta-data information that helps client
+  // application to build master/slave collaborative mechanism on top
+  void SetMasterController(int id);
+
+  // Description:
+  // Retrun the ID of the designed "Master" controller. That master controller
+  // is nothing else than a tag that can only be set on a single controller at
+  // a time.
+  int GetMasterController();
+
+  // Description:
   // Append the given controller to the composite set.
   // We focus on vtkSocketController because most of the API method are empty
   void RegisterController(vtkMultiProcessController* controller);

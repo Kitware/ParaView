@@ -40,6 +40,7 @@
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxyLocator;
+class vtkPVMultiClientsInformation;
 
 class VTK_EXPORT vtkSMCollaborationManager : public vtkSMRemoteObject
 {
@@ -75,6 +76,26 @@ public:
   // This method is used IN THAT SPECIAL CASE to notify external listeners
   virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
+  // Description:
+  // This method is used promote a new Master user. Master/Slave user doesn't
+  // buy you anything here. It just provide you the information, and it is your
+  // call to prevent slaves users to do or achieve some actions inside your client.
+  // When you call that method a SMMessage is also propagated to the other client
+  // so they could follow who is the Master without fetching the information again.
+  virtual void PromoteToMaster(int clientId);
+
+  // Description:
+  // Based on the chached information, it tells you if you are a master or not
+  virtual bool IsMaster();
+
+  // Description:
+  // Based on the chached information, it tells who's the master
+  virtual int GetMasterId();
+
+  // Description:
+  // Update the cache for the master informations
+  virtual void UpdateMasterInformation();
+
 protected:
   // Description:
   // Default constructor.
@@ -83,6 +104,8 @@ protected:
   // Description:
   // Destructor.
   virtual ~vtkSMCollaborationManager();
+
+  vtkPVMultiClientsInformation* InformationOnMasterUser;
 
 private:
   vtkSMCollaborationManager(const vtkSMCollaborationManager&); // Not implemented
