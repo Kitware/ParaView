@@ -325,22 +325,18 @@ void PrismCore::onSESAMEFileOpen()
         qDebug() << "No active server selected.";
         }
 
-
-
-
     QString filters = "All files (*)";
-    pqFileDialog* const file_dialog = new pqFileDialog(server, 
-        pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
-
-    file_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    file_dialog->setObjectName("FileOpenDialog");
-    file_dialog->setFileMode(pqFileDialog::ExistingFile);
-    QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-        this, SLOT(onSESAMEFileOpen(const QStringList&)));
-    file_dialog->setModal(true); 
-    file_dialog->show(); 
+    pqFileDialog dialog(server, pqCoreUtilities::mainWidget(), tr("Open File"), QString(), filters);
+    dialog.setModal(true);
+    dialog.setObjectName("FileOpenDialog");
+    dialog.setFileMode(pqFileDialog::ExistingFile);
+    if (QDialog::Accepted == dialog.exec())
+      {
+      this->onSESAMEFileOpen(dialog.getAllSelectedFiles()[0]);
+      }
 
     }
+
 void PrismCore::onSESAMEFileOpen(const QStringList& files)
     {
     if (files.empty())
@@ -413,21 +409,18 @@ void PrismCore::onCreatePrismView()
         return;
         }
 
-
-
     QString filters = "All files (*)";
-    pqFileDialog* const file_dialog = new pqFileDialog(server, 
-         pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
-
-    file_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    file_dialog->setObjectName("FileOpenDialog");
-    file_dialog->setFileMode(pqFileDialog::ExistingFile);
-    QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-        this, SLOT(onCreatePrismView(const QStringList&)));
-    file_dialog->setModal(true); 
-    file_dialog->show(); 
+    pqFileDialog dialog(server, pqCoreUtilities::mainWidget(), tr("Open File"), QString(), filters);
+    dialog.setModal(true);
+    dialog.setObjectName("FileOpenDialog");
+    dialog.setFileMode(pqFileDialog::ExistingFile);
+    if (QDialog::Accepted == dialog.exec())
+      {
+      this->onCreatePrismView(dialog.getAllSelectedFiles()[0]);
+      }
 
     }
+
 void PrismCore::onCreatePrismView(const QStringList& files)
     {
     // Get the list of selected sources.
