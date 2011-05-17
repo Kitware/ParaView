@@ -335,6 +335,17 @@ int vtkPrismFilter::RequestSESAMEData(
     contourOutput->ShallowCopy(this->Internal->Reader->GetOutput(2));
 
 
+    //Copy the PRISM_GEOMETRY_BOUNDS field data from output data 1
+    //to 3. This way the points have the same bounds key as the surface
+    vtkInformation *geomInfo = outputVector->GetInformationObject(3);
+    vtkMultiBlockDataSet *geomOutput = vtkMultiBlockDataSet::SafeDownCast(
+        geomInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+    //give it the same prism world bounds as the surface
+    //this way we don't scale the world with the points which will cause
+    //the reference surface to change size on each time step.
+    //we want to copy from the input port 1 so we get if the points have any scaling
+    geomOutput->GetFieldData()->PassData(output->GetFieldData());
 
     return 1;
 }
@@ -551,17 +562,6 @@ int vtkPrismFilter::RequestGeometryData(
     vtkInformation *info = outputVector->GetInformationObject(3);
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         info->Get(vtkDataObject::DATA_OBJECT()));
-
-    //give it the same prism world bounds as the surface
-    //this way we don't scale the world with the points which will cause
-    //the reference surface to change size on each time step
-    vtkDoubleArray *prismBounds = vtkDoubleArray::New();
-    prismBounds->SetNumberOfValues(6);
-    prismBounds->DeepCopy(this->GetRanges()); //copy the bounds into the prismBounds array
-    //than make sure the field name is set to the key properly
-    prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
-    output->GetFieldData()->AddArray(prismBounds);
-    prismBounds->FastDelete();
 
     if ( !output ) 
     {

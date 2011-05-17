@@ -1062,8 +1062,9 @@ int vtkPrismSurfaceReader::RequestData(
   //should be used to compute the world bounds.
   vtkDoubleArray *prismBounds = vtkDoubleArray::New();
   prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
-  prismBounds->SetNumberOfValues(6);  
-  this->GetRanges(prismBounds); //copy the bounds into the prismBounds array
+  prismBounds->SetNumberOfValues(6);
+  //we use the surface bounds as we want the properly scaled dataset including log scaling
+  surfaceOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
 
   surfaceOutput->GetFieldData()->AddArray(prismBounds);
   curveOutput->GetFieldData()->AddArray(prismBounds);
