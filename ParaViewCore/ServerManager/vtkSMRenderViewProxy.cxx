@@ -286,22 +286,10 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
 
-#if 0
   vtkCamera* camera = vtkCamera::SafeDownCast(this
                                               ->GetSubProxy( "ActiveCamera" )
                                               ->GetClientSideObject() );
   rv->SetActiveCamera( camera );
-#else
-  vtkSMProxy* cameraProxy = this->GetSubProxy("ActiveCamera");
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "SetActiveCamera"
-         << VTKOBJECT(cameraProxy)
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-#endif
 
   if (rv->GetInteractor())
     {
@@ -334,6 +322,8 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
         domain->GetEntryValueForText(pvoptions->GetStereoType()));
       }
     }
+
+  // 
 }
 
 //----------------------------------------------------------------------------
