@@ -142,8 +142,6 @@ int vtkUnstructuredDataDeliveryFilter::RequestData(
     vtkDataObject::GetData(inputVector[0], 0) : NULL;
   vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
 
-
-
   if (this->UsePassThrough)
     {
     if  ((this->DataMoveState & PASS_THROUGH) == 0)
@@ -178,6 +176,15 @@ int vtkUnstructuredDataDeliveryFilter::RequestData(
     this->ClientMoveData->Update();
     output->ShallowCopy(
       this->ClientMoveData->GetOutputDataObject(0));
+    vtkMultiProcessController* client_controller =
+      this->ClientMoveData->GetClientDataServerSocketController();
+    vtkCompositeMultiProcessController* ccontroller =
+      vtkCompositeMultiProcessController::SafeDownCast(client_controller);
+    if (ccontroller)
+      {
+      client_controller= ccontroller->GetActiveController();
+      }
+    this->HandledClients->insert(client_controller);
     }
 
   return 1;
@@ -272,7 +279,10 @@ void vtkUnstructuredDataDeliveryFilter::ProcessViewRequest(vtkInformation* info)
       this->HandledClients->end())
       {
       this->ClientMoveData->Modified();
-      this->HandledClients->insert(client_controller);
+      // don't add the client_controller to HandledClients list immediately, it
+      // will be added when the data is actually delivered to the client
+      // (in RequestData()).
+      // this->HandledClients->insert(client_controller);
       }
     }
   else // if (move_mode == vtkMPIMoveData::COLLECT_AND_PASS_THROUGH)
