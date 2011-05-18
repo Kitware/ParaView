@@ -184,6 +184,9 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
     {
     this->DataCollector->Update();
 
+    // since there's no direct connection between the mapper and the collector,
+    // we don't put an update-suppressor in the pipeline.
+
     vtkstd::string text;
 
     vtkFieldData* fieldData =

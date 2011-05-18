@@ -15,20 +15,10 @@
 #include "vtkPVUpdateSuppressor.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkCollection.h"
-#include "vtkCommand.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkDataObject.h"
-#include "vtkDemandDrivenPipeline.h"
-#include "vtkInformationDoubleVectorKey.h"
-#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
 #include <vtkstd/map>
@@ -44,38 +34,12 @@ vtkStandardNewMacro(vtkPVUpdateSuppressor);
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
-  this->UpdatePiece = 0;
-  this->UpdateNumberOfPieces = 1;
-
-  this->UpdateTime = 0.0;
-  this->UpdateTimeInitialized = false;
-
-
   this->Enabled = 1;
-
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
-  if (controller)
-    {
-    this->UpdateNumberOfPieces = controller->GetNumberOfProcesses();
-    this->UpdatePiece = controller->GetLocalProcessId();
-    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
-}
-
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::SetUpdateTime(double utime)
-{
-  this->UpdateTimeInitialized = true;
-  if (this->UpdateTime != utime)
-    {
-    this->Modified();
-    this->UpdateTime = utime;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -98,66 +62,11 @@ void vtkPVUpdateSuppressor::SetEnabled(int enable)
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::ForceUpdate()
 {    
-  // Make sure that output type matches input type
-  this->UpdateInformation();
-
-  vtkDataObject *input = this->GetInput();
-  if (input == 0)
-    {
-    vtkErrorMacro("No valid input.");
-    return;
-    }
-  vtkDataObject *output = this->GetOutput();
-
-  // int fixme; // I do not like this hack.  How can we get rid of it?
-  // Assume the input is the collection filter.
-  // Client needs to modify the collection filter because it is not
-  // connected to a pipeline.
-  vtkAlgorithm *source = input->GetProducerPort()->GetProducer();
-  if (source &&
-      (source->IsA("vtkMPIMoveData") ||
-       source->IsA("vtkCollectPolyData") ||
-       source->IsA("vtkM2NDuplicate") ||
-       source->IsA("vtkM2NCollect") ||
-       source->IsA("vtkOrderedCompositeDistributor") || 
-       source->IsA("vtkClientServerMoveData")))
-    {
-    source->Modified();
-    }
-
-  vtkInformation* info = input->GetPipelineInformation();
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      vtkExecutive::PRODUCER()->GetExecutive(info));
-  if (sddp)
-    {
-    sddp->SetUpdateExtent(info,
-                          this->UpdatePiece, 
-                          this->UpdateNumberOfPieces, 
-                          0);
-    }
-  else
-    {
-    input->SetUpdatePiece(this->UpdatePiece);
-    input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
-    input->SetUpdateGhostLevel(0);
-    }
-  vtkMyDebug("ForceUpdate ");
-  if (this->UpdateTimeInitialized)
-    {
-    info->Set(vtkCompositeDataPipeline::UPDATE_TIME_STEPS(), &this->UpdateTime, 1);
-    vtkMyDebug(this->UpdateTime);
-    }
-  vtkMyDebug(endl);
-
-  input->Update();
-  // Input may have changed, we obtain the pointer again.
-  input = this->GetInput();
-
-  output->ShallowCopy(input);
-  this->PipelineUpdateTime.Modified();
+  bool enabled = this->Enabled;
+  this->SetEnabled(false);
+  this->Update();
+  this->SetEnabled(enabled);
 }
-
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
@@ -223,8 +132,5 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation* vtkNotUsed(reqInfo),
 void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
-  os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
-  os << indent << "UpdateTime: " << this->UpdateTime << endl;
 }
