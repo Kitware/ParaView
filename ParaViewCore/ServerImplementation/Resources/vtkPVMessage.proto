@@ -151,28 +151,29 @@ message ActiveSelectionMessage {
   extend Message {
     required string name        = 50;
     required SelectionFlag type = 51;
-    repeated uint32 proxy       = 52;
+    required uint32 current_proxy = 52 [default = 0];
+    repeated uint32 proxy       = 53;
   }
 }
 
 message ClientInformation {
   extend Message {
-    required uint32 user     = 53;
-    optional string name     = 54;
-    optional bool req_update = 55 [default = false];
+    required uint32 user     = 54;
+    optional string name     = 55;
+    optional bool req_update = 56 [default = false];
   }
 }
 
 message ChatMessage {
   extend Message {
-    required string txt  = 56;
+    required string txt  = 57;
   }
 }
 
 message MasterSlaveMessage {
   extend Message {
-    required uint32 previous_master = 57;
-    required uint32 next_master     = 58;
+    required uint32 previous_master = 58;
+    required uint32 next_master     = 59;
   }
 }
 
@@ -188,8 +189,8 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 59;
-    optional uint32      proxy = 60 [default = 0];
+    required QtEventType type  = 60;
+    optional uint32      proxy = 61 [default = 0];
   }
 }
 

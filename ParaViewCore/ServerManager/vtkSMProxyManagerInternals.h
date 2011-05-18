@@ -234,6 +234,10 @@ public:
           }
 
         model->Select(proxyCollection.GetPointer(), cmd);
+        vtkSMProxy* currentProxy = vtkSMProxy::SafeDownCast(
+          session->GetRemoteObject(
+            msg->GetExtension(ActiveSelectionMessage::current_proxy)));
+        model->SetCurrentProxy(currentProxy, vtkSMProxySelectionModel::NO_UPDATE);
         }
       }
     }
@@ -315,7 +319,9 @@ public:
               selectionMessage.AddExtension(ActiveSelectionMessage::proxy,
                                             selectedProxy->GetGlobalID());
               }
-
+            selectionMessage.SetExtension(ActiveSelectionMessage::current_proxy,
+              model->GetCurrentProxy()?
+              model->GetCurrentProxy()->GetGlobalID() : 0);
             collaborationManager->SendToOtherClients(&selectionMessage);
             }
           }
