@@ -504,6 +504,8 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     this->PInternals->SelectionProxies.push_back(esProxy);
     }
   this->ExecuteStream(stream);
+  // FIXME_COLLABORATION : BUG #9658
+  this->PushState(this->State);
   this->SelectionProxiesCreated = true;
 }
 
