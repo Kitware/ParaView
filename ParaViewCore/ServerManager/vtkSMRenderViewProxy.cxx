@@ -29,6 +29,7 @@
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVLastSelectionInformation.h"
 #include "vtkPVOptions.h"
@@ -323,7 +324,20 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
       }
     }
 
-  // 
+  // Update whether render servers can open display i.e. remote rendering is
+  // possible on all processes.
+  vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
+  this->GetSession()->GatherInformation(
+    vtkPVSession::RENDER_SERVER, info, 0);
+  if (info->GetCanOpenDisplay() == 0)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << VTKOBJECT(this)
+      << "RemoteRenderingAvailableOff"
+      << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+    }
 }
 
 //----------------------------------------------------------------------------

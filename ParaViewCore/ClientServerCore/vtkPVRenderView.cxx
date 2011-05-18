@@ -84,7 +84,7 @@ vtkPVRenderView::vtkPVRenderView()
 {
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
-  this->RemoteRenderingAvailable = false;
+  this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
 
   this->UsedLODForLastRender = false;
   this->MakingSelection = false;
@@ -283,16 +283,6 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
-
-  this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
-  // Synchronize this among all processes involved.
-  unsigned int cannot_render = (this->RemoteRenderingAvailable &&
-                                vtkPVRenderView::IsRemoteRenderingAllowed()) ? 0 : 1;
-
-  // FIXME should be fixed by Utkarsh
-  //this->SynchronizeSize(cannot_render);
-
-  this->RemoteRenderingAvailable = cannot_render == 0;
 }
 
 //----------------------------------------------------------------------------

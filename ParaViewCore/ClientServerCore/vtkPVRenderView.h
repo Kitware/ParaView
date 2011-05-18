@@ -334,6 +334,8 @@ public:
   // Description:
   // Returns if remote-rendering is possible on the current group of processes.
   vtkGetMacro(RemoteRenderingAvailable, bool);
+  void RemoteRenderingAvailableOff()
+    { this->RemoteRenderingAvailable = false; }
 
   // Description:
   // Returns true if the most recent render used LOD.
