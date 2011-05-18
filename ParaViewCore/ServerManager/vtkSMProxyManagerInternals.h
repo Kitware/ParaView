@@ -18,17 +18,19 @@
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProxy.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
-#include "vtkSMProxyLocator.h"
+#include "vtkSMSession.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/map>
@@ -36,7 +38,6 @@
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
-#include <vtkNew.h>
 
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
@@ -302,11 +303,17 @@ public:
             unsigned int nbProxies = model->GetNumberOfSelectedProxies();
             for(unsigned int idx = 0; idx < nbProxies; idx++)
               {
-              assert( "Invalid selected proxy" &&
-                      model->GetSelectedProxy(idx) &&
-                      model->GetSelectedProxy(idx)->GetGlobalID() != 0);
+              vtkSMProxy* selectedProxy = model->GetSelectedProxy(idx);
+              assert( "Invalid selected proxy" && selectedProxy);
+              vtkSMOutputPort* port =
+                vtkSMOutputPort::SafeDownCast(selectedProxy);
+              if (port)
+                {
+                selectedProxy = port->GetSourceProxy();
+                }
+              assert("Invalid selected proxy" && selectedProxy->GetGlobalID());
               selectionMessage.AddExtension(ActiveSelectionMessage::proxy,
-                                            model->GetSelectedProxy(idx)->GetGlobalID());
+                                            selectedProxy->GetGlobalID());
               }
 
             collaborationManager->SendToOtherClients(&selectionMessage);
