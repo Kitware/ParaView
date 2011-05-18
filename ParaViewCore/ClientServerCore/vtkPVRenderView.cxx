@@ -275,6 +275,11 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Initialize(unsigned int id)
 {
+  if (this->Identifier == id)
+    {
+    // already initialized
+    return;
+    }
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderView->GetRenderWindow());
   this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());

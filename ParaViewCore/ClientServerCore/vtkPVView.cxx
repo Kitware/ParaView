@@ -72,7 +72,7 @@ vtkPVView::~vtkPVView()
 //----------------------------------------------------------------------------
 void vtkPVView::Initialize(unsigned int id)
 {
-  if(this->Identifier == id)
+  if (this->Identifier == id)
     {
     // already initialized
     return;
