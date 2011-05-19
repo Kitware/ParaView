@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewVRPN.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   under the terms of the ParaView license version 1.2. 
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,39 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRenderLoopEvent_h_
-#define __pqRenderLoopEvent_h_
+#include "vtkVRPropertyStyle.h"
 
-#include <QObject>
-#include "vtkVRQueue.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-
-class pqRenderLoopEvent : public QObject
+//-----------------------------------------------------------------------------
+vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
+  : Superclass(parentObject)
 {
-Q_OBJECT
+}
 
-public:
-  pqRenderLoopEvent();
-  ~pqRenderLoopEvent();
+//-----------------------------------------------------------------------------
+vtkVRPropertyStyle::~vtkVRPropertyStyle()
+{
+}
 
-  // Description:
-  // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRQueue* queue );
+//-----------------------------------------------------------------------------
+void vtkVRPropertyStyle::setSMProperty(
+  vtkSMProxy* proxy, const QString& property_name)
+{
+  this->Proxy = proxy;
+  this->PropertyName = property_name;
+}
 
-protected slots:
-  void Handle();
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty( vtkVREventData data );
-  bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
-protected:
-  vtkVRQueue *EventQueue;
-};
+//-----------------------------------------------------------------------------
+vtkSMProperty* vtkVRPropertyStyle::getSMProperty() const
+{
+  return this->Proxy? this->Proxy->GetProperty(
+    this->PropertyName.toAscii().data()) : NULL;
+}
 
-#endif //__pqRenderLoopEvent.h_
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkVRPropertyStyle::getSMProxy() const
+{
+  return this->Proxy;
+}

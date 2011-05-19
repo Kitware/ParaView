@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,38 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#ifndef __vtkVRVectorPropertyStyle_h 
+#define __vtkVRVectorPropertyStyle_h
 
-#include <QObject>
+#include "vtkVRPropertyStyle.h"
 
-class QTimer;
-class ParaViewVRPN;
-class vtkVRQueue;
-class vtkVRQueueHandler;
-
-class pqVRPNStarter : public QObject
+/// vtkVRVectorPropertyStyle can be used to control any 3-element numeric
+/// property. This style has modes which allows one to control how the property
+/// is updated i.e. whether to use the orientation vector or use displacement
+/// etc.
+class vtkVRVectorPropertyStyle : public vtkVRPropertyStyle
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef vtkVRPropertyStyle Superclass;
 public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+  enum eMode
+    {
+    DIRECTION_VECTOR=1,
+    DISPLACEMENT=2
+    };
 
-  // Callback for shutdown.
-  void onShutdown();
+public:
+  vtkVRVectorPropertyStyle(eMode mode, QObject* parent=0);
+  virtual ~vtkVRVectorPropertyStyle();
 
-  // Callback for startup.
-  void onStartup();
+  /// handle the event.
+  virtual bool handleEvent(const vtkVREventData& data);
 
 protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
+  void setValue(double x, double y, double z);
+  eMode Mode;
 
 private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  Q_DISABLE_COPY(vtkVRVectorPropertyStyle)
 };
 
 #endif

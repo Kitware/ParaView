@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    ParaViewVRPN.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,38 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#ifndef __vtkVRGenericStyle_h_
+#define __vtkVRGenericStyle_h_
 
-#include <QObject>
+#include "vtkVRInteractorStyle.h"
 
-class QTimer;
-class ParaViewVRPN;
-class vtkVRQueue;
-class vtkVRQueueHandler;
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
+struct vtkVREventData;
 
-class pqVRPNStarter : public QObject
+/// This is demonstration of how subclasses for vtkVRInteractorStyle can be
+/// implemented.
+class vtkVRGenericStyle : public vtkVRInteractorStyle
 {
-  Q_OBJECT
-  typedef QObject Superclass;
+  typedef vtkVRInteractorStyle Superclass;
 public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+  vtkVRGenericStyle(QObject* parent);
+  ~vtkVRGenericStyle();
 
-  // Callback for shutdown.
-  void onShutdown();
-
-  // Callback for startup.
-  void onStartup();
+  /// called to handle an event. If the style does not handle this event or
+  /// handles it but does not want to stop any other handlers from handling it
+  /// as well, they should return false. Other return true. Returning true
+  /// indicates that vtkVRQueueHandler the event has been "consumed".
+  virtual bool handleEvent(const vtkVREventData& data);
 
 protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
-
-private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  void HandleButton ( const vtkVREventData& data );
+  void HandleAnalog ( const vtkVREventData& data );
+  void HandleTracker( const vtkVREventData& data );
+  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
+                                  vtkSMDoubleVectorProperty** prop);
+  bool SetHeadPoseProperty(const vtkVREventData &data );
+  bool UpdateNRenderWithHeadPose();
+  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+protected:
 };
 
-#endif
+#endif //__vtkVRGenericStyle.h_
