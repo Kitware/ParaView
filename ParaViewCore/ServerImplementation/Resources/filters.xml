@@ -128,6 +128,17 @@
       </InputProperty>
 
       
+      <IntVectorProperty
+        name="Level"
+        command="SetMaxResolution"
+        number_of_elements="1"
+        default_values="1" >
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+      
       <DoubleVectorProperty
         name="OffSet"
         command="SetOffSetFromOrigin"
