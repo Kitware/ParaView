@@ -42,8 +42,8 @@ public:
   // Description:
   // Get/Set if the update suppressor is enabled. If the update suppressor 
   // is not enabled, it won't supress any updates. Enabled by default.
-  void SetEnabled(int);
-  vtkGetMacro(Enabled, int);
+  void SetEnabled(bool);
+  vtkGetMacro(Enabled, bool);
 
 protected:
   vtkPVUpdateSuppressor();
@@ -54,7 +54,7 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
 
-  int Enabled;
+  bool Enabled;
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();

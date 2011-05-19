@@ -34,7 +34,7 @@ vtkStandardNewMacro(vtkPVUpdateSuppressor);
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
-  this->Enabled = 1;
+  this->Enabled = true;
 }
 
 //----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::SetEnabled(int enable)
+void vtkPVUpdateSuppressor::SetEnabled(bool enable)
 {
   if (this->Enabled == enable)
     {

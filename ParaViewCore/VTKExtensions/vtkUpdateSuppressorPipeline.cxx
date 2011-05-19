@@ -24,7 +24,7 @@ vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 //----------------------------------------------------------------------------
 vtkUpdateSuppressorPipeline::vtkUpdateSuppressorPipeline()
 {
-  this->Enabled = 1;
+  this->Enabled = true;
 }
 
 //----------------------------------------------------------------------------
