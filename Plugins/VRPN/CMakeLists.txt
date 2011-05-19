@@ -19,7 +19,6 @@ find_library(VRPN_QUAT_LIBRARY quat)
 
 QT4_WRAP_CPP(MOC_SRCS
   ParaViewVRPN.h
-  pqRenderLoopEvent.h
   pqVRPNStarter.h
   vtkVRInteractorStyle.h
   vtkVRQueue.h
@@ -46,7 +45,7 @@ INCLUDE_DIRECTORIES(
 
 SET( VRPN_SOURCE_FILES
   ParaViewVRPN.cxx
-  pqRenderLoopEvent.cxx
+  vtkVRGenericStyle.cxx
   vtkVRInteractorStyle.cxx
   vtkVRPNCallBackHandlers.cxx
   vtkVRQueue.cxx

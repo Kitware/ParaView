@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-class vtkVREventData;
+struct vtkVREventData;
 
 class vtkVRInteractorStyle : public QObject
 {

@@ -29,39 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRenderLoopEvent_h_
-#define __pqRenderLoopEvent_h_
+#ifndef __vtkVRGenericStyle_h_
+#define __vtkVRGenericStyle_h_
 
-#include <QObject>
-#include "vtkVRQueue.h"
+#include "vtkVRInteractorStyle.h"
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
+struct vtkVREventData;
 
-class pqRenderLoopEvent : public QObject
+/// This is demonstration of how subclasses for vtkVRInteractorStyle can be
+/// implemented.
+class vtkVRGenericStyle : public vtkVRInteractorStyle
 {
-Q_OBJECT
-
+  typedef vtkVRInteractorStyle Superclass;
 public:
-  pqRenderLoopEvent();
-  ~pqRenderLoopEvent();
+  vtkVRGenericStyle(QObject* parent);
+  ~vtkVRGenericStyle();
 
-  // Description:
-  // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRQueue* queue );
+  /// called to handle an event. If the style does not handle this event or
+  /// handles it but does not want to stop any other handlers from handlign it
+  /// as well, they should return false. Other return true. Return true
+  /// indicates that vtkVRQueueHandler the event has been "consumed".
+  virtual bool handleEvent(const vtkVREventData& data);
 
-protected slots:
-  void Handle();
+protected:
   void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
   bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
                                   vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty( vtkVREventData data );
+  bool SetHeadPoseProperty(const vtkVREventData &data );
   bool UpdateNRenderWithHeadPose();
   void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 protected:
-  vtkVRQueue *EventQueue;
 };
 
-#endif //__pqRenderLoopEvent.h_
+#endif //__vtkVRGenericStyle.h_

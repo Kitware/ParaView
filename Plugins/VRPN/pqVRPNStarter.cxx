@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewVRPN.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkVRGenericStyle.h"
 #include "vtkVRQueue.h"
 #include "vtkVRQueueHandler.h"
 
@@ -49,6 +50,11 @@ pqVRPNStarter::pqVRPNStarter(QObject* p/*=0*/)
 {
   this->EventQueue = new vtkVRQueue(this);
   this->Handler = new vtkVRQueueHandler(this->EventQueue, this);
+
+  // for debugging, until we add support for reading styles from XML we simple
+  // create the generic style.
+  this->Handler->add(new vtkVRGenericStyle(this));
+
   this->InputDevice = NULL;
 }
 
