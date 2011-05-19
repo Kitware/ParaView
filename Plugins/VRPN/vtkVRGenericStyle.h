@@ -62,6 +62,7 @@ protected:
   bool SetHeadPoseProperty(const vtkVREventData &data );
   bool UpdateNRenderWithHeadPose();
   void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+
 protected:
 };
 

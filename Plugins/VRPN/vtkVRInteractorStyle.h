@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
+class vtkPVXMLElement;
+class vtkSMProxyLocator;
 struct vtkVREventData;
 
 class vtkVRInteractorStyle : public QObject
@@ -49,6 +51,22 @@ public:
   /// as well, they should return false. Other return true. Return true
   /// indicates that vtkVRQueueHandler the event has been "consumed".
   virtual bool handleEvent(const vtkVREventData& data)=0;
+
+  /// get/set the device name.
+  void setDeviceName(const QString& name)
+    { this->DeviceName = name; }
+  const QString& deviceName() const
+    { return this->DeviceName; }
+
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
+protected:
+  QString DeviceName;
+
 private:
   Q_DISABLE_COPY(vtkVRInteractorStyle)
 };
