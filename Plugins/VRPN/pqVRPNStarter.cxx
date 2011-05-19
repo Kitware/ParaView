@@ -93,10 +93,10 @@ void pqVRPNStarter::onStartup()
 //-----------------------------------------------------------------------------
 void pqVRPNStarter::onShutdown()
 {
-  this->InputDevice->terminate();
   this->Handler->stop();
-
-  delete this->InputDevice;
-  this->InputDevice = NULL;
+  if (this->InputDevice)
+    {
+    this->InputDevice->terminate();
+    }
   // qWarning() << "Message from pqVRPNStarter: Application Shutting down";
 }

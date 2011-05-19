@@ -21,8 +21,10 @@ QT4_WRAP_CPP(MOC_SRCS
   ParaViewVRPN.h
   pqVRPNStarter.h
   vtkVRInteractorStyle.h
+  vtkVRPropertyStyle.h
   vtkVRQueue.h
   vtkVRQueueHandler.h
+  vtkVRVectorPropertyStyle.h
   )
 
 SET (QT_USE_QTNETWORK TRUE)
