@@ -19,6 +19,7 @@
 #ifndef __vtkVRQueue_h
 #define __vtkVRQueue_h
 
+#include <QObject>
 #include <QQueue>
 #include <QMutex>
 #include <QWaitCondition>
@@ -65,12 +66,16 @@ struct vtkVREventData
 };
 
 
-class vtkVRQueue
+class vtkVRQueue : public QObject
 {
+  Q_OBJECT
+  typedef QObject Superclass;
 public:
+  vtkVRQueue(QObject* parentObject=0);
   void enqueue (const vtkVREventData& data);
   bool isEmpty() const;
   bool tryDequeue(vtkVREventData& data);
+  bool tryDequeue(QQueue<vtkVREventData>& data);
   void dequeue(vtkVREventData&  data) ;
 
 private:

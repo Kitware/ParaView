@@ -18,9 +18,13 @@ find_library(VRPN_LIBRARY vrpn)
 find_library(VRPN_QUAT_LIBRARY quat)
 
 QT4_WRAP_CPP(MOC_SRCS
-  pqVRPNStarter.h
   ParaViewVRPN.h
-  pqRenderLoopEvent.h)
+  pqRenderLoopEvent.h
+  pqVRPNStarter.h
+  vtkVRInteractorStyle.h
+  vtkVRQueue.h
+  vtkVRQueueHandler.h
+  )
 
 SET (QT_USE_QTNETWORK TRUE)
 INCLUDE(${QT_USE_FILE})
@@ -42,10 +46,11 @@ INCLUDE_DIRECTORIES(
 
 SET( VRPN_SOURCE_FILES
   ParaViewVRPN.cxx
-
-  vtkVRPNCallBackHandlers.cxx
   pqRenderLoopEvent.cxx
+  vtkVRInteractorStyle.cxx
+  vtkVRPNCallBackHandlers.cxx
   vtkVRQueue.cxx
+  vtkVRQueueHandler.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRPNStarter

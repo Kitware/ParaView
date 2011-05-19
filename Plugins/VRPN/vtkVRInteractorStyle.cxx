@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   under the terms of the ParaView license version 1.2. 
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,38 +29,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#include "vtkVRInteractorStyle.h"
 
-#include <QObject>
-
-class QTimer;
-class ParaViewVRPN;
-class vtkVRQueue;
-class vtkVRQueueHandler;
-
-class pqVRPNStarter : public QObject
+//-----------------------------------------------------------------------------
+vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef QObject Superclass;
-public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+}
 
-  // Callback for shutdown.
-  void onShutdown();
-
-  // Callback for startup.
-  void onStartup();
-
-protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
-
-private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
-};
-
-#endif
+//-----------------------------------------------------------------------------
+vtkVRInteractorStyle::~vtkVRInteractorStyle()
+{
+}
