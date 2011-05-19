@@ -27,6 +27,7 @@
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVUpdateSuppressor.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -68,6 +69,9 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
   this->Distributor->SetInputConnection(this->DeliveryFilter->GetOutputPort());
 
+  this->UpdateSuppressor = vtkPVUpdateSuppressor::New();
+  this->UpdateSuppressor->SetInputConnection(this->Distributor->GetOutputPort());
+
   this->LODGeometryFilter = vtkPVGeometryFilter::New();
   this->LODGeometryFilter->SetUseOutline(0);
 
@@ -75,10 +79,13 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter->SetOutputDataType(VTK_POLY_DATA);
   this->LODDeliveryFilter->SetLODMode(true);
+  this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
 
   this->CacheKeeper->SetInputConnection(this->Preprocessor->GetOutputPort());
   this->LODGeometryFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
-  this->LODMapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->LODMapper->SetInputConnection(
+    this->LODUpdateSuppressor->GetOutputPort());
   this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->DefaultMapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -97,6 +104,8 @@ vtkUnstructuredGridVolumeRepresentation::~vtkUnstructuredGridVolumeRepresentatio
   this->Actor->Delete();
   this->DeliveryFilter->Delete();
   this->Distributor->Delete();
+  this->UpdateSuppressor->Delete();
+  this->LODUpdateSuppressor->Delete();
 
   this->LODGeometryFilter->Delete();
   this->LODMapper->Delete();
@@ -143,9 +152,6 @@ vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridVolumeRepresentation::MarkModified()
 {
-  this->DeliveryFilter->Modified();
-  this->Distributor->Modified();
-  this->LODDeliveryFilter->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.
@@ -168,6 +174,11 @@ int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(
 int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  // mark delivery filters modified.
+  this->DeliveryFilter->Modified();
+  this->Distributor->Modified();
+  this->LODDeliveryFilter->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -256,7 +267,11 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
     this->UpdateMapperParameters();
     if (!this->Actor->GetEnableLOD())
       {
-      this->Distributor->Update();
+      this->UpdateSuppressor->ForceUpdate();
+      }
+    else
+      {
+      this->LODUpdateSuppressor->ForceUpdate();
       }
     }
 
@@ -292,7 +307,7 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
 
-  activeMapper->SetInputConnection(this->Distributor->GetOutputPort());
+  activeMapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
   activeMapper->SelectScalarArray(this->ColorArrayName);
 
   if (this->ColorArrayName && this->ColorArrayName[0])

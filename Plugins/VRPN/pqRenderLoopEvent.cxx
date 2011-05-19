@@ -138,15 +138,15 @@ bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVREventData data )
   if ( this->GetHeadPoseProxyNProperty( &proxy, &prop ) )
     {
     double rotMat[3][3];
-
     vtkMath::QuaternionToMatrix3x3( data.data.tracker.quat, rotMat );
+
     prop->SetElement( 0,  rotMat[0][0] );
     prop->SetElement( 1,  rotMat[0][1] );
     prop->SetElement( 2,  rotMat[0][2] );
-    prop->SetElement( 3,  data.data.tracker.pos [0]*1  );
+    prop->SetElement( 3,  data.data.tracker.pos [0]*-1  );
 
     prop->SetElement( 4,  rotMat[1][0] );
-    prop->SetElement( 5,  rotMat[1][1] );
+    prop->SetElement( 5,  -rotMat[1][1] );
     prop->SetElement( 6,  rotMat[1][2] );
     prop->SetElement( 7,  data.data.tracker.pos [1]*1  );
 
@@ -159,6 +159,7 @@ bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVREventData data )
     prop->SetElement( 13, 0.0 );
     prop->SetElement( 14, 0.0 );
     prop->SetElement( 15, 1.0 );
+
     return true;
     }
   false;

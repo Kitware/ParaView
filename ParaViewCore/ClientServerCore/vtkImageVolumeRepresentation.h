@@ -34,6 +34,7 @@ class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
+class vtkPVUpdateSuppressor;
 class vtkUnstructuredDataDeliveryFilter;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
@@ -153,6 +154,7 @@ protected:
 
   vtkOutlineSource* OutlineSource;
   vtkUnstructuredDataDeliveryFilter* OutlineDeliveryFilter;
+  vtkPVUpdateSuppressor* OutlineUpdateSuppressor;
   vtkPolyDataMapper* OutlineMapper;;
 
   int ColorAttributeType;

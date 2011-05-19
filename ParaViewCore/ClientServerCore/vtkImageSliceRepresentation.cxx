@@ -150,6 +150,9 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
       {
       this->DeliveryFilter->Update();
 
+      // since there's no direct connection between the mapper and the collector,
+      // we don't put an update-suppressor in the pipeline.
+
       // essential to break the pipeline link between the mapper and the delivery
       // filter since when the delivery filter produces an empty image, the
       // executive keeps on re-executing it every time.
@@ -173,6 +176,9 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
 int vtkImageSliceRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  // Mark delivery filter modified.
+  this->DeliveryFilter->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -288,7 +294,6 @@ bool vtkImageSliceRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkImageSliceRepresentation::MarkModified()
 {
-  this->DeliveryFilter->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.

@@ -25,6 +25,7 @@
 
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
+#include "vtkWeakPointer.h" // needed for vtkMultiProcessController
 
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
@@ -180,7 +181,7 @@ protected:
     };
 
   vtkPVProxyDefinitionManager* ProxyDefinitionManager;
-  vtkMultiProcessController* ParallelController;
+  vtkWeakPointer<vtkMultiProcessController> ParallelController;
   vtkClientServerInterpreter* Interpreter;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 

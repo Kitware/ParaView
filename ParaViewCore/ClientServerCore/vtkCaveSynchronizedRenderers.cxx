@@ -41,18 +41,14 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
   this->DisplayOrigin[0] = 0.0;
   this->DisplayOrigin[1] = 0.0;
   this->DisplayOrigin[2] = 0.0;
-  this->DisplayOrigin[3] = 1.0;
   this->DisplayX[0] = 0.0;
   this->DisplayX[1] = 0.0;
   this->DisplayX[2] = 0.0;
-  this->DisplayX[3] = 1.0;
   this->DisplayY[0] = 0.0;
   this->DisplayY[1] = 0.0;
   this->DisplayY[2] = 0.0;
-  this->DisplayY[3] = 1.0;
 
-  // Screen surface rotation matrix
-  SurfaceRot = vtkMatrix4x4::New();
+
   once =1;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 
@@ -82,14 +78,12 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
         options->GetLowerRight(cc), options->GetUpperRight(cc));
       }
     }
-  this->SetDisplayConfig();
 }
 
 //----------------------------------------------------------------------------
 vtkCaveSynchronizedRenderers::~vtkCaveSynchronizedRenderers()
 {
   this->SetNumberOfDisplays(0);
-  this->SurfaceRot->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -181,61 +175,13 @@ void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
   if(once)
     {
       cam->SetHeadTracked( true );
-      cam->SetConfigParams( this->O2Screen, this->O2Right,
-                            this->O2Left, this->O2Top, this->O2Bottom,
-                            0.065, 1.0, this->SurfaceRot);
+      cam->SetScreenConfig( this->DisplayOrigin,
+                            this->DisplayX,
+                            this->DisplayY ,0.065, 1.0);
       once =0;
     }
 }
 
-//------------------------------------------------------------------HeadTracked
-// This enables the display config for head tracking
-void vtkCaveSynchronizedRenderers::SetDisplayConfig()
-{
-  // Base coordinates of the screen
-  double xBase[3], yBase[3], zBase[3];
-  for (int i = 0; i < 3; ++i)
-    {
-    xBase[i] = this->DisplayX[i]-this->DisplayOrigin[i];
-    yBase[i] = this->DisplayY[i]-this->DisplayX[i];
-    }
-  vtkMath::Cross( xBase, yBase, zBase );
-
-  this->SetSurfaceRotation( xBase, yBase, zBase);
-
-  // Get the new DisplayOrigin, DisplayX and DisplayY after transfromation
-  this->SurfaceRot->MultiplyPoint( this->DisplayOrigin, this->DisplayOrigin );
-  this->SurfaceRot->MultiplyPoint( this->DisplayX, this->DisplayX );
-  this->SurfaceRot->MultiplyPoint( this->DisplayY, this->DisplayY );
-
-  // Set O2Screen, O2Right, O2Left, O2Bottom, O2Top
-  this->O2Screen = - this->DisplayOrigin[2];
-  this->O2Right  =   this->DisplayX[0];
-  this->O2Left   = - this->DisplayOrigin[0];
-  this->O2Top    =   this->DisplayY[1];
-  this->O2Bottom = - this->DisplayX[1];
-}
-
-void vtkCaveSynchronizedRenderers::SetSurfaceRotation( double xBase[3],
-                                                       double yBase[3],
-                                                       double zBase[3])
-{
-  vtkMath::Normalize( xBase );
-  vtkMath::Normalize( yBase );
-  vtkMath::Normalize( zBase );
-
-  this->SurfaceRot->SetElement( 0, 0, xBase[0] );
-  this->SurfaceRot->SetElement( 0, 1, xBase[1] );
-  this->SurfaceRot->SetElement( 0, 2, xBase[2] );
-
-  this->SurfaceRot->SetElement( 1, 0, yBase[0] );
-  this->SurfaceRot->SetElement( 1, 1, yBase[1] );
-  this->SurfaceRot->SetElement( 1, 2, yBase[2] );
-
-  this->SurfaceRot->SetElement( 2, 0, zBase[0]);
-  this->SurfaceRot->SetElement( 2, 1, zBase[1]);
-  this->SurfaceRot->SetElement( 2, 2, zBase[2]);
-}
 
 //----------------------------------------------------------------------------
 void vtkCaveSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
@@ -256,16 +202,13 @@ void vtkCaveSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Origin: "
      << this->DisplayOrigin[0] << " "
      << this->DisplayOrigin[1] << " "
-     << this->DisplayOrigin[2] << " "
-     << this->DisplayOrigin[3] << endl;
+     << this->DisplayOrigin[2] << endl;
   os << indent << "X: "
      << this->DisplayX[0] << " "
      << this->DisplayX[1] << " "
-     << this->DisplayX[2] << " "
-     << this->DisplayX[3] << endl;
+     << this->DisplayX[2] << endl;
   os << indent << "Y: "
      << this->DisplayY[0] << " "
      << this->DisplayY[1] << " "
-     << this->DisplayY[2] << " "
-     << this->DisplayY[3] << endl;
+     << this->DisplayY[2] << endl;
 }

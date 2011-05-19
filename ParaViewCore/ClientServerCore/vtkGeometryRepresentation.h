@@ -31,6 +31,7 @@ class vtkOrderedCompositeDistributor;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
+class vtkPVUpdateSuppressor;
 class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
@@ -238,6 +239,8 @@ protected:
   vtkUnstructuredDataDeliveryFilter* DeliveryFilter;
   vtkUnstructuredDataDeliveryFilter* LODDeliveryFilter;
   vtkOrderedCompositeDistributor* Distributor;
+  vtkPVUpdateSuppressor* UpdateSuppressor;
+  vtkPVUpdateSuppressor* LODUpdateSuppressor;
 
   int ColorAttributeType;
   char* ColorArrayName;
