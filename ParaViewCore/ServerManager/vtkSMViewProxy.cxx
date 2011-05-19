@@ -285,3 +285,35 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::HasDirtyRepresentation()
+{
+  vtkSMPropertyHelper helper1(this, "Representations");
+  for (unsigned int cc=0; cc  < helper1.GetNumberOfElements(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      helper1.GetAsProxy(cc));
+    if (repr)
+      {
+      if(repr->MarkedModified)
+        {
+        return true;
+        }
+      }
+    }
+
+  vtkSMPropertyHelper helper2(this, "HiddenRepresentations", true);
+  for (unsigned int cc=0; cc  < helper2.GetNumberOfElements(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      helper2.GetAsProxy(cc));
+    if (repr)
+      {
+      if(repr->MarkedModified)
+        {
+        return true;
+        }
+      }
+    }
+  return false;
+}
