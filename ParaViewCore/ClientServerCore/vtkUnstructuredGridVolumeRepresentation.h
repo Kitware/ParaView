@@ -32,6 +32,7 @@ class vtkProjectedTetrahedraMapper;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODVolume;
+class vtkPVUpdateSuppressor;
 class vtkUnstructuredDataDeliveryFilter;
 class vtkUnstructuredGridVolumeMapper;
 class vtkVolumeProperty;
@@ -153,12 +154,14 @@ protected:
   vtkPVCacheKeeper* CacheKeeper;
   vtkUnstructuredDataDeliveryFilter* DeliveryFilter;
   vtkOrderedCompositeDistributor* Distributor;
+  vtkPVUpdateSuppressor* UpdateSuppressor;
   vtkProjectedTetrahedraMapper* DefaultMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
 
   vtkPVGeometryFilter* LODGeometryFilter;
   vtkUnstructuredDataDeliveryFilter* LODDeliveryFilter;
+  vtkPVUpdateSuppressor* LODUpdateSuppressor;
   vtkPolyDataMapper* LODMapper;
 
   int ColorAttributeType;
