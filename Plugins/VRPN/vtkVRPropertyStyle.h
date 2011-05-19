@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewVRPN.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRGenericStyle_h_
-#define __vtkVRGenericStyle_h_
+#ifndef __vtkVRPropertyStyle_h 
+#define __vtkVRPropertyStyle_h
 
 #include "vtkVRInteractorStyle.h"
+#include "vtkSmartPointer.h"
 
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-struct vtkVREventData;
+class vtkSMProperty;
+class vtkSMProxy;
 
-/// This is demonstration of how subclasses for vtkVRInteractorStyle can be
-/// implemented.
-class vtkVRGenericStyle : public vtkVRInteractorStyle
+/// vtkVRPropertyStyle is superclass for interactor styles that change any
+/// property on some proxy. Which property/proxy is being controlled can be
+/// setup (in future) by means, reading configuration values from the state file
+/// or via some user-interface panel.
+class vtkVRPropertyStyle : public vtkVRInteractorStyle
 {
+  Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRGenericStyle(QObject* parent);
-  ~vtkVRGenericStyle();
+  vtkVRPropertyStyle(QObject* parent=0);
+  virtual ~vtkVRPropertyStyle();
 
-  /// called to handle an event. If the style does not handle this event or
-  /// handles it but does not want to stop any other handlers from handling it
-  /// as well, they should return false. Other return true. Returning true
-  /// indicates that vtkVRQueueHandler the event has been "consumed".
-  virtual bool handleEvent(const vtkVREventData& data);
+  /// Get/set the property being controlled by this style.
+  virtual vtkSMProperty* getSMProperty() const;
+  virtual vtkSMProxy* getSMProxy() const;
+  virtual const QString& getSMPropertyName() const
+    {return this->PropertyName; }
+  void setSMProperty(vtkSMProxy*, const QString& property_name);
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty(const vtkVREventData &data );
-  bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
-protected:
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  QString PropertyName;
+
+private:
+  Q_DISABLE_COPY(vtkVRPropertyStyle)
 };
 
-#endif //__vtkVRGenericStyle.h_
+#endif
