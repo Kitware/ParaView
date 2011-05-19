@@ -209,7 +209,7 @@ public:
     this->Target = t;
     }
 
-  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+  virtual void Execute(vtkObject *vtkNotUsed(obj), unsigned long vtkNotUsed(event), void* data)
     {
     vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
     if(msg->HasExtension(ActiveSelectionMessage::name))
@@ -257,7 +257,7 @@ public:
     this->Target = t;
     }
 
-  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+  virtual void Execute(vtkObject *obj, unsigned long vtkNotUsed(event), void* data)
     {
     if (this->Target)
       {

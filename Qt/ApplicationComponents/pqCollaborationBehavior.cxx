@@ -65,7 +65,7 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationBehavior::onServerRemoved(pqServer* server)
+void pqCollaborationBehavior::onServerRemoved(pqServer* vtkNotUsed(server))
 {
   if(this->CollaborationManager)
     {

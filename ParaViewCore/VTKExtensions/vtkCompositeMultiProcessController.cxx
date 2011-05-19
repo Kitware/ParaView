@@ -541,7 +541,7 @@ vtkCommunicator* vtkCompositeMultiProcessController::GetCommunicator()
   return this->Internal->GetActiveCommunicator();
 }
 //----------------------------------------------------------------------------
-void vtkCompositeMultiProcessController::TriggerRMI2NonActives(int remote,
+void vtkCompositeMultiProcessController::TriggerRMI2NonActives(int vtkNotUsed(remote),
                                                                void* data,
                                                                int length,
                                                                int tag)

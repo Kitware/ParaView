@@ -47,7 +47,7 @@ void vtkSMCollaborationManager::PrintSelf(ostream& os, vtkIndent indent)
 }
 //---------------------------------------------------------------------------
 void vtkSMCollaborationManager::LoadState( const vtkSMMessage* msg,
-                                                vtkSMProxyLocator* locator)
+                                           vtkSMProxyLocator* vtkNotUsed(locator))
 {
   // Execute locally
   vtkSMMessage* msgCopy = new vtkSMMessage();

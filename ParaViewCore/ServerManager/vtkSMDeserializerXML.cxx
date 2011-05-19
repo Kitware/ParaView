@@ -74,10 +74,11 @@ vtkSMProxy* vtkSMDeserializerXML::NewProxy(vtkTypeUInt32 id,
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMDeserializerXML::CreateProxy(const char* xmlgroup,
-                                              const char* xmlname)
+                                              const char* xmlname,
+                                              const char* subProxyName /*=NULL*/)
 {
   vtkSMProxyManager* pxm = this->GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname);
+  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subProxyName);
   return proxy;
 }
 

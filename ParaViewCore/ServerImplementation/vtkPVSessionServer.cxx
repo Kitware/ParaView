@@ -94,7 +94,7 @@ public:
       }
     }
   //-----------------------------------------------------------------
-  void CreateController(vtkObject* src, unsigned long event, void* data)
+  void CreateController(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
     {
     vtkNetworkAccessManager* nam =
         vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();

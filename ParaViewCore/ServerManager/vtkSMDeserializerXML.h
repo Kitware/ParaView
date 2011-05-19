@@ -60,7 +60,8 @@ protected:
   // Description:
   // Create a new proxy of the given group and name. Default implementation
   // simply asks the proxy manager to create a new proxy of the requested type.
-  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname);
+  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
+                                  const char* subProxyName = NULL);
 
   // Description:
   // Called after a new proxy has been created. Gives the subclasses an

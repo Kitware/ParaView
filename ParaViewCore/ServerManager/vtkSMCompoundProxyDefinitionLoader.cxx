@@ -53,7 +53,7 @@ vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeU
     if (currentElement->GetName() &&
       strcmp(currentElement->GetName(), "Proxy") == 0)
       {
-      int currentId;
+      vtkIdType currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
         {
         continue;

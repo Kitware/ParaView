@@ -538,7 +538,10 @@ void pqServer::processServerNotification()
     }
 }
 //-----------------------------------------------------------------------------
-void pqServer::onCollaborationCommunication(vtkObject* src, unsigned long event, void* method, void* data)
+void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
+                                            unsigned long vtkNotUsed(event),
+                                            void* vtkNotUsed(method),
+                                            void* data)
 {
   vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
   emit sentFromOtherClient(msg);

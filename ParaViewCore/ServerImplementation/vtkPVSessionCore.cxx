@@ -510,7 +510,7 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
     // Update chunks of GlobalID
     this->GetNextChunkGID(message);
     }
-  else if ( obj = this->Internals->GetSIObject(message->global_id()) )
+  else if ( (obj = this->Internals->GetSIObject(message->global_id())) )
     {
     // Generic SIObject
     obj->Pull(message);
