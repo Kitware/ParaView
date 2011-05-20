@@ -662,6 +662,10 @@ void PrismCore::onPreRepresentationRemoved(pqRepresentation* repr)
   if(dataRepr)
   {
     pqPipelineSource* input = dataRepr->getInput();
+    if (!input)
+      {
+      return;
+      }
     QString name=input->getProxy()->GetXMLName();
     if(name=="PrismFilter" || name=="PrismSurfaceReader")
     {
