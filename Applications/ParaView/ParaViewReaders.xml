@@ -70,4 +70,5 @@
   <Proxy group="sources" name="NetCDFPOPReader" />
   <Proxy group="sources" name="MPASReader" />
   <Proxy group="sources" name="EnzoParticlesReader" />
+  <Proxy group="sources" name="FlashParticlesReader" />
 </ParaViewReaders>
