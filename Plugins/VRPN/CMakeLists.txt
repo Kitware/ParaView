@@ -20,6 +20,7 @@ find_library(VRPN_QUAT_LIBRARY quat)
 QT4_WRAP_CPP(MOC_SRCS
   ParaViewVRPN.h
   pqVRPNStarter.h
+  vtkVRGenericStyle.h
   vtkVRInteractorStyle.h
   vtkVRPropertyStyle.h
   vtkVRQueue.h

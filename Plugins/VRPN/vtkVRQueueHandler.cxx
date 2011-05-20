@@ -32,12 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRQueueHandler.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkVRGenericStyle.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
+#include "vtkVRVectorPropertyStyle.h"
+#include "pqApplicationCore.h"
 
-#include <QPointer>
-#include <QTimer>
 #include <QList>
+#include <QPointer>
+#include <QtDebug>
+#include <QTimer>
 
 class vtkVRQueueHandler::pqInternals
 {
@@ -58,6 +63,14 @@ vtkVRQueueHandler::vtkVRQueueHandler(
   this->Internals->Timer.setSingleShot(true);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(processEvents()));
+
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(configureStyles(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateSaved(vtkPVXMLElement*)),
+    this, SLOT(saveStylesConfiguration(vtkPVXMLElement*)));
+
 }
 
 //----------------------------------------------------------------------------
@@ -110,4 +123,85 @@ void vtkVRQueueHandler::processEvents()
 
   // since timer is single-shot we start it again.
   this->Internals->Timer.start();
+}
+
+//----------------------------------------------------------------------------
+/* Sample configuration:
+  <VRInteractorStyles>
+    <Style class="vtkVRVectorPropertyStyle"
+           proxy="12"
+           property="Normal"
+           mode="direction">
+      <Event device="wand" button="1" />
+    </Style>
+  
+    <Style class="vtkVRVectorPropertyStyle"
+           proxy="12"
+           property="Origin"
+           mode="displacement">
+      <Event device="wand" button="2" />
+    </Style>
+  </VRInteractorStyles>
+*/
+void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
+  vtkSMProxyLocator* locator)
+{
+  if (!xml)
+    {
+    return;
+    }
+
+  if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles") == 0)
+    {
+    this->Internals->Styles.clear();
+    for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = xml->GetNestedElement(cc);
+      if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
+        {
+        const char* class_name = child->GetAttributeOrEmpty("class");
+        if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
+          {
+          vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRGenericStyle")==0)
+          {
+          vtkVRGenericStyle* style = new vtkVRGenericStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else
+          {
+          qWarning() << "Unknown interactor style: \"" << class_name << "\"";
+          }
+        }
+      }
+    }
+  else
+    {
+    this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
+      locator); 
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
+{
+  Q_ASSERT(root != NULL);
+
+  vtkPVXMLElement* parent = vtkPVXMLElement::New();
+  parent->SetName("VRInteractorStyles");
+  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+    {
+    vtkPVXMLElement* child = style->saveConfiguration();
+    if (child)
+      {
+      parent->AddNestedElement(child);
+      child->Delete();
+      }
+    }
+  root->AddNestedElement(parent);
+  parent->Delete();
 }

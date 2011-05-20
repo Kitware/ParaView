@@ -50,6 +50,12 @@ public:
   vtkVRPropertyStyle(QObject* parent=0);
   virtual ~vtkVRPropertyStyle();
 
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
   /// Get/set the property being controlled by this style.
   virtual vtkSMProperty* getSMProperty() const;
   virtual vtkSMProxy* getSMProxy() const;

@@ -31,8 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRPropertyStyle.h"
 
+#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 
 //-----------------------------------------------------------------------------
 vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
@@ -43,6 +45,42 @@ vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
 //-----------------------------------------------------------------------------
 vtkVRPropertyStyle::~vtkVRPropertyStyle()
 {
+}
+
+//-----------------------------------------------------------------------------
+bool vtkVRPropertyStyle::configure(vtkPVXMLElement* child,
+  vtkSMProxyLocator* locator)
+{
+  if (!this->Superclass::configure(child, locator))
+    {
+    return false;
+    }
+
+  const char* proxy = child->GetAttributeOrEmpty("proxy");
+  const char* property_name = child->GetAttributeOrEmpty("property");
+  if (proxy && property_name)
+    {
+    this->setSMProperty(
+      locator->LocateProxy(atoi(proxy)),
+      property_name);
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
+{
+  vtkPVXMLElement* element = this->Superclass::saveConfiguration();
+  if (element)
+    {
+    element->AddAttribute(
+      "proxy", this->Proxy? this->Proxy->GetGlobalIDAsString() : "0");
+    element->AddAttribute(
+      "property", this->PropertyName.toAscii().data());
+    }
+
+  return element;
 }
 
 //-----------------------------------------------------------------------------

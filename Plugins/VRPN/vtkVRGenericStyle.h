@@ -42,6 +42,7 @@ struct vtkVREventData;
 /// implemented.
 class vtkVRGenericStyle : public vtkVRInteractorStyle
 {
+  Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
   vtkVRGenericStyle(QObject* parent);
@@ -62,6 +63,7 @@ protected:
   bool SetHeadPoseProperty(const vtkVREventData &data );
   bool UpdateNRenderWithHeadPose();
   void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+
 protected:
 };
 
