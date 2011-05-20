@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,38 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#ifndef __vtkVRPropertyStyle_h 
+#define __vtkVRPropertyStyle_h
 
-#include <QObject>
+#include "vtkVRInteractorStyle.h"
+#include "vtkSmartPointer.h"
 
-class QTimer;
-class ParaViewVRPN;
-class vtkVRQueue;
-class vtkVRQueueHandler;
+class vtkSMProperty;
+class vtkSMProxy;
 
-class pqVRPNStarter : public QObject
+/// vtkVRPropertyStyle is superclass for interactor styles that change any
+/// property on some proxy. Which property/proxy is being controlled can be
+/// setup (in future) by means, reading configuration values from the state file
+/// or via some user-interface panel.
+class vtkVRPropertyStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef vtkVRInteractorStyle Superclass;
 public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+  vtkVRPropertyStyle(QObject* parent=0);
+  virtual ~vtkVRPropertyStyle();
 
-  // Callback for shutdown.
-  void onShutdown();
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 
-  // Callback for startup.
-  void onStartup();
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
+  /// Get/set the property being controlled by this style.
+  virtual vtkSMProperty* getSMProperty() const;
+  virtual vtkSMProxy* getSMProxy() const;
+  virtual const QString& getSMPropertyName() const
+    {return this->PropertyName; }
+  void setSMProperty(vtkSMProxy*, const QString& property_name);
 
 protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  QString PropertyName;
 
 private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  Q_DISABLE_COPY(vtkVRPropertyStyle)
 };
 
 #endif

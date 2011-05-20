@@ -32,6 +32,7 @@
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVTrivialProducer.h"
+#include "vtkPVUpdateSuppressor.h"
 #include "vtkQuadricClustering.h"
 #include "vtkRenderer.h"
 #include "vtkSelectionConverter.h"
@@ -99,6 +100,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->Distributor = vtkOrderedCompositeDistributor::New();
+  this->UpdateSuppressor = vtkPVUpdateSuppressor::New();
+  this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = VTK_SCALAR_MODE_DEFAULT;
@@ -129,6 +132,8 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->DeliveryFilter->Delete();
   this->LODDeliveryFilter->Delete();
   this->Distributor->Delete();
+  this->UpdateSuppressor->Delete();
+  this->LODUpdateSuppressor->Delete();
   this->SetColorArrayName(0);
 }
 
@@ -156,8 +161,13 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
   this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
-  this->Mapper->SetInputConnection(this->Distributor->GetOutputPort());
-  this->LODMapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+
+  this->UpdateSuppressor->SetInputConnection(this->Distributor->GetOutputPort());
+  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+
+  this->Mapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
+  this->LODMapper->SetInputConnection(this->LODUpdateSuppressor->GetOutputPort());
+
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
   this->Actor->SetProperty(this->Property);
@@ -239,7 +249,14 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       }
 
     this->UpdateColoringParameters();
-    this->Actor->GetMapper()->Update();
+    if (this->Actor->GetEnableLOD())
+      {
+      this->LODUpdateSuppressor->ForceUpdate();
+      }
+    else
+      {
+      this->UpdateSuppressor->ForceUpdate();
+      }
     }
 
   return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
@@ -293,6 +310,12 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   // cout << this << ":" << this->DebugString << ":RequestData" << endl;
+
+  // mark delivery filters modified.
+  this->DeliveryFilter->Modified();
+  this->LODDeliveryFilter->Modified();
+  this->Distributor->Modified();
+
 
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
@@ -375,10 +398,6 @@ bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*,
 void vtkGeometryRepresentation::MarkModified()
 {
   //cout << this << ":" << this->DebugString << ":MarkModified" << endl;
-  this->DeliveryFilter->Modified();
-  this->LODDeliveryFilter->Modified();
-  this->Distributor->Modified();
-
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.

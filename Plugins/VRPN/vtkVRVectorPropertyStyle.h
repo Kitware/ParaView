@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewVRPN.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,39 +29,51 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqRenderLoopEvent_h_
-#define __pqRenderLoopEvent_h_
+#ifndef __vtkVRVectorPropertyStyle_h 
+#define __vtkVRVectorPropertyStyle_h
 
-#include <QObject>
-#include "vtkVRQueue.h"
+#include "vtkVRPropertyStyle.h"
 
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-
-class pqRenderLoopEvent : public QObject
+/// vtkVRVectorPropertyStyle can be used to control any 3-element numeric
+/// property. This style has modes which allows one to control how the property
+/// is updated i.e. whether to use the orientation vector or use displacement
+/// etc.
+class vtkVRVectorPropertyStyle : public vtkVRPropertyStyle
 {
-Q_OBJECT
+  Q_OBJECT
+  typedef vtkVRPropertyStyle Superclass;
+public:
+  enum eMode
+    {
+    DIRECTION_VECTOR=1,
+    DISPLACEMENT=2
+    };
 
 public:
-  pqRenderLoopEvent();
-  ~pqRenderLoopEvent();
+  vtkVRVectorPropertyStyle(QObject* parent=0);
+  virtual ~vtkVRVectorPropertyStyle();
 
-  // Description:
-  // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRQueue* queue );
+  /// get/set the mode.
+  void setMode(eMode mode)
+    { this->Mode = mode; }
+  eMode mode() const
+    { return this->Mode; }
 
-protected slots:
-  void Handle();
-  void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
-  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty( vtkVREventData data );
-  bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+  /// handle the event.
+  virtual bool handleEvent(const vtkVREventData& data);
+
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
 protected:
-  vtkVRQueue *EventQueue;
+  void setValue(double x, double y, double z);
+  eMode Mode;
+
+private:
+  Q_DISABLE_COPY(vtkVRVectorPropertyStyle)
 };
 
-#endif //__pqRenderLoopEvent.h_
+#endif
