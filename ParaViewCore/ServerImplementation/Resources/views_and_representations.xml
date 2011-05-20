@@ -54,6 +54,7 @@
         command="SetSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.
@@ -4106,6 +4107,7 @@
         command="SetViewSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.
