@@ -1,60 +1,53 @@
-#include "pqRenderLoopEvent.h"
-#include "vtkVRQueue.h"
-#include "vtkMath.h"
+#include "vtkVRGenericStyle.h"
+
 #include "pqActiveObjects.h"
+#include "pqDataRepresentation.h"
 #include "pqView.h"
-#include <pqDataRepresentation.h>
-#include "vtkSMRenderViewProxy.h"
+#include "vtkCamera.h"
+#include "vtkMath.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkVRQueue.h"
 
-#include <iostream>
-
-pqRenderLoopEvent::pqRenderLoopEvent()
+vtkVRGenericStyle::vtkVRGenericStyle(QObject* parentObject) :
+  Superclass(parentObject)
 {
 
 }
 
-pqRenderLoopEvent::~pqRenderLoopEvent()
+vtkVRGenericStyle::~vtkVRGenericStyle()
 {
 
-}
-
-void pqRenderLoopEvent::SetQueue( vtkVRQueue* queue )
-{
-  this->EventQueue = queue;
 }
 
 // ----------------------------------------------------------------------------
 // This handler currently only get the
-void pqRenderLoopEvent::Handle()
+bool vtkVRGenericStyle::handleEvent(const vtkVREventData& data)
 {
-  vtkVREventData data;
-  // Invoke the respective event handlers
-  while ( this->EventQueue->tryDequeue( data ) )
+  switch( data.eventType )
     {
-    switch( data.eventType )
-      {
-      case BUTTON_EVENT:
-        this->HandleButton( data );
-        break;
-      case ANALOG_EVENT:
-        this->HandleAnalog( data );
-        break;
-      case TRACKER_EVENT:
-        this->HandleTracker( data );
-        break;
-      }
+  case BUTTON_EVENT:
+    this->HandleButton( data );
+    break;
+  case ANALOG_EVENT:
+    this->HandleAnalog( data );
+    break;
+  case TRACKER_EVENT:
+    this->HandleTracker( data );
+    break;
     }
+
   // Update the when all the events are handled
   this->UpdateNRenderWithHeadPose();
+  return true;
 }
 
-void pqRenderLoopEvent::HandleTracker( const vtkVREventData& data )
+// ----------------------------------------------------------------------------
+void vtkVRGenericStyle::HandleTracker( const vtkVREventData& data )
 {
   if ( data.data.tracker.sensor == 0 // Head from Kinect
        || data.data.tracker.sensor == 13 ) // Hand from Kinect
@@ -79,8 +72,8 @@ void pqRenderLoopEvent::HandleTracker( const vtkVREventData& data )
     }
 }
 
-
-void pqRenderLoopEvent::HandleButton( const vtkVREventData& data )
+// ----------------------------------------------------------------------------
+void vtkVRGenericStyle::HandleButton( const vtkVREventData& data )
 {
   std::cout << "(Button" << "\n"
             << "  :from  " << data.connId <<"\n"
@@ -89,7 +82,8 @@ void pqRenderLoopEvent::HandleButton( const vtkVREventData& data )
             << "  :state " << data.data.button.state << " )" << "\n";
 }
 
-void pqRenderLoopEvent::HandleAnalog( const vtkVREventData& data )
+// ----------------------------------------------------------------------------
+void vtkVRGenericStyle::HandleAnalog( const vtkVREventData& data )
 {
   std::cout << "(Analog" << "\n"
             << "  :from  " << data.connId <<"\n"
@@ -103,8 +97,8 @@ void pqRenderLoopEvent::HandleAnalog( const vtkVREventData& data )
 
 }
 
-
-bool pqRenderLoopEvent::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
+// ----------------------------------------------------------------------------
+bool vtkVRGenericStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
                                                    vtkSMDoubleVectorProperty** outProp)
 {
   *outProxy =0;
@@ -131,7 +125,7 @@ bool pqRenderLoopEvent::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outPro
   return false;
 }
 
-bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVREventData data )
+bool vtkVRGenericStyle::SetHeadPoseProperty(const vtkVREventData &data)
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
@@ -162,10 +156,10 @@ bool pqRenderLoopEvent::SetHeadPoseProperty( vtkVREventData data )
 
     return true;
     }
-  false;
+  return false;
 }
 
-bool pqRenderLoopEvent::UpdateNRenderWithHeadPose()
+bool vtkVRGenericStyle::UpdateNRenderWithHeadPose()
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
@@ -207,7 +201,7 @@ vtkAnalog AugmentChannelsToRetainLargestMagnitude(const vtkAnalog t)
   return at;
 }
 
-void pqRenderLoopEvent::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
+void vtkVRGenericStyle::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
 {
   vtkAnalog at = AugmentChannelsToRetainLargestMagnitude(data.data.analog);
   // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],

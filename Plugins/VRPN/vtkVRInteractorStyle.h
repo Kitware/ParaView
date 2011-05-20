@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRPNStarter.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,38 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRPNStarter_h
-#define __pqVRPNStarter_h
+#ifndef __vtkVRInteractorStyle_h 
+#define __vtkVRInteractorStyle_h
 
 #include <QObject>
 
-class QTimer;
-class ParaViewVRPN;
-class vtkVRQueue;
-class vtkVRQueueHandler;
+struct vtkVREventData;
 
-class pqVRPNStarter : public QObject
+class vtkVRInteractorStyle : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  pqVRPNStarter(QObject* p=0);
-  ~pqVRPNStarter();
+  vtkVRInteractorStyle(QObject* parent=0);
+  virtual ~vtkVRInteractorStyle();
 
-  // Callback for shutdown.
-  void onShutdown();
-
-  // Callback for startup.
-  void onStartup();
-
-protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
-
+  /// called to handle an event. If the style does not handle this event or
+  /// handles it but does not want to stop any other handlers from handlign it
+  /// as well, they should return false. Other return true. Return true
+  /// indicates that vtkVRQueueHandler the event has been "consumed".
+  virtual bool handleEvent(const vtkVREventData& data)=0;
 private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  Q_DISABLE_COPY(vtkVRInteractorStyle)
 };
 
 #endif
