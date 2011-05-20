@@ -20,6 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
@@ -28,16 +29,16 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSMMessage.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMServerStateLocator.h"
 #include "vtkSocketCommunicator.h"
 
-#include <vtkNew.h>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
@@ -836,6 +837,8 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
     }
   return this->LastGlobalID++;
 }
+
+
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
@@ -847,9 +850,9 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
 
-//  cout << "##########     Server notification    ##########" << id << endl;
-//  state.PrintDebugString();
-//  cout << "###################################################" << endl;
+  // cout << "##########     Server notification    ##########" << id << endl;
+  // state.PrintDebugString();
+  // cout << "###################################################" << endl;
 
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
@@ -858,8 +861,10 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
     {
     this->StartProcessingRemoteNotification();
     remoteObj->EnableLocalPushOnly();
+    vtkSMProxyProperty::EnableProxyCreation();
     remoteObj->LoadState(&state, this->GetProxyLocator());
     UPDATE_VTK_OBJECTS(remoteObj); // If SMProxy will call UpdateVTKObjects()
+    vtkSMProxyProperty::DisableProxyCreation();
     remoteObj->DisableLocalPushOnly();
     this->StopProcessingRemoteNotification();
     }
