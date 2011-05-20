@@ -42,6 +42,7 @@ struct vtkVREventData;
 /// implemented.
 class vtkVRGenericStyle : public vtkVRInteractorStyle
 {
+  Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
   vtkVRGenericStyle(QObject* parent);

@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
+  this->Button = -1;
+  this->Sensor = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -55,6 +57,8 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     if (event)
       {
       this->DeviceName = event->GetAttributeOrEmpty("device");
+      this->Button = atoi(event->GetAttributeOrEmpty("button"));
+      this->Sensor = atoi(event->GetAttributeOrEmpty("sensor"));
       return true;
       }
     }
@@ -72,6 +76,8 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
   vtkPVXMLElement* event = vtkPVXMLElement::New();
   event->SetName("Event");
   event->AddAttribute("device", this->DeviceName.toAscii().data());
+  event->AddAttribute("button", this->Button);
+  event->AddAttribute("sensor", static_cast<vtkIdType>(this->Sensor));
   child->AddNestedElement(event);
   event->FastDelete();
 

@@ -52,11 +52,29 @@ public:
   /// indicates that vtkVRQueueHandler the event has been "consumed".
   virtual bool handleEvent(const vtkVREventData& data)=0;
 
-  /// get/set the device name.
+  ///--------------------------------------------------------------------------
+  /// Identifies the device state when this style becomes active.
+
+  /// Get/Set the device name.
   void setDeviceName(const QString& name)
     { this->DeviceName = name; }
   const QString& deviceName() const
     { return this->DeviceName; }
+
+  /// Get/Set the button number (use -1 to indicate no button).
+  void setButton(int num)
+    { this->Button = num; }
+  int button() const
+    { return this->Button; }
+  
+  /// Get/Set the sensor id.
+  void setSensor(long id)
+    { this->Sensor = id; }
+  long sensor() const
+    { return this->Sensor; }
+
+  ///--------------------------------------------------------------------------
+  /// Used to save/load the style in XML for ParaView state files.
 
   /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
@@ -66,6 +84,8 @@ public:
 
 protected:
   QString DeviceName;
+  int Button;
+  long Sensor;
 
 private:
   Q_DISABLE_COPY(vtkVRInteractorStyle)

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
 #include "vtkVRVectorPropertyStyle.h"
+#include "pqApplicationCore.h"
 
 #include <QList>
 #include <QPointer>
@@ -62,6 +63,14 @@ vtkVRQueueHandler::vtkVRQueueHandler(
   this->Internals->Timer.setSingleShot(true);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(processEvents()));
+
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(configureStyles(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(stateSaved(vtkPVXMLElement*)),
+    this, SLOT(saveStylesConfiguration(vtkPVXMLElement*)));
+
 }
 
 //----------------------------------------------------------------------------
@@ -121,14 +130,14 @@ void vtkVRQueueHandler::processEvents()
   <VRInteractorStyles>
     <Style class="vtkVRVectorPropertyStyle"
            proxy="12"
-           propertyname="Normal"
+           property="Normal"
            mode="direction">
       <Event device="wand" button="1" />
     </Style>
   
     <Style class="vtkVRVectorPropertyStyle"
            proxy="12"
-           propertyname="Origin"
+           property="Origin"
            mode="displacement">
       <Event device="wand" button="2" />
     </Style>
@@ -142,7 +151,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
     return;
     }
 
-  if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles"))
+  if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles") == 0)
     {
     this->Internals->Styles.clear();
     for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
@@ -175,4 +184,24 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
       locator); 
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
+{
+  Q_ASSERT(root != NULL);
+
+  vtkPVXMLElement* parent = vtkPVXMLElement::New();
+  parent->SetName("VRInteractorStyles");
+  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+    {
+    vtkPVXMLElement* child = style->saveConfiguration();
+    if (child)
+      {
+      parent->AddNestedElement(child);
+      child->Delete();
+      }
+    }
+  root->AddNestedElement(parent);
+  parent->Delete();
 }

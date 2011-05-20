@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkVRVectorPropertyStyle::vtkVRVectorPropertyStyle(
@@ -55,13 +56,28 @@ bool vtkVRVectorPropertyStyle::configure(vtkPVXMLElement* child,
     {
     return false;
     }
-
-  
+  const char* mode = child->GetAttributeOrEmpty("mode");
+  if (strcmp(mode, "direction") == 0)
+    {
+    this->Mode = DIRECTION_VECTOR;
+    }
+  else
+    {
+    this->Mode = DISPLACEMENT;
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRVectorPropertyStyle::saveConfiguration() const
 {
+  vtkPVXMLElement* element = this->Superclass::saveConfiguration();
+  if (element && this->getSMProperty())
+    {
+    element->AddAttribute(
+      "mode", this->Mode == DIRECTION_VECTOR? "direction" : "displacement");
+    }
+  return element;
 }
 
 //-----------------------------------------------------------------------------

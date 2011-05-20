@@ -48,13 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqVRPNStarter::pqVRPNStarter(QObject* p/*=0*/)
   : QObject(p)
 {
-  this->EventQueue = new vtkVRQueue(this);
-  this->Handler = new vtkVRQueueHandler(this->EventQueue, this);
-
-  // for debugging, until we add support for reading styles from XML we simple
-  // create the generic style.
-  this->Handler->add(new vtkVRGenericStyle(this));
-
+  this->EventQueue = NULL;
+  this->Handler = NULL; 
   this->InputDevice = NULL;
 }
 
@@ -70,6 +65,15 @@ pqVRPNStarter::~pqVRPNStarter()
 void pqVRPNStarter::onStartup()
 {
   Q_ASSERT(this->InputDevice == NULL);
+
+  this->EventQueue = new vtkVRQueue(this);
+  this->Handler = new vtkVRQueueHandler(this->EventQueue, this);
+
+  // for debugging, until we add support for reading styles from XML we simple
+  // create the generic style.
+  this->Handler->add(new vtkVRGenericStyle(this));
+
+  this->InputDevice = NULL;
 
   //qWarning() << "Message from pqVRPNStarter: Application Started";
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
