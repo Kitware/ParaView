@@ -67,11 +67,11 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
 
   QObject::connect(this->Internal->Adaptor, 
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(onCurrentTextChanged(const QString&)), Qt::QueuedConnection);
+    this, SLOT(onCurrentTextChanged(const QString&)));
 
   QObject::connect(this->Internal->Adaptor, 
     SIGNAL(currentTextChanged(const QString&)),
-    this, SIGNAL(currentTextChanged(const QString&)), Qt::QueuedConnection);
+    this, SIGNAL(currentTextChanged(const QString&)));
 
   QObject::connect(&this->Internal->Links,
     SIGNAL(qtWidgetChanged()),

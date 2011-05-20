@@ -126,7 +126,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
     &this->Timer, SLOT(start()));
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(nameChanged(pqServerManagerModelItem*)),
+    SIGNAL(dataUpdated(pqPipelineSource*)),
     &this->Timer, SLOT(start()));
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(forceFilterMenuRefresh()),
@@ -168,7 +168,7 @@ void pqFiltersMenuReaction::updateEnableState()
         // proxy gets initialized.
         QObject::connect(source,
           SIGNAL(dataUpdated(pqPipelineSource*)),
-          this, SLOT(ondataUpdated()));
+          this, SLOT(onDataUpdated()));
         break;
         }
       outputPorts.append(opPort);
@@ -258,7 +258,7 @@ void pqFiltersMenuReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqFiltersMenuReaction::ondataUpdated()
+void pqFiltersMenuReaction::onDataUpdated()
 {
   QObject::disconnect(this->sender(), 0, this, 0);
   this->Timer.start(10);

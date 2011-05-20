@@ -65,7 +65,7 @@ protected slots:
   virtual void onTriggered(const QString& group, const QString& name)
     { pqFiltersMenuReaction::createFilter(group, name); } 
 
-  void ondataUpdated();
+  void onDataUpdated();
 private:
   Q_DISABLE_COPY(pqFiltersMenuReaction)
 
