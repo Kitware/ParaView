@@ -57,6 +57,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
 
+    servermanager.ProxyManager().DisableStateUpdateNotification()
     servermanager.ProxyManager().UpdateFromRemote()
     tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
     if not tk:
@@ -67,6 +68,9 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     if not scene:
        scene = AnimationScene()
        scene.TimeKeeper = tk
+
+    servermanager.ProxyManager().EnableStateUpdateNotification()
+    servermanager.ProxyManager().TriggerStateUpdate()
 
     return session
 
@@ -77,6 +81,7 @@ def ReverseConnect(port=11111):
     session = servermanager.ReverseConnect(port)
     _add_functions(globals())
 
+    servermanager.ProxyManager().DisableStateUpdateNotification()
     servermanager.ProxyManager().UpdateFromRemote()
     tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
     if not tk:
@@ -87,6 +92,9 @@ def ReverseConnect(port=11111):
     if not scene:
        scene = AnimationScene()
        scene.TimeKeeper = tk
+
+    servermanager.ProxyManager().EnableStateUpdateNotification()
+    servermanager.ProxyManager().TriggerStateUpdate()
 
     return session
 
@@ -172,6 +180,7 @@ def CreateWriter(filename, proxy=None, **extraArgs):
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view
+    if not view: view = servermanager.GetRenderView()
     if not view: view = CreateRenderView()
     return view
 
