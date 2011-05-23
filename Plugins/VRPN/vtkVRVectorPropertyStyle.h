@@ -50,11 +50,23 @@ public:
     };
 
 public:
-  vtkVRVectorPropertyStyle(eMode mode, QObject* parent=0);
+  vtkVRVectorPropertyStyle(QObject* parent=0);
   virtual ~vtkVRVectorPropertyStyle();
+
+  /// get/set the mode.
+  void setMode(eMode mode)
+    { this->Mode = mode; }
+  eMode mode() const
+    { return this->Mode; }
 
   /// handle the event.
   virtual bool handleEvent(const vtkVREventData& data);
+
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
   void setValue(double x, double y, double z);

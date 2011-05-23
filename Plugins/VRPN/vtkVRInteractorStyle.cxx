@@ -31,13 +31,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRInteractorStyle.h"
 
+#include "vtkPVXMLElement.h"
+
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
+  this->Button = -1;
+  this->Sensor = -1;
 }
 
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
+}
+
+//-----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
+{
+  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
+    strcmp(this->metaObject()->className(),
+      child->GetAttributeOrEmpty("class")) == 0)
+    {
+    vtkPVXMLElement* event = child->FindNestedElementByName("Event");
+    if (event)
+      {
+      this->DeviceName = event->GetAttributeOrEmpty("device");
+      this->Button = atoi(event->GetAttributeOrEmpty("button"));
+      this->Sensor = atoi(event->GetAttributeOrEmpty("sensor"));
+      return true;
+      }
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
+{
+  vtkPVXMLElement* child = vtkPVXMLElement::New();
+  child->SetName("Style");
+  child->AddAttribute("class",
+    this->metaObject()->className());
+
+  vtkPVXMLElement* event = vtkPVXMLElement::New();
+  event->SetName("Event");
+  event->AddAttribute("device", this->DeviceName.toAscii().data());
+  event->AddAttribute("button", this->Button);
+  event->AddAttribute("sensor", static_cast<vtkIdType>(this->Sensor));
+  child->AddNestedElement(event);
+  event->FastDelete();
+
+  return child;
 }

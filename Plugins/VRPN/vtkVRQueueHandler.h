@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkVRInteractorStyle;
 class vtkVRQueue;
+class vtkPVXMLElement;
+class vtkSMProxyLocator;
 
 /// vtkVRQueueHandler is a class that process events stacked on to vtkVRQueue
 /// one by one. One adds vtkVRInteractorStyles to the handler to do any actual
@@ -56,6 +58,13 @@ public slots:
   /// start/stop queue processing.
   void start();
   void stop();
+
+  /// clears current interactor styles and loads a new set of styles from the
+  /// XML configuration.
+  void configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* locator);
+
+  /// saves the styles configuration.
+  void saveStylesConfiguration(vtkPVXMLElement* root);
 
 protected slots:
   /// called to processes events from the queue.
