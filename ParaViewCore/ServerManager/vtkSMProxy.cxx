@@ -126,7 +126,7 @@ vtkSMProxy::vtkSMProxy()
   this->Hints = 0;
   this->Deprecated = 0;
 
-  this->State = 0;
+  this->State = new vtkSMMessage();
 }
 
 //---------------------------------------------------------------------------
@@ -722,7 +722,6 @@ void vtkSMProxy::CreateVTKObjects()
     }
 
   // Save to state
-  this->State = new vtkSMMessage();
   this->State->CopyFrom(message);
 
   // Add Empty property into state to keep track of index later on

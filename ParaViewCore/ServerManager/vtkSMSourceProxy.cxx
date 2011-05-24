@@ -473,6 +473,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
   this->CreateOutputPorts();
 
   vtkClientServerStream stream;
+  vtkSMMessage selectionProxyMessage;
   vtkSMProxyManager* pxm = this->GetProxyManager();
   unsigned int numOutputPorts = this->GetNumberOfOutputPorts();
   for (unsigned int cc=0; cc < numOutputPorts; cc++)
@@ -499,13 +500,15 @@ void vtkSMSourceProxy::CreateSelectionProxies()
 
       // Add selection proxy information in the state
       this->State->AddExtension(ProxyState::selection_proxy, esProxy->GetGlobalID());
+      selectionProxyMessage.AddExtension( ProxyState::selection_proxy,
+                                          esProxy->GetGlobalID());
       }
 
     this->PInternals->SelectionProxies.push_back(esProxy);
     }
   this->ExecuteStream(stream);
-  // FIXME_COLLABORATION : BUG #9658
-  this->PushState(this->State);
+  // Push only the selection information
+  this->PushState(&selectionProxyMessage);
   this->SelectionProxiesCreated = true;
 }
 
@@ -618,6 +621,7 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
     if(size > 0)
       {
       this->State->ClearExtension(ProxyState::selection_proxy);
+      this->PInternals->SelectionProxies.clear();
       this->SelectionProxiesCreated = true;
 
       for(int cc=0; cc < size; cc++)
