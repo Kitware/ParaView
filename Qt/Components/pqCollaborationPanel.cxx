@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationPanel.h"
 
 // Qt Includes.
+#include <QDockWidget>
 #include <QTextDocument>
 #include <QTextCursor>
 #include <QColor>
@@ -366,6 +367,21 @@ void pqCollaborationPanel::connectLocalSlots()
     QString userName = collab->getUserName(collab->userId());
     emit triggerUpdateUser( collab->userId(), userName, true);
     onUserUpdate(); // This may be called twice (one here + one from emit)
+
+    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentWidget)
+      {
+      parentWidget->toggleViewAction()->setEnabled(true);
+      }
+    }
+  else
+    {
+    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentWidget)
+      {
+      parentWidget->hide();
+      parentWidget->toggleViewAction()->setEnabled(false);
+      }
     }
 }
 
