@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
+#include "pqPluginManager.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -128,6 +129,10 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+                   SIGNAL(pluginsUpdated()),
+                   &this->Timer, SLOT(start()));
+
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(forceFilterMenuRefresh()),
     &this->Timer, SLOT(start()));
