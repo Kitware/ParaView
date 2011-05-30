@@ -14,21 +14,23 @@
 =========================================================================*/
 #include "vtkSMProxyManager.h"
 
-#include "vtkReservedRemoteObjectIds.h"
 #include "vtkCollection.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
+#include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkPVProxyDefinitionIterator.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
@@ -36,13 +38,11 @@
 #include "vtkSMReaderFactory.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
-#include "vtkProcessModule.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMUndoStackBuilder.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -121,7 +121,15 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->AddObserver(vtkCommand::UnRegisterEvent, obs);
 #endif
 
-  this->ProxyDefinitionManager = NULL;
+  this->ProxyDefinitionManager = vtkSMProxyDefinitionManager::New();
+  this->ProxyDefinitionManager->AddObserver(
+    vtkCommand::RegisterEvent, this->Observer);
+  this->ProxyDefinitionManager->AddObserver(
+    vtkCommand::UnRegisterEvent, this->Observer);
+  this->ProxyDefinitionManager->AddObserver(
+    vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated, this->Observer);
+  this->ProxyDefinitionManager->AddObserver(
+    vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Observer);
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
@@ -130,17 +138,11 @@ vtkSMProxyManager::vtkSMProxyManager()
   // Provide internal object a pointer to us
   this->Internals->ProxyManager = this;
 
-  this->Forwarder = vtkEventForwarderCommand::New();
-  this->Forwarder->SetTarget(this);
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::~vtkSMProxyManager()
 {
-  this->Forwarder->SetTarget(NULL);
-  this->Forwarder->Delete();
-  this->Forwarder = NULL;
-
   // This is causing a PushState() when the object is being destroyed. This
   // causes errors since the ProxyManager is destroyed only when the session is
   // being deleted, thus the session cannot be valid at this point.
@@ -157,7 +159,9 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory->Delete();
   this->WriterFactory = 0;
 
-  this->SetProxyDefinitionManager(NULL);
+  this->ProxyDefinitionManager->Delete();
+  this->ProxyDefinitionManager = NULL;
+
   if(this->PipelineState)
     {
     this->PipelineState->Delete();
@@ -169,38 +173,6 @@ vtkSMProxyManager::~vtkSMProxyManager()
 vtkTypeUInt32 vtkSMProxyManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMProxyManager::SetProxyDefinitionManager(
-  vtkPVProxyDefinitionManager* mgr)
-{
-  if (this->ProxyDefinitionManager == mgr)
-    {
-    return;
-    }
-  if (this->ProxyDefinitionManager)
-    {
-    this->ProxyDefinitionManager->RemoveObserver(this->Forwarder);
-    this->ProxyDefinitionManager->RemoveObserver(this->Observer);
-    }
-  vtkSetObjectBodyMacro(
-    ProxyDefinitionManager, vtkPVProxyDefinitionManager, mgr);
-  if (this->ProxyDefinitionManager)
-    {
-    this->ProxyDefinitionManager->AddObserver(
-      vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated, this->Forwarder);
-    this->ProxyDefinitionManager->AddObserver(
-      vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Forwarder);
-
-    this->ProxyDefinitionManager->AddObserver(
-        vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
-        this->Observer);
-    this->ProxyDefinitionManager->AddObserver(
-        vtkCommand::RegisterEvent, this->Observer);
-    this->ProxyDefinitionManager->AddObserver(
-        vtkCommand::UnRegisterEvent, this->Observer);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -238,7 +210,6 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     {
     this->UnRegisterAllLinks();
     this->UnRegisterProxies();
-    this->SetProxyDefinitionManager(NULL);
     this->PipelineState->Delete();
     this->PipelineState = NULL;
     }
@@ -250,8 +221,8 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     // This will also register the RemoteObject to the Session
     this->PipelineState = vtkSMPipelineState::New();
     this->PipelineState->SetSession(this->Session);
-    this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
     }
+  this->ProxyDefinitionManager->SetSession(session);
 }
 
 //----------------------------------------------------------------------------
@@ -270,8 +241,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
   // Not a huge fan of this iterator API. Need to make it more consistent with
   // VTK.
   vtkPVProxyDefinitionIterator* iter =
-      this->ProxyDefinitionManager->NewSingleGroupIterator( groupName,
-                                                            vtkPVProxyDefinitionManager::ALL_DEFINITIONS);
+      this->ProxyDefinitionManager->NewSingleGroupIterator(groupName);
 
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
@@ -300,7 +270,7 @@ void vtkSMProxyManager::InstantiatePrototypes()
 {
   assert(this->ProxyDefinitionManager != 0);
   vtkPVProxyDefinitionIterator* iter =
-    this->ProxyDefinitionManager->NewIterator(vtkPVProxyDefinitionManager::ALL_DEFINITIONS);
+    this->ProxyDefinitionManager->NewIterator();
 
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextGroup())
@@ -999,12 +969,13 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   // Manage ProxyDefinitionManager Events
   if(obj == this->ProxyDefinitionManager)
     {
-    RegisteredDefinitionInformation* defInfo;
+    vtkSIProxyDefinitionManager::RegisteredDefinitionInformation* defInfo;
     switch(event)
       {
       case vtkCommand::RegisterEvent:
       case vtkCommand::UnRegisterEvent:
-         defInfo = reinterpret_cast<RegisteredDefinitionInformation*>(data);
+         defInfo = reinterpret_cast<
+           vtkSIProxyDefinitionManager::RegisteredDefinitionInformation*>(data);
          if(defInfo->CustomDefinition)
            {
            RegisteredProxyInformation info;
@@ -1015,14 +986,9 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
            this->InvokeEvent(event, &info);
            }
          break;
-      case vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated:
-         // Forward the custom definition to the server side
-         if(this->Session)
-           {
-           vtkSMMessage msg;
-           this->ProxyDefinitionManager->SaveCustomProxyDefinitions(&msg);
-           this->Session->PushState(&msg);
-           }
+
+      default:
+         this->InvokeEvent(event, data);
          break;
       }
     }
@@ -1356,7 +1322,7 @@ vtkPVXMLElement* vtkSMProxyManager::AddInternalState(vtkPVXMLElement *parentElem
 void vtkSMProxyManager::UnRegisterCustomProxyDefinitions()
 {
   assert(this->ProxyDefinitionManager != 0);
-  this->ProxyDefinitionManager->ClearCustomProxyDefinition();
+  this->ProxyDefinitionManager->ClearCustomProxyDefinitions();
 }
 
 //---------------------------------------------------------------------------
@@ -1401,7 +1367,15 @@ void vtkSMProxyManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
 void vtkSMProxyManager::LoadCustomProxyDefinitions(const char* filename)
 {
   assert(this->ProxyDefinitionManager != 0);
-  this->ProxyDefinitionManager->LoadCustomProxyDefinitions(filename);
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName(filename);
+  if (!parser->Parse())
+    {
+    vtkErrorMacro("Failed to parse file : " << filename);
+    return;
+    }
+  this->ProxyDefinitionManager->LoadCustomProxyDefinitions(parser->GetRootElement());
+  parser->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -1410,13 +1384,6 @@ void vtkSMProxyManager::SaveCustomProxyDefinitions(
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->SaveCustomProxyDefinitions(rootElement);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveCustomProxyDefinitions(const char* filename)
-{
-  assert(this->ProxyDefinitionManager != 0);
-  this->ProxyDefinitionManager->SaveCustomProxyDefinitions(filename);
 }
 
 //---------------------------------------------------------------------------
@@ -1619,7 +1586,7 @@ vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
 bool vtkSMProxyManager::LoadConfigurationXML(const char* xml)
 {
   assert(this->ProxyDefinitionManager != 0);
-  return this->ProxyDefinitionManager->LoadConfigurationXML(xml);
+  return this->ProxyDefinitionManager->LoadConfigurationXMLFromString(xml);
 }
 
 //---------------------------------------------------------------------------
@@ -1699,15 +1666,6 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
   return NULL;
 }
 
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadXMLDefinitionFromServer()
-{
-  vtkSMMessage msg;
-  msg.set_global_id(vtkPVProxyDefinitionManager::GetReservedGlobalID());
-  msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
-  this->Session->PullState(&msg);
-  this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
-}
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
                                           vtkSMStateLocator* locator)

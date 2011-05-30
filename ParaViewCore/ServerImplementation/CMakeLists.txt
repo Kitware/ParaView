@@ -19,6 +19,11 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
+  vtkPVProxyDefinitionIterator.cxx
+  vtkPVSessionBase.cxx
+  vtkPVSessionCore.cxx
+  vtkPVSessionCoreInterpreterHelper.cxx
+  vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
   vtkSICompoundSourceProxy.cxx
@@ -31,13 +36,14 @@ SET (Kit_SRCS
   vtkSIInputProperty.cxx
   vtkSIIntVectorProperty.cxx
   vtkSIObject.cxx
-  vtkSIPVRepresentationProxy.cxx
   vtkSIProperty.cxx
   vtkSIProxy.cxx
+  vtkSIProxyDefinitionManager.cxx
   vtkSIProxyProperty.cxx
-  vtkSISILProperty.cxx
+  vtkSIPVRepresentationProxy.cxx
   vtkSIScalarBarActorProxy.cxx
   vtkSISelectionRepresentationProxy.cxx
+  vtkSISILProperty.cxx
   vtkSISourceProxy.cxx
   vtkSIStringVectorProperty.cxx
   vtkSITextSourceRepresentationProxy.cxx
@@ -49,12 +55,6 @@ SET (Kit_SRCS
   vtkSIWriterProxy.cxx
   vtkSIXMLAnimationWriterRepresentationProperty.cxx
   vtkSMMessage.cxx
-  vtkPVProxyDefinitionIterator.cxx
-  vtkPVProxyDefinitionManager.cxx
-  vtkPVSessionBase.cxx
-  vtkPVSessionCore.cxx
-  vtkPVSessionCoreInterpreterHelper.cxx
-  vtkPVSessionServer.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -163,7 +163,7 @@ SET (dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
 
 
-SET_SOURCE_FILES_PROPERTIES(vtkPVProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
+SET_SOURCE_FILES_PROPERTIES(vtkSIProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 

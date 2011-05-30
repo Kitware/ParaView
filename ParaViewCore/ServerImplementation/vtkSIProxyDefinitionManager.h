@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVProxyDefinitionManager.h
+  Module:    vtkSIProxyDefinitionManager.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,63 +12,47 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVProxyDefinitionManager - object responsible for managing XML
+// .NAME vtkSIProxyDefinitionManager - object responsible for managing XML
 // proxies definitions
 // .SECTION Description
-// vtkPVProxyDefinitionManager is a class that manages XML proxies definition.
+// vtkSIProxyDefinitionManager is a class that manages XML proxies definition.
 // It maintains a map of vtkPVXMLElement (populated by the XML parser) from
 // which it can extract Hint, Documentation, Properties, Domains definition.
 //
 // Whenever the proxy definitions are updated, this class fires
-// vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
-// vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
+// vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
+// vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
 // when a compound proxy is registered, on CompoundProxyDefinitionsUpdated
 // event is fired.
 // .SECTION See Also
 // vtkSMXMLParser
 
-#ifndef __vtkPVProxyDefinitionManager_h
-#define __vtkPVProxyDefinitionManager_h
+#ifndef __vtkSIProxyDefinitionManager_h
+#define __vtkSIProxyDefinitionManager_h
 
-#include "vtkObject.h"
-#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+#include "vtkSIObject.h"
 
 class vtkPVPlugin;
-class vtkPVXMLElement;
 class vtkPVProxyDefinitionIterator;
+class vtkPVXMLElement;
 
-// Description:
-// Information object used in Event notification
-struct RegisteredDefinitionInformation
-  {
-    const char* GroupName;
-    const char* ProxyName;
-    bool CustomDefinition;
-
-    RegisteredDefinitionInformation(const char* groupName,
-                                    const char* proxyName,
-                                    bool isCustom=false)
-      {
-      this->GroupName = groupName;
-      this->ProxyName = proxyName;
-      this->CustomDefinition = isCustom;
-      }
-  };
-
-class VTK_EXPORT vtkPVProxyDefinitionManager : public vtkObject
+class VTK_EXPORT vtkSIProxyDefinitionManager : public vtkSIObject
 {
 public:
+  static vtkSIProxyDefinitionManager* New();
+  vtkTypeMacro(vtkSIProxyDefinitionManager, vtkSIObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Returns the ID reserved for the proxy definition manager.
   static vtkTypeUInt32 GetReservedGlobalID();
 
-  // FIXME COLLABORATION : For now we dynamically convert InformationHelper
+  // Description:
+  // For now we dynamically convert InformationHelper
   // into the correct si_class and attribute sets.
   // THIS CODE SHOULD BE REMOVED once InformationHelper have been removed
   // from legacy XML
   static void PatchXMLProperty(vtkPVXMLElement* propElement);
-
-  static vtkPVProxyDefinitionManager* New();
-  vtkTypeMacro(vtkPVProxyDefinitionManager, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Returns a registered proxy definition or return a NULL otherwise.
@@ -101,7 +85,6 @@ public:
     return this->GetCollapsedProxyDefinition(group, name, subProxyName, true);
     }
 
-
   // Description:
   // Add a custom proxy definition. Custom definitions are NOT ALLOWED to
   // overrive or overlap any ProxyDefinition that has been defined by parsing
@@ -113,6 +96,8 @@ public:
   // configuration file.
   void AddCustomProxyDefinition( const char* group, const char* name,
                                  vtkPVXMLElement* top );
+  void AddCustomProxyDefinition(
+    const char* groupName, const char* proxyName, const char* xmlcontents);
 
   // Description:
   // Given its name, remove a custom proxy definition.
@@ -126,27 +111,20 @@ public:
   // Note that this can only be used to remove definitions added using
   // AddCustomProxyDefinition(), cannot be used to remove definitions
   // loaded using vtkSMXMLParser.
-  void ClearCustomProxyDefinition();
+  void ClearCustomProxyDefinitions();
 
   // Description:
   // Load custom proxy definitions and register them.
-  void LoadCustomProxyDefinitions(const char* filename);
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
-//BTX
-  void LoadCustomProxyDefinitions(vtkSMMessage* msg);
-//ETX
+  void LoadCustomProxyDefinitionsFromString(const char* xmlContent);
 
   // Description:
-  // Save registered custom proxy definitions.
-  void SaveCustomProxyDefinitions(const char* filename);
+  // Save registered custom proxy definitions. The caller must release the
+  // reference to the returned vtkPVXMLElement.
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
-//BTX
-  void SaveCustomProxyDefinitions(vtkSMMessage* msg);
-//ETX
 
   // Description:
   // Loads server-manager configuration xml.
-  bool LoadConfigurationXML(const char* filename);
   bool LoadConfigurationXML(vtkPVXMLElement* root);
   bool LoadConfigurationXMLFromString(const char* xmlContent);
 
@@ -174,7 +152,7 @@ public:
   // Description:
   // Return a NEW instance of vtkPVProxyDefinitionIterator configured to
   // get through all the definition available for the requested scope.
-  // Possible scope defined as enum inside vtkPVProxyDefinitionManager:
+  // Possible scope defined as enum inside vtkSIProxyDefinitionManager:
   //   ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
   // Some extra restriction can be set directly on the iterator itself
   // by setting a set of GroupName...
@@ -183,24 +161,44 @@ public:
   // Description
   // Return a new configured iterator for traversing a set of proxy definition
   // for only one GroupName.
-  // Possible scope defined as enum inside vtkPVProxyDefinitionManager:
+  // Possible scope defined as enum inside vtkSIProxyDefinitionManager:
   //   ALL_DEFINITIONS=0 / CORE_DEFINITIONS=1 / CUSTOM_DEFINITIONS=2
   vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
     int scope=ALL_DEFINITIONS);
 
 //BTX
+  // Description:
+  // Push a new state to the underneath implementation
+  // The provided implementation just store the message
+  // and return it at the Pull one.
+  virtual void Push(vtkSMMessage* msg);
 
   // Description:
-  // Write into the provided message the whole state of the current object.
-  void GetXMLDefinitionState(vtkSMMessage* msg);
+  // Pull the current state of the underneath implementation
+  // The provided implementation update the given message with the one
+  // that has been previously pushed
+  virtual void Pull(vtkSMMessage* msg);
 
   // Description:
-  // Reset the local state and load the one provided inside the message.
-  void LoadXMLDefinitionState(vtkSMMessage* msg);
+  // Information object used in Event notification
+  struct RegisteredDefinitionInformation
+    {
+    const char* GroupName;
+    const char* ProxyName;
+    bool CustomDefinition;
+    RegisteredDefinitionInformation(const char* groupName,
+      const char* proxyName,
+      bool isCustom=false)
+      {
+      this->GroupName = groupName;
+      this->ProxyName = proxyName;
+      this->CustomDefinition = isCustom;
+      }
+    };
 
 protected:
-  vtkPVProxyDefinitionManager();
-  ~vtkPVProxyDefinitionManager();
+  vtkSIProxyDefinitionManager();
+  ~vtkSIProxyDefinitionManager();
 
   // Description:
   // Helper method that add a ShowInMenu Hint for a proxy definition.
@@ -221,7 +219,6 @@ protected:
   // legacy proxy don't have those expected Hints.
   // FIXME: Once those pluging get updated, this extra hint attachement
   //        might be removed.
-  bool LoadConfigurationXML(const char* filename, bool attachShowInMenuHints);
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
   bool LoadConfigurationXMLFromString(const char* xmlContent, bool attachShowInMenuHints);
 
@@ -262,8 +259,8 @@ protected:
                                    const char* subProxyName);
 
 private:
-  vtkPVProxyDefinitionManager(const vtkPVProxyDefinitionManager&); // Not implemented
-  void operator=(const vtkPVProxyDefinitionManager&); // Not implemented
+  vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&); // Not implemented
+  void operator=(const vtkSIProxyDefinitionManager&); // Not implemented
 
   // Flag to disable during method calls notification calls.
   bool TriggerNotificationEvent;

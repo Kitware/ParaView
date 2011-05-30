@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIntValidator>
 
 // ParaView Includes.
-#include "vtkSMProxyManager.h"
-#include "vtkPVProxyDefinitionManager.h"
 #include "vtkPVProxyDefinitionIterator.h"
-#include "vtkSMProxy.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
+#include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 
 class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {

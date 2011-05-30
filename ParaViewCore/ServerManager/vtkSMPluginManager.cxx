@@ -20,6 +20,7 @@
 #include "vtkPVPluginTracker.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
@@ -107,6 +108,10 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
     }
   proxy->Delete();
 
+  // Refresh definitions since those may have changed.
+  vtkSMProxyManager::GetProxyManager()->GetProxyDefinitionManager()->
+    SynchronizeDefinitions();
+
   if (status)
     {
     // Refresh the remote plugin information
@@ -131,6 +136,10 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
     proxy->UpdateVTKObjects();
     proxy->LoadPluginConfigurationXMLFromString(xmlcontents);
     proxy->Delete();
+
+    // Refresh definitions since those may have changed.
+    vtkSMProxyManager::GetProxyManager()->GetProxyDefinitionManager()->
+      SynchronizeDefinitions();
 
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     this->Internals->Session->GatherInformation(
