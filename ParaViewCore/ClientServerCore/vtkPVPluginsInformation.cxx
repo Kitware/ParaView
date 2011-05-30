@@ -427,7 +427,7 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
   for (iter = server_plugins->Internals->begin();
     iter != server_plugins->Internals->end(); ++iter)
     {
-    if (iter->RequiredOnServer)
+    if (iter->RequiredOnClient)
       {
       vtkstd::set<vtkItem, vtkItem>::iterator iter2 = client_set.find(*iter);
       if (iter2 == client_set.end() || iter2->Loaded == false)
