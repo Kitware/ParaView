@@ -1064,7 +1064,7 @@ int vtkPrismSurfaceReader::RequestData(
   prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
   prismBounds->SetNumberOfValues(6);
   //we use the surface bounds as we want the properly scaled dataset including log scaling
-  surfaceOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
+  localOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
 
   surfaceOutput->GetFieldData()->AddArray(prismBounds);
   curveOutput->GetFieldData()->AddArray(prismBounds);
