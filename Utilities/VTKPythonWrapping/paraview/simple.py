@@ -64,7 +64,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
        tk = servermanager.misc.TimeKeeper()
        servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
 
-    scene = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
     if not scene:
        scene = AnimationScene()
        scene.TimeKeeper = tk
@@ -88,7 +88,7 @@ def ReverseConnect(port=11111):
        tk = servermanager.misc.TimeKeeper()
        servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
 
-    scene = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
     if not scene:
        scene = AnimationScene()
        scene.TimeKeeper = tk
