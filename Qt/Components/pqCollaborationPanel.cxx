@@ -156,7 +156,7 @@ void pqCollaborationPanel::onUserMessage()
 void pqCollaborationPanel::writeChatMessage(int userId, QString& txt)
   {
   QString message = QString("<b>%1:</b> %2 <br/>\n\n").
-                    arg( this->getSMCollaborationManager()->GetUserName(userId),
+                    arg( this->getSMCollaborationManager()->GetUserLabel(userId),
                          txt.trimmed());
 
   this->Internal->content->textCursor().atEnd();
@@ -177,9 +177,9 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
       if(collab->GetUserId() == id)
         {
         QString userName = item->text();
-        if(userName != collab->GetUserName(id))
+        if(userName != collab->GetUserLabel(id))
           {
-          collab->SetUserName(id, userName.toAscii().data());
+          collab->SetUserLabel(id, userName.toAscii().data());
           }
         }
       }
@@ -299,7 +299,7 @@ void pqCollaborationPanel::onUserUpdate()
   for(int cc = 0; cc < nbUsers; cc++)
     {
     userId = collab->GetUserId(cc);
-    userName = collab->GetUserName(userId);
+    userName = collab->GetUserLabel(userId);
 
     QTableWidgetItem* item = new QTableWidgetItem(userName);
     item->setData(Qt::UserRole, userId);

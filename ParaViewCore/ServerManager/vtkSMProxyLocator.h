@@ -22,7 +22,7 @@
 #define __vtkSMProxyLocator_h
 
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"
+#include "vtkWeakPointer.h" // needed to keep the session around
 
 class vtkCollection;
 class vtkSMDeserializer;

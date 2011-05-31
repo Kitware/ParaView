@@ -262,7 +262,7 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         break;
       case QtEvent::CHAT:
         userId = msg->GetExtension(ChatMessage::author);
-        userName = this->Internals->CollaborationManager->GetUserName(userId);
+        userName = this->Internals->CollaborationManager->GetUserLabel(userId);
         chatMsg =  msg->GetExtension(ChatMessage::txt).c_str();
         emit triggerChatMessage(userId, chatMsg);
         break;

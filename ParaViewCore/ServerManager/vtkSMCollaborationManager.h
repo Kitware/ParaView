@@ -89,15 +89,15 @@ public:
 
   // Description:
   // return the name of the provided userId
-  virtual const char* GetUserName(int userID);
+  virtual const char* GetUserLabel(int userID);
 
   // Description:
   // Update ou local user name
-  virtual void SetUserName(const char* userName);
+  virtual void SetUserLabel(const char* userName);
 
   // Description:
   // Update any user name
-  virtual void SetUserName(int userId, const char* userName);
+  virtual void SetUserLabel(int userId, const char* userName);
 
   // Description:
   // return the number of currently connected clients. This size is used to bound

@@ -244,18 +244,18 @@ int vtkSMCollaborationManager::GetUserId(int index)
   return this->Internal->Users[index];
 }
 //----------------------------------------------------------------------------
-const char* vtkSMCollaborationManager::GetUserName(int userID)
+const char* vtkSMCollaborationManager::GetUserLabel(int userID)
 {
   return this->Internal->GetUserName(userID);
 }
 //----------------------------------------------------------------------------
-void vtkSMCollaborationManager::SetUserName(const char* userName)
+void vtkSMCollaborationManager::SetUserLabel(const char* userName)
 {
-  this->SetUserName(this->Internal->Me, userName);
+  this->SetUserLabel(this->Internal->Me, userName);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCollaborationManager::SetUserName(int userId, const char* userName)
+void vtkSMCollaborationManager::SetUserLabel(int userId, const char* userName)
 {
   if(this->Internal->UpdateUserName(userId, userName))
     {
