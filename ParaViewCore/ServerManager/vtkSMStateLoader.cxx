@@ -64,11 +64,6 @@ vtkSMStateLoader::~vtkSMStateLoader()
   this->SetProxyLocator(0);
   this->ServerManagerStateElement = 0;
   this->ProxyLocator = 0;
-  if(this->Session)
-    {
-    this->Session->Delete();
-    this->Session = 0;
-    }
   delete this->Internal;
 }
 
