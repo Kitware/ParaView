@@ -59,7 +59,10 @@ public:
   ~pqPluginManager();
 
   /// Called during application initialization to load plugins from settings.
-  /// This only loads "local" plugins.
+  /// This only loads "local" plugins. pqApplicationCore class this method
+  /// explicitly after the essential components of the core have been
+  /// initialized. This ensures that any plugins  being loaded during startup of
+  /// application have the environment setup correctly.
   void loadPluginsFromSettings();
 
   enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
@@ -103,6 +106,9 @@ protected:
   void verifyPlugins();
 
 protected slots:
+  /// attempts to load the configuration for plugins for the particular server.
+  void loadPluginsFromSettings(pqServer*);
+
   void onServerConnected(pqServer*);
   void onServerDisconnected(pqServer*);
   void updatePluginLists();
