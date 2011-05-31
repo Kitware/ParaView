@@ -31,7 +31,6 @@ vtkSMProxyDefinitionManager::vtkSMProxyDefinitionManager()
   this->Forwarder = vtkEventForwarderCommand::New();
   this->Forwarder->SetTarget(this);
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
-  this->ProxyDefinitionManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -40,7 +39,6 @@ vtkSMProxyDefinitionManager::~vtkSMProxyDefinitionManager()
   this->SetSession(NULL);
   this->Forwarder->SetTarget(NULL);
   this->Forwarder->Delete();
-  this->ProxyDefinitionManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -50,12 +48,14 @@ void vtkSMProxyDefinitionManager::SetSession(vtkSMSession* session)
     {
     return;
     }
-  this->Superclass::SetSession(session);
+
   if (this->ProxyDefinitionManager)
     {
     this->ProxyDefinitionManager->RemoveObserver(this->Forwarder);
     }
   this->ProxyDefinitionManager = NULL;
+  this->Superclass::SetSession(session);
+
   if (session)
     {
     this->ProxyDefinitionManager = session->GetProxyDefinitionManager();
