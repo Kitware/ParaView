@@ -24,6 +24,7 @@
 
 #include "vtkSMRemoteObject.h"
 #include "vtkSIProxyDefinitionManager.h" // needed for enums
+#include "vtkWeakPointer.h" // needed for weak pointer.
 
 class vtkEventForwarderCommand;
 
@@ -179,7 +180,7 @@ protected:
   ~vtkSMProxyDefinitionManager();
 
   vtkEventForwarderCommand* Forwarder;
-  vtkSIProxyDefinitionManager* ProxyDefinitionManager;
+  vtkWeakPointer<vtkSIProxyDefinitionManager> ProxyDefinitionManager;
 
 private:
   vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented
