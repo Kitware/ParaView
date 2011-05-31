@@ -1179,8 +1179,9 @@ int vtkSpyPlotUniReader::SetCurrentTime(double time)
     { 
     vtkDebugMacro( << __LINE__ << " " 
                    << this << " Read: " << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+
   if ( time < this->TimeRange[0] || time > this->TimeRange[1] )
     {
       vtkWarningMacro("Requested time: " << time <<
@@ -1201,8 +1202,9 @@ int vtkSpyPlotUniReader::SetCurrentTimeStep(int timeStep)
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+
   if ( timeStep < this->TimeStepRange[0] || timeStep > this->TimeStepRange[1] )
     {
       vtkWarningMacro("Requested time step: " << timeStep <<
@@ -1223,8 +1225,9 @@ int vtkSpyPlotUniReader::GetTimeStepFromTime(double time)
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+  
   //int dump;
   //for ( dump = 0; dump < this->NumberOfDataDumps; ++ dump )
   //  {
@@ -1258,8 +1261,9 @@ double vtkSpyPlotUniReader::GetTimeFromTimeStep(int timeStep)
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+  
   if ( timeStep < this->TimeStepRange[0] )
     {
     return this->TimeRange[0];
@@ -1278,8 +1282,9 @@ int vtkSpyPlotUniReader::GetNumberOfDataBlocks()
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+
   return this->DataDumps[this->CurrentTimeStep].ActualNumberOfBlocks;
 }
 
@@ -1316,8 +1321,9 @@ vtkSpyPlotUniReader::Variable* vtkSpyPlotUniReader::GetCellField(int field)
     { 
     vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
                    << this->HaveInformation ); 
+    this->ReadInformation();
     }
-  this->ReadInformation();
+  
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
   if ( field < 0 || field >= dp->NumVars )
     {
