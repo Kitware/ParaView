@@ -180,3 +180,17 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
     }
   return true; // Successful call
 }
+
+//---------------------------------------------------------------------------
+vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+  const SIOBJECT& manipulator)
+{
+  vtkClientServerStream substream;
+  substream << vtkClientServerStream::Invoke
+            << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
+            << "GetSIObject"
+            << manipulator.Reference->GetGlobalID()
+            << vtkClientServerStream::End;
+  stream << substream;
+  return stream;
+}

@@ -32,9 +32,9 @@ class vtkClientServerStream;
 class vtkCollection;
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
-class vtkSIObject;
 class vtkPVInformation;
-class vtkPVProxyDefinitionManager;
+class vtkSIObject;
+class vtkSIProxyDefinitionManager;
 
 class VTK_EXPORT vtkPVSessionCore : public vtkObject
 {
@@ -50,7 +50,7 @@ public:
 
   // Description:
   // Provides access to the proxy definition manager.
-  vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkSIProxyDefinitionManager);
 
   // Description:
   // Push the state message.
@@ -180,7 +180,7 @@ protected:
     ROOT_SATELLITE_INFO_TAG = 887823
     };
 
-  vtkPVProxyDefinitionManager* ProxyDefinitionManager;
+  vtkSIProxyDefinitionManager* ProxyDefinitionManager;
   vtkWeakPointer<vtkMultiProcessController> ParallelController;
   vtkClientServerInterpreter* Interpreter;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;

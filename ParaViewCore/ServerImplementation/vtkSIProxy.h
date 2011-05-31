@@ -26,7 +26,7 @@
 class vtkAlgorithmOutput;
 class vtkSIProperty;
 class vtkPVXMLElement;
-class vtkPVProxyDefinitionManager;
+class vtkSIProxyDefinitionManager;
 
 class VTK_EXPORT vtkSIProxy : public vtkSIObject
 {
@@ -94,8 +94,8 @@ protected:
   vtkSIProxy* GetSubSIProxy(unsigned int cc);
 
   // Description:
-  // Provides access to the vtkPVProxyDefinitionManager held by the session.
-  vtkPVProxyDefinitionManager* GetProxyDefinitionManager();
+  // Provides access to the vtkSIProxyDefinitionManager held by the session.
+  vtkSIProxyDefinitionManager* GetProxyDefinitionManager();
 
   // Description:
   // Creates the VTK objects. This also parses  the xml definition for proxy to

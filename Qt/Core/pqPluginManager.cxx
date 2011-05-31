@@ -94,11 +94,19 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
 
+  // we ensure that the auto-load plugins are loaded before the application
+  // realizes that a new server connection has been made.
+  // (BUG #12238).
+  QObject::connect(smmodel, SIGNAL(preServerAdded(pqServer*)),
+    this, SLOT(loadPluginsFromSettings(pqServer*)));
+  QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
+    this, SLOT(onServerDisconnected(pqServer*)));
+
+  // After the new server has been setup, we can validate if the plugin
+  // requirements have been met successfully.
   QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerConnected(pqServer*)));
-  QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
-    this, SLOT(onServerDisconnected(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -127,10 +135,8 @@ void pqPluginManager::loadPluginsFromSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginManager::onServerConnected(pqServer* server)
+void pqPluginManager::loadPluginsFromSettings(pqServer* server)
 {
-  this->Internals->ActiveServer = server;
-
   // Tell the server to load all default-plugins.
   if (server->isRemote())
     {
@@ -149,7 +155,19 @@ void pqPluginManager::onServerConnected(pqServer* server)
         remote_plugin_config.toAscii().data(), true);
       }
     }
+}
 
+//-----------------------------------------------------------------------------
+void pqPluginManager::onServerConnected(pqServer* server)
+{
+  if (this->Internals->ActiveServer)
+    {
+    qCritical() << "There may be an issue with how the signals for server "
+      "connected/disconnected were fired. Please report to the mailing "
+      "list.";
+    }
+
+  this->Internals->ActiveServer = server;
   this->initialize(server->session()->GetPluginManager());
 }
 
@@ -192,7 +210,10 @@ void pqPluginManager::initialize(vtkSMPluginManager* mgr)
 
   // Validate plugins i.e. check plugins that are required on client and server
   // are indeed present on both.
-  this->verifyPlugins();
+  if (!this->verifyPlugins())
+    {
+    emit this->requiredPluginsNotLoaded();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -257,20 +278,17 @@ bool pqPluginManager::isHidden(const QString& lib, bool remote)
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginManager::verifyPlugins()
+bool pqPluginManager::verifyPlugins()
 {
   pqServer* activeServer = this->Internals->ActiveServer;
   if (!activeServer  || !activeServer->isRemote())
     {
     // no verification needed for non-remote servers.
-    return;
+    return true;
     }
 
   vtkPVPluginsInformation* local_info = this->loadedExtensions(false);
   vtkPVPluginsInformation* remote_info = this->loadedExtensions(true);
-  if (!vtkPVPluginsInformation::PluginRequirementsSatisfied(
-      local_info, remote_info))
-    {
-    emit this->requiredPluginsNotLoaded();
-    }
+  return vtkPVPluginsInformation::PluginRequirementsSatisfied(
+      local_info, remote_info);
 }

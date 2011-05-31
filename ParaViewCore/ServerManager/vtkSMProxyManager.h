@@ -27,7 +27,7 @@
 // definitions as well as registered proxies. When a new session is established
 // it updates the definitions and is the ready to create new proxies.
 // .SECTION See Also
-// vtkPVProxyDefinitionManager
+// vtkSMProxyDefinitionManager
 //
 // Basic XML Proxy definition documentation:
 //
@@ -101,7 +101,7 @@ class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
-class vtkPVProxyDefinitionManager;
+class vtkSMProxyDefinitionManager;
 class vtkSMProxyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManagerObserver;
@@ -136,14 +136,6 @@ public:
   // Note that session is not reference counted.
   void SetSession(vtkSMSession*);
   vtkGetObjectMacro(Session, vtkSMSession);
-
-  // Description:
-  // This method will trigger a request on the server to fetch the XML proxy
-  // definition and load it localy so the client proxy will always have the
-  // exact same proxy definition as the server. This will be usefull for plugins
-  // to prevent specific client side loading even if no plugin client side code
-  // exist.
-  void LoadXMLDefinitionFromServer();
 
   // Description:
   // Given a group and proxy name, create and return a proxy instance.
@@ -328,7 +320,6 @@ public:
 
   // Description:
   // Save registered custom proxy definitions.
-  void SaveCustomProxyDefinitions(const char* filename);
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
   // Description:
@@ -360,7 +351,7 @@ public:
   void InstantiatePrototypes();
 
   // Description:
-  // Return true if the XML Definition was found by vtkPVProxyDefinitionManager
+  // Return true if the XML Definition was found by vtkSMProxyDefinitionManager
   bool HasDefinition( const char* groupName, const char* proxyName );
 
 //BTX
@@ -493,7 +484,7 @@ public:
   // Get the proxy definition manager.
   // Proxy definition manager maintains all the information about proxy
   // definitions.
-  vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
 
 //BTX
 
@@ -544,12 +535,6 @@ protected:
   friend class vtkSMProxyManagerObserver;
 
   // Description:
-  // Set the proxy definition manager.
-  // Proxy definition manager maintains all the information about proxy
-  // definitions.
-  void SetProxyDefinitionManager(vtkPVProxyDefinitionManager*);
-
-  // Description:
   // Given an XML element and group name create a proxy
   // and all of it's properties.
   vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname,
@@ -594,7 +579,7 @@ protected:
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
-  vtkPVProxyDefinitionManager* ProxyDefinitionManager;
+  vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkSMSession* Session;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;

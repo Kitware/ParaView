@@ -68,7 +68,7 @@ vtkPVSessionBase::~vtkPVSessionBase()
 }
 
 //----------------------------------------------------------------------------
-vtkPVProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
+vtkSIProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
 {
   return this->SessionCore->GetProxyDefinitionManager();
 }

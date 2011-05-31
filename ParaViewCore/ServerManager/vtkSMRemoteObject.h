@@ -25,6 +25,7 @@
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
+class vtkClientServerStream;
 class vtkSMSession;
 class vtkSMStateLocator;
 
@@ -46,7 +47,7 @@ public:
   // Description:
   // Get/Set the session on wihch this object exists.
   // Note that session is not reference counted.
-  void SetSession(vtkSMSession*);
+  virtual void SetSession(vtkSMSession*);
   vtkSMSession* GetSession();
 
   // Description:
@@ -74,7 +75,8 @@ public:
   // object from scratch.
   // This method will be used to fill the undo stack.
   // If not overriden this will return NULL.
-  virtual const vtkSMMessage* GetFullState() = 0;
+  virtual const vtkSMMessage* GetFullState()
+    { return NULL; }
 
   // Description:
   // This method is used to initialise the object to the given state
@@ -83,7 +85,13 @@ public:
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly ) = 0;
+                          bool definitionOnly )
+    {
+    (void) msg;
+    (void) locator;
+    (void) definitionOnly;
+    }
+
 
 protected:
   // Description:
@@ -133,5 +141,30 @@ private:
   char* GlobalIDString;
 //ETX
 };
+
+// This defines a manipulator for the vtkClientServerStream that can be used on
+// the to indicate to the interpreter that the placeholder is to be replaced by
+// the vtkSIProxy instance for the given vtkSMProxy instance.
+// e.g.
+// <code>
+// vtkClientServerStream stream;
+// stream << vtkClientServerStream::Invoke
+//        << SIOBJECT(proxyA)
+//        << "MethodName"
+//        << vtkClientServerStream::End;
+// </code>
+// Will result in calling the vtkSIProxy::MethodName() when the stream in
+// interpreted.
+class VTK_EXPORT SIOBJECT
+{
+  vtkSMRemoteObject* Reference;
+  friend VTK_EXPORT vtkClientServerStream& operator<<(
+    vtkClientServerStream& stream, const SIOBJECT& manipulator);
+public:
+  SIOBJECT(vtkSMRemoteObject* rmobject) : Reference(rmobject) {}
+};
+
+VTK_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+  const SIOBJECT& manipulator);
 
 #endif // #ifndef __vtkSMRemoteObject_h
