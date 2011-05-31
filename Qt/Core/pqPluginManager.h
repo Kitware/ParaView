@@ -90,6 +90,11 @@ public:
   void hidePlugin(const QString& lib, bool remote);
   bool isHidden(const QString& lib, bool remote);
 
+  /// ensures that plugins required on client and server are present on both.
+  /// Fires requiredPluginsNotLoaded() signal if any mismatch is found.
+  /// Returns true is all plugin requirements are satisfied, else returns false.
+  bool verifyPlugins();
+
 signals:
   /// notification when plugin has been loaded.
   void pluginsUpdated();
@@ -100,10 +105,6 @@ signals:
 
 protected:
   void initialize(vtkSMPluginManager*);
-
-  /// ensures that plugins required on client and server are present on both.
-  /// Fires requiredPluginsNotLoaded() signal if any mismatch is found.
-  void verifyPlugins();
 
 protected slots:
   /// attempts to load the configuration for plugins for the particular server.

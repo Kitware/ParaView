@@ -421,6 +421,10 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
         all_requirements_are_met = false;
         iter->StatusMessage = "Must be loaded on Server as well";
         }
+      else
+        {
+        iter->StatusMessage = "";
+        }
       }
     }
 
@@ -434,6 +438,10 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
         {
         all_requirements_are_met = false;
         iter->StatusMessage = "Must be loaded on Client as well";
+        }
+      else
+        {
+        iter->StatusMessage = "";
         }
       }
     }

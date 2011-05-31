@@ -210,7 +210,10 @@ void pqPluginManager::initialize(vtkSMPluginManager* mgr)
 
   // Validate plugins i.e. check plugins that are required on client and server
   // are indeed present on both.
-  this->verifyPlugins();
+  if (!this->verifyPlugins())
+    {
+    emit this->requiredPluginsNotLoaded();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -275,20 +278,17 @@ bool pqPluginManager::isHidden(const QString& lib, bool remote)
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginManager::verifyPlugins()
+bool pqPluginManager::verifyPlugins()
 {
   pqServer* activeServer = this->Internals->ActiveServer;
   if (!activeServer  || !activeServer->isRemote())
     {
     // no verification needed for non-remote servers.
-    return;
+    return true;
     }
 
   vtkPVPluginsInformation* local_info = this->loadedExtensions(false);
   vtkPVPluginsInformation* remote_info = this->loadedExtensions(true);
-  if (!vtkPVPluginsInformation::PluginRequirementsSatisfied(
-      local_info, remote_info))
-    {
-    emit this->requiredPluginsNotLoaded();
-    }
+  return vtkPVPluginsInformation::PluginRequirementsSatisfied(
+      local_info, remote_info);
 }
