@@ -62,12 +62,6 @@ public:
   virtual vtkPVServerInformation* GetServerInformation();
 
   // Description:
-  // vtkMultiClientsInformation is an information-object that provides information
-  // about the clients that are currently connected on the server processes.
-  // These include their number, their ids and which is your id as client.
-  virtual vtkPVMultiClientsInformation* GetMultiClientsInformation();
-
-  // Description:
   // This is socket connection, if any to communicate between the data-server
   // and render-server nodes. Forwarded for vtkPVSessionCore.
   virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection();
@@ -190,7 +184,6 @@ protected:
   void UnRegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location);
 
   vtkPVSessionCore* SessionCore;
-  vtkPVMultiClientsInformation* LocalMultiClientsInformationCache;
 
 private:
   vtkPVSessionBase(const vtkPVSessionBase&); // Not implemented

@@ -82,9 +82,10 @@ public:
   vtkMultiProcessController* GetActiveController();
 
   // Description:
-  // Allow server to broadcast to connected client some data but it skip
-  // the connection that is the author of the previous network call.
-  virtual void TriggerRMI2NonActives(int remote, void* data, int length, int tag);
+  // Allow server to broadcast data to all connected client with our without
+  // sending to the active client
+  virtual void TriggerRMI2All(int remote, void* data, int length, int tag,
+                              bool sendToActiveToo);
 
   //  --------------- vtkMultiProcessController API ----------------------
   // Make sure inner vtkSocketController are initialized
@@ -120,6 +121,11 @@ public:
     return 1;
     }
   virtual bool RemoveRMICallback(unsigned long observerTagId);
+
+  enum EventId
+    {
+    CompositeMultiProcessControllerChanged = 2345
+    };
 
 protected:
   vtkCompositeMultiProcessController();

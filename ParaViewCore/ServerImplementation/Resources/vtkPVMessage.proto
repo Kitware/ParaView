@@ -146,45 +146,42 @@ message ActiveSelectionMessage {
     SELECT           = 2;
     CLEAR_AND_SELECT = 3;
     DESELECT         = 4;
-}
+  }
 
   extend Message {
-    required string name        = 50;
-    required SelectionFlag type = 51;
+    required string name          = 50;
+    required SelectionFlag type   = 51;
     required uint32 current_proxy = 52 [default = 0];
-    repeated uint32 proxy       = 53;
+    repeated uint32 proxy         = 53;
   }
 }
 
-message ClientInformation {
+message ClientsInformation {
+
+  message ClientInfo {
+    required uint32 user      = 1;
+    optional string name      = 2;
+    optional bool   is_master = 3 [default = false];
+  }
+
   extend Message {
-    required uint32 user     = 54;
-    optional string name     = 55;
-    optional bool req_update = 56 [default = false];
+    repeated ClientInfo user = 54;
   }
 }
 
 message ChatMessage {
   extend Message {
-    required string txt  = 57;
+    required uint32 author = 55;
+    required string txt    = 56;
   }
 }
-
-message MasterSlaveMessage {
-  extend Message {
-    required uint32 previous_master = 58;
-    required uint32 next_master     = 59;
-  }
-}
-
 
 message QtEvent {
   enum QtEventType {
     RENDER              = 0;
     INSPECTOR_TAB       = 1;
     PROXY_STATE_INVALID = 2;
-    USER                = 3;
-    CHAT                = 4;
+    CHAT                = 3;
     OTHER               = 15;
   }
 

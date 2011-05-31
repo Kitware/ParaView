@@ -171,6 +171,11 @@ signals:
   ///                      Qt::QueuedConnection);
   void sentFromOtherClient(vtkSMMessage* msg);
 
+  /// Signal triggered when user information get updated
+  void triggeredMasterUser(int);
+  void triggeredUserName(int, QString&);
+  void triggeredUserListChanged();
+
 public slots:
   /// Allow user to broadcast to other client a given message
   void sendToOtherClients(vtkSMMessage* msg);

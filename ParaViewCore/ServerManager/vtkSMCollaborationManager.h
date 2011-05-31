@@ -40,7 +40,6 @@
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxyLocator;
-class vtkPVMultiClientsInformation;
 
 class VTK_EXPORT vtkSMCollaborationManager : public vtkSMRemoteObject
 {
@@ -58,23 +57,10 @@ public:
   // valid, a new global id will be assigned automatically.
   virtual vtkTypeUInt32 GetGlobalID();
 
-//BTX
-  enum EventType
-    {
-    CollaborationNotification = 12345
-    };
-
   // Description:
-  // Send message to other clients which will trigger Observer
-  void SendToOtherClients(vtkSMMessage* msg);
-
-  // Description:
-  // This method return NULL because that class have no state.
-  virtual const vtkSMMessage* GetFullState() { return NULL; };
-
-  // Description:
-  // This method is used IN THAT SPECIAL CASE to notify external listeners
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+  // Override the session setting in order to update only once our current
+  // local user id
+  virtual void SetSession(vtkSMSession*);
 
   // Description:
   // This method is used promote a new Master user. Master/Slave user doesn't
@@ -85,16 +71,64 @@ public:
   virtual void PromoteToMaster(int clientId);
 
   // Description:
-  // Based on the chached information, it tells you if you are a master or not
+  // Return true if the current client is the master
   virtual bool IsMaster();
 
   // Description:
-  // Based on the chached information, it tells who's the master
+  // Return the userId of the current master
   virtual int GetMasterId();
 
   // Description:
-  // Update the cache for the master informations
-  virtual void UpdateMasterInformation();
+  // Return the id of the current client
+  virtual int GetUserId();
+
+  // Description:
+  // Return the id of the nth connected client.
+  // In the list you will find yourself as well.
+  virtual int GetUserId(int index);
+
+  // Description:
+  // return the name of the provided userId
+  virtual const char* GetUserName(int userID);
+
+  // Description:
+  // Update ou local user name
+  virtual void SetUserName(const char* userName);
+
+  // Description:
+  // Update any user name
+  virtual void SetUserName(int userId, const char* userName);
+
+  // Description:
+  // return the number of currently connected clients. This size is used to bound
+  // the GetUserId() method.
+  virtual int GetNumberOfConnectedClients();
+
+  // Description:
+  // Request an update of the user list from the server. (A pull request is done)
+  void UpdateUserInformations();
+
+//BTX
+  enum EventType
+    {
+    CollaborationNotification = 12345,
+    UpdateUserName = 12346,
+    UpdateUserList = 12347,
+    UpdateMasterUser = 12348
+    };
+
+  // Description:
+  // Send message to other clients which will trigger Observer
+  void SendToOtherClients(vtkSMMessage* msg);
+
+  // Description:
+  // This method return the state of the connected clients
+  virtual const vtkSMMessage* GetFullState();
+
+  // Description:
+  // This method is used to either load its internal connected clients
+  // informations or to forward messages across clients
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   // Description:
@@ -105,9 +139,10 @@ protected:
   // Destructor.
   virtual ~vtkSMCollaborationManager();
 
-  vtkPVMultiClientsInformation* InformationOnMasterUser;
-
 private:
+  class vtkInternal;
+  vtkInternal* Internal;
+
   vtkSMCollaborationManager(const vtkSMCollaborationManager&); // Not implemented
   void operator=(const vtkSMCollaborationManager&);       // Not implemented
 //ETX

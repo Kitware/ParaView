@@ -113,6 +113,11 @@ protected:
 
   bool MultipleConnection;
 
+  // Used for collaboration purpose
+  friend class vtkSICollaborationManager;
+  void SendToNonActiveClients(vtkSMMessage* msg);
+  void BroadcastToClients(vtkSMMessage* msg);
+
   class vtkInternals;
   vtkInternals* Internal;
   friend class vtkInternals;

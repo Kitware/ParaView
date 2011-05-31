@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServer;
 class pqView;
 class pqPipelineSource;
+class vtkSMCollaborationManager;
 class QSignalMapper;
 
 /// pqCollaborationManager is a QObject that aims to handle the collaboration
@@ -58,28 +59,10 @@ public:
   pqCollaborationManager(QObject* parent);
   virtual ~pqCollaborationManager();
   void setServer(pqServer*);
+  pqServer* server();
 
-  /// Return your userId regarding your server connection
-  int userId();
-
-  /// Request the server to provide the list of user ids connected to the server
-  /// as well as requesting to the clients their names.
-  void updateUserList();
-
-  /// Return the number of connected users to the server
-  int getNumberOfUsers();
-
-  /// Return the name of a given user based on its id
-  QString getUserName(int userId);
-
-  /// Return the idx connected userId
-  int getUserId(int idx);
-
-  /// Return the id of the current master user
-  int masterUserId();
-
-  /// Return true if current user is the master
-  bool isMaster();
+  /// Return the vtkSMCollaborationManager
+  vtkSMCollaborationManager* collaborationManager();
 
 signals:
   /// This will be triggered locally to broadcast the request
@@ -90,15 +73,6 @@ signals:
   /// the other clients
   void triggerChatMessage(int userId, QString& msgContent);
 
-  /// This will be triggered by remote clients as well as local clients.
-  /// It is triggered by local clients in order to notify the remote ones
-  /// with our current last user name.
-  void triggerUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
-
-  /// This will be triggered after each refreshUserList() if the user list has
-  /// really changed
-  void triggerUpdateUserList();
-
   /// This will be triggered when a remote client has changed its selected tab
   /// inside the inspector panel.
   void triggerInspectorSelectedTabChanged(int);
@@ -107,14 +81,14 @@ signals:
   /// not managed locally
   void triggerStateClientOnlyMessage(vtkSMMessage* msg);
 
-  /// This notify the application who is the new master
-  void triggerElectedMaster(int);
+  /// Signal triggered when user information get updated
+  /// (just forwared from the pqServer)
+  /// This allow us to not care about which server is currently used
+  void triggeredMasterUser(int);
+  void triggeredUserName(int, QString&);
+  void triggeredUserListChanged();
 
 public slots:
-
-  /// This will update the user information based on the latest server status
-  /// This slot is called internally every 5s
-  void refreshUserList();
 
   /// This will attach to the provided view the necessary listeners to share
   /// collaborative actions such as rendering decision, ...
@@ -125,18 +99,9 @@ public slots:
   /// broadcast to other client a chat message
   void onChatMessage(int userId, QString& msgContent);
 
-  /// This will be triggered by the updateParticipant() signal and will
-  /// broadcast to other client the current user name and if we expect other
-  /// to do the same or not
-  void onUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
-
   /// This is connected from pqProxyTabWidget itself so the selected tab information
   /// can be sent to the other clients if any.
   void onInspectorSelectedTabChanged(int tabIndex);
-
-  /// This will send a message to the server and other clients to promote a new
-  /// master
-  void promoteNewMaster(int masterId);
 
 private slots:
   /// Called when a message has been sent by another client

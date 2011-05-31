@@ -36,9 +36,6 @@ vtkPVSessionBase::vtkPVSessionBase()
   this->LocalServerInformation = vtkPVServerInformation::New();
   this->LocalServerInformation->CopyFromObject(NULL);
 
-  this->LocalMultiClientsInformationCache = vtkPVMultiClientsInformation::New();
-  this->LocalMultiClientsInformationCache->CopyFromObject(NULL);
-
   // This ensure that whenever a message is received on  the parallel
   // controller, this session is marked active. This is essential for
   // satellites when running in parallel.
@@ -69,9 +66,6 @@ vtkPVSessionBase::~vtkPVSessionBase()
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = NULL;
-
-  this->LocalMultiClientsInformationCache->Delete();
-  this->LocalMultiClientsInformationCache = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -113,12 +107,6 @@ vtkPVSessionBase::ServerFlags vtkPVSessionBase::GetProcessRoles()
 vtkPVServerInformation* vtkPVSessionBase::GetServerInformation()
 {
   return this->LocalServerInformation;
-}
-//----------------------------------------------------------------------------
-vtkPVMultiClientsInformation* vtkPVSessionBase::GetMultiClientsInformation()
-{
-  this->GatherInformation(DATA_SERVER_ROOT, this->LocalMultiClientsInformationCache, 0);
-  return this->LocalMultiClientsInformationCache;
 }
 
 //----------------------------------------------------------------------------

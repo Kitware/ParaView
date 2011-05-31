@@ -518,7 +518,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 
         // Add extra-informations
         msg.set_share_only(true);
-        msg.set_client_id(this->LocalMultiClientsInformationCache->GetClientId());
+        msg.set_client_id(this->ServerInformation->GetClientId());
 
         vtkMultiProcessStream stream;
         stream << static_cast<int>(vtkPVSessionServer::PUSH);

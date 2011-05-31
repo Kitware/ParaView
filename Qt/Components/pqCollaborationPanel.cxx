@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxy.h"
@@ -121,8 +122,6 @@ pqCollaborationPanel::~pqCollaborationPanel()
 
   QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
                        this,   SLOT(writeChatMessage(int,QString&)));
-  QObject::disconnect( this, SIGNAL(triggerUpdateUser(int,QString&,bool)),
-                       this,   SLOT(onUserUpdate()));
 
   QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
                        SIGNAL(serverAdded(pqServer*)),
@@ -144,10 +143,10 @@ void pqCollaborationPanel::onUserMessage()
     return;
     }
 
-  pqCollaborationManager* collab = getCollaborationManager();
+  vtkSMCollaborationManager* collab = getSMCollaborationManager();
   if(collab)
     {
-    int userId = collab->userId();
+    int userId = collab->GetUserId();
     QString msg = this->Internal->message->text();
     emit triggerChatMessage( userId, msg);
     this->Internal->message->clear();
@@ -157,7 +156,7 @@ void pqCollaborationPanel::onUserMessage()
 void pqCollaborationPanel::writeChatMessage(int userId, QString& txt)
   {
   QString message = QString("<b>%1:</b> %2 <br/>\n\n").
-                    arg( this->getCollaborationManager()->getUserName(userId),
+                    arg( this->getSMCollaborationManager()->GetUserName(userId),
                          txt.trimmed());
 
   this->Internal->content->textCursor().atEnd();
@@ -171,16 +170,16 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
 {
   if(item->column() == 0)
     {
-    pqCollaborationManager* collab = this->getCollaborationManager();
+    vtkSMCollaborationManager* collab = this->getSMCollaborationManager();
     if(collab)
       {
       int id = item->data(Qt::UserRole).toInt();
-      if(collab->userId() == id)
+      if(collab->GetUserId() == id)
         {
         QString userName = item->text();
-        if(userName != collab->getUserName(id))
+        if(userName != collab->GetUserName(id))
           {
-          emit triggerUpdateUser(id, userName, true);
+          collab->SetUserName(id, userName.toAscii().data());
           }
         }
       }
@@ -210,7 +209,7 @@ void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
     }
 
   // Update user Camera to follow
-  if(this->getCollaborationManager()->userId() == userId)
+  if(this->getSMCollaborationManager()->GetUserId() == userId)
     {
     this->Internal->CameraToFollowOfUserId = 0; // Looking at our local camera
     }
@@ -257,17 +256,13 @@ void pqCollaborationPanel::onNewMaster(int masterId)
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::promoteToMaster(int masterId)
 {
-  if(this->getCollaborationManager())
+  if(this->getSMCollaborationManager())
     {
-    pqCollaborationManager* collabManager = this->getCollaborationManager();
-    collabManager->refreshUserList();
-    if(collabManager->masterUserId() == collabManager->userId())
+    vtkSMCollaborationManager* collabManager = this->getSMCollaborationManager();
+    if(collabManager->GetMasterId() == collabManager->GetUserId())
       {
       // We tell everyone, who's the new master
-      collabManager->promoteNewMaster(masterId);
-
-      // We update our local UI
-      this->onNewMaster(masterId);
+      collabManager->PromoteToMaster(masterId);
       }
     }
 }
@@ -279,27 +274,38 @@ pqCollaborationManager* pqCollaborationPanel::getCollaborationManager()
   return qobject_cast<pqCollaborationManager*>(core->manager("COLLABORATION_MANAGER"));
 }
 //-----------------------------------------------------------------------------
+vtkSMCollaborationManager* pqCollaborationPanel::getSMCollaborationManager()
+{
+  pqCollaborationManager* pqCollab = this->getCollaborationManager();
+  if(pqCollab)
+    {
+    return pqCollab->collaborationManager();
+    }
+  return NULL;
+}
+//-----------------------------------------------------------------------------
 void pqCollaborationPanel::onUserUpdate()
 {
-  pqCollaborationManager* collab = this->getCollaborationManager();
+
+  vtkSMCollaborationManager* collab = this->getSMCollaborationManager();
   if(!collab)
     {
     return;
     }
-  int nbUsers = collab->getNumberOfUsers();
+  int nbUsers = collab->GetNumberOfConnectedClients();
   int userId;
   QString userName;
   this->Internal->members->setRowCount(nbUsers);
   for(int cc = 0; cc < nbUsers; cc++)
     {
-    userId = collab->getUserId(cc);
-    userName = collab->getUserName(userId);
+    userId = collab->GetUserId(cc);
+    userName = collab->GetUserName(userId);
 
     QTableWidgetItem* item = new QTableWidgetItem(userName);
     item->setData(Qt::UserRole, userId);
 
     // Add local user decoration
-    if(userId == collab->userId())
+    if(userId == collab->GetUserId())
       {
       item->setFlags( item->flags() | Qt::ItemIsEditable );
       QFont font = item->font();
@@ -313,7 +319,7 @@ void pqCollaborationPanel::onUserUpdate()
       }
 
     // Add master decoration
-    if(userId == collab->masterUserId())
+    if(userId == collab->GetMasterId())
       {
       item->setIcon(QIcon(":/pqWidgets/Icons/pqMousePick15.png"));
       }
@@ -348,24 +354,21 @@ void pqCollaborationPanel::connectLocalSlots()
     {
     QObject::connect( collab, SIGNAL(triggerChatMessage(int,QString&)),
                       this,   SLOT(writeChatMessage(int,QString&)));
-    QObject::connect( collab, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+    QObject::connect( collab,
+                      SIGNAL(triggeredUserListChanged()),
                       this,   SLOT(onUserUpdate()));
-    QObject::connect( collab, SIGNAL(triggerUpdateUserList()),
-                      this,   SLOT(onUserUpdate()));
-    QObject::connect( collab, SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
+    QObject::connect( collab,
+                      SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
                       this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
 
     QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                       collab, SLOT(onChatMessage(int,QString&)));
-    QObject::connect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
-                      collab, SLOT(onUpdateUser(int,QString&,bool)));
 
-    QObject::connect( collab, SIGNAL(triggerElectedMaster(int)),
+    QObject::connect( collab, SIGNAL(triggeredMasterUser(int)),
                       this,   SLOT(onNewMaster(int)));
 
     // Update the graphical panel
-    QString userName = collab->getUserName(collab->userId());
-    emit triggerUpdateUser( collab->userId(), userName, true);
+    collab->collaborationManager()->UpdateUserInformations();
     onUserUpdate(); // This may be called twice (one here + one from emit)
 
     QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
@@ -395,19 +398,17 @@ void pqCollaborationPanel::disconnectLocalSlots()
     // objects that we observed have been deleted
     QObject::disconnect( collab, SIGNAL(triggerChatMessage(int,QString&)),
                          this,   SLOT(writeChatMessage(int,QString&)));
-    QObject::disconnect( collab, SIGNAL(triggerUpdateUser(int,QString&,bool)),
+    QObject::disconnect( collab,
+                         SIGNAL(triggeredUserListChanged()),
                          this,   SLOT(onUserUpdate()));
-    QObject::disconnect( collab, SIGNAL(triggerUpdateUserList()),
-                         this,   SLOT(onUserUpdate()));
-    QObject::disconnect( collab, SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
+    QObject::disconnect( collab,
+                         SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
                          this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
 
     QObject::disconnect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                          collab, SLOT(onChatMessage(int,QString&)));
-    QObject::disconnect( this,   SIGNAL(triggerUpdateUser(int,QString&,bool)),
-                         collab, SLOT(onUpdateUser(int,QString&,bool)));
 
-    QObject::disconnect( collab, SIGNAL(triggerElectedMaster(int)),
+    QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
                          this,   SLOT(onNewMaster(int)));
     }
 }

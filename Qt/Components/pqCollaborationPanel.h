@@ -40,6 +40,7 @@ class pqServer;
 class pqView;
 class pqCollaborationManager;
 class QTableWidgetItem;
+class vtkSMCollaborationManager;
 
 /// pqCollaborationPanel is a properties page for the collaborative session. It
 /// allows the user to change its name and manage leadership of the session.
@@ -56,9 +57,6 @@ signals:
   /// if the user is the local one, the message will be broadcasted to the
   /// other clients.
   void triggerChatMessage(int userId, QString& msgContent);
-
-  /// This signal is directly connected to the active collaboration manager
-  void triggerUpdateUser(int userId, QString& userName, bool requestUpdateFromOthers);
 
 public slots:
   /// Called by pqCollaborationManager when a message is received
@@ -105,6 +103,7 @@ protected:
   void operator=(const pqCollaborationPanel&); // Not implemented.
 
   pqCollaborationManager* getCollaborationManager();
+  vtkSMCollaborationManager* getSMCollaborationManager();
 
   class pqInternal;
   pqInternal* Internal;

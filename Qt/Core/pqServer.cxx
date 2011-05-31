@@ -174,7 +174,7 @@ void pqServer::initialize()
       this->Internals->CollaborationCommunicator = session->GetCollaborationManager();
       this->Internals->VTKConnect->Connect(
           session->GetCollaborationManager(),
-          vtkSMCollaborationManager::CollaborationNotification,
+          vtkCommand::AnyEvent,
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
@@ -539,12 +539,31 @@ void pqServer::processServerNotification()
 }
 //-----------------------------------------------------------------------------
 void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
-                                            unsigned long vtkNotUsed(event),
+                                            unsigned long event,
                                             void* vtkNotUsed(method),
                                             void* data)
 {
-  vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
-  emit sentFromOtherClient(msg);
+  int userId;
+  QString userName;
+  switch(event)
+    {
+    case vtkSMCollaborationManager::UpdateUserName:
+    userId = *reinterpret_cast<int*>(data);
+      userName = this->Internals->CollaborationCommunicator->GetUserName(userId);
+      emit triggeredUserName(userId, userName);
+      break;
+    case vtkSMCollaborationManager::UpdateUserList:
+      emit triggeredUserListChanged();
+      break;
+    case vtkSMCollaborationManager::UpdateMasterUser:
+      userId = *reinterpret_cast<int*>(data);
+      emit triggeredMasterUser(userId);
+      break;
+    case vtkSMCollaborationManager::CollaborationNotification:
+      vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
+      emit sentFromOtherClient(msg);
+      break;
+    }
 }
 //-----------------------------------------------------------------------------
 void pqServer::sendToOtherClients(vtkSMMessage* msg)

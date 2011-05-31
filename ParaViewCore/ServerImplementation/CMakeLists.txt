@@ -27,6 +27,7 @@ SET (Kit_SRCS
   vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
+  vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIContextArraysProperty.cxx
   vtkSIDataArrayProperty.cxx

@@ -120,9 +120,17 @@ public:
   void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
     {
     vtkstd::string data = msgToBroadcast->SerializeAsString();
-    this->CompositeMultiProcessController->TriggerRMI2NonActives(
+    this->CompositeMultiProcessController->TriggerRMI2All(
         1, (void*)data.c_str(), data.size(),
-        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, false);
+    }
+    //-----------------------------------------------------------------
+  void NotifyAllClients(vtkSMMessage* msgToBroadcast)
+    {
+    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    this->CompositeMultiProcessController->TriggerRMI2All(
+        1, (void*)data.c_str(), data.size(),
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, true);
     }
   //-----------------------------------------------------------------
   vtkCompositeMultiProcessController* GetActiveController()
@@ -139,31 +147,8 @@ public:
     {
     if(msg && msg->share_only())
       {
-      if(msg->HasExtension(MasterSlaveMessage::previous_master))
-        {
-        if(static_cast<int>(msg->GetExtension(MasterSlaveMessage::previous_master))
-          == this->CompositeMultiProcessController->GetMasterController())
-          {
-          // Switch master
-          this->CompositeMultiProcessController->SetMasterController(
-              static_cast<int>(msg->GetExtension(MasterSlaveMessage::next_master)));
-          msg->SetExtension( MasterSlaveMessage::next_master,
-              this->CompositeMultiProcessController->GetMasterController());
-          }
-        else
-          {
-          // This user has not the right to switch to promote a new master
-          // => Return the real master...
-          int masterId = this->CompositeMultiProcessController->GetMasterController();
-          msg->SetExtension(MasterSlaveMessage::previous_master, masterId);
-          msg->SetExtension(MasterSlaveMessage::next_master,     masterId);
-          }
-        }
-      else
-        {
-        vtkTypeUInt32 id = msg->global_id();
-        this->ShareOnlyCache[id].CopyFrom(*msg);
-        }
+      vtkTypeUInt32 id = msg->global_id();
+      this->ShareOnlyCache[id].CopyFrom(*msg);
       return true;
       }
     return false;
@@ -438,7 +423,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
       // Notify when ProxyManager state has changed
       // or any other state change
-      this->Internal->NotifyOtherClients(&msg);
+      this->SendToNonActiveClients(&msg);
       }
     break;
 
@@ -575,4 +560,15 @@ void vtkPVSessionServer::OnCloseSessionRMI()
 void vtkPVSessionServer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::SendToNonActiveClients(vtkSMMessage* msg)
+{
+  this->Internal->NotifyOtherClients(msg);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::BroadcastToClients(vtkSMMessage* msg)
+{
+  this->Internal->NotifyAllClients(msg);
 }

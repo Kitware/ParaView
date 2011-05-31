@@ -150,6 +150,8 @@ public:
     this->ActiveController->AddRMICallbacks(this->RMICallbacks);
 
     this->UpdateActiveCommunicator();
+
+    this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
     }
   //-----------------------------------------------------------------
   void UnRegisterController(vtkMultiProcessController* ctrl)
@@ -346,16 +348,22 @@ public:
       this->UnRegisterController(*iter2);
       iter2++;
       }
+
+    if(controllersToDelete.size() > 0)
+      {
+      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
+      }
     }
   //-----------------------------------------------------------------
-  void TriggerRMI2NonActives(int remoteProcessId, void* data, int argLength,
-                             int tag)
+  void TriggerRMI2All(int remoteProcessId, void* data, int argLength,
+                      int tag, bool sendToActiveController)
     {
     vtkstd::vector<vtkMultiProcessController*> controllersToNotify;
     vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
-      if( iter->MultiProcessController.GetPointer() !=
+      if( sendToActiveController ||
+          iter->MultiProcessController.GetPointer() !=
           this->ActiveController->MultiProcessController.GetPointer() )
         {
         vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
@@ -410,6 +418,11 @@ public:
         {
         this->SetMasterController(newMaster);
         }
+      }
+
+    if(found)
+      {
+      this->Owner->InvokeEvent(CompositeMultiProcessControllerChanged);
       }
     }
   //-----------------------------------------------------------------
@@ -527,6 +540,7 @@ bool vtkCompositeMultiProcessController::RemoveRMICallback(unsigned long observe
 int vtkCompositeMultiProcessController::UnRegisterActiveController()
 {
   this->UnRegisterController(this->Internal->GetActiveController());
+  this->InvokeEvent(CompositeMultiProcessControllerChanged);
   return this->Internal->GetNumberOfRegisteredControllers();
 }
 
@@ -541,13 +555,14 @@ vtkCommunicator* vtkCompositeMultiProcessController::GetCommunicator()
   return this->Internal->GetActiveCommunicator();
 }
 //----------------------------------------------------------------------------
-void vtkCompositeMultiProcessController::TriggerRMI2NonActives(int vtkNotUsed(remote),
+void vtkCompositeMultiProcessController::TriggerRMI2All(int vtkNotUsed(remote),
                                                                void* data,
                                                                int length,
-                                                               int tag)
+                                                               int tag,
+                                                               bool sendToActiveToo)
 {
   this->Internal->CleanNonConnectedControllers();
-  this->Internal->TriggerRMI2NonActives(1, data, length, tag);
+  this->Internal->TriggerRMI2All(1, data, length, tag, sendToActiveToo);
 }
 //----------------------------------------------------------------------------
 int vtkCompositeMultiProcessController::GetActiveControllerID()
