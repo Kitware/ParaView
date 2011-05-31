@@ -38,6 +38,7 @@ public:
   void Seek(vtkTypeInt64 offset, bool rel = false);
   vtkTypeInt64 Tell();
 protected:
+  char FileBuffer[2097152];
   istream *IStream;
 };
 
