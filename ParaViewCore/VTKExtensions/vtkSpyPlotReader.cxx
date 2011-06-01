@@ -104,6 +104,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
+  this->FileNameChanged = true;
 
   this->TimeRequestedFromPipeline = false;
 }
@@ -121,6 +122,31 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
   delete this->Bounds;
   this->Map = 0;
   this->SetGlobalController(0);
+}
+
+
+//-----------------------------------------------------------------------------
+// Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+// whether the dataset is AMR.
+void vtkSpyPlotReader::SetFileName(const char* filename)
+{  
+  if ( this->FileName == NULL && filename == NULL) { return;}
+  if ( this->FileName && filename && (!strcmp(this->FileName,filename))) { return;}
+  if (this->FileName) { delete [] this->FileName; }
+  if (filename)
+    {
+    size_t n = strlen(filename) + 1;
+    char *cp1 =  new char[n];
+    const char *cp2 = (filename);
+    this->FileName = cp1;
+    do { *cp1++ = *cp2++; } while ( --n );
+    }
+   else
+    {
+    this->FileName = NULL;
+    }
+  this->FileNameChanged = true;
+  this->Modified();
 }
 
 
@@ -191,6 +217,17 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
 int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
                                   vtkInformationVector* outputVector)
 {
+  if (!this->FileNameChanged )
+    {
+    //if we haven't changed the file name we are looking at we don't need to
+    //reread the information header. This optimization saves loads of time
+    //as UpdateFile is called in RequestInfo and RequestDataObject, and those
+    //are called twice each to load the data. See bug #12166 for more info.
+    return 1;
+    }
+
+  this->FileNameChanged = false;
+
   ifstream ifs(this->FileName);
   if(!ifs)
     {
