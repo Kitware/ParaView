@@ -60,7 +60,7 @@ vtkMultiResolutionStreamer::vtkMultiResolutionStreamer()
   this->ViewPrioritization = 1;
   this->ProgressionMode = 0;
   this->RefinementDepth = 5;
-  this->DepthLimit = 10;
+  this->DepthLimit = 15;
   this->MaxSplits = 8;
   this->Interacting = false;
 }

@@ -120,6 +120,14 @@ pqStreamingControls::pqStreamingControls(QWidget* p)
   this->Internals->cache_size->setItemData(8, 64);
   this->Internals->cache_size->setItemData(9, 128);
   this->Internals->cache_size->setItemData(10, 256);
+  this->Internals->cache_size->setItemData(11, 512);
+  this->Internals->cache_size->setItemData(12, 1024);
+  this->Internals->cache_size->setItemData(13, 2048);
+  this->Internals->cache_size->setItemData(14, 4096);
+  this->Internals->cache_size->setItemData(15, 8192);
+  this->Internals->cache_size->setItemData(16, 16384);
+  this->Internals->cache_size->setItemData(17, 32768);
+  this->Internals->cache_size->setItemData(18, 65536);
 
   this->Internals->CacheSizeAdaptor = new pqSignalAdaptorComboBox(
     this->Internals->cache_size);
