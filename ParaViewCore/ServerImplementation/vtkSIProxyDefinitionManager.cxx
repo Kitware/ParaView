@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVProxyDefinitionManager.cxx
+  Module:    vtkSIProxyDefinitionManager.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -52,7 +52,7 @@ typedef vtkSmartPointer<vtkPVXMLElement>        XMLElement;
 typedef vtkstd::map<vtkStdString, XMLElement>   StrToXmlMap;
 typedef vtkstd::map<vtkStdString, StrToXmlMap>  StrToStrToXmlMap;
 
-class vtkPVProxyDefinitionManager::vtkInternals
+class vtkSIProxyDefinitionManager::vtkInternals
 {
 public:
   // Keep track of ServerManager definition
@@ -437,11 +437,12 @@ private:
   bool InvalidCoreIterator;
   bool InvalidCustomIterator;
 };
+
 //****************************************************************************/
-vtkStandardNewMacro(vtkPVProxyDefinitionManager)
+vtkStandardNewMacro(vtkSIProxyDefinitionManager)
 vtkStandardNewMacro(vtkInternalDefinitionIterator)
 //---------------------------------------------------------------------------
-vtkPVProxyDefinitionManager::vtkPVProxyDefinitionManager()
+vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
 {
   this->TriggerNotificationEvent = true;
   this->Internals = new vtkInternals;
@@ -455,7 +456,7 @@ vtkPVProxyDefinitionManager::vtkPVProxyDefinitionManager()
   // definitions.
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   tracker->AddObserver( vtkCommand::RegisterEvent, this,
-                        &vtkPVProxyDefinitionManager::OnPluginLoaded);
+                        &vtkSIProxyDefinitionManager::OnPluginLoaded);
   // process any already loaded plugins.
   for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
     {
@@ -464,14 +465,14 @@ vtkPVProxyDefinitionManager::vtkPVProxyDefinitionManager()
 }
 
 //---------------------------------------------------------------------------
-vtkPVProxyDefinitionManager::~vtkPVProxyDefinitionManager()
+vtkSIProxyDefinitionManager::~vtkSIProxyDefinitionManager()
 {
   delete this->Internals;
   delete this->InternalsFlatten;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::AddElement(const char* groupName,
+void vtkSIProxyDefinitionManager::AddElement(const char* groupName,
                                              const char* proxyName,
                                              vtkPVXMLElement* element)
 {
@@ -507,7 +508,7 @@ void vtkPVProxyDefinitionManager::AddElement(const char* groupName,
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVProxyDefinitionManager::GetProxyDefinition(
+vtkPVXMLElement* vtkSIProxyDefinitionManager::GetProxyDefinition(
                  const char* groupName, const char* proxyName,
                  const bool throwError)
 {
@@ -526,18 +527,18 @@ vtkPVXMLElement* vtkPVProxyDefinitionManager::GetProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::ClearCustomProxyDefinition()
+void vtkSIProxyDefinitionManager::ClearCustomProxyDefinitions()
 {
   this->Internals->CustomsDefinitions.clear();
   if(this->TriggerNotificationEvent)
     {
     this->InvokeEvent(
-        vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+        vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::RemoveCustomProxyDefinition(
+void vtkSIProxyDefinitionManager::RemoveCustomProxyDefinition(
     const char* groupName, const char* proxyName)
 {
   if (this->Internals->HasCustomDefinition(groupName, proxyName))
@@ -550,13 +551,13 @@ void vtkPVProxyDefinitionManager::RemoveCustomProxyDefinition(
       RegisteredDefinitionInformation info(groupName, proxyName, true);
       this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
       this->InvokeEvent(
-          vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+          vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
       }
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::AttachShowInMenuHintsToProxy(vtkPVXMLElement* proxy)
+void vtkSIProxyDefinitionManager::AttachShowInMenuHintsToProxy(vtkPVXMLElement* proxy)
 {
   if(!proxy)
     {
@@ -582,7 +583,7 @@ void vtkPVProxyDefinitionManager::AttachShowInMenuHintsToProxy(vtkPVXMLElement* 
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::
+void vtkSIProxyDefinitionManager::
     AttachShowInMenuHintsToProxyFromProxyGroups(vtkPVXMLElement* root)
 {
   if(!root)
@@ -617,7 +618,23 @@ void vtkPVProxyDefinitionManager::
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::AddCustomProxyDefinition(
+void vtkSIProxyDefinitionManager::AddCustomProxyDefinition(
+    const char* groupName, const char* proxyName, const char* xmlcontents)
+{
+  vtkNew<vtkPVXMLParser> parser;
+  if (parser->Parse(xmlcontents))
+    {
+    this->AddCustomProxyDefinition(groupName, proxyName,
+      parser->GetRootElement());
+    }
+  else
+    {
+    vtkErrorMacro("Failed to parse xml.");
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSIProxyDefinitionManager::AddCustomProxyDefinition(
     const char* groupName, const char* proxyName, vtkPVXMLElement* top)
 {
   if (!top)
@@ -656,13 +673,13 @@ void vtkPVProxyDefinitionManager::AddCustomProxyDefinition(
       RegisteredDefinitionInformation info(groupName, proxyName, true);
       this->InvokeEvent(vtkCommand::RegisterEvent, &info);
       this->InvokeEvent(
-          vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+          vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
       }
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
+void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
 {
   if (!root)
     {
@@ -700,88 +717,26 @@ void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
       }
     }
 }
-//---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(vtkSMMessage* msg)
-{
-  if (!msg)
-    {
-    return;
-    }
-
-  bool previousValue = this->TriggerNotificationEvent;
-  this->TriggerNotificationEvent = false;
-  vtkNew<vtkPVXMLParser> parser;
-  int size =
-      msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
-  const ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
-  for(int i=0; i < size; i++)
-    {
-    xmlDef =
-        &msg->GetExtension(ProxyDefinitionState::xml_custom_definition_proxy, i);
-    parser->Parse(xmlDef->xml().c_str());
-    this->AddCustomProxyDefinition( xmlDef->group().c_str(),
-                                    xmlDef->name().c_str(),
-                                    parser->GetRootElement() );
-    }
-  this->TriggerNotificationEvent = previousValue;
-}
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::LoadCustomProxyDefinitions(const char* filename)
+void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitionsFromString(
+  const char* xmlContent)
 {
   vtkNew<vtkPVXMLParser> parser;
-  parser->SetFileName(filename);
-  parser->Parse();
-  this->LoadCustomProxyDefinitions(parser->GetRootElement());
+  if (parser->Parse(xmlContent))
+    {
+    this->LoadCustomProxyDefinitions(parser->GetRootElement());
+    }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::SaveCustomProxyDefinitions(vtkSMMessage* msg)
+void vtkSIProxyDefinitionManager::SaveCustomProxyDefinitions(
+  vtkPVXMLElement* root)
 {
-  if (!msg)
-    {
-    vtkErrorMacro("State message must be specified.");
-    return;
-    }
-
-  // Reset message state content
-  ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
-  msg->Clear();
-  msg->set_global_id(vtkPVProxyDefinitionManager::GetReservedGlobalID());
-  msg->set_location(vtkPVSession::SERVERS); // This should be send to servers
-
-  // Fill the state with the locals custom definitions
-  vtkPVProxyDefinitionIterator* iter =
-      this->NewIterator(vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS);
-  while(!iter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* elem = iter->GetProxyDefinition();
-    if (elem)
-      {
-      vtkstd::ostringstream xmlContent;
-      iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
-
-      xmlDef = msg->AddExtension(ProxyDefinitionState::xml_custom_definition_proxy);
-      xmlDef->set_group(iter->GetGroupName());
-      xmlDef->set_name(iter->GetProxyName());
-      xmlDef->set_xml(xmlContent.str());
-      }
-    iter->GoToNextItem();
-    }
-  iter->Delete();
-}
-//---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::SaveCustomProxyDefinitions(
-  vtkPVXMLElement* rootElement)
-{
-  if (!rootElement)
-    {
-    vtkErrorMacro("root element must be specified.");
-    return;
-    }
+  assert(root != NULL);
 
   vtkPVProxyDefinitionIterator* iter =
-      this->NewIterator(vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS);
+      this->NewIterator(vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS);
   while(!iter->IsDoneWithTraversal())
     {
     vtkPVXMLElement* elem = iter->GetProxyDefinition();
@@ -792,7 +747,7 @@ void vtkPVProxyDefinitionManager::SaveCustomProxyDefinitions(
       defElement->AddAttribute("name", iter->GetProxyName());
       defElement->AddAttribute("group", iter->GetGroupName());
       defElement->AddNestedElement(elem, 0);
-      rootElement->AddNestedElement(defElement.GetPointer());
+      root->AddNestedElement(defElement.GetPointer());
       }
     iter->GoToNextItem();
     }
@@ -800,38 +755,12 @@ void vtkPVProxyDefinitionManager::SaveCustomProxyDefinitions(
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::SaveCustomProxyDefinitions(const char* filename)
-{
-  vtkNew<vtkPVXMLElement> root;
-  root->SetName("CustomProxyDefinitions");
-  this->SaveCustomProxyDefinitions(root.GetPointer());
-
-  ofstream os(filename, ios::out);
-  root->PrintXML(os, vtkIndent());
-}
-
-//---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXML(const char* filename)
-{
-  return this->LoadConfigurationXML(filename, false);
-}
-
-//---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXML( const char* filename,
-                                                        bool attachHints)
-{
-  vtkNew<vtkPVXMLParser> parser;
-  parser->SetFileName(filename);
-  return parser->Parse() &&
-      this->LoadConfigurationXML(parser->GetRootElement(), attachHints);
-}
-//---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent)
+bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent)
 {
   return this->LoadConfigurationXMLFromString(xmlContent, false);
 }
 //---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXMLFromString( const char* xmlContent,
+bool vtkSIProxyDefinitionManager::LoadConfigurationXMLFromString( const char* xmlContent,
                                                                   bool attachHints)
 {
   vtkNew<vtkPVXMLParser> parser;
@@ -840,12 +769,13 @@ bool vtkPVProxyDefinitionManager::LoadConfigurationXMLFromString( const char* xm
 }
 
 //---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
+bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 {
   return this->LoadConfigurationXML(root, false);
 }
+
 //---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bool attachHints)
+bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bool attachHints)
 {
   if (!root)
     {
@@ -879,22 +809,22 @@ bool vtkPVProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
     }
   if(this->TriggerNotificationEvent)
     {
-    this->InvokeEvent(vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated);
+    this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
     }
   return true;
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSIProxyDefinitionManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 //---------------------------------------------------------------------------
-// vtkPVProxyDefinitionManager::ALL_DEFINITIONS    = 0
-// vtkPVProxyDefinitionManager::CORE_DEFINITIONS   = 1
-// vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS = 2
+// vtkSIProxyDefinitionManager::ALL_DEFINITIONS    = 0
+// vtkSIProxyDefinitionManager::CORE_DEFINITIONS   = 1
+// vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS = 2
 vtkPVProxyDefinitionIterator*
-    vtkPVProxyDefinitionManager::NewSingleGroupIterator(char const* groupName,
+    vtkSIProxyDefinitionManager::NewSingleGroupIterator(char const* groupName,
                                                         int scope)
 {
   vtkPVProxyDefinitionIterator* iterator = this->NewIterator(scope);
@@ -902,18 +832,18 @@ vtkPVProxyDefinitionIterator*
   return iterator;
 }
 //---------------------------------------------------------------------------
-// vtkPVProxyDefinitionManager::ALL_DEFINITIONS    = 0
-// vtkPVProxyDefinitionManager::CORE_DEFINITIONS   = 1
-// vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS = 2
-vtkPVProxyDefinitionIterator* vtkPVProxyDefinitionManager::NewIterator(int scope)
+// vtkSIProxyDefinitionManager::ALL_DEFINITIONS    = 0
+// vtkSIProxyDefinitionManager::CORE_DEFINITIONS   = 1
+// vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS = 2
+vtkPVProxyDefinitionIterator* vtkSIProxyDefinitionManager::NewIterator(int scope)
 {
   vtkInternalDefinitionIterator* iterator = vtkInternalDefinitionIterator::New();
   switch(scope)
     {
-    case vtkPVProxyDefinitionManager::CORE_DEFINITIONS: // Core only
+    case vtkSIProxyDefinitionManager::CORE_DEFINITIONS: // Core only
       iterator->RegisterCoreDefinitionMap( & this->Internals->CoreDefinitions);
       break;
-    case vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS: // Custom only
+    case vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS: // Custom only
       iterator->RegisterCustomDefinitionMap( & this->Internals->CustomsDefinitions);
       break;
     default: // Both
@@ -924,12 +854,12 @@ vtkPVProxyDefinitionIterator* vtkPVProxyDefinitionManager::NewIterator(int scope
   return iterator;
 }
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::InvalidateCollapsedDefinition()
+void vtkSIProxyDefinitionManager::InvalidateCollapsedDefinition()
 {
   this->InternalsFlatten->CoreDefinitions.clear();
 }
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVProxyDefinitionManager::ExtractSubProxy(
+vtkPVXMLElement* vtkSIProxyDefinitionManager::ExtractSubProxy(
     vtkPVXMLElement* proxyDefinition, const char* subProxyName)
 {
   if(!subProxyName)
@@ -965,7 +895,7 @@ vtkPVXMLElement* vtkPVProxyDefinitionManager::ExtractSubProxy(
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVProxyDefinitionManager::GetCollapsedProxyDefinition(
+vtkPVXMLElement* vtkSIProxyDefinitionManager::GetCollapsedProxyDefinition(
     const char* group, const char* name, const char* subProxyName, bool throwError)
 {
   // Look in the cache
@@ -1037,7 +967,7 @@ vtkPVXMLElement* vtkPVProxyDefinitionManager::GetCollapsedProxyDefinition(
   return this->ExtractSubProxy(originalDefinition, subProxyName);
 }
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
+void vtkSIProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
                                                        vtkPVXMLElement* elementToFill)
 {
   // Meta-data of elementToFill
@@ -1125,11 +1055,11 @@ void vtkPVProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
+void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
 {
   // Setup required message header
   msg->Clear();
-  msg->set_global_id(vtkPVProxyDefinitionManager::GetReservedGlobalID());
+  msg->set_global_id(vtkSIProxyDefinitionManager::GetReservedGlobalID());
   msg->set_location(vtkPVSession::DATA_SERVER);
 
   // This is made in a naive way, but we are sure that at each request
@@ -1141,7 +1071,7 @@ void vtkPVProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
   vtkPVProxyDefinitionIterator* iter;
 
   // Core Definition
-  iter = this->NewIterator(vtkPVProxyDefinitionManager::CORE_DEFINITIONS);
+  iter = this->NewIterator(vtkSIProxyDefinitionManager::CORE_DEFINITIONS);
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
@@ -1158,7 +1088,7 @@ void vtkPVProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
   iter->Delete();
 
   // Custome Definition
-  iter = this->NewIterator(vtkPVProxyDefinitionManager::CUSTOM_DEFINITIONS);
+  iter = this->NewIterator(vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS);
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
@@ -1174,13 +1104,17 @@ void vtkPVProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
     }
   iter->Delete();
 }
+
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::LoadXMLDefinitionState(vtkSMMessage* msg)
+void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
 {
   // Init and local vars
   this->Internals->Clear();
   this->InternalsFlatten->Clear();
   vtkNew<vtkPVXMLParser> parser;
+
+  bool prev = this->TriggerNotificationEvent;
+  this->TriggerNotificationEvent = false;
 
   // Fill the definition with the content of the state
   int size = msg->ExtensionSize(ProxyDefinitionState::xml_definition_proxy);
@@ -1202,17 +1136,23 @@ void vtkPVProxyDefinitionManager::LoadXMLDefinitionState(vtkSMMessage* msg)
     this->AddCustomProxyDefinition( xmlDef->group().c_str(), xmlDef->name().c_str(),
                                     parser->GetRootElement());
     }
+
+  this->TriggerNotificationEvent = prev;
+  if (this->TriggerNotificationEvent)
+    {
+    this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+    }
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::OnPluginLoaded(
+void vtkSIProxyDefinitionManager::OnPluginLoaded(
   vtkObject*, unsigned long, void* calldata)
 {
   this->HandlePlugin(reinterpret_cast<vtkPVPlugin*>(calldata));
 }
 
 //---------------------------------------------------------------------------
-void vtkPVProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
+void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
 {
   vtkPVServerManagerPluginInterface* smplugin =
     dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
@@ -1227,7 +1167,7 @@ void vtkPVProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     }
 }
 //---------------------------------------------------------------------------
-bool vtkPVProxyDefinitionManager::HasDefinition( const char* groupName,
+bool vtkSIProxyDefinitionManager::HasDefinition( const char* groupName,
                                                  const char* proxyName)
 {
   return this->Internals->HasCustomDefinition(groupName, proxyName) ||
@@ -1239,7 +1179,7 @@ bool vtkPVProxyDefinitionManager::HasDefinition( const char* groupName,
 // into the correct si_class and attribute sets.
 // THIS CODE MUST BE REMOVED once InformationHelper have been removed from
 // legacy XML
-void vtkPVProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
+void vtkSIProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
 {
   vtkPVXMLElement* informationHelper = NULL;
 
@@ -1302,7 +1242,7 @@ void vtkPVProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
     }
 }
 //----------------------------------------------------------------------------
-vtkTypeUInt32 vtkPVProxyDefinitionManager::GetReservedGlobalID()
+vtkTypeUInt32 vtkSIProxyDefinitionManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID;
 }

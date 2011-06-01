@@ -21,6 +21,7 @@ int vtkSpyPlotIStream::ReadString(unsigned char* str, size_t len)
   return 1;
 }
 
+
 //-----------------------------------------------------------------------------
 int vtkSpyPlotIStream::ReadInt32s(int* val, int num)
 {
@@ -31,17 +32,9 @@ int vtkSpyPlotIStream::ReadInt32s(int* val, int num)
     return 0;
     }
   vtkByteSwap::SwapBERange(val, num);
-  /*
-    cout << " --- read [";
-    int cc;
-    for ( cc = 0; cc < num; cc ++ )
-    {
-    cout << " " << val[cc];
-    }
-    cout << " ]" << endl;
-  */
   return 1;
 }
+
 //-----------------------------------------------------------------------------
 int vtkSpyPlotIStream::ReadInt64s(vtkTypeInt64* val, int num)
 {
@@ -69,15 +62,6 @@ int vtkSpyPlotIStream::ReadDoubles(double* val, int num)
     return 0;
     }
   vtkByteSwap::SwapBERange(val, num);
-  /*
-    cout << " --- read [";
-    int cc;
-    for ( cc = 0; cc < num; cc ++ )
-    {
-    cout << " " << val[cc];
-    }
-    cout << " ]" << endl;
-  */
   return 1;
 }
 
@@ -99,7 +83,8 @@ vtkTypeInt64 vtkSpyPlotIStream::Tell()
 }
 
 void vtkSpyPlotIStream::SetStream(istream *ist)
-{
+{  
+  ist->rdbuf()->pubsetbuf(&(*this->FileBuffer),2097152);
   this->IStream = ist;
 }
 

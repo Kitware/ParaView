@@ -191,6 +191,9 @@ void pqPluginDialog::onRefresh()
 //----------------------------------------------------------------------------
 void pqPluginDialog::refresh()
 {
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+  pm->verifyPlugins();
+
   this->refreshLocal();
   this->refreshRemote();
 }
