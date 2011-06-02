@@ -227,7 +227,11 @@ int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
     //so whenever a file name is set we will reset UpdateFileCallCount to zero.
     //than the calls to updateFile in request data object and request information will
     //increment the counter and make sure the method doesn't execute more than twice
+
+    //When the file count is greater than two the only thing we have to do is handle
+    //changes to the temporal step, so we always call UpdateMetaData
     
+    this->UpdateMetaData(request,outputVector);
     return 1;
     }
   this->UpdateFileCallCount++;
