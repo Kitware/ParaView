@@ -608,20 +608,38 @@ int vtkSpyPlotRemoveBadGhostCells(
   */
   (void)* dataType;
   // skip some cell data.
+
+  //Performance analysis has shown that using ComputeCellId to be a bottleneck of the reader
+  //so we are going to replace the method with an incremental algorithm that will reduce the total 
+  //number of multiplications.
+  vtkIdType kOffset[2]={0,0},jOffset[2]={0,0};
+  vtkIdType realCellId=0,oldCellId=0;
+
   int xyz[3];
   int destXyz[3];
   DataType* dataPtr = static_cast<DataType*>(dataArray->GetVoidPointer(0));
   for (xyz[2] = realExtents[4], destXyz[2] = 0; 
        xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
     {
+    kOffset[0] = destXyz[2] * (realPtDims[1]-1);
+    kOffset[1] = xyz[2] * (ptDims[1]-1);
+
     for (xyz[1] = realExtents[2], destXyz[1] = 0;
          xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
       {
+      jOffset[0] = (kOffset[0] + destXyz[1]) * (realPtDims[0]-1);
+      jOffset[1] = (kOffset[1] + xyz[1]) * (ptDims[0]-1);
+
       for (xyz[0] = realExtents[0], destXyz[0] = 0;
            xyz[0] < realExtents[1]; ++xyz[0], ++destXyz[0])
         {
-        dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
-          dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+        realCellId = jOffset[0] + destXyz[0];
+        oldCellId = jOffset[1] + xyz[0];        
+        dataPtr[realCellId] = dataPtr[oldCellId];
+
+        //old slow way of calculating cell id
+        //dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
+        //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
         }
       }
     }
