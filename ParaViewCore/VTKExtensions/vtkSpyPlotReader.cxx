@@ -104,7 +104,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
-  this->FileNameChanged = true;
+  this->UpdateFileCallCount = 0;
 
   this->TimeRequestedFromPipeline = false;
 }
@@ -145,7 +145,7 @@ void vtkSpyPlotReader::SetFileName(const char* filename)
     {
     this->FileName = NULL;
     }
-  this->FileNameChanged = true;
+  this->UpdateFileCallCount = 0;
   this->Modified();
 }
 
@@ -217,16 +217,20 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
 int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
                                   vtkInformationVector* outputVector)
 {
-  if (!this->FileNameChanged )
+  if (this->UpdateFileCallCount >= 2)
     {
-    //if we haven't changed the file name we are looking at we don't need to
-    //reread the information header. This optimization saves loads of time
-    //as UpdateFile is called in RequestInfo and RequestDataObject, and those
-    //are called twice each to load the data. See bug #12166 for more info.
+    //We need to call UpdateFile twice once in RequestDataObject to set isAmr
+    //and a second time in RequestInformation so that the time information is properly set
+    //because of this design issue, these method should be refactored. But currently
+    //I don't know enough about spy plot to cleanly see a way to do this.
+
+    //so whenever a file name is set we will reset UpdateFileCallCount to zero.
+    //than the calls to updateFile in request data object and request information will
+    //increment the counter and make sure the method doesn't execute more than twice
+    
     return 1;
     }
-
-  this->FileNameChanged = false;
+  this->UpdateFileCallCount++;
 
   ifstream ifs(this->FileName);
   if(!ifs)
