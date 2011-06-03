@@ -165,6 +165,10 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     return this->Superclass::RequestData(request, inputVector, outputVector);
     }
 
+  this->ReductionFilter->Modified();
+  this->DeliveryFilter->Modified();
+  this->SelectionDeliveryFilter->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -220,9 +224,6 @@ bool vtkChartRepresentation::IsCached(double cache_key)
 //----------------------------------------------------------------------------
 void vtkChartRepresentation::MarkModified()
 {
-  this->ReductionFilter->Modified();
-  this->DeliveryFilter->Modified();
-  this->SelectionDeliveryFilter->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.
