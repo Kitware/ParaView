@@ -47,6 +47,9 @@
    <property name="text" >
     <string>Save &amp;Animation</string>
    </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionFileSaveData" >
    <property name="icon" >
@@ -58,10 +61,16 @@
    <property name="shortcut" >
     <string>Ctrl+S</string>
    </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionFileLoadServerState" >
    <property name="text" >
     <string>&amp;Load State</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionFileSaveServerState" >
@@ -72,6 +81,9 @@
   <action name="actionFileSaveGeometry" >
    <property name="text" >
     <string>Save &amp;Geometry</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionFileOpen" >
@@ -86,6 +98,9 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+O</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionFileExit" >

@@ -32,29 +32,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationManager.h"
 
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqServer.h"
-#include "pqView.h"
+#include "pqCoreUtilities.h"
 #include "pqPipelineSource.h"
-
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
 #include "vtkPVMultiClientsInformation.h"
-#include "vtkSMMessage.h"
-#include "vtkSMSession.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
+#include "vtkWeakPointer.h"
 
 #include <vtkstd/set>
-#include <vtkWeakPointer.h>
 
 // Qt includes.
+#include <QAction>
+#include <QEvent>
+#include <QMap>
+#include <QPointer>
+#include <QSignalMapper>
 #include <QtDebug>
 #include <QTimer>
-#include <QPointer>
-#include <QMap>
-#include <QSignalMapper>
+#include <QVariant>
+#include <QWidget>
 
-#define ReturnIfNotValidServer() \
+
+#define RETURN_IF_SERVER_NOT_VALID() \
         if(pqApplicationCore::instance()->getActiveServer() != this->Internals->server()) \
           {\
           cout << "Not same server" << endl;\
@@ -196,7 +201,7 @@ protected:
 };
 //***************************************************************************/
 pqCollaborationManager::pqCollaborationManager(QObject* parent) :
-  QObject(parent)
+  Superclass(parent)
 {
   this->Internals = new pqInternals(this);
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -218,6 +223,8 @@ pqCollaborationManager::pqCollaborationManager(QObject* parent) :
   QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
                     this,        SLOT(onChatMessage(int,QString&)));
 
+  QObject::connect(this, SIGNAL(triggeredMasterUser(int)),
+    this, SLOT(updateEnabledState()));
   core->registerManager("COLLABORATION_MANAGER", this);
 }
 
@@ -280,7 +287,7 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onTriggerRender(int viewId)
 {
-  ReturnIfNotValidServer();
+  RETURN_IF_SERVER_NOT_VALID();
   if(this->Internals->CanTriggerRender())
     {
     // Build message to notify other clients to trigger a render for the given view
@@ -295,7 +302,7 @@ void pqCollaborationManager::onTriggerRender(int viewId)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
 {
-  ReturnIfNotValidServer();
+  RETURN_IF_SERVER_NOT_VALID();
 
   // Broadcast to others only if its our message
   if(userId == this->Internals->CollaborationManager->GetUserId())
@@ -312,7 +319,7 @@ void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onInspectorSelectedTabChanged(int tabIndex)
 {
-  ReturnIfNotValidServer();
+  RETURN_IF_SERVER_NOT_VALID();
   vtkSMMessage activeTab;
   activeTab.SetExtension(QtEvent::type, QtEvent::INSPECTOR_TAB);
   // We use proxyId as holder of tab index
@@ -329,7 +336,7 @@ vtkSMCollaborationManager* pqCollaborationManager::collaborationManager()
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::addCollaborationEventManagement(pqView* view)
 {
-  ReturnIfNotValidServer();
+  RETURN_IF_SERVER_NOT_VALID();
   this->viewsSignalMapper->setMapping(view, view->getProxy()->GetGlobalID());
   QObject::connect(view, SIGNAL(endRender()), this->viewsSignalMapper, SLOT(map()));
 }
@@ -337,7 +344,7 @@ void pqCollaborationManager::addCollaborationEventManagement(pqView* view)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::removeCollaborationEventManagement(pqView* view)
 {
-  ReturnIfNotValidServer();
+  RETURN_IF_SERVER_NOT_VALID();
   QObject::disconnect(view, SIGNAL(endRender()), this->viewsSignalMapper, SLOT(map()));
 }
 
@@ -345,7 +352,9 @@ void pqCollaborationManager::removeCollaborationEventManagement(pqView* view)
 void pqCollaborationManager::setServer(pqServer* server)
 {
   this->Internals->setServer(server);
+  this->updateEnabledState();
 }
+
 //-----------------------------------------------------------------------------
 pqServer* pqCollaborationManager::server()
 {
@@ -360,5 +369,51 @@ void pqCollaborationManager::render()
     this->Internals->StartRendering();
     view->forceRender();
     this->Internals->StopRendering();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::updateEnabledState()
+{
+  bool enabled = this->collaborationManager()->IsMaster();
+  QWidget* mainWidget = pqCoreUtilities::mainWidget();
+  foreach (QWidget* wdg, mainWidget->findChildren<QWidget*>())
+    {
+    QVariant val = wdg->property("PV_MUST_BE_MASTER");
+    if (val.isValid() && val.toBool())
+      {
+      wdg->setEnabled(enabled);
+      }
+    val = wdg->property("PV_MUST_BE_MASTER_TO_SHOW");
+    if (val.isValid() && val.toBool())
+      {
+      wdg->setVisible(enabled);
+      }
+    }
+  foreach (QAction* actn, mainWidget->findChildren<QAction*>())
+    {
+    // some actions are hidden, if the process is not a master.
+    QVariant val = actn->property("PV_MUST_BE_MASTER_TO_SHOW");
+    if (val.isValid() && val.toBool())
+      {
+      actn->setVisible(enabled);
+      }
+    // some other actions are merely 'blocked", if the process is not a master.
+    // We don't use the enable/disable mechanism for actions, since most actions
+    // are have their enabled state updated by logic that will need to be made
+    // "collaboration aware" if we go that route. Instead, we install an event
+    // filter that eats away clicks, instead.
+
+    // Currently I cannot figure out how to do this. Event filters don't work on
+    // Actions. There's no means of disabling action-activations besides marking
+    // them disabled or hidden, it seems. block-signals seems to be the
+    // crappiest way out of this. The problem is used has no indication with
+    // block-signals that the action is not allowed in collaboration-mode. So
+    // we'll stay away from it.
+    val = actn->property("PV_MUST_BE_MASTER");
+    if (val.isValid() && val.toBool())
+      {
+      actn->blockSignals(!enabled);
+      }
     }
 }

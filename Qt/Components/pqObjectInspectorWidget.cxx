@@ -204,6 +204,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
 {
   this->setObjectName("objectInspector");
+  this->setProperty("PV_MUST_BE_MASTER", true);
 
   this->CurrentPanel = 0;
   this->ShowOnAccept = false;

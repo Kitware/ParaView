@@ -55,6 +55,7 @@ class QSignalMapper;
 class PQCORE_EXPORT pqCollaborationManager : public  QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:  
   pqCollaborationManager(QObject* parent);
   virtual ~pqCollaborationManager();
@@ -115,6 +116,13 @@ private slots:
 
   /// This will call force render on all the renderer that needs to be rendered
   void render();
+
+  /// updates the enabled-state for application wide widgets and actions based
+  /// whether the application is a master or not.
+  /// Widget/Actions need to set a dynamic property named PV_MUST_BE_MASTER or
+  /// PV_MUST_BE_MASTER_TO_SHOW. Only the state for widgets/actions with these
+  /// any of properties will be updated by this method.
+  void updateEnabledState();
 
 private:
   pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.
