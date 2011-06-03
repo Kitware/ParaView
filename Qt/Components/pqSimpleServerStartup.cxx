@@ -750,8 +750,7 @@ void pqSimpleServerStartup::startConnection()
     this->Implementation->Startup,
     SIGNAL(succeeded()),
     this,
-    SLOT(connectServer()),
-    Qt::QueuedConnection);
+    SLOT(connectServer()));
 
   QObject::connect(
     this->Implementation->StartupDialog, SIGNAL(rejected()),
