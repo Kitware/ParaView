@@ -82,6 +82,7 @@
       <IntVectorProperty name="UseOffscreenRendering"
         command="SetUseOffscreenRendering"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>

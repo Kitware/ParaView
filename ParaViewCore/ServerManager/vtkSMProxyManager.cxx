@@ -312,8 +312,11 @@ void vtkSMProxyManager::UpdateFromRemote()
         vtkNew<vtkSMDeserializerProtobuf> deserializer;
         deserializer->SetStateLocator(this->Session->GetStateLocator()->GetParentLocator());
         deserializer->SetSession(this->Session);
+
         vtkNew<vtkSMProxyLocator> serverLocator;
         serverLocator->SetDeserializer(deserializer.GetPointer());
+        serverLocator->UseSessionToLocateProxy(true);
+        serverLocator->SetSession(this->Session);
 
         // Load and update
         vtkSMProxyProperty::EnableProxyCreation();
