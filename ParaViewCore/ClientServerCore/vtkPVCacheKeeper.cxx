@@ -70,8 +70,6 @@ vtkPVCacheKeeper::~vtkPVCacheKeeper()
 //----------------------------------------------------------------------------
 void vtkPVCacheKeeper::RemoveAllCaches()
 {
-  bool something_removed = this->Cache->size() > 0;
-
   // cout << this << " RemoveAllCaches" << endl;
   unsigned long freed_size = this->Cache->GetActualMemorySize();
   this->Cache->clear();
@@ -80,10 +78,8 @@ void vtkPVCacheKeeper::RemoveAllCaches()
     // Tell the cache size keeper about the newly freed memory size.
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
     }
-  if (something_removed)
-    {
-    this->Modified();
-    }
+
+  // this method should never mark the filter modified !!!
 }
 
 //----------------------------------------------------------------------------

@@ -15,17 +15,17 @@
 #include "vtkSMWriterFactory.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
-#include "vtkPVProxyDefinitionManager.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>

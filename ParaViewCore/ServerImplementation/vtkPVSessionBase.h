@@ -29,9 +29,8 @@ class vtkClientServerStream;
 class vtkCollection;
 class vtkSIObject;
 class vtkPVInformation;
-class vtkPVMultiClientsInformation;
-class vtkPVProxyDefinitionManager;
 class vtkPVServerInformation;
+class vtkSIProxyDefinitionManager;
 class vtkPVSessionCore;
 
 class VTK_EXPORT vtkPVSessionBase : public vtkPVSession
@@ -111,7 +110,7 @@ public:
 
   // Description:
   // Get the ProxyDefinitionManager.
-  vtkPVProxyDefinitionManager* GetProxyDefinitionManager();
+  vtkSIProxyDefinitionManager* GetProxyDefinitionManager();
 
   // Description:
   // Returns a vtkSIObject or subclass given its global id, if any.

@@ -51,6 +51,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->Internals = new vtkInternals();
   this->DefaultMapper = vtkFixedPointVolumeRayCastMapper::New();
   this->Property = vtkVolumeProperty::New();
+
   this->Actor = vtkPVLODVolume::New();
   this->Actor->SetProperty(this->Property);
 
@@ -335,4 +336,34 @@ void vtkImageVolumeRepresentation::SetScalarOpacity(vtkPiecewiseFunction* pwf)
 void vtkImageVolumeRepresentation::SetScalarOpacityUnitDistance(double val)
 {
   this->Property->SetScalarOpacityUnitDistance(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetAmbient(double val)
+{
+  this->Property->SetAmbient(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetDiffuse(double val)
+{
+  this->Property->SetDiffuse(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetSpecular(double val)
+{
+  this->Property->SetSpecular(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetSpecularPower(double val)
+{
+  this->Property->SetSpecularPower(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetShade(bool val)
+{
+  this->Property->SetShade(val);
 }

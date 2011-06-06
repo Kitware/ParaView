@@ -100,6 +100,7 @@ SET (Kit_SRCS
   vtkSMProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
+  vtkSMProxyDefinitionManager.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx

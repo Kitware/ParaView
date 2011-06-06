@@ -32,14 +32,13 @@ class vtkClientServerStream;
 class vtkCollection;
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
-class vtkSIObject;
 class vtkPVInformation;
-class vtkPVProxyDefinitionManager;
+class vtkSIObject;
+class vtkSIProxyDefinitionManager;
 
 class VTK_EXPORT vtkPVSessionCore : public vtkObject
 {
 public:
-  static vtkTypeUInt32 GetReservedGlobalID();
   static vtkPVSessionCore* New();
   vtkTypeMacro(vtkPVSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -51,7 +50,7 @@ public:
 
   // Description:
   // Provides access to the proxy definition manager.
-  vtkGetObjectMacro(ProxyDefinitionManager, vtkPVProxyDefinitionManager);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkSIProxyDefinitionManager);
 
   // Description:
   // Push the state message.
@@ -135,10 +134,6 @@ public:
 
 //BTX
 
-  // Description:
-  // Return the first Id of the requested chunk inside a vtkSMMessage
-  virtual void GetNextChunkGID(vtkSMMessage* chunkRequest);
-
   enum MessageTypes
     {
     PUSH_STATE         = 12,
@@ -200,7 +195,7 @@ protected:
     ROOT_SATELLITE_INFO_TAG = 887823
     };
 
-  vtkPVProxyDefinitionManager* ProxyDefinitionManager;
+  vtkSIProxyDefinitionManager* ProxyDefinitionManager;
   vtkWeakPointer<vtkMultiProcessController> ParallelController;
   vtkClientServerInterpreter* Interpreter;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;

@@ -39,6 +39,7 @@ public:
 
   vtkSIObject* GetSIObject(vtkTypeUInt32 gid);
   vtkObjectBase* GetVTKObject(vtkTypeUInt32 gid);
+  vtkTypeUInt32 GetNextGlobalIdChunk(vtkTypeUInt32 chunkSize);
 
   vtkProcessModule* GetProcessModule();
   vtkPVProgressHandler* GetActiveProgressHandler();

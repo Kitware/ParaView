@@ -104,6 +104,13 @@ public:
   void beginRemoveServer(pqServer *server);
   void endRemoveServer();
 
+  /// This method to called by any code that's requesting ServerManager to
+  /// create a new connection (viz. pqObjectBuilder) to set the resource to be
+  /// used for the newly create pqServer instance. The active resource is
+  /// automatically cleared one a new pqServer instance is created. Refer to
+  /// pqObjectBuilder::createServer for details.
+  void setActiveResource(const pqServerResource& resource);
+
   /// Given a proxy, locates a pqServerManagerModelItem subclass for the given 
   /// proxy.
   template<class T>

@@ -892,6 +892,10 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       this->removeServer(smModel->getItemAtIndex<pqServer*>(0));
       }
 
+    // Let the pqServerManagerModel know the resource to use for the connection
+    // to be created.
+    smModel->setActiveResource(resource);
+
     // Based on the server resource, create the correct type of server ...
     vtkIdType id = 0;
     if (server_resource.scheme() == "builtin")
@@ -934,7 +938,6 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
     if (id != 0)
       {
       server = smModel->findServer(id);
-      server->setResource(server_resource);
 
       // Make sure the new session get the undostack
       pqApplicationCore* core = pqApplicationCore::instance();

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkPVProxyDefinitionIterator.h"
 
 #include "vtkSmartPointer.h"
@@ -627,13 +627,13 @@ void pqProxyGroupMenuManager::addProxyDefinitionUpdateObservers()
 
   // Regular proxy
   unsigned long callbackID = pxm->AddObserver(
-      vtkPVProxyDefinitionManager::ProxyDefinitionsUpdated,
+      vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
       this, &pqProxyGroupMenuManager::lookForNewDefinitions);
   this->Internal->CallBackIDs.insert(callbackID);
 
   // compound proxy
   callbackID = pxm->AddObserver(
-      vtkPVProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+      vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
       this, &pqProxyGroupMenuManager::lookForNewDefinitions);
   this->Internal->CallBackIDs.insert(callbackID);
 
@@ -646,16 +646,17 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
 {
   // Look inside the group name that are tracked
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkPVProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
+  vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
 
-  if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxdm == NULL)
+  if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxdm == NULL ||
+    pxdm->GetSession() == NULL)
     {
     return; // Nothing to look into...
     }
 
   // Setup definition iterator
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
-  iter.TakeReference(pxdm->NewIterator(vtkPVProxyDefinitionManager::ALL_DEFINITIONS));
+  iter.TakeReference(pxdm->NewIterator());
   foreach(QString groupName, this->Internal->ProxyDefinitionGroupToListen)
     {
     iter->AddTraversalGroupName(groupName.toAscii().data());

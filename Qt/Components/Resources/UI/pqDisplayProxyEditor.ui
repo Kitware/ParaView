@@ -610,9 +610,9 @@
         </property>
        </spacer>
       </item>
-      <item row="8" column="0" >
-       <widget class="QLabel" name="label_19" >
-        <property name="text" >
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
          <string>Volume mapper</string>
         </property>
        </widget>
@@ -680,6 +680,22 @@
       <string>Volume</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="Shading">
+        <property name="toolTip">
+         <string>When checked, shading is enabled.</string>
+        </property>
+        <property name="statusTip">
+         <string>When checked, shading is enabled.</string>
+        </property>
+        <property name="whatsThis">
+         <string>When checked, shading is enabled.</string>
+        </property>
+        <property name="text">
+         <string>Enable Shading</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QCheckBox" name="AutoAdjustSampleDistances">
         <property name="text">

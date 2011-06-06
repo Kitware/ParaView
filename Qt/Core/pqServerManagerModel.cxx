@@ -73,6 +73,8 @@ public:
   OutputPortMap OutputPorts;
 
   QList<QPointer<pqServerManagerModelItem> > ItemList;
+
+  pqServerResource ActiveResource;
 };
 
 //-----------------------------------------------------------------------------
@@ -113,6 +115,12 @@ pqServerManagerModel::~pqServerManagerModel()
     }
 
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::setActiveResource(const pqServerResource& resource)
+{
+  this->Internal->ActiveResource = resource;
 }
 
 //-----------------------------------------------------------------------------
@@ -475,6 +483,8 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqServer* server = new pqServer(id, pm->GetOptions(), this);
+  server->setResource(this->Internal->ActiveResource);
+  this->Internal->ActiveResource = pqServerResource();
 
   emit this->preItemAdded(server);
   emit this->preServerAdded(server);

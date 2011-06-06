@@ -701,17 +701,11 @@ protected:
 // </code>
 // Will result in calling the vtkSIProxy::MethodName() when the stream in
 // interpreted.
-class VTK_EXPORT SIPROXY
+class VTK_EXPORT SIPROXY : public SIOBJECT
 {
-  vtkSMProxy* Reference;
-  friend VTK_EXPORT vtkClientServerStream& operator<<(
-    vtkClientServerStream& stream, const SIPROXY& manipulator);
 public:
-  SIPROXY(vtkSMProxy* proxy) : Reference(proxy) {}
+  SIPROXY(vtkSMProxy* proxy) : SIOBJECT (proxy) { }
 };
-
-VTK_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
-  const SIPROXY& manipulator);
 
 // This defines a manipulator for the vtkClientServerStream that can be used on
 // the to indicate to the interpreter that the placeholder is to be replaced by

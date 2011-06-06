@@ -421,19 +421,27 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
         all_requirements_are_met = false;
         iter->StatusMessage = "Must be loaded on Server as well";
         }
+      else
+        {
+        iter->StatusMessage = "";
+        }
       }
     }
 
   for (iter = server_plugins->Internals->begin();
     iter != server_plugins->Internals->end(); ++iter)
     {
-    if (iter->RequiredOnServer)
+    if (iter->RequiredOnClient)
       {
       vtkstd::set<vtkItem, vtkItem>::iterator iter2 = client_set.find(*iter);
       if (iter2 == client_set.end() || iter2->Loaded == false)
         {
         all_requirements_are_met = false;
         iter->StatusMessage = "Must be loaded on Client as well";
+        }
+      else
+        {
+        iter->StatusMessage = "";
         }
       }
     }

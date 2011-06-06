@@ -1388,6 +1388,7 @@
           <Property name="BlendMode"/>
           <Property name="AutoAdjustSampleDistances"/>
           <Property name="SampleDistance"/>
+          <Property name="Shade"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -1780,6 +1781,44 @@
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <DoubleVectorProperty name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SpecularPower"
+        command="SetSpecularPower"
+        number_of_elements="1"
+        default_values="100.0">
+        <DoubleRangeDomain name="range" min="0" max="100" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Shade"
+        command="SetShade"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable shading.
+        </Documentation>
+      </IntVectorProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
         command="SetScalarOpacity">

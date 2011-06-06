@@ -69,7 +69,7 @@ vtkPVSessionBase::~vtkPVSessionBase()
 }
 
 //----------------------------------------------------------------------------
-vtkPVProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
+vtkSIProxyDefinitionManager* vtkPVSessionBase::GetProxyDefinitionManager()
 {
   return this->SessionCore->GetProxyDefinitionManager();
 }
@@ -269,18 +269,16 @@ vtkTypeUInt32 vtkPVSessionBase::GetNextGlobalUniqueIdentifier()
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkPVSessionBase::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize)
 {
-  // The DATA_SERVER_ROOT is the ONLY owner of the counter
-  vtkSMMessage request;
-  request.set_global_id(this->SessionCore->GetReservedGlobalID());
-  request.set_location(vtkPVSession::DATA_SERVER_ROOT);
-  Variant* var = request.AddExtension(PullRequest::arguments);
-  var->add_idtype(chunkSize);
-  var->set_type(Variant_Type_IDTYPE);
-
-  // Make the request
-  this->PullState(&request);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+      << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
+      << "GetNextGlobalIdChunk"
+      << chunkSize
+      << vtkClientServerStream::End;
+  this->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream);
 
   // Extract the first id of the new chunk
-  vtkTypeUInt32 id = request.GetExtension(PullRequest::arguments,0).idtype(0);
+  vtkTypeUInt32 id;
+  this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT).GetArgument(0,0, &id);
   return id;
 }

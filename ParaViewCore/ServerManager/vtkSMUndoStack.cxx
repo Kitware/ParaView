@@ -51,6 +51,7 @@ vtkSMUndoStack::~vtkSMUndoStack()
 void vtkSMUndoStack::Push(const char* label, vtkUndoSet* changeSet)
 {
   this->Superclass::Push(label, changeSet);
+  this->InvokeEvent(PushUndoSetEvent, changeSet);
 }
 
 //-----------------------------------------------------------------------------

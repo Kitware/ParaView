@@ -32,7 +32,7 @@
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkPVSessionCoreInterpreterHelper.h"
 #include "vtkSmartPointer.h"
 
@@ -222,8 +222,6 @@ vtkPVSessionCore::vtkPVSessionCore()
       this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
   observer->Delete();
 
-  this->ProxyDefinitionManager = vtkPVProxyDefinitionManager::New();
-
   this->ParallelController = vtkMultiProcessController::GetGlobalController();
   if (this->ParallelController &&
     this->ParallelController->GetLocalProcessId() > 0)
@@ -252,6 +250,14 @@ vtkPVSessionCore::vtkPVSessionCore()
     this->SymmetricMPIMode =
       vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode();
     }
+
+  // Setup some global/reserved SIObjects.
+  this->ProxyDefinitionManager = vtkSIProxyDefinitionManager::New();
+  this->ProxyDefinitionManager->SetGlobalID(
+    vtkSIProxyDefinitionManager::GetReservedGlobalID());
+  this->ProxyDefinitionManager->Initialize(this);
+  this->Internals->SIObjectMap[
+    this->ProxyDefinitionManager->GetGlobalID()] = this->ProxyDefinitionManager;
 }
 
 //----------------------------------------------------------------------------
@@ -276,11 +282,12 @@ vtkPVSessionCore::~vtkPVSessionCore()
     this->ParallelController->TriggerBreakRMIs();
     }
 
+  this->ProxyDefinitionManager->Delete();
+  this->ProxyDefinitionManager = NULL;
+
   // Clean local refs
   delete this->Internals;
   this->Internals = NULL;
-  this->ProxyDefinitionManager->Delete();
-  this->ProxyDefinitionManager = NULL;
 
   this->SetMPIMToNSocketConnection(NULL);
 }
@@ -352,18 +359,6 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
 
   vtkTypeUInt32 globalId = message->global_id();
 
-  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-    {
-    // Update custom definition
-    this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
-    return;
-    }
-  else if(globalId == this->GetReservedGlobalID())
-    {
-    return;
-    }
-
   // Standard management of SIObject ---------------------------------------
 
   // When the control reaches here, we are assured that the SIObject needs be
@@ -371,6 +366,12 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
   vtkSIObject* obj = this->Internals->GetSIObject(globalId);
   if (!obj)
     {
+    if ( globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS &&
+         !message->HasExtension(DefinitionHeader::server_class) )
+      {
+      return;
+      }
+
     if (!message->HasExtension(DefinitionHeader::server_class))
       {
       vtkErrorMacro("Message missing DefinitionHeader."
@@ -495,25 +496,15 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
     << "----------------------------------------------------------------\n"
     << message->DebugString().c_str());
 
-  vtkSIObject* obj;
-  vtkTypeUInt32 globalId = message->global_id();
-
-  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  // Special ParaView specific main components
-  if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-    {
-    // Update custom definition
-    this->ProxyDefinitionManager->GetXMLDefinitionState(message);
-    }
-  else if(globalId == this->GetReservedGlobalID())
-    {
-    // Update chunks of GlobalID
-    this->GetNextChunkGID(message);
-    }
-  else if ( (obj = this->Internals->GetSIObject(message->global_id())) )
+  vtkSIObject* obj = this->Internals->GetSIObject(message->global_id());
+  if (obj != NULL)
     {
     // Generic SIObject
     obj->Pull(message);
+    }
+  else
+    {
+    LOG(<< "**** No such object located\n");
     }
 
   LOG(
@@ -876,17 +867,6 @@ const vtkClientServerStream& vtkPVSessionCore::GetLastResult()
   return this->Interpreter->GetLastResult();
 }
 //----------------------------------------------------------------------------
-void vtkPVSessionCore::GetNextChunkGID(vtkSMMessage* chunkRequest)
-{
-  vtkTypeUInt32 chunkSizeRequest =
-      chunkRequest->GetExtension(PullRequest::arguments,0).idtype(0);
-
-  chunkRequest->ClearExtension(PullRequest::arguments);
-  Variant* var = chunkRequest->AddExtension(PullRequest::arguments);
-  var->add_idtype(this->GetNextChunkGlobalUniqueIdentifier(chunkSizeRequest));
-  var->set_type(Variant_Type_IDTYPE);
-}
-//----------------------------------------------------------------------------
 vtkTypeUInt32 vtkPVSessionCore::GetNextGlobalUniqueIdentifier()
 {
   ++this->LocalGlobalID;
@@ -898,9 +878,4 @@ vtkTypeUInt32 vtkPVSessionCore::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32
   vtkTypeUInt32 firstChunkId = this->LocalGlobalID + 1;
   this->LocalGlobalID += chunkSize;
   return firstChunkId;
-}
-//----------------------------------------------------------------------------
-vtkTypeUInt32 vtkPVSessionCore::GetReservedGlobalID()
-{
-  return vtkReservedRemoteObjectIds::RESERVED_ID_COUNTER_ID;
 }

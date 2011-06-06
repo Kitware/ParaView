@@ -280,7 +280,6 @@ void vtkDataLabelRepresentation::SetCellLabelFormat(const char* format)
 //----------------------------------------------------------------------------
 void vtkDataLabelRepresentation::MarkModified()
 {
-  this->DataCollector->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.
@@ -335,6 +334,8 @@ bool vtkDataLabelRepresentation::RemoveFromView(vtkView* view)
 int vtkDataLabelRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  this->DataCollector->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());

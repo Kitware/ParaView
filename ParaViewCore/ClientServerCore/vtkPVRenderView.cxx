@@ -449,7 +449,7 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
       {
       int propid = node->GetProperties()->Get(vtkSelectionNode::PROP_ID());
       vtkProp* prop = this->Selector->GetPropFromID(propid);
-      node->SetSelectedProp(prop);
+      node->GetProperties()->Set(vtkSelectionNode::PROP(), prop);
       }
     }
 

@@ -76,8 +76,8 @@ public:
 
   // Description:
   // Get and set the file name. It is either the name of the case file or the
-  // name of the single binary file.
-  vtkSetStringMacro(FileName);
+  // name of the single binary file.  
+  virtual void SetFileName(const char* filename);
   vtkGetStringMacro(FileName);
 
   // Description:
@@ -355,6 +355,8 @@ protected:
   bool TimeRequestedFromPipeline;
 
   int MergeXYZComponents;
+
+  int UpdateFileCallCount;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.

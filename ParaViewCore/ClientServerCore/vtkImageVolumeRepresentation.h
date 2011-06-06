@@ -108,6 +108,11 @@ public:
   void SetColor(vtkColorTransferFunction* lut);
   void SetScalarOpacity(vtkPiecewiseFunction* pwf);
   void SetScalarOpacityUnitDistance(double val);
+  void SetAmbient(double);
+  void SetDiffuse(double);
+  void SetSpecular(double);
+  void SetSpecularPower(double);
+  void SetShade(bool);
 
 //BTX
 protected:

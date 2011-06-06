@@ -4,6 +4,10 @@
   c = classname::New(); c->Print(cout); c->Delete();
 
 #include "vtkSIArraySelectionProperty.h"
+#include "vtkPVSessionBase.h"
+#include "vtkPVSessionCore.h"
+#include "vtkPVSessionCoreInterpreterHelper.h"
+#include "vtkPVSessionServer.h"
 #include "vtkSIChartRepresentationProxy.h"
 #include "vtkSICompoundSourceProxy.h"
 #include "vtkSIContextArraysProperty.h"
@@ -15,13 +19,14 @@
 #include "vtkSIInputProperty.h"
 #include "vtkSIIntVectorProperty.h"
 #include "vtkSIObject.h"
-#include "vtkSIPVRepresentationProxy.h"
 #include "vtkSIProperty.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSIProxy.h"
 #include "vtkSIProxyProperty.h"
-#include "vtkSISILProperty.h"
+#include "vtkSIPVRepresentationProxy.h"
 #include "vtkSIScalarBarActorProxy.h"
 #include "vtkSISelectionRepresentationProxy.h"
+#include "vtkSISILProperty.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSIStringVectorProperty.h"
 #include "vtkSITextSourceRepresentationProxy.h"
@@ -33,11 +38,6 @@
 #include "vtkSIWriterProxy.h"
 #include "vtkSIXMLAnimationWriterRepresentationProperty.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionManager.h"
-#include "vtkPVSessionBase.h"
-#include "vtkPVSessionCore.h"
-#include "vtkPVSessionCoreInterpreterHelper.h"
-#include "vtkPVSessionServer.h"
 
 
 int main(int, char**)
@@ -73,7 +73,7 @@ int main(int, char**)
   PRINT_SELF(vtkSIWriterProxy);
   PRINT_SELF(vtkSIXMLAnimationWriterRepresentationProperty);
   //PRINT_SELF(vtkSMMessage);
-  PRINT_SELF(vtkPVProxyDefinitionManager);
+  PRINT_SELF(vtkSIProxyDefinitionManager);
   PRINT_SELF(vtkPVSessionBase);
   PRINT_SELF(vtkPVSessionCore);
   PRINT_SELF(vtkPVSessionCoreInterpreterHelper);

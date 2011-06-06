@@ -71,6 +71,12 @@ public:
   virtual int Redo();
 
 //BTX
+
+  enum EventIds
+    {
+    PushUndoSetEvent = 1987
+    };
+
 protected:
   vtkSMUndoStack();
   ~vtkSMUndoStack();

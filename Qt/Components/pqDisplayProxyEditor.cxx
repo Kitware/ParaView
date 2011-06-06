@@ -609,6 +609,18 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       "checked", SIGNAL(toggled(bool)),
       reprProxy, reprProxy->GetProperty("AutoAdjustSampleDistances"));
     }
+  if (reprProxy->GetProperty("Shade"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->Shading,
+      "checked", SIGNAL(toggled(bool)),
+      reprProxy, reprProxy->GetProperty("Shade"));
+    this->Internal->Shading->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->Shading->setEnabled(false);
+    }
+
 }
 
 //-----------------------------------------------------------------------------

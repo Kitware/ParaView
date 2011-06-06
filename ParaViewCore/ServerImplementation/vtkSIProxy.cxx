@@ -24,7 +24,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkPVSessionCore.h"
 
 #include <vtkstd/map>
@@ -236,7 +236,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
     }
 }
 //----------------------------------------------------------------------------
-vtkPVProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
+vtkSIProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 {
   if (this->SessionCore)
     {
@@ -290,11 +290,13 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
       message->HasExtension(ProxyState::xml_sub_proxy_name) ?
       message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() : NULL);
 
-  vtkPVProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
-  vtkPVXMLElement* element =
-      pdm->GetCollapsedProxyDefinition( this->XMLGroup,
-                                        this->XMLName,
-                                        this->XMLSubProxyName);
+  vtkSIProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
+  vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
+    message->GetExtension(ProxyState::xml_group).c_str(),
+    message->GetExtension(ProxyState::xml_name).c_str(),
+    (message->HasExtension(ProxyState::xml_sub_proxy_name) ?
+     message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() :
+     NULL));
 
   if (!element)
     {
@@ -466,7 +468,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   assert(!name.empty() && this->GetSIProperty(name.c_str()) == NULL);
 
   // Patch XML to remove InformationHelper and set right si_class
-  vtkPVProxyDefinitionManager::PatchXMLProperty(propElement);
+  vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkSmartPointer<vtkObject> object;
   vtkstd::string classname;

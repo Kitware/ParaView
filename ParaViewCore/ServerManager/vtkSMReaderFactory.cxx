@@ -17,12 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkPVProxyDefinitionIterator.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -299,7 +299,7 @@ void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
 {
   vtkSMProxyManager* pxm = this->Internals->GetProxyManager();
   vtkPVProxyDefinitionIterator* iter;
-  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup, 0);
+  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkPVXMLElement* hints = pxm->GetProxyHints( iter->GetGroupName(),
