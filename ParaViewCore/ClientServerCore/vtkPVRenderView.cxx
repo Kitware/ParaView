@@ -561,6 +561,9 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
+  // essential to ensure that all representations are up-dated.
+  this->Update();
+
   // Do all passes needed for rendering so that the geometry in the renderer is
   // updated. This is essential since the bounds are determined by using the
   // geometry bounds know to the renders on all processes. If they are not
