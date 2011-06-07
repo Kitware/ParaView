@@ -104,7 +104,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
-  this->FileNameChanged = true;
+  this->UpdateFileCallCount = 0;
 
   this->TimeRequestedFromPipeline = false;
 }
@@ -145,7 +145,7 @@ void vtkSpyPlotReader::SetFileName(const char* filename)
     {
     this->FileName = NULL;
     }
-  this->FileNameChanged = true;
+  this->UpdateFileCallCount = 0;
   this->Modified();
 }
 
@@ -217,16 +217,24 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
 int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
                                   vtkInformationVector* outputVector)
 {
-  if (!this->FileNameChanged )
+  if (this->UpdateFileCallCount >= 2)
     {
-    //if we haven't changed the file name we are looking at we don't need to
-    //reread the information header. This optimization saves loads of time
-    //as UpdateFile is called in RequestInfo and RequestDataObject, and those
-    //are called twice each to load the data. See bug #12166 for more info.
+    //We need to call UpdateFile twice once in RequestDataObject to set isAmr
+    //and a second time in RequestInformation so that the time information is properly set
+    //because of this design issue, these method should be refactored. But currently
+    //I don't know enough about spy plot to cleanly see a way to do this.
+
+    //so whenever a file name is set we will reset UpdateFileCallCount to zero.
+    //than the calls to updateFile in request data object and request information will
+    //increment the counter and make sure the method doesn't execute more than twice
+
+    //When the file count is greater than two the only thing we have to do is handle
+    //changes to the temporal step, so we always call UpdateMetaData
+    
+    this->UpdateMetaData(request,outputVector);
     return 1;
     }
-
-  this->FileNameChanged = false;
+  this->UpdateFileCallCount++;
 
   ifstream ifs(this->FileName);
   if(!ifs)
@@ -600,20 +608,38 @@ int vtkSpyPlotRemoveBadGhostCells(
   */
   (void)* dataType;
   // skip some cell data.
+
+  //Performance analysis has shown that using ComputeCellId to be a bottleneck of the reader
+  //so we are going to replace the method with an incremental algorithm that will reduce the total 
+  //number of multiplications.
+  vtkIdType kOffset[2]={0,0},jOffset[2]={0,0};
+  vtkIdType realCellId=0,oldCellId=0;
+
   int xyz[3];
   int destXyz[3];
   DataType* dataPtr = static_cast<DataType*>(dataArray->GetVoidPointer(0));
   for (xyz[2] = realExtents[4], destXyz[2] = 0; 
        xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
     {
+    kOffset[0] = destXyz[2] * (realPtDims[1]-1);
+    kOffset[1] = xyz[2] * (ptDims[1]-1);
+
     for (xyz[1] = realExtents[2], destXyz[1] = 0;
          xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
       {
+      jOffset[0] = (kOffset[0] + destXyz[1]) * (realPtDims[0]-1);
+      jOffset[1] = (kOffset[1] + xyz[1]) * (ptDims[0]-1);
+
       for (xyz[0] = realExtents[0], destXyz[0] = 0;
            xyz[0] < realExtents[1]; ++xyz[0], ++destXyz[0])
         {
-        dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
-          dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+        realCellId = jOffset[0] + destXyz[0];
+        oldCellId = jOffset[1] + xyz[0];        
+        dataPtr[realCellId] = dataPtr[oldCellId];
+
+        //old slow way of calculating cell id
+        //dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
+        //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
         }
       }
     }

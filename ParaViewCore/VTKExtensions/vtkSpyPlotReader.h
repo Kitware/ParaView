@@ -356,7 +356,7 @@ protected:
 
   int MergeXYZComponents;
 
-  bool FileNameChanged;
+  int UpdateFileCallCount;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
