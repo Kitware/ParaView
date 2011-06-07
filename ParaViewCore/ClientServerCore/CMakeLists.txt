@@ -34,9 +34,10 @@ SET (Kit_SRCS
   vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
+  vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkMPIMoveData.cxx
+  vtkMultiClientMPIMoveData.cxx
   vtkNetworkAccessManager.cxx
   vtkNetworkImageSource.cxx
   vtkOutlineRepresentation.cxx
