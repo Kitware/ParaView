@@ -180,6 +180,9 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
         if(userName != collab->GetUserLabel(id))
           {
           collab->SetUserLabel(id, userName.toAscii().data());
+
+          // Expand table column
+          this->Internal->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
           }
         }
       }
@@ -344,6 +347,7 @@ void pqCollaborationPanel::onUserUpdate()
     this->Internal->members->setItem(cc, 2, item);
     }
 
+  // Expand table column
   this->Internal->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
 }
 //-----------------------------------------------------------------------------
@@ -375,6 +379,8 @@ void pqCollaborationPanel::connectLocalSlots()
     if(parentWidget)
       {
       parentWidget->toggleViewAction()->setEnabled(true);
+      QObject::connect( parentWidget, SIGNAL(visibilityChanged(bool)),
+                        this,         SLOT(onUserUpdate()));
       }
     }
   else
@@ -410,6 +416,13 @@ void pqCollaborationPanel::disconnectLocalSlots()
 
     QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
                          this,   SLOT(onNewMaster(int)));
+
+    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentWidget)
+      {
+      QObject::disconnect( parentWidget, SIGNAL(visibilityChanged(bool)),
+                           this,         SLOT(onUserUpdate()));
+      }
     }
 }
 //-----------------------------------------------------------------------------
