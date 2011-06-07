@@ -32,7 +32,7 @@
 
 #include "vtkPassInputTypeAlgorithm.h"
 
-class vtkMPIMoveData;
+class vtkMultiClientMPIMoveData;
 
 class VTK_EXPORT vtkImageSliceDataDeliveryFilter : public vtkPassInputTypeAlgorithm
 {
@@ -62,14 +62,10 @@ protected:
   int RequestDataObject(vtkInformation *,
     vtkInformationVector **, vtkInformationVector *);
 
-  // Description:
-  // Initializes internal filters
-  void InitializeForCommunication();
-
   // overridden to mark input as optional.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  vtkMPIMoveData* MoveData;
+  vtkMultiClientMPIMoveData* DeliveryHelper;
 
 private:
   vtkImageSliceDataDeliveryFilter(const vtkImageSliceDataDeliveryFilter&); // Not implemented
