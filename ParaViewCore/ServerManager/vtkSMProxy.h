@@ -401,6 +401,19 @@ public:
   // along the pipeline.
   void UpdateSelfAndAllInputs();
 
+  // Description:
+  // Allow to switch off any push of state change to the server for that
+  // particular object.
+  // This is used when we load a state based on a server notification. In that
+  // particular case, the server is already aware of that new state, so we keep
+  // those changes local.
+  virtual void EnableLocalPushOnly();
+
+  // Description:
+  // Enable the given remote object to communicate its state normaly to the
+  // server location.
+  virtual void DisableLocalPushOnly();
+
 //BTX
 
   // Description:

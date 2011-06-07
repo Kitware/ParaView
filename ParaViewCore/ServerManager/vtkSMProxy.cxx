@@ -2168,6 +2168,30 @@ void vtkSMProxy::UpdatePipelineInformation()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::EnableLocalPushOnly()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->EnableLocalPushOnly();
+    }
+  this->Superclass::EnableLocalPushOnly();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::DisableLocalPushOnly()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->DisableLocalPushOnly();
+    }
+  this->Superclass::DisableLocalPushOnly();
+}
+
+//---------------------------------------------------------------------------
 vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   const VTKOBJECT& manipulator)
 {
@@ -2180,6 +2204,8 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   stream << substream;
   return stream;
 }
+
+
 //---------------------------------------------------------------------------
 //                          Deprecated API
 //---------------------------------------------------------------------------
