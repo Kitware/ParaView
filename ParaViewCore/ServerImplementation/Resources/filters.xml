@@ -2000,7 +2000,7 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-         <DataType value="vtkPointSet"/>
+         <DataType value="vtkDataSet"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array">
          <RequiredProperties>
