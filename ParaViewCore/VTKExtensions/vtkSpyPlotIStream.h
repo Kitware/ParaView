@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 class VTK_EXPORT vtkSpyPlotIStream {
 public:
   vtkSpyPlotIStream();
+  virtual ~vtkSpyPlotIStream();
   void SetStream(istream *);
   istream *GetStream();
   int ReadString(char* str, size_t len);
@@ -39,6 +40,7 @@ public:
   vtkTypeInt64 Tell();
 protected:
   const int FileBufferSize;
+  char* Buffer;
   istream *IStream;
 };
 
