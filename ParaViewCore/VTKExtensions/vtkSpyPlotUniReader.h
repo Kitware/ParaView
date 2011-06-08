@@ -52,21 +52,19 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   virtual void SetCellArraySelection(vtkDataArraySelection* da);
-
+  
   // Description:
   // Reads the basic information from the file such as the header, number
   // of fields, etc..
-  int ReadInformation();
+  virtual int ReadInformation();
   
   // Description:
   // Make sure that actual data (including grid blocks) is current
   // else it will read in the required data from file
   int MakeCurrent();
 
-#if 0
   void PrintInformation();
   void PrintMemoryUsage();
-#endif
 
   //Description:
   // Set and get the current time step to process
@@ -174,7 +172,10 @@ private:
                           unsigned char* out, int outSize);
 
   int ReadHeader(vtkSpyPlotIStream *spis);
+  int ReadCellVariableInfo(vtkSpyPlotIStream *spis);
+  int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
+  int ReadDataDumps(vtkSpyPlotIStream *spis);
 
   // Header information
   char FileDescription[128];
