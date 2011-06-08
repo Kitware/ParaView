@@ -84,7 +84,7 @@ vtkTypeInt64 vtkSpyPlotIStream::Tell()
 
 void vtkSpyPlotIStream::SetStream(istream *ist)
 {  
-  ist->rdbuf()->pubsetbuf(&(*this->FileBuffer),2097152);
+  ist->rdbuf()->pubsetbuf(this->FileBuffer,2097152);
   this->IStream = ist;
 }
 
