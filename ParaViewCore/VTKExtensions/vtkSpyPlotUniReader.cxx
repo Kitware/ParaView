@@ -919,6 +919,26 @@ vtkDataArray* vtkSpyPlotUniReader::GetCellFieldData(int block, int field, int* f
 }
 
 //-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialMassField(const int& block,
+    const int& materialIndex)
+{
+  vtkSpyPlotUniReader::Variable *var = NULL;
+  vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
+  for ( int v=0; v < dp->NumVars; ++v )
+    {
+    var = &dp->Variables[v];
+    if (strcmp(var->MaterialField->Id,"M") == 0)
+      {
+      if ( var->Index == materialIndex )
+        {
+        return var->DataBlocks[block];
+        }
+      }
+    }
+ return NULL;
+}
+
+//-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::MarkCellFieldDataFixed(int block, int field)
 {
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;

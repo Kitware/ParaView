@@ -1009,6 +1009,10 @@ int vtkSpyPlotReader::RequestData(
         {
         this->MergeVectors(cd);
         }
+      
+      //now that everything else is done, lets compute all the
+      //derived variables that we can
+      this->ComputeDerivedVariables(cds, block, uniReader, blockID);
       }
     delete blockIterator;
     }
@@ -1027,6 +1031,8 @@ int vtkSpyPlotReader::RequestData(
       {
       this->AddBlockIdArray(cds);
       }
+
+
 
   return 1;
 }
@@ -1968,7 +1974,7 @@ int vtkSpyPlotReader::PrepareData(vtkMultiBlockDataSet *hb,
                  << coutVector6(bounds) );
   vtkDebugMacro( << " Rectilinear grid pointer: " << rg );
   *rg=vtkRectilinearGrid::New();
-  (*rg)->SetExtent(extents);
+  (*rg)->SetExtent(extents);  
   hb->SetBlock(hb->GetNumberOfBlocks(), *rg);
   if (coordinates[0])
     {
@@ -2465,6 +2471,106 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
         }
       }
     } 
+}
+
+//-----------------------------------------------------------------------------
+// synch data set structure
+int vtkSpyPlotReader::ComputeDerivedVariables(vtkCompositeDataSet *composite,
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID)
+{
+ 
+  //grab the cell data from the current block
+  vtkCompositeDataIterator* iter = composite->NewIterator();
+  iter->InitReverseTraversal();
+
+  //we always want the last dataset added which should be the last block added
+  //TODO: verify this is correct in AMR
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+  iter->Delete();
+
+  //find the dimensions so we can compute the volume
+  int dims[3] = {-1,-1,-1};
+  block->GetDimensions(dims);
+
+  //construct the density array;
+  vtkSmartPointer<vtkFloatArray> densityArray = vtkSmartPointer<vtkFloatArray>::New();
+  densityArray->SetName("Derived Density");
+  densityArray->SetNumberOfComponents(1);
+  densityArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+
+  //get the mass array for each material
+  int numberOfMaterials = reader->GetNumberOfMaterials();
+  double **materialsMassArray = new double*[numberOfMaterials];
+
+  bool invalidArrays = false;
+  for ( int i=0; i < numberOfMaterials; i++)    
+    {
+    vtkFloatArray *mat = vtkFloatArray::SafeDownCast(
+                            reader->GetMaterialMassField(blockID, i) );
+    if ( mat )
+      {
+      materialsMassArray[i] = static_cast<double*>(mat->GetVoidPointer(0));
+      }
+    else
+      {
+      vtkErrorMacro("Unable to find the mass array for the materials");
+      vtkErrorMacro("Unable to compute derived variables");
+      invalidArrays=true;
+      break;
+      }
+    }
+
+  if ( invalidArrays )
+    {
+    //cleanup memory and leave
+    delete[] materialsMassArray;
+    return 0;
+    }
+
+  //Create a basic POD struct to hold the info of the cell. this just makes it easier to use  
+  struct derivedCellInfo
+    {
+    float Mass;
+    float Density;
+    float Volume;
+    };
+  derivedCellInfo cell = {-1,-1,-1};
+
+  //todo:
+  //move all the get volume code to uni reader or inline it in a function here
+  block->SetCoordinateSystem(reader->GetCoordinateSystem());
+  
+  vtkIdType pos = 0;
+  for ( int i=0; i < dims[0]; i++)
+    {
+    for ( int j=0; j < dims[1]; j++)
+      {
+      for ( int k=0; k < dims[2]; k++, pos++)
+        {        
+        cell.Volume = block->GetCellVolume(i,j,k);
+
+        //sum the mass for each each material
+        cell.Mass = 0;
+        for(int mat=0; mat<numberOfMaterials;++mat)
+          {
+          cell.Mass += *materialsMassArray[mat];
+          materialsMassArray[mat]++;
+          }
+
+        //find the cells density
+        cell.Density = cell.Mass/cell.Volume;
+        
+        densityArray->SetTuple1(pos,cell.Density);
+        }
+      }
+    }
+
+  ds->GetCellData()->AddArray(densityArray);
+
+  //cleanup memory and leave
+  delete[] materialsMassArray;
+
+  return 1;
 }
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)

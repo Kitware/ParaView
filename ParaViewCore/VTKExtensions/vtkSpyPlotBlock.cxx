@@ -1,5 +1,21 @@
-#include "vtkFloatArray.h"
+/*=========================================================================
+
+Program:   Visualization Toolkit
+Module:    vtkSpyPlotBlock.cxx
+
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #include "vtkSpyPlotBlock.h"
+
+#include "vtkFloatArray.h"
+#include "vtkMath.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 #include "vtkBoundingBox.h"
@@ -33,6 +49,8 @@ vtkSpyPlotBlock::vtkSpyPlotBlock() :
   this->Status.Fixed = 0;
   this->Status.Debug = 0;
   this->Status.AMR = 0;
+
+  this->CoordSystem = Cartesian3D;
 }
 
 //-----------------------------------------------------------------------------
@@ -505,15 +523,87 @@ int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream *stream,
   return 1;
 }
 
+//-----------------------------------------------------------------------------
 int vtkSpyPlotBlock::HasObserver(const char *) const
 {
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 int vtkSpyPlotBlock::InvokeEvent(const char *, void *) const
 {
   return 0;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
+{
+  //if the number inputed is invalid we will make it a 3D coordinate
+  switch(coordinateSystem)
+    {
+    case vtkSpyPlotBlock::Cylinder1D:      
+      this->CoordSystem = vtkSpyPlotBlock::Cylinder1D;
+      break;
+    case vtkSpyPlotBlock::Sphere1D:
+      this->CoordSystem = vtkSpyPlotBlock::Sphere1D;  
+      break;
+    case vtkSpyPlotBlock::Cartesian2D:
+      this->CoordSystem = vtkSpyPlotBlock::Cartesian2D;
+      break;
+    case vtkSpyPlotBlock::Cylinder2D:
+      this->CoordSystem = vtkSpyPlotBlock::Cylinder2D;
+      break;
+    case vtkSpyPlotBlock::Cartesian3D:
+    default: //if unkown make it 3D
+      this->CoordSystem = vtkSpyPlotBlock::Cartesian3D;
+      break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+double vtkSpyPlotBlock::GetCellVolume( const int &i, const int &, const int &) const
+{
+  //make sure the cell index is valid;
+  double volume = -1;
+  if ( i < 0 || i >= this->Dimensions[0])
+    {
+    //invalid coordinate
+    return volume;
+    }
+
+  double spacing[3] = {0,0,0};
+  this->GetSpacing(spacing);
+
+  if ( this->CoordSystem == Cartesian3D )
+    {
+    //3d space
+    volume = spacing[2] * spacing[1] * spacing[0];    
+    }
+  else
+    {
+    double xCoordSquared = (spacing[0] * i) * (spacing[0] * i); //get the x coordinate squared
+    double nextXCoordSquared = (spacing[0] * i + spacing[0]) * (spacing[0] * i + spacing[0]);
+
+    //determine the volume by the blocks coordiate system:
+    switch(this->CoordSystem)
+      {
+      case vtkSpyPlotBlock::Cylinder1D:      
+        volume = vtkMath::Pi() * (nextXCoordSquared - xCoordSquared);
+        break;
+      case vtkSpyPlotBlock::Sphere1D:
+        volume = 4 * (vtkMath::Pi()/3) * (nextXCoordSquared - xCoordSquared);
+        break;
+      case vtkSpyPlotBlock::Cartesian2D:
+        volume = spacing[1] * spacing[0];
+        break;
+      case vtkSpyPlotBlock::Cylinder2D:
+        volume = vtkMath::Pi() * (spacing[1]) * (nextXCoordSquared - xCoordSquared);
+        break;
+      }
+    }
+  
+  return volume;
+  }
 
  
 //-----------------------------------------------------------------------------
