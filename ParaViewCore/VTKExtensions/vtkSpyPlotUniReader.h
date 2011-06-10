@@ -116,6 +116,13 @@ public:
   // for the passed in block
   vtkDataArray* GetMaterialMassField(const int& block,
     const int& materialIndex);
+  
+  //Description:
+  // Return the volume fraction data array for the material index passed in
+  // for the passed in block
+  vtkDataArray* GetMaterialVolumeFractionField(const int& block,
+    const int& materialIndex);  
+    
 
   // Description:
   // Mark the block's field to have been fixed w/r bad ghost cells
@@ -189,6 +196,8 @@ private:
   int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
   int ReadDataDumps(vtkSpyPlotIStream *spis);
+
+  vtkDataArray* GetMaterialField(const int& block, const int& materialIndex, const char* Id);
 
   // Header information
   char FileDescription[128];

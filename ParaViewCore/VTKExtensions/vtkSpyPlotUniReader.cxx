@@ -919,24 +919,39 @@ vtkDataArray* vtkSpyPlotUniReader::GetCellFieldData(int block, int field, int* f
 }
 
 //-----------------------------------------------------------------------------
-vtkDataArray* vtkSpyPlotUniReader::GetMaterialMassField(const int& block,
-    const int& materialIndex)
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialField(const int& block,
+    const int& materialIndex, const char* id)
 {
   vtkSpyPlotUniReader::Variable *var = NULL;
   vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
   for ( int v=0; v < dp->NumVars; ++v )
     {
     var = &dp->Variables[v];
-    if (strcmp(var->MaterialField->Id,"M") == 0)
+    if (strcmp(var->MaterialField->Id,id) == 0)
       {
-      if ( var->Index == materialIndex )
+      if ( var->Index == materialIndex && var->DataBlocks != NULL )
         {
         return var->DataBlocks[block];
         }
       }
     }
- return NULL;
+  return NULL;
 }
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialMassField(const int& block,
+    const int& materialIndex)
+{
+  return this->GetMaterialField(block,materialIndex,"M");
+}
+
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialVolumeFractionField(const int& block,
+    const int& materialIndex)
+{
+  return this->GetMaterialField(block,materialIndex,"VOLM");
+}
+
+
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::MarkCellFieldDataFixed(int block, int field)

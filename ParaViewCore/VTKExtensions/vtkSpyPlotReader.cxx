@@ -50,6 +50,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <sys/stat.h>
+#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
 #include <cctype>
@@ -2478,52 +2479,69 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
   vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
   int dims[3])
 {
-
   int totalSize = dims[0]*dims[1]*dims[2];
-
-  //construct the density array;
-  vtkSmartPointer<vtkFloatArray> densityArray = vtkSmartPointer<vtkFloatArray>::New();
-  densityArray->SetName("Derived Density");
-  densityArray->SetNumberOfComponents(1);
-  densityArray->SetNumberOfTuples(totalSize);
-
-  //get the mass array for each material
   int numberOfMaterials = reader->GetNumberOfMaterials();
-  float **materialsMassArray = new float*[numberOfMaterials];
+  
+  //construct the density arrays for all the materials
+  vtkFloatArray** materialDensities = new vtkFloatArray*[numberOfMaterials];  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    materialDensities[i] = vtkFloatArray::New();
+    std::stringstream buffer;
+    buffer << "Derived Density - " << i+1;
+    materialDensities[i]->SetName(buffer.str().c_str());
+    materialDensities[i]->SetNumberOfComponents(1);
+    materialDensities[i]->SetNumberOfTuples(totalSize);
+    }  
 
+  //get the mass and material volume array for each material  
+  vtkDataArray** materialMasses = new vtkDataArray*[numberOfMaterials];
+  vtkDataArray** materialVolumeFractions = new vtkDataArray*[numberOfMaterials];
+  
   bool invalidArrays = false;
   for ( int i=0; i < numberOfMaterials; i++)    
     {
-    vtkFloatArray *fmat = vtkFloatArray::SafeDownCast(
-                            reader->GetMaterialMassField(blockID, i) );
-    if ( fmat )
-      {
-      materialsMassArray[i] = static_cast<float*>(fmat->GetVoidPointer(0));
-      }
-    else
+    materialMasses[i] = reader->GetMaterialMassField(blockID, i);
+    materialVolumeFractions[i] = reader->GetMaterialVolumeFractionField(blockID,i);
+    
+    if(materialMasses[i] == NULL)
       {
       vtkErrorMacro("Unable to find the mass array for the materials");
       vtkErrorMacro("Unable to compute derived variables");
       invalidArrays=true;
       break;
       }
+    if(materialVolumeFractions[i] == NULL)
+      {
+      vtkErrorMacro("Unable to find the volume fraction array for the materials");
+      vtkErrorMacro("Unable to compute derived variables");
+      invalidArrays=true;
+      break;
+      }
     }
 
-  if ( invalidArrays )
+  if (!invalidArrays )
     {
-    //cleanup memory and leave
-    delete[] materialsMassArray;
-    return 0;
+    block->SetCoordinateSystem(reader->GetCoordinateSystem());
+    block->ComputeCellsVolume(numberOfMaterials, materialDensities,
+      materialMasses, materialVolumeFractions, dims);
+    
+    for ( int i=0; i < numberOfMaterials; i++)
+      {
+      data->AddArray(materialDensities[i]);
+      }
     }
 
-  block->SetCoordinateSystem(reader->GetCoordinateSystem());
-  block->ComputeCellsVolume(densityArray, materialsMassArray, numberOfMaterials, dims);
-  data->AddArray(densityArray);
-  
-  //cleanup memory and leave
-  delete[] materialsMassArray;
+  //cleanup memory and leave  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    materialDensities[i]->Delete();
+    }
+  delete[] materialDensities;
+  delete[] materialMasses;
+  delete[] materialVolumeFractions;
 
-  return 1;
+  return !invalidArrays;
 }
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)

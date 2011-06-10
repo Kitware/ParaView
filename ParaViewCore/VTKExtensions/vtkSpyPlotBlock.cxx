@@ -561,47 +561,37 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotBlock::ComputeCellsVolume( vtkFloatArray *densityArray, 
-  float** materialsMassArray, const int &numberOfMaterials, int dims[3] )
+void vtkSpyPlotBlock::ComputeCellsVolume( const int &numberOfMaterials, 
+  vtkFloatArray** materialDensities, vtkDataArray** materialMasses, 
+  vtkDataArray** materialVolumeFractions, int dims[3] ) const
 {
   double spacing[3] = {0,0,0};
   this->GetSpacing(spacing);
   
-  //Create a basic POD struct to hold the info of the cell. this just makes it easier to use  
-  struct derivedCellInfo
-    {
-    float Mass;
-    float Density;
-    float Volume;
-    };
-  derivedCellInfo cell = {-1,-1,-1};
-
+  double volume = -1, mass = -1, density = -1, volfrac = -1;  
   vtkIdType pos = 0;
   for ( int i=0; i < dims[0]; i++)
     {
+    //not a bug, volume is constant for across the x value
+    volume = this->GetCellVolume(spacing,i);
     for ( int j=0; j < dims[1]; j++)
       {
       for ( int k=0; k < dims[2]; k++, pos++)
         {
-        cell.Volume = this->GetCellVolume(spacing,i,j,k);
-        
         //sum the mass for each each material
-        cell.Mass = 0;
         for(int mat=0; mat<numberOfMaterials;++mat)
           {
-          cell.Mass += materialsMassArray[mat][pos];          
-          }
-        //find the cells density. If the mass is zero for this cell, set the
-        //density to zero
-        cell.Density = (cell.Mass <= 0) ? 0 : (cell.Mass/cell.Volume);        
-
-        densityArray->SetTuple1(pos,cell.Density);
+          mass = materialMasses[mat]->GetTuple1(pos);
+          volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
+          density = mass * ( volume * volfrac );
+          materialDensities[mat]->SetTuple1(pos,density);
+          }        
         }
       }
     }
 }
 //-----------------------------------------------------------------------------
-double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i, const int &, const int &) const
+double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i) const
 {  
   if ( this->CoordSystem == Cartesian3D )
     {
