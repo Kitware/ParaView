@@ -563,7 +563,8 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
 //-----------------------------------------------------------------------------
 void vtkSpyPlotBlock::ComputeCellsVolume( const int &numberOfMaterials, 
   vtkFloatArray** materialDensities, vtkDataArray** materialMasses, 
-  vtkDataArray** materialVolumeFractions, int dims[3] ) const
+  vtkDataArray** materialVolumeFractions, int dims[3],
+  const int& downConvertVolumeFraction  ) const
 {
   double spacing[3] = {0,0,0};
   this->GetSpacing(spacing);
@@ -583,6 +584,11 @@ void vtkSpyPlotBlock::ComputeCellsVolume( const int &numberOfMaterials,
           {
           mass = materialMasses[mat]->GetTuple1(pos);
           volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
+          if ( downConvertVolumeFraction )
+            {
+            //converting from 0-255 to a float
+            volfrac /= 255.0; 
+            }
           density = mass * ( volume * volfrac );
           materialDensities[mat]->SetTuple1(pos,density);
           }        

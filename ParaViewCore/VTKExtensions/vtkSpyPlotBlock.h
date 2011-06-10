@@ -90,7 +90,7 @@ public:
 
   void ComputeCellsVolume( const int &numberOfMaterials, 
   vtkFloatArray** materialDensities, vtkDataArray** materialMasses, 
-  vtkDataArray** materialVolumeFractions, int dims[3]) const;
+  vtkDataArray** materialVolumeFractions, int dims[3], const int &downConvertVolumeFraction) const;
 
   //Parameter i is the x dimension index not coordinate location
   //will return a negative volume if you requst a the volume of a cell

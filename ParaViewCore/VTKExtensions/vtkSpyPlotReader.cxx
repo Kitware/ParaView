@@ -2524,7 +2524,7 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
     {
     block->SetCoordinateSystem(reader->GetCoordinateSystem());
     block->ComputeCellsVolume(numberOfMaterials, materialDensities,
-      materialMasses, materialVolumeFractions, dims);
+      materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
     
     for ( int i=0; i < numberOfMaterials; i++)
       {
