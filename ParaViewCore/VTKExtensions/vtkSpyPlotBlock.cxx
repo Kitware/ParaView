@@ -561,26 +561,63 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSpyPlotBlock::GetCellVolume( const int &i, const int &, const int &) const
+void vtkSpyPlotBlock::ComputeCellsVolume( vtkFloatArray *densityArray, 
+  float** materialsMassArray, const int &numberOfMaterials, int dims[3] )
 {
-  //make sure the cell index is valid;
-  double volume = -1;
-  if ( i < 0 || i >= this->Dimensions[0])
-    {
-    //invalid coordinate
-    return volume;
-    }
-
   double spacing[3] = {0,0,0};
   this->GetSpacing(spacing);
+  
+  //Create a basic POD struct to hold the info of the cell. this just makes it easier to use  
+  struct derivedCellInfo
+    {
+    float Mass;
+    float Density;
+    float Volume;
+    };
+  derivedCellInfo cell = {-1,-1,-1};
 
+  vtkIdType pos = 0;
+  for ( int i=0; i < dims[0]; i++)
+    {
+    for ( int j=0; j < dims[1]; j++)
+      {
+      for ( int k=0; k < dims[2]; k++, pos++)
+        {
+        cell.Volume = this->GetCellVolume(spacing,i,j,k);
+        
+        //sum the mass for each each material
+        cell.Mass = 0;
+        for(int mat=0; mat<numberOfMaterials;++mat)
+          {
+          cell.Mass += materialsMassArray[mat][pos];          
+          }
+        //find the cells density. If the mass is zero for this cell, set the
+        //density to zero
+        cell.Density = (cell.Mass <= 0) ? 0 : (cell.Mass/cell.Volume);        
+
+        densityArray->SetTuple1(pos,cell.Density);
+        }
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i, const int &, const int &) const
+{  
   if ( this->CoordSystem == Cartesian3D )
     {
     //3d space
-    volume = spacing[2] * spacing[1] * spacing[0];    
+    return spacing[2] * spacing[1] * spacing[0];    
     }
   else
     {
+    //make sure the cell index is valid;
+    double volume = -1;
+    if ( i < 0 || i >= this->Dimensions[0])
+      {
+      //invalid coordinate
+      return volume;
+      }
+
     double xCoordSquared = (spacing[0] * i) * (spacing[0] * i); //get the x coordinate squared
     double nextXCoordSquared = (spacing[0] * i + spacing[0]) * (spacing[0] * i + spacing[0]);
 
@@ -600,10 +637,11 @@ double vtkSpyPlotBlock::GetCellVolume( const int &i, const int &, const int &) c
         volume = vtkMath::Pi() * (spacing[1]) * (nextXCoordSquared - xCoordSquared);
         break;
       }
+    return volume;
     }
-  
-  return volume;
-  }
+
+  return -1;
+}
 
  
 //-----------------------------------------------------------------------------

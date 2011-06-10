@@ -88,10 +88,13 @@ public:
     
   void SetCoordinateSystem(const int &coordinateSystem);
 
+  void ComputeCellsVolume( vtkFloatArray *densityArray, 
+    float** materialsMassArray, const int &numberOfMaterials, int dims[3] );
+
   //Parameters i,j,k are dimension index not coordinate location
   //will return a negative volume if you requst a the volume of a cell
   //that is outside the demensions of the block
-  double GetCellVolume(const int &i, const int &j, const int &k) const;
+  double GetCellVolume(double spacing[3], const int &i, const int &j, const int &k) const;
 
 protected:
   

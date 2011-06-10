@@ -2494,11 +2494,11 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
   bool invalidArrays = false;
   for ( int i=0; i < numberOfMaterials; i++)    
     {
-    vtkFloatArray *mat = vtkFloatArray::SafeDownCast(
+    vtkFloatArray *fmat = vtkFloatArray::SafeDownCast(
                             reader->GetMaterialMassField(blockID, i) );
-    if ( mat )
+    if ( fmat )
       {
-      materialsMassArray[i] = static_cast<float*>(mat->GetVoidPointer(0));
+      materialsMassArray[i] = static_cast<float*>(fmat->GetVoidPointer(0));
       }
     else
       {
@@ -2516,45 +2516,10 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
     return 0;
     }
 
-  //Create a basic POD struct to hold the info of the cell. this just makes it easier to use  
-  struct derivedCellInfo
-    {
-    float Mass;
-    float Density;
-    float Volume;
-    };
-  derivedCellInfo cell = {-1,-1,-1};
-
-  //todo:
-  //move all the get volume code to uni reader or inline it in a function here
   block->SetCoordinateSystem(reader->GetCoordinateSystem());
+  block->ComputeCellsVolume(densityArray, materialsMassArray, numberOfMaterials, dims);
+  data->AddArray(densityArray);
   
-  vtkIdType pos = 0;
-  for ( int i=0; i < dims[0]; i++)
-    {
-    for ( int j=0; j < dims[1]; j++)
-      {
-      for ( int k=0; k < dims[2]; k++, pos++)
-        {        
-        cell.Volume = block->GetCellVolume(i,j,k);
-
-        //sum the mass for each each material
-        cell.Mass = 0;
-        for(int mat=0; mat<numberOfMaterials;++mat)
-          {
-          cell.Mass += materialsMassArray[mat][pos];          
-          }
-        
-        //find the cells density. If the mass is zero for this cell, set the
-        //density to zero
-        cell.Density = (cell.Mass <= 0) ? 0 : (cell.Mass/cell.Volume);        
-
-        densityArray->SetTuple1(pos,cell.Density);
-        }
-      }
-    }
-  data->AddArray(densityArray);  
-
   //cleanup memory and leave
   delete[] materialsMassArray;
 
