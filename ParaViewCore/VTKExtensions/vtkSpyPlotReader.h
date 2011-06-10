@@ -335,8 +335,8 @@ protected:
                    vtkDataArray *a2,
                    vtkDataArray *a3);
 
-  int ComputeDerivedVariables(vtkCompositeDataSet* data, 
-    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID);
+  int ComputeDerivedVariables(vtkCellData* data, 
+    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
   
 
   vtkSpyPlotReaderMap *Map;

@@ -636,7 +636,6 @@ int vtkSpyPlotRemoveBadGhostCells(
         realCellId = jOffset[0] + destXyz[0];
         oldCellId = jOffset[1] + xyz[0];        
         dataPtr[realCellId] = dataPtr[oldCellId];
-
         //old slow way of calculating cell id
         //dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
         //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
@@ -990,13 +989,16 @@ int vtkSpyPlotReader::RequestData(
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
                               uniReader, cd);
+        this->ComputeDerivedVariables(cd, block, uniReader, blockID,dims);
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
+        this->ComputeDerivedVariables(cd, block, uniReader, blockID,realDims);
         }
+
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
         {
@@ -1008,11 +1010,7 @@ int vtkSpyPlotReader::RequestData(
       if (this->MergeXYZComponents)
         {
         this->MergeVectors(cd);
-        }
-      
-      //now that everything else is done, lets compute all the
-      //derived variables that we can
-      this->ComputeDerivedVariables(cds, block, uniReader, blockID);
+        }           
       }
     delete blockIterator;
     }
@@ -2034,6 +2032,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
         // make sure we have a clean array
         }
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
+      
       //vtkDebugMacro( << __LINE__ << " Read data block: " 
       // << blockID << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
@@ -2475,32 +2474,22 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 
 //-----------------------------------------------------------------------------
 // synch data set structure
-int vtkSpyPlotReader::ComputeDerivedVariables(vtkCompositeDataSet *composite,
-  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID)
+int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
+  int dims[3])
 {
- 
-  //grab the cell data from the current block
-  vtkCompositeDataIterator* iter = composite->NewIterator();
-  iter->InitReverseTraversal();
 
-  //we always want the last dataset added which should be the last block added
-  //TODO: verify this is correct in AMR
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-  iter->Delete();
-
-  //find the dimensions so we can compute the volume
-  int dims[3] = {-1,-1,-1};
-  block->GetDimensions(dims);
+  int totalSize = dims[0]*dims[1]*dims[2];
 
   //construct the density array;
   vtkSmartPointer<vtkFloatArray> densityArray = vtkSmartPointer<vtkFloatArray>::New();
   densityArray->SetName("Derived Density");
   densityArray->SetNumberOfComponents(1);
-  densityArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+  densityArray->SetNumberOfTuples(totalSize);
 
   //get the mass array for each material
   int numberOfMaterials = reader->GetNumberOfMaterials();
-  double **materialsMassArray = new double*[numberOfMaterials];
+  float **materialsMassArray = new float*[numberOfMaterials];
 
   bool invalidArrays = false;
   for ( int i=0; i < numberOfMaterials; i++)    
@@ -2509,7 +2498,7 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCompositeDataSet *composite,
                             reader->GetMaterialMassField(blockID, i) );
     if ( mat )
       {
-      materialsMassArray[i] = static_cast<double*>(mat->GetVoidPointer(0));
+      materialsMassArray[i] = static_cast<float*>(mat->GetVoidPointer(0));
       }
     else
       {
@@ -2553,19 +2542,18 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCompositeDataSet *composite,
         cell.Mass = 0;
         for(int mat=0; mat<numberOfMaterials;++mat)
           {
-          cell.Mass += *materialsMassArray[mat];
-          materialsMassArray[mat]++;
+          cell.Mass += materialsMassArray[mat][pos];          
           }
-
-        //find the cells density
-        cell.Density = cell.Mass/cell.Volume;
         
+        //find the cells density. If the mass is zero for this cell, set the
+        //density to zero
+        cell.Density = (cell.Mass <= 0) ? 0 : (cell.Mass/cell.Volume);        
+
         densityArray->SetTuple1(pos,cell.Density);
         }
       }
     }
-
-  ds->GetCellData()->AddArray(densityArray);
+  data->AddArray(densityArray);  
 
   //cleanup memory and leave
   delete[] materialsMassArray;
