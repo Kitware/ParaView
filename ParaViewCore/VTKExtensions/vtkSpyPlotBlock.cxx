@@ -14,11 +14,14 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkSpyPlotBlock.h"
 
+#include "vtkCellData.h"
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 #include "vtkBoundingBox.h"
+
+#include <sstream>
 #include <assert.h>
 
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
@@ -561,14 +564,33 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotBlock::ComputeCellsVolume( const int &numberOfMaterials, 
-  vtkFloatArray** materialDensities, vtkDataArray** materialMasses, 
+void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data, 
+  const int &numberOfMaterials, vtkDataArray** materialMasses, 
   vtkDataArray** materialVolumeFractions, int dims[3],
   const int& downConvertVolumeFraction  ) const
 {
   double spacing[3] = {0,0,0};
   this->GetSpacing(spacing);
   
+  //construct the density arrays for all the materials
+  vtkFloatArray** materialDensities = new vtkFloatArray*[numberOfMaterials];  
+  bool* validDensityToCompute = new bool[numberOfMaterials];
+  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    //only create density arrays for materials that we have all the needed information for
+    validDensityToCompute[i] = materialMasses[i] != NULL && materialVolumeFractions[i] != NULL;
+    if ( validDensityToCompute[i] )
+      {
+      materialDensities[i] = vtkFloatArray::New();
+      std::stringstream buffer;
+      buffer << "Derived Density - " << i+1;
+      materialDensities[i]->SetName(buffer.str().c_str());
+      materialDensities[i]->SetNumberOfComponents(1);
+      materialDensities[i]->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+      }
+    }  
+
   double volume = -1, mass = -1, density = -1, volfrac = -1;  
   vtkIdType pos = 0;
   for ( int i=0; i < dims[0]; i++)
@@ -582,19 +604,34 @@ void vtkSpyPlotBlock::ComputeCellsVolume( const int &numberOfMaterials,
         //sum the mass for each each material
         for(int mat=0; mat<numberOfMaterials;++mat)
           {
-          mass = materialMasses[mat]->GetTuple1(pos);
-          volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
-          if ( downConvertVolumeFraction )
+          if ( validDensityToCompute[mat] )
             {
-            //converting from 0-255 to a float
-            volfrac /= 255.0; 
+            mass = materialMasses[mat]->GetTuple1(pos);
+            volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
+            if ( downConvertVolumeFraction )
+              {
+              //converting from 0-255 to a float
+              volfrac /= 255.0; 
+              }
+            density = mass * ( volume * volfrac );
+            materialDensities[mat]->SetTuple1(pos,density);
             }
-          density = mass * ( volume * volfrac );
-          materialDensities[mat]->SetTuple1(pos,density);
           }        
         }
       }
     }
+  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    if ( validDensityToCompute[i] )
+      {
+      data->AddArray(materialDensities[i]);
+      materialDensities[i]->Delete();
+      }
+    }
+  delete[] materialDensities;
+  delete[] validDensityToCompute;
+  
 }
 //-----------------------------------------------------------------------------
 double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i) const

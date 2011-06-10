@@ -50,7 +50,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <sys/stat.h>
-#include <sstream>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
 #include <cctype>
@@ -2479,69 +2478,28 @@ int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
   vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
   int dims[3])
 {
-  int totalSize = dims[0]*dims[1]*dims[2];
   int numberOfMaterials = reader->GetNumberOfMaterials();
   
-  //construct the density arrays for all the materials
-  vtkFloatArray** materialDensities = new vtkFloatArray*[numberOfMaterials];  
-  for ( int i=0; i < numberOfMaterials; i++)
-    {
-    materialDensities[i] = vtkFloatArray::New();
-    std::stringstream buffer;
-    buffer << "Derived Density - " << i+1;
-    materialDensities[i]->SetName(buffer.str().c_str());
-    materialDensities[i]->SetNumberOfComponents(1);
-    materialDensities[i]->SetNumberOfTuples(totalSize);
-    }  
-
-  //get the mass and material volume array for each material  
+  //get the mass and material volume array for each material
   vtkDataArray** materialMasses = new vtkDataArray*[numberOfMaterials];
   vtkDataArray** materialVolumeFractions = new vtkDataArray*[numberOfMaterials];
   
-  bool invalidArrays = false;
+  //bit mask of which materials we have all the information for
   for ( int i=0; i < numberOfMaterials; i++)    
     {
     materialMasses[i] = reader->GetMaterialMassField(blockID, i);
-    materialVolumeFractions[i] = reader->GetMaterialVolumeFractionField(blockID,i);
-    
-    if(materialMasses[i] == NULL)
-      {
-      vtkErrorMacro("Unable to find the mass array for the materials");
-      vtkErrorMacro("Unable to compute derived variables");
-      invalidArrays=true;
-      break;
-      }
-    if(materialVolumeFractions[i] == NULL)
-      {
-      vtkErrorMacro("Unable to find the volume fraction array for the materials");
-      vtkErrorMacro("Unable to compute derived variables");
-      invalidArrays=true;
-      break;
-      }
+    materialVolumeFractions[i] = reader->GetMaterialVolumeFractionField(blockID,i);    
     }
 
-  if (!invalidArrays )
-    {
-    block->SetCoordinateSystem(reader->GetCoordinateSystem());
-    block->ComputeCellsVolume(numberOfMaterials, materialDensities,
-      materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
+  block->SetCoordinateSystem(reader->GetCoordinateSystem());
+  block->ComputeDerivedVariables(data, numberOfMaterials,
+    materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
     
-    for ( int i=0; i < numberOfMaterials; i++)
-      {
-      data->AddArray(materialDensities[i]);
-      }
-    }
-
   //cleanup memory and leave  
-  for ( int i=0; i < numberOfMaterials; i++)
-    {
-    materialDensities[i]->Delete();
-    }
-  delete[] materialDensities;
   delete[] materialMasses;
   delete[] materialVolumeFractions;
 
-  return !invalidArrays;
+  return 1;
 }
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)

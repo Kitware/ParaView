@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSystemIncludes.h"
 
+class vtkCellData;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkSpyPlotIStream;
@@ -88,9 +89,9 @@ public:
     
   void SetCoordinateSystem(const int &coordinateSystem);
 
-  void ComputeCellsVolume( const int &numberOfMaterials, 
-  vtkFloatArray** materialDensities, vtkDataArray** materialMasses, 
-  vtkDataArray** materialVolumeFractions, int dims[3], const int &downConvertVolumeFraction) const;
+  void ComputeDerivedVariables( vtkCellData *data, const int &numberOfMaterials, 
+    vtkDataArray** materialMasses, vtkDataArray** materialVolumeFractions,
+    int dims[3], const int &downConvertVolumeFraction) const;
 
   //Parameter i is the x dimension index not coordinate location
   //will return a negative volume if you requst a the volume of a cell
