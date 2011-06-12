@@ -496,7 +496,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* vtkNotUsed(modifiedProxy))
+void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (this->IsSelectionCached)
     {
@@ -508,6 +508,8 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* vtkNotUsed(modifiedProxy))
             << vtkClientServerStream::End;
     this->ExecuteStream(stream);
     }
+
+  this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //-----------------------------------------------------------------------------

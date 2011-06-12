@@ -567,6 +567,10 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
+  // FIXME: Call update only when needed. That can be done at some point in the
+  // future.
+  this->Update();
+
   // Do all passes needed for rendering so that the geometry in the renderer is
   // updated. This is essential since the bounds are determined by using the
   // geometry bounds know to the renders on all processes. If they are not
@@ -591,6 +595,21 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::Update()
+{
+  vtkTimerLog::MarkStartEvent("RenderView::Update");
+  this->Superclass::Update();
+
+  // Do the vtkView::REQUEST_INFORMATION() pass.
+  this->GatherRepresentationInformation();
+
+  // Gather information about geometry sizes from all representations.
+  this->GatherGeometrySizeInformation();
+
+  vtkTimerLog::MarkStartEvent("RenderView::Update");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::StillRender()
 {
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -611,20 +630,6 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
-  if (!interactive)
-    {
-    // Update all representations.
-    // This should update mostly just the inputs to the representations, and maybe
-    // the internal geometry filter.
-    this->Update();
-
-    // Do the vtkView::REQUEST_INFORMATION() pass.
-    this->GatherRepresentationInformation();
-
-    // Gather information about geometry sizes from all representations.
-    this->GatherGeometrySizeInformation();
-    }
-
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
 

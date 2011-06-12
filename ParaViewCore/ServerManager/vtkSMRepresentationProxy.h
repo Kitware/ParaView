@@ -47,6 +47,10 @@ public:
   // It also creates output ports if they are not already created.
   virtual void UpdatePipeline(double time);
 
+  // Description:
+  // Overridden to reset this->MarkedModified flag.
+  virtual void PostUpdateData();
+
 //BTX
 protected:
   vtkSMRepresentationProxy();
@@ -54,9 +58,6 @@ protected:
 
   virtual void UpdatePipelineInternal(double time, bool doTime);
 
-  virtual void CreateVTKObjects();
-
-  virtual void RepresentationUpdated();
 
   // Description:
   // Mark the data information as invalid.

@@ -15,7 +15,6 @@
 #include "vtkSMRepresentationProxy.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMProxyProperty.h"
@@ -36,31 +35,6 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 {
   this->RepresentedDataInformation->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMRepresentationProxy::CreateVTKObjects()
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
-  this->Superclass::CreateVTKObjects();
-
-  // If prototype, no need to add listeners...
-  if(this->Location == 0)
-    {
-    return;
-    }
-
-  vtkMemberFunctionCommand<vtkSMRepresentationProxy>* observer =
-    vtkMemberFunctionCommand<vtkSMRepresentationProxy>::New();
-  observer->SetCallback(*this, &vtkSMRepresentationProxy::RepresentationUpdated);
-
-  vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
-    vtkCommand::UpdateDataEvent, observer);
-  observer->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -135,10 +109,10 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationProxy::RepresentationUpdated()
+void vtkSMRepresentationProxy::PostUpdateData()
 {
   this->MarkedModified = false;
-  this->PostUpdateData();
+  this->Superclass::PostUpdateData();
   // PostUpdateData will call InvalidateDataInformation() which will mark
   // RepresentedDataInformationValid as false;
   // this->RepresentedDataInformationValid = false;

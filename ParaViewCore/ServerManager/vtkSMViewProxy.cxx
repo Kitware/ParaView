@@ -170,7 +170,7 @@ void vtkSMViewProxy::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::Update()
 {
-  if (this->ObjectsCreated)
+  if (this->ObjectsCreated && this->NeedsUpdate)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
@@ -180,6 +180,8 @@ void vtkSMViewProxy::Update()
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
+
+    this->PostUpdateData();
     }
 }
 

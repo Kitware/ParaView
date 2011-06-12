@@ -426,6 +426,14 @@ public:
   void AddManipulator(vtkCameraManipulator* val);
   void RemoveAllManipulators();
 
+  // Description:
+  // Overridden to synchronize information among processes whenever data
+  // changes. The vtkSMViewProxy ensures that this method is called only when
+  // something has changed on the view-proxy or one of its representations or
+  // their inputs. Hence it's okay to do some extra inter-process communication
+  // here.
+  virtual void Update();
+
 //BTX
 protected:
   vtkPVRenderView();
