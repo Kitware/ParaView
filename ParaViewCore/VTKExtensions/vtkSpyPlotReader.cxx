@@ -91,6 +91,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
+  this->ComputeDerivedVariables = 1;
   this->DownConvertVolumeFraction = 1;
   this->MergeXYZComponents = 1;
 
@@ -636,7 +637,6 @@ int vtkSpyPlotRemoveBadGhostCells(
         realCellId = jOffset[0] + destXyz[0];
         oldCellId = jOffset[1] + xyz[0];        
         dataPtr[realCellId] = dataPtr[oldCellId];
-
         //old slow way of calculating cell id
         //dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
         //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
@@ -990,13 +990,16 @@ int vtkSpyPlotReader::RequestData(
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
                               uniReader, cd);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,dims);
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,realDims);
         }
+
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
         {
@@ -1008,7 +1011,7 @@ int vtkSpyPlotReader::RequestData(
       if (this->MergeXYZComponents)
         {
         this->MergeVectors(cd);
-        }
+        }           
       }
     delete blockIterator;
     }
@@ -1027,6 +1030,8 @@ int vtkSpyPlotReader::RequestData(
       {
       this->AddBlockIdArray(cds);
       }
+
+
 
   return 1;
 }
@@ -1968,7 +1973,7 @@ int vtkSpyPlotReader::PrepareData(vtkMultiBlockDataSet *hb,
                  << coutVector6(bounds) );
   vtkDebugMacro( << " Rectilinear grid pointer: " << rg );
   *rg=vtkRectilinearGrid::New();
-  (*rg)->SetExtent(extents);
+  (*rg)->SetExtent(extents);  
   hb->SetBlock(hb->GetNumberOfBlocks(), *rg);
   if (coordinates[0])
     {
@@ -2028,6 +2033,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
         // make sure we have a clean array
         }
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
+      
       //vtkDebugMacro( << __LINE__ << " Read data block: " 
       // << blockID << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
@@ -2465,6 +2471,41 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
         }
       }
     } 
+}
+
+//-----------------------------------------------------------------------------
+// synch data set structure
+int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
+  int dims[3])
+{
+  if ( this->ComputeDerivedVariables != 1 )
+    {
+    return 0;
+    }
+
+  int numberOfMaterials = reader->GetNumberOfMaterials();
+  
+  //get the mass and material volume array for each material
+  vtkDataArray** materialMasses = new vtkDataArray*[numberOfMaterials];
+  vtkDataArray** materialVolumeFractions = new vtkDataArray*[numberOfMaterials];
+  
+  //bit mask of which materials we have all the information for
+  for ( int i=0; i < numberOfMaterials; i++)    
+    {
+    materialMasses[i] = reader->GetMaterialMassField(blockID, i);
+    materialVolumeFractions[i] = reader->GetMaterialVolumeFractionField(blockID,i);    
+    }
+
+  block->SetCoordinateSystem(reader->GetCoordinateSystem());
+  block->ComputeDerivedVariables(data, numberOfMaterials,
+    materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
+    
+  //cleanup memory and leave  
+  delete[] materialMasses;
+  delete[] materialVolumeFractions;
+
+  return 1;
 }
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)
