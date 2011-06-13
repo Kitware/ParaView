@@ -3555,6 +3555,18 @@
      </IntVectorProperty>
 
      <IntVectorProperty
+       name="ComputeDerivedVariables"
+       command="SetComputeDerivedVariables"
+       number_of_elements="1"
+       default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, the reader will convert derived variables like material density for the materials
+         that the user has selected. For Density the user needs to have selected Material Mass and Material Volume Fraction.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
         name="DistributeFiles"
         command="SetDistributeFiles"
         number_of_elements="1"

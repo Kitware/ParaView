@@ -91,6 +91,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
+  this->ComputeDerivedVariables = 1;
   this->DownConvertVolumeFraction = 1;
   this->MergeXYZComponents = 1;
 
@@ -989,14 +990,14 @@ int vtkSpyPlotReader::RequestData(
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
                               uniReader, cd);
-        this->ComputeDerivedVariables(cd, block, uniReader, blockID,dims);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,dims);
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
-        this->ComputeDerivedVariables(cd, block, uniReader, blockID,realDims);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,realDims);
         }
 
       // Add active block array, for debugging
@@ -2474,10 +2475,15 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 
 //-----------------------------------------------------------------------------
 // synch data set structure
-int vtkSpyPlotReader::ComputeDerivedVariables(vtkCellData* data,
+int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
   vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
   int dims[3])
 {
+  if ( this->ComputeDerivedVariables != 1 )
+    {
+    return 0;
+    }
+
   int numberOfMaterials = reader->GetNumberOfMaterials();
   
   //get the mass and material volume array for each material
