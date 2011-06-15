@@ -66,6 +66,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   this->SetEnabled(false);
   this->Update();
   this->SetEnabled(enabled);
+  this->ForcedUpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------

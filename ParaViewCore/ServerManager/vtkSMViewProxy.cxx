@@ -180,9 +180,9 @@ void vtkSMViewProxy::Update()
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
-
-    this->PostUpdateData();
     }
+
+  this->PostUpdateData();
 }
 
 //----------------------------------------------------------------------------

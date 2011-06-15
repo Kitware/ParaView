@@ -285,6 +285,11 @@ public:
   static vtkInformationObjectBaseKey* KD_TREE();
 
   // Description:
+  // Placed in REQUEST_PREPARE_FOR_RENDER() stage to indicate that the
+  // representation needs delivery.
+  static vtkInformationIntegerKey* NEEDS_DELIVERY();
+
+  // Description:
   // Make a selection. This will result in setting up of this->LastSelection
   // which can be accessed using GetLastSelection().
   // @CallOnAllProcessess
@@ -444,6 +449,10 @@ protected:
   virtual void Render(bool interactive, bool skip_rendering);
 
   // Description:
+  // Does data-delivery to the rendering nodes.
+  virtual void DoDataDelivery(bool using_lod_rendering, bool using_remote_rendering);
+
+  // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
   virtual void GatherRepresentationInformation();
 
@@ -537,6 +546,11 @@ protected:
   static bool RemoteRenderingAllowed;
 
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
+
+  vtkTimeStamp UpdateTime;
+  vtkTimeStamp StillRenderTime;
+  vtkTimeStamp InteractiveRenderTime;
+
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented
