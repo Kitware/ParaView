@@ -83,12 +83,29 @@ vtkTypeInt64 vtkSpyPlotIStream::Tell()
 }
 
 void vtkSpyPlotIStream::SetStream(istream *ist)
-{  
-  ist->rdbuf()->pubsetbuf(this->FileBuffer,2097152);
+{
+  if (!this->Buffer)
+    {
+    this->Buffer = new char[this->FileBufferSize];
+    }
+
+  std::streamsize s = sizeof(char) * (this->FileBufferSize-1);
+  ist->rdbuf()->pubsetbuf(this->Buffer,s);
   this->IStream = ist;
 }
 
 vtkSpyPlotIStream::vtkSpyPlotIStream()
-  : IStream(0)
+  : IStream(0),
+  FileBufferSize(2097152),
+  Buffer(0)
 {
+}
+
+vtkSpyPlotIStream::~vtkSpyPlotIStream()
+{
+  if (this->Buffer)
+  {
+  delete[] this->Buffer;
+  this->Buffer = NULL;
+  }
 }

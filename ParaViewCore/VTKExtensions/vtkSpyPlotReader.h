@@ -136,6 +136,14 @@ public:
   vtkBooleanMacro(DownConvertVolumeFraction,int);
 
   // Description:
+  // If true, the reader will calculate all derived variables it can given
+  // which properties the user has selected
+  // True by default.
+  vtkSetMacro(ComputeDerivedVariables, int);
+  vtkGetMacro(ComputeDerivedVariables,int);
+  vtkBooleanMacro(ComputeDerivedVariables,int);
+
+  // Description:
   // If true, the reader will merge scalar arrays named, for example, "X velocity"
   // "Y velocity" and "Z velocity" into a vector array named "velocity" with
   // scalar components X, Y and Z. It will also merge X and Y scalar arrays
@@ -334,6 +342,10 @@ protected:
                    vtkDataArray *a1,
                    vtkDataArray *a2,
                    vtkDataArray *a3);
+
+  int ComputeDerivedVariables;
+  int ComputeDerivedVars(vtkCellData* data, 
+    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
   
 
   vtkSpyPlotReaderMap *Map;

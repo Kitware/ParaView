@@ -52,21 +52,19 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   virtual void SetCellArraySelection(vtkDataArraySelection* da);
-
+  
   // Description:
   // Reads the basic information from the file such as the header, number
   // of fields, etc..
-  int ReadInformation();
+  virtual int ReadInformation();
   
   // Description:
   // Make sure that actual data (including grid blocks) is current
   // else it will read in the required data from file
   int MakeCurrent();
 
-#if 0
   void PrintInformation();
   void PrintMemoryUsage();
-#endif
 
   //Description:
   // Set and get the current time step to process
@@ -113,6 +111,19 @@ public:
   // bad ghost cells else it is set to 0
   vtkDataArray* GetCellFieldData(int block, int field, int* fixed);
 
+  //Description:
+  // Return the mass data array for the material index passed in
+  // for the passed in block
+  vtkDataArray* GetMaterialMassField(const int& block,
+    const int& materialIndex);
+  
+  //Description:
+  // Return the volume fraction data array for the material index passed in
+  // for the passed in block
+  vtkDataArray* GetMaterialVolumeFractionField(const int& block,
+    const int& materialIndex);  
+    
+
   // Description:
   // Mark the block's field to have been fixed w/r bad ghost cells
   int MarkCellFieldDataFixed(int block, int field);
@@ -123,6 +134,13 @@ public:
 
   // Return the ith block (i.e. grid) in the reader
   vtkSpyPlotBlock *GetBlock(int i);
+
+  // Returns the number of materials
+  int GetNumberOfMaterials( ) const { return NumberOfMaterials; }
+
+  // Returns the coordinate system of the file
+  int GetCoordinateSystem( ) const { return IGM; }
+
   struct CellMaterialField
   {
     char Id[30];
@@ -174,7 +192,12 @@ private:
                           unsigned char* out, int outSize);
 
   int ReadHeader(vtkSpyPlotIStream *spis);
+  int ReadCellVariableInfo(vtkSpyPlotIStream *spis);
+  int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
+  int ReadDataDumps(vtkSpyPlotIStream *spis);
+
+  vtkDataArray* GetMaterialField(const int& block, const int& materialIndex, const char* Id);
 
   // Header information
   char FileDescription[128];

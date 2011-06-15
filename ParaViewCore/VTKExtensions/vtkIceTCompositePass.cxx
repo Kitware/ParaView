@@ -183,7 +183,14 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   this->UpdateTileInformation(render_state);
 
   // Set IceT compositing strategy.
-  icetStrategy(ICET_STRATEGY_REDUCE);
+  if ((this->TileDimensions[0] == 1) && (this->TileDimensions[1] == 1))
+    {
+    icetStrategy(ICET_STRATEGY_SEQUENTIAL);
+    }
+  else
+    {
+    icetStrategy(ICET_STRATEGY_REDUCE);
+    }
 
   bool use_ordered_compositing =
     (this->KdTree && this->UseOrderedCompositing && !this->DepthOnly &&
