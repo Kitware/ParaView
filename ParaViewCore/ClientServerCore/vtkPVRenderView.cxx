@@ -519,8 +519,6 @@ void vtkPVRenderView::ResetCameraClippingRange()
 void vtkPVRenderView::GatherBoundsInformation(
   bool using_distributed_rendering)
 {
-  // FIXME: when doing client-only render, we are wasting our energy computing
-  // universal bounds. How can we fix that?
   vtkMath::UninitializeBounds(this->LastComputedBounds);
 
   if (this->GetLocalProcessDoesRendering(using_distributed_rendering))
@@ -532,7 +530,13 @@ void vtkPVRenderView::GatherBoundsInformation(
     this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
     this->CenterAxes->SetUseBounds(1);
     }
-  this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+
+  if (using_distributed_rendering)
+    {
+    // sync up bounds across all processes when doing distributed rendering.
+    this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+    }
+
   if (!vtkMath::AreBoundsInitialized(this->LastComputedBounds))
     {
     this->LastComputedBounds[0] = this->LastComputedBounds[2] =
@@ -610,8 +614,12 @@ void vtkPVRenderView::Update()
   // Gather information about geometry sizes from all representations.
   this->GatherGeometrySizeInformation();
 
+  // UpdateTime is used to determine if we need to redeliver the geometries.
+  // Hence the more accurate we can be about when to update this time, the
+  // better. Right now, we are relying on the client (vtkSMViewProxy) to ensure
+  // that Update is called only when some representation is modified.
   this->UpdateTime.Modified();
-  vtkTimerLog::MarkStartEvent("RenderView::Update");
+  vtkTimerLog::MarkEndEvent("RenderView::Update");
 }
 
 //----------------------------------------------------------------------------
@@ -743,9 +751,11 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   if (!interactive)
     {
     // Keep bounds information up-to-date.
-    // FIXME: How can be make this so that we don't have to do parallel
-    // communication each time.
+
+    // GatherBoundsInformation will not do communication unless using
+    // distributed rendering.
     this->GatherBoundsInformation(use_distributed_rendering);
+
     this->UpdateCenterAxes(this->LastComputedBounds);
     }
 
@@ -792,7 +802,7 @@ void vtkPVRenderView::DoDataDelivery(
      this->StillRenderTime > this->UpdateTime))
     {
     //cout << "skipping delivery" << endl;
-    //return;
+    return;
     }
 
   vtkMultiProcessController* s_controller =

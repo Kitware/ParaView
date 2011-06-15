@@ -15,11 +15,14 @@
 #include "vtkSMRepresentationProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMRepresentationProxy);
 //----------------------------------------------------------------------------
@@ -37,6 +40,27 @@ vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
   this->RepresentedDataInformation->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  this->Superclass::CreateVTKObjects();
+
+  // If prototype, no need to add listeners...
+  if(this->Location == 0 || !this->ObjectsCreated)
+    {
+    return;
+    }
+
+  vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
+    vtkCommand::UpdateDataEvent,
+    this, &vtkSMRepresentationProxy::OnVTKRepresentationUpdated);
+}
+
 //---------------------------------------------------------------------------
 int vtkSMRepresentationProxy::LoadXMLState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
@@ -45,6 +69,52 @@ int vtkSMRepresentationProxy::LoadXMLState(
   int ret = this->Superclass::LoadXMLState(proxyElement, locator);
   this->Location = oldserver;
   return ret;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
+{
+  this->Superclass::AddConsumer(property, proxy);
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxies(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      this->GetSubProxy(cc));
+    if (repr)
+      {
+      repr->AddConsumer(property, proxy);
+      }
+    }
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
+{
+  this->Superclass::RemoveConsumer(property, proxy);
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxies(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      this->GetSubProxy(cc));
+    if (repr)
+      {
+      repr->RemoveConsumer(property, proxy);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::RemoveAllConsumers()
+{
+  this->Superclass::RemoveAllConsumers();
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxies(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      this->GetSubProxy(cc));
+    if (repr)
+      {
+      repr->RemoveAllConsumers();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -105,17 +175,59 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
       this->ExecuteStream(stream);
       }
     }
+
+  // vtkSMProxy::MarkDirty does not call MarkConsumersAsDirty unless
+  // this->NeedsUpdate is false. Generally, that's indeed correct since we we
+  // have marked the consumer dirty previously, we don't need to do it again.
+  // However since consumers of representations are generally views, they need
+  // to marked dirty everytime (otherwise unhiding a representation would not
+  // result in the view realizing that data may have changed). Hence we force
+  // NeedsUpdate to false.
+  this->NeedsUpdate = false;
+
   this->Superclass::MarkDirty(modifiedProxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::OnVTKRepresentationUpdated()
+{
+  this->MarkedModified = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::ViewUpdated(vtkSMProxy* view)
+{
+  if (this->MarkedModified == false)
+    {
+    this->PostUpdateData();
+    }
+
+  // If this class has sub-representations, we need to tell those that the view
+  // has updated as well.
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxies(); cc++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      this->GetSubProxy(cc));
+    if (repr)
+      {
+      repr->ViewUpdated(view);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::PostUpdateData()
 {
-  this->MarkedModified = false;
-  this->Superclass::PostUpdateData();
-  // PostUpdateData will call InvalidateDataInformation() which will mark
-  // RepresentedDataInformationValid as false;
-  // this->RepresentedDataInformationValid = false;
+  // PostUpdateData may get called on all representations on the client side
+  // whenever the view updates. However, the underlying vtkPVDataRepresentation
+  // object may not have updated (possibly because of visibility being false).
+  // In that case, we should not let PostUpdateData() happen. The following
+  // check ensures that PostUpdateData() call has any effect only after the VTK
+  // representation has updated as well.
+  if (this->MarkedModified == false)
+    {
+    this->Superclass::PostUpdateData();
+    }
 }
 
 //----------------------------------------------------------------------------

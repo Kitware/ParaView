@@ -21,6 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkTimerLog.h"
 
 #include <assert.h>
 
@@ -173,6 +174,7 @@ void vtkPVView::CleanupAfterScreenshot()
 //----------------------------------------------------------------------------
 void vtkPVView::Update()
 {
+  vtkTimerLog::MarkStartEvent("vtkPVView::Update");
   // Ensure that cache size if synchronized among the processes.
   if (this->GetUseCache())
     {
@@ -188,6 +190,7 @@ void vtkPVView::Update()
 
   this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
     this->RequestInformation, this->ReplyInformationVector);
+  vtkTimerLog::MarkEndEvent("vtkPVView::Update");
 }
 
 //----------------------------------------------------------------------------
