@@ -367,6 +367,19 @@
         </Documentation>
      </IntVectorProperty>
      
+     <!-- Set Conversion to CGS -->
+     <IntVectorProperty
+        name="ConvertToCGS"
+        command="SetConvertToCGS"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether or not units will be
+          converted to CGS.
+        </Documentation>
+     </IntVectorProperty>
+     
      <!--  Set whether or not Particles are loaded -->
      <IntVectorProperty
         name="LoadParticles"
@@ -3204,6 +3217,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="LoadParticles" />
+          <Property name="ConvertToCGS" />
           <Property name="Level" />
           <Property name="PointArrayStatus" />
           <Property name="CellArrayStatus" />
