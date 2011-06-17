@@ -466,6 +466,8 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     this->LODMapper->SetScalarVisibility(1);
     this->Mapper->SelectColorArray(this->ColorArrayName);
     this->LODMapper->SelectColorArray(this->ColorArrayName);
+    this->Mapper->SetUseLookupTableScalarRange(1);
+    this->LODMapper->SetUseLookupTableScalarRange(1);
     switch (this->ColorAttributeType)
       {
     case CELL_DATA:
