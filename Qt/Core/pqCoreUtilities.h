@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqEventDispatcher.h"
 
+#include <QEventLoop>
 #include <QPointer>
 #include <QWidget>
 #include <QDir>
