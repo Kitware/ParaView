@@ -1,8 +1,27 @@
-#include "vtkFloatArray.h"
+/*=========================================================================
+
+Program:   Visualization Toolkit
+Module:    vtkSpyPlotBlock.cxx
+
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #include "vtkSpyPlotBlock.h"
+
+#include "vtkCellData.h"
+#include "vtkFloatArray.h"
+#include "vtkMath.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 #include "vtkBoundingBox.h"
+
+#include <sstream>
 #include <assert.h>
 
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
@@ -33,6 +52,8 @@ vtkSpyPlotBlock::vtkSpyPlotBlock() :
   this->Status.Fixed = 0;
   this->Status.Debug = 0;
   this->Status.AMR = 0;
+
+  this->CoordSystem = Cartesian3D;
 }
 
 //-----------------------------------------------------------------------------
@@ -505,14 +526,154 @@ int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream *stream,
   return 1;
 }
 
+//-----------------------------------------------------------------------------
 int vtkSpyPlotBlock::HasObserver(const char *) const
 {
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 int vtkSpyPlotBlock::InvokeEvent(const char *, void *) const
 {
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
+{
+  //if the number inputed is invalid we will make it a 3D coordinate
+  switch(coordinateSystem)
+    {
+    case vtkSpyPlotBlock::Cylinder1D:      
+      this->CoordSystem = vtkSpyPlotBlock::Cylinder1D;
+      break;
+    case vtkSpyPlotBlock::Sphere1D:
+      this->CoordSystem = vtkSpyPlotBlock::Sphere1D;  
+      break;
+    case vtkSpyPlotBlock::Cartesian2D:
+      this->CoordSystem = vtkSpyPlotBlock::Cartesian2D;
+      break;
+    case vtkSpyPlotBlock::Cylinder2D:
+      this->CoordSystem = vtkSpyPlotBlock::Cylinder2D;
+      break;
+    case vtkSpyPlotBlock::Cartesian3D:
+    default: //if unkown make it 3D
+      this->CoordSystem = vtkSpyPlotBlock::Cartesian3D;
+      break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data, 
+  const int &numberOfMaterials, vtkDataArray** materialMasses, 
+  vtkDataArray** materialVolumeFractions, int dims[3],
+  const int& downConvertVolumeFraction  ) const
+{
+  double spacing[3] = {0,0,0};
+  this->GetSpacing(spacing);
+  
+  //construct the density arrays for all the materials
+  vtkFloatArray** materialDensities = new vtkFloatArray*[numberOfMaterials];  
+  bool* validDensityToCompute = new bool[numberOfMaterials];
+  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    //only create density arrays for materials that we have all the needed information for
+    validDensityToCompute[i] = materialMasses[i] != NULL && materialVolumeFractions[i] != NULL;
+    if ( validDensityToCompute[i] )
+      {
+      materialDensities[i] = vtkFloatArray::New();
+      std::stringstream buffer;
+      buffer << "Derived Density - " << i+1;
+      materialDensities[i]->SetName(buffer.str().c_str());
+      materialDensities[i]->SetNumberOfComponents(1);
+      materialDensities[i]->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+      }
+    }  
+
+  double volume = -1, mass = -1, density = -1, volfrac = -1;  
+  vtkIdType pos = 0;
+  for ( int i=0; i < dims[0]; i++)
+    {
+    //not a bug, volume is constant for across the x value
+    volume = this->GetCellVolume(spacing,i);
+    for ( int j=0; j < dims[1]; j++)
+      {
+      for ( int k=0; k < dims[2]; k++, pos++)
+        {
+        //sum the mass for each each material
+        for(int mat=0; mat<numberOfMaterials;++mat)
+          {
+          if ( validDensityToCompute[mat] )
+            {
+            mass = materialMasses[mat]->GetTuple1(pos);
+            volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
+            if ( downConvertVolumeFraction )
+              {
+              //converting from 0-255 to a float
+              volfrac /= 255.0; 
+              }
+            density = mass * ( volume * volfrac );
+            materialDensities[mat]->SetTuple1(pos,density);
+            }
+          }        
+        }
+      }
+    }
+  
+  for ( int i=0; i < numberOfMaterials; i++)
+    {
+    if ( validDensityToCompute[i] )
+      {
+      data->AddArray(materialDensities[i]);
+      materialDensities[i]->Delete();
+      }
+    }
+  delete[] materialDensities;
+  delete[] validDensityToCompute;
+  
+}
+//-----------------------------------------------------------------------------
+double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i) const
+{  
+  if ( this->CoordSystem == Cartesian3D )
+    {
+    //3d space
+    return spacing[2] * spacing[1] * spacing[0];    
+    }
+  else
+    {
+    //make sure the cell index is valid;
+    double volume = -1;
+    if ( i < 0 || i >= this->Dimensions[0])
+      {
+      //invalid coordinate
+      return volume;
+      }
+
+    double xCoordSquared = (spacing[0] * i) * (spacing[0] * i); //get the x coordinate squared
+    double nextXCoordSquared = (spacing[0] * i + spacing[0]) * (spacing[0] * i + spacing[0]);
+
+    //determine the volume by the blocks coordiate system:
+    switch(this->CoordSystem)
+      {
+      case vtkSpyPlotBlock::Cylinder1D:      
+        volume = vtkMath::Pi() * (nextXCoordSquared - xCoordSquared);
+        break;
+      case vtkSpyPlotBlock::Sphere1D:
+        volume = 4 * (vtkMath::Pi()/3) * (nextXCoordSquared - xCoordSquared);
+        break;
+      case vtkSpyPlotBlock::Cartesian2D:
+        volume = spacing[1] * spacing[0];
+        break;
+      case vtkSpyPlotBlock::Cylinder2D:
+        volume = vtkMath::Pi() * (spacing[1]) * (nextXCoordSquared - xCoordSquared);
+        break;
+      }
+    return volume;
+    }
+
+  return -1;
 }
 
  

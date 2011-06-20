@@ -6,6 +6,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 =========================================================================*/
 #include "vtkPrismSurfaceReader.h"
+#include "vtkPrismPrivate.h"
 
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
@@ -21,7 +22,7 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
 #include "vtkPrismSESAMEReader.h"
-//#include "vtkRectilinearGridGeometryFilter.h"
+#include "vtkSESAMEConversionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
 #include "vtkStringArray.h"
@@ -29,8 +30,6 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkExtractPolyDataGeometry.h"
 #include "vtkBox.h"
 #include "vtkCleanPolyData.h"
-#include "vtkTransformFilter.h"
-#include "vtkTransform.h"
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -41,243 +40,12 @@ Module:    vtkPrismSurfaceReader.cxx
 
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
-namespace
-{
-class vtkSESAMEConversionFilter : public vtkPolyDataAlgorithm
-{
-public:
-  vtkTypeRevisionMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Construct with initial extent (0,100, 0,100, 0,0) (i.e., a k-plane).
-  static vtkSESAMEConversionFilter *New();
- // void SetConversions(double density,double temperature,double pressure,double energy);
-
-
-  void SetVariableConversionValues(int i, double value);
-  void SetNumberOfVariableConversionValues(int);
-  double GetVariableConversionValue(int i);
-
-  void AddVariableConversionNames( char*  value);
-  void RemoveAllVariableConversionNames();
-  const char * GetVariableConversionName(int i);
-
-
-
-
-
-
-
-protected:
-  vtkSESAMEConversionFilter();
-  ~vtkSESAMEConversionFilter() {};
-
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
- // virtual int FillInputPortInformation(int port, vtkInformation *info);
-
-
-
-  vtkSmartPointer<vtkStringArray> VariableConversionNames;
-  vtkSmartPointer<vtkDoubleArray> VariableConversionValues;
-
-private:
-  vtkSESAMEConversionFilter(const vtkSESAMEConversionFilter&);  // Not implemented.
-  void operator=(const vtkSESAMEConversionFilter&);  // Not implemented.
-};
-}
-vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.11");
-vtkStandardNewMacro(vtkSESAMEConversionFilter);
-
-//----------------------------------------------------------------------------
-vtkSESAMEConversionFilter::vtkSESAMEConversionFilter()
-{
-
-
-
-  this->VariableConversionNames = vtkSmartPointer<vtkStringArray>::New();
-  this->VariableConversionValues = vtkSmartPointer<vtkDoubleArray>::New();
-
-
-
-
-    this->SetNumberOfInputPorts(1);
-    this->SetNumberOfOutputPorts(1);
-}
-
-void vtkSESAMEConversionFilter::SetVariableConversionValues(int i, double value)
-{
-  this->VariableConversionValues->SetValue(i,value);
-  this->Modified();
-}
-void vtkSESAMEConversionFilter::SetNumberOfVariableConversionValues(int v)
-{
-  this->VariableConversionValues->SetNumberOfValues(v);
-}
-double vtkSESAMEConversionFilter::GetVariableConversionValue(int i)
-{
-  return this->VariableConversionValues->GetValue(i);
-}
-
-void vtkSESAMEConversionFilter::AddVariableConversionNames(char*  value)
-{
-  this->VariableConversionNames->InsertNextValue(value);
-    this->Modified();
-}
-void vtkSESAMEConversionFilter::RemoveAllVariableConversionNames()
-{
-  this->VariableConversionNames->Reset();
-    this->Modified();
-}
-const char * vtkSESAMEConversionFilter::GetVariableConversionName(int i)
-{
-  return this->VariableConversionNames->GetValue(i).c_str();
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkSESAMEConversionFilter::PrintSelf(ostream& os, vtkIndent indent)
-    {
-    this->Superclass::PrintSelf(os,indent);
-
-    os << indent << "Not Implemented: " << "\n";
-
-    }
-
-//----------------------------------------------------------------------------
-int vtkSESAMEConversionFilter::RequestData(
-                                       vtkInformation *vtkNotUsed(request),
-                                       vtkInformationVector **inputVector,
-                                       vtkInformationVector *outputVector)
-    {
-
-
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkPolyData *input = vtkPolyData::SafeDownCast(
-        inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if ( !input ) 
-    {
-        vtkDebugMacro( << "No input found." );
-        return 0;
-    }
-
-    vtkInformation *OutInfo = outputVector->GetInformationObject(0);
-    vtkPointSet *Output = vtkPointSet::SafeDownCast(
-        OutInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-
-    vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
-
-
-    vtkPoints *inPts;
-    vtkPointData *pd;
-
-    vtkIdType ptId, numPts;
-
-    localOutput->ShallowCopy(input);
-    localOutput->GetPointData()->DeepCopy(input->GetPointData());
-
-    inPts = localOutput->GetPoints();
-    pd = localOutput->GetPointData();
-
-    numPts = inPts->GetNumberOfPoints();
-
-   vtkIdType numArrays=localOutput->GetPointData()->GetNumberOfArrays();
-    vtkSmartPointer<vtkFloatArray> convertArray;
-
-    double conversion;
-    for(int i=0;i<numArrays;i++)
-    {
-      convertArray= vtkFloatArray::SafeDownCast(localOutput->GetPointData()->GetArray(i));
-      if(i<this->VariableConversionValues->GetNumberOfTuples())
-      {
-        conversion = this->VariableConversionValues->GetValue(i);
-      }
-      else
-      {
-        conversion=1.0;
-      }
-
-          for(ptId=0;ptId<numPts;ptId++)
-          {
-            convertArray->SetValue(ptId,convertArray->GetValue(ptId)*conversion);
-          }
-     }
-
-
-
-     //vtkStringArray* xName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("XAxisName"));
-     //vtkStringArray* yName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("YAxisName"));
-
-
-
-    //vtkSmartPointer<vtkFloatArray> xArray= vtkSmartPointer<vtkFloatArray>::New();
-    //xArray->SetNumberOfComponents(1);
-    //xArray->Allocate(numPts);
-    //if(xName)
-    //{
-    //  xArray->SetName(xName->GetValue(0).c_str());
-    //}
-    //else
-    //{
-    //  xArray->SetName("Density");
-    //}
-    //xArray->SetNumberOfTuples(numPts);
-
-    //vtkSmartPointer<vtkFloatArray> yArray= vtkSmartPointer<vtkFloatArray>::New();
-    //yArray->SetNumberOfComponents(1);
-    //yArray->Allocate(numPts);
-    //if(yName)
-    //{
-    //  yArray->SetName(yName->GetValue(0).c_str());
-    //}
-    //else
-    //{
-    //  yArray->SetName("Temperature");
-    //}
-    //yArray->SetNumberOfTuples(numPts);
-
-
-    //vtkSmartPointer<vtkPoints> newPts = vtkSmartPointer<vtkPoints>::New();
-    //newPts->SetNumberOfPoints(numPts);
-    //localOutput->SetPoints(newPts);
-
-
-    //double conversionValues[2];
-    //conversionValues[0]=1.0;
-    //conversionValues[0]=1.0;
-    //if(this->VariableConversionValues->GetNumberOfTuples()>=2)
-    //{
-    //  conversionValues[0]=this->VariableConversionValues->GetValue(0);
-    //  conversionValues[1]=this->VariableConversionValues->GetValue(1);
-    //}
-    //for(ptId=0;ptId<numPts;ptId++)
-    //{
-    //  double coords[3];
-    //  inPts->GetPoint(ptId,coords);
-    //  xArray->InsertValue(ptId,coords[0]*conversionValues[0]);
-    //  yArray->InsertValue(ptId,coords[1]*conversionValues[1]);
-    //}
-
-    //localOutput->GetPointData()->AddArray(xArray);
-    //localOutput->GetPointData()->AddArray(yArray);
-
-
-    Output->ShallowCopy(localOutput);
-    return 1;
-
-    }
-
 
 //---------------------------------------------------
-
-
-
 class vtkPrismSurfaceReader::MyInternal
     {
     public:
-         vtkSmartPointer<vtkPrismSESAMEReader> Reader;
+        vtkSmartPointer<vtkPrismSESAMEReader> Reader;
         vtkSmartPointer<vtkSESAMEConversionFilter> ConversionFilter;
 
         vtkSmartPointer<vtkPrismSESAMEReader> VaporizationReader;
@@ -296,8 +64,6 @@ class vtkPrismSurfaceReader::MyInternal
         vtkSmartPointer<vtkBox> Box;
 
         vtkSmartPointer<vtkCleanPolyData> CleanPolyData;
-        vtkSmartPointer<vtkTransformFilter> ScaleTransform;
-        vtkSmartPointer<vtkTransformFilter> ContourScaleTransform;
         vtkstd::string AxisVarName[3];
         vtkSmartPointer<vtkStringArray> ArrayNames;
 
@@ -345,10 +111,6 @@ class vtkPrismSurfaceReader::MyInternal
             this->YRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
              this->ZRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
            this->CRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
-
-           this->ScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
-           this->ContourScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
-
 
             this->XRangeArray->Initialize();
             this->XRangeArray->SetNumberOfComponents(1);
@@ -1136,6 +898,9 @@ int vtkPrismSurfaceReader::RequestData(
     return 0;
   }
   int tID=this->GetTable();
+  bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
   for(ptId=0;ptId<numPts;ptId++)
   {
 
@@ -1150,98 +915,11 @@ int vtkPrismSurfaceReader::RequestData(
 
 
     double coords[3];
-    if(xArray)
-    {
-      coords[0]=xArray->GetValue(ptId);
-    }
-    else
-    {
-      coords[0]=0.0;
-    }
+    coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+    coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+    coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+    vtkPrismCommon::scalePoint(coords,scalingEnabled,tID);
 
-    if(yArray)
-    {
-      coords[1]=yArray->GetValue(ptId);
-    }
-    else
-    {
-      coords[1]=0.0;
-    }
-
-    if(zArray)
-    {
-      coords[2]=zArray->GetValue(ptId);
-    }
-    else
-    {
-      coords[2]=0.0;
-    }
-
-
-
-    if(tID==502 ||
-      tID==503 ||
-      tID==504 ||
-      tID==505 ||
-      tID==601 ||
-      tID==602 ||
-      tID==603 ||
-      tID==604 ||
-      tID==605)
-    {
-      if(!this->GetXLogScaling())
-      {
-        coords[0]=pow(10.0,coords[0]);
-      }
-
-      if(!this->GetYLogScaling())
-      {
-        coords[1]=pow(10.0,coords[1]);
-      }
-
-      if(!this->GetZLogScaling())
-      {
-        coords[2]=pow(10.0,coords[2]);
-      }
-    }
-    else
-    {
-      if(this->GetXLogScaling())
-      {
-        if(coords[0]>0)
-        {
-          coords[0]=log(coords[0]);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-      }
-
-      if(this->GetYLogScaling())
-      {
-        if(coords[1]>0)
-        {
-          coords[1]=log(coords[1]);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-      }
-
-      if(this->GetZLogScaling())
-      {
-        if(coords[2]>0)
-        {
-          coords[2]=log(coords[2]);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-      }
-    }
     newPts->InsertPoint(ptId,coords);
 
   }
@@ -1321,40 +999,11 @@ int vtkPrismSurfaceReader::RequestData(
   {
     newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
   }
-  double scaleBounds[6];
-  this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
+ 
+  surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
 
-  double delta[3] = {
-    scaleBounds[1] - scaleBounds[0],
-    scaleBounds[3] - scaleBounds[2],
-    scaleBounds[5] - scaleBounds[4]
-  };
 
-  if(delta[0]<=1e-6)
-  {
-    delta[0]=100;
-  }
-  if(delta[1]<=1e-6)
-  {
-    delta[1]=100;
-  }
-  if(delta[2]<=1e-6)
-  {
-    delta[2]=100;
-  }
-
-  this->AspectScale[0]=100/delta[0];
-  this->AspectScale[1]=100/delta[1];
-  this->AspectScale[2]=100/delta[2];
-
-  vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
-
-  this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-  this->Internal->ScaleTransform->SetTransform(transform);
-  this->Internal->ScaleTransform->Update();
-  surfaceOutput->ShallowCopy(this->Internal->ScaleTransform->GetOutput());
-
+  //add the arrays needed by the custom cube axes representation
   if(newXArray)
   {
     vtkSmartPointer<vtkFloatArray> xRangeArray= vtkSmartPointer<vtkFloatArray>::New();
@@ -1365,6 +1014,12 @@ int vtkPrismSurfaceReader::RequestData(
     xRangeArray->InsertNextValue(rdb[0]);
     xRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(xRangeArray);
+
+    vtkSmartPointer<vtkStringArray> xNameArray = vtkSmartPointer<vtkStringArray>::New();
+    xNameArray->SetName("XTitle");
+    xNameArray->SetNumberOfValues(1);
+    xNameArray->SetValue(0,xArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(xNameArray);
   }
   if(newYArray)
   {
@@ -1376,6 +1031,12 @@ int vtkPrismSurfaceReader::RequestData(
     yRangeArray->InsertNextValue(rdb[0]);
     yRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(yRangeArray);
+
+    vtkSmartPointer<vtkStringArray> yNameArray = vtkSmartPointer<vtkStringArray>::New();
+    yNameArray->SetName("YTitle");
+    yNameArray->SetNumberOfValues(1);
+    yNameArray->SetValue(0,yArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(yNameArray);
   }
 
   if(newZArray)
@@ -1388,7 +1049,28 @@ int vtkPrismSurfaceReader::RequestData(
     zRangeArray->InsertNextValue(rdb[0]);
     zRangeArray->InsertNextValue(rdb[1]);
     surfaceOutput->GetFieldData()->AddArray(zRangeArray);
+
+    vtkSmartPointer<vtkStringArray> zNameArray = vtkSmartPointer<vtkStringArray>::New();
+    zNameArray->SetName("ZTitle");
+    zNameArray->SetNumberOfValues(1);
+    zNameArray->SetValue(0,zArray->GetName());
+    surfaceOutput->GetFieldData()->AddArray(zNameArray);
   }
+
+  
+  //add on the flag to the surface, curves and contours that they
+  //should be used to compute the world bounds.
+  vtkDoubleArray *prismBounds = vtkDoubleArray::New();
+  prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
+  prismBounds->SetNumberOfValues(6);
+  //we use the surface bounds as we want the properly scaled dataset including log scaling
+  localOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
+
+  surfaceOutput->GetFieldData()->AddArray(prismBounds);
+  curveOutput->GetFieldData()->AddArray(prismBounds);
+  contourOutput->GetFieldData()->AddArray(prismBounds);
+  prismBounds->FastDelete();
+
 
   if(this->Internal->DisplayContours)
   {
@@ -1417,14 +1099,15 @@ int vtkPrismSurfaceReader::RequestData(
 
       this->Internal->ContourFilter->SetInputArrayToProcess(
         0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
-      this->Internal->ContourFilter->Update();
-      this->Internal->ContourScaleTransform->SetInput(this->Internal->ContourFilter->GetOutput());
-      this->Internal->ContourScaleTransform->SetTransform(transform);
-      this->Internal->ContourScaleTransform->Update();
-      contourOutput->ShallowCopy(this->Internal->ContourScaleTransform->GetOutput());
+      this->Internal->ContourFilter->Update();      
+      contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
 
     }
-
+  }
+  else
+  {
+    vtkSmartPointer<vtkPoints> newContourPts = vtkSmartPointer<vtkPoints>::New();
+    contourOutput->SetPoints(newContourPts);
   }
 
   if(tID==301)
@@ -1432,14 +1115,18 @@ int vtkPrismSurfaceReader::RequestData(
 
     return this->RequestCurveData(curveOutput);
   }
-
+  else
+  {
+    vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
+    curveOutput->SetPoints(newCurvePts);
+  }
   return 1;
 
 
 
 }
 
-    //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 {
   vtkSmartPointer<vtkPolyData> resultPd[5];
@@ -1589,87 +1276,27 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
 
-
+        bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
         double coords[3];
         for(ptId=0;ptId<numPts;ptId++)
         {
-          if(xArray[v])
-          {
-            coords[0]=xArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-
-          if(yArray[v])
-          {
-            coords[1]=yArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-
-          if(zArray[v])
-          {
-            coords[2]=zArray[v]->GetValue(ptId);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-
-          if(this->GetXLogScaling())
-          {
-            if(coords[0]>0)
-            {
-              coords[0]=log(coords[0]);
-            }
-            else
-            {
-              coords[0]=0.0;
-            }
-          }
-
-          if(this->GetYLogScaling())
-          {
-            if(coords[1]>0)
-            {
-              coords[1]=log(coords[1]);
-            }
-            else
-            {
-              coords[1]=0.0;
-            }
-          }
-
-          if(this->GetZLogScaling())
-          {
-            if(coords[2]>0)
-            {
-              coords[2]=log(coords[2]);
-            }
-            else
-            {
-              coords[2]=0.0;
-            }
-          }
+          coords[0] = (xArray[v]) ? xArray[v]->GetValue(ptId) : 0.0;
+          coords[1] = (yArray[v]) ? yArray[v]->GetValue(ptId) : 0.0;
+          coords[2] = (zArray[v]) ? zArray[v]->GetValue(ptId) : 0.0;
+          vtkPrismCommon::logScale(coords,scalingEnabled);
+          
           newPts->InsertPoint(ptId,coords);
         }
 
 
         this->Internal->ExtractGeometry->SetInput(localOutput);
         this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-//        this->Internal->CleanPolyData->Update();
-
-        this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-        this->Internal->ScaleTransform->Update();
-
-
+        this->Internal->CleanPolyData->Update();
 
         vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-        output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+        output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
         resultPd[v]=output;
 
 
@@ -1807,72 +1434,17 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       newPts->SetNumberOfPoints(numPts);
       localOutput->SetPoints(newPts);
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
-      {
-        if(xArray)
         {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
+          
         newPts->InsertPoint(ptId,coords);
       }
 
@@ -1881,14 +1453,10 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-   //   this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
-
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[2]=output;
 
 
@@ -1923,8 +1491,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
     }
   }
-
-
 
   if(this->Internal->ShowSolidMelt)
   {
@@ -2029,86 +1595,27 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       localOutput->SetPoints(newPts);
 
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
-      {
-        if(xArray)
         {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
-
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
+          
         newPts->InsertPoint(ptId,coords);
       }
 
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-   //   this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
-
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[3]=output;
 
       vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
@@ -2234,84 +1741,26 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       localOutput->SetPoints(newPts);
 
 
-
+      bool scalingEnabled[3] = {this->GetXLogScaling(),
+                              this->GetYLogScaling(),
+                              this->GetZLogScaling()};
       double coords[3];
       for(ptId=0;ptId<numPts;ptId++)
       {
-        if(xArray)
-        {
-          coords[0]=xArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[0]=0.0;
-        }
+        coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
+        coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
+        coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+        vtkPrismCommon::logScale(coords,scalingEnabled);
 
-        if(yArray)
-        {
-          coords[1]=yArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[1]=0.0;
-        }
-
-        if(zArray)
-        {
-          coords[2]=zArray->GetValue(ptId);
-        }
-        else
-        {
-          coords[2]=0.0;
-        }
-
-        if(this->GetXLogScaling())
-        {
-          if(coords[0]>0)
-          {
-            coords[0]=log(coords[0]);
-          }
-          else
-          {
-            coords[0]=0.0;
-          }
-        }
-
-        if(this->GetYLogScaling())
-        {
-          if(coords[1]>0)
-          {
-            coords[1]=log(coords[1]);
-          }
-          else
-          {
-            coords[1]=0.0;
-          }
-        }
-
-        if(this->GetZLogScaling())
-        {
-          if(coords[2]>0)
-          {
-            coords[2]=log(coords[2]);
-          }
-          else
-          {
-            coords[2]=0.0;
-          }
-        }
         newPts->InsertPoint(ptId,coords);
       }
 
       this->Internal->ExtractGeometry->SetInput(localOutput);
       this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-  //    this->Internal->CleanPolyData->Update();
-
-      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
-      this->Internal->ScaleTransform->Update();
+      this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
+      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
       resultPd[4]=output;
 
 
@@ -2361,7 +1810,14 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
     appendPD->Update();
 
     curveOutput->ShallowCopy(appendPD->GetOutput());
-  }  return 1;
+  }
+  else
+  {
+
+    vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
+    curveOutput->SetPoints(newCurvePts);
+  }
+ return 1;
 }
 
 

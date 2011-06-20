@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QTimer;
 class ParaViewVRPN;
+class vtkVRQueue;
+class vtkVRQueueHandler;
 
 class pqVRPNStarter : public QObject
 {
@@ -52,14 +54,13 @@ public:
   void onStartup();
 
 protected:
-    QTimer *VRPNTimer;
-    ParaViewVRPN *InputDevice;
+  ParaViewVRPN *InputDevice;
+  vtkVRQueue* EventQueue;
+  vtkVRQueueHandler* Handler;
 
 private:
   pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
   void operator=(const pqVRPNStarter&); // Not implemented.
-
-
 };
 
 #endif

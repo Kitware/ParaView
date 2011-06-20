@@ -32,7 +32,7 @@
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkPVSessionCoreInterpreterHelper.h"
 #include "vtkSmartPointer.h"
 
@@ -220,8 +220,6 @@ vtkPVSessionCore::vtkPVSessionCore()
       this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
   observer->Delete();
 
-  this->ProxyDefinitionManager = vtkPVProxyDefinitionManager::New();
-
   this->ParallelController = vtkMultiProcessController::GetGlobalController();
   if (this->ParallelController &&
     this->ParallelController->GetLocalProcessId() > 0)
@@ -250,6 +248,14 @@ vtkPVSessionCore::vtkPVSessionCore()
     this->SymmetricMPIMode =
       vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode();
     }
+
+  // Setup some global/reserved SIObjects.
+  this->ProxyDefinitionManager = vtkSIProxyDefinitionManager::New();
+  this->ProxyDefinitionManager->SetGlobalID(
+    vtkSIProxyDefinitionManager::GetReservedGlobalID());
+  this->ProxyDefinitionManager->Initialize(this);
+  this->Internals->SIObjectMap[
+    this->ProxyDefinitionManager->GetGlobalID()] = this->ProxyDefinitionManager;
 }
 
 //----------------------------------------------------------------------------
@@ -274,11 +280,12 @@ vtkPVSessionCore::~vtkPVSessionCore()
     this->ParallelController->TriggerBreakRMIs();
     }
 
+  this->ProxyDefinitionManager->Delete();
+  this->ProxyDefinitionManager = NULL;
+
   // Clean local refs
   delete this->Internals;
   this->Internals = NULL;
-  this->ProxyDefinitionManager->Delete();
-  this->ProxyDefinitionManager = NULL;
 
   this->SetMPIMToNSocketConnection(NULL);
 }
@@ -348,20 +355,6 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
 
   vtkTypeUInt32 globalId = message->global_id();
 
-  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
-    {
-    // Special ParaView specific main components
-    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-      {
-      // Update custom definition
-      this->ProxyDefinitionManager->LoadCustomProxyDefinitions(message);
-      }
-
-    // TODO - FIXME_COLLABORATION: Forward registration proxy to other clients
-    return;
-    }
-
   // Standard management of SIObject ---------------------------------------
 
   // When the control reaches here, we are assured that the SIObject needs be
@@ -369,6 +362,11 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
   vtkSIObject* obj = this->Internals->GetSIObject(globalId);
   if (!obj)
     {
+    if (globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
+      {
+      return;
+      }
+
     if (!message->HasExtension(DefinitionHeader::server_class))
       {
       vtkErrorMacro("Message missing DefinitionHeader."
@@ -483,25 +481,15 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
     << "----------------------------------------------------------------\n"
     << message->DebugString().c_str());
 
-  vtkSIObject* obj;
-  vtkTypeUInt32 globalId = message->global_id();
-
-  // Manage reserved GlobalID for custom RemoteObject/SIObject  ------------
-  if(globalId < vtkReservedRemoteObjectIds::RESERVED_MAX_IDS)
-    {
-    // Special ParaView specific main components
-    if(globalId == this->ProxyDefinitionManager->GetReservedGlobalID())
-      {
-      // Update custom definition
-      this->ProxyDefinitionManager->GetXMLDefinitionState(message);
-      }
-
-    // FIXME_COLLABORATION_2: Get the server state for ProxyManager
-    }
-  else if ( obj = this->Internals->GetSIObject(message->global_id()) )
+  vtkSIObject* obj = this->Internals->GetSIObject(message->global_id());
+  if (obj != NULL)
     {
     // Generic SIObject
     obj->Pull(message);
+    }
+  else
+    {
+    LOG(<< "**** No such object located\n");
     }
 
   LOG(

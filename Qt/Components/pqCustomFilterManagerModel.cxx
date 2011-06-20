@@ -149,7 +149,7 @@ void pqCustomFilterManagerModel::addCustomFilter(QString name)
   // Make sure the name is new.
   if(this->Internal->contains(name))
     {
-    qDebug() << "Duplicate custom proxy definition added.";
+    // qDebug() << "Duplicate custom proxy definition added.";
     return;
     }
 

@@ -32,10 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __ParaViewVRPN_h
 #define __ParaViewVRPN_h
 
-#include <QObject>
+#include <QThread>
+#include <vrpn_Tracker.h>
+#include <vrpn_Button.h>
+#include <vrpn_Analog.h>
+#include <vrpn_Dial.h>
+#include <vrpn_Text.h>
+#include "vtkVRQueue.h"
+
+
+typedef QThread vtkThread;
 
 /// Callback to listen to VRPN events
-class ParaViewVRPN : public QObject
+class ParaViewVRPN : public vtkThread
 {
   Q_OBJECT
 public:
@@ -45,8 +54,7 @@ public:
   // Description:
   // Name of the device. For example, "Tracker0@localhost"
   // Initial value is a NULL pointer.
-  void SetName(const char *name);
-  const char *GetName() const;
+  void SetName(std::string name);
 
   // Description:
   // Initialize the device with the name.
@@ -56,16 +64,36 @@ public:
   // Tell if Init() was called succesfully
   bool GetInitialized() const;
 
-protected slots:
-  void callback();
+  // Description:
+  // Terminate the thread
+  void terminate();
+
+  // Description:
+  // Sets the Event Queue into which the vrpn data needs to be written
+  void SetQueue( vtkVRQueue* queue );
+
+ protected slots:
+  void run();
+
 
 protected:
-  char *Name;
+  void NewAnalogValue(vrpn_ANALOGCB data);
+  void NewButtonValue(vrpn_BUTTONCB data);
+  void NewTrackerValue(vrpn_TRACKERCB data );
+
+  friend void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
+  friend void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
+  friend void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
+
+  std::string Name;
+  bool Initialized;
+  bool _Stop;
+
+  vtkVRQueue* EventQueue;
 
   class pqInternals;
   pqInternals* Internals;
 
-  bool Initialized;
 
 private:
   ParaViewVRPN(const ParaViewVRPN&); // Not implemented.

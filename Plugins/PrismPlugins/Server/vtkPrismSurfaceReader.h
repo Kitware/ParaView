@@ -15,6 +15,9 @@
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 
+class vtkSESAMEConversionFilter;
+class vtkPrismSESAMEReader;
+
 class VTK_EXPORT vtkPrismSurfaceReader : public vtkPolyDataAlgorithm 
 {
 public:
@@ -131,9 +134,11 @@ public:
   void SetThresholdYBetween(double lower, double upper);
 
  virtual double *GetXThresholdBetween();
- virtual void GetXThresholdBetween (double &_arg1, double &_arg2);
  virtual void GetXThresholdBetween (double _arg[2]);
+ virtual void GetXThresholdBetween (double &_arg1, double &_arg2);
+ 
 
+  //vtkGetVector2Macro(XThresholdBetween,double);
   vtkGetVector2Macro(YThresholdBetween,double);
 
 
@@ -159,16 +164,11 @@ public:
 
  void GetRanges(vtkDoubleArray* RangeArray);
 
-  vtkGetVectorMacro(AspectScale,double,3);
-
 
 protected:
   vtkPrismSurfaceReader();
   ~vtkPrismSurfaceReader();
 
-
-  double AspectScale[3];
-  //double Range[6];
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];
@@ -187,6 +187,7 @@ protected:
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   //int FillOutputPortInformation(int port, vtkInformation* info);
   int RequestCurveData(vtkPointSet *curveOutput);
+
 private:
   vtkPrismSurfaceReader(const vtkPrismSurfaceReader&);  // Not implemented.
   void operator=(const vtkPrismSurfaceReader&);  // Not implemented.

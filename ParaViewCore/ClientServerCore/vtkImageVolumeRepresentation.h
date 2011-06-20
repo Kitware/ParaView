@@ -34,6 +34,7 @@ class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
+class vtkPVUpdateSuppressor;
 class vtkUnstructuredDataDeliveryFilter;
 class vtkVolumeMapper;
 class vtkVolumeProperty;
@@ -107,6 +108,11 @@ public:
   void SetColor(vtkColorTransferFunction* lut);
   void SetScalarOpacity(vtkPiecewiseFunction* pwf);
   void SetScalarOpacityUnitDistance(double val);
+  void SetAmbient(double);
+  void SetDiffuse(double);
+  void SetSpecular(double);
+  void SetSpecularPower(double);
+  void SetShade(bool);
 
 //BTX
 protected:
@@ -153,6 +159,7 @@ protected:
 
   vtkOutlineSource* OutlineSource;
   vtkUnstructuredDataDeliveryFilter* OutlineDeliveryFilter;
+  vtkPVUpdateSuppressor* OutlineUpdateSuppressor;
   vtkPolyDataMapper* OutlineMapper;;
 
   int ColorAttributeType;

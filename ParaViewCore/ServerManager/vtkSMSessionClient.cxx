@@ -29,7 +29,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkPVSessionServer.h"
-#include "vtkPVProxyDefinitionManager.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -270,13 +269,6 @@ bool vtkSMSessionClient::Connect(const char* url)
 void vtkSMSessionClient::Initialize()
 {
   this->Superclass::Initialize();
-
-  // Update definition from server
-  vtkSMMessage msg;
-  msg.set_global_id(this->GetProxyDefinitionManager()->GetReservedGlobalID());
-  msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
-  this->PullState(&msg);
-  this->GetProxyDefinitionManager()->LoadXMLDefinitionState(&msg);
 
   // Setup the socket connnection between data-server and render-server.
   if (this->DataServerController && this->RenderServerController)

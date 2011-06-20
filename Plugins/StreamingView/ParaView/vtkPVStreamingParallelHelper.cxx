@@ -80,12 +80,14 @@ void vtkPVStreamingParallelHelper::Reduce(bool &flag)
     return;
     }
   int value = (int)flag;
+  int result = value;
   if (parallelController)
     {
     //server nodes all continue if any needs to
-    parallelController->AllReduce(&value, &value, 1,
+    parallelController->AllReduce(&value, &result, 1,
                                   vtkCommunicator::LOGICAL_OR_OP);
     }
+  value = result;
 
   vtkMultiProcessController* c_s_controller =
     this->SynchronizedWindows->GetClientServerController();

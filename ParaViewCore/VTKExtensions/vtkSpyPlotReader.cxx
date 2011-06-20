@@ -91,6 +91,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
+  this->ComputeDerivedVariables = 1;
   this->DownConvertVolumeFraction = 1;
   this->MergeXYZComponents = 1;
 
@@ -104,6 +105,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
+  this->UpdateFileCallCount = 0;
 
   this->TimeRequestedFromPipeline = false;
 }
@@ -121,6 +123,31 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
   delete this->Bounds;
   this->Map = 0;
   this->SetGlobalController(0);
+}
+
+
+//-----------------------------------------------------------------------------
+// Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+// whether the dataset is AMR.
+void vtkSpyPlotReader::SetFileName(const char* filename)
+{  
+  if ( this->FileName == NULL && filename == NULL) { return;}
+  if ( this->FileName && filename && (!strcmp(this->FileName,filename))) { return;}
+  if (this->FileName) { delete [] this->FileName; }
+  if (filename)
+    {
+    size_t n = strlen(filename) + 1;
+    char *cp1 =  new char[n];
+    const char *cp2 = (filename);
+    this->FileName = cp1;
+    do { *cp1++ = *cp2++; } while ( --n );
+    }
+   else
+    {
+    this->FileName = NULL;
+    }
+  this->UpdateFileCallCount = 0;
+  this->Modified();
 }
 
 
@@ -191,6 +218,25 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
 int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
                                   vtkInformationVector* outputVector)
 {
+  if (this->UpdateFileCallCount >= 2)
+    {
+    //We need to call UpdateFile twice once in RequestDataObject to set isAmr
+    //and a second time in RequestInformation so that the time information is properly set
+    //because of this design issue, these method should be refactored. But currently
+    //I don't know enough about spy plot to cleanly see a way to do this.
+
+    //so whenever a file name is set we will reset UpdateFileCallCount to zero.
+    //than the calls to updateFile in request data object and request information will
+    //increment the counter and make sure the method doesn't execute more than twice
+
+    //When the file count is greater than two the only thing we have to do is handle
+    //changes to the temporal step, so we always call UpdateMetaData
+    
+    this->UpdateMetaData(request,outputVector);
+    return 1;
+    }
+  this->UpdateFileCallCount++;
+
   ifstream ifs(this->FileName);
   if(!ifs)
     {
@@ -563,20 +609,37 @@ int vtkSpyPlotRemoveBadGhostCells(
   */
   (void)* dataType;
   // skip some cell data.
+
+  //Performance analysis has shown that using ComputeCellId to be a bottleneck of the reader
+  //so we are going to replace the method with an incremental algorithm that will reduce the total 
+  //number of multiplications.
+  vtkIdType kOffset[2]={0,0},jOffset[2]={0,0};
+  vtkIdType realCellId=0,oldCellId=0;
+
   int xyz[3];
   int destXyz[3];
   DataType* dataPtr = static_cast<DataType*>(dataArray->GetVoidPointer(0));
   for (xyz[2] = realExtents[4], destXyz[2] = 0; 
        xyz[2] < realExtents[5]; ++xyz[2], ++destXyz[2])
     {
+    kOffset[0] = destXyz[2] * (realPtDims[1]-1);
+    kOffset[1] = xyz[2] * (ptDims[1]-1);
+
     for (xyz[1] = realExtents[2], destXyz[1] = 0;
          xyz[1] < realExtents[3]; ++xyz[1], ++destXyz[1])
       {
+      jOffset[0] = (kOffset[0] + destXyz[1]) * (realPtDims[0]-1);
+      jOffset[1] = (kOffset[1] + xyz[1]) * (ptDims[0]-1);
+
       for (xyz[0] = realExtents[0], destXyz[0] = 0;
            xyz[0] < realExtents[1]; ++xyz[0], ++destXyz[0])
         {
-        dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
-          dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+        realCellId = jOffset[0] + destXyz[0];
+        oldCellId = jOffset[1] + xyz[0];        
+        dataPtr[realCellId] = dataPtr[oldCellId];
+        //old slow way of calculating cell id
+        //dataPtr[vtkStructuredData::ComputeCellId(realPtDims,destXyz)] =
+        //  dataPtr[vtkStructuredData::ComputeCellId(ptDims,xyz)];
         }
       }
     }
@@ -927,13 +990,16 @@ int vtkSpyPlotReader::RequestData(
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
                               uniReader, cd);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,dims);
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
+        this->ComputeDerivedVars(cd, block, uniReader, blockID,realDims);
         }
+
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
         {
@@ -945,7 +1011,7 @@ int vtkSpyPlotReader::RequestData(
       if (this->MergeXYZComponents)
         {
         this->MergeVectors(cd);
-        }
+        }           
       }
     delete blockIterator;
     }
@@ -964,6 +1030,8 @@ int vtkSpyPlotReader::RequestData(
       {
       this->AddBlockIdArray(cds);
       }
+
+
 
   return 1;
 }
@@ -1905,7 +1973,7 @@ int vtkSpyPlotReader::PrepareData(vtkMultiBlockDataSet *hb,
                  << coutVector6(bounds) );
   vtkDebugMacro( << " Rectilinear grid pointer: " << rg );
   *rg=vtkRectilinearGrid::New();
-  (*rg)->SetExtent(extents);
+  (*rg)->SetExtent(extents);  
   hb->SetBlock(hb->GetNumberOfBlocks(), *rg);
   if (coordinates[0])
     {
@@ -1965,6 +2033,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
         // make sure we have a clean array
         }
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
+      
       //vtkDebugMacro( << __LINE__ << " Read data block: " 
       // << blockID << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
@@ -2402,6 +2471,41 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
         }
       }
     } 
+}
+
+//-----------------------------------------------------------------------------
+// synch data set structure
+int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
+  int dims[3])
+{
+  if ( this->ComputeDerivedVariables != 1 )
+    {
+    return 0;
+    }
+
+  int numberOfMaterials = reader->GetNumberOfMaterials();
+  
+  //get the mass and material volume array for each material
+  vtkDataArray** materialMasses = new vtkDataArray*[numberOfMaterials];
+  vtkDataArray** materialVolumeFractions = new vtkDataArray*[numberOfMaterials];
+  
+  //bit mask of which materials we have all the information for
+  for ( int i=0; i < numberOfMaterials; i++)    
+    {
+    materialMasses[i] = reader->GetMaterialMassField(blockID, i);
+    materialVolumeFractions[i] = reader->GetMaterialVolumeFractionField(blockID,i);    
+    }
+
+  block->SetCoordinateSystem(reader->GetCoordinateSystem());
+  block->ComputeDerivedVariables(data, numberOfMaterials,
+    materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
+    
+  //cleanup memory and leave  
+  delete[] materialMasses;
+  delete[] materialVolumeFractions;
+
+  return 1;
 }
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)

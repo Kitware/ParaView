@@ -27,12 +27,17 @@ GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h PrismCubeAxesEditorDialog.h )
+QT4_WRAP_CPP(MOC_SRCS 
+  PrismToolBarActions.h
+  PrismCore.h
+  PrismMenuActions.h
+  PrismObjectPanelsImplementation.h
+  PrismSurfacePanel.h
+  PrismPanel.h
+  PrismView.h )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui
-    Resources/UI/PrismDisplayProxyEditor.ui
-    Resources/UI/PrismCubeAxesEditorDialog.ui
     Resources/UI/PrismPanelWidget.ui)
 
 SET(UI_RESOURCES
@@ -52,32 +57,42 @@ SOURCE_GROUP("Resources" FILES
 SOURCE_GROUP("Generated" FILES
   ${RCS_SOURCES}
 )
+ADD_PARAVIEW_VIEW_MODULE(
+                         VIEW_IFACES
+                         VIEW_IFACE_SRCS
+                         VIEW_TYPE "PrismView"
+                         VIEW_NAME "Prism View"
+                         VIEW_XML_GROUP views
+                         VIEW_XML_NAME PrismView
+                         )
 
-ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBarActions 
+
+ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBarActions
                           GROUP_NAME "ToolBar/Prism")
 
-ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions 
+ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions
                           GROUP_NAME "MenuBar/Prism")
+
+
 # create a plugin for this panel
-ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1" 
+ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     SERVER_MANAGER_XML PRISMServerManagerXML.xml
-                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels
-                    SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx vtkSMPrismDoubleRangeDomain.cxx
+                    GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} PrismObjectPanels
+                    SERVER_MANAGER_SOURCES vtkSMPrismDoubleRangeDomain.cxx vtkSMPrismViewProxy.cxx
                     GUI_SOURCES
                     PrismToolBarActions.cxx
                     PrismCore.cxx
                     PrismMenuActions.cxx
-                    PrismDisplayProxyEditor.cxx
-                    PrismCubeAxesEditorDialog.cxx
-                    PrismDisplayPanelsImplementation.cxx
                     PrismObjectPanelsImplementation.cxx
                     PrismSurfacePanel.cxx
                     PrismPanel.cxx
+                    PrismView.cxx
                     ${RCS_SOURCES}
                     ${MOC_SRCS}
                     ${TOOLBAR_IFACE_SRCS}
                     ${MENU_IFACE_SRCS}
                     ${UI_BUILT_SOURCES}
+                    ${VIEW_IFACE_SRCS}
                     REQUIRED_ON_CLIENT
 )
 

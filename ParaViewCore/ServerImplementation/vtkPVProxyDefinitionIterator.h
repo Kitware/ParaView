@@ -30,7 +30,6 @@
 #include "vtkObject.h"
 
 class vtkPVXMLElement;
-class vtkPVProxyDefinitionManager;
 
 class VTK_EXPORT vtkPVProxyDefinitionIterator : public vtkObject
 {

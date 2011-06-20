@@ -24,7 +24,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkPVSessionCore.h"
 
 #include <vtkstd/map>
@@ -162,7 +162,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-vtkPVProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
+vtkSIProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 {
   if (this->SessionCore)
     {
@@ -209,7 +209,7 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
-  vtkPVProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
+  vtkSIProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
   vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
     message->GetExtension(ProxyState::xml_group).c_str(),
     message->GetExtension(ProxyState::xml_name).c_str(),
@@ -385,7 +385,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   assert(!name.empty() && this->GetSIProperty(name.c_str()) == NULL);
 
   // Patch XML to remove InformationHelper and set right si_class
-  vtkPVProxyDefinitionManager::PatchXMLProperty(propElement);
+  vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkSmartPointer<vtkObject> object;
   vtkstd::string classname;

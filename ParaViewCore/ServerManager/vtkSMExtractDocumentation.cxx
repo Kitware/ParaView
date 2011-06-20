@@ -1,6 +1,8 @@
 #include "vtkDataSetAttributes.h"
+#include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMArrayListDomain.h"
@@ -17,16 +19,14 @@
 #include "vtkSMNumberOfGroupsDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
-#include "vtkPVProxyDefinitionManager.h"
-#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkInitializationHelper.h"
-#include "vtkSMSession.h"
 #include <vtkstd/list>
 #include <vtkstd/string>
 #include <vtkstd/map>

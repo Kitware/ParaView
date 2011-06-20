@@ -1872,7 +1872,7 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-         <DataType value="vtkPointSet"/>
+         <DataType value="vtkDataSet"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array">
          <RequiredProperties>
@@ -10427,26 +10427,86 @@ This property controls how the filter works to generate tensor cell data. You ca
      </IntVectorProperty>
 
      <DoubleVectorProperty
-        name="RhoCScale"
-        command="SetRhoCScale"
-        label="scale factor for rho_c"
+        name="RhoC"
+        command="SetRhoC"
+        label="rho_c"
         number_of_elements="1"
-        default_values="1.0" >
+        default_values="2.77536627e11" >
      <DoubleRangeDomain name="range" />
        <Documentation>
-       Scale factor for rho_c in SOD halo finding such that rho_c' = rho_c * scale factor.  Initial rho_c is 2.77536627e11 (M_sun/h) / (Mpc/h)^3.
+       rho_c (critical density) for SOD halo finding.
        </Documentation>
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
-        name="SODMassScale"
-        command="SetSODMassScale"
-        label="scale factor for initial SOD mass"
+        name="SODMass"
+        command="SetSODMass"
+        label="initial SOD mass"
         number_of_elements="1"
-        default_values="1.0" >
+        default_values="1.0e14" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The initial SOD mass.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="MinRadiusFactor"
+        command="SetMinRadiusFactor"
+        label="minimum radius factor"
+        number_of_elements="1"
+        default_values="0.5" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       Minimum radius factor for SOD finding.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaxRadiusFactor"
+        command="SetMaxRadiusFactor"
+        label="maximum radius factor"
+        number_of_elements="1"
+        default_values="2.0" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       Maximum radius factor for SOD finding.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="SODBins"
+        command="SetSODBins"
+        label="number of bins"
+        number_of_elements="1"
+        default_values="20" >
+     <IntRangeDomain name="range" min="1" />
+       <Documentation>
+       Number of bins for SOD finding.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="MinFOFSize"
+        command="SetMinFOFSize"
+        label="minimum FOF size"
+        number_of_elements="1"
+        default_values="1000" >
+     <IntRangeDomain name="range" min="0" />
+       <Documentation>
+       Minimum FOF halo size to calculate an SOD halo.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MinFOFMass"
+        command="SetMinFOFMass"
+        label="minimum FOF mass"
+        number_of_elements="1"
+        default_values="5.0e12" >
      <DoubleRangeDomain name="range" />
        <Documentation>
-       Scale factor for the initial SOD mass such that mass' = mass * scale factor.  Initial SOD mass is 1.0e14 (M_sun/h).
+       Minimum FOF mass to calculate an SOD halo.
        </Documentation>
      </DoubleVectorProperty>
 

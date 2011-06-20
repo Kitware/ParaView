@@ -76,8 +76,8 @@ public:
 
   // Description:
   // Get and set the file name. It is either the name of the case file or the
-  // name of the single binary file.
-  vtkSetStringMacro(FileName);
+  // name of the single binary file.  
+  virtual void SetFileName(const char* filename);
   vtkGetStringMacro(FileName);
 
   // Description:
@@ -134,6 +134,14 @@ public:
   void SetDownConvertVolumeFraction(int vf);
   vtkGetMacro(DownConvertVolumeFraction,int);
   vtkBooleanMacro(DownConvertVolumeFraction,int);
+
+  // Description:
+  // If true, the reader will calculate all derived variables it can given
+  // which properties the user has selected
+  // True by default.
+  vtkSetMacro(ComputeDerivedVariables, int);
+  vtkGetMacro(ComputeDerivedVariables,int);
+  vtkBooleanMacro(ComputeDerivedVariables,int);
 
   // Description:
   // If true, the reader will merge scalar arrays named, for example, "X velocity"
@@ -334,6 +342,10 @@ protected:
                    vtkDataArray *a1,
                    vtkDataArray *a2,
                    vtkDataArray *a3);
+
+  int ComputeDerivedVariables;
+  int ComputeDerivedVars(vtkCellData* data, 
+    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
   
 
   vtkSpyPlotReaderMap *Map;
@@ -355,6 +367,8 @@ protected:
   bool TimeRequestedFromPipeline;
 
   int MergeXYZComponents;
+
+  int UpdateFileCallCount;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.

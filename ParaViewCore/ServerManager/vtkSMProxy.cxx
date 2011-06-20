@@ -31,7 +31,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkPVProxyDefinitionManager.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -1357,7 +1357,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     }
 
   // Patch XML to remove InformationHelper and set right si_class
-  vtkPVProxyDefinitionManager::PatchXMLProperty(propElement);
+  vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;
@@ -2110,20 +2110,6 @@ void vtkSMProxy::UpdatePipelineInformation()
     }
 
   this->UpdatePropertyInformation();
-}
-
-//---------------------------------------------------------------------------
-vtkClientServerStream& operator<< (vtkClientServerStream& stream,
-  const SIPROXY& manipulator)
-{
-  vtkClientServerStream substream;
-  substream << vtkClientServerStream::Invoke
-            << vtkClientServerID(1) // ID for the vtkSMSessionCore helper.
-            << "GetSIObject"
-            << manipulator.Reference->GetGlobalID()
-            << vtkClientServerStream::End;
-  stream << substream;
-  return stream;
 }
 
 //---------------------------------------------------------------------------

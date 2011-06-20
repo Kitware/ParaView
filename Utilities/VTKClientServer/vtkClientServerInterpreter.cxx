@@ -411,6 +411,10 @@ vtkClientServerInterpreter
 ::ProcessCommandDelete(const vtkClientServerStream& msg, int midx)
 {
   // This command ignores any previous result.
+  if(this->LastResultMessage == NULL)
+    {
+    return 0;
+    }
   this->LastResultMessage->Reset();
 
   // Get the ID to delete.

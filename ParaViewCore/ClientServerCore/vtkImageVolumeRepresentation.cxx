@@ -26,6 +26,7 @@
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVUpdateSuppressor.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredDataDeliveryFilter.h"
@@ -50,6 +51,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->Internals = new vtkInternals();
   this->DefaultMapper = vtkFixedPointVolumeRayCastMapper::New();
   this->Property = vtkVolumeProperty::New();
+
   this->Actor = vtkPVLODVolume::New();
   this->Actor->SetProperty(this->Property);
 
@@ -57,6 +59,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 
   this->OutlineSource = vtkOutlineSource::New();
   this->OutlineDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
+  this->OutlineUpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->OutlineMapper = vtkPolyDataMapper::New();
 
   this->ColorArrayName = 0;
@@ -66,8 +69,10 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->CacheKeeper->SetInput(this->Cache);
   this->OutlineDeliveryFilter->SetInputConnection(
     this->OutlineSource->GetOutputPort());
-  this->OutlineMapper->SetInputConnection(
+  this->OutlineUpdateSuppressor->SetInputConnection(
     this->OutlineDeliveryFilter->GetOutputPort());
+  this->OutlineMapper->SetInputConnection(
+    this->OutlineUpdateSuppressor->GetOutputPort());
   this->Actor->SetLODMapper(this->OutlineMapper);
 }
 
@@ -80,6 +85,7 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->Actor->Delete();
   this->OutlineSource->Delete();
   this->OutlineDeliveryFilter->Delete();
+  this->OutlineUpdateSuppressor->Delete();
   this->OutlineMapper->Delete();
   this->CacheKeeper->Delete();
 
@@ -151,7 +157,7 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     // // this is where we will look to see on what nodes are we going to render and
     // // render set that up.
     this->OutlineDeliveryFilter->ProcessViewRequest(inInfo);
-    this->OutlineDeliveryFilter->Update();
+    this->OutlineUpdateSuppressor->ForceUpdate();
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -165,6 +171,9 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  // mark delivery filters modified.
+  this->OutlineDeliveryFilter->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -206,7 +215,6 @@ bool vtkImageVolumeRepresentation::IsCached(double cache_key)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::MarkModified()
 {
-  this->OutlineDeliveryFilter->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.
@@ -328,4 +336,34 @@ void vtkImageVolumeRepresentation::SetScalarOpacity(vtkPiecewiseFunction* pwf)
 void vtkImageVolumeRepresentation::SetScalarOpacityUnitDistance(double val)
 {
   this->Property->SetScalarOpacityUnitDistance(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetAmbient(double val)
+{
+  this->Property->SetAmbient(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetDiffuse(double val)
+{
+  this->Property->SetDiffuse(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetSpecular(double val)
+{
+  this->Property->SetSpecular(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetSpecularPower(double val)
+{
+  this->Property->SetSpecularPower(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetShade(bool val)
+{
+  this->Property->SetShade(val);
 }

@@ -25,16 +25,20 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotBlock_h
 #define __vtkSpyPlotBlock_h
 
+#include "vtkSystemIncludes.h"
+
+class vtkCellData;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkSpyPlotIStream;
 class vtkBoundingBox;
 
-class VTK_EXPORT vtkSpyPlotBlock {
+class VTK_EXPORT vtkSpyPlotBlock
+{
 public:
+  
   vtkSpyPlotBlock();
-  ~vtkSpyPlotBlock();
-
+  ~vtkSpyPlotBlock();    
   // Description:
   // 
   int GetLevel() const;
@@ -82,7 +86,20 @@ public:
   const char *GetClassName() const;
   int HasObserver(const char *) const;
   int InvokeEvent(const char *, void *) const;
+    
+  void SetCoordinateSystem(const int &coordinateSystem);
+
+  void ComputeDerivedVariables( vtkCellData *data, const int &numberOfMaterials, 
+    vtkDataArray** materialMasses, vtkDataArray** materialVolumeFractions,
+    int dims[3], const int &downConvertVolumeFraction) const;
+
+  //Parameter i is the x dimension index not coordinate location
+  //will return a negative volume if you requst a the volume of a cell
+  //that is outside the demensions of the block
+  double GetCellVolume(double spacing[3], const int &i) const;
+
 protected:
+  
   int Dimensions[3];
   struct BlockStatusType
   {
@@ -100,6 +117,16 @@ protected:
   int SavedExtents[6];
   int SavedRealExtents[6];
   int SavedRealDims[6];
+private:
+  enum CoordinateSystem
+    {
+    Cylinder1D=11,
+    Sphere1D=12,
+    Cartesian2D=20,
+    Cylinder2D=21,
+    Cartesian3D=30
+    };
+  CoordinateSystem CoordSystem;
 };
 
 inline int vtkSpyPlotBlock::GetLevel() const 

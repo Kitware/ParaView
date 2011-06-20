@@ -121,7 +121,6 @@ bool vtkTextSourceRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkTextSourceRepresentation::MarkModified()
 {
-  this->DataCollector->Modified();
   if (!this->GetUseCache())
     {
     // Cleanup caches when not using cache.
@@ -141,6 +140,8 @@ int vtkTextSourceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
+  this->DataCollector->Modified();
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -183,6 +184,9 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
   if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
     {
     this->DataCollector->Update();
+
+    // since there's no direct connection between the mapper and the collector,
+    // we don't put an update-suppressor in the pipeline.
 
     vtkstd::string text;
 
