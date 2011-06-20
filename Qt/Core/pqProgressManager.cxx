@@ -109,7 +109,6 @@ void pqProgressManager::lockProgress(QObject* object)
 
   if (this->Lock)
     {
-    qDebug() << "Progress is already locked.";
     return;
     }
   this->Lock = object;
@@ -147,9 +146,16 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     {
     return;
     }
-  this->InUpdate = true;
-  pqCoreUtilities::processEvents();
-  emit this->progress(message, progress_val);  
+  this->InUpdate = true;    
+  emit this->progress(message, progress_val);
+  if ( progress_val > 0)
+    {
+    //we don't want to call a processEvents on zero progress
+    //since that breaks numerous other classes currently in ParaView
+    //mainly because of subtle timing issues from QTimers that are expected
+    //to expire in a certain order
+    pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
   this->InUpdate = false;
 }
 
@@ -187,7 +193,7 @@ void pqProgressManager::setEnableProgress(bool enable)
     {
     emit this->enableProgress(enable);
     }
-  this->InUpdate = false;
+  this->InUpdate = false;  
 }
 
 //-----------------------------------------------------------------------------
@@ -234,7 +240,7 @@ void pqProgressManager::onProgress(vtkObject* caller)
     this->onEndProgress();
     return;
     }
-
+  
   // only forward progress events to the GUI if we get at least .05 seconds
   // since the last time we forwarded the progress event
   double lastprog = vtkTimerLog::GetUniversalTime();
