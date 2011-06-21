@@ -48,14 +48,13 @@ class QTWIDGETS_EXPORT pqProgressBar : public QWidget
 public:
   pqProgressBar(QWidget* _p);
   virtual ~pqProgressBar();
-
 public slots:
   void reset();
   void setProgress(const QString& message, int value);
-
 protected:
   QProgressBar* ProgressBar;
   QLabel* ProgressLabel;
+  QString PreviousMessage;
 };
 
 #endif

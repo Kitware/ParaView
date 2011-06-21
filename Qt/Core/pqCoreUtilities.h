@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCoreUtilities_h
 
 #include "pqCoreExport.h"
+#include "pqEventDispatcher.h"
 
+#include <QEventLoop>
 #include <QPointer>
 #include <QWidget>
 #include <QDir>
@@ -62,6 +64,13 @@ public:
       pqCoreUtilities::MainWidget = pqCoreUtilities::findMainWindow();
       }
     return pqCoreUtilities::MainWidget; 
+    }
+
+  /// Call QApplication::processEvents plus make sure the testing framework
+  /// is 
+  static void processEvents(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents)
+    {
+    pqEventDispatcher::processEvents(flags);
     }
 
   /// Return the path of the root ParaView user specific configuration directory

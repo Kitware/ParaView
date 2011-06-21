@@ -178,7 +178,7 @@ VTK_ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
 
 ## Widgets does not depend on VTK/ParaView. Only Qt.
 TARGET_LINK_LIBRARIES(pqWidgets
-  ${QT_LIBRARIES}
+  ${QT_LIBRARIES}  
 )
 
 if(APPLE)

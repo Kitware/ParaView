@@ -114,5 +114,3 @@ void pqProgressWidget::enableAbort(bool enabled)
 {
   this->AbortButton->setEnabled(enabled);
 }
-
-

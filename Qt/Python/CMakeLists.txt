@@ -9,6 +9,8 @@ INCLUDE_DIRECTORIES(
   ${pqCore_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
+  ${QtTesting_SOURCE_DIR}
+  ${QtTesting_BINARY_DIR}
   ${QtPython_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}
