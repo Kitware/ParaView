@@ -146,8 +146,7 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     {
     return;
     }
-  this->InUpdate = true;    
-  emit this->progress(message, progress_val);
+  this->InUpdate = true;  
   if ( progress_val > 0)
     {
     //we don't want to call a processEvents on zero progress
@@ -156,6 +155,7 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     //to expire in a certain order
     pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
     }
+  emit this->progress(message, progress_val);
   this->InUpdate = false;
 }
 
