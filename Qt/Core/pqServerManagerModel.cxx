@@ -338,7 +338,7 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
       this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
     QObject::connect(
       source, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-      this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+      this, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)));
     QObject::connect(
       source, SIGNAL(dataUpdated(pqPipelineSource*)),
       this, SIGNAL(dataUpdated(pqPipelineSource*)));

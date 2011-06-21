@@ -151,6 +151,7 @@ SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
 SET (XYHistogram_BREAK TRUE)
 
+SET(ExtractLevel_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.

@@ -590,7 +590,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   this->DisableSlots = 0;
-  QTimer::singleShot(0, this, SLOT(updateEnableState()));
+  //QTimer::singleShot(0, this, SLOT(updateEnableState()));
 
 
   //
@@ -620,6 +620,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     {
     this->Internal->Shading->setEnabled(false);
     }
+
+  this->updateEnableState();
 
 }
 
