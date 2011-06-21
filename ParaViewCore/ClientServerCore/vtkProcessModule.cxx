@@ -184,7 +184,9 @@ bool vtkProcessModule::Finalize()
   // destroy the process-module.
   vtkProcessModule::Singleton = NULL;
 
-  // release the controller reference.
+  // We don't really need to call SetGlobalController(NULL) since
+  // it's really stored with a weak pointer.  We set it to null anyways
+  // in case it gets changed later to reference counting the pointer
   vtkMultiProcessController::SetGlobalController(NULL);
   vtkProcessModule::GlobalController->Finalize(/*finalizedExternally*/1);
   vtkProcessModule::GlobalController = NULL;
@@ -332,7 +334,7 @@ vtkSessionIterator* vtkProcessModule::NewSessionIterator()
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkProcessModule::GetGlobalController()
 {
-  return vtkProcessModule::GlobalController;
+  return vtkMultiProcessController::GetGlobalController();
 }
 
 //----------------------------------------------------------------------------
