@@ -41,6 +41,9 @@ echo "Setting up the topic stage..."
 ./SetupTopicStage.sh || exit 1
 echo
 
+echo "Setting up the PVVTK stage..."
+./SetupPVVTK.sh || exit 1
+
 echo "Setting up git aliases..."
 ./SetupGitAliases.sh || exit 1
 echo
