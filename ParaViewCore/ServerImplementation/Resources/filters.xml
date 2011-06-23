@@ -191,6 +191,17 @@
            </Documentation>
       </InputProperty>
 
+      <IntVectorProperty
+         name="ForwardUpstream"
+         command="SetForwardUpstream"
+         number_of_elements="1"
+         default_values="0">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           This property specifies whether or not requests will be propagated
+           upstream.
+         </Documentation>
+      </IntVectorProperty>
       
       <IntVectorProperty
         name="Level"
