@@ -242,7 +242,23 @@
             This property specifies the Flash file name
           </Documentation>        
      </StringVectorProperty>
-  
+            
+    <!-- Display the number of levels -->
+    <IntVectorProperty
+        name="NumLevels"
+        command="GetNumberOfLevels"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+     <!--  Display the number of blocks -->
+      <IntVectorProperty
+        name="NumBlocks"
+        command="GetNumberOfBlocks"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
      <!--  Define MaxLevel property -->
      <IntVectorProperty
         name="Level"
@@ -255,20 +271,7 @@
           resolution that will be visible.
         </Documentation>
      </IntVectorProperty>
-     
-     <!--  Set whether or not Particles are loaded -->
-     <IntVectorProperty
-        name="LoadParticles"
-        command="SetLoadParticles"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          This property specifies whether or not particles
-          are loaded
-        </Documentation>
-     </IntVectorProperty>
-     
+          
      <!--  Array Selection GUI Component -->     
      <StringVectorProperty
         name="CellArrayInfo"
@@ -354,6 +357,22 @@
           </Documentation>        
      </StringVectorProperty>
   
+     <!-- Display the number of levels -->
+    <IntVectorProperty
+        name="NumLevels"
+        command="GetNumberOfLevels"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+     <!--  Display the number of blocks -->
+      <IntVectorProperty
+        name="NumBlocks"
+        command="GetNumberOfBlocks"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
      <!--  Define MaxLevel property -->
      <IntVectorProperty
         name="Level"
@@ -379,20 +398,7 @@
           converted to CGS.
         </Documentation>
      </IntVectorProperty>
-     
-     <!--  Set whether or not Particles are loaded -->
-     <IntVectorProperty
-        name="LoadParticles"
-        command="SetLoadParticles"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          This property specifies whether or not particles
-          are loaded
-        </Documentation>
-     </IntVectorProperty>
-     
+          
      <!--  Array Selection GUI Component -->     
      <StringVectorProperty
         name="CellArrayInfo"
@@ -3151,7 +3157,8 @@
                proxyname="FlashReaderCore">
         </Proxy>
         <ExposedProperties>
-          <Property name="LoadParticles" />
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
           <Property name="Level" />
           <Property name="PointArrayStatus" />
           <Property name="CellArrayStatus" />
@@ -3216,7 +3223,8 @@
                proxyname="EnzoReaderCore">
         </Proxy>
         <ExposedProperties>
-          <Property name="LoadParticles" />
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
           <Property name="ConvertToCGS" />
           <Property name="Level" />
           <Property name="PointArrayStatus" />
