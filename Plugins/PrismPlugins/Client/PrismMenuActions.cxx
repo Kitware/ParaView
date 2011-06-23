@@ -7,20 +7,12 @@
 PrismMenuActions::PrismMenuActions(QObject* p)
 :QActionGroup(p)
     {
-
-     this->setParent(pqCoreUtilities::mainWidget());
+    this->setParent(pqCoreUtilities::mainWidget());
     PrismCore* core=PrismCore::instance();
 
-    core->createMenuActions(this);
-/*
-    QList<QAction*> actionsList;
-    core->actions(actionsList);
-    foreach(QAction *a,actionsList)
-        {
-        this->addAction(a);
-        }
-*/
-
+    QAction *prismView = new QAction(this);
+    QAction *sesameFilter = new QAction(this);
+    core->registerActions(prismView,sesameFilter);
     }
 
 PrismMenuActions::~PrismMenuActions()
