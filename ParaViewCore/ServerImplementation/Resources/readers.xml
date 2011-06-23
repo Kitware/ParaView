@@ -25,6 +25,14 @@
         </Documentation>         
       </StringVectorProperty>
     
+     <!-- Display the number of Particles -->
+    <IntVectorProperty
+        name="NumParticles"
+        command="GetTotalNumberOfParticles"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
     <IntVectorProperty name="Frequency"
                        command="SetFrequency"
                        number_of_elements="1"
@@ -126,6 +134,14 @@
         </Documentation>         
     </StringVectorProperty>
     
+     <!-- Display the number of Particles -->
+    <IntVectorProperty
+        name="NumParticles"
+        command="GetTotalNumberOfParticles"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
     <IntVectorProperty name="Frequency"
                        command="SetFrequency"
                        number_of_elements="1"
@@ -3025,6 +3041,7 @@
                  proxyname="FlashParticlesReaderCore" >
           </Proxy>
           <ExposedProperties>
+            <Property name="NumParticles" />
             <Property name="Frequency" />
             <Property name="FilterLocation" />
             <Property name="MinLocation" />
@@ -3091,6 +3108,7 @@
                proxyname="EnzoParticlesReaderCore">
         </Proxy>
         <ExposedProperties>
+          <Property name="NumParticles" />
           <Property name="Frequency" />
           <Property name="FilterLocation" />
           <Property name="MinLocation" />
