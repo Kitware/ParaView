@@ -26,15 +26,15 @@ void vtkPSciVizMultiCorrelativeStats::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
 }
 
-int vtkPSciVizMultiCorrelativeStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
+int vtkPSciVizMultiCorrelativeStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable* inData )
 {
   // Create the statistics filter and run it
   vtkPMultiCorrelativeStatistics* stats = vtkPMultiCorrelativeStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );
-  vtkIdType ncols = trainingData->GetNumberOfColumns();
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
+  vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
+    stats->SetColumnStatus( inData->GetColumnName( i ), 1 );
     }
 
   stats->SetLearnOption( true );

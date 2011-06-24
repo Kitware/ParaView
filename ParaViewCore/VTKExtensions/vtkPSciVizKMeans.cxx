@@ -31,18 +31,18 @@ void vtkPSciVizKMeans::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "Tolerance: " << this->Tolerance << "\n";
 }
 
-int vtkPSciVizKMeans::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
+int vtkPSciVizKMeans::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable* inData )
 {
   // Create the statistics filter and run it
   vtkPKMeansStatistics* stats = vtkPKMeansStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
   stats->SetDefaultNumberOfClusters( this->K );
   stats->SetMaxNumIterations( this->MaxNumIterations );
   stats->SetTolerance( this->Tolerance );
-  vtkIdType ncols = trainingData->GetNumberOfColumns();
+  vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
+    stats->SetColumnStatus( inData->GetColumnName( i ), 1 );
     }
 
   stats->SetLearnOption( true );

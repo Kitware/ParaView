@@ -90,12 +90,10 @@ public:
     * Doing so can result in a too-liberal estimate of model error, especially if overfitting occurs.
     * Because we expect that MODEL_AND_ASSESS, despite being ill-advised, will be frequently used
     * the TrainingFraction parameter has been created.
-    * By fitting a model using only a small fraction of the data present,
-    * the hope is that the remaining data will indicate whether overfitting occurred.
     */
   enum Tasks
     {
-    FULL_STATISTICS,  //!< Compute statistics on all of the data
+    MODEL_INPUT,      //!< Execute Learn and Derive operations of a statistical engine on the input dataset
     CREATE_MODEL,     //!< Create a statistical model from a random subset the input dataset
     ASSESS_INPUT,     //!< Assess the input dataset using a statistical model from input port 1
     MODEL_AND_ASSESS  //!< Create a statistical model of the input dataset and use it to assess the dataset. This is a bad idea.
@@ -137,19 +135,10 @@ protected:
   virtual int PrepareTrainingTable( vtkTable* trainingTable, vtkTable* fullDataTable, vtkIdType numObservations );
 
   // Description:
-  // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
-  //
-  // The name of a vtkDataObject subclass should be returned.
-  // If you override this method, you <b>may</b> also override CreateModelDataType();
-  // if you don't, then the instantiator will be used to create an object of the type
-  // specified by GetModelDataTypeName().
-  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
-
-  // Description:
-  // Method subclasses <b>must</b> override to fit a model to the given training data.
+  // Method subclasses <b>must</b> override to calculate a full model from the given input data.
   // The model should be placed on the first output port of the passed vtkInformationVector
   // as well as returned in the \a model parameter.
-  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData ) = 0;
+  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData ) = 0;
 
   // Description:
   // Method subclasses <b>must</b> override to assess an input table given a model of the proper type.
