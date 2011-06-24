@@ -12,7 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSciVizStatistics - Abstract base class for computing statistics on scientific datasets.
+/*-------------------------------------------------------------------------
+  Copyright 2011 Sandia Corporation.
+  Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+  the U.S. Government retains certain rights in this software.
+  -------------------------------------------------------------------------*/
+// .NAME vtkSciVizStatistics - Abstract base class for computing statistics with vtkStatistics
 // .SECTION Description
 // This filter either computes a statistical model of
 // a dataset or takes such a model as its second input.
@@ -22,6 +27,9 @@
 // This class serves as a base class that handles table conversion,
 // interfacing with the array selection in the ParaView user interface,
 // and provides a simplified interface to vtkStatisticsAlgorithm.
+// .SECTION Thanks
+// Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
+// for implementing this class.
 
 #ifndef __vtkSciVizStatistics_h
 #define __vtkSciVizStatistics_h

@@ -23,7 +23,7 @@
 // See VTK documentation for details
 /
 // .SECTION Thanks
-// Thanks to Philippe Pebay and David Thompson from Sandia National Laboratories 
+// Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
 // for implementing this class.
 #ifndef __vtkPSciVizDescriptiveStats_h
 #define __vtkPSciVizDescriptiveStats_h
