@@ -18,6 +18,8 @@ if test -d .git/.git; then
 Please 'rm -rf' this directory."
 fi
 
+Utilities/Git/GitInfo # Help CMake find Git
+
 echo "Configuring push urls..."
 git config remote.origin.pushurl git@paraview.org:ParaView.git
 
