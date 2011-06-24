@@ -21,7 +21,7 @@
 // .SECTION Description
 // This filter provides access to the features of vtkDescriptiveStatistics.
 // See VTK documentation for details
-/
+//
 // .SECTION Thanks
 // Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
 // for implementing this class.

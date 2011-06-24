@@ -180,7 +180,7 @@ int vtkSciVizStatistics::RequestDataObject(
   vtkCompositeDataSet* inDataComp = vtkCompositeDataSet::SafeDownCast( inData );
 
   // Output 0: Model
-  // The output model type should always be a multiblock dataset, but it is possible to override this for specific statistics.
+  // The output model type must be a multiblock dataset
   vtkInformation* oinfom = output->GetInformationObject( 0 );
   vtkDataObject* ouModel = oinfom->Get( vtkDataObject::DATA_OBJECT() );
 
@@ -198,9 +198,9 @@ int vtkSciVizStatistics::RequestDataObject(
     }
   else
     {
-    if ( ! ouModel || ! ouModel->IsA( this->GetModelDataTypeName() ) )
+    if ( ! ouModel || ! ouModel->IsA( "vtkMultiBlockDataSet" ) )
       {
-      vtkDataObject* modelObj = this->CreateModelDataType();
+      vtkMultiBlockDataSet* modelObj = vtkMultiBlockDataSet::New();
       modelObj->SetPipelineInformation( oinfom );
       oinfom->Set( vtkDataObject::DATA_OBJECT(), modelObj );
       oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), modelObj->GetExtentType() );
@@ -361,7 +361,7 @@ int vtkSciVizStatistics::RequestData(
       vtkDataObject* ouModelCur = ouModelIter->GetCurrentDataObject();
       if ( ! ouModelCur )
         {
-        ouModelCur = this->CreateModelDataType();
+        vtkMultiBlockDataSet* outModelCur = vtkMultiBlockDataSet::New();
         ouModelIter->GetDataSet()->SetDataSet( ouModelIter, ouModelCur );
         ouModelCur->Delete();
         }
@@ -628,26 +628,6 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
     }
   row->Delete();
   return 1;
-}
-
-vtkDataObject* vtkSciVizStatistics::CreateModelDataType()
-{
-  vtkDataObject* modelDO = 0;
-  vtkObject* model = vtkInstantiator::CreateInstance( this->GetModelDataTypeName() );
-  if ( model )
-    {
-    modelDO = vtkDataObject::SafeDownCast( model );
-    if ( ! modelDO )
-      {
-      vtkErrorMacro( "Object " << model << " of type \"" << model->GetClassName() << "\" not a subclass of vtkDataObject." );
-      model->Delete();
-      }
-    }
-  else
-    {
-    vtkErrorMacro( "Could not create object of type \"" << model->GetClassName() << ".\"" );
-    }
-  return modelDO;
 }
 
 vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining( vtkTable* observations )

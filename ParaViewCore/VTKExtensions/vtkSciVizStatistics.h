@@ -146,13 +146,6 @@ protected:
   virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
 
   // Description:
-  // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
-  //
-  // A new instance of a vtkDataObject subclass should be returned.
-  // If you override this method, you must also override GetModelDataTypeName().
-  virtual vtkDataObject* CreateModelDataType();
-
-  // Description:
   // Method subclasses <b>must</b> override to fit a model to the given training data.
   // The model should be placed on the first output port of the passed vtkInformationVector
   // as well as returned in the \a model parameter.
