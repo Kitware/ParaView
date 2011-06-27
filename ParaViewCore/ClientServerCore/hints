@@ -1,2 +1,4 @@
 vtkPVArrayInformation GetComponentRange 307 2
 vtkGlyph3DRepresentation GetBounds  307 6
+vtkPVImplicitPlaneRepresentation GetScaledOrigin 307  3
+vtkPVImplicitPlaneRepresentation GetScaledNormal 307  3

@@ -22,6 +22,7 @@
 
 #include "vtkImplicitPlaneRepresentation.h"
 
+class vtkTransform;
 class VTK_EXPORT vtkPVImplicitPlaneRepresentation : public vtkImplicitPlaneRepresentation
 {
 public:
@@ -29,11 +30,29 @@ public:
   vtkTypeMacro(vtkPVImplicitPlaneRepresentation, vtkImplicitPlaneRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void SetTransformedOrigin(double x, double y, double z);
+  double* GetTransformedOrigin();
+
+  void SetTransformedNormal(double x, double y, double z);
+  double* GetTransformedNormal();
+  
+  void PlaceTransformedWidget(double bounds[6]);
+
+  //Set the transform that this plane rep is going to be scaled by
+  void SetTransform(vtkTransform *transform);
+  
 //BTX
 protected:
   vtkPVImplicitPlaneRepresentation();
   ~vtkPVImplicitPlaneRepresentation();
 
+  vtkTransform* Transform;
+  vtkTransform* InverseTransform;
+
+  void DumpInfo();
+
+  double ScaledOrigin[3];
+  double ScaledNormal[3];
 private:
   vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&); // Not implemented
   void operator=(const vtkPVImplicitPlaneRepresentation&); // Not implemented

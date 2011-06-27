@@ -19,7 +19,9 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkWidgetRepresentation.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtk3DWidgetRepresentation);
 vtkCxxSetObjectMacro(vtk3DWidgetRepresentation, Widget, vtkAbstractWidget);
@@ -33,6 +35,9 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->Representation = 0;
   this->UseNonCompositedRenderer = false;
   this->Enabled = false;
+
+  this->CustomTransform = vtkTransform::New();
+  this->CustomTransform->Identity();
 }
 
 //----------------------------------------------------------------------------
@@ -40,6 +45,7 @@ vtk3DWidgetRepresentation::~vtk3DWidgetRepresentation()
 {
   this->SetWidget(0);
   this->SetRepresentation(0);
+  this->CustomTransform->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +109,14 @@ void vtk3DWidgetRepresentation::UpdateEnabled()
         {
         this->Widget->SetCurrentRenderer(this->View->GetRenderer());
         }
+
+      //set the transform to the repsentation
+      vtkPVImplicitPlaneRepresentation *plane = 
+        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
+        if (plane)
+          {
+          plane->SetTransform(this->CustomTransform);
+          }
       }
 
     this->Widget->SetEnabled(this->Enabled);
@@ -137,6 +151,19 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
     }
   return false;
 }
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform)
+{
+  this->CustomTransform->SetInput(transform);
+  if ( transform == NULL )
+    {
+    this->CustomTransform->Identity();
+    }
+
+  this->UpdateEnabled();
+}
+
 
 //----------------------------------------------------------------------------
 void vtk3DWidgetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
