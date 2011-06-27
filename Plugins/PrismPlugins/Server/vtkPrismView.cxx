@@ -24,20 +24,66 @@
 #include "vtkPrismRepresentation.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkSelectionRepresentation.h"
+#include "vtkTransform.h"
+#include "vtk3DWidgetRepresentation.h"
 
 vtkStandardNewMacro(vtkPrismView);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
 //----------------------------------------------------------------------------
 vtkPrismView::vtkPrismView()
 {
-
+  this->Transform = vtkTransform::New();
+  this->Transform->PostMultiply();
+  this->Transform->Identity();
 }
 
 //----------------------------------------------------------------------------
 vtkPrismView::~vtkPrismView()
 {
+  this->Transform->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkPrismView::AddRepresentation(vtkDataRepresentation* rep)
+{
+  if (!this->IsRepresentationPresent(rep))
+    {
+    vtk3DWidgetRepresentation *widget = vtk3DWidgetRepresentation::SafeDownCast(rep);
+    if ( widget )
+      {
+      widget->SetCustomWidgetTransform(this->Transform);
+      }
+    }
+  this->Superclass::AddRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrismView::RemoveRepresentation(vtkDataRepresentation* rep)
+{
+  if (this->IsRepresentationPresent(rep))
+    {
+    vtk3DWidgetRepresentation *widget = vtk3DWidgetRepresentation::SafeDownCast(rep);
+    if ( widget )
+      {
+      widget->SetCustomWidgetTransform(NULL);
+      }
+    }
+  this->Superclass::RemoveRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds)
+{
+    //now calculate out the new 4x4 matrix for the transform
+    double matrix[16] =
+      { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
+        
+    matrix[0] = 100.0 / worldBounds.GetLength(0);
+    matrix[5] = 100.0 / worldBounds.GetLength(1);
+    matrix[10] = 100.0 / worldBounds.GetLength(2);
+
+    this->Transform->SetMatrix(matrix);
+}
 //----------------------------------------------------------------------------
 void vtkPrismView::GatherRepresentationInformation()
 {
@@ -64,44 +110,37 @@ void vtkPrismView::GatherRepresentationInformation()
       ++numPrismBoundsFound;
       }
     }
+  this->UpdateWorldScale(worldBounds);
 
-  if ( numPrismBoundsFound > 0 )
+  //now set the scale on each item
+  double *scale = this->Transform->GetScale();
+  for (int cc=0; cc < num_reprs; cc++)
     {
-    //now calculate out the scale of each object
-    double scale[3];
-    scale[0] = 100.0 / worldBounds.GetLength(0);
-    scale[1] = 100.0 / worldBounds.GetLength(1);
-    scale[2] = 100.0 / worldBounds.GetLength(2);
+    vtkInformation* info =
+      this->ReplyInformationVector->GetInformationObject(cc);
 
-    //now set the scale and center on each item
-    for (int cc=0; cc < num_reprs; cc++)
+    vtkDataRepresentation *repr = this->GetRepresentation(cc);
+    vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
+    vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
+    vtkSelectionRepresentation *selection = vtkSelectionRepresentation::SafeDownCast(repr);
+    if(compositeRep)
       {
-      vtkInformation* info =
-        this->ReplyInformationVector->GetInformationObject(cc);
-
-      vtkDataRepresentation *repr = this->GetRepresentation(cc);
-      vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
-      vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
-      vtkSelectionRepresentation *selection = vtkSelectionRepresentation::SafeDownCast(repr);
-      if(compositeRep)
+      vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
+        compositeRep->GetActiveRepresentation());
+      if (prismRep)
         {
-        vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
-          compositeRep->GetActiveRepresentation());
-        if (prismRep)
-          {
-          prismRep->SetScale(scale[0],scale[1],scale[2]);
-          }
-        }
-      else if (cubeAxes)
-        {
-        cubeAxes->SetScale(scale[0],scale[1],scale[2]);
-        }
-      else if (selection)
-        {
-        selection->SetScale(scale[0],scale[1],scale[2]);
+        prismRep->SetScale(scale[0],scale[1],scale[2]);
         }
       }
-    }  
+    else if (cubeAxes)
+      {
+      cubeAxes->SetScale(scale[0],scale[1],scale[2]);
+      }
+    else if (selection)
+      {
+      selection->SetScale(scale[0],scale[1],scale[2]);
+      }
+    }
 }
 
 
