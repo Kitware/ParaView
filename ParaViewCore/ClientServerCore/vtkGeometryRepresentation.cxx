@@ -745,4 +745,6 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(val);
     }
   this->Modified();
+  this->DeliveryFilter->Modified();
+  this->LODDeliveryFilter->Modified();
 }
