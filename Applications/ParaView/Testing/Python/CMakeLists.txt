@@ -6,6 +6,7 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
