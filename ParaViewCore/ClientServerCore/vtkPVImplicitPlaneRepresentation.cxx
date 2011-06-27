@@ -53,26 +53,37 @@ vtkPVImplicitPlaneRepresentation::~vtkPVImplicitPlaneRepresentation()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImplicitPlaneRepresentation::ClearTransform()
+{
+  this->StoreOriginalInfo = true;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImplicitPlaneRepresentation::SetTransform(vtkTransform *transform)
 {
   if ( transform )
     {
+    this->StoreOriginalInfo = false;
     this->Transform->SetInput(transform);
     this->InverseTransform->Update();
     
     
-    this->PlaceTransformedWidget(this->GetBounds());
-
-    double origin[3];
-    this->GetOrigin(origin);
-    this->SetTransformedOrigin(origin[0],origin[1],origin[2]);
-    this->UpdatePlacement();
+    cout << "Setting the transform" << endl << endl;
+    this->PlaceTransformedWidget(this->OriginalBounds);
+    this->SetTransformedOrigin(this->OriginalOrigin[0],this->OriginalOrigin[1],
+      this->OriginalOrigin[2]);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneRepresentation::SetTransformedOrigin(double x, double y, double z)
 {
+  if (this->StoreOriginalInfo)
+    {
+    this->OriginalOrigin[0] = x;
+    this->OriginalOrigin[1] = y;
+    this->OriginalOrigin[2] = z;
+    }
   double in_point[4] = {x, y, z, 1};
   this->Transform->TransformPoint(in_point, in_point);  
   this->Superclass::SetOrigin(in_point);
@@ -106,11 +117,20 @@ double* vtkPVImplicitPlaneRepresentation::GetTransformedOrigin()
 void vtkPVImplicitPlaneRepresentation::PlaceTransformedWidget(double bounds[6])
 {
   double tempBounds[6];
+  if (this->StoreOriginalInfo)
+    {
+    this->OriginalBounds[0] = bounds[0];
+    this->OriginalBounds[1] = bounds[1];
+    this->OriginalBounds[2] = bounds[2];
+    this->OriginalBounds[3] = bounds[3];
+    this->OriginalBounds[4] = bounds[4];
+    this->OriginalBounds[5] = bounds[5];
+    }
 
   double point[3] = {bounds[0], bounds[2], bounds[4] };
   double point2[3] = {bounds[1], bounds[3], bounds[5] };
   cout << "Point 1 before transform is " << point[0] << ", " << point[1] << ", " << point[2] << endl;
-  cout << "Point 2 before transform is " << point2[0] << ", " << point2[1] << ", " << point2[2] << endl;
+  cout << "Point 2 before transform is " << point2[0] << ", " << point2[1] << ", " << point2[2] << endl << endl;
   this->Transform->TransformPoint(point, point);
   tempBounds[0] = point[0];
   tempBounds[2] = point[1];
@@ -120,8 +140,6 @@ void vtkPVImplicitPlaneRepresentation::PlaceTransformedWidget(double bounds[6])
   tempBounds[1] = point2[0];
   tempBounds[3] = point2[1];
   tempBounds[5] = point2[1];
-  cout << "Point 1 after transform is " << point[0] << ", " << point[1] << ", " << point[2] << endl;
-  cout << "Point 2 after transform is " << point2[0] << ", " << point2[1] << ", " << point2[2] << endl;
 
   this->Superclass::PlaceWidget(tempBounds);
 }

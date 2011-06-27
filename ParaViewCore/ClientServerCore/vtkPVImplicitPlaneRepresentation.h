@@ -40,6 +40,7 @@ public:
 
   //Set the transform that this plane rep is going to be scaled by
   void SetTransform(vtkTransform *transform);
+  void ClearTransform();
   
 //BTX
 protected:
@@ -49,7 +50,9 @@ protected:
   vtkTransform* Transform;
   vtkTransform* InverseTransform;
 
-  void DumpInfo();
+  bool StoreOriginalInfo;
+  double OriginalBounds[6];
+  double OriginalOrigin[3];
 
   double ScaledOrigin[3];
   double ScaledNormal[3];

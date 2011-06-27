@@ -145,6 +145,14 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
         {
         pvview->GetRenderer()->RemoveActor(this->Representation);
         }
+      //set the transform to the repsentation
+      vtkPVImplicitPlaneRepresentation *plane = 
+        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
+      if (plane)
+        {
+        plane->ClearTransform();
+        }
+
       this->Representation->SetRenderer(0);
       }
     return true;
