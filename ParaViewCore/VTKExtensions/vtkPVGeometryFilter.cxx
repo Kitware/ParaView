@@ -63,6 +63,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkAMRBox.h"
+#include "vtkMath.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -678,7 +679,7 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
       // Note -1 is subtracted here because the tmpBox
       // is cell-dimensioned and we downshift to number
       // from 0.
-      ndim[i] = round( (max[i]-min[i])/spacing[i] )-1;
+      ndim[i] = vtkMath::Round( (max[i]-min[i])/spacing[i] )-1;
     }
 
   int lo[3];

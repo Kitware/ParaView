@@ -60,6 +60,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessController.h"
 #include "vtkAssertUtils.hpp"
+#include "vtkMath.h"
 
 #include <hdf5.h>          // for the HDF data loading engine
 #include <cassert>
@@ -1955,7 +1956,7 @@ void vtkEnzoReader::SetRefinementRatio( vtkHierarchicalBoxDataSet *hbds )
       myBox.GetGridSpacing( currentSpacing );
 
       // TODO: Note current implementation assumes uniform spacing
-      int ratio = round(parentSpacing[0]/currentSpacing[0]);
+      int ratio = vtkMath::Round(parentSpacing[0]/currentSpacing[0]);
 
       std::cout << "Ratio: " << ratio << std::endl;
       std::cout.flush();
