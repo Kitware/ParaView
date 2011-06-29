@@ -157,18 +157,7 @@ void pqPluginDialog::loadPlugin(
   // now pass it off to the plugin manager to load everything that this 
   // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pqPluginManager::LoadStatus loadresult = pm->loadExtension(server, plugin, &error, remote);
-
-  if (loadresult == pqPluginManager::NOTLOADED)
-    {
-//    QMessageBox::information(NULL, "Plugin Load Failed", error);
-//    ret = QString();
-    }
-
-  if (loadresult != pqPluginManager::LOADED)
-    {
-//    ret = QString();
-    }
+  pm->loadExtension(server, plugin, &error, remote);
 }
 
 //----------------------------------------------------------------------------
