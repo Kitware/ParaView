@@ -128,20 +128,8 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
           // we need to flip Y.
           int height = senderWidget->size().height();
           pos[1] = height - pos[1];
-          pqDataRepresentation* picked_repr = view->pick(pos);
-          this->PickedRepresentation = picked_repr;
-          if (picked_repr)
-            {
-            this->Menu->clear();
-            this->buildMenu(picked_repr);
-            }
-          else
-            {
-            // when nothing was picked we show the "link camera" menu.
-            this->Menu->clear();
-            this->Menu->addAction("Link Camera...",
-              view, SLOT(linkToOtherView()));
-            }
+          this->PickedRepresentation = view->pick(pos);
+          this->buildMenu(this->PickedRepresentation);
           this->Menu->popup(senderWidget->mapToGlobal(newPos));
           }
         }
@@ -155,39 +143,57 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
 //-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
 {
-  pqPipelineRepresentation* pipelineRepr =
-    qobject_cast<pqPipelineRepresentation*>(repr);
+  pqRenderView* view = qobject_cast<pqRenderView*>(
+    pqActiveObjects::instance().activeView());  
 
-  QAction* action;
-  action = this->Menu->addAction("Hide");
-  QObject::connect(action, SIGNAL(triggered()), this, SLOT(hide()));
-
-  QMenu* reprMenu = this->Menu->addMenu("Representation")
-    << pqSetName("Representation");
-
-  // populate the representation types menu.
-  QList<QVariant> rTypes = pqSMAdaptor::getEnumerationPropertyDomain(
-    repr->getProxy()->GetProperty("Representation"));
-  QVariant curRType = pqSMAdaptor::getEnumerationProperty(
-    repr->getProxy()->GetProperty("Representation"));
-  foreach (QVariant rtype, rTypes)
+  if (repr)
     {
-    QAction* raction = reprMenu->addAction(rtype.toString());
-    raction->setCheckable(true);
-    raction->setChecked(rtype == curRType);
-    }
-  QObject::connect(reprMenu, SIGNAL(triggered(QAction*)),
-    this, SLOT(reprTypeChanged(QAction*)));
+    this->Menu->clear();
 
-  this->Menu->addSeparator();
-  if (pipelineRepr)
-    {
-    QMenu* colorFieldsMenu = this->Menu->addMenu("Color By")
-      << pqSetName("ColorBy");
-    this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
+    QAction* action;
+    action = this->Menu->addAction("Hide");
+    QObject::connect(action, SIGNAL(triggered()), this, SLOT(hide()));
+
+    QMenu* reprMenu = this->Menu->addMenu("Representation")
+      << pqSetName("Representation");
+
+    // populate the representation types menu.
+    QList<QVariant> rTypes = pqSMAdaptor::getEnumerationPropertyDomain(
+      repr->getProxy()->GetProperty("Representation"));
+    QVariant curRType = pqSMAdaptor::getEnumerationProperty(
+      repr->getProxy()->GetProperty("Representation"));
+    foreach (QVariant rtype, rTypes)
+      {
+      QAction* raction = reprMenu->addAction(rtype.toString());
+      raction->setCheckable(true);
+      raction->setChecked(rtype == curRType);
+      }
+
+    QObject::connect(reprMenu, SIGNAL(triggered(QAction*)),
+      this, SLOT(reprTypeChanged(QAction*)));
+
+    this->Menu->addSeparator();
+
+    pqPipelineRepresentation* pipelineRepr =
+      qobject_cast<pqPipelineRepresentation*>(repr);
+
+    if (pipelineRepr)
+      {
+      QMenu* colorFieldsMenu = this->Menu->addMenu("Color By")
+        << pqSetName("ColorBy");
+      this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
+      }
+
+    action = this->Menu->addAction("Edit Color");
+    new pqEditColorMapReaction(action);
     }
-  action = this->Menu->addAction("Edit Color");
-  new pqEditColorMapReaction(action);
+  else
+    {
+      // when nothing was picked we show the "link camera" menu.
+      this->Menu->clear();
+      this->Menu->addAction("Link Camera...",
+        view, SLOT(linkToOtherView()));
+    }
 }
 
 //-----------------------------------------------------------------------------
