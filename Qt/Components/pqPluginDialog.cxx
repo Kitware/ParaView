@@ -60,7 +60,7 @@ enum PluginTreeCol
 
 //----------------------------------------------------------------------------
 pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
-  : QDialog(p), Server(server)
+  : Superclass(p), Server(server)
 {
   this->setupUi(this);
   this->setupTreeWidget(this->remotePlugins);
