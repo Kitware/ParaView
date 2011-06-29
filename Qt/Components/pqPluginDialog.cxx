@@ -211,10 +211,8 @@ void pqPluginDialog::refreshRemote()
 //----------------------------------------------------------------------------
 void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 {
-//  pluginTree->setHeaderItem(0);
   pluginTree->setColumnCount(2);
   pluginTree->header()->setResizeMode(NameCol, QHeaderView::ResizeToContents);
-  //pluginTree->header()->setStretchLastSection(false);
   pluginTree->header()->setResizeMode(ValueCol, QHeaderView::Custom);
 
   pluginTree->setHeaderLabels(
