@@ -78,7 +78,7 @@ protected:
   vtkPSciVizMultiCorrelativeStats();
   virtual ~vtkPSciVizMultiCorrelativeStats();
 
-  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData );
+  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
 private:
