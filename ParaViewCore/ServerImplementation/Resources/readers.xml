@@ -275,6 +275,17 @@
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
      
+      <IntVectorProperty
+        name="EnableCaching"
+        command="SetEnableCaching"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn cahcing on/off
+        </Documentation>
+     </IntVectorProperty>
+     
      <!--  Define MaxLevel property -->
      <IntVectorProperty
         name="Level"
@@ -387,6 +398,17 @@
         command="GetNumberOfBlocks"
         information_only="1">
         <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+      <IntVectorProperty
+        name="EnableCaching"
+        command="SetEnableCaching"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn cahcing on/off
+        </Documentation>
      </IntVectorProperty>
      
      <!--  Define MaxLevel property -->
@@ -3177,6 +3199,7 @@
         <ExposedProperties>
           <Property name="NumLevels" />
           <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
           <Property name="Level" />
           <Property name="PointArrayStatus" />
           <Property name="CellArrayStatus" />
@@ -3243,6 +3266,7 @@
         <ExposedProperties>
           <Property name="NumLevels" />
           <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
           <Property name="ConvertToCGS" />
           <Property name="Level" />
           <Property name="PointArrayStatus" />
