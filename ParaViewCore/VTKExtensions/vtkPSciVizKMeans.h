@@ -62,9 +62,8 @@ public:
 protected:
   vtkPSciVizKMeans();
   virtual ~vtkPSciVizKMeans();
-  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
 
-  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData );
+  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
   int K;

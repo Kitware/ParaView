@@ -12,23 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPSciVizDescriptiveStats - Derive contingency tables and use them to assess the likelihood of associations.
+/*-------------------------------------------------------------------------
+  Copyright 2011 Sandia Corporation.
+  Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+  the U.S. Government retains certain rights in this software.
+  -------------------------------------------------------------------------*/
+// .NAME vtkPSciVizDescriptiveStats - Provide access to VTK descriptive statistics.
 // .SECTION Description
-// This filter either computes a statistical model of
-// a dataset or takes such a model as its second input.
-// Then, the model (however it is obtained) may
-// optionally be used to assess the input dataset.
+// This filter provides access to the features of vtkDescriptiveStatistics.
+// See VTK documentation for details
 //
-// This filter computes the min, max, mean, raw moments M2 through M4,
-// standard deviation, skewness, and kurtosis for each array you select.
-//
-// The model is simply a univariate Gaussian distribution with the mean
-// and standard deviation provided. Data is assessed using this model by
-// detrending the data (i.e., subtracting the mean) and then dividing by
-// the standard deviation.
-// Thus the assessment is an array whose entries are the number of standard
-// deviations from the mean that each input point lies.
-
+// .SECTION Thanks
+// Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
+// for implementing this class.
 #ifndef __vtkPSciVizDescriptiveStats_h
 #define __vtkPSciVizDescriptiveStats_h
 
@@ -48,7 +44,7 @@ protected:
   vtkPSciVizDescriptiveStats();
   virtual ~vtkPSciVizDescriptiveStats();
 
-  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData );
+  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData );
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
   int SignedDeviations;

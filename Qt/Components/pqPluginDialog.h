@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqPluginDialog :
   public QDialog, private Ui::pqPluginDialog
 {
   Q_OBJECT
-  typedef QDialog base;
+  typedef QDialog Superclass;
 public:
   /// create this dialog with a parent
   pqPluginDialog(pqServer* server, QWidget* p=0);

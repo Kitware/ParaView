@@ -12,7 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSciVizStatistics - Abstract base class for computing statistics on scientific datasets.
+/*-------------------------------------------------------------------------
+  Copyright 2011 Sandia Corporation.
+  Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+  the U.S. Government retains certain rights in this software.
+  -------------------------------------------------------------------------*/
+// .NAME vtkSciVizStatistics - Abstract base class for computing statistics with vtkStatistics
 // .SECTION Description
 // This filter either computes a statistical model of
 // a dataset or takes such a model as its second input.
@@ -22,6 +27,9 @@
 // This class serves as a base class that handles table conversion,
 // interfacing with the array selection in the ParaView user interface,
 // and provides a simplified interface to vtkStatisticsAlgorithm.
+// .SECTION Thanks
+// Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
+// for implementing this class.
 
 #ifndef __vtkSciVizStatistics_h
 #define __vtkSciVizStatistics_h
@@ -82,12 +90,10 @@ public:
     * Doing so can result in a too-liberal estimate of model error, especially if overfitting occurs.
     * Because we expect that MODEL_AND_ASSESS, despite being ill-advised, will be frequently used
     * the TrainingFraction parameter has been created.
-    * By fitting a model using only a small fraction of the data present,
-    * the hope is that the remaining data will indicate whether overfitting occurred.
     */
   enum Tasks
     {
-    FULL_STATISTICS,  //!< Compute statistics on all of the data
+    MODEL_INPUT,      //!< Execute Learn and Derive operations of a statistical engine on the input dataset
     CREATE_MODEL,     //!< Create a statistical model from a random subset the input dataset
     ASSESS_INPUT,     //!< Assess the input dataset using a statistical model from input port 1
     MODEL_AND_ASSESS  //!< Create a statistical model of the input dataset and use it to assess the dataset. This is a bad idea.
@@ -129,26 +135,10 @@ protected:
   virtual int PrepareTrainingTable( vtkTable* trainingTable, vtkTable* fullDataTable, vtkIdType numObservations );
 
   // Description:
-  // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
-  //
-  // The name of a vtkDataObject subclass should be returned.
-  // If you override this method, you <b>may</b> also override CreateModelDataType();
-  // if you don't, then the instantiator will be used to create an object of the type
-  // specified by GetModelDataTypeName().
-  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
-
-  // Description:
-  // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
-  //
-  // A new instance of a vtkDataObject subclass should be returned.
-  // If you override this method, you must also override GetModelDataTypeName().
-  virtual vtkDataObject* CreateModelDataType();
-
-  // Description:
-  // Method subclasses <b>must</b> override to fit a model to the given training data.
+  // Method subclasses <b>must</b> override to calculate a full model from the given input data.
   // The model should be placed on the first output port of the passed vtkInformationVector
   // as well as returned in the \a model parameter.
-  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData ) = 0;
+  virtual int LearnAndDerive( vtkMultiBlockDataSet* model, vtkTable* inData ) = 0;
 
   // Description:
   // Method subclasses <b>must</b> override to assess an input table given a model of the proper type.

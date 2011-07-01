@@ -60,7 +60,7 @@ enum PluginTreeCol
 
 //----------------------------------------------------------------------------
 pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
-  : QDialog(p), Server(server)
+  : Superclass(p), Server(server)
 {
   this->setupUi(this);
   this->setupTreeWidget(this->remotePlugins);
@@ -157,18 +157,7 @@ void pqPluginDialog::loadPlugin(
   // now pass it off to the plugin manager to load everything that this 
   // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pqPluginManager::LoadStatus loadresult = pm->loadExtension(server, plugin, &error, remote);
-
-  if (loadresult == pqPluginManager::NOTLOADED)
-    {
-//    QMessageBox::information(NULL, "Plugin Load Failed", error);
-//    ret = QString();
-    }
-
-  if (loadresult != pqPluginManager::LOADED)
-    {
-//    ret = QString();
-    }
+  pm->loadExtension(server, plugin, &error, remote);
 }
 
 //----------------------------------------------------------------------------
@@ -222,14 +211,15 @@ void pqPluginDialog::refreshRemote()
 //----------------------------------------------------------------------------
 void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 {
-//  pluginTree->setHeaderItem(0);
   pluginTree->setColumnCount(2);
   pluginTree->header()->setResizeMode(NameCol, QHeaderView::ResizeToContents);
-  //pluginTree->header()->setStretchLastSection(false);
   pluginTree->header()->setResizeMode(ValueCol, QHeaderView::Custom);
 
   pluginTree->setHeaderLabels(
     QStringList() << tr("Name") << tr("Property"));
+
+  pluginTree->setSortingEnabled(true);
+  pluginTree->sortByColumn(-1);
 
   QObject::connect(pluginTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(onPluginItemChanged(QTreeWidgetItem*, int))/*, Qt::QueuedConnection*/);
