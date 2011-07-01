@@ -24,6 +24,7 @@ vtkSIVectorProperty::vtkSIVectorProperty()
   this->UseIndex = false;
   this->CleanCommand = NULL;
   this->SetNumberCommand = NULL;
+  this->InitialString = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -31,6 +32,7 @@ vtkSIVectorProperty::~vtkSIVectorProperty()
 {
   this->SetCleanCommand(0);
   this->SetSetNumberCommand(0);
+  this->SetInitialString(0);
 }
 
 //---------------------------------------------------------------------------
@@ -65,6 +67,12 @@ bool vtkSIVectorProperty::ReadXMLAttributes(
   if (clean_command)
     {
     this->SetCleanCommand(clean_command);
+    }
+
+  const char* initial_string = element->GetAttribute("initial_string");
+  if (initial_string)
+    {
+    this->SetInitialString(initial_string);
     }
 
   return 1;

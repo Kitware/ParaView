@@ -65,6 +65,7 @@ public:
   // with the number of arguments as the parameter.
   vtkGetStringMacro(SetNumberCommand);
 
+  vtkGetStringMacro(InitialString);
 
 //BTX
 protected:
@@ -72,11 +73,13 @@ protected:
   ~vtkSIVectorProperty();
   vtkSetStringMacro(CleanCommand);
   vtkSetStringMacro(SetNumberCommand);
+  vtkSetStringMacro(InitialString);
 
   char* SetNumberCommand;
   char* CleanCommand;
   bool UseIndex;
   int NumberOfElementsPerCommand;
+  char *InitialString;
 
   // Description:
   // Set the appropriate ivars from the xml element.
