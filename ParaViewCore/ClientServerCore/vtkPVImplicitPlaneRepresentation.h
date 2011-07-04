@@ -30,17 +30,17 @@ public:
   vtkTypeMacro(vtkPVImplicitPlaneRepresentation, vtkImplicitPlaneRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetTransformedOrigin(double x, double y, double z);
-  double* GetTransformedOrigin();
-
-  void SetTransformedNormal(double x, double y, double z);
-  double* GetTransformedNormal();
-  
-  void PlaceTransformedWidget(double bounds[6]);
-
   //Set the transform that this plane rep is going to be scaled by
   void SetTransform(vtkTransform *transform);
   void ClearTransform();
+
+  void SetTransformedOrigin(double x, double y, double z);
+  void SetTransformedNormal(double x, double y, double z);
+  
+  double* GetTransformedOrigin();
+  double* GetTransformedNormal();
+  
+  void PlaceTransformedWidget(double bounds[6]);
   
 //BTX
 protected:

@@ -83,9 +83,13 @@ void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds)
     matrix[5] = 100.0 / maxpoint[1];
     matrix[10] = 100.0 / maxpoint[2];
 
-    
-
-    this->Transform->SetMatrix(matrix);
+    double* scale =this->Transform->GetScale();
+    if (scale[0] != matrix[0] ||
+        scale[1] != matrix[5] ||
+        scale[2] != matrix[10])
+        {
+        this->Transform->SetMatrix(matrix);
+        }    
 }
 //----------------------------------------------------------------------------
 void vtkPrismView::GatherRepresentationInformation()
@@ -123,23 +127,30 @@ void vtkPrismView::GatherRepresentationInformation()
       this->ReplyInformationVector->GetInformationObject(cc);
 
     vtkDataRepresentation *repr = this->GetRepresentation(cc);
-    vtkCompositeRepresentation *compositeRep = vtkCompositeRepresentation::SafeDownCast(repr);
-    vtkCubeAxesRepresentation *cubeAxes = vtkCubeAxesRepresentation::SafeDownCast(repr);
-    vtkSelectionRepresentation *selection = vtkSelectionRepresentation::SafeDownCast(repr);
-    if(compositeRep)
+    vtkCompositeRepresentation *comp =
+      vtkCompositeRepresentation::SafeDownCast(repr);
+    if ( comp )
       {
-      vtkPrismRepresentation *prismRep = vtkPrismRepresentation::SafeDownCast(
-        compositeRep->GetActiveRepresentation());
-      if (prismRep)
+      vtkPrismRepresentation *prismRep =
+        vtkPrismRepresentation::SafeDownCast(comp->GetActiveRepresentation());
+      if ( prismRep )
         {
-        prismRep->SetScale(scale[0],scale[1],scale[2]);
+        prismRep->SetScale(scale[0],scale[1],scale[2]);      
+        continue;
         }
       }
-    else if (cubeAxes)
+
+    vtkCubeAxesRepresentation *cubeAxes =
+      vtkCubeAxesRepresentation::SafeDownCast(repr);
+    if (cubeAxes)
       {
       cubeAxes->SetScale(scale[0],scale[1],scale[2]);
+      continue;
       }
-    else if (selection)
+
+    vtkSelectionRepresentation *selection =
+      vtkSelectionRepresentation::SafeDownCast(repr);
+    if (selection)
       {
       selection->SetScale(scale[0],scale[1],scale[2]);
       }

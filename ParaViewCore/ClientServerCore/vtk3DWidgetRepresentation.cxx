@@ -165,11 +165,10 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
 void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform)
 {
   this->CustomTransform->SetInput(transform);
-  if ( transform == NULL )
+  if (!transform)
     {
     this->CustomTransform->Identity();
     }
-
   this->UpdateEnabled();
 }
 
