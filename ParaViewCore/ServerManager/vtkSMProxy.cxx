@@ -1061,7 +1061,7 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
       {
       // UpdatePropertyEvent is fired only for exposed properties.
       this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)exposed_name);
-      this->MarkModified(this);
+      this->MarkModified(subproxy);
       }
     }
 

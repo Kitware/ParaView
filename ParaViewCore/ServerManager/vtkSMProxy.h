@@ -567,15 +567,15 @@ protected:
   // Description:
   // Called by a proxy property, this adds the property,proxy
   // pair to the list of consumers.
-  void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
   // Remove the property,proxy pair from the list of consumers.
-  void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
   // Remove all consumers.
-  void RemoveAllConsumers();
+  virtual void RemoveAllConsumers();
 
   // Description:
   // Called by an proxy/input property to add property, proxy pair
