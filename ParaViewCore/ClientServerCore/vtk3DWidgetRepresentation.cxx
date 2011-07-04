@@ -37,6 +37,7 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->Enabled = false;
 
   this->CustomTransform = vtkTransform::New();
+  this->CustomTransform->PostMultiply();
   this->CustomTransform->Identity();
 }
 
