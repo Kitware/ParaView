@@ -77,10 +77,13 @@ void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds)
     //now calculate out the new 4x4 matrix for the transform
     double matrix[16] =
       { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-        
-    matrix[0] = 100.0 / worldBounds.GetLength(0);
-    matrix[5] = 100.0 / worldBounds.GetLength(1);
-    matrix[10] = 100.0 / worldBounds.GetLength(2);
+
+    const double* maxpoint = worldBounds.GetMaxPoint();
+    matrix[0] = 100.0 / maxpoint[0];
+    matrix[5] = 100.0 / maxpoint[1];
+    matrix[10] = 100.0 / maxpoint[2];
+
+    
 
     this->Transform->SetMatrix(matrix);
 }
