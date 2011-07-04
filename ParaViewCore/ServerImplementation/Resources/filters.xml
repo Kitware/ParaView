@@ -7162,6 +7162,24 @@ The Generic Contour filter operates on a generic data set, but the input is requ
      <Hints>
        <Visibility replace_input="0" />
      </Hints>
+
+     <!-- incremental point locator begin -->
+     <ProxyProperty name="Locator" command="SetLocator"
+       label="Point Merge Method">
+       <ProxyGroupDomain name="groups">
+         <Group name="incremental_point_locators" />
+       </ProxyGroupDomain>
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="incremental_point_locators" name="MergePoints" />
+         <Proxy group="incremental_point_locators" name="IncrementalOctreeMergePoints" />
+         <Proxy group="incremental_point_locators" name="NonMergingPointLocator" />
+       </ProxyListDomain>
+       <Documentation>
+         This property specifies an incremental point locator for merging duplicate / coincident points.
+       </Documentation>
+     </ProxyProperty>
+     <!-- incremental point locator end -->
+
    <!-- End GenericContour -->
    </SourceProxy>
 
@@ -7258,6 +7276,19 @@ Extract geometry from a higher-order dataset.
              Set the input to the Generic Geometry Filter.
            </Documentation>
       </InputProperty>
+
+     <IntVectorProperty
+        name="PassThroughCellIds"
+        command="SetPassThroughCellIds"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to forward original ids.
+       </Documentation>
+     </IntVectorProperty>
+
 
    <!-- End GenericGeometryFilter -->
    </SourceProxy>
