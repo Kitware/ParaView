@@ -509,7 +509,11 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     this->ExecuteStream(stream);
     }
 
-  this->Superclass::MarkDirty(modifiedProxy);
+  // skip modified properties on camera subproxy.
+  if (modifiedProxy != this->GetSubProxy("ActiveCamera"))
+    {
+    this->Superclass::MarkDirty(modifiedProxy);
+    }
 }
 
 //-----------------------------------------------------------------------------
