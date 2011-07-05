@@ -1153,7 +1153,7 @@ void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::InvalidateCachedSelection()
 {
-  this->Selector->Modified();
+  this->Selector->InvalidateCachedSelection();
 }
 
 //*****************************************************************
