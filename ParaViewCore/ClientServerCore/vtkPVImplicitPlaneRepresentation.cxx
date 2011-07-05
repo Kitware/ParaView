@@ -85,6 +85,7 @@ void vtkPVImplicitPlaneRepresentation::SetTransform(vtkTransform *transform)
     this->SetTransformedOrigin( this->OriginalOrigin[0],
                                 this->OriginalOrigin[1],
                                 this->OriginalOrigin[2]);
+    this->StoreOriginalInfo = true;
     }
   else if ( this->Transform->GetInput() )
     {
