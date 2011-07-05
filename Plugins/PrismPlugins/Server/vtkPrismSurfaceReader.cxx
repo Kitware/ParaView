@@ -933,57 +933,12 @@ int vtkPrismSurfaceReader::RequestData(
     bounds[5]=10;
   }
 
-  if(this->GetXLogScaling())
-  {
-    if(this->XThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[0]=log(this->XThresholdBetween[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[0]=0.0;
-    }
-    if(this->XThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[1]=log(this->XThresholdBetween[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[1]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[0]=this->XThresholdBetween[0];
-    this->ActualThresholdBounds[1]=this->XThresholdBetween[1];
-  }
-  if(this->GetYLogScaling())
-  {
-    if(this->YThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[2]=log(this->YThresholdBetween[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[2]=0.0;
-    }
-    if(this->YThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[3]=log(this->YThresholdBetween[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[3]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[2]=this->YThresholdBetween[0];
-    this->ActualThresholdBounds[3]=this->YThresholdBetween[1];
-  }
+  //scale the threshold numbers
+  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,tID,
+    this->XThresholdBetween, this->YThresholdBetween,
+    this->ActualThresholdBounds);
   this->ActualThresholdBounds[4]=bounds[4];
   this->ActualThresholdBounds[5]=bounds[5];
-
 
   this->Internal->ExtractGeometry->SetInput(localOutput);
   this->Internal->Box->SetBounds(this->ActualThresholdBounds);
