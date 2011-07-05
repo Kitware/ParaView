@@ -28,6 +28,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 
 QT4_WRAP_CPP(MOC_SRCS 
+  PrismDisplayPanelDecorator.h
   PrismToolBarActions.h
   PrismCore.h
   PrismMenuActions.h
@@ -72,14 +73,19 @@ ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBa
 
 ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions
                           GROUP_NAME "MenuBar/Prism")
+ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(DISPLAYPANELIFACES DISPLAY_PANEL_IFACE_SRCS CLASS_NAME PrismDisplayPanelDecorator
+                          PANEL_TYPES pqDisplayProxyEditor)                          
 
 
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     SERVER_MANAGER_XML PRISMServerManagerXML.xml
-                    GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} PrismObjectPanels
-                    SERVER_MANAGER_SOURCES vtkSMPrismDoubleRangeDomain.cxx vtkSMPrismViewProxy.cxx
+                    GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} ${DISPLAYPANELIFACES}  PrismObjectPanels
+                    SERVER_MANAGER_SOURCES
+                    vtkSMPrismDoubleRangeDomain.cxx
+                    vtkSMPrismViewProxy.cxx
                     GUI_SOURCES
+                    PrismDisplayPanelDecorator.cxx
                     PrismToolBarActions.cxx
                     PrismCore.cxx
                     PrismMenuActions.cxx
@@ -93,6 +99,7 @@ ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     ${MENU_IFACE_SRCS}
                     ${UI_BUILT_SOURCES}
                     ${VIEW_IFACE_SRCS}
+                    ${DISPLAY_PANEL_IFACE_SRCS}
                     REQUIRED_ON_CLIENT
 )
 
