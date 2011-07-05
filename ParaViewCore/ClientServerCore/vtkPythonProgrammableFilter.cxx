@@ -212,7 +212,7 @@ int vtkPythonProgrammableFilter::RequestUpdateExtent(
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+void vtkPythonProgrammableFilter::SetParameterInternal(const char *raw_name,
                                                const char *raw_value)
 {
   const vtkstd::string name = raw_name ? raw_name : "";
@@ -227,6 +227,42 @@ void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
   this->Implementation->Parameters[name] = value;
   this->Modified();
 }
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const int value)
+{
+  char buf[20];
+  snprintf(buf, 20, "%d", value);
+  this->SetParameterInternal(raw_name, buf);
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const double value)
+{
+  char buf[20];
+  snprintf(buf, 20, "%f", value);
+  this->SetParameterInternal(raw_name, buf);
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const char *value)
+{
+  char buf[100];
+  snprintf(buf, 100, "'%s'", value);
+  this->SetParameterInternal(raw_name, buf);
+}
+
+void vtkPythonProgrammableFilter::SetParameter(
+    const char *raw_name,
+    const double value1, 
+    const double value2,
+    const double value3)
+{
+  char buf[100];
+  snprintf(buf, 100, "[%f, %f, %f]", value1, value2, value3);
+  this->SetParameterInternal(raw_name, buf);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ClearParameters()

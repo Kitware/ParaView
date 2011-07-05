@@ -15,8 +15,8 @@
           Enable/Disable widget interaction.
         </Documentation>
       </IntVectorProperty>
-
       <SubProxy>
+
         <Proxy name="Prop"
           proxygroup="3d_widget_representations" proxyname="HandleRepresentation">
         </Proxy>
