@@ -574,7 +574,10 @@ vtkSelection* vtkGeometryRepresentation::ConvertSelection(
   vtkView* _view, vtkSelection* selection)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(_view);
-  if (!view)
+  // if this->GeometryFilter has 0 inputs, it means we don't have any valid
+  // input data on this process, so we can't convert the selection.
+  if (!view ||
+    this->GeometryFilter->GetNumberOfInputConnections(0) == 0)
     {
     return this->Superclass::ConvertSelection(_view, selection);
     }
