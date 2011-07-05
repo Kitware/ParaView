@@ -131,7 +131,8 @@ public:
         {
         return new pqIsoVolumePanel(proxy, p);
         }
-      if(QString("Contour") == proxy->getProxy()->GetXMLName())
+      if(QString("Contour") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericContour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
         }
@@ -179,6 +180,7 @@ public:
          QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
          QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName())
         {
