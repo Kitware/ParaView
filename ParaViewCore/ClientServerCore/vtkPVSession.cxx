@@ -23,6 +23,7 @@ vtkPVSession::vtkPVSession()
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->ProgressHandler->SetSession(this); // not reference counted.
   this->ProgressCount = 0;
+  this->InCleanupPendingProgress = false;
 }
 
 //----------------------------------------------------------------------------
@@ -48,6 +49,11 @@ vtkMultiProcessController* vtkPVSession::GetController(vtkPVSession::ServerFlags
 //----------------------------------------------------------------------------
 void vtkPVSession::PrepareProgress()
 {
+  if (this->InCleanupPendingProgress)
+    {
+    return;
+    }
+
   if (this->ProgressCount == 0)
     {
     this->PrepareProgressInternal();
@@ -58,6 +64,12 @@ void vtkPVSession::PrepareProgress()
 //----------------------------------------------------------------------------
 void vtkPVSession::CleanupPendingProgress()
 {
+  if (this->InCleanupPendingProgress)
+    {
+    return;
+    }
+
+  this->InCleanupPendingProgress = true;
   this->ProgressCount--;
   if (this->ProgressCount == 0)
     {
@@ -68,6 +80,7 @@ void vtkPVSession::CleanupPendingProgress()
     vtkErrorMacro("PrepareProgress and CleanupPendingProgress mismatch!");
     this->ProgressCount = 0;
     }
+  this->InCleanupPendingProgress = false;
 }
 
 //----------------------------------------------------------------------------

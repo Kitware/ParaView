@@ -109,6 +109,9 @@ private:
   void operator=(const vtkPVSession&); // Not implemented
 
   int ProgressCount;
+  // This flags ensures that while we are waiting for an previous progress-pair
+  // to finish, we don't start new progress-pairs.
+  bool InCleanupPendingProgress;
 //ETX
 };
 
