@@ -810,7 +810,7 @@ void vtkPVRenderView::DoDataDelivery(
   vtkMultiProcessController* d_controller =
     this->SynchronizedWindows->GetClientDataServerController();
   vtkMultiProcessController* p_controller =
-    this->SynchronizedWindows->GetParallelController();
+    vtkMultiProcessController::GetGlobalController();
 
   vtkMultiProcessStream stream;
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
