@@ -38,6 +38,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QRegExp>
+#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
@@ -406,7 +407,7 @@ void pqDisplayArrayWidget::needReloadGUI()
     return;
     }
   this->Internal->Updating = true;
-  this->reloadGUI();
+  QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------

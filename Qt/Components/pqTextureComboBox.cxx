@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
@@ -139,7 +140,7 @@ void pqTextureComboBox::proxyUnRegistered(const QString& group, const QString&,
   if (group == TEXTURESGROUP)
     {
     this->Internal->TextureIcons.remove(proxy);
-    this->updateTextures();
+    QTimer::singleShot(0, this, SLOT(updateTextures()));
     }
 }
 
@@ -201,7 +202,7 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
   // changed, and texture coords may have become available. Hence, we update the
   // enabled state.
   QObject::connect(this->Internal->Representation, SIGNAL(dataUpdated()),
-    this, SLOT(updateEnableState()));
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
   // When the texture attached to the representation changes, we want to update
   // the combo box.
@@ -213,7 +214,7 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
     }
   this->updateFromProperty();
 
-  this->updateEnableState();
+  QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
