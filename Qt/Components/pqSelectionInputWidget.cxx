@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 #include <QTextStream>
-#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
@@ -74,7 +73,7 @@ pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
                      this, SLOT(onActiveSelectionChanged()));
     }
 
-  QTimer::singleShot(10, this, SLOT(initializeWidget()));
+  this->initializeWidget();
 }
 
 //-----------------------------------------------------------------------------

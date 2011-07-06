@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QRegExp>
-#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
