@@ -98,11 +98,13 @@ public:
     {
     if(QString("filters") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("Cut") == proxy->getProxy()->GetXMLName())
+      if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericCut") == proxy->getProxy()->GetXMLName())
         {
         return new pqCutPanel(proxy, p);
         }
-      if(QString("Clip") == proxy->getProxy()->GetXMLName())
+      if(QString("Clip") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericClip") == proxy->getProxy()->GetXMLName())
         {
         return new pqClipPanel(proxy, p);
         }
@@ -115,7 +117,8 @@ public:
         {
         return new pqGlyphPanel(proxy, p);
         }
-      if(QString("StreamTracer") == proxy->getProxy()->GetXMLName())
+      if(QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericStreamTracer") == proxy->getProxy()->GetXMLName())
         {
         return new pqStreamTracerPanel(proxy, p);
         }
@@ -168,11 +171,14 @@ public:
     if(QString("filters") == proxy->getProxy()->GetXMLGroup())
       {
       if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericCut") == proxy->getProxy()->GetXMLName() ||
          QString("Clip") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericClip") == proxy->getProxy()->GetXMLName() ||
          QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
          QString("Glyph") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
+         QString("GenericStreamTracer") == proxy->getProxy()->GetXMLName() ||
 //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||

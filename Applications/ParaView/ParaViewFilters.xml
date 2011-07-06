@@ -178,6 +178,6 @@
 
   <Proxy group="filters" name="GenericClip" />
   <Proxy group="filters" name="GenericContour" />
-  <Proxy group="filters" name="GenericCutter" />
+  <Proxy group="filters" name="GenericCut" />
   <Proxy group="filters" name="GenericStreamTracer" />
 </ParaViewFilters>
