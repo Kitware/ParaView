@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSession.h"
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
@@ -119,5 +120,20 @@ bool pqQVTKWidget::paintCachedImage()
   // In future we can update this code to ensure that view->Render() is never
   // called from the pqQVTKWidget. For now, we are letting the default path
   // execute when not resizing.
-  return this->Superclass::paintCachedImage();
+
+  if (this->Superclass::paintCachedImage())
+    {
+    return true;
+    }
+
+  // despite our best efforts, it's possible that the paint event happens while
+  // the server manager is busy processing some other request that yields
+  // progress (e.g. pvcrs.UndoRedo2 test).
+  // Triggering renders in that case is hazardous. So we skip calling
+  // rendering in those cases.
+  if (this->ViewProxy && this->ViewProxy->GetSession()->GetPendingProgress())
+    {
+    return true;
+    }
+  return false;
 }
