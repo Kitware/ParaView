@@ -78,21 +78,24 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 //----------------------------------------------------------------------------
 void pqQVTKWidget::updateSizeProperties()
 {
-  BEGIN_UNDO_EXCLUDE();
-  int view_size[2];
-  view_size[0] = this->size().width();
-  view_size[1] = this->size().height();
-  vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
+  if (this->ViewProxy)
+    {
+    BEGIN_UNDO_EXCLUDE();
+    int view_size[2];
+    view_size[0] = this->size().width();
+    view_size[1] = this->size().height();
+    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
 
-  QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
-    this->mapToParent(QPoint(0, 0));
-  int view_position[2];
-  view_position[0] = view_pos.x();
-  view_position[1] = view_pos.y();;
-  vtkSMPropertyHelper(this->ViewProxy, "ViewPosition").Set(view_position, 2);
-  this->ViewProxy->UpdateProperty("ViewSize");
-  this->ViewProxy->UpdateProperty("ViewPosition");
-  END_UNDO_EXCLUDE();
+    QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
+      this->mapToParent(QPoint(0, 0));
+    int view_position[2];
+    view_position[0] = view_pos.x();
+    view_position[1] = view_pos.y();;
+    vtkSMPropertyHelper(this->ViewProxy, "ViewPosition").Set(view_position, 2);
+    this->ViewProxy->UpdateProperty("ViewSize");
+    this->ViewProxy->UpdateProperty("ViewPosition");
+    END_UNDO_EXCLUDE();
+    }
 
   this->markCachedImageAsDirty();
 
@@ -115,6 +118,12 @@ void pqQVTKWidget::setViewProxy(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
+void pqQVTKWidget::setSession(vtkSMSession* session)
+{
+  this->Session = session;
+}
+
+//----------------------------------------------------------------------------
 bool pqQVTKWidget::paintCachedImage()
 {
   // In future we can update this code to ensure that view->Render() is never
@@ -132,6 +141,11 @@ bool pqQVTKWidget::paintCachedImage()
   // Triggering renders in that case is hazardous. So we skip calling
   // rendering in those cases.
   if (this->ViewProxy && this->ViewProxy->GetSession()->GetPendingProgress())
+    {
+    return true;
+    }
+
+  if (this->Session && this->Session->GetPendingProgress())
     {
     return true;
     }
