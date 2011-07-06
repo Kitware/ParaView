@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetRangeDomain.h"
 
 // Qt includes
-#include <QTimer>
 #include <QWidget>
 
 // VTK includes
@@ -59,7 +58,6 @@ public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
-    this->MarkedForUpdate = false;
     }
   ~pqInternal()
     {
@@ -71,7 +69,6 @@ public:
   int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
-  bool MarkedForUpdate;
 };
   
 
@@ -142,13 +139,7 @@ pqWidgetRangeDomain::~pqWidgetRangeDomain()
 
 void pqWidgetRangeDomain::domainChanged()
 {
-  if(this->Internal->MarkedForUpdate)
-    {
-    return;
-    }
-
-  this->Internal->MarkedForUpdate = true;
-  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
+  this->internalDomainChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -190,8 +181,6 @@ void pqWidgetRangeDomain::internalDomainChanged()
     {
     this->setRange(range[0], range[1]);
     }
-
-  this->Internal->MarkedForUpdate = false;
 }
 
 

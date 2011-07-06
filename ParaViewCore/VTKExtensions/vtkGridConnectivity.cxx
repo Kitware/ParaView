@@ -14,31 +14,31 @@
 =========================================================================*/
 #include "vtkGridConnectivity.h"
 
+#include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataObject.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
-#include "vtkIdTypeArray.h"
+#include "vtkEquivalenceSet.h"
 #include "vtkIdList.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointData.h"
+#include "vtkPolyData.h"
 #include "vtkPolygon.h"
 #include "vtkTriangle.h"
-#include "vtkDataObject.h"
-#include "vtkDataSet.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkPolyData.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkCellArray.h"
-#include "vtkEquivalenceSet.h"
-
 
 // Distributed:
 // Find the max process global point id (face hash).
@@ -563,13 +563,29 @@ void vtkGridConnectivityExecuteProcess(
     // The status array is a mask that identifies unused cells.
     vtkDoubleArray* statusArray = vtkDoubleArray::SafeDownCast(
                      inputs[ii]->GetCellData()->GetArray("STATUS"));
+    // locate cell-ghost levels if present. We are going to skip over ghost
+    // cells.
+    vtkUnsignedCharArray * ghostLevels =
+      vtkUnsignedCharArray::SafeDownCast(
+        inputs[ii]->GetCellData()->GetArray("vtkGhostLevels"));
+    if (ghostLevels && (
+        ghostLevels->GetNumberOfComponents() != 1 ||
+        ghostLevels->GetNumberOfTuples() != numCells))
+      {
+      vtkGenericWarningMacro("Poorly formed ghost cells. Ignoring them.");
+      ghostLevels = NULL;
+      }
     double* statusPtr = 0;
     if (statusArray)
       {
       statusPtr = statusArray->GetPointer(0);
       }
-    for (int jj = 0; jj < numCells; ++jj)
+    for (vtkIdType jj = 0; jj < numCells; ++jj)
       {
+      if (ghostLevels && ghostLevels->GetValue(jj) > 0)
+        {
+        continue;
+        }
       if (statusPtr == 0 || *statusPtr++ == 0.0)
         {
         // Loop through faces of the cell.

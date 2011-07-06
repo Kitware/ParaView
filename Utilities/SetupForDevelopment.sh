@@ -18,6 +18,8 @@ if test -d .git/.git; then
 Please 'rm -rf' this directory."
 fi
 
+Utilities/Git/GitInfo # Help CMake find Git
+
 echo "Configuring push urls..."
 git config remote.origin.pushurl git@paraview.org:ParaView.git
 
@@ -40,6 +42,9 @@ echo
 echo "Setting up the topic stage..."
 ./SetupTopicStage.sh || exit 1
 echo
+
+echo "Setting up the PVVTK stage..."
+./SetupPVVTK.sh || exit 1
 
 echo "Setting up git aliases..."
 ./SetupGitAliases.sh || exit 1

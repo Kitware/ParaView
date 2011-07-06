@@ -180,7 +180,7 @@ int vtkSciVizStatistics::RequestDataObject(
   vtkCompositeDataSet* inDataComp = vtkCompositeDataSet::SafeDownCast( inData );
 
   // Output 0: Model
-  // The output model type should always be a multiblock dataset, but it is possible to override this for specific statistics.
+  // The output model type must be a multiblock dataset
   vtkInformation* oinfom = output->GetInformationObject( 0 );
   vtkDataObject* ouModel = oinfom->Get( vtkDataObject::DATA_OBJECT() );
 
@@ -198,9 +198,9 @@ int vtkSciVizStatistics::RequestDataObject(
     }
   else
     {
-    if ( ! ouModel || ! ouModel->IsA( this->GetModelDataTypeName() ) )
+    if ( ! ouModel || ! ouModel->IsA( "vtkMultiBlockDataSet" ) )
       {
-      vtkDataObject* modelObj = this->CreateModelDataType();
+      vtkMultiBlockDataSet* modelObj = vtkMultiBlockDataSet::New();
       modelObj->SetPipelineInformation( oinfom );
       oinfom->Set( vtkDataObject::DATA_OBJECT(), modelObj );
       oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), modelObj->GetExtentType() );
@@ -278,7 +278,7 @@ int vtkSciVizStatistics::RequestData(
 
   if ( compDataObjIn )
     {
-    // Loop over each data object of interest, fitting and/or assessing it.
+    // Loop over each data object of interest, calculating a model from and/or assessing it.
     vtkCompositeDataSet* compModelObjIn = vtkCompositeDataSet::SafeDownCast( modelObjIn );
     vtkCompositeDataSet* compModelObjOu = vtkCompositeDataSet::SafeDownCast( modelObjOu );
     vtkCompositeDataSet* compDataObjOu = vtkCompositeDataSet::SafeDownCast( dataObjOu );
@@ -361,7 +361,7 @@ int vtkSciVizStatistics::RequestData(
       vtkDataObject* ouModelCur = ouModelIter->GetCurrentDataObject();
       if ( ! ouModelCur )
         {
-        ouModelCur = this->CreateModelDataType();
+        vtkMultiBlockDataSet* outModelCur = vtkMultiBlockDataSet::New();
         ouModelIter->GetDataSet()->SetDataSet( ouModelIter, ouModelCur );
         ouModelCur->Delete();
         }
@@ -403,10 +403,10 @@ int vtkSciVizStatistics::RequestData(
 }
 
 int vtkSciVizStatistics::RequestData(
-    vtkDataObject* observationsOut, vtkDataObject* modelOut,
-    vtkDataObject* observationsIn, vtkDataObject* modelIn )
+    vtkDataObject* outData, vtkDataObject* outModel,
+    vtkDataObject* inData, vtkDataObject* inModel )
 {
-  vtkFieldData* dataAttrIn = observationsIn->GetAttributesAsFieldData( this->AttributeMode );
+  vtkFieldData* dataAttrIn = inData->GetAttributesAsFieldData( this->AttributeMode );
   if ( ! dataAttrIn )
     {
     // Silently ignore missing attributes.
@@ -414,27 +414,27 @@ int vtkSciVizStatistics::RequestData(
     }
 
   // Create a table with all the data
-  vtkTable* tableIn = vtkTable::New();
-  int stat = this->PrepareFullDataTable( tableIn, dataAttrIn );
+  vtkTable* inTable = vtkTable::New();
+  int stat = this->PrepareFullDataTable( inTable, dataAttrIn );
   if ( stat < 1 )
     { // return an error (stat=0) or success (stat=-1)
-    tableIn->FastDelete();
+    inTable->FastDelete();
     return -stat;
     }
 
   // Either create or retrieve the model, depending on the task at hand
   if ( this->Task != ASSESS_INPUT )
     {
-    // We are creating a model by fitting the input data
-    // Create a table to hold the training data (unless the TrainingFraction is exactly 1.0)
+    // We are creating a model by executing Learn and Derive operations on the input data
+    // Create a table to hold the input data (unless the TrainingFraction is exactly 1.0)
     vtkTable* train = 0;
-    vtkIdType N = tableIn->GetNumberOfRows();
-    vtkIdType M = this->Task == FULL_STATISTICS ? N : this->GetNumberOfObservationsForTraining( tableIn );
+    vtkIdType N = inTable->GetNumberOfRows();
+    vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining( inTable );
     if ( M == N )
       {
-      train = tableIn;
+      train = inTable;
       train->Register( this );
-      if ( this->Task != FULL_STATISTICS  && this->TrainingFraction < 1. )
+      if ( this->Task != MODEL_INPUT  && this->TrainingFraction < 1. )
         {
         vtkWarningMacro(
           << "Either TrainingFraction (" << this->TrainingFraction << ") is high enough to include all observations after rounding"
@@ -445,19 +445,20 @@ int vtkSciVizStatistics::RequestData(
     else
       {
       train = vtkTable::New();
-      this->PrepareTrainingTable( train, tableIn, M );
+      this->PrepareTrainingTable( train, inTable, M );
       }
 
-    // Fit the output model to the data
-    if ( ! modelOut )
+    // Calculate detailed statistical model from the input data set
+    vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast( outModel );
+    if ( ! outModelDS )
       {
-      vtkErrorMacro( "No model output dataset" );
+      vtkErrorMacro( "No model output dataset or incorrect type" );
       stat = 0;
       }
     else
       {
-      modelOut->Initialize();
-      stat = this->FitModel( vtkMultiBlockDataSet::SafeDownCast( modelOut ), train );
+      outModel->Initialize();
+      stat = this->LearnAndDerive( outModelDS, train );
       }
 
     if ( train )
@@ -468,35 +469,45 @@ int vtkSciVizStatistics::RequestData(
   else
     {
     // We are using an input model specified by the user
-    //stat = this->FetchModel( modelOut, input[1] ); // retrieves modelOut from input[1]
-    if ( ! modelIn )
+    //stat = this->FetchModel( outModel, input[1] ); // retrieves outModel from input[1]
+    if ( ! inModel )
       {
-      vtkErrorMacro( "No input model dataset" );
+      vtkErrorMacro( "No input model" );
       stat = 0;
       }
-    modelOut->ShallowCopy( modelIn );
+    outModel->ShallowCopy( inModel );
     }
 
   if ( stat < 1 )
     { // Exit on failure (0) or early success (-1)
-    tableIn->Delete();
+    inTable->Delete();
     return -stat;
     }
 
-  if ( observationsOut )
+  if ( outData )
     {
-    observationsOut->ShallowCopy( observationsIn );
+    outData->ShallowCopy( inData );
     }
-  if ( this->Task != CREATE_MODEL && this->Task != FULL_STATISTICS )
-    { // we need to assess the data using the input or the just-created model
-    stat = this->AssessData( tableIn, observationsOut, vtkMultiBlockDataSet::SafeDownCast( modelOut ) );
+  if ( this->Task != CREATE_MODEL && this->Task != MODEL_INPUT )
+    { 
+    // Assess the data using the input or the just-created model
+    vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast( outModel );
+    if ( ! outModelDS )
+      {
+      vtkErrorMacro( "No model output dataset or incorrect type" );
+      stat = 0;
+      }
+    else
+      {
+      stat = this->AssessData( inTable, outData, outModelDS );
+      }
     }
-  tableIn->Delete();
+  inTable->Delete();
 
   return stat ? 1 : 0;
 }
 
-int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* tableIn, vtkFieldData* dataAttrIn )
+int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* inTable, vtkFieldData* dataAttrIn )
 {
   vtkstd::set<vtkStdString>::iterator colIt;
   for ( colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++ colIt )
@@ -525,7 +536,7 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* tableIn, vtkFieldData* 
           arrCol->SetNumberOfComponents( 1 );
           arrCol->SetNumberOfTuples( ntup );
           comps.push_back( arrCol );
-          tableIn->AddColumn( arrCol );
+          inTable->AddColumn( arrCol );
           arrCol->FastDelete();
           }
         vtkIdType vidx = 0;
@@ -567,12 +578,12 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* tableIn, vtkFieldData* 
         }
       else
         {
-        tableIn->AddColumn( arr );
+        inTable->AddColumn( arr );
         }
       }
     }
 
-  vtkIdType ncols = tableIn->GetNumberOfColumns();
+  vtkIdType ncols = inTable->GetNumberOfColumns();
   if ( ncols < 1 )
     {
     vtkWarningMacro( "Every requested array wasn't a scalar or wasn't present." )
@@ -628,26 +639,6 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
     }
   row->Delete();
   return 1;
-}
-
-vtkDataObject* vtkSciVizStatistics::CreateModelDataType()
-{
-  vtkDataObject* modelDO = 0;
-  vtkObject* model = vtkInstantiator::CreateInstance( this->GetModelDataTypeName() );
-  if ( model )
-    {
-    modelDO = vtkDataObject::SafeDownCast( model );
-    if ( ! modelDO )
-      {
-      vtkErrorMacro( "Object " << model << " of type \"" << model->GetClassName() << "\" not a subclass of vtkDataObject." );
-      model->Delete();
-      }
-    }
-  else
-    {
-    vtkErrorMacro( "Could not create object of type \"" << model->GetClassName() << ".\"" );
-    }
-  return modelDO;
 }
 
 vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining( vtkTable* observations )

@@ -27,7 +27,7 @@ void vtkPSciVizDescriptiveStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "SignedDeviations: " << this->SignedDeviations << "\n";
 }
 
-int vtkPSciVizDescriptiveStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
+int vtkPSciVizDescriptiveStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable* inData )
 {
   if ( ! modelDO )
     {
@@ -37,12 +37,12 @@ int vtkPSciVizDescriptiveStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTabl
 
   // Create the statistics filter and run it
   vtkPDescriptiveStatistics* stats = vtkPDescriptiveStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );
-  vtkIdType ncols = trainingData->GetNumberOfColumns();
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
+  vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    //stats->AddColumn( trainingData->GetColumnName( i ) );
-    stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
+    //stats->AddColumn( inData->GetColumnName( i ) );
+    stats->SetColumnStatus( inData->GetColumnName( i ), 1 );
     }
   //stats->SetSignedDeviations( this->SignedDeviations ); // Shouldn't matter for model fitting, only affects assessed values.
 

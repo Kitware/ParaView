@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
-#include <QTimer>
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
@@ -590,8 +589,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   this->DisableSlots = 0;
-  QTimer::singleShot(0, this, SLOT(updateEnableState()));
-
 
   //
   if(reprProxy->GetProperty("SampleDistance"))
@@ -620,6 +617,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     {
     this->Internal->Shading->setEnabled(false);
     }
+
+  this->updateEnableState();
 
 }
 
@@ -690,7 +689,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->SliceDirection);
   QObject::connect(this->Internal->SliceDirectionAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
+    this, SLOT(sliceDirectionChanged()));
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
@@ -767,7 +766,7 @@ void pqDisplayProxyEditor::updateEnableState()
     // every time the user switches to Slice mode we update the domain for the
     // slider since the domain depends on the input to the image mapper which
     // may have changed.
-    QTimer::singleShot(0, this, SLOT(sliceDirectionChanged()));
+    this->sliceDirectionChanged();
     }
 
   this->Internal->compositeTree->setVisible(

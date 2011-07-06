@@ -157,6 +157,15 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     // // this is where we will look to see on what nodes are we going to render and
     // // render set that up.
     this->OutlineDeliveryFilter->ProcessViewRequest(inInfo);
+    if (this->OutlineDeliveryFilter->GetMTime() >
+      this->OutlineUpdateSuppressor->GetForcedUpdateTimeStamp())
+      {
+      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    this->OutlineDeliveryFilter->Modified();
     this->OutlineUpdateSuppressor->ForceUpdate();
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())

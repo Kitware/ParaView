@@ -149,448 +149,6 @@ void vtkSpyPlotUniReader::SetDownConvertVolumeFraction(int vf)
   this->DataTypeChanged = 1;
 }
 
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotUniReader::ReadInformation()
-{
-  if ( !this->HaveInformation ) { 
-  vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
-                 << this->HaveInformation ); 
-  }
-  if ( this->HaveInformation )
-    {
-    return 1;
-    }
-  // Initial checks
-  if ( !this->CellArraySelection )
-    {
-    vtkErrorMacro( "Cell array selection not specified" );
-    return 0;
-    }
-  if ( !this->FileName )
-    {
-    vtkErrorMacro( "FileName not specifed" );
-    return 0;
-    }
-  ifstream ifs(this->FileName, ios::binary|ios::in);
-  if ( !ifs )
-    {
-    vtkErrorMacro( "Cannot open file: " << this->FileName );
-    return 0;
-    }
-  vtkSpyPlotIStream spis;
-  spis.SetStream(&ifs);
-
-  if (!this->ReadHeader(&spis))
-    {
-    vtkErrorMacro("Invalid Header");
-    return 0;
-    }
-
-  // Create the array of blocks we are going to use
-  this->Blocks = new vtkSpyPlotBlock[this->NumberOfBlocks];
-
-  // Process all the Cell Material  Fields
-
-  //printf("Before cell fields: %ld\n", ifs.tellg());
-  // Read all possible cell fields
-  if ( !spis.ReadInt32s(&(this->NumberOfPossibleCellFields), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of material fields" );
-    return 0;
-    }
-  this->CellFields = 
-    new vtkSpyPlotUniReader::CellMaterialField[this->NumberOfPossibleCellFields];
-  int fieldCnt;
-  for ( fieldCnt = 0; 
-        fieldCnt < this->NumberOfPossibleCellFields; 
-        ++ fieldCnt )
-    {
-    vtkSpyPlotUniReader::CellMaterialField *field 
-      = this->CellFields + fieldCnt;
-    field->Index = 0;
-    if ( !spis.ReadString(field->Id, 30) )
-      {
-      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
-      return 0;
-      }
-    if ( !spis.ReadString(field->Comment, 80) )
-      {
-      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
-      return 0;
-      }
-    if ( this->FileVersion >= 101 )
-      {
-      if ( !spis.ReadInt32s(&(field->Index), 1) )
-        {
-        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
-        return 0;
-        }
-      }
-    }
-
-  //printf("Before material fields: %ld\n", ifs.tellg());
-  // Read all possible material fields
-  if ( !spis.ReadInt32s(&(this->NumberOfPossibleMaterialFields), 1) )
-    {
-    vtkErrorMacro( "Cannot read number of possible material fields" );
-    return 0;
-    }
-
-  this->MaterialFields = 
-    new vtkSpyPlotUniReader::CellMaterialField[this->NumberOfPossibleMaterialFields];
-
-  for ( fieldCnt = 0; 
-        fieldCnt < this->NumberOfPossibleMaterialFields; 
-        ++ fieldCnt )
-    {
-    vtkSpyPlotUniReader::CellMaterialField *field = 
-      this->MaterialFields + fieldCnt;
-    field->Index = 0;
-    if ( !spis.ReadString(field->Id, 30) )
-      {
-      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
-      return 0;
-      }
-    if ( !spis.ReadString(field->Comment, 80) )
-      {
-      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
-      return 0;
-      }
-    if ( this->FileVersion >= 101 )
-      {
-      if ( !spis.ReadInt32s(&(field->Index), 1) )
-        {
-        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
-        return 0;
-        }
-      }
-    }
-  
-  if (!this->ReadGroupHeaderInformation(&spis))
-    {
-    vtkErrorMacro("Problem reading group header information");
-    return 0;
-    }
-
-  this->TimeStepRange[1] = this->NumberOfDataDumps-1;
-  this->TimeRange[0] = this->DumpTime[0];
-  this->TimeRange[1] = this->DumpTime[this->NumberOfDataDumps-1];
-
-  this->DataDumps = new vtkSpyPlotUniReader::DataDump[this->NumberOfDataDumps];
-  int dump;
-  // Read in the time step information 
-  for ( dump = 0; dump < this->NumberOfDataDumps; ++dump )
-    {
-    vtkTypeInt64 cpos = spis.Tell();
-    vtkTypeInt64 offset = this->DumpOffset[dump];
-    if ( cpos > offset )
-      {
-      vtkDebugMacro(<< "The offset is back in file: " << cpos << " > " 
-                    << offset);
-      }
-    spis.Seek(offset);
-    vtkSpyPlotUniReader::DataDump *dh = &this->DataDumps[dump];
-    memset(dh, 0, sizeof(dh));
-    if ( !spis.ReadInt32s(&(dh->NumVars), 1) )
-      {
-      vtkErrorMacro( "Cannot read number of variables" );
-      return 0;
-      }
-    if ( dh->NumVars <= 0 )
-      {
-      vtkErrorMacro( "Got bad number of variables: " << dh->NumVars );
-      return 0;
-      }
-    dh->SavedVariables = new int[ dh->NumVars ];
-    dh->SavedVariableOffsets = new vtkTypeInt64[ dh->NumVars ];
-    //printf("Reading saved variables: %ld\n", ifs.tellg());
-    if ( !spis.ReadInt32s(dh->SavedVariables, dh->NumVars) )
-      {
-      vtkErrorMacro( "Cannot read the saved variables" );
-      return 0;
-      }
-    if ( !spis.ReadInt64s(dh->SavedVariableOffsets, dh->NumVars) )
-      {
-      vtkErrorMacro( "Cannot read the saved variable offsets" );
-      return 0;
-      }
-    dh->Variables = new vtkSpyPlotUniReader::Variable[dh->NumVars];
-    for ( fieldCnt = 0; fieldCnt < dh->NumVars; fieldCnt ++ )
-      {
-      vtkSpyPlotUniReader::Variable* variable = dh->Variables+fieldCnt;
-      variable->Material = -1;
-      variable->Index = -1;
-      variable->DataBlocks = 0;
-      int var = dh->SavedVariables[fieldCnt];
-      if ( var >= 100 )
-        {
-        variable->Index = var % 100 - 1;
-        var /= 100;
-        var *= 100;
-        }
-      int cfc;
-      if ( variable->Index >= 0 )
-        {
-        for ( cfc = 0; cfc < this->NumberOfPossibleMaterialFields; ++ cfc )
-          {
-          if ( this->MaterialFields[cfc].Index == var )
-            {
-            variable->Material = cfc;
-            variable->MaterialField = this->MaterialFields + cfc;
-            break;
-            }
-          }
-        }
-      else
-        {
-        for ( cfc = 0; cfc < this->NumberOfPossibleCellFields; ++ cfc )
-          {
-          if ( this->CellFields[cfc].Index == var )
-            {
-            variable->Material = cfc;
-            variable->MaterialField = this->CellFields + cfc;
-            break;
-            }
-          }
-        }
-      if ( variable->Material < 0 )
-        {
-        vtkErrorMacro( "Cannot found variable or material with ID: " << var );
-        return 0;
-        }
-      if ( variable->Index >= 0 )
-        {
-        vtksys_ios::ostringstream ostr;
-        ostr << this->MaterialFields[variable->Material].Comment << " - " 
-             << variable->Index+1 << ends;
-        variable->Name = new char[ostr.str().size() + 1];
-        strcpy(variable->Name, ostr.str().c_str());
-        }
-      else
-        {
-        const char* cname = this->CellFields[variable->Material].Comment;
-        variable->Name = new char[strlen(cname) + 1];
-        strcpy(variable->Name, cname);
-        }
-      if ( !this->CellArraySelection->ArrayExists(variable->Name) )
-        {
-        //vtkDebugMacro( << __LINE__ << " Disable array: " << variable->Name );
-        this->CellArraySelection->DisableArray(variable->Name);
-        }
-      }
-
-    //printf("Before tracers: %ld\n", ifs.tellg());
-    if ( !spis.ReadInt32s(&dh->NumberOfTracers, 1) )
-      {
-      vtkErrorMacro( "Problem reading the num of tracers" );
-      return 0;
-      }
-    if ( dh->NumberOfTracers > 0 )
-      {
-      vtkstd::vector<unsigned char> tracerBuffer;
-      int tracer;
-      vtkFloatArray *coords[3];
-      for (tracer = 0; tracer < 3; tracer ++)
-        {
-        int numBytes;
-        if ( !spis.ReadInt32s(&numBytes, 1) )
-          {
-          vtkErrorMacro( "Problem reading the num of tracers" );
-          return 0;
-          }
-        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
-          {
-          tracerBuffer.resize (numBytes);
-          }
-        if ( !spis.ReadString(&*tracerBuffer.begin(), numBytes) )
-          {
-          vtkErrorMacro( "Problem reading the bytes" );
-          return 0;
-          }
-        coords[tracer] = vtkFloatArray::New ();
-        coords[tracer]->SetNumberOfValues (dh->NumberOfTracers);
-        float* ptr = coords[tracer]->GetPointer(0);
-        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
-                                        numBytes, ptr, dh->NumberOfTracers) )
-          {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
-          return 0;
-          }
-        }
-      dh->TracerCoord = vtkFloatArray::New ();
-      dh->TracerCoord->SetNumberOfComponents (3);
-      dh->TracerCoord->SetNumberOfTuples (dh->NumberOfTracers);
-      for (int n = 0; n < dh->NumberOfTracers; n ++)
-        {
-        dh->TracerCoord->SetComponent (n, 0, coords[0]->GetValue (n));
-        dh->TracerCoord->SetComponent (n, 1, coords[1]->GetValue (n));
-        dh->TracerCoord->SetComponent (n, 2, coords[2]->GetValue (n));
-        }
-      coords[0]->Delete ();
-      coords[1]->Delete ();
-      coords[2]->Delete ();
-
-      vtkIntArray *blocks[4];
-      for ( tracer = 0; tracer < 4; ++ tracer ) // yes, 7 (3 above + 4) is the magic number
-        {
-        int numBytes;
-        if ( !spis.ReadInt32s(&numBytes, 1) )
-          {
-          vtkErrorMacro( "Problem reading the num of tracers" );
-          return 0;
-          }
-        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
-          {
-          tracerBuffer.resize (numBytes);
-          }
-        if ( !spis.ReadString(&*tracerBuffer.begin(), numBytes) )
-          {
-          vtkErrorMacro( "Problem reading the bytes" );
-          return 0;
-          }
-        blocks[tracer] = vtkIntArray::New ();
-        blocks[tracer]->SetNumberOfValues (dh->NumberOfTracers);
-        int * ptr = blocks[tracer]->GetPointer(0);
-        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
-                                        numBytes, ptr, dh->NumberOfTracers) )
-          {
-          vtkErrorMacro( "Problem RLD decoding int data array" );
-          return 0;
-          }
-        }
-      dh->TracerBlock = vtkIntArray::New ();
-      dh->TracerBlock->SetNumberOfComponents (4);
-      dh->TracerBlock->SetNumberOfTuples (dh->NumberOfTracers);
-      for (int n = 0; n < dh->NumberOfTracers; n ++)
-        {
-        dh->TracerBlock->SetComponent (n, 0, blocks[0]->GetValue (n));
-        dh->TracerBlock->SetComponent (n, 1, blocks[1]->GetValue (n));
-        dh->TracerBlock->SetComponent (n, 2, blocks[2]->GetValue (n));
-        dh->TracerBlock->SetComponent (n, 3, blocks[3]->GetValue (n));
-        }
-      blocks[0]->Delete ();
-      blocks[1]->Delete ();
-      blocks[2]->Delete ();
-      blocks[3]->Delete ();
-      }
-
-    // Skip Histogram
-    int numberOfIndicators;
-    if ( !spis.ReadInt32s(&numberOfIndicators, 1) )
-      {
-      vtkErrorMacro( "Problem reading the num of tracers" );
-      return 0;
-      }
-    if ( numberOfIndicators > 0 )
-      {
-      spis.Seek(sizeof(int), true);
-      int ind;
-      for ( ind = 0; ind < numberOfIndicators; ++ ind )
-        {
-        spis.Seek(sizeof(int) + sizeof(double) * 6, true);
-        int numBins;
-        if ( !spis.ReadInt32s(&numBins, 1) )
-          {
-          vtkErrorMacro( "Problem reading the num of tracers" );
-          return 0;
-          }
-        if ( numBins > 0 )
-          {
-          int someSize;
-          if ( !spis.ReadInt32s(&someSize, 1) )
-            {
-            vtkErrorMacro( "Problem reading the num of tracers" );
-            return 0;
-            }
-          spis.Seek(someSize, true);
-          }
-        }
-      }
-
-    // Now scan the data blocks information
-    if ( !spis.ReadInt32s(&dh->NumberOfBlocks, 1) )
-      {
-      vtkErrorMacro( "Problem reading the num of blocks" );
-      return 0;
-      }
-    if ( this->NumberOfBlocks != dh->NumberOfBlocks )
-      {
-      vtkErrorMacro( "Different number of blocks..." );
-      }
-    dh->SavedBlockAllocatedStates = new unsigned char[dh->NumberOfBlocks];
-    int block;
-    int totalBlocks = 0;
-    // Record where the state of the block definition is for this
-    // time step
-    dh->BlocksOffset = spis.Tell();
-    for ( block = 0; block < dh->NumberOfBlocks; ++ block )
-      {
-      // Skip over the block but remember its allocated state
-      if (!vtkSpyPlotBlock::Scan(&spis, 
-                                 &(dh->SavedBlockAllocatedStates[block]),
-                                 this->FileVersion))
-      {
-      vtkErrorMacro( "Problem scanning the block information" );
-      return 0;
-      }
-      if ( dh->SavedBlockAllocatedStates[block] )
-        {
-        totalBlocks ++;
-        }
-      }
-    
-    dh->ActualNumberOfBlocks = totalBlocks;
-    dh->SavedBlocksGeometryOffset = spis.Tell();
-    
-    vtkstd::vector<unsigned char> arrayBuffer;
-    for ( block = 0; block < dh->NumberOfBlocks; ++ block )
-      {
-      if (dh->SavedBlockAllocatedStates[block])
-        {
-        int numBytes;
-        int component;
-        //vtkDebugMacro( "Block: " << block );
-        for ( component = 0; component < 3; ++ component )
-          {
-          if ( !spis.ReadInt32s(&numBytes, 1) )
-            {
-            vtkErrorMacro( "Problem reading the number of bytes" );
-            return 0;
-            }
-          if ( static_cast<int>(arrayBuffer.size()) < numBytes )
-            {
-            arrayBuffer.resize(numBytes);
-            }
-
-          if ( !spis.ReadString(&*arrayBuffer.begin(), numBytes) )
-            {
-            vtkErrorMacro( "Problem reading the bytes" );
-            return 0;
-            }
-          }
-        }
-      }
-    }
-
-  this->NumberOfCellFields = this->CellArraySelection->GetNumberOfArrays();
-  this->CurrentTime = this->TimeRange[0];
-  if ( !this->HaveInformation ) 
-    { 
-    vtkDebugMacro( << __LINE__ << " " << this << " Read: " 
-                   << this->HaveInformation ); 
-    }
-  
-  this->HaveInformation = 1;
-  if ( !this->HaveInformation ) 
-    { 
-    vtkDebugMacro( << __LINE__ << " " << this << " Read: "
-                   << this->HaveInformation );
-    }
-  return 1;
-}
-
-
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::MakeCurrent()
 {
@@ -723,9 +281,8 @@ int vtkSpyPlotUniReader::MakeCurrent()
 
   dump = this->CurrentTimeStep;
   dp = this->DataDumps+dump;
-  
-  int fieldCnt;
-  for ( fieldCnt = 0; fieldCnt < dp->NumVars; ++ fieldCnt )
+    
+  for (int fieldCnt = 0; fieldCnt < dp->NumVars; ++ fieldCnt )
     {
     vtkSpyPlotUniReader::Variable* var = dp->Variables + fieldCnt;
     vtkDebugMacro( "Variable: " << var << " (" << var->Name << ") - " 
@@ -880,7 +437,6 @@ int vtkSpyPlotUniReader::MakeCurrent()
   return 1;
 }
 
-#if 0
 //-----------------------------------------------------------------------------
 void vtkSpyPlotUniReader::PrintMemoryUsage()
 {
@@ -1056,7 +612,6 @@ void vtkSpyPlotUniReader::PrintInformation()
 
   this->CellArraySelection->Print(cout);
 }
-#endif
 
 //-----------------------------------------------------------------------------
 /* Routine run-length-encodes the data pointed to by *data, placing
@@ -1332,9 +887,6 @@ vtkSpyPlotUniReader::Variable* vtkSpyPlotUniReader::GetCellField(int field)
   return  dp->Variables + field;
 }
 
-
-
-
 //-----------------------------------------------------------------------------
 const char* vtkSpyPlotUniReader::GetCellFieldName(int field)
 {
@@ -1365,6 +917,41 @@ vtkDataArray* vtkSpyPlotUniReader::GetCellFieldData(int block, int field, int* f
   vtkDebugMacro( "GetCellField(" << block << " " << field << " " << *fixed << ") = " << var->DataBlocks[block] );
   return var->DataBlocks[block];
 }
+
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialField(const int& block,
+    const int& materialIndex, const char* id)
+{
+  vtkSpyPlotUniReader::Variable *var = NULL;
+  vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
+  for ( int v=0; v < dp->NumVars; ++v )
+    {
+    var = &dp->Variables[v];
+    if (strcmp(var->MaterialField->Id,id) == 0)
+      {
+      if ( var->Index == materialIndex && var->DataBlocks != NULL )
+        {
+        return var->DataBlocks[block];
+        }
+      }
+    }
+  return NULL;
+}
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialMassField(const int& block,
+    const int& materialIndex)
+{
+  return this->GetMaterialField(block,materialIndex,"M");
+}
+
+//-----------------------------------------------------------------------------
+vtkDataArray* vtkSpyPlotUniReader::GetMaterialVolumeFractionField(const int& block,
+    const int& materialIndex)
+{
+  return this->GetMaterialField(block,materialIndex,"VOLM");
+}
+
+
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::MarkCellFieldDataFixed(int block, int field)
@@ -1668,3 +1255,467 @@ void vtkSpyPlotUniReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::ReadInformation()
+{
+ 
+  if ( this->HaveInformation )
+    {
+    return 1;
+    }
+  // Initial checks
+  if ( !this->CellArraySelection )
+    {
+    vtkErrorMacro( "Cell array selection not specified" );
+    return 0;
+    }
+  if ( !this->FileName )
+    {
+    vtkErrorMacro( "FileName not specifed" );
+    return 0;
+    }
+  ifstream ifs(this->FileName, ios::binary|ios::in);
+  if ( !ifs )
+    {
+    vtkErrorMacro( "Cannot open file: " << this->FileName );
+    return 0;
+    }
+  vtkSpyPlotIStream spis;
+  spis.SetStream(&ifs);
+
+  if (!this->ReadHeader(&spis))
+    {
+    vtkErrorMacro("Invalid Header");
+    return 0;
+    }
+
+  // Create the array of blocks we are going to use
+  this->Blocks = new vtkSpyPlotBlock[this->NumberOfBlocks];
+
+  // Process all the Cell Material  Fields
+  if(!this->ReadCellVariableInfo(&spis))
+    {
+    vtkErrorMacro("Invalid cell variable section");
+    return 0;
+    }
+
+  // Read all possible material fields
+  if(!this->ReadMaterialInfo(&spis))
+    {
+    vtkErrorMacro("Invalid material section");
+    return 0;
+    }
+    
+  if (!this->ReadGroupHeaderInformation(&spis))
+    {
+    vtkErrorMacro("Problem reading group header information");
+    return 0;
+    }
+
+  //now that the group header has been read create the data dumps
+  this->DataDumps = new vtkSpyPlotUniReader::DataDump[this->NumberOfDataDumps];
+
+  //Setup time information
+  this->TimeStepRange[1] = this->NumberOfDataDumps-1;
+  this->TimeRange[0] = this->DumpTime[0];
+  this->TimeRange[1] = this->DumpTime[this->NumberOfDataDumps-1];
+
+  if (!this->ReadDataDumps(&spis))
+    {
+    vtkErrorMacro("Problem reading time information");
+    return 0;
+    }
+
+  this->NumberOfCellFields = this->CellArraySelection->GetNumberOfArrays();
+  this->CurrentTime = this->TimeRange[0];  
+  this->HaveInformation = 1;
+  
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::ReadCellVariableInfo(vtkSpyPlotIStream *spis)
+{ 
+  //printf("Before cell fields: %ld\n", ifs.tellg());
+  // Read all possible cell fields
+  if ( !spis->ReadInt32s(&(this->NumberOfPossibleCellFields), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of material fields" );
+    return 0;
+    }
+  this->CellFields = 
+    new vtkSpyPlotUniReader::CellMaterialField[this->NumberOfPossibleCellFields];
+  int fieldCnt;
+  for ( fieldCnt = 0; 
+        fieldCnt < this->NumberOfPossibleCellFields; 
+        ++ fieldCnt )
+    {
+    vtkSpyPlotUniReader::CellMaterialField *field 
+      = this->CellFields + fieldCnt;
+    field->Index = 0;
+    if ( !spis->ReadString(field->Id, 30) )
+      {
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
+      return 0;
+      }
+    if ( !spis->ReadString(field->Comment, 80) )
+      {
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
+      return 0;
+      }
+    if ( this->FileVersion >= 101 )
+      {
+      if ( !spis->ReadInt32s(&(field->Index), 1) )
+        {
+        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
+        return 0;
+        }
+      }
+    }
+  return 1;
+}
+
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::ReadMaterialInfo(vtkSpyPlotIStream *spis)
+{ 
+  //printf("Before material fields: %ld\n", ifs.tellg());
+  // Read all possible material fields
+  if ( !spis->ReadInt32s(&(this->NumberOfPossibleMaterialFields), 1) )
+    {
+    vtkErrorMacro( "Cannot read number of possible material fields" );
+    return 0;
+    }
+
+  this->MaterialFields = 
+    new vtkSpyPlotUniReader::CellMaterialField[this->NumberOfPossibleMaterialFields];
+
+  for (int fieldCnt = 0; 
+        fieldCnt < this->NumberOfPossibleMaterialFields; 
+        ++ fieldCnt )
+    {
+    vtkSpyPlotUniReader::CellMaterialField *field = 
+      this->MaterialFields + fieldCnt;
+    field->Index = 0;
+    if ( !spis->ReadString(field->Id, 30) )
+      {
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " id" );
+      return 0;
+      }
+    if ( !spis->ReadString(field->Comment, 80) )
+      {
+      vtkErrorMacro( "Cannot read field " << fieldCnt << " commenet" );
+      return 0;
+      }
+    if ( this->FileVersion >= 101 )
+      {
+      if ( !spis->ReadInt32s(&(field->Index), 1) )
+        {
+        vtkErrorMacro( "Cannot read field " << fieldCnt << " int" );
+        return 0;
+        }
+      }
+    }
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
+{ 
+  int dump;
+  // Read in the time step information 
+  for ( dump = 0; dump < this->NumberOfDataDumps; ++dump )
+    {
+    vtkTypeInt64 cpos = spis->Tell();
+    vtkTypeInt64 offset = this->DumpOffset[dump];
+    if ( cpos > offset )
+      {
+      vtkDebugMacro(<< "The offset is back in file: " << cpos << " > " 
+                    << offset);
+      }
+    spis->Seek(offset);
+    vtkSpyPlotUniReader::DataDump *dh = &this->DataDumps[dump];
+    memset(dh, 0, sizeof(dh));
+    if ( !spis->ReadInt32s(&(dh->NumVars), 1) )
+      {
+      vtkErrorMacro( "Cannot read number of variables" );
+      return 0;
+      }
+    if ( dh->NumVars <= 0 )
+      {
+      vtkErrorMacro( "Got bad number of variables: " << dh->NumVars );
+      return 0;
+      }
+    dh->SavedVariables = new int[ dh->NumVars ];
+    dh->SavedVariableOffsets = new vtkTypeInt64[ dh->NumVars ];
+    //printf("Reading saved variables: %ld\n", ifs.tellg());
+    if ( !spis->ReadInt32s(dh->SavedVariables, dh->NumVars) )
+      {
+      vtkErrorMacro( "Cannot read the saved variables" );
+      return 0;
+      }
+    if ( !spis->ReadInt64s(dh->SavedVariableOffsets, dh->NumVars) )
+      {
+      vtkErrorMacro( "Cannot read the saved variable offsets" );
+      return 0;
+      }
+    dh->Variables = new vtkSpyPlotUniReader::Variable[dh->NumVars];
+    for (int fieldCnt = 0; fieldCnt < dh->NumVars; fieldCnt ++ )
+      {
+      vtkSpyPlotUniReader::Variable* variable = dh->Variables+fieldCnt;
+      variable->Material = -1;
+      variable->Index = -1;
+      variable->DataBlocks = 0;
+      int var = dh->SavedVariables[fieldCnt];
+      if ( var >= 100 )
+        {
+        variable->Index = var % 100 - 1;
+        var /= 100;
+        var *= 100;
+        }
+      int cfc;
+      if ( variable->Index >= 0 )
+        {
+        for ( cfc = 0; cfc < this->NumberOfPossibleMaterialFields; ++ cfc )
+          {
+          if ( this->MaterialFields[cfc].Index == var )
+            {
+            variable->Material = cfc;
+            variable->MaterialField = this->MaterialFields + cfc;
+            break;
+            }
+          }
+        }
+      else
+        {
+        for ( cfc = 0; cfc < this->NumberOfPossibleCellFields; ++ cfc )
+          {
+          if ( this->CellFields[cfc].Index == var )
+            {
+            variable->Material = cfc;
+            variable->MaterialField = this->CellFields + cfc;
+            break;
+            }
+          }
+        }
+      if ( variable->Material < 0 )
+        {
+        vtkErrorMacro( "Cannot found variable or material with ID: " << var );
+        return 0;
+        }
+      if ( variable->Index >= 0 )
+        {
+        vtksys_ios::ostringstream ostr;
+        ostr << this->MaterialFields[variable->Material].Comment << " - " 
+             << variable->Index+1 << ends;
+        variable->Name = new char[ostr.str().size() + 1];
+        strcpy(variable->Name, ostr.str().c_str());
+        }
+      else
+        {
+        const char* cname = this->CellFields[variable->Material].Comment;
+        variable->Name = new char[strlen(cname) + 1];
+        strcpy(variable->Name, cname);
+        }
+      if ( !this->CellArraySelection->ArrayExists(variable->Name) )
+        {
+        //vtkDebugMacro( << __LINE__ << " Disable array: " << variable->Name );
+        this->CellArraySelection->DisableArray(variable->Name);
+        }
+      }
+
+    //printf("Before tracers: %ld\n", ifs.tellg());
+    if ( !spis->ReadInt32s(&dh->NumberOfTracers, 1) )
+      {
+      vtkErrorMacro( "Problem reading the num of tracers" );
+      return 0;
+      }
+    if ( dh->NumberOfTracers > 0 )
+      {
+      vtkstd::vector<unsigned char> tracerBuffer;
+      int tracer;
+      vtkFloatArray *coords[3];
+      for (tracer = 0; tracer < 3; tracer ++)
+        {
+        int numBytes;
+        if ( !spis->ReadInt32s(&numBytes, 1) )
+          {
+          vtkErrorMacro( "Problem reading the num of tracers" );
+          return 0;
+          }
+        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
+          {
+          tracerBuffer.resize (numBytes);
+          }
+        if ( !spis->ReadString(&*tracerBuffer.begin(), numBytes) )
+          {
+          vtkErrorMacro( "Problem reading the bytes" );
+          return 0;
+          }
+        coords[tracer] = vtkFloatArray::New ();
+        coords[tracer]->SetNumberOfValues (dh->NumberOfTracers);
+        float* ptr = coords[tracer]->GetPointer(0);
+        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
+                                        numBytes, ptr, dh->NumberOfTracers) )
+          {
+          vtkErrorMacro( "Problem RLD decoding float data array" );
+          return 0;
+          }
+        }
+      dh->TracerCoord = vtkFloatArray::New ();
+      dh->TracerCoord->SetNumberOfComponents (3);
+      dh->TracerCoord->SetNumberOfTuples (dh->NumberOfTracers);
+      for (int n = 0; n < dh->NumberOfTracers; n ++)
+        {
+        dh->TracerCoord->SetComponent (n, 0, coords[0]->GetValue (n));
+        dh->TracerCoord->SetComponent (n, 1, coords[1]->GetValue (n));
+        dh->TracerCoord->SetComponent (n, 2, coords[2]->GetValue (n));
+        }
+      coords[0]->Delete ();
+      coords[1]->Delete ();
+      coords[2]->Delete ();
+
+      vtkIntArray *blocks[4];
+      for ( tracer = 0; tracer < 4; ++ tracer ) // yes, 7 (3 above + 4) is the magic number
+        {
+        int numBytes;
+        if ( !spis->ReadInt32s(&numBytes, 1) )
+          {
+          vtkErrorMacro( "Problem reading the num of tracers" );
+          return 0;
+          }
+        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
+          {
+          tracerBuffer.resize (numBytes);
+          }
+        if ( !spis->ReadString(&*tracerBuffer.begin(), numBytes) )
+          {
+          vtkErrorMacro( "Problem reading the bytes" );
+          return 0;
+          }
+        blocks[tracer] = vtkIntArray::New ();
+        blocks[tracer]->SetNumberOfValues (dh->NumberOfTracers);
+        int * ptr = blocks[tracer]->GetPointer(0);
+        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
+                                        numBytes, ptr, dh->NumberOfTracers) )
+          {
+          vtkErrorMacro( "Problem RLD decoding int data array" );
+          return 0;
+          }
+        }
+      dh->TracerBlock = vtkIntArray::New ();
+      dh->TracerBlock->SetNumberOfComponents (4);
+      dh->TracerBlock->SetNumberOfTuples (dh->NumberOfTracers);
+      for (int n = 0; n < dh->NumberOfTracers; n ++)
+        {
+        dh->TracerBlock->SetComponent (n, 0, blocks[0]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 1, blocks[1]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 2, blocks[2]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 3, blocks[3]->GetValue (n));
+        }
+      blocks[0]->Delete ();
+      blocks[1]->Delete ();
+      blocks[2]->Delete ();
+      blocks[3]->Delete ();
+      }
+
+    // Skip Histogram
+    int numberOfIndicators;
+    if ( !spis->ReadInt32s(&numberOfIndicators, 1) )
+      {
+      vtkErrorMacro( "Problem reading the num of tracers" );
+      return 0;
+      }
+    if ( numberOfIndicators > 0 )
+      {
+      spis->Seek(sizeof(int), true);
+      int ind;
+      for ( ind = 0; ind < numberOfIndicators; ++ ind )
+        {
+        spis->Seek(sizeof(int) + sizeof(double) * 6, true);
+        int numBins;
+        if ( !spis->ReadInt32s(&numBins, 1) )
+          {
+          vtkErrorMacro( "Problem reading the num of tracers" );
+          return 0;
+          }
+        if ( numBins > 0 )
+          {
+          int someSize;
+          if ( !spis->ReadInt32s(&someSize, 1) )
+            {
+            vtkErrorMacro( "Problem reading the num of tracers" );
+            return 0;
+            }
+          spis->Seek(someSize, true);
+          }
+        }
+      }
+
+    // Now scan the data blocks information
+    if ( !spis->ReadInt32s(&dh->NumberOfBlocks, 1) )
+      {
+      vtkErrorMacro( "Problem reading the num of blocks" );
+      return 0;
+      }
+    if ( this->NumberOfBlocks != dh->NumberOfBlocks )
+      {
+      vtkErrorMacro( "Different number of blocks..." );
+      }
+    dh->SavedBlockAllocatedStates = new unsigned char[dh->NumberOfBlocks];
+    int block;
+    int totalBlocks = 0;
+    // Record where the state of the block definition is for this
+    // time step
+    dh->BlocksOffset = spis->Tell();
+    for ( block = 0; block < dh->NumberOfBlocks; ++ block )
+      {
+      // Skip over the block but remember its allocated state
+      if (!vtkSpyPlotBlock::Scan(spis, 
+                                 &(dh->SavedBlockAllocatedStates[block]),
+                                 this->FileVersion))
+      {
+      vtkErrorMacro( "Problem scanning the block information" );
+      return 0;
+      }
+      if ( dh->SavedBlockAllocatedStates[block] )
+        {
+        totalBlocks ++;
+        }
+      }
+    
+    dh->ActualNumberOfBlocks = totalBlocks;
+    dh->SavedBlocksGeometryOffset = spis->Tell();
+    
+    vtkstd::vector<unsigned char> arrayBuffer;
+    for ( block = 0; block < dh->NumberOfBlocks; ++ block )
+      {
+      if (dh->SavedBlockAllocatedStates[block])
+        {
+        int numBytes;
+        int component;
+        //vtkDebugMacro( "Block: " << block );
+        for ( component = 0; component < 3; ++ component )
+          {
+          if ( !spis->ReadInt32s(&numBytes, 1) )
+            {
+            vtkErrorMacro( "Problem reading the number of bytes" );
+            return 0;
+            }
+          if ( static_cast<int>(arrayBuffer.size()) < numBytes )
+            {
+            arrayBuffer.resize(numBytes);
+            }
+
+          if ( !spis->ReadString(&*arrayBuffer.begin(), numBytes) )
+            {
+            vtkErrorMacro( "Problem reading the bytes" );
+            return 0;
+            }
+          }
+        }
+      }
+    }
+  return 1;
+}

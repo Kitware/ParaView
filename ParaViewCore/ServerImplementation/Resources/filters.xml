@@ -1872,7 +1872,7 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-         <DataType value="vtkPointSet"/>
+         <DataType value="vtkDataSet"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array">
          <RequiredProperties>
@@ -9602,14 +9602,14 @@ This property controls how the filter works to generate tensor cell data. You ca
          number_of_elements="1"
          default_values="3">
        <EnumerationDomain name="task_list">
-         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="0" text="Detailed model of input data"/>
          <Entry value="1" text="Model a subset of the data"/>
          <Entry value="2" text="Assess the data with a model"/>
          <Entry value="3" text="Model and assess the same data"/>
        </EnumerationDomain>
        <Documentation>
          Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
-         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Detailed model of input data," creates a set of output tables containing a calculated statistical model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
          &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
          &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
          &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
@@ -9735,14 +9735,14 @@ This property controls how the filter works to generate tensor cell data. You ca
          number_of_elements="1"
          default_values="3">
        <EnumerationDomain name="task_list">
-         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="0" text="Detailed model of input data"/>
          <Entry value="1" text="Model a subset of the data"/>
          <Entry value="2" text="Assess the data with a model"/>
          <Entry value="3" text="Model and assess the same data"/>
        </EnumerationDomain>
        <Documentation>
          Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
-         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Detailed model of input data," creates a set of output tables containing a calculated statistical model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
          &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
          &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
          &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
@@ -9882,14 +9882,14 @@ This property controls how the filter works to generate tensor cell data. You ca
          number_of_elements="1"
          default_values="3">
        <EnumerationDomain name="task_list">
-         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="0" text="Detailed model of input data"/>
          <Entry value="1" text="Model a subset of the data"/>
          <Entry value="2" text="Assess the data with a model"/>
          <Entry value="3" text="Model and assess the same data"/>
        </EnumerationDomain>
        <Documentation>
          Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
-         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Detailed model of input data," creates a set of output tables containing a calculated statistical model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
          &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
          &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
          &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
@@ -10055,14 +10055,14 @@ This property controls how the filter works to generate tensor cell data. You ca
          number_of_elements="1"
          default_values="3">
        <EnumerationDomain name="task_list">
-         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="0" text="Detailed model of input data"/>
          <Entry value="1" text="Model a subset of the data"/>
          <Entry value="2" text="Assess the data with a model"/>
          <Entry value="3" text="Model and assess the same data"/>
        </EnumerationDomain>
        <Documentation>
          Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
-         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Detailed model of input data," creates a set of output tables containing a calculated statistical model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
          &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
          &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
          &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
@@ -10189,14 +10189,14 @@ This property controls how the filter works to generate tensor cell data. You ca
          number_of_elements="1"
          default_values="3">
        <EnumerationDomain name="task_list">
-         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="0" text="Detailed model of input data"/>
          <Entry value="1" text="Model a subset of the data"/>
          <Entry value="2" text="Assess the data with a model"/>
          <Entry value="3" text="Model and assess the same data"/>
        </EnumerationDomain>
        <Documentation>
          Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
-         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Detailed model of input data," creates a set of output tables containing a calculated statistical model of the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
          &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
          &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
          &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
