@@ -47,6 +47,12 @@ vtkMultiProcessController* vtkPVSession::GetController(vtkPVSession::ServerFlags
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVSession::GetPendingProgress()
+{
+  return (this->InCleanupPendingProgress || this->ProgressCount > 0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSession::PrepareProgress()
 {
   if (this->InCleanupPendingProgress)

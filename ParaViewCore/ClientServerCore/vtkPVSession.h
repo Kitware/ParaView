@@ -83,6 +83,11 @@ public:
   void PrepareProgress();
   void CleanupPendingProgress();
 
+  // Description:
+  // Returns true if the session is within a PrepareProgress() and
+  // CleanupPendingProgress() block.
+  bool GetPendingProgress();
+
 //BTX
 protected:
   vtkPVSession();
