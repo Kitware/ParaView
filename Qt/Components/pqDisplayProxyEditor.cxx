@@ -692,7 +692,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->SliceDirection);
   QObject::connect(this->Internal->SliceDirectionAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
+    this, SLOT(sliceDirectionChanged()));
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
@@ -769,7 +769,7 @@ void pqDisplayProxyEditor::updateEnableState()
     // every time the user switches to Slice mode we update the domain for the
     // slider since the domain depends on the input to the image mapper which
     // may have changed.
-    QTimer::singleShot(0, this, SLOT(sliceDirectionChanged()));
+    this->sliceDirectionChanged();
     }
 
   this->Internal->compositeTree->setVisible(
