@@ -59,6 +59,12 @@ bool pqAutoApplyReaction::autoApply()
 }
 
 //-----------------------------------------------------------------------------
+void pqAutoApplyReaction::setAutoApply(bool autoAccept)
+{
+  pqObjectInspectorWidget::setAutoAccept(autoAccept);
+}
+
+//-----------------------------------------------------------------------------
 void pqAutoApplyReaction::updateState()
 {
   // Doh! I have no way of knowing when the auto-accept state changes :(.
