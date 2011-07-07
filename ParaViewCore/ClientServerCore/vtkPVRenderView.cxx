@@ -599,6 +599,8 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeForCollaboration()
 {
+  // FIXME_COLLABORATION: Ensure that this code gets called only in
+  // collaboration mode. Also, can we optimize this further?
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
   vtkMultiProcessController* d_controller = 
@@ -632,8 +634,9 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     {
     p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
     }
-  //cout << "Current RemoteRenderingThreshold: " << this->RemoteRenderingThreshold
-  //  << endl;
+  // Force DoDataDelivery(). That should happen every time in collaborative
+  // mode.
+  this->UpdateTime.Modified();
 }
 
 //----------------------------------------------------------------------------
