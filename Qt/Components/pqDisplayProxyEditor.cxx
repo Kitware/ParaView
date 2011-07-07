@@ -839,9 +839,13 @@ void pqDisplayProxyEditor::updateEnableState()
         return;
         }
       }
+    if ( arrayInfo )
+      {
+      this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+      }
     }
 
-  this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+  
   this->Internal->ColorMapScalars->setEnabled(false);
 }
 
