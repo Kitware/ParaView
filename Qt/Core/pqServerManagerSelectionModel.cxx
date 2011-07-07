@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
+#include <assert.h>
+
 // register meta type for pqSMProxy
 static const int pqServerManagerSelectionId = 
 qRegisterMetaType<pqServerManagerSelection>("pqServerManagerSelection");
@@ -96,12 +98,8 @@ void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
   this->Internal->Server = server;
   vtkSMProxyManager* pxm = server->proxyManager();
   vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
-  if (!selmodel)
-    {
-    selmodel = vtkSMProxySelectionModel::New();
-    pxm->RegisterSelectionModel("ActiveSources", selmodel);
-    selmodel->Delete();
-    }
+
+  assert("The session should be set at that point to the ProxyManager" && selmodel);
 
   this->Internal->ActiveSources = selmodel;
   this->Internal->VTKConnect =
@@ -110,6 +108,10 @@ void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
     this, SLOT(smCurrentChanged()));
   this->Internal->VTKConnect->Connect(selmodel,
     vtkCommand::SelectionChangedEvent, this, SLOT(smSelectionChanged()));
+
+  // Update with the local state if any
+  smCurrentChanged();
+  smSelectionChanged();
 }
 
 //-----------------------------------------------------------------------------

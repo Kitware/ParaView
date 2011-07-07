@@ -19,8 +19,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkCollection.h"
+#include "vtkSMProxyLocator.h"
+
+#include "vtkSMMessage.h"
+
+#include "vtkPVSession.h"
 
 #include <vtkstd/vector>
+#include <vtkstd/set>
+#include <vtkNew.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
@@ -51,6 +59,10 @@ vtkSMProxySelectionModel::vtkSMProxySelectionModel()
   this->NewlyDeselected = vtkCollection::New();
   this->Selection = vtkCollection::New();
   this->Internal = new vtkSMProxySelectionModel::vtkInternal();
+
+  this->State = new vtkSMMessage();
+  this->SetLocation(vtkPVSession::CLIENT);
+  this->State->SetExtension(DefinitionHeader::server_class, "vtkSIObject"); // Dummy SIObject
 }
 
 //-----------------------------------------------------------------------------
@@ -60,8 +72,8 @@ vtkSMProxySelectionModel::~vtkSMProxySelectionModel()
   this->NewlyDeselected->Delete();
   this->Selection->Delete();
   delete this->Internal;
+  delete this->State;
 }
-
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxySelectionModel::GetCurrentProxy()
 {
@@ -167,6 +179,15 @@ void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
 
   this->NewlyDeselected->RemoveAllItems();
   this->NewlySelected->RemoveAllItems();
+
+  // Update the local state and push to the session
+  this->State->ClearExtension(ProxySelectionModelState::proxy);
+  this->Selection->InitTraversal();
+  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+    {
+    this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+    }
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +206,86 @@ void vtkSMProxySelectionModel::InvokeSelectionChanged(int selectionFlag)
 void vtkSMProxySelectionModel::PrintSelf(ostream&  os,  vtkIndent  indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Selected Proxies: ";
+  this->Selection->InitTraversal();
+  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+    {
+    os << obj->GetGlobalID() << " ";
+    }
+  os << endl;
+}
+//-----------------------------------------------------------------------------
+const vtkSMMessage* vtkSMProxySelectionModel::GetFullState()
+{
+  return this->State;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator)
+{
+  if(!this->HasGlobalID())
+    {
+    this->SetGlobalID(msg->global_id());
+    }
+  // Compute the diff and send the proper events
+  vtkstd::set<vtkTypeUInt32> newProxyInSelection;
+  for(int i=0; i < msg->ExtensionSize(ProxySelectionModelState::proxy); i++)
+    {
+    newProxyInSelection.insert(msg->GetExtension(ProxySelectionModelState::proxy, i));
+    }
 
+  // Take care of the deselect first
+  vtkNew<vtkCollection> proxyToDeselect;
+  this->Selection->InitTraversal();
+  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+    {
+    if(newProxyInSelection.find(obj->GetGlobalID()) == newProxyInSelection.end())
+      {
+      proxyToDeselect->AddItem(obj);
+      }
+    else
+      {
+      newProxyInSelection.erase(obj->GetGlobalID());
+      }
+    }
+
+  // Take care of the add-on
+  vtkNew<vtkCollection> proxyToSelect;
+  for( vtkstd::set<vtkTypeUInt32>::iterator iter = newProxyInSelection.begin();
+       iter != newProxyInSelection.end();
+       iter++)
+    {
+    if(vtkSMProxy* proxy = locator->LocateProxy(*iter))
+      {
+      proxyToSelect->AddItem(proxy);
+      }
+    }
+
+  // Apply the state
+  bool tmp = this->IsLocalPushOnly();
+  this->EnableLocalPushOnly();
+  if(proxyToDeselect->GetNumberOfItems() > 0)
+    {
+    this->Select(proxyToDeselect.GetPointer(), DESELECT);
+    }
+  if(proxyToSelect->GetNumberOfItems() == 1)
+    {
+    this->Select(proxyToSelect.GetPointer(), SELECT);
+    this->SetCurrentProxy(
+        vtkSMProxy::SafeDownCast(proxyToSelect->GetItemAsObject(0)), SELECT);
+    }
+  else if(proxyToSelect->GetNumberOfItems() > 0)
+    {
+    this->Select(proxyToSelect.GetPointer(), SELECT);
+    }
+  if(!tmp) this->DisableLocalPushOnly();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::PushStateToSession()
+{
+  if(!this->IsLocalPushOnly() && this->GetSession())
+    {
+    this->PushState(this->State);
+    }
+}

@@ -92,9 +92,9 @@ message ProxyState
   }
 }
 
-// Extension ProxyManagerState ******************************************* [30]
+// Extension PXMRegisteredProxyState ************************************* [30]
 
-message ProxyManagerState
+message PXMRegisteredProxyState
 {
   message ProxyRegistrationInfo
     {
@@ -104,11 +104,26 @@ message ProxyManagerState
     }
 
   extend Message {
-    repeated ProxyRegistrationInfo registered_proxy = 30;
+    repeated ProxyRegistrationInfo   registered_proxy           = 30;
   }
 }
 
-// Extension ProxyDefinitionState ************************************* [31-32]
+// Extension PXMRegisteredSelectionModelState **************************** [31]
+
+message PXMRegisteredSelectionModelState
+{
+  message ProxySelectionModelInfo
+    {
+    required string name      = 1;
+    required uint64 global_id = 2;
+    }
+
+  extend Message {
+    repeated ProxySelectionModelInfo registered_selection_model = 31;
+  }
+}
+
+// Extension ProxyDefinitionState ************************************* [35-36]
 
 message ProxyDefinitionState
 {
@@ -120,8 +135,8 @@ message ProxyDefinitionState
     }
 
   extend Message {
-    repeated ProxyXMLDefinition xml_definition_proxy        = 31;
-    repeated ProxyXMLDefinition xml_custom_definition_proxy = 32;
+    repeated ProxyXMLDefinition xml_definition_proxy        = 35;
+    repeated ProxyXMLDefinition xml_custom_definition_proxy = 36;
   }
 }
 
@@ -133,26 +148,12 @@ message PullRequest {
   }
 }
 
-// Extension Collaboration Communication ****************************** [50-60]
+// Extension ProxySelectionModel State *********************************** [50]
 
-message ActiveSelectionMessage {
-
-  // This enum should be in sync
-  // with vtkSMProxySelectionModel
-
-  enum SelectionFlag {
-    NO_UPDATE        = 0;
-    CLEAR            = 1;
-    SELECT           = 2;
-    CLEAR_AND_SELECT = 3;
-    DESELECT         = 4;
-  }
+message ProxySelectionModelState {
 
   extend Message {
-    required string name          = 50;
-    required SelectionFlag type   = 51;
-    required uint32 current_proxy = 52 [default = 0];
-    repeated uint32 proxy         = 53;
+    repeated uint32 proxy         = 50;
   }
 }
 

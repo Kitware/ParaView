@@ -198,141 +198,7 @@ struct vtkSMProxyManagerEntry
   }
 };
 //-----------------------------------------------------------------------------
-class vtkSMProxyManagerSelectionObserver : public vtkCommand
-{
-public:
-  static vtkSMProxyManagerSelectionObserver* New()
-    { return new vtkSMProxyManagerSelectionObserver(); }
 
-  void SetTarget(vtkSMProxyManager* t)
-    {
-    this->Target = t;
-    }
-
-  virtual void Execute(vtkObject *vtkNotUsed(obj), unsigned long vtkNotUsed(event), void* data)
-    {
-    vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
-    if(msg->HasExtension(ActiveSelectionMessage::name))
-      {
-      const char* name = msg->GetExtension(ActiveSelectionMessage::name).c_str();
-
-      vtkSMProxySelectionModel* model = this->Target->GetSelectionModel(name);
-      if(model)
-        {
-        vtkSMSession* session = this->Target->GetSession();
-
-        int cmd = msg->GetExtension(ActiveSelectionMessage::type);
-        vtkNew<vtkCollection> proxyCollection;
-        int nbProxy = msg->ExtensionSize(ActiveSelectionMessage::proxy);
-        for(int cc=0; cc < nbProxy; ++cc)
-          {
-          assert( "Invalid Proxy id" &&
-                  msg->GetExtension(ActiveSelectionMessage::proxy, cc));
-          proxyCollection->AddItem(
-              session->GetRemoteObject(
-                  msg->GetExtension(ActiveSelectionMessage::proxy, cc)));
-          }
-
-        model->Select(proxyCollection.GetPointer(), cmd);
-        vtkSMProxy* currentProxy = vtkSMProxy::SafeDownCast(
-          session->GetRemoteObject(
-            msg->GetExtension(ActiveSelectionMessage::current_proxy)));
-        model->SetCurrentProxy(currentProxy, vtkSMProxySelectionModel::NO_UPDATE);
-        }
-      }
-    }
-
-protected:
-  vtkWeakPointer<vtkSMProxyManager> Target;
-};
-//-----------------------------------------------------------------------------
-class vtkSMProxySelectionModelObserver : public vtkCommand
-{
-public:
-  static vtkSMProxySelectionModelObserver* New()
-    { return new vtkSMProxySelectionModelObserver(); }
-
-  void SetTarget(vtkSMProxyManager* t)
-    {
-    this->Target = t;
-    }
-
-  virtual void Execute(vtkObject *obj, unsigned long vtkNotUsed(event), void* data)
-    {
-    if (this->Target)
-      {
-      vtkSMSessionClient* sessionClient =
-          vtkSMSessionClient::SafeDownCast(this->Target->GetSession());
-      if(sessionClient)
-        {
-        vtkSMCollaborationManager* collaborationManager =
-            sessionClient->GetCollaborationManager();
-        if(collaborationManager)
-          {
-          vtkSMProxySelectionModel* model = vtkSMProxySelectionModel::SafeDownCast(obj);
-          if(model)
-            {
-            vtkSMMessage selectionMessage;
-            selectionMessage.SetExtension( ActiveSelectionMessage::name,
-                                           this->Target->GetSelectionModelName(model));
-
-            switch(*reinterpret_cast<int*>(data))
-              {
-              case vtkSMProxySelectionModel::NO_UPDATE:
-                selectionMessage.SetExtension(ActiveSelectionMessage::type,
-                                              ActiveSelectionMessage::NO_UPDATE);
-                break;
-
-              case vtkSMProxySelectionModel::CLEAR:
-                selectionMessage.SetExtension(ActiveSelectionMessage::type,
-                                              ActiveSelectionMessage::CLEAR);
-                break;
-
-              case vtkSMProxySelectionModel::SELECT:
-                selectionMessage.SetExtension(ActiveSelectionMessage::type,
-                                              ActiveSelectionMessage::SELECT);
-                break;
-
-              case vtkSMProxySelectionModel::DESELECT:
-                selectionMessage.SetExtension(ActiveSelectionMessage::type,
-                                              ActiveSelectionMessage::DESELECT);
-                break;
-
-              case vtkSMProxySelectionModel::CLEAR_AND_SELECT:
-                selectionMessage.SetExtension(ActiveSelectionMessage::type,
-                                              ActiveSelectionMessage::CLEAR_AND_SELECT);
-                break;
-                }
-
-            unsigned int nbProxies = model->GetNumberOfSelectedProxies();
-            for(unsigned int idx = 0; idx < nbProxies; idx++)
-              {
-              vtkSMProxy* selectedProxy = model->GetSelectedProxy(idx);
-              assert( "Invalid selected proxy" && selectedProxy);
-              vtkSMOutputPort* port =
-                vtkSMOutputPort::SafeDownCast(selectedProxy);
-              if (port)
-                {
-                selectedProxy = port->GetSourceProxy();
-                }
-              assert("Invalid selected proxy" && selectedProxy->GetGlobalID());
-              selectionMessage.AddExtension(ActiveSelectionMessage::proxy,
-                                            selectedProxy->GetGlobalID());
-              }
-            selectionMessage.SetExtension(ActiveSelectionMessage::current_proxy,
-              model->GetCurrentProxy()?
-              model->GetCurrentProxy()->GetGlobalID() : 0);
-            collaborationManager->SendToOtherClients(&selectionMessage);
-            }
-          }
-        }
-      }
-    }
-
-protected:
-  vtkWeakPointer<vtkSMProxyManager> Target;
-};
-//-----------------------------------------------------------------------------
 struct vtkSMProxyManagerInternals
 {
   // This data structure stores actual proxy instances grouped in
@@ -361,11 +227,6 @@ struct vtkSMProxyManagerInternals
     SelectionModelsType;
   SelectionModelsType SelectionModels;
 
-  // Data structure for selection models.
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModelObserver> >
-    SelectionModelObserversType;
-  SelectionModelObserversType SelectionModelObservers;
-
   // Data structure for storing GlobalPropertiesManagers.
   typedef vtkstd::map<vtkstd::string,
           vtkSmartPointer<vtkSMGlobalPropertiesManager> >
@@ -381,9 +242,6 @@ struct vtkSMProxyManagerInternals
 
   // Keep ref to the proxyManager to access the session
   vtkSMProxyManager *ProxyManager;
-
-  // Keep ref to the proxyManager collaboration observer
-  vtkNew<vtkSMProxyManagerSelectionObserver> CollaborationObserver;
 
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,
@@ -409,11 +267,11 @@ struct vtkSMProxyManagerInternals
     {
     // Fill equivalent temporary data structure
     vtkstd::set<vtkSMProxyManagerEntry> newStateContent;
-    int max = newState->ExtensionSize(ProxyManagerState::registered_proxy);
+    int max = newState->ExtensionSize(PXMRegisteredProxyState::registered_proxy);
     for(int cc=0; cc < max; cc++)
       {
-      ProxyManagerState_ProxyRegistrationInfo reg =
-          newState->GetExtension(ProxyManagerState::registered_proxy, cc);
+      PXMRegisteredProxyState_ProxyRegistrationInfo reg =
+          newState->GetExtension(PXMRegisteredProxyState::registered_proxy, cc);
       vtkSMProxy *proxy = locator->LocateProxy(reg.global_id());
       if(proxy)
         {
@@ -490,16 +348,16 @@ struct vtkSMProxyManagerInternals
     // Deal with State
     vtkSMMessage backup;
     backup.CopyFrom(this->State);
-    int nbRegisteredProxy = this->State.ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State.ClearExtension(ProxyManagerState::registered_proxy);
+    int nbRegisteredProxy = this->State.ExtensionSize(PXMRegisteredProxyState::registered_proxy);
+    this->State.ClearExtension(PXMRegisteredProxyState::registered_proxy);
     for(int cc=0; cc < nbRegisteredProxy; ++cc)
       {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+      const PXMRegisteredProxyState_ProxyRegistrationInfo *reg =
+          &backup.GetExtension(PXMRegisteredProxyState::registered_proxy, cc);
 
       if( reg->name() != nameString ) // Keep it
         {
-        this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+        this->State.AddExtension(PXMRegisteredProxyState::registered_proxy)->CopyFrom(*reg);
         }
       }
     }
@@ -556,16 +414,16 @@ struct vtkSMProxyManagerInternals
       vtkSMMessage backup;
       backup.CopyFrom(this->State);
       int nbRegisteredProxy =
-          this->State.ExtensionSize(ProxyManagerState::registered_proxy);
-      this->State.ClearExtension(ProxyManagerState::registered_proxy);
+          this->State.ExtensionSize(PXMRegisteredProxyState::registered_proxy);
+      this->State.ClearExtension(PXMRegisteredProxyState::registered_proxy);
       for(int cc=0; cc < nbRegisteredProxy; ++cc)
         {
-        const ProxyManagerState_ProxyRegistrationInfo *reg =
-            &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+        const PXMRegisteredProxyState_ProxyRegistrationInfo *reg =
+            &backup.GetExtension(PXMRegisteredProxyState::registered_proxy, cc);
 
         if( reg->group() != groupString || reg->name() != nameString ) // Keep it
           {
-          this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+          this->State.AddExtension(PXMRegisteredProxyState::registered_proxy)->CopyFrom(*reg);
           }
         }
       }
@@ -613,14 +471,14 @@ struct vtkSMProxyManagerInternals
       vtkSMMessage backup;
       backup.CopyFrom(this->State);
 
-      int nbRegisteredProxy = this->State.ExtensionSize(ProxyManagerState::registered_proxy);
-      this->State.ClearExtension(ProxyManagerState::registered_proxy);
+      int nbRegisteredProxy = this->State.ExtensionSize(PXMRegisteredProxyState::registered_proxy);
+      this->State.ClearExtension(PXMRegisteredProxyState::registered_proxy);
 
 
       for(int cc=0; cc < nbRegisteredProxy; ++cc)
         {
-        const ProxyManagerState_ProxyRegistrationInfo *reg =
-            &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+        const PXMRegisteredProxyState_ProxyRegistrationInfo *reg =
+            &backup.GetExtension(PXMRegisteredProxyState::registered_proxy, cc);
 
         if( reg->group() ==  groupString && reg->name() == nameString
             && reg->global_id() == proxy->GetGlobalID() )
@@ -630,13 +488,30 @@ struct vtkSMProxyManagerInternals
         else
           {
           // Keep it
-          this->State.AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+          this->State.AddExtension(PXMRegisteredProxyState::registered_proxy)->CopyFrom(*reg);
           }
         }
       }
 
     return found;
     }
+
+  // --------------------------------------------------------------------------
+  void UpdateProxySelectionModelState()
+    {
+    this->State.ClearExtension(PXMRegisteredSelectionModelState::registered_selection_model);
+    vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >::iterator iter;
+    for(iter  = this->SelectionModels.begin();
+        iter != this->SelectionModels.end();
+        iter++)
+      {
+      PXMRegisteredSelectionModelState_ProxySelectionModelInfo *selModel =
+          this->State.AddExtension(PXMRegisteredSelectionModelState::registered_selection_model);
+      selModel->set_name(iter->first);
+      selModel->set_global_id(iter->second->GetGlobalID());
+      }
+    }
+  // --------------------------------------------------------------------------
 };
 
 #endif

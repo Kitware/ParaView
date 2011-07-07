@@ -122,7 +122,6 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->PipelineState = NULL;
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
-  this->Internals->CollaborationObserver->SetTarget(this);
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
 #if 0 // for debugging
@@ -223,17 +222,9 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState->Delete();
     this->PipelineState = NULL;
 
-    // Deal with collaboration with SelectionModels
-    vtkSMSessionClient* sClient = vtkSMSessionClient::SafeDownCast(this->Session);
-    if(sClient)
-      {
-      vtkSMCollaborationManager* collabManager = sClient->GetCollaborationManager();
-      if(collabManager)
-        {
-        collabManager->RemoveObserver(
-            this->Internals->CollaborationObserver.GetPointer());
-        }
-      }
+    // Remove previously created selection models
+    this->Internals->SelectionModels.clear();
+    this->Internals->UpdateProxySelectionModelState();
     }
 
   this->Session = session;
@@ -244,19 +235,6 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState = vtkSMPipelineState::New();
     this->PipelineState->SetSession(this->Session);
     this->ProxyDefinitionManager->SetSession(session);
-
-    // Deal with collaboration with SelectionModels
-    vtkSMSessionClient* sClient = vtkSMSessionClient::SafeDownCast(this->Session);
-    if(sClient)
-      {
-      vtkSMCollaborationManager* collabManager = sClient->GetCollaborationManager();
-      if(collabManager)
-        {
-        collabManager->AddObserver(
-            vtkSMCollaborationManager::CollaborationNotification,
-            this->Internals->CollaborationObserver.GetPointer());
-        }
-      }
     }
 }
 //----------------------------------------------------------------------------
@@ -272,7 +250,7 @@ void vtkSMProxyManager::UpdateFromRemote()
       msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
       msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
       this->Session->PullState(&msg);
-      if(msg.ExtensionSize(ProxyManagerState::registered_proxy) > 0)
+      if(msg.ExtensionSize(PXMRegisteredProxyState::registered_proxy) > 0)
         {
         // We take the parent locator to always refer to the server while loading
         // the state. This prevent us from getting a creation state instead of
@@ -752,7 +730,7 @@ void vtkSMProxyManager::UnRegisterProxies()
 
   this->Internals->ModifiedProxies.clear();
   this->Internals->RegisteredProxyTuple.clear();
-  this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
+  this->Internals->State.ClearExtension(PXMRegisteredProxyState::registered_proxy);
 
   // Push state for undo/redo BUT only if it is not a clean up before deletion.
   if(this->PipelineState->GetSession())
@@ -896,8 +874,8 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     vtksys::RegularExpression prototypesRe("_prototypes$");
     if (!prototypesRe.find(groupname))
       {
-      ProxyManagerState_ProxyRegistrationInfo *registration =
-          this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
+      PXMRegisteredProxyState_ProxyRegistrationInfo *registration =
+          this->Internals->State.AddExtension(PXMRegisteredProxyState::registered_proxy);
       registration->set_group(groupname);
       registration->set_name(name);
       registration->set_global_id(proxy->GetGlobalID());
@@ -1552,89 +1530,26 @@ vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterSelectionModel(
-  const char* name, vtkSMProxySelectionModel* model)
-{
-  if (!model)
-    {
-    vtkErrorMacro("Cannot register a null model.");
-    return;
-    }
-  if (!name)
-    {
-    vtkErrorMacro("Cannot register model with no name.");
-    return;
-    }
-
-  vtkSMProxySelectionModel* curmodel = this->GetSelectionModel(name);
-  if (curmodel && curmodel == model)
-    {
-    // already registered.
-    return;
-    }
-
-  if (curmodel)
-    {
-    vtkWarningMacro("Replacing existing selection model: " << name);
-    }
-  this->Internals->SelectionModels[name] = model;
-
-  // Attach collaborative observer
-  vtkSMProxySelectionModelObserver* obs = vtkSMProxySelectionModelObserver::New();
-  obs->SetTarget(this);
-  this->Internals->SelectionModelObservers[name] = obs;
-  model->AddObserver(vtkCommand::SelectionChangedEvent, obs);
-  obs->FastDelete();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterSelectionModel( const char* name)
-{
-  // Detatch collaborative observer
-  vtkSMProxySelectionModelObserver* obs = this->Internals->SelectionModelObservers[name];
-  vtkSMProxySelectionModel* model = this->Internals->SelectionModels[name];
-  if(model && obs)
-    {
-    model->RemoveObserver(obs);
-    }
-  this->Internals->SelectionModelObservers.erase(name);
-
-  // Remove selection model
-  this->Internals->SelectionModels.erase(name);
-}
-
-//---------------------------------------------------------------------------
 vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
   const char* name)
 {
+  if(!this->Session)
+    {
+    return NULL;
+    }
+
   vtkSMProxyManagerInternals::SelectionModelsType::iterator iter =
     this->Internals->SelectionModels.find(name);
   if (iter == this->Internals->SelectionModels.end())
     {
-    return 0;
+    vtkNew<vtkSMProxySelectionModel> model;
+    model->SetSession(this->Session);
+    this->Internals->SelectionModels[name] = model.GetPointer();
+    return model.GetPointer();
     }
 
   return iter->second;
 }
-//---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetSelectionModelName(vtkSMProxySelectionModel* model)
-{
-  if(model)
-    {
-    vtkSMProxyManagerInternals::SelectionModelsType::iterator iter;
-    for( iter = this->Internals->SelectionModels.begin();
-         iter != this->Internals->SelectionModels.end();
-         iter++)
-      {
-      if (iter->second == model)
-        {
-        return iter->first.c_str();
-        }
-      }
-    }
-  return NULL;
-}
-
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
     vtkSMGlobalPropertiesManager* mgr)
@@ -1776,6 +1691,32 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* lo
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
+
+  // Manage ProxySelectionModel state
+  for(int i = 0,
+      size = msg->ExtensionSize(PXMRegisteredSelectionModelState::registered_selection_model);
+      i < size && this->Session;
+      i++)
+    {
+    vtkTypeUInt32 remoteObjectId =
+        msg->GetExtension(PXMRegisteredSelectionModelState::registered_selection_model, i).global_id();
+    const char* name =
+        msg->GetExtension(PXMRegisteredSelectionModelState::registered_selection_model, i).name().c_str();
+
+    vtkSMProxySelectionModel* model = this->GetSelectionModel(name);
+    if(!model->HasGlobalID())
+      {
+      vtkSMMessage msg;
+      msg.set_global_id(remoteObjectId);
+      msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
+      this->Session->PullState(&msg);
+
+      model->LoadState(&msg, locator);
+
+      this->Internals->UpdateProxySelectionModelState();
+      this->TriggerStateUpdate();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1803,8 +1744,9 @@ void vtkSMProxyManager::EnableStateUpdateNotification()
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::TriggerStateUpdate()
 {
-  if(this->StateUpdateNotification)
+  if(this->PipelineState && this->StateUpdateNotification)
     {
+    this->Internals->UpdateProxySelectionModelState();
     this->PipelineState->ValidateState();
     }
 }

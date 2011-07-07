@@ -885,9 +885,6 @@ class ActiveObjects(object):
         "Internal method."
         pxm = servermanager.ProxyManager()
         model = pxm.GetSelectionModel(name)
-        if not model:
-            model = servermanager.vtkSMProxySelectionModel()
-            pxm.RegisterSelectionModel(name, model)
         return model
 
     def set_view(self, view):

@@ -492,19 +492,19 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     // other clients
     if( num_controllers == 0 )
       {
-      vtkSMProxy* proxy =
-          vtkSMProxy::SafeDownCast(this->GetRemoteObject(message->global_id()));
+      vtkSMRemoteObject* remoteObject =
+          vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(message->global_id()));
       vtkSMMessage msg;
-      if(proxy && proxy->GetFullState() == NULL)
+      if(remoteObject && remoteObject->GetFullState() == NULL)
         {
-        vtkWarningMacro( "The following proxy ("
-                         << proxy->GetXMLGroup() << "-" << proxy->GetXMLName()
+        vtkWarningMacro( "The following vtkRemoteObject ("
+                         << remoteObject->GetClassName() << "-" << remoteObject->GetGlobalIDAsString()
                          << ") does not support properly GetFullState() so no "
                          << "collaboration mechanisme could be applied to it.");
         }
-      else if(!proxy->IsLocalPushOnly())
+      else if(!remoteObject->IsLocalPushOnly())
         {
-        msg.CopyFrom( proxy ? *proxy->GetFullState(): *message);
+        msg.CopyFrom( remoteObject ? *remoteObject->GetFullState(): *message);
         msg.set_global_id(message->global_id());
         msg.set_location(message->location());
 

@@ -442,20 +442,10 @@ public:
   static const char* GetParaViewSourceVersion();
 
   // Description:
-  // Register/UnRegister a selection model. A selection model can be typically
-  // used by applications to keep track of active sources, filters, views etc.
-  void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
-  void UnRegisterSelectionModel(const char* name);
-
-  // Description:
-  // Get a registered selection model. Will return null if no such model is
-  // registered.
+  // Create or retreived a previously created selection model. Will return null
+  // if no Session is available in the ProxyManager.
+  // The ProxyManager will automatically delete it if we change the session
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
-
-  // Description:
-  // Get a registered selection model name if any. Will return null if no such
-  // model is registered.
-  const char* GetSelectionModelName(vtkSMProxySelectionModel*);
 
   // Description:
   // ParaView has notion of "global properties". These are application wide
