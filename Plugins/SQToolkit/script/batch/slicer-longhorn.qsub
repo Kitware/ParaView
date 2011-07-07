@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#$ -V                                   # Inherit the submission environment
+#$ -cwd                                 # Start job in submission dir
+#$ -N Slicer-xyz-100
+#$ -o $HOME/$JOB_NAME.out               # Name of the output file
+#$ -m abe
+#$ -M bloring@lbl.gov
+#$ -j y 
+#$ -q request
+#$ -pe 8way 256
+#$ -l h_rt=06:00:00
+#$ -P data
+
+module use -a /home/01237/bloring/modulefiles
+module load PV3-3.8.0-icc-ompi-R
+module load SVTK-11.02-PV3-3.8.0-icc-ompi-R
+
+EXE=`which Slicer`
+echo "EXE=$EXE"
+
+IBRUN_PATH=/share/sge6.2/default/pe_scripts
+
+$IBRUN_PATH/ibrun $EXE 1  0 1 0  0 2918 0  100  /scratch/01237/bloring/asym/info.bov /scratch/01237/bloring/slice-asym y ui ue b
+$IBRUN_PATH/ibrun $EXE 1  1 0 0  2918 0 0  100  /scratch/01237/bloring/asym/info.bov /scratch/01237/bloring/slice-asym x ui ue b
+$IBRUN_PATH/ibrun $EXE 1  0 0 1  0 0 1118  100  /scratch/01237/bloring/asym/info.bov /scratch/01237/bloring/slice-asym z ui ue b
+
