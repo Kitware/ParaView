@@ -327,6 +327,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
       << vtkClientServerStream::End;
     this->ExecuteStream(stream);
     }
+  info->Delete();
 }
 
 //----------------------------------------------------------------------------
