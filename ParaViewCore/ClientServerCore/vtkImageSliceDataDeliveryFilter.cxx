@@ -36,7 +36,7 @@ vtkImageSliceDataDeliveryFilter::vtkImageSliceDataDeliveryFilter()
 vtkImageSliceDataDeliveryFilter::~vtkImageSliceDataDeliveryFilter()
 {
   this->DeliveryHelper->Delete();
-  this->DeliveryHelper->Delete();
+  this->DeliveryHelper = NULL;
 }
 
 //----------------------------------------------------------------------------
