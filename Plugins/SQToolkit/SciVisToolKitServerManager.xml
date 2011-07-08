@@ -1,0 +1,3796 @@
+<!--
+   ____    _ __           ____               __    ____
+  / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
+ _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+
+Copyright 2008 SciberQuest Inc.
+-->
+
+<ServerManagerConfiguration>
+
+<!--
+*******************************************************************************
+*                                                                             *
+*                                   Readers                                   *
+*                                                                             *
+*******************************************************************************
+-->
+
+<ProxyGroup name="sources">
+
+<!--========================================================================-->
+  <SourceProxy
+      name="vtkSQBOVReader"
+      class="vtkSQBOVReader"
+      label="SQ BOV Reader">
+    <Documentation
+        short_help="BOV reader.">
+        long_help="BOV Reader. Reads raw or brick of values files in parallel handles time."
+    </Documentation>
+
+    <!-- File Name -->
+    <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+    <FileListDomain name="files"/>
+    <Documentation>
+      This property specifies the file name for the reader.
+    </Documentation>
+    </StringVectorProperty>
+    <!-- Time Steps -->
+    <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+      <TimeStepsInformationHelper/>
+      <Documentation>
+      Available timestep values.
+      </Documentation>
+    </DoubleVectorProperty>
+    <!-- Array selection -->
+    <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+    </StringVectorProperty>
+    <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Arrays">
+      <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+      </ArraySelectionDomain>
+      <Documentation>
+      This property is used to select arrays to read in.
+    </Documentation>
+    </StringVectorProperty>
+    <!-- Subset selection -->
+    <IntVectorProperty 
+        name="ISubsetInfo"
+        command="GetISubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="ISubset"
+        command="SetISubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="ISubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="ISubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        This property controls what subset of data is read in. Subset for smaller memory footprint and better interactivity.
+      </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="JSubsetInfo"
+        command="GetJSubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="JSubset"
+        command="SetJSubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="JSubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="JSubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        This property controls what subset of data is read in. Subset for smaller memory footprint and better interactivity.
+      </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="KSubsetInfo"
+        command="GetKSubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="KSubset"
+        command="SetKSubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="KSubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="KSubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        This property controls what subset of data is read in. Subset for smaller memory footprint and better interactivity.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- MPI File Hints -->
+    <IntVectorProperty
+        name="UseCollectiveIO"
+        lable="Collective IO"
+        command="SetUseCollectiveIO"
+        number_of_elements="1"
+        default_values="1" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO collective buffering.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="NumberOfIONodes"
+        lable="N IO Nodes"
+        command="SetNumberOfIONodes"
+        number_of_elements="1"
+        default_values="0" >
+      <Documentation>
+        Set the number of IO nodes. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="CollectBufferSize"
+        lable="CIO Buffer Size"
+        command="SetCollectBufferSize"
+        number_of_elements="1"
+        default_values="2147483647" >
+      <EnumerationDomain name="enum">
+        <Entry value="0"          text="default"/>
+        <Entry value="536870912"  text=" 512 MB"/>
+        <Entry value="1073741824" text=" 1.0 GB"/>
+        <Entry value="1610612736" text=" 1.5 GB"/>
+        <Entry value="2147483647" text=" 2.0 GB"/>
+      </EnumerationDomain>
+      <Documentation>
+        Set the size of the buffer for aggregation. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="UseDeferredOpen"
+        lable="Deferred Open"
+        command="SetUseDeferredOpen"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO deferred.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="UseDataSieving"
+        lable="Data Sieving"
+        command="SetUseDataSieving"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO data sieving.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="SieveBufferSize"
+        lable="Sieve Buffer Size"
+        command="SetSieveBufferSize"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0"        text="default"/>
+        <Entry value="1048576"  text="1 MB"/>
+        <Entry value="2097152"  text="2 MB"/>
+        <Entry value="4194304"  text="4 MB"/>
+        <Entry value="8388608"  text="8 MB"/>
+        <Entry value="16777216" text="16 MB"/>
+        <Entry value="33554432" text="32 MB"/>
+      </EnumerationDomain>
+      <Documentation>
+        Set the size of the buffer for sieving. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Meta Flag -->
+    <IntVectorProperty 
+        name="MetaRead" 
+        command="SetMetaRead" 
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      If checked meta mode is active. Meta data will be read and processed however actual read will be 
+      deffered to down stream filters. If unchecked the reader performs as expected, an actual read of
+      the requested arrays.
+      </Documentation>
+    </IntVectorProperty>
+    <Hints>
+      <Property name="MetaRead" show="0"/>
+      <ReaderFactory extensions="bov" file_description="Brick-Of-Values files." />
+      <View type="RenderView"/>
+    </Hints>
+  </SourceProxy>
+
+  <!--========================================================================-->
+  <SourceProxy
+      name="vtkSQBOVMetaReader"
+      class="vtkSQBOVReader"
+      label="SQ BOV Meta Reader">
+    <Documentation
+        short_help="BOV reader.">
+        long_help="BOV Reader. Reads raw or brick of values files in parallel handles time."
+    </Documentation>
+
+    <!-- File Name -->
+    <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+    <FileListDomain name="files"/>
+    <Documentation>
+      This property specifies the file name for the reader.
+    </Documentation>
+    </StringVectorProperty>
+
+    <!-- Time Steps -->
+    <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+      <TimeStepsInformationHelper/>
+      <Documentation>
+      Available timestep values.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!-- Array selection -->
+    <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+    </StringVectorProperty>
+    <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Arrays">
+      <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+      </ArraySelectionDomain>
+      <Documentation>
+      This property is used to select arrays to read in.
+    </Documentation>
+    </StringVectorProperty>
+
+    <!-- Subset selection -->
+    <IntVectorProperty 
+        name="ISubsetInfo"
+        command="GetISubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="ISubset"
+        command="SetISubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="ISubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="ISubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        Set data subset range in the z direction.
+      </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="JSubsetInfo"
+        command="GetJSubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="JSubset"
+        command="SetJSubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="JSubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="JSubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        Set data subset range in the y direction.
+      </Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="KSubsetInfo"
+        command="GetKSubsetRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+    <IntVectorProperty 
+        name="KSubset"
+        command="SetKSubset"
+        number_of_elements="2" 
+        default_values="1 0"
+        animateable="0"
+        information_property="KSubsetInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+            <Property name="KSubsetInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        Set data subset range in the z direction.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Periodic boundary conditions -->
+    <IntVectorProperty
+        name="XPeriodic"
+        label="Periodic in X"
+        command="SetXHasPeriodicBC"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Apply periodic boundary condition in the x direction during integration.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="YPeriodic"
+        label="Periodic in Y"
+        command="SetYHasPeriodicBC"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Apply periodic boundary condition in the y direction during integration.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="ZPeriodic"
+        label="Periodic in Z"
+        command="SetZHasPeriodicBC"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Apply periodic boundary condition in the z direction during integration.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="NGhosts"
+        label="Number of ghost cells"
+        command="SetNumberOfGhostCells"
+        number_of_elements="1"
+        default_values="1">
+      <Documentation>
+        Number of ghost cells to read.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Subset Decomposition -->
+    <IntVectorProperty 
+        name="DecompDims"
+        command="SetDecompDims" 
+        number_of_elements="3"
+        default_values="1 1 1">
+      <Documentation>
+      Set the number of blocks to be used in an out of core read. The resulting block size 
+      must be less than 2 GB per block for a scalar and less than 6 GB per block for a vector.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="BlockSize"
+        command="SetXHasPeriodicBC"
+        number_of_elements="1"
+        default_values="0">
+      <Documentation>
+        Memory used by the largest block in the domain decomposition. Must be less than 2 GB per block
+        for a scalar and less than 6 GB per block for a vector.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="NBlocksToCache"
+        label="No. Blocks to Cache"
+        command="SetBlockCacheSize" 
+        number_of_elements="1"
+        default_values="10">
+      <Documentation>
+      Set the number of blocks to cache during out of core operation. Increasing the number of
+      blocks cached improves the IO perforomance while increasing the memory footprint.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="BlockCacheSize"
+        command="SetXHasPeriodicBC"
+        number_of_elements="1"
+        default_values="0">
+      <Documentation>
+        Wrost case bound on memory used by the block cache.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="ClearCachedBlocks"
+        label="Clear Cached Blocks"
+        command="SetClearCachedBlocks"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        If set the block cache is explcitly cleared after each pipeline update.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- MPI File Hints -->
+    <IntVectorProperty
+        name="UseCollectiveIO"
+        lable="Collective IO"
+        command="SetUseCollectiveIO"
+        number_of_elements="1"
+        default_values="1" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO collective buffering.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="NumberOfIONodes"
+        lable="N IO Nodes"
+        command="SetNumberOfIONodes"
+        number_of_elements="1"
+        default_values="0" >
+      <Documentation>
+        Set the number of IO nodes. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="CollectBufferSize"
+        lable="CIO Buffer Size"
+        command="SetCollectBufferSize"
+        number_of_elements="1"
+        default_values="2147483647" >
+      <EnumerationDomain name="enum">
+        <Entry value="0"          text="default"/>
+        <Entry value="536870911"  text=" 512 MB"/>
+        <Entry value="1073741823" text=" 1.0 GB"/>
+        <Entry value="1610612735" text=" 1.5 GB"/>
+        <Entry value="2147483647" text=" 2.0 GB"/>
+      </EnumerationDomain>
+      <Documentation>
+        Set the size of the buffer for aggregation. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="UseDeferredOpen"
+        lable="Deferred Open"
+        command="SetUseDeferredOpen"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO deferred.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="UseDataSieving"
+        lable="Data Sieving"
+        command="SetUseDataSieving"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO data sieving.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="SieveBufferSize"
+        lable="Sieve Buffer Size"
+        command="SetSieveBufferSize"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0"        text="default"/>
+        <Entry value="1048576"  text="1 MB"/>
+        <Entry value="2097152"  text="2 MB"/>
+        <Entry value="4194304"  text="4 MB"/>
+        <Entry value="8388608"  text="8 MB"/>
+        <Entry value="16777216" text="16 MB"/>
+        <Entry value="33554432" text="32 MB"/>
+      </EnumerationDomain>
+      <Documentation>
+        Set the size of the buffer for sieving. Set to 0 to use the implementation default.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Meta Flag -->
+    <IntVectorProperty 
+        name="MetaRead" 
+        command="SetMetaRead" 
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      If checked meta mode is active. Meta data will be read and processed however actual read will be 
+      deffered to down stream filters. If unchecked the reader performs as expected, an actual read of
+      the requested arrays.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="MetaRead" show="0"/>
+      <ReaderFactory extensions="bovm" file_description="Brick-Of-Values files." />
+    </Hints>
+  </SourceProxy>
+
+</ProxyGroup>
+
+<!--
+*******************************************************************************
+*                                                                             *
+*                                   Sources                                   *
+*                                                                             *
+*******************************************************************************
+-->
+
+<ProxyGroup name="sources">
+  <!-- ==================================================================== -->
+   <SourceProxy name="vtkSQLineSource" class="vtkSQLineSource" label="SQ Line Source">
+      <Documentation
+         long_help="This source creates a line between two points. The resolution indicates how many segments are in the line." 
+         short_help="Create a line between two points">
+         The Line source can be used to interactively (using a 3D widget) or manually
+         (using the entries on the user interface) add a line to the 3D scene. The output
+         of the Line source is polygonal data.
+      </Documentation>
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         animateable="1"
+         default_values="-0.5 0.0 0.0" >
+         <DoubleRangeDomain name="range" />
+         <Documentation>
+           This property controls the coordinates of the first endpoint of the line.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.5 0.0 0.0" >
+         <DoubleRangeDomain name="range" />
+         <Documentation>
+           This property controls the coordinates of the second endpoint of the line.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          This property specifies the number of pieces into which to divide the line.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="LineSource" label="Line">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+          <Property function="Resolution"          name="Resolution" />
+        </PropertyGroup>
+      </Hints>
+   <!-- End Line -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="vtkSQPointSource" class="vtkSQPointSource" label="SQ Point Source">
+      <Documentation long_help="Create a point cloud of a certain size, radius, and center."
+                     short_help="Create a point cloud">
+          The point source creates a specified number of points within a given radius 
+          about a specified center point and generates data that may be parallelized on
+          cell id.
+      </Documentation>
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the center of the point cloud.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="NumberOfPoints"
+         command="SetNumberOfPoints"
+         number_of_elements="1"
+         animateable="1"
+         default_values="1" >
+         <IntRangeDomain name="range" min="1"/>
+         <Documentation>
+           Specifies the number of points in the point cloud.
+         </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0.0" >
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Specifies the radius of the point cloud.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="PointSource" >
+          <Property function="WorldPosition"  name="Center" />
+          <Property function="Radius"         name="Radius" />
+          <Property function="NumberOfPoints" name="NumberOfPoints" />
+        </PropertyGroup>
+      </Hints>
+   <!-- End PointSource -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy name="vtkSQPlaneSource" 
+        class="vtkSQPlaneSource"
+        label="SQ Plane Source">
+      <Documentation
+        long_help="Create a parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
+        short_help="Create a parallelogram from an origin and two points">
+        The Plane source can be used to add a polygonal parallelogram to the 3D scene.
+      </Documentation>
+
+      <StringVectorProperty
+         name="Name"
+         command="SetDescriptiveName"
+         number_of_elements="1">
+        <Documentation>
+          Give the object a name that may be used downstream to identify it.
+        </Documentation>
+      </StringVectorProperty>
+     <!--<StringVectorProperty name="GetName"
+        command="GetDescriptiveName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>-->
+
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the 3D coordinate of the origin (one corner) of the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!--
+      information_property="OriginInfo"
+      <DoubleVectorProperty name="OriginInfo"
+        command="GetOrigin"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+     </DoubleVectorProperty>-->
+
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         animateable="1"
+         default_values="1.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the 3D coordinate a second corner of the parallelogram.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 1.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the 3D coordinate a third corner of the parallelogram.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Constraint"
+         command="SetConstraint"
+         number_of_elements="1"
+         animateable="0"
+         default_values="0" >
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          This property specifies a constraint type.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="XResolution"
+         command="SetXResolution"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          This property specifies the number of divisions along the X axis of the parallelogram.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="YResolution"
+         command="SetYResolution"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          This property specifies the number of divisions along the Y axis of the parallelogram.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="ImmediateMode"
+         command="SetImmediateMode"
+         number_of_elements="1"
+         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Switch between immediate and demand mode.
+        </Documentation>
+      </IntVectorProperty>
+
+   <!-- End Plane -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+      name="vtkSQVolumeSource"
+      class="vtkSQVolumeSource"
+      label="SQ Volume Source">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Generates a hexahedron composed of hexahedral cells of the requested number.
+    </Documentation>
+
+    <DoubleVectorProperty
+        name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        animateable="1"
+        default_values="0.0 0.0 0.0">
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        This property specifies the coordinate of the origin (one corner) of the hexaderon.
+      </Documentation>
+    </DoubleVectorProperty>
+    <!--
+    information_property="OriginInfo"
+    <DoubleVectorProperty name="OriginInfo"
+      command="GetOrigin"
+      information_only="1"
+      number_of_elements="3"
+      default_values="0.0 0.0 0.0">
+      <SimpleDoubleInformationHelper />
+    </DoubleVectorProperty>-->
+
+    <DoubleVectorProperty
+        name="Point1"
+        command="SetPoint1"
+        number_of_elements="3"
+        animateable="1"
+        default_values="1.0 0.0 0.0" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        This property specifies the coordinate a second corner of the hexaderon.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="Point2"
+        command="SetPoint2"
+        number_of_elements="3"
+        animateable="1"
+        default_values="0.0 1.0 0.0" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        This property specifies the coordinate a third corner of the hexaderon.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="Point3"
+        command="SetPoint3"
+        number_of_elements="3"
+        animateable="1"
+        default_values="0.0 0.0 1.0" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        This property specifies the coordinate a fourth corner of the hexaderon.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!-- Resolution -->
+     <IntVectorProperty
+        name="Resolution"
+        label="Resolution"
+        command="SetResolution"
+        number_of_elements="3"
+        default_values="1 1 1">
+     </IntVectorProperty>
+
+      <IntVectorProperty
+         name="ImmediateMode"
+         command="SetImmediateMode"
+         number_of_elements="1"
+         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Switch between immediate and demand mode.
+        </Documentation>
+      </IntVectorProperty>
+
+  <!-- End vtkSQVolumeSource -->
+  </SourceProxy>
+
+
+   <!-- ==================================================================== -->
+   <SourceProxy 
+     name="vtkSQSphereSource"
+     class="vtkSQSphereSource"
+     label="SQ Sphere Source">
+      <Documentation
+        long_help="Create a 3D sphere given a center and radius."
+        short_help="Create a 3D sphere">
+          The Sphere source can be used to add a polygonal sphere to the 3D scene. The output of the Sphere source is polygonal data with point normals defined.
+      </Documentation>
+
+      <StringVectorProperty
+         name="Name"
+         command="SetDescriptiveName"
+         number_of_elements="1">
+        <Documentation>
+          Give the object a name that may be used downstream to identify it.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty
+         name="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the 3D coordinates for the center of the sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0.5" >
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          This property specifies the radius of the sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ThetaResolution"
+         command="SetThetaResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions between Start Theta and End Theta around the sphere. (See the Start Theta and End Theta properties.) The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="StartTheta"
+         command="SetStartTheta"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0" >
+        <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Theta property should be 360 degrees. The value of this property can be adjusted to form only a portion of a sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="EndTheta"
+         command="SetEndTheta"
+         number_of_elements="1"
+         animateable="1"
+         default_values="360" >
+        <DoubleRangeDomain name="range" min="0" max="360" />
+        <Documentation>
+          The value of this property can be adjusted to form only a portion of a sphere. This value is measured in degrees.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="PhiResolution"
+         command="SetPhiResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions between Start Phi and End Phi on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar to latitude lines on the earth.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="StartPhi"
+         command="SetStartPhi"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0" >
+        <DoubleRangeDomain name="range" min="0" max="180" />
+        <Documentation>
+          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Phi property should be 180 degrees. The value of this property can be adjusted to form only a portion of a sphere.
+          Set the starting angle (in degrees) in the latitudinal direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="EndPhi"
+         command="SetEndPhi"
+         number_of_elements="1"
+         animateable="1"
+         default_values="180" >
+        <DoubleRangeDomain name="range" min="0" max="180" />
+        <Documentation>
+          The value of this property can be adjusted to form only a portion of a sphere. The value is measured in degrees.
+        </Documentation>
+      </DoubleVectorProperty>
+   <!-- End Sphere -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+    name="vtkSQHemisphereSource"
+    class="vtkSQHemisphereSource"
+    label="SQ Hemisphere Source">
+    <Documentation
+      long_help="Create a 3D sphere given a center and radius."
+      short_help="Create a 3D sphere">
+      The Hemisphere source can be used to add a polygonal sphere to the 3D scene. The output of the Hemisphere source is polygonal data with point normals defined.
+    </Documentation>
+
+    <!-- Out -->
+    <OutputPort name="Northern Hemisphere" index="0" />
+    <OutputPort name="Southern Hemisphere" index="1" />
+
+    <DoubleVectorProperty 
+      name="GetCenter"
+      command="GetCenter"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty
+      name="Center"
+      command="SetCenter"
+      number_of_elements="3"
+      animateable="1"
+      default_values="0.0 0.0 0.0"
+      information_property="GetCenter">
+    <DoubleRangeDomain name="range"/>
+    <Documentation>
+      The center of the sphere.
+    </Documentation>
+  </DoubleVectorProperty>
+
+  <DoubleVectorProperty
+      name="GetNorth"
+      command="GetNorth"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty
+      name="North"
+      command="SetNorth"
+      number_of_elements="3"
+      animateable="1"
+      default_values="0.0 1.0 0.0"
+      information_property="GetNorth">
+    <DoubleRangeDomain name="range"/>
+    <Documentation>
+      The center of the sphere.
+    </Documentation>
+  </DoubleVectorProperty>
+
+  <DoubleVectorProperty 
+    name="GetRadius"
+    command="GetRadius"
+    information_only="1">
+    <SimpleDoubleInformationHelper/>
+  </DoubleVectorProperty>
+  <DoubleVectorProperty
+    name="Radius"
+    command="SetRadius"
+    number_of_elements="1"
+    animateable="1"
+    default_values="0.5"
+    information_property="GetRadius">
+    <DoubleRangeDomain name="range" min="1E-15"/>
+    <Documentation>
+      This property specifies the radius of the sphere.
+    </Documentation>
+  </DoubleVectorProperty>
+
+  <IntVectorProperty 
+    name="GetResolution"
+    command="GetResolution"
+    information_only="1">
+    <SimpleIntInformationHelper/>
+  </IntVectorProperty>
+  <IntVectorProperty
+      name="Resolution"
+      command="SetResolution"
+      number_of_elements="1"
+      default_values="32"
+      information_property="GetResolution">
+    <IntRangeDomain name="range" min="3" max="1024" />
+    <Documentation>
+      The value of this property controls the number of lat-lon linies in the output.
+    </Documentation>
+  </IntVectorProperty>
+
+  <!-- End Hemisphere Source -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQProcessMonitor"
+      class="vtkSQProcessMonitor"
+      label="SQ Process Monitor">
+    <Documentation
+      long_help="A custom Qt panel that manages and monitors the running processes."
+      short_help="A custom Qt panel that manages and monitors the running processes.">
+      A custom panel that manages and monitors the running processes.
+    </Documentation>
+
+    <!-- run configuration from each server instance -->
+    <StringVectorProperty name="ConfigStream"
+      command="GetConfigStream"
+      information_only="1" >
+      <SimpleStringInformationHelper />
+    </StringVectorProperty>
+
+    <!-- memory use across all server instances -->
+    <StringVectorProperty name="MemoryUseStream"
+      command="GetMemoryUseStream"
+      information_only="1" >
+      <SimpleStringInformationHelper />
+    </StringVectorProperty>
+
+    <IntVectorProperty name="GetInformationMTime"
+      command="GetInformationMTime"
+      information_only="1" >
+      <SimpleIntInformationHelper />
+    </IntVectorProperty>
+    <IntVectorProperty name="SetInformationMTime"
+      command="SetInformationMTime" 
+      number_of_elements="1"
+      default_values="0">
+    </IntVectorProperty>
+
+    <!-- Signals -->
+    <IntVectorProperty
+      name="EnableBacktraceHandler"
+      command="SetEnableBacktraceHandler"
+      number_of_elements="1"
+      default_values="0">
+    <Documentation>
+      Enable/Disable a signal handler that prints a backtrace.
+    </Documentation>
+    </IntVectorProperty>
+
+    <!-- Floating point exceptions -->
+    <IntVectorProperty
+      name="EnableFE_DIVBYZERO"
+      command="SetEnableFE_DIVBYZERO"
+      number_of_elements="1"
+      default_values="0">
+    <Documentation>
+      Trap divide by zero FPE.
+    </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="EnableFE_INEXACT"
+      command="SetEnableFE_INEXACT"
+      number_of_elements="1"
+      default_values="0">
+      <Documentation>
+        Trap inexact FPE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="EnableFE_INVALID"
+      command="SetEnableFE_INVALID"
+      number_of_elements="1"
+      default_values="0">
+      <Documentation>
+        Trap invalid FPE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="EnableFE_OVERFLOW"
+      command="SetEnableFE_OVERFLOW"
+      number_of_elements="1"
+      default_values="0">
+      <Documentation>
+        Trap overflow FPE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="EnableFE_UNDERFLOW"
+      command="SetEnableFE_UNDERFLOW"
+      number_of_elements="1"
+      default_values="0">
+      <Documentation>
+        Trap underflow FPE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+      name="EnableFE_ALL"
+      command="SetEnableFE_ALL"
+      number_of_elements="1"
+      default_values="0">
+      <Documentation>
+        Enable/Disable all floating point exceptions.
+      </Documentation>
+    </IntVectorProperty>
+
+   <!-- End Debug Panel -->
+   </SourceProxy>
+
+</ProxyGroup>
+
+
+<!--
+*******************************************************************************
+*                                                                             *
+*                                   Filters                                   *
+*                                                                             *
+*******************************************************************************
+-->
+
+<ProxyGroup name="filters">
+
+    <!-- ==================================================================== -->
+    <SourceProxy
+      name="vtkSQImageGhosts"
+      class="vtkSQImageGhosts"
+      label="SQ Image Ghosts">
+
+      <Documentation
+        long_help="TODO"
+        short_help="TODO">
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+        </Documentation>
+      </InputProperty>
+
+    <Hints>
+      <View type="RenderView"/>
+    </Hints>
+
+
+    </SourceProxy>
+
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="vtkSQTensorGlyph" class="vtkSQTensorGlyph" label="SQ Tensor Glyphs">
+
+      <Documentation
+        long_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at
+                   each point of the input data set. The glyphs are oriented and scaled according 
+                   to eigenvalues and eigenvectors of tensor point data of the input data set."
+        short_help="This filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at each
+                   point of the input data set. The glyphs are oriented and scaled according to eigenvalues
+                   and eigenvectors of tensor point data of the input data set.">
+
+        The Tensor Glyph filter generates an ellipsoid, cuboid, cylinder or superquadric glyph at every point in
+        the input data set. The glyphs are oriented and scaled according to eigenvalues and eigenvectors of tensor
+        point data of the input data set. The Tensor Glyph filter operates on any type of data set. Its output is
+        polygonal.
+      </Documentation>
+
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkDataSet" />
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array1" attribute_type="point"
+            number_of_components="9" />
+      <InputArrayDomain name="input_array2" attribute_type="point"
+            number_of_components="1" optional="1" />
+      <Documentation>
+        This property specifies the input to the Glyph filter.
+      </Documentation>
+    </InputProperty>
+
+    <StringVectorProperty
+        name="SelectInputTensors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Tensors">
+      <ArrayListDomain name="array_list" attribute_type="Tensors"
+          input_domain_name="input_array1">
+        <RequiredProperties>
+          <Property name="Input" function="Input" />
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+              This property indicates the name of the tensor array on which to operate. The indicated array's
+              eigenvalues and eigenvectors are used for scaling and orienting the glyphs.
+      </Documentation>
+    </StringVectorProperty>
+
+    <InputProperty
+        name="Source"
+        command="SetSourceConnection"
+        label="Glyph Type">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources" />
+        <Group name="glyph_sources" />
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkPolyData" />
+      </DataTypeDomain>
+      <ProxyListDomain name="proxy_list">
+        <Proxy group="sources" name="SphereSource" />
+        <Proxy group="sources" name="CylinderSource" />
+        <Proxy group="sources" name="CubeSource" />
+        <Proxy group="sources" name="SuperquadricSource" />
+      </ProxyListDomain>
+      <Documentation>
+        This property determines which type of glyph will be placed at the points in the input dataset.
+      </Documentation>
+    </InputProperty>
+
+    <IntVectorProperty
+        name="ExtractEigenvalues"
+        command="SetExtractEigenvalues"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        Toggle whether to extract eigenvalues from tensor. If false, eigenvalues/eigenvectors are not extracted and
+        the columns of the tensor are taken as the eigenvectors (the norm of column, always positive, is the eigenvalue).
+        If true, the glyph is scaled and oriented according to eigenvalues and eigenvectors; additionally, eigenvalues
+        are provided as new data array.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="ColorGlyphs"
+        command="SetColorGlyphs"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        This property determines whether or not to color the glyphes.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty
+        name="SelectInputScalars"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="1"
+        label="Scalars"><!-- default_values=1 is important to set here and not in Tensors
+                previously. Omitting the setting here would mess up changed
+                tensor input being recognized as tensor input and not as
+                scalar input and vice versa. -->
+      <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array2">
+        <RequiredProperties>
+          <Property name="Input" function="Input" />
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property indicates the name of the scalar array to use for coloring
+      </Documentation>
+    </StringVectorProperty>
+
+    <IntVectorProperty
+        name="ColorMode"
+        command="SetColorMode"
+        number_of_elements="1"
+        default_values="0"
+        label="Color by">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="input scalars" />
+              <Entry value="1" text="eigenvalues" />
+            </EnumerationDomain>
+      <Documentation>
+        This property determines whether input scalars or computed eigenvalues at the point should be used
+        to color the glyphs. If ThreeGlyphs is set and the eigenvalues are chosen for coloring then each glyph
+        is colored by the corresponding eigenvalue and if not set the color corresponding to the largest
+        eigenvalue is chosen.
+      </Documentation>
+   </IntVectorProperty>
+
+          <!-- Disabled as vtkTensorGlyph.cxx does not respect this parameter currently. -->
+          <!--
+          <IntVectorProperty
+        name="Scaling"
+        command="SetScaling"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        This property determines whether or not to scale glyphs with eigenvalues.
+      </Documentation>
+          </IntVectorProperty>
+          -->
+    <DoubleVectorProperty
+        name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1">
+      <Documentation>
+        This property specifies the scale factor to scale every glyph by.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="LimitScalingByEigenvalues"
+        command="SetClampScaling"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        This property determines whether scaling of glyphs by ScaleFactor times eigenvalue should be limited.
+        This is useful to prevent uncontrolled scaling near singularities.
+      </Documentation>
+    </IntVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxScaleFactor"
+        command="SetMaxScaleFactor"
+        number_of_elements="1"
+        default_values="10">
+      <Documentation>
+        If scaling by eigenvalues should be limited, this value sets an upper limit for scale factor times
+        eigenvalue.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="Symmetric"
+        command="SetSymmetric"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        This property determines whether or not to draw a mirror of each glyph.
+      </Documentation>
+    </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ThreeGlyphs"
+        command="SetThreeGlyphs"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        Toggle whether to produce three glyphs, each of which oriented along an eigenvector and scaled according
+        to the corresponding eigenvector.
+      </Documentation>
+          </IntVectorProperty>
+    </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQFieldTopologySelect"
+      label="SQ Field Topology Select"
+      class="vtkSQFieldTopologySelect">
+
+    <!-- Input -->
+    <InputProperty
+        name="DatasetInput"
+        command="SetInputConnection"
+        label="Topograph">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="cell" number_of_components="1"/>
+      <Documentation>
+        Dataset containing the topograph.
+      </Documentation>
+    </InputProperty>
+
+    <!-- topological class selection -->
+    <IntVectorProperty
+        name="domain-domain"
+        command="SetSelectDD"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="north-domain"
+        command="SetSelectND"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="south-domain"
+        command="SetSelectSD"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="null-domain"
+        command="SetSelectOD"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="short-domain"
+        command="SetSelectID"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="north-north"
+        command="SetSelectNN"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="south-north"
+        command="SetSelectSN"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="null-north"
+        command="SetSelectON"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="short-north"
+        command="SetSelectIN"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="south-south"
+        command="SetSelectSS"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="null-south"
+        command="SetSelectOS"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="short-south"
+        command="SetSelectIS"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="null-null"
+        command="SetSelectOO"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="short-null"
+        command="SetSelectIO"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="short-short"
+        command="SetSelectII"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="2" />
+    </Hints>
+
+  </SourceProxy>
+
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQFieldTopologySplit"
+      label="SQ Field Topology Split"
+      class="vtkSQFieldTopologySplit">
+
+    <!-- Input -->
+    <InputProperty
+        name="DatasetInput"
+        command="SetInputConnection"
+        label="Topograph">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="cell" number_of_components="1"/>
+      <Documentation>
+        Dataset containing the topograph.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Solar Wind"      index="0" />
+    <OutputPort name="Magnetosphere"   index="1" />
+    <OutputPort name="North Connected" index="2" />
+    <OutputPort name="South Connected" index="3" />
+    <OutputPort name="Null/Short Int." index="4" />
+
+    <Hints>
+      <Visibility replace_input="2" />
+    </Hints>
+
+  </SourceProxy>
+
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQFieldTracer"
+      label="SQ Field Tracer"
+      class="vtkSQFieldTracer">
+
+    <!-- Inputs -->
+    <InputProperty
+        name="DatasetInput"
+        command="AddVectorInputConnection"
+        clean_command="ClearVectorInputConnections"
+        label="Vector Field">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="point" number_of_components="3"/>
+      <Documentation>
+        Dataset containing the vector field.
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="SeedPointInput"
+        command="AddSeedPointInputConnection"
+        clean_command="ClearSeedPointInputConnections"
+        label="Seed Cells"
+        multiple_input="0">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Cells to generate seed points from (at cell center).
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="TerminatorInput"
+        command="AddTerminatorInputConnection"
+        clean_command="ClearTerminatorInputConnections"
+        label="Terminator Surfaces"
+        multiple_input="1"
+        optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Surfaces which if present stop field line integration when a field line crosses one.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Streamlines" index="0"/>
+
+    <!-- Vector Field Selection -->
+    <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vector Field">
+      <ArrayListDomain name="array_list" attribute_type="Vectors">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property contains the name of the vector array from which to generate streamlines.
+      </Documentation>
+    </StringVectorProperty>
+
+    <!-- Integrator type -->
+    <IntVectorProperty
+        name="IntegratorType"
+        label="Integrator"
+        command="SetIntegratorType"
+        number_of_elements="1"
+        default_values="2">
+      <EnumerationDomain name="enum">
+        <Entry value="1"       text="RK-2"/>
+        <Entry value="2"       text="RK-4"/>
+        <!--<Entry value="3"       text="RK-4-5"/>-->
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <!-- Integrator parameters
+    <DoubleVectorProperty
+        name="MinStep"
+        label="Minimum Step"
+        command="SetMinStep"
+        number_of_elements="1"
+        default_values="1.0e-8" >
+      <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
+      <Documentation>
+        Minimum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty> -->
+
+    <DoubleVectorProperty
+        name="MaxStep"
+        label="Max Step Size"
+        command="SetMaxStep"
+        number_of_elements="1"
+        default_values="0.1" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Maximum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!--<DoubleVectorProperty
+        name="MaxError"
+        command="SetMaxError"
+        number_of_elements="1"
+        default_values="1.0e-4">
+      <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
+      <Documentation>
+        Error bound for adaptive step size integration.
+      </Documentation>
+    </DoubleVectorProperty> 
+
+    <IdTypeVectorProperty
+        name="MaxNumberOfSteps"
+        label="Max Number of Steps"
+        command="SetMaxNumberOfSteps"
+        number_of_elements="1"
+        default_values="100000000" >
+      <IntRangeDomain name="range"/>
+      <Documentation>
+        Maximum number of steps, beyond which integration is terminated.
+      </Documentation>
+    </IdTypeVectorProperty>-->
+
+    <DoubleVectorProperty
+        name="MaxLineLength"
+        label="Max Arc Length"
+        command="SetMaxLineLength"
+        number_of_elements="1"
+        default_values="1.0" >
+      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.5">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </BoundsDomain>
+      <Documentation>
+        Maximum streamline arc length beyond which line integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="NullThreshold"
+        label="Null Threshold"
+        command="SetNullThreshold"
+        number_of_elements="1"
+        default_values="0.001" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Vector field magnitude below which particle advection/integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="ForwardOnly"
+        label="Disable reverse integrate"
+        command="SetForwardOnly"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <!-- Colormap/Legened control -->
+    <IntVectorProperty 
+        name="SqueezeColorMap"
+        label="Squeeze Color Map"
+        command="SetSqueezeColorMap"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      Use the minimum number of intersect colors required. Requires global reduction.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Integration parameter unit (2=cell length)
+    <IntVectorProperty 
+        name="StepUnit"
+        label="Step Unit"
+        command="SetStepUnit" 
+        number_of_elements="1"
+        default_values="2"/>
+    -->
+
+    <!-- Mode Flag -->
+    <IntVectorProperty 
+        name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing/work scheduling controls -->
+    <IntVectorProperty 
+        name="UseDynamicScheduler"
+        command="SetUseDynamicScheduler"
+        number_of_elements="1"
+        default_values="0" > 
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated 
+      on all processes. This must be off if this is not the case. Set once before the filter runs.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="MasterBlockSize"
+        command="SetMasterBlockSize"
+        number_of_elements="1"
+        default_values="16"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work the master does in between servicing work requests
+        from the workers. Should be much smaller the WorkerBlockSize.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="WorkerBlockSize"
+        command="SetWorkerBlockSize"
+        number_of_elements="1"
+        default_values="512"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work is given to the worker processes at each
+        request.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="Mode" show="0"/>
+    </Hints>
+    <!-- End OOCFieldTracer -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQFieldTracerRK45"
+      label="SQ Field Tracer RK-4-5"
+      class="vtkSQFieldTracer">
+
+    <!-- Inputs -->
+    <InputProperty
+        name="DatasetInput"
+        command="AddVectorInputConnection"
+        clean_command="ClearVectorInputConnections"
+        label="Vector Field">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="point" number_of_components="3"/>
+      <Documentation>
+        Dataset containing the vector field.
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="SeedPointInput"
+        command="AddSeedPointInputConnection"
+        clean_command="ClearSeedPointInputConnections"
+        label="Seed Cells"
+        multiple_input="0">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Cells to generate seed points from (at cell center).
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="TerminatorInput"
+        command="AddTerminatorInputConnection"
+        clean_command="ClearTerminatorInputConnections"
+        label="Terminator Surfaces"
+        multiple_input="1"
+        optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Surfaces which if present stop field line integration when a field line crosses one.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Streamlines" index="0"/>
+
+    <!-- Vector Field Selection -->
+    <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vector Field">
+      <ArrayListDomain name="array_list" attribute_type="Vectors">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property contains the name of the vector array from which to generate streamlines.
+      </Documentation>
+    </StringVectorProperty>
+
+    <!-- Integrator type -->
+    <IntVectorProperty
+        name="IntegratorType"
+        label="Integrator"
+        command="SetIntegratorType"
+        number_of_elements="1"
+        default_values="3">
+      <EnumerationDomain name="enum">
+        <Entry value="1"       text="RK-2"/>
+        <Entry value="2"       text="RK-4"/>
+        <Entry value="3"       text="RK-4-5"/>
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <!-- Integrator parameters -->
+    <DoubleVectorProperty
+        name="MinStep"
+        label="Min Step Size"
+        command="SetMinStep"
+        number_of_elements="1"
+        default_values="1.0e-8" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Minimum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxStep"
+        label="Max Step Size"
+        command="SetMaxStep"
+        number_of_elements="1"
+        default_values="0.1" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Maximum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxError"
+        label="Max Error"
+        command="SetMaxError"
+        number_of_elements="1"
+        default_values="1.0e-3">
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Error bound for adaptive step size integration.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IdTypeVectorProperty
+        name="MaxNumberOfSteps"
+        label="Max Number of Steps"
+        command="SetMaxNumberOfSteps"
+        number_of_elements="1"
+        default_values="1000" >
+      <IntRangeDomain name="range"/>
+      <Documentation>
+        Maximum number of steps, beyond which integration is terminated.
+      </Documentation>
+    </IdTypeVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxLineLength"
+        label="Max Arc Length"
+        command="SetMaxLineLength"
+        number_of_elements="1"
+        default_values="1.0" >
+      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.5">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </BoundsDomain>
+      <Documentation>
+        Maximum streamline arc length beyond which line integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="NullThreshold"
+        label="Null Threshold"
+        command="SetNullThreshold"
+        number_of_elements="1"
+        default_values="0.001" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Vector field magnitude below which particle advection/integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="ForwardOnly"
+        label="Disable reverse integrate"
+        command="SetForwardOnly"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <!-- Colormap/Legened control -->
+    <IntVectorProperty 
+        name="SqueezeColorMap"
+        label="Squeeze Color Map"
+        command="SetSqueezeColorMap"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      Use the minimum number of intersect colors required. Requires global reduction.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Integration parameter unit (2=cell length)
+    <IntVectorProperty 
+        name="StepUnit"
+        label="Step Unit"
+        command="SetStepUnit" 
+        number_of_elements="1"
+        default_values="2"/>
+    -->
+
+    <!-- Mode Flag -->
+    <IntVectorProperty 
+        name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing/work scheduling controls -->
+    <IntVectorProperty 
+        name="UseDynamicScheduler"
+        command="SetUseDynamicScheduler"
+        number_of_elements="1"
+        default_values="0" > 
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated 
+      on all processes. This must be off if this is not the case. Set once before the filter runs.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="MasterBlockSize"
+        command="SetMasterBlockSize"
+        number_of_elements="1"
+        default_values="16"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work the master does in between servicing work requests
+        from the workers. Should be much smaller the WorkerBlockSize.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="WorkerBlockSize"
+        command="SetWorkerBlockSize"
+        number_of_elements="1"
+        default_values="512"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work is given to the worker processes at each
+        request.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="Mode" show="0"/>
+      <Property name="IntegratorType" show="0"/>
+    </Hints>
+    <!-- End OOCFieldTracer -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+      name="vtkSQFieldTopologyMapper"
+      label="SQ Field Topology Mapper"
+      class="vtkSQFieldTracer">
+
+    <!-- Inputs -->
+    <InputProperty
+        name="DatasetInput"
+        command="AddVectorInputConnection"
+        clean_command="ClearVectorInputConnections"
+        label="Vector Field">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="point" number_of_components="3"/>
+      <Documentation>
+        Dataset containing the vector field.
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="SeedPointInput"
+        command="AddSeedPointInputConnection"
+        clean_command="ClearSeedPointInputConnections"
+        label="Seed Cells"
+        multiple_input="0">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Cells to generate seed points from (at cell center).
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="TerminatorInput"
+        command="AddTerminatorInputConnection"
+        clean_command="ClearTerminatorInputConnections"
+        label="Terminator Surfaces"
+        multiple_input="1"
+        optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Surfaces which if present stop field line integration when a field line crosses one.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Field Topology Map" index="0" />
+
+    <!-- Vector Field Selection -->
+    <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vector Field">
+      <ArrayListDomain name="array_list" attribute_type="Vectors">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property contains the name of the vector array from which to generate streamlines.
+      </Documentation>
+    </StringVectorProperty>
+
+    <!-- Integrator type -->
+    <IntVectorProperty
+        name="IntegratorType"
+        label="Integrator"
+        command="SetIntegratorType"
+        number_of_elements="1"
+        default_values="3">
+      <EnumerationDomain name="enum">
+        <Entry value="1"       text="RK-2"/>
+        <Entry value="2"       text="RK-4"/>
+        <Entry value="3"       text="RK-4-5"/>
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <!-- Integrator parameters -->
+    <DoubleVectorProperty
+        name="MinStep"
+        label="Min Step Size"
+        command="SetMinStep"
+        number_of_elements="1"
+        default_values="1.0e-8" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Minimum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxStep"
+        label="Max Step Size"
+        command="SetMaxStep"
+        number_of_elements="1"
+        default_values="0.1" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Maximum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxError"
+        label="Max Error"
+        command="SetMaxError"
+        number_of_elements="1"
+        default_values="1.0e-3">
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Error bound for adaptive step size integration.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IdTypeVectorProperty
+        name="MaxNumberOfSteps"
+        label="Max Number of Steps"
+        command="SetMaxNumberOfSteps"
+        number_of_elements="1"
+        default_values="10000" >
+      <IntRangeDomain name="range"/>
+      <Documentation>
+        Maximum number of steps, beyond which integration is terminated.
+      </Documentation>
+    </IdTypeVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxLineLength"
+        label="Max Arc Length"
+        command="SetMaxLineLength"
+        number_of_elements="1"
+        default_values="1.0" >
+      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </BoundsDomain>
+      <Documentation>
+        Maximum streamline arc length beyond which line integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="NullThreshold"
+        label="Null Threshold"
+        command="SetNullThreshold"
+        number_of_elements="1"
+        default_values="0.001" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Vector field magnitude below which particle advection/integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="ForwardOnly"
+        label="Disable reverse integrate"
+        command="SetForwardOnly"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <!-- Colormap/Legened control -->
+    <IntVectorProperty 
+        name="SqueezeColorMap"
+        label="Squeeze Color Map"
+        command="SetSqueezeColorMap"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      Use the minimum number of intersect colors required. Requires global reduction.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Integration parameter unit (2=cell length)
+    <IntVectorProperty 
+        name="StepUnit"
+        label="Step Unit"
+        command="SetStepUnit" 
+        number_of_elements="1"
+        default_values="2"/>
+    -->
+
+    <!-- Mode Flag -->
+    <IntVectorProperty 
+        name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="2">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing/work scheduling control -->
+    <IntVectorProperty
+        name="UseDynamicScheduler"
+        command="SetUseDynamicScheduler"
+        number_of_elements="1"
+        default_values="1" > 
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated 
+      on all processes. This must be off if this is not the case. Set once before the filter runs.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing controls -->
+    <IntVectorProperty 
+        name="MasterBlockSize"
+        command="SetMasterBlockSize"
+        number_of_elements="1"
+        default_values="16"
+        animateable="0">
+      <IntRangeDomain name="range" min="1" max="131072"/>
+      <Documentation>
+        Controls how much work the master does in between servicing work requests
+        from the workers. Should be much smaller the WorkerBlockSize.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="WorkerBlockSize"
+        command="SetWorkerBlockSize"
+        number_of_elements="1"
+        default_values="512"
+        animateable="0">
+      <IntRangeDomain name="range" min="1" max="131072"/>
+      <Documentation>
+        Controls how much work is given to the worker processes at each
+        request.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="Mode" show="0"/>
+      <Property name="ForwardOnly" show="0"/>
+    </Hints>
+
+  <!-- End Topology Mapper -->
+  </SourceProxy>
+
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+    name="vtkSQPoincareMapper"
+    label="SQ Poincare Mapper"
+    class="vtkSQFieldTracer">
+
+    <!-- Inputs -->
+    <InputProperty
+        name="DatasetInput"
+        command="AddVectorInputConnection"
+        clean_command="ClearVectorInputConnections"
+        label="Vector Field">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="point" number_of_components="3"/>
+      <Documentation>
+        Dataset containing the vector field.
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="SeedPointInput"
+        command="AddSeedPointInputConnection"
+        clean_command="ClearSeedPointInputConnections"
+        label="Seed Cells"
+        multiple_input="0">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Cells to generate seed points from (at cell center).
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="TerminatorInput"
+        command="AddTerminatorInputConnection"
+        clean_command="ClearTerminatorInputConnections"
+        label="Map Surfaces"
+        multiple_input="1"
+        optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Surfaces which if present stop field line integration when a field line crosses one.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Poincare Map" index="0" />
+
+    <!-- Vector Field Selection -->
+    <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vector Field">
+      <ArrayListDomain name="array_list" attribute_type="Vectors">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property contains the name of the vector array from which to generate streamlines.
+      </Documentation>
+    </StringVectorProperty>
+
+    <!-- Integrator type -->
+    <IntVectorProperty
+        name="IntegratorType"
+        label="Integrator"
+        command="SetIntegratorType"
+        number_of_elements="1"
+        default_values="2">
+      <EnumerationDomain name="enum">
+        <Entry value="1"       text="RK-2"/>
+        <Entry value="2"       text="RK-4"/>
+        <!--<Entry value="3"       text="RK-4-5"/>-->
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <!-- Integrator parameters 
+    <DoubleVectorProperty
+        name="MinStep"
+        label="Minimum Step"
+        command="SetMinStep"
+        number_of_elements="1"
+        default_values="1.0e-8" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Minimum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>-->
+
+    <DoubleVectorProperty
+        name="MaxStep"
+        label="Max Step Size"
+        command="SetMaxStep"
+        number_of_elements="1"
+        default_values="0.1" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Maximum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!--
+    <DoubleVectorProperty
+        name="MaxError"
+        command="SetMaxError"
+        number_of_elements="1"
+        default_values="1.0e-4">
+      <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
+      <Documentation>
+        Error bound for adaptive step size integration.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IdTypeVectorProperty
+        name="MaxNumberOfSteps"
+        label="Max Number of Steps"
+        command="SetMaxNumberOfSteps"
+        number_of_elements="1"
+        default_values="100000000" >
+      <IntRangeDomain name="range"/>
+      <Documentation>
+        Maximum number of steps, beyond which integration is terminated.
+      </Documentation>
+    </IdTypeVectorProperty>-->
+
+    <DoubleVectorProperty
+        name="MaxLineLength"
+        label="Max Arc Length"
+        command="SetMaxLineLength"
+        number_of_elements="1"
+        default_values="1.0" >
+      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </BoundsDomain>
+      <Documentation>
+        Maximum streamline arc length beyond which line integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="NullThreshold"
+        label="Null Threshold"
+        command="SetNullThreshold"
+        number_of_elements="1"
+        default_values="0.001" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Vector field magnitude below which particle advection/integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="ForwardOnly"
+        label="Disable reverse integrate"
+        command="SetForwardOnly"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <!-- Colormap/Legened control
+    <IntVectorProperty 
+        name="SqueezeColorMap"
+        label="Squeeze Color Map"
+        command="SetSqueezeColorMap"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Use the minimum number of intersect colors required. Requires global reduction.
+      </Documentation>
+    </IntVectorProperty>
+    -->
+
+    <!-- Integration parameter unit (2=cell length)
+    <IntVectorProperty 
+        name="StepUnit"
+        label="Step Unit"
+        command="SetStepUnit" 
+        number_of_elements="1"
+        default_values="2"/>
+    -->
+
+    <!-- Mode Flag -->
+    <IntVectorProperty 
+        name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="3">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing/work scheduling controls -->
+    <IntVectorProperty 
+        name="UseDynamicScheduler"
+        command="SetUseDynamicScheduler"
+        number_of_elements="1"
+        default_values="1" > 
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated 
+      on all processes. This must be off if this is not the case. Set once before the filter runs.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="MasterBlockSize"
+        command="SetMasterBlockSize"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work the master does in between servicing work requests
+        from the workers. Should be much smaller the WorkerBlockSize.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="WorkerBlockSize"
+        command="SetWorkerBlockSize"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work is given to the worker processes at each
+        request.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="Mode" show="0"/>
+      <Property name="UseDynamicScheduler" show="0"/>
+      <Property name="MasterBlockSize" show="1"/>
+      <Property name="WorkerBlockSize" show="1"/>
+    </Hints>
+
+   <!-- End SQ Poincare Mapper -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+    name="vtkSQPoincareMapperRK45"
+    label="SQ Poincare Mapper RK-4-5"
+    class="vtkSQFieldTracer">
+
+    <!-- Inputs -->
+    <InputProperty
+        name="DatasetInput"
+        command="AddVectorInputConnection"
+        clean_command="ClearVectorInputConnections"
+        label="Vector Field">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+      <InputArrayDomain name="input_array" attribute_type="point" number_of_components="3"/>
+      <Documentation>
+        Dataset containing the vector field.
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="SeedPointInput"
+        command="AddSeedPointInputConnection"
+        clean_command="ClearSeedPointInputConnections"
+        label="Seed Cells"
+        multiple_input="0">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Cells to generate seed points from (at cell center).
+      </Documentation>
+    </InputProperty>
+
+    <InputProperty
+        name="TerminatorInput"
+        command="AddTerminatorInputConnection"
+        clean_command="ClearTerminatorInputConnections"
+        label="Map Surfaces"
+        multiple_input="1"
+        optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <Documentation>
+        Surfaces which if present stop field line integration when a field line crosses one.
+      </Documentation>
+    </InputProperty>
+
+    <!-- Outputs -->
+    <OutputPort name="Poincare Map" index="0" />
+
+    <!-- Vector Field Selection -->
+    <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vector Field">
+      <ArrayListDomain name="array_list" attribute_type="Vectors">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Documentation>
+        This property contains the name of the vector array from which to generate streamlines.
+      </Documentation>
+    </StringVectorProperty>
+
+    <!-- Integrator type -->
+    <IntVectorProperty
+        name="IntegratorType"
+        label="Integrator"
+        command="SetIntegratorType"
+        number_of_elements="1"
+        default_values="3">
+      <EnumerationDomain name="enum">
+        <Entry value="1"       text="RK-2"/>
+        <Entry value="2"       text="RK-4"/>
+        <Entry value="3"       text="RK-4-5"/>
+      </EnumerationDomain>
+    </IntVectorProperty>
+
+    <!-- Integrator parameters -->
+    <DoubleVectorProperty
+        name="MinStep"
+        label="Min Step Size"
+        command="SetMinStep"
+        number_of_elements="1"
+        default_values="1.0e-8" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Minimum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty> 
+
+    <DoubleVectorProperty
+        name="MaxStep"
+        label="Max Step Size"
+        command="SetMaxStep"
+        number_of_elements="1"
+        default_values="0.1" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Maximum integration step size as a multiple of cell lengths.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxError"
+        label="Max Error"
+        command="SetMaxError"
+        number_of_elements="1"
+        default_values="1.0e-6">
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Error bound for adaptive step size integration.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IdTypeVectorProperty
+        name="MaxNumberOfSteps"
+        label="Max Step Sizes"
+        command="SetMaxNumberOfSteps"
+        number_of_elements="1"
+        default_values="100000000" >
+      <IntRangeDomain name="range"/>
+      <Documentation>
+        Maximum number of steps, beyond which integration is terminated.
+      </Documentation>
+    </IdTypeVectorProperty>
+
+    <DoubleVectorProperty
+        name="MaxLineLength"
+        label="Max Arc Length"
+        command="SetMaxLineLength"
+        number_of_elements="1"
+        default_values="1.0" >
+      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
+        <RequiredProperties>
+          <Property name="DatasetInput" function="Input"/>
+        </RequiredProperties>
+      </BoundsDomain>
+      <Documentation>
+        Maximum streamline arc length beyond which line integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+        name="NullThreshold"
+        label="Null Threshold"
+        command="SetNullThreshold"
+        number_of_elements="1"
+        default_values="0.001" >
+      <DoubleRangeDomain name="range"/>
+      <Documentation>
+        Vector field magnitude below which particle advection/integration is terminated.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+        name="ForwardOnly"
+        label="Disable reverse integrate"
+        command="SetForwardOnly"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <!-- Colormap/Legened control
+    <IntVectorProperty 
+        name="SqueezeColorMap"
+        label="Squeeze Color Map"
+        command="SetSqueezeColorMap"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Use the minimum number of intersect colors required. Requires global reduction.
+      </Documentation>
+    </IntVectorProperty>
+    -->
+
+    <!-- Integration parameter unit (2=cell length)
+    <IntVectorProperty 
+        name="StepUnit"
+        label="Step Unit"
+        command="SetStepUnit" 
+        number_of_elements="1"
+        default_values="2"/>
+    -->
+
+    <!-- Mode Flag -->
+    <IntVectorProperty 
+        name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="3">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!-- Load balancing/work scheduling controls -->
+    <IntVectorProperty 
+        name="UseDynamicScheduler"
+        command="SetUseDynamicScheduler"
+        number_of_elements="1"
+        default_values="1">
+      <BooleanDomain name="bool"/>
+      <Documentation>
+      When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated 
+      on all processes. This must be off if this is not the case. Set once before the filter runs.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="MasterBlockSize"
+        command="SetMasterBlockSize"
+        number_of_elements="1"
+        default_values="1">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work the master does in between servicing work requests
+        from the workers. Should be much smaller the WorkerBlockSize.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty 
+        name="WorkerBlockSize"
+        command="SetWorkerBlockSize"
+        number_of_elements="1"
+        default_values="1">
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+        Controls how much work is given to the worker processes at each
+        request.
+      </Documentation>
+    </IntVectorProperty>
+
+    <Hints>
+      <Property name="Mode" show="0"/>
+      <Property name="IntegratorType" show="0"/>
+      <Property name="UseDynamicScheduler" show="0"/>
+      <Property name="MasterBlockSize" show="1"/>
+      <Property name="WorkerBlockSize" show="1"/>
+    </Hints>
+
+   <!-- End SQ Poincare Mapper -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+    name="vtkSQVortexFilter" 
+    class="vtkSQVortexFilter"
+    label="SQ Vortex Detect">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Textual Documentation.
+    </Documentation>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
+           <Documentation>
+             This property specifies the input to the Warp (vector) filter.
+           </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty 
+         name="SelectInputVectors" 
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2"
+         label="Vector Field">
+            <ArrayListDomain name="array_list" attribute_type="Vectors">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+            <Documentation>
+              Identifies the vector field on which to operate.
+            </Documentation>
+      </StringVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeRotation"
+        label="Rotation"
+        command="SetComputeRotation"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Compute the rotation (curl) of the vector field using a point centered stencil.
+        </Documentation>
+     </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ComputeHelicity"
+        label="Helicity"
+        command="SetComputeHelicity"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Compute the helicity (dot of vector and its curl) of the vector field using a point centered stencil.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeNormalizedHelicity"
+        label="Normalized helicity"
+        command="SetComputeNormalizedHelicity"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Compute the normailzed helicity of the vector field using a point centered stencil.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeLambda"
+        label="Lambda-(1,2,3)"
+        command="SetComputeLambda"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Compute the 3 eigenvalues of corrected pressure hessian.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeLambda2"
+        label="Lambda-2"
+        command="SetComputeLambda2"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Compute the second eigenvalue of corrected pressure hessian.
+        </Documentation>
+     </IntVectorProperty>
+
+    <Hints>
+      <View type="RenderView"/>
+    </Hints>
+
+  <!-- End vtkSQVortexFilter -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+    name="vtkSQKernelConvolution" 
+    class="vtkSQKernelConvolution"
+    label="SQ Kernel Convolution">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Textual Documentation.
+    </Documentation>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"/>
+      </InputProperty>
+
+      <StringVectorProperty
+         name="SelectInputVectors"
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2"
+         label="Vector Field">
+            <ArrayListDomain name="array_list" attribute_type="Vectors">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+            <Documentation>
+              Identifies the vector field on which to operate.
+            </Documentation>
+      </StringVectorProperty>
+
+    <!--
+    <IntVectorProperty
+        name="Mode"
+        lable="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="3D"/>
+        <Entry value="1" text="2D_XY"/>
+      </EnumerationDomain>
+      <Documentation>
+        Select finite difference stencil.
+      </Documentation>
+    </IntVectorProperty>
+    -->
+
+    <IntVectorProperty
+        name="KernelType"
+        lable="Kernel"
+        command="SetKernelType"
+        number_of_elements="1"
+        default_values="0" >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="Gaussian"/>
+        <Entry value="1" text="Constant"/>
+      </EnumerationDomain>
+      <Documentation>
+        Select a kernel.
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="KernelWidth"
+        label="Width"
+        command="SetKernelWidth"
+        number_of_elements="1"
+        default_values="3">
+      <EnumerationDomain name="enum">
+        <Entry value="3" text="3"/>
+        <Entry value="5" text="5"/>
+        <Entry value="7" text="7"/>
+        <Entry value="9" text="9"/>
+        <Entry value="11" text="11"/>
+        <Entry value="13" text="13"/>
+        <Entry value="15" text="15"/>
+        <Entry value="17" text="17"/>
+        <Entry value="19" text="19"/>
+        <Entry value="21" text="21"/>
+        <Entry value="23" text="23"/>
+        <Entry value="25" text="25"/>
+        <Entry value="27" text="27"/>
+        <Entry value="29" text="29"/>
+        <Entry value="31" text="31"/>
+        <Entry value="33" text="33"/>
+        <Entry value="35" text="35"/>
+        <Entry value="37" text="37"/>
+        <Entry value="39" text="39"/>
+      </EnumerationDomain>
+      <Documentation>
+        Kernel size.
+      </Documentation>
+    </IntVectorProperty>
+
+    <!--
+    <IntVectorProperty
+        name="NumberOfIterations"
+        label="Iterations"
+        command="SetNumberOfIterations"
+        number_of_elements="1"
+        default_values="1">
+      <IntRangeDomain name="range" min="1" max="100"/>
+      <Documentation>
+        Set the number of times to apply the convolution.
+      </Documentation>
+    </IntVectorProperty>
+    -->
+
+    <Hints>
+      <View type="RenderView"/>
+    </Hints>
+
+  <!-- End vtkSQKernelConvolution -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+      name="vtkSQSurfaceVectors" 
+      class="vtkSQSurfaceVectors"
+      label="SQ Surface Vectors">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Compute project vector fields onto a surface and surface normal.
+    </Documentation>
+
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+    </InputProperty>
+
+  <!-- End vtkSQSurfaceVectors -->
+  </SourceProxy>
+
+
+  <!-- ==================================================================== -->
+  <SourceProxy name="vtkSQDistributedStreamTracer" class="vtkSQDistributedStreamTracer"
+    label="SQ-PV-3.6-Stream Tracer">
+    <Documentation
+       long_help="Integrate field lines in a vector field."
+       short_help="Integrate field lines in a vector field.">
+      This is the old PV-3.6 stream tracer which doesn't load all data on all processes, but occasionally deadlocks. The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. Production of streamlines terminates if a streamline crosses the exterior boundary of the input dataset. Other reasons for termination are listed for the MaximumNumberOfSteps, TerminalSpeed, and MaximumPropagation properties. This filter operates on any type of dataset, provided it has point-centered vectors. The output is polygonal data containing polylines. 
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="AddInputConnection"
+       clean_command="RemoveAllInputs"
+       multiple_input="1">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type" composite_data_supported="1">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="3"/>
+          <Documentation>
+            This property specifies the input to the Stream Tracer filter.
+          </Documentation>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSourceConnection"
+        label="Seed Type">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+           <Documentation>
+             The value of this property determines how the seeds for the 
+             streamlines will be generated.
+           </Documentation>
+      </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Vectors">
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <Documentation>
+             This property contains the name of the vector array from which to generate streamlines.
+           </Documentation>
+     </StringVectorProperty>
+
+     <!-- Never generate any seeds, user must supply -->
+     <IntVectorProperty
+        name="NumberOfPoints"
+        number_of_elements="1"
+        default_values="0"/>
+     <!-- Always integrate in both directions -->
+     <IntVectorProperty 
+       name="IntegrationDirection" 
+       command="SetIntegrationDirection" 
+       number_of_elements="1"
+       default_values="2"/>
+     <!-- Always use the best integrator -->
+     <IntVectorProperty 
+       name="IntegratorType" 
+       command="SetIntegratorType" 
+       number_of_elements="1"
+       default_values="2"/>
+     <!-- Always measure integrate as multiple of cell length -->
+     <IntVectorProperty 
+       name="IntegrationStepUnit"
+       label="Integration Step Unit"
+       command="SetIntegrationStepUnit" 
+       number_of_elements="1"
+       default_values="2"/>
+
+     <DoubleVectorProperty
+       name="InitialIntegrationStep"
+       label="Initial Step Length"
+       command="SetInitialIntegrationStep"
+       number_of_elements="1"
+       default_values="0.2" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the initial integration step size as a multiple of cell lengths.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+       name="MinimumIntegrationStep"
+       label="Minimum Step Length"
+       command="SetMinimumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the minimum integration step size.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+       name="MaximumIntegrationStep"
+       label="Maximum Step Length"
+       command="SetMaximumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.5" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the maximum integration step size.
+       </Documentation>
+     </DoubleVectorProperty>  
+
+     <IntVectorProperty 
+       name="MaximumNumberOfSteps" 
+       label="Maximum Steps"
+       command="SetMaximumNumberOfSteps" 
+       number_of_elements="1"
+       default_values="2000" >
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the maximum number of steps, beyond which streamline integration is terminated.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+       name="MaximumPropagation"
+       label="Maximum Streamline Length"
+       command="SetMaximumPropagation"
+       number_of_elements="1"
+       default_values="1.0" >
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10.0">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+       <Documentation>
+         This property specifies the maximum streamline length (i.e., physical arc length), beyond which line integration is terminated.
+       </Documentation>       
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+       name="TerminalSpeed"
+       label="Terminal Speed"
+       command="SetTerminalSpeed"
+       number_of_elements="1"
+       default_values="0.000000000001" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the terminal speed, below which particle advection/integration is terminated.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <!-- Always use this error -->
+     <DoubleVectorProperty
+       name="MaximumError"
+       command="SetMaximumError"
+       number_of_elements="1"
+       default_values="0.000001"
+       information_only="1"/>
+     <Hints>
+       <Visibility replace_input="2" />
+       <Property name="NumberOfPoints" show="0"/>
+       <Property name="IntegrationDirection" show="0"/>
+       <Property name="IntegratorType" show="0"/>
+       <Property name="IntegrationStepUnit" show="0"/>
+       <Property name="MaximumError" show="0"/>
+     </Hints>
+   <!-- End StreamTracer -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="vtkSQTubeFilter" class="vtkSQTubeFilter" label="SQ Tube">
+    <Documentation
+       long_help="Convert lines into tubes. Normals are used to avoid cracks between tube segments."
+       short_help="Convert lines into tubes.">
+      The Tube filter creates tubes around the lines in the input polygonal/unstructured dataset. The output is polygonal.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array1" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+          <InputArrayDomain name="input_array2" attribute_type="point"
+                            number_of_components="3" optional="1"/>
+          <Documentation>
+            This property specifies the input to the Tube filter.
+          </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Scalars">
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+               input_domain_name="input_array1">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the scalar array on which to
+            operate. The indicated array may be used for scaling the tubes.
+            (See the VaryRadius property.)
+          </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="1" 
+        label="Vectors">  <!-- default value=1 so normals go to the right place -->
+          <ArrayListDomain name="array_list" attribute_type="Vectors"
+               input_domain_name="input_array2">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the vector array on which to
+            operate. The indicated array may be used for scaling and/or
+            orienting the tubes. (See the VaryRadius property.)
+          </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="NumberOfSides" 
+        command="SetNumberOfSides" 
+        number_of_elements="1"
+        animateable="1"
+        default_values="6"
+        label="Number of Sides"> 
+       <IntRangeDomain name="range" min="3"/>
+       <Documentation>
+         The value of this property indicates the number of faces around the circumference of the tube.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, endcaps will be drawn on the tube. Otherwise the ends of the tube will be open.
+       </Documentation>
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="1.0" >
+        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.01">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          The value of this property sets the radius of the tube. If the radius is varying (VaryRadius property), then this value is the minimum radius.
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="VaryRadius" 
+        command="SetVaryRadius" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="By Scalar"/>
+         <Entry value="2" text="By Vector"/>
+         <Entry value="3" text="By Absolute Scalar"/>
+       </EnumerationDomain>
+       <Documentation>
+         The property determines whether/how to vary the radius of the tube. If
+         varying by scalar (1), the tube radius is based on the point-based
+         scalar values in the dataset. If it is varied by vector, the vector
+         magnitude is used in varying the radius.
+       </Documentation>
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="RadiusFactor"
+         command="SetRadiusFactor"
+         number_of_elements="1"
+         default_values="10" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          If varying the radius (VaryRadius property), the property sets the
+          maximum tube radius in terms of a multiple of the minimum radius. If
+          not varying the radius, this value has no effect.
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="UseDefaultNormal" 
+        command="SetUseDefaultNormal" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 0, and the input contains no vector array, then default ribbon normals will be generated (DefaultNormal property); if a vector array has been set (SelectInputVectors property), the ribbon normals will be set from the specified array. If this property is set to 1, the default normal (DefaultNormal property) will be used, regardless of whether the SelectInputVectors property has been set.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="DefaultNormal"
+        command="SetDefaultNormal"
+        number_of_elements="3"
+        default_values="0 0 1" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         The value of this property specifies the normal to use when the UseDefaultNormal property is set to 1 or the input contains no vector array (SelectInputVectors property).
+       </Documentation>
+     </DoubleVectorProperty>
+
+   <!-- End TubeFilter -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+    name="vtkSQSeedPointLatice"
+    class="vtkSQSeedPointLatice"
+    label="SQ Seed Point Latice">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Generates vertices on a latice. The latice can either be unifomrly space or 
+      non-linearly stretched independently in each direction.
+    </Documentation>
+
+    <InputProperty
+      name="Input"
+      command="SetInputConnection"
+      optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+    </InputProperty>
+
+     <!-- Bounds -->
+    <DoubleVectorProperty 
+      name="IBoundsInfo"
+      command="GetIBounds"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty 
+      name="IBounds"
+      label="X Range"
+      command="SetIBounds"
+      number_of_elements="2"
+      default_values="-1.0 1.0"
+      information_property="IBoundsInfo">
+      <Documentation>
+        This property controls the bounds of the seed points.
+      </Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty 
+      name="JBoundsInfo"
+      command="GetJBounds"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty 
+      name="JBounds"
+      label="Y Range"
+      command="SetJBounds"
+      number_of_elements="2"
+      default_values="-1.0 1.0"
+      information_property="JBoundsInfo">
+      <Documentation>
+        This property controls the bounds of the seed points.
+      </Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty
+      name="KBoundsInfo"
+      command="GetKBounds"
+      information_only="1">
+      <SimpleDoubleInformationHelper/>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty 
+      name="KBounds"
+      label="Z Range"
+      command="SetKBounds"
+      number_of_elements="2"
+      default_values="-1.0 1.0"
+      information_property="KBoundsInfo">
+      <Documentation>
+        This property controls the bounds of the seed points.
+      </Documentation>
+    </DoubleVectorProperty>
+
+    <!-- Resolution -->
+     <IntVectorProperty
+        name="Resolution"
+        label="Latice Resolution"
+        command="SetNX"
+        number_of_elements="3"
+        default_values="1 1 1">
+     </IntVectorProperty>
+
+     <!-- Transforms -->
+     <DoubleVectorProperty
+        name="TransformPower"
+        label="Transform Power"
+        command="SetTransformPower"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <Documentation>
+          Controls how non-linear the generated points are. 0 is linear.
+        </Documentation>
+     </DoubleVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="0" />
+    </Hints>
+
+  <!-- End vtkSQSeedPointLatice -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy
+    name="vtkSQRandomCells"
+    class="vtkSQRandomCells"
+    label="SQ Random Cells">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Passes randomly selected cells from the input to output.
+    </Documentation>
+
+    <InputProperty
+      name="Input"
+      command="SetInputConnection"
+      optional="1">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkDataSet"/>
+      </DataTypeDomain>
+    </InputProperty>
+
+    <IntVectorProperty
+        name="Sample Size"
+        label="Sample Size"
+        command="SetSampleSize"
+        number_of_elements="1"
+        default_values="1">
+      <Documentation>
+         Set the number of randomly selected cells to pass through to the output.
+       </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
+        name="RNGSeed"
+        label="Random Number Generator Seed"
+        command="SetSeed"
+        number_of_elements="1"
+        default_values="0">
+      <Documentation>
+        Set the seed to the random number generator. -1 means to use system time.
+      </Documentation>  
+    </IntVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="0" />
+    </Hints>
+
+  <!-- End vtkSQSeedPointLatice -->
+  </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <SourceProxy 
+    name="vtkSQRandomSeedPoints" 
+    class="vtkSQRandomSeedPoints"
+    label="SQ Random Seed Points">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Textual Documentation.
+    </Documentation>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+     <IntVectorProperty
+        name="NumberOfPoints"
+        label="Number Of Points"
+        command="SetNumberOfPoints"
+        number_of_elements="1"
+        default_values="10">
+     </IntVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="0" />
+    </Hints>
+
+  <!-- End vtkSQRandomSeedPoints -->
+  </SourceProxy>
+
+</ProxyGroup>
+
+</ServerManagerConfiguration>

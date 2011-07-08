@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<MagnetosphereTopologyBatch>
+
+  <!--
+  /scratch/01237/bloring/openggcm/tg457370/all.bovm
+  /scratch/01237/bloring/openggcm/tg457370/topo-2d/nmm
+  -->
+
+  <vtkSQBOVReader
+      vectors="b"
+      decomp_dims="5 3 3"
+      block_cache_size="45"/>
+
+  <vtkSQHemisphereSource
+      center="0.0 0.0 0.0"
+      north="0.0 0.0 1.0"
+      radius="3.45"
+      resolution="16"/>
+
+  <vtkSQPlaneSource
+      origin="-12 0 -8"
+      point1="  0 0 -8"
+      point2="-12 0  8"
+      resolution="300 400"/>
+
+  <vtkSQFieldTracer
+      integrator_type="2"
+      max_step_size="0.01"
+      max_number_steps="1000000"
+      max_arc_length="10000"
+      null_threshold="1e-3"
+      dynamic_scheduler="1"
+      master_block_size="16"
+      worker_block_size="512"/>
+
+</MagnetosphereTopologyBatch>
