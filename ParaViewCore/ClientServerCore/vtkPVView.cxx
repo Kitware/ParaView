@@ -51,6 +51,7 @@ vtkPVView::vtkPVView()
   this->RequestInformation = vtkInformation::New();
   this->ReplyInformationVector = vtkInformationVector::New();
 
+  this->ViewTimeValid = false;
   this->LastRenderOneViewAtATime = false;
 
   this->Size[1] = this->Size[0] = 300;
@@ -107,6 +108,7 @@ void vtkPVView::SetViewTime(double time)
   if (this->ViewTime != time)
     {
     this->ViewTime = time;
+    this->ViewTimeValid = true;
     this->InvokeEvent(ViewTimeChangedEvent);
     this->Modified();
     }
@@ -206,7 +208,11 @@ void vtkPVView::CallProcessViewRequest(
       if (pvrepr)
         {
         // Pass the view time information to the representation
-        pvrepr->SetUpdateTime(this->GetViewTime());
+        if(this->ViewTimeValid)
+          {
+          pvrepr->SetUpdateTime(this->GetViewTime());
+          }
+
         pvrepr->SetUseCache(this->GetUseCache());
         pvrepr->SetCacheKey(this->GetCacheKey());
         }

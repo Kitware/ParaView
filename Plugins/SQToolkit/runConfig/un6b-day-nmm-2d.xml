@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<MagnetosphereTopologyBatch>
+
+  <!--
+  /scratch/01237/bloring/un6b/un6b.bovm
+  /scratch/01237/bloring/un6b/topo-2d/nmm
+  -->
+
+  <vtkSQBOVReader
+      vectors="b"
+      decomp_dims="5 5 5"
+      block_cache_size="125"/>
+
+  <vtkSQHemisphereSource
+      center="255.5 255.5 255.5"
+      north="0.0 1.0 0.0"
+      radius="8"
+      resolution="16"/>
+
+  <vtkSQPlaneSource
+      origin="172 205 255.5"
+      point1="215 205 255.5"
+      point2="172 300 255.5"
+      resolution="600 1325"/>
+
+  <vtkSQFieldTracer
+      integrator_type="3"
+      min_step_size="1e-8"
+      max_step_size="0.1"
+      max_error="1e-3"
+      max_number_steps="20000"
+      max_arc_length="20000"
+      null_threshold="1e-3"
+      dynamic_scheduler="1"
+      master_block_size="16"
+      worker_block_size="512"/>
+
+</MagnetosphereTopologyBatch>

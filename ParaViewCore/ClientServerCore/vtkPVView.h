@@ -194,6 +194,7 @@ private:
   static vtkWeakPointer<vtkPVSynchronizedRenderWindows>
     SingletonSynchronizedWindows;
 
+  bool ViewTimeValid;
   bool LastRenderOneViewAtATime;
 //ETX
 };

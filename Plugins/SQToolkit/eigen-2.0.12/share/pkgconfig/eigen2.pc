@@ -1,0 +1,7 @@
+
+Name: Eigen2
+Description: A C++ template library for linear algebra: vectors, matrices, and related algorithms
+Requires:
+Version: 2.0.11
+Libs:
+Cflags: -I/opt/eigen/include/eigen2
