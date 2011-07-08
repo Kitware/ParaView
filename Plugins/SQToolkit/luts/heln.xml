@@ -1,0 +1,11 @@
+<ColorMap name="HELN" space="RGB">
+  <!-- 0 = red -->
+  <Point x="-1.00"  o="1" r="1" g="0" b="0"/>
+  <Point x="-0.50"  o="1" r="1" g="0" b="0"/>
+  <!-- 1 = yellow -->
+  <Point x="-0.49"  o="1" r="1" g="1" b="0"/>
+  <Point x=" 0.50 " o="1" r="1" g="1" b="0"/>
+  <!-- 2 = blue -->
+  <Point x=" 0.51"  o="1" r="0" g="0" b="1"/>
+  <Point x=" 1.00 " o="1" r="0" g="0" b="1"/>
+</ColorMap>

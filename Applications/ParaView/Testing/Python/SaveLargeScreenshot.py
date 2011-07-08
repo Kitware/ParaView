@@ -25,6 +25,17 @@ object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/Multi
 QtTesting.playCommand(object8, 'mousePress', '1,1,0,42,4')
 QtTesting.playCommand(object8, 'mouseRelease', '1,0,0,42,4')
 
+###
+object15 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
+QtTesting.playCommand(object15, 'keyEvent', '7,16777220,0,,0,1')
+object16 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/MultiViewFrameMenu/CloseAction'
+QtTesting.playCommand(object16, 'activate', '')
+object17 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalAction'
+QtTesting.playCommand(object17, 'activate', '')
+object18 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/3D View'
+QtTesting.playCommand(object18, 'activate', '')
+###
+
 object9 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object9, 'activate', 'actionFileSaveScreenshot')
 object12 = 'pqClientMainWindow/SaveSnapshotDialog/selectedViewOnly'

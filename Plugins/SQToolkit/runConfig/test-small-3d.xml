@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<MagnetosphereTopologyBatch>
+
+<!--
+bov_file_name="/opt/Data/SciVis/un6b/un6b.bov"
+-->
+
+  <vtkSQBOVReader
+      start_time="50000"
+      end_time="50000"
+      vectors="b"
+      decomp_dims="10 10 10"
+      block_cache_size="1001"/>
+
+  <vtkSQHemisphereSource
+      center="255.5 255.5 255.5"
+      radius="10"
+      resolution="32"/>
+
+  <vtkSQVolumeSource
+      origin="170 220 245"
+      point1="195 220 245"
+      point2="170 290 245"
+      point3="170 220 265"
+      resolution="25 50 20"/>
+
+  <vtkSQFieldTracer
+      integrator_type="3"
+      min_step_size="1e-8"
+      max_step_size="0.1"
+      max_error="1e-3"
+      max_number_steps="100000"
+      max_arc_length="30000"
+      null_threshold="1e-3"
+      dynamic_scheduler="1"
+      master_block_size="16"
+      worker_block_size="256"/>
+
+</MagnetosphereTopologyBatch>

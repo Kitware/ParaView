@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<MagnetosphereTopologyBatch>
+
+<!--
+bov_file_name="/scratch/01237/bloring/test4/test4.bovm"
+-->
+
+  <vtkSQBOVReader
+      vectors="b"
+      decomp_dims="5 10 5"
+      block_cache_size="250"/>
+
+  <vtkSQHemisphereSource
+      center="255.5 511.5 255.5"
+      radius="14"
+      resolution="32"/>
+
+  <vtkSQPlaneSource
+      origin="140 511.5 80"
+      point1="320 511.5 80"
+      point2="140 511.5 430.5"
+      resolution="1700 3310"/>
+
+  <vtkSQFieldTracer
+      integrator_type="3"
+      min_step_size="1e-8"
+      max_step_size="0.1"
+      max_error="1e-3"
+      max_number_steps="100000"
+      max_arc_length="50000"
+      null_threshold="1e-3"
+      dynamic_scheduler="1"
+      master_block_size="16"
+      worker_block_size="256"/>
+
+</MagnetosphereTopologyBatch>
