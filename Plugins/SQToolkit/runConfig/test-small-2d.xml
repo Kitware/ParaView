@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<MagnetosphereTopologyBatch>
+
+<!--
+bov_file_name="/opt/Data/SciVis/2D/fte-vortex/run2-2D.bov"
+-->
+
+  <vtkSQBOVReader
+      vectors="bp"
+      decomp_dims="10 10 1"
+      block_cache_size="1000"/>
+
+  <vtkSQHemisphereSource
+      center="1024 1024 0"
+      radius="24"
+      resolution="32"/>
+
+  <vtkSQPlaneSource
+      origin="750 708 0"
+      point1="1024 708 0"
+      point2="750 1340 0"
+      resolution="10 20"/>
+
+  <vtkSQFieldTracer
+      integrator_type="3"
+      min_step_size="1e-8"
+      max_step_size="0.1"
+      max_error="1e-3"
+      max_number_steps="100000"
+      max_arc_length="30000"
+      null_threshold="1e-3"
+      dynamic_scheduler="1"
+      master_block_size="16"
+      worker_block_size="256"/>
+
+</MagnetosphereTopologyBatch>
