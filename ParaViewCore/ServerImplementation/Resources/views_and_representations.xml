@@ -1277,6 +1277,7 @@
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkDataSet"/>
+          <DataType value="vtkGenericDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array_cell" attribute_type="cell"
           optional="1">
