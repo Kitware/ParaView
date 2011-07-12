@@ -99,7 +99,9 @@ public:
       QObject::disconnect( this->Server,
                            SIGNAL(triggeredUserName(int, QString&)),
                            this->Owner, SIGNAL(triggeredUserName(int, QString&)));
-
+      QObject::disconnect( this->Server,
+                           SIGNAL(triggerFollowCamera(int)),
+                           this->Owner, SIGNAL(triggerFollowCamera(int)));
       }
     this->Server = server;
     if(server)
@@ -117,6 +119,9 @@ public:
       QObject::connect( server,
                         SIGNAL(triggeredUserName(int, QString&)),
                         this->Owner, SIGNAL(triggeredUserName(int, QString&)));
+      QObject::connect( server,
+                        SIGNAL(triggerFollowCamera(int)),
+                        this->Owner, SIGNAL(triggerFollowCamera(int)));
       if(vtkSMSessionClient::SafeDownCast(server->session()))
         {
         vtkSMSessionClient* session =

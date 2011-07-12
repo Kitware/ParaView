@@ -89,6 +89,10 @@ signals:
   void triggeredUserName(int, QString&);
   void triggeredUserListChanged();
 
+  /// This will be triggered when a remote master client has requested the other
+  /// users to follow a given camera
+  void triggerFollowCamera(int);
+
 public slots:
 
   /// This will attach to the provided view the necessary listeners to share

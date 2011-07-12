@@ -548,7 +548,7 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
   switch(event)
     {
     case vtkSMCollaborationManager::UpdateUserName:
-    userId = *reinterpret_cast<int*>(data);
+      userId = *reinterpret_cast<int*>(data);
       userName = this->Internals->CollaborationCommunicator->GetUserLabel(userId);
       emit triggeredUserName(userId, userName);
       break;
@@ -558,6 +558,10 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
     case vtkSMCollaborationManager::UpdateMasterUser:
       userId = *reinterpret_cast<int*>(data);
       emit triggeredMasterUser(userId);
+      break;
+    case vtkSMCollaborationManager::FollowUserCamera:
+      userId = *reinterpret_cast<int*>(data);
+      emit triggerFollowCamera(userId);
       break;
     case vtkSMCollaborationManager::CollaborationNotification:
       vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);

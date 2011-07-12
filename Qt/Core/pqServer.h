@@ -175,6 +175,7 @@ signals:
   void triggeredMasterUser(int);
   void triggeredUserName(int, QString&);
   void triggeredUserListChanged();
+  void triggerFollowCamera(int);
 
 public slots:
   /// Allow user to broadcast to other client a given message

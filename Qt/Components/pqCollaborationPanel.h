@@ -91,10 +91,10 @@ protected slots:
   /// Called when the user double click on any cell
   void cellDoubleClicked(int, int);
 
-protected:
+  /// Called when to follow a given user camera
+  void followUserCamera(int userId);
 
-  /// Activate camera synchronization
-  void setCameraSynchronizationToUser(int userId);
+protected:
 
   /// Promote a new master
   void promoteToMaster(int masterId);

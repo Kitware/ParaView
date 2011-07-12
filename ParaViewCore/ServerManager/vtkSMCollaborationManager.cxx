@@ -59,7 +59,7 @@ public:
     if(this->Master != newMaster)
       {
       this->Master = newMaster;
-      this->UpdateState();
+      this->UpdateState(-1);
       this->Manager->InvokeEvent(
           (unsigned long)vtkSMCollaborationManager::UpdateMasterUser,
           (void*) &newMaster);
@@ -75,7 +75,7 @@ public:
       if(this->UserNames[userId] != userName)
         {
         this->UserNames[userId] = userName;
-        this->UpdateState();
+        this->UpdateState(-1);
         this->Manager->InvokeEvent(
             (unsigned long)vtkSMCollaborationManager::UpdateUserName,
             (void*) &userId);
@@ -85,7 +85,7 @@ public:
     else
       {
       this->UserNames.erase(userId);
-      this->UpdateState();
+      this->UpdateState(-1);
       }
     return false;
     }
@@ -98,7 +98,7 @@ public:
     this->State.Clear();
     }
 
-  void UpdateState()
+  void UpdateState(int followCamUserId)
     {
     this->State.ClearExtension(ClientsInformation::user);
     int size = this->Users.size();
@@ -111,6 +111,10 @@ public:
       if(this->Users[i] == this->Master)
         {
         user->set_is_master(true);
+        }
+      if(this->Users[i] == followCamUserId)
+        {
+        user->set_follow_cam(true);
         }
       }
     }
@@ -140,7 +144,16 @@ public:
         {
         foundChanges = this->UpdateMaster(id) || foundChanges;
         }
+
+      if(user->follow_cam())
+        {
+        // Invoke event...
+        this->Manager->InvokeEvent(
+            (unsigned long)vtkSMCollaborationManager::FollowUserCamera,
+            (void*) &id);
+        }
       }
+
     return foundChanges;
     }
 
@@ -220,6 +233,15 @@ void vtkSMCollaborationManager::PromoteToMaster(int clientId)
 {
   this->Internal->UpdateMaster(clientId);
   this->UpdateUserInformations();
+}
+//----------------------------------------------------------------------------
+void vtkSMCollaborationManager::FollowUser(int clientId)
+{
+  if(this->IsMaster())
+    {
+    this->Internal->UpdateState(clientId);
+    this->UpdateUserInformations();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -70,6 +70,7 @@ class pqCollaborationPanel::pqInternal : public Ui::pqCollaborationPanel
 public:
   int CameraToFollowOfUserId;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
+  vtkstd::map<int, vtkSMMessage> LocalCameraStateCache;
 };
 //-----------------------------------------------------------------------------
 pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
@@ -195,7 +196,7 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
   switch(col)
     {
     case 1: // Camera Link
-      this->setCameraSynchronizationToUser(userId);
+      this->followUserCamera(userId);
       break;
     case 0: // Master user
       this->promoteToMaster(userId);
@@ -204,7 +205,7 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
+void pqCollaborationPanel::followUserCamera(int userId)
 {
   if(this->Internal->CameraToFollowOfUserId == userId)
     {
@@ -221,6 +222,12 @@ void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
     this->Internal->CameraToFollowOfUserId = userId;
     }
 
+  // If we are the master we want the slaves to follow the same camera as us
+  if(this->getSMCollaborationManager()->IsMaster())
+    {
+    this->getSMCollaborationManager()->FollowUser(userId);
+    }
+
   // Update the UI
   int nbRows = this->Internal->members->rowCount();
   for(int i=0; i < nbRows; i++)
@@ -234,13 +241,20 @@ void pqCollaborationPanel::setCameraSynchronizationToUser(int userId)
       this->Internal->members->item(i, 1)->setIcon(QIcon());
       }
     }
+
+  vtkstd::map<int, vtkSMMessage>::iterator camCache;
+  camCache = this->Internal->LocalCameraStateCache.find(userId);
+  if(camCache != this->Internal->LocalCameraStateCache.end())
+    {
+    this->onShareOnlyMessage(&camCache->second);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::onNewMaster(int masterId)
 {
   // When a new master is elected, we just by default get our camera synch to his
-  this->setCameraSynchronizationToUser(masterId);
+  this->followUserCamera(masterId);
 
   // Update the UI
   int nbRows = this->Internal->members->rowCount();
@@ -371,6 +385,9 @@ void pqCollaborationPanel::connectLocalSlots()
     QObject::connect( collab, SIGNAL(triggeredMasterUser(int)),
                       this,   SLOT(onNewMaster(int)));
 
+    QObject::connect( collab, SIGNAL(triggerFollowCamera(int)),
+                      this,   SLOT(followUserCamera(int)));
+
     // Update the graphical panel
     collab->collaborationManager()->UpdateUserInformations();
     onUserUpdate(); // This may be called twice (one here + one from emit)
@@ -417,6 +434,9 @@ void pqCollaborationPanel::disconnectLocalSlots()
     QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
                          this,   SLOT(onNewMaster(int)));
 
+    QObject::disconnect( collab, SIGNAL(triggerFollowCamera(int)),
+                         this,   SLOT(followUserCamera(int)));
+
     QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
     if(parentWidget)
       {
@@ -453,7 +473,7 @@ void pqCollaborationPanel::disconnectViewLocalSlots(pqView* view)
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::stopFollowingCamera()
 {
-  this->setCameraSynchronizationToUser(-1);
+  this->followUserCamera(-1);
 }
 
 //-----------------------------------------------------------------------------
@@ -463,7 +483,13 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
   if(msg->HasExtension(DefinitionHeader::client_class) &&
      msg->GetExtension(DefinitionHeader::client_class) == "vtkSMCameraProxy")
     {
-    if(this->Internal->CameraToFollowOfUserId == static_cast<int>(msg->client_id()))
+    int currentUserId = static_cast<int>(msg->client_id());
+
+    // Keep in cache the latest camera position of each participants
+    this->Internal->LocalCameraStateCache[currentUserId].CopyFrom(*msg);
+
+    // If I'm following that one just update my camera
+    if(this->Internal->CameraToFollowOfUserId == currentUserId)
       {
       vtkTypeUInt32 cameraId = msg->global_id();
       pqApplicationCore* core = pqApplicationCore::instance();

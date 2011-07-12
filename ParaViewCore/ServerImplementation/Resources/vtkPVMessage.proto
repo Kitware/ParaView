@@ -157,25 +157,30 @@ message ProxySelectionModelState {
   }
 }
 
+// Extension ClientsInformation State ********************************* [60-65]
+
 message ClientsInformation {
 
   message ClientInfo {
-    required uint32 user      = 1;
-    optional string name      = 2;
-    optional bool   is_master = 3 [default = false];
+    required uint32 user       = 1;
+    optional string name       = 2;
+    optional bool   is_master  = 3 [default = false];
+    optional bool   follow_cam = 4 [default = false];
   }
 
   extend Message {
-    repeated ClientInfo user = 54;
+    repeated ClientInfo user = 60;
   }
 }
 
 message ChatMessage {
   extend Message {
-    required uint32 author = 55;
-    required string txt    = 56;
+    required uint32 author = 64;
+    required string txt    = 65;
   }
 }
+
+// Extension Qt Events ************************************************ [70-71]
 
 message QtEvent {
   enum QtEventType {
@@ -187,8 +192,8 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 60;
-    optional uint32      proxy = 61 [default = 0];
+    required QtEventType type  = 70;
+    optional uint32      proxy = 71 [default = 0];
   }
 }
 
