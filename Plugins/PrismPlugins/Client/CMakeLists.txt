@@ -33,13 +33,17 @@ QT4_WRAP_CPP(MOC_SRCS
   PrismCore.h
   PrismMenuActions.h
   PrismObjectPanelsImplementation.h
+  PrismScaleViewDialog.h
   PrismSurfacePanel.h
   PrismPanel.h
-  PrismView.h )
+  PrismView.h  
+  )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui
-    Resources/UI/PrismPanelWidget.ui)
+    Resources/UI/PrismPanelWidget.ui
+    Resources/UI/PrismViewScalingWidget.ui
+    )
 
 SET(UI_RESOURCES
   Resources/Prism.qrc
@@ -73,26 +77,35 @@ ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBa
 
 ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions
                           GROUP_NAME "MenuBar/Prism")
+
 ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(DISPLAYPANELIFACES DISPLAY_PANEL_IFACE_SRCS CLASS_NAME PrismDisplayPanelDecorator
-                          PANEL_TYPES pqDisplayProxyEditor)                          
+                          PANEL_TYPES pqDisplayProxyEditor)
 
 
+SET SM_PRISM_SRCS(
+    vtkSMPrismDoubleRangeDomain.cxx
+    vtkSMPrismViewProxy.cxx
+  )
+
+SET GUI_PRISM_SRCS(
+  PrismDisplayPanelDecorator.cxx
+  PrismToolBarActions.cxx
+  PrismCore.cxx
+  PrismMenuActions.cxx
+  PrismObjectPanelsImplementation.cxx
+  PrismScaleViewDialog.cxx
+  PrismSurfacePanel.cxx
+  PrismPanel.cxx
+  PrismView.cxx
+  )
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     SERVER_MANAGER_XML PRISMServerManagerXML.xml
                     GUI_INTERFACES ${VIEW_IFACES} ${TOOLBARIFACE} ${MENUBARIFACE} ${DISPLAYPANELIFACES}  PrismObjectPanels
                     SERVER_MANAGER_SOURCES
-                    vtkSMPrismDoubleRangeDomain.cxx
-                    vtkSMPrismViewProxy.cxx
+                    ${SM_PRISM_SRCS}
                     GUI_SOURCES
-                    PrismDisplayPanelDecorator.cxx
-                    PrismToolBarActions.cxx
-                    PrismCore.cxx
-                    PrismMenuActions.cxx
-                    PrismObjectPanelsImplementation.cxx
-                    PrismSurfacePanel.cxx
-                    PrismPanel.cxx
-                    PrismView.cxx
+                    ${GUI_PRISM_SRCS}
                     ${RCS_SOURCES}
                     ${MOC_SRCS}
                     ${TOOLBAR_IFACE_SRCS}
