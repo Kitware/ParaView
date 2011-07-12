@@ -2,7 +2,10 @@
 
 #include "PrismCore.h"
 #include "PrismView.h"
+#include "PrismScaleViewDialog.h"
+
 #include "pqApplicationCore.h"
+#include "pqActiveView.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"

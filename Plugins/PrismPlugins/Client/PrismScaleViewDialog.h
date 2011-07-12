@@ -25,7 +25,7 @@ protected slots:
   void onCustomBoundsChanged();
   void updateView();
 
-protected
+protected:
   bool hasCustomBounds() const;
   void modeChanged(const int& pos, const int& value);
   void setupViewInfo();

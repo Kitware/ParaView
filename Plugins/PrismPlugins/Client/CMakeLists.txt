@@ -82,12 +82,12 @@ ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(DISPLAYPANELIFACES DISPLAY_PANEL_IFACE_SRCS
                           PANEL_TYPES pqDisplayProxyEditor)
 
 
-SET SM_PRISM_SRCS(
+SET(SM_PRISM_SRCS
     vtkSMPrismDoubleRangeDomain.cxx
     vtkSMPrismViewProxy.cxx
   )
 
-SET GUI_PRISM_SRCS(
+SET(GUI_PRISM_SRCS
   PrismDisplayPanelDecorator.cxx
   PrismToolBarActions.cxx
   PrismCore.cxx

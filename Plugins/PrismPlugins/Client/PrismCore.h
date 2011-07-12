@@ -49,13 +49,13 @@ private slots:
   void onPrismSelection(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void onConnectionAdded(pqPipelineSource* source,pqPipelineSource* consumer);
 
-private:
+private:  
   pqPipelineSource *getActiveSource() const;
   pqServer* getActiveServer() const;
 
  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
+ PrismScaleViewDialog* ScaleViewDialog;
  bool ProcessingEvent;
-
 };
 
 class SESAMEComboBoxDelegate : public QItemDelegate
@@ -82,7 +82,6 @@ protected:
      QStringList Variables;
      PrismSurfacePanel* SPanel;
      PrismPanel* PPanel;
-     PrismScaleViewDialog* ScaleViewDialog;
  };
 
 

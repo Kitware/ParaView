@@ -96,7 +96,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="YCustomMin">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -121,7 +121,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_2">
+        <widget class="QLineEdit" name="ZCustomMin">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -234,12 +234,12 @@
   <tabstop>UseYFullBounds</tabstop>
   <tabstop>UseYThresholdBounds</tabstop>
   <tabstop>UseYCustomScale</tabstop>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>YCustomMin</tabstop>
   <tabstop>YCustomMax</tabstop>
   <tabstop>UseZFullBounds</tabstop>
   <tabstop>UseZThresholdBounds</tabstop>
   <tabstop>UseZCustomScale</tabstop>
-  <tabstop>lineEdit_2</tabstop>
+  <tabstop>ZCustomMin</tabstop>
   <tabstop>ZCustomMax</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
@@ -312,7 +312,7 @@
   <connection>
    <sender>UseYCustomScale</sender>
    <signal>toggled(bool)</signal>
-   <receiver>lineEdit</receiver>
+   <receiver>YCustomMin</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -328,7 +328,7 @@
   <connection>
    <sender>UseZCustomScale</sender>
    <signal>toggled(bool)</signal>
-   <receiver>lineEdit_2</receiver>
+   <receiver>ZCustomMin</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
