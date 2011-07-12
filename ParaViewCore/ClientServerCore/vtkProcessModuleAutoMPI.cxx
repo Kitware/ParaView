@@ -55,6 +55,7 @@ public:
 
     int port = this->GetPort(this->SocketDescriptor);
     this->CloseSocket(this->SocketDescriptor);
+    this->SocketDescriptor = -1;
     return port;
     }
   private:
