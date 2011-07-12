@@ -270,7 +270,9 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
     }
   if(proxyToSelect->GetNumberOfItems() == 1)
     {
-    this->Select(proxyToSelect.GetPointer(), SELECT);
+    // No need to do: this->Select(proxyToSelect.GetPointer(), SELECT);
+    // This is achieved in the SetCurrentProxy.
+
     this->SetCurrentProxy(
         vtkSMProxy::SafeDownCast(proxyToSelect->GetItemAsObject(0)), SELECT);
     }
