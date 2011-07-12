@@ -96,6 +96,13 @@ public:
 
   ~PrismView();
 
+  void GetWorldBounds(double bounds[6]);
+  void GetThresholdBounds(double bounds[6]);
+  void GetCustomBounds(double bounds[6]);
+
+  void SetWorldScaleMode(int mode[3]);
+  void SetCustomBounds(double bounds[6]);
+
 protected:
 
 private:

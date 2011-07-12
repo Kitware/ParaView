@@ -105,3 +105,33 @@ PrismView::PrismView(
 PrismView::~PrismView()
 {
 }
+
+//-----------------------------------------------------------------------------
+void PrismView::GetWorldBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper(v, "WorldBounds").Get(bounds, 6);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetThresholdBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper(v, "ThresholdBounds").Get(bounds, 6);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetCustomBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper(v, "CustomBounds").Get(bounds, 6);
+    }
+}

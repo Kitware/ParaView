@@ -1,6 +1,7 @@
 
 
 #include "PrismCore.h"
+#include "PrismView.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqPipelineSource.h"
@@ -44,6 +45,7 @@
 #include <QComboBox>
 #include <QList>
 #include "vtkSMOutputPort.h"
+
 //-----------------------------------------------------------------------------
 static PrismCore* Instance = 0;
 
@@ -197,6 +199,7 @@ void SESAMEComboBoxDelegate::updateEditorGeometry(QWidget *editor,
 PrismCore::PrismCore(QObject* p)
 :QObject(p)
     {
+    
     this->ProcessingEvent=false;
     this->VTKConnections = NULL;
 
@@ -220,6 +223,9 @@ PrismCore::PrismCore(QObject* p)
     this->connect(builder,SIGNAL(proxyCreated(pqProxy*)),
        this, SLOT(onSelectionChanged()));
 
+
+    //construct a scale view dialog that isn't set to a view
+    this->ScaleViewDialog = new PrismScaleViewDialog();
     this->onSelectionChanged();
     }
 
@@ -227,6 +233,7 @@ PrismCore::PrismCore(QObject* p)
 PrismCore::~PrismCore()
 {
   Instance=NULL;
+  delete this->ScaleViewDialog;
 }
 
 //-----------------------------------------------------------------------------
@@ -240,7 +247,8 @@ PrismCore* PrismCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-void PrismCore::registerActions(QAction* prismView, QAction* sesameSurface)
+void PrismCore::registerActions(QAction* prismView, QAction* sesameSurface,
+  QAction* scaleView)
 {
 
   prismView->setText("Prism View");
@@ -248,12 +256,17 @@ void PrismCore::registerActions(QAction* prismView, QAction* sesameSurface)
   prismView->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
   prismView->setEnabled(false);
   QObject::connect(prismView, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
-  bool created = QObject::connect(this,SIGNAL(prismViewCreatable(bool)),prismView, SLOT(setEnabled(bool)));
+  QObject::connect(this,SIGNAL(prismViewCreatable(bool)),prismView, SLOT(setEnabled(bool)));
 
   sesameSurface->setText("SESAME Surface");
   sesameSurface->setToolTip("Open SESAME Surface");
   sesameSurface->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
   QObject::connect(sesameSurface, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
+
+  scaleView->setText("Change Prism View Scale");
+  scaleView->setToolTip("Change Prism View Scale");
+  prismView->setIcon(QIcon(":/Prism/Icons/PrismViewScale.png"));
+  QObject::connect(prismView, SIGNAL(triggered(bool)), this, SLOT(onChangePrismViewScale()));
 }
 
 //-----------------------------------------------------------------------------
@@ -759,4 +772,20 @@ void PrismCore::onSelectionChanged()
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void PrismCore::onChangePrismViewScale()
+{
+  //first check if the active view is a prism view.
+  pqView *view = pqActiveView::instance().current();
+  PrismView *pview = qobject_cast<PrismView*>(view);
+  if (!pview)
+    {
+    return;
+    }
+
+  //show the dialog, it handles the reset since it isn't modal
+  this->ScaleViewDialog->setView(pview);
+  this->ScaleViewDialog->show();
 }

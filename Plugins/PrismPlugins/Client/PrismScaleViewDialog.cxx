@@ -40,20 +40,11 @@ public:
 //-----------------------------------------------------------------------------
 PrismScaleViewDialog::PrismScaleViewDialog(
   QWidget* parentObject, Qt::WindowFlags _flags)
-  : Superclass(parentObject, _flags),
-  View(view)
+  : Superclass(parentObject, _flags)
 {
-  double worldBounds[6], thresholdBounds[6], double customBounds[6];
-  pview->GetWorldBounds(worldBounds);
-  pview->GetThresholdBounds(thresholdBounds);
-  pview->GetCustomBounds(customBounds);
-  
-  int currentAxesMode[3];
-  pview->GetCurrentAxesMode(currentAxesMode);
-  
   this->Internals = new pqInternals();
-  this->Internals->setupUi(this);
 
+  this->Internals->setupUi(this);
   //Setup the button groups so we have a group for each axes
   this->Internals->XAxesBG->AddButton(this->Internals->UseXFullBounds);
   this->Internals->XAxesBG->AddButton(this->Internals->UseXThresholdBounds);
@@ -67,9 +58,96 @@ PrismScaleViewDialog::PrismScaleViewDialog(
   this->Internals->ZAxesBG->AddButton(this->Internals->UseZThresholdBounds);
   this->Internals->ZAxesBG->AddButton(this->Internals->UseZCustomScale);
 
+  //setup the custom bounds editing signals
+  QObject::connect(this->Internals->XCustomMin, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+  QObject::connect(this->Internals->XCustomMax, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+
+  QObject::connect(this->Internals->YCustomMin, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+  QObject::connect(this->Internals->YCustomMax, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+
+  QObject::connect(this->Internals->ZCustomMin, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+  QObject::connect(this->Internals->ZCustomMax, SIGNAL(editingFinished()),
+    this, SLOT(onCustomBoundsChanged()));
+
+  //connect all the radio buttons to the signal mapper
+  QObject::connect(this->Internals->UseXFullBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseYFullBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseZFullBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseXThresholdBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseYThresholdBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseZThresholdBounds, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseXCustomScale, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseYCustomScale, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+  QObject::connect(this->Internals->UseZCustomScale, SIGNAL(clicked()),
+    this->Internals->SigMap, SLOT(map()));
+
+  //setup the signal mapper text string for each button
+  this->Internals->SigMap->setMapping(this->Internals->UseXFullBounds, "00");
+  this->Internals->SigMap->setMapping(this->Internals->UseXThresholdBounds, "01");
+  this->Internals->SigMap->setMapping(this->Internals->UseXCustomScale, "02");
+  this->Internals->SigMap->setMapping(this->Internals->UseYFullBounds, "10");
+  this->Internals->SigMap->setMapping(this->Internals->UseYThresholdBounds, "11");
+  this->Internals->SigMap->setMapping(this->Internals->UseYCustomScale, "12");
+  this->Internals->SigMap->setMapping(this->Internals->UseZFullBounds, "20");
+  this->Internals->SigMap->setMapping(this->Internals->UseZThresholdBounds, "21");
+  this->Internals->SigMap->setMapping(this->Internals->UseZCustomScale, "22");
+
+  QObject::connect(this->Internals->SigMap, SIGNAL(mapped(const QString &)),
+  this, SLOT(onModeChanged(const QString &)));
+
+  //connect the button box up
+  QObject::connect(this->Internals->buttonBox, SIGNAL(accepted()),
+    this, SLOT(updateView()));
+
+}
+
+//-----------------------------------------------------------------------------
+PrismScaleViewDialog::~PrismScaleViewDialog()
+{
+  if(this->Internals)
+    {
+    delete this->Internals;
+    }
+  this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::setView(PrismView* view)
+{
+  if ( view && this->View != view )
+    {
+    this->View = view;
+    this->updateView();
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::updateView( )
+{
+  double worldBounds[6], thresholdBounds[6], double customBounds[6];
+  pview->GetWorldBounds(worldBounds);
+  pview->GetThresholdBounds(thresholdBounds);
+  pview->GetCustomBounds(customBounds);
+
+  int currentAxesMode[3];
+  pview->GetCurrentAxesMode(currentAxesMode);
   
   //make sure we restore the dialog to have the correct radio buttons
-  //activated as it had last time
+  //activated as it had last time. Ugghh todo make this cleaner
   if(currentAxesMode[0] == 0 )
     {
     this->Internals->UseXFullBounds.setChecked(true);
@@ -107,7 +185,7 @@ PrismScaleViewDialog::PrismScaleViewDialog(
   else
     {
     this->Internals->UseXCustomScale.setChecked(true);
-    }    
+    }
 
   //setup the Full Bounds labels
   const QString BoundsText = QString("%1 - %2");
@@ -133,89 +211,12 @@ PrismScaleViewDialog::PrismScaleViewDialog(
 
   this->Internals->ZCustomMin.setText(QString::number(customBounds[4]));
   this->Internals->ZCustomMax.setText(QString::number(customBounds[5]));
-  
-  //setup the custom bounds editing signals
-  QObject::connect(this->Internals->XCustomMin, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->XCustomMax, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));    
-    
-  QObject::connect(this->Internals->YCustomMin, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->YCustomMax, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));    
-    
-  QObject::connect(this->Internals->ZCustomMin, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->ZCustomMax, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));        
-    
-  //connect all the radio buttons to the signal mapper
-  QObject::connect(this->Internals->UseXFullBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseYFullBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseZFullBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseXThresholdBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseYThresholdBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseZThresholdBounds, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseXCustomScale, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseYCustomScale, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-  QObject::connect(this->Internals->UseZCustomScale, SIGNAL(clicked()),
-    this->Internals->SigMap, SLOT(map()));
-
-  //setup the signal mapper text string for each button
-  this->Internals->SigMap->setMapping(this->Internals->UseXFullBounds, "00");
-  this->Internals->SigMap->setMapping(this->Internals->UseXThresholdBounds, "01");
-  this->Internals->SigMap->setMapping(this->Internals->UseXCustomScale, "02");
-  this->Internals->SigMap->setMapping(this->Internals->UseYFullBounds, "10");
-  this->Internals->SigMap->setMapping(this->Internals->UseYThresholdBounds, "11");
-  this->Internals->SigMap->setMapping(this->Internals->UseYCustomScale, "12");
-  this->Internals->SigMap->setMapping(this->Internals->UseZFullBounds, "20");
-  this->Internals->SigMap->setMapping(this->Internals->UseZThresholdBounds, "21");
-  this->Internals->SigMap->setMapping(this->Internals->UseZCustomScale, "22");
-
-  QObject::connect(this->Internals->SigMap, SIGNAL(mapped(const QString &)),
-  this, SLOT(onModeChanged(const QString &)));
-  
-}
-
-//-----------------------------------------------------------------------------
-PrismScaleViewDialog::~PrismScaleViewDialog()
-{
-  if(this->Internals)
-    {
-    delete this->Internals;
-    }
-  this->Internals = NULL;
-
-  delete this->XAxesBG;
-  delete this->YAxesBG;
-  delete this->ZAxesBG;
 }
 
 //-----------------------------------------------------------------------------
 bool PrismScaleViewDialog::hasCustomBounds() const
 {
   return (this->ScalingMode[0] == 2 || this->ScalingMode[1] == 2 || this->ScalingMode[2] == 2);
-}
-
-//-----------------------------------------------------------------------------
-int* PrismScaleViewDialog::scalingMode() const
-{
-  return this->ScalingMode;
-}
-
-//-----------------------------------------------------------------------------
-double* PrismScaleViewDialog::customBounds() const
-{
-  return this->CustomBounds;
 }
 
 //-----------------------------------------------------------------------------
@@ -243,4 +244,15 @@ void PrismScaleViewDialog::onCustomBoundsChanged( )
 void PrismScaleViewDialog::modeChanged(const int& pos, const int& value)
 {
   this->Internals->ScalingMode[pos] = value;
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::updateView()
+{
+  //push the changes in the scaling down to the view
+  this->View->SetWorldScaleMode(this->Internals->ScalingMode);
+  if (this->hasCustomBounds())
+    {
+    this->View->SetCustomBounds(this->Internals->CustomBounds);
+    }
 }

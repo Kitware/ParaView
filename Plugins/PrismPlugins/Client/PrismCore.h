@@ -19,6 +19,7 @@ class pqDataRepresentation;
 class QAction;
 class QActionGroup;
 class pqRenderView;
+class PrismScaleViewDialog;
 
 class PrismCore : public QObject
 {
@@ -29,7 +30,8 @@ public:
 
    static PrismCore* instance();
 
-  void registerActions(QAction* prismView, QAction* sesameSurface);
+  void registerActions(QAction* prismView, QAction* sesameSurface,
+    QAction* scaleView);
 
 signals:
   void prismViewCreatable(bool);
@@ -39,6 +41,7 @@ public slots:
   void onSESAMEFileOpen(const QStringList&);
   void onCreatePrismView();
   void onCreatePrismView(const QStringList& files);
+  void onChangePrismViewScale();
 
 private slots:
   void onSelectionChanged();
@@ -79,6 +82,7 @@ protected:
      QStringList Variables;
      PrismSurfacePanel* SPanel;
      PrismPanel* PPanel;
+     PrismScaleViewDialog* ScaleViewDialog;
  };
 
 

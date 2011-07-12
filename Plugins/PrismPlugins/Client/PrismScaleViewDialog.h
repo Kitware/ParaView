@@ -16,21 +16,19 @@ class PrismScaleViewDialog : public QDialog
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  /// \c view cannot be NULL.
-  PrismScaleViewDialog(PrismView *view,
-    QWidget* parent=0, Qt::WindowFlags flags=0);
+  PrismScaleViewDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~PrismScaleViewDialog();
-
-  bool hasCustomBounds() const;
-  int* scalingMode() const;
-  double* customBounds() const;
-
+  
+  void setView(PrismView* view);
 protected slots:
   void onModeChanged(const QString& mode);
   void onCustomBoundsChanged();
+  void updateView();
 
 protected
+  bool hasCustomBounds() const;
   void modeChanged(const int& pos, const int& value);
+  void setupViewInfo();
   
 private:
   class pqInternals;

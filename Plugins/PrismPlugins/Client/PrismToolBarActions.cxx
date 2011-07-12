@@ -12,7 +12,8 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
 
     QAction *prismView = new QAction(this);
     QAction *sesameFilter = new QAction(this);
-    core->registerActions(prismView,sesameFilter);
+    QAction *scaleView = new QAction(this);
+    core->registerActions(prismView,sesameFilter,scaleView);
     }
 
 PrismToolBarActions::~PrismToolBarActions()
