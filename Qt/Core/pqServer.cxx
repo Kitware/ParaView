@@ -167,13 +167,13 @@ void pqServer::initialize()
   if(this->session()->GetServerInformation()->GetMultiClientsEnable())
     {
     this->IdleCollaborationTimer.start();
-    vtkSMSessionClient* session = vtkSMSessionClient::SafeDownCast(this->session());
-    if(session)
+    vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
+    if(currentSession)
       {
       // Initialise the CollaborationManager to listen server notification
-      this->Internals->CollaborationCommunicator = session->GetCollaborationManager();
+      this->Internals->CollaborationCommunicator = currentSession->GetCollaborationManager();
       this->Internals->VTKConnect->Connect(
-          session->GetCollaborationManager(),
+          currentSession->GetCollaborationManager(),
           vtkCommand::AnyEvent,
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
@@ -539,13 +539,13 @@ void pqServer::processServerNotification()
 }
 //-----------------------------------------------------------------------------
 void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
-                                            unsigned long event,
+                                            unsigned long event_,
                                             void* vtkNotUsed(method),
                                             void* data)
 {
   int userId;
   QString userName;
-  switch(event)
+  switch(event_)
     {
     case vtkSMCollaborationManager::UpdateUserName:
       userId = *reinterpret_cast<int*>(data);

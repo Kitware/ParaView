@@ -1706,12 +1706,12 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* lo
     vtkSMProxySelectionModel* model = this->GetSelectionModel(name);
     if(!model->HasGlobalID())
       {
-      vtkSMMessage msg;
-      msg.set_global_id(remoteObjectId);
-      msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
-      this->Session->PullState(&msg);
+      vtkSMMessage msgTmp;
+      msgTmp.set_global_id(remoteObjectId);
+      msgTmp.set_location(vtkPVSession::DATA_SERVER_ROOT);
+      this->Session->PullState(&msgTmp);
 
-      model->LoadState(&msg, locator);
+      model->LoadState(&msgTmp, locator);
 
       this->Internals->UpdateProxySelectionModelState();
       this->TriggerStateUpdate();

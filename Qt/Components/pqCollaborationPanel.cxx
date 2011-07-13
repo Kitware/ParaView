@@ -325,10 +325,10 @@ void pqCollaborationPanel::onUserUpdate()
     if(userId == collab->GetUserId())
       {
       item->setFlags( item->flags() | Qt::ItemIsEditable );
-      QFont font = item->font();
-      font.setBold(true);
-      font.setItalic(true);
-      item->setFont(font);
+      QFont userFont = item->font();
+      userFont.setBold(true);
+      userFont.setItalic(true);
+      item->setFont(userFont);
       }
     else
       {
@@ -392,21 +392,21 @@ void pqCollaborationPanel::connectLocalSlots()
     collab->collaborationManager()->UpdateUserInformations();
     onUserUpdate(); // This may be called twice (one here + one from emit)
 
-    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentWidget)
+    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentDock)
       {
-      parentWidget->toggleViewAction()->setEnabled(true);
-      QObject::connect( parentWidget, SIGNAL(visibilityChanged(bool)),
+      parentDock->toggleViewAction()->setEnabled(true);
+      QObject::connect( parentDock, SIGNAL(visibilityChanged(bool)),
                         this,         SLOT(onUserUpdate()));
       }
     }
   else
     {
-    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentWidget)
+    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentDock)
       {
-      parentWidget->hide();
-      parentWidget->toggleViewAction()->setEnabled(false);
+      parentDock->hide();
+      parentDock->toggleViewAction()->setEnabled(false);
       }
     }
 }
@@ -437,10 +437,10 @@ void pqCollaborationPanel::disconnectLocalSlots()
     QObject::disconnect( collab, SIGNAL(triggerFollowCamera(int)),
                          this,   SLOT(followUserCamera(int)));
 
-    QDockWidget* parentWidget = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentWidget)
+    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
+    if(parentDock)
       {
-      QObject::disconnect( parentWidget, SIGNAL(visibilityChanged(bool)),
+      QObject::disconnect( parentDock, SIGNAL(visibilityChanged(bool)),
                            this,         SLOT(onUserUpdate()));
       }
     }

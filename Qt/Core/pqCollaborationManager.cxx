@@ -83,7 +83,7 @@ public:
                       this->Owner, SLOT(render()));
     }
   //-------------------------------------------------
-  void setServer(pqServer* server)
+  void setServer(pqServer* s)
     {
     if(!this->Server.isNull())
       {
@@ -103,29 +103,29 @@ public:
                            SIGNAL(triggerFollowCamera(int)),
                            this->Owner, SIGNAL(triggerFollowCamera(int)));
       }
-    this->Server = server;
-    if(server)
+    this->Server = s;
+    if(s)
       {
-      QObject::connect( server,
+      QObject::connect( s,
                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
                         this->Owner, SLOT(onClientMessage(vtkSMMessage*)),
                         Qt::QueuedConnection);
-      QObject::connect( server,
+      QObject::connect( s,
                         SIGNAL(triggeredMasterUser(int)),
                         this->Owner, SIGNAL(triggeredMasterUser(int)));
-      QObject::connect( server,
+      QObject::connect( s,
                         SIGNAL(triggeredUserListChanged()),
                         this->Owner, SIGNAL(triggeredUserListChanged()));
-      QObject::connect( server,
+      QObject::connect( s,
                         SIGNAL(triggeredUserName(int, QString&)),
                         this->Owner, SIGNAL(triggeredUserName(int, QString&)));
-      QObject::connect( server,
+      QObject::connect( s,
                         SIGNAL(triggerFollowCamera(int)),
                         this->Owner, SIGNAL(triggerFollowCamera(int)));
-      if(vtkSMSessionClient::SafeDownCast(server->session()))
+      if(vtkSMSessionClient::SafeDownCast(s->session()))
         {
         vtkSMSessionClient* session =
-            vtkSMSessionClient::SafeDownCast(server->session());
+            vtkSMSessionClient::SafeDownCast(s->session());
         this->CollaborationManager = session->GetCollaborationManager();
         this->CollaborationManager->UpdateUserInformations();
         }
@@ -354,9 +354,9 @@ void pqCollaborationManager::removeCollaborationEventManagement(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::setServer(pqServer* server)
+void pqCollaborationManager::setServer(pqServer* s)
 {
-  this->Internals->setServer(server);
+  this->Internals->setServer(s);
   this->updateEnabledState();
 }
 

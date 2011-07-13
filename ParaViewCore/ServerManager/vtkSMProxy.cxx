@@ -107,7 +107,8 @@ public:
       this->Proxy = 0;
     }
   
-  virtual void Execute(vtkObject *c, unsigned long event, void* pname)
+  virtual void Execute(vtkObject* vtkNotUsed(c), unsigned long vtkNotUsed(event),
+                       void* vtkNotUsed(pname))
     {
     if(!this->Proxy)
       {
