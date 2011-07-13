@@ -171,8 +171,13 @@ void pqFiltersMenuReaction::updateEnableState()
         enabled = false;
         // we listen to state change so that we can update enable state when the
         // proxy gets initialized.
+        //
+        // It is better to expect a dataUpdated(pqPipelineSource*) signal than
+        // modifiedStateChanged(pqServerManagerModelItem*)
+        // as the rest of the GUI expect the dataUpdated(pqPipelineSource*))
+        // SIGNAL to happen after an apply even if the data did not changed.
         QObject::connect(source,
-          SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+          SIGNAL(dataUpdated(pqPipelineSource*)),
           this, SLOT(onDataUpdated()));
         break;
         }
