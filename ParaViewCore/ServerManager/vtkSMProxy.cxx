@@ -1993,7 +1993,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
       }
 
     // Make sure we do not try to load a state to a proxy that has already
-    // sub-proxy with IDs that defer from the message state
+    // sub-proxy with IDs that differ from the message state
     if(subProxy->HasGlobalID() &&
        (subProxy->GlobalID != subProxyMsg->global_id() ||
        !this->Session->GetRemoteObject(subProxyMsg->global_id())))

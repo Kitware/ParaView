@@ -40,8 +40,8 @@ public:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
-  // A property can be set to be both input and output by setting updateDir
-  // to INPUT | OUTPUT.
+  // A propterty can be set to be both input and output by adding 2 link, one
+  // to INPUT and the other to OUTPUT
   // When a link is added, all output property values are
   // synchronized with that of the input.
   void AddLinkedProperty(vtkSMProxy* proxy, 
@@ -57,11 +57,11 @@ public:
   // UpdateVTKObjects, use the overload with vtkSMProxy as the argument.
   // When a link is added, all output property values are
   // synchronized with that of the input.
-  void AddLinkedProperty(vtkSMProperty* property, int updateDir);
+  // DEPRECATED void AddLinkedProperty(vtkSMProperty* property, int updateDir);
 
   // Description:
   // Remove a linked property.
-  void RemoveLinkedProperty(vtkSMProperty* property);
+  // DEPRECATED void RemoveLinkedProperty(vtkSMProperty* property);
 
   // Description:
   // Get the number of properties that are involved in this link.
@@ -87,38 +87,52 @@ public:
   // Description:
   // Remove all links.
   virtual void RemoveAllLinks();
+
+//BTX
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();
-
 
   // Description:
   // Synchornize the value of all output properties
   // with the input property.
   void Synchronize();
-//BTX
+
   friend struct vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;
-//ETX
 
   // Description:
   // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
 
   // Description:
   // Save the state of the link.
-  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
+  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
   
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void PropertyModified(vtkSMProxy* caller, const char* pname);
   virtual void UpdateProperty(vtkSMProxy* caller, const char* pname);
   void PropertyModified(vtkSMProperty* property);
+
+  // Description:
+  // Update the internal protobuf state
+  virtual void UpdateState();
 private:
   vtkSMPropertyLinkInternals* Internals;
   bool ModifyingProperty;
 
   vtkSMPropertyLink(const vtkSMPropertyLink&); // Not implemented.
   void operator=(const vtkSMPropertyLink&); // Not implemented.
+//ETX
 };
 
 

@@ -16,9 +16,11 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkPVSession.h"
 
 #include <vtkstd/list>
 
@@ -86,6 +88,10 @@ vtkSMLink::vtkSMLink()
   this->Observer = obs;
   this->PropagateUpdateVTKObjects = 1;
   this->Enabled = true;
+
+  this->State = new vtkSMMessage();
+  this->SetLocation(vtkPVSession::CLIENT);
+  this->State->SetExtension(DefinitionHeader::server_class, "vtkSIObject"); // Dummy SIObject
 }
 
 //-----------------------------------------------------------------------------
@@ -94,6 +100,7 @@ vtkSMLink::~vtkSMLink()
   ((vtkSMLinkObserver*)this->Observer)->Link = NULL;
   this->Observer->Delete();
   this->Observer = NULL;
+  delete this->State; this->State = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -111,4 +118,28 @@ void vtkSMLink::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "PropagateUpdateVTKObjects: " <<
     this->PropagateUpdateVTKObjects << endl;
+}
+//-----------------------------------------------------------------------------
+void vtkSMLink::PushStateToSession()
+{
+  if(!this->IsLocalPushOnly() && this->GetSession())
+    {
+    this->State->SetExtension(DefinitionHeader::client_class, this->GetClassName());
+    this->State->SetExtension(LinkState::propagate_update, this->PropagateUpdateVTKObjects);
+    this->State->SetExtension(LinkState::enabled, this->Enabled);
+    this->PushState(this->State);
+    }
+}
+//-----------------------------------------------------------------------------
+const vtkSMMessage* vtkSMLink::GetFullState()
+{
+  return this->State;
+}
+//-----------------------------------------------------------------------------
+void vtkSMLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *locator)
+{
+  this->Superclass::LoadState(msg, locator);
+
+  this->SetPropagateUpdateVTKObjects(msg->GetExtension(LinkState::propagate_update) ? 1 : 0);
+  this->SetEnabled(msg->GetExtension(LinkState::enabled) ? 1 : 0);
 }

@@ -399,7 +399,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
       if (link)
         {
-        if (!link->LoadState(currentElement, this->ProxyLocator))
+        if (!link->LoadXMLState(currentElement, this->ProxyLocator))
           {
           return 0;
           }

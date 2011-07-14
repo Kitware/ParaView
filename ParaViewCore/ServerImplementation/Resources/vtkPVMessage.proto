@@ -92,34 +92,21 @@ message ProxyState
   }
 }
 
-// Extension PXMRegisteredProxyState ************************************* [30]
+// Extension PXMState ************************************************* [30-32]
 
-message PXMRegisteredProxyState
+message PXMRegistrationState
 {
-  message ProxyRegistrationInfo
+  message Entry
     {
-    required string group     = 1;
+    optional string group     = 1;
     required string name      = 2;
     required uint64 global_id = 3;
     }
 
   extend Message {
-    repeated ProxyRegistrationInfo   registered_proxy           = 30;
-  }
-}
-
-// Extension PXMRegisteredSelectionModelState **************************** [31]
-
-message PXMRegisteredSelectionModelState
-{
-  message ProxySelectionModelInfo
-    {
-    required string name      = 1;
-    required uint64 global_id = 2;
-    }
-
-  extend Message {
-    repeated ProxySelectionModelInfo registered_selection_model = 31;
+    repeated Entry registered_proxy           = 30;
+    repeated Entry registered_selection_model = 31;
+    repeated Entry registered_link            = 32;
   }
 }
 
@@ -157,7 +144,35 @@ message ProxySelectionModelState {
   }
 }
 
-// Extension ClientsInformation State ********************************* [60-65]
+// Extension Link State *********************************************** [60-64]
+
+message LinkState {
+
+  message LinkDescription
+    {
+    // Need to be in sync with the enum in vtkSMLink.h
+    enum Direction
+      {
+      NONE   = 0;
+      INPUT  = 1;
+      OUTPUT = 2;
+      }
+
+    required uint32 proxy         = 1;
+    optional string property_name = 2;
+    required Direction direction  = 3;
+    }
+
+  extend Message {
+    optional bool propagate_update         = 60 [default = true];
+    optional bool enabled                  = 61 [default = true];
+    optional bool sync_interactive_renders = 62 [default = true];
+    repeated LinkDescription link          = 63;
+    repeated string exception_property     = 64;
+  }
+}
+
+// Extension ClientsInformation State ********************************* [80-85]
 
 message ClientsInformation {
 
@@ -169,18 +184,18 @@ message ClientsInformation {
   }
 
   extend Message {
-    repeated ClientInfo user = 60;
+    repeated ClientInfo user = 80;
   }
 }
 
 message ChatMessage {
   extend Message {
-    required uint32 author = 64;
-    required string txt    = 65;
+    required uint32 author = 84;
+    required string txt    = 85;
   }
 }
 
-// Extension Qt Events ************************************************ [70-71]
+// Extension Qt Events ************************************************ [98-99]
 
 message QtEvent {
   enum QtEventType {
@@ -192,8 +207,8 @@ message QtEvent {
   }
 
   extend Message {
-    required QtEventType type  = 70;
-    optional uint32      proxy = 71 [default = 0];
+    required QtEventType type  = 98;
+    optional uint32      proxy = 99 [default = 0];
   }
 }
 
