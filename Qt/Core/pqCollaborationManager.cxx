@@ -205,8 +205,8 @@ protected:
   QPointer<pqCollaborationManager> Owner;
 };
 //***************************************************************************/
-pqCollaborationManager::pqCollaborationManager(QObject* parent) :
-  Superclass(parent)
+pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
+  Superclass(parentObject)
 {
   this->Internals = new pqInternals(this);
   pqApplicationCore* core = pqApplicationCore::instance();
