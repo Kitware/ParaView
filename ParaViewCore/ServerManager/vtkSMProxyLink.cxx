@@ -406,6 +406,11 @@ void vtkSMProxyLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *locat
 //-----------------------------------------------------------------------------
 void vtkSMProxyLink::UpdateState()
 {
+  if(this->Session == NULL)
+    {
+    return;
+    }
+
   this->State->ClearExtension(LinkState::link);
   this->State->ClearExtension(LinkState::exception_property);
 
