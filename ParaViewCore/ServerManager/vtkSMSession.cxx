@@ -24,6 +24,7 @@
 #include "vtkSMSessionClient.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkSMUndoStack.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkWeakPointer.h"
 #include "vtkPVRenderView.h"
@@ -130,6 +131,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
         if(createAction)
           {
           // Do we want to manage object creation ?
+          this->UndoStackBuilder->GetUndoStack()->InvokeEvent(vtkSMUndoStack::ObjectCreationEvent, &newState);
           }
         else
           {
