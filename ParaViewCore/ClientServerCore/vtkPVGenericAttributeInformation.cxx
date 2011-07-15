@@ -50,7 +50,7 @@ void vtkPVGenericAttributeInformation::CopyFromObject(vtkObject* obj)
   int idx;
 
   this->SetName(array->GetName());
-  this->DataType = array->GetType();
+  this->DataType = array->GetComponentType();
   this->SetNumberOfComponents(array->GetNumberOfComponents());
   ptr = this->Ranges;
   if (this->NumberOfComponents > 1)

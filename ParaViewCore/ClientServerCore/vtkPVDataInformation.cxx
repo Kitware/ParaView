@@ -980,6 +980,7 @@ int vtkPVDataInformation::IsDataStructured()
     case VTK_STRUCTURED_GRID:
     case VTK_RECTILINEAR_GRID:
     case VTK_UNIFORM_GRID:
+    case VTK_GENERIC_DATA_SET:
       return 1;
     }
   return 0;
