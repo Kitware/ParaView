@@ -88,6 +88,14 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
     {
     return true;
     }
+
+  // We do not keep track of ProxySelectionModel in Undo/redo
+  if(proxy && proxy->IsA("vtkSMProxySelectionModel"))
+    {
+    return true;
+    }
+
+  // We keep the state, no filtering here
   return false;
 }
 
