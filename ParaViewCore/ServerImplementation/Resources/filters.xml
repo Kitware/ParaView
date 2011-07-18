@@ -6039,6 +6039,17 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        </Documentation>
      </DoubleVectorProperty>
 
+      <IntVectorProperty
+         name="ComputeVorticity"
+         command="SetComputeVorticity"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether or not to compute vorticity.
+        </Documentation>
+      </IntVectorProperty>
+
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
@@ -6236,6 +6247,17 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          This property specifies the maximum error (for Runge-Kutta 4-5) tolerated throughout streamline integration. The Runge-Kutta 4-5 integrator tries to adjust the step size such that the estimated error is less than this threshold.
        </Documentation>
      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ComputeVorticity"
+         command="SetComputeVorticity"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether or not to compute vorticity.
+        </Documentation>
+      </IntVectorProperty>
 
      <Hints>
        <Visibility replace_input="2" />
