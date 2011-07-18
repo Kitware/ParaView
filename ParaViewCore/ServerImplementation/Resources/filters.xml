@@ -104,70 +104,6 @@
   <ProxyGroup name="filters">
 
    <!-- ==================================================================== -->
-   <SourceProxy name="AMRParticlesSlice" class="vtkAMRParticlesSliceFilter"
-                label="Slice AMR Particles Data" >
-                
-      <Documentation
-        short_help="Slices AMR Particle Data"
-        long_help="Slices AMR Particle Data">
-        This filter slices AMR Particle data.
-      </Documentation>
-      
-       <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkMultiBlockDataSet"/>
-           </DataTypeDomain>
-           <Documentation>
-             This property specifies the input for this filter.
-           </Documentation>
-      </InputProperty>
-      
-     <DoubleVectorProperty
-        name="OffSet"
-        command="SetOffSetFromOrigin"
-        number_of_elements="1"
-        default_values="1.0" >
-       <DoubleRangeDomain name="range" min="0"/>
-       <Documentation>
-        Set's the offset from the origin of the data-set
-       </Documentation>
-     </DoubleVectorProperty>
-     
-     <DoubleVectorProperty
-        name="DX"
-        command="SetDX"
-        number_of_elements="1"
-        default_values="1.0" >
-       <DoubleRangeDomain name="range" min="0"/>
-       <Documentation>
-        Set's the distance from the plane
-       </Documentation>
-     </DoubleVectorProperty>
-     
-     <IntVectorProperty
-        name="Normal"
-        command="SetNormal"
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="1" text="X-Normal"/>
-         <Entry value="2" text="Y-Normal"/>
-         <Entry value="3" text="Z-Normal"/>
-       </EnumerationDomain>
-       <Documentation>
-    This property sets the normal of the slice.
-       </Documentation>
-     </IntVectorProperty>
-     
-   </SourceProxy>
-   
-   <!-- ==================================================================== -->
    <SourceProxy name="AMRSlice" class="vtkAMRSliceFilter"
                 label="Slice AMR data" >
       <Documentation
@@ -191,6 +127,14 @@
            </Documentation>
       </InputProperty>
 
+      <IntVectorPropery
+        name="LevelRange"
+        command="GetLevelRange"
+        information_only="1"
+        number_of_elements="2"
+        default_values="0 0">
+      </IntVectorPropery>
+      
       <IntVectorProperty
          name="ForwardUpstream"
          command="SetForwardUpstream"
@@ -207,8 +151,12 @@
         name="Level"
         command="SetMaxResolution"
         number_of_elements="1"
-        default_values="1" >
-        <IntRangeDomain name="range" min="0" max="100" />
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" /> 
+<!--         <RequiredProperties>
+         <Property name="LevelRange" function="LevelRange"/>
+        </RequiredProperties>
+-->
         <Documentation>
           Set maximum slice resolution.
         </Documentation>
