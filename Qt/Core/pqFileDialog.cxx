@@ -687,7 +687,7 @@ QStringList pqFileDialog::buildFileGroup(const QString &filename)
         }
       else
         {
-        index = model->index(row, column, rowIndex);
+        index = model->index(0, column, rowIndex);
         }
 
       QString label = model->data(index, Qt::DisplayRole).toString();
