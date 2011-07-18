@@ -672,26 +672,42 @@ QStringList pqFileDialog::buildFileGroup(const QString &filename)
 
   // if we find the file passed in is the parent of a group,
   // add the entire group to the return QList
-  QAbstractProxyModel* m = &this->Implementation->FileFilter;
-  int numrows = m->rowCount(QModelIndex());
-  for(int i=0; i<numrows; i++)
+  QAbstractProxyModel *model = &this->Implementation->FileFilter;
+
+  for(int row = 0; row < model->rowCount(); row++)
     {
-    QModelIndex idx = m->index(i, 0, QModelIndex());
-    QString cmp = m->data(idx, Qt::DisplayRole).toString();
-    if(filename == cmp)
+    QModelIndex rowIndex = model->index(row, 0);
+
+    for(int column = 0; column < model->columnCount(rowIndex); column++)
       {
-      QModelIndex sidx = m->mapToSource(idx);
-      QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
-      for(int j=0; j < sel_files.count(); ++j)
+      QModelIndex index;
+      if(column == 0)
         {
-        files.push_back(sel_files.at(j));
+        index = rowIndex;
+        }
+      else
+        {
+        index = model->index(row, column, rowIndex);
+        }
+
+      QString label = model->data(index, Qt::DisplayRole).toString();
+
+      if(filename == label)
+        {
+        if(column == 0)
+          {
+          QModelIndex sourceIndex = model->mapToSource(index);
+          files += this->Implementation->Model->getFilePaths(sourceIndex);
+          }
+        else
+          {
+          // UserRole will return the full file path
+          files += model->data(index, Qt::UserRole).toString();
+          }
         }
       }
     }
-  if(files.empty())
-    {
-    files.append(this->Implementation->Model->absoluteFilePath(filename));
-    }
+
   return files;
 }
 
