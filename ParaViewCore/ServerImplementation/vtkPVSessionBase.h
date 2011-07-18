@@ -91,13 +91,13 @@ public:
   // location refers to multiple processes, then the reply is only fetched from
   // the "closest" process.
   virtual const vtkClientServerStream& GetLastResult(vtkTypeUInt32 location);
+//ETX
 
   // Description:
   // Gather information about an object referred by the \c globalid.
   // \c location identifies the processes to gather the information from.
   virtual bool GatherInformation(vtkTypeUInt32 location,
     vtkPVInformation* information, vtkTypeUInt32 globalid);
-//ETX
 
   //---------------------------------------------------------------------------
   // API dealing with/forwarded to vtkPVSessionCore dealing with SIObjects and

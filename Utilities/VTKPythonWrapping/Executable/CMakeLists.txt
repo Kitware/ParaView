@@ -17,6 +17,7 @@ INCLUDE_DIRECTORIES(
   "${ParaView_SOURCE_DIR}/VTK/Common"
   "${ParaView_SOURCE_DIR}/VTK/Parallel"
   "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python"
+  "${ParaView_BINARY_DIR}/VTK/Wrapping/Python"
   "${PVCommon_SOURCE_DIR}"
   "${PVClientServerCore_SOURCE_DIR}"
   "${PVServerImplementation_SOURCE_DIR}"
