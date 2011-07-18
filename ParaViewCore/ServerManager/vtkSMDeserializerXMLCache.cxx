@@ -57,6 +57,14 @@ vtkPVXMLElement* vtkSMDeserializerXMLCache::LocateProxyElement(vtkTypeUInt32 id)
 void vtkSMDeserializerXMLCache::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPVXMLElement> >::iterator iter;
+  for( iter = this->Internals->XMLCacheMap.begin();
+       iter != this->Internals->XMLCacheMap.end();
+       iter++)
+    {
+    os << indent << "Proxy " << iter->first << " state:" << endl;
+    iter->second.GetPointer()->PrintXML(os, indent.GetNextIndent());
+    }
 }
 
 //----------------------------------------------------------------------------

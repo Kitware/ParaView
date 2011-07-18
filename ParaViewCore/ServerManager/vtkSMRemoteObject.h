@@ -35,6 +35,7 @@ class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
 // My friends are...
   friend class vtkSMStateHelper;          // To pull state
   friend class vtkSMDeserializerProtobuf; // To set GlobalId
+  friend class vtkSMDeserializerXML;      // To set GlobalId
 
 public:
   vtkTypeMacro(vtkSMRemoteObject,vtkSMObject);
@@ -138,6 +139,7 @@ protected:
   // Assigned at :
   // - First push
   // - or when the RemoteObject is created by the ProcessModule remotely.
+  // - or when state is loaded from protobuf messages
   vtkTypeUInt32 GlobalID;
 
   // Location flag identify the processes on which the vtkSIObject

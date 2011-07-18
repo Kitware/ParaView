@@ -23,6 +23,8 @@
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
+class vtkSMProxy;
+
 class VTK_EXPORT vtkSMStateLocator : public vtkSMObject
 {
 public:
@@ -64,6 +66,12 @@ public:
   // Description:
   // Return true if the given state do exist in the locator hierachy
   virtual bool IsStateAvailable(vtkTypeUInt32 globalID);
+
+  // Description:
+  // Register the given proxy state as well as all its sub-proxy state so if
+  // that proxy need to be renew all its sub-proxy will be renew in the exact
+  // same state.
+  virtual void RegisterFullState(vtkSMProxy* proxy);
 
 protected:
   vtkSMStateLocator();

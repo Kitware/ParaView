@@ -481,6 +481,7 @@ protected:
   friend class vtkSMSourceProxy;
   friend class vtkSMUndoRedoStateLoader;
   friend class vtkSMDeserializerProtobuf;
+  friend class vtkSMStateLocator;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML

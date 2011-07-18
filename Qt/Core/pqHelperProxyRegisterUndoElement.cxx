@@ -168,4 +168,9 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
 void pqHelperProxyRegisterUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  for (unsigned int cc=0; cc < this->Internal->HelperList.size(); cc++)
+    {
+    HelperProxy item = this->Internal->HelperList[cc];
+    os << indent << "Proxy " << item.Name.toAscii().data() << " with id " << item.Id << endl;
+    }
 }

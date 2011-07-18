@@ -46,6 +46,11 @@ vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 void vtkSMRemoteObjectUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GlobalId: " << this->GetGlobalId() << endl;
+  os << indent << "Before state: " << endl;
+  if(this->BeforeState) this->BeforeState->PrintDebugString();
+  os << indent << "After state: " << endl;
+  if(this->AfterState) this->AfterState->PrintDebugString();
 }
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::Undo()

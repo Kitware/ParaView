@@ -16,6 +16,11 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSession.h"
+
+#include <vtkstd/map>
+#include <vtkstd/set>
 
 //***************************************************************************
 //                        Internal class Definition
@@ -114,4 +119,24 @@ bool vtkSMStateLocator::IsStateAvailable(vtkTypeUInt32 globalID)
   return ( this->IsStateLocal(globalID) ||
            ( this->ParentLocator &&
              this->ParentLocator->IsStateAvailable(globalID)));
+}
+//---------------------------------------------------------------------------
+void vtkSMStateLocator::RegisterFullState(vtkSMProxy* proxy)
+{
+  if(!proxy)
+    {
+    return;
+    }
+
+  // Save the current proxy state
+  const vtkSMMessage *state = proxy->GetFullState();
+  this->Internals->RegisterState(proxy->GetGlobalID(), state);
+
+  // Save sub-proxies
+  unsigned int numberOfSubProxy = proxy->GetNumberOfSubProxies();
+  for(unsigned int idx = 0; idx < numberOfSubProxy; idx++)
+    {
+    vtkSMProxy* subproxy = proxy->GetSubProxy(idx);
+    this->RegisterFullState(subproxy);
+    }
 }

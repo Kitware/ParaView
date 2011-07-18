@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSmartPointer.h>
 
 class vtkSMProxyLocator;
-class vtkSMDeserializerXMLCache;
+class vtkSMStateLocator;
+class vtkSMDeserializerProtobuf;
 class vtkSMProxy;
 
 /// pqCloseViewUndoElement is undo element used to undo the closing
@@ -82,7 +83,8 @@ protected:
   char* Index;
   vtkSmartPointer<vtkPVXMLElement> State;
   vtkSMProxyLocator*               ProxyLocator;
-  vtkSMDeserializerXMLCache*       CacheDeserializer;
+  vtkSMDeserializerProtobuf*       CacheDeserializer;
+  vtkSMStateLocator*               StateCache;
 
 private:
   pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.
