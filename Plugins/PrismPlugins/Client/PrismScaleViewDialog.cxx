@@ -276,6 +276,7 @@ void PrismScaleViewDialog::onButtonClicked(QAbstractButton* button)
       break;
     case QDialogButtonBox::RejectRole:
       this->reject();
+      break;
     }
   this->saveWindowPosition();
   }
@@ -305,7 +306,6 @@ void PrismScaleViewDialog::saveWindowPosition()
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("PrismPlugin/ViewScaleDialog/geometry",
         this->saveGeometry());
-  Superclass::hide();
 }
 
 //-----------------------------------------------------------------------------
