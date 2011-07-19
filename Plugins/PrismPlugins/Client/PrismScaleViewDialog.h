@@ -12,6 +12,7 @@ Module:    PrismScaleViewDialog.h
 
 class PrismView;
 class QAbstractButton;
+class QCloseEvent;
 class PrismScaleViewDialog : public QDialog
 {
   Q_OBJECT
@@ -21,6 +22,9 @@ public:
   virtual ~PrismScaleViewDialog();
   
   void setView(PrismView* view);
+public slots:
+  void show();
+
 protected slots:
   void onModeChanged(const QString& mode);
   void onCustomBoundsChanged();
@@ -31,6 +35,10 @@ protected:
   void modeChanged(const int& pos, const int& value);
   void setupViewInfo();
   void updateView();
+
+  //needed to handle saving the dialog position on screen
+  virtual void closeEvent( QCloseEvent* cevent);
+  void saveWindowPosition();
   
 private:
   class pqInternals;

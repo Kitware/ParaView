@@ -12,6 +12,10 @@ Module:    PrismScaleViewDialog.cxx
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QSignalMapper>
+#include <QCloseEvent>
+
+#include "pqSettings.h"
+#include "pqApplicationCore.h"
 
 class PrismScaleViewDialog::pqInternals : public Ui::PrismViewScalingWidget
 {
@@ -273,7 +277,9 @@ void PrismScaleViewDialog::onButtonClicked(QAbstractButton* button)
     case QDialogButtonBox::RejectRole:
       this->reject();
     }
+  this->saveWindowPosition();
   }
+
 //-----------------------------------------------------------------------------
 void PrismScaleViewDialog::updateView()
 {
@@ -284,4 +290,29 @@ void PrismScaleViewDialog::updateView()
     this->View->SetCustomBounds(this->Internals->CustomBounds);
     }
   this->View->render();
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::closeEvent(QCloseEvent* cevent)
+{
+  this->saveWindowPosition();
+  cevent->accept();
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::saveWindowPosition()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("PrismPlugin/ViewScaleDialog/geometry",
+        this->saveGeometry());
+  Superclass::hide();
+}
+
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::show( )
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  this->restoreGeometry(
+    settings->value("PrismPlugin/ViewScaleDialog/geometry").toByteArray());
+  Superclass::show();
 }
