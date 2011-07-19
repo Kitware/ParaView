@@ -19,6 +19,7 @@ find_library(VRPN_QUAT_LIBRARY quat)
 
 QT4_WRAP_CPP(MOC_SRCS
   vtkVRPNConnection.h
+  vtkVRConnectionManager.h
   pqVRPNStarter.h
   vtkVRGenericStyle.h
   vtkVRInteractorStyle.h
@@ -48,6 +49,7 @@ INCLUDE_DIRECTORIES(
 
 SET( VRPN_SOURCE_FILES
   vtkVRPNConnection.cxx
+  vtkVRConnectionManager.cxx
   vtkVRGenericStyle.cxx
   vtkVRInteractorStyle.cxx
   vtkVRPNCallBackHandlers.cxx
