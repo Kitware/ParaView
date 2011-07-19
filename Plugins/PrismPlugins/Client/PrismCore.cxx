@@ -268,8 +268,8 @@ void PrismCore::registerActions(QAction* prismView, QAction* sesameSurface,
 
   scaleView->setText("Change Prism View Scale");
   scaleView->setToolTip("Change Prism View Scale");
-  prismView->setIcon(QIcon(":/Prism/Icons/PrismViewScale.png"));
-  QObject::connect(prismView, SIGNAL(triggered(bool)), this, SLOT(onChangePrismViewScale()));
+  scaleView->setIcon(QIcon(":/Prism/Icons/PrismViewScale.png"));
+  QObject::connect(scaleView, SIGNAL(triggered(bool)), this, SLOT(onChangePrismViewScale()));
 }
 
 //-----------------------------------------------------------------------------
