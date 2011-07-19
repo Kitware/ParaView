@@ -226,17 +226,14 @@ PrismCore::PrismCore(QObject* p)
     this->connect(builder,SIGNAL(proxyCreated(pqProxy*)),
        this, SLOT(onSelectionChanged()));
 
-
-    //construct a scale view dialog that isn't set to a view
-    this->ScaleViewDialog = new PrismScaleViewDialog();
+    this->ScaleViewDialog = NULL;
     this->onSelectionChanged();
     }
 
 //-----------------------------------------------------------------------------
 PrismCore::~PrismCore()
 {
-  Instance=NULL;
-  delete this->ScaleViewDialog;
+  Instance=NULL;  
 }
 
 //-----------------------------------------------------------------------------
@@ -788,7 +785,13 @@ void PrismCore::onChangePrismViewScale()
     return;
     }
 
-  //show the dialog, it handles the reset since it isn't modal
+  if (!this->ScaleViewDialog)
+    {
+    QWidget *mainWindow = pqCoreUtilities::mainWidget();
+    this->ScaleViewDialog = new PrismScaleViewDialog(mainWindow);
+    }
+  
+  //show the dialog
   this->ScaleViewDialog->setView(pview);
   this->ScaleViewDialog->show();
 }
