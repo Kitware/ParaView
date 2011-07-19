@@ -708,6 +708,11 @@ QStringList pqFileDialog::buildFileGroup(const QString &filename)
       }
     }
 
+  if(files.empty())
+    {
+    files.append(this->Implementation->Model->absoluteFilePath(filename));
+    }
+
   return files;
 }
 
