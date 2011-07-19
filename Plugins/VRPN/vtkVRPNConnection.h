@@ -39,53 +39,116 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
 #include "vtkVRQueue.h"
+#include "vtkTransform.h"
+#include "vtkMatrix4x4.h"
 
+#include <map>
 
-typedef QThread vtkThread;
+class vtkPVXMLElement;
+class vtkSMProxyLocator;
 
 /// Callback to listen to VRPN events
-class ParaViewVRPN : public vtkThread
+class vtkVRPNConnection : public QThread
 {
   Q_OBJECT
+  typedef QThread Superclass;
 public:
-  ParaViewVRPN();
-  ~ParaViewVRPN();
+  vtkVRPNConnection(QObject *parent=0);
+  ~vtkVRPNConnection();
 
   // Description:
   // Name of the device. For example, "Tracker0@localhost"
   // Initial value is a NULL pointer.
+  void SetAddress(std::string name);
+
+  // Description:
+  // Set the device name.
   void SetName(std::string name);
 
   // Description:
+  // Add button device
+  void AddButton(std::string id, std::string name);
+
+  // Description:
+  // Add Analog device
+  void AddAnalog(std::string id,  std::string name );
+
+  // Description:
+  // Add tracking device
+  void AddTracking( std::string id,  std::string name);
+
+  // Description:
+  // Adding a transformation matrix
+  void SetTransformation( vtkMatrix4x4* matix );
+
+  // Description:
+  // Adding Translation Component for tracking
+  void SetTranslation( double x, double y, double z );
+
+  // Description:
+  // Adding Rotation Component for tracking
+  void SetRotation( double angle, double x, double y, double z );
+
+  // Description:
   // Initialize the device with the name.
-  void Init();
+  bool Init();
 
   // Description:
   // Tell if Init() was called succesfully
-  bool GetInitialized() const;
+  // bool GetInitialized() const;
 
   // Description:
   // Terminate the thread
-  void terminate();
+  void Stop();
 
   // Description:
   // Sets the Event Queue into which the vrpn data needs to be written
   void SetQueue( vtkVRQueue* queue );
 
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
  protected slots:
   void run();
 
-
 protected:
+  std::string GetName( int eventType, int id=0 );
   void NewAnalogValue(vrpn_ANALOGCB data);
   void NewButtonValue(vrpn_BUTTONCB data);
   void NewTrackerValue(vrpn_TRACKERCB data );
+  void verifyConfig( const char* id,
+                     const char* name );
 
+  void configureTransform( vtkPVXMLElement* child );
+  void saveButtonEventConfig( vtkPVXMLElement* child ) const;
+  void saveAnalogEventConfig( vtkPVXMLElement* child ) const;
+  void saveTrackerEventConfig( vtkPVXMLElement* child ) const;
+  void saveTrackerTranslationConfig( vtkPVXMLElement* child ) const;
+  void saveTrackerRotationConfig( vtkPVXMLElement* child ) const;
+  void saveTrackerTransformationConfig( vtkPVXMLElement* child ) const;
   friend void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
   friend void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
   friend void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
 
   std::string Name;
+  std::string Address;
+  std::string Type;
+
+  // std::map<std::string,std::string> Mapping;
+  std::map<std::string,std::string> ButtonMapping;
+  std::map<std::string,std::string> AnalogMapping;
+  std::map<std::string,std::string> TrackerMapping;
+
+  bool TrackerPresent, ButtonPresent, AnalogPresent,  TrackerTransformPresent;
+
+  double Translate[3];
+  double RotationAxis[3];
+  double RotationAngle;
+  vtkMatrix4x4 *Transformation;
+
   bool Initialized;
   bool _Stop;
 
@@ -96,8 +159,8 @@ protected:
 
 
 private:
-  ParaViewVRPN(const ParaViewVRPN&); // Not implemented.
-  void operator=(const ParaViewVRPN&); // Not implemented.
+  vtkVRPNConnection(const vtkVRPNConnection&); // Not implemented.
+  void operator=(const vtkVRPNConnection&); // Not implemented.
 };
 
 #endif
