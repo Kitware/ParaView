@@ -89,11 +89,11 @@ namespace vtkPrismCommon
    scalePoint(point2,scalingEnabled,tableId);
 
    //assign the updated value back to the threshold
-   xThreshold[0] = point1[0];
-   xThreshold[1] = point2[0];
+   thresholdBounds[0] = point1[0];
+   thresholdBounds[1] = point2[0];
 
-   yThreshold[0] = point1[1];
-   yThreshold[1] = point2[1];
+   thresholdBounds[2] = point1[1];
+   thresholdBounds[3] = point2[1];
   }
 };
 
