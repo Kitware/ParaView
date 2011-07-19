@@ -112,7 +112,9 @@ void PrismView::GetWorldBounds(double bounds[6])
   vtkSMProxy *v = this->getProxy();
   if (v)
     {
-    vtkSMPropertyHelper(v, "WorldBounds").Get(bounds, 6);
+    vtkSMPropertyHelper prop(v, "WorldBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
     }
 }
 
@@ -122,7 +124,9 @@ void PrismView::GetThresholdBounds(double bounds[6])
   vtkSMProxy *v = this->getProxy();
   if (v)
     {
-    vtkSMPropertyHelper(v, "ThresholdBounds").Get(bounds, 6);
+    vtkSMPropertyHelper prop(v, "ThresholdBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
     }
 }
 
@@ -132,7 +136,9 @@ void PrismView::GetCustomBounds(double bounds[6])
   vtkSMProxy *v = this->getProxy();
   if (v)
     {
-    vtkSMPropertyHelper(v, "CustomBounds").Get(bounds, 6);
+    vtkSMPropertyHelper prop(v, "CustomBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
     }
 }
 
@@ -152,7 +158,9 @@ void PrismView::GetWorldScaleMode(int mode[3])
   vtkSMProxy *v = this->getProxy();
   if (v)
     {
-    vtkSMPropertyHelper(v, "WorldScaleMode").Get(mode, 3);
+    vtkSMPropertyHelper prop(v, "WorldScaleMode");
+    prop.UpdateValueFromServer();
+    prop.Get(mode,3);
     }
 }
 
