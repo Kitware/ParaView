@@ -8,6 +8,50 @@
         of Prism Filters.
       </Documentation>
 
+      <IntVectorProperty name="WorldScaleMode"
+         command="SetWorldScaleMode"
+         number_of_elements="3"
+         information_property="WorldScaleModeInfo"
+         default_values="0 0 0">
+         <DoubleRangeDomain name="range"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="WorldScaleModeInfo"
+         command="GetWorldScaleMode"
+         information_only="1">
+         <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="WorldBounds"
+         command="GetFullWorldBounds"
+         number_of_elements="6"
+         default_values="0 1 0 1 0 1"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ThresholdBounds"
+         command="GetThresholdWorldBounds"
+         number_of_elements="6"
+         default_values="0 1 0 1 0 1"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CustomBounds"
+         command="SetCustomWorldBounds"
+         number_of_elements="6"
+         information_property="CustomBoundsInfo"
+         default_values="0 1 0 1 0 1">
+         <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CustomBoundsInfo"
+         command="GetCustomWorldBounds"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
       <!-- End of PrismView -->
     </PrismViewProxy>
     <!-- End of Views -->
