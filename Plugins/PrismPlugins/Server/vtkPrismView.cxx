@@ -84,42 +84,46 @@ void vtkPrismView::RemoveRepresentation(vtkDataRepresentation* rep)
 void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
   const vtkBoundingBox& thresholdBounds)
 {
-    //now calculate out the new 4x4 matrix for the transform
-    double matrix[16] =
-      {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
+  //update the world and threshold ivars
+  worldBounds.GetBounds(this->FullWorldBounds);
+  thresholdBounds.GetBounds(this->ThresholdWorldBounds);
 
-    double bounds[6];
-    int index = 0;
-    for ( int i=0; i < 3; ++i, index+=2)
-      {      
-      switch(this->WorldScaleMode[i])
-        {
-        case vtkPrismView::FullBounds:
-          bounds[index] = worldBounds.GetBound(index);
-          bounds[index+1] = worldBounds.GetBound(index+1);
-          break;
-        case vtkPrismView::ThresholdBounds:
-          bounds[index] = thresholdBounds.GetBound(index);
-          bounds[index+1] = thresholdBounds.GetBound(index+1);
-          break;
-        case vtkPrismView::CustomBounds:
-          bounds[index] = this->CustomWorldBounds[index];
-          bounds[index+1] = this->CustomWorldBounds[index+1];
-          break;
-        }
+  //now calculate out the new 4x4 matrix for the transform
+  double matrix[16] =
+    {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
+
+  double bounds[6];
+  int index = 0;
+  for ( int i=0; i < 3; ++i, index+=2)
+    {      
+    switch(this->WorldScaleMode[i])
+      {
+      case vtkPrismView::FullBounds:
+        bounds[index] = worldBounds.GetBound(index);
+        bounds[index+1] = worldBounds.GetBound(index+1);
+        break;
+      case vtkPrismView::ThresholdBounds:
+        bounds[index] = thresholdBounds.GetBound(index);
+        bounds[index+1] = thresholdBounds.GetBound(index+1);
+        break;
+      case vtkPrismView::CustomBounds:
+        bounds[index] = this->CustomWorldBounds[index];
+        bounds[index+1] = this->CustomWorldBounds[index+1];
+        break;
       }
+    }
 
-    matrix[0] = 100.0 / (bounds[1] - bounds[0]);
-    matrix[5] = 100.0 / (bounds[3] - bounds[2]);
-    matrix[10] = 100.0 / (bounds[5] - bounds[4]);
+  matrix[0] = 100.0 / (bounds[1] - bounds[0]);
+  matrix[5] = 100.0 / (bounds[3] - bounds[2]);
+  matrix[10] = 100.0 / (bounds[5] - bounds[4]);
 
-    double* scale =this->Transform->GetScale();
-    if (scale[0] != matrix[0] ||
-        scale[1] != matrix[5] ||
-        scale[2] != matrix[10])
-        {
-        this->Transform->SetMatrix(matrix);
-        }    
+  double* scale =this->Transform->GetScale();
+  if (scale[0] != matrix[0] ||
+      scale[1] != matrix[5] ||
+      scale[2] != matrix[10])
+      {
+      this->Transform->SetMatrix(matrix);
+      }    
 }
 //----------------------------------------------------------------------------
 void vtkPrismView::GatherRepresentationInformation()
