@@ -35,6 +35,15 @@ public:
   vtkTypeMacro(vtkPrismView, vtkPVRenderView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
+  enum ScaleMode
+    {
+    FullBounds=0,
+    ThresholdBounds,
+    CustomBounds
+    };
+  //ETX
+
   // Description:
   // Adds the representation to the view.
   void AddRepresentation(vtkDataRepresentation* rep);
@@ -44,22 +53,55 @@ public:
   void RemoveRepresentation(vtkDataRepresentation* rep);
 
   // Description:
-  // Scaling that should be applied to each object
-  // to have it corr
+  // Bounds of the full geometry that can be used to determine the proper
+  // scaling factor for the view
   static vtkInformationDoubleVectorKey* PRISM_GEOMETRY_BOUNDS();
+
+  // Description:
+  // Bounds of the thresholded geometry that can be used to determine the proper
+  // scaling factor for the view
+  static vtkInformationDoubleVectorKey* PRISM_THRESHOLD_BOUNDS();
 
   // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
   void GatherRepresentationInformation();
+
+  // Description:
+  // Set / Get the world scale mode for each axis.
+  //Note values will be between 0 and 2.
+  //See ScaleMode enum for what each one means
+  vtkSetVector3Macro(WorldScaleMode,int);
+  vtkGetVector3Macro(WorldScaleMode,int);
+
+  // Description:
+  // Set / Get the custom bounds for each axes
+  // These values are only used if the WorldScaleMode for that axes is set
+  // too ScaleMode::CustomBounds
+  vtkSetVector6Macro(CustomWorldBounds,double);
+  vtkGetVector6Macro(CustomWorldBounds,double);
+
+  // Description:
+  // Get the current world scale mode for each axis.
+  vtkGetVector6Macro(FullWorldBounds,double);
+
+  // Description:
+  // Get the current threshold scale mode for each axis.
+  vtkGetVector6Macro(ThresholdWorldBounds,double);
 
 //BTX
 protected:
   vtkPrismView();
   ~vtkPrismView();
 
-  void UpdateWorldScale(const vtkBoundingBox& worldBounds);
+  void UpdateWorldScale(const vtkBoundingBox& worldBounds,
+    const vtkBoundingBox& thresholdBounds);
 
   vtkTransform *Transform;
+
+  int WorldScaleMode[3];
+  double CustomWorldBounds[6];
+  double FullWorldBounds[6];
+  double ThresholdWorldBounds[6];
 
 private:
   vtkPrismView(const vtkPrismView&); // Not implemented
