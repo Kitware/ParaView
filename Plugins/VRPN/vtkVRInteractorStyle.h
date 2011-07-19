@@ -52,14 +52,16 @@ public:
   /// indicates that vtkVRQueueHandler the event has been "consumed".
   virtual bool handleEvent(const vtkVREventData& data)=0;
 
+  virtual bool update()=0;
+
   ///--------------------------------------------------------------------------
   /// Identifies the device state when this style becomes active.
 
   /// Get/Set the device name.
-  void setDeviceName(const QString& name)
-    { this->DeviceName = name; }
-  const QString& deviceName() const
-    { return this->DeviceName; }
+  void setName(const QString& name)
+    { this->Name = name; }
+  const QString& name() const
+    { return this->Name; }
 
   /// Get/Set the button number (use -1 to indicate no button).
   void setButton(int num)
@@ -83,7 +85,7 @@ public:
   virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
-  QString DeviceName;
+  QString Name;
   int Button;
   long Sensor;
 

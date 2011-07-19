@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRGenericStyle.h"
+#include "vtkVRHeadTrackingStyle.h"
+#include "vtkVRWandTrackingStyle.h"
+#include "vtkVRActiveObjectManipulationStyle.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
 #include "vtkVRVectorPropertyStyle.h"
@@ -70,7 +73,6 @@ vtkVRQueueHandler::vtkVRQueueHandler(
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(saveStylesConfiguration(vtkPVXMLElement*)));
-
 }
 
 //----------------------------------------------------------------------------
@@ -89,6 +91,12 @@ void vtkVRQueueHandler::add(vtkVRInteractorStyle* style)
 void vtkVRQueueHandler::remove(vtkVRInteractorStyle* style)
 {
   this->Internals->Styles.removeAll(style);
+}
+
+//----------------------------------------------------------------------public
+void vtkVRQueueHandler::clear()
+{
+  this->Internals->Styles.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -120,7 +128,15 @@ void vtkVRQueueHandler::processEvents()
         }
       }
     }
-
+  // There should be an explicit update for each handler. Otherwise the server
+  // side updates will not happen
+  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+    {
+    if (style && style->update())
+      {
+      break;
+      }
+    }
   // since timer is single-shot we start it again.
   this->Internals->Timer.start();
 }
@@ -134,7 +150,7 @@ void vtkVRQueueHandler::processEvents()
            mode="direction">
       <Event device="wand" button="1" />
     </Style>
-  
+
     <Style class="vtkVRVectorPropertyStyle"
            proxy="12"
            property="Origin"
@@ -153,7 +169,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
 
   if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles") == 0)
     {
-    this->Internals->Styles.clear();
+    this->clear();
     for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
       {
       vtkPVXMLElement* child = xml->GetNestedElement(cc);
@@ -172,6 +188,24 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
           style->configure(child, locator);
           this->add(style);
           }
+        else if (strcmp(class_name, "vtkVRHeadTrackingStyle")==0)
+          {
+          vtkVRHeadTrackingStyle* style = new vtkVRHeadTrackingStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRWandTrackingStyle")==0)
+          {
+          vtkVRWandTrackingStyle* style = new vtkVRWandTrackingStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRActiveObjectManipulationStyle")==0)
+          {
+          vtkVRActiveObjectManipulationStyle* style = new vtkVRActiveObjectManipulationStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
         else
           {
           qWarning() << "Unknown interactor style: \"" << class_name << "\"";
@@ -182,7 +216,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
   else
     {
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
-      locator); 
+      locator);
     }
 }
 

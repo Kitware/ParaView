@@ -34,6 +34,7 @@
 struct vtkTracker
 {
   long   sensor;		// Which sensor is reporting
+  double matrix[16]; // The matrix with transformations applied
   double pos[3];		// Position of the sensor
   double quat[4];		// Orientation of the
 };
@@ -60,6 +61,7 @@ union vtkVREventCommonData
 struct vtkVREventData
 {
   std::string connId;
+  std::string name;		// Specified from configuration
   unsigned int eventType;
   vtkVREventCommonData data;
   unsigned int timeStamp;

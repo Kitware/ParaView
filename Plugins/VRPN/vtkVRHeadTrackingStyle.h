@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewVRPN.h
+   Module:    vtkVRHeadTrackingStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRGenericStyle_h_
-#define __vtkVRGenericStyle_h_
+#ifndef __vtkVRHeadTrackingStyle_h_
+#define __vtkVRHeadTrackingStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 
@@ -40,13 +40,13 @@ struct vtkVREventData;
 
 /// This is demonstration of how subclasses for vtkVRInteractorStyle can be
 /// implemented.
-class vtkVRGenericStyle : public vtkVRInteractorStyle
+class vtkVRHeadTrackingStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRGenericStyle(QObject* parent);
-  ~vtkVRGenericStyle();
+  vtkVRHeadTrackingStyle(QObject* parent);
+  ~vtkVRHeadTrackingStyle();
 
   /// called to handle an event. If the style does not handle this event or
   /// handles it but does not want to stop any other handlers from handling it
@@ -68,9 +68,8 @@ protected:
                                   vtkSMDoubleVectorProperty** prop);
   bool SetHeadPoseProperty(const vtkVREventData &data );
   bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 
 protected:
 };
 
-#endif //__vtkVRGenericStyle.h_
+#endif //__vtkVRHeadTrackingStyle.h_

@@ -30,7 +30,7 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include "ParaViewVRPN.h"
+#include "vtkVRPNConnection.h"
 
 #include <vtkstd/vector>
 #include <iostream>
@@ -38,14 +38,14 @@
 // -------------------------------------------------------------------------fun
 void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b)
 {
-  ParaViewVRPN *self = static_cast<ParaViewVRPN*> ( userdata );
+  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
   self->NewAnalogValue( b );
 }
 
 // -------------------------------------------------------------------------fun
 void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b)
 {
-  ParaViewVRPN *self = static_cast<ParaViewVRPN*> ( userdata );
+  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
   self->NewButtonValue( b );
 }
 
@@ -53,7 +53,7 @@ void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b)
 void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t)
 {
   //  printf( " inside trackin handler\n" );
-  ParaViewVRPN *self = static_cast<ParaViewVRPN*> ( userdata );
+  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
   self->NewTrackerValue( t );
 }
 

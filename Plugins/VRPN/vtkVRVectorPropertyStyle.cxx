@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -80,10 +80,12 @@ vtkPVXMLElement* vtkVRVectorPropertyStyle::saveConfiguration() const
   return element;
 }
 
+
 //-----------------------------------------------------------------------------
 bool vtkVRVectorPropertyStyle::handleEvent(const vtkVREventData& data)
 {
-  (void)data;
+  std::cout << "this is something new" << std::endl;
+  //(void)data;
   switch (this->Mode)
     {
     // TODO:handle the data and compute the 3-tuple based on the mode.
@@ -114,4 +116,15 @@ void vtkVRVectorPropertyStyle::setValue(double x, double y, double z)
       this->getSMPropertyName().toAscii().data()).Set(values, 3);
     smproxy->UpdateVTKObjects();
     }
+}
+
+bool vtkVRVectorPropertyStyle::update()
+{
+  vtkSMProperty* smprop = this->getSMProperty();
+  vtkSMProxy* smproxy = this->getSMProxy();
+  if (smproxy && smprop)
+    {
+      smproxy->UpdateVTKObjects();
+    }
+  return false;
 }

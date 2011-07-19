@@ -56,7 +56,7 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     vtkPVXMLElement* event = child->FindNestedElementByName("Event");
     if (event)
       {
-      this->DeviceName = event->GetAttributeOrEmpty("device");
+      this->Name = event->GetAttributeOrEmpty("name");
       this->Button = atoi(event->GetAttributeOrEmpty("button"));
       this->Sensor = atoi(event->GetAttributeOrEmpty("sensor"));
       return true;
@@ -75,7 +75,7 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
 
   vtkPVXMLElement* event = vtkPVXMLElement::New();
   event->SetName("Event");
-  event->AddAttribute("device", this->DeviceName.toAscii().data());
+  event->AddAttribute("name", this->Name.toAscii().data());
   event->AddAttribute("button", this->Button);
   event->AddAttribute("sensor", static_cast<vtkIdType>(this->Sensor));
   child->AddNestedElement(event);

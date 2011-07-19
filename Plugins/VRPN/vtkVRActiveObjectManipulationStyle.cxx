@@ -1,4 +1,4 @@
-#include "vtkVRGenericStyle.h"
+#include "vtkVRActiveObjectManipulationStyle.h"
 
 #include "pqActiveObjects.h"
 #include "pqDataRepresentation.h"
@@ -13,22 +13,21 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkVRQueue.h"
 
-vtkVRGenericStyle::vtkVRGenericStyle(QObject* parentObject) :
+vtkVRActiveObjectManipulationStyle::vtkVRActiveObjectManipulationStyle(QObject* parentObject) :
   Superclass(parentObject)
 {
 
 }
 
-vtkVRGenericStyle::~vtkVRGenericStyle()
+vtkVRActiveObjectManipulationStyle::~vtkVRActiveObjectManipulationStyle()
 {
 
 }
 
 // ----------------------------------------------------------------------------
 // This handler currently only get the
-bool vtkVRGenericStyle::handleEvent(const vtkVREventData& data)
+bool vtkVRActiveObjectManipulationStyle::handleEvent(const vtkVREventData& data)
 {
-  std::cout<< "Event Name = " << data.name << std::endl;
   switch( data.eventType )
     {
   case BUTTON_EVENT:
@@ -45,58 +44,38 @@ bool vtkVRGenericStyle::handleEvent(const vtkVREventData& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRGenericStyle::HandleTracker( const vtkVREventData& data )
+void vtkVRActiveObjectManipulationStyle::HandleTracker( const vtkVREventData& data )
 {
-  if ( data.data.tracker.sensor == 0 // Head from Kinect
-       || data.data.tracker.sensor == 13 ) // Hand from Kinect
-    {
-    std::cout  << "(Tracker" << "\n"
-               << "  :from  " << data.connId <<"\n"
-               << "  :time  " << data.timeStamp << "\n"
-               << "  :id    " << data.data.tracker.sensor << "\n"
-               << "  :pos   '( "
-               << data.data.tracker.pos[0] << " "
-               << data.data.tracker.pos[1] << " "
-               << data.data.tracker.pos[2] << " )"<< "\n"
-               << "  :quat  '( "
-               << data.data.tracker.quat[0] << " "
-               << data.data.tracker.quat[1] << " "
-               << data.data.tracker.quat[2] << " "
-               << data.data.tracker.quat[3] << " ))" << "\n" ;
-    }
-  if ( data.data.tracker.sensor ==0 ) // Handle head tracking
-    {
-    this->SetHeadPoseProperty( data );
-    }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRGenericStyle::HandleButton( const vtkVREventData& data )
+void vtkVRActiveObjectManipulationStyle::HandleButton( const vtkVREventData& data )
 {
   std::cout << "(Button" << "\n"
-            << "  :from  " << data.connId <<"\n"
+            << "  :from  " << data.name <<"\n"
             << "  :time  " << data.timeStamp << "\n"
             << "  :id    " << data.data.button.button << "\n"
             << "  :state " << data.data.button.state << " )" << "\n";
+
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRGenericStyle::HandleAnalog( const vtkVREventData& data )
+void vtkVRActiveObjectManipulationStyle::HandleAnalog( const vtkVREventData& data )
 {
   std::cout << "(Analog" << "\n"
-            << "  :from  " << data.connId <<"\n"
+            << "  :from  " << data.name <<"\n"
             << "  :time  " << data.timeStamp << "\n"
             << "  :channel '(" ;
   for ( int i =0 ; i<data.data.analog.num_channel; i++ )
     {
-    std::cout << data.data.analog.channel[i] ;
+    std::cout << data.data.analog.channel[i] << " ";
     }
   std::cout  << " ))" << "\n" ;
-  HandleSpaceNavigatorAnalog( data );
+  HandleSpaceNavigatorAnalog(data);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRGenericStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
+bool vtkVRActiveObjectManipulationStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
                                                    vtkSMDoubleVectorProperty** outProp)
 {
   *outProxy =0;
@@ -123,7 +102,7 @@ bool vtkVRGenericStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outPro
   return false;
 }
 
-bool vtkVRGenericStyle::SetHeadPoseProperty(const vtkVREventData &data)
+bool vtkVRActiveObjectManipulationStyle::SetHeadPoseProperty(const vtkVREventData &data)
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
@@ -157,7 +136,7 @@ bool vtkVRGenericStyle::SetHeadPoseProperty(const vtkVREventData &data)
   return false;
 }
 
-bool vtkVRGenericStyle::UpdateNRenderWithHeadPose()
+bool vtkVRActiveObjectManipulationStyle::UpdateNRenderWithHeadPose()
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
@@ -170,7 +149,6 @@ bool vtkVRGenericStyle::UpdateNRenderWithHeadPose()
   return false;
 }
 
-#if 0
 // -------------------------------------------------------------------------fun
 vtkAnalog AugmentChannelsToRetainLargestMagnitude(const vtkAnalog t)
 {
@@ -200,7 +178,7 @@ vtkAnalog AugmentChannelsToRetainLargestMagnitude(const vtkAnalog t)
   return at;
 }
 
-void vtkVRGenericStyle::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
+void vtkVRActiveObjectManipulationStyle::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
 {
   vtkAnalog at = AugmentChannelsToRetainLargestMagnitude(data.data.analog);
   // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],
@@ -315,8 +293,8 @@ void vtkVRGenericStyle::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
       }
     }
 }
-#endif
-bool vtkVRGenericStyle::update()
+
+bool vtkVRActiveObjectManipulationStyle::update()
 {
     // Update the when all the events are handled
     this->UpdateNRenderWithHeadPose();

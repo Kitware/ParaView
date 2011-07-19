@@ -62,6 +62,9 @@ public:
   /// handle the event.
   virtual bool handleEvent(const vtkVREventData& data);
 
+  /// updates the server side
+  virtual bool update();
+
   /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 

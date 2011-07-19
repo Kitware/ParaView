@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class QTimer;
-class ParaViewVRPN;
+class vtkVRPNConnection;
 class vtkVRQueue;
 class vtkVRQueueHandler;
+class vtkPVXMLElement;
+class vtkSMProxyLocator;
 
 class pqVRPNStarter : public QObject
 {
@@ -53,14 +55,14 @@ public:
   // Callback for startup.
   void onStartup();
 
+
 protected:
-  ParaViewVRPN *InputDevice;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
+  vtkVRPNConnection *InputDevice[2];
 
 private:
-  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
-  void operator=(const pqVRPNStarter&); // Not implemented.
+  Q_DISABLE_COPY(pqVRPNStarter);
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

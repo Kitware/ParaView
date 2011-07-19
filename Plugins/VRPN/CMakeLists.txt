@@ -22,6 +22,9 @@ QT4_WRAP_CPP(MOC_SRCS
   vtkVRConnectionManager.h
   pqVRPNStarter.h
   vtkVRGenericStyle.h
+  vtkVRHeadTrackingStyle.h
+  vtkVRWandTrackingStyle.h
+  vtkVRActiveObjectManipulationStyle.h
   vtkVRInteractorStyle.h
   vtkVRPropertyStyle.h
   vtkVRQueue.h
@@ -51,6 +54,9 @@ SET( VRPN_SOURCE_FILES
   vtkVRPNConnection.cxx
   vtkVRConnectionManager.cxx
   vtkVRGenericStyle.cxx
+  vtkVRHeadTrackingStyle.cxx
+  vtkVRWandTrackingStyle.cxx
+  vtkVRActiveObjectManipulationStyle.cxx
   vtkVRInteractorStyle.cxx
   vtkVRPNCallBackHandlers.cxx
   vtkVRQueue.cxx

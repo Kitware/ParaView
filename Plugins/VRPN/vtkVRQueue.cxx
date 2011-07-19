@@ -19,7 +19,6 @@ bool vtkVRQueue::isEmpty() const
 {
   QMutexLocker lock(&this->Mutex);
   return this->Queue.isEmpty();
-
 }
 
 //----------------------------------------------------------------------------
@@ -33,7 +32,6 @@ bool vtkVRQueue::tryDequeue(vtkVREventData& data)
 
   data=this->Queue.dequeue();
   return true;
-
 }
 
 //----------------------------------------------------------------------------
