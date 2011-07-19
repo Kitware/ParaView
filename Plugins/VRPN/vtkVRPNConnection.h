@@ -82,14 +82,6 @@ public:
   void SetTransformation( vtkMatrix4x4* matix );
 
   // Description:
-  // Adding Translation Component for tracking
-  void SetTranslation( double x, double y, double z );
-
-  // Description:
-  // Adding Rotation Component for tracking
-  void SetRotation( double angle, double x, double y, double z );
-
-  // Description:
   // Initialize the device with the name.
   bool Init();
 
@@ -143,10 +135,6 @@ protected:
   std::map<std::string,std::string> TrackerMapping;
 
   bool TrackerPresent, ButtonPresent, AnalogPresent,  TrackerTransformPresent;
-
-  double Translate[3];
-  double RotationAxis[3];
-  double RotationAngle;
   vtkMatrix4x4 *Transformation;
 
   bool Initialized;

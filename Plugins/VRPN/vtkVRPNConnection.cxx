@@ -112,8 +112,6 @@ vtkVRPNConnection::vtkVRPNConnection(QObject* parentObject)
   this->Address = "";
   this->Name = "";
   this->Type = "VRPN";
-  this->SetRotation(180.0f, 0.0f,1.0f,0.0f);
-  this->SetTranslation(0.0f,0.0f, -1.0f);
   this->TrackerPresent = false;
   this->AnalogPresent = false;
   this->ButtonPresent = false;
@@ -271,7 +269,6 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   double rotMatrix[3][3];
   vtkMath::QuaternionToMatrix3x3( data.quat, rotMatrix );
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-  //vtkMatrix4x4 *invTranslationMat = vtkMatrix4x4::New();
 
   matrix->Element[0][0] = rotMatrix[0][0];
   matrix->Element[0][1] = rotMatrix[0][1];
@@ -293,19 +290,8 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   matrix->Element[3][2] = 0.0f;
   matrix->Element[3][3] = 1.0f;
 
- //  vtkTransform *rotationMat = vtkTransform::New();
- //  vtkTransform *translationMat = vtkTransform::New();
- //  rotationMat->RotateWXYZ(this->RotationAngle,this->RotationAxis);
- //  translationMat->Translate(this->Translate);
- //  vtkMatrix4x4::Invert(translationMat->GetMatrix(),invTranslationMat);
- // // vtkMatrix4x4::Multiply4x4(invTranslationMat,matrix,matrix);
- //  vtkMatrix4x4::Multiply4x4(rotationMat->GetMatrix(),matrix,matrix);
- //  vtkMatrix4x4::Multiply4x4(translationMat->GetMatrix(),matrix,matrix);
-
- //  translationMat->Delete();
- //  rotationMat->Delete();
-
   vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
+
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
   temp.data.tracker.matrix[1] = matrix->Element[0][1];
   temp.data.tracker.matrix[2] = matrix->Element[0][2];
@@ -431,27 +417,6 @@ void vtkVRPNConnection::configureTransform( vtkPVXMLElement* child )
                                16,
                                ( double* ) this->Transformation->Element );
     this->TrackerTransformPresent = true;
-    this->Transformation->PrintSelf( std::cout,  vtkIndent( 1 ) );
-    // for (int i = 0; i < child->GetNumberOfNestedElements(); ++i)
-    //   {
-    //   vtkPVXMLElement* element = child->GetNestedElement( i );
-    //   if ( element && element->GetName() )
-    //  {
-
-    //  const char* index = event->GetAttributeOrEmpty( "index" );
-    //  const char* value = event->GetAttributeOrEmpty( "value" );
-    //  this->verifyConfigElement( index, value );
-
-    //  if ( strcmp( event->GetName(), "Element" )==0 )
-    //    {
-    //    this->AddTransformElement( id, name );
-    //    }
-    //  else
-    //    {
-    //    qWarning() << "Unknown Item type: \"" << element->GetName() <<"\"";
-    //    }
-    //  }
-    //   }
     }
 }
 
@@ -562,31 +527,6 @@ void vtkVRPNConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
     }
 }
 
-// // ----------------------------------------------------------------------public
-// void vtkVRPNConnection::saveTrackerTranslationConfig(vtkPVXMLElement* trackerEvent) const
-// {
-//   vtkPVXMLElement* translation = vtkPVXMLElement::New();
-//   translation->SetName("Translation");
-//   translation->AddAttribute("x",this->Translate[0]);
-//   translation->AddAttribute("y",this->Translate[1]);
-//   translation->AddAttribute("z",this->Translate[2]);
-//   trackerEvent->AddNestedElement(translation);
-//   translation->FastDelete();
-// }
-
-// // ---------------------------------------------------------------------private
-// void vtkVRPNConnection::saveTrackerRotationConfig(vtkPVXMLElement* trackerEvent) const
-// {
-//   vtkPVXMLElement* rotation = vtkPVXMLElement::New();
-//   rotation->SetName("Rotation");
-//   rotation->AddAttribute("angle",this->RotationAngle);
-//   rotation->AddAttribute("x",this->RotationAxis[0]);
-//   rotation->AddAttribute("y",this->RotationAxis[1]);
-//   rotation->AddAttribute("z",this->RotationAxis[2]);
-//   trackerEvent->AddNestedElement(rotation);
-//   rotation->FastDelete();
-// }
-
 // ---------------------------------------------------------------------private
 void vtkVRPNConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child ) const
 {
@@ -597,34 +537,10 @@ void vtkVRPNConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child 
   for (int i = 0; i < 16; ++i)
     {
     matrix <<  double( *( ( double* )this->Transformation->Element +i ) ) << " ";
-    // vtkPVXMLElement* element = vtkPVXMLElement::New();
-    // element->SetName( "Element" );
-    // element->AddAttribute( "index",i );
-    // element->AddAttribute( "value", double( *( ( double* )this->Transformation->Element +i ) ) );
-    // transformationMatrix->AddNestedElement( element );
-    // element->FastDelete();
     }
   transformationMatrix->AddAttribute( "value",  matrix.str().c_str() );
   child->AddNestedElement(transformationMatrix);
   transformationMatrix->FastDelete();
-}
-
-
-// ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetTranslation( double x, double y, double z )
-{
-  this->Translate[0] = x;
-  this->Translate[1] = y;
-  this->Translate[2] = z;
-}
-
-// ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetRotation( double angle, double x, double y, double z )
-{
-  this->RotationAxis[0] = x;
-  this->RotationAxis[1] = y;
-  this->RotationAxis[2] = z;
-  this->RotationAngle = angle;
 }
 
 // ----------------------------------------------------------------------public
