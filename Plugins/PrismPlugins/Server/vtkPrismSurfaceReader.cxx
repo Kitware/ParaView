@@ -1021,10 +1021,25 @@ int vtkPrismSurfaceReader::RequestData(
   //we use the surface bounds as we want the properly scaled dataset including log scaling
   localOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
 
+  //add on the flag to the surface, curves and contours that they
+  //have a thresholded bounds too
+  vtkDoubleArray *prismThresholdBounds = vtkDoubleArray::New();
+  prismThresholdBounds->SetName("PRISM_THRESHOLD_BOUNDS");
+  prismThresholdBounds->SetNumberOfValues(6);
+  //copy the thresholded bounds into the prismBounds array
+  this->Internal->Box->GetBounds(prismThresholdBounds->GetPointer(0));
+
   surfaceOutput->GetFieldData()->AddArray(prismBounds);
+  surfaceOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   curveOutput->GetFieldData()->AddArray(prismBounds);
+  curveOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   contourOutput->GetFieldData()->AddArray(prismBounds);
+  contourOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   prismBounds->FastDelete();
+  prismThresholdBounds->FastDelete();
 
 
   if(this->Internal->DisplayContours)

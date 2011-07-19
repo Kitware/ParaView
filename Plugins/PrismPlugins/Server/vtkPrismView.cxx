@@ -150,7 +150,7 @@ void vtkPrismView::GatherRepresentationInformation()
 
       //collect all the bounds of the thresholded world
       vtkBoundingBox tBounds;
-      tBounds.AddBounds(info->Get(vtkPrismView::PRISM_GEOMETRY_BOUNDS()));
+      tBounds.AddBounds(info->Get(vtkPrismView::PRISM_THRESHOLD_BOUNDS()));
       thresholdBounds.AddBox(tBounds);
       }
     }
