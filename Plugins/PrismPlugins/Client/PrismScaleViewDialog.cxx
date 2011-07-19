@@ -131,7 +131,10 @@ void PrismScaleViewDialog::setView(PrismView* view)
 {
   if ( view && this->View != view )
     {
-    this->View = view;
+    this->View = view;    
+    }
+  if (this->View)
+    {
     this->setupViewInfo();
     }
 }
