@@ -78,23 +78,23 @@ PrismScaleViewDialog::PrismScaleViewDialog(
 
   //connect all the radio buttons to the signal mapper
   QObject::connect(this->Internals->UseXFullBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseYFullBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseZFullBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseXThresholdBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseYThresholdBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseZThresholdBounds, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseXCustomScale, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseYCustomScale, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
   QObject::connect(this->Internals->UseZCustomScale, SIGNAL(clicked()),
-    &this->Internals->SigMap, SIGNAL(map()));
+    &this->Internals->SigMap, SLOT(map()));
 
   //setup the signal mapper text string for each button
   this->Internals->SigMap.setMapping(this->Internals->UseXFullBounds, "00");
@@ -111,9 +111,8 @@ PrismScaleViewDialog::PrismScaleViewDialog(
   this, SLOT(onModeChanged(const QString &)));
 
   //connect the button box up
-  QObject::connect(this->Internals->buttonBox, SIGNAL(accepted()),
-    this, SLOT(updateView()));
-
+  QObject::connect(this->Internals->buttonBox, SIGNAL(clicked(QAbstractButton*)),
+    this, SLOT(onButtonClicked(QAbstractButton*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -257,7 +256,24 @@ void PrismScaleViewDialog::modeChanged(const int& pos, const int& value)
 {
   this->Internals->ScalingMode[pos] = value;
 }
-
+//-----------------------------------------------------------------------------
+void PrismScaleViewDialog::onButtonClicked(QAbstractButton* button)
+  {
+  QDialogButtonBox::ButtonRole role = 
+    this->Internals->buttonBox->buttonRole(button);
+  switch(role)
+    {
+    case QDialogButtonBox::ApplyRole:
+      this->updateView();
+      break;
+    case QDialogButtonBox::AcceptRole:
+      this->updateView();
+      this->accept();
+      break;
+    case QDialogButtonBox::RejectRole:
+      this->reject();
+    }
+  }
 //-----------------------------------------------------------------------------
 void PrismScaleViewDialog::updateView()
 {

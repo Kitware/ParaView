@@ -11,6 +11,7 @@ Module:    PrismScaleViewDialog.h
 #include <QString>
 
 class PrismView;
+class QAbstractButton;
 class PrismScaleViewDialog : public QDialog
 {
   Q_OBJECT
@@ -23,12 +24,13 @@ public:
 protected slots:
   void onModeChanged(const QString& mode);
   void onCustomBoundsChanged();
-  void updateView();
+  void onButtonClicked(QAbstractButton * button);
 
 protected:
   bool hasCustomBounds() const;
   void modeChanged(const int& pos, const int& value);
   void setupViewInfo();
+  void updateView();
   
 private:
   class pqInternals;

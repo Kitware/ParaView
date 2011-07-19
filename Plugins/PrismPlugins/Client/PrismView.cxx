@@ -149,6 +149,7 @@ void PrismView::SetCustomBounds(double bounds[6])
   if (v)
     {
     vtkSMPropertyHelper(v, "CustomBounds").Set(bounds, 6);
+    v->UpdateProperty("CustomBounds");
     }
 }
 
@@ -171,5 +172,6 @@ void PrismView::SetWorldScaleMode(int mode[3])
   if (v)
     {
     vtkSMPropertyHelper(v, "WorldScaleMode").Set(mode, 3);
+    v->UpdateProperty("WorldScaleMode");
     }
 }
