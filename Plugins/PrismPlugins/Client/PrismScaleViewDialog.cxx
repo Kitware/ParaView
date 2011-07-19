@@ -193,14 +193,20 @@ void PrismScaleViewDialog::setupViewInfo( )
 
   //setup the Full Bounds labels
   const QString BoundsText = QString("%1 - %2");
-  this->Internals->UseXFullBounds->setText(BoundsText.arg(worldBounds[0],worldBounds[1]));
-  this->Internals->UseYFullBounds->setText(BoundsText.arg(worldBounds[2],worldBounds[3]));
-  this->Internals->UseZFullBounds->setText(BoundsText.arg(worldBounds[4],worldBounds[5]));
+  this->Internals->UseXFullBounds->setText(BoundsText.arg(
+    QString::number(worldBounds[0]),QString::number(worldBounds[1])));
+  this->Internals->UseYFullBounds->setText(BoundsText.arg(
+    QString::number(worldBounds[2]),QString::number(worldBounds[3])));
+  this->Internals->UseZFullBounds->setText(BoundsText.arg(
+    QString::number(worldBounds[4]),QString::number(worldBounds[5])));
 
   //setup the Threshold labels
-  this->Internals->UseXThresholdBounds->setText(BoundsText.arg(thresholdBounds[0],thresholdBounds[1]));
-  this->Internals->UseYThresholdBounds->setText(BoundsText.arg(thresholdBounds[2],thresholdBounds[3]));
-  this->Internals->UseZThresholdBounds->setText(BoundsText.arg(thresholdBounds[4],thresholdBounds[5]));
+  this->Internals->UseXThresholdBounds->setText(BoundsText.arg(
+    QString::number(thresholdBounds[0]),QString::number(thresholdBounds[1])));
+  this->Internals->UseYThresholdBounds->setText(BoundsText.arg(
+    QString::number(thresholdBounds[2]),QString::number(thresholdBounds[3])));
+  this->Internals->UseZThresholdBounds->setText(BoundsText.arg(
+    QString::number(thresholdBounds[4]),QString::number(thresholdBounds[5])));
 
   //setup the text for the custom scale line edits
   for(int i=0; i < 6; i++)
