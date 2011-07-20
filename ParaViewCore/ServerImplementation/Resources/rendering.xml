@@ -134,7 +134,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-         name="HandPose"
+         name="WandPose"
          command="SetModelTransformMatrix"
          number_of_elements="16"
          default_values="1.0 0.0 0.0 0.0
