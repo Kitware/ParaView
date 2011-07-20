@@ -66,8 +66,6 @@ pqVRPNStarter::pqVRPNStarter(QObject* p/*=0*/)
   this->Internals = new pqInternals;
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
-  this->InputDevice[0] = NULL;
-  this->InputDevice[1] = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,58 +73,18 @@ pqVRPNStarter::~pqVRPNStarter()
 {
   delete this->Internals->EventQueue;
   delete this->Internals->Handler;
-  delete this->InputDevice[0];
-  delete this->InputDevice[1];
 }
 
 //-----------------------------------------------------------------------------
 void pqVRPNStarter::onStartup()
 {
-  Q_ASSERT(this->InputDevice[0] == NULL);
-  Q_ASSERT(this->InputDevice[1] == NULL);
-
-   this->Internals->EventQueue = new vtkVRQueue(this);
-  this->Internals->ConnectionManager =
-    new vtkVRConnectionManager(this->Internals->EventQueue,this);
+  this->Internals->EventQueue = new vtkVRQueue(this);
+  this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
   this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
-
-  // for debugging, until we add support for reading styles from XML we simple
-  // create the generic style.
-  this->Internals->Handler->add(new vtkVRActiveObjectManipulationStyle(this));
-  vtkVRHeadTrackingStyle* headTracking = new vtkVRHeadTrackingStyle(this);
-  headTracking->setName("kinect.head");
-  this->Internals->Handler->add(headTracking);
-
-  this->InputDevice[0] = NULL;
-  this->InputDevice[1] = NULL;
 
   //qWarning() << "Message from pqVRPNStarter: Application Started";
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions *options = (vtkPVOptions*)pm->GetOptions();
-  if(options->GetUseVRPN())
-    {
-    // Create vrpn client to read device information
-    this->InputDevice[0]=new vtkVRPNConnection;
-    this->InputDevice[0]->SetQueue( this->Internals->EventQueue );
-    this->InputDevice[0]->SetName( "kinect" );
-    this->InputDevice[0]->SetAddress("Tracker0@192.168.1.126");
-    this->InputDevice[0]->AddTracking( "0", "head" );
-    this->InputDevice[0]->AddTracking( "13", "right-hand" );
-    // this->InputDevice[0]->Init();
-    // this->InputDevice[0]->start();
-
-    this->InputDevice[1]=new vtkVRPNConnection;
-    this->InputDevice[1]->SetQueue( this->Internals->EventQueue );
-    this->InputDevice[1]->SetName( "space-navigator" );
-    this->InputDevice[1]->SetAddress("device0@localhost");
-    this->InputDevice[1]->AddAnalog( "0", "crown" );
-    this->InputDevice[1]->AddButton( "0", "left-button" );
-    this->InputDevice[1]->AddButton( "1", "right-button" );
-    // this->InputDevice[1]->Init();
-    // this->InputDevice[1]->start();
-    }
-  this->Internals->ConnectionManager->add( this->InputDevice[0] );
-  this->Internals->ConnectionManager->add( this->InputDevice[1] );
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
 }
@@ -136,13 +94,9 @@ void pqVRPNStarter::onStartup()
 void pqVRPNStarter::onShutdown()
 {
   this->Internals->Handler->stop();
-  if (this->InputDevice[0])
-    {
-    this->InputDevice[0]->Stop();
-    }
-  if (this->InputDevice[1])
-    {
-    this->InputDevice[1]->Stop();
-    }
+  this->Internals->ConnectionManager->stop();
+  delete this->Internals->Handler;
+  delete this->Internals->ConnectionManager;
+  delete this->Internals->EventQueue;
   // qWarning() << "Message from pqVRPNStarter: Application Shutting down";
 }

@@ -55,10 +55,6 @@ public:
   // Callback for startup.
   void onStartup();
 
-
-protected:
-  vtkVRPNConnection *InputDevice[2];
-
 private:
   Q_DISABLE_COPY(pqVRPNStarter);
   class pqInternals;
