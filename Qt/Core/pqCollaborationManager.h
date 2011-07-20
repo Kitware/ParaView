@@ -86,6 +86,7 @@ signals:
   /// (just forwared from the pqServer)
   /// This allow us to not care about which server is currently used
   void triggeredMasterUser(int);
+  void triggeredMasterChanged(bool);
   void triggeredUserName(int, QString&);
   void triggeredUserListChanged();
 
@@ -108,6 +109,13 @@ public slots:
   /// can be sent to the other clients if any.
   void onInspectorSelectedTabChanged(int tabIndex);
 
+  /// updates the enabled-state for application wide widgets and actions based
+  /// whether the application is a master or not.
+  /// Widget/Actions need to set a dynamic property named PV_MUST_BE_MASTER or
+  /// PV_MUST_BE_MASTER_TO_SHOW. Only the state for widgets/actions with these
+  /// any of properties will be updated by this method.
+  void updateEnabledState();
+
 private slots:
   /// Called when a message has been sent by another client
   /// This method will trigger signals that will be used by other Qt classes
@@ -120,13 +128,6 @@ private slots:
 
   /// This will call force render on all the renderer that needs to be rendered
   void render();
-
-  /// updates the enabled-state for application wide widgets and actions based
-  /// whether the application is a master or not.
-  /// Widget/Actions need to set a dynamic property named PV_MUST_BE_MASTER or
-  /// PV_MUST_BE_MASTER_TO_SHOW. Only the state for widgets/actions with these
-  /// any of properties will be updated by this method.
-  void updateEnabledState();
 
 private:
   pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.

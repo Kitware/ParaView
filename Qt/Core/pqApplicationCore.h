@@ -291,6 +291,9 @@ signals:
   /// Fired when the filter menu state needs to be manually updated
   void forceFilterMenuRefresh();
 
+  /// Fired when master changed. true if current user is master, false otherwise.
+  void updateMasterEnableState(bool);
+
 protected slots:
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
   void onStateSaved(vtkPVXMLElement* root);

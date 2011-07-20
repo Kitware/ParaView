@@ -421,4 +421,6 @@ void pqCollaborationManager::updateEnabledState()
       actn->blockSignals(!enabled);
       }
     }
+
+  emit triggeredMasterChanged(enabled);
 }

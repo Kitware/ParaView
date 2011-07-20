@@ -61,6 +61,16 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
     {
     this->CollaborationManager = new pqCollaborationManager(this);
     this->CollaborationManager->setServer(server);
+    QObject::connect(this->CollaborationManager,
+                     SIGNAL(triggeredMasterChanged(bool)),
+                     pqApplicationCore::instance(),
+                     SIGNAL(updateMasterEnableState(bool)));
+
+    QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                      SIGNAL(serverAdded(pqServer*)),
+                      this->CollaborationManager, SLOT(updateEnabledState()),
+                      Qt::QueuedConnection);
+
     }
 }
 
@@ -69,6 +79,13 @@ void pqCollaborationBehavior::onServerRemoved(pqServer* vtkNotUsed(server))
 {
   if(this->CollaborationManager)
     {
+    QObject::disconnect( this->CollaborationManager,
+                         SIGNAL(triggeredMasterChanged(bool)),
+                         pqApplicationCore::instance(),
+                         SIGNAL(updateMasterEnableState(bool)));
+    QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
+                         SIGNAL(serverAdded(pqServer*)),
+                         this->CollaborationManager, SLOT(updateEnabledState()));
     this->CollaborationManager->deleteLater();
     this->CollaborationManager = NULL;
     }
