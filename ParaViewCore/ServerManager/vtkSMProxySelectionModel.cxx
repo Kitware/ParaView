@@ -19,6 +19,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMOutputPort.h"
 #include "vtkCollection.h"
 #include "vtkSMProxyLocator.h"
 
@@ -182,10 +184,23 @@ void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
 
   // Update the local state and push to the session
   this->State->ClearExtension(ProxySelectionModelState::proxy);
+  this->State->ClearExtension(ProxySelectionModelState::port);
   this->Selection->InitTraversal();
   while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
     {
-    this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+    if(vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
+      {
+      this->State->AddExtension( ProxySelectionModelState::proxy,
+                                 port->GetSourceProxy()->GetGlobalID());
+      this->State->AddExtension( ProxySelectionModelState::port,
+                                 port->GetPortIndex());
+      cout << "add output port in state " << port << endl;
+      }
+    else
+      {
+      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
+      }
     }
   this->PushStateToSession();
 }
@@ -227,11 +242,31 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
     {
     this->SetGlobalID(msg->global_id());
     }
-  // Compute the diff and send the proper events
-  vtkstd::set<vtkTypeUInt32> newProxyInSelection;
+
+  // Load the proxy in the state
+  vtkstd::set<vtkSMProxy*> newProxyInSelection;
   for(int i=0; i < msg->ExtensionSize(ProxySelectionModelState::proxy); i++)
     {
-    newProxyInSelection.insert(msg->GetExtension(ProxySelectionModelState::proxy, i));
+    vtkSMProxy* proxy =
+        locator->LocateProxy(msg->GetExtension(ProxySelectionModelState::proxy, i));
+    if(proxy)
+      {
+      if(msg->GetExtension(ProxySelectionModelState::port, i) != -1)
+        {
+        // We have to select an output port
+        vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+        assert("Try to select an output port of a non source proxy" && source);
+
+        proxy = source->GetOutputPort(msg->GetExtension(ProxySelectionModelState::port, i));
+        }
+
+      // Just add the proxy in the set
+      newProxyInSelection.insert(proxy);
+      }
+    else
+      {
+      vtkErrorMacro("Did not find the proxy for selection Model");
+      }
     }
 
   // Take care of the deselect first
@@ -239,25 +274,25 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   this->Selection->InitTraversal();
   while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
     {
-    if(newProxyInSelection.find(obj->GetGlobalID()) == newProxyInSelection.end())
+    if(newProxyInSelection.find(obj) == newProxyInSelection.end())
       {
       proxyToDeselect->AddItem(obj);
       }
     else
       {
-      newProxyInSelection.erase(obj->GetGlobalID());
+      newProxyInSelection.erase(obj);
       }
     }
 
   // Take care of the add-on
   vtkNew<vtkCollection> proxyToSelect;
-  for( vtkstd::set<vtkTypeUInt32>::iterator iter = newProxyInSelection.begin();
+  for( vtkstd::set<vtkSMProxy*>::iterator iter = newProxyInSelection.begin();
        iter != newProxyInSelection.end();
        iter++)
     {
-    if(vtkSMProxy* proxy = locator->LocateProxy(*iter))
+    if(*iter)
       {
-      proxyToSelect->AddItem(proxy);
+      proxyToSelect->AddItem(*iter);
       }
     }
 
