@@ -47,23 +47,6 @@ bool vtkVRHeadTrackingStyle::handleEvent(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRHeadTrackingStyle::HandleTracker( const vtkVREventData& data )
 {
-  // if ( data.data.tracker.sensor == 0 // Head from Kinect
-  //      || data.data.tracker.sensor == 13 ) // Hand from Kinect
-  //   {
-  //   std::cout  << "(Tracker" << "\n"
-  //              << "  :from  " << data.connId <<"\n"
-  //              << "  :time  " << data.timeStamp << "\n"
-  //              << "  :id    " << data.data.tracker.sensor << "\n"
-  //              << "  :pos   '( "
-  //              << data.data.tracker.pos[0] << " "
-  //              << data.data.tracker.pos[1] << " "
-  //              << data.data.tracker.pos[2] << " )"<< "\n"
-  //              << "  :quat  '( "
-  //              << data.data.tracker.quat[0] << " "
-  //              << data.data.tracker.quat[1] << " "
-  //              << data.data.tracker.quat[2] << " "
-  //              << data.data.tracker.quat[3] << " ))" << "\n" ;
-  //   }
   if ( this->Name == QString(data.name.c_str()) ) // Handle head tracking
     {
     this->SetHeadPoseProperty( data );
@@ -73,25 +56,11 @@ void vtkVRHeadTrackingStyle::HandleTracker( const vtkVREventData& data )
 // ----------------------------------------------------------------------------
 void vtkVRHeadTrackingStyle::HandleButton( const vtkVREventData& data )
 {
-  // std::cout << "(Button" << "\n"
-  //           << "  :from  " << data.connId <<"\n"
-  //           << "  :time  " << data.timeStamp << "\n"
-  //           << "  :id    " << data.data.button.button << "\n"
-  //           << "  :state " << data.data.button.state << " )" << "\n";
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRHeadTrackingStyle::HandleAnalog( const vtkVREventData& data )
 {
-  // std::cout << "(Analog" << "\n"
-  //           << "  :from  " << data.connId <<"\n"
-  //           << "  :time  " << data.timeStamp << "\n"
-  //           << "  :channel '(" ;
-  // for ( int i =0 ; i<data.data.analog.num_channel; i++ )
-  //   {
-  //   std::cout << data.data.analog.channel[i] ;
-  //   }
-  // std::cout  << " ))" << "\n" ;
 }
 
 // ----------------------------------------------------------------------------
