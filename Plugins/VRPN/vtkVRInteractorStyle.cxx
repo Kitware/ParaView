@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
-  this->Button = -1;
-  this->Sensor = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,8 +55,7 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     if (event)
       {
       this->Name = event->GetAttributeOrEmpty("name");
-      this->Button = atoi(event->GetAttributeOrEmpty("button"));
-      this->Sensor = atoi(event->GetAttributeOrEmpty("sensor"));
+      this->Type = event->GetAttributeOrEmpty("type");
       return true;
       }
     }
@@ -76,8 +73,7 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
   vtkPVXMLElement* event = vtkPVXMLElement::New();
   event->SetName("Event");
   event->AddAttribute("name", this->Name.toAscii().data());
-  event->AddAttribute("button", this->Button);
-  event->AddAttribute("sensor", static_cast<vtkIdType>(this->Sensor));
+  event->AddAttribute( "type", this->Type.toAscii().data() );
   child->AddNestedElement(event);
   event->FastDelete();
 
