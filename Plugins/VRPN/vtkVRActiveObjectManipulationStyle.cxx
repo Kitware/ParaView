@@ -51,102 +51,12 @@ void vtkVRActiveObjectManipulationStyle::HandleTracker( const vtkVREventData& da
 // ----------------------------------------------------------------------------
 void vtkVRActiveObjectManipulationStyle::HandleButton( const vtkVREventData& data )
 {
-  std::cout << "(Button" << "\n"
-            << "  :from  " << data.name <<"\n"
-            << "  :time  " << data.timeStamp << "\n"
-            << "  :id    " << data.data.button.button << "\n"
-            << "  :state " << data.data.button.state << " )" << "\n";
-
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRActiveObjectManipulationStyle::HandleAnalog( const vtkVREventData& data )
 {
-  std::cout << "(Analog" << "\n"
-            << "  :from  " << data.name <<"\n"
-            << "  :time  " << data.timeStamp << "\n"
-            << "  :channel '(" ;
-  for ( int i =0 ; i<data.data.analog.num_channel; i++ )
-    {
-    std::cout << data.data.analog.channel[i] << " ";
-    }
-  std::cout  << " ))" << "\n" ;
   HandleSpaceNavigatorAnalog(data);
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRActiveObjectManipulationStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
-                                                   vtkSMDoubleVectorProperty** outProp)
-{
-  *outProxy =0;
-  *outProp = 0;
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-
-  pqView *view = 0;
-  view = pqActiveObjects::instance().activeView();
-  if ( view )
-    {
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
-      {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "HeadPose" ) );
-      if ( prop )
-        {
-        *outProxy = proxy;
-        *outProp =  prop;
-        return true;
-        }
-      }
-    }
-  return false;
-}
-
-bool vtkVRActiveObjectManipulationStyle::SetHeadPoseProperty(const vtkVREventData &data)
-{
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( this->GetHeadPoseProxyNProperty( &proxy, &prop ) )
-    {
-    double rotMat[3][3];
-    vtkMath::QuaternionToMatrix3x3( data.data.tracker.quat, rotMat );
-
-    prop->SetElement( 0,  rotMat[0][0] );
-    prop->SetElement( 1,  rotMat[0][1] );
-    prop->SetElement( 2,  rotMat[0][2] );
-    prop->SetElement( 3,  data.data.tracker.pos [0]*-1  );
-
-    prop->SetElement( 4,  rotMat[1][0] );
-    prop->SetElement( 5,  -rotMat[1][1] );
-    prop->SetElement( 6,  rotMat[1][2] );
-    prop->SetElement( 7,  data.data.tracker.pos [1]*1  );
-
-    prop->SetElement( 8,  rotMat[2][0] );
-    prop->SetElement( 9,  rotMat[2][1] );
-    prop->SetElement( 10, rotMat[2][2] );
-    prop->SetElement( 11, data.data.tracker.pos [2]*1  );
-
-    prop->SetElement( 12, 0.0 );
-    prop->SetElement( 13, 0.0 );
-    prop->SetElement( 14, 0.0 );
-    prop->SetElement( 15, 1.0 );
-
-    return true;
-    }
-  return false;
-}
-
-bool vtkVRActiveObjectManipulationStyle::UpdateNRenderWithHeadPose()
-{
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( GetHeadPoseProxyNProperty( &proxy, &prop ) )
-    {
-    proxy->UpdateVTKObjects();
-    proxy->StillRender();
-    return true;
-    }
-  return false;
 }
 
 // -------------------------------------------------------------------------fun
@@ -181,11 +91,6 @@ vtkAnalog AugmentChannelsToRetainLargestMagnitude(const vtkAnalog t)
 void vtkVRActiveObjectManipulationStyle::HandleSpaceNavigatorAnalog( const vtkVREventData& data )
 {
   vtkAnalog at = AugmentChannelsToRetainLargestMagnitude(data.data.analog);
-  // printf("%6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n", at.channel[0],
-  //    at.channel[1], at.channel[2], at.channel[3], at.channel[4],
-  //    at.channel[5]);
-  // Apply up-down motion
-
   pqView *view = 0;
   pqDataRepresentation *rep =0;
 
@@ -287,16 +192,23 @@ void vtkVRActiveObjectManipulationStyle::HandleSpaceNavigatorAnalog( const vtkVR
       camera->Elevation(  4.0*at.channel[3]);
       camera->Azimuth(    4.0*at.channel[5]);
       camera->Roll(       4.0*at.channel[4]);
-
-      // viewProxy->GetRenderer()->ResetCameraClippingRange();
-      // viewProxy->GetRenderWindow()->Render();
       }
     }
 }
 
 bool vtkVRActiveObjectManipulationStyle::update()
 {
-    // Update the when all the events are handled
-    this->UpdateNRenderWithHeadPose();
-    return false;
+  vtkSMRenderViewProxy *proxy =0;
+  pqView *view = 0;
+  view = pqActiveObjects::instance().activeView();
+  if ( view )
+    {
+    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( proxy )
+      {
+      proxy->UpdateVTKObjects();
+      proxy->StillRender();
+      }
+    }
+  return false;
 }
