@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
+#include "pqCollaborationManager.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
@@ -53,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMInputArrayDomain.h"
+#include "vtkPVServerInformation.h"
 
 
 #include <QMap>
@@ -112,6 +115,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   pqProxyGroupMenuManager* menuManager)
 : Superclass(menuManager)
 {
+  this->IsMaster = true;
   QObject::connect(&this->Timer, SIGNAL(timeout()),
     this, SLOT(updateEnableState()));
   this->Timer.setInterval(10);
@@ -137,13 +141,24 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
     SIGNAL(forceFilterMenuRefresh()),
     &this->Timer, SLOT(start()));
   this->updateEnableState();
+
+  // Deal with master/slave enable/disable
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateMasterEnableState(bool)));
 }
 
 //-----------------------------------------------------------------------------
 void pqFiltersMenuReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool enabled = activeObjects->activeServer() != NULL;
+  pqServer* server = activeObjects->activeServer();
+  bool enabled = (server != NULL);
+
+  if(enabled && server->getServerInformation()->GetMultiClientsEnable())
+    {
+    enabled = this->IsMaster;
+    }
 
   // selected ports.
   QList<pqOutputPort*> outputPorts;
@@ -272,6 +287,12 @@ void pqFiltersMenuReaction::onDataUpdated()
 {
   QObject::disconnect(this->sender(), 0, this, 0);
   this->Timer.start(10);
+}
+//-----------------------------------------------------------------------------
+void pqFiltersMenuReaction::updateMasterEnableState(bool isMaster)
+{
+  this->IsMaster = isMaster;
+  updateEnableState();
 }
 
 //-----------------------------------------------------------------------------

@@ -66,10 +66,13 @@ protected slots:
     { pqFiltersMenuReaction::createFilter(group, name); } 
 
   void onDataUpdated();
+
+  void updateMasterEnableState(bool);
 private:
   Q_DISABLE_COPY(pqFiltersMenuReaction)
 
   QTimer Timer;
+  bool IsMaster;
 };
 
 #endif
