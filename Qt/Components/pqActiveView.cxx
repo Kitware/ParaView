@@ -118,6 +118,10 @@ void pqActiveView::onSessionCreated()
     {
     this->VTKConnect->Connect(this->SMActiveView, vtkCommand::CurrentChangedEvent,
                               this, SLOT(smCurrentChanged()));
+
+    // Make sure we at least execute it once specially
+    // if the active view has already been set.
+    smCurrentChanged();
     }
 }
 
