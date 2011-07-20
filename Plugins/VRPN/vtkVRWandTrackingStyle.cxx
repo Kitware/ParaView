@@ -28,7 +28,6 @@ vtkVRWandTrackingStyle::~vtkVRWandTrackingStyle()
 // This handler currently only get the
 bool vtkVRWandTrackingStyle::handleEvent(const vtkVREventData& data)
 {
-  std::cout<< "Event Name = " << data.name << std::endl;
   switch( data.eventType )
     {
   case BUTTON_EVENT:
@@ -47,55 +46,24 @@ bool vtkVRWandTrackingStyle::handleEvent(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRWandTrackingStyle::HandleTracker( const vtkVREventData& data )
 {
-  if ( data.data.tracker.sensor == 0 // Head from Kinect
-       || data.data.tracker.sensor == 13 ) // Hand from Kinect
+  if ( this->Name == QString(data.name.c_str()) ) // Handle wand tracking
     {
-    std::cout  << "(Tracker" << "\n"
-               << "  :from  " << data.connId <<"\n"
-               << "  :time  " << data.timeStamp << "\n"
-               << "  :id    " << data.data.tracker.sensor << "\n"
-               << "  :pos   '( "
-               << data.data.tracker.pos[0] << " "
-               << data.data.tracker.pos[1] << " "
-               << data.data.tracker.pos[2] << " )"<< "\n"
-               << "  :quat  '( "
-               << data.data.tracker.quat[0] << " "
-               << data.data.tracker.quat[1] << " "
-               << data.data.tracker.quat[2] << " "
-               << data.data.tracker.quat[3] << " ))" << "\n" ;
-    }
-  if ( data.data.tracker.sensor ==0 ) // Handle head tracking
-    {
-    this->SetHeadPoseProperty( data );
+    this->SetWandPoseProperty( data );
     }
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRWandTrackingStyle::HandleButton( const vtkVREventData& data )
 {
-  std::cout << "(Button" << "\n"
-            << "  :from  " << data.connId <<"\n"
-            << "  :time  " << data.timeStamp << "\n"
-            << "  :id    " << data.data.button.button << "\n"
-            << "  :state " << data.data.button.state << " )" << "\n";
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRWandTrackingStyle::HandleAnalog( const vtkVREventData& data )
 {
-  std::cout << "(Analog" << "\n"
-            << "  :from  " << data.connId <<"\n"
-            << "  :time  " << data.timeStamp << "\n"
-            << "  :channel '(" ;
-  for ( int i =0 ; i<data.data.analog.num_channel; i++ )
-    {
-    std::cout << data.data.analog.channel[i] ;
-    }
-  std::cout  << " ))" << "\n" ;
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRWandTrackingStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
+bool vtkVRWandTrackingStyle::GetWandPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
                                                    vtkSMDoubleVectorProperty** outProp)
 {
   *outProxy =0;
@@ -110,7 +78,7 @@ bool vtkVRWandTrackingStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** o
     proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
     if ( proxy )
       {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "HeadPose" ) );
+      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
       if ( prop )
         {
         *outProxy = proxy;
@@ -122,29 +90,26 @@ bool vtkVRWandTrackingStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** o
   return false;
 }
 
-bool vtkVRWandTrackingStyle::SetHeadPoseProperty(const vtkVREventData &data)
+bool vtkVRWandTrackingStyle::SetWandPoseProperty(const vtkVREventData &data)
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
-  if ( this->GetHeadPoseProxyNProperty( &proxy, &prop ) )
+  if ( this->GetWandPoseProxyNProperty( &proxy, &prop ) )
     {
-    double rotMat[3][3];
-    vtkMath::QuaternionToMatrix3x3( data.data.tracker.quat, rotMat );
+    prop->SetElement( 0,  data.data.tracker.matrix[0] );
+    prop->SetElement( 1,  data.data.tracker.matrix[1] );
+    prop->SetElement( 2,  data.data.tracker.matrix[2] );
+    prop->SetElement( 3,  data.data.tracker.matrix[3]  );
 
-    prop->SetElement( 0,  rotMat[0][0] );
-    prop->SetElement( 1,  rotMat[0][1] );
-    prop->SetElement( 2,  rotMat[0][2] );
-    prop->SetElement( 3,  data.data.tracker.pos [0]*-1  );
+    prop->SetElement( 4,  data.data.tracker.matrix[4] );
+    prop->SetElement( 5,  data.data.tracker.matrix[5] );
+    prop->SetElement( 6,  data.data.tracker.matrix[6] );
+    prop->SetElement( 7,  data.data.tracker.matrix[7]  );
 
-    prop->SetElement( 4,  rotMat[1][0] );
-    prop->SetElement( 5,  -rotMat[1][1] );
-    prop->SetElement( 6,  rotMat[1][2] );
-    prop->SetElement( 7,  data.data.tracker.pos [1]*1  );
-
-    prop->SetElement( 8,  rotMat[2][0] );
-    prop->SetElement( 9,  rotMat[2][1] );
-    prop->SetElement( 10, rotMat[2][2] );
-    prop->SetElement( 11, data.data.tracker.pos [2]*1  );
+    prop->SetElement( 8,  data.data.tracker.matrix[8] );
+    prop->SetElement( 9,  data.data.tracker.matrix[9] );
+    prop->SetElement( 10, data.data.tracker.matrix[10] );
+    prop->SetElement( 11, data.data.tracker.matrix[11]  );
 
     prop->SetElement( 12, 0.0 );
     prop->SetElement( 13, 0.0 );
@@ -156,11 +121,11 @@ bool vtkVRWandTrackingStyle::SetHeadPoseProperty(const vtkVREventData &data)
   return false;
 }
 
-bool vtkVRWandTrackingStyle::UpdateNRenderWithHeadPose()
+bool vtkVRWandTrackingStyle::UpdateNRenderWithWandPose()
 {
   vtkSMRenderViewProxy *proxy =0;
   vtkSMDoubleVectorProperty *prop =0;
-  if ( GetHeadPoseProxyNProperty( &proxy, &prop ) )
+  if ( GetWandPoseProxyNProperty( &proxy, &prop ) )
     {
     proxy->UpdateVTKObjects();
     proxy->StillRender();
@@ -172,6 +137,6 @@ bool vtkVRWandTrackingStyle::UpdateNRenderWithHeadPose()
 bool vtkVRWandTrackingStyle::update()
 {
     // Update the when all the events are handled
-    this->UpdateNRenderWithHeadPose();
+    this->UpdateNRenderWithWandPose();
     return false;
 }

@@ -64,11 +64,6 @@ protected:
   void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
-  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
-  bool SetHeadPoseProperty(const vtkVREventData &data );
-  bool UpdateNRenderWithHeadPose();
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 
 protected:
 };
