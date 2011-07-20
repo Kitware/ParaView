@@ -2572,7 +2572,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="MaskPoints" class="vtkMaskPoints"
+   <SourceProxy name="MaskPoints" class="vtkPMaskPoints"
     label="Mask Points">
     <Documentation
           long_help="Reduce the number of points.  This filter is often used before glyphing. Generating vertices is an option."
