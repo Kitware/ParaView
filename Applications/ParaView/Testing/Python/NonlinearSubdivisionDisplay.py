@@ -25,18 +25,18 @@ object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwi
 QtTesting.playCommand(object8, 'activate', '')
 
 # Edit the color map to capture negative values that occur in the nonlinear interpolation.
-object9 = 'pqClientMainWindow/variableToolbar/actionEditColorMap'
-QtTesting.playCommand(object9, 'activate', '')
-object10 = 'pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/UseAutoRescale'
-QtTesting.playCommand(object10, 'set_boolean', 'false')
-object11 = 'pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/RescaleButton'
-QtTesting.playCommand(object11, 'activate', '')
-object12 = 'pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/MinimumScalar'
-QtTesting.playCommand(object12, 'set_string', '-.5')
-object13 = 'pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/RescaleButton'
-QtTesting.playCommand(object13, 'activate', '')
-object14 = 'pqClientMainWindow/pqColorScaleDialog/CloseButton'
-QtTesting.playCommand(object14, 'activate', '')
+#object9 = 'pqClientMainWindow/variableToolbar/actionEditColorMap'
+#QtTesting.playCommand(object9, 'activate', '')
+#object10 = 'pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/UseAutoRescale'
+#QtTesting.playCommand(object10, 'set_boolean', 'false')
+##object11 = 'pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/RescaleButton'
+##QtTesting.playCommand(object11, 'activate', '')
+##object12 = 'pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/MinimumScalar'
+##QtTesting.playCommand(object12, 'set_string', '-.5')
+##object13 = 'pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/RescaleButton'
+##QtTesting.playCommand(object13, 'activate', '')
+#object14 = 'pqClientMainWindow/pqColorScaleDialog/CloseButton'
+#QtTesting.playCommand(object14, 'activate', '')
 
 # Change to surface with edges rendering mode
 object15 = 'pqClientMainWindow/representationToolbar/displayRepresentation/comboBox'
