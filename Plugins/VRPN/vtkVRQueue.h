@@ -34,9 +34,7 @@
 struct vtkTracker
 {
   long   sensor;		// Which sensor is reporting
-  double matrix[16]; // The matrix with transformations applied
-  double pos[3];		// Position of the sensor
-  double quat[4];		// Orientation of the
+  double matrix[16];		// The matrix with transformations applied
 };
 
 struct vtkAnalog
