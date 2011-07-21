@@ -182,7 +182,6 @@ void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform
   this->UpdateEnabled();
 }
 
-
 //----------------------------------------------------------------------------
 void vtk3DWidgetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -192,4 +191,7 @@ void vtk3DWidgetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Widget: " << this->Widget << endl;
   os << indent << "Representation: " << this->Representation << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "UpdateTransform: " << this->UpdateTransform << endl;
+  os << indent << "CustomTransform: ";
+  this->CustomTransform->Print(os);
 }
