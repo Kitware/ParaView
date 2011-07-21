@@ -58,6 +58,10 @@ public:
   // setups extract selection proxies.
   virtual void SetupSelectionProxy(int port, vtkSIProxy* extractSelection);
 
+  // Description:
+  // Disables the creation of an extents translator.
+  static void SetDisableExtentsTranslator(bool value);
+
 //BTX
 protected:
   vtkSISourceProxy();
@@ -86,6 +90,7 @@ protected:
   // Description:
   // Create the extent translator (sources with no inputs only).
   // Needs to be before "ExtractPieces" because translator propagates.
+  // Returns true if the translator was created.
   bool CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port);
 
   // Description:
@@ -114,6 +119,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool PortsCreated;
+  static bool DisableExtentsTranslator;
   //ETX
 };
 

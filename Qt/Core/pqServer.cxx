@@ -139,6 +139,14 @@ void pqServer::initialize()
   this->GlobalMapperPropertiesProxy = proxy;
   proxy->Delete();
 
+  // Create Strict Load Balancing Proxy
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  proxy = pxm->NewProxy("misc", "StrictLoadBalancing");
+  vtkSMPropertyHelper(proxy, "DisableExtentsTranslator").Set(
+    settings->value("strictLoadBalancing", false).toBool());
+  proxy->UpdateVTKObjects();
+  proxy->Delete();
+
   this->updateGlobalMapperProperties();
 }
 
