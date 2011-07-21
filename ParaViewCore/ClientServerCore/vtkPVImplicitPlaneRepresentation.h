@@ -41,6 +41,9 @@ public:
   double* GetTransformedNormal();
   
   void PlaceTransformedWidget(double bounds[6]);
+  void UpdateTransformLocation();
+
+  void Reset();
   
 //BTX
 protected:
@@ -50,12 +53,9 @@ protected:
   vtkTransform* Transform;
   vtkTransform* InverseTransform;
 
-  bool StoreOriginalInfo;
-  double OriginalBounds[6];
-  double OriginalOrigin[3];
+  class vtkPVInternal;
+  vtkPVInternal *Internal;
 
-  double ScaledOrigin[3];
-  double ScaledNormal[3];
 private:
   vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&); // Not implemented
   void operator=(const vtkPVImplicitPlaneRepresentation&); // Not implemented

@@ -142,6 +142,7 @@
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
           <Property name="PlaceFactor" />
+          <Property name="Reset" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1086,6 +1087,11 @@
          animateable="1">
          <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+    <Property
+      name="Reset"
+      command="Reset">
+    </Property>
 
       <DoubleVectorProperty name="Origin"
          command="SetTransformedOrigin"
