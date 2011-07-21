@@ -81,7 +81,7 @@ void vtkPrismView::RemoveRepresentation(vtkDataRepresentation* rep)
 }
 
 //----------------------------------------------------------------------------
-void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
+bool vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
   const vtkBoundingBox& thresholdBounds)
 {
   //update the world and threshold ivars
@@ -123,7 +123,9 @@ void vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
       scale[2] != matrix[10])
       {
       this->Transform->SetMatrix(matrix);
-      }    
+      return true;
+      }
+  return false;
 }
 //----------------------------------------------------------------------------
 void vtkPrismView::GatherRepresentationInformation()
@@ -154,7 +156,7 @@ void vtkPrismView::GatherRepresentationInformation()
       thresholdBounds.AddBox(tBounds);
       }
     }
-  this->UpdateWorldScale(worldBounds, thresholdBounds);
+  bool updatedWorldScale = this->UpdateWorldScale(worldBounds, thresholdBounds);
 
   //now set the scale on each item
   double *scale = this->Transform->GetScale();
@@ -190,6 +192,17 @@ void vtkPrismView::GatherRepresentationInformation()
     if (selection)
       {
       selection->SetScale(scale[0],scale[1],scale[2]);
+      continue;
+      }
+
+    vtk3DWidgetRepresentation *widget = 
+      vtk3DWidgetRepresentation::SafeDownCast(repr);
+    if ( widget && updatedWorldScale )
+      {
+      //if the world scale has changed while the widget is active, remove and 
+      //re add the transform to get the widget to be transformed properly
+      widget->SetCustomWidgetTransform(NULL);
+      widget->SetCustomWidgetTransform(this->Transform);
       }
     }
 }

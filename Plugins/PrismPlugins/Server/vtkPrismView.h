@@ -93,7 +93,7 @@ protected:
   vtkPrismView();
   ~vtkPrismView();
 
-  void UpdateWorldScale(const vtkBoundingBox& worldBounds,
+  bool UpdateWorldScale(const vtkBoundingBox& worldBounds,
     const vtkBoundingBox& thresholdBounds);
 
   vtkTransform *Transform;
