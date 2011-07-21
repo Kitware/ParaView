@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqUndoStack.h"
 #include "pqObjectBuilder.h"
+#include "pqServer.h"
 
 #include "pqCollaborationManager.h"
 #include "vtkSMCollaborationManager.h"
@@ -55,18 +56,14 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(
   QObject::connect(menuManager, SIGNAL(menuPopulated()),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
-
-  // Deal with master/slave enable/disable
-  QObject::connect(pqApplicationCore::instance(),
-                   SIGNAL(updateMasterEnableState(bool)),
-                   this, SLOT(updateEnableState(bool)));
 }
 
 //-----------------------------------------------------------------------------
 void pqSourcesMenuReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  this->updateEnableState(activeObjects->activeServer() != NULL);
+  this->updateEnableState( activeObjects->activeServer() != NULL &&
+                           activeObjects->activeServer()->isMaster());
 }
 //-----------------------------------------------------------------------------
 void pqSourcesMenuReaction::updateEnableState(bool enabled)

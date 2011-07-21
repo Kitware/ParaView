@@ -115,7 +115,6 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   pqProxyGroupMenuManager* menuManager)
 : Superclass(menuManager)
 {
-  this->IsMaster = true;
   QObject::connect(&this->Timer, SIGNAL(timeout()),
     this, SLOT(updateEnableState()));
   this->Timer.setInterval(10);
@@ -141,11 +140,6 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
     SIGNAL(forceFilterMenuRefresh()),
     &this->Timer, SLOT(start()));
   this->updateEnableState();
-
-  // Deal with master/slave enable/disable
-  QObject::connect(pqApplicationCore::instance(),
-                   SIGNAL(updateMasterEnableState(bool)),
-                   this, SLOT(updateMasterEnableState(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -154,11 +148,7 @@ void pqFiltersMenuReaction::updateEnableState()
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   pqServer* server = activeObjects->activeServer();
   bool enabled = (server != NULL);
-
-  if(enabled && server->getServerInformation()->GetMultiClientsEnable())
-    {
-    enabled = this->IsMaster;
-    }
+  enabled = enabled ? server->isMaster() : enabled;
 
   // selected ports.
   QList<pqOutputPort*> outputPorts;
@@ -287,12 +277,6 @@ void pqFiltersMenuReaction::onDataUpdated()
 {
   QObject::disconnect(this->sender(), 0, this, 0);
   this->Timer.start(10);
-}
-//-----------------------------------------------------------------------------
-void pqFiltersMenuReaction::updateMasterEnableState(bool isMaster)
-{
-  this->IsMaster = isMaster;
-  updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
