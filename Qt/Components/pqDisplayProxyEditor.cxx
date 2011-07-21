@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
@@ -589,6 +590,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   this->DisableSlots = 0;
+  //QTimer::singleShot(0, this, SLOT(updateEnableState()));
+
 
   //
   if(reprProxy->GetProperty("SampleDistance"))
@@ -836,9 +839,13 @@ void pqDisplayProxyEditor::updateEnableState()
         return;
         }
       }
+    if ( arrayInfo )
+      {
+      this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+      }
     }
 
-  this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+  
   this->Internal->ColorMapScalars->setEnabled(false);
 }
 

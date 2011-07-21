@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMap>
 #include <QtDebug>
+#include <QTimer>
 #include <QTreeWidget>
 #include <QVariant>
 #include <QVector>

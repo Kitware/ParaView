@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QComboBox>
+#include <QTimer>
 
 // ParaView includes
 #include "pqSMAdaptor.h"
@@ -173,7 +174,7 @@ void pqFieldSelectionAdaptor::domainChanged()
     }
 
   this->MarkedForUpdate = true;
-  this->internalDomainChanged();
+  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
   
 void pqFieldSelectionAdaptor::blockDomainModified(vtkObject*, unsigned long, 

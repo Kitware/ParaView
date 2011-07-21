@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QComboBox>
+#include <QTimer>
 
 // VTK includes
 #include <vtkSmartPointer.h>
