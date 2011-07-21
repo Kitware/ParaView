@@ -244,6 +244,20 @@ bool pqServer::isRemote() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqServer::isMaster() const
+{
+  if(this->getServerInformation()->GetMultiClientsEnable())
+    {
+    vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
+    if(currentSession)
+      {
+      return currentSession->GetCollaborationManager()->IsMaster();
+      }
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 bool pqServer::isRenderServerSeparate()
 {
   if (this->isRemote())

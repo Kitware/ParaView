@@ -84,6 +84,10 @@ public:
   /// server or a built-in server.
   bool isRemote() const;
 
+  /// Returns true if the client is currently master. For non-collaborative
+  /// session, it always return true.
+  bool isMaster() const;
+
   /// Returns true is this connection has a separate render-server and
   /// data-server.
   bool isRenderServerSeparate();
