@@ -9,6 +9,7 @@ set(SOURCES
   vtkPrismRepresentation.cxx
   vtkPrismSESAMEReader.cxx
   vtkPrismSurfaceReader.cxx
+  vtkPrismTableToPolyData.cxx
   vtkPrismView.cxx
   vtkSESAMEConversionFilter.cxx
   )
