@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqManageLinksReaction_h 
 #define __pqManageLinksReaction_h
 
-#include "pqReaction.h"
+#include "pqMasterOnlyReaction.h"
 
 /// @ingroup Reactions
 /// pqManageLinksReaction is the reaction to pop-up the links manager dialog.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageLinksReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManageLinksReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 public:
   pqManageLinksReaction(QAction* action): Superclass(action) { }
 

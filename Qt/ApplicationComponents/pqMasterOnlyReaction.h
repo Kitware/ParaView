@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTestingReaction.h
+   Module:    pqMasterOnlyReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,66 +29,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTestingReaction_h 
-#define __pqTestingReaction_h
+#ifndef __pqMasterOnlyReaction_h
+#define __pqMasterOnlyReaction_h
 
-#include "pqMasterOnlyReaction.h"
+#include "pqReaction.h"
+#include <QAction>
+#include "pqApplicationComponentsExport.h"
+
+/// @defgroup Reactions ParaView Reactions
+/// ParaView client relies of a collection of reactions that autonomous entities
+/// that use pqApplicationCore and other core components to get their work done which
+/// keeping track for their own enabled state without any external input. To
+/// use, simple create this reaction and assign it to a menu
+/// and add it to menus/toolbars whatever.
 
 /// @ingroup Reactions
-/// pqTestingReaction can be used to recording or playing back tests.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTestingReaction : public pqMasterOnlyReaction
+/// This is a superclass just to make it easier to collect all such reactions.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqMasterOnlyReaction : public pqReaction
 {
   Q_OBJECT
-  typedef pqMasterOnlyReaction Superclass;
+  typedef pqReaction Superclass;
 public:
-  enum Mode
-    {
-    RECORD,
-    PLAYBACK,
-    LOCK_VIEW_SIZE,
-    LOCK_VIEW_SIZE_CUSTOM
-    };
+  pqMasterOnlyReaction(QAction* parentObject);
+  pqMasterOnlyReaction(QAction* parentObject, Qt::ConnectionType type);
 
-  pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type = Qt::AutoConnection);
+protected slots:
+  virtual void updateEnableState();
 
-  /// Records test.
-  static void recordTest(const QString& filename);
-  static void recordTest();
-
-  /// Plays test.
-  static void playTest(const QString& filename);
-  static void playTest();
-
-  /// Locks the view size for testing.
-  static void lockViewSize(bool);
-
-  /// Locks the view size with a custom resolution.
-  static void lockViewSizeCustom();
-
-protected:
-  virtual void onTriggered()
-    {
-    switch (this->ReactionMode)
-      {
-    case RECORD:
-      pqTestingReaction::recordTest();
-      break;
-    case PLAYBACK:
-      pqTestingReaction::playTest();
-      break;
-    case LOCK_VIEW_SIZE:
-      pqTestingReaction::lockViewSize(this->parentAction()->isChecked());
-      break;
-    case LOCK_VIEW_SIZE_CUSTOM:
-      pqTestingReaction::lockViewSizeCustom();
-      break;
-      }
-    }
 private:
-  Q_DISABLE_COPY(pqTestingReaction)
-  Mode ReactionMode;
+  Q_DISABLE_COPY(pqMasterOnlyReaction)
 };
 
 #endif
-
-

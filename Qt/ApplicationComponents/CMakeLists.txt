@@ -59,6 +59,7 @@ SET (MOC_HEADERS
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
+  pqMasterOnlyReaction.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
@@ -199,6 +200,8 @@ SET (SOURCE_FILES
   pqManageLinksReaction.h
   pqManagePluginsReaction.cxx
   pqManagePluginsReaction.h
+  pqMasterOnlyReaction.h
+  pqMasterOnlyReaction.cxx
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx

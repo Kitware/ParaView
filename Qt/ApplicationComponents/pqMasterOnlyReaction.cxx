@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqManageCustomFiltersReaction.h
+   Module:    pqMasterOnlyReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqManageCustomFiltersReaction_h 
-#define __pqManageCustomFiltersReaction_h
-
 #include "pqMasterOnlyReaction.h"
 
-class pqCustomFilterManagerModel;
-
-/// @ingroup Reactions
-/// Reaction for showing the custom-filter manager dialog.
-/// For now, this also manages loading and saving of custom filters in the
-/// application settings. We may want to move that code to a separate behavior.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMasterOnlyReaction
+//-----------------------------------------------------------------------------
+pqMasterOnlyReaction::pqMasterOnlyReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef pqMasterOnlyReaction Superclass;
-public:
-  pqManageCustomFiltersReaction(QAction* parentObject);
+}
+//-----------------------------------------------------------------------------
+pqMasterOnlyReaction::pqMasterOnlyReaction(QAction* parentObject, Qt::ConnectionType type)
+  : Superclass(parentObject, type)
+{
+}
 
-  /// Pops up the manage custom filters dialog.
-  void manageCustomFilters();
-
-protected:
-  virtual void onTriggered()
-    { this->manageCustomFilters(); }
-
-private:
-  Q_DISABLE_COPY(pqManageCustomFiltersReaction)
-  pqCustomFilterManagerModel* Model;
-};
-
-#endif
-
-
+//-----------------------------------------------------------------------------
+void pqMasterOnlyReaction::updateEnableState()
+  {
+  if(this->parentAction())
+    {
+    this->parentAction()->setEnabled(this->IsMaster);
+    }
+  }
