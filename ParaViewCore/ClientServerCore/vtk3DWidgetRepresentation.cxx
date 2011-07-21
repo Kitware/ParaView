@@ -35,6 +35,7 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->Representation = 0;
   this->UseNonCompositedRenderer = false;
   this->Enabled = false;
+  this->UpdateTransform = false;
 
   this->CustomTransform = vtkTransform::New();
   this->CustomTransform->PostMultiply();
@@ -117,6 +118,11 @@ void vtk3DWidgetRepresentation::UpdateEnabled()
         if (plane)
           {
           plane->SetTransform(this->CustomTransform);
+          if ( this->UpdateTransform )
+            {
+            this->UpdateTransform = false;
+            plane->UpdateTransformLocation();
+            }
           }
       }
 
@@ -164,6 +170,10 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform)
 {
+  if ( this->CustomTransform->GetInput () != transform && transform )
+    {
+    this->UpdateTransform = true;
+    }
   this->CustomTransform->SetInput(transform);
   if (!transform)
     {

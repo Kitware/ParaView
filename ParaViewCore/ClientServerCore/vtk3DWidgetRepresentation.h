@@ -85,6 +85,7 @@ protected:
 
   bool Enabled;
   bool UseNonCompositedRenderer;
+  bool UpdateTransform;
   vtkAbstractWidget* Widget;
   vtkWidgetRepresentation* Representation;
   vtkWeakPointer<vtkPVRenderView> View;
