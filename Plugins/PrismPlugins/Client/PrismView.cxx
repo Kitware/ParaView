@@ -87,8 +87,8 @@ PrismView::PrismView(
   const QString& name,
   vtkSMViewProxy* viewProxy,
   pqServer* server,
-  QObject* parent)
-  : pqRenderView(viewType, group, name, viewProxy, server, parent)
+  QObject* qparent)
+  : pqRenderView(viewType, group, name, viewProxy, server, qparent)
 {
 }
   PrismView::PrismView(
@@ -96,8 +96,8 @@ PrismView::PrismView(
                 const QString& name,
                 vtkSMViewProxy* viewProxy,
                 pqServer* server,
-                QObject* parent)
-  : pqRenderView(group, name, viewProxy, server, parent)
+                QObject* qparent)
+  : pqRenderView(group, name, viewProxy, server, qparent)
 {
 }
 
