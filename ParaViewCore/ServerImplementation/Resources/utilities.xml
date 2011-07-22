@@ -2020,6 +2020,18 @@
 
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
+
+    <Proxy name="StrictLoadBalancing" class="vtkSISourceProxy"
+      processes="client|dataserver|renderserver">
+      <IntVectorProperty
+        name="DisableExtentsTranslator"
+        command="SetDisableExtentsTranslator"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of StrictLoadBalancing -->
+    </Proxy>
     
     <PluginLoaderProxy name="PluginLoader"
                        class="vtkPVPluginLoader"
