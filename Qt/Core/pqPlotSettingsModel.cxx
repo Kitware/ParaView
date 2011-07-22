@@ -90,6 +90,11 @@ void pqPlotSettingsModel::setRepresentation(pqDataRepresentation* rep)
   this->Implementation->RepresentationProxy =
     vtkSMChartRepresentationProxy::SafeDownCast(rep->getProxy());
   this->Implementation->Representation = rep;
+  if (rep)
+    {
+    QObject::connect(rep, SIGNAL(dataUpdated()),
+      this, SLOT(reload()));
+    }
 }
 
 pqDataRepresentation* pqPlotSettingsModel::representation() const
@@ -229,6 +234,10 @@ Qt::ItemFlags pqPlotSettingsModel::flags(const QModelIndex &idx) const
 //-----------------------------------------------------------------------------
 void pqPlotSettingsModel::reload()
 {
+  if (this->Implementation->RepresentationProxy)
+    {
+    this->Implementation->RepresentationProxy->UpdatePropertyInformation();
+    }
   this->reset();
   this->updateCheckState(0, Qt::Horizontal);
 }
