@@ -28,7 +28,7 @@
 namespace vtkPrismCommon
 {
 
-  static void reverseLog10Scale(double point[3], bool scalingEnabled[3])
+  inline void reverseLog10Scale(double point[3], bool scalingEnabled[3])
     {
     //scale the point by the provided power value. 
     //remember the point is already log scaled
@@ -37,7 +37,7 @@ namespace vtkPrismCommon
     point[2] = scalingEnabled[2] ? point[2] : pow(10.0,point[2]);
     }
   
-  static void logScale(double point[3], bool scalingEnabled[3])
+  inline void logScale(double point[3], bool scalingEnabled[3])
     {
       //if scaling is not enabled use normal value,
       //if value is positive use log scaling,
@@ -51,7 +51,7 @@ namespace vtkPrismCommon
     }
   
   //Will scale the point as needed in place
-  static void scalePoint(double point[3], bool scalingEnabled[3], const int &tableId )
+  inline void scalePoint(double point[3], bool scalingEnabled[3], const int &tableId )
     {
     switch(tableId)
       {
@@ -77,7 +77,7 @@ namespace vtkPrismCommon
       }
     }
 
- static void scaleThresholdBounds(bool scalingEnabled[3], const int &tableId,
+ inline void scaleThresholdBounds(bool scalingEnabled[3], const int &tableId,
    double xThreshold[2], double yThreshold[2], double thresholdBounds[6])
    {
    //make two fake point that we scale
