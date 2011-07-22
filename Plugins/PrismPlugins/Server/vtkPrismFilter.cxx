@@ -534,9 +534,6 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
 
   }
 
-  vtkIdType pointId;
-  vtkIdType numberPts = newPoints->GetNumberOfPoints();
-
   polydata->SetPoints( newPoints );
   newPoints->Delete();
   polydata->Squeeze();

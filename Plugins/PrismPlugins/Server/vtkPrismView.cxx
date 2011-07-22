@@ -162,9 +162,6 @@ void vtkPrismView::GatherRepresentationInformation()
   double *scale = this->Transform->GetScale();
   for (int cc=0; cc < num_reprs; cc++)
     {
-    vtkInformation* info =
-      this->ReplyInformationVector->GetInformationObject(cc);
-
     vtkDataRepresentation *repr = this->GetRepresentation(cc);
     vtkCompositeRepresentation *comp =
       vtkCompositeRepresentation::SafeDownCast(repr);
