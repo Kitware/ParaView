@@ -488,7 +488,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
     in.close();
   
     
-    vtkSmartPointer<vtkXMLDataElement> rootElement =vtkXMLUtilities::ReadElementFromFile(fileName.toAscii().constData());
+    vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromFile(fileName.toAscii().constData());
     if(!rootElement)
         return false;
     if(strcmp(rootElement->GetName(),"PRISM_Conversions"))
@@ -506,7 +506,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
 
    for(int i=0;i<rootElement->GetNumberOfNestedElements();i++)
    {
-       vtkSmartPointer<vtkXMLDataElement> tableElement = rootElement->GetNestedElement(i);
+       vtkXMLDataElement* tableElement = rootElement->GetNestedElement(i);
        QString NameString= tableElement->GetName();
 
        if(NameString=="Table")
@@ -520,7 +520,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
 
            for(int v=0;v<tableElement->GetNumberOfNestedElements();v++)
            {
-               vtkSmartPointer<vtkXMLDataElement> variableElement = tableElement->GetNestedElement(v);
+               vtkXMLDataElement* variableElement = tableElement->GetNestedElement(v);
                vtkstd::string variableString= variableElement->GetName();
                if(variableString=="Variable")
                {
@@ -556,7 +556,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
     }
 
 
-
+   rootElement->Delete();
     return true;
 }
 

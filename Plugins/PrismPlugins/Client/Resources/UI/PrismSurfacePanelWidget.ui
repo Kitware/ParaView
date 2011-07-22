@@ -49,47 +49,19 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="ColdCurve">
-     <property name="text">
-      <string>Show Table 306 Cold Curve</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="VaporizationCurve">
-     <property name="text">
-      <string>Show Table 401 Vaporization Curve</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="SolidMeltCurve">
-     <property name="text">
-      <string>Show Table 411 Solid Melt Curve</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="LiquidMeltCurve">
-     <property name="text">
-      <string>Show Table 412 Liquid Melt Curve</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>X Axis</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Variable</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="QComboBox" name="XAxisVarName">
         <property name="minimumSize">
          <size>
@@ -99,7 +71,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="1" column="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -112,32 +84,32 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QCheckBox" name="XLogScaling">
-        <property name="text">
-         <string> Use Log Scaling</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Lower Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="pqDoubleRangeWidget" name="ThresholdXBetweenLower" native="true"/>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Upper Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="pqDoubleRangeWidget" name="ThresholdXBetweenUpper" native="true"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="XLogScaling">
+        <property name="text">
+         <string> Use Log Scaling</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -148,7 +120,7 @@
       <string>Y Axis</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="2">
+      <item row="1" column="2">
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -161,14 +133,14 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Variable</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="QComboBox" name="YAxisVarName">
         <property name="minimumSize">
          <size>
@@ -178,32 +150,32 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QCheckBox" name="YLogScaling">
-        <property name="text">
-         <string>Use Log Scaling</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
          <string>Lower Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="pqDoubleRangeWidget" name="ThresholdYBetweenLower" native="true"/>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Upper Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="pqDoubleRangeWidget" name="ThresholdYBetweenUpper" native="true"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="YLogScaling">
+        <property name="text">
+         <string>Use Log Scaling</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -217,14 +189,14 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Variable</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item row="1" column="1">
        <widget class="QComboBox" name="ZAxisVarName">
         <property name="minimumSize">
          <size>
@@ -234,7 +206,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="1" column="2">
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -247,27 +219,55 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" colspan="3">
+      <item row="0" column="0">
        <widget class="QCheckBox" name="ZLogScaling">
         <property name="text">
          <string>Use Log Scaling</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Curve Tables</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="ColdCurve">
+        <property name="text">
+         <string>Show Table 306 Cold Curve</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="VaporizationCurve">
+        <property name="text">
+         <string>Show Table 401 Vaporization Curve</string>
         </property>
-       </spacer>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="SolidMeltCurve">
+        <property name="text">
+         <string>Show Table 411 Solid Melt Curve</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="LiquidMeltCurve">
+        <property name="text">
+         <string>Show Table 412 Liquid Melt Curve</string>
+        </property>
+       </widget>
       </item>
      </layout>
+     <zorder>LiquidMeltCurve</zorder>
+     <zorder>SolidMeltCurve</zorder>
+     <zorder>VaporizationCurve</zorder>
+     <zorder>ColdCurve</zorder>
     </widget>
    </item>
    <item>

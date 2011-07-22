@@ -142,6 +142,7 @@
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
           <Property name="PlaceFactor" />
+          <Property name="Reset" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1087,8 +1088,13 @@
          <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+    <Property
+      name="Reset"
+      command="Reset">
+    </Property>
+
       <DoubleVectorProperty name="Origin"
-         command="SetOrigin"
+         command="SetTransformedOrigin"
          number_of_elements="3"
          information_property="OriginInfo"
          default_values="0 0 0">
@@ -1096,13 +1102,13 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="OriginInfo"
-         command="GetOrigin"
+         command="GetTransformedOrigin"
          information_only="1">
          <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Normal"
-         command="SetNormal"
+         command="SetTransformedNormal"
          number_of_elements="3"
          information_property="NormalInfo"
          default_values="1 0 0">
@@ -1110,14 +1116,14 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="NormalInfo"
-         command="GetNormal"
+         command="GetTransformedNormal"
          information_only="1">
          <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="PlaceWidget"
          is_internal="1"
-         command="PlaceWidget"
+         command="PlaceTransformedWidget"
          number_of_elements="6"
          argument_is_array="1"
          default_values="none">
