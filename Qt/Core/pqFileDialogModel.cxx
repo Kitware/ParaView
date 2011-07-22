@@ -749,12 +749,7 @@ QChar pqFileDialogModel::separator() const
   return this->Implementation->Separator;
 }
 
-int pqFileDialogModel::columnCount(const QModelIndex& /*idx*/) const
-{
-  return 1;
-}
-
-QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
+int pqFileDialogModel::columnCount(const QModelIndex& idx) const
 {
   const pqFileDialogModelFileInfo* file =
     this->Implementation->infoForIndex(idx);
@@ -762,12 +757,53 @@ QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
   if(!file)
     {
     // should never get here anyway
+    return 1;
+    }
+
+  return file->group().size() + 1;
+}
+
+QVariant pqFileDialogModel::data(const QModelIndex &idx, int role) const
+{
+
+  const pqFileDialogModelFileInfo *file;
+
+  if(idx.column() == 0)
+    {
+    file = this->Implementation->infoForIndex(idx);
+    }
+  else
+    {
+    file = this->Implementation->infoForIndex(idx.parent());
+    }
+
+  if(!file)
+    {
+    // should never get here anyway
     return QVariant();
     }
 
-  if((role == Qt::DisplayRole || role == Qt::EditRole) && idx.column() == 0)
+  if(role == Qt::DisplayRole || role == Qt::EditRole)
     {
-    return file->label();
+    if (idx.column() == 0)
+      {
+      return file->label();
+      }
+    else if (idx.column() <= file->group().size())
+      {
+      return file->group().at(idx.column()-1).label();
+      }
+    }
+  else if(role == Qt::UserRole)
+    {
+    if (idx.column() == 0)
+      {
+      return file->filePath();
+      }
+    else if (idx.column() <= file->group().size())
+      {
+      return file->group().at(idx.column()-1).filePath();
+      }
     }
   else if(role == Qt::DecorationRole && idx.column() == 0)
     {
