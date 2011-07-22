@@ -60,6 +60,11 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
+  // Description:
+  // Overridden to ensure that in multi-client configurations, same set of
+  // representations are "dirty" on all processes to avoid race conditions.
+  virtual void Update();
+
 //BTX
 protected:
   vtkPVContextView();
