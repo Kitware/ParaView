@@ -60,10 +60,6 @@ void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
     {
     pxm->LoadState(msg, locator);
     }
-
-//  // Make sure we cleared the cache of the locator as we are done
-//  // registering the proxies
-//  locator->Clear();
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()
