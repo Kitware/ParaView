@@ -82,6 +82,7 @@
   <Proxy group="filters" name="CellDerivatives"/>
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
+  <Proxy group="filters" name="CleanUnstructuredGridCells" />
   <Proxy group="filters" name="Clip" />
   <Proxy group="filters" name="ClipClosedSurface" />
   <Proxy group="filters" name="Contour" />

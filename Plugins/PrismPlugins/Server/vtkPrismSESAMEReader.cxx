@@ -37,6 +37,7 @@ public:
   vtkstd::vector<long> TableLocations;
   vtkIdType NumberTableVariables;
   vtkIdType TableId;
+  bool ReadTable;
   vtkstd::vector<vtkstd::string> TableArrays;
   vtkstd::vector<int> TableArrayStatus;
   vtkIntArray* TableIdsArray;
@@ -172,6 +173,7 @@ public:
     {
     this->TableIds.clear();
     this->TableId = -1;
+    this->ReadTable = true;
     this->TableIdsArray->Initialize();
     this->ClearArrays();
     }
@@ -186,6 +188,7 @@ public:
     {
     this->File = NULL;
     this->TableId = -1;
+    this->ReadTable = true;
     this->TableIdsArray = vtkIntArray::New();
     this->RectGridGeometry =  vtkSmartPointer<vtkRectilinearGridGeometryFilter>::New();
 
@@ -492,6 +495,7 @@ void vtkPrismSESAMEReader::SetTable(int tableId)
     if(TableIndex(tableId) != -1)
       {
       this->Internal->TableId = tableId;
+      this->Internal->ReadTable = true;
 
       // clean out info about the previous table
       this->Internal->ClearArrays();
@@ -599,6 +603,12 @@ void vtkPrismSESAMEReader::ExecuteInformation()
     this->Internal->TableId=this->Internal->TableIds.at(0);
 
   }
+
+  if (!this->Internal->ReadTable)
+    {
+    return;
+    }
+  this->Internal->ReadTable = false;
 
   if(this->Internal->TableId ==401 && this->Internal->TableArrays.empty())
   {
@@ -884,7 +894,6 @@ else if((this->Internal->TableId == 306 ||
       }
     }
   }
-
 
 }
 

@@ -830,7 +830,6 @@ int vtkPrismSurfaceReader::RequestData(
   vtkPointSet *input = this->Internal->ConversionFilter->GetOutput();
 
   vtkPoints *inPts;
-  vtkPointData *pd;
 
   vtkIdType ptId, numPts;
 
@@ -839,7 +838,6 @@ int vtkPrismSurfaceReader::RequestData(
   localOutput->ShallowCopy(input);
 
   inPts = input->GetPoints();
-  pd = input->GetPointData();
 
   numPts = inPts->GetNumberOfPoints();
 
@@ -933,57 +931,12 @@ int vtkPrismSurfaceReader::RequestData(
     bounds[5]=10;
   }
 
-  if(this->GetXLogScaling())
-  {
-    if(this->XThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[0]=log(this->XThresholdBetween[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[0]=0.0;
-    }
-    if(this->XThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[1]=log(this->XThresholdBetween[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[1]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[0]=this->XThresholdBetween[0];
-    this->ActualThresholdBounds[1]=this->XThresholdBetween[1];
-  }
-  if(this->GetYLogScaling())
-  {
-    if(this->YThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[2]=log(this->YThresholdBetween[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[2]=0.0;
-    }
-    if(this->YThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[3]=log(this->YThresholdBetween[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[3]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[2]=this->YThresholdBetween[0];
-    this->ActualThresholdBounds[3]=this->YThresholdBetween[1];
-  }
+  //scale the threshold numbers
+  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,tID,
+    this->XThresholdBetween, this->YThresholdBetween,
+    this->ActualThresholdBounds);
   this->ActualThresholdBounds[4]=bounds[4];
   this->ActualThresholdBounds[5]=bounds[5];
-
 
   this->Internal->ExtractGeometry->SetInput(localOutput);
   this->Internal->Box->SetBounds(this->ActualThresholdBounds);
@@ -1066,10 +1019,25 @@ int vtkPrismSurfaceReader::RequestData(
   //we use the surface bounds as we want the properly scaled dataset including log scaling
   localOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
 
+  //add on the flag to the surface, curves and contours that they
+  //have a thresholded bounds too
+  vtkDoubleArray *prismThresholdBounds = vtkDoubleArray::New();
+  prismThresholdBounds->SetName("PRISM_THRESHOLD_BOUNDS");
+  prismThresholdBounds->SetNumberOfValues(6);
+  //copy the thresholded bounds into the prismBounds array
+  this->Internal->Box->GetBounds(prismThresholdBounds->GetPointer(0));
+
   surfaceOutput->GetFieldData()->AddArray(prismBounds);
+  surfaceOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   curveOutput->GetFieldData()->AddArray(prismBounds);
+  curveOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   contourOutput->GetFieldData()->AddArray(prismBounds);
+  contourOutput->GetFieldData()->AddArray(prismThresholdBounds);
+
   prismBounds->FastDelete();
+  prismThresholdBounds->FastDelete();
 
 
   if(this->Internal->DisplayContours)
@@ -1258,7 +1226,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
       for(int v=0;v<2;v++)
       {
@@ -1266,7 +1233,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         localOutput->ShallowCopy(input);
 
         inPts = input->GetPoints();
-        pd = input->GetPointData();
 
         numPts = inPts->GetNumberOfPoints();
 
@@ -1418,14 +1384,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 
@@ -1578,14 +1542,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 
@@ -1724,14 +1686,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 

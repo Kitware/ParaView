@@ -47,7 +47,7 @@ bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInforma
   //Only those with the key are valid items to be used to determine
   //the prism world bound size and resulting scale in vtkPrismView.
   vtkDataObject* input = this->GeometryFilter->GetOutputDataObject(0);
-  if (!input->GetFieldData()->HasArray("PRISM_GEOMETRY_BOUNDS") )
+  if (!input->GetFieldData()->HasArray("PRISM_GEOMETRY_BOUNDS"))
     {
     //object doesn't have the key, no need to do anything else
     return true;
@@ -59,6 +59,19 @@ bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInforma
   if (vtkMath::AreBoundsInitialized(bounds))
     {
     outInfo->Set(vtkPrismView::PRISM_GEOMETRY_BOUNDS(), bounds, 6);
+    }
+  
+  b = vtkDoubleArray::SafeDownCast(
+      input->GetFieldData()->GetArray("PRISM_THRESHOLD_BOUNDS"));
+  if ( !b )
+    {
+    b = vtkDoubleArray::SafeDownCast(
+      input->GetFieldData()->GetArray("PRISM_GEOMETRY_BOUNDS"));
+    }
+  bounds = b->GetPointer(0);
+  if (vtkMath::AreBoundsInitialized(bounds))
+    {
+    outInfo->Set(vtkPrismView::PRISM_THRESHOLD_BOUNDS(), bounds, 6);
     }
   return true;
 }

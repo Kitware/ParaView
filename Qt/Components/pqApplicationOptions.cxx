@@ -126,6 +126,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->AutoMPI,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->StrictLoadBalancing,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->ForegroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
@@ -290,6 +293,9 @@ void pqApplicationOptions::applyChanges()
   vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(autoMPI);
 #endif
 
+  bool strictLoadBalancing = this->Internal->StrictLoadBalancing->isChecked();
+  settings->setValue("strictLoadBalancing", strictLoadBalancing);
+
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
   settings->setValue("GlobalProperties/SurfaceColor",
@@ -356,6 +362,9 @@ void pqApplicationOptions::resetChanges()
   vtkProcessModuleAutoMPI::
     SetUseMulticoreProcessors(this->Internal->AutoMPI->isTristate());
 #endif
+
+  this->Internal->StrictLoadBalancing->setChecked(
+    settings->value("strictLoadBalancing", false).toBool());
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",

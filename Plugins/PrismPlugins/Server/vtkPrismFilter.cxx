@@ -335,8 +335,9 @@ int vtkPrismFilter::RequestSESAMEData(
     contourOutput->ShallowCopy(this->Internal->Reader->GetOutput(2));
 
 
-    //Copy the PRISM_GEOMETRY_BOUNDS field data from output data 1
-    //to 3. This way the points have the same bounds key as the surface
+    //Copy the PRISM_GEOMETRY_BOUNDS and PRISM_THRESHOLD_BOUNDS field data
+    //from output data 1 to 3. This way the points have the same bounds key
+    //as the surface
     vtkInformation *geomInfo = outputVector->GetInformationObject(3);
     vtkMultiBlockDataSet *geomOutput = vtkMultiBlockDataSet::SafeDownCast(
         geomInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -532,9 +533,6 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     return 0;
 
   }
-
-  vtkIdType pointId;
-  vtkIdType numberPts = newPoints->GetNumberOfPoints();
 
   polydata->SetPoints( newPoints );
   newPoints->Delete();

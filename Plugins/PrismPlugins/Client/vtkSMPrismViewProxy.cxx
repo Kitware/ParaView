@@ -63,6 +63,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkSMPrismViewProxy.h"
+#include "vtkSMPrismSourceProxy.h"
 #include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
 
@@ -145,8 +146,19 @@ vtkSMRepresentationProxy* vtkSMPrismViewProxy::CreateDefaultRepresentation(
   pp->RemoveAllUncheckedProxies();
   if (usg)
     {
-    return vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy("representations", "PrismCompositeRepresentation"));
+    vtkSMProxy *repProxy = 
+      pxm->NewProxy("representations", "PrismCompositeRepresentation");
+    vtkSMPrismSourceProxy *pspProxy =
+      vtkSMPrismSourceProxy::SafeDownCast(source);
+    if ( opport == 0 && pspProxy)
+      {
+      //we don't want to be able to select anything on the zero output port
+      //on prism surfaces and filters which are vtkSMPrismSourceProxy instead
+      //of vtkSMSourceProxies.
+      vtkSMPropertyHelper helper(repProxy,"Pickable");
+      helper.Set(0);
+      }
+    return vtkSMRepresentationProxy::SafeDownCast(repProxy);
     }
 
   prototype = pxm->GetPrototypeProxy("representations",
