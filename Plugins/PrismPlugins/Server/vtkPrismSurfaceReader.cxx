@@ -830,7 +830,6 @@ int vtkPrismSurfaceReader::RequestData(
   vtkPointSet *input = this->Internal->ConversionFilter->GetOutput();
 
   vtkPoints *inPts;
-  vtkPointData *pd;
 
   vtkIdType ptId, numPts;
 
@@ -839,7 +838,6 @@ int vtkPrismSurfaceReader::RequestData(
   localOutput->ShallowCopy(input);
 
   inPts = input->GetPoints();
-  pd = input->GetPointData();
 
   numPts = inPts->GetNumberOfPoints();
 
@@ -1228,7 +1226,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
       for(int v=0;v<2;v++)
       {
@@ -1236,7 +1233,6 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         localOutput->ShallowCopy(input);
 
         inPts = input->GetPoints();
-        pd = input->GetPointData();
 
         numPts = inPts->GetNumberOfPoints();
 
@@ -1388,14 +1384,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 
@@ -1548,14 +1542,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 
@@ -1694,14 +1686,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       vtkPoints *inPts;
-      vtkPointData *pd;
       vtkIdType ptId, numPts;
 
       vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
       localOutput->ShallowCopy(input);
 
       inPts = input->GetPoints();
-      pd = input->GetPointData();
 
       numPts = inPts->GetNumberOfPoints();
 
