@@ -26,25 +26,66 @@
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/set>
 
-
 //*****************************************************************************
-// FIXME I broke VisTrail !!!
-//*****************************************************************************
+class vtkSMUndoStack::vtkInternal
+{
+public:
+  typedef  vtkstd::set<vtkSmartPointer<vtkSMSession> >   SessionSetType;
+  SessionSetType  Sessions;
 
+  void UpdateSessions(vtkUndoSet* undoSet)
+    {
+    int max = undoSet->GetNumberOfElements();
+    this->Sessions.clear();
+    for (int cc=0; cc < max; ++cc)
+      {
+      vtkSMUndoElement* elem =
+          vtkSMUndoElement::SafeDownCast(undoSet->GetElement(cc));
+      if(elem->GetSession())
+        {
+        this->Sessions.insert(elem->GetSession());
+        }
+      }
+    }
+
+  void FillSessionsRemoteObjects(vtkCollection* collection)
+    {
+    SessionSetType::iterator iter = this->Sessions.begin();
+    while(iter != this->Sessions.end())
+      {
+      iter->GetPointer()->GetAllRemoteObjects(collection);
+      iter++;
+      }
+    }
+
+  void ClearProxyLocators()
+    {
+    SessionSetType::iterator iter = this->Sessions.begin();
+    while(iter != this->Sessions.end())
+      {
+      iter->GetPointer()->GetProxyLocator()->Clear();
+      iter++;
+      }
+    }
+};
+//*****************************************************************************
 vtkStandardNewMacro(vtkSMUndoStack);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
 {
+  this->Internal = new vtkInternal();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::~vtkSMUndoStack()
 {
+  delete this->Internal; this->Internal = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +110,7 @@ int vtkSMUndoStack::Undo()
   this->FillWithRemoteObjects(this->GetNextUndoSet(), remoteObjectsCollection.GetPointer());
 
   int retValue = this->Superclass::Undo();
+  this->Internal->ClearProxyLocators();
 
   return retValue;
 }
@@ -88,6 +130,7 @@ int vtkSMUndoStack::Redo()
   this->FillWithRemoteObjects(this->GetNextRedoSet(), remoteObjectsCollection.GetPointer());
 
   int retValue = this->Superclass::Redo();
+  this->Internal->ClearProxyLocators();
 
   return retValue;
 }
@@ -99,23 +142,8 @@ void vtkSMUndoStack::FillWithRemoteObjects( vtkUndoSet *undoSet,
   if(!undoSet || !collection)
     return;
 
-  int max = undoSet->GetNumberOfElements();
-  vtkstd::set<vtkSmartPointer<vtkSMSession> > sessions;
-  for (int cc=0; cc < max; ++cc)
-    {
-    vtkSMUndoElement* elem =
-        vtkSMUndoElement::SafeDownCast(undoSet->GetElement(cc));
-    if(elem->GetSession())
-      {
-      sessions.insert(elem->GetSession());
-      }
-    }
-  vtkstd::set<vtkSmartPointer<vtkSMSession> >::iterator iter = sessions.begin();
-  while(iter != sessions.end())
-    {
-    iter->GetPointer()->GetAllRemoteObjects(collection);
-    iter++;
-    }
+  this->Internal->UpdateSessions(undoSet);
+  this->Internal->FillSessionsRemoteObjects(collection);
 }
 
 //-----------------------------------------------------------------------------

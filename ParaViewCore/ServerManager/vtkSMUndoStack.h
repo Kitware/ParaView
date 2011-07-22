@@ -93,6 +93,9 @@ protected:
 private:
   vtkSMUndoStack(const vtkSMUndoStack&); // Not implemented.
   void operator=(const vtkSMUndoStack&); // Not implemented.
+
+  class vtkInternal;
+  vtkInternal* Internal;
   
   vtkSMUndoStackObserver* Observer;
 //ETX
