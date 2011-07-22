@@ -275,6 +275,7 @@ void PrismScaleViewDialog::onButtonClicked(QAbstractButton* button)
       this->accept();
       break;
     case QDialogButtonBox::RejectRole:
+    default:
       this->reject();
       break;
     }
