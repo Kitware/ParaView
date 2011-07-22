@@ -34,6 +34,7 @@ SET (Kit_SRCS
   vtkCellIntegrator.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
+  vtkCleanUnstructuredGridCells.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkContextNamedOptions.cxx
