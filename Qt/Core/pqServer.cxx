@@ -246,7 +246,7 @@ void pqServer::heartBeat()
 {
   // Send random stream to all processes to produce some traffic and prevent
   // automatic disconnection
-  if(this->Session)
+  if(this->Session && !this->Session->GetPendingProgress())
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
