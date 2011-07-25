@@ -41,8 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRQueue.h"
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
+#include "vruiTrackerState.h"
+#include "vtkSmartPointer.h"
 
 #include <map>
+#include <vector>
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
@@ -60,6 +63,11 @@ public:
   // Name of the device. For example, "Tracker0@localhost"
   // Initial value is a NULL pointer.
   void SetAddress(std::string name);
+
+  // Description:
+  // Port number of the VRUI server.
+  // Initial value is 8555.
+  void SetPort(std::string port);
 
   // Description:
   // Set the device name.
@@ -103,16 +111,40 @@ public:
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
+
+
  protected slots:
   void run();
+  void callback();
 
 protected:
+    // Description:
+  void Activate();
+
+  // Description:
+  void Deactivate();
+
+  // Description:
+  void StartStream();
+
+  // Description:
+  void StopStream();
+
+  void PrintPositionOrientation();
+  void GetNextPacket();
+
   std::string GetName( int eventType, int id=0 );
-  void NewAnalogValue(vrpn_ANALOGCB data);
-  void NewButtonValue(vrpn_BUTTONCB data);
-  void NewTrackerValue(vrpn_TRACKERCB data );
+
   void verifyConfig( const char* id,
                      const char* name );
+
+  void GetAndEnqueueButtonData();
+  void GetAndEnqueueAnalogData();
+  void GetAndEnqueueTrackerData();
+
+  void NewAnalogValue(vtkstd::vector<float> *data);
+  void NewButtonValue(int state,  int button);
+  void NewTrackerValue(vtkSmartPointer<vruiTrackerState> data, int sensor);
 
   void configureTransform( vtkPVXMLElement* child );
   void saveButtonEventConfig( vtkPVXMLElement* child ) const;
@@ -121,12 +153,10 @@ protected:
   void saveTrackerTranslationConfig( vtkPVXMLElement* child ) const;
   void saveTrackerRotationConfig( vtkPVXMLElement* child ) const;
   void saveTrackerTransformationConfig( vtkPVXMLElement* child ) const;
-  friend void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
-  friend void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
-  friend void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
 
   std::string Name;
   std::string Address;
+  std::string Port;
   std::string Type;
 
   // std::map<std::string,std::string> Mapping;
