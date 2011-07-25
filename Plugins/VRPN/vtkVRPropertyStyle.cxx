@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,6 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkVRQueue.h"
+#include <iostream>
+#include <sstream>
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
@@ -102,4 +106,103 @@ vtkSMProperty* vtkVRPropertyStyle::getSMProperty() const
 vtkSMProxy* vtkVRPropertyStyle::getSMProxy() const
 {
   return this->Proxy;
+}
+
+bool vtkVRPropertyStyle::handleEvent(const vtkVREventData& data)
+{
+  switch( data.eventType )
+    {
+  case BUTTON_EVENT:
+    this->HandleButton( data );
+    break;
+  case ANALOG_EVENT:
+    this->HandleAnalog( data );
+    break;
+  case TRACKER_EVENT:
+    this->HandleTracker( data );
+    break;
+    }
+  return false;
+}
+
+bool vtkVRPropertyStyle::update()
+{
+}
+
+void vtkVRPropertyStyle::HandleButton( const vtkVREventData& data )
+{
+  std::stringstream event;
+  event << "BUTTON."<<data.name;
+  if ( this->Map.find(event.str() )!= this->Map.end() )
+    {
+    SetButtonValue( this->Map[event.str()], data.data.button.state );
+    }
+}
+
+void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
+{
+  for (int i = 0; i < data.data.analog.num_channel; ++i)
+    {
+    std::stringstream event;
+    event << "ANALOG."<<data.name<<"."<<i;
+    if ( this->Map.find(event.str() )!= this->Map.end() )
+      {
+      SetAnalogValue( this->Map[event.str()], data.data.analog.channel[i] );
+      }
+    }
+
+}
+
+void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
+{
+  for (int i = 0; i < 16; ++i)
+    {
+    std::stringstream event;
+    event << "TRACKER."<<data.name<<"."<<i;
+    if ( this->Map.find(event.str() )!= this->Map.end() )
+      {
+      SetTrackerValue( this->Map[event.str()], data.data.tracker.matrix[i] );
+      }
+    }
+}
+
+void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
+{
+  std::vector<std::string>token = this->tokenize( dest );
+  if ( token.size()==2 || token.size()==3 )
+    {
+    std::cerr << "Expected \"value\" Format:  Proxy.Property[.index]" <<std::endl;
+    }
+}
+
+void vtkVRPropertyStyle::SetAnalogValue( std::string dest, double value )
+{
+  std::vector<std::string>token = this->tokenize( dest );
+  if ( token.size()==2 || token.size()==3 )
+    {
+    std::cerr << "Expected \"value\" Format:  Proxy.Property[.index]" << std::endl;
+    }
+}
+
+void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
+{
+  std::vector<std::string>token = this->tokenize( dest );
+  if ( token.size()==2 || token.size()==3 )
+    {
+    std::cerr  << "Expected \"value\" Format:  Proxy.Property[.index]" << std::endl;
+    }
+}
+
+std::vector<std::string>& vtkVRPropertyStyle::tokenize( std::string input)
+{
+  std::replace( input.begin(), input.end(), '.', ' ' );
+  std::istringstream stm( input );
+  std::vector<std::string> token;
+  for (;;)
+    {
+    std::string word;
+    if (!(stm >> word)) break;
+    token.push_back(word);
+    }
+  return token;
 }

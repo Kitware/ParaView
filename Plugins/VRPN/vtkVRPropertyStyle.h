@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,11 +29,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRPropertyStyle_h 
+#ifndef __vtkVRPropertyStyle_h
 #define __vtkVRPropertyStyle_h
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkSmartPointer.h"
+#include <vector>
+#include <map>
 
 class vtkSMProperty;
 class vtkSMProxy;
@@ -50,6 +52,18 @@ public:
   vtkVRPropertyStyle(QObject* parent=0);
   virtual ~vtkVRPropertyStyle();
 
+  /// called to handle an event. If the style does not handle this event or
+  /// handles it but does not want to stop any other handlers from handling it
+  /// as well, they should return false. Other return true. Returning true
+  /// indicates that vtkVRQueueHandler the event has been "consumed".
+  virtual bool handleEvent(const vtkVREventData& data);
+
+  /// called to update all the remote vtkObjects and perhaps even to render.
+  /// Typically processing intensive operations go here. The method should not
+  /// be called from within the handler and is reserved to be called from an
+  /// external interaction style manager.
+  virtual bool update();
+
   /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 
@@ -64,8 +78,16 @@ public:
   void setSMProperty(vtkSMProxy*, const QString& property_name);
 
 protected:
+  void HandleButton ( const vtkVREventData& data );
+  void HandleAnalog ( const vtkVREventData& data );
+  void HandleTracker( const vtkVREventData& data );
+  void SetButtonValue( std::string dest, int value );
+  void SetAnalogValue( std::string dest, double value );
+  void SetTrackerValue( std::string dest, double value );
   vtkSmartPointer<vtkSMProxy> Proxy;
   QString PropertyName;
+  std::vector<std::string> &tokenize( std::string input);
+  std::map<std::string,std::string> Map;
 
 private:
   Q_DISABLE_COPY(vtkVRPropertyStyle)
