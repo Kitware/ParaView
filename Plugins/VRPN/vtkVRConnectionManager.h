@@ -39,6 +39,7 @@ class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkVRPNConnection;
+class vtkVRUIConnection;
 
 // -----------------------------------------------------------------------class
 class vtkVRConnectionManager: public QObject
@@ -52,6 +53,9 @@ public:
 
   void add( vtkVRPNConnection* conn );
   void remove ( vtkVRPNConnection *conn );
+  void add( vtkVRUIConnection* conn );
+  void remove ( vtkVRUIConnection *conn );
+
   void clear();
 
 public slots:

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include <QPointer>
 #include "vtkVRPNConnection.h"
+#include "vtkVRUIConnection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"
 #include "vtkObjectFactory.h"
@@ -49,7 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // update constructor and destructor methods.
 struct vtkVRConnectionManager::pqInternals
 {
-  QList<QPointer<vtkVRPNConnection> > Connections;
+  QList<QPointer<vtkVRPNConnection> > VRPNConnections;
+  QList<QPointer<vtkVRUIConnection> > VRUIConnections;
   QPointer<vtkVRQueue> Queue;
 };
 
@@ -76,24 +78,43 @@ vtkVRConnectionManager::~vtkVRConnectionManager()
 
 void vtkVRConnectionManager::add( vtkVRPNConnection* conn )
 {
-  this->Internals->Connections.push_front( conn );
+  this->Internals->VRPNConnections.push_front( conn );
 }
 
 void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
 {
   conn->Stop();
-  this->Internals->Connections.removeAll( conn );
+  this->Internals->VRPNConnections.removeAll( conn );
+}
+
+void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
+{
+  this->Internals->VRUIConnections.push_front( conn );
+}
+
+void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
+{
+  conn->Stop();
+  this->Internals->VRUIConnections.removeAll( conn );
 }
 
 void vtkVRConnectionManager::clear()
 {
   this->stop();
-  this->Internals->Connections.clear();
+  this->Internals->VRPNConnections.clear();
+  this->Internals->VRUIConnections.clear();
 }
 
 void vtkVRConnectionManager::start()
 {
-  foreach (vtkVRPNConnection* conn, this->Internals->Connections )
+  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+    {
+    if (conn && conn->Init())
+      {
+        conn->start();
+      }
+    }
+  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn && conn->Init())
       {
@@ -104,7 +125,14 @@ void vtkVRConnectionManager::start()
 
 void vtkVRConnectionManager::stop()
 {
-  foreach (vtkVRPNConnection* conn, this->Internals->Connections )
+  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+    {
+    if (conn)
+      {
+        conn->Stop();
+      }
+    }
+    foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn)
       {
@@ -142,7 +170,18 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             }
           else if (strcmp(child->GetName(), "VRUIConnection")==0)
             {
-
+            const char* name = child->GetAttributeOrEmpty( "name" );
+            const char* address = child->GetAttributeOrEmpty( "address" );
+            const char* port = child->GetAttribute( "port" );
+            vtkVRUIConnection* device = new vtkVRUIConnection(this);
+            device->SetQueue( this->Internals->Queue );
+            device->SetName( name );
+            device->SetAddress( address );
+            ( port )
+              ? device->SetPort( port )
+              : device->SetPort("8555"); // default
+            device->configure(child, locator);
+            this->add(device);
             }
           else
             {
@@ -164,7 +203,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
  Q_ASSERT(root != NULL);
   vtkPVXMLElement* parent = vtkPVXMLElement::New();
   parent->SetName("VRConnectionManager");
-  foreach (vtkVRPNConnection* conn, this->Internals->Connections )
+  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)
@@ -173,20 +212,15 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
       child->Delete();
       }
     }
-  // vtkPVXMLElement* child = vtkPVXMLElement::New();
-  // child->SetName("Style");
-  // child->AddAttribute("class",
-  //   this->metaObject()->className());
-
-  // vtkPVXMLElement* event = vtkPVXMLElement::New();
-  // event->SetName("Event");
-  // event->AddAttribute("device", 10);
-  // event->AddAttribute("button", 20);
-  // event->AddAttribute("sensor", 30);
-  // child->AddNestedElement(event);
-  // event->FastDelete();
-  // parent->AddNestedElement(child);
-  // child->Delete();
+  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+    {
+    vtkPVXMLElement* child = conn->saveConfiguration();
+    if (child)
+      {
+      parent->AddNestedElement(child);
+      child->Delete();
+      }
+    }
   root->AddNestedElement(parent);
   parent->Delete();
 }
