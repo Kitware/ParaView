@@ -65,6 +65,9 @@ SET( VRPN_SOURCE_FILES
   vtkVRQueueHandler.cxx
   vtkVRPropertyStyle.cxx
   vtkVRVectorPropertyStyle.cxx
+  vruiPipe.cxx
+  vruiServerState.cxx
+  vruiTrackerState.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRPNStarter
