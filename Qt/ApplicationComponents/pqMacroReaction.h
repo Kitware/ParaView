@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqMacroReaction_h
 #define __pqMacroReaction_h
 
-#include "pqReaction.h"
+#include "pqMasterOnlyReaction.h"
 
 /// @ingroup Reactions
 /// Reaction for creating or deleting a python macro
-class PQAPPLICATIONCOMPONENTS_EXPORT pqMacroReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqMacroReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 public:
   pqMacroReaction(QAction* parent);
 
