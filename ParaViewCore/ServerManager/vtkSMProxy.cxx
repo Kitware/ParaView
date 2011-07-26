@@ -1872,6 +1872,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 
   // Manage its sub-proxy state
   int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);
+  vtkstd::vector<vtkSMMessage> subProxyStateToLoad;
   for(int idx=0; idx < nbSubProxy; idx++)
     {
     const ProxyState_SubProxy *subProxyMsg =
@@ -1912,9 +1913,21 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
       if(this->GetSession()->GetStateLocator()->FindState(
           subProxy->GetGlobalID(), &subProxyState))
         {
-        subProxy->LoadState(&subProxyState, locator);
+        subProxyStateToLoad.push_back(subProxyState);
         }
       }
+    }
+  // Load deferred sub-proxy state
+  // Deferring sub-proxy loading IS VERY IMPORTANT, specialy for compound proxy
+  // that define pipeline connectivity.
+  // If not done while loading the pipeline connection, this will failed because
+  // the sub-proxy involved might not have a GlobalID yet !
+  for(size_t i = 0; i < subProxyStateToLoad.size(); i++)
+    {
+    vtkSMProxy* proxy =
+        vtkSMProxy::SafeDownCast(
+            this->Session->GetRemoteObject(subProxyStateToLoad[i].global_id()));
+    proxy->LoadState(&subProxyStateToLoad[i], locator);
     }
 
   // Manage properties
