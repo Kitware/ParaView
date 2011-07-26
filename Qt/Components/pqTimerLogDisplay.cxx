@@ -80,7 +80,8 @@ static pqTimerLogDisplayIntChoices LengthChoices[] = {
   { "500", 500 },
   { "1000", 1000 },
   { "5000", 5000 },
-  { "10000", 10000 }
+  { "10000", 10000 },
+  { "50000", 50000 }
 };
 static const int NumLengthChoices
   = sizeof(LengthChoices)/sizeof(pqTimerLogDisplayIntChoices);
