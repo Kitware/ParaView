@@ -617,12 +617,14 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
   // Handle selection proxy if any
   if(!this->SelectionProxiesCreated)
     {
+    this->CreateVTKObjects(); // Make sure the proxy is created
     int size = message->ExtensionSize(ProxyState::selection_proxy);
     if(size > 0)
       {
       this->State->ClearExtension(ProxyState::selection_proxy);
       this->PInternals->SelectionProxies.clear();
       this->SelectionProxiesCreated = true;
+      vtkClientServerStream stream;
 
       for(int cc=0; cc < size; cc++)
         {
@@ -642,6 +644,13 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
           selectionProxy->SelectionProxiesCreated = true;
           selectionProxy->UpdateVTKObjects();
 
+          stream << vtkClientServerStream::Invoke
+                 << SIPROXY(this)
+                 << "SetupSelectionProxy"
+                 << cc
+                 << SIPROXY(selectionProxy)
+                 << vtkClientServerStream::End;
+
           // Add selection proxy information in the state
           this->State->AddExtension(ProxyState::selection_proxy, selectionProxy->GetGlobalID());
 
@@ -649,6 +658,7 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
           this->PInternals->SelectionProxies.push_back(selectionProxy);
           }
         }
+      this->ExecuteStream(stream);
       }
     }
 }
