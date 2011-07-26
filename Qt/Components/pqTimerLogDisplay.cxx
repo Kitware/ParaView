@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QTextStream"
 #include <QtDebug>
 
+#include <limits>
+
 class pqTimerLogDisplayUi : public Ui::pqTimerLogDisplay {};
 
 //-----------------------------------------------------------------------------
@@ -77,7 +79,8 @@ static pqTimerLogDisplayIntChoices LengthChoices[] = {
   { "100", 100 },
   { "500", 500 },
   { "1000", 1000 },
-  { "5000", 5000 }
+  { "5000", 5000 },
+  { "10000", 10000 }
 };
 static const int NumLengthChoices
   = sizeof(LengthChoices)/sizeof(pqTimerLogDisplayIntChoices);
