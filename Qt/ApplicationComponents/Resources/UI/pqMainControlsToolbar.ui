@@ -84,9 +84,6 @@
    <property name="text">
     <string>&amp;Undo</string>
    </property>
-   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
-    <bool>true</bool>
-   </property>
   </action>
   <action name="actionRedo">
    <property name="icon">
@@ -95,9 +92,6 @@
    </property>
    <property name="text">
     <string>&amp;Redo</string>
-   </property>
-   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
-    <bool>true</bool>
    </property>
   </action>
   <action name="actionAutoApply">
