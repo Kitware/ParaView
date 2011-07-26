@@ -31,6 +31,7 @@
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/set>
+#include "vtkNew.h"
 
 //*****************************************************************************
 class vtkSMUndoStack::vtkInternal
@@ -62,6 +63,12 @@ public:
       iter->GetPointer()->GetAllRemoteObjects(collection);
       iter++;
       }
+    }
+
+  void Clear()
+    {
+    this->ClearProxyLocators();
+    this->Sessions.clear();
     }
 
   void ClearProxyLocators()
@@ -105,12 +112,11 @@ int vtkSMUndoStack::Undo()
     }
 
   // Hold remote objects refs while the UndoSet is processing
-  vtkSmartPointer<vtkCollection> remoteObjectsCollection;
-  remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> remoteObjectsCollection;
   this->FillWithRemoteObjects(this->GetNextUndoSet(), remoteObjectsCollection.GetPointer());
 
   int retValue = this->Superclass::Undo();
-  this->Internal->ClearProxyLocators();
+  this->Internal->Clear();
 
   return retValue;
 }
@@ -125,12 +131,11 @@ int vtkSMUndoStack::Redo()
     }
 
   // Hold remote objects refs while the UndoSet is processing
-  vtkSmartPointer<vtkCollection> remoteObjectsCollection;
-  remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
+  vtkNew<vtkCollection> remoteObjectsCollection;
   this->FillWithRemoteObjects(this->GetNextRedoSet(), remoteObjectsCollection.GetPointer());
 
   int retValue = this->Superclass::Redo();
-  this->Internal->ClearProxyLocators();
+  this->Internal->Clear();
 
   return retValue;
 }
