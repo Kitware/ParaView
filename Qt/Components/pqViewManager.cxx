@@ -405,7 +405,6 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
     {
     pqApplicationCore::instance()->getObjectBuilder()->destroy(view);
     }
-
 }
 
 //-----------------------------------------------------------------------------
@@ -678,11 +677,10 @@ void pqViewManager::onViewRemoved(pqView* view)
   if (frame)
     {
     this->disconnect(frame, view);
+    this->removeWidget(frame);
     }
 
   this->Internal->PendingViews.removeAll(view);
-
-  this->onActivate(frame);
 }
 
 //-----------------------------------------------------------------------------
