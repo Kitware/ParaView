@@ -55,6 +55,9 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(
     this, SLOT(updateEnableState()));
   QObject::connect(menuManager, SIGNAL(menuPopulated()),
     this, SLOT(updateEnableState()));
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 

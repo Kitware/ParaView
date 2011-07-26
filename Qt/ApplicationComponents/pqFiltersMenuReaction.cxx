@@ -139,6 +139,11 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(forceFilterMenuRefresh()),
     &this->Timer, SLOT(start()));
+
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateEnableState()));
+
   this->updateEnableState();
 }
 
