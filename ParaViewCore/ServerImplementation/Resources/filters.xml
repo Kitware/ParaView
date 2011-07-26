@@ -148,6 +148,18 @@
       </IntVectorProperty>
       
       <IntVectorProperty
+          name="EnablePrefetching"
+          command="SetEnablePrefetching"
+          number_of_elements="1"
+          default_values="0">
+          <BooleanDomain name="bool"/>
+          <Documentation>
+            This property specifies whether or not requests pre-fetching of 
+            blocks of the next level will be enabled.
+          </Documentation>
+      </IntVectorProperty>
+      
+      <IntVectorProperty
         name="Level"
         command="SetMaxResolution"
         number_of_elements="1"
