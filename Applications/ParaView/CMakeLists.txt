@@ -69,7 +69,10 @@ build_paraview_client(paraview
     INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
     INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
 
-write_plugins_file()
+# link enabled plugins if not building in shared library mode
+if(NOT BUILD_SHARED_LIBS)
+  target_link_libraries(paraview ${PARAVIEW_PLUGINLIST})
+endif(NOT BUILD_SHARED_LIBS)
 
 # This ensure that the paraview.qch file is generated.
 add_dependencies(${paraview_client_real_exe_name}
