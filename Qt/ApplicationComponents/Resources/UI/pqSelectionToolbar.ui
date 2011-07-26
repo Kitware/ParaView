@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>pqSelectionToolbar</class>
  <widget class="QToolBar" name="pqSelectionToolbar" >
+  <property name="PV_MUST_BE_MASTER" stdset="0">
+    <bool>true</bool>
+  </property>
   <property name="windowTitle" >
    <string>Selection Controls</string>
   </property>
