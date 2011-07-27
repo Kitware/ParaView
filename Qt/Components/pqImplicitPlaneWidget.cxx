@@ -346,7 +346,7 @@ void pqImplicitPlaneWidget::select()
   vtkBoundingBox box(input_bounds);
   box.AddPoint(center);
   pqFixBounds(box);
-  box.GetBounds(input_bounds);
+  box.GetBounds(input_bounds);  
 
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
   widget->UpdateVTKObjects();
@@ -369,6 +369,7 @@ void pqImplicitPlaneWidget::resetBounds(double input_bounds[6])
   double bounds[6];
   box.GetBounds(bounds);
 
+  widget->InvokeCommand("Reset");
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(bounds, 6);
   widget->UpdateVTKObjects();
   vtkSMPropertyHelper(widget, "Origin").Set(input_origin, 3);

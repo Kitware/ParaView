@@ -286,6 +286,12 @@ vtkObjectBase* vtkSIProxyProperty::GetObjectBase(vtkTypeUInt32 globalId)
 //----------------------------------------------------------------------------
 bool vtkSIProxyProperty::IsValidNull(vtkTypeUInt32 globalId)
 {
+  if(globalId == 0)
+    {
+    return true;
+    }
+
   vtkSIProxy* siProxy = vtkSIProxy::SafeDownCast(this->GetSIObject(globalId));
-  return globalId ? siProxy->IsNullProxy() : true;
+  assert("SIProxy shouldn't be null otherwise it's a Proxy location issue in the XML" && siProxy != 0);
+  return siProxy->IsNullProxy();
 }

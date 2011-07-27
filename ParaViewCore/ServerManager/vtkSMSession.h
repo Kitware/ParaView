@@ -62,6 +62,21 @@ public:
 
   vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
+  enum RenderingMode
+    {
+    RENDERING_NOT_AVAILABLE = 0x00,
+    RENDERING_UNIFIED = 0x01,
+    RENDERING_SPLIT = 0x02
+    };
+
+  // Description:
+  // Convenient method to determine if the rendering is done in a pvrenderer
+  // or not.
+  // For built-in or pvserver you will get RENDERING_UNIFIED and for a setting
+  // with a pvrenderer you will get RENDERING_SPLIT.
+  // If the session is something else it should reply RENDERING_NOT_AVAILABLE.
+  virtual unsigned int GetRenderClientMode();
+
   //---------------------------------------------------------------------------
   // Undo/Redo related API.
   //---------------------------------------------------------------------------

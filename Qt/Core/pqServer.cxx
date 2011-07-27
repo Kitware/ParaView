@@ -160,6 +160,22 @@ void pqServer::initialize()
     proxy->FastDelete();
     }
   this->GlobalMapperPropertiesProxy = proxy;
+  proxy->Delete();
+
+  // Create Strict Load Balancing Proxy
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  proxy = pxm->GetProxy("temp_prototypes", "StrictLoadBalancing");
+  if (proxy == NULL)
+    {
+    proxy = pxm->NewProxy("misc", "StrictLoadBalancing");
+    vtkSMPropertyHelper(proxy, "DisableExtentsTranslator").Set(
+      settings->value("strictLoadBalancing", false).toBool());
+    proxy->UpdateVTKObjects();
+
+    pxm->RegisterProxy("temp_prototypes", "StrictLoadBalancing", proxy);
+    proxy->FastDelete();
+    }
+
   this->updateGlobalMapperProperties();
 
   // In case of Multi-clients connection, the client has to listen

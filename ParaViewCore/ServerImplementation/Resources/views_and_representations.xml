@@ -1137,6 +1137,7 @@
           <Property name="LineWidth" />
           <Property name="LookupTable" />
           <Property name="MapScalars" />
+          <Property name="NonlinearSubdivisionLevel" />
           <Property name="Opacity" />
           <Property name="Orientation" />
           <Property name="Origin" />
@@ -1280,6 +1281,7 @@
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkDataSet"/>
+          <DataType value="vtkGenericDataSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array_cell" attribute_type="cell"
           optional="1">
@@ -2410,6 +2412,13 @@
           <Entry value="1" text="Gouraud" />
           <!--<Entry value="2" text="Phong" />-->
         </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NonlinearSubdivisionLevel"
+                         command="SetNonlinearSubdivisionLevel"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="0" max="4" />
       </IntVectorProperty>
 
       <DoubleVectorProperty name="Opacity"

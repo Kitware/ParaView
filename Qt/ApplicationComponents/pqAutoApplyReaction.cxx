@@ -47,15 +47,24 @@ pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
 //-----------------------------------------------------------------------------
 void pqAutoApplyReaction::checkStateChanged(bool autoAccept)
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("autoAccept", autoAccept);
-  pqObjectInspectorWidget::setAutoAccept(autoAccept);
+  pqAutoApplyReaction::setAutoApply(autoAccept);
 }
 
 //-----------------------------------------------------------------------------
 bool pqAutoApplyReaction::autoApply()
 {
   return pqObjectInspectorWidget::autoAccept();
+}
+
+//-----------------------------------------------------------------------------
+void pqAutoApplyReaction::setAutoApply(bool autoAccept)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if ( settings )
+    {
+    settings->setValue("autoAccept", autoAccept);
+    }
+  pqObjectInspectorWidget::setAutoAccept(autoAccept);
 }
 
 //-----------------------------------------------------------------------------

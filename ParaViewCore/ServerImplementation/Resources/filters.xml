@@ -786,6 +786,35 @@ The Clean to Grid filter merges points that are exactly coincident. It also conv
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="CleanUnstructuredGridCells" class="vtkCleanUnstructuredGridCells"
+      label="Clean Cells to Grid">
+      <Documentation
+         long_help="This filter merges cells and converts the data set to unstructured grid."
+         short_help="Merge cells.">
+Merges degenerate cells. Assumes the input grid does not contain duplicate
+points. You may want to run vtkCleanUnstructuredGrid first to assert it. If
+duplicated cells are found they are removed in the output. The filter also
+handles the case, where a cell may contain degenerate nodes (i.e. one and
+the same node is referenced by a cell more than once).
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkUnstructuredGrid"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input to the Clean Cells to Grid filter.
+           </Documentation>
+      </InputProperty>
+   <!-- End CleanUnstructuredGridCells -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="Delaunay2D" class="vtkDelaunay2D" label="Delaunay 2D">
       <Documentation
          long_help="Create 2D Delaunay triangulation of input points.
@@ -6011,6 +6040,17 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        </Documentation>
      </DoubleVectorProperty>
 
+      <IntVectorProperty
+         name="ComputeVorticity"
+         command="SetComputeVorticity"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether or not to compute vorticity.
+        </Documentation>
+      </IntVectorProperty>
+
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
@@ -6208,6 +6248,17 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          This property specifies the maximum error (for Runge-Kutta 4-5) tolerated throughout streamline integration. The Runge-Kutta 4-5 integrator tries to adjust the step size such that the estimated error is less than this threshold.
        </Documentation>
      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="ComputeVorticity"
+         command="SetComputeVorticity"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether or not to compute vorticity.
+        </Documentation>
+      </IntVectorProperty>
 
      <Hints>
        <Visibility replace_input="2" />
@@ -7034,6 +7085,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
+              <Proxy group="implicit_functions" name="Scalar" />
            </ProxyListDomain>
            <Documentation>
              Set the parameters of the clip function.
@@ -7048,6 +7100,28 @@ This filter operates on all types of data sets, and it returns unstructured grid
          </RequiredProperties>
        </BoundsDomain>
      </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="SelectInputScalars"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Scalars">
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
+           <Documentation>
+             If clipping with scalars, this property specifies the name of the scalar array on which to perform the clip operation.
+           </Documentation>
+     </StringVectorProperty>
 
      <IntVectorProperty
         name="InsideOut"
@@ -7068,6 +7142,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>
           <DoubleRangeDomain name="range"/>
@@ -7075,6 +7150,10 @@ This filter operates on all types of data sets, and it returns unstructured grid
             If clipping with a scalar array, choose the clipping value.
           </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
    <!-- End GenericClip -->
    </SourceProxy>
 
@@ -7105,9 +7184,32 @@ The Generic Contour filter operates on a generic data set, but the input is requ
           </Documentation>
      </InputProperty>
 
+     <StringVectorProperty
+        name="SelectInputScalars"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Contour By">
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
+          <Documentation>
+            This property specifies the name of the scalar array from which the contour filter will compute isolines and/or isosurfaces.
+          </Documentation>
+     </StringVectorProperty>
+
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
+        label="Isosurfaces"
         set_number_command="SetNumberOfContours"
         number_of_elements="0"
         repeat_command="1"
@@ -7117,10 +7219,11 @@ The Generic Contour filter operates on a generic data set, but the input is requ
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>
           <Documentation>
-            Specify the current contour values.
+            This property specifies the values at which to compute isosurfaces/isolines and also the number of such values.
           </Documentation>
      </DoubleVectorProperty>
 
@@ -7162,6 +7265,24 @@ The Generic Contour filter operates on a generic data set, but the input is requ
      <Hints>
        <Visibility replace_input="0" />
      </Hints>
+
+     <!-- incremental point locator begin -->
+     <ProxyProperty name="Locator" command="SetLocator"
+       label="Point Merge Method">
+       <ProxyGroupDomain name="groups">
+         <Group name="incremental_point_locators" />
+       </ProxyGroupDomain>
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="incremental_point_locators" name="MergePoints" />
+         <Proxy group="incremental_point_locators" name="IncrementalOctreeMergePoints" />
+         <Proxy group="incremental_point_locators" name="NonMergingPointLocator" />
+       </ProxyListDomain>
+       <Documentation>
+         This property specifies an incremental point locator for merging duplicate / coincident points.
+       </Documentation>
+     </ProxyProperty>
+     <!-- incremental point locator end -->
+
    <!-- End GenericContour -->
    </SourceProxy>
 
@@ -7220,18 +7341,19 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
         set_number_command="SetNumberOfContours"
         number_of_elements_per_command="1"
         use_index="1"
-        animateable="1">
+        animateable="1"
+        label="Slice Offset Values">
           <BoundsDomain name="bounds" mode="magnitude">
             <RequiredProperties>
               <Property name="Input" function="Input"/>
             </RequiredProperties>
           </BoundsDomain>
           <Documentation>
-            Specify a list of current offset values. This can be used to create multiple cuts with different centers. Each entry represents a new cut with center shifted by the offset value.
+            The values in this property specify a list of current offset values. This can be used to create multiple slices with different centers. Each entry represents a new slice with its center shifted by the offset value.
           </Documentation>
      </DoubleVectorProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="2" />
      </Hints>
    <!-- End GenericCut -->
    </SourceProxy>
@@ -7258,6 +7380,19 @@ Extract geometry from a higher-order dataset.
              Set the input to the Generic Geometry Filter.
            </Documentation>
       </InputProperty>
+
+     <IntVectorProperty
+        name="PassThroughCellIds"
+        command="SetPassThroughCellIds"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Select whether to forward original ids.
+       </Documentation>
+     </IntVectorProperty>
+
 
    <!-- End GenericGeometryFilter -->
    </SourceProxy>
@@ -7327,56 +7462,36 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <InputProperty
         name="Source"
-        command="SetSourceConnection">
+        command="SetSourceConnection"
+        label="Seed Type">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="extended_sources" name="PointSource" />
+              <Proxy group="extended_sources" name="HighResLineSource" />
+           </ProxyListDomain>
            <Documentation>
-             Specify the seed points for generating the streamlines.
+             The value of this property determines how the seeds for the streamlines will be generated.
            </Documentation>
       </InputProperty>
 
-     <!-- This is a hack used to bypass the fact that ParaView
-          does not have special proxies for things like point sources.
-          It should be removed in the future -->
-     <!-- TODO: Should this be removed now? -->
-     <DoubleVectorProperty
-        name="Radius"
-        number_of_elements="1"
-        default_values="0.1"
-        information_only="1">
-        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </BoundsDomain>
-        <Documentation>
-          Set the radius of the point cloud for setting seed points.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty
-        name="NumberOfPoints"
-        number_of_elements="1"
-        default_values="100"
-        information_only="1"/>
-
-     <IntVectorProperty
-        name="MaximumPropagationUnit"
-        command="SetMaximumPropagationUnit"
-        number_of_elements="1"
-        default_values="1" >
-       <EnumerationDomain>
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         Choose the unit for specifying the maximum streamline length.
-       </Documentation>
-     </IntVectorProperty>
+     <StringVectorProperty
+       name="SelectInputVectors"
+       command="SetInputArrayToProcess"
+       number_of_elements="5"
+       element_types="0 0 0 0 2"
+       animateable="0"
+       label="Vectors">
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <Documentation>
+             This property contains the name of the vector array from which to generate streamlines.
+           </Documentation>
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="MaximumPropagation"
@@ -7392,21 +7507,6 @@ This filter operates on any type of data set, provided it has point-centered vec
          Specify the maximum streamline length.
        </Documentation>
      </DoubleVectorProperty>
-
-     <IntVectorProperty
-        name="InitialIntegrationStepUnit"
-        command="SetInitialIntegrationStepUnit"
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain>
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         Choose the unit for specifying the initial integration step.
-       </Documentation>
-     </IntVectorProperty>
 
      <DoubleVectorProperty
         name="InitialIntegrationStep"
@@ -7424,13 +7524,13 @@ This filter operates on any type of data set, provided it has point-centered vec
         command="SetIntegrationDirection"
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="FORWARD"/>
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
        </EnumerationDomain>
        <Documentation>
-         Choose the integration direction.
+         This property determines in which direction(s) a streamline is generated.
        </Documentation>
      </IntVectorProperty>
 
@@ -7438,14 +7538,14 @@ This filter operates on any type of data set, provided it has point-centered vec
         name="IntegratorType"
         command="SetIntegratorType"
         number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain>
+        default_values="2" >
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Runge-Kutta 2"/>
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
        </EnumerationDomain>
        <Documentation>
-         Choose the type of integrator to use.
+         This property determines which integrator (with increasing accuracy) to use for creating streamlines.
        </Documentation>
      </IntVectorProperty>
 
@@ -7461,21 +7561,6 @@ This filter operates on any type of data set, provided it has point-centered vec
        </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty
-        name="MinimumIntegrationStepUnit"
-        command="SetMinimumIntegrationStepUnit"
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain>
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         Choose the unit to use for specifying the minimum integration step.
-       </Documentation>
-     </IntVectorProperty>
-
      <DoubleVectorProperty
         name="MinimumIntegrationStep"
         command="SetMinimumIntegrationStep"
@@ -7488,17 +7573,17 @@ This filter operates on any type of data set, provided it has point-centered vec
      </DoubleVectorProperty>
 
      <IntVectorProperty
-        name="MaximumIntegrationStepUnit"
-        command="SetMaximumIntegrationStepUnit"
+        name="IntegrationStepUnit"
+        command="SetIntegrationStepUnit"
         number_of_elements="1"
         default_values="2" >
-       <EnumerationDomain>
+       <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
          <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
        <Documentation>
-         Choose the unit to use for specifying the maximum integration step.
+         Choose the unit to use for the integration step.
        </Documentation>
      </IntVectorProperty>
 
@@ -7535,7 +7620,7 @@ This filter operates on any type of data set, provided it has point-centered vec
        </Documentation>
      </DoubleVectorProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="2" />
      </Hints>
    <!-- End GenericStreamTracer -->
    </SourceProxy>

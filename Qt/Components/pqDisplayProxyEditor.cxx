@@ -397,6 +397,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
                 this->Internal->NonlinearSubdivisionLevel,
                 "value", SIGNAL(valueChanged(int)),
                 reprProxy, reprProxy->GetProperty("NonlinearSubdivisionLevel"));
+    this->Internal->NonlinearSubdivisionLevel->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->NonlinearSubdivisionLevel->setEnabled(false);
     }
 
   // setup for map scalars

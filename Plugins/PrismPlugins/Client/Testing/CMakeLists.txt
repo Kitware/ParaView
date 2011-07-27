@@ -4,11 +4,15 @@ SET (PRISM_TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PrismMultipleSurfaces.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PrismSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PrismView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrismScaleView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PrismScaleView1.xml
 )
 
 SET (PrismMultipleSurfaces_BREAK TRUE)
 SET (PrismSelection_BREAK TRUE)
 SET (PrismView_BREAK TRUE)
+SET (PrismScaleView_BREAK TRUE)
+SET (PrismScaleView1_BREAK TRUE)
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("Prism"

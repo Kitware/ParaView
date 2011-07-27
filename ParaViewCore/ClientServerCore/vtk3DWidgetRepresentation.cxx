@@ -19,7 +19,9 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkWidgetRepresentation.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtk3DWidgetRepresentation);
 vtkCxxSetObjectMacro(vtk3DWidgetRepresentation, Widget, vtkAbstractWidget);
@@ -33,6 +35,11 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->Representation = 0;
   this->UseNonCompositedRenderer = false;
   this->Enabled = false;
+  this->UpdateTransform = false;
+
+  this->CustomTransform = vtkTransform::New();
+  this->CustomTransform->PostMultiply();
+  this->CustomTransform->Identity();
 }
 
 //----------------------------------------------------------------------------
@@ -40,6 +47,7 @@ vtk3DWidgetRepresentation::~vtk3DWidgetRepresentation()
 {
   this->SetWidget(0);
   this->SetRepresentation(0);
+  this->CustomTransform->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +111,19 @@ void vtk3DWidgetRepresentation::UpdateEnabled()
         {
         this->Widget->SetCurrentRenderer(this->View->GetRenderer());
         }
+
+      //set the transform to the repsentation
+      vtkPVImplicitPlaneRepresentation *plane = 
+        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
+        if (plane)
+          {
+          plane->SetTransform(this->CustomTransform);
+          if ( this->UpdateTransform )
+            {
+            this->UpdateTransform = false;
+            plane->UpdateTransformLocation();
+            }
+          }
       }
 
     this->Widget->SetEnabled(this->Enabled);
@@ -131,11 +152,34 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
         {
         pvview->GetRenderer()->RemoveActor(this->Representation);
         }
+      //set the transform to the repsentation
+      vtkPVImplicitPlaneRepresentation *plane = 
+        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
+      if (plane)
+        {
+        plane->ClearTransform();
+        }
+
       this->Representation->SetRenderer(0);
       }
     return true;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform)
+{
+  if (this->CustomTransform->GetInput () != transform)
+    {
+    this->UpdateTransform = true;
+    }
+  this->CustomTransform->SetInput(transform);
+  if (!transform)
+    {
+    this->CustomTransform->Identity();
+    }
+  this->UpdateEnabled();
 }
 
 //----------------------------------------------------------------------------
@@ -147,4 +191,7 @@ void vtk3DWidgetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Widget: " << this->Widget << endl;
   os << indent << "Representation: " << this->Representation << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "UpdateTransform: " << this->UpdateTransform << endl;
+  os << indent << "CustomTransform: ";
+  this->CustomTransform->Print(os);
 }

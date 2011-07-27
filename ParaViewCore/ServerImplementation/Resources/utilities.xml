@@ -775,7 +775,8 @@
     </Proxy>
 
     <Proxy name="CameraAnimationCue" class="vtkPVCameraAnimationCue"
-      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+      processes="client" base_proxygroup="animation"
+      base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue which can be used for animating Camera using keyframes.
       </Documentation>
@@ -1166,6 +1167,7 @@
 
     <Proxy name="CameraKeyFrame"
       class="vtkPVCameraKeyFrame"
+      processes="client"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
 
       <DoubleVectorProperty name="Position"
@@ -2020,6 +2022,18 @@
 
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
+
+    <Proxy name="StrictLoadBalancing" class="vtkSISourceProxy"
+      processes="client|dataserver|renderserver">
+      <IntVectorProperty
+        name="DisableExtentsTranslator"
+        command="SetDisableExtentsTranslator"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of StrictLoadBalancing -->
+    </Proxy>
     
     <PluginLoaderProxy name="PluginLoader"
                        class="vtkPVPluginLoader"

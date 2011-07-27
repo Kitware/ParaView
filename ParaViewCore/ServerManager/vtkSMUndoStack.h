@@ -74,7 +74,9 @@ public:
 
   enum EventIds
     {
-    PushUndoSetEvent = 1987
+    PushUndoSetEvent = 1987,
+    ObjectCreationEvent = 1988
+
     };
 
 protected:

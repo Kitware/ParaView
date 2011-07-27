@@ -97,7 +97,6 @@ int vtkSESAMEConversionFilter::RequestData(
     vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
 
     vtkPoints *inPts;
-    vtkPointData *pd;
 
     vtkIdType ptId, numPts;
 
@@ -105,7 +104,6 @@ int vtkSESAMEConversionFilter::RequestData(
     localOutput->GetPointData()->DeepCopy(input->GetPointData());
 
     inPts = localOutput->GetPoints();
-    pd = localOutput->GetPointData();
 
     numPts = inPts->GetNumberOfPoints();
 

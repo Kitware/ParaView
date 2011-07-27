@@ -70,6 +70,8 @@ showparse = False
 icetquirk = False
 
 start_frame = 0
+default_log_threshold = dict()
+default_buffer_length = dict()
 
 class OneLog :
     def __init__(self):
@@ -109,13 +111,14 @@ def maximize_logs () :
     if pm == None:
         return
 
-    acid = servermanager.ActiveConnection.ID #:) acronym
-    pm.SetLogBufferLength(acid, 0x1, 1000000)
-    pm.SetLogBufferLength(acid, 0x4, 1000000)
-    pm.SetLogBufferLength(acid, 0x10, 1000000)
-    pm.SetLogThreshold(acid, 0x1, 0.0)
-    pm.SetLogThreshold(acid, 0x4, 0.0)
-    pm.SetLogThreshold(acid, 0x10, 0.0)
+    # Not used here...
+    default_buffer_length[str(0x01)] = 1000000
+    default_buffer_length[str(0x04)] = 1000000
+    default_buffer_length[str(0x10)] = 1000000
+
+    default_log_threshold[str(0x01)] = 0.0
+    default_log_threshold[str(0x04)] = 0.0
+    default_log_threshold[str(0x10)] = 0.0
 
 
 def dump_logs( filename ) :
@@ -153,8 +156,9 @@ def get_logs() :
         return
 
     connectionId = paraview.servermanager.ActiveConnection.ID
-
+    session = paraview.servermanager.ActiveConnection.Session
     pmOptions = pm.GetOptions()
+
     """
     vtkPVOptions::ProcessTypeEnum
     PARAVIEW = 0x2,
@@ -169,7 +173,13 @@ def get_logs() :
     else:
         runmode = 'interactive'
 
-    if not pm.GetRenderClientMode(connectionId):
+    """
+    vtkSMSession::RenderingMode
+    RENDERING_NOT_AVAILABLE = 0x00,
+    RENDERING_UNIFIED = 0x01,
+    RENDERING_SPLIT = 0x02
+    """
+    if session.GetRenderClientMode() == 0x01:
         servertype = 'unified'
     else:
         servertype = 'split'
@@ -194,8 +204,9 @@ def get_logs() :
 
     for component in components:
         timerInfo = paraview.servermanager.vtkPVTimerInformation()
-        pm.GatherInformation(connectionId, component,\
-                             timerInfo, pm.GetProcessModuleIDAsInt())
+        if len(default_log_threshold) != 0:
+           timerInfo.SetLogThreshold(default_log_threshold[str(component)])
+        session.GatherInformation(component, timerInfo, 0)
 
         for i in range(timerInfo.GetNumberOfLogs()):
             alog = OneLog()

@@ -16,20 +16,22 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkProcessModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVServerInformation.h"
+#include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
-#include "vtkProcessModuleAutoMPI.h"
+#include "vtkSMUndoStack.h"
 #include "vtkWeakPointer.h"
-#include "vtkPVRenderView.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMDeserializerProtobuf.h"
-#include "vtkSMProxyLocator.h"
 
 #include <vtksys/ios/sstream>
 #include <vtkNew.h>
@@ -143,6 +145,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
         if(createAction)
           {
           // Do we want to manage object creation ?
+          this->UndoStackBuilder->GetUndoStack()->InvokeEvent(vtkSMUndoStack::ObjectCreationEvent, &newState);
           }
         else
           {
@@ -319,4 +322,27 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   session->RemoveObserver(id);
   session->Delete();
   return sid;
+}
+//----------------------------------------------------------------------------
+unsigned int vtkSMSession::GetRenderClientMode()
+{
+  if (this->GetIsAutoMPI())
+    {
+    return vtkSMSession::RENDERING_SPLIT;
+    }
+  if (this->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
+      this->GetController(vtkPVSession::RENDER_SERVER_ROOT))
+    {
+    // when the two controller are different, we have a separate render-server
+    // and data-server session.
+    return vtkSMSession::RENDERING_SPLIT;
+    }
+
+  vtkPVServerInformation* server_info = this->GetServerInformation();
+  if (server_info && server_info->GetNumberOfMachines() > 0)
+    {
+    return vtkSMSession::RENDERING_SPLIT;
+    }
+
+  return vtkSMSession::RENDERING_UNIFIED;
 }

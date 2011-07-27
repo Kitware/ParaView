@@ -152,6 +152,7 @@ void vtkGeometryRepresentation::SetupDefaults()
                                              // connected to the LOD pipeline.
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
+  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(1);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughPointIds(1);
 
@@ -765,4 +766,16 @@ void vtkGeometryRepresentation::SetUseOutline(int val)
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(val);
     }
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
+{
+  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+    {
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(val);
+    }
+  this->Modified();
+  this->DeliveryFilter->Modified();
+  this->LODDeliveryFilter->Modified();
 }
