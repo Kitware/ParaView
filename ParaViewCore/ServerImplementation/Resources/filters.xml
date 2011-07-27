@@ -103,6 +103,93 @@
 
   <ProxyGroup name="filters">
 
+   <SourceProxy name="AMRToGrid" class="vtkAMRToGrid"
+                label="Convert AMR dataset to a uniform grid" >
+      <Documentaion
+          short_help="Converts AMR data to a uniform grid"
+          long_help="Converts AMR data to a uniform grid">
+          This filter allows the user to specify a Region of Interest(ROI)
+          within the AMR data-set and extract it as a uniform grid.   
+     </Documentaion>
+     
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+     
+     
+     <IntVectorProperty
+        name="TransferToNodes"
+        command="SetTransferToNodes"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the solution will be transfered
+          to the nodes of the extracted region or the cells.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+        name="NumberOfSubdivisions"
+        command="SetNumberOfSubdivisions"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Set the number of subdivisions for recursive
+          coordinate bisection.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+        name="LevelOfResolution"
+        command="SetLevelOfResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" /> 
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+      
+      <DoubleVectorProperty name="Min"
+                          command="SetMin"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+     </DoubleVectorProperty>
+                                      
+     <DoubleVectorProperty name="Max"
+                          command="SetMax"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+       
+    </DoubleVectorProperty>
+    
+   </SourceProxy>
+   
    <!-- ==================================================================== -->
    <SourceProxy name="AMRSlice" class="vtkAMRSliceFilter"
                 label="Slice AMR data" >
