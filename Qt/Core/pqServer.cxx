@@ -160,7 +160,7 @@ void pqServer::initialize()
     proxy->FastDelete();
     }
   this->GlobalMapperPropertiesProxy = proxy;
-  proxy->Delete();
+  this->updateGlobalMapperProperties();
 
   // Create Strict Load Balancing Proxy
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -176,7 +176,6 @@ void pqServer::initialize()
     proxy->FastDelete();
     }
 
-  this->updateGlobalMapperProperties();
 
   // In case of Multi-clients connection, the client has to listen
   // server notification so collaboration could happen
