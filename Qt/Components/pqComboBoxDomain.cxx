@@ -195,6 +195,12 @@ void pqComboBoxDomain::internalDomainChanged()
 
   pqSMAdaptor::PropertyType type;
 
+  // the "data" corresponding to the current property value. This is used as the
+  // value to set as the current value if the combo-box didn't have any valid
+  // values to begin with. Otherwise, we try to preserve the current selection
+  // in the combo-box, if possible.
+  QVariant cur_property_value;
+
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   if(type == pqSMAdaptor::ENUMERATION)
     {
@@ -205,10 +211,12 @@ void pqComboBoxDomain::internalDomainChanged()
       texts.append(var.toString());
       data.append(var.toString());
       }
+    cur_property_value = pqSMAdaptor::getEnumerationProperty(
+      this->Internal->Property);
     }
   else if(type == pqSMAdaptor::FIELD_SELECTION)
     {
-    if(this->Internal->DomainName == "field_list")
+    if (this->Internal->DomainName == "field_list")
       {
       texts = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
       foreach (QString str, texts)
@@ -233,6 +241,8 @@ void pqComboBoxDomain::internalDomainChanged()
         data.append(pair.first);
         }
       }
+    cur_property_value =
+      pqSMAdaptor::getElementProperty(this->Internal->Property);
     }
   else if(type == pqSMAdaptor::PROXYSELECTION ||
           type == pqSMAdaptor::PROXYLIST)
@@ -243,6 +253,12 @@ void pqComboBoxDomain::internalDomainChanged()
       {
       texts.append(pxy->GetXMLLabel());
       data.append(pxy->GetXMLLabel());
+      }
+    pqSMProxy cur_value = pqSMAdaptor::getProxyProperty(
+      this->Internal->Property);
+    if (cur_value)
+      {
+      cur_property_value = cur_value->GetXMLLabel();
       }
     }
 
@@ -269,7 +285,20 @@ void pqComboBoxDomain::internalDomainChanged()
   if (oldData != data)
     {
     // save previous value to put back
-    QVariant old = combo->itemData(combo->currentIndex());
+    QVariant old;
+    if (combo->count() > 0)
+      {
+      old = combo->itemData(combo->currentIndex());
+      }
+    else
+      {
+      // the combo-box doesn't have any values currently, which implies that the
+      // domain is being setup of the first time. However, it's still possible
+      // that the property's value was already set (eg. undo/redo) so we need to
+      // ensure that we use the property value rather than the item in the
+      // combo-box.
+      old = cur_property_value;
+      }
     bool prev = combo->blockSignals(true);
     combo->clear();
     for (int cc=0; cc < data.size(); cc++)
