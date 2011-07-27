@@ -1175,7 +1175,7 @@ macro(write_static_plugins_init_file)
   foreach(plugin_name ${PARAVIEW_PLUGINLIST})
     set(plugins_init_function "${plugins_init_function}  PV_PLUGIN_IMPORT(${plugin_name});\n")
   endforeach()
-  set(plugins_init_function "${plugins_init_function}}")
+  set(plugins_init_function "${plugins_init_function}}\n")
 
   file(WRITE "${CMAKE_BINARY_DIR}/pvStaticPluginsInit.h" "${plugins_init_function}")
 endmacro()
