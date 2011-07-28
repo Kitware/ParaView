@@ -2408,6 +2408,7 @@ void vtkAMRDualClip::InitializeCopyAttributes(
   iter->InitTraversal();
   if (iter->IsDoneWithTraversal())
     { // Empty input
+    iter->Delete();
     return;
     }
   vtkDataObject *dataObject = iter->GetCurrentDataObject();
@@ -2417,6 +2418,7 @@ void vtkAMRDualClip::InitializeCopyAttributes(
     vtkErrorMacro("Expecting a uniform grid.");
     }
   mesh->GetPointData()->CopyAllocate(uGrid->GetCellData());
+  iter->Delete();
 }
 
 
