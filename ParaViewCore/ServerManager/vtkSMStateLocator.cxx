@@ -18,6 +18,8 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyProperty.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -35,6 +37,11 @@ public:
   void UnRegisterState(vtkTypeUInt32 globalId)
     {
     this->StateMap.erase(globalId);
+    }
+
+  void UnRegisterAllStates()
+    {
+    this->StateMap.clear();
     }
 
   bool FindState( vtkTypeUInt32 globalId, vtkSMMessage* stateToFill )
@@ -109,6 +116,15 @@ void vtkSMStateLocator::UnRegisterState( vtkTypeUInt32 globalID, bool force )
     }
 }
 //---------------------------------------------------------------------------
+void vtkSMStateLocator::UnRegisterAllStates(bool force)
+{
+  this->Internals->UnRegisterAllStates();
+  if(force && this->ParentLocator)
+    {
+    this->ParentLocator->UnRegisterAllStates(force);
+    }
+}
+//---------------------------------------------------------------------------
 bool vtkSMStateLocator::IsStateLocal( vtkTypeUInt32 globalID )
 {
   return this->Internals->FindState(globalID, NULL);
@@ -139,4 +155,22 @@ void vtkSMStateLocator::RegisterFullState(vtkSMProxy* proxy)
     vtkSMProxy* subproxy = proxy->GetSubProxy(idx);
     this->RegisterFullState(subproxy);
     }
+
+  // Save any proxy that is part of a Proxy/Source Property
+  vtkSMPropertyIterator* propIterator = proxy->NewPropertyIterator();
+  propIterator->Begin();
+  while(!propIterator->IsAtEnd())
+    {
+    vtkSMProxyProperty* property =
+        vtkSMProxyProperty::SafeDownCast(propIterator->GetProperty());
+    if(property)
+      {
+      for(unsigned int i=0; i < property->GetNumberOfProxies(); i++)
+        {
+        this->RegisterFullState(property->GetProxy(i));
+        }
+      }
+    propIterator->Next();
+    }
+  propIterator->Delete();
 }

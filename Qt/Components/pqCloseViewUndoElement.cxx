@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMDeserializerProtobuf.h"
+#include "vtkSMProxyProperty.h"
 
 #include "pqApplicationCore.h"
 #include "pqViewManager.h"
@@ -88,10 +89,18 @@ void pqCloseViewUndoElement::CloseView(
 //----------------------------------------------------------------------------
 int pqCloseViewUndoElement::Undo()
 {
-    pqViewManager* manager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  // Make sure that the associated representation get created again
+  bool oldCanCreateProxy = vtkSMProxyProperty::CanCreateProxy();
+  vtkSMProxyProperty::EnableProxyCreation();
+
+  pqViewManager* manager = qobject_cast<pqViewManager*>(
+      pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
   if (!manager)
     {
+    if(!oldCanCreateProxy)
+      {
+      vtkSMProxyProperty::DisableProxyCreation();
+      }
     vtkErrorMacro("Failed to locate the multi view manager. "
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
@@ -100,6 +109,12 @@ int pqCloseViewUndoElement::Undo()
   this->ProxyLocator->GetLocatedProxies(this->UndoSetWorkingContext);
 
   this->ProxyLocator->Clear();
+
+  // Bring back the old context
+  if(!oldCanCreateProxy)
+    {
+    vtkSMProxyProperty::DisableProxyCreation();
+    }
   return 1;
 }
 

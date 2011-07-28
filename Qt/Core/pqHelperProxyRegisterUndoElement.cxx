@@ -147,7 +147,6 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
       {
       helper = proxy->GetSession()->GetProxyLocator()->LocateProxy(item.Id);
       this->UndoSetWorkingContext->AddItem(helper);
-      helper->Delete();
       }
 
     if (!helper)
@@ -157,9 +156,6 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
       }
     pq_proxy->addHelperProxy(item.Name, helper);
     }
-
-  // Released cached proxy
-  proxy->GetSession()->GetProxyLocator()->Clear();
 
   return 1;
 }

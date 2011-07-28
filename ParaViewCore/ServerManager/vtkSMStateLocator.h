@@ -59,6 +59,11 @@ public:
   virtual void UnRegisterState(vtkTypeUInt32 globalID, bool force);
 
   // Description:
+  // Remove all the registered states
+  // if force is true, it will also remove it from its hierarchical parents.
+  virtual void UnRegisterAllStates(bool force);
+
+  // Description:
   // Return true if the given state can be found locally whitout the help of
   // on the hierarchical parent
   virtual bool IsStateLocal(vtkTypeUInt32 globalID);

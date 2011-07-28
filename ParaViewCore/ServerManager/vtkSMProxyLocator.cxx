@@ -130,4 +130,8 @@ vtkSMSession* vtkSMProxyLocator::GetSession()
 void vtkSMProxyLocator::SetSession(vtkSMSession* s)
 {
   this->Session = s;
+  if(this->Deserializer && s)
+    {
+    this->Deserializer->SetSession(s);
+    }
 }
