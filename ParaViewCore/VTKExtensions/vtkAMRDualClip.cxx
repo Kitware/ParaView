@@ -877,7 +877,7 @@ unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
   
   if (ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)] != 1)
     {
-    cerr << "debug\n";
+    //cerr << "debug\n";
     }
   
   return ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)];
