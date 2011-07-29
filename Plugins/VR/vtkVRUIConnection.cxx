@@ -84,8 +84,8 @@ class vtkVRUIConnection::pqInternals
   }
 
   bool Active;
-  vruiPipe *Pipe;
-  vruiServerState *State;
+  vtkVRUIPipe *Pipe;
+  vtkVRUIServerState *State;
   QMutex *StateMutex;
   bool Streaming;                   // streaming
   QWaitCondition *PacketSignalCond; // for streaming
@@ -99,16 +99,16 @@ class vtkVRUIConnection::pqInternals
     QMutex *stateLock;
     while(!done)
       {
-      vruiPipe::MessageTag m=this->Pipe->Receive();
+      vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
       switch(m)
         {
-        case vruiPipe::PACKET_REPLY:
+        case vtkVRUIPipe::PACKET_REPLY:
           cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
           this->StateMutex->lock();
           this->Pipe->ReadState(this->State);
           this->StateMutex->unlock();
           break;
-        case vruiPipe::STOPSTREAM_REPLY:
+        case vtkVRUIPipe::STOPSTREAM_REPLY:
           cout << "thread:STOPSTREAM_REPLY ok : tag=" << m << endl;
           done=true;
           break;
@@ -202,8 +202,8 @@ bool vtkVRUIConnection::Init()
 {
   QTcpSocket *socket=new QTcpSocket;
   socket->connectToHost(QString(this->Address.c_str()),atoi( this->Port.c_str() )); // ReadWrite?
-  this->Internals->Pipe=new vruiPipe(socket);
-  this->Internals->Pipe->Send(vruiPipe::CONNECT_REQUEST);
+  this->Internals->Pipe=new vtkVRUIPipe(socket);
+  this->Internals->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
   if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
     {
     cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
@@ -211,7 +211,7 @@ bool vtkVRUIConnection::Init()
     this->Internals->Pipe=0;
     return false;
     }
-  if(this->Internals->Pipe->Receive()!=vruiPipe::CONNECT_REPLY)
+  if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::CONNECT_REPLY)
     {
     cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
     delete this->Internals->Pipe;
@@ -219,7 +219,7 @@ bool vtkVRUIConnection::Init()
     return false;
     }
 
-  this->Internals->State=new vruiServerState;
+  this->Internals->State=new vtkVRUIServerState;
   this->Internals->StateMutex=new QMutex;
 
   this->Internals->Pipe->ReadLayout(this->Internals->State);
@@ -506,7 +506,7 @@ void vtkVRUIConnection::Activate()
 {
   if(!this->Internals->Active)
     {
-    this->Internals->Pipe->Send(vruiPipe::ACTIVATE_REQUEST);
+    this->Internals->Pipe->Send(vtkVRUIPipe::ACTIVATE_REQUEST);
     this->Internals->Active=true;
     }
 }
@@ -516,7 +516,7 @@ void vtkVRUIConnection::Deactivate()
   if(this->Internals->Active)
     {
     this->Internals->Active=false;
-    this->Internals->Pipe->Send(vruiPipe::DEACTIVATE_REQUEST);
+    this->Internals->Pipe->Send(vtkVRUIPipe::DEACTIVATE_REQUEST);
     }
 }
 
@@ -528,7 +528,7 @@ void vtkVRUIConnection::StartStream()
     this->Internals->PacketSignalCond=new QWaitCondition;
     QMutex m;
     m.lock();
-    this->Internals->Pipe->Send(vruiPipe::STARTSTREAM_REQUEST);
+    this->Internals->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
     this->Internals->PacketSignalCond->wait(&m);
     m.unlock();
     }
@@ -539,7 +539,7 @@ void vtkVRUIConnection::StopStream()
   if(this->Internals->Streaming)
     {
     this->Internals->Streaming=false;
-    this->Internals->Pipe->Send(vruiPipe::STOPSTREAM_REQUEST);
+    this->Internals->Pipe->Send(vtkVRUIPipe::STOPSTREAM_REQUEST);
     }
 }
 
@@ -572,10 +572,10 @@ void vtkVRUIConnection::GetNextPacket()
     else
       {
       // With a loop
-      this->Internals->Pipe->Send(vruiPipe::PACKET_REQUEST);
+      this->Internals->Pipe->Send(vtkVRUIPipe::PACKET_REQUEST);
       if(this->Internals->Pipe->WaitForServerReply(10000))
         {
-        if(this->Internals->Pipe->Receive()!=vruiPipe::PACKET_REPLY)
+        if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::PACKET_REPLY)
           {
           cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << endl;
           }
@@ -599,7 +599,7 @@ void vtkVRUIConnection::GetNextPacket()
 
 void vtkVRUIConnection::PrintPositionOrientation()
 {
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
+  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
   float pos[3];
@@ -685,7 +685,7 @@ void vtkVRUIConnection::NewButtonValue(int state,  int button)
   this->EventQueue->enqueue( temp );
 }
 
-void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vruiTrackerState> data, int sensor)
+void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor)
 {
 
   vtkVREventData temp;
@@ -765,7 +765,7 @@ void vtkVRUIConnection::GetAndEnqueueAnalogData()
 
 void vtkVRUIConnection::GetAndEnqueueTrackerData()
 {
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
+  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
   for (int i = 0; i < ( *trackers ).size(); ++i)

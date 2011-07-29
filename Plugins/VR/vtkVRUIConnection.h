@@ -111,8 +111,6 @@ public:
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
-
-
  protected slots:
   void run();
   void callback();
@@ -144,7 +142,7 @@ protected:
 
   void NewAnalogValue(vtkstd::vector<float> *data);
   void NewButtonValue(int state,  int button);
-  void NewTrackerValue(vtkSmartPointer<vruiTrackerState> data, int sensor);
+  void NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor);
 
   void configureTransform( vtkPVXMLElement* child );
   void saveButtonEventConfig( vtkPVXMLElement* child ) const;
@@ -174,7 +172,6 @@ protected:
 
   class pqInternals;
   pqInternals* Internals;
-
 
 private:
   vtkVRUIConnection(const vtkVRUIConnection&); // Not implemented.
