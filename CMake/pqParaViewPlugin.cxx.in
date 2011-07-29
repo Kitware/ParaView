@@ -135,10 +135,12 @@ void @PLUGIN_NAME@_Plugin::GetPythonSourceList(vtkstd::vector<vtkstd::string>& m
 PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
 
 //-----------------------------------------------------------------------------
+#ifdef BUILD_SHARED_LIBS
 #ifdef plugin_type_gui
 
 // Required to mark this as a Qt plugin.
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
+#endif
 #endif
 
 
