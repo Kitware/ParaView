@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkWeakPointer.h"
+#include "vtkEventQtSlotConnect.h"
 
 #include <QPointer>
 #include <QPixmap>
@@ -44,11 +45,19 @@ class pqPlotSettingsModel::pqImplementation
 {
 public:
   pqImplementation()
-  {
-  }
+    {
+    this->Connection = vtkEventQtSlotConnect::New();
+    }
+
+  ~pqImplementation()
+    {
+    this->Connection->Delete();
+    this->Connection = NULL;
+    }
 
   vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
+  vtkEventQtSlotConnect* Connection;
 
   vtkChartRepresentation* GetVTKRepresentation()
     {
@@ -82,6 +91,7 @@ void pqPlotSettingsModel::setRepresentation(pqDataRepresentation* rep)
     return;
     }
 
+  this->Implementation->Connection->Disconnect();
   if (this->Implementation->Representation)
     {
     QObject::disconnect(this->Implementation->Representation, 0, this, 0);
@@ -90,6 +100,13 @@ void pqPlotSettingsModel::setRepresentation(pqDataRepresentation* rep)
   this->Implementation->RepresentationProxy =
     vtkSMChartRepresentationProxy::SafeDownCast(rep->getProxy());
   this->Implementation->Representation = rep;
+  if (this->Implementation->RepresentationProxy)
+    {
+    this->Implementation->Connection->Connect(
+      this->Implementation->RepresentationProxy,
+      vtkCommand::PropertyModifiedEvent,
+      this, SLOT(emitDataChanged()));
+    }
 }
 
 pqDataRepresentation* pqPlotSettingsModel::representation() const
@@ -224,6 +241,15 @@ Qt::ItemFlags pqPlotSettingsModel::flags(const QModelIndex &idx) const
     }
 
   return result;
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotSettingsModel::emitDataChanged()
+{
+  emit this->dataChanged(
+    this->createIndex(0, 0),
+    this->createIndex(this->rowCount(QModelIndex())-1, 0));
+  this->updateCheckState(0, Qt::Horizontal);
 }
 
 //-----------------------------------------------------------------------------
