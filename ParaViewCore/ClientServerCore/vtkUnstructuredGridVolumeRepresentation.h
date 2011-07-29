@@ -153,6 +153,7 @@ protected:
   vtkVolumeRepresentationPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
   vtkUnstructuredDataDeliveryFilter* DeliveryFilter;
+  vtkPVUpdateSuppressor* DeliverySuppressor;
   vtkOrderedCompositeDistributor* Distributor;
   vtkPVUpdateSuppressor* UpdateSuppressor;
   vtkProjectedTetrahedraMapper* DefaultMapper;
@@ -161,6 +162,7 @@ protected:
 
   vtkPVGeometryFilter* LODGeometryFilter;
   vtkUnstructuredDataDeliveryFilter* LODDeliveryFilter;
+  vtkPVUpdateSuppressor* LODDeliverySuppressor;
   vtkPVUpdateSuppressor* LODUpdateSuppressor;
   vtkPolyDataMapper* LODMapper;
 

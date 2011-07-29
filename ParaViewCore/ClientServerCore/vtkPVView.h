@@ -88,7 +88,7 @@ public:
   // Get/Set the time this view is showing. Whenever time is changed, this fires
   // a ViewTimeChangedEvent event.
   // @CallOnAllProcessess
-  void SetViewTime(double value);
+  virtual void SetViewTime(double value);
   vtkGetMacro(ViewTime, double);
 
   // Description:
@@ -130,8 +130,15 @@ public:
   static vtkInformationRequestKey* REQUEST_PREPARE_FOR_RENDER();
 
   // Description:
+  // This is called to make representations deliver data to the rendering nodes
+  // after REQUEST_PREPARE_FOR_RENDER(). Called for every render only on those
+  // representations that should deliver data.
+  static vtkInformationRequestKey* REQUEST_DELIVERY();
+
+  // Description:
   // This is a render pass. This happens only after
-  // REQUEST_PREPARE_FOR_RENDER() has happened. This is called for every render.
+  // REQUEST_PREPARE_FOR_RENDER() (and optionally REQUEST_DELIVERY()) has happened.
+  // This is called for every render.
   static vtkInformationRequestKey* REQUEST_RENDER();
 
   // Description:

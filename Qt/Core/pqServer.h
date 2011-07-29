@@ -97,7 +97,11 @@ public:
 
   /// Returns the vtkPVServerInformation object which contains information about
   /// the command line options specified on the remote server, if any.
- vtkPVServerInformation* getServerInformation() const;
+  vtkPVServerInformation* getServerInformation() const;
+
+  /// Returns true if the client is waiting on some actions from the server that
+  /// typically result in progress events.
+  bool isProgressPending() const;
 
   /// Get/Set the application wide heart beat timeout setting.
   /// Heartbeats are used in case of remote server connections to avoid the

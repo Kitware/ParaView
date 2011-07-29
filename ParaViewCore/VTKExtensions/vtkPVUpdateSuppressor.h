@@ -45,6 +45,12 @@ public:
   void SetEnabled(bool);
   vtkGetMacro(Enabled, bool);
 
+//BTX
+  // Description:
+  // Provides access to the timestamp when the most recent ForceUpdate() was
+  // called.
+  vtkGetMacro(ForcedUpdateTimeStamp, vtkTimeStamp);
+
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
@@ -54,6 +60,8 @@ protected:
   int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
 
+  vtkTimeStamp ForcedUpdateTimeStamp;
+
   bool Enabled;
 
   // Create a default executive.
@@ -61,6 +69,7 @@ protected:
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
   void operator=(const vtkPVUpdateSuppressor&);  // Not implemented.
+//ETX
 };
 
 #endif

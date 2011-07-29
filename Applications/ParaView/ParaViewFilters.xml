@@ -185,4 +185,5 @@
   <Proxy group="filters" name="GenericContour" />
   <Proxy group="filters" name="GenericCut" />
   <Proxy group="filters" name="GenericStreamTracer" />
+  <Proxy group="filters" name="GenericGeometryFilter" />
 </ParaViewFilters>

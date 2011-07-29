@@ -22,7 +22,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="MySpecialRepresentation"
-        text="Special Mapper" subtype="1" />
+        text="Special Mapper" subtype="Surface" />
 
       <SubProxy>
         <Proxy name="MySpecialRepresentation"

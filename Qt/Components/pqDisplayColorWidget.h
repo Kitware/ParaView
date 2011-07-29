@@ -107,7 +107,6 @@ private slots:
   /// Called when any important property on the display changes.
   /// This updates the selected value.
   void updateGUI();
-  void needReloadGUI();
   void updateComponents();
 
 private:

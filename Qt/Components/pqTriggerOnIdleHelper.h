@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetVisibilityBehavior.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpreadSheetVisibilityBehavior_h 
-#define __pqSpreadSheetVisibilityBehavior_h
+#ifndef __pqTriggerOnIdleHelper_h 
+#define __pqTriggerOnIdleHelper_h
 
 #include <QObject>
-#include "pqApplicationComponentsExport.h"
+#include <QPointer>
+#include <QTimer>
+#include "pqComponentsExport.h"
 
-class pqView;
+class pqServer;
 
-/// @ingroup Behaviors
-/// Whenever spreadsheet view is created, ParaView wants to ensure that the
-/// active source is automatically displayed in that view. This is managed by
-/// this behavior. This also ensures that the spreadsheet view's decorator i.e.
-/// the toolbar where the user can choose the attribute to show is setup
-/// correctly as well.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetVisibilityBehavior : public QObject
+/// Often times we need to call certain slots on idle. However, just relying on
+/// Qt's idle is not safe since progress events often result in processing of
+/// pending events, which may not be a safe place for such slots to be called.
+/// In that such cases this class can be used. It emits the triggered() signal
+/// when the server (set using setServer()) is indeed idle. Otherwise it simply
+/// reschedules the triggering of another time.
+class PQCOMPONENTS_EXPORT pqTriggerOnIdleHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  pqSpreadSheetVisibilityBehavior(QObject* parent=0);
+  pqTriggerOnIdleHelper(QObject* parent=0);
+  virtual ~pqTriggerOnIdleHelper();
+
+  /// get the server
+  pqServer* server() const;
+
+signals:
+  void triggered();
+
+public slots:
+  void setServer(pqServer*);
+  void trigger();
 
 protected slots:
-  void showActiveSource(pqView*);
-  void createDecorator(pqView*);
+  void triggerInternal();
 
 private:
-  Q_DISABLE_COPY(pqSpreadSheetVisibilityBehavior)
+  Q_DISABLE_COPY(pqTriggerOnIdleHelper)
+
+  QPointer<pqServer> Server;
+  QTimer Timer;
 };
 
 #endif
-
-

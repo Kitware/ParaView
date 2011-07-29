@@ -170,16 +170,33 @@ void vtkSMViewProxy::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::Update()
 {
-  if (this->ObjectsCreated)
+  if (this->ObjectsCreated && this->NeedsUpdate)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << VTKOBJECT(this)
-           << "Update"
-           << vtkClientServerStream::End;
+      << VTKOBJECT(this)
+      << "Update"
+      << vtkClientServerStream::End;
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
+
+    unsigned int numProducers = this->GetNumberOfProducers();
+    for (unsigned int i=0; i<numProducers; i++)
+      {
+      vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+        this->GetProducerProxy(i));
+      if (repr)
+        {
+        repr->ViewUpdated(this);
+        }
+      else
+        {
+        //this->GetProducerProxy(i)->PostUpdateData();
+        }
+      }
+
+    this->PostUpdateData();
     }
 }
 

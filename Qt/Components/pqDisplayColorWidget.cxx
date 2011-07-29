@@ -317,10 +317,10 @@ void pqDisplayColorWidget::updateComponents()
       // remove previous connection, if any
       this->VTKConnect->Disconnect(
         lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
-        this, SLOT(needReloadGUI()), NULL);
+        this, SLOT(reloadGUI()), NULL);
       this->VTKConnect->Connect(
         lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
-        this, SLOT(needReloadGUI()), NULL, 0.0);
+        this, SLOT(reloadGUI()), NULL, 0.0);
 
       this->Components->addItem("Magnitude");
       for(int i=0; i<numComponents; i++)
@@ -361,43 +361,32 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
     {
     vtkSMProxy* repr = this->Representation->getProxy();
     this->VTKConnect->Connect(repr->GetProperty("ColorAttributeType"),
-      vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()),
+      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
       NULL, 0.0);
     this->VTKConnect->Connect(repr->GetProperty("ColorArrayName"),
-      vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()),
+      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
       NULL, 0.0);
 
     if (repr->GetProperty("Representation"))
       {
       this->VTKConnect->Connect(
         repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-        this, SLOT(needReloadGUI()),
+        this, SLOT(reloadGUI()),
         NULL, 0.0);
       }
 
     // Every time the display updates, it is possible that the arrays available for 
     // coloring have changed, hence we reload the list.
     QObject::connect(this->Representation, SIGNAL(dataUpdated()),
-      this, SLOT(needReloadGUI()));
+      this, SLOT(reloadGUI()));
     }
-  this->needReloadGUI();
+  this->reloadGUI();
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation* pqDisplayColorWidget::getRepresentation() const
 {
   return this->Representation;
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayColorWidget::needReloadGUI()
-{
-  if(this->Updating)
-    {
-    return;
-    }
-  this->Updating = true;
-  QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------

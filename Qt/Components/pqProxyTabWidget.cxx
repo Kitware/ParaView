@@ -73,11 +73,6 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   QObject::connect(this->Inspector, SIGNAL(postaccept()),
                    this->Display, SLOT(reloadGUI()));
 
-  this->DelayedSetViewTimer.setSingleShot(true);
-  this->DelayedSetViewTimer.setInterval(1);
-  QObject::connect(&this->DelayedSetViewTimer, SIGNAL(timeout()),
-    this, SLOT(setViewInternal()));
-
   this->setupDefaultConnections();
 }
 
@@ -126,14 +121,7 @@ void pqProxyTabWidget::setProxy(pqPipelineSource* proxy)
 //-----------------------------------------------------------------------------
 void pqProxyTabWidget::setView(pqView* view) 
 {
-  this->RequestedView = view;
-  this->DelayedSetViewTimer.start();
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyTabWidget::setViewInternal()
-{
-  this->View = this->RequestedView;
+  this->View = view;
   this->Inspector->setView(this->View);
   this->Display->setView(this->View);
 }

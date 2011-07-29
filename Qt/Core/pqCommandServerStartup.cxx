@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCommandServerStartup.h"
 
+#include "vtkPVConfig.h"
+
 #include <QTimer>
 #include <QtDebug>
 
@@ -129,6 +131,14 @@ void pqCommandServerStartup::execute(const OptionsT& user_options)
     QString::number(this->Server.renderServerPort(22221));
   options["PV_CONNECT_ID"] = "";
   options["PV_USERNAME"] = ""; // Unused at the moment
+  options["PV_VERSION_MAJOR"] =
+    QString::number(PARAVIEW_VERSION_MAJOR);
+  options["PV_VERSION_MINOR"] =
+    QString::number(PARAVIEW_VERSION_MINOR);
+  options["PV_VERSION_PATCH"] =
+    QString::number(PARAVIEW_VERSION_PATCH);
+  options["PV_VERSION"] = PARAVIEW_VERSION;
+  options["PV_VERSION_FULL"] = PARAVIEW_VERSION_FULL;
   
   // Merge user variables, allowing user variables to "override" the predefined variables ...
   for(OptionsT::const_iterator option = user_options.begin(); option != user_options.end(); ++option)

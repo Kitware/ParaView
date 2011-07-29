@@ -226,18 +226,8 @@ void pqProgressManager::onProgress(vtkObject* caller)
   int oldProgress = handler->GetLastProgress();
   QString text = handler->GetLastProgressText();
 
-  // forgive those who don't call SendPrepareProgress beforehand
-  if (this->EnableProgress == false &&
-    this->ReadyEnableProgress == false && oldProgress == 0)
+  if (this->ReadyEnableProgress == false)
     {
-    this->onStartProgress();
-    return;
-    }
-
-  // forgive those who don't cleanup or want to go the extra mile
-  if (oldProgress >= 100)
-    {
-    this->onEndProgress();
     return;
     }
   

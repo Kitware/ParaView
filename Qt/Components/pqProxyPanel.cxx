@@ -109,7 +109,7 @@ pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
 
   this->Implementation->VTKConnect->Connect(
     this->Implementation->Proxy, vtkCommand::UpdateDataEvent,
-    this, SLOT(dataUpdated()), 0, 0, Qt::QueuedConnection);
+    this, SLOT(dataUpdated()));
 }
 
 //-----------------------------------------------------------------------------

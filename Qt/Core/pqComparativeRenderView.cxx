@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 
 // Server Manager Includes.
-#include "QVTKWidget.h"
+#include "pqQVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqComparativeRenderView::pqInternal
 {
 public:
-  QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
+  QMap<vtkSMViewProxy*, QPointer<pqQVTKWidget> > RenderWidgets;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   pqInternal()
@@ -83,7 +83,7 @@ pqComparativeRenderView::pqComparativeRenderView(
 //-----------------------------------------------------------------------------
 pqComparativeRenderView::~pqComparativeRenderView()
 {
-  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
+  foreach (pqQVTKWidget* widget, this->Internal->RenderWidgets.values())
     {
     delete widget;
     }
@@ -168,7 +168,7 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
   // Destroy old QVTKWidgets widgets.
   foreach (vtkSMViewProxy* key, removed)
     {
-    QVTKWidget* item = this->Internal->RenderWidgets.take(key);
+    pqQVTKWidget* item = this->Internal->RenderWidgets.take(key);
     delete item;
     }
 
@@ -178,8 +178,9 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();
 
-    QVTKWidget* widget = new QVTKWidget();
+    pqQVTKWidget* widget = new pqQVTKWidget();
     widget->SetRenderWindow(renView->GetRenderWindow());
+    widget->setSession(compView->GetSession());
     widget->installEventFilter(this);
     widget->setContextMenuPolicy(Qt::NoContextMenu);
     this->Internal->RenderWidgets[key] = widget;
@@ -207,13 +208,11 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
       int index = y*dimensions[0]+x;
       vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
         currentViews->GetItemAsObject(index));
-      QVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
+      pqQVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
       layout->addWidget(vtkwidget, y, x);
       }
     }
-  
   currentViews->Delete();
-
 }
 
 //-----------------------------------------------------------------------------

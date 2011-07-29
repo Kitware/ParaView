@@ -23,6 +23,12 @@ FOREACH(pvexe ${PV_EXE_LIST})
   add_executable_with_forwarding(pv_exe_suffix
     ${pvexe} ${pvexe}.cxx)
   TARGET_LINK_LIBRARIES(${pvexe}${pv_exe_suffix} ${LIBS})
+
+  # link enabled plugins if not building in shared library mode
+  if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(${pvexe}${pv_exe_suffix} ${PARAVIEW_PLUGINLIST})
+  endif(NOT BUILD_SHARED_LIBS)
+
   # Install exe
   IF(NOT PV_INSTALL_NO_RUNTIME)
     INSTALL(TARGETS ${pvexe}

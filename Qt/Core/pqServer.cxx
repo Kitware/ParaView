@@ -232,6 +232,12 @@ vtkPVServerInformation* pqServer::getServerInformation() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqServer::isProgressPending() const
+{
+  return (this->Session && this->Session->GetPendingProgress());
+}
+
+//-----------------------------------------------------------------------------
 void pqServer::setHeartBeatTimeout(int msec)
 {
   // no need to set heart beats if not a remote connection.
@@ -254,7 +260,7 @@ void pqServer::heartBeat()
 {
   // Send random stream to all processes to produce some traffic and prevent
   // automatic disconnection
-  if(this->Session)
+  if(this->Session && !this->Session->GetPendingProgress())
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke

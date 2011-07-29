@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QList>
@@ -128,7 +128,7 @@ pqView::pqView( const QString& type,
   this->Internal->RenderTimer.setSingleShot(true);
   this->Internal->RenderTimer.setInterval(1);
   QObject::connect(&this->Internal->RenderTimer, SIGNAL(timeout()),
-    this, SLOT(forceRender()));
+    this, SLOT(tryRender()));
 
   pqServerManagerModel* smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -185,6 +185,19 @@ void pqView::initialize()
 void pqView::render()
 {
   this->Internal->RenderTimer.start();
+}
+
+//-----------------------------------------------------------------------------
+void pqView::tryRender()
+{
+  if (this->getProxy()->GetSession()->GetPendingProgress())
+    {
+    this->render();
+    }
+  else
+    {
+    this->forceRender();
+    }
 }
 
 //-----------------------------------------------------------------------------

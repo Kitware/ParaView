@@ -148,21 +148,26 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     // pipeline which breaks when running in parallel.
     if (this->DeliveryTimeStamp < this->DeliveryFilter->GetMTime())
       {
-      this->DeliveryFilter->Update();
-
-      // since there's no direct connection between the mapper and the collector,
-      // we don't put an update-suppressor in the pipeline.
-
-      // essential to break the pipeline link between the mapper and the delivery
-      // filter since when the delivery filter produces an empty image, the
-      // executive keeps on re-executing it every time.
-      vtkImageData* clone = vtkImageData::New();
-      clone->ShallowCopy(this->DeliveryFilter->GetOutputDataObject(0));
-      this->SliceMapper->SetInput(clone);
-      clone->Delete();
-
-      this->DeliveryTimeStamp.Modified();
+      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
       }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    this->DeliveryFilter->Modified();
+    this->DeliveryFilter->Update();
+
+    // since there's no direct connection between the mapper and the collector,
+    // we don't put an update-suppressor in the pipeline.
+
+    // essential to break the pipeline link between the mapper and the delivery
+    // filter since when the delivery filter produces an empty image, the
+    // executive keeps on re-executing it every time.
+    vtkImageData* clone = vtkImageData::New();
+    clone->ShallowCopy(this->DeliveryFilter->GetOutputDataObject(0));
+    this->SliceMapper->SetInput(clone);
+    clone->Delete();
+
+    this->DeliveryTimeStamp.Modified();
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

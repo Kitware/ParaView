@@ -50,7 +50,12 @@ void vtkPVUpdateSuppressor::SetEnabled(bool enable)
     return;
     }
   this->Enabled = enable;
-  this->Modified();
+
+  // This is not right. This will cause the update-suppressor to always
+  // re-execute when ForceUpdate() is called, which causes the sub-sequent
+  // filters/mappers to re-execute as well. This was resulting in display lists
+  // never being used.
+  //this->Modified();
   vtkUpdateSuppressorPipeline* executive = 
     vtkUpdateSuppressorPipeline::SafeDownCast(this->GetExecutive());
   if (executive)
@@ -66,6 +71,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   this->SetEnabled(false);
   this->Update();
   this->SetEnabled(enabled);
+  this->ForcedUpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------

@@ -102,6 +102,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Distributor = vtkOrderedCompositeDistributor::New();
   this->UpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
+  this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
+  this->LODDeliverySuppressor = vtkPVUpdateSuppressor::New();
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = VTK_SCALAR_MODE_DEFAULT;
@@ -134,6 +136,8 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->Distributor->Delete();
   this->UpdateSuppressor->Delete();
   this->LODUpdateSuppressor->Delete();
+  this->DeliverySuppressor->Delete();
+  this->LODDeliverySuppressor->Delete();
   this->SetColorArrayName(0);
 }
 
@@ -155,8 +159,11 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->DeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
   this->LODDeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
 
+  this->DeliverySuppressor->SetInputConnection(this->DeliveryFilter->GetOutputPort());
+  this->LODDeliverySuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+
   this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
-  this->Distributor->SetInputConnection(0, this->DeliveryFilter->GetOutputPort());
+  this->Distributor->SetInputConnection(0, this->DeliverySuppressor->GetOutputPort());
   this->Distributor->SetPassThrough(1);
 
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
@@ -164,7 +171,7 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
 
   this->UpdateSuppressor->SetInputConnection(this->Distributor->GetOutputPort());
-  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliverySuppressor->GetOutputPort());
 
   this->Mapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
   this->LODMapper->SetInputConnection(this->LODUpdateSuppressor->GetOutputPort());
@@ -211,8 +218,6 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     // this is where we will look to see on what nodes are we going to render and
     // render set that up.
-    this->DeliveryFilter->ProcessViewRequest(inInfo);
-    this->LODDeliveryFilter->ProcessViewRequest(inInfo);
     bool lod = this->SuppressLOD? false :
       (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
     if (lod)
@@ -223,13 +228,36 @@ int vtkGeometryRepresentation::ProcessViewRequest(
           inInfo->Get(vtkPVRenderView::LOD_RESOLUTION())) + 10;
         this->Decimator->SetNumberOfDivisions(division, division, division);
         }
-      this->LODDeliveryFilter->Update();
+      this->LODDeliveryFilter->ProcessViewRequest(inInfo);
+      if (this->LODDeliverySuppressor->GetForcedUpdateTimeStamp() <
+        this->LODDeliveryFilter->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
       }
     else
       {
-      this->DeliveryFilter->Update();
+      this->DeliveryFilter->ProcessViewRequest(inInfo);
+      if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
+        this->DeliveryFilter->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
       }
     this->Actor->SetEnableLOD(lod? 1 : 0);
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    if (this->Actor->GetEnableLOD())
+      {
+      this->LODDeliveryFilter->Modified();
+      this->LODDeliverySuppressor->ForceUpdate();
+      }
+    else
+      {
+      this->DeliveryFilter->Modified();
+      this->DeliverySuppressor->ForceUpdate();
+      }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -547,7 +575,10 @@ vtkSelection* vtkGeometryRepresentation::ConvertSelection(
   vtkView* _view, vtkSelection* selection)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(_view);
-  if (!view)
+  // if this->GeometryFilter has 0 inputs, it means we don't have any valid
+  // input data on this process, so we can't convert the selection.
+  if (!view ||
+    this->GeometryFilter->GetNumberOfInputConnections(0) == 0)
     {
     return this->Superclass::ConvertSelection(_view, selection);
     }

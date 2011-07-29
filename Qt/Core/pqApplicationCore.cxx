@@ -509,12 +509,18 @@ void pqApplicationCore::loadState(
     return ;
     }
 
+  // BUG #12398:
+  // This change was added to prevent VisTrails from recording unwanted events.
+  // We disable recording view deletion in Undo/Stack
+  // In anycase, the stack will be cleared, why bother recording something...
+  BEGIN_UNDO_EXCLUDE();
   QList<pqView*> current_views =
     this->ServerManagerModel->findItems<pqView*>(server);
   foreach (pqView* view, current_views)
     {
     this->ObjectBuilder->destroy(view);
     }
+  END_UNDO_EXCLUDE();
 
   emit this->aboutToLoadState(rootElement);
 

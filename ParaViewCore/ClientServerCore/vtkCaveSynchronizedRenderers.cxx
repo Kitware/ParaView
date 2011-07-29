@@ -174,10 +174,12 @@ void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
 {
   if(once)
     {
+#ifdef FIXME
       cam->SetHeadTracked( true );
       cam->SetScreenConfig( this->DisplayOrigin,
                             this->DisplayX,
                             this->DisplayY ,0.065, 1.0);
+#endif
       once =0;
     }
 }

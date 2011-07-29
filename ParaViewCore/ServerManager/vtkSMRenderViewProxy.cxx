@@ -496,7 +496,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* vtkNotUsed(modifiedProxy))
+void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (this->IsSelectionCached)
     {
@@ -507,6 +507,12 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* vtkNotUsed(modifiedProxy))
             << "InvalidateCachedSelection"
             << vtkClientServerStream::End;
     this->ExecuteStream(stream);
+    }
+
+  // skip modified properties on camera subproxy.
+  if (modifiedProxy != this->GetSubProxy("ActiveCamera"))
+    {
+    this->Superclass::MarkDirty(modifiedProxy);
     }
 }
 

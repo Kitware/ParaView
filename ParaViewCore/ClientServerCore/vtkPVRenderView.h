@@ -285,6 +285,11 @@ public:
   static vtkInformationObjectBaseKey* KD_TREE();
 
   // Description:
+  // Placed in REQUEST_PREPARE_FOR_RENDER() stage to indicate that the
+  // representation needs delivery.
+  static vtkInformationIntegerKey* NEEDS_DELIVERY();
+
+  // Description:
   // Make a selection. This will result in setting up of this->LastSelection
   // which can be accessed using GetLastSelection().
   // @CallOnAllProcessess
@@ -426,6 +431,14 @@ public:
   void AddManipulator(vtkCameraManipulator* val);
   void RemoveAllManipulators();
 
+  // Description:
+  // Overridden to synchronize information among processes whenever data
+  // changes. The vtkSMViewProxy ensures that this method is called only when
+  // something has changed on the view-proxy or one of its representations or
+  // their inputs. Hence it's okay to do some extra inter-process communication
+  // here.
+  virtual void Update();
+
 //BTX
 protected:
   vtkPVRenderView();
@@ -434,6 +447,10 @@ protected:
   // Description:
   // Actual render method.
   virtual void Render(bool interactive, bool skip_rendering);
+
+  // Description:
+  // Does data-delivery to the rendering nodes.
+  virtual void DoDataDelivery(bool using_lod_rendering, bool using_remote_rendering);
 
   // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
@@ -529,6 +546,11 @@ protected:
   static bool RemoteRenderingAllowed;
 
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
+
+  vtkTimeStamp UpdateTime;
+  vtkTimeStamp StillRenderTime;
+  vtkTimeStamp InteractiveRenderTime;
+
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

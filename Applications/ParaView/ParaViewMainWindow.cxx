@@ -38,9 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParaViewMenuBuilders.h"
 #include "vtkPVPlugin.h"
 
-
-
-
+#ifndef BUILD_SHARED_LIBS
+#include "pvStaticPluginsInit.h"
+#endif
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
@@ -51,6 +51,11 @@ ParaViewMainWindow::ParaViewMainWindow()
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+
+  // load static plugins
+#ifndef BUILD_SHARED_LIBS
+  paraview_static_plugins_init();
+#endif
 
   // Setup default GUI layout.
 

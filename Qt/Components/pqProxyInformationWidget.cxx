@@ -105,23 +105,21 @@ void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
   this->VTKConnect->Disconnect();
   if (this->OutputPort)
     {
-    QObject::disconnect(this->OutputPort->getServer()->getTimeKeeper(),
-                     SIGNAL(timeChanged()),
-                     this, SLOT(updateInformation()));
+    QObject::disconnect(this->OutputPort->getSource(), 
+        SIGNAL(dataUpdated(pqPipelineSource*)),
+        this, SLOT(updateInformation()));
     }
 
   this->OutputPort = source;
   
   if (this->OutputPort)
     {
-    QObject::connect(source->getSource(), 
+    QObject::connect(this->OutputPort->getSource(), 
         SIGNAL(dataUpdated(pqPipelineSource*)),
-        this,
-        SLOT(updateInformation()),
-        Qt::QueuedConnection);
+        this, SLOT(updateInformation()));
     }
 
-  QTimer::singleShot(10, this, SLOT(updateInformation()));
+  this->updateInformation();
 }
 
 //-----------------------------------------------------------------------------

@@ -2487,14 +2487,14 @@ attributes of the fragments.
       </DoubleVectorProperty>
 
       <IntVectorProperty
-        name="DegenerateCells"
-        command="SetEnableDegenerateCells"
+        name="InternalDecimation"
+        command="SetEnableInternalDecimation"
         number_of_elements="1"
         animateable="1"
         default_values="1" >
         <BooleanDomain name="bool"/>
         <Documentation>
-          If this property is on, a transition mesh between levels is created.
+          If this property is on, internal tetrahedra are decimation
         </Documentation>
       </IntVectorProperty>
 
@@ -2787,12 +2787,12 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="MaskPoints" class="vtkMaskPoints"
+   <SourceProxy name="MaskPoints" class="vtkPMaskPoints"
     label="Mask Points">
     <Documentation
           long_help="Reduce the number of points.  This filter is often used before glyphing. Generating vertices is an option."
           short_help="Reduce the number of points.">
-The Mask Points filter reduces the number of points in the dataset. It operates on any type of dataset, but produces only points / vertices as output. This filter is often used before the Glyph filter, but the basic point-masking functionality is also available on the Properties page for the Glyph filter.
+The Mask Points filter reduces the number of points in the dataset. It operates on any type of dataset, but produces only points / vertices as output.
     </Documentation>
     <InputProperty
        name="Input"
@@ -2816,7 +2816,7 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
         default_values="2" >
        <IntRangeDomain name="range" min="1"/>
        <Documentation>
-         The value of this property specifies the ratio of points to retain in the output. (For example, if the on ratio is 3, then the output will contain 1/3 as many points -- up to the value of the MaximumNumberOfPoints property -- as the input.)
+         The value of this property specifies that every OnStride-th points will be retained in the output when not using Random (the skip or stride size for point ids). (For example, if the on ratio is 3, then the output will contain every 3rd point, up to the the maximum number of points.)
        </Documentation>
      </IntVectorProperty>
 
@@ -2833,6 +2833,18 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
      </IntVectorProperty>
 
      <IntVectorProperty
+        name="ProportionalMaximumNumberOfPoints"
+        command="SetProportionalMaximumNumberOfPoints"
+        number_of_elements="1"
+        default_values="0"
+        label="Proportionally Distribute Maximum Number Of Points">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+        When this is off, the maximum number of points is taken per processor when running in parallel (total number of points = number of processors * maximum number of points).  When this is on, the maximum number of points is proportionally distributed across processors depending on the number of points per processor (total number of points = maximum number of points; maximum number of points per processor = number of points on a processor * maximum number of points / total number of points across all processors).
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
         name="Offset"
         command="SetOffset"
         number_of_elements="1"
@@ -2840,7 +2852,7 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
         default_values="0" >
        <IntRangeDomain name="range" min="0"/>
        <Documentation>
-         The value of this property indicates the point in the input dataset from which to start masking.
+         The value of this property indicates the starting point id in the ordered list of input points from which to start masking.
        </Documentation>
      </IntVectorProperty>
 
@@ -2849,10 +2861,26 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
         command="SetRandomMode"
         number_of_elements="1"
         default_values="0"
-        label="Random">
+        label="Random Sampling">
        <BooleanDomain name="bool"/>
        <Documentation>
-         If the value of this property is set to 0, then the points in the output will be randomly selected from the input; otherwise this filter will subsample regularly. Selecting points at random is helpful to avoid striping when masking the points of a structured dataset.
+         If the value of this property is set to true, then the points in the output will be randomly selected from the input in various ways set by Random Mode; otherwise this filter will subsample point ids regularly.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="RandomModeType"
+        command="SetRandomModeType"
+        number_of_elements="1"
+        default_values="0"
+        label="Random Sampling Mode">
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Randomized Id Strides"/>
+         <Entry value="1" text="Random Sampling"/>
+         <Entry value="2" text="Spatially Stratified Random Sampling"/>
+       </EnumerationDomain>
+       <Documentation>
+         Randomized Id Strides picks points with random id increments starting at Offset (the output probably isn't a statistically random sample).  Random Sampling generates a statistically random sample of the input, ignoring Offset (fast - O(sample size)).  Spatially Stratified Random Sampling is a variant of random sampling that splits the points into equal sized spatial strata before randomly sampling (slow - O(N log N)).
        </Documentation>
      </IntVectorProperty>
 

@@ -96,6 +96,8 @@ protected:
   vtkPolyData* DummyPolyData;
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
 
+  vtkTimeStamp DeliveryTimeStamp;
+
 private:
   vtkTextSourceRepresentation(const vtkTextSourceRepresentation&); // Not implemented
   void operator=(const vtkTextSourceRepresentation&); // Not implemented

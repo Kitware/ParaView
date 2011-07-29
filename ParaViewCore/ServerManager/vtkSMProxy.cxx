@@ -24,7 +24,6 @@
 #include "vtkSIProxy.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-#include "vtkPVProgressHandler.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
@@ -87,46 +86,6 @@ protected:
   vtkSMProxy* Proxy;
 };
 
-
-//-----------------------------------------------------------------------------
-class vtkSMProxyProgressObserver : public vtkCommand
-{
-public:
-
-  static vtkSMProxyProgressObserver* New()
-    {
-      return new vtkSMProxyProgressObserver;
-    }
-  vtkSMProxyProgressObserver()
-    {
-      this->Proxy = 0;
-    }
-  ~vtkSMProxyProgressObserver()
-    {
-      this->Proxy = 0;
-    }
-  
-  virtual void Execute(vtkObject *c, unsigned long event, void* pname)
-    {
-    if(!this->Proxy)
-      {
-      return;
-      }
-    this->Proxy->ProgressFinished();
-    }
-  
-  // Note that Proxy is not reference counted. Since the Proxy has a reference 
-  // to the Property and the Property has a reference to the Observer, making
-  // Proxy reference counted would cause a loop.
-  void SetProxy(vtkSMProxy* proxy)
-    {
-      this->Proxy = proxy;
-    }
-  vtkPVProgressHandler* ProgressHandler;
-protected:
-  vtkSMProxy* Proxy;
-};
-
 vtkStandardNewMacro(vtkSMProxy);
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
@@ -162,8 +121,6 @@ vtkSMProxy::vtkSMProxy()
   this->InMarkModified = 0;
 
   this->NeedsUpdate = true;
-  this->ProgressObserver = vtkSMProxyProgressObserver::New();
-  this->ProgressObserver->SetProxy(this);
 
   this->Hints = 0;
   this->Deprecated = 0;
@@ -201,21 +158,6 @@ vtkSMProxy::~vtkSMProxy()
     delete this->State;
     this->State = 0;
     }
-
-  this->RemoveProgressObserver();
-  if (this->ProgressObserver)
-    {
-    this->ProgressObserver->SetProxy(NULL);
-    this->ProgressObserver->Delete();
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxy::SetSession(vtkSMSession* session)
-{
-  //now we remove the observer so we don't keep sending out events
-  this->RemoveProgressObserver();
-  this->Superclass::SetSession(session);
 }
 
 //---------------------------------------------------------------------------
@@ -1061,7 +1003,7 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
       {
       // UpdatePropertyEvent is fired only for exposed properties.
       this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)exposed_name);
-      this->MarkModified(this);
+      this->MarkModified(subproxy);
       }
     }
 
@@ -1202,54 +1144,10 @@ void vtkSMProxy::PostUpdateData()
     }
   if (this->NeedsUpdate)
     {
-    if (this->Session)
-      {
-      //we need to watch for the end of progress so that we can properly
-      //send out the UpdateDataEvent after all the processes have finished
-      //if we don't wait intill the server is finished we run a good chance
-      //that representation on the client will try to update before the servers
-      //have finished rendering it
-      this->RemoveProgressObserver();
-
-      this->ProgressObserver->ProgressHandler = this->Session->GetProgressHandler();
-      this->ProgressObserver->ProgressHandler->AddObserver(
-        vtkCommand::EndEvent,this->ProgressObserver);
-      }
-    else if ( !this->Session )
-      {
-      //fallback to sending the event now.
-      this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
-      }    
+    this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
     this->NeedsUpdate = false;
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkSMProxy::ProgressFinished( )
-{
-  //We only want to send the UpdateDataEvent event once all the servers
-  //have reported back they are done. We know the servers are done once
-  //the progress handler starts to cleanup. All this works is done because
-  //if we send the UpdateDataEvent while the servers are running we can break
-  //ParaView. Mainly what will happen is that the progress manager will call
-  //processEvents which will make timers that are listening to UpdateDataEvent
-  //fire MPI communications to the server for updated information on the source
-  //that is still being generated on the server.
-  this->RemoveProgressObserver();
-  this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
-  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMProxy::RemoveProgressObserver()
-{
-  if (this->Session && this->ProgressObserver)
-    {
-    this->Session->GetProgressHandler()->RemoveObserver(this->ProgressObserver);
-    }
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)

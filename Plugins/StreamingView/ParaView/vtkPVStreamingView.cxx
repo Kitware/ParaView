@@ -181,6 +181,10 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
         pvrepr->MarkModified();
         }
       }
+
+    // Since the vtkPVStreamingView modifies representations, we need to update
+    // them explicitly.
+    this->Update();
     }
 
   this->Superclass::Render(interactive, skip_rendering);

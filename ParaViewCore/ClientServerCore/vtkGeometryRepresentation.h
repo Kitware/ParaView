@@ -242,6 +242,8 @@ protected:
   vtkOrderedCompositeDistributor* Distributor;
   vtkPVUpdateSuppressor* UpdateSuppressor;
   vtkPVUpdateSuppressor* LODUpdateSuppressor;
+  vtkPVUpdateSuppressor* DeliverySuppressor;
+  vtkPVUpdateSuppressor* LODDeliverySuppressor;
 
   int ColorAttributeType;
   char* ColorArrayName;

@@ -185,6 +185,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
+  pqTriggerOnIdleHelper.h
   pqTwoDRenderViewOptions.h
   pqVCRController.h
   pqViewContextMenuHandler.h
@@ -624,6 +625,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
+  pqTriggerOnIdleHelper.cxx
+  pqTriggerOnIdleHelper.h
   pqTwoDRenderViewOptions.cxx
   pqTwoDRenderViewOptions.h
   pqUndoStackBuilder.cxx

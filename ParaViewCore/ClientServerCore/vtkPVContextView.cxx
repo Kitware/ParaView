@@ -75,16 +75,8 @@ void vtkPVContextView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContextView::Render(bool interactive)
+void vtkPVContextView::Render(bool vtkNotUsed(interactive))
 {
-  if (!interactive)
-    {
-    // Update all representations.
-    // This should update mostly just the inputs to the representations, and maybe
-    // the internal geometry filter.
-    this->Update();
-    }
-
   // Since currently we only support client-side rendering, we disable render
   // synchronization for charts among all processes.
   this->SynchronizedWindows->SetEnabled(false);

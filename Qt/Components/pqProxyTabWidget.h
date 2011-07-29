@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTabWidget>
 #include <QPointer>
-#include <QTimer>
 #include "pqComponentsExport.h"
 
 class pqDataRepresentation;
@@ -112,9 +111,6 @@ protected:
   /// get the proxy for which properties are displayed
   pqPipelineSource* getProxy();
 
-private slots:
-  void setViewInternal();
-
 private:
   pqObjectInspectorWidget* Inspector;
   pqDisplayProxyEditorWidget* Display;
@@ -122,8 +118,6 @@ private:
   
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqView> View;
-  QPointer<pqView> RequestedView;
-  QTimer DelayedSetViewTimer;
 };
 
 #endif

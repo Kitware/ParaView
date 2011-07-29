@@ -76,9 +76,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
+#include "pqServer.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardColorLinkAdaptor.h"
+#include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
 #include "pqWidgetRangeDomain.h"
 
@@ -121,6 +123,7 @@ public:
   pqSignalAdaptorComboBox* BackfaceRepresentationAdaptor;
   pqWidgetRangeDomain* SliceDomain;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
+  pqTriggerOnIdleHelper TriggerUpdateEnableState;
 
   // map of <material labels, material files>
   static QMap<QString, QString> MaterialMap;
@@ -135,6 +138,10 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
+
+  QObject::connect(&this->Internal->TriggerUpdateEnableState,
+    SIGNAL(triggered()), this, SLOT(updateEnableState()));
+
   this->setupGUIConnections();
 
   // setting a repr proxy will enable this
@@ -182,6 +189,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   this->Internal->Representation = repr;
+  this->Internal->TriggerUpdateEnableState.setServer(
+    repr? repr->getServer() : NULL);
   if (!repr )
     {
     this->setEnabled(false);
@@ -420,7 +429,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->ColorBy->setRepresentation(repr);
   QObject::connect(this->Internal->ColorBy,
     SIGNAL(modified()),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    &this->Internal->TriggerUpdateEnableState, SLOT(trigger()));
 
   this->Internal->StyleRepresentation->setRepresentation(repr);
   QObject::connect(this->Internal->StyleRepresentation,
@@ -429,7 +438,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    &this->Internal->TriggerUpdateEnableState, SLOT(trigger()));
 
   this->Internal->Texture->setRepresentation(repr);
 
@@ -517,7 +526,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   QObject::connect(this->Internal->BackfaceStyleRepresentation,
                    SIGNAL(currentIndexChanged(const QString&)),
-                   this, SLOT(updateEnableState()), Qt::QueuedConnection);
+                   &this->Internal->TriggerUpdateEnableState, SLOT(trigger()));
 
   // setup for choosing backface color
   if (reprProxy->GetProperty("BackfaceDiffuseColor"))
@@ -697,7 +706,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->SliceDirection);
   QObject::connect(this->Internal->SliceDirectionAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
+    this, SLOT(sliceDirectionChanged()));
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
@@ -730,6 +739,15 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateEnableState()
 {
+  if (!this->Internal->Representation ||
+    this->Internal->Representation->getServer() == NULL)
+    {
+    return;
+    }
+
+  Q_ASSERT(
+    this->Internal->Representation->getServer()->isProgressPending() == false);
+
   QString reprType = this->Internal->Representation->getRepresentationType();
 
   if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
@@ -774,7 +792,7 @@ void pqDisplayProxyEditor::updateEnableState()
     // every time the user switches to Slice mode we update the domain for the
     // slider since the domain depends on the input to the image mapper which
     // may have changed.
-    QTimer::singleShot(0, this, SLOT(sliceDirectionChanged()));
+    this->sliceDirectionChanged();
     }
 
   this->Internal->compositeTree->setVisible(
@@ -844,9 +862,13 @@ void pqDisplayProxyEditor::updateEnableState()
         return;
         }
       }
+    if ( arrayInfo )
+      {
+      this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+      }
     }
 
-  this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+  
   this->Internal->ColorMapScalars->setEnabled(false);
 }
 
