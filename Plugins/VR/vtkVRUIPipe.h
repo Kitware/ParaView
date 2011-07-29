@@ -1,11 +1,11 @@
-#ifndef vruiPipe_h
-#define vruiPipe_h
+#ifndef vtkVRUIPipe_h
+#define vtkVRUIPipe_h
 
 class QTcpSocket;
 
-class vruiServerState;
+class vtkVRUIServerState;
 
-class vruiPipe
+class vtkVRUIPipe
 {
 public:
   // Description:
@@ -27,11 +27,11 @@ public:
   // Description:
   // Constructor from tcp socket.
   // \pre socket_exists: socket!=0
-  vruiPipe(QTcpSocket *socket);
+  vtkVRUIPipe(QTcpSocket *socket);
 
   // Description:
   // Destructor.
-  ~vruiPipe();
+  ~vtkVRUIPipe();
 
   // Description:
   // Send a VRUI protocol message.
@@ -50,20 +50,20 @@ public:
   // Description:
   // Read server's layout (whatever that means) and initialize current state
   // \pre state_exists: state!=0
-  void ReadLayout(vruiServerState *state);
+  void ReadLayout(vtkVRUIServerState *state);
 
   // Description:
   // Read server state.
   // \pre state_exists: state!=0
-  void ReadState(vruiServerState *state);
+  void ReadState(vtkVRUIServerState *state);
 
 protected:
   QTcpSocket *Socket;
 
 private:
-  vruiPipe(); // Not implemented.
-  vruiPipe(const vruiPipe&); // Not implemented.
-  void operator=(const vruiPipe&); // Not implemented.
+  vtkVRUIPipe(); // Not implemented.
+  vtkVRUIPipe(const vtkVRUIPipe&); // Not implemented.
+  void operator=(const vtkVRUIPipe&); // Not implemented.
 };
 
-#endif // #ifndef vruiPipe_h
+#endif // #ifndef vtkVRUIPipe_h

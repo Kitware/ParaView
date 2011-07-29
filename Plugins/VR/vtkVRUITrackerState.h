@@ -1,13 +1,13 @@
-#ifndef vruiTrackerState_h
-#define vruiTrackerState_h
+#ifndef vtkVRUITrackerState_h
+#define vtkVRUITrackerState_h
 
 #include "vtkObject.h"
 
-class vruiTrackerState : public vtkObject
+class vtkVRUITrackerState : public vtkObject
 {
 public:
-  static vruiTrackerState *New();
-  vtkTypeMacro(vruiTrackerState,vtkObjectBase);
+  static vtkVRUITrackerState *New();
+  vtkTypeMacro(vtkVRUITrackerState,vtkObjectBase);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -35,8 +35,8 @@ public:
   vtkSetVector3Macro(AngularVelocity,float);
 
 protected:
-  vruiTrackerState();
-  ~vruiTrackerState();
+  vtkVRUITrackerState();
+  ~vtkVRUITrackerState();
 
   float Position[3];
   float UnitQuaternion[4];
@@ -45,9 +45,9 @@ protected:
   float AngularVelocity[3];
 
 private:
-  vruiTrackerState(const vruiTrackerState&); // Not implemented.
-  void operator=(const vruiTrackerState&); // Not implemented.
+  vtkVRUITrackerState(const vtkVRUITrackerState&); // Not implemented.
+  void operator=(const vtkVRUITrackerState&); // Not implemented.
 };
 
 
-#endif // #ifndef vruiTrackerState_h
+#endif // #ifndef vtkVRUITrackerState_h

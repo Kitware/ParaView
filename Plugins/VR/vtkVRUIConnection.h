@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRQueue.h"
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
-#include "vruiTrackerState.h"
+#include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
 
 #include <map>

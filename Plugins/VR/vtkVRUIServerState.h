@@ -1,20 +1,20 @@
-#ifndef vruiServerState_h
-#define vruiServerState_h
+#ifndef vtkVRUIServerState_h
+#define vtkVRUIServerState_h
 
-#include "vruiTrackerState.h"
+#include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-class vruiServerState
+class vtkVRUIServerState
 {
 public:
   // Description:
   // Default constructor. All arrays are of size 0.
-  vruiServerState();
+  vtkVRUIServerState();
 
   // Description:
   // Return the state of all the trackers.
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *GetTrackerStates();
+  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *GetTrackerStates();
 
   // Description:
   // Return the state of all the buttons.
@@ -25,13 +25,13 @@ public:
   vtkstd::vector<float> *GetValuatorStates();
 
 protected:
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > TrackerStates;
+  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > TrackerStates;
   vtkstd::vector<bool> ButtonStates;
   vtkstd::vector<float> ValuatorStates;
 
 private:
-  vruiServerState(const vruiServerState&); // Not implemented.
-  void operator=(const vruiServerState&); // Not implemented.
+  vtkVRUIServerState(const vtkVRUIServerState&); // Not implemented.
+  void operator=(const vtkVRUIServerState&); // Not implemented.
 };
 
-#endif // #ifndef vruiServerState_h
+#endif // #ifndef vtkVRUIServerState_h

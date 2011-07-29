@@ -1,25 +1,25 @@
-#include "vruiServerState.h"
+#include "vtkVRUIServerState.h"
 
 // ----------------------------------------------------------------------------
-vruiServerState::vruiServerState()
+vtkVRUIServerState::vtkVRUIServerState()
 {
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *
-vruiServerState::GetTrackerStates()
+vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *
+vtkVRUIServerState::GetTrackerStates()
 {
   return &(this->TrackerStates);
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<bool> *vruiServerState::GetButtonStates()
+vtkstd::vector<bool> *vtkVRUIServerState::GetButtonStates()
 {
   return &(this->ButtonStates);
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<float> *vruiServerState::GetValuatorStates()
+vtkstd::vector<float> *vtkVRUIServerState::GetValuatorStates()
 {
   return &(this->ValuatorStates);
 }

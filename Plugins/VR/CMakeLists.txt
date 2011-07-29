@@ -65,9 +65,9 @@ SET( VR_SOURCE_FILES
   vtkVRQueueHandler.cxx
   vtkVRPropertyStyle.cxx
   vtkVRVectorPropertyStyle.cxx
-  vruiPipe.cxx
-  vruiServerState.cxx
-  vruiTrackerState.cxx
+  vtkVRUIPipe.cxx
+  vtkVRUIServerState.cxx
+  vtkVRUITrackerState.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRStarter

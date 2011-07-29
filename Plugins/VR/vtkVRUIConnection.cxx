@@ -52,9 +52,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkMath.h"
-#include "vruiPipe.h"
-#include "vruiServerState.h"
-#include "vruiTrackerState.h"
+#include "vtkVRUIPipe.h"
+#include "vtkVRUIServerState.h"
+#include "vtkVRUITrackerState.h"
 
 
 class vtkVRUIConnection::pqInternals

@@ -1,10 +1,10 @@
-#include "vruiTrackerState.h"
+#include "vtkVRUITrackerState.h"
 #include "vtkObjectFactory.h"
 
-vtkStandardNewMacro(vruiTrackerState);
+vtkStandardNewMacro(vtkVRUITrackerState);
 
 // ----------------------------------------------------------------------------
-vruiTrackerState::vruiTrackerState()
+vtkVRUITrackerState::vtkVRUITrackerState()
 {
   this->Position[0]=0.0;
   this->Position[1]=0.0;
@@ -24,12 +24,12 @@ vruiTrackerState::vruiTrackerState()
 }
 
 // ----------------------------------------------------------------------------
-vruiTrackerState::~vruiTrackerState()
+vtkVRUITrackerState::~vtkVRUITrackerState()
 {
 }
 
 // ----------------------------------------------------------------------------
-void vruiTrackerState::PrintSelf(ostream& os, vtkIndent indent)
+void vtkVRUITrackerState::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

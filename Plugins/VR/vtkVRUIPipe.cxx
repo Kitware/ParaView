@@ -1,24 +1,24 @@
-#include "vruiPipe.h"
+#include "vtkVRUIPipe.h"
 #include <cassert>
 #include <QTcpSocket>
-#include "vruiServerState.h"
+#include "vtkVRUIServerState.h"
 
 typedef unsigned short MessageTagPropocol;
 
 // ----------------------------------------------------------------------------
-vruiPipe::vruiPipe(QTcpSocket *socket)
+vtkVRUIPipe::vtkVRUIPipe(QTcpSocket *socket)
 {
   assert("pre: socket_exist" && socket!=0);
   this->Socket=socket;
 }
 
 // ----------------------------------------------------------------------------
-vruiPipe::~vruiPipe()
+vtkVRUIPipe::~vtkVRUIPipe()
 {
 }
 
 // ----------------------------------------------------------------------------
-void vruiPipe::Send(MessageTag m)
+void vtkVRUIPipe::Send(MessageTag m)
 {
   MessageTagPropocol message=m;
   this->Socket->write(reinterpret_cast<const char*>(&message),
@@ -26,13 +26,13 @@ void vruiPipe::Send(MessageTag m)
 }
 
 // ----------------------------------------------------------------------------
-bool vruiPipe::WaitForServerReply(int msecs)
+bool vtkVRUIPipe::WaitForServerReply(int msecs)
 {
   return this->Socket->waitForReadyRead(msecs);
 }
 
 // ----------------------------------------------------------------------------
-vruiPipe::MessageTag vruiPipe::Receive()
+vtkVRUIPipe::MessageTag vtkVRUIPipe::Receive()
 {
   MessageTagPropocol message;
 
@@ -51,7 +51,7 @@ vruiPipe::MessageTag vruiPipe::Receive()
 }
 
 // ----------------------------------------------------------------------------
-void vruiPipe::ReadLayout(vruiServerState *state)
+void vtkVRUIPipe::ReadLayout(vtkVRUIServerState *state)
 {
   assert("pre: state_exists" && state!=0);
 
@@ -61,7 +61,7 @@ void vruiPipe::ReadLayout(vruiServerState *state)
   int i=0;
   while(i<value)
     {
-    (*(state->GetTrackerStates()))[i]=vruiTrackerState::New();
+    (*(state->GetTrackerStates()))[i]=vtkVRUITrackerState::New();
     ++i;
     }
 
@@ -79,17 +79,17 @@ void vruiPipe::ReadLayout(vruiServerState *state)
 }
 
 // ----------------------------------------------------------------------------
-void vruiPipe::ReadState(vruiServerState *state)
+void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
 {
   assert("pre: state_exists" && state!=0);
 
   // read all trackers states.
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *trackers=state->GetTrackerStates();
+  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=state->GetTrackerStates();
   size_t i=0;
   size_t c=trackers->size();
   while(i<c)
     {
-    vruiTrackerState *tracker=(*trackers)[i].GetPointer();
+    vtkVRUITrackerState *tracker=(*trackers)[i].GetPointer();
     this->Socket->read(reinterpret_cast<char *>(tracker->GetPosition()),
                        3*sizeof(float));
     this->Socket->read(reinterpret_cast<char *>(tracker->GetUnitQuaternion()),
