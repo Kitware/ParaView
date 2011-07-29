@@ -179,7 +179,7 @@ void pqServer::initialize()
 
   // In case of Multi-clients connection, the client has to listen
   // server notification so collaboration could happen
-  if(this->session()->GetServerInformation()->GetMultiClientsEnable())
+  if(this->session()->IsMultiClients())
     {
     this->IdleCollaborationTimer.start();
     vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
@@ -261,7 +261,7 @@ bool pqServer::isRemote() const
 //-----------------------------------------------------------------------------
 bool pqServer::isMaster() const
 {
-  if(this->getServerInformation()->GetMultiClientsEnable())
+  if(this->session()->IsMultiClients())
     {
     vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
     if(currentSession)

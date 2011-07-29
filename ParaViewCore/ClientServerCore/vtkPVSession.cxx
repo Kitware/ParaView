@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkPVServerInformation.h"
 
 //----------------------------------------------------------------------------
 vtkPVSession::vtkPVSession()
@@ -133,4 +134,9 @@ bool vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
 void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+bool vtkPVSession::IsMultiClients()
+{
+  return this->GetServerInformation()->GetMultiClientsEnable();
 }

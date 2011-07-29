@@ -75,6 +75,11 @@ public:
   virtual vtkPVServerInformation* GetServerInformation()=0;
 
   // Description:
+  // Allow anyone to know easily if the current session is involved in
+  // collaboration or not. This is mostly true for the Client side.
+  virtual bool IsMultiClients();
+
+  // Description:
   // Provides access to the progress handler.
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 

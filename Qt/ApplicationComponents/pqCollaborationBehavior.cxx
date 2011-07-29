@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqCollaborationManager.h"
 
-#include "vtkPVServerInformation.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 pqCollaborationBehavior::pqCollaborationBehavior(QObject* parentObject)
@@ -57,7 +57,7 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
   // Clean-up previous instance if needed
   this->onServerRemoved(NULL);
 
-  if(server->getServerInformation()->GetMultiClientsEnable())
+  if(server->session()->IsMultiClients())
     {
     this->CollaborationManager = new pqCollaborationManager(this);
     this->CollaborationManager->setServer(server);
