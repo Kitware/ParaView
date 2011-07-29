@@ -56,7 +56,6 @@ public:
   vtkVRConnectionManager *ConnectionManager;
   vtkVRQueue* EventQueue;
   vtkVRQueueHandler* Handler;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -88,7 +87,6 @@ void pqVRStarter::onStartup()
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqVRStarter::onShutdown()
