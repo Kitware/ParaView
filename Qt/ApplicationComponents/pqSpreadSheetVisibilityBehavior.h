@@ -51,7 +51,8 @@ public:
   pqSpreadSheetVisibilityBehavior(QObject* parent=0);
 
 protected slots:
-  void onViewCreated(pqView*);
+  void showActiveSource(pqView*);
+  void createDecorator(pqView*);
 
 private:
   Q_DISABLE_COPY(pqSpreadSheetVisibilityBehavior)
