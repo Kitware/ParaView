@@ -694,6 +694,10 @@ void vtkPlotEdges::ReducePolyData(vtkPolyData* polyData, vtkPolyData* output)
   md->Update();
 
   output->ShallowCopy(vtkPolyData::SafeDownCast(md->GetOutputDataObject(0)));
+
+  // vtkPlotEdges cannot handle ghost-cells at all. Remove all ghost cells
+  // BUG #12422.
+  output->RemoveGhostCells(1);
 }
 
 

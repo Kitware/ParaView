@@ -59,6 +59,8 @@ public:
   // These are to evaluate performances. You can turn off degenerate cells
   // and multiprocess comunication to see how they affect speed of execution.
   // Degenerate cells is the meshing between levels in the grid.
+  vtkSetMacro(EnableInternalDecimation,int);
+  vtkGetMacro(EnableInternalDecimation,int);
   vtkSetMacro(EnableDegenerateCells,int);
   vtkGetMacro(EnableDegenerateCells,int);
   vtkBooleanMacro(EnableDegenerateCells,int);
@@ -85,12 +87,18 @@ protected:
   double IsoValue;
 
   // Algorithm options that may improve performance.
+  int EnableInternalDecimation;
   int EnableDegenerateCells;
   int EnableMultiProcessCommunication;
   int EnableMergePoints;
 
+  // Needed for copying cell data to point data.
+  vtkUnstructuredGrid* Mesh;
+
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  void InitializeCopyAttributes(vtkHierarchicalBoxDataSet *hbdsInput, vtkDataSet* mesh);
 
   // Description:
   // Not a pipeline function. This is a helper function that
@@ -109,14 +117,13 @@ protected:
 
   void ProcessDualCell(
     vtkAMRDualGridHelperBlock* block, int blockId,
-    int marchingCase,
     int x, int y, int z,
-    double values[8]);
+    vtkIdType cornerOffsets[8],
+    vtkDataArray *volumeFractionArray);
 
   void InitializeLevelMask(vtkAMRDualGridHelperBlock* block);
   void ShareLevelMask(vtkAMRDualGridHelperBlock* block);
   void DistributeLevelMasks();
-
 
   //void DebugCases();
   //void PermuteCases();

@@ -2301,14 +2301,14 @@ attributes of the fragments.
       </DoubleVectorProperty>
 
       <IntVectorProperty
-        name="DegenerateCells"
-        command="SetEnableDegenerateCells"
+        name="InternalDecimation"
+        command="SetEnableInternalDecimation"
         number_of_elements="1"
         animateable="1"
         default_values="1" >
         <BooleanDomain name="bool"/>
         <Documentation>
-          If this property is on, a transition mesh between levels is created.
+          If this property is on, internal tetrahedra are decimation
         </Documentation>
       </IntVectorProperty>
 

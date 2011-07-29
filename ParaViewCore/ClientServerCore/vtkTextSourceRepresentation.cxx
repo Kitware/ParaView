@@ -183,6 +183,15 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
     {
+
+    if (this->DeliveryTimeStamp < this->DataCollector->GetMTime())
+      {
+      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    this->DataCollector->Modified();
     this->DataCollector->Update();
 
     // since there's no direct connection between the mapper and the collector,
@@ -205,6 +214,7 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
       {
       repr->SetText(text.c_str());
       }
+    this->DeliveryTimeStamp.Modified();
     }
 
   return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);

@@ -39,6 +39,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkHierarchicalBoxDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkAMRBox.h"
 #include "vtkCellArray.h"
@@ -341,6 +342,7 @@ static int vtkAMRDualClipTetraTable[256][65] = {
 
 
 
+// Different from the same table in Contour!!!!!!!!
 static int vtkAMRDualIsoEdgeToPointsTable[12][2] =
   { {0,1}, {2,3}, {4,5}, {6,7},
     {0,2}, {1,3}, {4,6}, {5,7},
@@ -416,7 +418,7 @@ public:
   // Other regions need to be copied.
   // If the center has already been computed, then this returns immediately
   // (so it is ok to call this multiple times).
-  void ComputeLevelMask(vtkDataArray* scalars, double isoValue);
+  void ComputeLevelMask(vtkDataArray* scalars, double isoValue, int decimate);
 
   // This is used to syncronize the ghost level mask with neighbors.
   void CopyNeighborLevelMask(
@@ -571,7 +573,8 @@ void vtkDualGridClipInitializeLevelMask(
 // from neighbors if they are not on the boundary of the dataset.
 void vtkAMRDualClipLocator::ComputeLevelMask(
   vtkDataArray* scalars,
-  double isoValue)
+  double isoValue,
+  int decimate)
 {
   if (this->CenterLevelMaskComputed)
     {
@@ -603,7 +606,13 @@ void vtkAMRDualClipLocator::ComputeLevelMask(
 
   // Recursive : Going in compute tree,  going out fill it mask.
 
-  this->RecursiveComputeLevelMask(0);
+  // If decimation is off, then we might be able to skip computing the level mask.
+  // It might avoid some communication when synchronizing masks.
+  // This is easiest for now.
+  if (decimate)
+    {
+    this->RecursiveComputeLevelMask(0);
+    }
 }
 
 
@@ -865,6 +874,12 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
 unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 {
   unsigned char* ptr = this->GetLevelMaskPointer();
+  
+  if (ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)] != 1)
+    {
+    //cerr << "debug\n";
+    }
+  
   return ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)];
 }
 
@@ -1333,7 +1348,9 @@ vtkAMRDualClip::vtkAMRDualClip()
 {
   this->IsoValue = 100.0;
 
-  this->EnableDegenerateCells = 0;
+  this->EnableInternalDecimation = 0;
+  // When this is off, there
+  this->EnableDegenerateCells = 1;
   this->EnableMultiProcessCommunication = 0;
   this->EnableMergePoints = 0;
 
@@ -1367,6 +1384,8 @@ void vtkAMRDualClip::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "IsoValue: " << this->IsoValue << endl;
+  os << indent << "EnableInternalDecimation: "
+     << this->EnableInternalDecimation << endl;
   os << indent << "EnableDegenerateCells: "
      << this->EnableDegenerateCells << endl;
   os << indent << "EnableMergePoints: " << this->EnableMergePoints << endl;
@@ -1517,6 +1536,9 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
   this->LevelMaskPointArray->SetName("LevelMask");
   mesh->GetPointData()->AddArray(this->LevelMaskPointArray);
 
+  this->Mesh = mesh;
+  this->InitializeCopyAttributes(hbdsInput, this->Mesh);
+
   // Loop through blocks
   int numLevels = hbdsInput->GetNumberOfLevels();
   int numBlocks;
@@ -1541,6 +1563,7 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
   mesh->SetCells(VTK_TETRA,this->Cells);
 
   mesh->Delete();
+  this->Mesh = 0;
   this->Points->Delete();
   this->Points = 0;
   this->Cells->Delete();
@@ -1555,23 +1578,20 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
 
 //----------------------------------------------------------------------------
 // The only data specific stuff we need to do for the contour.
+//----------------------------------------------------------------------------
 template <class T>
-void vtkDualGridClipExtractCornerValues(
-  T* ptr, int yInc, int zInc,
-  double values[8])
+void vtkDualGridContourCastCornerValues(
+  T* ptr, vtkIdType offsets[8], double values[8])
 {
-  // Because of the marching cubes case table, I am stuck with
-  // VTK's indexing of corners.
-  values[0] = (double)(*ptr);
-  values[1] = (double)(ptr[1]);
-  values[2] = (double)(ptr[yInc]);
-  values[3] = (double)(ptr[1+yInc]);
-  values[4] = (double)(ptr[zInc]);
-  values[5] = (double)(ptr[1+zInc]);
-  values[6] = (double)(ptr[yInc+zInc]);
-  values[7] = (double)(ptr[1+yInc+zInc]);
+  values[0] = (double)(ptr[offsets[0]]);
+  values[1] = (double)(ptr[offsets[1]]);
+  values[2] = (double)(ptr[offsets[2]]);
+  values[3] = (double)(ptr[offsets[3]]);
+  values[4] = (double)(ptr[offsets[4]]);
+  values[5] = (double)(ptr[offsets[5]]);
+  values[6] = (double)(ptr[offsets[6]]);
+  values[7] = (double)(ptr[offsets[7]]);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(
@@ -1634,12 +1654,12 @@ void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
     { // Remote blocks are only to setup local block bit flags.
     return;
     }
-//  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
   vtkDataArray* volumeFractionArray =
       image->GetCellData()->GetArray(this->Helper->GetArrayName());
 
   vtkAMRDualClipLocator* locator = vtkAMRDualClipGetBlockLocator(block);
-  locator->ComputeLevelMask(volumeFractionArray, this->IsoValue);
+  locator->ComputeLevelMask(volumeFractionArray, this->IsoValue,
+                            this->EnableInternalDecimation);
 
   vtkAMRDualGridHelperBlock* neighbor;
   vtkAMRDualClipLocator* neighborLocator;
@@ -1689,7 +1709,8 @@ void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
 //                volumeFractionArray = this->GetInputArrayToProcess(0, image);
                 volumeFractionArray =
                     image->GetCellData()->GetArray(this->Helper->GetArrayName());
-                neighborLocator->ComputeLevelMask(volumeFractionArray, this->IsoValue);
+                neighborLocator->ComputeLevelMask(volumeFractionArray, this->IsoValue,
+                                                  this->EnableInternalDecimation);
                 locator->CopyNeighborLevelMask(block, neighbor);
                 }
               }
@@ -1803,7 +1824,7 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     return;
     }
 
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
+  //void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   double  origin[3];
   double* spacing;
   int     extent[6];
@@ -1840,19 +1861,18 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
 
   // We deal with the various data types by copying the corner values
   // into a double array.  We have to cast anyway to compute the case.
-  double cornerValues[8];
+  vtkIdType cornerOffsets[8];
 
   // The templated function needs the increments for pointers
   // cast to the correct datatype.
   int yInc = (extent[1]-extent[0]+1);
   int zInc = yInc * (extent[3]-extent[2]+1);
   // Use void pointers to march through the volume before we cast.
-  int dataType = volumeFractionArray->GetDataType();
-  int xVoidInc = volumeFractionArray->GetDataTypeSize();
-  int yVoidInc = xVoidInc * yInc;
-  int zVoidInc = xVoidInc * zInc;
+  //int dataType = volumeFractionArray->GetDataType();
+  //int xVoidInc = volumeFractionArray->GetDataTypeSize();
+  //int yVoidInc = xVoidInc * yInc;
+  //int zVoidInc = xVoidInc * zInc;
 
-  int cubeIndex;
 
   // Loop over all the cells in the dual grid.
   int x, y, z;
@@ -1863,9 +1883,10 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   int yMax = extent[3]-1;
   int zMax = extent[5]-1;
   //-
-  unsigned char* zPtr = (unsigned char*)(volumeFractionPtr);
-  unsigned char* yPtr;
-  unsigned char* xPtr;
+  vtkIdType zOffset = 0;
+  vtkIdType yOffset = 0;
+  vtkIdType xOffset = 0;
+  //-
   for (z = extent[4]; z < extent[5]; ++z)
     {
     int nz = 1;
@@ -1873,7 +1894,7 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     else if (z == zMax) {nz = 2;}
     sz = spacing[2];
     oz = origin[2] + (double)(z)*sz;
-    yPtr = zPtr;
+    yOffset = zOffset;
     for (y = extent[2]; y < extent[3]; ++y)
       {
       int ny = 1;
@@ -1881,7 +1902,7 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
       else if (y == yMax) {ny = 2;}
       sy = spacing[1];
       oy = origin[1] + (double)(y)*sy;
-      xPtr = yPtr;
+      xOffset = yOffset;
       for (x = extent[0]; x < extent[1]; ++x)
         {
         int nx = 1;
@@ -1892,58 +1913,23 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
         // Skip the cell if a neighbor is already processing it.
         if ( (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitOwner) )
           {
-          // Get the corner values as doubles
-          switch (dataType)
-            {
-            vtkTemplateMacro(vtkDualGridClipExtractCornerValues(
-                             (VTK_TT *)(xPtr), yInc, zInc,
-                             cornerValues));
-            default:
-              vtkGenericWarningMacro("Execute: Unknown ScalarType");
-            }
-          // compute the case index
-          cubeIndex = 0;
-          if (cornerValues[0] > this->IsoValue)
-            {
-            cubeIndex += 1;
-            }
-          if (cornerValues[1] > this->IsoValue)
-            {
-            cubeIndex += 2;
-            }
-          if (cornerValues[2] > this->IsoValue)
-            {
-            cubeIndex += 4;
-            }
-          if (cornerValues[3] > this->IsoValue)
-            {
-            cubeIndex += 8;
-            }
-          if (cornerValues[4] > this->IsoValue)
-            {
-            cubeIndex += 16;
-            }
-          if (cornerValues[5] > this->IsoValue)
-            {
-            cubeIndex += 32;
-            }
-          if (cornerValues[6] > this->IsoValue)
-            {
-            cubeIndex += 64;
-            }
-          if (cornerValues[7] > this->IsoValue)
-            {
-            cubeIndex += 128;
-            }
-          this->ProcessDualCell(block, blockId,
-                                cubeIndex, x, y, z,
-                                cornerValues);
+          // Get the corner values as offsets
+          cornerOffsets[0] = xOffset;
+          cornerOffsets[1] = xOffset+1;
+          cornerOffsets[2] = xOffset+yInc;
+          cornerOffsets[3] = xOffset+1+yInc;
+          cornerOffsets[4] = xOffset+zInc;
+          cornerOffsets[5] = xOffset+1+zInc;
+          cornerOffsets[6] = xOffset+yInc+zInc;
+          cornerOffsets[7] = xOffset+1+yInc+zInc;
+          this->ProcessDualCell(block, blockId, x, y, z,
+                                cornerOffsets, volumeFractionArray);
           }
-        xPtr += xVoidInc;
+        xOffset += 1; // xInc
         }
-      yPtr += yVoidInc;
+      yOffset += yInc;
       }
-    zPtr += zVoidInc;
+    zOffset += zInc;
     }
 
   if (this->EnableMergePoints)
@@ -1968,19 +1954,78 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
 
 
 
+
+
+
+
+
+
+
 //----------------------------------------------------------------------------
 // Not implemented as optimally as we could.  It can be improved by making
 // a fast path for internal cells (with no degeneracies).
 void vtkAMRDualClip::ProcessDualCell(
   vtkAMRDualGridHelperBlock* block, int blockId,
-  int cubeCase,
   int x, int y, int z,
-  double cornerValues[8])
+  vtkIdType cornerOffsets[8],
+  vtkDataArray *volumeFractionArray)
 {
+  // compute the case index
+  vtkImageData* image = block->Image;
+  if (image == 0)
+    { // Remote blocks are only to setup local block bit flags.
+    return;
+    }
+
+  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
+  int dataType = volumeFractionArray->GetDataType();
+  double cornerValues[8];
+  switch (dataType)
+    {
+    vtkTemplateMacro(vtkDualGridContourCastCornerValues(
+                     (VTK_TT *)(volumeFractionPtr), cornerOffsets, cornerValues));
+    default:
+      vtkGenericWarningMacro("Execute: Unknown ScalarType");
+    }
+  // compute the case index
+  int cubeIndex = 0;
+  if (cornerValues[0] > this->IsoValue)
+    {
+    cubeIndex += 1;
+    }
+  if (cornerValues[1] > this->IsoValue)
+    {
+    cubeIndex += 2;
+    }
+  if (cornerValues[2] > this->IsoValue)
+    {
+    cubeIndex += 4;
+    }
+  if (cornerValues[3] > this->IsoValue)
+    {
+    cubeIndex += 8;
+    }
+  if (cornerValues[4] > this->IsoValue)
+    {
+    cubeIndex += 16;
+    }
+  if (cornerValues[5] > this->IsoValue)
+    {
+    cubeIndex += 32;
+    }
+  if (cornerValues[6] > this->IsoValue)
+    {
+    cubeIndex += 64;
+    }
+  if (cornerValues[7] > this->IsoValue)
+    {
+    cubeIndex += 128;
+    }
+
   // I am trying to exit as quick as possible if there is
   // no surface to generate.  I could also check that the index
-  // is not on boundary.
-  if (cubeCase == 0)
+  // is not on boundary.4
+  if (cubeIndex == 0)
     {
     return;
     }
@@ -2022,7 +2067,7 @@ void vtkAMRDualClip::ProcessDualCell(
   gz = z + block->OriginIndex[2];
 
   double dx, dy, dz; // Chop cells in half at boundary.
-  double cornerPoints[32]; // 4 is easier to optimize than 3.
+  double cornerPoints[32]; // 4 per point is easier to optimize than 3. (32 vs 24)
   // Loop over the corners.
   for (int c = 0; c < 8; ++c)
     {
@@ -2145,7 +2190,7 @@ void vtkAMRDualClip::ProcessDualCell(
   // We have the points, now contour the cell.
   // Get edges.
   double pt[3];
-  int  *tetra = vtkAMRDualClipTetraTable[cubeCase];
+  int  *tetra = vtkAMRDualClipTetraTable[cubeIndex];
   vtkIdType* ptIdPtr;
 
   // loop over tetras
@@ -2157,12 +2202,17 @@ void vtkAMRDualClip::ProcessDualCell(
       {
       unsigned char levelMaskValue = 0;
       int casePtId = *tetra;
+      // convert from VTK corner ids to bit (x,y,z) corner ids.
       if (casePtId < 8)
         { // Corner (internal point)
         ptIdPtr = this->BlockLocator->GetCornerPointer(x,y,z,casePtId, block->OriginIndex);
         levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+((casePtId&1)?1:0),
                                                                y+((casePtId&2)?1:0),
                                                                z+((casePtId&4)?1:0));
+        if (levelMaskValue == 0) 
+          { // bug !!!!! trying to figure out what is going on.
+          levelMaskValue = 1;
+          }
         if (*ptIdPtr == -1)
           {
           // I am not going to tamper with the computation of points on the surface
@@ -2170,7 +2220,7 @@ void vtkAMRDualClip::ProcessDualCell(
           // Compute points for interior dual cells based on the
           // level mask degeneracy in the locator.
           // We could skip computing the "cornerpoints" for case 255 (all internal).
-          // It is a pain to handle boundaries here with duplicat code but oh well.
+          // It is a pain to handle boundaries here with duplicate code but oh well.
           // Hey! The results of the last pass were saved in cube boundary bits.
           dx = dy = dz = 0.5;
           if (cubeBoundaryBits[casePtId] & 1) { dx = 1.0; }
@@ -2192,6 +2242,19 @@ void vtkAMRDualClip::ProcessDualCell(
           pt[1] = origin[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
           pt[2] = origin[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
           *ptIdPtr = this->Points->InsertNextPoint(pt);
+          if (pt[1] > 100000.0)
+            {
+            cerr << "bug\n";
+            }
+
+          // For internal points we do not need to interpolate attributes.
+          // We just need to copy from a cell.  I do not know what to do for decimated degeneracy.
+          // I suppose the correct solution would be to average all high-res values in the degenerate
+          // lower level cell bounds, but that would be too dificult.  Just pick one.
+          // Averaging could be a pre processing step but we would have to modify input attributes .......
+          vtkIdType offset = cornerOffsets[casePtId];
+          this->Mesh->GetPointData()->CopyData(block->Image->GetCellData(),offset, *ptIdPtr);
+
           this->LevelMaskPointArray->InsertNextValue(levelMaskValue);
           }
         }
@@ -2213,6 +2276,17 @@ void vtkAMRDualClip::ProcessDualCell(
           pt[1] = cornerPoints[pt1Idx|1] + k*(cornerPoints[pt2Idx|1]-cornerPoints[pt1Idx|1]);
           pt[2] = cornerPoints[pt1Idx|2] + k*(cornerPoints[pt2Idx|2]-cornerPoints[pt1Idx|2]);
           *ptIdPtr = this->Points->InsertNextPoint(pt);
+          if (pt[1] > 100000.0)
+            {
+            cerr << "bug\n";
+            }
+
+          // Interpolate attributes
+          // Find the offsets of the two attributes to interpolate
+          vtkIdType offset0 = cornerOffsets[pt1Idx>>2];
+          vtkIdType offset1 = cornerOffsets[pt2Idx>>2];
+          this->Mesh->GetPointData()->InterpolateEdge(block->Image->GetCellData(),*ptIdPtr,offset0,offset1,k);
+
           this->LevelMaskPointArray->InsertNextValue(levelMaskValue);
           }
         }
@@ -2291,14 +2365,16 @@ void vtkAMRDualClip::DistributeLevelMasks()
                       {
                       scalars = block->Image->GetCellData()->GetArray(arrayName);
                       vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
-                      blockLocator->ComputeLevelMask(scalars, this->IsoValue);
+                      blockLocator->ComputeLevelMask(scalars, this->IsoValue,
+                                                     this->EnableInternalDecimation);
                       blockLevelMaskArray = blockLocator->GetLevelMaskArray();
                       }
                     if (neighborBlock->Image)
                       {
                       scalars = neighborBlock->Image->GetCellData()->GetArray(arrayName);
                       vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
-                      neighborLocator->ComputeLevelMask(scalars, this->IsoValue);
+                      neighborLocator->ComputeLevelMask(scalars, this->IsoValue,
+                                                        this->EnableInternalDecimation);
                       neighborLevelMaskArray = neighborLocator->GetLevelMaskArray();
                       }
 
@@ -2320,6 +2396,30 @@ void vtkAMRDualClip::DistributeLevelMasks()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkAMRDualClip::InitializeCopyAttributes(
+  vtkHierarchicalBoxDataSet *hbdsInput,
+  vtkDataSet* mesh)
+{
+  // Most of this is just getting a block with cell attributes so we can
+  // call CopyAllocate.
+  vtkCompositeDataIterator* iter = hbdsInput->NewIterator();
+  iter->GetVisitOnlyLeaves();
+  iter->InitTraversal();
+  if (iter->IsDoneWithTraversal())
+    { // Empty input
+    iter->Delete();
+    return;
+    }
+  vtkDataObject *dataObject = iter->GetCurrentDataObject();
+  vtkUniformGrid* uGrid = vtkUniformGrid::SafeDownCast(dataObject);
+  if (uGrid == 0)
+    {
+    vtkErrorMacro("Expecting a uniform grid.");
+    }
+  mesh->GetPointData()->CopyAllocate(uGrid->GetCellData());
+  iter->Delete();
+}
 
 
 // All this was for helping to generate and debug the case table.

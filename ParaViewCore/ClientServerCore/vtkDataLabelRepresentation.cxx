@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkDataLabelRepresentation.h"
 
-#include "vtkActor.h"
 #include "vtkActor2D.h"
+#include "vtkActor.h"
 #include "vtkCellCenters.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkInformation.h"
@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVUpdateSuppressor.h"
 #include "vtkRenderer.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform.h"
@@ -40,6 +41,7 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->MergeBlocks = vtkCompositeDataToUnstructuredGridFilter::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->DataCollector = vtkUnstructuredDataDeliveryFilter::New();
+  this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
 
   this->PointLabelMapper = vtkLabeledDataMapper::New();
   this->PointLabelActor = vtkActor2D::New();
@@ -56,8 +58,10 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->DataCollector->SetOutputDataType(VTK_UNSTRUCTURED_GRID);
 
   this->CacheKeeper->SetInputConnection(this->MergeBlocks->GetOutputPort());
-  this->PointLabelMapper->SetInputConnection(this->DataCollector->GetOutputPort());
-  this->CellCenters->SetInputConnection(this->DataCollector->GetOutputPort());
+
+  this->DeliverySuppressor->SetInputConnection(this->DataCollector->GetOutputPort());
+  this->PointLabelMapper->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
+  this->CellCenters->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
   this->CellLabelMapper->SetInputConnection(this->CellCenters->GetOutputPort());
 
   this->PointLabelActor->SetMapper(this->PointLabelMapper);
@@ -81,6 +85,7 @@ vtkDataLabelRepresentation::~vtkDataLabelRepresentation()
 {
   this->MergeBlocks->Delete();
   this->DataCollector->Delete();
+  this->DeliverySuppressor->Delete();
   this->PointLabelMapper->Delete();
   this->PointLabelActor->Delete();
   this->PointLabelProperty->Delete();
@@ -353,11 +358,34 @@ int vtkDataLabelRepresentation::RequestData(vtkInformation* request,
     this->DataCollector->RemoveAllInputs();
     }
 
-  // Since data-deliver mode never changes for this representation, we simply do
-  // the data-delivery in RequestData itself to keep things simple.
-  this->DataCollector->Update();
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+int vtkDataLabelRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request_type,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (!this->GetVisibility())
+    {
+    return false;
+    }
+
+  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+    {
+    if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
+      this->DataCollector->GetMTime())
+      {
+      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    this->DataCollector->Modified();
+    this->DeliverySuppressor->ForceUpdate();
+    }
+
+  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------
