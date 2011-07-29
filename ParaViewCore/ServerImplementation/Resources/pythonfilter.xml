@@ -245,7 +245,7 @@ Interpretor, a python interpretor to run the script upon the first
         default_values="0"> 
        <EnumerationDomain name="enum">
          <!-- Values come from vtkType.h-->
-         <Entry value="8" text="Same as Input"/> <!-- text="vtkDataSet" -->
+         <!-- <Entry value="8" text="Same as Input"/> --><!-- text="vtkDataSet" -->
          <Entry value="0" text="vtkPolyData"/>
          <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
          <Entry value="2" text="vtkStructuredGrid"/>

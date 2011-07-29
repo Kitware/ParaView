@@ -81,3 +81,6 @@ FOREACH (external_plugin_dir ${PARAVIEW_EXTERNAL_PLUGIN_DIRS})
   paraview_build_optional_plugin(${plugin_name}
     "${plugin_name} (External Plugin)" ${external_plugin_dir} ON)
 ENDFOREACH () 
+
+write_plugins_file()
+write_static_plugins_init_file()

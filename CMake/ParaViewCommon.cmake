@@ -791,12 +791,6 @@ IF(PARAVIEW_MINIMAL_BUILD)
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 #########################################################################
-# Add command line executables.
-ADD_SUBDIRECTORY(CommandLineExecutables)
-
-
-
-#########################################################################
 CONFIGURE_FILE(${ParaView_CMAKE_DIR}/CTestCustom.ctest.in
   ${ParaView_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
