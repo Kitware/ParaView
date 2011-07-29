@@ -38,7 +38,8 @@ class vtkContextNamedOptions::PlotInfo
 public:
   vtkWeakPointer<vtkPlot> Plot;
   vtkStdString Label;
-  bool Initialized;
+  bool ColorInitialized;
+  bool VisibilityInitialized;
   int LineThickness;
   int LineStyle;
   int MarkerStyle;
@@ -48,27 +49,29 @@ public:
 
   PlotInfo()
     {
-    Initialized = false;
-    LineThickness = 2;
-    LineStyle = 1;
-    MarkerStyle = 0;
-    Visible = 1;
-    Corner = 0;
-    Color[0] = Color[1] = Color[2] = 0;
+    this->ColorInitialized = false;
+    this->VisibilityInitialized = false;
+    this->LineThickness = 2;
+    this->LineStyle = 1;
+    this->MarkerStyle = 0;
+    this->Visible = 1;
+    this->Corner = 0;
+    this->Color[0] = this->Color[1] = this->Color[2] = 0;
     }
 
   PlotInfo(const PlotInfo &p)
     {
-    Initialized = p.Initialized;
-    LineThickness = p.LineThickness;
-    LineStyle = p.LineStyle;
-    MarkerStyle = p.MarkerStyle;
-    Visible = p.Visible;
-    Label = p.Label;
-    Color[0] = p.Color[0];
-    Color[1] = p.Color[1];
-    Color[2] = p.Color[2];
-    Plot = p.Plot;
+    this->ColorInitialized = p.ColorInitialized;
+    this->VisibilityInitialized = p.VisibilityInitialized;
+    this->LineThickness = p.LineThickness;
+    this->LineStyle = p.LineStyle;
+    this->MarkerStyle = p.MarkerStyle;
+    this->Visible = p.Visible;
+    this->Label = p.Label;
+    this->Color[0] = p.Color[0];
+    this->Color[1] = p.Color[1];
+    this->Color[2] = p.Color[2];
+    this->Plot = p.Plot;
     }
 
 };
@@ -238,7 +241,7 @@ void SetPlotInfoColor(vtkContextNamedOptions::PlotInfo& plotInfo, vtkColor3ub co
   plotInfo.Color[0] = color.GetData()[0]/255.0;
   plotInfo.Color[1] = color.GetData()[1]/255.0;
   plotInfo.Color[2] = color.GetData()[2]/255.0;
-  plotInfo.Initialized = true;
+  plotInfo.ColorInitialized = true;
 }
 }
 
@@ -272,9 +275,13 @@ void vtkContextNamedOptions::RefreshPlots()
 
     // Get the existing PlotInfo or initialize a new one
     PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
-    if (!plotInfo.Initialized)
+    if (!plotInfo.ColorInitialized)
       {
       SetPlotInfoColor(plotInfo, this->Internals->Colors->GetColorRepeating(i));
+      }
+    if (!plotInfo.VisibilityInitialized)
+      {
+      plotInfo.VisibilityInitialized = true;
       plotInfo.Visible = defaultVisible;
       }
 
@@ -392,6 +399,7 @@ void vtkContextNamedOptions::SetVisibility(const char* name, int visible)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible;
+  plotInfo.VisibilityInitialized = true;
   this->SetPlotVisibilityInternal(plotInfo, visible !=0, name);
 }
 
@@ -426,7 +434,7 @@ void vtkContextNamedOptions::SetColor(const char* name,
   plotInfo.Color[0] = r;
   plotInfo.Color[1] = g;
   plotInfo.Color[2] = b;
-  plotInfo.Initialized = true;
+  plotInfo.ColorInitialized = true;
   if (plotInfo.Plot)
     {
     plotInfo.Plot->SetColor(r, g, b);

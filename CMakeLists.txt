@@ -330,6 +330,10 @@ GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 ADD_SUBDIRECTORY(Plugins)
 
 #########################################################################
+# Add command line executables.
+ADD_SUBDIRECTORY(CommandLineExecutables)
+
+#########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
   # Applications MUST be configured after plugins, so they can override
   # the plugin configuration when necessary.

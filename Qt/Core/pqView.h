@@ -219,6 +219,12 @@ private slots:
   /// We check if the representation belongs to this view.
   void representationCreated(pqRepresentation* repr);
 
+  /// This is called when the timer in render() times out. We test if the
+  /// current moment is a reasonable moment to render and if so, call
+  /// forceRender(). If there are any pending progress events, then we treat the
+  /// moment as not a "reasonable moment" to render and defer the render again.
+  void tryRender();
+
 protected:
   /// Constructor:
   /// \c type  :- view type.

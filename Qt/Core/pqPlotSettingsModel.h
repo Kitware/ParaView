@@ -40,6 +40,8 @@ class vtkTable;
 class vtkChartXY;
 class pqDataRepresentation;
 
+/// pqPlotSettingsModel is used by display panels for plots to show the
+/// properties of all the series in a table.
 class PQCORE_EXPORT pqPlotSettingsModel : public pqCheckableHeaderModel
 {
   typedef pqCheckableHeaderModel Superclass;
@@ -120,6 +122,10 @@ public slots:
   int getSeriesStyle(int row) const;
   int getSeriesAxisCorner(int row) const;
   int getSeriesMarkerStyle(int row) const;
+
+protected slots:
+  /// emits data-changed event whenever the properties are modified.
+  void emitDataChanged();
 
 signals:
   void redrawChart();

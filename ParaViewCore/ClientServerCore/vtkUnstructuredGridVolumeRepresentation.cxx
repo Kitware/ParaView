@@ -65,9 +65,12 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->DeliveryFilter->SetOutputDataType(VTK_UNSTRUCTURED_GRID);
 
+  this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
+  this->DeliverySuppressor->SetInputConnection(this->DeliveryFilter->GetOutputPort());
+
   this->Distributor = vtkOrderedCompositeDistributor::New();
   this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
-  this->Distributor->SetInputConnection(this->DeliveryFilter->GetOutputPort());
+  this->Distributor->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
 
   this->UpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->UpdateSuppressor->SetInputConnection(this->Distributor->GetOutputPort());
@@ -79,11 +82,14 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDeliveryFilter->SetOutputDataType(VTK_POLY_DATA);
   this->LODDeliveryFilter->SetLODMode(true);
+
+  this->LODDeliverySuppressor = vtkPVUpdateSuppressor::New();
   this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
 
   this->CacheKeeper->SetInputConnection(this->Preprocessor->GetOutputPort());
   this->LODGeometryFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
-  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->LODDeliverySuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
+  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliverySuppressor->GetOutputPort());
   this->LODMapper->SetInputConnection(
     this->LODUpdateSuppressor->GetOutputPort());
   this->Actor->SetProperty(this->Property);
@@ -110,6 +116,9 @@ vtkUnstructuredGridVolumeRepresentation::~vtkUnstructuredGridVolumeRepresentatio
   this->LODGeometryFilter->Delete();
   this->LODMapper->Delete();
   this->LODDeliveryFilter->Delete();
+
+  this->DeliverySuppressor->Delete();
+  this->LODDeliverySuppressor->Delete();
 
   this->SetColorArrayName(0);
 
@@ -233,18 +242,39 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
 
     // // this is where we will look to see on what nodes are we going to render and
     // // render set that up.
-    this->DeliveryFilter->ProcessViewRequest(inInfo);
-    this->LODDeliveryFilter->ProcessViewRequest(inInfo);
 
     if (inInfo->Has(vtkPVRenderView::USE_LOD()))
       {
-      this->LODDeliveryFilter->Update();
+      this->LODDeliveryFilter->ProcessViewRequest(inInfo);
       this->Actor->SetEnableLOD(1);
+      if (this->LODDeliverySuppressor->GetForcedUpdateTimeStamp() <
+        this->LODDeliveryFilter->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
       }
     else
       {
-      this->DeliveryFilter->Update();
+      this->DeliveryFilter->ProcessViewRequest(inInfo);
       this->Actor->SetEnableLOD(0);
+      if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
+        this->DeliveryFilter->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    if (this->Actor->GetEnableLOD())
+      {
+      this->LODDeliveryFilter->Modified();
+      this->LODDeliverySuppressor->ForceUpdate();
+      }
+    else
+      {
+      this->DeliveryFilter->Modified();
+      this->DeliverySuppressor->ForceUpdate();
       }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())

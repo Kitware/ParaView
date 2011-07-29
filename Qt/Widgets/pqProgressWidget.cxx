@@ -82,8 +82,9 @@ void pqProgressWidget::setProgress(const QString& message, int value)
     {
     this->PendingEnableProgress = false;    
     }
-  if (!this->PendingEnableProgress)
+  if (!this->PendingEnableProgress && value > 0)
     {
+    this->ProgressBar->setEnabled((value < 100));
     this->ProgressBar->setProgress(message,value);
 
     }
@@ -96,15 +97,14 @@ void pqProgressWidget::enableProgress(bool enabled)
     {
     if (!this->PendingEnableProgress)
       {
-      this->PendingEnableProgress = true;
-      this->ProgressBar->setEnabled(true);
+      this->PendingEnableProgress = true;      
       this->EnableTime.start();
       }
     }
   else
     {
-    this->ProgressBar->reset();
     this->ProgressBar->setEnabled(false);
+    this->ProgressBar->reset();
     this->PendingEnableProgress = false;
     }
 }
