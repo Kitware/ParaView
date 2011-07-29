@@ -135,9 +135,6 @@ class vtkSMPropertyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
-class vtkSMProxyProgressObserver;
-class vtkSMSession;
-
 
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
@@ -153,11 +150,6 @@ public:
   static vtkSMProxy* New();
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the session on wihch this object exists.
-  // Note that session is not reference counted.
-  virtual void SetSession(vtkSMSession*);
 
   // Description:
   // Get/Set the location where the underlying VTK-objects are created. The
@@ -461,7 +453,6 @@ protected:
   friend class vtkSMNamedPropertyIterator;
   friend class vtkSMProxyManager;
   friend class vtkSMProxyObserver;
-  friend class vtkSMProxyProgressObserver;
   friend class vtkSMProxyProperty;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
@@ -567,15 +558,15 @@ protected:
   // Description:
   // Called by a proxy property, this adds the property,proxy
   // pair to the list of consumers.
-  void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
   // Remove the property,proxy pair from the list of consumers.
-  void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
   // Remove all consumers.
-  void RemoveAllConsumers();
+  virtual void RemoveAllConsumers();
 
   // Description:
   // Called by an proxy/input property to add property, proxy pair
@@ -643,17 +634,6 @@ protected:
   virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
 
   // Description:
-  // This method is called after the progress has finished being reported
-  // from all the servers. This is used in conjuction with with postUpdateData
-  // to properly invoke the vtkCommand::UpdateDataEvent after all the servers
-  // have finished
-  virtual void ProgressFinished( );  
-
-  // Description:
-  // This method is called to properly remove the progress callback observer
-  virtual void RemoveProgressObserver();
-
-  // Description:
   // SIClassName identifies the classname for the helper on the server side.
   vtkSetStringMacro(SIClassName);
   vtkGetStringMacro(SIClassName);
@@ -703,7 +683,6 @@ protected:
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
-  vtkSMProxyProgressObserver* ProgressObserver;
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
 //ETX

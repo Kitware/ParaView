@@ -33,19 +33,21 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVHardwareSelector.h"
 #include "vtkPKdTree.h"
 #include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
+#include "vtkPVDataRepresentation.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballRotate.h"
-#include "vtkTrackballPan.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
@@ -55,8 +57,8 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
+#include "vtkTrackballPan.h"
 #include "vtkWeakPointer.h"
-#include "vtkPVDisplayInformation.h"
 
 #include <assert.h>
 #include <vtkstd/vector>
@@ -78,6 +80,8 @@ vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REDISTRIBUTABLE_DATA_PRODUCER, ObjectBase);
 vtkInformationKeyMacro(vtkPVRenderView, KD_TREE, ObjectBase);
+vtkInformationKeyMacro(vtkPVRenderView, NEEDS_DELIVERY, Integer);
+
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -515,8 +519,6 @@ void vtkPVRenderView::ResetCameraClippingRange()
 void vtkPVRenderView::GatherBoundsInformation(
   bool using_distributed_rendering)
 {
-  // FIXME: when doing client-only render, we are wasting our energy computing
-  // universal bounds. How can we fix that?
   vtkMath::UninitializeBounds(this->LastComputedBounds);
 
   if (this->GetLocalProcessDoesRendering(using_distributed_rendering))
@@ -528,7 +530,13 @@ void vtkPVRenderView::GatherBoundsInformation(
     this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
     this->CenterAxes->SetUseBounds(1);
     }
-  this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+
+  if (using_distributed_rendering)
+    {
+    // sync up bounds across all processes when doing distributed rendering.
+    this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+    }
+
   if (!vtkMath::AreBoundsInitialized(this->LastComputedBounds))
     {
     this->LastComputedBounds[0] = this->LastComputedBounds[2] =
@@ -567,6 +575,10 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
+  // FIXME: Call update only when needed. That can be done at some point in the
+  // future.
+  this->Update();
+
   // Do all passes needed for rendering so that the geometry in the renderer is
   // updated. This is essential since the bounds are determined by using the
   // geometry bounds know to the renders on all processes. If they are not
@@ -591,6 +603,26 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::Update()
+{
+  vtkTimerLog::MarkStartEvent("RenderView::Update");
+  this->Superclass::Update();
+
+  // Do the vtkView::REQUEST_INFORMATION() pass.
+  this->GatherRepresentationInformation();
+
+  // Gather information about geometry sizes from all representations.
+  this->GatherGeometrySizeInformation();
+
+  // UpdateTime is used to determine if we need to redeliver the geometries.
+  // Hence the more accurate we can be about when to update this time, the
+  // better. Right now, we are relying on the client (vtkSMViewProxy) to ensure
+  // that Update is called only when some representation is modified.
+  this->UpdateTime.Modified();
+  vtkTimerLog::MarkEndEvent("RenderView::Update");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::StillRender()
 {
   vtkTimerLog::MarkStartEvent("Still Render");
@@ -611,20 +643,6 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
-  if (!interactive)
-    {
-    // Update all representations.
-    // This should update mostly just the inputs to the representations, and maybe
-    // the internal geometry filter.
-    this->Update();
-
-    // Do the vtkView::REQUEST_INFORMATION() pass.
-    this->GatherRepresentationInformation();
-
-    // Gather information about geometry sizes from all representations.
-    this->GatherGeometrySizeInformation();
-    }
-
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
 
@@ -697,10 +715,14 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     }
 
   // In REQUEST_PREPARE_FOR_RENDER, this view expects all representations to
-  // know the data-delivery mode.
+  // know the data-delivery mode. No representation should do any delivery here.
+  // Only inform the view whether they will do delivery. Then the "driver" will
+  // dictate what representations need to do delivery.
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_PREPARE_FOR_RENDER(),
     this->RequestInformation, this->ReplyInformationVector);
+
+  this->DoDataDelivery(use_lod_rendering, use_distributed_rendering);
 
   if (use_distributed_rendering &&
     this->OrderedCompositingBSPCutsSource->GetNumberOfInputConnections(0) > 0)
@@ -729,13 +751,24 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   if (!interactive)
     {
     // Keep bounds information up-to-date.
-    // FIXME: How can be make this so that we don't have to do parallel
-    // communication each time.
+
+    // GatherBoundsInformation will not do communication unless using
+    // distributed rendering.
     this->GatherBoundsInformation(use_distributed_rendering);
+
     this->UpdateCenterAxes(this->LastComputedBounds);
     }
 
   this->UsedLODForLastRender = use_lod_rendering;
+
+  if (interactive)
+    {
+    this->InteractiveRenderTime.Modified();
+    }
+  else
+    {
+    this->StillRenderTime.Modified();
+    }
 
   if (skip_rendering)
     {
@@ -756,6 +789,94 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
      use_distributed_rendering))
     {
     this->GetRenderWindow()->Render();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DoDataDelivery(
+  bool using_lod_rendering, bool using_remote_rendering)
+{
+  if ((using_lod_rendering &&
+    this->InteractiveRenderTime > this->UpdateTime) ||
+    (!using_lod_rendering &&
+     this->StillRenderTime > this->UpdateTime))
+    {
+    //cout << "skipping delivery" << endl;
+    return;
+    }
+
+  vtkMultiProcessController* s_controller =
+    this->SynchronizedWindows->GetClientServerController();
+  vtkMultiProcessController* d_controller =
+    this->SynchronizedWindows->GetClientDataServerController();
+  vtkMultiProcessController* p_controller =
+    vtkMultiProcessController::GetGlobalController();
+
+  vtkMultiProcessStream stream;
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    // Tell everyone the representations that this process thinks are need to
+    // delivery data.
+    int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
+    vtkstd::vector<int> need_delivery;
+    for (int cc=0; cc < num_reprs; cc++)
+      {
+      vtkInformation* info =
+        this->ReplyInformationVector->GetInformationObject(cc);
+      if (info->Has(NEEDS_DELIVERY()) && info->Get(NEEDS_DELIVERY()) == 1)
+        {
+        need_delivery.push_back(cc);
+        }
+      }
+
+    stream << static_cast<int>(need_delivery.size());
+    for (size_t cc=0; cc < need_delivery.size(); cc++)
+      {
+      stream << need_delivery[cc];
+      }
+
+    if (s_controller)
+      {
+      s_controller->Send(stream, 1, 9998877);
+      }
+    if (d_controller)
+      {
+      d_controller->Send(stream, 1, 9998877);
+      }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    }
+  else
+    {
+    if (s_controller)
+      {
+      s_controller->Receive(stream, 1, 9998877);
+      }
+    if (d_controller)
+      {
+      d_controller->Receive(stream, 1, 9998877);
+      }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    }
+  int size;
+  stream >> size;
+  for (int cc=0; cc < size; cc++)
+    {
+    int index;
+    stream >> index;
+    vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
+      this->GetRepresentation(index));
+    if (repr)
+      {
+      //cout << "Requesting Delivery: " << index << ": " << repr->GetClassName()
+      //  << endl;
+      repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
+      }
     }
 }
 
@@ -1032,7 +1153,7 @@ void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::InvalidateCachedSelection()
 {
-  this->Selector->Modified();
+  this->Selector->InvalidateCachedSelection();
 }
 
 //*****************************************************************

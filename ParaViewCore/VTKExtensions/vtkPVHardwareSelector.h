@@ -18,6 +18,9 @@
 // vtkHardwareSelector is subclass of vtkHardwareSelector that adds logic to
 // reuse the captured buffers as much as possible. Thus avoiding repeated
 // selection-rendering of repeated selections or picking.
+// This class does not know, however, when the cached buffers are invalid.
+// External logic must explicitly calls InvalidateCachedSelection() to ensure
+// that the cache is not reused.
 
 #ifndef __vtkPVHardwareSelector_h
 #define __vtkPVHardwareSelector_h
@@ -40,6 +43,10 @@ public:
   // capture the selection-buffers.
   virtual bool NeedToRenderForSelection();
 
+  // Description:
+  // Called to invalidate the cache.
+  void InvalidateCachedSelection()
+    { this->Modified(); }
 //BTX
 protected:
   vtkPVHardwareSelector();

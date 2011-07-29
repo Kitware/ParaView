@@ -52,12 +52,10 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::NeedToRenderForSelection()
 {
-  // I am worried this is not enough. But seems like whenever the data changes,
-  // for some reason the camera is modified and that seems to do the trick for
-  // now. But I am wary, very very wary!
-  return this->CaptureTime < this->GetMTime() ||
-    (this->Renderer &&
-     this->CaptureTime < this->Renderer->GetActiveCamera()->GetMTime());
+  // We rely on external logic to ensure that the MTime for the
+  // vtkPVHardwareSelector is explicitly modified when some action happens that
+  // would result in invalidation of captured buffers.
+  return this->CaptureTime < this->GetMTime();
 }
 
 //----------------------------------------------------------------------------

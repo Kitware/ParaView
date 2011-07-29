@@ -33,6 +33,7 @@ class vtkCompositeDataToUnstructuredGridFilter;
 class vtkLabeledDataMapper;
 class vtkProp3D;
 class vtkPVCacheKeeper;
+class vtkPVUpdateSuppressor;
 class vtkTextProperty;
 class vtkTransform;
 class vtkUnstructuredDataDeliveryFilter;
@@ -92,6 +93,14 @@ public:
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
 
+  // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  int ProcessViewRequest(
+    vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
 //BTX
 protected:
   vtkDataLabelRepresentation();
@@ -138,6 +147,7 @@ protected:
   vtkCompositeDataToUnstructuredGridFilter* MergeBlocks;
   vtkPVCacheKeeper* CacheKeeper;
   vtkUnstructuredDataDeliveryFilter* DataCollector;
+  vtkPVUpdateSuppressor* DeliverySuppressor;
 
   vtkLabeledDataMapper* PointLabelMapper;
   vtkTextProperty* PointLabelProperty;

@@ -47,16 +47,32 @@ public:
   // It also creates output ports if they are not already created.
   virtual void UpdatePipeline(double time);
 
+  // Description:
+  // Overridden to reset this->MarkedModified flag.
+  virtual void PostUpdateData();
+
+  // Description:
+  // Called after the view updates.
+  virtual void ViewUpdated(vtkSMProxy* view);
+
 //BTX
 protected:
   vtkSMRepresentationProxy();
   ~vtkSMRepresentationProxy();
 
-  virtual void UpdatePipelineInternal(double time, bool doTime);
+  // Unlike subproxies in regular proxies, subproxies in representations
+  // typically represent internal representations e.g. label representation,
+  // representation for selection etc. In that case, if the internal
+  // representation is modified, we need to ensure that any of our consumers is
+  // a consumer of all our subproxies as well.
+  virtual void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
+  virtual void RemoveAllConsumers();
 
   virtual void CreateVTKObjects();
+  void OnVTKRepresentationUpdated();
 
-  virtual void RepresentationUpdated();
+  virtual void UpdatePipelineInternal(double time, bool doTime);
 
   // Description:
   // Mark the data information as invalid.
