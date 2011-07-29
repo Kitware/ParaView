@@ -193,7 +193,7 @@ void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
     }
 }
 
-std::vector<std::string>& vtkVRPropertyStyle::tokenize( std::string input)
+std::vector<std::string> vtkVRPropertyStyle::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
   std::istringstream stm( input );
