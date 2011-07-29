@@ -28,6 +28,8 @@
 #include "vtkSMStateLocator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMDeserializerProtobuf.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/set>
@@ -39,6 +41,43 @@ class vtkSMUndoStack::vtkInternal
 public:
   typedef  vtkstd::set<vtkSmartPointer<vtkSMSession> >   SessionSetType;
   SessionSetType  Sessions;
+  vtkNew<vtkSMProxyLocator>         UndoSetProxyLocator;
+  vtkNew<vtkSMDeserializerProtobuf> UndoSetProxyDeserializer;
+  vtkNew<vtkSMStateLocator>         UndoSetStateLocator;
+
+  vtkInternal()
+    {
+    this->UndoSetProxyDeserializer->SetStateLocator(
+        this->UndoSetStateLocator.GetPointer());
+    this->UndoSetProxyLocator->SetDeserializer(
+        this->UndoSetProxyDeserializer.GetPointer());
+    this->UndoSetProxyLocator->UseSessionToLocateProxy(true);
+    }
+
+  void FillLocatorWithUndoStates(vtkUndoSet* undoSet, bool useBeforeState)
+    {
+    this->UndoSetStateLocator->UnRegisterAllStates(false);
+    int max = undoSet->GetNumberOfElements();
+    for (int cc=0; cc < max; ++cc)
+      {
+      vtkSMRemoteObjectUpdateUndoElement* elem =
+          vtkSMRemoteObjectUpdateUndoElement::SafeDownCast(
+              undoSet->GetElement(cc));
+
+      if(elem)
+        {
+        elem->SetProxyLocator(this->UndoSetProxyLocator.GetPointer());
+        if(useBeforeState)
+          {
+          this->UndoSetStateLocator->RegisterState(elem->BeforeState);
+          }
+        else
+          {
+          this->UndoSetStateLocator->RegisterState(elem->AfterState);
+          }
+        }
+      }
+    }
 
   void UpdateSessions(vtkUndoSet* undoSet)
     {
@@ -52,6 +91,12 @@ public:
         {
         this->Sessions.insert(elem->GetSession());
         }
+      }
+
+    assert("Undo element should not involve more than one session" && this->Sessions.size() < 2);
+    if(this->Sessions.size() == 1)
+      {
+      this->UndoSetStateLocator->SetParentLocator(this->Sessions.begin()->GetPointer()->GetStateLocator());
       }
     }
 
@@ -73,6 +118,7 @@ public:
 
   void ClearProxyLocators()
     {
+    this->UndoSetProxyLocator->Clear();
     SessionSetType::iterator iter = this->Sessions.begin();
     while(iter != this->Sessions.end())
       {
@@ -114,6 +160,7 @@ int vtkSMUndoStack::Undo()
   // Hold remote objects refs while the UndoSet is processing
   vtkNew<vtkCollection> remoteObjectsCollection;
   this->FillWithRemoteObjects(this->GetNextUndoSet(), remoteObjectsCollection.GetPointer());
+  this->Internal->FillLocatorWithUndoStates(this->GetNextUndoSet(), true);
 
   int retValue = this->Superclass::Undo();
   this->Internal->Clear();
@@ -133,6 +180,7 @@ int vtkSMUndoStack::Redo()
   // Hold remote objects refs while the UndoSet is processing
   vtkNew<vtkCollection> remoteObjectsCollection;
   this->FillWithRemoteObjects(this->GetNextRedoSet(), remoteObjectsCollection.GetPointer());
+  this->Internal->FillLocatorWithUndoStates(this->GetNextRedoSet(), false);
 
   int retValue = this->Superclass::Redo();
   this->Internal->Clear();
