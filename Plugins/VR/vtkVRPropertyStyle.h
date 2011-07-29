@@ -86,7 +86,7 @@ protected:
   void SetTrackerValue( std::string dest, double value );
   vtkSmartPointer<vtkSMProxy> Proxy;
   QString PropertyName;
-  std::vector<std::string> &tokenize( std::string input);
+  std::vector<std::string> tokenize( std::string input);
   std::map<std::string,std::string> Map;
 
 private:
