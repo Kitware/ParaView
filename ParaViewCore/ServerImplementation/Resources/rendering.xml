@@ -127,6 +127,7 @@
          name="HeadPose"
          command="SetEyeTransformMatrix"
          number_of_elements="16"
+	 argument_is_array="1"
          default_values="1.0 0.0 0.0 0.0
 			 0.0 1.0 0.0 0.0
 			 0.0 0.0 1.0 0.0
@@ -137,6 +138,7 @@
          name="WandPose"
          command="SetModelTransformMatrix"
          number_of_elements="16"
+	 argument_is_array="1"
          default_values="1.0 0.0 0.0 0.0
 			 0.0 1.0 0.0 0.0
 			 0.0 0.0 1.0 0.0
