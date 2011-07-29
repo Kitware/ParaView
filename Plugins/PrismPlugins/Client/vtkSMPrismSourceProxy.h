@@ -1,11 +1,11 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    PrismView.h
+  Program:   ParaView
+  Module:    vtkSMPrismSourceProxy.h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    PrismView.h
+  Module:    vtkSMPrismSourceProxy.h
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,57 +58,29 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME PrismView -
+// .NAME vtkPrismViewProxy - view setup for vtkPrism
 // .SECTION Description
-//
+// source proxy class used to easily identify our filters in 
+// vtkSMPrismViewProxy
 
-#ifndef _PrismView_h
-#define _PrismView_h
 
-#include "pqRenderView.h"
+#ifndef __vtkSMPrismSourceProxy_h
+#define __vtkSMPrismSourceProxy_h
 
-class PrismView : public pqRenderView
+#include "vtkSMSourceProxy.h"
+class vtkSMPrismSourceProxy : public vtkSMSourceProxy
 {
-  Q_OBJECT
-  typedef pqRenderView Superclass;
 public:
-  static QString prismViewType() { return "PrismView"; }
-  static QString prismViewTypeName() { return "Prism Rendered 3D View"; }
-  // Constructor:
-  // \c group :- SManager registration group name.
-  // \c name  :- SManager registration name.
-  // \c view  :- RenderView proxy.
-  // \c server:- server on which the proxy is created.
-  // \c parent:- QObject parent.
-  PrismView( const QString& group,
-                const QString& name,
-                vtkSMViewProxy* viewProxy,
-                pqServer* server,
-                QObject* parent=NULL);
+  static vtkSMPrismSourceProxy* New();
+  vtkTypeMacro(vtkSMPrismSourceProxy, vtkSMSourceProxy);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  PrismView( const QString& tname,
-                const QString& group,
-                const QString& name,
-                vtkSMViewProxy* viewProxy,
-                pqServer* server,
-                QObject* parent=NULL);
-
-
-  ~PrismView();
-
-  void GetWorldBounds(double bounds[6]);
-  void GetThresholdBounds(double bounds[6]);
-
-  void GetCustomBounds(double bounds[6]);
-  void SetCustomBounds(double bounds[6]);
-
-  void GetWorldScaleMode(int mode[3]);
-  void SetWorldScaleMode(int mode[3]);
+protected:
+  vtkSMPrismSourceProxy();
+  ~vtkSMPrismSourceProxy();
 
 private:
-  PrismView(const PrismView&); // Not implemented.
-  void operator=(const PrismView&); // Not implemented.
-
+  vtkSMPrismSourceProxy(const vtkSMPrismSourceProxy&); // Not implemented.
+  void operator=(const vtkSMPrismSourceProxy&); // Not implemented.
 };
-
-#endif // _PrismView_h
+#endif

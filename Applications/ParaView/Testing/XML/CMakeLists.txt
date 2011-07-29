@@ -173,6 +173,13 @@ IF (PARAVIEW_USE_MPI)
 
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
+
+  # The hierchical fractal source is a temporary testing source and it does not
+  # create the dataset correctly in parallel. Since it's a testing source, I am
+  # just going to disable the test in parallel. We can fix the source when
+  # needed.
+  SET (RectilinearFractal_DISABLE_CS TRUE)
+  SET (RectilinearFractal_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
 # Composite Surface Selection is currently broken in everything but bultin

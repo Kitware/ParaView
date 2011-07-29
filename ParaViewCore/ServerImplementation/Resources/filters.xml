@@ -786,6 +786,35 @@ The Clean to Grid filter merges points that are exactly coincident. It also conv
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="CleanUnstructuredGridCells" class="vtkCleanUnstructuredGridCells"
+      label="Clean Cells to Grid">
+      <Documentation
+         long_help="This filter merges cells and converts the data set to unstructured grid."
+         short_help="Merge cells.">
+Merges degenerate cells. Assumes the input grid does not contain duplicate
+points. You may want to run vtkCleanUnstructuredGrid first to assert it. If
+duplicated cells are found they are removed in the output. The filter also
+handles the case, where a cell may contain degenerate nodes (i.e. one and
+the same node is referenced by a cell more than once).
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkUnstructuredGrid"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input to the Clean Cells to Grid filter.
+           </Documentation>
+      </InputProperty>
+   <!-- End CleanUnstructuredGridCells -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="Delaunay2D" class="vtkDelaunay2D" label="Delaunay 2D">
       <Documentation
          long_help="Create 2D Delaunay triangulation of input points.

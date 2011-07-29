@@ -38,6 +38,8 @@
 
 #include <assert.h>
 
+bool vtkSISourceProxy::DisableExtentsTranslator = false;
+
 //*****************************************************************************
 class vtkSISourceProxy::vtkInternals
 {
@@ -186,6 +188,11 @@ bool vtkSISourceProxy::InitializeOutputPort(vtkAlgorithm* algo, int port)
 // Needs to be before "ExtractPieces" because translator propagates.
 bool vtkSISourceProxy::CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port)
 {
+  if(this->DisableExtentsTranslator)
+    {
+    return false;
+    }
+
   // Do not overwrite custom extent translators.
   // PVExtent translator should really be the default,
   // Then we would not need to do this.
@@ -422,6 +429,12 @@ void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelectio
   vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(
     extractSelection->GetVTKObject());
   algo->SetInputConnection(this->GetOutputPort(port));
+}
+
+//----------------------------------------------------------------------------
+void vtkSISourceProxy::SetDisableExtentsTranslator(bool value)
+{
+  DisableExtentsTranslator = value;
 }
 
 //----------------------------------------------------------------------------

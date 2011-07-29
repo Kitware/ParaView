@@ -127,6 +127,7 @@ public:
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
   void SetUseOutline(int);
+  void SetNonlinearSubdivisionLevel(int);
 
   //***************************************************************************
   // Forwarded to vtkProperty.

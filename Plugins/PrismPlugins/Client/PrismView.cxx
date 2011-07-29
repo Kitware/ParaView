@@ -87,8 +87,8 @@ PrismView::PrismView(
   const QString& name,
   vtkSMViewProxy* viewProxy,
   pqServer* server,
-  QObject* parent)
-  : pqRenderView(viewType, group, name, viewProxy, server, parent)
+  QObject* qparent)
+  : pqRenderView(viewType, group, name, viewProxy, server, qparent)
 {
 }
   PrismView::PrismView(
@@ -96,12 +96,82 @@ PrismView::PrismView(
                 const QString& name,
                 vtkSMViewProxy* viewProxy,
                 pqServer* server,
-                QObject* parent)
-  : pqRenderView(group, name, viewProxy, server, parent)
+                QObject* qparent)
+  : pqRenderView(group, name, viewProxy, server, qparent)
 {
 }
 
 //-----------------------------------------------------------------------------
 PrismView::~PrismView()
 {
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetWorldBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper prop(v, "WorldBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetThresholdBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper prop(v, "ThresholdBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetCustomBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper prop(v, "CustomBounds");
+    prop.UpdateValueFromServer();
+    prop.Get(bounds,6);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::SetCustomBounds(double bounds[6])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper(v, "CustomBounds").Set(bounds, 6);
+    v->UpdateProperty("CustomBounds");
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::GetWorldScaleMode(int mode[3])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper prop(v, "WorldScaleMode");
+    prop.UpdateValueFromServer();
+    prop.Get(mode,3);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void PrismView::SetWorldScaleMode(int mode[3])
+{
+  vtkSMProxy *v = this->getProxy();
+  if (v)
+    {
+    vtkSMPropertyHelper(v, "WorldScaleMode").Set(mode, 3);
+    v->UpdateProperty("WorldScaleMode");
+    }
 }

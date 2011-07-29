@@ -6,6 +6,7 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
@@ -33,6 +34,7 @@ SET (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
 set (FileSeries_BREAK TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
 set (LoadStateMultiView_BREAK TRUE)
+set (NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 set (TestIsoVolume_BREAK TRUE)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
