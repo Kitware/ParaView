@@ -45,6 +45,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqContextView.h
+  pqCollaborationEventPlayer.h
   pqCollaborationManager.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
@@ -186,6 +187,8 @@ VTK_ADD_LIBRARY(pqCore
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
+  pqCollaborationEventPlayer.cxx
+  pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
   pqCollaborationManager.h
   pqColorButtonEventPlayer.cxx

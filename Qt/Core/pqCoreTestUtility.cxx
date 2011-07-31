@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTesting.h"
 
+#include "pqCollaborationEventPlayer.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorButtonEventTranslator.h"
 #include "pqFileDialogEventPlayer.h"
@@ -115,6 +116,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFlatTreeViewEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqColorButtonEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+      new pqCollaborationEventPlayer(this));
 }
 
 pqCoreTestUtility::~pqCoreTestUtility()

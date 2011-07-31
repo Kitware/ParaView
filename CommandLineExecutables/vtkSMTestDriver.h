@@ -54,12 +54,13 @@ protected:
                          ProcessType type, 
                          const char* numProc,
                          int argStart=0,
-                         int argCount=0,
+                         int argEnd=0,
                          char* argv[]=0);
   
-  int StartServer(vtksysProcess* server, const char* name,
-                  vtkstd::vector<char>& out, vtkstd::vector<char>& err);
-  int StartClient(vtksysProcess* client, const char* name);
+  int StartProcessAndWait(vtksysProcess* server, const char* name,
+                  vtkstd::vector<char>& out, vtkstd::vector<char>& err,
+                  const char* string_to_wait_for);
+  int StartProcess(vtksysProcess* client, const char* name);
   void Stop(vtksysProcess* p, const char* name);
   int OutputStringHasError(const char* pname, vtkstd::string& output);
 
@@ -69,12 +70,20 @@ protected:
   int WaitForAndPrintLine(const char* pname, vtksysProcess* process,
                           vtkstd::string& line, double timeout,
                           vtkstd::vector<char>& out, vtkstd::vector<char>& err,
-                          int* foundWaiting);
+                          const char* string_to_wait_for=NULL,
+                          int* foundWaiting=NULL);
 
   vtkstd::string GetDirectory(vtkstd::string location);
 
 private:
-  vtkstd::string ClientExecutable;  // fullpath to paraview executable
+  struct ClientExecutableInfo
+    {
+    vtkstd::string ClientExecutable; //< fullpath to paraview executable
+    int ArgStart;
+    int ArgEnd;
+    };
+
+  vtkstd::vector<ClientExecutableInfo> ClientExecutables;
   vtkstd::string ServerExecutable;  // fullpath to paraview server executable
   vtkstd::string RenderServerExecutable;  // fullpath to paraview renderserver executable
   vtkstd::string DataServerExecutable;  // fullpath to paraview dataserver executable
@@ -122,9 +131,9 @@ private:
   int TestRenderServer;
   int TestServer;
   int TestTiledDisplay;
-  int ArgStart;
   int AllowErrorInOutput;
   int TestRemoteRendering;
+  int TestMultiClient;
   
   // Specify if the -rc flag was passed or not
   int ReverseConnection;

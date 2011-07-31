@@ -144,6 +144,12 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
 #endif
     }
 
+  if (options->GetDisableRegistry())
+    {
+    // a cout for test playback.
+    cout << "Process started" << endl;
+    }
+
   if (options->GetNumberOfTestScripts() > 0)
     {
     QTimer::singleShot(1000, this, SLOT(playTests()));
