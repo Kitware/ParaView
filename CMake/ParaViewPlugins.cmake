@@ -1158,3 +1158,24 @@ FUNCTION(WRITE_PLUGINS_FILE)
 
   FILE(WRITE "${EXECUTABLE_OUTPUT_PATH}/.plugins" "${plugins_ini}")
 ENDFUNCTION(WRITE_PLUGINS_FILE)
+
+# create a header file containing a paraview_init_static_plugins() method which
+# calls PV_PLUGIN_IMPORT for each plugin in the plugins list
+macro(write_static_plugins_init_file)
+  set(plugins_init_function "#include \"vtkPVPlugin.h\"\n\n")
+
+  # write PV_PLUGIN_IMPORT_INIT calls
+  foreach(plugin_name ${PARAVIEW_PLUGINLIST})
+    set(plugins_init_function "${plugins_init_function}PV_PLUGIN_IMPORT_INIT(${plugin_name});\n")
+  endforeach()
+  set(plugins_init_function "${plugins_init_function}\n")
+
+  # write PV_PLUGIN_IMPORT calls
+  set(plugins_init_function "${plugins_init_function}inline void paraview_static_plugins_init()\n{\n")
+  foreach(plugin_name ${PARAVIEW_PLUGINLIST})
+    set(plugins_init_function "${plugins_init_function}  PV_PLUGIN_IMPORT(${plugin_name});\n")
+  endforeach()
+  set(plugins_init_function "${plugins_init_function}}\n")
+
+  file(WRITE "${CMAKE_BINARY_DIR}/pvStaticPluginsInit.h" "${plugins_init_function}")
+endmacro()

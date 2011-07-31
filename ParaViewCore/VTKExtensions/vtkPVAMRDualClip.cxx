@@ -62,7 +62,9 @@ int vtkPVAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
 
-  this->SetIsoValue(this->VolumeFractionSurfaceValue *
+  // Don't call SetIsoValue() that changes filter's MTime which is not
+  // acceptable in RequestData().
+  this->IsoValue = (this->VolumeFractionSurfaceValue *
                     PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR);
 
   size_t noOfArrays = this->Implementation->CellArrays.size();

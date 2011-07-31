@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerObserver.h"
 #include "pqSMAdaptor.h"
+#include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
 
 
@@ -73,6 +74,7 @@ public:
   QPointer<pqRenderView> RenderView;
   QMap<vtkSMProxy*, Info> TextureIcons;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  pqTriggerOnIdleHelper TriggerUpdateEnableState;
 
   pqInternal()
     {
@@ -100,6 +102,9 @@ namespace
 pqTextureComboBox::pqTextureComboBox(QWidget* _parent):Superclass(_parent)
 {
   this->Internal = new pqInternal();
+  QObject::connect(&this->Internal->TriggerUpdateEnableState,
+    SIGNAL(triggered()), this, SLOT(updateEnableState()));
+
   this->InOnActivate = false;
 
   QObject::connect(this, SIGNAL(currentIndexChanged(int)),
@@ -193,6 +198,8 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
       this->Internal->Representation->getProxy()->GetProperty("Texture"));
     }
   this->Internal->Representation = repr;
+  this->Internal->TriggerUpdateEnableState.setServer(
+    repr? repr->getServer() : NULL);
   if (!this->Internal->Representation)
     {
     return;
@@ -202,7 +209,7 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
   // changed, and texture coords may have become available. Hence, we update the
   // enabled state.
   QObject::connect(this->Internal->Representation, SIGNAL(dataUpdated()),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    &this->Internal->TriggerUpdateEnableState, SLOT(trigger()));
 
   // When the texture attached to the representation changes, we want to update
   // the combo box.
@@ -214,7 +221,7 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
     }
   this->updateFromProperty();
 
-  QTimer::singleShot(0, this, SLOT(updateEnableState()));
+  this->Internal->TriggerUpdateEnableState.trigger();
 }
 
 //-----------------------------------------------------------------------------
