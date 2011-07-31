@@ -920,6 +920,11 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataObject* da
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
 {
+  if (this->ClientDataServerSocketController == NULL)
+    {
+    return;
+    }
+
   int myId = this->Controller->GetLocalProcessId();
 
   if (myId == 0)
