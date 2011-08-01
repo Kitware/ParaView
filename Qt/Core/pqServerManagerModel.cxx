@@ -103,17 +103,6 @@ pqServerManagerModel::pqServerManagerModel(
 //-----------------------------------------------------------------------------
 pqServerManagerModel::~pqServerManagerModel()
 {
-  vtkIdType serverID;
-  foreach( serverID ,this->Internal->Servers.keys() )
-    {
-    vtkSMSession* session = this->Internal->Servers.value(serverID)->session();
-    vtkSMSessionClient* sClient = vtkSMSessionClient::SafeDownCast(session);
-    if(sClient)
-      {
-      sClient->PreCollaborationSessionDisconnection();
-      }
-    }
-
   delete this->Internal;
 }
 

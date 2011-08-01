@@ -90,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkSMSessionClient.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -646,6 +647,16 @@ pqServer* pqApplicationCore::getActiveServer() const
 //-----------------------------------------------------------------------------
 void pqApplicationCore::prepareForQuit()
 {
+  foreach(pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
+    {
+    vtkSMSessionClient* sClient =
+        vtkSMSessionClient::SafeDownCast(server->session());
+    if(sClient)
+      {
+      sClient->PreCollaborationSessionDisconnection();
+      }
+    }
+
   // As tempting as it is to connect this slot to
   // aboutToQuit() signal, it doesn't work since that signal is not
   // fired until the event loop exits, which doesn't happen until animation

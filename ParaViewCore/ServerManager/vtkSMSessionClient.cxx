@@ -454,6 +454,12 @@ vtkTypeUInt32 vtkSMSessionClient::GetRealLocation(vtkTypeUInt32 location)
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::PushState(vtkSMMessage* message)
 {
+  // Prevent to push anything during the Quit process
+  if(this->NoMoreDelete)
+    {
+    return;
+    }
+
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
   int num_controllers=0;
