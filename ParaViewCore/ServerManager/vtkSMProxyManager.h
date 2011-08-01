@@ -448,6 +448,14 @@ public:
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
   // Description:
+  // Return the number of Selections models registered
+  vtkIdType GetNumberOfSelectionModel();
+
+  // Description:
+  // Return the selection model present at the index idx.
+  vtkSMProxySelectionModel* GetSelectionModelAt(int idx);
+
+  // Description:
   // ParaView has notion of "global properties". These are application wide
   // properties such as foreground color, text color etc. Changing values of
   // these properties affects all objects that are linked to these properties.

@@ -36,6 +36,17 @@ public:
   static vtkSMProxySelectionModel*  New();
   vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMRemoteObject);
   void PrintSelf(ostream&  os,  vtkIndent  indent);
+
+  // Description:
+  // Override the set session, so we can attach an observer to the Collaboration
+  // manager in order to monitor master/slave changes.
+  virtual void SetSession(vtkSMSession*);
+
+  // Description:
+  // Allow to synchronize the active object with master or just keep remote object
+  // out-of-synch. Only the state from the master will be loaded.
+  void SetFollowingMaster(bool following);
+  bool IsFollowingMaster();
  
 //BTX
   // vtkSMProxy selection flags
@@ -150,6 +161,7 @@ private:
   void operator = (const  vtkSMProxySelectionModel&); // Not implemented
 
   class vtkInternal;
+  friend class vtkInternal;
   vtkInternal* Internal;
 //ETX
 };

@@ -1565,6 +1565,30 @@ vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
   return iter->second;
 }
 //---------------------------------------------------------------------------
+vtkIdType vtkSMProxyManager::GetNumberOfSelectionModel()
+{
+  return static_cast<vtkIdType>(this->Internals->SelectionModels.size());
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModelAt(int idx)
+{
+  vtkSMProxyManagerInternals::SelectionModelsType::iterator iter =
+      this->Internals->SelectionModels.begin();
+  for(int i=0;i<idx;i++)
+    {
+    if(iter == this->Internals->SelectionModels.end())
+      {
+      // Out of range
+      return NULL;
+      }
+    iter++;
+    }
+
+  return iter->second;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
     vtkSMGlobalPropertiesManager* mgr)
 {

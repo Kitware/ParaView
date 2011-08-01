@@ -53,7 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVServerInformation.h"
 
@@ -247,6 +249,15 @@ void pqCollaborationPanel::followUserCamera(int userId)
   if(camCache != this->Internal->LocalCameraStateCache.end())
     {
     this->onShareOnlyMessage(&camCache->second);
+    }
+
+  // If we follow master lets selection model follow as well
+  bool followMaster = (userId == this->getSMCollaborationManager()->GetMasterId());
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  for(vtkIdType idx=0; idx < pxm->GetNumberOfSelectionModel(); idx++)
+    {
+    vtkSMProxySelectionModel* selectionModel = pxm->GetSelectionModelAt(idx);
+    selectionModel->SetFollowingMaster(followMaster);
     }
 }
 
