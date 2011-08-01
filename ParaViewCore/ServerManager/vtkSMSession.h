@@ -27,6 +27,7 @@ class vtkSMUndoStackBuilder;
 class vtkSMStateLocator;
 class vtkProcessModuleAutoMPI;
 class vtkSMProxyLocator;
+class vtkSMCollaborationManager;
 
 class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
 {
@@ -34,6 +35,16 @@ public:
   static vtkSMSession* New();
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  //---------------------------------------------------------------------------
+  // API for collaboration management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Return the instance of vtkSMCollaborationManager that will be
+  // lazy created at the first call.
+  // By default we return NULL
+  virtual vtkSMCollaborationManager* GetCollaborationManager() { return NULL; }
 
   //---------------------------------------------------------------------------
   // API for client-side components of a session.

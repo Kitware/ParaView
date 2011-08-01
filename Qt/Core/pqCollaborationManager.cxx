@@ -122,16 +122,11 @@ public:
       QObject::connect( s,
                         SIGNAL(triggerFollowCamera(int)),
                         this->Owner, SIGNAL(triggerFollowCamera(int)));
-      if(vtkSMSessionClient::SafeDownCast(s->session()))
+
+      this->CollaborationManager = s->session()->GetCollaborationManager();
+      if(this->CollaborationManager)
         {
-        vtkSMSessionClient* session =
-            vtkSMSessionClient::SafeDownCast(s->session());
-        this->CollaborationManager = session->GetCollaborationManager();
         this->CollaborationManager->UpdateUserInformations();
-        }
-      else
-        {
-        this->CollaborationManager = NULL;
         }
       }
     }
