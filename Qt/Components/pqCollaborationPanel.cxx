@@ -410,6 +410,9 @@ void pqCollaborationPanel::connectLocalSlots()
       QObject::connect( parentDock, SIGNAL(visibilityChanged(bool)),
                         this,         SLOT(onUserUpdate()));
       }
+
+    // By default we should follow the master
+    this->followUserCamera(collab->collaborationManager()->GetMasterId());
     }
   else
     {
