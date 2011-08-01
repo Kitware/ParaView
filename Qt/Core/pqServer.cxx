@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTimeKeeper.h"
+#include "pqView.h"
 #include "vtkClientServerStream.h"
 #include "vtkMapper.h"                 // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
 #include "vtkNetworkAccessManager.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMViewProxy.h"
 #include "vtkToolkits.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -69,6 +71,8 @@ public:
   // Used to send an heart beat message to the server to avoid 
   // inactivity timeouts.
   QTimer HeartbeatTimer;
+
+  int IdleServerMessageCounter;
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
@@ -569,7 +573,28 @@ void pqServer::processServerNotification()
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
   if(sessionClient && sessionClient->IsNotBusy())
     {
-    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100);
+    if(vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100) == 0)
+      {
+      if(++this->Internals->IdleServerMessageCounter > 100)
+        {
+        // We should try to render dirty views
+        foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+          {
+          vtkSMViewProxy* viewProxy = view->getViewProxy();
+          if(viewProxy && viewProxy->HasDirtyRepresentation())
+            {
+            view->render();
+            }
+          }
+        // Reset the counter
+        this->Internals->IdleServerMessageCounter = 0;
+        }
+      }
+    else
+      {
+      // Reset the counter
+      this->Internals->IdleServerMessageCounter = 0;
+      }
     }
 }
 //-----------------------------------------------------------------------------
