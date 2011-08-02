@@ -88,6 +88,11 @@ public:
   /// session, it always return true.
   bool isMaster() const;
 
+  /// Returns true if the client is currently processing remote messages
+  /// and still have more to process.
+  /// This method is used to deffered the tryRender.
+  bool isProcessingPending() const;
+
   /// Returns true is this connection has a separate render-server and
   /// data-server.
   bool isRenderServerSeparate();

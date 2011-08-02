@@ -73,6 +73,7 @@ public:
   QTimer HeartbeatTimer;
 
   int IdleServerMessageCounter;
+  bool PendingMessageToProcess;
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
@@ -197,6 +198,10 @@ void pqServer::initialize()
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
+    }
+  else
+    {
+    this->Internals->PendingMessageToProcess = false;
     }
 }
 
@@ -573,14 +578,11 @@ void pqServer::processServerNotification()
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
   if(sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
     {
+    // No more messages waiting in the queue
+    this->Internals->PendingMessageToProcess = false;
+
     if(vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100) == 0)
       {
-      // As we are IDLE, make sure that the view can call render
-      foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
-        {
-        view->enableRender();
-        }
-
       // After several IDLE iteration, see if it's needed to render dirty views
       if(++this->Internals->IdleServerMessageCounter > 100)
         {
@@ -599,15 +601,11 @@ void pqServer::processServerNotification()
       }
     else
       {
+      // We have more messages waiting in the queue
+      this->Internals->PendingMessageToProcess = true;
+
       // Reset the counter
       this->Internals->IdleServerMessageCounter = 0;
-
-      // We are in the middle of processing several server messages.
-      // => Disable any possible render
-      foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
-        {
-        view->disableRender();
-        }
       }
     }
 }
@@ -650,4 +648,9 @@ void pqServer::sendToOtherClients(vtkSMMessage* msg)
     {
     this->Internals->CollaborationCommunicator->SendToOtherClients(msg);
     }
+}
+//-----------------------------------------------------------------------------
+bool pqServer::isProcessingPending() const
+{
+  return this->Internals->PendingMessageToProcess;
 }

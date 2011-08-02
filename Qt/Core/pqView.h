@@ -102,12 +102,6 @@ public slots:
   /// The default implementation does nothing, but subclasses may override.
   virtual void resetDisplay() {}
 
-  /// Usefull when we want to temporary disable any render call
-  void disableRender();
-
-  /// Usefull when we want to enable render call after disabeling them
-  void enableRender();
-
 public:
   /// Returns true if undo can be done.
   virtual bool canUndo() const {return false;}

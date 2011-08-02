@@ -190,7 +190,8 @@ void pqView::render()
 //-----------------------------------------------------------------------------
 void pqView::tryRender()
 {
-  if (this->getProxy()->GetSession()->GetPendingProgress())
+  if ( this->getProxy()->GetSession()->GetPendingProgress() ||
+       this->getServer()->isProcessingPending())
     {
     this->render();
     }
@@ -414,14 +415,4 @@ void pqView::setAnnotationLink(vtkSMSourceProxy* link)
 vtkSMSourceProxy* pqView::getAnnotationLink()
 {
   return this->Internal->AnnotationLink;
-}
-//-----------------------------------------------------------------------------
-void pqView::enableRender()
-{
-  this->Internal->RenderTimer.blockSignals(false);
-}
-//-----------------------------------------------------------------------------
-void pqView::disableRender()
-{
-  this->Internal->RenderTimer.blockSignals(true);
 }
