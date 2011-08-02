@@ -571,7 +571,7 @@ vtkSMProxyManager* pqServer::proxyManager() const
 void pqServer::processServerNotification()
 {
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
-  if(sessionClient && sessionClient->IsNotBusy())
+  if(sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
     {
     if(vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100) == 0)
       {
