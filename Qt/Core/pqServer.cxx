@@ -575,6 +575,13 @@ void pqServer::processServerNotification()
     {
     if(vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100) == 0)
       {
+      // As we are IDLE, make sure that the view can call render
+      foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+        {
+        view->enableRender();
+        }
+
+      // After several IDLE iteration, see if it's needed to render dirty views
       if(++this->Internals->IdleServerMessageCounter > 100)
         {
         // We should try to render dirty views
@@ -594,6 +601,13 @@ void pqServer::processServerNotification()
       {
       // Reset the counter
       this->Internals->IdleServerMessageCounter = 0;
+
+      // We are in the middle of processing several server messages.
+      // => Disable any possible render
+      foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+        {
+        view->disableRender();
+        }
       }
     }
 }

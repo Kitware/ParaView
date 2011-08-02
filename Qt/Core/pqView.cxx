@@ -415,3 +415,13 @@ vtkSMSourceProxy* pqView::getAnnotationLink()
 {
   return this->Internal->AnnotationLink;
 }
+//-----------------------------------------------------------------------------
+void pqView::enableRender()
+{
+  this->Internal->RenderTimer.blockSignals(false);
+}
+//-----------------------------------------------------------------------------
+void pqView::disableRender()
+{
+  this->Internal->RenderTimer.blockSignals(true);
+}
