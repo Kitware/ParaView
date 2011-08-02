@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
+#include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -86,6 +87,9 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
+  this->ReloadGUIHelper = new pqTriggerOnIdleHelper(this);
+  QObject::connect(this->ReloadGUIHelper, SIGNAL(triggered()),
+    this, SLOT(reloadGUIInternal()));
 }
 
 //-----------------------------------------------------------------------------
@@ -95,6 +99,7 @@ pqDisplayColorWidget::~pqDisplayColorWidget()
   delete this->PointDataIcon;
   delete this->SolidColorIcon;
   this->VTKConnect->Delete();
+  delete this->ReloadGUIHelper;
 }
 
 //-----------------------------------------------------------------------------
@@ -357,8 +362,10 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
 
   this->VTKConnect->Disconnect();
   this->Representation = qobject_cast<pqPipelineRepresentation*>(display);
+  this->ReloadGUIHelper->setServer(NULL);
   if(this->Representation)
     {
+    this->ReloadGUIHelper->setServer(display->getServer());
     vtkSMProxy* repr = this->Representation->getProxy();
     this->VTKConnect->Connect(repr->GetProperty("ColorAttributeType"),
       vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
@@ -391,6 +398,14 @@ pqPipelineRepresentation* pqDisplayColorWidget::getRepresentation() const
 
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::reloadGUI()
+{
+  // pqTriggerOnIdleHelper is used to ensure that reloadGUI() never gets called
+  // when the process is busy.
+  this->ReloadGUIHelper->trigger();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::reloadGUIInternal()
 {
   this->Updating = false;
   this->BlockEmission++;
