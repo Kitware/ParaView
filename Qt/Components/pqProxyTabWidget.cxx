@@ -104,15 +104,6 @@ void pqProxyTabWidget::setupDefaultConnections()
     pqApplicationCore::instance()->getObjectBuilder(),
     SIGNAL(sourceCreated(pqPipelineSource*)),
     this, SLOT(showPropertiesTab()));
-
-  // Attach/Detach collaboration manager if any
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                    SIGNAL(serverAdded(pqServer*)),
-                    this, SLOT(connectToCollaborationManager()));
-
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                    SIGNAL(aboutToRemoveServer(pqServer*)),
-                    this, SLOT(disconnectToCollaborationManager()));
 }
 
 //-----------------------------------------------------------------------------
@@ -191,37 +182,4 @@ void pqProxyTabWidget::setShowOnAccept(bool val)
 bool pqProxyTabWidget::showOnAccept() const
 {
   return this->Inspector->showOnAccept();
-}
-//-----------------------------------------------------------------------------
-void pqProxyTabWidget::connectToCollaborationManager()
-{
-  pqCollaborationManager* collabManager =
-      qobject_cast<pqCollaborationManager*>(
-          pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
-  if(collabManager)
-    {
-    QObject::connect( this, SIGNAL(currentChanged(int)),
-                      collabManager,
-                      SLOT(onInspectorSelectedTabChanged(int)));
-    QObject::connect( collabManager,
-                      SIGNAL(triggerInspectorSelectedTabChanged(int)),
-                      this, SLOT(setCurrentIndex(int)));
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyTabWidget::disconnectToCollaborationManager()
-{
-  pqCollaborationManager* collabManager =
-      qobject_cast<pqCollaborationManager*>(
-          pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
-  if(collabManager)
-    {
-    QObject::disconnect( this, SIGNAL(currentChanged(int)),
-                         collabManager,
-                         SLOT(onInspectorSelectedTabChanged(int)));
-    QObject::disconnect( collabManager,
-                         SIGNAL(triggerInspectorSelectedTabChanged(int)),
-                         this, SLOT(setCurrentIndex(int)));
-    }
 }

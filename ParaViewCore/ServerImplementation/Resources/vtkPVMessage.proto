@@ -200,16 +200,12 @@ message ChatMessage {
 
 message QtEvent {
   enum QtEventType {
-    RENDER              = 0;
-    INSPECTOR_TAB       = 1;
-    PROXY_STATE_INVALID = 2;
-    CHAT                = 3;
-    OTHER               = 15;
+    CHAT                = 1;
+    OTHER               = 2;
   }
 
   extend Message {
     required QtEventType type  = 98;
-    optional uint32      proxy = 99 [default = 0];
   }
 }
 

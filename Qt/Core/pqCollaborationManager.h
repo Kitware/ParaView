@@ -66,17 +66,10 @@ public:
   vtkSMCollaborationManager* collaborationManager();
 
 signals:
-  /// This will be triggered locally to broadcast the request
-  void triggerRender(int viewId);
-
   /// This will be triggered by the remote clients to update any interessting
   /// components. This should be triggered by local client to broadcast to
   /// the other clients
   void triggerChatMessage(int userId, QString& msgContent);
-
-  /// This will be triggered when a remote client has changed its selected tab
-  /// inside the inspector panel.
-  void triggerInspectorSelectedTabChanged(int);
 
   /// This will forward client_only message to anyone that may interessted when
   /// not managed locally
@@ -96,18 +89,9 @@ signals:
 
 public slots:
 
-  /// This will attach to the provided view the necessary listeners to share
-  /// collaborative actions such as rendering decision, ...
-  void addCollaborationEventManagement(pqView*);
-  void removeCollaborationEventManagement(pqView*);
-
   /// This will be triggered by the triggerChatMessage() signal and will
   /// broadcast to other client a chat message
   void onChatMessage(int userId, QString& msgContent);
-
-  /// This is connected from pqProxyTabWidget itself so the selected tab information
-  /// can be sent to the other clients if any.
-  void onInspectorSelectedTabChanged(int tabIndex);
 
   /// updates the enabled-state for application wide widgets and actions based
   /// whether the application is a master or not.
@@ -122,20 +106,12 @@ private slots:
   /// to synchronize their state.
   void onClientMessage(vtkSMMessage* msg);
 
-  /// This will be triggered by the triggerRender(int) signal and will
-  /// broadcast to other client a render request
-  void onTriggerRender(int viewId);
-
-  /// This will call force render on all the renderer that needs to be rendered
-  void render();
-
 private:
   pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.
   pqCollaborationManager& operator=(const pqCollaborationManager&); // Not implemented.
 
   class pqInternals;
   pqInternals* Internals;
-  QSignalMapper* viewsSignalMapper;
 };
 
 #endif // !_pqCollaborationManager_h

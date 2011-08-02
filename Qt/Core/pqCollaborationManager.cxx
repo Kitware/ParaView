@@ -52,9 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QMap>
 #include <QPointer>
-#include <QSignalMapper>
 #include <QtDebug>
-#include <QTimer>
 #include <QVariant>
 #include <QWidget>
 
@@ -75,12 +73,6 @@ public:
   pqInternals(pqCollaborationManager* owner)
     {
     this->Owner = owner;
-    this->RenderingFromNotification = false;
-    this->RenderTimer.setInterval(500);
-    this->RenderTimer.setSingleShot(false);
-    this->RenderTimer.start(1000);
-    QObject::connect( &this->RenderTimer, SIGNAL(timeout()),
-                      this->Owner, SLOT(render()));
     }
   //-------------------------------------------------
   void setServer(pqServer* s)
@@ -137,48 +129,6 @@ public:
     return this->Server.data();
     }
   //-------------------------------------------------
-  bool CanTriggerRender()
-    {
-    return !this->RenderingFromNotification;
-    }
-  //-------------------------------------------------
-  void Render(vtkTypeUInt32 viewId)
-    {
-    this->ViewToRender.insert(viewId);
-    if(this->IsLocalRendering())
-      {
-      this->Owner->render();
-      }
-    }
-
-  void StartRendering()
-    {
-    this->RenderingFromNotification = true;
-    }
-  //-------------------------------------------------
-  void StopRendering()
-    {
-    this->RenderingFromNotification = false;
-    }
-  //-------------------------------------------------
-  pqView* GetNextViewToRender()
-    {
-    if(this->ViewToRender.size() == 0)
-      {
-      return NULL;
-      }
-    int value = *this->ViewToRender.begin();
-    this->ViewToRender.erase(this->ViewToRender.begin());
-    pqApplicationCore* core = pqApplicationCore::instance();
-    return core->getServerManagerModel()->findItem<pqView*>(value);
-    }
-  //-------------------------------------------------
-  bool IsLocalRendering()
-    {
-    return true; // TODO
-    }
-
-  //-------------------------------------------------
   int GetClientId(int idx)
     {
     if(this->CollaborationManager)
@@ -189,13 +139,10 @@ public:
     }
 
 public:
-  bool RenderingFromNotification;
   QMap<int, QString> UserNameMap;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationManager;
 
 protected:
-  vtkstd::set<vtkTypeUInt32> ViewToRender;
-  QTimer RenderTimer;
   QPointer<pqServer> Server;
   QPointer<pqCollaborationManager> Owner;
 };
@@ -205,19 +152,6 @@ pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
 {
   this->Internals = new pqInternals(this);
   pqApplicationCore* core = pqApplicationCore::instance();
-
-  // Signal mappers
-  this->viewsSignalMapper = new QSignalMapper(this);
-
-  // View management
-  QObject::connect(this->viewsSignalMapper, SIGNAL(mapped(int)),
-                   this, SIGNAL(triggerRender(int)));
-  QObject::connect(this, SIGNAL(triggerRender(int)),
-                   this, SLOT(onTriggerRender(int)));
-  QObject::connect(core->getServerManagerModel(), SIGNAL(viewAdded(pqView*)),
-                   this, SLOT(addCollaborationEventManagement(pqView*)));
-  QObject::connect(core->getServerManagerModel(), SIGNAL(viewRemoved(pqView*)),
-                   this, SLOT(removeCollaborationEventManagement(pqView*)));
 
   // Chat management + User list panel
   QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
@@ -231,15 +165,6 @@ pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
 //-----------------------------------------------------------------------------
 pqCollaborationManager::~pqCollaborationManager()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  // View management
-  QObject::disconnect(core->getServerManagerModel(),
-                      SIGNAL(viewAdded(pqView*)),
-                      this, SLOT(addCollaborationEventManagement(pqView*)));
-  QObject::disconnect(core->getServerManagerModel(),
-                      SIGNAL(viewRemoved(pqView*)),
-                      this, SLOT(removeCollaborationEventManagement(pqView*)));
-
   // Chat management + User list panel
   QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
                        this, SLOT(onChatMessage(int,QString&)));
@@ -255,18 +180,8 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
     int userId = 0;
     QString userName;
     QString chatMsg;
-    vtkTypeUInt32 proxyId = msg->GetExtension(QtEvent::proxy);
     switch(msg->GetExtension(QtEvent::type))
       {
-      case QtEvent::RENDER:
-        //this->Internals->Render(proxyId);
-        break;
-      case QtEvent::INSPECTOR_TAB:
-        // We use proxyId as holder of tab index
-        emit triggerInspectorSelectedTabChanged(proxyId);;
-        break;
-      case QtEvent::PROXY_STATE_INVALID:
-        break;
       case QtEvent::CHAT:
         userId = msg->GetExtension(ChatMessage::author);
         userName = this->Internals->CollaborationManager->GetUserLabel(userId);
@@ -285,21 +200,6 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::onTriggerRender(int viewId)
-{
-  RETURN_IF_SERVER_NOT_VALID();
-  if(this->Internals->CanTriggerRender())
-    {
-    // Build message to notify other clients to trigger a render for the given view
-    vtkSMMessage msg;
-    msg.SetExtension(QtEvent::type, QtEvent::RENDER);
-    msg.SetExtension(QtEvent::proxy, viewId);
-
-    // Broadcast the message
-    this->Internals->server()->sendToOtherClients(&msg);
-    }
-}
-//-----------------------------------------------------------------------------
 void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
 {
   RETURN_IF_SERVER_NOT_VALID();
@@ -317,37 +217,10 @@ void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
     }
 }
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::onInspectorSelectedTabChanged(int tabIndex)
-{
-  RETURN_IF_SERVER_NOT_VALID();
-  vtkSMMessage activeTab;
-  activeTab.SetExtension(QtEvent::type, QtEvent::INSPECTOR_TAB);
-  // We use proxyId as holder of tab index
-  activeTab.SetExtension(QtEvent::proxy, tabIndex);
-
-  this->Internals->server()->sendToOtherClients(&activeTab);
-}
-
-//-----------------------------------------------------------------------------
 vtkSMCollaborationManager* pqCollaborationManager::collaborationManager()
 {
   return this->Internals->CollaborationManager;
 }
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::addCollaborationEventManagement(pqView* view)
-{
-  RETURN_IF_SERVER_NOT_VALID();
-  this->viewsSignalMapper->setMapping(view, view->getProxy()->GetGlobalID());
-  QObject::connect(view, SIGNAL(endRender()), this->viewsSignalMapper, SLOT(map()));
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::removeCollaborationEventManagement(pqView* view)
-{
-  RETURN_IF_SERVER_NOT_VALID();
-  QObject::disconnect(view, SIGNAL(endRender()), this->viewsSignalMapper, SLOT(map()));
-}
-
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::setServer(pqServer* s)
 {
@@ -360,18 +233,6 @@ pqServer* pqCollaborationManager::server()
 {
   return this->Internals->server();
 }
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::render()
-{
-  pqView* view;
-  while((view = this->Internals->GetNextViewToRender()) != NULL)
-    {
-    this->Internals->StartRendering();
-    view->forceRender();
-    this->Internals->StopRendering();
-    }
-}
-
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::updateEnabledState()
 {
