@@ -45,6 +45,7 @@
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
+#include "vtkPVSession.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballRotate.h"
@@ -605,8 +606,8 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeForCollaboration()
 {
-  // FIXME_COLLABORATION: Ensure that this code gets called only in
-  // collaboration mode. Also, can we optimize this further?
+  // Also, can we optimize this further? This happens on every render in
+  // collaborative mode.
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
   vtkMultiProcessController* d_controller = 
@@ -686,7 +687,12 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
-  this->SynchronizeForCollaboration();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (activeSession && activeSession->IsMultiClients())
+    {
+    this->SynchronizeForCollaboration();
+    }
 
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
@@ -855,7 +861,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::DoDataDelivery(
-  bool using_lod_rendering, bool using_remote_rendering)
+  bool using_lod_rendering, bool vtkNotUsed(using_remote_rendering))
 {
   if ((using_lod_rendering &&
     this->InteractiveRenderTime > this->UpdateTime) ||
