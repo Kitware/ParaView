@@ -106,7 +106,7 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0" colspan="3">
+       <item row="11" column="0" colspan="3">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -209,6 +209,20 @@ p, li { white-space: pre-wrap; }
         <widget class="QLabel" name="StrictLoadBalancingLabel">
          <property name="text">
           <string>Use Strict Load Balancing</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="DisableSplashScreenLabel">
+         <property name="text">
+          <string>Disable Splash Screen</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QCheckBox" name="DisableSplashScreen">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -525,7 +539,7 @@ p, li { white-space: pre-wrap; }
  <customwidgets>
   <customwidget>
    <class>pqColorChooserButton</class>
-   <extends>QToolButton</extends>
+   <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
