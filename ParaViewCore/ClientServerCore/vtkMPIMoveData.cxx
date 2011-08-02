@@ -662,7 +662,10 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input,
 
   if (numProcs <= 1)
     {
-    output->ShallowCopy(input);
+    if (input)
+      {
+      output->ShallowCopy(input);
+      }
     return;
     }
 
