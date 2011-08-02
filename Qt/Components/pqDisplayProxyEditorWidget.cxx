@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertyLinks.h"
+#include "pqServer.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
@@ -326,6 +327,15 @@ void pqDisplayProxyEditorWidget::updatePanel()
     }
 
   this->layout()->addWidget(this->Internal->DisplayPanel);
+
+  // Add property PV_MUST_BE_MASTER to all its children
+  pqApplicationCore* core = pqApplicationCore::instance();
+  bool isMaster = core->getActiveServer()->isMaster();
+  foreach (QWidget* wdg, this->Internal->DisplayPanel->findChildren<QWidget*>())
+    {
+    wdg->setProperty("PV_MUST_BE_MASTER", QVariant(true));
+    wdg->setEnabled(isMaster && wdg->isEnabled());
+    }
 }
 
 //-----------------------------------------------------------------------------
