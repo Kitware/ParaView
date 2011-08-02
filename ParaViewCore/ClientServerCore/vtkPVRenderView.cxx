@@ -823,11 +823,14 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Call Render() on local render window only if
   // 1: Local process is the driver OR
   // 2: RenderEventPropagation is Off and we are doing distributed rendering.
+  // 3: In tile-display mode or cave-mode.
   // Note, ParaView no longer has RenderEventPropagation ON. It's set to off
   // always.
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
-    (!this->SynchronizedWindows->GetRenderEventPropagation() &&
-     use_distributed_rendering))
+  if (
+    (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
+     (!this->SynchronizedWindows->GetRenderEventPropagation() && use_distributed_rendering) ||
+     in_tile_display_mode || in_cave_mode) &&
+    vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_DATA_SERVER)
     {
     this->GetRenderWindow()->Render();
     }
