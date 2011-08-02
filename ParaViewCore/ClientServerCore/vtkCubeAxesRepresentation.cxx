@@ -117,6 +117,21 @@ int vtkCubeAxesRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
     {
+    if (this->BoundsUpdateTime < this->GetMTime())
+      {
+      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    if (this->View)
+      {
+      // This is a complex code that ensures that all processes end up with the
+      // max bounds. This includes the client, data-server, render-server nodes.
+      this->View->SynchronizeBounds(this->DataBounds);
+      }
+    this->BoundsUpdateTime.Modified();
+
     this->UpdateBounds();
     }
 
@@ -171,16 +186,6 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::UpdateBounds()
 {
-  if (this->BoundsUpdateTime < this->GetMTime())
-    {
-    if (this->View)
-      {
-      // This is a complex code that ensures that all processes end up with the
-      // max bounds. This includes the client, data-server, render-server nodes.
-      this->View->SynchronizeBounds(this->DataBounds);
-      }
-    this->BoundsUpdateTime.Modified();
-    }
   double *scale = this->Scale;
   double *position = this->Position;
   double *rotation = this->Orientation;
