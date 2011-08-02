@@ -197,7 +197,7 @@ if __name__ == '__main__':
                    cmdclass          = {'install_data': my_install_data},
                    packages          = ['paraview', 'paraview.vtk', 'paraview.demos'],
                    #scripts          = get_scripts(),
-                   data_files        = [('paraview', [get_pv_libs()]), ('paraview/vtk', [get_vtk_libs()])],
+                   data_files        = [('paraview', get_pv_libs()), ('paraview/vtk', get_vtk_libs())],
                    )
     # If setup_tools is available, then add an extra option to disable
     # creation of a ZIP file.
