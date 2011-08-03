@@ -134,6 +134,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->SpecularHighlighting,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->DisableSplashScreen,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->ForegroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
@@ -304,6 +307,9 @@ void pqApplicationOptions::applyChanges()
   bool strictLoadBalancing = this->Internal->StrictLoadBalancing->isChecked();
   settings->setValue("strictLoadBalancing", strictLoadBalancing);
 
+  bool disableSpashScreen = this->Internal->DisableSplashScreen->isChecked();
+  settings->setValue("disableSplashScreen", disableSpashScreen);
+
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
   settings->setValue("GlobalProperties/SurfaceColor",
@@ -386,6 +392,9 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->StrictLoadBalancing->setChecked(
     settings->value("strictLoadBalancing", false).toBool());
+
+  this->Internal->DisableSplashScreen->setChecked(
+    settings->value("disableSplashScreen", false).toBool());
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",

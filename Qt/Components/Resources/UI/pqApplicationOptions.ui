@@ -106,19 +106,6 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="3">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>364</width>
-           <height>157</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -212,6 +199,13 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="SpecularHighlightingLabel">
+         <property name="text">
+          <string>Specular Highlighting with Scalar Coloring</string>
+         </property>
+        </widget>
+       </item>
        <item row="10" column="1">
         <widget class="QCheckBox" name="SpecularHighlighting">
          <property name="text">
@@ -219,12 +213,32 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="SpecularHighlightingLabel">
+       <item row="11" column="0">
+        <widget class="QLabel" name="DisableSplashScreenLabel">
          <property name="text">
-          <string>Specular Highlighting with Scalar Coloring</string>
+          <string>Disable Splash Screen</string>
          </property>
         </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="QCheckBox" name="DisableSplashScreen">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
