@@ -79,6 +79,8 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->members->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+  this->Internal->members->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
   this->Internal->CameraToFollowOfUserId = -1;
 
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
@@ -183,9 +185,6 @@ void pqCollaborationPanel::itemChanged(QTableWidgetItem* item)
         if(userName != collab->GetUserLabel(id))
           {
           collab->SetUserLabel(id, userName.toAscii().data());
-
-          // Expand table column
-          this->Internal->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
           }
         }
       }
@@ -371,9 +370,6 @@ void pqCollaborationPanel::onUserUpdate()
     item->setFlags( item->flags() & ~Qt::ItemIsEditable );
     this->Internal->members->setItem(cc, 2, item);
     }
-
-  // Expand table column
-  this->Internal->members->horizontalHeader()->resizeSections(QHeaderView::Stretch);
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::connectLocalSlots()
