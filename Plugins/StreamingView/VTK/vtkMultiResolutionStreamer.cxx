@@ -246,13 +246,31 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       double aMin = 1.0;
       double aMax = -1.0;
       double aConf = 1.0;
+      unsigned long numCells = 0;
+      unsigned long int nPix = 0;
       harness->ComputePieceMetaInformation
         (p, np, res,
-         pbbox, gConf, aMin, aMax, aConf);
+         pbbox, gConf, aMin, aMax, aConf,
+         numCells);
       double gPri = 1.0;
+      piece.SetReachedLimit(false);
       if (this->ViewPrioritization)
         {
+        nPix = this->ComputePixelCount(pbbox);
         gPri = this->CalculateViewPriority(pbbox);
+        double nc = (double)numCells;
+        //assume i,j,k about same, then 3rd root to get edge, and square to get
+        //numcells on near side
+        double side = pow(nc, .66);
+        numCells = (unsigned long)side;
+        //cerr << p << "/" << np << "@" << res
+        //       << " " << numCells << " vs " << nPix << endl;
+        if (numCells > nPix)
+          {
+          //cerr << p << "/" << np << "@" << res
+          //<< " reached limit " << numCells << ">" << nPix << endl;
+          piece.SetReachedLimit(true);
+          }
         }
       DEBUGPRINT_PRIORITY
         (
@@ -352,7 +370,8 @@ int vtkMultiResolutionStreamer::Refine(vtkStreamingHarness *harness)
     double res = piece.GetResolution();
     double priority = piece.GetPriority();
     if ((priority > 0.0) &&
-        (res+res_delta <= maxRes))
+        (res+res_delta <= maxRes) &&
+        (!piece.GetReachedLimit()))
       {
       numSplittable++;
       ToSplit->AddPiece(piece);
@@ -458,9 +477,9 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
 
   vtkPieceList *ToDo = harness->GetPieceList1();
   vtkPieceList *NextFrame = harness->GetPieceList2();
+  NextFrame->MergePieceList(ToDo);
 
   //sort pieces according to levels
-  NextFrame->MergePieceList(ToDo);
   while (NextFrame->GetNumberOfPieces())
     {
     vtkPiece piece = NextFrame->PopPiece();
@@ -517,6 +536,7 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
             }
           double res = piece.GetResolution()-res_delta;
           piece.SetResolution(res);
+          piece.SetReachedLimit(false);
           NextFrame->AddPiece(piece);
           npl->RemovePiece(i);
           found = true;
@@ -551,6 +571,7 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
 //----------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
 {
+  double res_delta = (1.0/this->RefinementDepth);
   vtkPieceList *ToDo = harness->GetPieceList1();
   int important = ToDo->GetNumberNonZeroPriority();
   int total = ToDo->GetNumberOfPieces();
@@ -563,7 +584,7 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
   //cerr << "TODO:" << endl;
   //ToDo->Print();
 
-  double res_delta = (1.0/this->RefinementDepth);
+  //double res_delta = (1.0/this->RefinementDepth);
 
   vtkPieceList *toMerge = vtkPieceList::New();
   for (int i = total-1; i>=important; --i)
@@ -606,6 +627,7 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
             }
           piece.SetResolution(res);
           piece.SetPipelinePriority(0.0);
+          piece.SetReachedLimit(false);
           DEBUGPRINT_REFINE
             (
              cerr << "REAP "
