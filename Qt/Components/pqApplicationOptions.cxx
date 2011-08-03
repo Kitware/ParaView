@@ -342,9 +342,14 @@ void pqApplicationOptions::applyChanges()
 
   foreach(pqPipelineRepresentation *representation, serverManagerModel->findItems<pqPipelineRepresentation*>())
     {
-    vtkSMPropertyHelper(representation->getProxy(), "AllowSpecularHighlightingWithScalarColoring").Set(
-      settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
-    representation->getProxy()->UpdateVTKObjects();
+    vtkSMProxy *proxy = representation->getProxy();
+    if(proxy->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
+      {
+      vtkSMPropertyHelper(representation->getProxy(), "AllowSpecularHighlightingWithScalarColoring").Set(
+        settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
+
+      proxy->UpdateVTKObjects();
+      }
     }
 
   // render all views.
