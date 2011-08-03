@@ -217,9 +217,9 @@ int pqPipelineSource::getNumberOfOutputPorts() const
 
 //-----------------------------------------------------------------------------
 // Overridden to add the proxies to the domain as well.
-void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
+void pqPipelineSource::addInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
 {
-  this->Superclass::addHelperProxy(key, helper);
+  this->Superclass::addInternalHelperProxy(key, helper);
 
   vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
   if (prop)
@@ -229,6 +229,23 @@ void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
     if (pld && !pld->HasProxy(helper))
       {
       pld->AddProxy(helper);
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+// Overridden to add the proxies to the domain as well.
+void pqPipelineSource::removeInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
+{
+  this->Superclass::removeInternalHelperProxy(key, helper);
+
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  if (prop)
+    {
+     vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+      prop->GetDomain("proxy_list"));
+    if (pld && pld->HasProxy(helper))
+      {
+      pld->RemoveProxy(helper);
       }
     }
 }
