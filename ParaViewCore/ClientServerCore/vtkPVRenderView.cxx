@@ -706,17 +706,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Decide if we are doing remote rendering or local rendering.
   bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();
 
-  // When in tile-display mode, we are always doing shared rendering. However
-  // when use_distributed_rendering we tell IceT that geometry is duplicated on
-  // all processes.
-  this->SynchronizedWindows->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
-  this->SynchronizedRenderers->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
-  this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
-    in_cave_mode ||
-    (!use_distributed_rendering && in_tile_display_mode));
-
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
 
@@ -811,8 +800,20 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   if (skip_rendering)
     {
+    // essential to restore state.
     return;
     }
+
+  // When in tile-display mode, we are always doing shared rendering. However
+  // when use_distributed_rendering we tell IceT that geometry is duplicated on
+  // all processes.
+  this->SynchronizedWindows->SetEnabled(
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
+  this->SynchronizedRenderers->SetEnabled(
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
+  this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
+    in_cave_mode ||
+    (!use_distributed_rendering && in_tile_display_mode));
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -834,6 +835,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     {
     this->GetRenderWindow()->Render();
     }
+  this->SynchronizedWindows->SetEnabled(false);
+  this->SynchronizedRenderers->SetEnabled(false);
 }
 
 //----------------------------------------------------------------------------
