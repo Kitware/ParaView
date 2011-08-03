@@ -636,6 +636,5 @@ bool pqServer::isProcessingPending() const
   // from the server.
   bool retVal = vtkProcessModule::GetProcessModule()->
     GetNetworkAccessManager()->GetNetworkEventsAvailable();
-  cout << "isProcessingPending: " << retVal << endl;
   return retVal;
 }
