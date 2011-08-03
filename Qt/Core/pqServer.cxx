@@ -73,7 +73,6 @@ public:
   QTimer HeartbeatTimer;
 
   int IdleServerMessageCounter;
-  bool PendingMessageToProcess;
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
@@ -114,8 +113,8 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   this->setHeartBeatTimeout(pqServer::getHeartBeatTimeoutSetting());
 
   // Setup idle Timer for collaboration in order to get server notification
-  this->IdleCollaborationTimer.setInterval(0);
-  this->IdleCollaborationTimer.setSingleShot(false);
+  this->IdleCollaborationTimer.setInterval(100);
+  this->IdleCollaborationTimer.setSingleShot(true);
   QObject::connect(&this->IdleCollaborationTimer, SIGNAL(timeout()),
                    this, SLOT(processServerNotification()));
 }
@@ -198,10 +197,6 @@ void pqServer::initialize()
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
-    }
-  else
-    {
-    this->Internals->PendingMessageToProcess = false;
     }
 }
 
@@ -576,39 +571,24 @@ vtkSMProxyManager* pqServer::proxyManager() const
 void pqServer::processServerNotification()
 {
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
-  if(sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
+  if (sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
     {
-    // No more messages waiting in the queue
-    this->Internals->PendingMessageToProcess = false;
-
-    if(vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(100) == 0)
+    // process all server-notification events.
+    while (vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(1) == 1)
       {
-      // After several IDLE iteration, see if it's needed to render dirty views
-      if(++this->Internals->IdleServerMessageCounter > 100)
+      }
+    foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+      {
+      vtkSMViewProxy* viewProxy = view->getViewProxy();
+      if(viewProxy && viewProxy->HasDirtyRepresentation())
         {
-        // We should try to render dirty views
-        foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
-          {
-          vtkSMViewProxy* viewProxy = view->getViewProxy();
-          if(viewProxy && viewProxy->HasDirtyRepresentation())
-            {
-            view->render();
-            }
-          }
-        // Reset the counter
-        this->Internals->IdleServerMessageCounter = 0;
+        view->render();
         }
       }
-    else
-      {
-      // We have more messages waiting in the queue
-      this->Internals->PendingMessageToProcess = true;
-
-      // Reset the counter
-      this->Internals->IdleServerMessageCounter = 0;
-      }
     }
+  this->IdleCollaborationTimer.start();
 }
+
 //-----------------------------------------------------------------------------
 void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
                                             unsigned long event_,
@@ -652,5 +632,10 @@ void pqServer::sendToOtherClients(vtkSMMessage* msg)
 //-----------------------------------------------------------------------------
 bool pqServer::isProcessingPending() const
 {
-  return this->Internals->PendingMessageToProcess;
+  // check with the network access manager if there are any messages to receive
+  // from the server.
+  bool retVal = vtkProcessModule::GetProcessModule()->
+    GetNetworkAccessManager()->GetNetworkEventsAvailable();
+  cout << "isProcessingPending: " << retVal << endl;
+  return retVal;
 }

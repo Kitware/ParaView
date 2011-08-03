@@ -35,6 +35,8 @@
 // communication.
 #define GENERATE_DEBUG_LOG 0
 
+#define MAX_SOCKETS 256
+
 class vtkTCPNetworkAccessManager::vtkInternals
 {
 public:
@@ -138,9 +140,21 @@ bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
   return false;
 }
 
-#define MAX_SOCKETS 256
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetNetworkEventsAvailable()
+{
+  return (this->ProcessEventsInternal(1, false) == 1);
+}
+
 //----------------------------------------------------------------------------
 int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
+{
+  return this->ProcessEventsInternal(timeout_msecs, true);
+}
+
+//----------------------------------------------------------------------------
+int vtkTCPNetworkAccessManager::ProcessEventsInternal(
+  unsigned long timeout_msecs, bool do_processing)
 {
   int sockets_to_select[MAX_SOCKETS];
   vtkObject* controller_or_server_socket[MAX_SOCKETS];
@@ -167,6 +181,12 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       if(comm->HasBufferredMessages())
         {
         ctrlWithBufferToEmpty = controller;
+        if (!do_processing)
+          {
+          // we do have events to process, but we were told not to process them,
+          // so just return and say we have something to process here.
+          return 1;
+          }
         }
       size++;
       }
@@ -208,6 +228,12 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
   if (result <= 0)
     {
     return result;
+    }
+  if (result > 0 && !do_processing)
+    {
+    // we were told not to do any processing, so just let the caller know that
+    // we have events to process.
+    return 1;
     }
 
   if (controller_or_server_socket[selected_index]->IsA("vtkServerSocket"))
