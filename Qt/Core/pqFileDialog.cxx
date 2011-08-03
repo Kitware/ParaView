@@ -902,6 +902,10 @@ bool pqFileDialog::getShowHidden()
 void pqFileDialog::onTextEdited(const QString &str)
 {
   this->Implementation->Ui.Favorites->clearSelection();
+
+  //really important to block signals so that the clearSelection
+  //doesn't cause a signal to be fired that calls fileSelectionChanged
+  this->Implementation->Ui.Files->blockSignals(true);
   this->Implementation->Ui.Files->clearSelection();
   if (str.size() > 0 )
     {
@@ -913,6 +917,7 @@ void pqFileDialog::onTextEdited(const QString &str)
     {    
     this->Implementation->FileNames.clear();
     }
+  this->Implementation->Ui.Files->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1083,12 +1088,6 @@ void pqFileDialog::fileSelectionChanged()
 {
   // Selection changed, update the FileName entry box
   // to reflect the current selection.
-  if (this->Implementation->Ui.FileName->hasFocus())
-    {
-    //we don't want to do this while the user is typing
-    return;
-    }
-
   QString fileString;
   const QModelIndexList indices =
     this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
