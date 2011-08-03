@@ -167,6 +167,8 @@ public:
   // be applied to this representation, return NULL.
   virtual vtkSelection* ConvertSelection(vtkView* view, vtkSelection* selection);
 
+  virtual void SetAllowSpecularHighlightingWithScalarColoring(int allow);
+
 //BTX
 protected:
   vtkGeometryRepresentation();
@@ -252,6 +254,7 @@ protected:
   double Diffuse;
   int Representation;
   bool SuppressLOD;
+  bool AllowSpecularHighlightingWithScalarColoring;
 
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented

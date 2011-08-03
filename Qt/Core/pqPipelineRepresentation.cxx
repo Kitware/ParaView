@@ -543,6 +543,10 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   // Color by property.
   this->colorByArray(NULL, 0);
+
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  vtkSMPropertyHelper(repr, "AllowSpecularHighlightingWithScalarColoring").Set(
+        settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
 }
 
 //-----------------------------------------------------------------------------
