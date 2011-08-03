@@ -420,6 +420,12 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
 
   vtkSelection* sel = this->Selector->Select(region);
+
+  // look at ::Render(..,..). We need to disable these once we are done with
+  // rendering.
+  this->SynchronizedWindows->SetEnabled(false);
+  this->SynchronizedRenderers->SetEnabled(false);
+
   if (sel)
     {
     // A valid sel is only generated on the "driver" node. The driver node may not have
@@ -835,8 +841,16 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     {
     this->GetRenderWindow()->Render();
     }
-  this->SynchronizedWindows->SetEnabled(false);
-  this->SynchronizedRenderers->SetEnabled(false);
+
+  if (!this->MakingSelection)
+    {
+
+    // If we are making selection, then it's a multi-step render process and we
+    // need to leave the SynchronizedWindows/SynchronizedRenderers enabled for
+    // that entire process.
+    this->SynchronizedWindows->SetEnabled(false);
+    this->SynchronizedRenderers->SetEnabled(false);
+    }
 }
 
 //----------------------------------------------------------------------------
