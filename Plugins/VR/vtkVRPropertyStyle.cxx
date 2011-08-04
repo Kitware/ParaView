@@ -40,18 +40,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <algorithm>
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------cnstr
 vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
 }
 
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------destr
 vtkVRPropertyStyle::~vtkVRPropertyStyle()
 {
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------public
 bool vtkVRPropertyStyle::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* locator)
 {
@@ -82,7 +82,7 @@ bool vtkVRPropertyStyle::configure(vtkPVXMLElement* child,
   return false;
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------public
 vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -109,7 +109,7 @@ vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
   return child;
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------public
 void vtkVRPropertyStyle::setSMProperty(
   vtkSMProxy* proxy, const QString& property_name)
 {
@@ -117,19 +117,20 @@ void vtkVRPropertyStyle::setSMProperty(
   this->PropertyName = property_name;
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------public
 vtkSMProperty* vtkVRPropertyStyle::getSMProperty() const
 {
   return this->Proxy? this->Proxy->GetProperty(
     this->PropertyName.toAscii().data()) : NULL;
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------public
 vtkSMProxy* vtkVRPropertyStyle::getSMProxy() const
 {
   return this->Proxy;
 }
 
+//-----------------------------------------------------------------------public
 bool vtkVRPropertyStyle::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
@@ -147,10 +148,12 @@ bool vtkVRPropertyStyle::handleEvent(const vtkVREventData& data)
   return false;
 }
 
+//-----------------------------------------------------------------------public
 bool vtkVRPropertyStyle::update()
 {
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::HandleButton( const vtkVREventData& data )
 {
   std::stringstream event;
@@ -161,6 +164,7 @@ void vtkVRPropertyStyle::HandleButton( const vtkVREventData& data )
     }
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
 {
   for (int i = 0; i < data.data.analog.num_channel; ++i)
@@ -175,6 +179,7 @@ void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
 
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
 {
   for (int i = 0; i < 16; ++i)
@@ -188,6 +193,7 @@ void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
     }
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
 {
   std::vector<std::string>token = this->tokenize( dest );
@@ -197,6 +203,7 @@ void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
     }
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::SetAnalogValue( std::string dest, double value )
 {
   std::vector<std::string>token = this->tokenize( dest );
@@ -206,6 +213,7 @@ void vtkVRPropertyStyle::SetAnalogValue( std::string dest, double value )
     }
 }
 
+//----------------------------------------------------------------------private
 void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
 {
   std::vector<std::string>token = this->tokenize( dest );
@@ -215,6 +223,7 @@ void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
     }
 }
 
+//----------------------------------------------------------------------private
 std::vector<std::string> vtkVRPropertyStyle::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
