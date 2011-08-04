@@ -18,6 +18,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMUndoStack.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
 
@@ -29,6 +30,9 @@
 //***************************************************************************
 class vtkSMStateLocator::vtkInternal {
 public:
+  vtkInternal(): SessionRegistrationObserverID(0), SessionUnRegistrationObserverID(0),
+  UndoStackRemoveObserverID(0), UndoStackClearObserverID(0) {}
+
   void RegisterState(vtkTypeUInt32 globalId, const vtkSMMessage* state)
     {
     this->StateMap[globalId].CopyFrom(*state);
@@ -57,8 +61,134 @@ public:
     return false;
     }
 
+  void CallBackSession(vtkObject* vtkNotUsed(src),long unsigned int event, void* data)
+    {
+    vtkTypeUInt32 id = 0;
+    if(event != vtkUndoStack::UndoSetClearedEvent)
+    switch(event)
+      {
+      case vtkSMSession::RegisterRemoteObjectEvent:
+        // If the object is alive, we should make sure we don't keep it
+        // in the list of object to delete after a while...
+        id = *reinterpret_cast<vtkTypeUInt32*>(data);
+        if(this->TimeToLiveMap.find(id) != this->TimeToLiveMap.end())
+          {
+          this->TimeToLiveMap.erase(id);
+          }
+        break;
+      case vtkSMSession::UnRegisterRemoteObjectEvent:
+        // Init the object for garbage collection
+        id = *reinterpret_cast<vtkTypeUInt32*>(data);
+        this->TimeToLiveMap[id] = this->UndoStackSize;
+        break;
+      }
+    }
+
+  void CallBackUndoStack(vtkObject* vtkNotUsed(src),long unsigned int event, void* vtkNotUsed(data))
+    {
+    vtkstd::map<vtkTypeUInt32, vtkTypeUInt32>::iterator iter;
+    iter = this->TimeToLiveMap.begin();
+    vtkTypeUInt32 globalId = 0;
+    switch(event)
+      {
+      case vtkUndoStack::UndoSetClearedEvent:
+        // Remove all the state that are in the list for deletion
+        for(; iter != this->TimeToLiveMap.end(); iter++)
+          {
+          globalId = iter->first;
+          this->StateMap.erase(globalId);
+          }
+        this->TimeToLiveMap.clear();
+        break;
+      case vtkUndoStack::UndoSetRemovedEvent:
+        // Register for delete all the state that reach the 0 TimeToLive
+        vtkstd::set<vtkTypeUInt32> itemsToDelete;
+        for(; iter != this->TimeToLiveMap.end(); iter++)
+          {
+          globalId = iter->first;
+          vtkTypeUInt32 timeToLive = iter->second - 1;
+          this->TimeToLiveMap[globalId] = timeToLive;
+
+          if(timeToLive == 0)
+            {
+            itemsToDelete.insert(globalId);
+            }
+          }
+        // Clean-up state map and TTL map
+        for(vtkstd::set<vtkTypeUInt32>::iterator i = itemsToDelete.begin();
+            i != itemsToDelete.end();
+            i++)
+          {
+          this->TimeToLiveMap.erase(*i);
+          this->StateMap.erase(*i);
+          }
+      break;
+      }
+    }
+
+  void AttachObserver(vtkSMSession* session)
+    {
+    if(session)
+      {
+      this->SessionRegistrationObserverID =
+          session->AddObserver( vtkSMSession::RegisterRemoteObjectEvent,
+                                this, &vtkSMStateLocator::vtkInternal::CallBackSession);
+      this->SessionUnRegistrationObserverID =
+          session->AddObserver( vtkSMSession::UnRegisterRemoteObjectEvent,
+                                this, &vtkSMStateLocator::vtkInternal::CallBackSession);
+      }
+    }
+
+  void DetatchObserver(vtkSMSession* session)
+    {
+    if(this->SessionRegistrationObserverID && session)
+      {
+      session->RemoveObserver(this->SessionRegistrationObserverID);
+      }
+    this->SessionRegistrationObserverID = 0;
+    if(this->SessionUnRegistrationObserverID && session)
+      {
+      session->RemoveObserver(this->SessionUnRegistrationObserverID);
+      }
+    this->SessionUnRegistrationObserverID = 0;
+    }
+
+  void AttachObserver(vtkUndoStack* undostack)
+    {
+    if(undostack)
+      {
+      this->UndoStackSize = undostack->GetStackDepth();
+      this->UndoStackRemoveObserverID =
+          undostack->AddObserver( vtkUndoStack::UndoSetRemovedEvent,
+                                  this, &vtkSMStateLocator::vtkInternal::CallBackUndoStack);
+      this->UndoStackClearObserverID =
+          undostack->AddObserver( vtkUndoStack::UndoSetClearedEvent,
+                                  this, &vtkSMStateLocator::vtkInternal::CallBackUndoStack);
+      }
+    }
+
+  void DetatchObserver(vtkUndoStack* undostack)
+    {
+    if(this->UndoStackRemoveObserverID && undostack)
+      {
+      undostack->RemoveObserver(this->UndoStackRemoveObserverID);
+      }
+    this->UndoStackRemoveObserverID = 0;
+    if(this->UndoStackClearObserverID && undostack)
+      {
+      undostack->RemoveObserver(this->UndoStackClearObserverID);
+      }
+    this->UndoStackClearObserverID = 0;
+    }
+
 private:
+  vtkTypeUInt32 UndoStackSize;
   vtkstd::map<vtkTypeUInt32, vtkSMMessage> StateMap;
+  vtkstd::map<vtkTypeUInt32, vtkTypeUInt32> TimeToLiveMap;
+  unsigned int SessionRegistrationObserverID;
+  unsigned int SessionUnRegistrationObserverID;
+  unsigned int UndoStackRemoveObserverID;
+  unsigned int UndoStackClearObserverID;
 };
 //***************************************************************************
 vtkStandardNewMacro(vtkSMStateLocator);
@@ -72,6 +202,9 @@ vtkSMStateLocator::vtkSMStateLocator()
 //---------------------------------------------------------------------------
 vtkSMStateLocator::~vtkSMStateLocator()
 {
+  this->Internals->DetatchObserver(this->Session);
+  this->Internals->DetatchObserver(this->UndoStack);
+
   this->SetParentLocator(0);
   delete this->Internals;
 }
@@ -173,4 +306,21 @@ void vtkSMStateLocator::RegisterFullState(vtkSMProxy* proxy)
     propIterator->Next();
     }
   propIterator->Delete();
+}
+//---------------------------------------------------------------------------
+void vtkSMStateLocator::InitGarbageCollector(vtkSMSession* session, vtkUndoStack* stack)
+{
+  if(!((session && stack) || (!session && !stack)))
+    {
+    vtkErrorMacro("Invalid set of parameters");
+    }
+
+  this->Internals->DetatchObserver(this->Session);
+  this->Internals->DetatchObserver(this->UndoStack);
+
+  this->Session = session;
+  this->UndoStack = stack;
+
+  this->Internals->AttachObserver(this->Session);
+  this->Internals->AttachObserver(this->UndoStack);
 }

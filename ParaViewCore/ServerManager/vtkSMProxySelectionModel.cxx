@@ -294,7 +294,8 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
 
   // Make sure we are loading the master state and we want to follow it.
   // Otherwise don't try to load that state
-  if(!(this->IsFollowingMaster() && this->Internal->GetMasterId() == msg->client_id()))
+  if(!( this->IsFollowingMaster() &&
+        this->Internal->GetMasterId() == static_cast<int>(msg->client_id())))
     {
     return;
     }

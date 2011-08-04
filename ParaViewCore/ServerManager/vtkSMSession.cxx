@@ -43,7 +43,6 @@ vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
     vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
-vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 {
@@ -83,6 +82,17 @@ vtkSMSession::~vtkSMSession()
   this->SetUndoStackBuilder(0);
   this->StateLocator->Delete();
   this->ProxyLocator->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::SetUndoStackBuilder(vtkSMUndoStackBuilder *undostackBuilder)
+{
+  // Init garbage collection for StateLocator
+  if(undostackBuilder)
+    {
+    this->StateLocator->InitGarbageCollector(this, undostackBuilder->GetUndoStack());
+    }
+
+  vtkSetObjectBodyMacro(UndoStackBuilder, vtkSMUndoStackBuilder, undostackBuilder);
 }
 
 //----------------------------------------------------------------------------

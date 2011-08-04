@@ -228,6 +228,8 @@ vtkObject* vtkPVSessionBase::GetRemoteObject(vtkTypeUInt32 globalid)
 void vtkPVSessionBase::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
 {
   this->SessionCore->RegisterRemoteObject(gid, obj);
+
+  this->InvokeEvent(vtkPVSessionBase::RegisterRemoteObjectEvent, &gid);
 }
 
 //----------------------------------------------------------------------------
@@ -240,6 +242,8 @@ void vtkPVSessionBase::UnRegisterRemoteObject(vtkTypeUInt32 gid, vtkTypeUInt32 l
   deleteMsg.set_global_id(gid);
   deleteMsg.set_location(location);
   this->DeleteSIObject(&deleteMsg);
+
+  this->InvokeEvent(vtkPVSessionBase::UnRegisterRemoteObjectEvent, &gid);
 }
 
 //----------------------------------------------------------------------------

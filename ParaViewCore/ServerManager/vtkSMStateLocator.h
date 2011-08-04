@@ -22,8 +22,11 @@
 
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
+#include "vtkWeakPointer.h" // need for observer
 
 class vtkSMProxy;
+class vtkSMSession;
+class vtkUndoStack;
 
 class VTK_EXPORT vtkSMStateLocator : public vtkSMObject
 {
@@ -37,6 +40,11 @@ public:
   // to search from if a given state was not found locally.
   vtkSetObjectMacro(ParentLocator, vtkSMStateLocator);
   vtkGetObjectMacro(ParentLocator, vtkSMStateLocator);
+
+  // Description:
+  // By initializing the garabage collector the stored state get removed once
+  // their is no more chance for them to be reused inside the session.
+  void InitGarbageCollector(vtkSMSession*, vtkUndoStack*);
 
 //BTX
   // Description:
@@ -83,6 +91,8 @@ protected:
   ~vtkSMStateLocator();
 
   vtkSMStateLocator* ParentLocator;
+  vtkWeakPointer<vtkSMSession> Session;
+  vtkWeakPointer<vtkUndoStack> UndoStack;
 
 private:
   vtkSMStateLocator(const vtkSMStateLocator&); // Not implemented

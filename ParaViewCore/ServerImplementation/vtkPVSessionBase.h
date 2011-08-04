@@ -39,6 +39,11 @@ public:
   vtkTypeMacro(vtkPVSessionBase, vtkPVSession);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  enum EventIds
+    {
+    RegisterRemoteObjectEvent   = 1234,
+    UnRegisterRemoteObjectEvent = 4321
+    };
 
   //---------------------------------------------------------------------------
   // Superclass Implementations
