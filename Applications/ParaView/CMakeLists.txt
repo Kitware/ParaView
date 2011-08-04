@@ -228,26 +228,29 @@ install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 #
 if(APPLE)
 
-  set (ParaView_BUNDLE_LOCATION "" CACHE STRING
-  "Subdirectory in which to place ParaView app inside a bundle.")
+  option(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE "Build ParaView as a Mac Application Bundle" ON)
+  if(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
+    set (ParaView_BUNDLE_LOCATION "" CACHE STRING
+      "Subdirectory in which to place ParaView app inside a bundle.")
 
-  mark_as_advanced(ParaView_BUNDLE_LOCATION)
+    mark_as_advanced(ParaView_BUNDLE_LOCATION)
 
-  set(distributed_plugins ${PARAVIEW_PLUGINLIST})
-  set(PV_EXE_NAME "paraview")
-  set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
-    "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
-  set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
-    "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
+    set(distributed_plugins ${PARAVIEW_PLUGINLIST})
+    set(PV_EXE_NAME "paraview")
+    set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
+      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
+    set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
+      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
     
-  set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
+    set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
 
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
-    "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
-    "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+      "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+      "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
 
-  install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+  endif(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
 endif(APPLE)
 
 set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
