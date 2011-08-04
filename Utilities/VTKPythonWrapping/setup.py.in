@@ -196,7 +196,7 @@ if __name__ == '__main__':
                    platforms         = ['Any'],
                    cmdclass          = {'install_data': my_install_data},
                    packages          = ['paraview', 'paraview.vtk', 'paraview.demos'],
-                   package_dir       = {'' : 'site-packages'}
+                   package_dir       = {'' : 'site-packages'},
                    #scripts          = get_scripts(),
                    data_files        = [('paraview', get_pv_libs()), ('paraview/vtk', get_vtk_libs())],
                    )
