@@ -498,6 +498,13 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     return NULL;
     }
 
+  // Make sure the associated selection proxy of the source get created before
+  // the representation get register.
+  // In some case, a collaborative client could trigger a render which will
+  // cause the source to create its selection proxy whithout waiting for the
+  // master to get the correct extract selection proxy ID.
+  vtkSMSourceProxy::SafeDownCast(source->getProxy())->CreateSelectionProxies();
+
   // (for undo/redo to work).
   QString name = QString("DataRepresentation%1").arg(
     this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
