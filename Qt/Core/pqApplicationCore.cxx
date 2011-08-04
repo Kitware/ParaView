@@ -90,7 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
-#include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -649,12 +649,7 @@ void pqApplicationCore::prepareForQuit()
 {
   foreach(pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
     {
-    vtkSMSessionClient* sClient =
-        vtkSMSessionClient::SafeDownCast(server->session());
-    if(sClient)
-      {
-      sClient->PreCollaborationSessionDisconnection();
-      }
+    server->session()->PreDisconnection();
     }
 
   // As tempting as it is to connect this slot to

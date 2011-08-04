@@ -136,6 +136,12 @@ public:
   virtual void PushState(vtkSMMessage* msg);
 //ETX
 
+  //---------------------------------------------------------------------------
+  // API for Collaboration management
+  //---------------------------------------------------------------------------
+
+  // Called before application quit or session disconnection
+  virtual void PreDisconnection() {}
 
   //---------------------------------------------------------------------------
   // Static methods to create and register sessions easily.

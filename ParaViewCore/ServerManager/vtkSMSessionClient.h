@@ -127,7 +127,9 @@ public:
   // API for Collaboration management
   //---------------------------------------------------------------------------
 
-  virtual void PreCollaborationSessionDisconnection();
+  // Called before application quit or session disconnection
+  // Used to prevent quiting client to delete proxy of a running session.
+  virtual void PreDisconnection();
 
   // Description:
   // Flag used to know if it is a good time to handle server notification.

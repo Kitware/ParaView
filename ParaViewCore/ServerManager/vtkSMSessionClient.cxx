@@ -426,7 +426,7 @@ void vtkSMSessionClient::CloseSession()
     }
 }
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::PreCollaborationSessionDisconnection()
+void vtkSMSessionClient::PreDisconnection()
 {
   this->NoMoreDelete = true;
 }
