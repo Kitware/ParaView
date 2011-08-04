@@ -53,38 +53,60 @@ vtkVRPropertyStyle::~vtkVRPropertyStyle()
 
 //-----------------------------------------------------------------------------
 bool vtkVRPropertyStyle::configure(vtkPVXMLElement* child,
-  vtkSMProxyLocator* locator)
+                                   vtkSMProxyLocator* locator)
 {
-  if (!this->Superclass::configure(child, locator))
+  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
+    strcmp(this->metaObject()->className(),
+      child->GetAttributeOrEmpty("class")) == 0)
     {
-    return false;
+      for (unsigned cc=0; cc < child->GetNumberOfNestedElements(); cc++)
+        {
+        vtkPVXMLElement* event = child->GetNestedElement(cc);
+        if (event && event->GetName() && strcmp(event->GetName(), "Event")==0)
+          {
+          Map[event->GetAttributeOrEmpty("name")] =
+            event->GetAttributeOrEmpty("value");
+          }
+        }
+      return true;
     }
-
-  const char* proxy = child->GetAttributeOrEmpty("proxy");
-  const char* property_name = child->GetAttributeOrEmpty("property");
-  if (proxy && property_name)
-    {
-    this->setSMProperty(
-      locator->LocateProxy(atoi(proxy)),
-      property_name);
-    return true;
-    }
+  // const char* proxy = child->GetAttributeOrEmpty("proxy");
+  // const char* property_name = child->GetAttributeOrEmpty("property");
+  // if (proxy && property_name)
+  //   {
+  //   this->setSMProperty(
+  //     locator->LocateProxy(atoi(proxy)),
+  //     property_name);
+  //   return true;
+  //   }
   return false;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
 {
-  vtkPVXMLElement* element = this->Superclass::saveConfiguration();
-  if (element)
+  vtkPVXMLElement* child = vtkPVXMLElement::New();
+  child->SetName( "Style" );
+  child->AddAttribute("class", this->metaObject()->className());
+
+  for ( std::map<std::string, std::string>::const_iterator i=Map.begin();i != Map.end();++i )
     {
-    element->AddAttribute(
-      "proxy", this->Proxy? this->Proxy->GetGlobalIDAsString() : "0");
-    element->AddAttribute(
-      "property", this->PropertyName.toAscii().data());
+    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    event->SetName("Event");
+    event->AddAttribute("name", ( *i ).first.c_str() );
+    event->AddAttribute( "type", ( *i ).second.c_str() );
+    child->AddNestedElement(event);
+    event->FastDelete();
     }
 
-  return element;
+  // if (element)
+  //   {
+  //   element->AddAttribute(
+  //     "proxy", this->Proxy? this->Proxy->GetGlobalIDAsString() : "0");
+  //   element->AddAttribute(
+  //     "property", this->PropertyName.toAscii().data());
+  //   }
+  return child;
 }
 
 //-----------------------------------------------------------------------------
