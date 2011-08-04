@@ -182,7 +182,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
           style->configure(child, locator);
           this->add(style);
           }
-        if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
+         else if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
           {
           vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
           style->configure(child, locator);
