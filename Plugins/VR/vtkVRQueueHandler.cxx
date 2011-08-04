@@ -176,6 +176,12 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
+         if (strcmp(class_name, "vtkVRPropertyStyle")==0)
+          {
+          vtkVRPropertyStyle* style = new vtkVRPropertyStyle(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
         if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
           {
           vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
