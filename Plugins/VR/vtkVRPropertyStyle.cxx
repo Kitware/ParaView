@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
 #include <iostream>
@@ -201,6 +202,8 @@ void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
     {
     std::cerr << "Expected \"value\" Format:  Proxy.Property[.index]" <<std::endl;
     }
+  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+  vtkSMProperty *property = proxy->GetProperty( token[0].c_str());
 }
 
 //----------------------------------------------------------------------private
