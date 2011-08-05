@@ -655,6 +655,37 @@ int vtkAMRDualContour::RequestData(
     }
   const char *arrayNameToProcess = inArrayInfo->Get(vtkDataObject::FIELD_NAME());
 
+  vtkMultiBlockDataSet* out =
+    this->DoRequestData(hbdsInput, arrayNameToProcess);
+
+  if(out)
+    {
+    mbdsOutput0->ShallowCopy(out);
+    out->Delete();
+    }
+  else
+    {
+    return 0;
+    }
+
+  return 1;
+}
+
+vtkMultiBlockDataSet*
+vtkAMRDualContour::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
+                              const char* arrayNameToProcess)
+{
+  vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::New();
+  mbdsOutput0->SetNumberOfBlocks(1);
+  vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
+  mbdsOutput0->SetBlock(0,mpds);
+
+  mpds->SetNumberOfPieces(0);
+
+  if(this->Helper)
+    {
+    this->Helper->Delete();
+    }
 
   this->Helper = vtkAMRDualGridHelper::New();
   this->Helper->SetEnableDegenerateCells(this->EnableDegenerateCells);
@@ -668,6 +699,7 @@ int vtkAMRDualContour::RequestData(
     this->Helper->SetController(NULL);
     }
 
+  // @TODO: Check if this is the right thing to do.
   this->Helper->Initialize(hbdsInput, arrayNameToProcess);
 
   this->Mesh = vtkPolyData::New();
@@ -678,7 +710,7 @@ int vtkAMRDualContour::RequestData(
   mpds->SetPiece(0, this->Mesh);
 
   this->InitializeCopyAttributes(hbdsInput, this->Mesh);
-  
+
   // For debugging.
   this->BlockIdCellArray = vtkIntArray::New();
   this->BlockIdCellArray->SetName("BlockIds");
@@ -686,17 +718,15 @@ int vtkAMRDualContour::RequestData(
 
   // Loop through blocks
   int numLevels = hbdsInput->GetNumberOfLevels();
-  int numBlocks;
-  int blockId;
 
   // Add each block.
   for (int level = 0; level < numLevels; ++level)
     {
-    numBlocks = this->Helper->GetNumberOfBlocksInLevel(level);
-    for (blockId = 0; blockId < numBlocks; ++blockId)
+    int numBlocks = this->Helper->GetNumberOfBlocksInLevel(level);
+    for (int blockId = 0; blockId < numBlocks; ++blockId)
       {
       vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock(level, blockId);
-      this->ProcessBlock(block, blockId);
+      this->ProcessBlock(block, blockId, arrayNameToProcess);
       }
     }
 
@@ -715,7 +745,7 @@ int vtkAMRDualContour::RequestData(
   this->Helper->Delete();
   this->Helper = 0;
 
-  return 1;
+  return mbdsOutput0;
 }
 
 //----------------------------------------------------------------------------
@@ -774,13 +804,23 @@ void vtkAMRDualContour::ShareBlockLocatorWithNeighbors(
 
 //----------------------------------------------------------------------------
 void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
-                                     int blockId)
+                                     int blockId, const char* arrayNameToProcess)
 {
   vtkImageData* image = block->Image;
   if (image == 0)
     { // Remote blocks are only to setup local block bit flags.
     return;
     }
+
+  // We are looking for only cell data arrays.
+  vtkDataArray* volumeFractionArray =
+    image->GetCellData()->GetArray(arrayNameToProcess);
+
+  if(!volumeFractionArray)
+    {
+    return;
+    }
+
   double  origin[3];
   double* spacing;
   int     extent[6];
@@ -877,7 +917,7 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
           cornerOffsets[6] = xOffset+1+yInc+zInc;
           cornerOffsets[7] = xOffset+yInc+zInc;
           this->ProcessDualCell(block, blockId, x, y, z,
-                                cornerOffsets);
+                                cornerOffsets, volumeFractionArray);
           }
         xOffset += 1; // xInc
         }
@@ -972,7 +1012,8 @@ static int vtkAMRDualLegacyIdToBitIdMap[8] = {0,1,3,2,4,5,7,6};
 void vtkAMRDualContour::ProcessDualCell(
   vtkAMRDualGridHelperBlock* block, int blockId,
   int x, int y, int z,
-  vtkIdType cornerOffsets[8])
+  vtkIdType cornerOffsets[8],
+  vtkDataArray *volumeFractionArray)
 {
   // compute the case index
   vtkImageData* image = block->Image;
@@ -981,7 +1022,6 @@ void vtkAMRDualContour::ProcessDualCell(
     return;
     }
 
-  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
   void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   int dataType = volumeFractionArray->GetDataType();
   double cornerValues[8];
