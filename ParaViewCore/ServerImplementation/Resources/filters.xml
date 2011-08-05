@@ -1964,6 +1964,16 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
          vorticity/curl of a 3 component array.
        </Documentation>
      </IntVectorProperty>
+     <IntVectorProperty name="ComputeQCriterion"
+                        command="SetComputeQCriterion"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         When this flag is on, the gradient filter will compute the
+         Q-criterion of a 3 component array.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End UnstructuredGradient -->
    </SourceProxy>
 
