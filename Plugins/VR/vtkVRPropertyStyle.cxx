@@ -190,6 +190,8 @@ void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
 
     if ( this->Map.find(event.str() )!= this->Map.end() )
       {
+      std::cout << event.str() << std::endl;
+      std::vector<std::string>token = this->tokenize(data.name );
       SetTrackerValue( this->Map[event.str()], data.data.tracker.matrix[i] );
       }
     }
@@ -201,7 +203,7 @@ void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
   std::vector<std::string>token = this->tokenize( dest );
   if ( token.size()==2 || token.size()==3 )
     {
-    std::cerr << "Expected \"value\" Format:  Proxy.Property[.index]" <<std::endl;
+    std::cerr << "Expected \"set_value\" Format:  Proxy.Property[.index]" <<std::endl;
     }
   vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
   vtkSMProperty *property = proxy->GetProperty( token[0].c_str());
@@ -213,7 +215,7 @@ void vtkVRPropertyStyle::SetAnalogValue( std::string dest, double value )
   std::vector<std::string>token = this->tokenize( dest );
   if ( token.size()==2 || token.size()==3 )
     {
-    std::cerr << "Expected \"value\" Format:  Proxy.Property[.index]" << std::endl;
+    std::cerr << "Expected \"set_value\" Format:  Proxy.Property[.index]" << std::endl;
     }
 }
 
@@ -223,7 +225,7 @@ void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
   std::vector<std::string>token = this->tokenize( dest );
   if ( token.size()==2 || token.size()==3 )
     {
-    std::cerr  << "Expected \"value\" Format:  Proxy.Property[.index]" << std::endl;
+    std::cerr  << "Expected \"set_value\" Format:  Proxy.Property[.index]" << std::endl;
     }
 }
 
