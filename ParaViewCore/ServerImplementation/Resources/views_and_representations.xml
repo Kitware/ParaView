@@ -1117,6 +1117,7 @@
           proxyname="SurfaceRepresentation">
         </Proxy>
         <ExposedProperties>
+          <Property name="AllowSpecularHighlightingWithScalarColoring" />
           <Property name="Ambient" />
           <Property name="AmbientColor" />
           <Property name="BackfaceAmbientColor" />
@@ -2517,6 +2518,13 @@
 
       <IntVectorProperty name="StaticMode"
         command="SetStatic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AllowSpecularHighlightingWithScalarColoring"
+        command="SetAllowSpecularHighlightingWithScalarColoring"
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool" />
