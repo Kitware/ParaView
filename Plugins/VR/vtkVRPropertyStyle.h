@@ -84,6 +84,7 @@ protected:
   void SetButtonValue( std::string dest, int value );
   void SetAnalogValue( std::string dest, double value );
   void SetTrackerValue( std::string dest, double value );
+  void SetTrackerVectorValue( std::string dest, double value[16] );
   vtkSmartPointer<vtkSMProxy> Proxy;
   QString PropertyName;
   std::vector<std::string> tokenize( std::string input);

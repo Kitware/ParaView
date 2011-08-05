@@ -230,6 +230,29 @@ void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
 }
 
 //----------------------------------------------------------------------private
+void vtkVRPropertyStyle::SetTrackerVectorValue( std::string dest,
+                                                double value[16] )
+{
+  std::vector<std::string>token = this->tokenize( dest );
+  if ( token.size()==2 || token.size()==3 )
+    {
+    std::cerr  << "Expected \"set_value\" Format:  Proxy.Property[.index]" << std::endl;
+    }
+
+  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+  vtkSMProperty* property;
+  if( proxy )
+    {
+    property = proxy->GetProperty( token[1].c_str());
+    }
+  else
+    {
+    return;
+    }
+
+}
+
+//----------------------------------------------------------------------private
 std::vector<std::string> vtkVRPropertyStyle::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
