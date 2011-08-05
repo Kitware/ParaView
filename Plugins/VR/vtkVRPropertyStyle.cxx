@@ -158,7 +158,7 @@ bool vtkVRPropertyStyle::update()
 void vtkVRPropertyStyle::HandleButton( const vtkVREventData& data )
 {
   std::stringstream event;
-  event << "BUTTON."<<data.name;
+  event <<data.name;
   if ( this->Map.find(event.str() )!= this->Map.end() )
     {
     SetButtonValue( this->Map[event.str()], data.data.button.state );
@@ -171,7 +171,7 @@ void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
   for (int i = 0; i < data.data.analog.num_channel; ++i)
     {
     std::stringstream event;
-    event << "ANALOG."<<data.name<<"."<<i;
+    event << data.name<<"."<<i;
     if ( this->Map.find(event.str() )!= this->Map.end() )
       {
       SetAnalogValue( this->Map[event.str()], data.data.analog.channel[i] );
@@ -186,7 +186,8 @@ void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
   for (int i = 0; i < 16; ++i)
     {
     std::stringstream event;
-    event << "TRACKER."<<data.name<<"."<<i;
+    event <<data.name<<"."<<i;
+
     if ( this->Map.find(event.str() )!= this->Map.end() )
       {
       SetTrackerValue( this->Map[event.str()], data.data.tracker.matrix[i] );
