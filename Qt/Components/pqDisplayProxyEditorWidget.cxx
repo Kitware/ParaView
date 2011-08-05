@@ -334,7 +334,10 @@ void pqDisplayProxyEditorWidget::updatePanel()
   foreach (QWidget* wdg, this->Internal->DisplayPanel->findChildren<QWidget*>())
     {
     wdg->setProperty("PV_MUST_BE_MASTER", QVariant(true));
-    wdg->setEnabled(isMaster && wdg->isEnabled());
+    if(!isMaster && wdg->isEnabled())
+      {
+      wdg->setEnabled(false);
+      }
     }
 }
 
