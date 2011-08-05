@@ -65,7 +65,7 @@ bool vtkVRPropertyStyle::configure(vtkPVXMLElement* child,
         if (event && event->GetName() && strcmp(event->GetName(), "Event")==0)
           {
           Map[event->GetAttributeOrEmpty("name")] =
-            event->GetAttributeOrEmpty("value");
+            event->GetAttributeOrEmpty("set_value");
           }
         }
       return true;
@@ -94,7 +94,7 @@ vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
     vtkPVXMLElement* event = vtkPVXMLElement::New();
     event->SetName("Event");
     event->AddAttribute("name", ( *i ).first.c_str() );
-    event->AddAttribute( "type", ( *i ).second.c_str() );
+    event->AddAttribute( "set_value", ( *i ).second.c_str() );
     child->AddNestedElement(event);
     event->FastDelete();
     }
