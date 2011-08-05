@@ -83,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
 #include "pqWidgetRangeDomain.h"
+#include "pqSettings.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -156,7 +157,10 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
   QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged()),
     this, SLOT(volumeBlockSelected()));
 
-  this->DisableSpecularOnScalarColoring = true;
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  bool allowSpecularHighlightingWithScalarColoring = settings->value(
+    "allowSpecularHighlightingWithScalarColoring").toBool();
+  this->DisableSpecularOnScalarColoring = !allowSpecularHighlightingWithScalarColoring;
 }
 
 //-----------------------------------------------------------------------------

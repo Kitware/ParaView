@@ -1964,6 +1964,16 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
          vorticity/curl of a 3 component array.
        </Documentation>
      </IntVectorProperty>
+     <IntVectorProperty name="ComputeQCriterion"
+                        command="SetComputeQCriterion"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         When this flag is on, the gradient filter will compute the
+         Q-criterion of a 3 component array.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End UnstructuredGradient -->
    </SourceProxy>
 
@@ -2339,7 +2349,7 @@ attributes of the fragments.
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy name="AMRDualContour" class="vtkAMRDualContour"
+    <SourceProxy name="AMRDualContour" class="vtkPVAMRDualContour"
        label="AMR Contour">
       <Documentation
         short_help="Iso surface cell array.">
@@ -2360,35 +2370,37 @@ attributes of the fragments.
       </InputProperty>
 
       <StringVectorProperty
-        name="SelectInputScalars"
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        animateable="0"
-        label="Contour By">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
+        name="SelectMaterialArrays"
+        command="AddInputCellArrayToProcess"
+        clean_command="ClearInputCellArrayToProcess"
+        number_of_elements="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
-          This property specifies the name of the cell scalar array from which the contour filter will compute isolines and/or isosurfaces.
+          This property specifies the cell arrays from which the contour filter will
+          compute contour cells.
         </Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty
-        name="ContourValue"
-        command="SetIsoValue"
-        label="Isosurface"
+        name="VolumeFractionSurfaceValue"
+        command="SetVolumeFractionSurfaceValue"
+        label="Volume Fraction Value"
         number_of_elements="1"
-        default_values="1" >
-        animateable="1">
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
+        default_values="0.1" >
+        <DoubleRangeDomain name="scalar_range" min="0.0" max="1.0" />
+          <!--<RequiredProperties>
             <Property name="Input" function="Input"/>
-            <Property name="SelectInputScalars" function="ArraySelection"/>
+            <Property name="AddInputCellArrayToProcess" function="ArraySelection"/>
           </RequiredProperties>
-        </ArrayRangeDomain>
+        </ArrayRangeDomain>-->
         <Documentation>
           This property specifies the values at which to compute the isosurface.
         </Documentation>

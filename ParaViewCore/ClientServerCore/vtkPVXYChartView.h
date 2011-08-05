@@ -226,6 +226,9 @@ public:
   // Set the label positions for the top axis.
   void SetAxisLabelsTop(int index, double value);
 
+  void SetTooltipNotation(int notation);
+  void SetTooltipPrecision(int precision);
+
   // Description:
   // Provides access to the chart view.
   virtual vtkChart* GetChart();

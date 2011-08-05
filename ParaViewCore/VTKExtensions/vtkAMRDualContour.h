@@ -116,19 +116,28 @@ protected:
 
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  // Description:
+  // Not a pipeline function. This is a helper function that
+  // allows creating a new data set given a input and a cell array name.
+  vtkMultiBlockDataSet* DoRequestData(vtkHierarchicalBoxDataSet* input,
+                                          const char* arrayNameToProcess);
+
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
   void ShareBlockLocatorWithNeighbors(
     vtkAMRDualGridHelperBlock* block);
 
-  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId);
+  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId,
+                    const char* arrayName);
 
 
   void ProcessDualCell(
     vtkAMRDualGridHelperBlock* block, int blockId,
     int x, int y, int z,
-    vtkIdType cornerOffsets[8]);
+    vtkIdType cornerOffsets[8],
+    vtkDataArray *volumeFractionArray);
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 

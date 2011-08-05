@@ -902,18 +902,22 @@ bool pqFileDialog::getShowHidden()
 void pqFileDialog::onTextEdited(const QString &str)
 {
   this->Implementation->Ui.Favorites->clearSelection();
+
+  //really important to block signals so that the clearSelection
+  //doesn't cause a signal to be fired that calls fileSelectionChanged
+  this->Implementation->Ui.Files->blockSignals(true);
+  this->Implementation->Ui.Files->clearSelection();
   if (str.size() > 0 )
     {
-    pqFileDialog::FileMode realMode = this->Implementation->Mode;    
-    this->setFileMode(pqFileDialog::ExistingFile);
-    this->Implementation->Ui.Files->keyboardSearch(str);
-    this->setFileMode(realMode);
+    //convert the typed information to be this->Implementation->FileNames
+    this->Implementation->FileNames = 
+      str.split(this->Implementation->FileNamesSeperator,QString::SkipEmptyParts);
     }
   else
-    {
-    this->Implementation->Ui.Files->clearSelection();
+    {    
     this->Implementation->FileNames.clear();
     }
+  this->Implementation->Ui.Files->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1113,7 +1117,6 @@ void pqFileDialog::fileSelectionChanged()
       fileNames.append(name);
       }
     }
-
   //if we are in directory mode we have to enable / disable the OK button
   //based on if the user has selected a file.
   if ( this->Implementation->Mode == pqFileDialog::Directory &&
@@ -1133,13 +1136,11 @@ void pqFileDialog::fileSelectionChanged()
     return;
     }
 
-  if (!this->Implementation->Ui.FileName->hasFocus())
-    {
-    //user is currently editing a name, don't change the text
-    this->Implementation->Ui.FileName->blockSignals(true);
-    this->Implementation->Ui.FileName->setText(fileString);
-    this->Implementation->Ui.FileName->blockSignals(false);
-    }
+  //user is currently editing a name, don't change the text
+  this->Implementation->Ui.FileName->blockSignals(true);
+  this->Implementation->Ui.FileName->setText(fileString);
+  this->Implementation->Ui.FileName->blockSignals(false);
+
   this->Implementation->FileNames = fileNames;
 }
 
