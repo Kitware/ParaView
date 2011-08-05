@@ -183,6 +183,18 @@ void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
 //----------------------------------------------------------------------private
 void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
 {
+  std::vector<std::string>token = this->tokenize(data.name );
+
+  // check for events of types device.name (vector events)
+  std::stringstream event;
+  event << token[0]<<"."<<token[1];
+  if ( this->Map.find(event.str() )!= this->Map.end() )
+    {
+    std::cout << event.str() << std::endl;
+    SetTrackerVectorValue(this->Map[event.str()],data.dta.tracker.matrix );
+    }
+
+  // check for events of type device.name.index (scalar events)
   for (int i = 0; i < 16; ++i)
     {
     std::stringstream event;
