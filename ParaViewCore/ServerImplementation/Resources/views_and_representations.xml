@@ -882,6 +882,22 @@
         use_index="1">
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="TooltipNotation"
+        command="SetTooltipNotation"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="TooltipPrecision"
+        command="SetTooltipPrecision"
+        number_of_elements="1"
+        default_values="6">
+        <IntRangeDomain name="range" min="0" max="12" />
+      </IntVectorProperty>
+
     </ContextViewProxy>
 
     <!-- ================================================================== -->
