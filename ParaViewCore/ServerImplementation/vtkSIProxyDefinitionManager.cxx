@@ -1164,6 +1164,9 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
       {
       this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
       }
+
+    // Make sure we invalidate any cached flatten version of our proxy definition
+    this->InternalsFlatten->Clear();
     }
 }
 //---------------------------------------------------------------------------

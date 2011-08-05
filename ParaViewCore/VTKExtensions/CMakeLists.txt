@@ -96,6 +96,7 @@ SET (Kit_SRCS
   vtkPSciVizMultiCorrelativeStats.cxx
   vtkPSciVizPCAStats.cxx
   vtkPVAMRDualClip.cxx
+  vtkPVAMRDualContour.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationScene.cxx
   vtkPVArrayCalculator.cxx

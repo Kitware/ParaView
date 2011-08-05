@@ -1,64 +1,150 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqChartOptionsWidget</class>
- <widget class="QWidget" name="pqChartOptionsWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="pqChartOptionsWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>323</height>
+    <width>466</width>
+    <height>731</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Chart Options</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QStackedWidget" name="ChartPages" >
-     <property name="currentIndex" >
+    <widget class="QStackedWidget" name="ChartPages">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="General" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="General">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
-       <item row="9" column="3" >
+       <item row="0" column="0" colspan="5">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Chart Title</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" rowspan="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>16</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Text</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" colspan="2">
+        <widget class="QLineEdit" name="ChartTitle"/>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;${TIME}&lt;/span&gt; to display current time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Font</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="ChartTitleFont">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Description</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ChartTitleFontButton">
+           <property name="text">
+            <string>Set &amp;Font</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Alignment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="QComboBox" name="ChartTitleAlignment">
+         <item>
+          <property name="text">
+           <string>Left</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Center</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Right</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -66,247 +152,34 @@
          </property>
         </spacer>
        </item>
-       <item row="10" column="0" colspan="4" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>20</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item rowspan="3" row="7" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType" >
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>16</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item rowspan="4" row="1" column="0" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType" >
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>16</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Font</string>
+       <item row="5" column="1">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Color</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <property name="leftMargin" >
+       <item row="5" column="3" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>0</number>
          </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="ChartTitleFont" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text" >
-            <string>Description</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ChartTitleFontButton" >
-           <property name="text" >
-            <string>Set &amp;Font</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="2" colspan="2" >
-        <widget class="QLineEdit" name="ChartTitle" />
-       </item>
-       <item row="1" column="1" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
-          <string>Text</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="4" >
-        <widget class="QLabel" name="label" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>Chart Title</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="4" >
-        <widget class="QLabel" name="label_5" >
-         <property name="font" >
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>Chart Legend</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1" colspan="3" >
-        <widget class="QCheckBox" name="ShowLegend" >
-         <property name="text" >
-          <string>Show the Chart Legend When Available</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1" >
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
-          <string>Location</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
-          <string>Flow</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="2" >
-        <widget class="QComboBox" name="LegendLocation" >
-         <item>
-          <property name="text" >
-           <string>Top-left (inline)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Top-right (inline)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Bottom-right (inline)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Bottom-left (inline)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Left</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Top</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Right</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Bottom</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Custom</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="9" column="2" >
-        <widget class="QComboBox" name="LegendFlow" >
-         <item>
-          <property name="text" >
-           <string>Left to Right</string>
-          </property>
-         </item>
-         <item>
-          <property name="text" >
-           <string>Top to Bottom</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="5" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
-          <number>0</number>
-         </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="pqColorChooserButton" name="ChartTitleColor" >
-           <property name="text" >
+          <widget class="pqColorChooserButton" name="ChartTitleColor">
+           <property name="text">
             <string>Set Co&amp;lor</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
              <height>20</height>
@@ -316,58 +189,104 @@
          </item>
         </layout>
        </item>
-       <item row="8" column="3" >
+       <item row="6" column="0" colspan="5">
+        <widget class="QLabel" name="label_5">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Chart Legend</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" rowspan="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
+           <width>16</width>
            <height>20</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item row="5" column="1" >
-        <widget class="QLabel" name="label_8" >
-         <property name="text" >
-          <string>Color</string>
+       <item row="7" column="1" colspan="4">
+        <widget class="QCheckBox" name="ShowLegend">
+         <property name="text">
+          <string>Show the Chart Legend When Available</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QLabel" name="label_4" >
-         <property name="text" >
-          <string>Alignment</string>
+       <item row="8" column="1">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Location</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="2" >
-        <widget class="QComboBox" name="ChartTitleAlignment" >
+       <item row="8" column="3">
+        <widget class="QComboBox" name="LegendLocation">
          <item>
-          <property name="text" >
+          <property name="text">
+           <string>Top-left (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Top-right (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Bottom-right (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Bottom-left (inline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>Left</string>
           </property>
          </item>
          <item>
-          <property name="text" >
-           <string>Center</string>
+          <property name="text">
+           <string>Top</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Right</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Bottom</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Custom</string>
           </property>
          </item>
         </widget>
        </item>
-       <item row="4" column="3" >
+       <item row="8" column="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -375,44 +294,109 @@
          </property>
         </spacer>
        </item>
-       <item row="2" column="2" >
-        <widget class="QLabel" name="label_17" >
-         <property name="text" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
-p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Use &lt;span style=" font-weight:600;">${TIME}&lt;/span> to display current time.&lt;/p>&lt;/body>&lt;/html></string>
+       <item row="9" column="1">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Flow</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="3">
+        <widget class="QComboBox" name="LegendFlow">
+         <item>
+          <property name="text">
+           <string>Left to Right</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Top to Bottom</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="9" column="4">
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Tooltip</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>Notation</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>Precision</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="3">
+        <widget class="QComboBox" name="TooltipNotation">
+         <item>
+          <property name="text">
+           <string>Standard</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Scientific</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Fixed</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="12" column="3">
+        <widget class="QSpinBox" name="TooltipPrecision">
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="Axis" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="Axis">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
-       <item row="10" column="3" >
+       <item row="10" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -420,12 +404,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="9" column="3" >
+       <item row="9" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -433,12 +417,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="3" column="3" >
+       <item row="3" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -446,12 +430,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="11" column="0" colspan="4" >
+       <item row="11" column="0" colspan="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>0</height>
@@ -459,15 +443,15 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item rowspan="5" row="6" column="0" >
+       <item row="6" column="0" rowspan="5">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>16</width>
            <height>20</height>
@@ -475,15 +459,15 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item rowspan="4" row="1" column="0" >
+       <item row="1" column="0" rowspan="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>16</width>
            <height>20</height>
@@ -491,81 +475,72 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="9" column="2" >
-        <widget class="QComboBox" name="LabelNotation" >
+       <item row="9" column="2">
+        <widget class="QComboBox" name="LabelNotation">
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Standard</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Exponential</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Engineering</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Mixed</string>
           </property>
          </item>
         </widget>
        </item>
-       <item row="10" column="2" >
-        <widget class="QSpinBox" name="LabelPrecision" >
-         <property name="maximum" >
+       <item row="10" column="2">
+        <widget class="QSpinBox" name="LabelPrecision">
+         <property name="maximum">
           <number>6</number>
          </property>
         </widget>
        </item>
-       <item row="10" column="1" >
-        <widget class="QLabel" name="label_24" >
-         <property name="text" >
+       <item row="10" column="1">
+        <widget class="QLabel" name="label_24">
+         <property name="text">
           <string>Precision</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1" >
-        <widget class="QLabel" name="label_23" >
-         <property name="text" >
+       <item row="9" column="1">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
           <string>Notation</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+       <item row="8" column="2" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>0</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="pqColorChooserButton" name="LabelColor" >
-           <property name="text" >
+          <widget class="pqColorChooserButton" name="LabelColor">
+           <property name="text">
             <string>&amp;Label Color</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
              <height>20</height>
@@ -575,130 +550,112 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item row="8" column="1" >
-        <widget class="QLabel" name="label_22" >
-         <property name="text" >
+       <item row="8" column="1">
+        <widget class="QLabel" name="label_22">
+         <property name="text">
           <string>Color</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1" >
-        <widget class="QLabel" name="label_21" >
-         <property name="text" >
+       <item row="7" column="1">
+        <widget class="QLabel" name="label_21">
+         <property name="text">
           <string>Font</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1" colspan="3" >
-        <widget class="QCheckBox" name="ShowAxisLabels" >
-         <property name="text" >
+       <item row="6" column="1" colspan="3">
+        <widget class="QCheckBox" name="ShowAxisLabels">
+         <property name="text">
           <string>Show Axis Labels When Space is Available</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+       <item row="7" column="2" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="AxisLabelFont" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+          <widget class="QLabel" name="AxisLabelFont">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Description</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="AxisLabelFontButton" >
-           <property name="text" >
+          <widget class="QPushButton" name="AxisLabelFontButton">
+           <property name="text">
             <string>Set &amp;Font</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="5" column="0" colspan="4" >
-        <widget class="QLabel" name="label_20" >
-         <property name="font" >
+       <item row="5" column="0" colspan="4">
+        <widget class="QLabel" name="label_20">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Axis Labels</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" colspan="3" >
-        <widget class="QCheckBox" name="ShowAxis" >
-         <property name="text" >
+       <item row="1" column="1" colspan="3">
+        <widget class="QCheckBox" name="ShowAxis">
+         <property name="text">
           <string>Show Axis</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QLabel" name="label_19" >
-         <property name="text" >
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_19">
+         <property name="text">
           <string>Colors</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+       <item row="4" column="2" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="pqColorChooserButton" name="AxisColor" >
-           <property name="text" >
+          <widget class="pqColorChooserButton" name="AxisColor">
+           <property name="text">
             <string>A&amp;xis Color</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="pqColorChooserButton" name="GridColor" >
-           <property name="text" >
+          <widget class="pqColorChooserButton" name="GridColor">
+           <property name="text">
             <string>&amp;Grid Color</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
              <height>20</height>
@@ -708,78 +665,66 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item row="3" column="1" >
-        <widget class="QLabel" name="label_18" >
-         <property name="text" >
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_18">
+         <property name="text">
           <string>Grid Color</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2" >
-        <widget class="QComboBox" name="GridType" >
+       <item row="3" column="2">
+        <widget class="QComboBox" name="GridType">
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Lighter</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Specified</string>
           </property>
          </item>
         </widget>
        </item>
-       <item row="2" column="1" colspan="3" >
-        <widget class="QCheckBox" name="ShowAxisGrid" >
-         <property name="text" >
+       <item row="2" column="1" colspan="3">
+        <widget class="QCheckBox" name="ShowAxisGrid">
+         <property name="text">
           <string>Show Axis Grid</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="4" >
-        <widget class="QLabel" name="AxisGeneralLabel" >
-         <property name="font" >
+       <item row="0" column="0" colspan="4">
+        <widget class="QLabel" name="AxisGeneralLabel">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>General</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="AxisLayout" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="AxisLayout">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
-       <item rowspan="5" row="1" column="0" >
+       <item row="1" column="0" rowspan="5">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>16</width>
            <height>20</height>
@@ -787,51 +732,39 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="5" column="1" >
-        <widget class="QStackedWidget" name="AxisLayoutPages" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <item row="5" column="1">
+        <widget class="QStackedWidget" name="AxisLayoutPages">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="currentIndex" >
+         <property name="currentIndex">
           <number>2</number>
          </property>
-         <widget class="QWidget" name="BlankPage" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+         <widget class="QWidget" name="BlankPage">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
          </widget>
-         <widget class="QWidget" name="RangePage" >
-          <layout class="QGridLayout" >
-           <property name="leftMargin" >
+         <widget class="QWidget" name="RangePage">
+          <layout class="QGridLayout">
+           <property name="margin">
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
+           <property name="spacing">
             <number>6</number>
            </property>
-           <property name="verticalSpacing" >
-            <number>6</number>
-           </property>
-           <item row="2" column="0" colspan="2" >
+           <item row="2" column="0" colspan="2">
             <spacer>
-             <property name="orientation" >
+             <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
                <height>0</height>
@@ -839,54 +772,42 @@ p, li { white-space: pre-wrap; }
              </property>
             </spacer>
            </item>
-           <item row="1" column="1" >
-            <widget class="QLineEdit" name="AxisMaximum" />
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="AxisMaximum"/>
            </item>
-           <item row="0" column="1" >
-            <widget class="QLineEdit" name="AxisMinimum" />
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="AxisMinimum"/>
            </item>
-           <item row="1" column="0" >
-            <widget class="QLabel" name="label_16" >
-             <property name="text" >
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
               <string>Maximum</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0" >
-            <widget class="QLabel" name="label_15" >
-             <property name="text" >
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
               <string>Minimum</string>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="ListPage" >
-          <layout class="QGridLayout" >
-           <property name="leftMargin" >
+         <widget class="QWidget" name="ListPage">
+          <layout class="QGridLayout">
+           <property name="margin">
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
+           <property name="spacing">
             <number>6</number>
            </property>
-           <property name="verticalSpacing" >
-            <number>6</number>
-           </property>
-           <item row="3" column="1" >
+           <item row="3" column="1">
             <spacer>
-             <property name="orientation" >
+             <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
                <height>0</height>
@@ -894,33 +815,33 @@ p, li { white-space: pre-wrap; }
              </property>
             </spacer>
            </item>
-           <item row="2" column="1" >
-            <widget class="QPushButton" name="GenerateButton" >
-             <property name="text" >
+           <item row="2" column="1">
+            <widget class="QPushButton" name="GenerateButton">
+             <property name="text">
               <string>&amp;Generate</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1" >
-            <widget class="QPushButton" name="RemoveButton" >
-             <property name="text" >
+           <item row="1" column="1">
+            <widget class="QPushButton" name="RemoveButton">
+             <property name="text">
               <string>&amp;Delete</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1" >
-            <widget class="QPushButton" name="AddButton" >
-             <property name="text" >
+           <item row="0" column="1">
+            <widget class="QPushButton" name="AddButton">
+             <property name="text">
               <string>&amp;New Label</string>
              </property>
             </widget>
            </item>
-           <item rowspan="4" row="0" column="0" >
-            <widget class="QListView" name="LabelList" >
-             <property name="editTriggers" >
-              <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+           <item row="0" column="0" rowspan="4">
+            <widget class="QListView" name="LabelList">
+             <property name="editTriggers">
+              <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
              </property>
-             <property name="selectionMode" >
+             <property name="selectionMode">
               <enum>QAbstractItemView::ExtendedSelection</enum>
              </property>
             </widget>
@@ -929,87 +850,75 @@ p, li { white-space: pre-wrap; }
          </widget>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <widget class="QRadioButton" name="UseChartSelect" >
-         <property name="whatsThis" >
+       <item row="2" column="1">
+        <widget class="QRadioButton" name="UseChartSelect">
+         <property name="whatsThis">
           <string>Check this option to let the chart choose the best axis layout.</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Let the Chart Determine the Axis Layout</string>
          </property>
-         <property name="checked" >
+         <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QRadioButton" name="UseFixedInterval" >
-         <property name="whatsThis" >
+       <item row="4" column="1">
+        <widget class="QRadioButton" name="UseFixedInterval">
+         <property name="whatsThis">
           <string>Check this option to specify each of the axis labels. This option gives you the most control.</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Specify Each of the Axis Labels.</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
-        <widget class="QRadioButton" name="UseBestFit" >
-         <property name="whatsThis" >
+       <item row="3" column="1">
+        <widget class="QRadioButton" name="UseBestFit">
+         <property name="whatsThis">
           <string>Check this option to specify the range and let the chart choose suitable intervals.</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Specify the Axis Range</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QCheckBox" name="UseLogScale" >
-         <property name="text" >
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="UseLogScale">
+         <property name="text">
           <string>Use Logarithmic Scale When Available</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="2" >
-        <widget class="QLabel" name="label_14" >
-         <property name="font" >
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_14">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Axis Layout</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="AxisTitle" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="AxisTitle">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <property name="horizontalSpacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
-       <item row="6" column="0" colspan="4" >
+       <item row="6" column="0" colspan="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>0</height>
@@ -1017,12 +926,12 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="4" column="3" >
+       <item row="4" column="3">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
@@ -1030,138 +939,120 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="4" column="2" >
-        <widget class="QComboBox" name="AxisTitleAlignment" >
+       <item row="4" column="2">
+        <widget class="QComboBox" name="AxisTitleAlignment">
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Left</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Center</string>
           </property>
          </item>
          <item>
-          <property name="text" >
+          <property name="text">
            <string>Right</string>
           </property>
          </item>
         </widget>
        </item>
-       <item row="0" column="0" colspan="4" >
-        <widget class="QLabel" name="label_9" >
-         <property name="font" >
+       <item row="0" column="0" colspan="4">
+        <widget class="QLabel" name="label_9">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Axis Title</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
-        <widget class="QLabel" name="label_11" >
-         <property name="text" >
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
           <string>Font</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QLabel" name="label_10" >
-         <property name="text" >
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
           <string>Text</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QLabel" name="label_12" >
-         <property name="text" >
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
           <string>Alignment</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1" >
-        <widget class="QLabel" name="label_13" >
-         <property name="text" >
+       <item row="5" column="1">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
           <string>Color</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="2" colspan="2" >
-        <widget class="QLineEdit" name="AxisTitleText" />
+       <item row="1" column="2" colspan="2">
+        <widget class="QLineEdit" name="AxisTitleText"/>
        </item>
-       <item row="3" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+       <item row="3" column="2" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="AxisTitleFont" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+          <widget class="QLabel" name="AxisTitleFont">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Description</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="AxisTitleFontButton" >
-           <property name="text" >
+          <widget class="QPushButton" name="AxisTitleFontButton">
+           <property name="text">
             <string>Set &amp;Font</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="5" column="2" colspan="2" >
-        <layout class="QHBoxLayout" >
-         <property name="spacing" >
+       <item row="5" column="2" colspan="2">
+        <layout class="QHBoxLayout">
+         <property name="spacing">
           <number>0</number>
          </property>
-         <property name="leftMargin" >
-          <number>0</number>
-         </property>
-         <property name="topMargin" >
-          <number>0</number>
-         </property>
-         <property name="rightMargin" >
-          <number>0</number>
-         </property>
-         <property name="bottomMargin" >
+         <property name="margin">
           <number>0</number>
          </property>
          <item>
-          <widget class="pqColorChooserButton" name="AxisTitleColor" >
-           <property name="text" >
+          <widget class="pqColorChooserButton" name="AxisTitleColor">
+           <property name="text">
             <string>Set Co&amp;lor</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
              <height>20</height>
@@ -1171,15 +1062,15 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item rowspan="4" row="1" column="0" >
+       <item row="1" column="0" rowspan="4">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>16</width>
            <height>20</height>
@@ -1187,19 +1078,32 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="2" column="2" >
-        <widget class="QLabel" name="label_25" >
-         <property name="text" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       <item row="2" column="2">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Use &lt;span style=" font-weight:600;">${TIME}&lt;/span> to display current time.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Use &lt;span style=&quot; font-weight:600;&quot;&gt;${TIME}&lt;/span&gt; to display current time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -72,19 +72,20 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
 //-----------------------------------------------------------------------------
 bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 {
-  vtkSMRemoteObject* proxy = vtkSMRemoteObject::SafeDownCast(
-    session->GetRemoteObject(globalId));
+  vtkObject* remoteObj = session->GetRemoteObject(globalId);
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
 
   // We filter proxy type that must not be involved in undo/redo state.
   // The property themselves are already filtered based on a flag in the XML.
   // XML Flag: state_ignored="1"
-  if( !proxy || (proxy && (
+  if( !remoteObj || (proxy && (
       proxy->IsA("vtkSMCameraProxy") ||
       proxy->IsA("vtkSMTimeKeeperProxy") ||
       proxy->IsA("vtkSMAnimationScene") ||
       proxy->IsA("vtkSMAnimationSceneProxy") ||
       proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
-      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
+      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy") ||
+      !strcmp(proxy->GetXMLName(),"FileInformationHelper") )))
     {
     return true;
     }

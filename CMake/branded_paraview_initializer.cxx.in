@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewManager.h"
 #include "pqBrandPluginsLoader.h"
 #include "pqOptions.h"
+#include "pqSettings.h"
 
 #ifdef Q_WS_X11
 #include <QPlastiqueStyle>
@@ -88,15 +89,29 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   Q_INIT_RESOURCE(@BPC_NAME@_help);
 #endif  
 
-  // Create and show the splash screen as the main window is being created.
-  QPixmap pixmap("@BPC_SPLASH_RESOURCE@");
-  this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
-  this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
-  // splash screen slows down tests. So don't show it unless we are not running
-  // tests.
-  bool show_splash = (!getenv("DASHBOARD_TEST_FROM_CTEST"));
-  if (show_splash)
+  pqSettings *settings = this->PVApp->settings();
+  bool show_splash;
+  if(settings->value("disableSplashScreen").toBool() == true)
     {
+    show_splash = false;
+    }
+  else if(getenv("DASHBOARD_TEST_FROM_CTEST") != 0)
+    {
+    // splash screen slows down tests. So don't show it unless we are not running
+    // tests.
+    show_splash = false;
+    }
+  else
+    {
+    show_splash = true;
+    }
+
+  if(show_splash)
+    {
+    // Create and show the splash screen as the main window is being created.
+    QPixmap pixmap(":/paraview/SplashImage.img");
+    this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+    this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
     this->Splash->show();
     }
 

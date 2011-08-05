@@ -470,6 +470,18 @@ void pqXYChartOptionsEditor::connectGUI()
                                      proxy,
                                      proxy->GetProperty("LegendLocation"));
 
+  this->Internal->Links.registerLink(this->Internal->Form->TooltipNotation,
+                                     "currentIndex",
+                                     SIGNAL(currentIndexChanged(int)),
+                                     proxy,
+                                     proxy->GetProperty("TooltipNotation"));
+
+  this->Internal->Links.registerLink(this->Internal->Form->TooltipPrecision,
+                                     "value",
+                                     SIGNAL(valueChanged(int)),
+                                     proxy,
+                                     proxy->GetProperty("TooltipPrecision"));
+
   this->updateOptions();
 
   this->blockSignals(false);
@@ -972,6 +984,12 @@ void pqXYChartOptionsEditor::updateOptions()
           values[3*i + 2].toDouble());
       }
     }
+
+  this->Internal->Form->TooltipNotation->setCurrentIndex(
+    pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipNotation")).toInt());
+
+  this->Internal->Form->TooltipPrecision->setValue(
+    pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipPrecision")).toInt());
 
   this->blockSignals(false);
 

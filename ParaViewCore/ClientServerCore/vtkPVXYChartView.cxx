@@ -454,6 +454,24 @@ void vtkPVXYChartView::SetAxisLabelsTop(int i, double value)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTooltipNotation(int notation)
+{
+  for(int i = 0; i < this->Chart->GetNumberOfPlots(); i++)
+    {
+    this->Chart->GetPlot(i)->SetTooltipNotation(notation);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTooltipPrecision(int precision)
+{
+  for(int i = 0; i < this->Chart->GetNumberOfPlots(); i++)
+    {
+    this->Chart->GetPlot(i)->SetTooltipPrecision(precision);
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkChart* vtkPVXYChartView::GetChart()
 {
   return this->Chart;

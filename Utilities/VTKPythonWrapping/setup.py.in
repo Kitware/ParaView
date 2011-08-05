@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+
+"""
+setup.py for installing the VTK-Python bindings using distutils.
+
+Created by David Partyka, August 20011.
+
+"""
+
+import sys
+import string
+import os
+import os.path
+from types import StringType
+from distutils.core import setup
+from distutils.command.install_data import install_data
+from distutils.sysconfig import get_config_var
+
+# Support for Python Eggs:
+#  http://peak.telecommunity.com/DevCenter/PythonEggs
+#  http://peak.telecommunity.com/DevCenter/EasyInstall
+has_setup_tools = 0
+try:
+    from setuptools import setup
+except ImportError:
+    pass
+else:
+    has_setup_tools = 1
+
+# VTK build configuration settings.
+pv_version = "@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@"
+pv_lib_dir = "@LIBRARY_OUTPUT_PATH@"
+pv_bin_dir = "@EXECUTABLE_OUTPUT_PATH@"
+vtk_use_rendering = @VTK_PYTHON_USE_RENDERING@
+vtk_use_parallel = @VTK_PYTHON_USE_PARALLEL@
+vtk_use_charts = @VTK_PYTHON_USE_CHARTS@
+vtk_use_geovis = @VTK_PYTHON_USE_GEOVIS@
+vtk_use_infovis = @VTK_PYTHON_USE_INFOVIS@
+vtk_use_text_analysis = @VTK_PYTHON_USE_TEXT_ANALYSIS@
+vtk_use_views = @VTK_PYTHON_USE_VIEWS@
+vtk_use_mpi = @VTK_PYTHON_USE_MPI@
+pv_has_configuration_types = @VTK_PYTHON_HAS_CONFIG_TYPES@
+vtk_use_sip = @VTK_PYTHON_USE_SIP@
+vtk_use_qt = @VTK_PYTHON_USE_QT@
+
+
+# The build type ('Release', 'Debug' etc.).  If pv_has_configuration_types
+# is true this must be set.  It may be set on the command line by something
+# like 'BUILD_TYPE=Release'.  For example::
+#   python setup.py install --prefix=D:\\Python23 BUILD_TYPE=Release
+pv_build_type = @VTK_PYTHON_BUILD_TYPE@
+
+# Construct the list of kit names to be installed.
+vtk_kit_names = ['Common', 'Filtering', 'IO', 'Graphics', 'GenericFiltering', 'Imaging']
+pv_kit_names = ['Common', 'ServerManager', 'ServerImplementation', 'ClientServerCore', 'VTKExtensions']
+vtk_kit_names2 = []
+vtk_kit_names3 = []
+if vtk_use_rendering:
+    vtk_kit_names.extend(['Rendering', 'VolumeRendering', 'Hybrid', 'Widgets'])
+if vtk_use_parallel:
+    vtk_kit_names.extend(['Parallel'])
+if vtk_use_charts:
+    vtk_kit_names.extend(['Charts'])
+if vtk_use_geovis:
+    vtk_kit_names.extend(['Geovis'])
+if vtk_use_infovis:
+    vtk_kit_names.extend(['Infovis'])
+if vtk_use_text_analysis:
+    vtk_kit_names.extend(['TextAnalysis'])
+if vtk_use_views:
+    vtk_kit_names.extend(['Views'])
+if vtk_use_qt:
+    vtk_kit_names2.extend(['Qt'])
+    vtk_kit_names3.extend(['QVTK'])
+
+# Construct the list of executable names to be installed.
+pv_exe_names = ['pvpython']
+
+def get_vtk_libs():
+    """Returns a list of vtk libraries to be installed.  """
+    libs = []
+
+    # Select platform-specific components of the module file names.
+    if os.name == 'posix':
+        dir = pv_lib_dir
+        prefix = 'vtk'
+        suffix = get_config_var('SO')
+    else:
+        dir = pv_bin_dir.replace('/', '\\')
+        prefix = 'vtk'
+        suffix = '.pyd'
+
+    # If this build has configuration types append the selected configuration.
+    if pv_has_configuration_types:
+        dir = os.path.join(dir, pv_build_type)
+
+    # Enumerate ths list of module files.
+    for kit in vtk_kit_names:
+        libs.append(os.path.abspath(os.path.join(dir, prefix+kit+'Python'+suffix)))
+        if vtk_use_sip:
+          libs.append(os.path.abspath(os.path.join(dir, 'vtk'+kit+'PythonSIP'+suffix)))
+
+    for kit in vtk_kit_names2:
+        libs.append(os.path.abspath(os.path.join(dir, prefix+kit+'Python'+suffix)))
+
+    for kit in vtk_kit_names3:
+        libs.append(os.path.abspath(os.path.join(dir, kit+'Python'+suffix)))
+
+    return libs
+
+
+def get_pv_libs():
+    """Returns a list of paraview libraries to be installed.  """
+    libs = []
+
+    # Select platform-specific components of the module file names.
+    if os.name == 'posix':
+        dir = pv_lib_dir
+        prefix = 'vtk'
+        suffix = get_config_var('SO')
+    else:
+        dir = pv_bin_dir.replace('/', '\\')
+        prefix = 'vtk'
+        suffix = '.pyd'
+
+    # If this build has configuration types append the selected configuration.
+    if pv_has_configuration_types:
+        dir = os.path.join(dir, pv_build_type)
+
+    # Enumerate ths list of module files.
+    for kit in pv_kit_names:
+        libs.append(os.path.abspath(os.path.join(dir, prefix+'PV'+kit+'Python'+suffix)))
+
+    return libs
+
+
+def get_scripts():
+    """Returns the appropriate pvpython executable that is to be installed."""
+    scripts = []
+
+    # Select platform-specific components of the executable file names.
+    if os.name == 'posix':
+        dir = pv_lib_dir
+        suffix = ''
+    else:
+        dir = pv_bin_dir.replace('/', '\\')
+        suffix = '.exe'
+
+    # If this build has configuration types append the selected configuration.
+    if pv_has_configuration_types:
+        dir = os.path.join(dir, pv_build_type)
+
+    # Enumerate ths list of executable files.
+    for exe in pv_exe_names:
+        scripts.append(os.path.abspath(os.path.join(dir, exe+suffix)))
+
+    return scripts
+
+
+class my_install_data (install_data):
+    def finalize_options (self):
+        """Needed to make this thing work properly."""
+        self.set_undefined_options ('install',
+                                    ('install_lib', 'install_dir'),
+                                    ('root', 'root'),
+                                    ('force', 'force'),
+                                    )
+
+if __name__ == '__main__':
+    # Get the optional build type argument.
+    for x in sys.argv[:]:
+        if string.find(x, 'BUILD_TYPE') > -1:
+            pv_build_type = string.strip(string.split(x, '=')[1])
+            sys.argv.remove(x)
+            break
+
+    # Make sure a build type was specified if it is required.
+    if pv_has_configuration_types:
+        if not pv_build_type:
+            raise "ERROR: Must specify BUILD_TYPE=<config-name> on command line."
+
+    def mk_dict(**kw):
+        # Unnecessary in recent Pythons but handy for earlier
+        # versions.
+        return kw
+
+    # The options for setup.
+    opts = mk_dict(name              = "ParaView",
+                   version           = pv_version,
+                   description       = "ParaView",
+                   maintainer        = "ParaView Developers",
+                   maintainer_email  = "paraview-developers@paraview.org",
+                   license           = "BSD",
+                   long_description  = "Data analysis and visualization application",
+                   url               = "http://www.paraview.org/",
+                   platforms         = ['Any'],
+                   cmdclass          = {'install_data': my_install_data},
+                   packages          = ['paraview', 'paraview.vtk', 'paraview.demos'],
+                   package_dir       = {'' : 'site-packages'},
+                   #scripts          = get_scripts(),
+                   data_files        = [('paraview', get_pv_libs()), ('paraview/vtk', get_vtk_libs())],
+                   )
+    # If setup_tools is available, then add an extra option to disable
+    # creation of a ZIP file.
+    if has_setup_tools:
+        opts['zip_safe'] = 0
+
+    setup(**opts)

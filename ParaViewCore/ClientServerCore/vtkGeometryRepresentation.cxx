@@ -116,6 +116,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->DebugString = 0;
   this->SetDebugString(this->GetClassName());
 
+  this->AllowSpecularHighlightingWithScalarColoring = false;
+
   this->SetupDefaults();
 }
 
@@ -533,9 +535,9 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     ambient = 1.0;
     specular = 0.0;
     }
-  else if (using_scalar_coloring)
+  else if (using_scalar_coloring && !this->AllowSpecularHighlightingWithScalarColoring)
     {
-    // Disable specular highlighting is coloring by scalars.
+    // Disable specular highlighting if coloring by scalars.
     specular = 0.0;
     }
 
@@ -615,6 +617,11 @@ vtkSelection* vtkGeometryRepresentation::ConvertSelection(
   convertor->Delete();
   newInput->Delete();
   return output;
+}
+
+void vtkGeometryRepresentation::SetAllowSpecularHighlightingWithScalarColoring(int allow)
+{
+  this->AllowSpecularHighlightingWithScalarColoring = allow;
 }
 
 //----------------------------------------------------------------------------

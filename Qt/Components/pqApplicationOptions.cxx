@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartRepresentation.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
@@ -129,6 +131,12 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->StrictLoadBalancing,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->SpecularHighlighting,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->DisableSplashScreen,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->ForegroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
@@ -187,8 +195,6 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(serverChanged(pqServer*)),
     this, SLOT(updatePalettes()));
-  vtkProcessModuleAutoMPI::
-    SetUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
 #else
   this->Internal->LabelMultiCore->setEnabled(false);
   this->Internal->AutoMPI->setEnabled(false);
@@ -293,8 +299,14 @@ void pqApplicationOptions::applyChanges()
   vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(autoMPI);
 #endif
 
+  bool specularHighlighting = this->Internal->SpecularHighlighting->isChecked();
+  settings->setValue("allowSpecularHighlightingWithScalarColoring", specularHighlighting);
+
   bool strictLoadBalancing = this->Internal->StrictLoadBalancing->isChecked();
   settings->setValue("strictLoadBalancing", strictLoadBalancing);
+
+  bool disableSpashScreen = this->Internal->DisableSplashScreen->isChecked();
+  settings->setValue("disableSplashScreen", disableSpashScreen);
 
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
@@ -322,6 +334,21 @@ void pqApplicationOptions::applyChanges()
   pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
+
+  pqServerManagerModel *serverManagerModel = pqApplicationCore::instance()->
+    getServerManagerModel();
+
+  foreach(pqPipelineRepresentation *representation, serverManagerModel->findItems<pqPipelineRepresentation*>())
+    {
+    vtkSMProxy *proxy = representation->getProxy();
+    if(proxy->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
+      {
+      vtkSMPropertyHelper(representation->getProxy(), "AllowSpecularHighlightingWithScalarColoring").Set(
+        settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
+
+      proxy->UpdateVTKObjects();
+      }
+    }
 
   // render all views.
   pqApplicationCore::instance()->render();
@@ -359,12 +386,16 @@ void pqApplicationOptions::resetChanges()
 #if defined(PARAVIEW_USE_MPI)
   this->Internal->AutoMPI->setChecked(
     settings->value("autoMPI", false).toBool());
-  vtkProcessModuleAutoMPI::
-    SetUseMulticoreProcessors(this->Internal->AutoMPI->isTristate());
 #endif
+
+  this->Internal->SpecularHighlighting->setChecked(
+    settings->value("allowSpecularHighlightingWithScalarColoring", false).toBool());
 
   this->Internal->StrictLoadBalancing->setChecked(
     settings->value("strictLoadBalancing", false).toBool());
+
+  this->Internal->DisableSplashScreen->setChecked(
+    settings->value("disableSplashScreen", false).toBool());
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",
