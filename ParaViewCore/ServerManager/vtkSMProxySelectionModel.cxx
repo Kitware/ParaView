@@ -47,6 +47,7 @@ public:
   unsigned int CollaborationManagerObserverID;
   vtkSMProxySelectionModel* Owner;
   bool FollowinMaster;
+  bool Initilized;
   vtkstd::map<int, vtkSMMessage> ClientsCachedState;
 
   vtkInternal(vtkSMProxySelectionModel* owner)
@@ -54,6 +55,7 @@ public:
     this->Owner = owner;
     this->CollaborationManagerObserverID = 0;
     this->FollowinMaster = true;
+    this->Initilized = false;
     }
 
   ~vtkInternal()
@@ -294,11 +296,16 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
 
   // Make sure we are loading the master state and we want to follow it.
   // Otherwise don't try to load that state
-  if(!( this->IsFollowingMaster() &&
-        this->Internal->GetMasterId() == static_cast<int>(msg->client_id())))
+  // If we did not get initialized yet, we don't filter
+  if(!( !this->Internal->Initilized ||
+        (this->IsFollowingMaster() &&
+         this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
     {
     return;
     }
+
+  // Has we are going to load a state, we can consider to be initialized
+  this->Internal->Initilized = true;
 
   // Load the proxy in the state
   vtkstd::set<vtkSMProxy*> newProxyInSelection;
