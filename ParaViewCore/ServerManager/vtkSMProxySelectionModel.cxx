@@ -94,7 +94,7 @@ public:
 
   int GetMasterId()
     {
-    if(!this->Owner->Session)
+    if(!this->Owner->Session || !this->Owner->Session->GetCollaborationManager())
       {
       return -1;
       }
@@ -297,9 +297,10 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Make sure we are loading the master state and we want to follow it.
   // Otherwise don't try to load that state
   // If we did not get initialized yet, we don't filter
-  if(!( !this->Internal->Initilized ||
-        (this->IsFollowingMaster() &&
-         this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
+  if( this->Internal->GetMasterId() != -1 &&
+      !( !this->Internal->Initilized ||
+         (this->IsFollowingMaster() &&
+          this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
     {
     return;
     }
