@@ -38,6 +38,7 @@
 
 #include "assert.h"
 #include <fstream>
+#include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
@@ -68,8 +69,12 @@ namespace
       sessioncore->ExecuteStreamSatelliteCallback();
       break;
 
-    case vtkPVSessionCore::DELETE_SI:
-      sessioncore->DeleteSIObjectSatelliteCallback();
+    case vtkPVSessionCore::UNREGISTER_SI:
+      sessioncore->UnRegisterSIObjectSatelliteCallback();
+      break;
+
+    case vtkPVSessionCore::REGISTER_SI:
+      sessioncore->RegisterSIObjectSatelliteCallback();
       break;
       }
     }
@@ -89,6 +94,7 @@ public:
     SIObjectMapType::iterator iter;
     int nbFound, nbDelete;
     nbFound = nbDelete = 1;
+    int targetRefCount = 1;
     while(nbFound > 0)
       {
       nbDelete = nbFound = 0;
@@ -98,28 +104,73 @@ public:
         if(obj)
           {
           nbFound++;
-          if(obj->GetReferenceCount() == 1)
+          if(obj->GetReferenceCount() == targetRefCount)
             {
             nbDelete++;
             obj->Delete();
             }
           }
         }
+//      if(nbDelete == 0 && nbFound > 0)
+//        {
+//        targetRefCount++;
+//        }
+//      else
+//        {
+//        targetRefCount = 1;
+//        }
       }
     }
   //---------------------------------------------------------------------------
-  void Delete(vtkTypeUInt32 globalUniqueId)
+  void UnRegisterSI(vtkTypeUInt32 globalUniqueId, int origin)
     {
+    // Update map to keep track on which client is pointing to what
+    this->ClientSIRegistrationMap[origin].erase(globalUniqueId);
+
     // Remove SI (ServerImplementation) object
     SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
     if (iter != this->SIObjectMap.end())
       {
       if(iter->second)
         {
-        iter->second->Delete();
+        iter->second->UnRegister(NULL);
         }
       }
     }
+  //---------------------------------------------------------------------------
+  void RegisterSI(vtkTypeUInt32 globalUniqueId, int origin)
+    {
+    // Update map to keep track on which client is pointing to what
+    if(origin > 0)
+      {
+      this->KnownClients.insert(origin);
+      this->ClientSIRegistrationMap[origin].insert(globalUniqueId);
+      }
+
+    // Remove SI (ServerImplementation) object
+    SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
+    if (iter != this->SIObjectMap.end())
+      {
+      if(iter->second)
+        {
+        iter->second->Register(NULL);
+        }
+      }
+    }
+  //---------------------------------------------------------------------------
+  void UnRegisterSIObjectsOfClient(int clientId)
+    {
+    this->KnownClients.erase(clientId);
+    vtkstd::set<vtkTypeUInt32> siObjectIds = this->ClientSIRegistrationMap[clientId];
+    vtkstd::set<vtkTypeUInt32>::iterator iter = siObjectIds.begin();
+    while(iter != siObjectIds.end())
+      {
+      this->UnRegisterSI(*iter, -1);
+      iter++;
+      }
+    siObjectIds.clear();
+    }
+
   //---------------------------------------------------------------------------
   void DeleteRemoteObject(vtkTypeUInt32 globalUniqueId)
     {
@@ -183,10 +234,14 @@ public:
     SIObjectMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> >
     RemoteObjectMapType;
+  typedef vtkstd::map<int, vtkstd::set<vtkTypeUInt32> >
+    ClientSIRegistrationMapType;
+  ClientSIRegistrationMapType ClientSIRegistrationMap;
   SIObjectMapType SIObjectMap;
   RemoteObjectMapType RemoteObjectMap;
   unsigned long InterpreterObserverID;
   vtkstd::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
+  vtkstd::set<int> KnownClients;
 };
 
 //****************************************************************************/
@@ -596,7 +651,7 @@ void vtkPVSessionCore::ExecuteStreamInternal(const vtkClientServerStream& stream
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionCore::DeleteSIObject(vtkSMMessage* message)
+void vtkPVSessionCore::RegisterSIObject(vtkSMMessage* message)
 {
   // This can only be called on the root node.
   assert( this->ParallelController == NULL ||
@@ -621,7 +676,7 @@ void vtkPVSessionCore::DeleteSIObject(vtkSMMessage* message)
       // configuration, the message will end up being send to all data-server
       // nodes as well. Although we never do that presently, it's a possibility
       // and we should fix this.
-      unsigned char type = DELETE_SI;
+      unsigned char type = REGISTER_SI;
       this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
                                                         ROOT_SATELLITE_RMI_TAG);
 
@@ -634,11 +689,52 @@ void vtkPVSessionCore::DeleteSIObject(vtkSMMessage* message)
       }
     }
 
-  this->DeleteSIObjectInternal(message);
+  this->RegisterSIObjectInternal(message);
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionCore::UnRegisterSIObject(vtkSMMessage* message)
+{
+  // This can only be called on the root node.
+  assert( this->ParallelController == NULL ||
+          this->ParallelController->GetLocalProcessId() == 0 ||
+          this->SymmetricMPIMode);
+
+  vtkTypeUInt32 location = message->location();
+
+  if ( (location & vtkProcessModule::SERVERS) != 0 && !this->SymmetricMPIMode)
+    {
+    // send message to satellites and then start processing.
+
+    if ( this->ParallelController &&
+         this->ParallelController->GetNumberOfProcesses() > 1 &&
+         this->ParallelController->GetLocalProcessId() == 0)
+      {
+      // Forward the message to the satellites if the object is expected to exist
+      // on the satellites.
+
+      // FIXME: There's one flaw in this logic. If a object is to be created on
+      // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
+      // configuration, the message will end up being send to all data-server
+      // nodes as well. Although we never do that presently, it's a possibility
+      // and we should fix this.
+      unsigned char type = UNREGISTER_SI;
+      this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
+                                                        ROOT_SATELLITE_RMI_TAG);
+
+      int byte_size = message->ByteSize();
+      unsigned char *raw_data = new unsigned char[byte_size + 1];
+      message->SerializeToArray(raw_data, byte_size);
+      this->ParallelController->Broadcast(&byte_size, 1, 0);
+      this->ParallelController->Broadcast(raw_data, byte_size, 0);
+      delete [] raw_data;
+      }
+    }
+
+  this->UnRegisterSIObjectInternal(message);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionCore::DeleteSIObjectSatelliteCallback()
+void vtkPVSessionCore::UnRegisterSIObjectSatelliteCallback()
 {
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
@@ -653,19 +749,48 @@ void vtkPVSessionCore::DeleteSIObjectSatelliteCallback()
     }
   else
     {
-    this->DeleteSIObjectInternal(&message);
+    this->UnRegisterSIObjectInternal(&message);
+    }
+  delete [] raw_data;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionCore::RegisterSIObjectSatelliteCallback()
+{
+  int byte_size = 0;
+  this->ParallelController->Broadcast(&byte_size, 1, 0);
+
+  unsigned char *raw_data = new unsigned char[byte_size + 1];
+  this->ParallelController->Broadcast(raw_data, byte_size, 0);
+
+  vtkSMMessage message;
+  if (!message.ParseFromArray(raw_data, byte_size))
+    {
+    vtkErrorMacro("Failed to parse protobuf message.");
+    }
+  else
+    {
+    this->RegisterSIObjectInternal(&message);
     }
   delete [] raw_data;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionCore::DeleteSIObjectInternal(vtkSMMessage* message)
+void vtkPVSessionCore::UnRegisterSIObjectInternal(vtkSMMessage* message)
 {
   LOG( << "----------------------------------------------------------------\n"
-       << "Delete ( " << message->ByteSize() << " bytes )\n"
+       << "UnRegister ( " << message->ByteSize() << " bytes )\n"
        << "----------------------------------------------------------------\n"
        << message->DebugString().c_str() );
-  this->Internals->Delete(message->global_id());
+  this->Internals->UnRegisterSI(message->global_id(), message->client_id());
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionCore::RegisterSIObjectInternal(vtkSMMessage* message)
+{
+  LOG( << "----------------------------------------------------------------\n"
+       << "Register ( " << message->ByteSize() << " bytes )\n"
+       << "----------------------------------------------------------------\n"
+       << message->DebugString().c_str() );
+  this->Internals->RegisterSI(message->global_id(), message->client_id());
 }
 
 //----------------------------------------------------------------------------
@@ -878,4 +1003,23 @@ vtkTypeUInt32 vtkPVSessionCore::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32
   vtkTypeUInt32 firstChunkId = this->LocalGlobalID + 1;
   this->LocalGlobalID += chunkSize;
   return firstChunkId;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionCore::GarbageCollectSIObject(int* clientIds, int nbClients)
+{
+  // Look for dead clients IDs
+  vtkstd::set<int> deadClients;
+  deadClients = this->Internals->KnownClients;
+  for(int i=0; i < nbClients; i++)
+    {
+    deadClients.erase(clientIds[i]);
+    }
+
+  // UnRegister SI Objects of dead clients
+  vtkstd::set<int>::iterator iter = deadClients.begin();
+  while(iter != deadClients.end())
+    {
+    this->Internals->UnRegisterSIObjectsOfClient(*iter);
+    iter++;
+    }
 }

@@ -177,6 +177,7 @@ vtkSMCollaborationManager::vtkSMCollaborationManager()
   this->SetLocation(vtkPVSession::DATA_SERVER_ROOT);
   this->Internal = new vtkInternal();
   this->Internal->Manager = this;
+  this->SetGlobalID(vtkSMCollaborationManager::GetReservedGlobalID());
 }
 
 //----------------------------------------------------------------------------

@@ -774,7 +774,7 @@ bool vtkSMSessionClient::GatherInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
+void vtkSMSessionClient::UnRegisterSIObject(vtkSMMessage* message)
 {
   if(this->NoMoreDelete)
     {
@@ -783,6 +783,7 @@ void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 
   vtkTypeUInt32 location = this->GetRealLocation(message->location());
   message->set_location(location);
+  message->set_client_id(this->GetServerInformation()->GetClientId());
 
   vtkMultiProcessController* controllers[2] = {NULL, NULL};
   int num_controllers=0;
@@ -799,7 +800,7 @@ void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
   if (num_controllers > 0)
     {
     vtkMultiProcessStream stream;
-    stream << static_cast<int>(vtkPVSessionServer::DELETE_SI);
+    stream << static_cast<int>(vtkPVSessionServer::UNREGISTER_SI);
     stream << message->SerializeAsString();
     vtkstd::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
@@ -813,7 +814,51 @@ void vtkSMSessionClient::DeleteSIObject(vtkSMMessage* message)
 
   if  ( (location & vtkPVSession::CLIENT) != 0)
     {
-    this->Superclass::DeleteSIObject(message);
+    this->Superclass::UnRegisterSIObject(message);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::RegisterSIObject(vtkSMMessage* message)
+{
+  if(this->NoMoreDelete)
+    {
+    return;
+    }
+
+  vtkTypeUInt32 location = this->GetRealLocation(message->location());
+  message->set_location(location);
+  message->set_client_id(this->GetServerInformation()->GetClientId());
+
+  vtkMultiProcessController* controllers[2] = {NULL, NULL};
+  int num_controllers=0;
+  if ((location &
+      (vtkPVSession::DATA_SERVER|vtkPVSession::DATA_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->DataServerController;
+    }
+  if ((location &
+    (vtkPVSession::RENDER_SERVER|vtkPVSession::RENDER_SERVER_ROOT)) != 0)
+    {
+    controllers[num_controllers++] = this->RenderServerController;
+    }
+  if (num_controllers > 0)
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(vtkPVSessionServer::REGISTER_SI);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    for (int cc=0; cc < num_controllers; cc++)
+      {
+      controllers[cc]->TriggerRMIOnAllChildren(
+        &raw_message[0], static_cast<int>(raw_message.size()),
+        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      }
+    }
+
+  if  ( (location & vtkPVSession::CLIENT) != 0)
+    {
+    this->Superclass::RegisterSIObject(message);
     }
 }
 
@@ -926,8 +971,6 @@ vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationManager()
     {
     this->CollaborationCommunicator = vtkSMCollaborationManager::New();
     this->CollaborationCommunicator->SetSession(this);
-    this->RegisterRemoteObject(this->CollaborationCommunicator->GetGlobalID(),
-                               this->CollaborationCommunicator);
     }
   return this->CollaborationCommunicator;
 }

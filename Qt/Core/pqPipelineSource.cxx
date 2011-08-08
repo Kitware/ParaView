@@ -456,9 +456,11 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getOutputPort("
+        << outputport
+        << "). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
+    abort();
     return NULL;
     }
   return this->Internal->OutputPorts[outputport];
@@ -493,9 +495,10 @@ pqPipelineSource *pqPipelineSource::getConsumer(int outputport, int index) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getConsumer("
+        << outputport << ", " << index
+        << "). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return NULL;
     }
 
@@ -533,9 +536,10 @@ pqDataRepresentation* pqPipelineSource::getRepresentation(
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getRepresentation("
+        << outputport << ", view)"
+        << ". Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return 0;
     }
   return this->Internal->OutputPorts[outputport]->getRepresentation(view);
@@ -547,9 +551,10 @@ QList<pqDataRepresentation*> pqPipelineSource::getRepresentations(
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getRepresentations("
+        << outputport
+        << ", view). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return QList<pqDataRepresentation*>();
     }
 

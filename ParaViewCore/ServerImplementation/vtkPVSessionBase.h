@@ -123,8 +123,12 @@ public:
 
 //BTX
   // Description:
-  // Delete server side object. (SIObject)
-  virtual void DeleteSIObject(vtkSMMessage* msg);
+  // Unregister server side object. (SIObject)
+  virtual void UnRegisterSIObject(vtkSMMessage* msg);
+
+  // Description:
+  // Register server side object. (SIObject)
+  virtual void RegisterSIObject(vtkSMMessage* msg);
 //ETX
 
   // Description:
@@ -181,7 +185,8 @@ protected:
 
   // Description:
   // Register a remote object
-  void RegisterRemoteObject(vtkTypeUInt32 globalid,vtkObject* obj);
+  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location,
+                            vtkObject* obj);
 
   // Description:
   // Unregister a remote object

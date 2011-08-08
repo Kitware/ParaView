@@ -27,6 +27,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
@@ -81,6 +82,9 @@ public:
         &CloseSessionCallback, this->Owner,
         vtkPVSessionServer::CLOSE_SESSION);
 
+    this->CompositeMultiProcessController->AddObserver(
+        vtkCompositeMultiProcessController::CompositeMultiProcessControllerChanged,
+        this, &vtkPVSessionServer::vtkInternals::ReleaseDeadClientSIObjects);
     }
   //-----------------------------------------------------------------
   void CloseActiveController()
@@ -171,6 +175,18 @@ public:
       return true;
       }
     return false;
+    }
+  //-----------------------------------------------------------------
+  void ReleaseDeadClientSIObjects(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+    {
+    int nbCtrls = this->CompositeMultiProcessController->GetNumberOfControllers();
+
+    vtkstd::vector<int> alivedClients(nbCtrls);
+    for(int i = 0; i < nbCtrls; i++)
+      {
+      alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
+      }
+    this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
     }
 
 private:
@@ -446,14 +462,22 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       this->Internal->GetActiveController()->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
       }
     break;
-
-  case vtkPVSessionServer::DELETE_SI:
+  case vtkPVSessionServer::REGISTER_SI:
       {
       vtkstd::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->DeleteSIObject(&msg);
+      this->RegisterSIObject(&msg);
+      }
+    break;
+  case vtkPVSessionServer::UNREGISTER_SI:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->UnRegisterSIObject(&msg);
       }
     break;
 

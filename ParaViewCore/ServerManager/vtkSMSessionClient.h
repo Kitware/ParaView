@@ -175,7 +175,11 @@ protected:
 
   // Description:
   // Delete server side object. (SIObject)
-  virtual void DeleteSIObject(vtkSMMessage* msg);
+  virtual void UnRegisterSIObject(vtkSMMessage* msg);
+
+  // Description:
+  // Notify server side object that it is used by one more client. (SIObject)
+  virtual void RegisterSIObject(vtkSMMessage* msg);
 
   // Description:
   // Translates the location to a real location based on whether a separate

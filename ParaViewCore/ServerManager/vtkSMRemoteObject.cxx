@@ -62,7 +62,7 @@ void vtkSMRemoteObject::SetSession(vtkSMSession* session)
   // Register object if possible
   if(this->Session && this->GlobalID != 0)
     {
-    this->Session->RegisterRemoteObject(this->GlobalID, this);
+    this->Session->RegisterRemoteObject(this->GlobalID, this->Location, this);
     }
 }
 
@@ -86,7 +86,7 @@ vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
     {
     this->GlobalID = this->GetSession()->GetNextGlobalUniqueIdentifier();
     // Register object
-    this->Session->RegisterRemoteObject(this->GlobalID, this);
+    this->Session->RegisterRemoteObject(this->GlobalID, this->Location, this);
     }
 
   return this->GlobalID;
@@ -130,7 +130,7 @@ void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
   // Register object if possible
   if(this->Session && this->GlobalID != 0)
     {
-    this->Session->RegisterRemoteObject(this->GlobalID, this);
+    this->Session->RegisterRemoteObject(this->GlobalID, this->Location, this);
     }
 }
 
