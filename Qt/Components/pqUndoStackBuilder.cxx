@@ -91,7 +91,7 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
     }
 
   // We do not keep track of ProxySelectionModel in Undo/redo
-  if(proxy && proxy->IsA("vtkSMProxySelectionModel"))
+  if(remoteObj->IsA("vtkSMProxySelectionModel"))
     {
     return true;
     }
