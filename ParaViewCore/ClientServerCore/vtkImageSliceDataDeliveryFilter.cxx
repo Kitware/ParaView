@@ -18,8 +18,13 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMoveData.h"
-#include "vtkMultiClientMPIMoveData.h"
+#include "vtkMPIMoveData.h"
+#include "vtkMPIMToNSocketConnection.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
+#include "vtkPVRenderView.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkImageSliceDataDeliveryFilter);
 //----------------------------------------------------------------------------
@@ -28,15 +33,23 @@ vtkImageSliceDataDeliveryFilter::vtkImageSliceDataDeliveryFilter()
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
 
-  this->DeliveryHelper = vtkMultiClientMPIMoveData::New();
-  this->DeliveryHelper->SetOutputDataType(VTK_IMAGE_DATA);
+  this->MoveData = vtkMPIMoveData::New();
+  this->MoveData->SetOutputDataType(VTK_IMAGE_DATA);
+
+  // Discover process type and setup communication ivars.
+  this->InitializeForCommunication();
 }
 
 //----------------------------------------------------------------------------
 vtkImageSliceDataDeliveryFilter::~vtkImageSliceDataDeliveryFilter()
 {
-  this->DeliveryHelper->Delete();
-  this->DeliveryHelper = NULL;
+  this->MoveData->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceDataDeliveryFilter::InitializeForCommunication()
+{
+  this->MoveData->InitializeForCommunicationForParaView();
 }
 
 //----------------------------------------------------------------------------
@@ -75,28 +88,47 @@ int vtkImageSliceDataDeliveryFilter::RequestData(
   vtkDataObject* input = (inputVector[0]->GetNumberOfInformationObjects() == 1)?
     vtkDataObject::GetData(inputVector[0], 0) : NULL;
   vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
-  this->DeliveryHelper->Deliver(input, output);
+
+  vtkSmartPointer<vtkDataObject> inputClone;
+  if (input)
+    {
+    inputClone.TakeReference(input->NewInstance());
+    inputClone->ShallowCopy(input);
+    }
+  this->MoveData->SetInput(inputClone);
+  this->MoveData->Modified();
+  this->MoveData->Update();
+  output->ShallowCopy(this->MoveData->GetOutputDataObject(0));
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkImageSliceDataDeliveryFilter::Modified()
 {
-  this->DeliveryHelper->Reset();
+  this->MoveData->Modified();
   this->Superclass::Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkImageSliceDataDeliveryFilter::ProcessViewRequest(vtkInformation* info)
 {
-  this->DeliveryHelper->ProcessViewRequest(info);
+  if (info->Has(vtkPVRenderView::DATA_DISTRIBUTION_MODE()))
+    {
+    this->MoveData->SetMoveMode(
+      info->Get(vtkPVRenderView::DATA_DISTRIBUTION_MODE()));
+    }
+  else
+    {
+    // default mode is pass-through.
+    this->MoveData->SetMoveModeToPassThrough();
+    }
 }
 
 //----------------------------------------------------------------------------
 unsigned long vtkImageSliceDataDeliveryFilter::GetMTime()
 {
   unsigned long mtime = this->Superclass::GetMTime();
-  unsigned long md_mtime = this->DeliveryHelper->GetMTime();
+  unsigned long md_mtime = this->MoveData->GetMTime();
   mtime = mtime > md_mtime? mtime : md_mtime;
   return mtime;
 }

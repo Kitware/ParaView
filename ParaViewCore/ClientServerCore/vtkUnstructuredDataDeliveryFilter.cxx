@@ -19,8 +19,11 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMoveData.h"
-#include "vtkMultiClientMPIMoveData.h"
+#include "vtkMPIMToNSocketConnection.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVRenderView.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkUnstructuredDataDeliveryFilter);
 //----------------------------------------------------------------------------
@@ -29,19 +32,21 @@ vtkUnstructuredDataDeliveryFilter::vtkUnstructuredDataDeliveryFilter()
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
 
-  this->DeliveryHelper = vtkMultiClientMPIMoveData::New();
+  this->MoveData = vtkMPIMoveData::New();
 
   this->OutputDataType = VTK_VOID;
   this->SetOutputDataType(VTK_POLY_DATA);
 
   this->LODMode = false;
+
+  // Discover process type and setup communication ivars.
+  this->InitializeForCommunication();
 }
 
 //----------------------------------------------------------------------------
 vtkUnstructuredDataDeliveryFilter::~vtkUnstructuredDataDeliveryFilter()
 {
-  this->DeliveryHelper->Delete();
-  this->DeliveryHelper = NULL;
+  this->MoveData->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -59,7 +64,7 @@ void vtkUnstructuredDataDeliveryFilter::SetOutputDataType(int type)
   if (this->OutputDataType != type)
     {
     this->OutputDataType = type;
-    this->DeliveryHelper->SetOutputDataType(type);
+    this->MoveData->SetOutputDataType(type);
     this->Modified();
     }
 }
@@ -88,6 +93,12 @@ int vtkUnstructuredDataDeliveryFilter::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
+void vtkUnstructuredDataDeliveryFilter::InitializeForCommunication()
+{
+  this->MoveData->InitializeForCommunicationForParaView();
+}
+
+//----------------------------------------------------------------------------
 int vtkUnstructuredDataDeliveryFilter::RequestData(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **inputVector,
@@ -97,30 +108,61 @@ int vtkUnstructuredDataDeliveryFilter::RequestData(
     vtkDataObject::GetData(inputVector[0], 0) : NULL;
   vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
 
-  this->DeliveryHelper->Deliver(input, output);
+  vtkSmartPointer<vtkDataObject> inputClone;
+  if (input)
+    {
+    inputClone.TakeReference(input->NewInstance());
+    inputClone->ShallowCopy(input);
+    }
+  this->MoveData->SetInput(inputClone);
+  this->MoveData->Update();
+  output->ShallowCopy(this->MoveData->GetOutputDataObject(0));
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkUnstructuredDataDeliveryFilter::Modified()
 {
-  this->DeliveryHelper->Reset();
+  this->MoveData->Modified();
   this->Superclass::Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkUnstructuredDataDeliveryFilter::ProcessViewRequest(vtkInformation* info)
 {
-  this->DeliveryHelper->SetLODMode(this->LODMode);
-  this->DeliveryHelper->ProcessViewRequest(info);
+  if (info->Has(vtkPVRenderView::DATA_DISTRIBUTION_MODE()))
+    {
+    this->MoveData->SetMoveMode(
+      info->Get(vtkPVRenderView::DATA_DISTRIBUTION_MODE()));
+    }
+  else
+    {
+    // default mode is pass-through.
+    this->MoveData->SetMoveModeToPassThrough();
+    }
+
+  bool deliver_outline =
+    (info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT()) != 0);
+  if (this->LODMode)
+    {
+    deliver_outline |=
+      (info->Has(vtkPVRenderView::DELIVER_OUTLINE_TO_CLIENT_FOR_LOD())!=0);
+    }
+  if (deliver_outline)
+    {
+    this->MoveData->SetDeliverOutlineToClient(1);
+    }
+  else
+    {
+    this->MoveData->SetDeliverOutlineToClient(0);
+    }
 }
 
 //----------------------------------------------------------------------------
 unsigned long vtkUnstructuredDataDeliveryFilter::GetMTime()
 {
   unsigned long mtime = this->Superclass::GetMTime();
-
-  unsigned long md_mtime = this->DeliveryHelper->GetMTime();
+  unsigned long md_mtime = this->MoveData->GetMTime();
   mtime = mtime > md_mtime? mtime : md_mtime;
   return mtime;
 }

@@ -37,7 +37,6 @@ SET (Kit_SRCS
   vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkMultiClientMPIMoveData.cxx
   vtkNetworkAccessManager.cxx
   vtkNetworkImageSource.cxx
   vtkOutlineRepresentation.cxx

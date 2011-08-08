@@ -25,15 +25,14 @@
 // ensure that the data is available in the form/shape requested on the
 // rendering nodes.
 // .SECTION See Also
-// vtkImageSliceDataDeliveryFilter, vtkMultiClientMPIMoveData
+// vtkImageSliceDataDeliveryFilter
 
 #ifndef __vtkUnstructuredDataDeliveryFilter_h
 #define __vtkUnstructuredDataDeliveryFilter_h
 
 #include "vtkPassInputTypeAlgorithm.h"
 
-
-class vtkMultiClientMPIMoveData;
+class vtkMPIMoveData;
 
 class VTK_EXPORT vtkUnstructuredDataDeliveryFilter : public vtkPassInputTypeAlgorithm
 {
@@ -77,18 +76,20 @@ protected:
   int RequestDataObject(vtkInformation *,
     vtkInformationVector **, vtkInformationVector *);
 
+  // Description:
+  // Initializes internal filters
+  void InitializeForCommunication();
+
   // overridden to mark input as optional.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  bool LODMode;
+  vtkMPIMoveData* MoveData;
   int OutputDataType;
-
-  vtkMultiClientMPIMoveData* DeliveryHelper;
+  bool LODMode;
 
 private:
   vtkUnstructuredDataDeliveryFilter(const vtkUnstructuredDataDeliveryFilter&); // Not implemented
   void operator=(const vtkUnstructuredDataDeliveryFilter&); // Not implemented
-
 //ETX
 };
 
