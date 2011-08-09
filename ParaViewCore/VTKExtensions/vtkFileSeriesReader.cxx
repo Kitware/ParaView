@@ -407,12 +407,14 @@ unsigned long vtkFileSeriesReader::GetMTime()
 void vtkFileSeriesReader::AddFileName(const char* name)
 {
   this->Internal->FileNames.push_back(name);
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkFileSeriesReader::RemoveAllFileNames()
 {
   this->Internal->FileNames.clear();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
