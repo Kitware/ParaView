@@ -246,6 +246,15 @@ ENDIF()
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
 
+
+# Enable collaboration tests.
+set (AnimatePipelineTime_ENABLE_COLLAB TRUE)
+set (3DWidgetInCustomFilter_ENABLE_COLLAB TRUE)
+set (CalcParens_ENABLE_COLLAB TRUE)
+set (Calculator_ENABLE_COLLAB TRUE)
+set (ColorEditor1_ENABLE_COLLAB TRUE)
+set (Fractal2D_ENABLE_COLLAB TRUE)
+
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   PARALLEL
@@ -271,5 +280,9 @@ IF (PARAVIEW_DATA_ROOT)
   ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
 # TODO: remote rendering tests and reverse connect tests.
+
+  add_multi_client_tests("pvcs-collab"
+    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    TEST_SCRIPTS ${TESTS_WITH_BASELINES})
 
 ENDIF (PARAVIEW_DATA_ROOT)

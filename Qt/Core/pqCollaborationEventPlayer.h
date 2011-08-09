@@ -51,6 +51,13 @@ public:
     const QString& command,
     const QString& arguments, bool& error);
 
+  /// used to wait till the process becomes a master.
+  static void waitForMaster();
+
+  /// used to wait until there are num_connection connections.
+  static void waitForConnections(int num_connections);
+
+  static void wait(int milli_seconds);
 private:
   Q_DISABLE_COPY(pqCollaborationEventPlayer)
 };

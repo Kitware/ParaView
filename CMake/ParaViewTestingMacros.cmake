@@ -100,12 +100,41 @@ ENDFUNCTION (add_client_server_tests)
 FUNCTION (add_client_render_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
-       --data-server ${PARAVIEW_DATA_SERVER_EXECUTABLE}
-       --render-server ${PARAVIEW_RENDER_SERVER_EXECUTABLE}
-       --client ${CLIENT_EXECUTABLE}
-       -dr
-       --disable-light-kit
-       --server=testserver-dsrs
-       --test-directory=${PARAVIEW_TEST_DIR}
+
     ${ARGN})
 ENDFUNCTION (add_client_render_server_tests)
+
+FUNCTION(add_multi_client_tests prefix)
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "PARALLEL" ${ARGN})
+
+  foreach (test_script ${ACT_TEST_SCRIPTS})
+    get_filename_component(test_name ${test_script} NAME_WE)
+    if (${test_name}_ENABLE_COLLAB)
+      set (extra_args)
+      process_args(extra_args)
+      add_test("${prefix}.${test_name}"
+          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        --test-multi-clients
+        --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+        --client ${CLIENT_EXECUTABLE}
+        -dr
+        --disable-light-kit
+        --server=testserver
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --test-script=${test_script}
+        --test-master
+        --exit
+
+        --client ${CLIENT_EXECUTABLE}
+        -dr
+        --disable-light-kit
+        --server=testserver
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --test-slave
+        ${extra_args}
+        --exit
+        )
+    endif()
+  endforeach(test_script)
+ENDFUNCTION(add_multi_client_tests)

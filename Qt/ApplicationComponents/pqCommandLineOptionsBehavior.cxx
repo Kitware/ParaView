@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCommandLineOptionsBehavior.h"
 
 #include "pqActiveObjects.h"
+#include "pqCollaborationEventPlayer.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
@@ -172,6 +173,18 @@ void pqCommandLineOptionsBehavior::playTests()
       {
       this->resetApplication();
       }
+    else if (cc==0)
+      {
+      if (options->GetTestMaster())
+        {
+        pqCollaborationEventPlayer::waitForConnections(2);
+        }
+      else if (options->GetTestSlave())
+        {
+        pqCollaborationEventPlayer::waitForMaster();
+        }
+      }
+
 
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
@@ -189,6 +202,11 @@ void pqCommandLineOptionsBehavior::playTests()
 
   if (options->GetExitAppWhenTestsDone())
     {
+    if (options->GetTestMaster())
+      {
+      pqCollaborationEventPlayer::wait(1000);
+      }
+
     QApplication::instance()->exit(success? 0 : 1);
     }
 }

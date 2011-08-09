@@ -216,7 +216,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->TestTiledDisplay = 1;
       fprintf(stderr, "Test Tiled Display.\n");
       }
-    if(strcmp(argv[i], "--test-multi-client") == 0)
+    if(strcmp(argv[i], "--test-multi-clients") == 0)
       {
       this->TestMultiClient = 1;
       fprintf(stderr, "Test Tiled Display.\n");

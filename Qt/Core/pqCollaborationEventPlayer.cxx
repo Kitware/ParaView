@@ -50,37 +50,54 @@ pqCollaborationEventPlayer::~pqCollaborationEventPlayer()
 }
 
 //-----------------------------------------------------------------------------
+void pqCollaborationEventPlayer::waitForMaster()
+{
+  pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
+    pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
+  // this process should just wait patiently until it becomes the master.
+  while (mgr && !mgr->collaborationManager()->IsMaster())
+    {
+    pqEventDispatcher::processEventsAndWait(500); 
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationEventPlayer::waitForConnections(int num_connections)
+{
+  pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
+    pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
+  // this process should just wait patiently until it becomes the master.
+  while (mgr && mgr->collaborationManager()->GetNumberOfConnectedClients() <
+    num_connections)
+    {
+    pqEventDispatcher::processEventsAndWait(500); 
+    }
+  pqEventDispatcher::processEventsAndWait(1000); 
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationEventPlayer::wait(int ms)
+{
+  pqEventDispatcher::processEventsAndWait(ms); 
+}
+
+//-----------------------------------------------------------------------------
 bool pqCollaborationEventPlayer::playEvent(QObject* , 
   const QString& command, const QString& arguments, bool& error)
 {
-  pqCollaborationManager* mgr =
-    qobject_cast<pqCollaborationManager*>(
-      pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
-  if (mgr && command == "waitForMaster")
+  if (command == "waitForMaster")
     {
-    cout << "waitForMaster" << endl;
-    // this process should just wait patiently until it becomes the master.
-    while (!mgr->collaborationManager()->IsMaster())
-      {
-      pqEventDispatcher::processEventsAndWait(500); 
-      }
-    cout << "Done" << endl;
+    pqCollaborationEventPlayer::waitForMaster();
     return true;
     }
-  else if (mgr && command == "waitForConnections")
+  else if (command == "waitForConnections")
     {
-    cout << "waitForConnections" << endl;
-    // this process should just wait patiently until it becomes the master.
-    while (mgr->collaborationManager()->GetNumberOfConnectedClients() < 2)
-      {
-      pqEventDispatcher::processEventsAndWait(500); 
-      }
-    cout << "Done" << endl;
+    pqCollaborationEventPlayer::waitForConnections(2);
     return true;
     }
   else if (command == "wait")
     {
-    pqEventDispatcher::processEventsAndWait(1000); 
+    pqCollaborationEventPlayer::wait(1000);
     return true;
     }
   return false;
