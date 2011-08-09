@@ -94,6 +94,13 @@ void vtkSMProxyDefinitionManager::SynchronizeDefinitions()
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
   this->ProxyDefinitionManager->Push(&message);
 }
+//----------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::LoadState( const vtkSMMessage* msg,
+                                             vtkSMProxyLocator* vtkNotUsed(locator))
+{
+  vtkSMMessage copy = *msg;
+  this->ProxyDefinitionManager->Push(&copy);
+}
 
 //----------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::AddCustomProxyDefinition(

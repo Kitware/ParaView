@@ -34,6 +34,7 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSocketController.h"
+#include "vtkSIProxyDefinitionManager.h"
 
 #include <assert.h>
 #include <vtkstd/string>
@@ -85,6 +86,13 @@ public:
     this->CompositeMultiProcessController->AddObserver(
         vtkCompositeMultiProcessController::CompositeMultiProcessControllerChanged,
         this, &vtkPVSessionServer::vtkInternals::ReleaseDeadClientSIObjects);
+
+    this->Owner->GetSessionCore()->GetProxyDefinitionManager()->AddObserver(
+        vtkCommand::RegisterEvent, this,
+        &vtkPVSessionServer::vtkInternals::CallBackProxyDefinitionManagerHasChanged);
+    this->Owner->GetSessionCore()->GetProxyDefinitionManager()->AddObserver(
+        vtkCommand::UnRegisterEvent, this,
+        &vtkPVSessionServer::vtkInternals::CallBackProxyDefinitionManagerHasChanged);
     }
   //-----------------------------------------------------------------
   void CloseActiveController()
@@ -187,6 +195,15 @@ public:
       alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
       }
     this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
+    }
+  //-----------------------------------------------------------------
+  void CallBackProxyDefinitionManagerHasChanged(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+    {
+    vtkSMMessage proxyDefinitionManagerState;
+    this->Owner->GetSessionCore()->GetSIObject(
+        vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID)
+        ->Pull(&proxyDefinitionManagerState);
+    this->NotifyOtherClients(&proxyDefinitionManagerState);
     }
 
 private:
