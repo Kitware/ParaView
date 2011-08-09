@@ -248,7 +248,26 @@ void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
     std::cerr << "Expected \"set_value\" Format:  Proxy.Property[.index]" <<std::endl;
     }
   vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
-  vtkSMProperty *property = proxy->GetProperty( token[0].c_str());
+   // if( proxy )
+   //  {
+  //   property = proxy->GetProperty( token[1].c_str());
+  //   if ( property )
+  //     {
+  //     property->SetElement( atoi(token[2].c_str() ), value );
+  //     proxy->UpdateVTKObjects();
+  //     }
+  //   else
+  //     {
+  //     std::cout<< "Property ( " << token[1] << ") :Not Found" <<std::endl;
+  //     return;
+  //     }
+  //   }
+  // else
+  //   {
+  //   std::cout<< "Proxy ( " << token[1] << ") :Not Found" << std::endl;
+  //   return;
+  //   }
+  // vtkSMProperty *property = proxy->GetProperty( token[0].c_str());
 }
 
 //----------------------------------------------------------------------private
