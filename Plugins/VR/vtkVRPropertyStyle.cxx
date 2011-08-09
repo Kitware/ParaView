@@ -34,12 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include "pqView.h"
+#include "pqActiveObjects.h"
+#include "vtkSMRenderViewProxy.h"
 
 //------------------------------------------------------------------------cnstr
 vtkVRPropertyStyle::vtkVRPropertyStyle(QObject* parentObject)
@@ -152,6 +156,18 @@ bool vtkVRPropertyStyle::handleEvent(const vtkVREventData& data)
 //-----------------------------------------------------------------------public
 bool vtkVRPropertyStyle::update()
 {
+  pqView *view = 0;
+  vtkSMRenderViewProxy *proxy =0;
+  view = pqActiveObjects::instance().activeView();
+  if ( view )
+    {
+    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( proxy )
+      {
+      proxy->UpdateVTKObjects();
+      proxy->StillRender();
+      }
+    }
 }
 
 //----------------------------------------------------------------------private
@@ -168,16 +184,30 @@ void vtkVRPropertyStyle::HandleButton( const vtkVREventData& data )
 //----------------------------------------------------------------------private
 void vtkVRPropertyStyle::HandleAnalog( const vtkVREventData& data )
 {
+  std::vector<std::string>token = this->tokenize(data.name );
+
+  // check for events of types device.name (vector events)
+  std::stringstream event;
+  event << token[0]<<"."<<token[1];
+  if ( this->Map.find(event.str() )!= this->Map.end() )
+    {
+    std::cout << event.str() << std::endl;
+    SetAnalogVectorValue(this->Map[event.str()],
+                          data.data.analog.channel,
+                          data.data.analog.num_channel );
+    }
+
+  // check for events of type device.name.index (scalar events)
   for (int i = 0; i < data.data.analog.num_channel; ++i)
     {
     std::stringstream event;
     event << data.name<<"."<<i;
     if ( this->Map.find(event.str() )!= this->Map.end() )
       {
+      std::cout << event.str() <<" = "<< data.data.analog.channel[i] << std::endl;
       SetAnalogValue( this->Map[event.str()], data.data.analog.channel[i] );
       }
     }
-
 }
 
 //----------------------------------------------------------------------private
@@ -191,7 +221,7 @@ void vtkVRPropertyStyle::HandleTracker( const vtkVREventData& data )
   if ( this->Map.find(event.str() )!= this->Map.end() )
     {
     std::cout << event.str() << std::endl;
-    SetTrackerVectorValue(this->Map[event.str()],data.dta.tracker.matrix );
+    SetTrackerVectorValue(this->Map[event.str()],data.data.tracker.matrix );
     }
 
   // check for events of type device.name.index (scalar events)
@@ -225,9 +255,53 @@ void vtkVRPropertyStyle::SetButtonValue( std::string dest, int value )
 void vtkVRPropertyStyle::SetAnalogValue( std::string dest, double value )
 {
   std::vector<std::string>token = this->tokenize( dest );
-  if ( token.size()==2 || token.size()==3 )
+  if ( token.size()!=3 )
     {
-    std::cerr << "Expected \"set_value\" Format:  Proxy.Property[.index]" << std::endl;
+    std::cerr << "Expected \"set_value\" Format:  Proxy.Property.index" << std::endl;
+    }
+  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+  vtkSMDoubleVectorProperty* property;
+  if( proxy )
+    {
+    property = vtkSMDoubleVectorProperty::SafeDownCast( proxy->GetProperty( token[1].c_str()) );
+    if ( property )
+      {
+      property->SetElement( atoi(token[2].c_str() ), value );
+      proxy->UpdateVTKObjects();
+      }
+    else
+      {
+      std::cout<< "Property ( " << token[1] << ") :Not Found" <<std::endl;
+      return;
+      }
+    }
+  else
+    {
+    std::cout<< "Proxy ( " << token[1] << ") :Not Found" << std::endl;
+    return;
+    }
+}
+
+//----------------------------------------------------------------------private
+void vtkVRPropertyStyle::SetAnalogVectorValue( std::string dest,
+                                               const double* value,
+                                               unsigned int total)
+{
+  std::vector<std::string>token = this->tokenize( dest );
+  if ( token.size()!=2)
+    {
+    std::cerr  << "Expected \"set_value\" Format:  Proxy.Property" << std::endl;
+    }
+
+  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+  vtkSMProperty* property;
+  if( proxy )
+    {
+    property = proxy->GetProperty( token[1].c_str());
+    }
+  else
+    {
+    return;
     }
 }
 
@@ -243,7 +317,7 @@ void vtkVRPropertyStyle::SetTrackerValue( std::string dest, double value )
 
 //----------------------------------------------------------------------private
 void vtkVRPropertyStyle::SetTrackerVectorValue( std::string dest,
-                                                double value[16] )
+                                                const double value[16] )
 {
   std::vector<std::string>token = this->tokenize( dest );
   if ( token.size()==2 || token.size()==3 )
@@ -261,7 +335,6 @@ void vtkVRPropertyStyle::SetTrackerVectorValue( std::string dest,
     {
     return;
     }
-
 }
 
 //----------------------------------------------------------------------private
