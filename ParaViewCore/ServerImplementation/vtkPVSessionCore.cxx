@@ -158,17 +158,9 @@ public:
       }
     }
   //---------------------------------------------------------------------------
-  void UnRegisterSIObjectsOfClient(int clientId)
+  vtkstd::set<vtkTypeUInt32>& GetSIObjectOfClient(int clientId)
     {
-    this->KnownClients.erase(clientId);
-    vtkstd::set<vtkTypeUInt32> siObjectIds = this->ClientSIRegistrationMap[clientId];
-    vtkstd::set<vtkTypeUInt32>::iterator iter = siObjectIds.begin();
-    while(iter != siObjectIds.end())
-      {
-      this->UnRegisterSI(*iter, -1);
-      iter++;
-      }
-    siObjectIds.clear();
+    return this->ClientSIRegistrationMap[clientId];
     }
 
   //---------------------------------------------------------------------------
@@ -1015,11 +1007,30 @@ void vtkPVSessionCore::GarbageCollectSIObject(int* clientIds, int nbClients)
     deadClients.erase(clientIds[i]);
     }
 
+  // Init message setup
+  vtkSMMessage unregisterMsg;
+  unregisterMsg.set_location(vtkProcessModule::SERVERS);
+
   // UnRegister SI Objects of dead clients
   vtkstd::set<int>::iterator iter = deadClients.begin();
+  vtkstd::set<vtkTypeUInt32>::iterator idIter;
   while(iter != deadClients.end())
     {
-    this->Internals->UnRegisterSIObjectsOfClient(*iter);
+    // Set Client ID
+    unregisterMsg.set_client_id(*iter);
+
+    vtkstd::set<vtkTypeUInt32> ids = this->Internals->GetSIObjectOfClient(*iter);
+    idIter = ids.begin();
+    while(idIter != ids.end())
+      {
+      // Set object ID
+      unregisterMsg.set_global_id(*idIter);
+
+      // Unregister
+      this->UnRegisterSIObject(&unregisterMsg);
+
+      idIter++;
+      }
     iter++;
     }
 }
