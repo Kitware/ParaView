@@ -246,10 +246,18 @@ ENDIF()
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
 
+##########################################################
+# List of known incompatible tests for Collaboration
+#
+#   Contains Undo/Redo actions:
+#     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
+#
+#   Contains Plugin Loading actions:
+#     - LoadPlugins, NiftiReaderWriterPlugin
+#
+##########################################################
 
-# Enable collaboration tests.
-# Those following test MUST NOT contains Undo
-# ALL - [Clip, GlobalProperties, UndoRedo...]
+# List of test Enable for collaboration
 set (AnimatePipelineTime_ENABLE_COLLAB TRUE)
 set (3DWidgetInCustomFilter_ENABLE_COLLAB TRUE)
 set (CalcParens_ENABLE_COLLAB TRUE)
@@ -278,13 +286,12 @@ set (ExtractBlock_ENABLE_COLLAB TRUE)
 set (ExtractLevel_ENABLE_COLLAB TRUE)
 #set (EyeDomeLighting_ENABLE_COLLAB TRUE)
 #set (FindDataDialog_ENABLE_COLLAB TRUE)
-#set (FFTOverTime_ENABLE_COLLAB TRUE)
+set (FFTOverTime_ENABLE_COLLAB TRUE)
 set (Flow_ENABLE_COLLAB TRUE)
 set (Flow2_ENABLE_COLLAB TRUE)
 set (Fractal2D_ENABLE_COLLAB TRUE)
 set (GridConnectivity_ENABLE_COLLAB TRUE)
 #set (H5PartReaderPlugin_ENABLE_COLLAB TRUE)
-#set (LoadPlugins_ENABLE_COLLAB TRUE)
 #set (LoadSaveStateAnimation_ENABLE_COLLAB TRUE)
 set (LoadState_ENABLE_COLLAB TRUE)
 set (NormalGlyphs_ENABLE_COLLAB TRUE)
@@ -292,8 +299,8 @@ set (NormalGlyphs_ENABLE_COLLAB TRUE)
 set (ObjectInspectorSphere_ENABLE_COLLAB TRUE)
 set (OpenSaveData_ENABLE_COLLAB TRUE)
 set (Plot3DReader_ENABLE_COLLAB TRUE)
-#set (PlotEdges_ENABLE_COLLAB TRUE)
-#set (PlotEdges2_ENABLE_COLLAB TRUE)
+set (PlotEdges_ENABLE_COLLAB TRUE)
+set (PlotEdges2_ENABLE_COLLAB TRUE)
 set (PropertyConversion_ENABLE_COLLAB TRUE)
 set (PropertyConversion1_ENABLE_COLLAB TRUE)
 set (PropertyConversion2_ENABLE_COLLAB TRUE)
@@ -307,7 +314,7 @@ set (SelectReader_ENABLE_COLLAB TRUE)
 set (SimpleInteraction_ENABLE_COLLAB TRUE)
 set (Slice_ENABLE_COLLAB TRUE)
 set (SpreadSheet1_ENABLE_COLLAB TRUE)
-#set (SpreadSheet2_ENABLE_COLLAB TRUE)
+set (SpreadSheet2_ENABLE_COLLAB TRUE)
 set (SPTimeseries_ENABLE_COLLAB TRUE)
 #set (SpyPlotHistoryReader_ENABLE_COLLAB TRUE)
 set (StreamTracerUpdates_ENABLE_COLLAB TRUE)
@@ -327,8 +334,8 @@ set (XdmfReadRectilinearGridCollection_ENABLE_COLLAB TRUE)
 set (XdmfReadStructuredGrid_ENABLE_COLLAB TRUE)
 set (XdmfReadStructuredGridCollection_ENABLE_COLLAB TRUE)
 set (XdmfGridAttributes_ENABLE_COLLAB TRUE)
-#set (XYChart_ENABLE_COLLAB TRUE)
-#set (XYHistogram_ENABLE_COLLAB TRUE)
+set (XYChart_ENABLE_COLLAB TRUE)
+set (XYHistogram_ENABLE_COLLAB TRUE)
 set (ZLibXDMF_ENABLE_COLLAB TRUE)
 
 add_client_tests("pv"

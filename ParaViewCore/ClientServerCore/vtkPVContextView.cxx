@@ -55,6 +55,11 @@ vtkPVContextView::~vtkPVContextView()
 //----------------------------------------------------------------------------
 void vtkPVContextView::Initialize(unsigned int id)
 {
+  if (this->Identifier == id)
+    {
+    // already initialized
+    return;
+    }
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderWindow);
   this->SynchronizedWindows->AddRenderer(id, this->ContextView->GetRenderer());
   this->Superclass::Initialize(id);
