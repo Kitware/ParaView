@@ -100,7 +100,13 @@ ENDFUNCTION (add_client_server_tests)
 FUNCTION (add_client_render_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
-
+       --data-server ${PARAVIEW_DATA_SERVER_EXECUTABLE}
+       --render-server ${PARAVIEW_RENDER_SERVER_EXECUTABLE}
+       --client ${CLIENT_EXECUTABLE}
+       -dr
+       --disable-light-kit
+       --server=testserver-dsrs
+       --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_render_server_tests)
 
