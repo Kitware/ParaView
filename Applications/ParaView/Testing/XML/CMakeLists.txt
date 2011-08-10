@@ -253,7 +253,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin
+#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting
 #
 ##########################################################
 
@@ -284,7 +284,6 @@ set (ExTimeseries_ENABLE_COLLAB TRUE)
 set (ExTimeseries2_ENABLE_COLLAB TRUE)
 set (ExtractBlock_ENABLE_COLLAB TRUE)
 set (ExtractLevel_ENABLE_COLLAB TRUE)
-#set (EyeDomeLighting_ENABLE_COLLAB TRUE)
 #set (FindDataDialog_ENABLE_COLLAB TRUE)
 set (FFTOverTime_ENABLE_COLLAB TRUE)
 set (Flow_ENABLE_COLLAB TRUE)
@@ -295,7 +294,6 @@ set (GridConnectivity_ENABLE_COLLAB TRUE)
 #set (LoadSaveStateAnimation_ENABLE_COLLAB TRUE)
 set (LoadState_ENABLE_COLLAB TRUE)
 set (NormalGlyphs_ENABLE_COLLAB TRUE)
-#set (NiftiReaderWriterPlugin_ENABLE_COLLAB TRUE)
 set (ObjectInspectorSphere_ENABLE_COLLAB TRUE)
 set (OpenSaveData_ENABLE_COLLAB TRUE)
 set (Plot3DReader_ENABLE_COLLAB TRUE)
