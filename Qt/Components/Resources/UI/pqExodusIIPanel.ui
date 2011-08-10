@@ -45,14 +45,11 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
+    <layout class="QGridLayout" name="gridLayout">
      <property name="margin">
       <number>0</number>
      </property>
-     <item>
+     <item row="0" column="0">
       <widget class="QCheckBox" name="ApplyDisplacements">
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -62,13 +59,37 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QLineEdit" name="DisplacementMagnitude"/>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>mag.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="UseVariableCache">
+       <property name="text">
+        <string>Variable Cache</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>GB</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="VariableCacheSize">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>0</string>
        </property>
       </widget>
      </item>
@@ -549,5 +570,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>UseVariableCache</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>VariableCacheSize</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>16</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>188</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
