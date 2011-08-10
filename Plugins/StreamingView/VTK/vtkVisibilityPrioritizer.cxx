@@ -161,44 +161,28 @@ double vtkVisibilityPrioritizer::CalculatePriority(double *pbbox)
       //for those that are not rejected, compute a priority from the bounds
       //such that pieces nearest to camera eye have highest priority 1 and
       //those furthest away have lowest 0.
-      //Must do this using only information about current piece.
+
       vtkBoundingBox box(pbbox);
-      double center[3];
-      //box.GetCenter(center);
-
-      // use the closest corner, not the center for uneven sized pieces
-      if(fabs(this->CameraState[0] - pbbox[0]) <
-         fabs(this->CameraState[0] - pbbox[1]))
+      double nearestptonbox[3];
+      for (int i=0; i<3; i++)
         {
-        center[0] = pbbox[0];
+        double p = this->CameraState[i];
+        if (pbbox[i*2] > p)
+          {
+          p = pbbox[i*2];
+          }
+        if (pbbox[i*2+1] < p)
+          {
+          p = pbbox[i*2+1];
+          }
+        nearestptonbox[i] = p;
         }
-      else
-        {
-        center[0] = pbbox[1];
-        }
-
-      if(fabs(this->CameraState[1] - pbbox[2]) <
-         fabs(this->CameraState[1] - pbbox[3]))
-        {
-        center[1] = pbbox[2];
-        }
-      else
-        {
-        center[1] = pbbox[3];
-        }
-
-      if(fabs(this->CameraState[2] - pbbox[4]) <
-         fabs(this->CameraState[2] - pbbox[5]))
-        {
-        center[2] = pbbox[4];
-        }
-      else
-        {
-        center[2] = pbbox[5];
-        }
-
       double dbox=sqrt
-        (vtkMath::Distance2BetweenPoints(&this->CameraState[0], center));
+        (vtkMath::Distance2BetweenPoints(&this->CameraState[0],
+                                         nearestptonbox));
+
+      //ordering must only use information about current piece, so we
+      //normalize by dividing by distance to far corner or frustum
       const double *farlowerleftcorner = &this->Frustum[1*4];
       double dfar=sqrt
         (vtkMath::Distance2BetweenPoints
