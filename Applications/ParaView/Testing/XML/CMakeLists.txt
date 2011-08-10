@@ -253,7 +253,13 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting
+#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
+#
+#   Does not work in CS or CRS mode
+#     - ViewSettingsDialog
+#
+#   Does not work because a disconnection is involved
+#     - ExportX3dPOVVRML
 #
 ##########################################################
 
@@ -267,31 +273,29 @@ set (ColorEditor1_ENABLE_COLLAB TRUE)
 set (ColorEditor2_ENABLE_COLLAB TRUE)
 set (ColorEditor3_ENABLE_COLLAB TRUE)
 set (ColorEditor4_ENABLE_COLLAB TRUE)
-#set (ComparativeVisPanel_ENABLE_COLLAB TRUE)
+set (ComparativeVisPanel_ENABLE_COLLAB TRUE)     # ===== ISSUE HERE (DeadLock) =====
 set (CompositeSurfaceSelection_ENABLE_COLLAB TRUE)
 set (Contour_ENABLE_COLLAB TRUE)
 set (ContourRange_ENABLE_COLLAB TRUE)
 set (CustomFilter_ENABLE_COLLAB TRUE)
 set (CustomSourceProbe_ENABLE_COLLAB TRUE)
 set (D3SmallCells_ENABLE_COLLAB TRUE)
-#set (DualSphereAnimation_ENABLE_COLLAB TRUE)
+set (DualSphereAnimation_ENABLE_COLLAB TRUE)     # ===== ISSUE HERE (DeadLock) =====
 set (EnSight_ENABLE_COLLAB TRUE)
 set (ExodusIIPanel_ENABLE_COLLAB TRUE)
 set (ExodusModeShapes_ENABLE_COLLAB TRUE)
 set (ExodusXML_ENABLE_COLLAB TRUE)
-#set (ExportX3dPOVVRML_ENABLE_COLLAB TRUE)
 set (ExTimeseries_ENABLE_COLLAB TRUE)
 set (ExTimeseries2_ENABLE_COLLAB TRUE)
 set (ExtractBlock_ENABLE_COLLAB TRUE)
 set (ExtractLevel_ENABLE_COLLAB TRUE)
-#set (FindDataDialog_ENABLE_COLLAB TRUE)
+set (FindDataDialog_ENABLE_COLLAB TRUE)          # ===== Kind of normal failure =====
 set (FFTOverTime_ENABLE_COLLAB TRUE)
 set (Flow_ENABLE_COLLAB TRUE)
 set (Flow2_ENABLE_COLLAB TRUE)
 set (Fractal2D_ENABLE_COLLAB TRUE)
 set (GridConnectivity_ENABLE_COLLAB TRUE)
-#set (H5PartReaderPlugin_ENABLE_COLLAB TRUE)
-#set (LoadSaveStateAnimation_ENABLE_COLLAB TRUE)
+set (LoadSaveStateAnimation_ENABLE_COLLAB TRUE)
 set (LoadState_ENABLE_COLLAB TRUE)
 set (NormalGlyphs_ENABLE_COLLAB TRUE)
 set (ObjectInspectorSphere_ENABLE_COLLAB TRUE)
@@ -302,8 +306,8 @@ set (PlotEdges2_ENABLE_COLLAB TRUE)
 set (PropertyConversion_ENABLE_COLLAB TRUE)
 set (PropertyConversion1_ENABLE_COLLAB TRUE)
 set (PropertyConversion2_ENABLE_COLLAB TRUE)
-#set (PropertyLink_ENABLE_COLLAB TRUE)
-#set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB TRUE)
+set (PropertyLink_ENABLE_COLLAB TRUE)              # ===== ISSUE HERE (DeadLock) =====
+set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB TRUE)
 set (RectilinearFractal_ENABLE_COLLAB TRUE)
 set (RepresentationSelector_ENABLE_COLLAB TRUE)
 set (SaveColorMap_ENABLE_COLLAB TRUE)
@@ -314,16 +318,15 @@ set (Slice_ENABLE_COLLAB TRUE)
 set (SpreadSheet1_ENABLE_COLLAB TRUE)
 set (SpreadSheet2_ENABLE_COLLAB TRUE)
 set (SPTimeseries_ENABLE_COLLAB TRUE)
-#set (SpyPlotHistoryReader_ENABLE_COLLAB TRUE)
+set (SpyPlotHistoryReader_ENABLE_COLLAB TRUE)      # ===== ISSUE HERE (DeadLock)=====
 set (StreamTracerUpdates_ENABLE_COLLAB TRUE)
-#set (TemporalInterpolator_ENABLE_COLLAB TRUE)
-#set (TemporalShiftScale_ENABLE_COLLAB TRUE)
+set (TemporalInterpolator_ENABLE_COLLAB TRUE)
+set (TemporalShiftScale_ENABLE_COLLAB TRUE)        # ===== ISSUE HERE (DeadLock because of DualSphereAnimation) =====
 set (Tessellate_ENABLE_COLLAB TRUE)
 set (Threshold_ENABLE_COLLAB TRUE)
 set (UnstructuredOutline_ENABLE_COLLAB TRUE)
 set (VariableSelector_ENABLE_COLLAB TRUE)
 set (VariableSelector1_ENABLE_COLLAB TRUE)
-#set (ViewSettingsDialog_ENABLE_COLLAB TRUE)
 set (XdmfRead_ENABLE_COLLAB TRUE)
 set (XdmfReadImageData_ENABLE_COLLAB TRUE)
 set (XdmfReadImageDataCollection_ENABLE_COLLAB TRUE)
