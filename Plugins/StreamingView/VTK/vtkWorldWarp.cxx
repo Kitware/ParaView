@@ -317,7 +317,6 @@ int vtkWorldWarp::ProcessRequest(
 
   // update the piece bounding box based on the transformation
   vtkSmartPointer<vtkPoints> inPts = vtkSmartPointer<vtkPoints>::New();
-  int i;
   vtkIdType ptId, numPts;
   double inpt[3], outpt[3];
 

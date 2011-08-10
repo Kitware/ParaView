@@ -80,7 +80,6 @@ int vtkWarpScalarsAndMetaInfo::ProcessRequest(
     }
 
   vtkSmartPointer<vtkPoints> inPts = vtkSmartPointer<vtkPoints>::New();
-  vtkDataArray *inNormals;
   vtkDataArray *inScalars;
   int i;
   vtkIdType ptId, numPts;
@@ -140,7 +139,7 @@ int vtkWarpScalarsAndMetaInfo::ProcessRequest(
   for (ptId=0; ptId < numPts; ptId++)
     {
     inPts->GetPoint(ptId, x);
-    n = (this->*(this->PointNormal))(ptId,inNormals);
+    n = (this->*(this->PointNormal))(ptId,NULL);
     if ( this->XYPlane )
       {
       s = x[2];
@@ -159,7 +158,7 @@ int vtkWarpScalarsAndMetaInfo::ProcessRequest(
   for (ptId=0; ptId < numPts; ptId++)
     {
     inPts->GetPoint(ptId, x);
-    n = (this->*(this->PointNormal))(ptId,inNormals);
+    n = (this->*(this->PointNormal))(ptId,NULL);
     if ( this->XYPlane )
       {
       s = x[2];
