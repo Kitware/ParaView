@@ -24,6 +24,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkStreamingDriver.h"
 #include "vtkStreamingHarness.h"
+#include "vtkVisibilityPrioritizer.h"
 
 #define DEBUGPRINT_PASSES( arg ) ;
 #define DEBUGPRINT_PRIORITY( arg ) ;
@@ -63,6 +64,10 @@ vtkMultiResolutionStreamer::vtkMultiResolutionStreamer()
   this->DepthLimit = 15;
   this->MaxSplits = 8;
   this->Interacting = false;
+
+  //0.666 = assume i,j,k about same, then 3rd root to get edge, and square to get
+  //numcells on near side
+  this->CellPixelFactor = 0.666;
 }
 
 //----------------------------------------------------------------------------
@@ -249,10 +254,12 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       double aConf = 1.0;
       unsigned long numCells = 0;
       unsigned long int nPix = 0;
+      double pNormal[3];
+      double *normalresult = pNormal;
       harness->ComputePieceMetaInformation
         (p, np, res,
          pbbox, gConf, aMin, aMax, aConf,
-         numCells);
+         numCells, &normalresult);
       double gPri = 1.0;
       piece.SetReachedLimit(false);
       if (res >= 1.0)
@@ -262,11 +269,9 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       if (this->ViewPrioritization && res<1.0)
         {
         nPix = this->ComputePixelCount(pbbox);
-        gPri = this->CalculateViewPriority(pbbox);
+        gPri = this->CalculateViewPriority(pbbox, normalresult);
         double nc = (double)numCells;
-        //0.666 = assume i,j,k about same, then 3rd root to get edge, and square to get
-        //numcells on near side
-        double side = pow(nc, 0.666);
+        double side = pow(nc, this->CellPixelFactor);
         numCells = (unsigned long)side;
         //cerr << p << "/" << np << "@" << res
         //       << " " << numCells << " vs " << nPix << endl;
@@ -605,14 +610,16 @@ void vtkMultiResolutionStreamer::PixelBackoff(vtkStreamingHarness *harness)
       double aMax = -1.0;
       double aConf = 1.0;
       unsigned long numCells = 0;
+      double pNormal[3];
+      double *normalresult = pNormal;
       harness->ComputePieceMetaInformation
         (p, np, res,
          pbbox, gConf, aMin, aMax, aConf,
-         numCells);
+         numCells, &normalresult);
       unsigned long int nPix = 0;
       nPix = this->ComputePixelCount(pbbox);
       double nc = (double)numCells;
-      double side = pow(nc, 0.666);
+      double side = pow(nc, this->CellPixelFactor);
       numCells = (unsigned long)side;
       if (numCells > nPix)
         {
@@ -1143,4 +1150,25 @@ void vtkMultiResolutionStreamer::Refine()
 void vtkMultiResolutionStreamer::Coarsen()
 {
   this->Internal->CoarsenNow = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiResolutionStreamer::SetBackFaceFactor(double value)
+{
+  vtkVisibilityPrioritizer *viewsorter = this->GetVisibilityPrioritizer();
+  if (viewsorter)
+    {
+    viewsorter->SetBackFaceFactor(value);
+    }
+}
+
+//----------------------------------------------------------------------------
+double vtkMultiResolutionStreamer::GetBackFaceFactor()
+{
+  vtkVisibilityPrioritizer *viewsorter = this->GetVisibilityPrioritizer();
+  if (viewsorter)
+    {
+    return viewsorter->GetBackFaceFactor();
+    }
+  return -1.0;
 }

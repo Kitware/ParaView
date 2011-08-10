@@ -41,7 +41,15 @@ public:
   vtkGetVectorMacro(Frustum, double, 32);
 
   //an interface to use this class outside of the pipeline
-  double CalculatePriority(double *piecebbox);
+  double CalculatePriority(double *piecebbox, double *pnorm=NULL);
+
+  //Description:
+  //When back piece rejection is in effect, this says how back facing
+  //a piece must be to be considered hidden. Ideally it would be 0.0,
+  //but we make it lower because piece norms are approximations and
+  //doing so reduces popping.
+  vtkSetMacro(BackFaceFactor, double);
+  vtkGetMacro(BackFaceFactor, double);
 
 protected:
   vtkVisibilityPrioritizer();
@@ -67,6 +75,7 @@ protected:
   double *CameraState;
   double *Frustum;
   bool Enabled;
+  double BackFaceFactor;
 
 private:
   vtkVisibilityPrioritizer(const vtkVisibilityPrioritizer&);  // Not implemented.
