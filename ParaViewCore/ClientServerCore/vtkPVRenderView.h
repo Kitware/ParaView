@@ -447,6 +447,17 @@ protected:
   ~vtkPVRenderView();
 
   // Description:
+  // Overridden to assign IDs to each representation. This assumes that
+  // representations will be added/removed in a consistent fashion across
+  // processes even in multi-client modes. The only exception is
+  // vtk3DWidgetRepresentation. However, since vtk3DWidgetRepresentation never
+  // does any data-delivery, we don't assign IDs for these, nor affect the ID
+  // uniquifier when a vtk3DWidgetRepresentation is added.
+  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
+  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
+
+
+  // Description:
   // Actual render method.
   virtual void Render(bool interactive, bool skip_rendering);
 
@@ -568,6 +579,9 @@ private:
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.
   bool RemoteRenderingAvailable;
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

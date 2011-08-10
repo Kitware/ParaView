@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
+#include "vtk3DWidgetRepresentation.h"
 #include "vtkBoundingBox.h"
 #include "vtkBSPCutsGenerator.h"
 #include "vtkCamera.h"
@@ -64,6 +65,20 @@
 #include <assert.h>
 #include <vtkstd/vector>
 #include <vtkstd/set>
+#include <vtkstd/map>
+
+class vtkPVRenderView::vtkInternals
+{
+public:
+  vtkstd::map<void*, int> RepToIdMap;
+  vtkstd::map<int, vtkDataRepresentation*> IdToRepMap;
+  int UniqueId;
+  vtkInternals()
+    {
+    this->UniqueId = 0;
+    }
+};
+
 
 //----------------------------------------------------------------------------
 // Statics
@@ -87,6 +102,8 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  this->Internals = new vtkInternals();
+
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
   this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
@@ -260,6 +277,9 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->OrderedCompositingBSPCutsSource->Delete();
   this->OrderedCompositingBSPCutsSource = NULL;
+
+  delete this->Internals;
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -293,6 +313,32 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (vtk3DWidgetRepresentation::SafeDownCast(rep) == NULL)
+    {
+    unsigned int id = this->Internals->UniqueId++;
+    this->Internals->RepToIdMap[rep] = id;
+    this->Internals->IdToRepMap[id] = rep;
+    }
+  this->Superclass::AddRepresentationInternal(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (this->Internals->RepToIdMap.find(rep) !=
+    this->Internals->RepToIdMap.end())
+    {
+    this->Internals->IdToRepMap.erase(
+      this->Internals->RepToIdMap[rep]);
+    this->Internals->RepToIdMap.erase(rep);
+    }
+
+  this->Superclass::RemoveRepresentationInternal(rep);
 }
 
 //----------------------------------------------------------------------------
@@ -892,7 +938,10 @@ void vtkPVRenderView::DoDataDelivery(
         this->ReplyInformationVector->GetInformationObject(cc);
       if (info->Has(NEEDS_DELIVERY()) && info->Get(NEEDS_DELIVERY()) == 1)
         {
-        need_delivery.push_back(cc);
+        assert(this->Internals->RepToIdMap.find(this->GetRepresentation(cc)) !=
+          this->Internals->RepToIdMap.end());
+        need_delivery.push_back(
+          this->Internals->RepToIdMap[this->GetRepresentation(cc)]);
         }
       }
 
@@ -936,8 +985,8 @@ void vtkPVRenderView::DoDataDelivery(
     {
     int index;
     stream >> index;
-    vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
-      this->GetRepresentation(index));
+    vtkPVDataRepresentation* repr =
+      vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
     if (repr)
       {
       //cout << "Requesting Delivery: " << index << ": " << repr->GetClassName()
