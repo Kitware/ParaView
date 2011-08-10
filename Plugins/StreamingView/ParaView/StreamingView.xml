@@ -251,6 +251,175 @@
   </ProxyGroup>
 
   <ProxyGroup
+      name="filters">
+
+    <SourceProxy
+        name="WarpScalarsWithMetaInfo"
+        class="vtkWarpScalarsAndMetaInfo"
+        base_proxygroup="filters"
+        base_proxyname="WarpScalar">
+      <Documentation>
+        A version of warp scalars that works with view prioritization.
+      </Documentation>
+      <!-- End WarpScalarsWithMetaInfo -->
+    </SourceProxy>
+
+    <SourceProxy
+        name="Spherical Projection"
+        class="vtkWorldWarp">
+      <Documentation>
+        A filter to warp data onto globe.
+      </Documentation>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input which is warped.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+          name="MapFileName"
+          command="SetMapFileName"
+          animateable="0"
+          number_of_elements="1"
+          default_values="/Users/demarle/tmp/dump.txt">
+        <!--<FileListDomain name="files"/> -todo: how to pop up the file dialog that reader can?-->
+        <Documentation>
+          This property specifies the file name that contains lat lon depth mapping for the filter.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+          name="Controls Longitude"
+          command="SetLonInput"
+          number_of_elements="1"
+          default_values="0" >
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="X"/>
+          <Entry value="1" text="Y"/>
+          <Entry value="2" text="Z"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies which input axis specifies longitude.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="Controls Latitude"
+          command="SetLatInput"
+          number_of_elements="1"
+          default_values="1" >
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="X"/>
+          <Entry value="1" text="Y"/>
+          <Entry value="2" text="Z"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies which input axis specifies latitude.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="Controls Altitude"
+          command="SetAltInput"
+          number_of_elements="1"
+          default_values="2" >
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="X"/>
+          <Entry value="1" text="Y"/>
+          <Entry value="2" text="Z"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies which input axis corresponds to altitude.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+          name="X Scale"
+          command="SetXScale"
+          number_of_elements="1"
+          default_values="1.0" >
+        <Documentation>
+          This specifies scaling for X so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="X Bias"
+          command="SetXBias"
+          number_of_elements="1"
+          default_values="0.0" >
+        <Documentation>
+          This specifies offset for X so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Y Scale"
+          command="SetYScale"
+          number_of_elements="1"
+          default_values="1.0" >
+        <Documentation>
+          This specifies scaling for Y so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Y Bias"
+          command="SetYBias"
+          number_of_elements="1"
+          default_values="0.0" >
+        <Documentation>
+          This specifies offset for Y so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Z Scale"
+          command="SetZScale"
+          number_of_elements="1"
+          default_values="1.0" >
+        <Documentation>
+          This specifies scaling for Z so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="Z Bias"
+          command="SetZBias"
+          number_of_elements="1"
+          default_values="0.0" >
+        <Documentation>
+          This specifies offset for Z so that it can be normalized before transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+          name="Z Emphasis"
+          command="SetAltitudeScale"
+          number_of_elements="1"
+          default_values="1.0" >
+        <Documentation>
+          This specifies scaling for altitude so that it can be exagerated after transformation.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+          name="Base Altitude"
+          command="SetBaseAltitude"
+          number_of_elements="1"
+          default_values="6371000" >
+        <Documentation>
+          This specifies base level of altitude. Default is earth mean radius of earth.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End WorldWarp -->
+    </SourceProxy>
+
+    <!-- End Filters -->
+  </ProxyGroup>
+
+  <ProxyGroup
       name="utilities">
 
     <SourceProxy
@@ -276,7 +445,6 @@
 
       <!-- End of PieceCache -->
     </SourceProxy>
-
 
     <SourceProxy
         name="StreamingHarness"
@@ -312,11 +480,6 @@
       <!-- End of StreamingHarness -->
     </SourceProxy>
 
-    <!-- End Filters -->
-  </ProxyGroup>
-
-  <ProxyGroup
-      name="utilities">
     <Proxy
         name="IteratingDriver"
         class="vtkIterativeStreamer"
