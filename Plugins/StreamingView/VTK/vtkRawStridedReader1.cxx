@@ -731,11 +731,11 @@ int vtkRawStridedReader1::RequestData(
 
   //DEBUGPRINT_RESOLUTION(
   //{
-  double res = 1.0;
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
-    {
-    res = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
-    }
+  //double res = 1.0;
+  //if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
+  //  {
+  //  res = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
+  //  }
   int P = outInfo->Get(
                        vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int NP = outInfo->Get(

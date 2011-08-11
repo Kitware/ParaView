@@ -286,7 +286,7 @@
           command="SetMapFileName"
           animateable="0"
           number_of_elements="1"
-          default_values="/Users/demarle/tmp/dump.txt">
+          default_values="ncdump.txt">
         <!--<FileListDomain name="files"/> -todo: how to pop up the file dialog that reader can?-->
         <Documentation>
           This property specifies the file name that contains lat lon depth mapping for the filter.

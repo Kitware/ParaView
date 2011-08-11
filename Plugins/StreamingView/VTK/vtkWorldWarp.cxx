@@ -164,7 +164,6 @@ void vtkWorldWarp::SetMapFileName(const char *_arg)
           {
           start = whereisequal+1;
           }
-        size_t end = 0;
         while (start != std::string::npos &&
                (start < nextline.size()-2) )
           {
@@ -203,7 +202,7 @@ void vtkWorldWarp::SetMapFileName(const char *_arg)
               dest = this->AltMap;
               break;
             }
-          for (int i = 0; i < values.size(); i++)
+          for (unsigned int i = 0; i < values.size(); i++)
             {
             *dest = values[i];
             dest++;
