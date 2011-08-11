@@ -822,14 +822,15 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     system(PV_TEST_CLEAN_COMMAND);
     }
 #endif
-  // Get the results.
-  int clientResult = 1;
+  // Get the results (0 == success).
+  int clientResult = 0;
   for (size_t cc=0; cc < clients.size(); cc++)
     {
     vtksys_ios::ostringstream client_name;
     client_name << "client" << cc;
     int cur_result = this->ReportStatus(clients[cc], client_name.str().c_str());
-    clientResult &= cur_result;
+    // 0 == success
+    clientResult |= cur_result;
     }
   int serverResult = 0;
   if(server)
