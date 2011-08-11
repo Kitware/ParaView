@@ -21,6 +21,7 @@
       <DoubleVectorProperty name="CacheKey"
         command="SetCacheKey"
         number_of_elements="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -32,6 +33,7 @@
       <IntVectorProperty name="UseCache"
         command="SetUseCache"
         number_of_elements="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -4145,7 +4147,7 @@
 
       <DoubleVectorProperty name="CacheKey"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -4156,7 +4158,7 @@
 
       <IntVectorProperty name="UseCache"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
