@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkPVXMLElement.h"
 
 // Qt includes.
 #include <QList>
@@ -56,6 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 
 inline int pqCeil(double val)
 {
@@ -393,6 +396,50 @@ vtkImageData* pqView::captureImage(const QSize& fullsize)
     this->render();
     }
   return vtkimage;
+}
+
+//-----------------------------------------------------------------------------
+bool pqView::canDisplay(pqOutputPort* opPort) const
+{
+  pqPipelineSource* source = opPort ? opPort->getSource() : 0;
+  vtkSMSourceProxy* sourceProxy = source ? vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
+  if(!opPort||
+     !source ||
+     opPort->getServer()->GetConnectionID() != this->getServer()->GetConnectionID() ||
+     !sourceProxy ||
+     sourceProxy->GetOutputPortsCreated() == 0)
+    {
+    return false;
+    }
+
+  vtkPVXMLElement* hints = sourceProxy->GetHints();
+  if (hints)
+    {
+    unsigned int elementCount = hints->GetNumberOfNestedElements();
+    for(unsigned int i = 0; i < elementCount; i++)
+      {
+      vtkPVXMLElement* child = hints->GetNestedElement(i);
+      const char *childName = child->GetName();
+
+      if(childName && strcmp(childName, "DefaultRepresentations") == 0)
+        {
+        unsigned int defaultRepsCount = child->GetNumberOfNestedElements();
+        for(int j = 0; j < defaultRepsCount; j++)
+          {
+          vtkPVXMLElement *defaultRep = child->GetNestedElement(j);
+
+          const char *defaultRepViewType = defaultRep->GetAttribute("view");
+          if(defaultRepViewType &&
+             this->ViewType == defaultRepViewType)
+            {
+            return true;
+            }
+          }
+        }
+      }
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------

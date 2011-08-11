@@ -144,7 +144,7 @@ public:
   /// view. This is a convenience method, it gets
   /// the pqDisplayPolicy object from the pqApplicationCore
   /// are queries it.
-  virtual bool canDisplay(pqOutputPort* opPort) const =0;
+  virtual bool canDisplay(pqOutputPort* opPort) const;
 
   /// The annotation link used on representations to share the selection
   /// and annotations. This is only used in views aware of this link.
