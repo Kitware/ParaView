@@ -1805,10 +1805,7 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* lo
         link->LoadState(&msgTmp, locator);
         this->RegisterLink(name, link);
         }
-      else
-        {
-        object->Delete();
-        }
+      object->Delete();
       }
     }
   // Remove Link that have disapeared...
