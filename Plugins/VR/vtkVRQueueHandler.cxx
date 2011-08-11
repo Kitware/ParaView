@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
 #include "vtkVRVectorPropertyStyle.h"
+#include "vtkVRStyleGrabNRotateWorld.h"
 #include "pqApplicationCore.h"
 
 #include <QList>
@@ -143,24 +144,18 @@ void vtkVRQueueHandler::processEvents()
 
 //----------------------------------------------------------------------------
 /* Sample configuration:
-  <VRInteractorStyles>
-    <Style class="vtkVRVectorPropertyStyle"
-           proxy="12"
-           property="Normal"
-           mode="direction">
-      <Event device="wand" button="1" />
+ <VRInteractorStyles>
+    <Style class="vtkVRStyleGrabNRotateWorld">
+      <Button name="wiimote.A"/>
+      <Tracker name="wiimote.tracker"/>
     </Style>
-
-    <Style class="vtkVRVectorPropertyStyle"
-           proxy="12"
-           property="Origin"
-           mode="displacement">
-      <Event device="wand" button="2" />
+    <Style class="vtkVRWandTrackingStyle">
+      <Event name="wiitracker.hand" type = "tracker"/>
     </Style>
-  </VRInteractorStyles>
-*/
+ </VRInteractorStyles>
+ */
 void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
-  vtkSMProxyLocator* locator)
+                                        vtkSMProxyLocator* locator)
 {
   if (!xml)
     {
@@ -176,13 +171,19 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-         if (strcmp(class_name, "vtkVRPropertyStyle")==0)
+        if (strcmp(class_name, "vtkVRPropertyStyle")==0)
           {
           vtkVRPropertyStyle* style = new vtkVRPropertyStyle(this);
           style->configure(child, locator);
           this->add(style);
           }
-         else if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
+        else if (strcmp(class_name, "vtkVRStyleGrabNRotateWorld")==0)
+          {
+          vtkVRStyleGrabNRotateWorld* style = new vtkVRStyleGrabNRotateWorld(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
           {
           vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
           style->configure(child, locator);
@@ -222,7 +223,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
   else
     {
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
-      locator);
+                          locator);
     }
 }
 
