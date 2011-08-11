@@ -53,7 +53,6 @@ public:
   pqPythonShell(QWidget* Parent);
   ~pqPythonShell();
 
-
   /// Initializes the interpretor. If an interpretor is already setup (by an
   /// earlier call to this method), it will be destroyed.
   void initializeInterpretor(int argc, char* argv[]);
@@ -71,6 +70,11 @@ public:
   /// Given a python variable name, lookup its attributes and return them in a
   /// string list.
   QStringList getPythonAttributes(const QString& name);
+
+  /// Call this method to initialize the interpretor for ParaView GUI
+  /// applications. This is typically called right after
+  /// InitializeSubInterpretor().
+  void executeInitFromGUI();
 
 signals:
   void executing(bool);

@@ -72,9 +72,12 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
       this, SLOT(onManipulatorModified()));
     }
 
-  this->Internal->VTKConnect->Connect(
-    proxy->GetProperty("AnimatedProxy"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(modified()));
+  if (proxy->GetProperty("AnimatedProxy"))
+    {
+    this->Internal->VTKConnect->Connect(
+      proxy->GetProperty("AnimatedProxy"), vtkCommand::ModifiedEvent,
+      this, SIGNAL(modified()));
+    }
   if (proxy->GetProperty("AnimatedPropertyName"))
     {
     // since some cue like that for Camera doesn't have this property.
@@ -82,9 +85,13 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
       proxy->GetProperty("AnimatedPropertyName"), vtkCommand::ModifiedEvent,
       this, SIGNAL(modified()));
     }
-  this->Internal->VTKConnect->Connect(
-    proxy->GetProperty("AnimatedElement"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(modified()));
+
+  if (proxy->GetProperty("AnimatedElement"))
+    {
+    this->Internal->VTKConnect->Connect(
+      proxy->GetProperty("AnimatedElement"), vtkCommand::ModifiedEvent,
+      this, SIGNAL(modified()));
+    }
 
   this->Internal->VTKConnect->Connect(
     proxy->GetProperty("Enabled"), vtkCommand::ModifiedEvent,
@@ -159,7 +166,7 @@ void pqAnimationCue::setDefaultPropertyValues()
   this->Superclass::setDefaultPropertyValues();
 
   vtkSMProxy* proxy = this->getProxy();
-  if (!this->Internal->Manipulator)
+  if (!this->Internal->Manipulator && proxy->GetProperty("Manipulator"))
     {
     vtkSMProxyManager* pxm = this->proxyManager();
     vtkSMProxy* manip = 

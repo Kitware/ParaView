@@ -294,6 +294,11 @@ void pqPythonShell::releaseControl()
   this->Implementation->Interpreter->ReleaseControl();
 }
 
+void pqPythonShell::executeInitFromGUI()
+{
+  this->Implementation->Interpreter->ExecuteInitFromGUI();
+}
+
 void pqPythonShell::executeScript(const QString& script)
 {
   this->printStdout("\n");

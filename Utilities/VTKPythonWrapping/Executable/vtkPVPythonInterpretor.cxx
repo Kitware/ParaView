@@ -524,6 +524,22 @@ void vtkPVPythonInterpretor::RunSimpleFile(const char* const filename)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::ExecuteInitFromGUI()
+{
+  const char* initStr = 
+    "import paraview\n"
+    "paraview.compatibility.major = 3\n"
+    "paraview.compatibility.minor = 5\n"
+    "from paraview import servermanager\n"
+    "servermanager.InitFromGUI()\n"
+    "from paraview.simple import *\n"
+    "active_objects.view = servermanager.GetRenderView()\n"
+    "paraview.simple._add_functions(globals())";
+  this->RunSimpleString(initStr);
+  this->FlushMessages();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVPythonInterpretor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
