@@ -256,7 +256,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
-#     - ViewSettingsDialog
+#     - ViewSettingsDialog, ColorEditor3
 #
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
@@ -274,7 +274,6 @@ set (Calculator_ENABLE_COLLAB TRUE)
 set (CameraLink_ENABLE_COLLAB TRUE)
 set (ColorEditor1_ENABLE_COLLAB TRUE)
 set (ColorEditor2_ENABLE_COLLAB TRUE)
-set (ColorEditor3_ENABLE_COLLAB TRUE)
 set (ColorEditor4_ENABLE_COLLAB TRUE)
 set (CompositeSurfaceSelection_ENABLE_COLLAB TRUE)
 set (Contour_ENABLE_COLLAB TRUE)
