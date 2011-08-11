@@ -424,7 +424,7 @@ bool pqView::canDisplay(pqOutputPort* opPort) const
       if(childName && strcmp(childName, "DefaultRepresentations") == 0)
         {
         unsigned int defaultRepsCount = child->GetNumberOfNestedElements();
-        for(int j = 0; j < defaultRepsCount; j++)
+        for(unsigned int j = 0; j < defaultRepsCount; j++)
           {
           vtkPVXMLElement *defaultRep = child->GetNestedElement(j);
 
