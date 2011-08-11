@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkVRStyleGrabNRotateWorld::vtkVRStyleGrabNRotateWorld(QObject* parentObject)
   : Superclass(parentObject)
 {
+  this->Enabled = false;
 }
 
 //------------------------------------------------------------------------destr
@@ -83,9 +84,10 @@ bool vtkVRStyleGrabNRotateWorld::configure(vtkPVXMLElement* child,
                 << "Button event has to be specified" << std::endl
                 << "<Button name=\"buttonEventName\"/>"
                 << std::endl;
+      return false;
       }
     vtkPVXMLElement* tracker = child->GetNestedElement(1);
-    if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Button")==0)
+    if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Tracker")==0)
       {
       this->Tracker = tracker->GetAttributeOrEmpty("name");
       }
@@ -95,7 +97,9 @@ bool vtkVRStyleGrabNRotateWorld::configure(vtkPVXMLElement* child,
                 << "Please Specify Tracker event" <<std::endl
                 << "<Tracker name=\"TrackerEventName\"/>"
                 << std::endl;
+      return false;
       }
+    return true;
     }
   return false;
 }
@@ -158,12 +162,11 @@ bool vtkVRStyleGrabNRotateWorld::update()
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateWorld::HandleButton( const vtkVREventData& data )
 {
-  // std::stringstream event;
-  // event <<data.name;
-  // if ( this->Map.find(event.str() )!= this->Map.end() )
-  //   {
-  //   SetButtonValue( this->Map[event.str()], data.data.button.state );
-  //   }
+  if ( this->Button == data.name )
+    {
+    std::cout << data.name << std::endl;
+    this->Enabled = data.data.button.state;
+    }
 }
 
 //----------------------------------------------------------------------private
@@ -198,30 +201,10 @@ void vtkVRStyleGrabNRotateWorld::HandleAnalog( const vtkVREventData& data )
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
 {
-  // std::vector<std::string>token = this->tokenize(data.name );
-
-  // // check for events of types device.name (vector events)
-  // std::stringstream event;
-  // event << token[0]<<"."<<token[1];
-  // if ( this->Map.find(event.str() )!= this->Map.end() )
-  //   {
-  //   std::cout << event.str() << std::endl;
-  //   SetTrackerVectorValue(this->Map[event.str()],data.data.tracker.matrix );
-  //   }
-
-  // // check for events of type device.name.index (scalar events)
-  // for (int i = 0; i < 16; ++i)
-  //   {
-  //   std::stringstream event;
-  //   event <<data.name<<"."<<i;
-
-  //   if ( this->Map.find(event.str() )!= this->Map.end() )
-  //     {
-  //     std::cout << event.str() << std::endl;
-  //     std::vector<std::string>token = this->tokenize(data.name );
-  //     SetTrackerValue( this->Map[event.str()], data.data.tracker.matrix[i] );
-  //     }
-  //   }
+  if ( this->Enabled && ( this->Tracker == data.name ))
+    {
+    std::cout << "its time to rotate " << std::endl;
+    }
 }
 
 //----------------------------------------------------------------------private

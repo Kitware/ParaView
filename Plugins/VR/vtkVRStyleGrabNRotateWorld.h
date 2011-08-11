@@ -84,7 +84,7 @@ protected:
   std::vector<std::string> tokenize( std::string input);
   std::string Button;
   std::string Tracker;
-
+  bool Enabled;
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateWorld)
 };
