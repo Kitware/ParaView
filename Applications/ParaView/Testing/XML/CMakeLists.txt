@@ -261,6 +261,9 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
 #
+#   Don't want to support for now
+#     - ComparativeVisPanel
+#
 ##########################################################
 
 # List of test Enable for collaboration
@@ -273,7 +276,6 @@ set (ColorEditor1_ENABLE_COLLAB TRUE)
 set (ColorEditor2_ENABLE_COLLAB TRUE)
 set (ColorEditor3_ENABLE_COLLAB TRUE)
 set (ColorEditor4_ENABLE_COLLAB TRUE)
-set (ComparativeVisPanel_ENABLE_COLLAB TRUE)     # ===== ISSUE HERE (DeadLock) =====
 set (CompositeSurfaceSelection_ENABLE_COLLAB TRUE)
 set (Contour_ENABLE_COLLAB TRUE)
 set (ContourRange_ENABLE_COLLAB TRUE)
