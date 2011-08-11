@@ -760,12 +760,21 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   int renderServerPipe = 1;
   vtkstd::string output;
   int mpiError = 0;
+  vtkstd::vector<int> client_pipe_status;
+  client_pipe_status.resize(clients.size(), 1);
   while(clientPipe)
     {
-    for (size_t cc=0; cc < clients.size() && clientPipe; cc++)
+    clientPipe = 0;
+    for (size_t cc=0; cc < clients.size(); cc++)
       {
-      clientPipe = this->WaitForAndPrintLine("client", clients[cc], output, 0.1,
-                                             ClientStdOut, ClientStdErr);
+      // we don't stop listening from clients until all clients have closed
+      // their pipes.
+      if (client_pipe_status[cc])
+        {
+        client_pipe_status [cc] = this->WaitForAndPrintLine("client", clients[cc], output, 0.1,
+          ClientStdOut, ClientStdErr);
+        }
+      clientPipe |= client_pipe_status[cc];
       }
     if(!mpiError && this->OutputStringHasError("client", output))
       {
