@@ -610,9 +610,7 @@ void vtkMultiResolutionStreamer::PixelBackoff(vtkStreamingHarness *harness)
          pbbox, gConf, aMin, aMax, aConf,
          numCells);
       unsigned long int nPix = 0;
-      double gPri = 1.0;
       nPix = this->ComputePixelCount(pbbox);
-      gPri = this->CalculateViewPriority(pbbox);
       double nc = (double)numCells;
       double side = pow(nc, 0.666);
       numCells = (unsigned long)side;
