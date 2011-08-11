@@ -96,9 +96,9 @@ void pqActiveObjects::activeViewChanged(pqView* newView)
   if (newView)
     {
     QObject::connect(newView, SIGNAL(representationAdded(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
+                     this, SLOT(updateRepresentation()), Qt::UniqueConnection);
     QObject::connect(newView, SIGNAL(representationRemoved(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
+                     this, SLOT(updateRepresentation()), Qt::UniqueConnection);
     }
   if (this->CachedView != newView)
     {
@@ -179,6 +179,12 @@ void pqActiveObjects::onSelectionChanged()
 //-----------------------------------------------------------------------------
 void pqActiveObjects::setActiveView(pqView* view)
 {
+  // Make sure the cache view is updated for the tests as well
+  if(pqActiveView::instance().current() != view)
+    {
+    this->activeViewChanged(view);
+    }
+
   pqActiveView::instance().setCurrent(view);
 }
 
