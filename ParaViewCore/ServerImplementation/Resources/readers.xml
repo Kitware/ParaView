@@ -1927,28 +1927,6 @@
      </DoubleVectorProperty>
 
      <IntVectorProperty
-        name="UseVariableCache"
-        command="SetUseVariableCache"
-        number_of_elements="1"
-        default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-		Enable the usage of the variable cache to store
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="VariableCacheSize"
-        command="SetVariableCacheSize"
-        number_of_elements="1"
-        default_values="0" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         Size of the variable cache in GigaBytes.
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty
         name="GenerateObjectIdCellArray"
         command="SetGenerateObjectIdCellArray"
         number_of_elements="1"
@@ -5034,8 +5012,6 @@
          <Property name="NodeSetResultArrayStatus" />
          <Property name="ApplyDisplacements" />
          <Property name="DisplacementMagnitude" />
-         <Property name="UseVariableCache" />
-         <Property name="VariableCacheSize" />
          <Property name="GenerateObjectIdCellArray" />
          <Property name="GenerateGlobalNodeIdArray" />
          <Property name="GenerateGlobalElementIdArray" />
@@ -5156,8 +5132,6 @@
          <Property name="NodeSetResultArrayStatus" />
          <Property name="ApplyDisplacements" />
          <Property name="DisplacementMagnitude" />
-         <Property name="UseVariableCache" />
-         <Property name="VariableCacheSize" />
          <Property name="GenerateObjectIdCellArray" />
          <Property name="GenerateGlobalNodeIdArray" />
          <Property name="GenerateGlobalElementIdArray" />
