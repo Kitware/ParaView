@@ -592,6 +592,8 @@
          <Property name="CameraParallelScaleInfo" />
          <Property name="CameraParallelProjection" />
          <Property name="EyeAngle" />
+	 <Property name="HeadPose" />
+	 <Property name="WandPose" />
        </ExposedProperties>
      </SubProxy>
     </RenderViewProxy>
