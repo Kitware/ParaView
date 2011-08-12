@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVServerOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPVSessionServer.h"
+#include "vtkPVConfig.h"
 
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
