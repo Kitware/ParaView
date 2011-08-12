@@ -925,6 +925,25 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
     bounds[4] = origin[2] + spacing[2] * ext[4];
     bounds[5] = origin[2] + spacing[2] * ext[5];
     outInfo->Set(vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(), bounds, 6);
+
+    int ic = (ext[1]-ext[0]);
+    if (ic < 1)
+      {
+      ic = 1;
+      }
+    int jc = (ext[3]-ext[2]);
+    if (jc < 1)
+      {
+      jc = 1;
+      }
+    int kc = (ext[5]-ext[4]);
+    if (kc < 1)
+      {
+      kc = 1;
+      }
+    outInfo->Set
+      (vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS(), ic*jc*kc);
+
 /*
     cerr << P << "/" << NP << "\t";
     {for (int i = 0; i < 3; i++) cerr << spacing[i] << " ";}

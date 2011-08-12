@@ -266,6 +266,20 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
   double bounds[6], double &gconfidence,
   double &min, double &max, double &aconfidence)
 {
+  unsigned long ignore = 0;
+  this->ComputePieceMetaInformation(piece, NumPieces, resolution,
+                                    bounds, gconfidence,
+                                    min, max, aconfidence,
+                                    ignore);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingHarness::ComputePieceMetaInformation(
+  int piece, int NumPieces, double resolution,
+  double bounds[6], double &gconfidence,
+  double &min, double &max, double &aconfidence,
+  unsigned long &numCells)
+{
   this->ForOther = true;
 
   //TODO: Can I get all of the arrays, not just the active scalars?
@@ -332,6 +346,12 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
     min = range[0];
     max = range[1];
     aconfidence = 1.0;
+    }
+
+  numCells = 0;
+  if (inInfo->Has(vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS()))
+    {
+    numCells = inInfo->Get(vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS());
     }
 
   //restore the old setting

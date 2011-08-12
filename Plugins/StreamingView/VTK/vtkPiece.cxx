@@ -10,6 +10,7 @@ vtkPiece::vtkPiece()
   this->Piece = 0;
   this->NumPieces = 1;
   this->Resolution = 1.0;
+  this->ReachedLimit = false;
 
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = 0;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -1;
@@ -37,4 +38,5 @@ void vtkPiece::CopyPiece(vtkPiece other)
   this->SetViewPriority(other.GetViewPriority());
   this->SetCachedPriority(other.GetCachedPriority());
   this->SetBounds(other.GetBounds());
+  this->SetReachedLimit(other.GetReachedLimit());
 }

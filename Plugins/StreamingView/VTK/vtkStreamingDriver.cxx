@@ -405,3 +405,53 @@ void vtkStreamingDriver::CopyBackBufferToFront()
   rw->SetRGBACharPixelData
     (0, 0, size[0]-1, size[1]-1, this->Internal->PixelArray, 1);
 }
+
+//------------------------------------------------------------------------------
+unsigned long int vtkStreamingDriver::ComputePixelCount(double *pbbox)
+{
+  //project bbox to screen to get number of pixels covered by the piece
+  vtkRenderer *ren = this->GetRenderer();
+  int *screen = this->GetRenderer()->GetSize();
+
+  double minx = screen[1];
+  double maxx = 0;
+  double miny = screen[0];
+  double maxy = 0;
+
+  //convert pbbox to 8 world space corner positions
+  double coords[8][3];
+  coords[0][0] = pbbox[0]; coords[0][1] = pbbox[2]; coords[0][2] = pbbox[4];
+  coords[1][0] = pbbox[1]; coords[1][1] = pbbox[2]; coords[1][2] = pbbox[4];
+  coords[2][0] = pbbox[0]; coords[2][1] = pbbox[3]; coords[2][2] = pbbox[4];
+  coords[3][0] = pbbox[1]; coords[3][1] = pbbox[3]; coords[3][2] = pbbox[4];
+  coords[4][0] = pbbox[0]; coords[4][1] = pbbox[2]; coords[4][2] = pbbox[5];
+  coords[5][0] = pbbox[1]; coords[5][1] = pbbox[2]; coords[5][2] = pbbox[5];
+  coords[6][0] = pbbox[0]; coords[6][1] = pbbox[3]; coords[6][2] = pbbox[5];
+  coords[7][0] = pbbox[1]; coords[7][1] = pbbox[3]; coords[7][2] = pbbox[5];
+
+  double display[3];
+  for (int c = 0; c < 8; c++)
+    {
+    ren->SetWorldPoint(coords[c][0], coords[c][1], coords[c][2], 1);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(display);
+    if (display[0] < minx)
+      {
+      minx = display[0];
+      }
+    if (display[0] > maxx)
+      {
+      maxx = display[0];
+      }
+    if (display[1] < miny)
+      {
+      miny = display[1];
+      }
+    if (display[1] > maxy)
+      {
+      maxy = display[1];
+      }
+    }
+  //cerr << "display bounds are " << minx << "," << maxx << " " << miny << "," << maxy << endl;
+  return (unsigned long)((maxx-minx) * (maxy-miny));
+}

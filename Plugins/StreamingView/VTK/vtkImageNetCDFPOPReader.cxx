@@ -520,6 +520,24 @@ int vtkImageNetCDFPOPReader::ProcessRequest(vtkInformation *request,
     outInfo->Set
       (vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(), bounds, 6);
 
+    int ic = (ext[1]-ext[0]);
+    if (ic < 1)
+      {
+      ic = 1;
+      }
+    int jc = (ext[3]-ext[2]);
+    if (jc < 1)
+      {
+      jc = 1;
+      }
+    int kc = (ext[5]-ext[4]);
+    if (kc < 1)
+      {
+      kc = 1;
+      }
+    outInfo->Set
+      (vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS(), ic*jc*kc);
+
     double range[2];
     vtkInformationVector *miv =
       outInfo->Get(vtkDataObject::POINT_DATA_VECTOR());
