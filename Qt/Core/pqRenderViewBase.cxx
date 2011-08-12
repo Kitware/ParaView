@@ -697,6 +697,11 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
 //-----------------------------------------------------------------------------
 bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
 {
+  if(this->Superclass::canDisplay(opPort))
+    {
+    return true;
+    }
+
   pqPipelineSource* source = opPort? opPort->getSource() :0;
   vtkSMSourceProxy* sourceProxy = source? 
     vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
