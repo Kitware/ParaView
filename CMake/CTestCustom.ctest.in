@@ -125,6 +125,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "vtkPVMessage.pb.h"
   "vtkSMMessage.h.*pragma GCC diagnostic"
   "/google/protobuf/"
+
+  # ignore VRPN warnings
+  ".*vrpn.*"
   )
 
 SET(CTEST_CUSTOM_WARNING_EXCEPTION

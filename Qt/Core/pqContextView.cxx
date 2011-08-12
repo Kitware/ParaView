@@ -337,6 +337,11 @@ void pqContextView::resetDisplay()
 /// Returns true if data on the given output port can be displayed by this view.
 bool pqContextView::canDisplay(pqOutputPort* opPort) const
 {
+  if(this->Superclass::canDisplay(opPort))
+    {
+    return true;
+    }
+
   pqPipelineSource* source = opPort? opPort->getSource() :0;
   vtkSMSourceProxy* sourceProxy = source ?
     vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;

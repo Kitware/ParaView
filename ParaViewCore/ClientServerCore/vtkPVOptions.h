@@ -55,11 +55,6 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
-  vtkGetMacro(UseVRPN, int);
-  vtkGetStringMacro(VRPNAddress);
-  vtkGetMacro(UseVRUI, int);
-  vtkGetStringMacro(VRUIAddress);
-
 
   vtkGetMacro(ClientMode, int);
   // Description:
@@ -212,8 +207,6 @@ private:
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
-  int UseVRPN;
-  int UseVRUI;
   int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
@@ -240,12 +233,6 @@ private:
 
   vtkSetStringMacro(StereoType);
   char* StereoType;
-
-  vtkSetStringMacro(VRPNAddress);
-  char* VRPNAddress;
-
-  vtkSetStringMacro(VRUIAddress);
-  char* VRUIAddress;
 
 //ETX
 private:

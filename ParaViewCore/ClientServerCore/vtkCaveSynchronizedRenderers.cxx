@@ -170,17 +170,23 @@ void vtkCaveSynchronizedRenderers::DefineDisplay(
 // Client camera is the camera on the client.  The out camera is the
 // combination of the two used for the final cave display.
 // It is the room camera transformed by the world camera.
-void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
+void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* camera)
 {
   if(once)
     {
-#ifdef FIXME
-      cam->SetHeadTracked( true );
-      cam->SetScreenConfig( this->DisplayOrigin,
-                            this->DisplayX,
-                            this->DisplayY ,0.065, 1.0);
-#endif
-      once =0;
+    double eyePosition[3] = {0.0, 0.0, 10.0};
+    camera->SetScreenBottomLeft(this->DisplayOrigin);
+    camera->SetScreenBottomRight(this->DisplayX);
+    camera->SetScreenTopRight(this->DisplayY);
+    camera->SetUseOffAxisProjection(true);
+    camera->SetEyePosition(eyePosition);
+    camera->SetEyeSeparation(0.05);
+
+    // cam->SetHeadTracked( true );
+    // cam->SetScreenConfig( this->DisplayOrigin,
+    //                       this->DisplayX,
+    //                       this->DisplayY ,0.065, 1.0);
+    once =0;
     }
 }
 
