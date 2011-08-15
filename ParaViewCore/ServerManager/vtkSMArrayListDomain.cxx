@@ -262,11 +262,15 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
     {
     if (ivp->GetNumberOfUncheckedElements() == 1)
       {
-      attribute_type = ivp->GetUncheckedElement(0);
+      attribute_type =
+        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
+          ivp->GetUncheckedElement(0));
       }
     else
       {
-      attribute_type = ivp->GetElement(0);
+      attribute_type =
+        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
+          ivp->GetElement(0));
       }
     }
 
@@ -323,6 +327,12 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
     this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad,
       vtkDataObject::FIELD_ASSOCIATION_ROWS);
     this->Association = vtkDataObject:: FIELD_ASSOCIATION_ROWS;
+    break;
+
+  case  vtkSMInputArrayDomain::NONE:
+    this->AddArrays(sp, outputport, info->GetFieldDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_NONE);
+    this->Association = vtkDataObject::FIELD_ASSOCIATION_NONE;
     break;
     }
 

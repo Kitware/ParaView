@@ -38,6 +38,8 @@ public:
   double GetResolution() { return this->Resolution; }
   void SetProcessor(int nv) { this->Processor = nv; }
   int GetProcessor() { return this->Processor; }
+  void SetReachedLimit(bool nv) { this->ReachedLimit = nv; }
+  bool GetReachedLimit() { return this->ReachedLimit; }
 
   //Description:
   // When available, a piece's geometric bounds determines if view priority.
@@ -126,6 +128,7 @@ protected:
   int Processor;
   int Piece;
   int NumPieces;
+  bool ReachedLimit;
   double Resolution;
 
   double Bounds[6];

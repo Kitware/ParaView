@@ -209,8 +209,15 @@ void pqSpreadSheetView::onEndRender()
 //-----------------------------------------------------------------------------
 bool pqSpreadSheetView::canDisplay(pqOutputPort* opPort) const
 {
-  return (opPort && opPort->getServer()->GetConnectionID() ==
-    this->getServer()->GetConnectionID());
+  if(this->Superclass::canDisplay(opPort))
+    {
+    return true;
+    }
+  else
+    {
+    return (opPort && opPort->getServer()->GetConnectionID() ==
+            this->getServer()->GetConnectionID());
+    }
 }
 
 //-----------------------------------------------------------------------------

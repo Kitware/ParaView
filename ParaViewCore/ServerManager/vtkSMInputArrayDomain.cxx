@@ -202,6 +202,31 @@ int vtkSMInputArrayDomain::IsFieldValid(
 }
 
 //----------------------------------------------------------------------------
+int vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
+  int dsaAssociation)
+{
+  switch (dsaAssociation)
+    {
+     case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+        return vtkSMInputArrayDomain::POINT;
+     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        return vtkSMInputArrayDomain::CELL;
+     case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
+        // TODO: Handle this case.
+        return vtkSMInputArrayDomain::POINT;
+     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+        return vtkSMInputArrayDomain::VERTEX;
+     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+        return vtkSMInputArrayDomain::EDGE;
+     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+        return vtkSMInputArrayDomain::ROW;
+     case vtkDataObject::FIELD_ASSOCIATION_NONE:
+        return vtkSMInputArrayDomain::NONE;
+      }
+  return vtkDataObject::FIELD_ASSOCIATION_POINTS;
+}
+
+//----------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsFieldValid(
   vtkSMSourceProxy* proxy, int outputport,
   vtkPVArrayInformation* arrayInfo, int bypass)
@@ -226,34 +251,8 @@ int vtkSMInputArrayDomain::IsFieldValid(
       {
       int val = (fds)? atoi(fds->GetUncheckedElement(3)) :
         ifds->GetUncheckedElement(0);
-      if (val == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-        {
-        attributeType = vtkSMInputArrayDomain::POINT;
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-        {
-        attributeType = vtkSMInputArrayDomain::CELL;
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS)
-        {
-        // TODO: Handle this case.
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
-        {
-        attributeType = vtkSMInputArrayDomain::VERTEX;
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_EDGES)
-        {
-        attributeType = vtkSMInputArrayDomain::EDGE;
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_ROWS)
-        {
-        attributeType = vtkSMInputArrayDomain::ROW;
-        }
-      else if (val == vtkDataObject::FIELD_ASSOCIATION_NONE)
-        {
-        attributeType = vtkSMInputArrayDomain::NONE;
-        }
+      attributeType =
+        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(val);
       }
     }
 

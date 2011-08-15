@@ -76,18 +76,12 @@ vtkPVOptions::vtkPVOptions()
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftwareRendering = 0;
   this->UseStereoRendering = 0;
-  this->UseVRPN = 0;
-  this->UseVRUI = 0;
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
   this->ConnectID = 0;
   this->LogFileName = 0;
   this->StereoType = 0;
   this->SetStereoType("Anaglyph");
-  this->VRPNAddress = 0;
-  this->SetVRPNAddress("Tracker0@localhost");
-  this->VRUIAddress = 0;
-  this->SetVRUIAddress("localhost");
 
   this->Timeout = 0;
 
@@ -116,8 +110,6 @@ vtkPVOptions::~vtkPVOptions()
   this->SetLogFileName(0);
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
-  this->SetVRPNAddress(0);
-  this->SetVRUIAddress(0);
 }
 
 //----------------------------------------------------------------------------
@@ -198,22 +190,6 @@ void vtkPVOptions::Initialize()
                            "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
                            "\"Dresden\", \"Anaglyph\", \"Checkerboard\"",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-  this->AddBooleanArgument("--vrpn", 0, &this->UseVRPN,
-                           "Tell the application to use VRPN for head tracking",
-                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-  this->AddArgument("--vrpn-address", 0, &this->VRPNAddress,
-                    "Specify the VRPN tracker name. This valid only when "
-                    "--vrpn is specified. Examples: "
-                    "\"Tracker0@localhost\", \"Head0@localhost\""
-                    "Please check VRPN configuration file",
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-  this->AddBooleanArgument("--vrui", 0, &this->UseVRUI,
-                           "Tell the application to use VRUI for head tracking",
-                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-  this->AddArgument("--vrui-address", 0, &this->VRUIAddress,
-                    "Specify the VRUI host name.",
-                    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-
 
   /*
   this->AddArgument("--server-host", "-sh", &this->ServerHostName,

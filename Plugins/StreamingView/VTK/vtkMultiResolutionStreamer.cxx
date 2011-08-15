@@ -194,6 +194,7 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
 
     //combine empties that no longer matter
     this->Reap(harness); //merges unimportant pieces left in TD
+    this->PixelBackoff(harness); //coarsens pieces that are over pixel resolution
 
     //either refine, coarsen or leave alone the pieces depending on mode
     if ((this->ProgressionMode == MANUAL && manualCommand == COARSEN))
@@ -246,13 +247,35 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       double aMin = 1.0;
       double aMax = -1.0;
       double aConf = 1.0;
+      unsigned long numCells = 0;
+      unsigned long int nPix = 0;
       harness->ComputePieceMetaInformation
         (p, np, res,
-         pbbox, gConf, aMin, aMax, aConf);
+         pbbox, gConf, aMin, aMax, aConf,
+         numCells);
       double gPri = 1.0;
-      if (this->ViewPrioritization)
+      piece.SetReachedLimit(false);
+      if (res >= 1.0)
         {
+        piece.SetReachedLimit(true);
+        }
+      if (this->ViewPrioritization && res<1.0)
+        {
+        nPix = this->ComputePixelCount(pbbox);
         gPri = this->CalculateViewPriority(pbbox);
+        double nc = (double)numCells;
+        //0.666 = assume i,j,k about same, then 3rd root to get edge, and square to get
+        //numcells on near side
+        double side = pow(nc, 0.666);
+        numCells = (unsigned long)side;
+        //cerr << p << "/" << np << "@" << res
+        //       << " " << numCells << " vs " << nPix << endl;
+        if (numCells > nPix)
+          {
+          //cerr << p << "/" << np << "@" << res
+          //<< " reached limit " << numCells << ">" << nPix << endl;
+          piece.SetReachedLimit(true);
+          }
         }
       DEBUGPRINT_PRIORITY
         (
@@ -352,7 +375,8 @@ int vtkMultiResolutionStreamer::Refine(vtkStreamingHarness *harness)
     double res = piece.GetResolution();
     double priority = piece.GetPriority();
     if ((priority > 0.0) &&
-        (res+res_delta <= maxRes))
+        (res+res_delta <= maxRes) &&
+        (!piece.GetReachedLimit()))
       {
       numSplittable++;
       ToSplit->AddPiece(piece);
@@ -458,9 +482,9 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
 
   vtkPieceList *ToDo = harness->GetPieceList1();
   vtkPieceList *NextFrame = harness->GetPieceList2();
+  NextFrame->MergePieceList(ToDo);
 
   //sort pieces according to levels
-  NextFrame->MergePieceList(ToDo);
   while (NextFrame->GetNumberOfPieces())
     {
     vtkPiece piece = NextFrame->PopPiece();
@@ -549,8 +573,158 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
 }
 
 //----------------------------------------------------------------------------
+void vtkMultiResolutionStreamer::PixelBackoff(vtkStreamingHarness *harness)
+{
+  double res_delta = (1.0/this->RefinementDepth);
+
+  //find pieces that are two levels too refined for this viewpoint
+  vtkPieceList *tmp = vtkPieceList::New();
+  vtkPieceList *tooHigh = vtkPieceList::New();
+  vtkPieceList *NextFrame = harness->GetPieceList2();
+  tmp->MergePieceList(NextFrame);
+  while (tmp->GetNumberOfPieces())
+    {
+    vtkPiece piece = tmp->PopPiece();
+    if (piece.GetReachedLimit())
+      {
+      double res = piece.GetResolution();
+      res = res - res_delta;
+      if (res < 0.0)
+        {
+        NextFrame->AddPiece(piece);
+        continue;
+        }
+      int p = piece.GetPiece();
+      int np = piece.GetNumPieces();
+      //cerr << p << "/" << np << "@" << res+res_delta << " is over";
+      p = p/2;
+      np = np/2;
+      double pbbox[6];
+      double gConf = 1.0;
+      double aMin = 1.0;
+      double aMax = -1.0;
+      double aConf = 1.0;
+      unsigned long numCells = 0;
+      harness->ComputePieceMetaInformation
+        (p, np, res,
+         pbbox, gConf, aMin, aMax, aConf,
+         numCells);
+      unsigned long int nPix = 0;
+      nPix = this->ComputePixelCount(pbbox);
+      double nc = (double)numCells;
+      double side = pow(nc, 0.666);
+      numCells = (unsigned long)side;
+      if (numCells > nPix)
+        {
+        //cerr << p << "/" << np << "@" << res << " is too";
+        tooHigh->AddPiece(piece);
+        }
+      else
+        {
+        NextFrame->AddPiece(piece);
+        }
+      //cerr << endl;
+      }
+    else
+      {
+      NextFrame->AddPiece(piece);
+      }
+    }
+  //cerr << "CANDIDATES ARE:" << endl;
+  //tooHigh->Print();
+
+  //cerr << "PRE REAP:" << endl;
+  //cerr << "TODO:" << endl;
+  //tooHigh->Print();
+
+  vtkPieceList *toMerge = vtkPieceList::New();
+  toMerge->MergePieceList(tooHigh);
+
+  vtkPieceList *merged = vtkPieceList::New();
+
+  bool done = false;
+  while (!done)
+    {
+    int mcount = 0;
+    //pick a piece
+    while (toMerge->GetNumberOfPieces()>0)
+      {
+      vtkPiece piece = toMerge->PopPiece();
+      int p = piece.GetPiece();
+      int np = piece.GetNumPieces();
+      bool found = false;
+
+      //look for a piece that can be merged with it
+      for (int j = 0; j < toMerge->GetNumberOfPieces(); j++)
+        {
+        vtkPiece other = toMerge->GetPiece(j);
+        int p2 = other.GetPiece();
+        int np2 = other.GetNumPieces();
+        if ((np==np2) &&
+            (p/2==p2/2) )
+          //TODO, when Degree==N!=2, have to round up all N sibs
+          {
+          //make the parent of the two pieces
+          piece.SetPiece(p/2);
+          piece.SetNumPieces(np/2);
+          double res = piece.GetResolution()-res_delta;
+          if (res < 0.0)
+            {
+            res = 0.0;
+            }
+          piece.SetResolution(res);
+          //cerr << "JOIN "
+          //     << p << "&" << p2 << "/" << np
+          //     << " -> "
+          //     << p/2 << "/" << np/2 << "@" << res << endl;
+          //cerr << "-------------------------------------------------------------------------------" << endl;
+          //save it
+          tmp->AddPiece(piece);
+          //get rid of the second half of the piece
+          toMerge->RemovePiece(j);
+          found = true;
+          mcount++;
+
+          //remove the cached data for the merged pieces
+          vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+          if (pcf)
+            {
+            int index;
+            index = pcf->ComputeIndex(p,np);
+            pcf->DeletePiece(index);
+            index = pcf->ComputeIndex(p2,np);
+            pcf->DeletePiece(index);
+            }
+          break;
+          }
+        }
+      if (!found)
+        {
+        //put the candidate back
+        merged->AddPiece(piece);
+        }
+      }
+    if (mcount==0)
+      {
+      done = true;
+      }
+    toMerge->MergePieceList(merged);
+    }
+
+  //add the merged and nonmergable pieces back
+  NextFrame->MergePieceList(toMerge);
+  NextFrame->MergePieceList(tmp);
+  tooHigh->Delete();
+  toMerge->Delete();
+  merged->Delete();
+  tmp->Delete();
+
+}
+
+//----------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
 {
+  double res_delta = (1.0/this->RefinementDepth);
   vtkPieceList *ToDo = harness->GetPieceList1();
   int important = ToDo->GetNumberNonZeroPriority();
   int total = ToDo->GetNumberOfPieces();
@@ -563,7 +737,7 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
   //cerr << "TODO:" << endl;
   //ToDo->Print();
 
-  double res_delta = (1.0/this->RefinementDepth);
+  //double res_delta = (1.0/this->RefinementDepth);
 
   vtkPieceList *toMerge = vtkPieceList::New();
   for (int i = total-1; i>=important; --i)
@@ -796,7 +970,8 @@ bool vtkMultiResolutionStreamer::AnyToRefine(vtkStreamingHarness *harness)
     double res = piece.GetResolution();
     double priority = piece.GetPriority();
     if ((priority > 0.0) &&
-        (res+res_delta <= maxRes))
+        (res+res_delta <= maxRes) &&
+        !piece.GetReachedLimit())
       {
       return true;
       }

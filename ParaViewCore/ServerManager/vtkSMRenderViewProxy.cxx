@@ -402,8 +402,9 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
       {
       int index;
       vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      if (child->GetName() &&
-        strcmp(child->GetName(), "OutputPort") == 0 &&
+      const char *childName = child->GetName();
+      if (childName &&
+        strcmp(childName, "OutputPort") == 0 &&
         child->GetScalarAttribute("index", &index) &&
         index == opport &&
         child->GetAttribute("type") &&
@@ -412,6 +413,19 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
         return vtkSMRepresentationProxy::SafeDownCast(
           pxm->NewProxy("representations", "TextSourceRepresentation"));
         }
+      else if(childName && strcmp(childName, "DefaultRepresentations") == 0)
+        {
+        unsigned int defaultRepCount = child->GetNumberOfNestedElements();
+        for(int i = 0; i < defaultRepCount; i++)
+          {
+          vtkPVXMLElement *defaultRep = child->GetNestedElement(i);
+          const char *representation = defaultRep->GetAttribute("representation");
+
+          return vtkSMRepresentationProxy::SafeDownCast(
+            pxm->NewProxy("representations", representation));
+          }
+        }
+
       }
     }
 

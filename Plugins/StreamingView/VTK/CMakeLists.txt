@@ -34,6 +34,8 @@ SET(vtkStreaming_SOURCES
   vtkStreamingDriver.cxx
   vtkStreamingHarness.cxx
   vtkVisibilityPrioritizer.cxx
+  vtkWarpScalarsAndMetaInfo.cxx
+  vtkWorldWarp.cxx
 )
 
 IF(NOT WIN32)
@@ -68,6 +70,8 @@ IF (BUILD_AGAINST_PARAVIEW)
       vtkStreamedMandelbrot
       vtkStreamingDriver
       vtkStreamingHarness
+      vtkWarpScalarsAndMetaInfo
+      vtkWorldWarp
       )
     GET_FILENAME_COMPONENT(src_name "${SRC}" NAME_WE)
     GET_FILENAME_COMPONENT(src_path "${SRC}" ABSOLUTE)

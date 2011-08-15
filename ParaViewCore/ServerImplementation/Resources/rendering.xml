@@ -123,6 +123,28 @@
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+         name="HeadPose"
+         command="SetEyeTransformMatrix"
+         number_of_elements="16"
+	 argument_is_array="1"
+         default_values="1.0 0.0 0.0 0.0
+			 0.0 1.0 0.0 0.0
+			 0.0 0.0 1.0 0.0
+			 0.0 0.0 0.0 1.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="WandPose"
+         command="SetModelTransformMatrix"
+         number_of_elements="16"
+	 argument_is_array="1"
+         default_values="1.0 0.0 0.0 0.0
+			 0.0 1.0 0.0 0.0
+			 0.0 0.0 1.0 0.0
+			 0.0 0.0 0.0 1.0" >
+      </DoubleVectorProperty>
+
     </CameraProxy> <!-- end of Camera Proxy -->
   </ProxyGroup>
 

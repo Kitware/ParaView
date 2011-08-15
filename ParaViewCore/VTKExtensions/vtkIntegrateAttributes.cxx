@@ -51,15 +51,13 @@ vtkIntegrateAttributes::vtkIntegrateAttributes()
   this->IntegrationDimension = 0;
   this->Sum = 0.0;
   this->SumCenter[0] = this->SumCenter[1] = this->SumCenter[2] = 0.0;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
-  if (this->Controller)
-    {
-    this->Controller->Register(this);
-    }
+  this->Controller = 0;
 
   this->PointFieldList = 0;
   this->CellFieldList = 0;
   this->FieldListIndex = 0;
+
+  SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //-----------------------------------------------------------------------------
@@ -69,6 +67,22 @@ vtkIntegrateAttributes::~vtkIntegrateAttributes()
     {
     this->Controller->Delete();
     this->Controller = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkIntegrateAttributes::SetController(vtkMultiProcessController *controller)
+{
+  if(this->Controller)
+    {
+    this->Controller->UnRegister(this);
+    }
+
+  this->Controller = controller;
+
+  if(this->Controller)
+    {
+    this->Controller->Register(this);
     }
 }
 

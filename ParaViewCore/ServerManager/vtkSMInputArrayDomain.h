@@ -93,6 +93,11 @@ public:
   static void SetAutomaticPropertyConversion(bool);
   static bool GetAutomaticPropertyConversion();
 
+  // Description:
+  // Use this method to convert a vtkDataSet::FIELD_ASSOCIATION_* to
+  // AttributeTypes enum.
+  static int GetAttributeTypeFromFieldAssociation(int);
+
 //BTX
   enum AttributeTypes
   {

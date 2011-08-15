@@ -40,6 +40,9 @@ public:
   vtkTypeMacro(vtkIntegrateAttributes,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkIntegrateAttributes *New();
+
+  void SetController(vtkMultiProcessController *controller);
+
 //BTX
 protected:
   vtkIntegrateAttributes();

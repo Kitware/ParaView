@@ -228,6 +228,9 @@ int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop)
   if (ivp && this->DefaultValue != -1)
     {
     ivp->SetElement(0, this->DefaultValue);
+    // update unchecked value for now as well. We really need a mechanism to
+    // "clear" the unchecked values when a value is set.
+    ivp->SetUncheckedElement(0, this->DefaultValue);
     return 1;
     }
 

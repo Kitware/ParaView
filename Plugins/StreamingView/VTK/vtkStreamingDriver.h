@@ -124,6 +124,10 @@ protected:
   void CopyBackBufferToFront();
 
   // Description:
+  //project bbox to screen to get number of pixels covered by the piece
+  unsigned long int ComputePixelCount(double bounds[6]);
+
+  // Description:
   // Gives driver a chance to setup a new harness as the driver wants it
   // to be.
   virtual void AddHarnessInternal(vtkStreamingHarness *) = 0;
