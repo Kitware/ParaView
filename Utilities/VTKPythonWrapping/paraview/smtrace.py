@@ -34,6 +34,7 @@ def reset_trace_globals():
     "animation" : ["Cues"]}
   trace_globals.proxy_ctor_hook = None
   trace_globals.paused_for_animation = False
+  trace_globals.paused_for_execute_script = False
   reset_trace_observer()
 reset_trace_globals()
 
@@ -466,6 +467,24 @@ def trace_save_animation_end():
   trace_globals.paused_for_animation = False
   add_observers()
 
+def trace_save_execute_script(filename):
+  """This method is called from the paraview C++ implementation. Do not change
+     the arguments without updating the C++ code."""
+  if not trace_globals.observer_active: return
+
+  # make sure the trace is up to date
+  append_trace()
+
+  trace_globals.trace_output.append("execfile('%s')\n" % filename)
+  stop_trace()
+  trace_globals.paused_for_execute_script = True
+
+def trace_save_execute_script_end():
+  """This method is called from the paraview C++ implementation. Do not change
+     the arguments without updating the C++ code."""
+  if not trace_globals.paused_for_execute_script: return
+  trace_globals.paused_for_execute_script = False
+  add_observers()
 
 def property_references_untraced_proxy(propPyVariable, propValue, propInfoList):
   """Given a property pyvariable, the property value, and a list of prop_trace_info
