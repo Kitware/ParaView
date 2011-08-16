@@ -383,7 +383,7 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
-    int size = 0;
+    size_t size = 0;
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
     for (; it2 != it->second.end(); ++it2)
