@@ -33,21 +33,86 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 #include <assert.h>
+#include <sstream>
 
 namespace
 {
-  void DeMangleArrayName(vtkstd::string mangledName, vtkstd::string seperator,
-    vtkstd::string& demangled_name, vtkstd::string& demagled_component_name)
+  // Demangles a mangled string containing an array name and a component name.
+  void DeMangleArrayName(const vtkstd::string &mangledName,
+                         vtkDataObject *dataObject,
+                         vtkstd::string &demangledName,
+                         vtkstd::string &demangledComponentName)
     {
-    size_t found = mangledName.rfind(seperator);
-    if (found == vtkstd::string::npos)
+    vtkDataSet *dataSet = vtkDataSet::SafeDownCast(dataObject);
+    if(!dataSet)
       {
-      // no vector conversion needed
-      demangled_name = mangledName;
       return;
       }
-    demagled_component_name = mangledName.substr(found+1, mangledName.size());
-    demangled_name = mangledName.substr(0, found);
+
+    std::vector<vtkDataSetAttributes *> attributesArray;
+    attributesArray.push_back(dataSet->GetCellData());
+    attributesArray.push_back(dataSet->GetPointData());
+
+    for(int index = 0; index < attributesArray.size(); index++)
+      {
+      vtkDataSetAttributes *dataSetAttributes = attributesArray[index];
+      if(!dataSetAttributes)
+        {
+        continue;
+        }
+
+      for(int arrayIndex = 0; arrayIndex < dataSetAttributes->GetNumberOfArrays(); arrayIndex++)
+        {
+        // check for matching array name at the start of the mangled name
+        const char *arrayName = dataSetAttributes->GetArrayName(arrayIndex);
+        size_t arrayNameLength = strlen(arrayName);
+        if(strncmp(mangledName.c_str(), arrayName, arrayNameLength) == 0)
+          {
+          if(mangledName.size() == arrayNameLength)
+            {
+            // the mangled name is just the array name
+            demangledName = mangledName;
+            demangledComponentName = vtkstd::string();
+            return;
+            }
+          else if(mangledName.size() > arrayNameLength + 1)
+            {
+            vtkAbstractArray *array = dataSetAttributes->GetAbstractArray(arrayIndex);
+            size_t componentCount = array->GetNumberOfComponents();
+
+            // check the for a matching component name
+            for(int componentIndex = 0; componentIndex < componentCount; componentIndex++)
+              {
+              const char *componentName = array->GetComponentName(componentIndex);
+              if(!componentName)
+                {
+                // use the default component name if the component has no name set
+                componentName = vtkPVPostFilter::DefaultComponentName(componentIndex, componentCount).c_str();
+
+                if(!componentName || strlen(componentName) == 0)
+                  {
+                  continue;
+                  }
+                }
+
+              // check component name from the end of array name string after the underscore
+              const char *mangledComponentName = &mangledName[arrayNameLength+1];
+              if(strcmp(componentName, mangledComponentName) == 0)
+                {
+                // found a match
+                demangledName = arrayName;
+                demangledComponentName = mangledComponentName;
+                return;
+                }
+              }
+            }
+          }
+        }
+      }
+
+    // return original name
+    demangledName = mangledName;
+    demangledComponentName = vtkstd::string();
     }
 }
 
@@ -73,6 +138,36 @@ vtkPVPostFilter::~vtkPVPostFilter()
 vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()
 {
   return vtkPVPostFilterExecutive::New();
+}
+
+//----------------------------------------------------------------------------
+vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int componentCount)
+{
+  if (componentCount <= 1)
+    {
+    return "";
+    }
+  else if (componentNumber == -1)
+    {
+    return "Magnitude";
+    }
+  else if (componentCount <= 3 && componentNumber < 3)
+    {
+    const char* titles[] = {"X", "Y", "Z"};
+    return titles[componentNumber];
+    }
+  else if (componentCount == 6)
+    {
+    const char* titles[] = {"XX", "YY", "ZZ", "XY", "YZ", "XZ"};
+    // Assume this is a symmetric matrix.
+    return titles[componentNumber];
+    }
+  else
+    {
+    vtkstd::ostringstream buffer;
+    buffer << componentNumber;
+    return buffer.str();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -175,9 +270,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
   int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
   vtkstd::string demangled_name, demagled_component_name;
 
-  DeMangleArrayName(name,
-    postArrayInfo->Get(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY()),
-    demangled_name, demagled_component_name);
+  DeMangleArrayName(name, output, demangled_name, demagled_component_name);
 
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(output);
   if (cd)

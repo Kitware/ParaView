@@ -40,6 +40,8 @@ public:
   // so that we can figure out what we conversion(s) we need to do
   vtkExecutive* CreateDefaultExecutive();
 
+  static vtkStdString DefaultComponentName(int componentNumber, int componentCount);
+
 protected:
   vtkPVPostFilter();
   ~vtkPVPostFilter();
