@@ -83,8 +83,10 @@ public:
     unsigned int nbProxy = 0;
     if(groupName)
     {
-      nbProxy += this->CoreDefinitions[groupName].size();
-      nbProxy += this->CustomsDefinitions[groupName].size();
+      nbProxy += static_cast<unsigned int>(
+        this->CoreDefinitions[groupName].size());
+      nbProxy += static_cast<unsigned int>(
+        this->CustomsDefinitions[groupName].size());
     }
     return nbProxy;
   }
@@ -866,7 +868,7 @@ vtkPVXMLElement* vtkSIProxyDefinitionManager::ExtractSubProxy(
     {
     return proxyDefinition;
     }
-  
+
   vtksys::RegularExpression proxyDefRe(".*Proxy$");
 
   // Extract just the sub-proxy in-line definition
