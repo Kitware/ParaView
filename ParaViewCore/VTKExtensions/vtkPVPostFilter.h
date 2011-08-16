@@ -26,6 +26,7 @@
 #define __vtkPVPostFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkStdString.h" // needed for: vtkStdString
 
 class VTK_EXPORT vtkPVPostFilter : public vtkDataObjectAlgorithm
 {
