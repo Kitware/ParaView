@@ -104,7 +104,7 @@
   <ProxyGroup name="filters">
 
    <SourceProxy name="AMRToGrid" class="vtkAMRToGrid"
-                label="Convert AMR dataset to a uniform grid" >
+                label="Extract ROI from AMR dataset" >
       <Documentaion
           short_help="Converts AMR data to a uniform grid"
           long_help="Converts AMR data to a uniform grid">
