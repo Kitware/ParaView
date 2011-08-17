@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p), PreviousMessage("")
 {
 
-  QGridLayout *layout = new QGridLayout(this);
-  layout->setSpacing(0);
-  layout->setContentsMargins(0,0,4,0);
+  QGridLayout *gridlayout = new QGridLayout(this);
+  gridlayout->setSpacing(0);
+  gridlayout->setContentsMargins(0,0,4,0);
 
   this->ProgressBar = new QProgressBar(this);
   this->ProgressBar->setRange(0,100);
@@ -55,9 +55,9 @@ pqProgressBar::pqProgressBar(QWidget* _p) : QWidget(_p), PreviousMessage("")
   this->ProgressLabel->setMinimumWidth(100);
   this->ProgressLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Fixed);
 
-  layout->addWidget(this->ProgressBar,0,0);
-  layout->addWidget(this->ProgressLabel,0,1);
-  this->setLayout(layout);
+  gridlayout->addWidget(this->ProgressBar,0,0);
+  gridlayout->addWidget(this->ProgressLabel,0,1);
+  this->setLayout(gridlayout);
 
 
   this->reset();

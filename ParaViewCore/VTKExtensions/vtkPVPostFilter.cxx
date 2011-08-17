@@ -47,7 +47,7 @@ namespace
     attributesArray.push_back(dataSet->GetCellData());
     attributesArray.push_back(dataSet->GetPointData());
 
-    for(int index = 0; index < attributesArray.size(); index++)
+    for(size_t index = 0; index < attributesArray.size(); index++)
       {
       vtkDataSetAttributes *dataSetAttributes = attributesArray[index];
       if(!dataSetAttributes)
@@ -75,7 +75,7 @@ namespace
             size_t componentCount = array->GetNumberOfComponents();
 
             // check the for a matching component name
-            for(int componentIndex = 0; componentIndex < componentCount; componentIndex++)
+            for(size_t componentIndex = 0; componentIndex < componentCount; componentIndex++)
               {
               vtkStdString componentNameString;
               const char *componentName = array->GetComponentName(componentIndex);

@@ -669,6 +669,8 @@ double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i) const
       case vtkSpyPlotBlock::Cylinder2D:
         volume = vtkMath::Pi() * (spacing[1]) * (nextXCoordSquared - xCoordSquared);
         break;
+      case vtkSpyPlotBlock::Cartesian3D:
+        break;
       }
     return volume;
     }

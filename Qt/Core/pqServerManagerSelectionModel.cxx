@@ -113,7 +113,7 @@ void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerSelectionModel::onSessionClosed(pqServer* server)
+void pqServerManagerSelectionModel::onSessionClosed(pqServer* vtkNotUsed(server))
 {
   Q_ASSERT(server == this->Internal->Server);
   this->Internal->Server = NULL;

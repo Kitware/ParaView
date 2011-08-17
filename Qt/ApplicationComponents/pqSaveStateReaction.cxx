@@ -118,5 +118,7 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
     return;
     }
   pythonManager->saveTraceState(filename);
+#else
+  static_cast<void>(filename); // unused warning with PARAVIEW_ENABLE_PYTHON is off.
 #endif
 }
