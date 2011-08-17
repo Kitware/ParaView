@@ -113,9 +113,10 @@ void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerSelectionModel::onSessionClosed(pqServer* vtkNotUsed(server))
+void pqServerManagerSelectionModel::onSessionClosed(pqServer* server)
 {
   Q_ASSERT(server == this->Internal->Server);
+  static_cast<void>(server);
   this->Internal->Server = NULL;
   this->Internal->ActiveSources = NULL;
   this->Internal->VTKConnect->Disconnect();
