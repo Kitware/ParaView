@@ -29,6 +29,8 @@ QT4_WRAP_CPP(MOC_SRCS
   vtkVRInteractorStyle.h
   vtkVRPropertyStyle.h
   vtkVRStyleGrabNRotateWorld.h
+  vtkVRStyleGrabNTranslateWorld.h
+  vtkVRStyleScaleWorld.h
   vtkVRQueue.h
   vtkVRQueueHandler.h
   vtkVRVectorPropertyStyle.h
@@ -66,6 +68,8 @@ SET( VR_SOURCE_FILES
   vtkVRQueueHandler.cxx
   vtkVRPropertyStyle.cxx
   vtkVRStyleGrabNRotateWorld.cxx
+  vtkVRStyleGrabNTranslateWorld.cxx
+  vtkVRStyleScaleWorld.cxx
   vtkVRVectorPropertyStyle.cxx
   vtkVRUIPipe.cxx
   vtkVRUIServerState.cxx

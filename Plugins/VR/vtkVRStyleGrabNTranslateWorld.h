@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleGrabNRotateWorld_h
-#define __vtkVRStyleGrabNRotateWorld_h
+#ifndef __vtkVRStyleGrabNTranslateWorld_h
+#define __vtkVRStyleGrabNTranslateWorld_h
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkSmartPointer.h"
@@ -39,19 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProperty;
 class vtkSMProxy;
-class vtkSMRenderViewProxy;
+class vtkTransform;
 
-/// vtkVRStyleGrabNRotateWorld is superclass for interactor styles that change any
+/// vtkVRStyleGrabNTranslateWorld is superclass for interactor styles that change any
 /// property on some proxy. Which property/proxy is being controlled can be
 /// setup (in future) by means, reading configuration values from the state file
 /// or via some user-interface panel.
-class vtkVRStyleGrabNRotateWorld : public vtkVRInteractorStyle
+class vtkVRStyleGrabNTranslateWorld : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRStyleGrabNRotateWorld(QObject* parent=0);
-  virtual ~vtkVRStyleGrabNRotateWorld();
+  vtkVRStyleGrabNTranslateWorld(QObject* parent=0);
+  virtual ~vtkVRStyleGrabNTranslateWorld();
 
   /// called to handle an event. If the style does not handle this event or
   /// handles it but does not want to stop any other handlers from handling it
@@ -80,20 +80,18 @@ protected:
   void SetAnalogVectorValue( std::string dest,
                              const double* value,
                              unsigned int total);
-  void RecordOrientation(vtkSMRenderViewProxy* proxy,  const vtkVREventData& data);
-  void UpdateOrientation(const vtkVREventData& data);
+  void RecordCurrentPosition(const vtkVREventData& data);
   void SetTrackerValue( std::string dest, double value );
   void SetTrackerVectorValue( std::string dest, const double value[16] );
   std::vector<std::string> tokenize( std::string input);
   std::string Button;
   std::string Tracker;
   bool Enabled;
-  bool InitialOrientationRecored;
-  double InitialQuat[4];
-  double InitialTrackerQuat[4];
-  double UpdatedQuat[4];
+  bool InitialPositionRecorded;
+  double InitialPos[3];
+  vtkTransform *Old, *Tx, *Neo;
 private:
-  Q_DISABLE_COPY(vtkVRStyleGrabNRotateWorld)
+  Q_DISABLE_COPY(vtkVRStyleGrabNTranslateWorld)
 };
 
 #endif

@@ -203,6 +203,7 @@ bool vtkVRUIConnection::Init()
   QTcpSocket *socket=new QTcpSocket;
   socket->connectToHost(QString(this->Address.c_str()),atoi( this->Port.c_str() )); // ReadWrite?
   this->Internals->Pipe=new vtkVRUIPipe(socket);
+  std::cout<< "Trying to connect" <<std::endl;
   this->Internals->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
   if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
     {
@@ -547,7 +548,7 @@ void vtkVRUIConnection::callback()
 {
   if(this->Initialized)
     {
-    // std::cout << "callback()" << std::endl;
+     std::cout << "callback()" << std::endl;
 
     this->Internals->StateMutex->lock();
     this->GetAndEnqueueButtonData();

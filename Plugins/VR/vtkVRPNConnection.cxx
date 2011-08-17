@@ -182,14 +182,14 @@ bool vtkVRPNConnection::Init()
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
-  this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
-  this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
+  // this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
+  // this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
 
   this->Initialized= ( this->Internals->Tracker!=0
                        && this->Internals->Analog!=0
-                       && this->Internals->Button!=0
-                       && this->Internals->Dial!=0
-                       && this->Internals->Text!=0 );
+                       && this->Internals->Button!=0 );
+                       // && this->Internals->Dial!=0
+                       // && this->Internals->Text!=0 );
 
   if(this->Initialized)
     {
@@ -210,13 +210,12 @@ void vtkVRPNConnection::run()
     {
     if(this->Initialized)
       {
-      //    std::cout << "callback()" << std::endl;
+      // std::cout << "callback()" << std::endl;
       this->Internals->Tracker->mainloop();
       this->Internals->Button->mainloop();
       this->Internals->Analog->mainloop();
-      this->Internals->Dial->mainloop();
-      this->Internals->Text->mainloop();
-      //msleep( 40 );
+      // this->Internals->Dial->mainloop();
+      // this->Internals->Text->mainloop();
       }
     }
 }
@@ -224,6 +223,7 @@ void vtkVRPNConnection::run()
 // ---------------------------------------------------------------------private
 void vtkVRPNConnection::Stop()
 {
+  this->Initialized = false;
   this->_Stop = true;
   QThread::terminate();
 }
