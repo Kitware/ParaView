@@ -39,16 +39,10 @@ namespace
 {
   // Demangles a mangled string containing an array name and a component name.
   void DeMangleArrayName(const vtkstd::string &mangledName,
-                         vtkDataObject *dataObject,
+                         vtkDataSet *dataSet,
                          vtkstd::string &demangledName,
                          vtkstd::string &demangledComponentName)
     {
-    vtkDataSet *dataSet = vtkDataSet::SafeDownCast(dataObject);
-    if(!dataSet)
-      {
-      return;
-      }
-
     std::vector<vtkDataSetAttributes *> attributesArray;
     attributesArray.push_back(dataSet->GetCellData());
     attributesArray.push_back(dataSet->GetPointData());
@@ -268,9 +262,6 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
 
   const char* name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
   int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
-  vtkstd::string demangled_name, demagled_component_name;
-
-  DeMangleArrayName(name, output, demangled_name, demagled_component_name);
 
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(output);
   if (cd)
@@ -282,6 +273,9 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
       vtkDataSet* dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (dataset)
         {
+        vtkstd::string demangled_name, demagled_component_name;
+        DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
+
         this->DoAnyNeededConversions(dataset, name, fieldAssociation,
           demangled_name.c_str(), demagled_component_name.c_str());
         }
@@ -289,10 +283,22 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
     iter->Delete();
     return 1;
     }
+  else
+    {
+    vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
+    if (dataset)
+      {
+      vtkstd::string demangled_name, demagled_component_name;
+      DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
 
-  return this->DoAnyNeededConversions(vtkDataSet::SafeDownCast(output),
-    name, fieldAssociation, demangled_name.c_str(),
-    demagled_component_name.c_str());
+      return this->DoAnyNeededConversions(dataset,
+                                          name,
+                                          fieldAssociation,
+                                          demangled_name.c_str(),
+                                          demagled_component_name.c_str());
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
