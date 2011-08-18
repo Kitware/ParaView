@@ -103,6 +103,44 @@
 
   <ProxyGroup name="filters">
 
+   <SourceProxy name="UniformGridPartitioner" class="vtkUniformGridPartitioner"
+                label="Partition UniformGrid by RCB">
+      <Documentation
+          short_help="Partitions a Uniform grid by RCB"
+          long_help="Partitions a uniform grid by RCB">
+          This filters partitions a uniform grid instance. The output is a
+          multiblock of uniform grids.
+      </Documentation>
+      
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>   
+     
+     <IntVectorProperty
+        name="NumberOfSubdivisions"
+        command="SetNumberOfSubdivisions"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Set the number of subdivisions for recursive
+          coordinate bisection.
+        </Documentation>
+     </IntVectorProperty>
+     
+   </SourceProxy>
+   
    <SourceProxy name="AMRToGrid" class="vtkAMRToGrid"
                 label="Extract ROI from AMR dataset" >
       <Documentaion
