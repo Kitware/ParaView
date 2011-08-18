@@ -77,21 +77,26 @@ namespace
             // check the for a matching component name
             for(int componentIndex = 0; componentIndex < componentCount; componentIndex++)
               {
+              vtkStdString componentNameString;
               const char *componentName = array->GetComponentName(componentIndex);
-              if(!componentName)
+              if(componentName)
+                {
+                componentNameString = componentName;
+                }
+              else
                 {
                 // use the default component name if the component has no name set
-                componentName = vtkPVPostFilter::DefaultComponentName(componentIndex, componentCount).c_str();
+                componentNameString = vtkPVPostFilter::DefaultComponentName(componentIndex, componentCount);
+                }
 
-                if(!componentName || strlen(componentName) == 0)
-                  {
-                  continue;
-                  }
+              if(componentNameString.empty())
+                {
+                continue;
                 }
 
               // check component name from the end of array name string after the underscore
               const char *mangledComponentName = &mangledName[arrayNameLength+1];
-              if(strcmp(componentName, mangledComponentName) == 0)
+              if(componentNameString == mangledComponentName)
                 {
                 // found a match
                 demangledName = arrayName;
