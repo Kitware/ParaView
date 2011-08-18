@@ -24,7 +24,7 @@ if(WIN32)
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # getting short path doesnt work on directories that dont exist
-  file(MAKE_DIRECTORY ${CGNS_install})
+  file(MAKE_DIRECTORY "${CGNS_install}")
   execute_process(
     COMMAND cscript /NoLogo ${CMAKE_CURRENT_SOURCE_DIR}/shortpath.vbs ${CGNS_install}
     OUTPUT_VARIABLE cgns_install_dos_short_path
@@ -46,8 +46,8 @@ elseif(APPLE)
   # cgns only appears to build statically on mac.
 
   # cgns install system sucks..
-  file(MAKE_DIRECTORY ${CGNS_install}/lib)
-  file(MAKE_DIRECTORY ${CGNS_install}/include)
+  file(MAKE_DIRECTORY "${CGNS_install}/lib")
+  file(MAKE_DIRECTORY "${CGNS_install}/include")
   
   if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
     set(cgns_64 --enable-64bit)
@@ -75,8 +75,8 @@ elseif(APPLE)
 else()
 
   # cgns install system sucks..
-  file(MAKE_DIRECTORY ${CGNS_install}/lib)
-  file(MAKE_DIRECTORY ${CGNS_install}/include)
+  file(MAKE_DIRECTORY "${CGNS_install}/lib")
+  file(MAKE_DIRECTORY "${CGNS_install}/include")
 
   ExternalProject_Add(CGNS
     SOURCE_DIR ${CGNS_source}
@@ -91,10 +91,10 @@ else()
 
 endif()
 
-set(CGNS_INCLUDE_DIR ${CGNS_install}/include)
+set(CGNS_INCLUDE_DIR "${CGNS_install}/include")
 
 if(APPLE)
-  set(CGNS_LIBRARY ${CGNS_install}/lib/libcgns.a)
+  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns.a")
 else()
-  set(CGNS_LIBRARY ${CGNS_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX})
+  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX}")
 endif()
