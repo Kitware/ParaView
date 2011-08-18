@@ -341,7 +341,7 @@ void vtkVRStyleGrabNRotateWorld::UpdateOrientation(const vtkVREventData& data)
     // deltaQuat[1] = deltaQuat[1]/mag;
     // deltaQuat[2] = deltaQuat[2]/mag;
     // deltaQuat[3] = deltaQuat[3]/mag;
-    vtkMath::MultiplyQuaternion( deltaQuat,  this->InitialQuat,  this->UpdatedQuat );
+    //vtkMath::MultiplyQuaternion( deltaQuat,  this->InitialQuat,  this->UpdatedQuat );
     std::cout << "deltaQuat : ["
               << deltaQuat[0] << " "
               << deltaQuat[1] << " "
