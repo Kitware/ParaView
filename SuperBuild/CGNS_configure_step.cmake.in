@@ -6,6 +6,6 @@ if(APPLE)
 endif()
 
 EXECUTE_PROCESS(
-  COMMAND sh configure --prefix=@CGNS_install@ --without-fortran @cgns_64@
-  WORKING_DIRECTORY "@cgns_source@"
+  COMMAND sh configure --prefix="@CGNS_install@" --without-fortran @cgns_64@
+  WORKING_DIRECTORY "@CGNS_source@"
   )
