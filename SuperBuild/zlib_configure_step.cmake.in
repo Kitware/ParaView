@@ -6,6 +6,6 @@ if(APPLE)
 endif()
 
 EXECUTE_PROCESS(
-  COMMAND sh configure --prefix=@zlib_install@
+  COMMAND sh configure --prefix="@zlib_install@"
   WORKING_DIRECTORY "@zlib_source@"
   )
