@@ -1,6 +1,6 @@
 #ifndef vtkVRUIPipe_h
 #define vtkVRUIPipe_h
-
+#include <string>
 class QTcpSocket;
 
 class vtkVRUIServerState;
@@ -56,6 +56,26 @@ public:
   // Read server state.
   // \pre state_exists: state!=0
   void ReadState(vtkVRUIServerState *state);
+
+  // Description:
+  // Prints the appropriate packet type
+  std::string GetString( MessageTag m )
+  {
+    switch( m )
+      {
+      case CONNECT_REQUEST: return "CONNECT_REQUEST";
+      case CONNECT_REPLY: return "CONNECT_REPLY";
+      case DISCONNECT_REQUEST: return "DISCONNECT_REQUEST";
+      case ACTIVATE_REQUEST: return "ACTIVATE_REQUEST";
+      case DEACTIVATE_REQUEST: return "DEACTIVATE_REQUEST";
+      case PACKET_REQUEST: return "PACKET_REQUEST";
+      case PACKET_REPLY: return "PACKET_REPLY";
+      case STARTSTREAM_REQUEST: return "STARTSTREAM_REQUEST";
+      case STOPSTREAM_REQUEST: return "STOPSTREAM_REQUEST";
+      case STOPSTREAM_REPLY: return "STOPSTREAM_REPLY";
+      default: return "UNKNOWN";
+      }
+  }
 
 protected:
   QTcpSocket *Socket;

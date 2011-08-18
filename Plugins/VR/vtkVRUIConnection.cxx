@@ -62,13 +62,14 @@ class vtkVRUIConnection::pqInternals
     public:
   pqInternals()
   {
+    this->Socket = false;
     this->Active=false;
     this->Pipe=0;
     this->State=0;
     this->StateMutex=0;
     this->Streaming=false;           // streaming
-    this->PacketSignalCond=0;        // for streaming
-    this->PacketSignalCondMutex=0; // for streaming
+    //  this->PacketSignalCond=0;        // for streaming
+    //   this->PacketSignalCondMutex=0; // for streaming
   }
 
   ~pqInternals()
@@ -83,40 +84,119 @@ class vtkVRUIConnection::pqInternals
       }
   }
 
+  QTcpSocket *Socket;
   bool Active;
   vtkVRUIPipe *Pipe;
   vtkVRUIServerState *State;
   QMutex *StateMutex;
   bool Streaming;                   // streaming
-  QWaitCondition *PacketSignalCond; // for streaming
-  QMutex *PacketSignalCondMutex;    // for streaming
+  // QWaitCondition *PacketSignalCond; // for streaming
+  // QMutex *PacketSignalCondMutex;    // for streaming
 
+  void initSocket(std::string address,  std::string port)
+  {
+    this->Socket=new QTcpSocket;
+    qDebug() << QString( address.c_str() ) << "::"
+             << QString( port.c_str() ).toInt();
+
+    this->Socket->connectToHost(QString(address.c_str()),
+                                QString( port.c_str() ).toInt() ); // ReadWrite?
+  }
+
+  void initPipe()
+  {
+    this->Pipe=new vtkVRUIPipe(this->Socket);
+  }
+
+  bool connect()
+  {
+    std::cout<< "Trying to connect" <<std::endl;
+    this->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
+    if(!this->Pipe->WaitForServerReply(30000)) // 30s
+      {
+      cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
+      delete this->Pipe;
+      this->Pipe=0;
+      return false;
+      }
+    if(this->Pipe->Receive()!=vtkVRUIPipe::CONNECT_REPLY)
+      {
+      cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
+      delete this->Pipe;
+      this->Pipe=0;
+      return false;
+      }
+    this->State=new vtkVRUIServerState;
+    this->StateMutex=new QMutex;
+    this->Pipe->ReadLayout(this->State);
+    return true;
+  }
+
+  void activate()
+  {
+    if(!this->Active)
+      {
+      this->Pipe->Send(vtkVRUIPipe::ACTIVATE_REQUEST);
+      this->Active=true;
+      }
+  }
+
+  void deactivate()
+  {
+    if(this->Active)
+      {
+      this->Active=false;
+      this->Pipe->Send(vtkVRUIPipe::DEACTIVATE_REQUEST);
+      }
+  }
+
+  void startStream()
+  {
+    if(this->Active)
+      {
+      std::cout<<"start streaming" <<std::endl;
+      this->Streaming=true;
+      this->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
+      }
+  }
+
+  void stopStream()
+  {
+    if(this->Streaming)
+      {
+      this->Streaming=false;
+      this->Pipe->Send(vtkVRUIPipe::STOPSTREAM_REQUEST);
+      }
+  }
 
   // Streaming routine called when streaming is used
-  void stream()
+  void readStream()
   {
+    this->StateMutex->lock();
+    this->Pipe->ReadState(this->State);
+    this->StateMutex->unlock();
     bool done=false;
     QMutex *stateLock;
-    while(!done)
+    vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
+    switch(m)
       {
-      vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
-      switch(m)
-        {
-        case vtkVRUIPipe::PACKET_REPLY:
-          cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
-          this->StateMutex->lock();
-          this->Pipe->ReadState(this->State);
-          this->StateMutex->unlock();
-          break;
-        case vtkVRUIPipe::STOPSTREAM_REPLY:
-          cout << "thread:STOPSTREAM_REPLY ok : tag=" << m << endl;
-          done=true;
-          break;
-        default:
-          cerr << "thread: Mismatching message while waiting for PACKET_REPLY: tag=" << m << endl;
-          done=true;
-          break;
-        }
+      case vtkVRUIPipe::PACKET_REPLY:
+        cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
+        this->StateMutex->lock();
+        this->Pipe->ReadState(this->State);
+        this->StateMutex->unlock();
+
+        break;
+      case vtkVRUIPipe::STOPSTREAM_REPLY:
+        cout << "thread:STOPSTREAM_REPLY ok : tag=" << m << endl;
+        done=true;
+        break;
+      default:
+        cerr << "thread: Mismatching message while waiting for PACKET_REPLY: tag="
+             << this->Pipe->GetString( m ) << "::"
+             << m << endl;
+        done=true;
+        break;
       }
   }
 
@@ -144,10 +224,8 @@ vtkVRUIConnection::vtkVRUIConnection(QObject* parentObject)
 // -----------------------------------------------------------------------destr
 vtkVRUIConnection::~vtkVRUIConnection()
 {
-  this->StopStream();
-
-  this->Deactivate();
-
+  this->Internals->stopStream();
+  this->Internals->deactivate();
   delete this->Internals;
   this->Transformation->Delete();
 }
@@ -200,35 +278,12 @@ void vtkVRUIConnection::SetQueue( vtkVRQueue* queue )
 // ----------------------------------------------------------------------------
 bool vtkVRUIConnection::Init()
 {
-  QTcpSocket *socket=new QTcpSocket;
-  socket->connectToHost(QString(this->Address.c_str()),atoi( this->Port.c_str() )); // ReadWrite?
-  this->Internals->Pipe=new vtkVRUIPipe(socket);
-  std::cout<< "Trying to connect" <<std::endl;
-  this->Internals->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
-  if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
-    {
-    cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
-    delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
-    return false;
-    }
-  if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::CONNECT_REPLY)
-    {
-    cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
-    delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
-    return false;
-    }
-
-  this->Internals->State=new vtkVRUIServerState;
-  this->Internals->StateMutex=new QMutex;
-
-  this->Internals->Pipe->ReadLayout(this->Internals->State);
-
-  this->Activate();
-
-  //this->StartStream();
-
+  // Initialize the socket connetion;
+  this->Internals->initSocket(this->Address, this->Port);
+  this->Internals->initPipe();
+  if ( !this->Internals->connect() ) return false;
+  this->Internals->activate();
+  //this->Internals->startStream();
   this->Initialized=true;
   return true;
 }
@@ -242,7 +297,7 @@ void vtkVRUIConnection::run()
       {
       if ( this->Internals->Streaming )
         {
-        this->Internals->stream();
+        this->Internals->readStream();
         }
       else
         {
@@ -256,8 +311,8 @@ void vtkVRUIConnection::run()
 void vtkVRUIConnection::Stop()
 {
   this->_Stop = true;
-  this->StopStream();
-  this->Deactivate();
+  this->Internals->stopStream();
+  this->Internals->deactivate();
   QThread::terminate();
 }
 
@@ -503,58 +558,18 @@ void vtkVRUIConnection::SetTransformation( vtkMatrix4x4* matrix )
   this->TrackerTransformPresent = true;
 }
 
-void vtkVRUIConnection::Activate()
-{
-  if(!this->Internals->Active)
-    {
-    this->Internals->Pipe->Send(vtkVRUIPipe::ACTIVATE_REQUEST);
-    this->Internals->Active=true;
-    }
-}
-
-void vtkVRUIConnection::Deactivate()
-{
-  if(this->Internals->Active)
-    {
-    this->Internals->Active=false;
-    this->Internals->Pipe->Send(vtkVRUIPipe::DEACTIVATE_REQUEST);
-    }
-}
-
-void vtkVRUIConnection::StartStream()
-{
-  if(this->Internals->Active)
-    {
-    this->Internals->Streaming=true;
-    this->Internals->PacketSignalCond=new QWaitCondition;
-    QMutex m;
-    m.lock();
-    this->Internals->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
-    this->Internals->PacketSignalCond->wait(&m);
-    m.unlock();
-    }
-}
-
-void vtkVRUIConnection::StopStream()
-{
-  if(this->Internals->Streaming)
-    {
-    this->Internals->Streaming=false;
-    this->Internals->Pipe->Send(vtkVRUIPipe::STOPSTREAM_REQUEST);
-    }
-}
-
 void vtkVRUIConnection::callback()
 {
   if(this->Initialized)
     {
-     std::cout << "callback()" << std::endl;
+    std::cout << "callback()" << std::endl;
 
     this->Internals->StateMutex->lock();
     this->GetAndEnqueueButtonData();
     this->GetAndEnqueueAnalogData();
     this->GetAndEnqueueTrackerData();
     this->Internals->StateMutex->unlock();
+
     this->GetNextPacket(); // for the next step
     }
 }
@@ -566,15 +581,15 @@ void vtkVRUIConnection::GetNextPacket()
     if(this->Internals->Streaming)
       {
       // With a thread
-      this->Internals->PacketSignalCondMutex->lock();
-      this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
-      this->Internals->PacketSignalCondMutex->unlock();
+      // this->Internals->PacketSignalCondMutex->lock();
+      // this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
+      // this->Internals->PacketSignalCondMutex->unlock();
       }
     else
       {
       // With a loop
       this->Internals->Pipe->Send(vtkVRUIPipe::PACKET_REQUEST);
-      if(this->Internals->Pipe->WaitForServerReply(10000))
+      if(this->Internals->Pipe->WaitForServerReply(-1))
         {
         if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::PACKET_REPLY)
           {
@@ -598,66 +613,6 @@ void vtkVRUIConnection::GetNextPacket()
     }
 }
 
-void vtkVRUIConnection::PrintPositionOrientation()
-{
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
-    this->Internals->State->GetTrackerStates();
-
-  float pos[3];
-  float q[4];
-  (*trackers)[0]->GetPosition(pos);
-  (*trackers)[0]->GetUnitQuaternion(q);
-
-  // cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
-  // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
-  //      << endl;
-
-  vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
-  // cout << "button0=" << (*buttons)[0] << endl;
-  pqView *view = 0;
-  view = pqActiveObjects::instance().activeView();
-  if ( view )
-    {
-    vtkSMRenderViewProxy *proxy = 0;
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
-      {
-      double rotMat[3][3];
-      vtkMath::QuaternionToMatrix3x3((double*)q,rotMat);
-      vtkSMDoubleVectorProperty *prop = 0;
-      prop = vtkSMDoubleVectorProperty::SafeDownCast( proxy->GetProperty( "HeadPose" ) );
-      if ( prop )
-        {
-        prop->SetElement( 0,  rotMat[0][0] );
-        prop->SetElement( 1,  rotMat[0][1] );
-        prop->SetElement( 2,  rotMat[0][2] );
-        prop->SetElement( 3,  pos [0]*1  );
-
-        prop->SetElement( 4,  rotMat[1][0] );
-        prop->SetElement( 5,  rotMat[1][1] );
-        prop->SetElement( 6,  rotMat[1][2] );
-        prop->SetElement( 7,  pos [1]*1  );
-
-        prop->SetElement( 8,  rotMat[2][0] );
-        prop->SetElement( 9,  rotMat[2][1] );
-        prop->SetElement( 10, rotMat[2][2] );
-        prop->SetElement( 11, pos [2]*1  );
-
-        prop->SetElement( 12, 0.0 );
-        prop->SetElement( 13, 0.0 );
-        prop->SetElement( 14, 0.0 );
-        prop->SetElement( 15, 1.0 );
-
-        // proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], pos[0]*1,
-        //                  rotMat[1][0], rotMat[1][1],rotMat[1][2], pos[1]*1,
-        //                  rotMat[2][0], rotMat[2][1],rotMat[2][2], pos[2]*1,
-        //                  0.0, 0.0, 0.0, 1.0 );
-        proxy->UpdateVTKObjects();
-        proxy->StillRender();
-        }
-      }
-    }
-}
 
 void vtkVRUIConnection::NewAnalogValue(vtkstd::vector<float> *data)
 {
@@ -700,23 +655,26 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   float q[4];
   data->GetPosition(pos);
   data->GetUnitQuaternion(q);
+  cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
+       << endl;
   vtkMath::QuaternionToMatrix3x3(&q[0], rotMatrix );
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
 
   matrix->Element[0][0] = rotMatrix[0][0];
   matrix->Element[0][1] = rotMatrix[0][1];
   matrix->Element[0][2] = rotMatrix[0][2];
-  matrix->Element[0][3] = pos[0];
+  matrix->Element[0][3] = pos[0]/10;
 
   matrix->Element[1][0] = rotMatrix[1][0];
-  matrix->Element[1][1] = 1*rotMatrix[1][1];
+  matrix->Element[1][1] = rotMatrix[1][1];
   matrix->Element[1][2] = rotMatrix[1][2];
-  matrix->Element[1][3] = pos[1];
+  matrix->Element[1][3] = pos[1]/10;
 
   matrix->Element[2][0] = rotMatrix[2][0];
   matrix->Element[2][1] = rotMatrix[2][1];
   matrix->Element[2][2] = rotMatrix[2][2];
-  matrix->Element[2][3] = pos[2];
+  matrix->Element[2][3] = pos[2]/100;
 
   matrix->Element[3][0] = 0.0f;
   matrix->Element[3][1] = 0.0f;

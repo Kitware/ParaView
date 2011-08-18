@@ -116,19 +116,8 @@ public:
   void callback();
 
 protected:
-    // Description:
-  void Activate();
 
-  // Description:
-  void Deactivate();
-
-  // Description:
-  void StartStream();
-
-  // Description:
-  void StopStream();
-
-  void PrintPositionOrientation();
+  // void PrintPositionOrientation();
   void GetNextPacket();
 
   std::string GetName( int eventType, int id=0 );

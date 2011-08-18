@@ -21,14 +21,19 @@ vtkVRUIPipe::~vtkVRUIPipe()
 void vtkVRUIPipe::Send(MessageTag m)
 {
   MessageTagPropocol message=m;
+  std::cout << "Sending : " << this->GetString( m ) << std::endl;
   this->Socket->write(reinterpret_cast<const char*>(&message),
                       sizeof(MessageTagPropocol));
+  this->Socket->flush();
 }
 
 // ----------------------------------------------------------------------------
 bool vtkVRUIPipe::WaitForServerReply(int msecs)
 {
-  return this->Socket->waitForReadyRead(msecs);
+  std::cout<< "in" <<std::endl;
+  bool status = this->Socket->waitForReadyRead(msecs);
+  std::cout<< "out : " << status <<std::endl;
+  return status;
 }
 
 // ----------------------------------------------------------------------------
@@ -40,13 +45,16 @@ vtkVRUIPipe::MessageTag vtkVRUIPipe::Receive()
 
   while(bytes!=sizeof(MessageTagPropocol)) // 2
     {
+    std::cout<< "Waiting to recieve" <<std::endl;
     bytes=this->Socket->read(reinterpret_cast<char *>(&message),
                              sizeof(MessageTagPropocol));
+    if ( bytes )
+      cout << "bytes=" << bytes << endl;
     }
-
-//  cout << "bytes=" << bytes << endl;
-//  cout << "sizeof=" << sizeof(MessageTagPropocol) <<  endl;
-
+  cout << "sizeof=" << sizeof(MessageTagPropocol) <<  endl;
+  std::cout << "Recieved : "
+            << this->GetString( static_cast<MessageTag>( message ) )
+            << std::endl;
   return static_cast<MessageTag>(message);
 }
 
