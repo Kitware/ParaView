@@ -534,7 +534,7 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
 unsigned int
 vtkTransferFunctionEditorRepresentationSimple1D::GetNumberOfHandles()
 {
-  return this->Handles->size();
+  return static_cast<unsigned int>(this->Handles->size());
 }
 
 //----------------------------------------------------------------------
