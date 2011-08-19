@@ -119,11 +119,11 @@ set(SILO_MD5 040d99a7b55be4e2e0bb765560d3137c)
 
 set(HDF5_MAJOR 1)
 set(HDF5_MINOR 8)
-set(HDF5_PATCH 5-patch1)
+set(HDF5_PATCH 7)
 set(HDF5_VERSION ${HDF5_MAJOR}.${HDF5_MINOR}.${HDF5_PATCH})
 set(HDF5_URL http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-${HDF5_VERSION}/src)
 set(HDF5_GZ hdf5-${HDF5_VERSION}.tar.gz)
-set(HDF5_MD5 d22a35a17877e369055ed50da5ba91fa)
+set(HDF5_MD5 37711d4bcb72997e93d495f97c76c33a)
 
 set(ZLIB_MAJOR 1)
 set(ZLIB_MINOR 2)
