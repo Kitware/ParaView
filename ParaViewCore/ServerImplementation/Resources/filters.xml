@@ -103,6 +103,43 @@
 
   <ProxyGroup name="filters">
 
+   <SourceProxy name="AMRCutPlane" class="vtkAMRCutPlane" label="AMR CutPlane">
+      <Documentation
+          short_help="Planar Cut of an AMR grid dataset"
+          long_help="Planar Cut of an AMR grid dataset">
+          This filter creates a cut-plane of the 
+      </Documentation>
+      
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+     
+     <ProxyProperty name="CutFunction" command="SetCutFunction"
+        label="Slice Type">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+           </ProxyListDomain>
+           <Documentation>
+             This property sets the parameters of the slice function.
+           </Documentation>
+     </ProxyProperty>
+      
+   </SourceProxy>
+   
    <SourceProxy name="UniformGridPartitioner" class="vtkUniformGridPartitioner"
                 label="Partition UniformGrid by RCB">
       <Documentation

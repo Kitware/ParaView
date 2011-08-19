@@ -69,7 +69,7 @@
   <Proxy group="filters" name="AMRSlice" />
   <Proxy group="filters" name="AMRToGrid" />
   <Proxy group="filters" name="UniformGridPartitioner" />
-  <Proxy group="filters" name="AMRParticlesSlice" />
+  <Proxy group="filters" name="AMRCutPlane" />
   <Proxy group="filters" name="AMRFlashContour" />
   <Proxy group="filters" name="Append" />
   <Proxy group="filters" name="AppendAttributes" />
