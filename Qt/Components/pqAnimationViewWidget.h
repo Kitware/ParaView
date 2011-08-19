@@ -89,6 +89,10 @@ protected slots:
   // called when creating a track
   void createTrack();
 
+  /// called to create a new python animation track.
+  /// we allow creating as many python tracks as needed.
+  void createPythonTrack();
+
   // set active view changed
   void setActiveView(pqView*);
   // set the current proxy selection
