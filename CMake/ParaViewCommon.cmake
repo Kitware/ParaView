@@ -427,7 +427,7 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 #########################################################################
 # Configure HDF5
 IF(VTK_USE_SYSTEM_HDF5)
-  SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIBRARY})
+  SET(PARAVIEW_HDF5_LIBRARIES ${VTK_HDF5_LIBRARIES})
 ELSE()
   SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/VTK/Utilities/vtkhdf5/vtkHDF5Config.cmake)
   INCLUDE("${HDF5_CONFIG}")
