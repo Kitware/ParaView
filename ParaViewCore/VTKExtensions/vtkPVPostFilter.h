@@ -26,6 +26,7 @@
 #define __vtkPVPostFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkStdString.h" // needed for: vtkStdString
 
 class VTK_EXPORT vtkPVPostFilter : public vtkDataObjectAlgorithm
 {
@@ -39,6 +40,8 @@ public:
   // is not what we want. Instead we need the PVCompositeDataPipeline
   // so that we can figure out what we conversion(s) we need to do
   vtkExecutive* CreateDefaultExecutive();
+
+  static vtkStdString DefaultComponentName(int componentNumber, int componentCount);
 
 protected:
   vtkPVPostFilter();
