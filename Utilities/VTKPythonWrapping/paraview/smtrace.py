@@ -467,7 +467,7 @@ def trace_save_animation_end():
   trace_globals.paused_for_animation = False
   add_observers()
 
-def trace_save_execute_script(filename):
+def trace_save_execute_script(code):
   """This method is called from the paraview C++ implementation. Do not change
      the arguments without updating the C++ code."""
   if not trace_globals.observer_active: return
@@ -475,7 +475,7 @@ def trace_save_execute_script(filename):
   # make sure the trace is up to date
   append_trace()
 
-  trace_globals.trace_output.append("execfile('%s')\n" % filename)
+  trace_globals.trace_output.append(code)
   stop_trace()
   trace_globals.paused_for_execute_script = True
 
