@@ -156,11 +156,9 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   if (options->GetTellVersion() )
     {
-    int MajorVersion = PARAVIEW_VERSION_MAJOR;
-    int MinorVersion = PARAVIEW_VERSION_MINOR;
-    char name[128];
-    sprintf(name, "ParaView%d.%d\n", MajorVersion, MinorVersion);
-    vtkOutputWindow::GetInstance()->DisplayText(name);
+    vtksys_ios::ostringstream str;
+    str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
+    vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
     // TODO: indicate to the caller that application must quit.
     }
 
