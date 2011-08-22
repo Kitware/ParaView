@@ -175,37 +175,9 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-
-    // Deprecated code...
-//    pqServerResource serverRes = activeServer->getResource();
-//    int reversed = (serverRes.scheme() == "csrc" ||
-//      serverRes.scheme() == "cdsrsrc") ? 1 : 0;
-//    QString dsHost(""), rsHost("");
-//    int dsPort = 0, rsPort = 0;
-//    QString strURI = serverRes.toURI();
-//    if(strURI != "builtin:")
-//      {
-//      dsHost = serverRes.dataServerHost().isEmpty() ?
-//        serverRes.host() : serverRes.dataServerHost();
-//      dsPort = serverRes.dataServerPort() < 0 ?
-//        serverRes.port() : serverRes.dataServerPort();
-//      rsHost = serverRes.renderServerHost();
-//      rsPort = serverRes.renderServerPort() < 0 ?
-//        rsPort : serverRes.renderServerPort();
-//      }
-      
-    QString initStr = QString(
-      "import paraview\n"
-      "paraview.compatibility.major = 3\n"
-      "paraview.compatibility.minor = 5\n"
-      "from paraview import servermanager\n"
-      "servermanager.InitFromGUI()\n"
-      "from paraview.simple import *\n"
-      "active_objects.view = servermanager.GetRenderView()\n"
-      "paraview.simple._add_functions(globals())");
     this->Internal->PythonDialog->print(
-      "from paraview.simple import *");
-    this->Internal->PythonDialog->runString(initStr);
+      "from paraview.simple import *\n");
+    this->Internal->PythonDialog->shell()->executeInitFromGUI();
     emit this->paraviewPythonModulesImported();
     }
 }

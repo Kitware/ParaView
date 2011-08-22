@@ -149,8 +149,23 @@ void pqPythonDialog::runScript(const QStringList& files)
     QFile file(files[i]);
     if(file.open(QIODevice::ReadOnly))
       {
-      this->Implementation->Ui.shellWidget->executeScript(
-        file.readAll().data());
+      QByteArray code = file.readAll();
+
+      QString script =
+      "try:\n"
+      "  paraview.smtrace\n"
+      "  paraview.smtrace.trace_save_execute_script('''%1''')\n"
+      "except AttributeError: pass\n";
+      this->Implementation->Ui.shellWidget->executeScript(script.arg(code.data()));
+
+      this->Implementation->Ui.shellWidget->executeScript(code.data());
+
+      script =
+      "try:\n"
+      "  paraview.smtrace\n"
+      "  paraview.smtrace.trace_save_execute_script_end()\n"
+      "except AttributeError: pass\n";
+      this->Implementation->Ui.shellWidget->executeScript(script);
       }
     else
       {

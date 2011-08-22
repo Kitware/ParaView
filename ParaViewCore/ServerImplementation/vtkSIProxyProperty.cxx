@@ -103,7 +103,7 @@ private:
   vtkstd::set<vtkTypeUInt32> VariantSet;
   vtkstd::vector<vtkSmartPointer<vtkSIObject> > Dependancy;
   vtkSIProxyProperty* Parent;
-  int NumberOfDependancyToDelete;
+  size_t NumberOfDependancyToDelete;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkSIProxyProperty);

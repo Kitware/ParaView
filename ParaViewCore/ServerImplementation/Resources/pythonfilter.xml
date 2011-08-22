@@ -224,6 +224,7 @@
     </SourceProxy>
   </ProxyGroup>
 
+  <!-- =================================================================== -->
   <ProxyGroup name="sources">
 
     <SourceProxy name="ProgrammableSource" 
@@ -321,6 +322,62 @@ Interpretor, a python interpretor to run the script upon the first
     <!-- End ProgrammableSource -->
     </SourceProxy>
 
+  </ProxyGroup>
+
+  <!-- =================================================================== -->
+  <ProxyGroup name="animation">
+    <Proxy name="PythonAnimationCue" class="vtkPythonAnimationCue"
+      processes="client">
+      <Documentation>
+        Animation cue that can use python script for animation.
+      </Documentation>
+
+      <IntVectorProperty name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enables this animation cue.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TimeMode"
+         command="SetTimeMode"
+         number_of_elements="1"
+         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Normalized" />
+          <Entry value="1" text="Relative" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="StartTime"
+        command="SetStartTime"
+        number_of_elements="1"
+        default_values="0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EndTime"
+        command="SetEndTime"
+        number_of_elements="1"
+        default_values="1">
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="Script"
+         command="SetScript"
+         number_of_elements="1"
+         default_values="def start_cue(self): pass&#xa;&#xa;def tick(self): pass&#xa;&#xa;def end_cue(self): pass" >
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+        <Documentation>
+          This property contains the text for the script to execute.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- end of PythonAnimationCue -->
+    </Proxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

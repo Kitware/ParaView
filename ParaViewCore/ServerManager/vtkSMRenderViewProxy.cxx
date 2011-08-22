@@ -416,7 +416,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
       else if(childName && strcmp(childName, "DefaultRepresentations") == 0)
         {
         unsigned int defaultRepCount = child->GetNumberOfNestedElements();
-        for(int i = 0; i < defaultRepCount; i++)
+        for(unsigned int i = 0; i < defaultRepCount; i++)
           {
           vtkPVXMLElement *defaultRep = child->GetNestedElement(i);
           const char *representation = defaultRep->GetAttribute("representation");

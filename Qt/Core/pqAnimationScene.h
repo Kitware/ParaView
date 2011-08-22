@@ -65,6 +65,7 @@ public:
     int index);
   pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
     int index, const QString& cuetype);
+  pqAnimationCue* createCue(const QString& cuetype);
 
   /// Removes all cues which animate the indicated proxy, if any.
   void removeCues(vtkSMProxy* proxy);

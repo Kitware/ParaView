@@ -338,6 +338,12 @@ pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
+pqAnimationCue* pqAnimationScene::createCue(const QString& cuetype) 
+{
+  return this->createCueInternal(cuetype, NULL, NULL, -1);
+}
+
+//-----------------------------------------------------------------------------
 static void pqAnimationSceneResetCameraKeyFrameToCurrent(vtkSMProxy* ren,
                                                          vtkSMProxy* dest)
 {
@@ -478,17 +484,23 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
     }
   cue->setDefaultPropertyValues();
 
-  pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"), proxy);
-  pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"), 
-    propertyname);
-  pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedElement"), index);
-  cueProxy->UpdateVTKObjects();
+  if (proxy)
+    {
+    pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"), proxy);
+    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"), 
+      propertyname);
+    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedElement"), index);
+    cueProxy->UpdateVTKObjects();
+    }
 
   vtkSMProxy* sceneProxy = this->getProxy();
   pqSMAdaptor::addProxyProperty(sceneProxy->GetProperty("Cues"), cueProxy);
   sceneProxy->UpdateVTKObjects();
 
-  this->initializeCue(proxy, propertyname, index, cue);
+  if (proxy)
+    {
+    this->initializeCue(proxy, propertyname, index, cue);
+    }
 
   // We don't directly add this cue to the internal Cues, it will get added
   // as a side effect of the change in the "Cues" property.

@@ -155,7 +155,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       }
     else if (xml_type == "KeyFrameAnimationCue" ||
       xml_type == "CameraAnimationCue" ||
-      xml_type == "TimeAnimationCue")
+      xml_type == "TimeAnimationCue" ||
+      xml_type == "PythonAnimationCue")
       {
       return new pqAnimationCue(group, name, proxy, server, 0);
       }

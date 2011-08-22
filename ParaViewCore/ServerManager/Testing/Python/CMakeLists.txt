@@ -67,6 +67,7 @@ SET (PY_TESTS
   PythonPVSimpleSphere
   PythonSMTraceTest1
   PythonSMTraceTest2
+  PythonAnimationTrack
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )

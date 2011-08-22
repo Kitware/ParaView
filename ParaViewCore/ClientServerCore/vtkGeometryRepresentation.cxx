@@ -621,7 +621,7 @@ vtkSelection* vtkGeometryRepresentation::ConvertSelection(
 
 void vtkGeometryRepresentation::SetAllowSpecularHighlightingWithScalarColoring(int allow)
 {
-  this->AllowSpecularHighlightingWithScalarColoring = allow;
+  this->AllowSpecularHighlightingWithScalarColoring = allow > 0 ? true : false;
 }
 
 //----------------------------------------------------------------------------

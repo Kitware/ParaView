@@ -107,6 +107,12 @@ public:
   // Can be called only after InitializeSubInterpretor().
   void AddPythonPath(const char*);
 
+  // Description:
+  // Call this method to initialize the interpretor for ParaView GUI
+  // applications. This is typically called right after
+  // InitializeSubInterpretor().
+  void ExecuteInitFromGUI();
+
 protected:
   vtkPVPythonInterpretor();
   ~vtkPVPythonInterpretor();
