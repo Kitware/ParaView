@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMContextViewProxy.h"
 
+#include "vtkChart.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkObjectFactory.h"
@@ -94,6 +95,12 @@ vtkChart* vtkSMContextViewProxy::GetChart()
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
   return pvview? pvview->GetChart() : NULL;
+}
+//-----------------------------------------------------------------------------
+void vtkSMContextViewProxy::ResetDisplay()
+{
+  this->GetChart()->RecalculateBounds();
+  this->GetChartView()->Render();
 }
 
 //-----------------------------------------------------------------------------
