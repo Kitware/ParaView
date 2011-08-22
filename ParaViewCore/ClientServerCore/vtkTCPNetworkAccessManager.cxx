@@ -259,7 +259,9 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     !this->ParaViewHandshake(controller, false, handshake))
     {
     controller->Delete();
-    vtkErrorMacro("Failed to connect to " << hostname << ":" << port);
+    vtkErrorMacro("Failed to connect to " << hostname << ":" << port
+      << ". Client-Server Handshake failed. Please verify that the client and"
+      << " server versions are compatible with each other");
     return NULL;
     }
   this->Internals->Controllers.push_back(controller);
