@@ -188,7 +188,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
 
   vtksys_ios::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION_FULL;
+  handshake << "handshake=paraview." << PARAVIEW_VERSION;
   // Add connect-id if needed (or maybe we extract that from url as well (just
   // like vtkNetworkAccessManager).
 
@@ -272,6 +272,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     {
     this->SetClientController(ccontroller);
     ccontroller->Delete();
+    cout << "Client connected." << endl;
     }
 
   return (this->ClientController != NULL);
