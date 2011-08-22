@@ -16,6 +16,7 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
   ${PARAVIEW_INCLUDE_DIRS}
   ${VTKPythonWrapping_SOURCE_DIR}/Executable
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # Reduce the number of dirs that get included on moc command line
