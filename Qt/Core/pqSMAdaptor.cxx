@@ -407,8 +407,6 @@ QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(vtkSMProperty* Propert
   iter->Delete();
   
   int numSelections = 0;
-  vtkSMVectorProperty* VectorProperty = NULL;
-  VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
   if(EnumerationDomain)
     {
     numSelections = EnumerationDomain->GetNumberOfEntries();

@@ -644,7 +644,7 @@ vtkAMRDualGridHelperFace::~vtkAMRDualGridHelperFace()
 void vtkAMRDualGridHelperFace::InheritBlockValues(vtkAMRDualGridHelperBlock* block, int faceIndex)
 {
   // avoid warning.
-  faceIndex = block->Level;
+  static_cast<void>(faceIndex);
   /* we are not worring about connectivity yet.
   int* ext = block->Image->GetExtent();
   this->Level = block->Level;
@@ -2325,8 +2325,8 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
   int    lowestLevel = 0;
   double lowestSpacing[3];
   double lowestOrigin[3];
-  int    lowestDims[3];
-  int    largestLevel = 0;
+  //int    lowestDims[3];
+  //int    largestLevel = 0;
   double largestOrigin[3];
   double largestSpacing[3];
   int    largestDims[3];
@@ -2379,7 +2379,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
           largestNumCells = numCells;
           image->GetOrigin(largestOrigin);
           image->GetSpacing(largestSpacing);
-          largestLevel = level;
+          // largestLevel = level;
           }
         // Find the lowest level block.
         image->GetSpacing(spacing);
@@ -2388,25 +2388,21 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
           image->GetSpacing(lowestSpacing);
           lowestLevel = level;
           image->GetOrigin(lowestOrigin);
-          lowestDims[0] = cellDims[0];
-          lowestDims[1] = cellDims[1];
-          lowestDims[2] = cellDims[2];
+          //lowestDims[0] = cellDims[0];
+          //lowestDims[1] = cellDims[1];
+          //lowestDims[2] = cellDims[2];
           }
         }
       }
     }
 
   // Send the results to process 0 that will choose the origin ...
-  int numProcs = 1;
-  int myId = 0;
 
   const int REDUCE_MESSAGE_SIZE = 11;
   double dMsg[REDUCE_MESSAGE_SIZE];
   double dRcv[REDUCE_MESSAGE_SIZE];
   if (this->Controller->GetNumberOfProcesses() > 1)
     {
-    numProcs = this->Controller->GetNumberOfProcesses();
-    myId = this->Controller->GetLocalProcessId();
 
     dMsg[0] = largestNumCells;
     dMsg[1] = largestDims[0];

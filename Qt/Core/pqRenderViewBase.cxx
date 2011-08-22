@@ -240,8 +240,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
   renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
   if( renderViewProxy != NULL )
     {
-    pqProgressManager* progressManager;
-    progressManager = pqApplicationCore::instance()->getProgressManager();
     // Generate Signals when interaction event occurs ??? Here ???
     this->getConnector()->Connect(
         renderViewProxy->GetInteractor(),

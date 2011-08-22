@@ -186,7 +186,6 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
     }
   int addToList = 1;
   int addObserver = updateDir & INPUT;
-  bool input_exists = false;
 
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
@@ -196,11 +195,6 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
       {
       addObserver = 0;
       addToList = 0;
-      }
-
-    if (iter->UpdateDirection & INPUT)
-      {
-      input_exists = true;
       }
     }
 

@@ -1022,8 +1022,7 @@ void vtkGridConnectivity::GenerateOutput(
         inputPoints->GetPoint(ptId, pt);
         outCellPtIds[ii] = outPoints->InsertNextPoint(pt);
         }
-      vtkIdType cellId;
-      cellId = outCells->InsertNextCell(numFacePts, outCellPtIds);
+      outCells->InsertNextCell(numFacePts, outCellPtIds);
       cellFragmentIdArray->InsertNextValue(face->FragmentId);
 
       // There is no need to pass the fragment ids though the

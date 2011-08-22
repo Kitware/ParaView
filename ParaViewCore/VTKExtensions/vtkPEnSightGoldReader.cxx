@@ -2872,14 +2872,10 @@ int vtkPEnSightGoldReader::CreateRectilinearGridOutput(int partId,
   zCoords->Allocate(newDimensions[2]);
 
   int beginDimension[3];
-  int endDimension[3];
 
   beginDimension[ splitDimension ] = splitDimensionBeginIndex;
-  endDimension[ splitDimension ] = beginDimension[ splitDimension ] + newDimensions[ splitDimension ];
   beginDimension[ (splitDimension + 1) % 3 ] = 0;
-  endDimension[ (splitDimension + 1) % 3 ] = newDimensions[ (splitDimension + 1) % 3 ];
   beginDimension[ (splitDimension + 2) % 3 ] = 0;
-  endDimension[ (splitDimension + 2) % 3 ] = newDimensions[ (splitDimension + 2) % 3 ];
 
   float val;
   for (i = 0; i < dimensions[0]; i++)

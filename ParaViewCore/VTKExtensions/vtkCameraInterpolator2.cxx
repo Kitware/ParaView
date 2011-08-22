@@ -86,8 +86,6 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
 {
   double tuple[3];
 
-  bool position_set = false, focalpoint_set = false;
-
   this->FocalSpline->SetClosed(this->ClosedFocalPath);
   this->PositionSpline->SetClosed(this->ClosedPositionPath);
 
@@ -95,14 +93,12 @@ void vtkCameraInterpolator2::InterpolateCamera(double u, vtkCamera* camera)
     {
     this->Evaluate(u, this->FocalSpline, tuple);
     camera->SetFocalPoint(tuple);
-    focalpoint_set = true;
     }
 
   if (this->PositionMode == PATH)
     {
     this->Evaluate(u, this->PositionSpline, tuple);
     camera->SetPosition(tuple);
-    position_set = true;
     }
 }
 
