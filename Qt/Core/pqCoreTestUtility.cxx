@@ -32,43 +32,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreTestUtility.h"
 
-#include <QDir>
-#include <QFileInfo>
 #include <QApplication>
+#include <QCommonStyle>
+#include <QCoreApplication>
+#include <QDir>
+#include <QEvent>
+#include <QFileInfo>
+#include <QImage>
+#include <QPixmap>
+#include <QtDebug>
+#include <QWidget>
 
 #include "QtTestingConfigure.h"
 
-#include "vtkProcessModule.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkBMPWriter.h"
-#include "vtkTIFFWriter.h"
-#include "vtkPNMWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkJPEGWriter.h"
-#include "vtkErrorCode.h"
-#include "vtkSmartPointer.h"
-#include "vtkPNGReader.h"
-#include "vtkImageDifference.h"
-#include "vtkImageShiftScale.h"
-#include "vtkPVConfig.h"
-#include "vtkRenderWindow.h"
-#include "vtkTesting.h"
-
+#include "pqApplicationCore.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorButtonEventTranslator.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
 #include "pqFlatTreeViewEventPlayer.h"
 #include "pqFlatTreeViewEventTranslator.h"
+#include "pqImageUtil.h"
 #include "pqOptions.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
+#include "pqXMLEventObserver.h"
+#include "pqXMLEventSource.h"
+#include "vtkBMPWriter.h"
+#include "vtkErrorCode.h"
+#include "vtkImageDifference.h"
+#include "vtkImageShiftScale.h"
+#include "vtkJPEGWriter.h"
+#include "vtkPNGReader.h"
+#include "vtkPNGWriter.h"
+#include "vtkPNMWriter.h"
+#include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+#include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMViewProxy.h"
+#include "vtkTesting.h"
+#include "vtkTIFFWriter.h"
+#include "vtkWindowToImageFilter.h"
 
 #ifdef QT_TESTING_WITH_PYTHON
 # include "pqPythonEventSourceImage.h"
 #endif
-#include "pqXMLEventSource.h"
-#include "pqXMLEventObserver.h"
 
 
 template<typename WriterT>
@@ -117,10 +129,12 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqColorButtonEventPlayer(this));
 }
 
+//-----------------------------------------------------------------------------
 pqCoreTestUtility::~pqCoreTestUtility()
 {
 }
 
+//-----------------------------------------------------------------------------
 QString pqCoreTestUtility::DataRoot()
 {
   QString result;
@@ -157,6 +171,7 @@ QString pqCoreTestUtility::DataRoot()
   return result;
 }
 
+//-----------------------------------------------------------------------------
 bool pqCoreTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
 {
   vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
@@ -182,6 +197,7 @@ bool pqCoreTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QStr
   return success;
 }
 
+//-----------------------------------------------------------------------------
 bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow, 
   const QString& ReferenceImage, double Threshold, 
   ostream& vtkNotUsed(Output), const QString& TempDirectory)
@@ -199,6 +215,7 @@ bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
   return false;
 }
 
+//-----------------------------------------------------------------------------
 bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
   const QString& ReferenceImage, double Threshold, 
   ostream& vtkNotUsed(Output), const QString& TempDirectory)
@@ -215,6 +232,108 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
   return false;
 }
 
+namespace pqCoreTestUtilityInternal{
+  class WidgetSizer
+    {
+    QSize OldSize;
+    QWidget* Widget;
+  public:
+    WidgetSizer(QWidget* widget, const QSize& size)
+      {
+      this->OldSize = widget->size();
+      this->Widget = widget;
+      widget->resize(size);
+      }
+    ~WidgetSizer()
+      {
+      this->Widget->resize(this->OldSize); 
+      }
+
+    };
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreTestUtility::CompareImage(QWidget* widget,
+  const QString& referenceImage, double threshold, 
+  ostream& output, const QString& tempDirectory,
+  const QSize& size /*=QSize(300, 300)*/)
+{
+  Q_ASSERT(widget != NULL);
+  pqCoreTestUtilityInternal::WidgetSizer sizer(widget, size);
+
+  // try to locate a pqView, if any associated with the QWidget.
+  QList<pqView*> views =
+    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
+  foreach (pqView* view, views)
+    {
+    if (view && (view->getWidget() == widget))
+      {
+      cout << "Using View API for capture" << endl;
+      return pqCoreTestUtility::CompareView(view, referenceImage, threshold,
+        tempDirectory);
+      }
+    }
+
+  // for generic QWidget's, let's paint the widget into our QPixmap,
+  // put it in a vtkImageData and compare the image with a baseline
+  QFont oldFont = widget->font();
+#if defined(Q_WS_WIN)
+  QFont newFont("Courier", 10, QFont::Normal, false);
+#elif defined(Q_WS_X11)
+  QFont newFont("Courier", 10, QFont::Normal, false);
+#else
+  QFont newFont("Courier Regular", 10, QFont::Normal, false);
+#endif
+  QCommonStyle style;
+  QStyle* oldStyle = widget->style();
+  widget->setStyle(&style);
+  widget->setFont(newFont);
+  QImage img = QPixmap::grabWidget(widget).toImage();
+  widget->setFont(oldFont);
+  widget->setStyle(oldStyle);
+
+  vtkSmartPointer<vtkImageData> vtkimage = vtkSmartPointer<vtkImageData>::New();
+  pqImageUtil::toImageData(img, vtkimage);
+
+  return pqCoreTestUtility::CompareImage(vtkimage,
+    referenceImage, threshold, output, tempDirectory);
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreTestUtility::CompareView(
+  pqView* curView,
+  const QString& referenceImage,
+  double threshold,
+  const QString& tempDirectory)
+{
+  Q_ASSERT(curView != NULL);
+
+  vtkImageData* test_image = curView->captureImage(1);
+  if (!test_image)
+    {
+    qCritical() << "ERROR: Failed to capture snapshot.";
+    return false;
+    }
+
+  // The returned image will have extents translated to match the view position,
+  // we shift them back.
+  int viewPos[2];
+  vtkSMPropertyHelper(curView->getViewProxy(), "ViewPosition").Get(viewPos, 2);
+  // Update image extents based on ViewPosition
+  int extents[6];
+  test_image->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] -= viewPos[cc/2];
+    }
+  test_image->SetExtent(extents);
+  bool ret = pqCoreTestUtility::CompareImage(test_image, referenceImage,
+    threshold, cout, tempDirectory);
+  test_image->Delete();
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
 QString pqCoreTestUtility::TestDirectory()
 {
   if (pqOptions* const options = pqOptions::SafeDownCast(
