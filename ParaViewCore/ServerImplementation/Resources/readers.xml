@@ -6810,6 +6810,7 @@
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
 
+#ifdef PARAVIEW_USE_MPI
    <SourceProxy name="PNetCDFPOPReader"
                 class="vtkFileSeriesReader"
                 si_class="vtkSIFileSeriesReaderProxy"
@@ -6870,6 +6871,7 @@
      </Hints>
    </SourceProxy>
    <!-- End PNetCDFPOPReader -->
+#endif
 
    <SourceProxy name="CosmoReader"
                           class="vtkFileSeriesReader"
