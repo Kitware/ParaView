@@ -109,17 +109,17 @@ bool vtkVRHeadTrackingStyle::SetHeadPoseProperty(const vtkVREventData &data)
     prop->SetElement( 0,  rotMat[0][0] );
     prop->SetElement( 1,  rotMat[0][1] );
     prop->SetElement( 2,  rotMat[0][2] );
-    prop->SetElement( 3,  data.data.tracker.pos [0]*-1  );
+    prop->SetElement( 3,  data.data.tracker.pos [0]  );
 
     prop->SetElement( 4,  rotMat[1][0] );
-    prop->SetElement( 5,  -rotMat[1][1] );
+    prop->SetElement( 5,  rotMat[1][1] );
     prop->SetElement( 6,  rotMat[1][2] );
-    prop->SetElement( 7,  data.data.tracker.pos [1]*1  );
+    prop->SetElement( 7,  data.data.tracker.pos [1]  );
 
     prop->SetElement( 8,  rotMat[2][0] );
     prop->SetElement( 9,  rotMat[2][1] );
     prop->SetElement( 10, rotMat[2][2] );
-    prop->SetElement( 11, data.data.tracker.pos [2]*1  );
+    prop->SetElement( 11, data.data.tracker.pos [2]  );
 
     prop->SetElement( 12, 0.0 );
     prop->SetElement( 13, 0.0 );
