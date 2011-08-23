@@ -45,7 +45,15 @@
 #include <QDateTime>
 #include <QDebug>
 #include <vtkstd/vector>
+#ifdef QTSOCK
 #include <QTcpSocket>
+#else
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#endif
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -62,7 +70,11 @@ class vtkVRUIConnection::pqInternals
     public:
   pqInternals()
   {
+#ifdef QTSOCK
     this->Socket = false;
+#else
+    this->Socket = -1;
+#endif
     this->Active=false;
     this->Pipe=0;
     this->State=0;
@@ -84,7 +96,11 @@ class vtkVRUIConnection::pqInternals
       }
   }
 
+#ifdef QTSOCK
   QTcpSocket *Socket;
+#else
+  int	Socket;
+#endif
   bool Active;
   vtkVRUIPipe *Pipe;
   vtkVRUIServerState *State;
@@ -95,12 +111,44 @@ class vtkVRUIConnection::pqInternals
 
   void initSocket(std::string address,  std::string port)
   {
+#ifdef QTSOCK
     this->Socket=new QTcpSocket;
+#ifdef VRUI_ENABLE_DEBUG
     qDebug() << QString( address.c_str() ) << "::"
              << QString( port.c_str() ).toInt();
+#endif
 
     this->Socket->connectToHost(QString(address.c_str()),
                                 QString( port.c_str() ).toInt() ); // ReadWrite?
+#else
+struct sockaddr_in	client_addr;
+struct  hostent         *hp;
+
+    this->Socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->Socket < 0) {
+#ifdef VRUI_ENABLE_DEBUG
+          qDebug() << "Error opening stream socket";
+          abort();
+#endif
+    }
+
+        /* Name socket using file system name */
+        hp = gethostbyname(address.c_str());
+        if (hp == 0) {
+                fprintf(stderr, "%s: unknown host\n", address.c_str());
+                return;
+        }
+        bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);
+
+        client_addr.sin_family = AF_INET;
+        client_addr.sin_port = htons(atoi(port.c_str()));
+
+        if (::connect(this->Socket, (struct sockaddr *)&client_addr, sizeof(struct sockaddr_in)) < 0) { /* TODO: why is this "sockaddr", when the type is "sockaddr_in" ?? */
+                close(this->Socket);
+                perror("connecting stream socket");
+                return;
+        }
+#endif
   }
 
   void initPipe()
@@ -110,7 +158,9 @@ class vtkVRUIConnection::pqInternals
 
   bool connect()
   {
+#ifdef VRUI_ENABLE_DEBUG
     std::cout<< "Trying to connect" <<std::endl;
+#endif
     this->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
     if(!this->Pipe->WaitForServerReply(30000)) // 30s
       {
@@ -154,7 +204,9 @@ class vtkVRUIConnection::pqInternals
   {
     if(this->Active)
       {
+#ifdef VRUI_ENABLE_DEBUG
       std::cout<<"start streaming" <<std::endl;
+#endif
       this->Streaming=true;
       this->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
       }
@@ -181,7 +233,9 @@ class vtkVRUIConnection::pqInternals
     switch(m)
       {
       case vtkVRUIPipe::PACKET_REPLY:
+#ifdef VRUI_ENABLE_DEBUG
         cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
+#endif
         this->StateMutex->lock();
         this->Pipe->ReadState(this->State);
         this->StateMutex->unlock();
@@ -562,8 +616,10 @@ void vtkVRUIConnection::callback()
 {
   if(this->Initialized)
     {
-    std::cout << "callback()" << std::endl;
 
+#ifdef VRUI_ENABLE_DEBUG
+    std::cout << "callback()" << std::endl;
+#endif
     this->Internals->StateMutex->lock();
     this->GetAndEnqueueButtonData();
     this->GetAndEnqueueAnalogData();
@@ -589,11 +645,12 @@ void vtkVRUIConnection::GetNextPacket()
       {
       // With a loop
       this->Internals->Pipe->Send(vtkVRUIPipe::PACKET_REQUEST);
-      if(this->Internals->Pipe->WaitForServerReply(-1))
-        {
+      if(this->Internals->Pipe->WaitForServerReply(30000))
+	{
         if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::PACKET_REPLY)
           {
-          cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << endl;
+          cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << std::endl;
+	  abort();
           }
         else
           {
@@ -655,33 +712,39 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   float q[4];
   data->GetPosition(pos);
   data->GetUnitQuaternion(q);
+
+#if defined( VRUI_ENABLE_DEBUG ) || 1
   cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
-  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
-       << endl;
+  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")" << endl;
+#endif
   vtkMath::QuaternionToMatrix3x3(&q[0], rotMatrix );
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
 
   matrix->Element[0][0] = rotMatrix[0][0];
   matrix->Element[0][1] = rotMatrix[0][1];
   matrix->Element[0][2] = rotMatrix[0][2];
-  matrix->Element[0][3] = pos[0]/10;
+  matrix->Element[0][3] = pos[0]*1/12;
 
   matrix->Element[1][0] = rotMatrix[1][0];
   matrix->Element[1][1] = rotMatrix[1][1];
   matrix->Element[1][2] = rotMatrix[1][2];
-  matrix->Element[1][3] = pos[1]/10;
+  matrix->Element[1][3] = pos[2]*1/12;
 
   matrix->Element[2][0] = rotMatrix[2][0];
   matrix->Element[2][1] = rotMatrix[2][1];
   matrix->Element[2][2] = rotMatrix[2][2];
-  matrix->Element[2][3] = pos[2]/100;
+  matrix->Element[2][3] = pos[1]*-1/12;
 
   matrix->Element[3][0] = 0.0f;
   matrix->Element[3][1] = 0.0f;
   matrix->Element[3][2] = 0.0f;
   matrix->Element[3][3] = 1.0f;
 
-  vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
+#if defined( VRUI_ENABLE_DEBUG ) || 1
+  cout << "post pos=("<< matrix->Element[0][3] << "," << matrix->Element[1][3] << "," << matrix->Element[2][3] << ")" << endl;
+#endif
+
+  //vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
 
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
   temp.data.tracker.matrix[1] = matrix->Element[0][1];
