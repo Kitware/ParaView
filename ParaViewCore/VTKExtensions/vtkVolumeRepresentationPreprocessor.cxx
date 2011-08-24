@@ -95,6 +95,7 @@ int vtkVolumeRepresentationPreprocessor::RequestData(
 
   // copy to output
   output->ShallowCopy(triangleFilterOutput);
+  output->RemoveGhostCells(1);
   return 1;
 }
 
