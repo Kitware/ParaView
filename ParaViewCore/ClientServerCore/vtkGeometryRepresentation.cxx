@@ -104,6 +104,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
   this->LODDeliverySuppressor = vtkPVUpdateSuppressor::New();
+  this->RequestGhostCellsIfNeeded = true;
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = VTK_SCALAR_MODE_DEFAULT;
@@ -303,13 +304,18 @@ bool vtkGeometryRepresentation::DoRequestGhostCells(vtkInformation* info)
     return false;
     }
 
-  // ensure that there's no WholeExtent to ensure
-  // that this UG was never born out of a structured dataset.
-  bool has_whole_extent = (info->Has(
-      vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
-  if (!has_whole_extent)
+  if (vtkUnstructuredGrid::GetData(info) != NULL ||
+    vtkCompositeDataSet::GetData(info) != NULL)
     {
-    return true;
+    // ensure that there's no WholeExtent to ensure
+    // that this UG was never born out of a structured dataset.
+    bool has_whole_extent = (info->Has(
+        vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+    if (!has_whole_extent)
+      {
+      //cout << "Need ghosts" << endl;
+      return true;
+      }
     }
 
   return false;
@@ -333,7 +339,8 @@ int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
       vtkStreamingDemandDrivenPipeline* sddp =
         vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
       int ghostLevels = sddp->GetUpdateGhostLevel(inInfo);
-      if (vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
+      if (this->RequestGhostCellsIfNeeded &&
+        vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
         {
         ghostLevels++;
         }

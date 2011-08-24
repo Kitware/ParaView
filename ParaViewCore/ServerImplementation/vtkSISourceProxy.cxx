@@ -351,10 +351,14 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   vtkAlgorithm* algo = output_port->GetProducer();
   assert(algo);
 
-  algo->UpdateInformation();
+
   vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       algo->GetExecutive());
+
+  sddp->UpdateInformation();
+  sddp->UpdateDataObject();
+
   int real_port = output_port->GetIndex();
 
   // Refer to BUG #11811 and BUG #12546. vtkGeometryRepresentation needs
