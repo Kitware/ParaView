@@ -19,6 +19,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
@@ -354,9 +355,17 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       algo->GetExecutive());
-
   int real_port = output_port->GetIndex();
-  sddp->SetUpdateExtent(real_port, processid, numprocs, /*ghost level*/0);
+
+  // Refer to BUG #11811 and BUG #12546. vtkGeometryRepresentation needs
+  // ghost-cells if available (11811), but not asking for ghost-cells earlier than the
+  // representation results in multiple executes (12546). Hence, we request
+  // ghost-cells in UpdatePipeline().
+  bool req_ghost_cells = vtkGeometryRepresentation::DoRequestGhostCells(
+    sddp->GetOutputInformation(real_port));
+
+  sddp->SetUpdateExtent(real_port, processid, numprocs, /*ghost level*/
+    req_ghost_cells?1 : 0);
   if (doTime)
     {
     sddp->SetUpdateTimeStep(real_port, time);

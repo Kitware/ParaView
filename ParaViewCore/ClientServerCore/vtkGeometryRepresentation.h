@@ -124,6 +124,11 @@ public:
   // Returns the data object that is rendered from the given input port.
   virtual vtkDataObject* GetRenderedDataObject(int port);
 
+  // Description:
+  // Returns true if this class would like to get ghost-cells if available for
+  // the connection whose information object is passed as the argument.
+  static bool DoRequestGhostCells(vtkInformation* information); 
+
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
   void SetUseOutline(int);
