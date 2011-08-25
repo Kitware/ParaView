@@ -156,7 +156,12 @@ def CreateWriter(filename, proxy=None, **extraArgs):
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view
-    if not view: view = CreateRenderView()
+    if not view:
+        # it's possible that there's no active view, but a render view exists.
+        # If so, locate that and return it (before trying to create a new one).
+        view = servermanager.GetRenderView()
+    if not view:
+        view = CreateRenderView()
     return view
 
 def GetRenderViews():
