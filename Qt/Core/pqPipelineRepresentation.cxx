@@ -432,6 +432,8 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     == "Outline")
     {
     // no need to determine scalar coloring for outline representation.
+    // just ensure that the color is empty (BUG #12180).
+    vtkSMPropertyHelper(repr, "ColorArrayName", true).Set((char*)NULL);
     return;
     }
 
