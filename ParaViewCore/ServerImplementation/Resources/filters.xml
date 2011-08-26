@@ -9055,6 +9055,15 @@ This property controls how the filter works to generate tensor cell data. You ca
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="MergePoints"
+        label="Merge Points"
+        command="SetMergePoints"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
       <!-- End of MergeBlocks -->
     </SourceProxy>
 
