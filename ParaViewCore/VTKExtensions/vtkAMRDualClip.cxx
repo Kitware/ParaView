@@ -508,7 +508,7 @@ void vtkDualGridClipInitializeLevelMask(
   T* scalarPtr, double isoValue,
   unsigned char* levelMask, int dims[3])
 {
-  unsigned char flag = 1;
+  //unsigned char flag = 1;
 
   // We only set the inside because the ghost regions can already be set.
   scalarPtr += 1+ dims[0] + dims[0]*dims[1];
@@ -532,7 +532,7 @@ void vtkDualGridClipInitializeLevelMask(
         else
           { // Special value  indicating point is outside clipped volume.
           *levelMask++ = 0;
-          flag = 0;
+          //flag = 0;
           }
         }
       // Skip last ghost of this row and first ghost of next.
@@ -1877,7 +1877,6 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   // Loop over all the cells in the dual grid.
   int x, y, z;
   // These are needed to handle the cropped boundary cells.
-  double ox, oy, oz;
   double sx, sy, sz;
   int xMax = extent[1]-1;
   int yMax = extent[3]-1;
@@ -1893,7 +1892,6 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     if (z == extent[4]) {nz = 0;}
     else if (z == zMax) {nz = 2;}
     sz = spacing[2];
-    oz = origin[2] + (double)(z)*sz;
     yOffset = zOffset;
     for (y = extent[2]; y < extent[3]; ++y)
       {
@@ -1901,7 +1899,6 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
       if (y == extent[2]) {ny = 0;}
       else if (y == yMax) {ny = 2;}
       sy = spacing[1];
-      oy = origin[1] + (double)(y)*sy;
       xOffset = yOffset;
       for (x = extent[0]; x < extent[1]; ++x)
         {
@@ -1909,7 +1906,6 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
         if (x == extent[0]) {nx = 0;}
         else if (x == xMax) {nx = 2;}
         sx = spacing[0];
-        ox = origin[0] + (double)(x)*sx;
         // Skip the cell if a neighbor is already processing it.
         if ( (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitOwner) )
           {
@@ -2033,7 +2029,6 @@ void vtkAMRDualClip::ProcessDualCell(
   // Which boundaries does this cube/cell touch?
   unsigned char cubeBoundaryBits[8] = {0,0,0,0,0,0,0,0};
   // If this cell is degenerate, then remove triangles with 2 points.
-  int degenerateFlag = 0;
 
   int nx, ny, nz; // Neighbor index [3][3][3];
   vtkIdType pointIds[6];
@@ -2158,7 +2153,6 @@ void vtkAMRDualClip::ProcessDualCell(
     // /*
     if (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask)
       { // point lies in lower level neighbor.
-      degenerateFlag = 1;
       int levelDiff = block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask;
       px = px >> levelDiff;
       py = py >> levelDiff;

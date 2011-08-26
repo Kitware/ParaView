@@ -512,7 +512,6 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
   m_NiftiImage->dv = m_NiftiImage->pixdim[6];
   m_NiftiImage->dw = m_NiftiImage->pixdim[7];
 
- int m_ComponentType;
  int numberOfVoxels = m_NiftiImage->nx;
  
  if(m_NiftiImage->ny>0){
@@ -541,44 +540,37 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
       switch(imageDataType)
     {
     case VTK_BIT://DT_BINARY:
-      m_ComponentType = DT_BINARY;
     m_NiftiImage->datatype = DT_BINARY;
     m_NiftiImage->nbyper = 0;
     dataTypeSize = 0.125;
       break;
     case VTK_CHAR://Type not supported
     vtkErrorMacro("Analyze does not support the type signed char") ;
-      m_ComponentType = DT_UNSIGNED_CHAR;
     m_NiftiImage->datatype = DT_UNSIGNED_CHAR;
     m_NiftiImage->nbyper = 1;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
     case VTK_UNSIGNED_CHAR://DT_UNSIGNED_CHAR:
-      m_ComponentType = DT_UNSIGNED_CHAR;
     m_NiftiImage->datatype = DT_UNSIGNED_CHAR;
     m_NiftiImage->nbyper = 1;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
     case VTK_SHORT://DT_SIGNED_SHORT:
-      m_ComponentType = DT_SIGNED_SHORT;
     m_NiftiImage->datatype = DT_SIGNED_SHORT;
     m_NiftiImage->nbyper = 2;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
     case VTK_INT://DT_SIGNED_INT:
-      m_ComponentType = DT_SIGNED_INT;
     m_NiftiImage->datatype = DT_SIGNED_INT;
     m_NiftiImage->nbyper = 4;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
     case VTK_FLOAT://DT_FLOAT:
-      m_ComponentType = DT_FLOAT;
     m_NiftiImage->datatype = DT_FLOAT;
     m_NiftiImage->nbyper = 4;
      dataTypeSize = m_NiftiImage->nbyper;
      break;
     case VTK_DOUBLE://DT_DOUBLE:
-      m_ComponentType = DT_DOUBLE;
     m_NiftiImage->datatype = DT_DOUBLE;
     m_NiftiImage->nbyper = 8;
     dataTypeSize = m_NiftiImage->nbyper;
@@ -704,9 +696,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   int InPlaceFilteredAxes[3];
   int count;
   int inExtent[6];
-  int outExtent[6];
   int inStride[3];
-  int outStride[3];
   long inOffset;
   long charInOffset;
 
@@ -776,9 +766,6 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
-    outStride[count]       = inStride[InPlaceFilteredAxes[count]];
-  outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
-  outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
 
   unsigned char* tempUnsignedCharData = NULL;
@@ -945,14 +932,12 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     unsigned char tempByteValue = 0;
     unsigned char tempBitValue = 0;
     int outBitNumber = 0;
-    int outTotalBitNumber = 0;
 
     for ( idZ = 0 ; idZ < outDim[2] ; idZ++){
     for ( idY = 0; idY < outDim[1] ; idY++){
       for (idX = 0; idX < outDim[0] ; idX++){
       outSliceOffset = tempSliceSizeInt * idZ;
       outSliceBit =  (idY * outDim[0]) + idX;
-      outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
       outSliceByte = (int) (outSliceBit / 8);
       outOffsetByte = outSliceOffset + outSliceByte;
       outBitNumber = outSliceBit %8;

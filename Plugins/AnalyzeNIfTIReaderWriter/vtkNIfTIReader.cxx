@@ -198,7 +198,6 @@ void vtkNIfTIReader::ExecuteInformation()
   nifti_image * m_NiftiImage;
   dataTypeSize = 1.0;
   unsigned int numComponents = 1;
-  int m_ComponentType;
   nifti_1_header tempNiftiHeader;
   unsigned char * niftiHeaderUnsignedCharArrayPtr = (unsigned char *) &tempNiftiHeader;
 
@@ -248,32 +247,26 @@ void vtkNIfTIReader::ExecuteInformation()
     switch(Type)
     {
     case DT_BINARY:
-      m_ComponentType = VTK_BIT;
     this->SetDataScalarType(VTK_BIT);
     dataTypeSize = 0.125;
      break;
     case DT_UNSIGNED_CHAR:
-      m_ComponentType = VTK_UNSIGNED_CHAR;
     this->SetDataScalarTypeToUnsignedChar();
     dataTypeSize = 1;
       break;
     case DT_SIGNED_SHORT:
-      m_ComponentType = VTK_SHORT;
     this->SetDataScalarTypeToShort();
     dataTypeSize = 2;
       break;
     case DT_SIGNED_INT:
-      m_ComponentType = VTK_INT;
     this->SetDataScalarTypeToInt();
     dataTypeSize = 4;
       break;
     case DT_FLOAT:
-      m_ComponentType = VTK_FLOAT;
     this->SetDataScalarTypeToFloat();
     dataTypeSize = 4;
       break;
     case DT_DOUBLE:
-      m_ComponentType = VTK_DOUBLE;
      this->SetDataScalarTypeToDouble();
     dataTypeSize = 8;
       break;
@@ -323,8 +316,6 @@ void vtkNIfTIReader::ExecuteInformation()
   int outDim[3];
   double inOriginOffset[3];
   double flippedOriginOffset[3];
-  double outPreFlippedOriginOffset[3];
-  double outPostFlippedOriginOffset[3];
   double outNoFlipOriginOffset[3];
   double outOriginOffset[3];
   
@@ -498,17 +489,9 @@ void vtkNIfTIReader::ExecuteInformation()
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
-  outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
-  outPreFlippedOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
- }
+    outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
+   }
 
-  for (count=0;count<3;count++){
-    if(flipAxis[count]){
-    outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count] - outDim[count];
-    } else {
-    outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count];
-    }
-  }
 
   for (count=0;count<3;count++){
     if(qform_code>0){
@@ -665,7 +648,6 @@ void vtkNIfTIReader::ExecuteData(vtkDataObject *output)
   int inIncrements[3];
   int outIncrements[3];
   double inOriginOffset[3];
-  double outOriginOffset[3];
   double inSpacing[3];
   double outSpacing[3];
   double inOrigin[3];
@@ -861,7 +843,6 @@ void vtkNIfTIReader::ExecuteData(vtkDataObject *output)
   outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
   outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
     outOrigin[count]       = inOrigin[InPlaceFilteredAxes[count]];
-    outOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
  }
 
   for (count=0;count<3;count++){

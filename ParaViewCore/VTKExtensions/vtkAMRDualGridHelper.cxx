@@ -644,6 +644,7 @@ vtkAMRDualGridHelperFace::~vtkAMRDualGridHelperFace()
 void vtkAMRDualGridHelperFace::InheritBlockValues(vtkAMRDualGridHelperBlock* block, int faceIndex)
 {
   // avoid warning.
+  static_cast<void>(block);
   static_cast<void>(faceIndex);
   /* we are not worring about connectivity yet.
   int* ext = block->Image->GetExtent();

@@ -871,7 +871,6 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   // Loop over all the cells in the dual grid.
   int x, y, z;
   // These are needed to handle the cropped boundary cells.
-  double sx, sy, sz;
   int xMax = extent[1]-1;
   int yMax = extent[3]-1;
   int zMax = extent[5]-1;
@@ -885,21 +884,18 @@ void vtkAMRDualContour::ProcessBlock(vtkAMRDualGridHelperBlock* block,
     int nz = 1;
     if (z == extent[4]) {nz = 0;}
     else if (z == zMax) {nz = 2;}
-    sz = spacing[2];
     yOffset = zOffset;
     for (y = extent[2]; y < extent[3]; ++y)
       {
       int ny = 1;
       if (y == extent[2]) {ny = 0;}
       else if (y == yMax) {ny = 2;}
-      sy = spacing[1];
       xOffset = yOffset;
       for (x = extent[0]; x < extent[1]; ++x)
         {
         int nx = 1;
         if (x == extent[0]) {nx = 0;}
         else if (x == xMax) {nx = 2;}
-        sx = spacing[0];
         // Skip the cell if a neighbor is already processing it.
         if ( (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitOwner) )
           {
