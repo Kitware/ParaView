@@ -358,7 +358,6 @@ int vtkWorldWarp::ProcessRequest(
   bbox.GetBounds(obounds);
   outInfo->Set(vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(), obounds, 6);
 
-/*
   //compute a normal for the piece so that pieces on back of sphere are rejected
   double midback[3];
   midback[0] = (pbounds[0]+pbounds[1])/2;
@@ -385,7 +384,6 @@ int vtkWorldWarp::ProcessRequest(
   pnorm[2] = midfront[2] - midback[2];
   //cerr << pnorm[0] << "," << pnorm[1] << "," << pnorm[2] << endl;
   outInfo->Set(vtkStreamingDemandDrivenPipeline::PIECE_NORMAL(), pnorm, 3);
-*/
 
   return 1;
 }

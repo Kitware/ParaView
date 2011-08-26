@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>357</width>
-    <height>696</height>
+    <width>434</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,8 +25,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>329</width>
-         <height>642</height>
+         <width>391</width>
+         <height>728</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -298,15 +298,6 @@
            <string>MultiResolution Streaming Controls</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
@@ -433,6 +424,69 @@
               <widget class="QLabel" name="label_13">
                <property name="text">
                 <string>levels</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>pixel limit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="cell_pixel_factor">
+               <property name="toolTip">
+                <string>higher numbers mean refinement stops earlier</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>2.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.666000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_16">
+               <property name="text">
+                <string>backface test</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="back_face_factor">
+               <property name="toolTip">
+                <string>higher numbers mean more pieces culled</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>-1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.050000000000000</double>
+               </property>
+               <property name="value">
+                <double>-0.750000000000000</double>
                </property>
               </widget>
              </item>
