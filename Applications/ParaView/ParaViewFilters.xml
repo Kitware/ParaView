@@ -106,6 +106,7 @@
   <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
+  <Proxy group="filters" name="GaussianSplatter"/>
   <Proxy group="filters" name="GenerateIdScalars"/>
   <Proxy group="filters" name="Glyph" />
   <Proxy group="filters" name="Gradient" />
