@@ -313,7 +313,6 @@ void vtkNIfTIReader::ExecuteInformation()
   }
 
   int inDim[3];
-  int outDim[3];
   double inOriginOffset[3];
   double flippedOriginOffset[3];
   double outNoFlipOriginOffset[3];
@@ -487,7 +486,6 @@ void vtkNIfTIReader::ExecuteInformation()
   }
 
   for (count=0;count<3;count++){
-    outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
     outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
    }

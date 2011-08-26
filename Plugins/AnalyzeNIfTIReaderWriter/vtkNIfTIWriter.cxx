@@ -534,7 +534,6 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
   int flipIndex[3];
   int InPlaceFilteredAxes[3];
   int count;
-  int inExtent[6];
   int inStride[3];
   int outStride[3];
   long inOffset;
@@ -681,8 +680,6 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
 
   for (count=0;count<3;count++){
   inDim[count] = (extent[(count*2)+1] - extent[count*2]) + 1;
-  inExtent[count*2] = extent[count*2];
-  inExtent[(count*2)+1] = extent[(count*2)+1];
  }
 
   inStride[0] =                       scalarSize;

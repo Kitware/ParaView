@@ -695,8 +695,6 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   int flipIndex[3];
   int InPlaceFilteredAxes[3];
   int count;
-  int inExtent[6];
-  int inStride[3];
   long inOffset;
   long charInOffset;
 
@@ -756,13 +754,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   for (count=0;count<3;count++){
   inDim[count] = (extent[(count*2)+1] - extent[count*2]) + 1;
-  inExtent[count*2] = extent[count*2];
-  inExtent[(count*2)+1] = extent[(count*2)+1];
  }
-
-  inStride[0] =                       scalarSize;
-  inStride[1] =            inDim[0] * scalarSize;
-  inStride[2] = inDim[1] * inDim[0] * scalarSize;
 
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
