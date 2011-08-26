@@ -13,6 +13,8 @@ FOREACH(policy CMP0017)
 ENDFOREACH()
 
 PROJECT(ParaView)
+SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
 
 INCLUDE(Utilities/Git/Git.cmake)
 
@@ -57,24 +59,27 @@ IF("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
 ENDIF("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
 
 #########################################################################
-SET(PARAVIEW_VERSION_MAJOR 3)
-SET(PARAVIEW_VERSION_MINOR 11)
-SET(PARAVIEW_VERSION_PATCH 1)
-#SET(PARAVIEW_VERSION_RC 1)
-SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
-SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
-IF(PARAVIEW_VERSION_RC)
-  SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
-ENDIF()
+SET (PARAVIEW_VERSION_MAJOR 0)
+SET (PARAVIEW_VERSION_MINOR 0)
+SET (PARAVIEW_VERSION_PATCH -1)
+SET (PARAVIEW_VERSION "0.0")
+SET (PARAVIEW_VERSION_FULL "0.0.-1")
+SET (PARAVIEW_VERSION_IS_RELEASE FALSE)
 
-# See VTK/CMakeLists.txt for an explanation of this default selection.
-IF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+INCLUDE(ParaViewDetermineVersion)
+determine_version(
+  ${ParaView_SOURCE_DIR}
+  ${GIT_EXECUTABLE}
+  ${ParaView_SOURCE_DIR}/CMake/.paraview.version
+  "PARAVIEW")
+
+IF (PARAVIEW_VERSION_IS_RELEASE)
   # This is a release version.  Default to not use rpath.
   SET(VTK_USE_RPATH_DEFAULT OFF)
-ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+ELSE()
   # This is a development version.  Default to use rpath.
   SET(VTK_USE_RPATH_DEFAULT ON)
-ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
+ENDIF()
 
 #########################################################################
 # build VTK/Qt support
@@ -238,9 +243,6 @@ SET (dynamicHeaders)
 # It also adds the VTK directories
 SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
 SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
-
-SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
 
 # used in ParaViewPlugins.cmake
 SET(ParaView_QT_DIR ${ParaView_SOURCE_DIR}/Qt)
