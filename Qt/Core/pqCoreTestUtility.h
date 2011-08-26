@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTestUtility.h"
 #include <vtkIOStream.h>
 #include <QStringList>
+#include <QSize>
 
-class QString;
 class pqEventPlayer;
 class pqEventTranslator;
-class vtkRenderWindow;
+class pqView;
+class QString;
 class vtkImageData;
+class vtkRenderWindow;
 
 /// Provides ParaView-specific functionality for regression testing
 class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
@@ -82,6 +84,18 @@ public:
                            double Threshold, 
                            ostream& Output, 
                            const QString& TempDirectory);
+
+  /// Compares the contents of any arbitrary QWidget to a reference image,
+  /// returning true iff the two match within a given threshold
+  static bool CompareImage(QWidget* widget,
+                           const QString& referenceImage, 
+                           double threshold, 
+                           ostream& output,
+                           const QString& tempDirectory,
+                           const QSize& size = QSize(300, 300));
+
+  static bool CompareView(pqView* curView,
+    const QString& referenceImage, double threshold, const QString& tempDirectory);
 
 private:
   QStringList TestFilenames;
