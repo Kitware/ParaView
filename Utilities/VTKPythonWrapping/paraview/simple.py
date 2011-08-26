@@ -226,7 +226,10 @@ def ResetCamera(view=None):
     used."""
     if not view:
         view = active_objects.view
-    view.ResetCamera()
+    if hasattr(view, "ResetCamera"):
+        view.ResetCamera()
+    if hasattr(view, "ResetDisplay"):
+        view.ResetDisplay()
     Render(view)
 
 def _DisableFirstRenderCameraReset():
