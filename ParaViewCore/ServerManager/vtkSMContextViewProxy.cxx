@@ -106,11 +106,9 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetChartView()->GetRenderWindow());
   w2i->SetMagnification(magnification);
-  w2i->ReadFrontBufferOff();
-  // ShouldRerender was turned off previously. Why? Since we told w2i to read
-  // backbuffer, shouldn't we re-render again?
-  w2i->ShouldRerenderOn();
   w2i->Update();
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
 
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
