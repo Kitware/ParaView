@@ -794,7 +794,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::DoDataDelivery(
-  bool using_lod_rendering, bool using_remote_rendering)
+  bool using_lod_rendering, 
+  bool vtkNotUsed(using_remote_rendering)
+  )
 {
   if ((using_lod_rendering &&
     this->InteractiveRenderTime > this->UpdateTime) ||
