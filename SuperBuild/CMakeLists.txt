@@ -221,7 +221,7 @@ else()
 endif()
 
 set(MANTA_ARGS)
- Manta doesn't compile on Windows x64 currently
+# Manta doesn't compile on Windows x64 currently
 if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
   include(External_Manta)
   set(MANTA_ARGS
