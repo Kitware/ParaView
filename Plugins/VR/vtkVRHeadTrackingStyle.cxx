@@ -97,35 +97,10 @@ bool vtkVRHeadTrackingStyle::SetHeadPoseProperty(const vtkVREventData &data)
   vtkSMDoubleVectorProperty *prop =0;
   if ( this->GetHeadPoseProxyNProperty( &proxy, &prop ) )
     {
-#if 1
     for (int i = 0; i < 16; ++i)
       {
       prop->SetElement( i, data.data.tracker.matrix[i] );
       }
-#else
-    double rotMat[3][3];
-    vtkMath::QuaternionToMatrix3x3( data.data.tracker.quat, rotMat );
-
-    prop->SetElement( 0,  rotMat[0][0] );
-    prop->SetElement( 1,  rotMat[0][1] );
-    prop->SetElement( 2,  rotMat[0][2] );
-    prop->SetElement( 3,  data.data.tracker.pos [0]  );
-
-    prop->SetElement( 4,  rotMat[1][0] );
-    prop->SetElement( 5,  rotMat[1][1] );
-    prop->SetElement( 6,  rotMat[1][2] );
-    prop->SetElement( 7,  data.data.tracker.pos [1]  );
-
-    prop->SetElement( 8,  rotMat[2][0] );
-    prop->SetElement( 9,  rotMat[2][1] );
-    prop->SetElement( 10, rotMat[2][2] );
-    prop->SetElement( 11, data.data.tracker.pos [2]  );
-
-    prop->SetElement( 12, 0.0 );
-    prop->SetElement( 13, 0.0 );
-    prop->SetElement( 14, 0.0 );
-    prop->SetElement( 15, 1.0 );
-#endif
     return true;
     }
   return false;
