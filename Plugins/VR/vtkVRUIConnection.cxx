@@ -99,7 +99,7 @@ class vtkVRUIConnection::pqInternals
 #ifdef QTSOCK
   QTcpSocket *Socket;
 #else
-  int	Socket;
+  int   Socket;
 #endif
   bool Active;
   vtkVRUIPipe *Pipe;
@@ -121,7 +121,7 @@ class vtkVRUIConnection::pqInternals
     this->Socket->connectToHost(QString(address.c_str()),
                                 QString( port.c_str() ).toInt() ); // ReadWrite?
 #else
-struct sockaddr_in	client_addr;
+struct sockaddr_in      client_addr;
 struct  hostent         *hp;
 
     this->Socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -646,11 +646,11 @@ void vtkVRUIConnection::GetNextPacket()
       // With a loop
       this->Internals->Pipe->Send(vtkVRUIPipe::PACKET_REQUEST);
       if(this->Internals->Pipe->WaitForServerReply(30000))
-	{
+        {
         if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::PACKET_REPLY)
           {
           cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << std::endl;
-	  abort();
+          abort();
           }
         else
           {
@@ -713,11 +713,8 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   data->GetPosition(pos);
   data->GetUnitQuaternion(q);
 
-  
-
-#if defined( VRUI_ENABLE_DEBUG ) || 1
-  if( sensor )
-    cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+#if defined( VRUI_ENABLE_DEBUG ) || 0
+  cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
   cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")" << endl;
 #endif
 
@@ -795,6 +792,7 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   if(sensor)
     cout << "post pos=("<< matrix->Element[0][3] << "," << matrix->Element[1][3] << "," << matrix->Element[2][3] << ")" << endl;
 #endif
+
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
   temp.data.tracker.matrix[1] = matrix->Element[1][0];
   temp.data.tracker.matrix[2] = matrix->Element[2][0];
