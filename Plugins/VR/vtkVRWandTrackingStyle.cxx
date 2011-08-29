@@ -111,10 +111,10 @@ bool vtkVRWandTrackingStyle::SetWandPoseProperty(const vtkVREventData &data)
     prop->SetElement( 10, data.data.tracker.matrix[10] );
     prop->SetElement( 11, data.data.tracker.matrix[11]  );
 
-    prop->SetElement( 12,  data.data.tracker.matrix[12] );
-    prop->SetElement( 13,  data.data.tracker.matrix[13] );
-    prop->SetElement( 14,  data.data.tracker.matrix[14] );
-    prop->SetElement( 15,  data.data.tracker.matrix[15] );
+    prop->SetElement( 12, data.data.tracker.matrix[12] );
+    prop->SetElement( 13, data.data.tracker.matrix[13] );
+    prop->SetElement( 14, data.data.tracker.matrix[14]);
+    prop->SetElement( 15, data.data.tracker.matrix[15]);
 
     return true;
     }
