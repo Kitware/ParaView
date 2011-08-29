@@ -267,9 +267,14 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
   temp.data.tracker.sensor = data.sensor;
   double rotMatrix[3][3];
-  vtkMath::QuaternionToMatrix3x3( data.quat, rotMatrix );
+  double vtkQuat[4] = {data.quat[3],
+                       data.quat[0],
+                       data.quat[1],
+                       data.quat[2]};
+  vtkMath::QuaternionToMatrix3x3( vtkQuat, rotMatrix );
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-
+#define COLUMN_MAJOR 1
+#if COLUMN_MAJOR
   matrix->Element[0][0] = rotMatrix[0][0];
   matrix->Element[0][1] = rotMatrix[0][1];
   matrix->Element[0][2] = rotMatrix[0][2];
@@ -290,8 +295,32 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   matrix->Element[3][2] = 0.0f;
   matrix->Element[3][3] = 1.0f;
 
+#else
+
+  matrix->Element[0][0] = rotMatrix[0][0];
+  matrix->Element[1][0] = rotMatrix[0][1];
+  matrix->Element[2][0] = rotMatrix[0][2];
+  matrix->Element[3][0] = 0.0;
+
+  matrix->Element[0][1] = rotMatrix[1][0];
+  matrix->Element[1][1] = rotMatrix[1][1];
+  matrix->Element[2][1] = rotMatrix[1][2];
+  matrix->Element[3][1] = 0.0;
+
+  matrix->Element[0][2] = rotMatrix[2][0];
+  matrix->Element[1][2] = rotMatrix[2][1];
+  matrix->Element[2][2] = rotMatrix[2][2];
+  matrix->Element[3][2] = 0.0;
+
+  matrix->Element[0][3] = data .pos[0]*1;
+  matrix->Element[1][3] = data.pos[1];
+  matrix->Element[2][3] = data.pos[2];
+  matrix->Element[3][3] = 1.0f;
+#endif
+
   vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
 
+#if COLUMN_MAJOR
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
   temp.data.tracker.matrix[1] = matrix->Element[0][1];
   temp.data.tracker.matrix[2] = matrix->Element[0][2];
@@ -311,7 +340,27 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   temp.data.tracker.matrix[13] = matrix->Element[3][1];
   temp.data.tracker.matrix[14] = matrix->Element[3][2];
   temp.data.tracker.matrix[15] = matrix->Element[3][3];
+#else
+  temp.data.tracker.matrix[0] = matrix->Element[0][0];
+  temp.data.tracker.matrix[1] = matrix->Element[1][0];
+  temp.data.tracker.matrix[2] = matrix->Element[2][0];
+  temp.data.tracker.matrix[3] = matrix->Element[3][0];
 
+  temp.data.tracker.matrix[4] = matrix->Element[0][1];
+  temp.data.tracker.matrix[5] = matrix->Element[1][1];
+  temp.data.tracker.matrix[6] = matrix->Element[2][1];
+  temp.data.tracker.matrix[7] = matrix->Element[3][1];
+
+  temp.data.tracker.matrix[8] = matrix->Element[0][2];
+  temp.data.tracker.matrix[9] = matrix->Element[1][2];
+  temp.data.tracker.matrix[10] = matrix->Element[2][2];
+  temp.data.tracker.matrix[11] = matrix->Element[3][2];
+
+  temp.data.tracker.matrix[12] = matrix->Element[0][3];
+  temp.data.tracker.matrix[13] = matrix->Element[1][3];
+  temp.data.tracker.matrix[14] = matrix->Element[2][3];
+  temp.data.tracker.matrix[15] = matrix->Element[3][3];
+#endif
   matrix->Delete();
   this->EventQueue->enqueue( temp );
 }
