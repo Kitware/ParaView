@@ -125,19 +125,56 @@
            </Documentation>
      </InputProperty>
      
-     <ProxyProperty name="CutFunction" command="SetCutFunction"
-        label="Slice Type">
-           <ProxyGroupDomain name="groups">
-              <Group name="implicit_functions"/>
-           </ProxyGroupDomain>
-           <ProxyListDomain name="proxy_list">
-              <Proxy group="implicit_functions" name="Plane" />
-           </ProxyListDomain>
-           <Documentation>
-             This property sets the parameters of the slice function.
-           </Documentation>
-     </ProxyProperty>
+     <IntVectorProperty
+        name="UseNativeCutter"
+        command="SetUseNativeCutter"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the ParaView's generic dataset
+          cutter is used instead of the specialized AMR cutter.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+        name="LevelOfResolution"
+        command="SetLevelOfResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" /> 
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
       
+      <DoubleVectorProperty
+         name="Center"
+         label="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.5 0.5 0.5" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Normal"
+         label="Normal"
+         command="SetNormal"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 1" >
+      </DoubleVectorProperty>
+     
+      <Hints>
+        <PropertyGroup type="Plane" label="Slice Widget">
+          <Property function="Origin" name="Center" />
+          <Property function="Normal" name="Normal" />
+        </PropertyGroup>
+        <PropertyGroup type="Handle" label="Slice Widget">
+        </PropertyGroup>
+
+      </Hints>
    </SourceProxy>
    
    <SourceProxy name="UniformGridPartitioner" class="vtkUniformGridPartitioner"
