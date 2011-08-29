@@ -319,11 +319,11 @@ void vtkVRStyleGrabNRotateWorld::UpdateOrientation(const vtkVREventData& data)
   // Make quaternion
   vtkMath::Matrix3x3ToQuaternion( mat, quat );
 
-  // // Get the delta rotation
-  // deltaQuat[0] = quat[0] - this->InitialTrackerQuat[0];
-  // deltaQuat[1] = quat[1] - this->InitialTrackerQuat[1];
-  // deltaQuat[2] = quat[2] - this->InitialTrackerQuat[2];
-  // deltaQuat[3] = quat[3] - this->InitialTrackerQuat[3];
+  // Get the delta rotation
+  deltaQuat[0] = quat[0] - this->InitialTrackerQuat[0];
+  deltaQuat[1] = quat[1] - this->InitialTrackerQuat[1];
+  deltaQuat[2] = quat[2] - this->InitialTrackerQuat[2];
+  deltaQuat[3] = quat[3] - this->InitialTrackerQuat[3];
 
   // if ( fabs( deltaQuat[0] ) > 0 &&
   //      ( fabs( deltaQuat[1] ) > 0 ||
@@ -341,7 +341,8 @@ void vtkVRStyleGrabNRotateWorld::UpdateOrientation(const vtkVREventData& data)
     // deltaQuat[1] = deltaQuat[1]/mag;
     // deltaQuat[2] = deltaQuat[2]/mag;
     // deltaQuat[3] = deltaQuat[3]/mag;
-    vtkMath::MultiplyQuaternion( quat,  this->InitialQuat,  this->UpdatedQuat );
+    vtkMath::MultiplyQuaternion( deltaQuat,  this->InitialQuat,  this->UpdatedQuat );
+    //vtkMath::MultiplyQuaternion( quat,  this->InitialQuat,  this->UpdatedQuat );
     // std::cout << "deltaQuat : ["
     //           << deltaQuat[0] << " "
     //           << deltaQuat[1] << " "
