@@ -54,7 +54,7 @@ void vtkBalancedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
   // get total number of polys and figure out how many each processor should have
 
-  int myId, numProcs;
+  int numProcs;
   if (!this->Controller)
     {
     vtkErrorMacro("need controller to set weights");
@@ -62,7 +62,7 @@ void vtkBalancedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     }
 
   numProcs = this->Controller->GetNumberOfProcesses();
-  myId = this->Controller->GetLocalProcessId();
+  this->Controller->GetLocalProcessId();
 
   this->SetWeights(0, numProcs-1, 1.);
   this->vtkWeightedRedistributePolyData::MakeSchedule(localSched);

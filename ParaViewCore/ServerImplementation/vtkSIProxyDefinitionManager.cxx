@@ -30,7 +30,6 @@
 #include "vtkPVXMLParser.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGeneratedModules.h"
 #include "vtkSMMessage.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
@@ -44,6 +43,9 @@
 #include <vtkstd/vector>
 
 #include <assert.h>
+
+// this file must be included after vtkPVConfig etc. are included.
+#include "vtkSMGeneratedModules.h"
 
 //****************************************************************************/
 //                    Internal Classes and typedefs

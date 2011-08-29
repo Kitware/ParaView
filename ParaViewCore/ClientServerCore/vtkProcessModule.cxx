@@ -59,6 +59,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
   vtkProcessModule::ProcessType = type;
 
   vtkProcessModule::GlobalController = vtkSmartPointer<vtkDummyController>::New();
+
 #ifdef VTK_USE_MPI
   bool use_mpi = (type != PROCESS_CLIENT);
   // initialize MPI only on non-client processes.
@@ -97,6 +98,9 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       vtkProcessModule::GlobalController)->SetCommunicator(comm);
     comm->Delete();
     }
+#else
+  static_cast<void>(argc); // unused warning when MPI is off
+  static_cast<void>(argv); // unused warning when MPI is off
 #endif // VTK_USE_MPI
   vtkMultiProcessController::SetGlobalController(
     vtkProcessModule::GlobalController);

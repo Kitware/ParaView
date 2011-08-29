@@ -48,6 +48,10 @@ vtkVisibilityPrioritizer::vtkVisibilityPrioritizer()
   memcpy(this->Frustum, frustinit, 32*sizeof(double));
   this->FrustumTester = vtkExtractSelectedFrustum::New();
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
+
+  //if estimate was perfect, backfaces would be <0.0, but since dealing with curves
+  //and a single normal we err on side of visibility to reduce popping artifacts
+  this->BackFaceFactor = -0.75;
 }
 
 //----------------------------------------------------------------------------
@@ -142,7 +146,7 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
 }
 
 //------------------------------------------------------------------------------
-double vtkVisibilityPrioritizer::CalculatePriority(double *pbbox)
+double vtkVisibilityPrioritizer::CalculatePriority(double *pbbox, double *pnorm)
 {
   double outPriority = 1.0;
 
@@ -150,6 +154,34 @@ double vtkVisibilityPrioritizer::CalculatePriority(double *pbbox)
       pbbox[2] <= pbbox[3] &&
       pbbox[4] <= pbbox[5])
     {
+    if (pnorm != NULL)
+      {
+      double n = sqrt(pnorm[0]*pnorm[0] + pnorm[1]*pnorm[1] + pnorm[2]*pnorm[2]);
+      pnorm[0] = pnorm[0]/n;
+      pnorm[1] = pnorm[1]/n;
+      pnorm[2] = pnorm[2]/n;
+      double gaze[3];
+      gaze[0] = this->CameraState[6] - this->CameraState[0];
+      gaze[1] = this->CameraState[7] - this->CameraState[1];
+      gaze[2] = this->CameraState[8] - this->CameraState[2];
+      n = sqrt(gaze[0]*gaze[0] + gaze[1]*gaze[1] + gaze[2]*gaze[2]);
+      gaze[0] = gaze[0]/n;
+      gaze[1] = gaze[1]/n;
+      gaze[2] = gaze[2]/n;
+      //cerr << "gaze " << gaze[0] << "," << gaze[1] << "," << gaze[2] << endl;
+      double dotprod = gaze[0]*pnorm[0] + gaze[1]*pnorm[1] + gaze[2]*pnorm[2];
+      if (dotprod < this->BackFaceFactor)
+        {
+        //cerr << "reject" << endl;
+        outPriority = 0.0;
+        return outPriority;
+        }
+      else
+        {
+        //cerr << "accept" << endl;
+        }
+      }
+
     //use the frustum extraction filter to reject pieces that do not
     //intersect the view frustum
     if (!this->FrustumTester->OverallBoundsTest(pbbox))

@@ -123,12 +123,13 @@ int vtkCleanUnstructuredGridCells::RequestData(
     cellIter = cellSet.find(nn);
 
     // only copy a cell to the output if it is neither degenerate nor duplicate
-    if(nn.size() == cellPoints->GetNumberOfIds() && cellIter == cellSet.end())
+    if(nn.size() == static_cast<unsigned int>(cellPoints->GetNumberOfIds()) &&
+       cellIter == cellSet.end())
       {
       output->InsertNextCell(input->GetCellType(id), cellPoints);
       cellSet.insert(nn);
       }
-    else if(nn.size() != cellPoints->GetNumberOfIds())
+    else if(nn.size() != static_cast<unsigned int>(cellPoints->GetNumberOfIds()))
       {
       ndeg++; // a node appeared more than once in a cell
       }

@@ -681,6 +681,22 @@
         <IntRangeDomain name="range" min="1" max="10000"/>
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+          name="CellPixelFactor"
+          command="SetCellPixelFactor"
+          number_of_elements="1"
+          default_values="0.666">
+        <DoubleRangeDomain name="range" min="0.0" max="2.0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+          name="BackFaceFactor"
+          command="SetBackFaceFactor"
+          number_of_elements="1"
+          default_values="-0.75">
+        <DoubleRangeDomain name="range" min="-1.0" max="0.0"/>
+      </DoubleVectorProperty>
+
       <Property
           name="Refine"
           command="Refine">

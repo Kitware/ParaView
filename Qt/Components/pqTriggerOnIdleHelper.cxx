@@ -55,9 +55,9 @@ pqServer* pqTriggerOnIdleHelper::server() const
 }
 
 //-----------------------------------------------------------------------------
-void pqTriggerOnIdleHelper::setServer(pqServer* server)
+void pqTriggerOnIdleHelper::setServer(pqServer* s)
 {
-  this->Server = server;
+  this->Server = s;
 }
 
 //-----------------------------------------------------------------------------

@@ -363,7 +363,7 @@ int vtkHierarchicalFractal::TwoDTest(double bds[6], int level, int target)
 int vtkHierarchicalFractal::MandelbrotTest(double x, double y)
 {
   unsigned short count = 0;
-  double v0, v1;
+  double v1;
   double cReal, cImag, zReal, zImag;
   double zReal2, zImag2;
 
@@ -374,7 +374,6 @@ int vtkHierarchicalFractal::MandelbrotTest(double x, double y)
 
   zReal2 = zReal * zReal;
   zImag2 = zImag * zImag;
-  v0 = 0.0;
   v1 = (zReal2 + zImag2);
   while ( v1 < 4.0 && count < 100)
     {
@@ -383,7 +382,6 @@ int vtkHierarchicalFractal::MandelbrotTest(double x, double y)
     zReal2 = zReal * zReal;
     zImag2 = zImag * zImag;
     ++count;
-    v0 = v1;
     v1 = (zReal2 + zImag2);
     }
 

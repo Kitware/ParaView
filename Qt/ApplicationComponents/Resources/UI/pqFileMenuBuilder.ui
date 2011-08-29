@@ -89,9 +89,6 @@
    </property>
   </action>
   <action name="actionFileExit" >
-   <property name="icon" >
-    <iconset/>
-   </property>
    <property name="text" >
     <string>E&amp;xit</string>
    </property>

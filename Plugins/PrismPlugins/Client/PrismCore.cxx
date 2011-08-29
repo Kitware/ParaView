@@ -348,8 +348,7 @@ void PrismCore::onSESAMEFileOpen(const QStringList& files)
         stack->beginUndoSet("Open Prism Surface");
         }
 
-    pqPipelineSource* filter = 0;
-    filter =  builder->createReader("sources", "PrismSurfaceReader", files, server);
+    builder->createReader("sources", "PrismSurfaceReader", files, server);
     if(stack)
         {
         stack->endUndoSet();

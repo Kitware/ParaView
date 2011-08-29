@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqView.h"
 #include "vtkImageData.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMViewProxy.h"
 
 #include <QWidget>
 #include <QDebug>
@@ -69,33 +67,9 @@ bool pqComponentsTestUtility::CompareView(
   // All tests need a 300x300 render window size.
   QSize cur_size = curView->getWidget()->size();
   curView->getWidget()->resize(300,300);
-  vtkImageData* test_image = curView->captureImage(1);
-  if (!test_image)
-    {
-    qCritical() << "ERROR: Failed to capture snapshot.";
-    return false;
-    }
-
-  // The returned image will have extents translated to match the view position,
-  // we shift them back.
-  int viewPos[2];
-  vtkSMPropertyHelper(curView->getViewProxy(), "ViewPosition").Get(viewPos, 2);
-  // Update image extents based on ViewPosition
-  int extents[6];
-  test_image->GetExtent(extents);
-  for (int cc=0; cc < 4; cc++)
-    {
-    extents[cc] -= viewPos[cc/2];
-    }
-  test_image->SetExtent(extents);
-
-  bool ret = pqCoreTestUtility::CompareImage(test_image, referenceImage,
-    threshold, cout, tempDirectory);
-  test_image->Delete();
+  bool retVal = pqCoreTestUtility::CompareView(
+    curView, referenceImage, threshold, tempDirectory);
   curView->getWidget()->resize(cur_size);
   curView->render();
-  return ret;
+  return retVal;
 }
-
-
-

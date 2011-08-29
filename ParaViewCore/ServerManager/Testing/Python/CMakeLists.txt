@@ -68,6 +68,7 @@ SET (PY_TESTS
   PythonSMTraceTest1
   PythonSMTraceTest2
   PythonAnimationTrack
+  GhostCellsInMergeBlocks
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )

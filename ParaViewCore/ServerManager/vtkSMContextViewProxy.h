@@ -45,6 +45,10 @@ public:
 //ETX
 
   // Description:
+  // Resets the zoom level to 100%
+  virtual void ResetDisplay();
+
+  // Description:
   // Return the render window from which offscreen rendering and interactor can
   // be accessed
   vtkRenderWindow* GetRenderWindow();

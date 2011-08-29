@@ -743,7 +743,6 @@ int vtkH5PartReader::RequestData(
       dataarray->SetName(rootname.c_str());
 
       // now read the data components.
-      herr_t r;
       hsize_t count1_mem[] = { Nt*Nc };
       hsize_t count2_mem[] = { Nt };
       hsize_t offset_mem[] = { 0 };
@@ -756,7 +755,7 @@ int vtkH5PartReader::RequestData(
         hid_t memspace = H5Screate_simple(1, count1_mem, NULL);
         hid_t component_datatype = H5PartGetNativeDatasetType(H5FileId, name);
         offset_mem[0] = c;
-        r = H5Sselect_hyperslab(
+        H5Sselect_hyperslab(
           memspace, H5S_SELECT_SET,
           offset_mem, stride_mem, count2_mem, NULL);
         if (component_datatype == datatype)
@@ -774,7 +773,7 @@ int vtkH5PartReader::RequestData(
             vtkDataArray::CreateDataArray(GetVTKDataType(component_datatype));
           temparray->SetNumberOfComponents(Nc);
           temparray->SetNumberOfTuples(Nt);
-          r = H5Sselect_hyperslab(
+          H5Sselect_hyperslab(
             memspace, H5S_SELECT_SET,
             offset_mem, stride_mem, count2_mem, NULL);
           H5Dread(dataset, component_datatype, memspace,

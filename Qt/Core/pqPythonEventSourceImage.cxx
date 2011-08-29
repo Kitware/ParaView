@@ -40,24 +40,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonEventSourceImage.h"
 
 // Qt include
-#include <QPixmap>
-#include <QImage>
 #include <QWidget>
 #include <QCoreApplication>
 #include <QEvent>
-#include <QDir>
-#include <QCommonStyle>
 
 // Qt testing includes
+#include "pqEventDispatcher.h"
 #include "pqObjectNaming.h"
 #include "pqTestUtility.h"
-#include "pqEventDispatcher.h"
 
 // VTK includes
-#include "vtkImageData.h"
 #include "vtkPNGReader.h"
 #include "vtkSmartPointer.h"
-#include "vtkTesting.h"
 
 // SM includes
 #include "vtkProcessModule.h"
@@ -65,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pqCore includes
 #include "pqCoreTestUtility.h"
 #include "pqOptions.h"
-#include "pqImageUtil.h"
 
 
 // since we have only one instance at a time
@@ -77,6 +70,7 @@ QString SnapshotTestImage;
 int SnapshotWidth = 1;
 int SnapshotHeight = 1;
 
+//-----------------------------------------------------------------------------
 static PyObject*
 QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
 {
@@ -117,14 +111,11 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   SnapshotTestImage = pngfile;
 
   // get our routines on the GUI thread to do the image comparison
-  QMetaObject::invokeMethod(Instance, "doComparison", Qt::QueuedConnection);
+  QMetaObject::invokeMethod(Instance, "doComparison", Qt::BlockingQueuedConnection);
 
-  // wait for image comparison results
-  if(!Instance->waitForGUI())
-    {
-    PyErr_SetString(PyExc_ValueError, "error during image comparison");
-    return NULL;
-    }
+  // I'm going to start using Qt::BlockingQueuedConnection instead of
+  // pqThreadedEventSource::waitForGUI(). We should deprecate that.
+  // Qt::BlockingQueuedConnection will "block until the slot returns".
 
   if(!image_image_compare && SnapshotWidget == QString::null)
     {
@@ -141,6 +132,7 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   return Py_BuildValue(const_cast<char*>(""));
 }
 
+//-----------------------------------------------------------------------------
 static PyMethodDef QtTestingImageMethods[] = {
   {
     const_cast<char*>("compareImage"), 
@@ -152,6 +144,7 @@ static PyMethodDef QtTestingImageMethods[] = {
   {NULL, NULL, 0, NULL} // Sentinal
 };
 
+//-----------------------------------------------------------------------------
 PyMODINIT_FUNC
 initQtTestingImage(void)
 {
@@ -159,6 +152,7 @@ initQtTestingImage(void)
 }
 
 
+//-----------------------------------------------------------------------------
 pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
   : pqPythonEventSource(p)
 {
@@ -168,10 +162,12 @@ pqPythonEventSourceImage::pqPythonEventSourceImage(QObject* p)
                          initQtTestingImage);
 }
 
+//-----------------------------------------------------------------------------
 pqPythonEventSourceImage::~pqPythonEventSourceImage()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqPythonEventSourceImage::run()
 {
   Instance = this;
@@ -182,111 +178,53 @@ void pqPythonEventSourceImage::run()
 void pqPythonEventSourceImage::doComparison()
 {
   // make sure all other processing has been done before we take a snapshot
-  pqEventDispatcher::processEventsAndWait(10);
+  pqEventDispatcher::processEventsAndWait(500);
 
   // assume all images are in the dataroot/Baseline directory
-  QString fullpath = pqCoreTestUtility::DataRoot();
-  fullpath += "/Baseline/";
-  fullpath += SnapshotBaseline;
+  QString baseline_image = pqCoreTestUtility::DataRoot();
+  baseline_image += "/Baseline/";
+  baseline_image += SnapshotBaseline;
 
   pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
   int threshold = options->GetCurrentImageThreshold();
-  QString testdir = options->GetTestDirectory();
-  if(testdir == QString::null)
+
+  QString test_directory = pqCoreTestUtility::TestDirectory();
+  if(test_directory == QString::null)
     {
-    testdir = ".";
+    test_directory = ".";
     }
 
   if (SnapshotWidget != QString::null)
     {
     QWidget* widget =
       qobject_cast<QWidget*>(pqObjectNaming::GetObject(SnapshotWidget));
-    if(widget)
+    if (widget)
       {
-      this->compareImage(widget,
-                          fullpath,
-                          threshold,
-                          testdir);
+      widget->resize(SnapshotWidth, SnapshotHeight);
+      ::SnapshotResult = pqCoreTestUtility::CompareImage(
+        widget, baseline_image, threshold, std::cerr, test_directory,
+        QSize(SnapshotWidth, SnapshotHeight));
       }
     }
   else if (SnapshotTestImage != QString::null)
     {
-    SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT",
-      pqCoreTestUtility::TestDirectory());
+    SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT", test_directory);
     SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_DATA_ROOT",
       pqCoreTestUtility::DataRoot());
-    this->compareImage(SnapshotTestImage, fullpath, threshold, testdir);
+
+    vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
+    if (!reader->CanReadFile(SnapshotTestImage.toAscii().data()))
+      {
+      qCritical("cannot read file %s\n", SnapshotTestImage.toAscii().data());
+      ::SnapshotResult = false;
+      }
+    else
+      {
+      reader->SetFileName(SnapshotTestImage.toAscii().data());
+      reader->Update();
+      ::SnapshotResult = pqCoreTestUtility::CompareImage(
+        reader->GetOutput(), baseline_image, threshold, std::cerr, test_directory);
+      }
     }
-
-  // signal the testing thread
-  this->guiAcknowledge();
 }
-
-//-----------------------------------------------------------------------------
-void pqPythonEventSourceImage::compareImage(QWidget* widget,
-                    const QString& baseline,
-                    double threshold,
-                    const QString& tempDir)
-{
-  
-  // for generic QWidget's, let's paint the widget into our QPixmap,
-  // put it in a vtkImageData and compare the image with a baseline
-
-  // grab an image of the widget
-  QSize oldSize = widget->size();
-  widget->resize(SnapshotWidth, SnapshotHeight);
-  QFont oldFont = widget->font();
-#if defined(Q_WS_WIN)
-  QFont newFont("Courier", 10, QFont::Normal, false);
-#elif defined(Q_WS_X11)
-  QFont newFont("Courier", 10, QFont::Normal, false);
-#else
-  QFont newFont("Courier Regular", 10, QFont::Normal, false);
-#endif
-  QCommonStyle style;
-  QStyle* oldStyle = widget->style();
-  widget->setStyle(&style);
-  widget->setFont(newFont);
-  QImage img = QPixmap::grabWidget(widget).toImage();
-  widget->resize(oldSize);
-  widget->setFont(oldFont);
-  widget->setStyle(oldStyle);
- 
-  vtkSmartPointer<vtkImageData> vtkimage = vtkSmartPointer<vtkImageData>::New();
-  pqImageUtil::toImageData(img, vtkimage);
-
-  this->compareImageInternal(vtkimage, baseline, threshold, tempDir);
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonEventSourceImage::compareImageInternal(vtkImageData* vtkimage,
-  const QString& baseline, double threshold, const QString& tempDir)
-{
-  vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
-  testing->AddArgument("-T");
-  testing->AddArgument(tempDir.toAscii().data());
-  testing->AddArgument("-V");
-  testing->AddArgument(baseline.toAscii().data());
-
-  // compare the image
-  SnapshotResult = 
-    (testing->RegressionTest(vtkimage, threshold) == vtkTesting::PASSED);
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonEventSourceImage::compareImage(const QString& image,
-  const QString& baseline, double threshold, const QString& tempDir)
-{
-  vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
-  if (!reader->CanReadFile(image.toAscii().data()))
-    {
-    qCritical("cannot read file %s\n", image.toAscii().data());
-    SnapshotResult = false;
-    return;
-    }
-  reader->SetFileName(image.toAscii().data());
-  reader->Update();
-  this->compareImageInternal(reader->GetOutput(), baseline, threshold, tempDir);
-}
-

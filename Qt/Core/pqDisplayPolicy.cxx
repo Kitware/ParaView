@@ -152,34 +152,6 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
       }
     }
 
-  //Check if we should create any of the Plot Views.
-  if (datainfo && ( className == "vtkRectilinearGrid" || className == "vtkImageData"  ) )
-    {
-    int extent[6];
-    datainfo->GetExtent(extent);
-    int temp[6]={0, 0, 0, 0, 0, 0};
-    int dimensionality = vtkStructuredData::GetDataDimension(
-      vtkStructuredData::SetExtent(extent, temp));
-
-    vtkPVDataSetAttributesInformation* cellDataInfo =
-      datainfo->GetCellDataInformation();
-    vtkPVDataSetAttributesInformation* pointDataInfo =
-      datainfo->GetPointDataInformation();
-    if (dimensionality == 1 && cellDataInfo->GetNumberOfArrays() > 0)
-      {
-      // Has cell data, mostlikely this is a histogram.
-      view_type = pqXYBarChartView::XYBarChartViewType();
-      }
-    else if (dimensionality == 1 &&
-      (pointDataInfo->GetNumberOfArrays() > 0 ||
-       cellDataInfo->GetNumberOfArrays() > 0 ) &&
-      datainfo->GetNumberOfPoints() > 1)
-      {
-      // No cell data, but some point data -- may be a XY line plot.
-      view_type = pqXYChartView::XYChartViewType();
-      }
-    }
-
   // Show table in spreadsheet view by default (unless the table is to be
   // treated as a "string" source).
   if (className == "vtkTable" && !is_text)

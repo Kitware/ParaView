@@ -39,9 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** Python event source with Image comparison capabilities 
 
  import QtTestingImage
+ QtTestingImage.compareImage('widgetName', 'baseline', threshold, 'tempDir')
 
- QtTestingImage.compareView('widgetName', 'baseline', threshold, 'tempDir')
- 
+
+
  */
 class vtkImageData;
 
@@ -53,24 +54,9 @@ public:
   pqPythonEventSourceImage(QObject* p=0);
   ~pqPythonEventSourceImage();
 
-public slots:
-  // Compare the view in the \c widget with the baseline.
-  void compareImage(QWidget* widget,
-                    const QString& baseline,
-                    double threshold,
-                    const QString& tempDir);
-
- // Compare the image (for now, only png files are supported)
- // with the baseline.
- void compareImage(const QString& pngfile,
-                   const QString& baseline,
-                   double threshold,
-                   const QString& tempDir);
 protected:
   virtual void run();
 
-  void compareImageInternal(vtkImageData* vtkimage,
-    const QString& baseline, double threshold, const QString& tempDir);
 protected slots:
   void doComparison();
 };

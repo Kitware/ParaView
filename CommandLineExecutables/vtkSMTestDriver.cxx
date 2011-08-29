@@ -711,8 +711,6 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
 
   // Report the output of the processes.
   int clientPipe = 1;
-  int serverPipe = 1;
-  int renderServerPipe = 1;
   vtkstd::string output;
   int mpiError = 0;
   while(clientPipe)
@@ -727,15 +725,14 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     // for this->ServerExitTimeOut, then we'll kill the servers, if needed.
     double timeout = (clientPipe)? 0.1 : this->ServerExitTimeOut;
     output = "";
-    serverPipe = this->WaitForAndPrintLine("server", server, output, timeout,
+    this->WaitForAndPrintLine("server", server, output, timeout,
                                            ServerStdOut, ServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("server", output))
       {
       mpiError = 1;
       }
     output = "";
-    renderServerPipe =
-      this->WaitForAndPrintLine("renderserver", renderServer, output, timeout,
+    this->WaitForAndPrintLine("renderserver", renderServer, output, timeout,
                                 RenderServerStdOut, RenderServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("renderserver", output))
       {

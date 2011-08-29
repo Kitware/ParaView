@@ -267,10 +267,12 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
   double &min, double &max, double &aconfidence)
 {
   unsigned long ignore = 0;
+  double ignoreN[3];
+  double *normalResult = ignoreN;
   this->ComputePieceMetaInformation(piece, NumPieces, resolution,
                                     bounds, gconfidence,
                                     min, max, aconfidence,
-                                    ignore);
+                                    ignore, &normalResult);
 }
 
 //----------------------------------------------------------------------------
@@ -278,7 +280,7 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
   int piece, int NumPieces, double resolution,
   double bounds[6], double &gconfidence,
   double &min, double &max, double &aconfidence,
-  unsigned long &numCells)
+  unsigned long &numCells, double **pNormal)
 {
   this->ForOther = true;
 
@@ -352,6 +354,19 @@ void vtkStreamingHarness::ComputePieceMetaInformation(
   if (inInfo->Has(vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS()))
     {
     numCells = inInfo->Get(vtkStreamingDemandDrivenPipeline::ORIGINAL_NUMBER_OF_CELLS());
+    }
+
+  if (inInfo->Has(vtkStreamingDemandDrivenPipeline::PIECE_NORMAL()))
+    {
+    double *normal = inInfo->Get(vtkStreamingDemandDrivenPipeline::PIECE_NORMAL());
+    double *dest = *pNormal;
+    dest[0] = normal[0];
+    dest[1] = normal[1];
+    dest[2] = normal[2];
+    }
+  else
+    {
+    *pNormal = NULL;
     }
 
   //restore the old setting

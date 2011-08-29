@@ -27,6 +27,7 @@ vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
   this->SubTreeCompositeIndex = 0;
+  this->MergePoints = true;
 }
 
 //----------------------------------------------------------------------------
@@ -53,7 +54,7 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
 
 
   vtkAppendFilter* appender = vtkAppendFilter::New();
-  appender->MergePointsOn();
+  appender->SetMergePoints(this->MergePoints? 1 : 0);  
   if (ds)
     {
     this->AddDataSet(ds, appender);

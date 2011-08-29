@@ -161,7 +161,6 @@ void vtkAnalyzeReader::ExecuteInformation()
   nifti_image * m_NiftiImage;
   dataTypeSize = 1.0;
   unsigned int numComponents = 1;
-  int m_ComponentType;
   nifti_1_header niftiHeader;
   unsigned char * analyzeHeaderUnsignedCharArrayPtr = (unsigned char *) &niftiHeader;
 
@@ -287,32 +286,26 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     switch( Type )
     {
     case DT_BINARY:
-      m_ComponentType = VTK_BIT;
     this->SetDataScalarType(VTK_BIT);
     dataTypeSize = 0.125;
      break;
     case DT_UNSIGNED_CHAR:
-      m_ComponentType = VTK_UNSIGNED_CHAR;
     this->SetDataScalarTypeToUnsignedChar();
     dataTypeSize = 1;
       break;
     case DT_SIGNED_SHORT:
-      m_ComponentType = VTK_SHORT;
     this->SetDataScalarTypeToShort();
     dataTypeSize = 2;
       break;
     case DT_SIGNED_INT:
-      m_ComponentType = VTK_INT;
     this->SetDataScalarTypeToInt();
     dataTypeSize = 4;
       break;
     case DT_FLOAT:
-      m_ComponentType = VTK_FLOAT;
     this->SetDataScalarTypeToFloat();
     dataTypeSize = 4;
       break;
     case DT_DOUBLE:
-      m_ComponentType = VTK_DOUBLE;
      this->SetDataScalarTypeToDouble();
     dataTypeSize = 8;
       break;

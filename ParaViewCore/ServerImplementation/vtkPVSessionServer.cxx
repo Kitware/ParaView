@@ -188,12 +188,11 @@ bool vtkPVSessionServer::Connect(const char* url)
     "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
 
   vtksys_ios::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION_FULL;
+  handshake << "handshake=paraview." << PARAVIEW_VERSION;
   // Add connect-id if needed (or maybe we extract that from url as well (just
   // like vtkNetworkAccessManager).
 
   vtkstd::string client_url;
-  bool using_reverse_connect = false;
   if (pvserver.find(url))
     {
     int port = atoi(pvserver.match(3).c_str());
@@ -211,8 +210,6 @@ bool vtkPVSessionServer::Connect(const char* url)
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
     client_url = stream.str();
-
-    using_reverse_connect = true;
     }
   else if (pvrenderserver.find(url))
     {
@@ -261,10 +258,7 @@ bool vtkPVSessionServer::Connect(const char* url)
       stream << "tcp://" << renderserverhost.c_str() << ":" << dsport << "?" << handshake.str();
       client_url = stream.str();
       }
-
-    using_reverse_connect = true;
     }
-
 
   vtkMultiProcessController* ccontroller =
     nam->NewConnection(client_url.c_str());
@@ -272,6 +266,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     {
     this->SetClientController(ccontroller);
     ccontroller->Delete();
+    cout << "Client connected." << endl;
     }
 
   return (this->ClientController != NULL);

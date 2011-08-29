@@ -95,9 +95,9 @@ void vtkSpyPlotIStream::SetStream(istream *ist)
 }
 
 vtkSpyPlotIStream::vtkSpyPlotIStream()
-  : IStream(0),
-  FileBufferSize(2097152),
-  Buffer(0)
+  : FileBufferSize(2097152),
+    Buffer(0),
+    IStream(0)
 {
 }
 

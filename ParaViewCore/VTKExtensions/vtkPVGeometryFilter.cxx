@@ -1061,7 +1061,6 @@ void vtkPVGeometryFilter::DataSetExecute(
 {
   double bds[6];
   int procid = 0;
-  int numProcs = 1;
 
   if (!doCommunicate && input->GetNumberOfPoints() == 0)
     {
@@ -1071,7 +1070,6 @@ void vtkPVGeometryFilter::DataSetExecute(
   if (this->Controller )
     {
     procid = this->Controller->GetLocalProcessId();
-    numProcs = this->Controller->GetNumberOfProcesses();
     }
 
   input->GetBounds(bds);
@@ -1109,7 +1107,6 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 {
   double bds[6];
   int procid = 0;
-  int numProcs = 1;
 
   if (!this->UseOutline)
     {
@@ -1141,7 +1138,6 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
   if (this->Controller )
     {
     procid = this->Controller->GetLocalProcessId();
-    numProcs = this->Controller->GetNumberOfProcesses();
     }
 
   input->GetBounds(bds);
@@ -1315,13 +1311,6 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
                                                 int updateNumPieces,
                                                 int updateGhosts)
 {
-  int *ext;
-
-  ext = input->GetWholeExtent();
-
-  // If 2d then default to superclass behavior.
-//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
-//      !this->UseOutline)
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)
@@ -1358,13 +1347,6 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
                                                 int updateNumPieces,
                                                 int updateGhosts)
 {
-  int *ext;
-
-  ext = input->GetWholeExtent();
-
-  // If 2d then default to superclass behavior.
-//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
-//      !this->UseOutline)
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)

@@ -302,6 +302,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     {
     return;
     }
+  
 #ifdef PARAVIEW_USE_ICE_T
   if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
     {
@@ -309,6 +310,8 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
                  (vtkIceTSynchronizedRenderers*)this->ParallelSynchronizer;
     aux->SetUseDepthBuffer(useDB);
     }
+#else
+  static_cast<void>(useDB); // unused warning when MPI is off.
 #endif
 }
 

@@ -2478,21 +2478,13 @@ def __determineGroup(proxy):
         return "sources"
     elif xmlgroup == "filters":
         return "sources"
-    elif xmlgroup == "views":
-        return "views"
     elif xmlgroup == "representations":
         if xmlname == "ScalarBarWidgetRepresentation":
             return "scalar_bars"
         return "representations"
-    elif xmlgroup == "lookup_tables":
-        return "lookup_tables"
-    elif xmlgroup == "implicit_functions":
-        return "implicit_functions"
-    elif xmlgroup == "piecewise_functions":
-        return "piecewise_functions"
-    elif xmlgroup == "animation" or xmlgroup == "animation_keyframes":
+    elif xmlgroup == "animation_keyframes":
         return "animation"
-    return None
+    return xmlgroup
 
 __nameCounter = {}
 def __determineName(proxy, group):

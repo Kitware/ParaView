@@ -104,6 +104,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
   this->LODDeliverySuppressor = vtkPVUpdateSuppressor::New();
+  this->RequestGhostCellsIfNeeded = true;
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = VTK_SCALAR_MODE_DEFAULT;
@@ -294,6 +295,33 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
+bool vtkGeometryRepresentation::DoRequestGhostCells(vtkInformation* info)
+{
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+  if (controller == NULL || controller->GetNumberOfProcesses() <= 1)
+    {
+    return false;
+    }
+
+  if (vtkUnstructuredGrid::GetData(info) != NULL ||
+    vtkCompositeDataSet::GetData(info) != NULL)
+    {
+    // ensure that there's no WholeExtent to ensure
+    // that this UG was never born out of a structured dataset.
+    bool has_whole_extent = (info->Has(
+        vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+    if (!has_whole_extent)
+      {
+      //cout << "Need ghosts" << endl;
+      return true;
+      }
+    }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
 int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
@@ -302,9 +330,7 @@ int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
 
   // ensure that the ghost-level information is setup correctly to avoid
   // internal faces for unstructured grids.
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
-  for (int cc=0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
+  for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
     {
     for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
@@ -313,21 +339,10 @@ int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
       vtkStreamingDemandDrivenPipeline* sddp =
         vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
       int ghostLevels = sddp->GetUpdateGhostLevel(inInfo);
-      if (controller->GetNumberOfProcesses() > 1)
+      if (this->RequestGhostCellsIfNeeded &&
+        vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
         {
-        vtkUnstructuredGrid* ug_input = vtkUnstructuredGrid::GetData(inInfo);
-        vtkCompositeDataSet* cd_input = vtkCompositeDataSet::GetData(inInfo);
-        if (ug_input || cd_input)
-          {
-          // ensure that there's no WholeExtent to ensure
-          // that this UG was never born out of a structured dataset.
-          bool has_whole_extent = (inInfo->Has(
-              vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
-          if (!has_whole_extent)
-            {
-            ghostLevels++;
-            }
-          }
+        ghostLevels++;
         }
       sddp->SetUpdateGhostLevel(inInfo, ghostLevels);
       }

@@ -31,6 +31,7 @@ vtkSelectionRepresentation::vtkSelectionRepresentation()
   this->GeometryRepresentation = vtkGeometryRepresentation::New();
   this->GeometryRepresentation->SetPickable(0);
   this->GeometryRepresentation->SetDebugString("vtkSelectionRepresentation");
+  this->GeometryRepresentation->RequestGhostCellsIfNeededOff();
 
   this->LabelRepresentation = vtkDataLabelRepresentation::New();
   this->LabelRepresentation->SetPointLabelMode(VTK_LABEL_FIELD_DATA);

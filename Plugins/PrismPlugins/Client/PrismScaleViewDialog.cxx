@@ -256,9 +256,9 @@ void PrismScaleViewDialog::onCustomBoundsChanged( )
 }
 
 //-----------------------------------------------------------------------------
-void PrismScaleViewDialog::modeChanged(const int& pos, const int& value)
+void PrismScaleViewDialog::modeChanged(const int& position, const int& value)
 {
-  this->Internals->ScalingMode[pos] = value;
+  this->Internals->ScalingMode[position] = value;
 }
 //-----------------------------------------------------------------------------
 void PrismScaleViewDialog::onButtonClicked(QAbstractButton* button)

@@ -985,7 +985,6 @@ void pqSierraPlotToolsManager::slotPlotDialogAccepted()
   if (this->Internal->plotGUI->areVariablesSelected())
     {
     QList<QListWidgetItem *> selectedItems = this->Internal->plotGUI->getSelectedItems();
-    QList<QListWidgetItem *>::iterator iter = selectedItems.begin();
 
     if (! this->createPlotOverTime())
       {

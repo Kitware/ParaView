@@ -342,9 +342,9 @@ bool vtkStreamingDriver::HasCameraMoved()
 }
 
 //------------------------------------------------------------------------------
-double vtkStreamingDriver::CalculateViewPriority(double *pbbox)
+double vtkStreamingDriver::CalculateViewPriority(double *pbbox, double *pNormal)
 {
-  return this->Internal->ViewSorter->CalculatePriority(pbbox);
+  return this->Internal->ViewSorter->CalculatePriority(pbbox, pNormal);
 }
 
 //------------------------------------------------------------------------------
@@ -454,4 +454,10 @@ unsigned long int vtkStreamingDriver::ComputePixelCount(double *pbbox)
     }
   //cerr << "display bounds are " << minx << "," << maxx << " " << miny << "," << maxy << endl;
   return (unsigned long)((maxx-minx) * (maxy-miny));
+}
+
+//----------------------------------------------------------------------------
+vtkVisibilityPrioritizer *vtkStreamingDriver::GetVisibilityPrioritizer()
+{
+  return this->Internal->ViewSorter;
 }

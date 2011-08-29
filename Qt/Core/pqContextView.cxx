@@ -328,8 +328,7 @@ void pqContextView::resetDisplay()
   vtkSMContextViewProxy *proxy = this->getContextViewProxy();
   if (proxy)
     {
-    proxy->GetChart()->RecalculateBounds();
-    proxy->GetChartView()->Render();
+    proxy->ResetDisplay();
     }
 }
 

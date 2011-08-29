@@ -16,7 +16,7 @@ set (QT_USE_QTNETWORK TRUE)
 include(${QT_USE_FILE})
 
 include_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ParaView_SOURCE_FILES
@@ -250,11 +250,6 @@ if(APPLE)
   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
 endif(APPLE)
 
-set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
-if(PARAVIEW_VERSION_RC)
-  set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
-endif(PARAVIEW_VERSION_RC)
-
 set(_package_name "ParaView")
 if(PARAVIEW_INSTALL_DEVELOPMENT)
   set(_package_name "ParaView-Development")
@@ -267,7 +262,7 @@ build_paraview_client_cpack_config_init(
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH ${_VERSION_PATCH}
+    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
     DESCRIPTION "ParaView is a scientific visualization tool"
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"

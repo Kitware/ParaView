@@ -32,6 +32,7 @@ class vtkParallelStreamHelper;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkStreamingHarness;
+class vtkVisibilityPrioritizer;
 
 class VTK_EXPORT vtkStreamingDriver : public vtkObject
 {
@@ -117,7 +118,7 @@ protected:
   // Determines view priority of an object relative to camera frustum
   // Must call Is Restart prior to calling this.
   // This is common to prioritized subclasses, so I've placed it here
-  double CalculateViewPriority(double *bbox);
+  double CalculateViewPriority(double *bbox, double *pNormal=NULL);
 
   // Description:
   // Copies renwin's back buffer to its front to make what we've drawn visible.
@@ -131,6 +132,10 @@ protected:
   // Gives driver a chance to setup a new harness as the driver wants it
   // to be.
   virtual void AddHarnessInternal(vtkStreamingHarness *) = 0;
+
+  // Description:
+  // So subclasses can tune it's behavior.
+  vtkVisibilityPrioritizer * GetVisibilityPrioritizer();
 
   bool ManualStart;
   bool ManualFinish;

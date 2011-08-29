@@ -44,6 +44,13 @@ public:
   vtkSetMacro(SubTreeCompositeIndex, unsigned int);
   vtkGetMacro(SubTreeCompositeIndex, unsigned int);
 
+  // Description:
+  // Turn on/off merging of coincidental points.  Frontend to
+  // vtkAppendFilter::MergePoints. Default is on.
+  vtkSetMacro(MergePoints, bool);
+  vtkGetMacro(MergePoints, bool);
+  vtkBooleanMacro(MergePoints, bool);
+
 //BTX
 protected:
   vtkCompositeDataToUnstructuredGridFilter();
@@ -66,6 +73,7 @@ protected:
 
   void ExecuteSubTree(vtkCompositeDataSet* cd, vtkAppendFilter* output);
   unsigned int SubTreeCompositeIndex;
+  bool MergePoints;
 private:
   vtkCompositeDataToUnstructuredGridFilter(const vtkCompositeDataToUnstructuredGridFilter&); // Not implemented
   void operator=(const vtkCompositeDataToUnstructuredGridFilter&); // Not implemented

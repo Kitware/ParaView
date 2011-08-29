@@ -6313,14 +6313,14 @@ int vtknifti1_io::nifti_short_order(void)   /* determine this CPU's byte order *
 nifti_image *vtknifti1_io::nifti_image_from_ascii( const char *str, int * bytes_read )
 {
    char lhs[1024] , rhs[1024] ;
-   int ii , spos, nn , slen ;
+   int ii , spos, nn;
    nifti_image *nim ;              /* will be output */
 
    if( str == NULL || *str == '\0' ) return NULL ;  /* bad input!? */
 
    /* scan for opening string */
 
-   spos = 0 ; slen = (int)strlen(str) ;
+   spos = 0;
    ii = sscanf( str+spos , "%1023s%n" , lhs , &nn ) ; spos += nn ;
    if( ii == 0 || strcmp(lhs,"<nifti_image") != 0 ) return NULL ;
 
