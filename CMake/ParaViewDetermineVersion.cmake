@@ -27,6 +27,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     WORKING_DIRECTORY ${source_dir}
     RESULT_VARIABLE result
     OUTPUT_VARIABLE output
+    ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_STRIP_TRAILING_WHITESPACE)
   if (${result} EQUAL 0)
@@ -45,7 +46,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
 
   if (NOT major)
     # Check is file exists, use that.
-    file (READ ${alternative_version_file} contents)
+    file (STRINGS ${alternative_version_file} contents)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
       version_matches ${contents})
     if (CMAKE_MATCH_0) 
