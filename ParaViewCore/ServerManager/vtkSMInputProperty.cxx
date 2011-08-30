@@ -443,3 +443,46 @@ int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
   this->ImmediateUpdate = prevImUpdate;
   return 1;
 }
+
+//---------------------------------------------------------------------------
+void vtkSMInputProperty::Copy(vtkSMProperty* src)
+{
+  int imUpdate = this->ImmediateUpdate;
+  this->ImmediateUpdate = 0;
+
+  this->Superclass::Copy(src);
+
+  vtkSMInputProperty* dsrc = vtkSMInputProperty::SafeDownCast(src);
+  if (dsrc)
+    {
+    this->IPInternals->OutputPorts = dsrc->IPInternals->OutputPorts;
+    this->IPInternals->UncheckedOutputPorts =
+      dsrc->IPInternals->UncheckedOutputPorts;
+    }
+
+  this->ImmediateUpdate = imUpdate;
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMInputProperty::DeepCopy(vtkSMProperty* src, 
+  const char* exceptionClass, int proxyPropertyCopyFlag)
+{
+  vtkSMInputProperty* dsrc = vtkSMInputProperty::SafeDownCast(src);
+  int imUpdate = this->ImmediateUpdate;
+  this->ImmediateUpdate = 0;
+
+  this->Superclass::DeepCopy(src, exceptionClass, proxyPropertyCopyFlag);
+  if (dsrc)
+    {
+    this->IPInternals->OutputPorts = dsrc->IPInternals->OutputPorts;
+    this->IPInternals->UncheckedOutputPorts =
+      dsrc->IPInternals->UncheckedOutputPorts;
+    }
+
+  this->ImmediateUpdate = imUpdate;
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
+}
