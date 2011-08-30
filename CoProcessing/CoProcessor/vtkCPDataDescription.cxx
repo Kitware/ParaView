@@ -26,13 +26,13 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 class vtkCPDataDescription::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkCPInputDataDescription> >
+  typedef std::map<std::string, vtkSmartPointer<vtkCPInputDataDescription> >
     GridDescriptionMapType;
   GridDescriptionMapType GridDescriptionMap;
 };

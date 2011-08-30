@@ -41,7 +41,7 @@ public:
   /// Macros for getting the time step and simulation time.
   vtkGetMacro(TimeStep, vtkIdType);
   vtkGetMacro(Time, double);
- 
+
   /// Add names for grids produced by the simulation. This allocates a new
   /// vtkCPInputDataDescription for that grid, if a grid by that name does not
   /// already exist.
