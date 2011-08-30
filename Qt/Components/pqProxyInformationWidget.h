@@ -51,9 +51,6 @@ public:
   /// destructor
   ~pqProxyInformationWidget();
 
-  /// Set the display whose properties we want to edit. 
-  void setOutputPort(pqOutputPort* outputport);
-
   /// get the proxy for which properties are displayed
   pqOutputPort* getOutputPort();
 
@@ -61,6 +58,9 @@ public slots:
   /// TODO: have this become automatic instead of relying on 
   /// the accept button in case another client modifies the pipeline.
   void updateInformation();
+
+  /// Set the display whose properties we want to edit.
+  void setOutputPort(pqOutputPort* outputport);
 
 private slots:
   void onItemClicked(QTreeWidgetItem* item);

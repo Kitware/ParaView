@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
 
+#include "pqActiveObjects.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
@@ -70,11 +71,15 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 
+  this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+  this->tabifyDockWidget(this->Internals->informationDock, this->Internals->displayDock);
+  this->tabifyDockWidget(this->Internals->informationDock, this->Internals->objectInspectorDock);
+
   // Enable automatic creation of representation on accept.
-  this->Internals->proxyTabWidget->setShowOnAccept(true);
+  this->Internals->objectInspector->setShowOnAccept(true);
 
   // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget->getObjectInspector(),
+  QObject::connect(this->Internals->objectInspector,
     SIGNAL(helpRequested(QString)),
     this, SLOT(showHelpForProxy(const QString&)));
 

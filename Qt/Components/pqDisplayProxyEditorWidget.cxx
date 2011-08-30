@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPanelDecoratorInterface.h"
 #include "pqDisplayPanelInterface.h"
@@ -192,6 +193,19 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
 
   this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
   l->addWidget(this->Internal->DisplayPanel);
+
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(portChanged(pqOutputPort*)),
+                this,
+                SLOT(setOutputPort(pqOutputPort*)));
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(viewChanged(pqView*)),
+                this,
+                SLOT(setView(pqView*)));
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(representationChanged(pqRepresentation*)),
+                this,
+                SLOT(setRepresentation(pqRepresentation*)));
 }
 
 //-----------------------------------------------------------------------------

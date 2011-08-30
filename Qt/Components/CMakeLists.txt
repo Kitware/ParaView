@@ -143,7 +143,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyInformationWidget.h
   pqProxyPanel.h
   pqProxySelectionWidget.h
-  pqProxyTabWidget.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
@@ -540,8 +539,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqProxyPanel.h
   pqProxySelectionWidget.cxx
   pqProxySelectionWidget.h
-  pqProxyTabWidget.cxx
-  pqProxyTabWidget.h
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
   pqQueryDialog.cxx
