@@ -22,6 +22,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
   set (minor)
   set (patch)
   set (full)
+  set (git_command)
   execute_process(
     COMMAND ${git_command} describe
     WORKING_DIRECTORY ${source_dir}
@@ -43,7 +44,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     endif()
   endif()
 
-  if (NOT ${major})
+  if (NOT major)
     # Check is file exists, use that.
     file (READ ${alternative_version_file} contents)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
@@ -57,7 +58,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     endif()
   endif()
 
-  if (NOT ${major})
+  if (NOT major)
     message (FATAL_ERROR "Failed to determine source version correctly.")
   endif()
 
