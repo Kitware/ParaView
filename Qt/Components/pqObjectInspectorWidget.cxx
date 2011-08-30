@@ -82,6 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
 #include "pqOutputPort.h"
+#include "pqApplyPropertiesManager.h"
 
 #include "vtkTimerLog.h"
 
@@ -276,7 +277,24 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   mainLayout->addLayout(buttonlayout);
   mainLayout->addWidget(s);
 
-  this->connect(this->AcceptButton, SIGNAL(clicked()), SLOT(accept()));
+  // connect the apply button to the apply properties manager
+  pqApplyPropertiesManager *applyPropertiesManager =
+      qobject_cast<pqApplyPropertiesManager *>(
+        pqApplicationCore::instance()->manager("APPLY_PROPERTIES"));
+
+  if(applyPropertiesManager)
+    {
+    this->connect(this->AcceptButton,
+                  SIGNAL(clicked()),
+                  applyPropertiesManager,
+                  SLOT(applyProperties()));
+
+    this->connect(applyPropertiesManager,
+                  SIGNAL(apply()),
+                  this,
+                  SLOT(accept()));
+    }
+
   this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
   this->connect(this->DeleteButton, SIGNAL(clicked()), SLOT(deleteProxy()));
   this->connect(this->HelpButton, SIGNAL(clicked()), SLOT(showHelp()));
@@ -420,7 +438,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   this->HelpButton->setEnabled(true);
 
   // search for a custom form for this proxy with pending changes
-  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
+  QMap<pqProxy*, QPointer<pqObjectPanel> >::iterator iter;
   iter = this->PanelStore.find(proxy);
   if(iter != this->PanelStore.end())
     {
@@ -505,10 +523,6 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::accept()
 {
-  BEGIN_UNDO_SET("Apply");
-  vtkTimerLog::MarkStartEvent("Apply");
-  emit this->preaccept();
-
   QSet<pqProxy*> proxies_to_show;
 
   // accept all panels that are dirty.
@@ -553,13 +567,6 @@ void pqObjectInspectorWidget::accept()
     }
 
   emit this->accepted();
-  emit this->postaccept();
-
-  END_UNDO_SET();
-  vtkTimerLog::MarkEndEvent("Apply");
-
-  // Essential to render all views.
-  pqApplicationCore::instance()->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -612,7 +619,7 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     this->CurrentPanel = NULL;
     }
 
-  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
+  QMap<pqProxy*, QPointer<pqObjectPanel> >::iterator iter;
   iter = this->PanelStore.find(proxy);
   if (iter != this->PanelStore.end())
     {

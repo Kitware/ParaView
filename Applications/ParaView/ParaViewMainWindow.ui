@@ -175,8 +175,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>125</height>
+          <width>82</width>
+          <height>167</height>
          </rect>
         </property>
        </widget>
@@ -210,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>125</height>
+          <width>82</width>
+          <height>167</height>
          </rect>
         </property>
        </widget>
@@ -219,6 +219,15 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QDockWidget" name="summaryDock">
+   <property name="windowTitle">
+    <string>Summary</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqSummaryPanel" name="summaryWidget"/>
   </widget>
  </widget>
  <customwidgets>
@@ -279,6 +288,12 @@
    <class>pqProxyInformationWidget</class>
    <extends>QWidget</extends>
    <header>pqProxyInformationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSummaryPanel</class>
+   <extends>QWidget</extends>
+   <header>pqSummaryPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

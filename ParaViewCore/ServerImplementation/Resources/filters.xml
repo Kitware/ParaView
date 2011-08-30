@@ -1675,6 +1675,9 @@ The filter operates on any type of data set, but the input data set must have at
         <Documentation>
           This property contains the name for the output array containing the result of this computation.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
      </StringVectorProperty>
 
      <StringVectorProperty
@@ -1684,6 +1687,9 @@ The filter operates on any type of data set, but the input data set must have at
         <Documentation>
           This property contains the equation for computing the new array.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
      </StringVectorProperty>
 
      <IntVectorProperty
@@ -4579,6 +4585,9 @@ The Warp (vector) filter translates the points of the input dataset using a spec
             <Documentation>
               The value of this property contains the name of the vector array by which to warp the dataset's point coordinates.
             </Documentation>
+            <Hints>
+              <ShowInSummaryPanel/>
+            </Hints>
       </StringVectorProperty>
 
       <DoubleVectorProperty
@@ -4590,6 +4599,9 @@ The Warp (vector) filter translates the points of the input dataset using a spec
         <Documentation>
           Each component of the selected vector array will be multiplied by the value of this property before being used to compute new point coordinates.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
    <!-- End WarpVector -->
    </SourceProxy>
@@ -4629,6 +4641,9 @@ This filter extracts the portion of the input dataset that lies along the specif
            <Documentation>
              This property sets the parameters of the slice function.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -4791,6 +4806,9 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
            <Documentation>
              This property specifies the parameters of the clip function (an implicit plane) used to clip the dataset.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -5037,6 +5055,9 @@ To select between these two options, select either Point Data or Cell Data from 
            <Documentation>
              The value of this property contains the name of the scalar array from which to perform thresholding.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </StringVectorProperty>
 
      <DoubleVectorProperty
@@ -5054,6 +5075,9 @@ To select between these two options, select either Point Data or Cell Data from 
           <Documentation>
             The values of this property specify the upper and lower bounds of the thresholding operation.
           </Documentation>
+          <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </DoubleVectorProperty>
 
      <IntVectorProperty
@@ -5068,6 +5092,7 @@ To select between these two options, select either Point Data or Cell Data from 
      </IntVectorProperty>
      <Hints>
        <Visibility replace_input="2" />
+       <ShowInSummaryPanel/>
      </Hints>
    <!-- End Threshold -->
    </SourceProxy>
@@ -5191,6 +5216,9 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
           <Documentation>
             This property specifies the name of the scalar array from which the contour filter will compute isolines and/or isosurfaces.
           </Documentation>
+          <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </StringVectorProperty>
 
      <DoubleVectorProperty
@@ -5212,6 +5240,9 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
           <Documentation>
             This property specifies the values at which to compute isosurfaces/isolines and also the number of such values.
           </Documentation>
+          <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </DoubleVectorProperty>
 
      <IntVectorProperty
@@ -5315,6 +5346,9 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
           <Documentation>
             This property indicates the name of the scalar array on which to operate. The indicated array may be used for scaling the glyphs. (See the SetScaleMode property.)
           </Documentation>
+          <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </StringVectorProperty>
 
      <StringVectorProperty
@@ -5333,6 +5367,9 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
           <Documentation>
             This property indicates the name of the vector array on which to operate. The indicated array may be used for scaling and/or orienting the glyphs. (See the SetScaleMode and SetOrient properties.)
           </Documentation>
+          <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </StringVectorProperty>
 
      <InputProperty
@@ -5358,6 +5395,9 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
            <Documentation>
              This property determines which type of glyph will be placed at the points in the input dataset.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </InputProperty>
 
      <ProxyProperty name="GlyphTransform" command="SetSourceTransform">
@@ -5397,6 +5437,9 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
        <Documentation>
          The value of this property specifies how/if the glyphs should be scaled based on the point-centered scalars/vectors in the input dataset.
        </Documentation>
+       <Hints>
+         <ShowInSummaryPanel/>
+       </Hints>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -5909,6 +5952,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
            <Documentation>
              The value of this property determines how the seeds for the streamlines will be generated.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
       </InputProperty>
 
      <StringVectorProperty
@@ -5926,6 +5972,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
            <Documentation>
              This property contains the name of the vector array from which to generate streamlines.
            </Documentation>
+           <Hints>
+            <ShowInSummaryPanel/>
+          </Hints>
      </StringVectorProperty>
 
      <IntVectorProperty
