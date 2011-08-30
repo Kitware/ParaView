@@ -726,18 +726,18 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
 
   matrix->Element[0][0] = rotMatrix[0][0];
-  matrix->Element[1][0] = rotMatrix[0][1];
-  matrix->Element[2][0] = rotMatrix[0][2];
+  matrix->Element[1][0] = rotMatrix[1][0];
+  matrix->Element[2][0] = rotMatrix[2][0];
   matrix->Element[3][0] = 0.0;
 
-  matrix->Element[0][1] = rotMatrix[1][0];
+  matrix->Element[0][1] = rotMatrix[0][1];
   matrix->Element[1][1] = rotMatrix[1][1];
-  matrix->Element[2][1] = rotMatrix[1][2];
+  matrix->Element[2][1] = rotMatrix[2][1];
   //matrix->Element[1][3] = pos[2]*1/12;
   matrix->Element[3][1] = 0.0;
 
-  matrix->Element[0][2] = rotMatrix[2][0];
-  matrix->Element[1][2] = rotMatrix[2][1];
+  matrix->Element[0][2] = rotMatrix[0][2];
+  matrix->Element[1][2] = rotMatrix[1][2];
   matrix->Element[2][2] = rotMatrix[2][2];
   //matrix->Element[2][3] = pos[1]*-1/12;
   matrix->Element[3][2] = 0.0;
@@ -794,23 +794,23 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
 #endif
 
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
-  temp.data.tracker.matrix[1] = matrix->Element[1][0];
-  temp.data.tracker.matrix[2] = matrix->Element[2][0];
-  temp.data.tracker.matrix[3] = matrix->Element[3][0];
+  temp.data.tracker.matrix[1] = matrix->Element[0][1];
+  temp.data.tracker.matrix[2] = matrix->Element[0][2];
+  temp.data.tracker.matrix[3] = matrix->Element[0][3];
 
-  temp.data.tracker.matrix[4] = matrix->Element[0][1];
+  temp.data.tracker.matrix[4] = matrix->Element[1][0];
   temp.data.tracker.matrix[5] = matrix->Element[1][1];
-  temp.data.tracker.matrix[6] = matrix->Element[2][1];
-  temp.data.tracker.matrix[7] = matrix->Element[3][1];
+  temp.data.tracker.matrix[6] = matrix->Element[1][2];
+  temp.data.tracker.matrix[7] = matrix->Element[1][3];
 
-  temp.data.tracker.matrix[8] = matrix->Element[0][2];
-  temp.data.tracker.matrix[9] = matrix->Element[1][2];
+  temp.data.tracker.matrix[8] = matrix->Element[2][0];
+  temp.data.tracker.matrix[9] = matrix->Element[2][1];
   temp.data.tracker.matrix[10] = matrix->Element[2][2];
-  temp.data.tracker.matrix[11] = matrix->Element[3][2];
+  temp.data.tracker.matrix[11] = matrix->Element[2][3];
 
-  temp.data.tracker.matrix[12] = matrix->Element[0][3];
-  temp.data.tracker.matrix[13] = matrix->Element[1][3];
-  temp.data.tracker.matrix[14] = matrix->Element[2][3];
+  temp.data.tracker.matrix[12] = matrix->Element[3][0];
+  temp.data.tracker.matrix[13] = matrix->Element[3][1];
+  temp.data.tracker.matrix[14] = matrix->Element[3][2];
   temp.data.tracker.matrix[15] = matrix->Element[3][3];
 
   matrix->Delete();
