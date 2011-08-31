@@ -34,7 +34,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
       version_matches ${output})
     if (CMAKE_MATCH_0) 
-      message("Determined Source Version : ${CMAKE_MATCH_0}")
+      message(STATUS "Determined Source Version : ${CMAKE_MATCH_0}")
       set (full ${CMAKE_MATCH_0})
       set (major ${CMAKE_MATCH_1})
       set (minor ${CMAKE_MATCH_2})
@@ -50,7 +50,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
       version_matches ${contents})
     if (CMAKE_MATCH_0) 
-      message("Determined Source Version from file: ${CMAKE_MATCH_0}")
+      message(STATUS "Determined Source Version from file : ${CMAKE_MATCH_0}")
       set (full ${CMAKE_MATCH_0})
       set (major ${CMAKE_MATCH_1})
       set (minor ${CMAKE_MATCH_2})
