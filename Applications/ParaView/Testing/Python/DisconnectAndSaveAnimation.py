@@ -5,19 +5,19 @@ import QtTestingImage
 
 object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object2 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(object3, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object4 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
+object4 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
 QtTesting.playCommand(object4, 'set_string', '1')
 QtTesting.playCommand(object2, 'activate', '')
 object5 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
 QtTesting.playCommand(object5, 'currentChanged', '/0/0|0')
-object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar'
+object6 = 'pqClientMainWindow/1QTabBar1'
 QtTesting.playCommand(object6, 'set_tab', '1')
-object7 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
+object7 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object7, 'set_boolean', 'true')
 object8 = 'pqClientMainWindow/menubar'
 QtTesting.playCommand(object8, 'activate', 'menu_View')
