@@ -18,10 +18,7 @@
 #include "vtkObject.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 
-class vtkDataObject;
-class vtkDataSet;
 class vtkFieldData;
-class vtkStringArray;
 class vtkCPInputDataDescription;
 
 /// @ingroup CoProcessing
@@ -88,6 +85,14 @@ public:
   /// Returns true if any of the grids is necessary.
   bool GetIfAnyGridNecessary();
 
+  /// Set user defined information that can be passed from the
+  /// adaptor to the coprocessing pipelines.
+  void SetUserData(vtkFieldData* UserData);
+
+  /// Set user defined information that can be passed from the
+  /// adaptor to the coprocessing pipelines.
+  vtkGetObjectMacro(UserData, vtkFieldData);
+
 //BTX
 protected:
   vtkCPDataDescription();
@@ -111,6 +116,11 @@ private:
   /// pipeline.  Default is false.  If this is true then
   /// GetIsGridNecessary() and GetIfAnyGridIsNecessary() will return true.
   bool ForceOutput;
+
+  /// UserData allows the user to pass information from the adaptor to
+  /// the coprocessing pipelines.  We currently use vtkFieldData since
+  /// it can store a wide variety of data types which are all python wrapped.
+  vtkFieldData* UserData;
 
   class vtkInternals;
   vtkInternals* Internals;

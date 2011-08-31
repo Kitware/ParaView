@@ -37,6 +37,7 @@ public:
   GridDescriptionMapType GridDescriptionMap;
 };
 
+vtkCxxSetObjectMacro(vtkCPDataDescription, UserData, vtkFieldData);
 vtkStandardNewMacro(vtkCPDataDescription);
 //----------------------------------------------------------------------------
 vtkCPDataDescription::vtkCPDataDescription()
@@ -45,6 +46,7 @@ vtkCPDataDescription::vtkCPDataDescription()
   this->TimeStep = 0;
   this->IsTimeDataSet = false;
   this->ForceOutput = false;
+  this->UserData = NULL;
 
   this->Internals = new vtkInternals();
 }
@@ -52,6 +54,7 @@ vtkCPDataDescription::vtkCPDataDescription()
 //----------------------------------------------------------------------------
 vtkCPDataDescription::~vtkCPDataDescription()
 {
+  this->SetUserData(NULL);
   delete this->Internals;
   this->Internals = 0;
 }
@@ -176,4 +179,12 @@ void vtkCPDataDescription::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeStep: " << this->TimeStep << "\n";
   os << indent << "IsTimeDataSet: " << this->IsTimeDataSet << "\n";
   os << indent << "ForceOutput: " << this->ForceOutput << "\n";
+  if(this->UserData)
+    {
+    os << indent << "UserData: " << this->UserData << "\n";
+    }
+  else
+    {
+    os << indent << "UserData: (NULL)\n";
+    }
 }
