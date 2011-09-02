@@ -150,6 +150,7 @@ if(NOT APPLE)
   endif()
 
   set(MPI_ARGS
+    -DMPI_DIR:PATH=${MPI_INSTALL}
     -DPARAVIEW_USE_MPI:BOOL=ON
     -DMPIEXEC:FILEPATH=${MPIEXEC}
     -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
@@ -169,7 +170,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER)
+  if(CMAKE_Fortran_COMPILER AND NOT WIN32)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
@@ -211,6 +212,7 @@ else()
   find_package(MPI)
   set(MPI_ARGS
     -DPARAVIEW_USE_MPI:BOOL=ON
+    -DMPI_DIR:PATH=${MPI_INSTALL}
     -DMPIEXEC:FILEPATH=${MPIEXEC}
     -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
@@ -395,7 +397,6 @@ ExternalProject_Add(${proj}
     -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
     # Qt
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-    -DQT_QTUITOOLS_INCLUDE_DIR:PATH=/Users/partyd/Support/qt-4.6.4/install/include/QtUiTools
     # MPI
     ${MPI_ARGS}
     # Manta
@@ -419,6 +420,6 @@ ExternalProject_Add(${proj}
     # zlib
     ${ZLIB_ARGS}
     # Documentation
-    ${DOC_ARGS}
+    #${DOC_ARGS}
   INSTALL_COMMAND ""
   )
