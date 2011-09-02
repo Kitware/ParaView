@@ -475,7 +475,7 @@ def trace_save_execute_script(code):
   # make sure the trace is up to date
   append_trace()
 
-  trace_globals.trace_output.append(code)
+  trace_globals.trace_output.append("exec(\"\"\"\n%s\"\"\", dict(globals()))\n\n" % code)
   stop_trace()
   trace_globals.paused_for_execute_script = True
 
