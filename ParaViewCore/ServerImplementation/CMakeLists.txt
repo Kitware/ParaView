@@ -89,8 +89,8 @@ ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
     COMMAND protoc_compiler
-      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
-      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto
+      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:"${CMAKE_CURRENT_BINARY_DIR}"
+      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources "${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto"
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
 )
 
