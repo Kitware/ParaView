@@ -27,13 +27,14 @@ function(determine_version source_dir git_command alternative_version_file var_p
     WORKING_DIRECTORY ${source_dir}
     RESULT_VARIABLE result
     OUTPUT_VARIABLE output
+    ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_STRIP_TRAILING_WHITESPACE)
   if (${result} EQUAL 0)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
       version_matches ${output})
     if (CMAKE_MATCH_0) 
-      message("Determined Source Version : ${CMAKE_MATCH_0}")
+      message(STATUS "Determined Source Version : ${CMAKE_MATCH_0}")
       set (full ${CMAKE_MATCH_0})
       set (major ${CMAKE_MATCH_1})
       set (minor ${CMAKE_MATCH_2})
@@ -43,13 +44,13 @@ function(determine_version source_dir git_command alternative_version_file var_p
     endif()
   endif()
 
-  if (NOT ${major})
+  if (NOT major)
     # Check is file exists, use that.
-    file (READ ${alternative_version_file} contents)
+    file (STRINGS ${alternative_version_file} contents)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
       version_matches ${contents})
     if (CMAKE_MATCH_0) 
-      message("Determined Source Version : ${CMAKE_MATCH_0}")
+      message(STATUS "Determined Source Version from file : ${CMAKE_MATCH_0}")
       set (full ${CMAKE_MATCH_0})
       set (major ${CMAKE_MATCH_1})
       set (minor ${CMAKE_MATCH_2})
@@ -57,7 +58,7 @@ function(determine_version source_dir git_command alternative_version_file var_p
     endif()
   endif()
 
-  if (NOT ${major})
+  if (NOT major)
     message (FATAL_ERROR "Failed to determine source version correctly.")
   endif()
 
