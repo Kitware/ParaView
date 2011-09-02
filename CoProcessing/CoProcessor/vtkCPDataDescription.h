@@ -18,10 +18,7 @@
 #include "vtkObject.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 
-class vtkDataObject;
-class vtkDataSet;
 class vtkFieldData;
-class vtkStringArray;
 class vtkCPInputDataDescription;
 
 /// @ingroup CoProcessing
@@ -34,14 +31,30 @@ public:
   vtkTypeMacro(vtkCPDataDescription,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /// Description:
   /// Set the time step and current simulation time.
   void SetTimeData(double time, vtkIdType timeStep);
 
-  /// Macros for getting the time step and simulation time.
+  /// Get the current time step that should be set in the adaptor.
   vtkGetMacro(TimeStep, vtkIdType);
+
+  /// Get the current time that should be set in the adaptor.
   vtkGetMacro(Time, double);
- 
+
+  /// Specify whether or not to force output of all coprocessing pipelines.
+  /// This is meant to be set in the adaptor and used in the coprocessing
+  /// pipeline.  Default is false.  If this is true then
+  /// GetIsGridNecessary() and GetIfAnyGridIsNecessary() will return true.
+  vtkSetMacro(ForceOutput, bool);
+
+  /// Specify whether or not to force output of all coprocessing pipelines.
+  /// This is meant to be set in the adaptor and used in the coprocessing
+  /// pipeline.  Default is false.  If this is true then
+  /// GetIsGridNecessary() and GetIfAnyGridIsNecessary() will return true.
+  vtkBooleanMacro(ForceOutput, bool);
+
+  /// Return whether or not output is forced for all coprocessing pipelines.
+  vtkGetMacro(ForceOutput, bool);
+
   /// Add names for grids produced by the simulation. This allocates a new
   /// vtkCPInputDataDescription for that grid, if a grid by that name does not
   /// already exist.
@@ -50,8 +63,15 @@ public:
   /// Returns the number of input descriptions.
   unsigned int GetNumberOfInputDescriptions();
 
-  /// Reset the names of the fields that are needed, the required meshes etc.
-  void Reset();
+  /// Reset the names of the fields that are needed, the required meshes,
+  /// etc. that are stored in the vtkCPInputDescriptions.
+  void ResetInputDescriptions();
+
+  /// Reset the names of the fields that are needed, the required meshes,
+  /// etc. that are stored in the vtkCPInputDescriptions as well as
+  /// the time information and output forcing.  Automatically
+  /// called after vtkCPProcessor::CoProcess() is called.
+  void ResetAll();
 
   /// Provides access to a grid description using the index.
   vtkCPInputDataDescription *GetInputDescription(unsigned int);
@@ -65,6 +85,14 @@ public:
   /// Returns true if any of the grids is necessary.
   bool GetIfAnyGridNecessary();
 
+  /// Set user defined information that can be passed from the
+  /// adaptor to the coprocessing pipelines.
+  void SetUserData(vtkFieldData* UserData);
+
+  /// Set user defined information that can be passed from the
+  /// adaptor to the coprocessing pipelines.
+  vtkGetObjectMacro(UserData, vtkFieldData);
+
 //BTX
 protected:
   vtkCPDataDescription();
@@ -74,11 +102,25 @@ private:
   vtkCPDataDescription(const vtkCPDataDescription&); // Not implemented
   void operator=(const vtkCPDataDescription&); // Not implemented
 
-  /// Information about the current simulation time and whether is has been
-  /// set for this object.
+  /// The current simulation time.  This should be set in the adaptor.
   double Time;
+
+  /// The current simulation time step.  This should be set in the adaptor.
   vtkIdType TimeStep;
+
+  /// Specify whether or not a value for Time and TimeStep have been set.
   bool IsTimeDataSet;
+
+  /// Flag to specify whether or not to force output of all coprocessing pipelines.
+  /// This is meant to be set in the adaptor and used in the coprocessing
+  /// pipeline.  Default is false.  If this is true then
+  /// GetIsGridNecessary() and GetIfAnyGridIsNecessary() will return true.
+  bool ForceOutput;
+
+  /// UserData allows the user to pass information from the adaptor to
+  /// the coprocessing pipelines.  We currently use vtkFieldData since
+  /// it can store a wide variety of data types which are all python wrapped.
+  vtkFieldData* UserData;
 
   class vtkInternals;
   vtkInternals* Internals;
