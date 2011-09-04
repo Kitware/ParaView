@@ -92,6 +92,7 @@ protected:
   double InitialQuat[4];
   double InitialTrackerQuat[4];
   double UpdatedQuat[4];
+  double InitialInvertedPose[16];
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateWorld)
 };

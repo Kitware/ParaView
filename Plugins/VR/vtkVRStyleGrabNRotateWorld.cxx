@@ -186,6 +186,11 @@ void vtkVRStyleGrabNRotateWorld::HandleAnalog( const vtkVREventData& data )
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
 {
+
+  // check if the button is clicked
+  // if it is then get the active proxy and property
+  // check if the proxy and property are successfull obtained
+  //
   if ( this->Enabled )
     {
     std::cout << "its time to rotate " << std::endl;
@@ -202,7 +207,8 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
         prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
         if ( prop )
           {
-#define FANCY_LOGIC 1
+#define FANCY_LOGIC 0
+#define VRUI_LOGIC 1
 #if FANCY_LOGIC
           if ( !this->InitialOrientationRecored )
             {
@@ -231,6 +237,21 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
             prop->SetElement( 9,  newMat[2][1] );
             prop->SetElement( 10, newMat[2][2] );
             //this->RecordOrientation( proxy , data);
+            }
+#elsif VRUI_LOGIC
+          if( !this->InitialOrientationRecored)
+            {
+            vtkMath::InvertedMatrix(data.data.tracker.matrix, &this->InitialInvertedPose[0],16);
+            this->InitialOrientationRecored = true;
+            }
+          else
+            {
+            double wandPose[16];
+            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            vtkMatrix4x4::Multiply4x4(this->InitialInvertedPose,wandPose,wandPose);
+            vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,wandPose,wandPose);
+            vtkMath::InvertMatrix(data.data.tracker.matrix,&this->InitialInvertedPose[0],16);
+            vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
             }
 #else
           prop->SetElement( 0,  data.data.tracker.matrix[0] );
