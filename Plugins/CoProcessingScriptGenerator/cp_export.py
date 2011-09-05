@@ -74,7 +74,7 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
     ctorArgs = [ctorMethod, \
                 "\"%s\"" % proxy.GetProperty("FileName").GetElement(0),\
-                write_frequency]
+                write_frequency, "cp_writers"]
     ctorMethod = "CreateWriter"
 
     # Locate which simulation input this write is connected to, if any. If so,
@@ -126,28 +126,29 @@ output_contents = """
 try: paraview.simple
 except: from paraview.simple import *
 
-cp_writers = []
-
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
-    timestep = datadescription.GetTimeStep()
+    if datadescription.GetForceOutput() == True:
+        for i in range(datadescription.GetNumberOfInputDescriptions()):
+            datadescription.GetInputDescription(i).AllFieldsOn()
+            datadescription.GetInputDescription(i).GenerateMeshOn()
+        return
 
+    timestep = datadescription.GetTimeStep()
 %s
 
 def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
-    global cp_writers
     cp_writers = []
     timestep = datadescription.GetTimeStep()
 
 %s
-
     for writer in cp_writers:
-        if timestep %% writer.cpFrequency == 0:
+        if timestep %% writer.cpFrequency == 0 or datadescription.GetForceOutput() == True:
             writer.FileName = writer.cpFileName.replace("%%t", str(timestep))
             writer.UpdatePipeline()
 
-    if timestep %% %s == 0:
+    if timestep %% %s == 0 or datadescription.GetForceOutput() == True:
         renderviews = servermanager.GetRenderViews()
         imagefilename = "%s"
         for view in range(len(renderviews)):
@@ -156,44 +157,42 @@ def DoCoProcessing(datadescription):
             WriteImage(fname, renderviews[view])
 
     # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
-    tobedeleted = GetProxiesToDelete()
-    while len(tobedeleted) > 0:
-        Delete(tobedeleted[0])
-        tobedeleted = GetProxiesToDelete()
+    tobedeleted = GetNextProxyToDelete()
+    while tobedeleted != None:
+        Delete(tobedeleted)
+        tobedeleted = GetNextProxyToDelete()
 
-def GetProxiesToDelete():
+def GetNextProxyToDelete():
     iter = servermanager.vtkSMProxyIterator()
     iter.Begin()
-    tobedeleted = []
     while not iter.IsAtEnd():
-      if iter.GetGroup().find("prototypes") != -1:
-         iter.Next()
-         continue
-      proxy = servermanager._getPyProxy(iter.GetProxy())
-      proxygroup = iter.GetGroup()
-      iter.Next()
-      if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
-          tobedeleted.append(proxy)
+        if iter.GetGroup().find("prototypes") != -1:
+            iter.Next()
+            continue
+        proxy = servermanager._getPyProxy(iter.GetProxy())
+        proxygroup = iter.GetGroup()
+        if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
+            tobedeleted.append(proxy)
+        iter.Next()
 
-    return tobedeleted
+    return None
 
 def CreateProducer(datadescription, gridname):
-  "Creates a producer proxy for the grid"
-  if not datadescription.GetInputDescriptionByName(gridname):
-    raise RuntimeError, "Simulation input name '%%s' does not exist" %% gridname
-  grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
-  producer = PVTrivialProducer()
-  producer.GetClientSideObject().SetOutput(grid)
-  if grid.IsA("vtkImageData") == True or grid.IsA("vtkStructuredGrid") == True or grid.IsA("vtkRectilinearGrid") == True:
-    extent = datadescription.GetInputDescriptionByName(gridname).GetWholeExtent()
-    producer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
+    "Creates a producer proxy for the grid"
+    if not datadescription.GetInputDescriptionByName(gridname):
+        raise RuntimeError, "Simulation input name '%%s' does not exist" %% gridname
+    grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
+    producer = PVTrivialProducer()
+    producer.GetClientSideObject().SetOutput(grid)
+    if grid.IsA("vtkImageData") == True or grid.IsA("vtkStructuredGrid") == True or grid.IsA("vtkRectilinearGrid") == True:
+        extent = datadescription.GetInputDescriptionByName(gridname).GetWholeExtent()
+        producer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
 
-  producer.UpdatePipeline()
-  return producer
+    producer.UpdatePipeline()
+    return producer
 
 
-def CreateWriter(proxy_ctor, filename, freq):
-    global cp_writers
+def CreateWriter(proxy_ctor, filename, freq, cp_writers):
     writer = proxy_ctor()
     writer.FileName = filename
     writer.add_attribute("cpFrequency", freq)

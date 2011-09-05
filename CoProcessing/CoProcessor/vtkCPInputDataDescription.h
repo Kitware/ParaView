@@ -70,13 +70,13 @@ public:
 
   // Description:
   // Use this to enable the mesh. Off by default. Note that calling Reset()
-  // resets this flag to Off as well. 
+  // resets this flag to Off as well.
   vtkSetMacro(GenerateMesh, bool);
   vtkGetMacro(GenerateMesh, bool);
   vtkBooleanMacro(GenerateMesh, bool);
 
   // Description:
-  // Set the grid input for coprocessing.  The grid should have all of 
+  // Set the grid input for coprocessing.  The grid should have all of
   // the point data and cell data properly set.
   void SetGrid(vtkDataObject* grid);
 

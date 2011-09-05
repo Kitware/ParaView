@@ -4,6 +4,37 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
 OPTION(ENABLE_MPI4PY "Build mpi4py support to allow python filters to use mpi calls" ON)
 IF(ENABLE_MPI4PY)
 
+  #-----------------------------------------------------------------------------
+  # Option to allow the user to disable compiler warnings
+  #-----------------------------------------------------------------------------
+  OPTION (MPI4PY_DISABLE_COMPILER_WARNINGS "Disable compiler warnings" ON)
+  MARK_AS_ADVANCED(MPI4PY_DISABLE_COMPILER_WARNINGS)
+
+  IF (MPI4PY_DISABLE_COMPILER_WARNINGS)
+    # MSVC uses /w to suppress warnings.  It also complains if another
+    # warning level is given, so remove it.
+    IF (MSVC)
+      SET (MPI4PY_WARNINGS_BLOCKED 1)
+      STRING (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " "
+          CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+      SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+    ENDIF ()
+    IF(WIN32)
+      ADD_DEFINITIONS (-D_CRT_SECURE_NO_WARNINGS)
+    ENDIF()
+    # Borland uses -w- to suppress warnings.
+    IF (BORLAND)
+      SET (MPI4PY_WARNINGS_BLOCKED 1)
+      SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
+    ENDIF ()
+
+    # Most compilers use -w to suppress warnings.
+    IF (NOT MPI4PY_WARNINGS_BLOCKED)
+      SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    ENDIF ()
+  ENDIF ()
+
+
   SET(PV_MPI_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mpi4py")
   SET(PV_MPI_PYTHON_MODULE_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/mpi4py")
   MAKE_DIRECTORY(${PV_MPI_PYTHON_MODULE_BINARY_DIR})

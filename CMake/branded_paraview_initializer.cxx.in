@@ -109,7 +109,7 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   if(show_splash)
     {
     // Create and show the splash screen as the main window is being created.
-    QPixmap pixmap(":/paraview/SplashImage.img");
+    QPixmap pixmap("@BPC_SPLASH_RESOURCE@");
     this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
     this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
     this->Splash->show();

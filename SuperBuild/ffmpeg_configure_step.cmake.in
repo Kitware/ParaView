@@ -1,10 +1,10 @@
 
 if(APPLE)
-  set(ENV{MACOSX_DEPLOYMENT_TARGET} "10.5")
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
-  set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
-  set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
-  set(ENV{LDFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+  set(ENV{MACOSX_DEPLOYMENT_TARGET} "@CMAKE_OSX_SYSROOT@")
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  set(ENV{LDFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
 endif()
 
   EXECUTE_PROCESS(
