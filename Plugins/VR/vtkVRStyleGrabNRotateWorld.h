@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMRenderViewProxy;
+class vtkMatrix4x4;
 
 /// vtkVRStyleGrabNRotateWorld is superclass for interactor styles that change any
 /// property on some proxy. Which property/proxy is being controlled can be
@@ -92,7 +93,7 @@ protected:
   double InitialQuat[4];
   double InitialTrackerQuat[4];
   double UpdatedQuat[4];
-  double InitialInvertedPose[16];
+  vtkMatrix4x4 *InitialInvertedPose;
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateWorld)
 };

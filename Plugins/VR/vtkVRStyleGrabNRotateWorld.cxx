@@ -54,11 +54,13 @@ vtkVRStyleGrabNRotateWorld::vtkVRStyleGrabNRotateWorld(QObject* parentObject)
 {
   this->Enabled = false;
   this->InitialOrientationRecored = false;
+  this->InitialInvertedPose = vtkMatrix4x4::New();
 }
 
 //------------------------------------------------------------------------destr
 vtkVRStyleGrabNRotateWorld::~vtkVRStyleGrabNRotateWorld()
 {
+  this->InitialInvertedPose->Delete();
 }
 
 //-----------------------------------------------------------------------public
@@ -238,19 +240,42 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
             prop->SetElement( 10, newMat[2][2] );
             //this->RecordOrientation( proxy , data);
             }
-#elsif VRUI_LOGIC
+#elif VRUI_LOGIC
           if( !this->InitialOrientationRecored)
             {
-            vtkMath::InvertedMatrix(data.data.tracker.matrix, &this->InitialInvertedPose[0],16);
+            // Copy the data into matrix
+            for (int i = 0; i < 4; ++i)
+              {
+              for (int j = 0; j < 4; ++j)
+                {
+                this->InitialInvertedPose->SetElement( i,j,data.data.tracker.matrix[i*4+j] );
+                }
+              }
+            // invert the matrix
+            vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
+            double wandPose[16];
+            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
+                                      wandPose,
+                                      &this->InitialInvertedPose->Element[0][0]);
             this->InitialOrientationRecored = true;
             }
           else
             {
             double wandPose[16];
-            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
-            vtkMatrix4x4::Multiply4x4(this->InitialInvertedPose,wandPose,wandPose);
-            vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,wandPose,wandPose);
-            vtkMath::InvertMatrix(data.data.tracker.matrix,&this->InitialInvertedPose[0],16);
+            vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
+                                      &this->InitialInvertedPose->Element[0][0],
+                                      wandPose);
+            // // Copy the data into matrix
+            // for (int i = 0; i < 4; ++i)
+            //   {
+            //   for (int j = 0; j < j; ++j)
+            //  {
+            //  this->InitialInvertedPose->SetElement( i,j,data.data.tracker.matrix[i*4+j] );
+            //  }
+            //   }
+            // // invert the matrix
+            // vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
             vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
             }
 #else
