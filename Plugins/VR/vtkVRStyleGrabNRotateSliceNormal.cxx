@@ -71,6 +71,37 @@ bool vtkVRStyleGrabNRotateSliceNormal::configure(vtkPVXMLElement* child,
     strcmp(this->metaObject()->className(),
       child->GetAttributeOrEmpty("class")) == 0)
     {
+    this->NormalPropStr = child->GetAttributeOrEmpty( "normal" );
+    if ( !this->NormalPropStr.size() )
+      {
+      std::cerr << "vtkVRStyleGrabNRotateSliceNormal::configure(): "
+                << "Origin property not specified " << std::endl
+                << "<Style class=\"vtkVRStyleGrabNRotateSliceNormal\" normal=\"buttonEventName\"/>" << std::endl
+                << std::endl;
+      return false;
+      }
+
+    std::vector<std::string> token = this->tokenize( this->NormalPropStr );
+    if ( token.size()!=2 )
+      {
+      std::cerr << "Expected \"origin\" Format:  Proxy.Property" << std::endl;
+      }
+    this->Proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+    if( this->Proxy )
+      {
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast( this->Proxy->GetProperty( token[1].c_str()) );
+      if ( !this->Property )
+        {
+        std::cout<< "Property ( " << token[1] << ") :Not Found" <<std::endl;
+        return false;
+        }
+      }
+    else
+      {
+      std::cout<< "Proxy ( " << token[0] << ") :Not Found" << std::endl;
+      return false;
+      }
+
     if ( child->GetNumberOfNestedElements() !=2 )
       {
       std::cerr << "vtkVRStyleGrabNRotateSliceNormal::configure(): "
@@ -78,7 +109,9 @@ bool vtkVRStyleGrabNRotateSliceNormal::configure(vtkPVXMLElement* child,
                 << "<Button name=\"buttonEventName\"/>" << std::endl
                 << "<Tracker name=\"trackerEventName\"/>"
                 << std::endl;
+      return false;
       }
+
     vtkPVXMLElement* button = child->GetNestedElement(0);
     if (button && button->GetName() && strcmp(button->GetName(), "Button")==0)
       {
@@ -116,6 +149,7 @@ vtkPVXMLElement* vtkVRStyleGrabNRotateSliceNormal::saveConfiguration() const
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName( "Style" );
   child->AddAttribute("class", this->metaObject()->className());
+  child->AddAttribute( "normal", this->NormalPropStr.c_str() );
 
   vtkPVXMLElement* button = vtkPVXMLElement::New();
   button->SetName("Button");
@@ -167,6 +201,7 @@ bool vtkVRStyleGrabNRotateSliceNormal::update()
     proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
     if ( proxy )
       {
+      this->Proxy->UpdateVTKObjects();
       proxy->UpdateVTKObjects();
       proxy->StillRender();
       }
@@ -188,16 +223,13 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleAnalog( const vtkVREventData& data 
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data )
 {
-
-  // check if the button is clicked
-  // if it is then get the active proxy and property
-  // check if the proxy and property are successfull obtained
-  //
   if ( this->Enabled )
     {
     std::cout << "its time to rotate " << std::endl;
     vtkSMRenderViewProxy *proxy =0;
     vtkSMDoubleVectorProperty *prop =0;
+    // property->SetElement( atoi(token[2].c_str() ), value );
+    // proxy->UpdateVTKObjects();
 
     pqView *view = 0;
     view = pqActiveObjects::instance().activeView();
@@ -209,38 +241,6 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
         prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
         if ( prop )
           {
-#define FANCY_LOGIC 0
-#define VRUI_LOGIC 1
-#if FANCY_LOGIC
-          if ( !this->InitialOrientationRecored )
-            {
-            this->RecordOrientation( proxy , data);
-              this->InitialOrientationRecored = true;
-            }
-          else
-            {
-            this->UpdateOrientation(data);
-
-
-            // Transform the new quaternion to matrix
-            double newMat[3][3];
-            vtkMath::QuaternionToMatrix3x3( this->UpdatedQuat, newMat );
-
-            // Update the property
-            prop->SetElement( 0,  newMat[0][0] );
-            prop->SetElement( 1,  newMat[0][1] );
-            prop->SetElement( 2,  newMat[0][2] );
-
-            prop->SetElement( 4,  newMat[1][0] );
-            prop->SetElement( 5,  newMat[1][1] );
-            prop->SetElement( 6,  newMat[1][2] );
-
-            prop->SetElement( 8,  newMat[2][0] );
-            prop->SetElement( 9,  newMat[2][1] );
-            prop->SetElement( 10, newMat[2][2] );
-            //this->RecordOrientation( proxy , data);
-            }
-#elif VRUI_LOGIC
           if( !this->InitialOrientationRecored)
             {
             // Copy the data into matrix
@@ -266,31 +266,13 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
                                       &this->InitialInvertedPose->Element[0][0],
                                       wandPose);
-            // // Copy the data into matrix
-            // for (int i = 0; i < 4; ++i)
-            //   {
-            //   for (int j = 0; j < j; ++j)
-            //  {
-            //  this->InitialInvertedPose->SetElement( i,j,data.data.tracker.matrix[i*4+j] );
-            //  }
-            //   }
-            // // invert the matrix
-            // vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-            vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
+            double normal[4];
+            vtkSMPropertyHelper( this->Proxy, "Normal" ).Get(normal, 3 );
+            normal[3] =0;
+            vtkMatrix4x4::MultiplyPoint( wandPose, normal, normal );
+            vtkSMPropertyHelper( this->Proxy, "Normal" ).Set(normal, 3 );
+            //vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
             }
-#else
-          prop->SetElement( 0,  data.data.tracker.matrix[0] );
-          prop->SetElement( 1,  data.data.tracker.matrix[1] );
-          prop->SetElement( 2,  data.data.tracker.matrix[2] );
-
-          prop->SetElement( 4,  data.data.tracker.matrix[4] );
-          prop->SetElement( 5,  data.data.tracker.matrix[5] );
-          prop->SetElement( 6,  data.data.tracker.matrix[6] );
-
-          prop->SetElement( 8,  data.data.tracker.matrix[8] );
-          prop->SetElement( 9,  data.data.tracker.matrix[9] );
-          prop->SetElement( 10, data.data.tracker.matrix[10] );
-#endif
           }
         }
       }

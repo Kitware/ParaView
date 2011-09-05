@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRVectorPropertyStyle.h"
 #include "vtkVRStyleGrabNRotateWorld.h"
 #include "vtkVRStyleGrabNTranslateWorld.h"
+#include "vtkVRStyleGrabNRotateSliceNormal.h"
+#include "vtkVRStyleGrabNTranslateSliceOrigin.h"
 #include "vtkVRStyleScaleWorld.h"
 #include "pqApplicationCore.h"
 
@@ -194,6 +196,18 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
         else if (strcmp(class_name, "vtkVRStyleScaleWorld")==0)
           {
           vtkVRStyleScaleWorld* style = new vtkVRStyleScaleWorld(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
+          {
+          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
+          {
+          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
           style->configure(child, locator);
           this->add(style);
           }

@@ -75,8 +75,8 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
     strcmp(this->metaObject()->className(),
       child->GetAttributeOrEmpty("class")) == 0)
     {
-    std::string originProp = child->GetAttributeOrEmpty( "origin" );
-    if ( !originProp.size() )
+    this->OriginPropStr = child->GetAttributeOrEmpty( "origin" );
+    if ( !this->OriginPropStr.size() )
       {
       std::cerr << "vtkVRStyleGrabNTranslateSliceOrigin::configure(): "
                 << "Origin property not specified " << std::endl
@@ -84,6 +84,27 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
                 << std::endl;
       return false;
       }
+    std::vector<std::string> token = this->tokenize( this->OriginPropStr );
+    if ( token.size()!=2 )
+      {
+      std::cerr << "Expected \"origin\" Format:  Proxy.Property" << std::endl;
+      }
+    this->Proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+    if( this->Proxy )
+      {
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast( this->Proxy->GetProperty( token[1].c_str()) );
+      if ( !this->Property )
+        {
+        std::cout<< "Property ( " << token[1] << ") :Not Found" <<std::endl;
+        return false;
+        }
+      }
+    else
+      {
+      std::cout<< "Proxy ( " << token[0] << ") :Not Found" << std::endl;
+      return false;
+      }
+
     if ( child->GetNumberOfNestedElements() !=2 )
       {
       std::cerr << "vtkVRStyleGrabNTranslateSliceOrigin::configure(): "
@@ -91,6 +112,7 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
                 << "<Button name=\"buttonEventName\"/>" << std::endl
                 << "<Tracker name=\"trackerEventName\"/>"
                 << std::endl;
+      return false;
       }
     vtkPVXMLElement* button = child->GetNestedElement(0);
     if (button && button->GetName() && strcmp(button->GetName(), "Button")==0)
@@ -129,6 +151,7 @@ vtkPVXMLElement* vtkVRStyleGrabNTranslateSliceOrigin::saveConfiguration() const
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName( "Style" );
   child->AddAttribute("class", this->metaObject()->className());
+  child->AddAttribute( "origin", this->OriginPropStr.c_str() );
 
   vtkPVXMLElement* button = vtkPVXMLElement::New();
   button->SetName("Button");
@@ -180,6 +203,7 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::update()
     proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
     if ( proxy )
       {
+      this->Proxy->UpdateVTKObjects();
       proxy->UpdateVTKObjects();
       proxy->StillRender();
       }
@@ -232,15 +256,21 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
           deltaPos[2] = data.data.tracker.matrix[11] - InitialPos[2];
           this->RecordCurrentPosition(data);
 
-          // Get the current transformation matrix
-          std::cout<< "Gettting the wand pose" <<std::endl;
-          double oldPose[16];
-          vtkSMPropertyHelper(proxy, "WandPose").
-            Get(&oldPose[0], 16 );
+          double origin[3];
+          vtkSMPropertyHelper( this->Proxy, "Origin" ).Get( origin, 3 );
+          for ( int i=0;i<3;i++ )
+            origin[i] += deltaPos[i];
+          vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
 
-          prop->SetElement( 3,  oldPose[3]  + deltaPos[0]);
-          prop->SetElement( 7,  oldPose[7]  + deltaPos[1]);
-          prop->SetElement( 11, oldPose[11]  + deltaPos[2]);
+          // // Get the current transformation matrix
+          // std::cout<< "Gettting the wand pose" <<std::endl;
+          // double oldPose[16];
+          // vtkSMPropertyHelper(proxy, "WandPose").
+          //   Get(&oldPose[0], 16 );
+
+          // prop->SetElement( 3,  oldPose[3]  + deltaPos[0]);
+          // prop->SetElement( 7,  oldPose[7]  + deltaPos[1]);
+          // prop->SetElement( 11, oldPose[11]  + deltaPos[2]);
           }
         }
       }

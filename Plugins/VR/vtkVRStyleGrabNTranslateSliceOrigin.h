@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkTransform;
+class vtkSMDoubleVectorProperty;
 
 /// vtkVRStyleGrabNTranslateSliceOrigin is superclass for interactor styles that change any
 /// property on some proxy. Which property/proxy is being controlled can be
@@ -90,6 +91,9 @@ protected:
   bool InitialPositionRecorded;
   double InitialPos[3];
   vtkTransform *Old, *Tx, *Neo;
+  std::string OriginPropStr;
+  vtkSMProxy* Proxy;
+  vtkSMDoubleVectorProperty* Property;
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNTranslateSliceOrigin)
 };

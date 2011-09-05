@@ -41,6 +41,7 @@ class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMRenderViewProxy;
 class vtkMatrix4x4;
+class vtkSMDoubleVectorProperty;
 
 /// vtkVRStyleGrabNRotateSliceNormal is superclass for interactor styles that change any
 /// property on some proxy. Which property/proxy is being controlled can be
@@ -94,6 +95,9 @@ protected:
   double InitialTrackerQuat[4];
   double UpdatedQuat[4];
   vtkMatrix4x4 *InitialInvertedPose;
+  std::string NormalPropStr;
+  vtkSMProxy* Proxy;
+  vtkSMDoubleVectorProperty* Property;
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateSliceNormal)
 };
