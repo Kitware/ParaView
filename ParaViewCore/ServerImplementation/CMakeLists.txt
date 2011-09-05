@@ -85,18 +85,22 @@ INCLUDE_DIRECTORIES(
 
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
+# run it from a script so we can set necessary paths.
+
+configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
+               @ONLY)
 ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
-    COMMAND protoc_compiler
-      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:"${CMAKE_CURRENT_BINARY_DIR}"
-      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources "${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto"
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_custom_target(
   protobuf_code_generation ALL
-  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
 )
 #------------------------------------------------------------------------------
 
