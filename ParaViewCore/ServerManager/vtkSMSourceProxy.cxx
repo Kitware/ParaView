@@ -301,6 +301,15 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
     this->GetOutputPort(i)->UpdatePipeline(time);
     }
 
+  // When calling UpdatePipeline() we check if this->NeedsUpdate is true and
+  // call the real update only if that's the case. We don't do that when one
+  // uses UpdatePipeline(time) since we can never be too sure what time was
+  // used. In that case, we assume the pipeline needs update and hence we should
+  // set the NeedsUpdate ivar to true as well. Otherwise PostUpdateData()
+  // doesn't fire the necessary events and that can cause problems (BUG
+  // #12571).
+  this->NeedsUpdate = true;
+
   this->PostUpdateData();
   //this->InvalidateDataInformation();
 }
