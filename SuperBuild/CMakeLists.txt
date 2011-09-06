@@ -224,7 +224,8 @@ endif()
 
 set(MANTA_ARGS)
 # Manta doesn't compile on Windows x64 currently
-if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
+#if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
+if(NOT WIN32)
   include(External_Manta)
   set(MANTA_ARGS
     -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
