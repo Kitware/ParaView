@@ -27,11 +27,11 @@ set(PYQT_GZ PyQt-x11-gpl-${PYQT_VERSION}.tar.gz)
 set(PYQT_MD5 d54fd1c37a74864faf42709c8102f254)
 
 set(NUMPY_MAJOR 1)
-set(NUMPY_MINOR 5)
+set(NUMPY_MINOR 6)
 set(NUMPY_PATCH 1)
 set(NUMPY_URL http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_MAJOR}.${NUMPY_MINOR}.${NUMPY_PATCH})
 set(NUMPY_GZ numpy-${NUMPY_MAJOR}.${NUMPY_MINOR}.${NUMPY_PATCH}.tar.gz)
-set(NUMPY_MD5 376ef150df41b5353944ab742145352d)
+set(NUMPY_MD5 2bce18c08fc4fce461656f0f4dd9103e)
 
 set(BLAS_URL http://www.netlib.org/blas)
 set(BLAS_GZ blas.tgz)
