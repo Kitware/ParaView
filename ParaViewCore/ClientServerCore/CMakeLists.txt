@@ -159,7 +159,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVView.cxx
   vtkSession.cxx
   vtkTileDisplayHelper.cxx
-
   ABSTRACT)
 
 INCLUDE_DIRECTORIES(
