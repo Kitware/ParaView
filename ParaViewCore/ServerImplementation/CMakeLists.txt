@@ -90,18 +90,20 @@ INCLUDE_DIRECTORIES(
 configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
                @ONLY)
-ADD_CUSTOM_COMMAND(
+add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+    COMMAND ${CMAKE_COMMAND}
+    ARGS    -DOutDir=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler ${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_custom_target(
-  protobuf_code_generation ALL
-  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
+  protobuf_code_generation
+  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc ${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
 )
+
 #------------------------------------------------------------------------------
 
 SET(resourceFiles
