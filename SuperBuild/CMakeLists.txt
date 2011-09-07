@@ -381,6 +381,8 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
+    ${pv_cxx_flags}
+    ${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
