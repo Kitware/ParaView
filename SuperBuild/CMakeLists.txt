@@ -170,7 +170,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER AND NOT WIN32)
+  if(CMAKE_Fortran_COMPILER AND NOT WIN32 AND NOT UNIX)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
@@ -381,8 +381,8 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
-    ${pv_cxx_flags}
-    ${pv_c_flags}
+    -DCMAKE_CXX_FLAGS:STRING=${pv_cxx_flags}
+    -DCMAKE_C_FLAGS:STRING=${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
