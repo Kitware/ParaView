@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCursor>
 #include <QColor>
 #include <QPointer>
+#include <QCheckBox>
 #include <QScrollArea>
 #include <QtDebug>
 
@@ -92,6 +93,9 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   QObject::connect(this->Internal->members, SIGNAL(cellDoubleClicked(int,int)),
                    this, SLOT(cellDoubleClicked(int,int)));
 
+  QObject::connect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)),
+                   this, SIGNAL(shareLocalMousePointer(bool)));
+
   QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
                     this,   SLOT(writeChatMessage(int,QString&)));
 
@@ -109,6 +113,8 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(preViewRemoved(pqView*)),
                     this, SLOT(disconnectViewLocalSlots(pqView*)));
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +130,9 @@ pqCollaborationPanel::~pqCollaborationPanel()
   QObject::disconnect( this->Internal->members,
                        SIGNAL(cellDoubleClicked(int,int)),
                        this, SLOT(cellDoubleClicked(int,int)));
+
+  QObject::disconnect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)),
+                      this, SIGNAL(shareLocalMousePointer(bool)));
 
   QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
                        this,   SLOT(writeChatMessage(int,QString&)));
@@ -208,6 +217,9 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::followUserCamera(int userId)
 {
+  // Update collaboration manager to know if we follow a given user or not
+  this->getCollaborationManager()->setFollowUserView(userId);
+
   if(this->Internal->CameraToFollowOfUserId == userId)
     {
     return;
@@ -389,6 +401,9 @@ void pqCollaborationPanel::connectLocalSlots()
     QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                       collab, SLOT(onChatMessage(int,QString&)));
 
+    QObject::connect( this,   SIGNAL(shareLocalMousePointer(bool)),
+                      collab, SLOT(enableMousePointerSharing(bool)));
+
     QObject::connect( collab, SIGNAL(triggeredMasterUser(int)),
                       this,   SLOT(onNewMaster(int)));
 
@@ -440,6 +455,9 @@ void pqCollaborationPanel::disconnectLocalSlots()
 
     QObject::disconnect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                          collab, SLOT(onChatMessage(int,QString&)));
+
+    QObject::disconnect( this,   SIGNAL(shareLocalMousePointer(bool)),
+                         collab, SLOT(enableMousePointerSharing(bool)));
 
     QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
                          this,   SLOT(onNewMaster(int)));

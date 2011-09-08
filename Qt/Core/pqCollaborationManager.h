@@ -41,6 +41,7 @@ class pqView;
 class pqPipelineSource;
 class vtkSMCollaborationManager;
 class QSignalMapper;
+class QMouseEvent;
 
 /// pqCollaborationManager is a QObject that aims to handle the collaboration
 /// for the Qt layer. This class is used to synchronize the ActiveObject across
@@ -65,6 +66,9 @@ public:
   /// Return the vtkSMCollaborationManager
   vtkSMCollaborationManager* collaborationManager();
 
+  void setFollowUserView(int);
+  int getUserViewToFollow();
+
 signals:
   /// This will be triggered by the remote clients to update any interessting
   /// components. This should be triggered by local client to broadcast to
@@ -88,7 +92,6 @@ signals:
   void triggerFollowCamera(int);
 
 public slots:
-
   /// This will be triggered by the triggerChatMessage() signal and will
   /// broadcast to other client a chat message
   void onChatMessage(int userId, QString& msgContent);
@@ -100,11 +103,32 @@ public slots:
   /// any of properties will be updated by this method.
   void updateEnabledState();
 
+  /// Method called localy when user want to broadcast its pointer to
+  /// other users.
+  void updateMousePointerLocation(QMouseEvent* e);
+
+  /// Method triggered by the internal collaboration Timer.
+  /// This timer prevent a network overload by only sending the latest
+  /// mouse location to the other clients every 100 ms
+  void sendMousePointerLocationToOtherClients();
+
+  /// Attach a mouse listener if its a 3D view so we can share that
+  /// information with other clients
+  void attachMouseListenerTo3DViews();
+
+  /// Enable/disable local mouse pointer location
+  void enableMousePointerSharing(bool);
+
 private slots:
   /// Called when a message has been sent by another client
   /// This method will trigger signals that will be used by other Qt classes
   /// to synchronize their state.
   void onClientMessage(vtkSMMessage* msg);
+
+  /// Show another mouse pointer as overlay to a 3D view.
+  /// x et y are normalized based on height/2 where 0 is the center of the
+  /// view.
+  void showMousePointer(vtkTypeUInt32 viewId, double x, double y);
 
 private:
   pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.
@@ -112,6 +136,7 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+  int UserViewToFollow;
 };
 
 #endif // !_pqCollaborationManager_h

@@ -58,6 +58,10 @@ signals:
   /// other clients.
   void triggerChatMessage(int userId, QString& msgContent);
 
+  /// Emmitting this signal when user has allowed its mouse position to be
+  /// shared and send to the other clients
+  void shareLocalMousePointer(bool);
+
 public slots:
   /// Called by pqCollaborationManager when a message is received
   void writeChatMessage(int userId, QString& txt);

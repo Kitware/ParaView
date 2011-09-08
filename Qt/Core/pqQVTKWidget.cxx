@@ -34,17 +34,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMoveEvent>
 #include <QResizeEvent>
 #include <QTimer>
+#include <QPixmap>
+#include <QImage>
+#include <QPainter>
+#include <QPointer>
+#include <QPoint>
 
 #include "pqUndoStack.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkRenderWindow.h"
+
+#include "QVTKInteractorAdapter.h"
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
   : Superclass(parentObject, f)
 {
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
+
+  // Tmp objects
+  QPixmap mousePixmap(":/pqWidgets/Icons/pqMousePick15.png");
+  int w = mousePixmap.width();
+  int h = mousePixmap.height();
+  QImage image(w, h, QImage::Format_ARGB32);
+  QPainter painter(&image);
+  painter.drawPixmap(0,0,mousePixmap);
+  painter.end();
+  image = image.rgbSwapped();
+
+  // Save the loaded image
+  this->MousePointerToDraw = image.mirrored();
 }
 
 //----------------------------------------------------------------------------
@@ -150,4 +171,29 @@ bool pqQVTKWidget::paintCachedImage()
     return true;
     }
   return false;
+}
+//----------------------------------------------------------------------------
+vtkTypeUInt32 pqQVTKWidget::getProxyId()
+{
+  if(this->ViewProxy)
+    {
+    return this->ViewProxy->GetGlobalID();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void pqQVTKWidget::paintMousePointer(int x, int y)
+{
+  // Local repaint
+  QVTKWidget::paintEvent(NULL);
+
+  // Paint mouse pointer image on top of it
+  int imagePointingDelta = 10;
+  this->mRenWin->SetRGBACharPixelData(
+      x - imagePointingDelta,
+      this->height() - y + imagePointingDelta,
+      this->MousePointerToDraw.width()+x-1 - imagePointingDelta,
+      this->height() - (this->MousePointerToDraw.height() + y + 1) + imagePointingDelta,
+      this->MousePointerToDraw.bits(), 1, 1);
 }

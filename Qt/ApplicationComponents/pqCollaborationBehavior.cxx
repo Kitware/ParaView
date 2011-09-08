@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationBehavior.h"
 
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqCollaborationManager.h"
@@ -71,6 +72,11 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
                       this->CollaborationManager, SLOT(updateEnabledState()),
                       Qt::QueuedConnection);
 
+    QObject::connect( &pqActiveObjects::instance(),
+                      SIGNAL(viewChanged(pqView*)),
+                      this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
+                      Qt::UniqueConnection);
+
     }
 }
 
@@ -86,6 +92,9 @@ void pqCollaborationBehavior::onServerRemoved(pqServer* vtkNotUsed(server))
     QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
                          SIGNAL(serverAdded(pqServer*)),
                          this->CollaborationManager, SLOT(updateEnabledState()));
+    QObject::disconnect( &pqActiveObjects::instance(),
+                         SIGNAL(viewChanged(pqView*)),
+                         this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()));
     this->CollaborationManager->deleteLater();
     this->CollaborationManager = NULL;
     }

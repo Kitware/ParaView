@@ -76,6 +76,12 @@ public:
 
   QWidget* positionReference() const;
 
+  /// Retrun the Proxy ID if any, otherwise return 0
+  vtkTypeUInt32 getProxyId();
+
+public slots:
+  void paintMousePointer(int x, int y);
+
 protected:
   /// overloaded resize handler
   virtual void resizeEvent(QResizeEvent* event);
@@ -96,6 +102,7 @@ private:
   vtkSmartPointer<vtkSMProxy> ViewProxy;
   vtkWeakPointer<vtkSMSession> Session;
   QPointer<QWidget> PositionReference;
+  QImage MousePointerToDraw;
 };
 
 #endif

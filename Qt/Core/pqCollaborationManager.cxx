@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
+#include "pqQVTKWidget.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -55,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QVariant>
 #include <QWidget>
+#include <QMouseEvent>
+#include <QTimer>
 
 
 #define RETURN_IF_SERVER_NOT_VALID() \
@@ -73,6 +76,11 @@ public:
   pqInternals(pqCollaborationManager* owner)
     {
     this->Owner = owner;
+    this->BroadcastMouseLocation = false;
+    this->CollaborativeTimer.setInterval(100);
+    QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()),
+                     this->Owner, SLOT(sendMousePointerLocationToOtherClients()));
+    this->CollaborativeTimer.start();
     }
   //-------------------------------------------------
   void setServer(pqServer* s)
@@ -119,6 +127,9 @@ public:
       if(this->CollaborationManager)
         {
         this->CollaborationManager->UpdateUserInformations();
+        // Update the client id for mouse pointer
+        this->LastMousePointerPosition.set_client_id(
+            this->CollaborationManager->GetUserId());
         }
       }
     }
@@ -141,15 +152,20 @@ public:
 public:
   QMap<int, QString> UserNameMap;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationManager;
+  vtkSMMessage LastMousePointerPosition;
+  bool MousePointerLocationUpdated;
+  bool BroadcastMouseLocation;
 
 protected:
   QPointer<pqServer> Server;
   QPointer<pqCollaborationManager> Owner;
+  QTimer CollaborativeTimer;
 };
 //***************************************************************************/
 pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
   Superclass(parentObject)
 {
+  this->UserViewToFollow = -1;
   this->Internals = new pqInternals(this);
   pqApplicationCore* core = pqApplicationCore::instance();
 
@@ -159,6 +175,7 @@ pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
 
   QObject::connect(this, SIGNAL(triggeredMasterUser(int)),
     this, SLOT(updateEnabledState()));
+
   core->registerManager("COLLABORATION_MANAGER", this);
 }
 
@@ -192,6 +209,14 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         // Custom handling
         break;
       }
+    }
+  else if(msg->HasExtension(MousePointer::view) &&
+          ( msg->GetExtension(MousePointer::forceShow) ||
+            msg->client_id() == this->UserViewToFollow))
+    {
+    this->showMousePointer(msg->GetExtension(MousePointer::view),
+                           msg->GetExtension(MousePointer::x),
+                           msg->GetExtension(MousePointer::y));
     }
   else
     {
@@ -233,6 +258,68 @@ pqServer* pqCollaborationManager::server()
 {
   return this->Internals->server();
 }
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
+{
+  pqQVTKWidget* widget = qobject_cast<pqQVTKWidget*>(QObject::sender());
+  if(widget)
+    {
+    double w2 = widget->width() / 2;
+    double h2 = widget->height()/ 2;
+    double px = (e->x()-w2)/h2;
+    double py = (e->y()-h2)/h2;
+
+    this->Internals->LastMousePointerPosition.SetExtension(
+        MousePointer::view, widget->getProxyId());
+    this->Internals->LastMousePointerPosition.SetExtension(
+        MousePointer::x, px);
+    this->Internals->LastMousePointerPosition.SetExtension(
+        MousePointer::y, py);
+    this->Internals->MousePointerLocationUpdated = true;
+    }
+  else
+    {
+    qCritical("Invalid cast");
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::sendMousePointerLocationToOtherClients()
+{
+  if( this->Internals->BroadcastMouseLocation &&
+      this->Internals->MousePointerLocationUpdated )
+    {
+    this->Internals->server()->sendToOtherClients(&this->Internals->LastMousePointerPosition);
+    this->Internals->MousePointerLocationUpdated = false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId, double x, double y)
+{
+  pqServerManagerModel* smmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+  pqView* view = smmodel->findItem<pqView*>(viewId);
+  pqQVTKWidget* widget = NULL;
+  if(view && (widget = qobject_cast<pqQVTKWidget*>(view->getWidget())))
+    {
+    double w2 = widget->width() / 2;
+    double h2 = widget->height()/ 2;
+    double px = h2*x + w2;
+    double py = h2*y + h2;
+    widget->paintMousePointer(px, py);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::setFollowUserView(int value)
+{
+  this->UserViewToFollow = value;
+}
+//-----------------------------------------------------------------------------
+int pqCollaborationManager::getUserViewToFollow()
+{
+  return this->UserViewToFollow;
+}
+
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::updateEnabledState()
 {
@@ -279,4 +366,21 @@ void pqCollaborationManager::updateEnabledState()
     }
 
   emit triggeredMasterChanged(enabled);
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::attachMouseListenerTo3DViews()
+{
+  QWidget* mainWidget = pqCoreUtilities::mainWidget();
+  foreach (pqQVTKWidget* widget, mainWidget->findChildren<pqQVTKWidget*>())
+    {
+    QObject::connect(widget, SIGNAL(mouseEvent(QMouseEvent*)),
+                     this, SLOT(updateMousePointerLocation(QMouseEvent*)),
+                     Qt::UniqueConnection);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::enableMousePointerSharing(bool enable)
+{
+  this->Internals->BroadcastMouseLocation = enable;
 }
