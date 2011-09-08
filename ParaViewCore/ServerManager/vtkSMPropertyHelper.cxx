@@ -54,10 +54,7 @@
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
-inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
-{
-  return x < y? x : y;
-}
+#include <algorithm>
 
 #define vtkSMPropertyHelperWarningMacro(blah)\
   if (this->Quiet == false) \
@@ -236,7 +233,7 @@ unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count /*=1*/)
   switch (this->Type)
     {
     SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      count = std::min(SMProperty->GetNumberOfElements(), count);
       for (unsigned int cc=0; cc < count; cc++)
         {
         values[cc] = static_cast<int>(SMProperty->GetElement(cc));
@@ -318,7 +315,7 @@ unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count /*=1*/)
   switch (this->Type)
     {
     SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      count = std::min(SMProperty->GetNumberOfElements(), count);
       for (unsigned int cc=0; cc < count; cc++)
         {
         values[cc] = static_cast<double>(SMProperty->GetElement(cc));
@@ -408,7 +405,7 @@ unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count /*=1
   switch (this->Type)
     {
     SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      count = std::min(SMProperty->GetNumberOfElements(), count);
       for (unsigned int cc=0; cc < count; cc++)
         {
         values[cc] = static_cast<vtkIdType>(SMProperty->GetElement(cc));
