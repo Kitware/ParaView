@@ -92,9 +92,6 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProperty *property, bool quiet)
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::~vtkSMPropertyHelper()
 {
-  delete [] this->IntValues;
-  delete [] this->IdTypeValues;
-  delete [] this->DoubleValues;
 }
 
 //----------------------------------------------------------------------------
@@ -102,9 +99,6 @@ void vtkSMPropertyHelper::Initialize(vtkSMProperty *property)
 {
   this->Property = property;
   this->Type = vtkSMPropertyHelper::NONE;
-  this->DoubleValues = NULL;
-  this->IntValues = NULL;
-  this->IdTypeValues = NULL;
 
   if(property != NULL)
     {
@@ -249,17 +243,16 @@ unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count /*=1*/)
 }
 
 //----------------------------------------------------------------------------
-const int* vtkSMPropertyHelper::GetAsIntPtr()
+std::vector<int> vtkSMPropertyHelper::GetIntArray()
 {
-  delete [] this->IntValues;
-  this->IntValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
+  std::vector<int> array;
+
+  for(int i = 0; i < this->GetNumberOfElements(); i++)
     {
-    this->IntValues = new int[num_elems];
-    this->Get(this->IntValues, num_elems);
+    array.push_back(this->GetAsInt(i));
     }
-  return this->IntValues;
+
+  return array;
 }
 
 //----------------------------------------------------------------------------
@@ -331,17 +324,16 @@ unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count /*=1*/)
 }
 
 //----------------------------------------------------------------------------
-const double* vtkSMPropertyHelper::GetAsDoublePtr()
+std::vector<double> vtkSMPropertyHelper::GetDoubleArray()
 {
-  delete [] this->DoubleValues;
-  this->DoubleValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
+  std::vector<double> array;
+
+  for(int i = 0; i < this->GetNumberOfElements(); i++)
     {
-    this->DoubleValues= new double[num_elems];
-    this->Get(this->DoubleValues, num_elems);
+    array.push_back(this->GetAsDouble(i));
     }
-  return this->DoubleValues;
+
+  return array;
 }
 
 //----------------------------------------------------------------------------
@@ -437,17 +429,16 @@ vtkIdType vtkSMPropertyHelper::GetAsIdType(unsigned int index /*=0*/)
 }
 
 //----------------------------------------------------------------------------
-const vtkIdType* vtkSMPropertyHelper::GetAsIdTypePtr()
+std::vector<vtkIdType> vtkSMPropertyHelper::GetIdTypeArray()
 {
-  delete [] this->IdTypeValues;
-  this->IdTypeValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
+  std::vector<vtkIdType> array;
+
+  for(int i = 0; i < this->GetNumberOfElements(); i++)
     {
-    this->IdTypeValues = new vtkIdType[num_elems];
-    this->Get(this->IdTypeValues, num_elems);
+    array.push_back(this->GetAsIdType(i));
     }
-  return this->IdTypeValues;
+
+  return array;
 }
 
 //----------------------------------------------------------------------------

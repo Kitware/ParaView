@@ -59,6 +59,8 @@
 
 #include "vtkSMObject.h"
 
+#include <vector>
+
 #ifdef INT
 #undef INT
 #endif
@@ -111,7 +113,7 @@ public:
   void Set(const int* values, unsigned int count);
   int GetAsInt(unsigned int index = 0);
   unsigned int Get(int* values, unsigned int count = 1);
-  const int* GetAsIntPtr();
+  std::vector<int> GetIntArray();
 
   // Description:
   // Set/Get methods with \c double API. Calling these method on
@@ -122,7 +124,7 @@ public:
   void Set(const double* values, unsigned int count);
   double GetAsDouble(unsigned int index = 0);
   unsigned int Get(double* values, unsigned int count = 1);
-  const double* GetAsDoublePtr();
+  std::vector<double> GetDoubleArray();
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
   // Description:
@@ -135,7 +137,7 @@ public:
   unsigned int Get(vtkIdType* values, unsigned int count = 1);
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0);
-  const vtkIdType* GetAsIdTypePtr();
+  std::vector<vtkIdType> GetIdTypeArray();
 
   // Description:
   // Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
@@ -199,10 +201,6 @@ private:
   };
 
   bool Quiet;
-  double* DoubleValues;
-  int* IntValues;
-  vtkIdType* IdTypeValues;
-
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;
   PType Type;

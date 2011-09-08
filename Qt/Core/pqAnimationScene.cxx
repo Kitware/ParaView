@@ -454,7 +454,7 @@ void pqAnimationScene::initializeCue(
     double center[3];
     bbox.GetCenter(center);
     vtkPoints* pts = vtkSMUtilities::CreateOrbit(center,
-      vtkSMPropertyHelper(kf0, "ViewUp").GetAsDoublePtr(),
+      &vtkSMPropertyHelper(kf0, "ViewUp").GetDoubleArray()[0],
       5*bbox.GetMaxLength()/2.0, 10);
     vtkSMPropertyHelper(kf0, "PositionPathPoints").Set(
       reinterpret_cast<double*>(pts->GetVoidPointer(0)),
