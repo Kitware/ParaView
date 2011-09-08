@@ -79,6 +79,7 @@ public:
   // If quiet is true, then no errors or warning are raised if the property is
   // missing or of incorrect type.
   vtkSMPropertyHelper(vtkSMProxy* proxy, const char* name, bool quiet=false);
+  vtkSMPropertyHelper(vtkSMProperty *property, bool quiet = false);
   ~vtkSMPropertyHelper();
 
   // Description:
@@ -185,6 +186,7 @@ public:
 private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented
   void operator=(const vtkSMPropertyHelper&); // Not implemented
+  void Initialize(vtkSMProperty *property);
  
   enum PType {
     INT,

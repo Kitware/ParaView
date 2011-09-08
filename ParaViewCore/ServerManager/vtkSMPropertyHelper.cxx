@@ -71,45 +71,25 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
   bool quiet)
 {
   this->Proxy = proxy;
-  this->Property = proxy->GetProperty(pname);
-  this->Type = vtkSMPropertyHelper::NONE;
-  this->DoubleValues = NULL;
-  this->IntValues = NULL;
-  this->IdTypeValues = NULL;
   this->Quiet = quiet;
 
-  if (!this->Property)
+  vtkSMProperty *property = proxy->GetProperty(pname);
+
+  if(!property)
     {
     vtkSMPropertyHelperWarningMacro("Failed to locate property: " << pname);
     }
-  else if (this->Property->IsA("vtkSMIntVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::INT;
-    }
-  else if (this->Property->IsA("vtkSMDoubleVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::DOUBLE;
-    }
-  else if (this->Property->IsA("vtkSMIdTypeVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::IDTYPE;
-    }
-  else if (this->Property->IsA("vtkSMStringVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::STRING;
-    }
-  else if (this->Property->IsA("vtkSMInputProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::INPUT;
-    }
-  else if (this->Property->IsA("vtkSMProxyProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::PROXY;
-    }
-  else
-    {
-    vtkSMPropertyHelperWarningMacro("Unhandled property type : " << this->Property->GetClassName());
-    }
+
+  this->Initialize(property);
+}
+
+//----------------------------------------------------------------------------
+vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProperty *property, bool quiet)
+{
+  this->Proxy = 0;
+  this->Quiet = quiet;
+
+  this->Initialize(property);
 }
 
 //----------------------------------------------------------------------------
@@ -121,9 +101,58 @@ vtkSMPropertyHelper::~vtkSMPropertyHelper()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Initialize(vtkSMProperty *property)
+{
+  this->Property = property;
+  this->Type = vtkSMPropertyHelper::NONE;
+  this->DoubleValues = NULL;
+  this->IntValues = NULL;
+  this->IdTypeValues = NULL;
+
+  if(property != NULL)
+    {
+    if (property->IsA("vtkSMIntVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::INT;
+      }
+    else if (property->IsA("vtkSMDoubleVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::DOUBLE;
+      }
+    else if (property->IsA("vtkSMIdTypeVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::IDTYPE;
+      }
+    else if (property->IsA("vtkSMStringVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::STRING;
+      }
+    else if (property->IsA("vtkSMInputProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::INPUT;
+      }
+    else if (property->IsA("vtkSMProxyProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::PROXY;
+      }
+    else
+      {
+      vtkSMPropertyHelperWarningMacro("Unhandled property type : " << property->GetClassName());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::UpdateValueFromServer()
 {
-  this->Proxy->UpdatePropertyInformation(this->Property);
+  if(this->Proxy)
+    {
+    this->Proxy->UpdatePropertyInformation(this->Property);
+    }
+  else
+    {
+    vtkGenericWarningMacro("No proxy set.");
+    }
 }
 
 #define SM_CASE_MACRO(typeN, type, ctype, call) \
