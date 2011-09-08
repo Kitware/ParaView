@@ -44,7 +44,7 @@ set(CMAKE_MODULE_PATH
 # Enable and setup External project global properties
 #-----------------------------------------------------------------------------
 
-INCLUDE(ExternalProject)
+include(ExternalProject)
 
 #-----------------------------------------------------------------------------
 # Git protocol option
@@ -121,6 +121,10 @@ endif()
 
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
+
+#------------------------------------------------------------------------------
+CONFIGURE_FILE(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CTestCustom.ctest.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
