@@ -73,6 +73,13 @@
 
 class vtkSMProperty;
 class vtkSMProxy;
+class vtkSMVectorProperty;
+class vtkSMIntVectorProperty;
+class vtkSMDoubleVectorProperty;
+class vtkSMIdTypeVectorProperty;
+class vtkSMStringVectorProperty;
+class vtkSMProxyProperty;
+class vtkSMInputProperty;
 
 class VTK_EXPORT vtkSMPropertyHelper 
 {
@@ -98,7 +105,7 @@ public:
   // Description:
   // Get the number of elements in the property.
   // For vtkSMProxyProperty, this is equivalent to GetNumberOfProxies().
-  unsigned int GetNumberOfElements();
+  unsigned int GetNumberOfElements() const;
 
   // Description:
   // Equivalent to SetNumberOfElements(0).
@@ -189,6 +196,12 @@ private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented
   void operator=(const vtkSMPropertyHelper&); // Not implemented
   void Initialize(vtkSMProperty *property);
+
+  template<typename T> T GetProperty(unsigned int index) const;
+  template<typename T> std::vector<T> GetPropertyArray() const;
+  template<typename T> unsigned int GetPropertyArray(T *values, unsigned int count = 1);
+  template<typename T> void SetProperty(unsigned int index, T value);
+  template<typename T> void SetPropertyArray(const T *values, unsigned int count);
  
   enum PType {
     INT,
@@ -202,8 +215,19 @@ private:
 
   bool Quiet;
   vtkSMProxy* Proxy;
-  vtkSMProperty* Property;
   PType Type;
+
+  union
+    {
+    vtkSMProperty *Property;
+    vtkSMVectorProperty *VectorProperty;
+    vtkSMIntVectorProperty *IntVectorProperty;
+    vtkSMDoubleVectorProperty *DoubleVectorProperty;
+    vtkSMIdTypeVectorProperty *IdTypeVectorProperty;
+    vtkSMStringVectorProperty *StringVectorProperty;
+    vtkSMProxyProperty *ProxyProperty;
+    vtkSMInputProperty *InputProperty;
+    };
 //ETX
 };
 
