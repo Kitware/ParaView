@@ -191,6 +191,9 @@ public:
   void SetStatus(const char* key, const char* value);
   const char* GetStatus(const char* key, const char* default_value);
 
+protected:
+  void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
+
 //BTX
 private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented
@@ -214,6 +217,7 @@ private:
   };
 
   bool Quiet;
+  bool UseUnchecked;
   vtkSMProxy* Proxy;
   PType Type;
 
