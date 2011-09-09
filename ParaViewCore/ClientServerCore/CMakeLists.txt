@@ -159,7 +159,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVView.cxx
   vtkSession.cxx
   vtkTileDisplayHelper.cxx
-
   ABSTRACT)
 
 INCLUDE_DIRECTORIES(
@@ -170,6 +169,7 @@ INCLUDE_DIRECTORIES(
   ${PVClientServerCore_SOURCE_DIR}
   ${PVClientServerCore_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
+  ${VTK_ZLIB_INCLUDE_DIRS}
   )
 
 IF (VTK_USE_MPI)

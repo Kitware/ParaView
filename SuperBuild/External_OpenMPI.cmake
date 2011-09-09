@@ -16,10 +16,10 @@ if(WIN32)
     URL ${OPENMPI_URL}/${OPENMPI_GZ}
     URL_MD5 ${OPENMPI_MD5}
     CMAKE_CACHE_ARGS
-      -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
-      -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
+#      -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
+#      -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
-      ${pv_tpl_compiler_args}
+#      ${pv_tpl_compiler_args}
       ${OpenMPI_EXTRA_ARGS}
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
@@ -42,9 +42,12 @@ set(MPIEXEC ${OpenMPI_install}/bin/mpiexec${CMAKE_EXECUTABLE_SUFFIX})
 set(MPICC ${OpenMPI_install}/bin/mpicc${CMAKE_EXECUTABLE_SUFFIX})
 set(MPICXX ${OpenMPI_install}/bin/mpic++${CMAKE_EXECUTABLE_SUFFIX})
 set(MPI_INCLUDE_PATH ${OpenMPI_install}/include)
+set(MPI_INSTALL ${OpenMPI_install})
 if(WIN32)
-  set(MPI_LIBRARY optimized ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpid${_LINK_LIBRARY_SUFFIX})
-  set(MPI_EXTRA_LIBRARY optimized ${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpi_cxxd${_LINK_LIBRARY_SUFFIX})
+  #set(MPI_LIBRARY optimized "${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpid${_LINK_LIBRARY_SUFFIX}")
+  set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX})
+  #set(MPI_EXTRA_LIBRARY optimized "${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpi_cxxd${_LINK_LIBRARY_SUFFIX}")
+  set(MPI_EXTRA_LIBRARY "${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX}")
 else()
   set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi.a)
   set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx.a)
