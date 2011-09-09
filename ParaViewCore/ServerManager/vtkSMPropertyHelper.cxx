@@ -147,6 +147,20 @@ inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
 }
 
 //----------------------------------------------------------------------------
+template<>
+inline vtkSMProxy* vtkSMPropertyHelper::GetProperty(unsigned int index) const
+{
+  switch(this->Type)
+    {
+    case PROXY:
+    case INPUT:
+      return this->ProxyProperty->GetProxy(index);
+    default:
+      return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
 template<typename T>
 inline std::vector<T> vtkSMPropertyHelper::GetPropertyArray() const
 {
@@ -540,15 +554,13 @@ const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
 void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value, 
   unsigned int outputport/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->SetProxy(index, value);
+    this->ProxyProperty->SetProxy(index, value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->SetInputConnection(index, value, outputport);
+    this->InputProperty->SetInputConnection(index, value, outputport);
     }
   else
     {
@@ -560,15 +572,13 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value,
 void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count, 
   unsigned int *outputports/*=NULL*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->SetProxies(count, value);
+    this->ProxyProperty->SetProxies(count, value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->SetProxies(count, value, outputports);
+    this->InputProperty->SetProxies(count, value, outputports);
     }
   else
     {
@@ -579,15 +589,13 @@ void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count,
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->AddProxy(value);
+    this->ProxyProperty->AddProxy(value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->AddInputConnection(value, outputport);
+    this->InputProperty->AddInputConnection(value, outputport);
     }
   else
     {
@@ -598,11 +606,10 @@ void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY ||
-    this->Type == vtkSMPropertyHelper::INPUT)
+  if(this->Type == PROXY ||
+     this->Type == INPUT)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->RemoveProxy(value);
+    this->ProxyProperty->RemoveProxy(value);
     }
   else
     {
@@ -613,28 +620,15 @@ void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
 {
-  switch (this->Type)
-    {
-  case vtkSMPropertyHelper::PROXY:
-  case vtkSMPropertyHelper::INPUT:
-    {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    return pp->GetProxy(index);
-    }
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-  return 0;
+  return this->GetProperty<vtkSMProxy*>(index);
 }
 
 //----------------------------------------------------------------------------
 unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::INPUT)
+  if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    return ip->GetOutputPortForConnection(index);
+    return this->InputProperty->GetOutputPortForConnection(index);
     }
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
