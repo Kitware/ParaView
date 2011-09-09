@@ -295,7 +295,7 @@ void pqRenderViewBase::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 
   this->restoreSettings(false);
-  this->resetCamera();
+  proxy->InvokeCommand("ResetCamera");
 }
 
 //-----------------------------------------------------------------------------
