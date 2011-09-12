@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMExtentDomain.h"
 #include "vtkSMFileListDomain.h"
@@ -1386,6 +1387,29 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
 }
 
+QList<QVariant> pqSMAdaptor::getUncheckedMultipleElementProperty(vtkSMProperty* Property)
+{
+  QList<QVariant> props;
+
+  vtkSMVectorProperty* VectorProperty;
+  VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
+  if(!VectorProperty)
+    {
+    return props;
+    }
+
+  int i;
+  int num = VectorProperty->GetNumberOfElements();
+  for(i=0; i<num; i++)
+    {
+    props.push_back(
+       pqSMAdaptor::getUncheckedMultipleElementProperty(Property, i)
+       );
+    }
+
+  return props;
+}
+
 void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property,
                                                       QList<QVariant> Value)
 {
@@ -1609,6 +1633,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       idvp->SetElement(Index, v);
       }
     }
+}
+
+QVariant pqSMAdaptor::getUncheckedMultipleElementProperty(vtkSMProperty* Property,
+                                                          unsigned int Index)
+{
+  vtkVariant variant = vtkSMUncheckedPropertyHelper(Property).GetAsVariant(Index);
+
+  return convertToQVariant(variant);
 }
 
 void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProperty* Property, 

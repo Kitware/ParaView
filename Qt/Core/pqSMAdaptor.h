@@ -152,6 +152,7 @@ public:
   /// set the multiple elements of a property (integer, string, real, etc..)
   static void setMultipleElementProperty(vtkSMProperty* Property, 
                                          QList<QVariant> Value);
+  static QList<QVariant> getUncheckedMultipleElementProperty(vtkSMProperty *Property);
   static void setUncheckedMultipleElementProperty(vtkSMProperty* Property, 
                                                   QList<QVariant> Value);
   /// get the ranges of possible values to 
@@ -167,6 +168,8 @@ public:
   static void setMultipleElementProperty(vtkSMProperty* Property, 
                                          unsigned int Index, 
                                          QVariant Value);
+  static QVariant getUncheckedMultipleElementProperty(vtkSMProperty* Property,
+                                                      unsigned int Index);
   static void setUncheckedMultipleElementProperty(vtkSMProperty* Property, 
                                                   unsigned int Index, 
                                                   QVariant Value);
