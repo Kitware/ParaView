@@ -193,7 +193,15 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::SINGLE_ELEMENT:
         {
-        prop = pqSMAdaptor::getElementProperty(this->Internal->Property);
+        if(this->Internal->UseUncheckedProperties)
+          {
+          prop = pqSMAdaptor::getUncheckedElementProperty(this->Internal->Property);
+          }
+        else
+          {
+          prop = pqSMAdaptor::getElementProperty(this->Internal->Property);
+          }
+
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -244,8 +252,17 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         {
         if(this->Internal->Index == -1)
           {
-          prop = pqSMAdaptor::getMultipleElementProperty(
-            this->Internal->Property);
+          if(this->Internal->UseUncheckedProperties)
+            {
+            prop = pqSMAdaptor::getUncheckedMultipleElementProperty(
+                     this->Internal->Property);
+            }
+          else
+            {
+            prop = pqSMAdaptor::getMultipleElementProperty(
+                     this->Internal->Property);
+            }
+
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -254,9 +271,19 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
           }
         else
           {
-          prop = pqSMAdaptor::getMultipleElementProperty(
-            this->Internal->Property, 
-            this->Internal->Index);
+          if(this->Internal->UseUncheckedProperties)
+            {
+            prop = pqSMAdaptor::getUncheckedMultipleElementProperty(
+                     this->Internal->Property,
+                     this->Internal->Index);
+            }
+          else
+            {
+            prop = pqSMAdaptor::getMultipleElementProperty(
+                     this->Internal->Property,
+                     this->Internal->Index);
+            }
+
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
