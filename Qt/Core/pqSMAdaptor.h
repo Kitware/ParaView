@@ -142,6 +142,7 @@ public:
   /// set the single element of a property (integer, string, real, etc..)
   static void setElementProperty(vtkSMProperty* Property, 
                                  QVariant Value);
+  static QVariant getUncheckedElementProperty(vtkSMProperty* Property);
   static void setUncheckedElementProperty(vtkSMProperty* Property, 
                                           QVariant Value);
   /// get the range of possible values to set the single element of a property

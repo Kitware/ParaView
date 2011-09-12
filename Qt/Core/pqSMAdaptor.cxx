@@ -1269,6 +1269,11 @@ void pqSMAdaptor::setElementProperty(vtkSMProperty* Property, QVariant Value)
   pqSMAdaptor::setMultipleElementProperty(Property, 0, Value);
 }
 
+QVariant pqSMAdaptor::getUncheckedElementProperty(vtkSMProperty* Property)
+{
+  return pqSMAdaptor::getUncheckedMultipleElementProperty(Property, 0);
+}
+
 void pqSMAdaptor::setUncheckedElementProperty(vtkSMProperty* Property, 
                                               QVariant Value)
 {
