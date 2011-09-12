@@ -177,13 +177,17 @@ inline vtkVariant vtkSMPropertyHelper::GetProperty(unsigned int index) const
   switch(this->Type)
     {
     case INT:
-      return this->IntVectorProperty->GetElement(index);
+      return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                                  this->IntVectorProperty->GetElement(index);
     case DOUBLE:
-      return this->DoubleVectorProperty->GetElement(index);
+      return this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
+                                  this->DoubleVectorProperty->GetElement(index);
     case IDTYPE:
-      return this->IdTypeVectorProperty->GetElement(index);
+      return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
+                                  this->IdTypeVectorProperty->GetElement(index);
     case STRING:
-      return this->StringVectorProperty->GetElement(index);
+      return this->UseUnchecked ? this->StringVectorProperty->GetUncheckedElement(index) :
+                                  this->StringVectorProperty->GetElement(index);
     default:
       return vtkVariant();
     }
