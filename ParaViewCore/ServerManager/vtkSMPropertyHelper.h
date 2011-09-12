@@ -58,6 +58,7 @@
 #define __vtkSMPropertyHelper_h
 
 #include "vtkSMObject.h"
+#include "vtkVariant.h"
 
 #include <vector>
 
@@ -110,6 +111,10 @@ public:
   // Description:
   // Equivalent to SetNumberOfElements(0).
   void RemoveAllValues() { this->SetNumberOfElements(0); }
+
+  // Description:
+  // Get value as a variant.
+  vtkVariant GetAsVariant(unsigned int index);
 
   // Description:
   // Set/Get methods with \c int API. Calling these method on

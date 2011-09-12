@@ -171,6 +171,25 @@ inline vtkSMProxy* vtkSMPropertyHelper::GetProperty(unsigned int index) const
 }
 
 //----------------------------------------------------------------------------
+template<>
+inline vtkVariant vtkSMPropertyHelper::GetProperty(unsigned int index) const
+{
+  switch(this->Type)
+    {
+    case INT:
+      return this->IntVectorProperty->GetElement(index);
+    case DOUBLE:
+      return this->DoubleVectorProperty->GetElement(index);
+    case IDTYPE:
+      return this->IdTypeVectorProperty->GetElement(index);
+    case STRING:
+      return this->StringVectorProperty->GetElement(index);
+    default:
+      return vtkVariant();
+    }
+}
+
+//----------------------------------------------------------------------------
 template<typename T>
 inline std::vector<T> vtkSMPropertyHelper::GetPropertyArray() const
 {
@@ -518,6 +537,12 @@ unsigned int vtkSMPropertyHelper::GetNumberOfElements() const
       vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
       return 0;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkVariant vtkSMPropertyHelper::GetAsVariant(unsigned int index)
+{
+  return GetProperty<vtkVariant>(index);
 }
 
 //----------------------------------------------------------------------------
