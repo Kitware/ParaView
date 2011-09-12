@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
@@ -1544,36 +1545,9 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
 QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
                                                  unsigned int Index)
 {
-  QVariant var;
-  
-  vtkSMDoubleVectorProperty* dvp = NULL;
-  vtkSMIntVectorProperty* ivp = NULL;
-  vtkSMIdTypeVectorProperty* idvp = NULL;
-  vtkSMStringVectorProperty* svp = NULL;
+  vtkVariant variant = vtkSMPropertyHelper(Property).GetAsVariant(Index);
 
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(Property);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
-  idvp = vtkSMIdTypeVectorProperty::SafeDownCast(Property);
-  svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-
-  if(dvp && dvp->GetNumberOfElements() > Index)
-    {
-    var = dvp->GetElement(Index);
-    }
-  else if(ivp && ivp->GetNumberOfElements() > Index)
-    {
-    var = ivp->GetElement(Index);
-    }
-  else if(svp && svp->GetNumberOfElements() > Index)
-    {
-    var = svp->GetElement(Index);
-    }
-  else if(idvp && idvp->GetNumberOfElements() > Index)
-    {
-    var = idvp->GetElement(Index);
-    }
-  
-  return var;
+  return convertToQVariant(variant);
 }
 
 void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property, 
@@ -2022,4 +1996,48 @@ QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
     }
   iter->Delete();
   return types;
+}
+
+//-----------------------------------------------------------------------------
+QVariant pqSMAdaptor::convertToQVariant(const vtkVariant &variant)
+{
+  switch(variant.GetType())
+    {
+    case VTK_CHAR:
+      return variant.ToChar();
+    case VTK_UNSIGNED_CHAR:
+      return variant.ToUnsignedChar();
+    case VTK_SIGNED_CHAR:
+      return variant.ToSignedChar();
+    case VTK_SHORT:
+      return variant.ToShort();
+    case VTK_UNSIGNED_SHORT:
+      return variant.ToUnsignedShort();
+    case VTK_INT:
+      return variant.ToInt();
+    case VTK_UNSIGNED_INT:
+      return variant.ToUnsignedInt();
+#ifdef VTK_TYPE_USE___INT64
+    case VTK___INT64:
+      return variant.ToTypeInt64();
+    case VTK_UNSIGNED___INT64:
+      return variant.ToTypeUInt64();
+#endif
+#ifdef VTK_TYPE_USE_LONG_LONG
+    case VTK_LONG_LONG:
+      return variant.ToLongLong();
+    case VTK_UNSIGNED_LONG_LONG:
+      return variant.ToUnsignedLongLong();
+#endif
+    case VTK_FLOAT:
+      return variant.ToFloat();
+    case VTK_DOUBLE:
+      return variant.ToDouble();
+    case VTK_STRING:
+      return variant.ToString().c_str();
+    case VTK_OBJECT:
+      return QVariant(QMetaType::VoidStar, variant.ToVTKObject());
+    default:
+      return QVariant();
+    }
 }

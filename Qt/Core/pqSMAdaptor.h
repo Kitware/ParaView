@@ -44,6 +44,7 @@ class QWidget;
 #include <QList>
 #include <QPair>
 #include "pqSMProxy.h"
+#include "vtkVariant.h"
 
 Q_DECLARE_METATYPE(QList<QList<QVariant> >)
 
@@ -200,6 +201,9 @@ public:
   /// if a property has vtkSMBoundsDomain and vtkSMArrayListDomain then
   /// this method will returns ["vtkSMBoundsDomain", "vtkSMArrayListDomain"].
   static QList<QString> getDomainTypes(vtkSMProperty* property);
+
+  /// Converts a vtkVariant into a QVariant.
+  static QVariant convertToQVariant(const vtkVariant &variant);
 };
 
 #endif // !_pqSMAdaptor_h
