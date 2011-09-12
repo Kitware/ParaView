@@ -24,7 +24,9 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
+#include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
+#include "vtkSMProperty.h"
 #include <typeinfo>
 
 class vtkSMProperty;
@@ -137,6 +139,7 @@ public:
       this->SetNumberOfUncheckedElements(idx+1);
       }
     this->UncheckedValues[idx] = value;
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
   //---------------------------------------------------------------------------
   int SetElementAsString(unsigned int idx, const char* value)
@@ -167,6 +170,10 @@ public:
       this->SetNumberOfElements(idx+1);
       }
     this->Values[idx] = value;
+
+    // copy values to unchecked values
+    this->UncheckedValues = this->Values;
+
     // Make sure to initialize BEFORE Modified() is called. Otherwise,
     // the value would not be pushed.
     this->Initialized = true;
@@ -202,6 +209,10 @@ public:
       }
 
     vtkstd::copy(values, values+numArgs, this->Values.begin());
+
+    // copy values to unchecked values
+    this->UncheckedValues = this->Values;
+
     this->Initialized = true;
     this->Property->Modified();
     return 1;
@@ -239,6 +250,10 @@ public:
     if (this->DefaultsValid && this->DefaultValues != this->Values)
       {
       this->Values = this->DefaultValues;
+
+      // copy values to unchecked values
+      this->UncheckedValues = this->Values;
+
       // Make sure to initialize BEFORE Modified() is called. Otherwise,
       // the value would not be pushed.
       this->Initialized = true;

@@ -604,9 +604,19 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   pqPropertyLinksConnection *conn = 
     new pqPropertyLinksConnection(this, Proxy, Property, Index, qObject, qProperty);
   this->Internal->Links.push_back(conn);
-  this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
-                                          conn, 
-                                          SLOT(triggerDelayedSMLinkedPropertyChanged()));
+
+  if(this->Internal->UseUncheckedProperties)
+    {
+    this->Internal->VTKConnections->Connect(Property, vtkCommand::UncheckedPropertyModifiedEvent,
+                                            conn,
+                                            SLOT(triggerDelayedSMLinkedPropertyChanged()));
+    }
+  else
+    {
+    this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
+                                            conn,
+                                            SLOT(triggerDelayedSMLinkedPropertyChanged()));
+    }
   
   QObject::connect(qObject, signal,conn, SLOT(qtLinkedPropertyChanged()));
 
@@ -632,8 +642,19 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject,
     {
     if (conn && conn->isEqual(Proxy, Property, Index, qObject, qProperty))
       {
-      this->Internal->VTKConnections->Disconnect(conn->Internal->Property, 
-        vtkCommand::ModifiedEvent, conn);
+      if(this->Internal->UseUncheckedProperties)
+        {
+        this->Internal->VTKConnections->Disconnect(conn->Internal->Property,
+                                                   vtkCommand::UncheckedPropertyModifiedEvent,
+                                                   conn);
+        }
+      else
+        {
+        this->Internal->VTKConnections->Disconnect(conn->Internal->Property,
+                                                   vtkCommand::ModifiedEvent,
+                                                   conn);
+        }
+
       QObject::disconnect(conn->Internal->QtObject, signal, conn, 
         SLOT(qtLinkedPropertyChanged()));
       QObject::disconnect(conn, 0, this, 0);
