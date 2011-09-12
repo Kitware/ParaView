@@ -552,6 +552,10 @@ protected:
   virtual void ExecuteEvent(vtkObject* obj, unsigned long event, void* data);
 
   // Description:
+  // Removes a prototype. Used internally to cleanup obsolete prototypes.
+  void RemovePrototype(const char* groupname, const char* proxyname);
+
+  // Description:
   // Mark/UnMark a proxy as modified.
   void MarkProxyAsModified(vtkSMProxy*);
   void UnMarkProxyAsModified(vtkSMProxy*);
