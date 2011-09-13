@@ -125,6 +125,8 @@ public:
   // Returns the default value, if any, specified in the XML.
   int GetDefaultValue(int idx);
 
+  virtual void ClearUncheckedElements();
+
 //BTX
 protected:
   vtkSMIntVectorProperty();

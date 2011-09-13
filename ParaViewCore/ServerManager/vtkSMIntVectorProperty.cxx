@@ -123,6 +123,12 @@ int vtkSMIntVectorProperty::GetDefaultValue(int idx)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMIntVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
+}
+
+//---------------------------------------------------------------------------
 int *vtkSMIntVectorProperty::GetElements()
 {
   return this->Internals->GetElements();

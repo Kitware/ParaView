@@ -2036,6 +2036,16 @@ QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
 }
 
 //-----------------------------------------------------------------------------
+void pqSMAdaptor::clearUncheckedProperty(vtkSMProperty *property)
+{
+  vtkSMVectorProperty *VectorProperty = vtkSMVectorProperty::SafeDownCast(property);
+  if(VectorProperty)
+    {
+    VectorProperty->ClearUncheckedElements();
+    }
+}
+
+//-----------------------------------------------------------------------------
 QVariant pqSMAdaptor::convertToQVariant(const vtkVariant &variant)
 {
   switch(variant.GetType())

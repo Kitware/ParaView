@@ -206,6 +206,9 @@ public:
   /// this method will returns ["vtkSMBoundsDomain", "vtkSMArrayListDomain"].
   static QList<QString> getDomainTypes(vtkSMProperty* property);
 
+  /// Clears any unchecked values on the property.
+  static void clearUncheckedProperty(vtkSMProperty *property);
+
   /// Converts a vtkVariant into a QVariant.
   static QVariant convertToQVariant(const vtkVariant &variant);
 };

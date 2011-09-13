@@ -267,6 +267,12 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::ResetToDefaultInternal()
 {
   this->Internals->ResetToDefaultInternal();

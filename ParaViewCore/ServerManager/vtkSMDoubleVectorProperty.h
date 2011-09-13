@@ -136,6 +136,8 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  virtual void ClearUncheckedElements();
+
 protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();

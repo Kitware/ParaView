@@ -146,6 +146,11 @@ void pqPropertyLinksConnection::clearOutOfSync() const
   this->Internal->OutOfSync = false;
 }
 
+void pqPropertyLinksConnection::clearUncheckedProperties()
+{
+  pqSMAdaptor::clearUncheckedProperty(this->Internal->Property);
+}
+
 void pqPropertyLinksConnection::triggerDelayedSMLinkedPropertyChanged()
 {
   if(this->Internal->Updating == false)
@@ -688,6 +693,7 @@ void pqPropertyLinks::reset()
     {
     if (conn && conn->getOutOfSync())
       {
+      conn->clearUncheckedProperties();
       conn->smLinkedPropertyChanged();
       conn->clearOutOfSync();
       }

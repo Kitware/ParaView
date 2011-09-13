@@ -100,6 +100,8 @@ public:
   vtkSetStringMacro(SetNumberCommand);
   vtkGetStringMacro(SetNumberCommand);
 
+  virtual void ClearUncheckedElements();
+
   char* SetNumberCommand;
 
 protected:
