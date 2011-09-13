@@ -188,6 +188,10 @@ inline vtkVariant vtkSMPropertyHelper::GetProperty(unsigned int index) const
     case STRING:
       return this->UseUnchecked ? this->StringVectorProperty->GetUncheckedElement(index) :
                                   this->StringVectorProperty->GetElement(index);
+    case PROXY:
+    case INPUT:
+      return this->UseUnchecked ? this->ProxyProperty->GetUncheckedProxy(index) :
+                                  this->ProxyProperty->GetProxy(index);
     default:
       return vtkVariant();
     }
