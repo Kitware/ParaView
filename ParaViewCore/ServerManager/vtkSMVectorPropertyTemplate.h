@@ -138,8 +138,12 @@ public:
       {
       this->SetNumberOfUncheckedElements(idx+1);
       }
-    this->UncheckedValues[idx] = value;
-    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+
+    if(this->UncheckedValues[idx] != value)
+      {
+      this->UncheckedValues[idx] = value;
+      this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+      }
     }
   //---------------------------------------------------------------------------
   int SetElementAsString(unsigned int idx, const char* value)
@@ -163,6 +167,16 @@ public:
     if (this->Initialized && idx < numElems && value == this->GetElement(idx))
       {
       return 1;
+      }
+
+    if ( vtkSMProperty::GetCheckDomains() )
+      {
+      this->SetUncheckedElement(idx, value);
+      if (!this->Property->IsInDomains())
+        {
+        this->SetNumberOfUncheckedElements(numElems);
+        return 0;
+        }
       }
 
     if (idx >= numElems)
@@ -236,6 +250,7 @@ public:
       if (modified)
         {
         this->Property->Modified();
+        this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
         }
       }
     }
@@ -279,6 +294,7 @@ public:
     {
     // copy values to unchecked values
     this->UncheckedValues = this->Values;
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 };
 #endif

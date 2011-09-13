@@ -245,6 +245,12 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMIdTypeVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::ResetToDefaultInternal()
 {
   this->Internals->ResetToDefaultInternal();

@@ -115,6 +115,8 @@ public:
   // Returns the default value, if any, specified in the XML.
   const char* GetDefaultValue(int idx);
 
+  virtual void ClearUncheckedElements();
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();

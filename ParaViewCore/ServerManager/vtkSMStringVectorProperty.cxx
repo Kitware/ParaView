@@ -290,6 +290,11 @@ const char* vtkSMStringVectorProperty::GetDefaultValue(int idx)
   return this->Internals->GetDefaultValue(idx).c_str();
 }
 
+void vtkSMStringVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
+}
+
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
 {
