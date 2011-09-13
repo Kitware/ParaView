@@ -184,12 +184,13 @@ public:
       this->SetNumberOfElements(idx+1);
       }
     this->Values[idx] = value;
-    this->ClearUncheckedElements();
 
     // Make sure to initialize BEFORE Modified() is called. Otherwise,
     // the value would not be pushed.
     this->Initialized = true;
     this->Property->Modified();
+
+    this->ClearUncheckedElements();
     return 1;
     }
 
@@ -221,10 +222,11 @@ public:
       }
 
     vtkstd::copy(values, values+numArgs, this->Values.begin());
-    this->ClearUncheckedElements();
 
     this->Initialized = true;
     this->Property->Modified();
+
+    this->ClearUncheckedElements();
     return 1;
     }
 
@@ -261,11 +263,11 @@ public:
     if (this->DefaultsValid && this->DefaultValues != this->Values)
       {
       this->Values = this->DefaultValues;
-      this->ClearUncheckedElements();
       // Make sure to initialize BEFORE Modified() is called. Otherwise,
       // the value would not be pushed.
       this->Initialized = true;
       this->Property->Modified();
+      this->ClearUncheckedElements();
       }
     }
   //---------------------------------------------------------------------------
