@@ -74,7 +74,6 @@ int vtkCPProcessModulePythonHelper::RunGUIStart(
   (void)numServerProcs;
 
   this->SMApplication->Initialize();
-  vtkSMProperty::SetCheckDomains(0);
 
   // Do static initialization of python libraries
   cppythonmodules_h_LoadAllPythonModules();
