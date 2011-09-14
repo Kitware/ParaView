@@ -302,7 +302,7 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
     if (this->RandomMode)
       {
       double r
-      = vtkMath::Random( (this->BlockNumGlyphedPts)*(this->BlockSampleStride), (this->BlockNumGlyphedPts+1)*(this->BlockSampleStride-1.0) );
+      = vtkMath::Random( (this->BlockNumGlyphedPts)*(this->BlockSampleStride), (this->BlockNumGlyphedPts+1)*(this->BlockSampleStride) - 1 );
       this->BlockNextPoint=static_cast<vtkIdType>(r+0.5);
       }
     else
@@ -427,7 +427,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         this->BlockSampleStride=1;
         }
       // We will glyph this many points.
-      this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock);
+      this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock + 0.5) ;
       //
       this->BlockPointCounter = 0;
       this->BlockNumGlyphedPts = 0;
