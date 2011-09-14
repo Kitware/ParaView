@@ -362,8 +362,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
         {
         if(this->Internal->UseUncheckedProperties)
           {
-          pqSMAdaptor::setUncheckedEnumerationProperty(
-            this->Internal->Property, prop);
+          pqSMAdaptor::setEnumerationProperty(this->Internal->Property,
+                                              prop,
+                                              pqSMAdaptor::UNCHECKED);
           }
         else
           {
@@ -380,8 +381,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
         {
         if(this->Internal->UseUncheckedProperties)
           {
-          pqSMAdaptor::setUncheckedElementProperty(
-            this->Internal->Property, prop);
+          pqSMAdaptor::setElementProperty(this->Internal->Property,
+                                          prop,
+                                          pqSMAdaptor::UNCHECKED);
           }
         else
           {
@@ -404,8 +406,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
             }
           else
             {
-            pqSMAdaptor::setUncheckedFileListProperty(
-                           this->Internal->Property, prop.value<QStringList>());
+            pqSMAdaptor::setFileListProperty(this->Internal->Property,
+                                             prop.value<QStringList>(),
+                                             pqSMAdaptor::UNCHECKED);
             }
           }
         else
@@ -433,8 +436,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           QList<QList<QVariant> > theProp = prop.value<QList<QList<QVariant> > >();
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedSelectionProperty(
-              this->Internal->Property, theProp);
+            pqSMAdaptor::setSelectionProperty(this->Internal->Property,
+                                              theProp,
+                                              pqSMAdaptor::UNCHECKED);
             }
           else
             {
@@ -457,8 +461,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
 
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedSelectionProperty(
-              this->Internal->Property, selection);
+            pqSMAdaptor::setSelectionProperty(this->Internal->Property,
+                                              selection,
+                                              pqSMAdaptor::UNCHECKED);
             }
           else
             {
@@ -480,8 +485,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           {
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedMultipleElementProperty(
-              this->Internal->Property, prop.toList());
+            pqSMAdaptor::setMultipleElementProperty(this->Internal->Property,
+                                                    prop.toList(),
+                                                    pqSMAdaptor::UNCHECKED);
             }
           else
             {
@@ -497,8 +503,10 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           {
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedMultipleElementProperty(
-              this->Internal->Property, this->Internal->Index, prop);
+            pqSMAdaptor::setMultipleElementProperty(this->Internal->Property,
+                                                    this->Internal->Index,
+                                                    prop,
+                                                    pqSMAdaptor::UNCHECKED);
             }
           else
             {
@@ -518,8 +526,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           {
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedFieldSelectionMode(
-              this->Internal->Property, prop.toString());
+            pqSMAdaptor::setFieldSelectionMode(this->Internal->Property,
+                                               prop.toString(),
+                                               pqSMAdaptor::UNCHECKED);
             }
           else
             {
@@ -535,8 +544,9 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           {
           if(this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedFieldSelectionScalar(
-              this->Internal->Property, prop.toString());
+            pqSMAdaptor::setFieldSelectionScalar(this->Internal->Property,
+                                                 prop.toString(),
+                                                 pqSMAdaptor::UNCHECKED);
             }
           else
             {

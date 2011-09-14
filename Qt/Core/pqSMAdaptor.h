@@ -33,11 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSMAdaptor_h
 #define _pqSMAdaptor_h
 
-class pqSMAdaptorInternal;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkObject;
-class QWidget;
 
 #include "pqCoreExport.h"
 #include <QVariant>
@@ -75,6 +73,12 @@ public:
     SIL,
     };
 
+  enum PropertyValueType
+    {
+    CHECKED,
+    UNCHECKED
+    };
+
   /// Get the type of the property
   static PropertyType getPropertyType(vtkSMProperty* Property);
 
@@ -110,20 +114,20 @@ public:
 
 
   /// get the pairs of selections for a selection property
-  static QList<QList<QVariant> > getSelectionProperty(vtkSMProperty* Property);
+  static QList<QList<QVariant> > getSelectionProperty(vtkSMProperty* Property,
+                                                      PropertyValueType Type = CHECKED);
   /// get the pairs of selections for a selection property
   static QList<QVariant> getSelectionProperty(vtkSMProperty* Property, 
-                                              unsigned int Index);
+                                              unsigned int Index,
+                                              PropertyValueType Type = CHECKED);
   /// set the pairs of selections for a selection property
   static void setSelectionProperty(vtkSMProperty* Property, 
-                                   QList<QList<QVariant> > Value);
-  static void setUncheckedSelectionProperty(vtkSMProperty* Property, 
-                                            QList<QList<QVariant> > Value);
+                                   QList<QList<QVariant> > Value,
+                                   PropertyValueType Type = CHECKED);
   /// set the pairs of selections for a selection property
   static void setSelectionProperty(vtkSMProperty* Property, 
-                                   QList<QVariant> Value);
-  static void setUncheckedSelectionProperty(vtkSMProperty* Property, 
-                                            QList<QVariant> Value);
+                                   QList<QVariant> Value,
+                                   PropertyValueType Type = CHECKED);
   /// get the possible names for the selection property
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   
@@ -131,72 +135,68 @@ public:
   static QVariant getEnumerationProperty(vtkSMProperty* Property);
   /// set the enumeration for a property
   static void setEnumerationProperty(vtkSMProperty* Property, 
-                                     QVariant Value);
-  static void setUncheckedEnumerationProperty(vtkSMProperty* Property, 
-                                              QVariant Value);
+                                     QVariant Value,
+                                     PropertyValueType Type = CHECKED);
   /// get the possible enumerations (string) for a property
   static QList<QVariant> getEnumerationPropertyDomain(vtkSMProperty* Property);
 
   /// get the single element of a property (integer, string, real, etc..)
-  static QVariant getElementProperty(vtkSMProperty* Property);
+  static QVariant getElementProperty(vtkSMProperty* Property,
+                                     PropertyValueType Type = CHECKED);
   /// set the single element of a property (integer, string, real, etc..)
-  static void setElementProperty(vtkSMProperty* Property, 
-                                 QVariant Value);
-  static QVariant getUncheckedElementProperty(vtkSMProperty* Property);
-  static void setUncheckedElementProperty(vtkSMProperty* Property, 
-                                          QVariant Value);
+  static void setElementProperty(vtkSMProperty* Property,
+                                 QVariant Value,
+                                 PropertyValueType Type = CHECKED);
   /// get the range of possible values to set the single element of a property
   static QList<QVariant> getElementPropertyDomain(vtkSMProperty* Property);
   
   /// get the multiple elements of a property (integer, string, real, etc..)
-  static QList<QVariant> getMultipleElementProperty(vtkSMProperty* Property);
+  static QList<QVariant> getMultipleElementProperty(vtkSMProperty* Property,
+                                                    PropertyValueType Type = CHECKED);
   /// set the multiple elements of a property (integer, string, real, etc..)
-  static void setMultipleElementProperty(vtkSMProperty* Property, 
-                                         QList<QVariant> Value);
-  static QList<QVariant> getUncheckedMultipleElementProperty(vtkSMProperty *Property);
-  static void setUncheckedMultipleElementProperty(vtkSMProperty* Property, 
-                                                  QList<QVariant> Value);
+  static void setMultipleElementProperty(vtkSMProperty* Property,
+                                         QList<QVariant> Value,
+                                         PropertyValueType Type = CHECKED);
   /// get the ranges of possible values to 
   /// set the multiple elements of a property
-  static QList<QList<QVariant> > getMultipleElementPropertyDomain(
-                                           vtkSMProperty* Property);
+  static QList<QList<QVariant> > getMultipleElementPropertyDomain(vtkSMProperty* Property,
+                                                                  PropertyValueType Type = CHECKED);
   /// get one of the multiple elements of a 
   /// property (integer, string, real, etc..)
   static QVariant getMultipleElementProperty(vtkSMProperty* Property, 
-                                             unsigned int Index);
+                                             unsigned int Index,
+                                             PropertyValueType Type = CHECKED);
   /// set one of the multiple elements of a 
   /// property (integer, string, real, etc..)
-  static void setMultipleElementProperty(vtkSMProperty* Property, 
-                                         unsigned int Index, 
-                                         QVariant Value);
-  static QVariant getUncheckedMultipleElementProperty(vtkSMProperty* Property,
-                                                      unsigned int Index);
-  static void setUncheckedMultipleElementProperty(vtkSMProperty* Property, 
-                                                  unsigned int Index, 
-                                                  QVariant Value);
+  static void setMultipleElementProperty(vtkSMProperty* Property,
+                                         unsigned int Index,
+                                         QVariant Value,
+                                         PropertyValueType Type = CHECKED);
+
   /// get one of the ranges of possible values 
   /// to set the multiple elements of a property
-  static QList<QVariant> getMultipleElementPropertyDomain(
-                       vtkSMProperty* Property, unsigned int Index);
+  static QList<QVariant> getMultipleElementPropertyDomain(vtkSMProperty* Property,
+                                                          unsigned int Index);
 
   /// get the single element of a property (integer, string, real, etc..)
   static QStringList getFileListProperty(vtkSMProperty* Property);
   /// set the single element of a property (integer, string, real, etc..)
   static void setFileListProperty(vtkSMProperty* Property, 
-                                  QStringList Value);
-  static void setUncheckedFileListProperty(vtkSMProperty* Property, 
-                                           QStringList Value);
+                                  QStringList Value,
+                                  PropertyValueType Type = CHECKED);
 
   /// get/set the field selection mode (point, cell, ...)
   static QString getFieldSelectionMode(vtkSMProperty* prop);
-  static void setFieldSelectionMode(vtkSMProperty*, const QString&);
-  static void setUncheckedFieldSelectionMode(vtkSMProperty*, const QString&);
+  static void setFieldSelectionMode(vtkSMProperty* Property,
+                                    const QString& Value,
+                                    PropertyValueType Type = CHECKED);
   static QList<QString> getFieldSelectionModeDomain(vtkSMProperty*);
   
   /// get/set the field selection scalar 
   static QString getFieldSelectionScalar(vtkSMProperty*);
-  static void setFieldSelectionScalar(vtkSMProperty*, const QString&);
-  static void setUncheckedFieldSelectionScalar(vtkSMProperty*, const QString&);
+  static void setFieldSelectionScalar(vtkSMProperty* Property,
+                                      const QString& Value,
+                                      PropertyValueType Type = CHECKED);
   static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*);
   static QList<QPair<QString, bool> > getFieldSelectionScalarDomainWithPartialArrays(vtkSMProperty*);
 
