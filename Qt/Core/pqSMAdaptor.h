@@ -132,7 +132,8 @@ public:
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   
   /// get the enumeration for a property
-  static QVariant getEnumerationProperty(vtkSMProperty* Property);
+  static QVariant getEnumerationProperty(vtkSMProperty* Property,
+                                         PropertyValueType Type = CHECKED);
   /// set the enumeration for a property
   static void setEnumerationProperty(vtkSMProperty* Property, 
                                      QVariant Value,
@@ -207,7 +208,7 @@ public:
   static QList<QString> getDomainTypes(vtkSMProperty* property);
 
   /// Clears any unchecked values on the property.
-  static void clearUncheckedProperty(vtkSMProperty *property);
+  static void clearUncheckedProperties(vtkSMProperty *property);
 
   /// Converts a vtkVariant into a QVariant.
   static QVariant convertToQVariant(const vtkVariant &variant);

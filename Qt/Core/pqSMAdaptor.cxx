@@ -209,12 +209,13 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
   return type;
 }
 
-pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property)
+pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty *Property)
 {
-  pqSMAdaptor::PropertyType type = pqSMAdaptor::getPropertyType(Property);
-  if( type == pqSMAdaptor::PROXY || type == pqSMAdaptor::PROXYSELECTION)
+  pqSMAdaptor::PropertyType propertyType = pqSMAdaptor::getPropertyType(Property);
+  if( propertyType == pqSMAdaptor::PROXY || propertyType == pqSMAdaptor::PROXYSELECTION)
     {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
+
     if(proxyProp->GetNumberOfProxies())
       {
       return pqSMProxy(proxyProp->GetProxy(0));
@@ -489,7 +490,7 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
             {
             if(StringName == StringProperty->GetUncheckedElement(i))
               {
-              value = StringProperty->GetElement(i+1);
+              value = StringProperty->GetUncheckedElement(i+1);
               break;
               }
             }
@@ -523,7 +524,7 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
               break;
               }
             }
-          else
+          else if(Type == CHECKED)
             {
             if(StringName == infoSP->GetElement(i))
               {
@@ -574,7 +575,7 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
   else if(EnumerationDomain)
     {
     QList<QVariant> values =
-      pqSMAdaptor::getMultipleElementProperty(Property);
+      pqSMAdaptor::getMultipleElementProperty(Property, Type);
 
     if(Index < EnumerationDomain->GetNumberOfEntries())
       {
@@ -830,7 +831,8 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
   return ret;
 }
 
-QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
+QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property,
+                                             PropertyValueType Type)
 {
   QVariant var;
   if(!Property)
@@ -876,14 +878,48 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
   pp = vtkSMProxyProperty::SafeDownCast(Property);
 
-  if(BooleanDomain && ivp && ivp->GetNumberOfElements() > 0)
+  unsigned int ivpElementCount = 0;
+  unsigned int svpElementCount = 0;
+  unsigned int ppProxyCount = 0;
+
+  if(Type == CHECKED)
     {
-    var = (ivp->GetElement(0)) == 0 ? false : true;
+    ivpElementCount = ivp ? ivp->GetNumberOfElements() : 0;
+    svpElementCount = svp ? svp->GetNumberOfElements() : 0;
+    ppProxyCount = pp ? pp->GetNumberOfProxies() : 0;
     }
-  else if(EnumerationDomain && ivp && ivp->GetNumberOfElements() > 0)
+  else if(Type == UNCHECKED)
     {
-    int val = ivp->GetElement(0);
-    for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
+    ivpElementCount = ivp ? ivp->GetNumberOfUncheckedElements() : 0;
+    svpElementCount = svp ? svp->GetNumberOfUncheckedElements() : 0;
+    ppProxyCount = pp ? pp->GetNumberOfUncheckedProxies() : 0;
+    }
+
+  if(BooleanDomain && ivpElementCount > 0)
+    {
+    if(Type == CHECKED)
+      {
+      var = (ivp->GetElement(0)) == 0 ? false : true;
+      }
+    else if(Type == UNCHECKED)
+      {
+      var = (ivp->GetUncheckedElement(0)) == 0 ? false : true;
+      }
+    }
+  else if(EnumerationDomain && ivpElementCount > 0)
+    {
+    int val = 0;
+
+    if(Type == CHECKED)
+      {
+      val = ivp->GetElement(0);
+      }
+    else if(Type == UNCHECKED)
+      {
+      val = ivp->GetUncheckedElement(0);
+      }
+
+    for (unsigned int i = 0; i < EnumerationDomain->GetNumberOfEntries(); i++)
       {
       if (EnumerationDomain->GetEntryValue(i) == val)
         {
@@ -894,20 +930,39 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
     }
   else if(StringListDomain && svp)
     {
-    unsigned int nos = svp->GetNumberOfElements();
-    for (unsigned int i=0; i < nos ; i++)
+    for (unsigned int i=0; i < svpElementCount ; i++)
       {
       if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
         {
-        var = svp->GetElement(i);
-        break;
+        if(Type == CHECKED)
+          {
+          var = svp->GetElement(i);
+          break;
+          }
+        else if(Type == UNCHECKED)
+          {
+          var = svp->GetUncheckedElement(i);
+          }
         }
       }
     }
-  else if (ProxyGroupDomain && pp && pp->GetNumberOfProxies() > 0)
+  else if (ProxyGroupDomain && ppProxyCount > 0)
     {
-    vtkSMProxy* p = pp->GetProxy(0);
-    var = ProxyGroupDomain->GetProxyName(p);
+    vtkSMProxy* p;
+
+    if(Type == CHECKED)
+      {
+      p = pp->GetProxy(0);
+      }
+    else if(Type == UNCHECKED)
+      {
+      p = pp->GetUncheckedProxy(0);
+      }
+
+    if(p)
+      {
+      var = ProxyGroupDomain->GetProxyName(p);
+      }
     }
 
   return var;
@@ -1186,20 +1241,19 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     {
     if(Type == CHECKED)
       {
-
-    double *dvalues = new double[num+1];
-    for(int i=0; i<num; i++)
-      {
-      bool ok = true;
-      double v = Value[i].toDouble(&ok);
-      dvalues[i] = ok? v : 0.0;
-      }
-    dvp->SetNumberOfElements(num);
-    if (num > 0)
-      {
-      dvp->SetElements(dvalues);
-      }
-    delete[] dvalues;
+      double *dvalues = new double[num+1];
+      for(int i=0; i<num; i++)
+        {
+        bool ok = true;
+        double v = Value[i].toDouble(&ok);
+        dvalues[i] = ok? v : 0.0;
+        }
+      dvp->SetNumberOfElements(num);
+      if (num > 0)
+        {
+        dvp->SetElements(dvalues);
+        }
+      delete[] dvalues;
       }
     else if(Type == UNCHECKED)
       {
@@ -1278,24 +1332,24 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     if(Type == CHECKED)
       {
 
-    vtkIdType* idvalues = new vtkIdType[num+1];
-    for(int i=0; i<num; i++)
-      {
-      bool ok = true;
-      vtkIdType v;
+      vtkIdType* idvalues = new vtkIdType[num+1];
+      for(int i=0; i<num; i++)
+        {
+        bool ok = true;
+        vtkIdType v;
 #if defined(VTK_USE_64BIT_IDS)
-      v = Value[i].toLongLong(&ok);
+        v = Value[i].toLongLong(&ok);
 #else
-      v = Value[i].toInt(&ok);
+        v = Value[i].toInt(&ok);
 #endif
-      idvalues[i] = ok? v : 0;
-      }
-    idvp->SetNumberOfElements(num);
-    if (num>0)
-      {
-      idvp->SetElements(idvalues);
-      }
-    delete[] idvalues;
+        idvalues[i] = ok? v : 0;
+        }
+      idvp->SetNumberOfElements(num);
+      if (num>0)
+        {
+        idvp->SetElements(idvalues);
+        }
+      delete[] idvalues;
       }
     else if(Type == UNCHECKED)
       {
@@ -1412,7 +1466,16 @@ QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
                                                  unsigned int Index,
                                                  PropertyValueType Type)
 {
-  vtkVariant variant = vtkSMPropertyHelper(Property).GetAsVariant(Index);
+  vtkVariant variant;
+
+  if(Type == CHECKED)
+    {
+    variant = vtkSMPropertyHelper(Property).GetAsVariant(Index);
+    }
+  else if(Type == UNCHECKED)
+    {
+    variant = vtkSMUncheckedPropertyHelper(Property).GetAsVariant(Index);
+    }
 
   return convertToQVariant(variant);
 }
@@ -1438,7 +1501,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     double v = Value.toDouble(&ok);
     if(ok)
       {
-      dvp->SetElement(Index, v);
+      if(Type == CHECKED)
+        {
+        dvp->SetElement(Index, v);
+        }
+      else if(Type == UNCHECKED)
+        {
+        dvp->SetUncheckedElement(Index, v);
+        }
       }
     }
   else if(ivp)
@@ -1452,7 +1522,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       }
     if(ok)
       {
-      ivp->SetElement(Index, v);
+      if(Type == CHECKED)
+        {
+        ivp->SetElement(Index, v);
+        }
+      else if(Type == UNCHECKED)
+        {
+        ivp->SetUncheckedElement(Index, v);
+        }
       }
     }
   else if(svp)
@@ -1460,7 +1537,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     QString v = Value.toString();
     if(!v.isNull())
       {
-      svp->SetElement(Index, v.toAscii().data());
+      if(Type == CHECKED)
+        {
+        svp->SetElement(Index, v.toAscii().constData());
+        }
+      else if(Type == UNCHECKED)
+        {
+        svp->SetUncheckedElement(Index, v.toAscii().constData());
+        }
       }
     }
   else if(idvp)
@@ -1474,7 +1558,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 #endif
     if(ok)
       {
-      idvp->SetElement(Index, v);
+      if(Type == CHECKED)
+        {
+        idvp->SetElement(Index, v);
+        }
+      else if(Type == UNCHECKED)
+        {
+        idvp->SetUncheckedElement(Index, v);
+        }
       }
     }
 }
@@ -1786,7 +1877,7 @@ QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
 }
 
 //-----------------------------------------------------------------------------
-void pqSMAdaptor::clearUncheckedProperty(vtkSMProperty *property)
+void pqSMAdaptor::clearUncheckedProperties(vtkSMProperty *property)
 {
   vtkSMVectorProperty *VectorProperty = vtkSMVectorProperty::SafeDownCast(property);
   if(VectorProperty)

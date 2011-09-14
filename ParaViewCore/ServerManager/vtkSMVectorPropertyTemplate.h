@@ -63,6 +63,7 @@ public:
   void SetNumberOfUncheckedElements(unsigned int num)
     {
     this->UncheckedValues.resize(num);
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 
   //---------------------------------------------------------------------------
@@ -136,7 +137,7 @@ public:
     {
     if (idx >= this->GetNumberOfUncheckedElements())
       {
-      this->SetNumberOfUncheckedElements(idx+1);
+      this->UncheckedValues.resize(idx+1);
       }
 
     if(this->UncheckedValues[idx] != value)
@@ -248,11 +249,10 @@ public:
       modified = modified || !this->Initialized;
       this->Initialized = true;
 
-      this->UncheckedValues = dsrc->UncheckedValues;
       if (modified)
         {
         this->Property->Modified();
-        this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+        this->ClearUncheckedElements();
         }
       }
     }
