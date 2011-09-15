@@ -21,6 +21,7 @@
 #define __vtkPVGlyphFilter_h
 
 #include "vtkGlyph3D.h"
+#include <vector>
 
 class vtkMaskPoints;
 
@@ -91,10 +92,12 @@ protected:
   vtkIdType BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
-  vtkIdType BlockSampleStride;
+//   vtkIdType BlockSampleStride;
   vtkIdType BlockPointCounter;
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
+
+  std::vector< vtkIdType > RandomPtsInDataset;
 
   int RandomMode;
 
