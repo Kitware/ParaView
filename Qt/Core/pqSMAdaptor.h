@@ -84,7 +84,8 @@ public:
 
   /// get the proxy for a property
   /// for example, glyph filter accepts a source (proxy) to glyph with
-  static pqSMProxy getProxyProperty(vtkSMProperty* Property);
+  static pqSMProxy getProxyProperty(vtkSMProperty* Property,
+                                    PropertyValueType Type = CHECKED);
 
   /// get the proxy for a property
   /// for example, glyph filter accepts a source (proxy) to glyph with
@@ -180,21 +181,24 @@ public:
                                                           unsigned int Index);
 
   /// get the single element of a property (integer, string, real, etc..)
-  static QStringList getFileListProperty(vtkSMProperty* Property);
+  static QStringList getFileListProperty(vtkSMProperty* Property,
+                                         PropertyValueType Type = CHECKED);
   /// set the single element of a property (integer, string, real, etc..)
   static void setFileListProperty(vtkSMProperty* Property, 
                                   QStringList Value,
                                   PropertyValueType Type = CHECKED);
 
   /// get/set the field selection mode (point, cell, ...)
-  static QString getFieldSelectionMode(vtkSMProperty* prop);
+  static QString getFieldSelectionMode(vtkSMProperty* prop,
+                                       PropertyValueType Type = CHECKED);
   static void setFieldSelectionMode(vtkSMProperty* Property,
                                     const QString& Value,
                                     PropertyValueType Type = CHECKED);
   static QList<QString> getFieldSelectionModeDomain(vtkSMProperty*);
   
   /// get/set the field selection scalar 
-  static QString getFieldSelectionScalar(vtkSMProperty*);
+  static QString getFieldSelectionScalar(vtkSMProperty* Property,
+                                         PropertyValueType Type = CHECKED);
   static void setFieldSelectionScalar(vtkSMProperty* Property,
                                       const QString& Value,
                                       PropertyValueType Type = CHECKED);

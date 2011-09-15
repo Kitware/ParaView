@@ -209,16 +209,27 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
   return type;
 }
 
-pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty *Property)
+pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty *Property,
+                                        PropertyValueType Type)
 {
   pqSMAdaptor::PropertyType propertyType = pqSMAdaptor::getPropertyType(Property);
   if( propertyType == pqSMAdaptor::PROXY || propertyType == pqSMAdaptor::PROXYSELECTION)
     {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
 
-    if(proxyProp->GetNumberOfProxies())
+    if(Type == CHECKED)
       {
-      return pqSMProxy(proxyProp->GetProxy(0));
+      if(proxyProp->GetNumberOfProxies())
+        {
+        return pqSMProxy(proxyProp->GetProxy(0));
+        }
+      }
+    else if(Type == UNCHECKED)
+      {
+      if(proxyProp->GetNumberOfUncheckedProxies())
+        {
+        return pqSMProxy(proxyProp->GetUncheckedProxy(0));
+        }
       }
     }
   return pqSMProxy(NULL);
@@ -948,7 +959,7 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property,
     }
   else if (ProxyGroupDomain && ppProxyCount > 0)
     {
-    vtkSMProxy* p;
+    vtkSMProxy* p = 0;
 
     if(Type == CHECKED)
       {
@@ -1626,7 +1637,8 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
   return domain;
 }
 
-QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
+QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property,
+                                             PropertyValueType Type)
 {
   QStringList files;
 
@@ -1637,7 +1649,14 @@ QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
     {
     for (unsigned int i = 0; i < svp->GetNumberOfElements(); i++)
       {
-      files.append(svp->GetElement(i));
+      if(Type == CHECKED)
+        {
+        files.append(svp->GetElement(i));
+        }
+      else if(Type == UNCHECKED)
+        {
+        files.append(svp->GetUncheckedElement(i));
+        }
       }
     }
 
@@ -1675,9 +1694,12 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
     i++;
     }
 
-  if (static_cast<int>(svp->GetNumberOfElements()) != Value.size())
+  if(Type == CHECKED)
     {
-    svp->SetNumberOfElements(svp->GetNumberOfElements());
+    if (static_cast<int>(svp->GetNumberOfElements()) != Value.size())
+      {
+      svp->SetNumberOfElements(svp->GetNumberOfElements());
+      }
     }
 
   if(Type == UNCHECKED)
@@ -1686,7 +1708,8 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
     }
 }
 
-QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop)
+QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop,
+                                           PropertyValueType Type)
 {
   QString ret;
   vtkSMStringVectorProperty* Property =
@@ -1696,7 +1719,17 @@ QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop)
   
   if(Property && domain)
     {
-    int which = QString(Property->GetElement(3)).toInt();
+    int which;
+
+    if(Type == CHECKED)
+      {
+      which = QString(Property->GetElement(3)).toInt();
+      }
+    else if(Type == UNCHECKED)
+      {
+      which = QString(Property->GetUncheckedElement(3)).toInt();
+      }
+
     int numEntries = domain->GetNumberOfEntries();
     for(int i=0; i<numEntries; i++)
       {
@@ -1768,7 +1801,8 @@ QList<QString> pqSMAdaptor::getFieldSelectionModeDomain(vtkSMProperty* prop)
 }
 
 
-QString pqSMAdaptor::getFieldSelectionScalar(vtkSMProperty* prop)
+QString pqSMAdaptor::getFieldSelectionScalar(vtkSMProperty* prop,
+                                             PropertyValueType Type)
 {
   QString ret;
   vtkSMStringVectorProperty* Property =
@@ -1776,7 +1810,14 @@ QString pqSMAdaptor::getFieldSelectionScalar(vtkSMProperty* prop)
   
   if(Property)
     {
-    ret = Property->GetElement(4);
+    if(Type == CHECKED)
+      {
+      ret = Property->GetElement(4);
+      }
+    else if(Type == UNCHECKED)
+      {
+      ret = Property->GetUncheckedElement(4);
+      }
     }
   return ret;
 }

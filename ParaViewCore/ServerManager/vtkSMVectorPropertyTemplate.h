@@ -170,16 +170,6 @@ public:
       return 1;
       }
 
-    if ( vtkSMProperty::GetCheckDomains() )
-      {
-      this->SetUncheckedElement(idx, value);
-      if (!this->Property->IsInDomains())
-        {
-        this->SetNumberOfUncheckedElements(numElems);
-        return 0;
-        }
-      }
-
     if (idx >= numElems)
       {
       this->SetNumberOfElements(idx+1);
