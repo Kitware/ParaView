@@ -96,26 +96,10 @@ bool vtkVRWandTrackingStyle::SetWandPoseProperty(const vtkVREventData &data)
   vtkSMDoubleVectorProperty *prop =0;
   if ( this->GetWandPoseProxyNProperty( &proxy, &prop ) )
     {
-    prop->SetElement( 0,  data.data.tracker.matrix[0] );
-    prop->SetElement( 1,  data.data.tracker.matrix[1] );
-    prop->SetElement( 2,  data.data.tracker.matrix[2] );
-    prop->SetElement( 3,  data.data.tracker.matrix[3]  );
-
-    prop->SetElement( 4,  data.data.tracker.matrix[4] );
-    prop->SetElement( 5,  data.data.tracker.matrix[5] );
-    prop->SetElement( 6,  data.data.tracker.matrix[6] );
-    prop->SetElement( 7,  data.data.tracker.matrix[7]  );
-
-    prop->SetElement( 8,  data.data.tracker.matrix[8] );
-    prop->SetElement( 9,  data.data.tracker.matrix[9] );
-    prop->SetElement( 10, data.data.tracker.matrix[10] );
-    prop->SetElement( 11, data.data.tracker.matrix[11]  );
-
-    prop->SetElement( 12, data.data.tracker.matrix[12] );
-    prop->SetElement( 13, data.data.tracker.matrix[13] );
-    prop->SetElement( 14, data.data.tracker.matrix[14]);
-    prop->SetElement( 15, data.data.tracker.matrix[15]);
-
+    for (int i = 0; i < 16; ++i)
+      {
+      prop->SetElement( i, data.data.tracker.matrix[i] );
+      }
     return true;
     }
   return false;
