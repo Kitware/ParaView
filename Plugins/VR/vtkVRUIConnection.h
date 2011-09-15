@@ -158,6 +158,8 @@ protected:
   bool _Stop;
 
   vtkVRQueue* EventQueue;
+  vtkMatrix4x4 *ZUpToYUpMatrix;
+  vtkMatrix4x4 *Matrix;
 
   class pqInternals;
   pqInternals* Internals;

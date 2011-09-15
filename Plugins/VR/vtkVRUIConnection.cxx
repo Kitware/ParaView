@@ -256,7 +256,6 @@ struct  hostent         *hp;
 
 };
 
-
 // -----------------------------------------------------------------------cnstr
 vtkVRUIConnection::vtkVRUIConnection(QObject* parentObject)
   :Superclass( parentObject )
@@ -273,15 +272,19 @@ vtkVRUIConnection::vtkVRUIConnection(QObject* parentObject)
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
+  this->Matrix= vtkMatrix4x4::New();
+  this->ZUpToYUpMatrix = vtkMatrix4x4::New();
 }
 
 // -----------------------------------------------------------------------destr
 vtkVRUIConnection::~vtkVRUIConnection()
 {
+  this->ZUpToYUpMatrix->Delete();
+  this->Matrix->Delete();
+  this->Transformation->Delete();
   this->Internals->stopStream();
   this->Internals->deactivate();
   delete this->Internals;
-  this->Transformation->Delete();
 }
 
 // ----------------------------------------------------------------------public
@@ -700,7 +703,6 @@ void vtkVRUIConnection::NewButtonValue(int state,  int button)
 
 void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor)
 {
-
   vtkVREventData temp;
   temp.connId = this->Address;
   temp.name = GetName( TRACKER_EVENT, sensor );
@@ -723,97 +725,98 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   float vtkQuat[4] = {q[3], q[0], q[1], q[2]};
 
   vtkMath::QuaternionToMatrix3x3(&vtkQuat[0], rotMatrix );
-  vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
 
-  matrix->Element[0][0] = rotMatrix[0][0];
-  matrix->Element[1][0] = rotMatrix[1][0];
-  matrix->Element[2][0] = rotMatrix[2][0];
-  matrix->Element[3][0] = 0.0;
 
-  matrix->Element[0][1] = rotMatrix[0][1];
-  matrix->Element[1][1] = rotMatrix[1][1];
-  matrix->Element[2][1] = rotMatrix[2][1];
-  //matrix->Element[1][3] = pos[2]*1/12;
-  matrix->Element[3][1] = 0.0;
+  this->Matrix->Element[0][0] = rotMatrix[0][0];
+  this->Matrix->Element[1][0] = rotMatrix[1][0];
+  this->Matrix->Element[2][0] = rotMatrix[2][0];
+  this->Matrix->Element[3][0] = 0.0;
 
-  matrix->Element[0][2] = rotMatrix[0][2];
-  matrix->Element[1][2] = rotMatrix[1][2];
-  matrix->Element[2][2] = rotMatrix[2][2];
-  //matrix->Element[2][3] = pos[1]*-1/12;
-  matrix->Element[3][2] = 0.0;
+  this->Matrix->Element[0][1] = rotMatrix[0][1];
+  this->Matrix->Element[1][1] = rotMatrix[1][1];
+  this->Matrix->Element[2][1] = rotMatrix[2][1];
+  //this->Matrix->Element[1][3] = pos[2]*1/12;
+  this->Matrix->Element[3][1] = 0.0;
 
-  matrix->Element[0][3] = pos[0] / 12.0;
-  matrix->Element[1][3] = pos[1] / 12.0;
-  matrix->Element[2][3] = pos[2] / 12.0;
-  matrix->Element[3][3] = 1.0f;
+  this->Matrix->Element[0][2] = rotMatrix[0][2];
+  this->Matrix->Element[1][2] = rotMatrix[1][2];
+  this->Matrix->Element[2][2] = rotMatrix[2][2];
+  //this->Matrix->Element[2][3] = pos[1]*-1/12;
+  this->Matrix->Element[3][2] = 0.0;
+
+  this->Matrix->Element[0][3] = pos[0] / 12.0;
+  this->Matrix->Element[1][3] = pos[1] / 12.0;
+  this->Matrix->Element[2][3] = pos[2] / 12.0;
+  this->Matrix->Element[3][3] = 1.0f;
 
 #if defined( VRUI_ENABLE_DEBUG ) || 0
   if(sensor)
   {
     std::cout << "Pre multiplication matrix: " << std::endl;
-    matrix->PrintSelf( cout, vtkIndent(0) );
+    this->Matrix->PrintSelf( cout, vtkIndent(0) );
   }
 #endif
 
-  vtkMatrix4x4 *zUpToYUpMatrix = vtkMatrix4x4::New();
-  zUpToYUpMatrix->Element[0][0] = 1.0;
-  zUpToYUpMatrix->Element[1][0] = 0.0;
-  zUpToYUpMatrix->Element[2][0] = 0.0;
-  zUpToYUpMatrix->Element[3][0] = 0.0;
 
-  zUpToYUpMatrix->Element[0][1] = 0.0;
-  zUpToYUpMatrix->Element[1][1] = 0.0;
-  zUpToYUpMatrix->Element[2][1] = -1.0;
-  zUpToYUpMatrix->Element[3][1] = 0.0;
+  this->ZUpToYUpMatrix->Element[0][0] = 1.0;
+  this->ZUpToYUpMatrix->Element[1][0] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][0] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][0] = 0.0;
 
-  zUpToYUpMatrix->Element[0][2] = 0.0;
-  zUpToYUpMatrix->Element[1][2] = 1.0;
-  zUpToYUpMatrix->Element[2][2] = 0.0;
-  zUpToYUpMatrix->Element[3][2] = 0.0;
+  this->ZUpToYUpMatrix->Element[0][1] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][1] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][1] = -1.0;
+  this->ZUpToYUpMatrix->Element[3][1] = 0.0;
 
-  zUpToYUpMatrix->Element[0][3] = 0.0;
-  zUpToYUpMatrix->Element[1][3] = 0.0;
-  zUpToYUpMatrix->Element[2][3] = 0.0;
-  zUpToYUpMatrix->Element[3][3] = 1.0;
+  this->ZUpToYUpMatrix->Element[0][2] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][2] = 1.0;
+  this->ZUpToYUpMatrix->Element[2][2] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][2] = 0.0;
 
-  vtkMatrix4x4::Multiply4x4( zUpToYUpMatrix, matrix, matrix );
+  this->ZUpToYUpMatrix->Element[0][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][3] = 1.0;
+
+  vtkMatrix4x4::Multiply4x4( this->ZUpToYUpMatrix, this->Matrix, this->Matrix );
 
 #if defined( VRUI_ENABLE_DEBUG ) || 0
   if(sensor)
     {
     std::cout << "Post multiplication matrix: " << std::endl;
-    matrix->PrintSelf( cout, vtkIndent(0) );
+    this->Matrix->PrintSelf( cout, vtkIndent(0) );
     }
 #endif
 
-  zUpToYUpMatrix->Delete();
 
-#if defined( VRUI_ENABLE_DEBUG ) || 1
+#if defined( VRUI_ENABLE_DEBUG ) || 0
   if(sensor)
-    cout << "post pos=("<< matrix->Element[0][3] << "," << matrix->Element[1][3] << "," << matrix->Element[2][3] << ")" << endl;
+    cout << "post pos=("
+         << this->Matrix->Element[0][3] << ","
+         << this->Matrix->Element[1][3] << ","
+         << this->Matrix->Element[2][3] << ")" << endl;
 #endif
 
-  temp.data.tracker.matrix[0] = matrix->Element[0][0];
-  temp.data.tracker.matrix[1] = matrix->Element[0][1];
-  temp.data.tracker.matrix[2] = matrix->Element[0][2];
-  temp.data.tracker.matrix[3] = matrix->Element[0][3];
+  temp.data.tracker.matrix[0] = this->Matrix->Element[0][0];
+  temp.data.tracker.matrix[1] = this->Matrix->Element[0][1];
+  temp.data.tracker.matrix[2] = this->Matrix->Element[0][2];
+  temp.data.tracker.matrix[3] = this->Matrix->Element[0][3];
 
-  temp.data.tracker.matrix[4] = matrix->Element[1][0];
-  temp.data.tracker.matrix[5] = matrix->Element[1][1];
-  temp.data.tracker.matrix[6] = matrix->Element[1][2];
-  temp.data.tracker.matrix[7] = matrix->Element[1][3];
+  temp.data.tracker.matrix[4] = this->Matrix->Element[1][0];
+  temp.data.tracker.matrix[5] = this->Matrix->Element[1][1];
+  temp.data.tracker.matrix[6] = this->Matrix->Element[1][2];
+  temp.data.tracker.matrix[7] = this->Matrix->Element[1][3];
 
-  temp.data.tracker.matrix[8] = matrix->Element[2][0];
-  temp.data.tracker.matrix[9] = matrix->Element[2][1];
-  temp.data.tracker.matrix[10] = matrix->Element[2][2];
-  temp.data.tracker.matrix[11] = matrix->Element[2][3];
+  temp.data.tracker.matrix[8] = this->Matrix->Element[2][0];
+  temp.data.tracker.matrix[9] = this->Matrix->Element[2][1];
+  temp.data.tracker.matrix[10] = this->Matrix->Element[2][2];
+  temp.data.tracker.matrix[11] = this->Matrix->Element[2][3];
 
-  temp.data.tracker.matrix[12] = matrix->Element[3][0];
-  temp.data.tracker.matrix[13] = matrix->Element[3][1];
-  temp.data.tracker.matrix[14] = matrix->Element[3][2];
-  temp.data.tracker.matrix[15] = matrix->Element[3][3];
+  temp.data.tracker.matrix[12] = this->Matrix->Element[3][0];
+  temp.data.tracker.matrix[13] = this->Matrix->Element[3][1];
+  temp.data.tracker.matrix[14] = this->Matrix->Element[3][2];
+  temp.data.tracker.matrix[15] = this->Matrix->Element[3][3];
 
-  matrix->Delete();
   this->EventQueue->enqueue( temp );
 }
 
