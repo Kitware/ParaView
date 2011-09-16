@@ -18,8 +18,8 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
-#include "vtkObjectFactory.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"
@@ -33,6 +33,7 @@
 #include "vtkSMMessage.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+#include "vtkTimerLog.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
@@ -448,7 +449,6 @@ vtkStandardNewMacro(vtkInternalDefinitionIterator)
 //---------------------------------------------------------------------------
 vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
 {
-  this->TriggerNotificationEvent = true;
   this->Internals = new vtkInternals;
   this->InternalsFlatten = new vtkInternals;
 
@@ -476,10 +476,20 @@ vtkSIProxyDefinitionManager::~vtkSIProxyDefinitionManager()
 }
 
 //----------------------------------------------------------------------------
+void vtkSIProxyDefinitionManager::InvokeCustomDefitionsUpdated()
+{
+  this->InvokeEvent(
+    vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
+  this->InvokeEvent(
+    vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+}
+
+//----------------------------------------------------------------------------
 void vtkSIProxyDefinitionManager::AddElement(const char* groupName,
                                              const char* proxyName,
                                              vtkPVXMLElement* element)
 {
+  bool updated = false;
   if (element->GetName() && strcmp(element->GetName(), "Extension") == 0)
     {
     // This is an extension for an existing definition.
@@ -492,6 +502,7 @@ void vtkSIProxyDefinitionManager::AddElement(const char* groupName,
         {
         coreElem->AddNestedElement(element->GetNestedElement(cc));
         }
+      updated = true;
       }
     else
       {
@@ -503,11 +514,15 @@ void vtkSIProxyDefinitionManager::AddElement(const char* groupName,
     {
     // Just referenced it
     this->Internals->CoreDefinitions[groupName][proxyName] = element;
-    if(this->TriggerNotificationEvent)
-      {
-      RegisteredDefinitionInformation info(groupName, proxyName, false);
-      this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-      }
+    updated = true;
+    }
+
+  if (updated)
+    {
+    // Let the world know that a core-definition was registered i.e. added or
+    // modified.
+    RegisteredDefinitionInformation info(groupName, proxyName, false);
+    this->InvokeEvent(vtkCommand::RegisterEvent, &info);
     }
 }
 
@@ -534,11 +549,7 @@ vtkPVXMLElement* vtkSIProxyDefinitionManager::GetProxyDefinition(
 void vtkSIProxyDefinitionManager::ClearCustomProxyDefinitions()
 {
   this->Internals->CustomsDefinitions.clear();
-  if(this->TriggerNotificationEvent)
-    {
-    this->InvokeEvent(
-        vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
-    }
+  this->InvokeCustomDefitionsUpdated();
 }
 
 //---------------------------------------------------------------------------
@@ -550,13 +561,9 @@ void vtkSIProxyDefinitionManager::RemoveCustomProxyDefinition(
     this->Internals->CustomsDefinitions[groupName].erase(proxyName);
 
     // Let the world know that definitions may have changed.
-    if(this->TriggerNotificationEvent)
-      {
-      RegisteredDefinitionInformation info(groupName, proxyName, true);
-      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-      this->InvokeEvent(
-          vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
-      }
+    RegisteredDefinitionInformation info(groupName, proxyName, true);
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+    this->InvokeCustomDefitionsUpdated();
     }
 }
 
@@ -641,9 +648,19 @@ void vtkSIProxyDefinitionManager::AddCustomProxyDefinition(
 void vtkSIProxyDefinitionManager::AddCustomProxyDefinition(
     const char* groupName, const char* proxyName, vtkPVXMLElement* top)
 {
+  if (this->AddCustomProxyDefinitionInternal(groupName, proxyName, top))
+    {
+    this->InvokeCustomDefitionsUpdated();
+    }
+}
+
+//---------------------------------------------------------------------------
+bool vtkSIProxyDefinitionManager::AddCustomProxyDefinitionInternal(
+    const char* groupName, const char* proxyName, vtkPVXMLElement* top)
+{
   if (!top)
     {
-    return;
+    return false;
     }
 
   // Attach automatic hints so it will show up in the menu
@@ -666,19 +683,16 @@ void vtkSIProxyDefinitionManager::AddCustomProxyDefinition(
     // A definition already exist with not the same content
     vtkErrorMacro("Proxy definition has already been registered with name \""
                   << proxyName << "\" under group \"" << groupName <<"\".");
+    return false;
     }
   else
     {
     this->Internals->CustomsDefinitions[groupName][proxyName] = top;
 
     // Let the world know that definitions may have changed.
-    if(this->TriggerNotificationEvent)
-      {
-      RegisteredDefinitionInformation info(groupName, proxyName, true);
-      this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-      this->InvokeEvent(
-          vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
-      }
+    RegisteredDefinitionInformation info(groupName, proxyName, true);
+    this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+    return true;
     }
 }
 
@@ -690,6 +704,7 @@ void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
     return;
     }
 
+  bool updated = true;
   vtksys::RegularExpression proxyDefRe(".*Proxy$");
   unsigned int numElems = root->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -710,7 +725,8 @@ void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
             {
             // Register custom proxy definitions for all elements ending with
             // "Proxy".
-            this->AddCustomProxyDefinition(group.c_str(), name.c_str(), defElement);
+            updated = this->AddCustomProxyDefinitionInternal(group.c_str(),
+              name.c_str(), defElement) || updated;
             }
           }
         }
@@ -719,6 +735,10 @@ void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
         vtkErrorMacro("Missing name or group");
         }
       }
+    }
+  if (updated)
+    {
+    this->InvokeCustomDefitionsUpdated();
     }
 }
 
@@ -811,10 +831,7 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
         }
       }
     }
-  if(this->TriggerNotificationEvent)
-    {
-    this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
-    }
+  this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
   return true;
 }
 
@@ -1112,13 +1129,11 @@ void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
 {
+  vtkTimerLog::MarkStartEvent("vtkSIProxyDefinitionManager Load Definitions");
   // Init and local vars
   this->Internals->Clear();
   this->InternalsFlatten->Clear();
   vtkNew<vtkPVXMLParser> parser;
-
-  bool prev = this->TriggerNotificationEvent;
-  this->TriggerNotificationEvent = false;
 
   // Fill the definition with the content of the state
   int size = msg->ExtensionSize(ProxyDefinitionState::xml_definition_proxy);
@@ -1132,20 +1147,22 @@ void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
     }
 
   // Manage custom ones
-  size = msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
-  for(int i=0; i < size; i++)
+  int custom_size = msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
+  for(int i=0; i < custom_size; i++)
     {
     xmlDef = &msg->GetExtension(ProxyDefinitionState::xml_custom_definition_proxy, i);
     parser->Parse(xmlDef->xml().c_str());
-    this->AddCustomProxyDefinition( xmlDef->group().c_str(), xmlDef->name().c_str(),
-                                    parser->GetRootElement());
+    this->AddCustomProxyDefinitionInternal(
+      xmlDef->group().c_str(), xmlDef->name().c_str(), parser->GetRootElement());
     }
 
-  this->TriggerNotificationEvent = prev;
-  if (this->TriggerNotificationEvent)
+  if (custom_size > 0)
     {
-    this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+    this->InvokeEvent(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
     }
+
+  this->InvokeEvent(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated);
+  vtkTimerLog::MarkEndEvent("vtkSIProxyDefinitionManager Load Definitions");
 }
 
 //---------------------------------------------------------------------------
