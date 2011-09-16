@@ -37,8 +37,6 @@ vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
 vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
 
-int vtkSMProperty::CheckDomains = 0;
-
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
 {
@@ -433,18 +431,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
     }
 
   return 1;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::SetCheckDomains(int check)
-{
-  vtkSMProperty::CheckDomains = check;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMProperty::GetCheckDomains()
-{
-  return vtkSMProperty::CheckDomains;
 }
 
 //---------------------------------------------------------------------------
