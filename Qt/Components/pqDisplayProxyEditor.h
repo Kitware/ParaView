@@ -72,7 +72,6 @@ protected slots:
   void rescaleToDataRange();
   void zoomToData();
   void updateEnableState();
-  void updateMaterial(int idx);
   virtual void editCubeAxes();
   virtual void cubeAxesVisibilityChanged();
   void sliceDirectionChanged();
