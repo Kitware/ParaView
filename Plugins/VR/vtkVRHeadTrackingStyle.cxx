@@ -119,10 +119,8 @@ bool vtkVRHeadTrackingStyle::UpdateNRenderWithHeadPose()
   return false;
 }
 
-
 bool vtkVRHeadTrackingStyle::update()
 {
-    // Update the when all the events are handled
     this->UpdateNRenderWithHeadPose();
     return false;
 }
