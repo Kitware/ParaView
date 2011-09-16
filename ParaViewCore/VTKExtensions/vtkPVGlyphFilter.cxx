@@ -32,7 +32,7 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <algorithm>
+#include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
@@ -450,13 +450,13 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         for(int i = 0; i < this->BlockMaxNumPts; i++)
           {
           r = rand() % static_cast<int>( floor(nPtsNotBlanked));
-          while( std::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
+          while( vtkstd::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
             {
             r = rand() % static_cast<int>( floor(nPtsNotBlanked) );
             }
           this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
           }
-        std::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
+        vtkstd::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
         }
       
 

@@ -21,7 +21,6 @@
 #define __vtkPVGlyphFilter_h
 
 #include "vtkGlyph3D.h"
-#include <vector>
 
 class vtkMaskPoints;
 
@@ -42,7 +41,7 @@ public:
   // Description:
   // Get the number of processes used to run this filter.
   vtkGetMacro(NumberOfProcesses, int);
-  
+
   // Description:
   // Set/get whether to mask points
   void SetUseMaskPoints(int useMaskPoints);
@@ -63,8 +62,8 @@ protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, 
+  virtual int RequestData(vtkInformation *,
+                          vtkInformationVector **,
                           vtkInformationVector *);
   virtual int RequestCompositeData(vtkInformation* request,
                                    vtkInformationVector** inputVector,
@@ -74,7 +73,7 @@ protected:
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
-  
+
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
 
   int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
@@ -88,7 +87,7 @@ protected:
   int NumberOfProcesses;
   int UseMaskPoints;
   int InputIsUniformGrid;
-  
+
   vtkIdType BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
@@ -97,7 +96,7 @@ protected:
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
 
-  std::vector< vtkIdType > RandomPtsInDataset;
+  vtkstd::vector< vtkIdType > RandomPtsInDataset;
 
   int RandomMode;
 
