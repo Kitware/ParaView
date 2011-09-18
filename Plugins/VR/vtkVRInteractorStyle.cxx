@@ -172,3 +172,31 @@ bool vtkVRInteractorStyle::update()
   ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
   return false;
 }
+
+// ---------------------------------------------------------------------private
+bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
+{
+  vtkSMProxy *p =0;
+  p = vtkSMProxyManager::GetProxyManager()->GetProxy( name.c_str() );
+  if( p )
+    {
+    *proxy = p;
+    return true;
+    }
+  return false;
+}
+
+// ---------------------------------------------------------------------private
+bool vtkVRInteractorStyle::GetProperty( std::string name,
+                                        vtkSMDoubleVectorProperty** property )
+{
+  vtkSMDoubleVectorProperty *p =0;
+  p =  vtkSMDoubleVectorProperty::
+      SafeDownCast( this->OutProxy->GetProperty( name.c_str()) );
+  if ( p )
+    {
+    *property = p;
+    return true;
+    }
+  return false;
+}

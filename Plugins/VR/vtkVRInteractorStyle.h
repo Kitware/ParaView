@@ -83,9 +83,11 @@ protected:
   virtual void HandleButton ( const vtkVREventData& data ) {}
   virtual void HandleAnalog ( const vtkVREventData& data ) {}
   virtual void HandleTracker( const vtkVREventData& data ) {}
-
   std::vector<std::string> tokenize( std::string input);
+  bool GetProxy( std::string name, vtkSMProxy ** proxy );
+  bool GetProperty( std::string name, vtkSMDoubleVectorProperty** property );
   bool GetOutProxyNProperty();
+
   std::string OutProxyName;
   std::string OutPropertyName;
   vtkSMProxy *OutProxy;
