@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <algorithm>
 
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------cnstr
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
@@ -50,12 +50,12 @@ vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   this->IsFoundOutProxyProperty=false;
 }
 
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------destr
 vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
 }
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------public
 bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 {
   if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
@@ -93,7 +93,7 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
   return false;
 }
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------public
 vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -106,7 +106,7 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
   return child;
 }
 
-//----------------------------------------------------------------------private
+// ---------------------------------------------------------------------private
 std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
@@ -121,7 +121,7 @@ std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
   return token;
 }
 
-//----------------------------------------------------------------------private
+// ---------------------------------------------------------------------private
 bool vtkVRInteractorStyle::GetOutProxyNProperty()
 {
   if(this->GetProxy( this->OutProxyName, &this->OutProxy ) )
@@ -145,6 +145,7 @@ bool vtkVRInteractorStyle::GetOutProxyNProperty()
   return true;
 }
 
+// ---------------------------------------------------------------------private
 bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
@@ -161,6 +162,7 @@ bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
     }
 }
 
+// -----------------------------------------------------------------------public
 bool vtkVRInteractorStyle::update()
 {
   this->OutProxy->UpdateVTKObjects();
