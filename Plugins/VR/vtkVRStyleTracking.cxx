@@ -26,8 +26,6 @@ vtkVRStyleTracking::vtkVRStyleTracking(QObject* parentObject) :
   this->IsFoundProxyProperty = GetProxyNProperty();
 }
 
-vtkVRStyleTracking::~vtkVRStyleTracking(){}
-
 //-----------------------------------------------------------------------public
 bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* locator)
@@ -85,7 +83,7 @@ bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
   return false;
 }
 
-//-----------------------------------------------------------------------public
+// -----------------------------------------------------------------------public
 vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
 {
   vtkPVXMLElement* child = Superclass::saveConfiguration();
@@ -108,24 +106,6 @@ vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRStyleTracking::handleEvent(const vtkVREventData& data)
-{
-  switch( data.eventType )
-    {
-  case BUTTON_EVENT:
-    this->HandleButton( data );
-    break;
-  case ANALOG_EVENT:
-    this->HandleAnalog( data );
-    break;
-  case TRACKER_EVENT:
-    this->HandleTracker( data );
-    break;
-    }
-  return false;
-}
-
-// ----------------------------------------------------------------------------
 void vtkVRStyleTracking::HandleTracker( const vtkVREventData& data )
 {
   if ( this->Tracker == data.name)
@@ -133,12 +113,6 @@ void vtkVRStyleTracking::HandleTracker( const vtkVREventData& data )
     this->SetProperty( data );
     }
 }
-
-// ----------------------------------------------------------------------------
-void vtkVRStyleTracking::HandleButton( const vtkVREventData& data ){}
-
-// ----------------------------------------------------------------------------
-void vtkVRStyleTracking::HandleAnalog( const vtkVREventData& data ){}
 
 // ----------------------------------------------------------------------------
 bool vtkVRStyleTracking::GetProxyNProperty()
@@ -165,15 +139,7 @@ bool vtkVRStyleTracking::SetProperty(const vtkVREventData &data)
 {
   for (int i = 0; i < 16; ++i)
     {
-    this->Property->SetElement( i, data.data.tracker.matrix[i] );
+    this->OutProperty->SetElement( i, data.data.tracker.matrix[i] );
     }
   return true;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRStyleTracking::update()
-{
-  this->Proxy->UpdateVTKObjects();
-  this->Proxy->StillRender();
-  return false;
 }

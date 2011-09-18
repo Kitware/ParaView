@@ -45,16 +45,11 @@ class vtkVRStyleTracking : public vtkVRInteractorStyle
   typedef vtkVRInteractorStyle Superclass;
 public:
   vtkVRStyleTracking(QObject* parent);
-  ~vtkVRStyleTracking();
-
+  ~vtkVRStyleTracking() {}
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual bool handleEvent(const vtkVREventData& data);
-  virtual bool update();
 
 protected:
-  virtual void HandleButton ( const vtkVREventData& data );
-  virtual void HandleAnalog ( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
   virtual bool GetProxyNProperty();
   virtual bool SetProperty(const vtkVREventData &data );

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkVRQueue.h"
 #include <sstream>
 #include <algorithm>
 
@@ -146,4 +148,27 @@ bool vtkVRInteractorStyle::GetOutProxyNProperty()
     return false;
     }
   return true;
+}
+
+bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
+{
+  switch( data.eventType )
+    {
+    case BUTTON_EVENT:
+      this->HandleButton( data );
+      break;
+    case ANALOG_EVENT:
+      this->HandleAnalog( data );
+      break;
+    case TRACKER_EVENT:
+      this->HandleTracker( data );
+      break;
+    }
+}
+
+bool vtkVRInteractorStyle::update()
+{
+  this->OutProxy->UpdateVTKObjects();
+  ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
+  return false;
 }

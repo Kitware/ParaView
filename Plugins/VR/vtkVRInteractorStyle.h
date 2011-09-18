@@ -53,9 +53,8 @@ public:
   /// handles it but does not want to stop any other handlers from handlign it
   /// as well, they should return false. Other return true. Return true
   /// indicates that vtkVRQueueHandler the event has been "consumed".
-  virtual bool handleEvent(const vtkVREventData& data)=0;
-
-  virtual bool update()=0;
+  virtual bool handleEvent(const vtkVREventData& data);
+  virtual bool update();
 
   ///--------------------------------------------------------------------------
   /// Identifies the device state when this style becomes active.
@@ -81,6 +80,10 @@ public:
   virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
+  virtual void HandleButton ( const vtkVREventData& data ) {}
+  virtual void HandleAnalog ( const vtkVREventData& data ) {}
+  virtual void HandleTracker( const vtkVREventData& data ) {}
+
   std::vector<std::string> tokenize( std::string input);
   bool GetOutProxyNProperty();
   std::string OutProxyName;
