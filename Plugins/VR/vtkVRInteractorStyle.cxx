@@ -124,14 +124,9 @@ std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
 //----------------------------------------------------------------------private
 bool vtkVRInteractorStyle::GetOutProxyNProperty()
 {
-  this->OutProxy =
-    vtkSMProxyManager::GetProxyManager()->GetProxy( this->OutProxyName.c_str() );
-  if(this->OutProxy )
+  if(this->GetProxy( this->OutProxyName, &this->OutProxy ) )
     {
-    this->OutProperty =
-      vtkSMDoubleVectorProperty::
-      SafeDownCast( this->OutProxy->GetProperty( this->OutPropertyName.c_str()) );
-    if ( !this->OutProperty )
+    if ( !this->GetProperty( this->OutPropertyName, &this->OutProperty ) )
       {
       std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
                 << std::endl
