@@ -633,7 +633,6 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
-#if 0
   // FIXME: Call update only when needed. That can be done at some point in the
   // future.
   this->Update();
@@ -649,7 +648,6 @@ void vtkPVRenderView::ResetCamera()
   this->RenderView->GetRenderer()->ResetCamera(this->LastComputedBounds);
 
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
-#endif
 }
 
 //----------------------------------------------------------------------------

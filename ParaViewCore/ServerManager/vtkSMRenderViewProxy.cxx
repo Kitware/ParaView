@@ -503,7 +503,6 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation)
 //----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 {
-#if 0
   this->CreateVTKObjects();
 
   vtkClientServerStream stream;
@@ -513,7 +512,6 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
          << vtkClientServerStream::InsertArray(bounds, 6)
          << vtkClientServerStream::End;
   this->ExecuteStream(stream);
-#endif
 }
 
 //-----------------------------------------------------------------------------
