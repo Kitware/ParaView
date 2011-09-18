@@ -16,16 +16,14 @@
 vtkVRWandTrackingStyle::vtkVRWandTrackingStyle(QObject* parentObject) :
   Superclass(parentObject)
 {
-
+  this->Proxy =0;
+  this->Property =0;
+  this->IsFoundProxyProperty = GetWandPoseProxyNProperty();
 }
 
-vtkVRWandTrackingStyle::~vtkVRWandTrackingStyle()
-{
-
-}
+vtkVRWandTrackingStyle::~vtkVRWandTrackingStyle(){}
 
 // ----------------------------------------------------------------------------
-// This handler currently only get the
 bool vtkVRWandTrackingStyle::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
@@ -53,36 +51,24 @@ void vtkVRWandTrackingStyle::HandleTracker( const vtkVREventData& data )
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRWandTrackingStyle::HandleButton( const vtkVREventData& data )
-{
-}
+void vtkVRWandTrackingStyle::HandleButton( const vtkVREventData& data ){}
 
 // ----------------------------------------------------------------------------
-void vtkVRWandTrackingStyle::HandleAnalog( const vtkVREventData& data )
-{
-}
+void vtkVRWandTrackingStyle::HandleAnalog( const vtkVREventData& data ){}
 
 // ----------------------------------------------------------------------------
-bool vtkVRWandTrackingStyle::GetWandPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
-                                                   vtkSMDoubleVectorProperty** outProp)
+bool vtkVRWandTrackingStyle::GetWandPoseProxyNProperty()
 {
-  *outProxy =0;
-  *outProp = 0;
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-
   pqView *view = 0;
   view = pqActiveObjects::instance().activeView();
   if ( view )
     {
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
+    this->Proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( this->Proxy )
       {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
-      if ( prop )
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "WandPose" ) );
+      if ( this->Property )
         {
-        *outProxy = proxy;
-        *outProp =  prop;
         return true;
         }
       }
@@ -90,37 +76,31 @@ bool vtkVRWandTrackingStyle::GetWandPoseProxyNProperty( vtkSMRenderViewProxy** o
   return false;
 }
 
+// ----------------------------------------------------------------------------
 bool vtkVRWandTrackingStyle::SetWandPoseProperty(const vtkVREventData &data)
 {
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( this->GetWandPoseProxyNProperty( &proxy, &prop ) )
+  if ( !this->IsFoundProxyProperty )
     {
-    for (int i = 0; i < 16; ++i)
-      {
-      prop->SetElement( i, data.data.tracker.matrix[i] );
-      }
-    return true;
+    this->IsFoundProxyProperty = GetWandPoseProxyNProperty();
+    return false;
     }
-  return false;
+
+  for (int i = 0; i < 16; ++i)
+    {
+    this->Property->SetElement( i, data.data.tracker.matrix[i] );
+    }
+  return true;
 }
 
-bool vtkVRWandTrackingStyle::UpdateNRenderWithWandPose()
-{
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( GetWandPoseProxyNProperty( &proxy, &prop ) )
-    {
-    proxy->UpdateVTKObjects();
-    proxy->StillRender();
-    return true;
-    }
-  return false;
-}
-
+// ----------------------------------------------------------------------------
 bool vtkVRWandTrackingStyle::update()
 {
-    // Update the when all the events are handled
-    this->UpdateNRenderWithWandPose();
+  if ( !this->IsFoundProxyProperty )
+    {
+    this->IsFoundProxyProperty = GetWandPoseProxyNProperty();
     return false;
+    }
+  this->Proxy->UpdateVTKObjects();
+  this->Proxy->StillRender();
+  return false;
 }

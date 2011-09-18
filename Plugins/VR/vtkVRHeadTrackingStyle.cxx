@@ -8,6 +8,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
@@ -16,16 +17,14 @@
 vtkVRHeadTrackingStyle::vtkVRHeadTrackingStyle(QObject* parentObject) :
   Superclass(parentObject)
 {
-
+  this->Proxy =0;
+  this->Property =0;
+  this->IsFoundProxyProperty = GetHeadPoseProxyNProperty();
 }
 
-vtkVRHeadTrackingStyle::~vtkVRHeadTrackingStyle()
-{
-
-}
+vtkVRHeadTrackingStyle::~vtkVRHeadTrackingStyle(){}
 
 // ----------------------------------------------------------------------------
-// This handler currently only get the
 bool vtkVRHeadTrackingStyle::handleEvent(const vtkVREventData& data)
 {
   // std::cout<< "Event Name = " << data.name << std::endl;
@@ -47,43 +46,31 @@ bool vtkVRHeadTrackingStyle::handleEvent(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRHeadTrackingStyle::HandleTracker( const vtkVREventData& data )
 {
-  if ( this->Name == QString(data.name.c_str()) ) // Handle head tracking
+  if ( this->Name == QString(data.name.c_str()) )
     {
     this->SetHeadPoseProperty( data );
     }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRHeadTrackingStyle::HandleButton( const vtkVREventData& data )
-{
-}
+void vtkVRHeadTrackingStyle::HandleButton( const vtkVREventData& data ){}
 
 // ----------------------------------------------------------------------------
-void vtkVRHeadTrackingStyle::HandleAnalog( const vtkVREventData& data )
-{
-}
+void vtkVRHeadTrackingStyle::HandleAnalog( const vtkVREventData& data ){}
 
 // ----------------------------------------------------------------------------
-bool vtkVRHeadTrackingStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** outProxy,
-                                                   vtkSMDoubleVectorProperty** outProp)
+bool vtkVRHeadTrackingStyle::GetHeadPoseProxyNProperty()
 {
-  *outProxy =0;
-  *outProp = 0;
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-
   pqView *view = 0;
   view = pqActiveObjects::instance().activeView();
   if ( view )
     {
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
+    this->Proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( this->Proxy )
       {
-      prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "HeadPose" ) );
-      if ( prop )
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "HeadPose" ) );
+      if ( this->Property )
         {
-        *outProxy = proxy;
-        *outProp =  prop;
         return true;
         }
       }
@@ -91,36 +78,30 @@ bool vtkVRHeadTrackingStyle::GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** o
   return false;
 }
 
+// ----------------------------------------------------------------------------
 bool vtkVRHeadTrackingStyle::SetHeadPoseProperty(const vtkVREventData &data)
 {
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( this->GetHeadPoseProxyNProperty( &proxy, &prop ) )
+  if ( !this->IsFoundProxyProperty )
     {
-    for (int i = 0; i < 16; ++i)
-      {
-      prop->SetElement( i, data.data.tracker.matrix[i] );
-      }
-    return true;
+    this->IsFoundProxyProperty = GetHeadPoseProxyNProperty();
+    return false;
     }
-  return false;
+  for (int i = 0; i < 16; ++i)
+    {
+    this->Property->SetElement( i, data.data.tracker.matrix[i] );
+    }
+  return true;
 }
 
-bool vtkVRHeadTrackingStyle::UpdateNRenderWithHeadPose()
-{
-  vtkSMRenderViewProxy *proxy =0;
-  vtkSMDoubleVectorProperty *prop =0;
-  if ( GetHeadPoseProxyNProperty( &proxy, &prop ) )
-    {
-    proxy->UpdateVTKObjects();
-    proxy->StillRender();
-    return true;
-    }
-  return false;
-}
-
+// ----------------------------------------------------------------------------
 bool vtkVRHeadTrackingStyle::update()
 {
-    this->UpdateNRenderWithHeadPose();
+  if ( !this->IsFoundProxyProperty )
+    {
+    this->IsFoundProxyProperty = GetHeadPoseProxyNProperty();
     return false;
+    }
+  this->Proxy->UpdateVTKObjects();
+  this->Proxy->StillRender();
+  return false;
 }

@@ -64,12 +64,13 @@ protected:
   void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
-  bool GetWandPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
+  bool GetWandPoseProxyNProperty();
   bool SetWandPoseProperty(const vtkVREventData &data );
-  bool UpdateNRenderWithWandPose();
 
 protected:
+  vtkSMRenderViewProxy *Proxy;
+  vtkSMDoubleVectorProperty *Property;
+  bool IsFoundProxyProperty;
 };
 
 #endif //__vtkVRWandTrackingStyle.h_

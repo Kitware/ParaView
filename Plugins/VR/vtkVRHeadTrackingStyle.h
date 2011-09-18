@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
 struct vtkVREventData;
 
 /// This is demonstration of how subclasses for vtkVRInteractorStyle can be
@@ -64,12 +65,13 @@ protected:
   void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
-  bool GetHeadPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
+  bool GetHeadPoseProxyNProperty();
   bool SetHeadPoseProperty(const vtkVREventData &data );
-  bool UpdateNRenderWithHeadPose();
 
 protected:
+  vtkSMRenderViewProxy *Proxy;
+  vtkSMDoubleVectorProperty *Property;
+  bool IsFoundProxyProperty;
 };
 
 #endif //__vtkVRHeadTrackingStyle.h_
