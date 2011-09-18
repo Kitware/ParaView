@@ -32,11 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include <sstream>
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
+  this->OutProxy =0;
+  this->OutProperty=0;
+  this->IsFoundOutProxyProperty=false;
 }
 
 //-----------------------------------------------------------------------------
@@ -48,16 +57,36 @@ vtkVRInteractorStyle::~vtkVRInteractorStyle()
 bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 {
   if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
-    strcmp(this->metaObject()->className(),
+      strcmp(this->metaObject()->className(),
       child->GetAttributeOrEmpty("class")) == 0)
     {
-    vtkPVXMLElement* event = child->FindNestedElementByName("Event");
-    if (event)
+    std::string outStr = child->GetAttributeOrEmpty( "set_property" );
+    if ( !outStr.size() )
       {
-      this->Name = event->GetAttributeOrEmpty("name");
-      this->Type = event->GetAttributeOrEmpty("type");
-      return true;
+      std::cerr << "vtkVRStyleGrabNTranslateSliceOrigin::configure(): "
+                << "set_property not specified "
+                << std::endl
+                << "<Style class=\""
+                << this->metaObject()->className()
+                << "\" "
+                << "set_property=\"ProxyName.PropertyName\"/>"
+                << std::endl;
+      return false;
       }
+    std::vector<std::string> token = this->tokenize( outStr );
+    if ( token.size()!=2 )
+      {
+      std::cerr << "Expected \"set_property\" Format:  Proxy.Property" << std::endl;
+      return false;
+      }
+    else
+      {
+      this->OutProxyName = token[0];
+      this->OutPropertyName = token[1];
+      this->IsFoundOutProxyProperty = GetOutProxyNProperty();
+      return this->IsFoundOutProxyProperty;
+      }
+    return true;
     }
   return false;
 }
@@ -67,15 +96,54 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
-  child->AddAttribute("class",
-    this->metaObject()->className());
-
-  vtkPVXMLElement* event = vtkPVXMLElement::New();
-  event->SetName("Event");
-  event->AddAttribute("name", this->Name.toAscii().data());
-  event->AddAttribute( "type", this->Type.toAscii().data() );
-  child->AddNestedElement(event);
-  event->FastDelete();
+  child->AddAttribute("class",this->metaObject()->className());
+  std::stringstream propertyStr;
+  propertyStr << this->OutProxyName << "." << this->OutPropertyName;
+  child->AddAttribute( "set_property",propertyStr.str().c_str() );
 
   return child;
+}
+
+//----------------------------------------------------------------------private
+std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
+{
+  std::replace( input.begin(), input.end(), '.', ' ' );
+  std::istringstream stm( input );
+  std::vector<std::string> token;
+  for (;;)
+    {
+    std::string word;
+    if (!(stm >> word)) break;
+    token.push_back(word);
+    }
+  return token;
+}
+
+//----------------------------------------------------------------------private
+bool vtkVRInteractorStyle::GetOutProxyNProperty()
+{
+  this->OutProxy =
+    vtkSMProxyManager::GetProxyManager()->GetProxy( this->OutProxyName.c_str() );
+  if(this->OutProxy )
+    {
+    this->OutProperty =
+      vtkSMDoubleVectorProperty::
+      SafeDownCast( this->OutProxy->GetProperty( this->OutPropertyName.c_str()) );
+    if ( !this->OutProperty )
+      {
+      std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
+                << std::endl
+                << "Property ( " << this->OutPropertyName << ") :Not Found"
+                <<std::endl;
+      return false;
+      }
+    }
+  else
+    {
+    std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
+              << std::endl
+              << "Proxy ( " << this->OutProxyName << ") :Not Found" << std::endl;
+    return false;
+    }
+  return true;
 }

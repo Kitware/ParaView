@@ -23,6 +23,7 @@ QT4_WRAP_CPP(MOC_SRCS
   vtkVRConnectionManager.h
   pqVRStarter.h
   vtkVRGenericStyle.h
+  vtkVRStyleTracking.h
   vtkVRHeadTrackingStyle.h
   vtkVRWandTrackingStyle.h
   vtkVRActiveObjectManipulationStyle.h
@@ -61,6 +62,7 @@ SET( VR_SOURCE_FILES
   vtkVRUIConnection.cxx
   vtkVRConnectionManager.cxx
   vtkVRGenericStyle.cxx
+  vtkVRStyleTracking.cxx
   vtkVRHeadTrackingStyle.cxx
   vtkVRWandTrackingStyle.cxx
   vtkVRActiveObjectManipulationStyle.cxx

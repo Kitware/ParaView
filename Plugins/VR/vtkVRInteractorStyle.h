@@ -33,9 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRInteractorStyle_h
 
 #include <QObject>
+#include <vector>
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
+class vtkSMProxy;
+class vtkSMDoubleVectorProperty;
 struct vtkVREventData;
 
 class vtkVRInteractorStyle : public QObject
@@ -78,6 +81,13 @@ public:
   virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
+  std::vector<std::string> tokenize( std::string input);
+  bool GetOutProxyNProperty();
+  std::string OutProxyName;
+  std::string OutPropertyName;
+  vtkSMProxy *OutProxy;
+  vtkSMDoubleVectorProperty *OutProperty;
+  bool IsFoundOutProxyProperty;
   QString Name;
   QString Type;
 private:
