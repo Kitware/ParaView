@@ -113,6 +113,8 @@ public:
   // Removes all unchecked proxies.
   virtual void RemoveAllUncheckedProxies();
 
+  virtual void ClearUncheckedProxies();
+
   // Description:
   // Remove all proxies from the list.
   virtual void RemoveAllProxies()

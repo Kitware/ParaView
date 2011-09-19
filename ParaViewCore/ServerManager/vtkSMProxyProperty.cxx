@@ -27,6 +27,7 @@
 #include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
 #include "vtkStdString.h"
+#include "vtkCommand.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
@@ -180,6 +181,19 @@ void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
 void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 {
   this->PPInternals->UncheckedProxies.clear();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::ClearUncheckedProxies()
+{
+  this->RemoveAllUncheckedProxies();
+
+  for(unsigned int i = 0; i < this->PPInternals->Proxies.size(); i++)
+    {
+    this->PPInternals->UncheckedProxies.push_back(this->GetProxy(i));
+    }
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------

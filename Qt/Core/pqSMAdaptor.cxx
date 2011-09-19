@@ -1920,10 +1920,13 @@ QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
 //-----------------------------------------------------------------------------
 void pqSMAdaptor::clearUncheckedProperties(vtkSMProperty *property)
 {
-  vtkSMVectorProperty *VectorProperty = vtkSMVectorProperty::SafeDownCast(property);
-  if(VectorProperty)
+  if(vtkSMVectorProperty *VectorProperty = vtkSMVectorProperty::SafeDownCast(property))
     {
     VectorProperty->ClearUncheckedElements();
+    }
+  else if(vtkSMProxyProperty *ProxyProperty = vtkSMProxyProperty::SafeDownCast(property))
+    {
+    ProxyProperty->ClearUncheckedProxies();
     }
 }
 
