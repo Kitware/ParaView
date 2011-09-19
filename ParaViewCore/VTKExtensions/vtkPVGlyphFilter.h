@@ -76,11 +76,11 @@ protected:
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
 
-  int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
-                     vtkDataSet* input,
-                     vtkInformation* request,
-                     vtkInformationVector** inputVector,
-                     vtkInformationVector* outputVector);
+  //Description:
+  //This is a generic function that can be called per
+  //block of the dataset to calculate indices of points
+  //to be glyphed in the block
+ void CalculatePtsToGlyph(vtkDataSet* ds, double PtsNotBlanked);
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
@@ -91,7 +91,6 @@ protected:
   vtkIdType BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
-//   vtkIdType BlockSampleStride;
   vtkIdType BlockPointCounter;
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
