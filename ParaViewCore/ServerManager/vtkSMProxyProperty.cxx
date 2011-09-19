@@ -146,6 +146,7 @@ vtkSMProxyProperty::~vtkSMProxyProperty()
 void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 {
   this->PPInternals->UncheckedProxies.push_back(proxy);
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
@@ -161,6 +162,7 @@ unsigned int vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
     if (*it == proxy)
       {
       this->PPInternals->UncheckedProxies.erase(it);
+      this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
       break;
       }
     }
@@ -175,12 +177,16 @@ void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
     this->PPInternals->UncheckedProxies.resize(idx+1);
     }
   this->PPInternals->UncheckedProxies[idx] = proxy;
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 {
   this->PPInternals->UncheckedProxies.clear();
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
@@ -483,6 +489,7 @@ void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src,
   if (this->ImmediateUpdate)
     {
     this->Modified();
+    this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 }
 
@@ -515,6 +522,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     }
 
   this->Modified();
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
