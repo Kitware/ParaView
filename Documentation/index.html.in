@@ -20,29 +20,16 @@ An application and architecture for display and analysis of massive
 scientific datasets.
 
 <p>
-To obtain other versions of the ParaView guide, including hardcopies, go to:
+This is an abridged version of the ParaView user's guide. The complete
+document is a file included with Kitware's binaries that is called "ParaView User's Guide
+v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.pdf".
+You can also obtain, print and even edit the most current version of the document here:
 <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents.</a>
 
 <div class="toc">
   <p><strong>Table of Contents</strong></p>
   <ul>
     <li><a href="Book/Book_Chapter1.html">Introduction</a><li>
-    <li><a href="Book/Book_Chapter2.html">Loading Data</a><li>
-    <li><a href="Book/Book_Chapter3.html">Understanding Data</a><li>
-    <li><a href="Book/Book_Chapter4.html">Displaying Data</a><li>
-    <li><a href="Book/Book_Chapter5.html">Modifying Data</a><li>
-    <li><a href="Book/Book_Chapter6.html">Quantitative Analysis</a><li>
-    <li><a href="Book/Book_Chapter7.html">Saving Data</a><li>
-    <li><a href="Book/Book_Chapter8.html">3D Widgets</a><li>
-    <li><a href="Book/Book_Chapter9.html">Annotation</a><li>
-    <li><a href="Book/Book_Chapter10.html">Animation</a><li>
-    <li><a href="Book/Book_Chapter11.html">Comparative Visualization</a><li>
-    <li><a href="Book/Book_Chapter12.html">Remote and Parallel Large
-  Data Visualization</a><li>
-    <li><a href="Book/Book_Chapter13.html">Parallel Rendering and
-  Large Displays</a><li>
-    <li><a href="Book/Book_Chapter14.html">Scripted Control</a><li>
-    <li><a href="Book/Book_Chapter15.html">In-Situ/CoProcessing</a><li>
     <li><a href="Book/Book_Chapter16.html">Plugins</a><li>
     <li><a href="Book/Book_Chapter17.html">Appendices</a><li>
     <li><a href="ParaViewSources.html">Sources</a></li>

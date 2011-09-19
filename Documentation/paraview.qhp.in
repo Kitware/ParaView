@@ -6,20 +6,6 @@
         <toc>
           <section title="ParaView" ref="index.html">
             <section title="Introduction" ref="Book/Book_Chapter1.html"/>
-            <section title="Loading Data" ref="Book/Book_Chapter2.html"/>
-            <section title="Understanding Data" ref="Book/Book_Chapter3.html"/>
-            <section title="Displaying Data" ref="Book/Book_Chapter4.html"/>
-            <section title="Modifying Data" ref="Book/Book_Chapter5.html"/>
-            <section title="Quantitative Analysis" ref="Book/Book_Chapter6.html"/>
-            <section title="Saving Data" ref="Book/Book_Chapter7.html"/>
-            <section title="3D Widgets" ref="Book/Book_Chapter8.html"/>
-            <section title="Annotation" ref="Book/Book_Chapter9.html"/>
-            <section title="Animation" ref="Book/Book_Chapter10.html"/>
-            <section title="Comparative Visualization" ref="Book/Book_Chapter11.html"/>
-            <section title="Remote and Parallel Large Data Visualization" ref="Book/Book_Chapter12.html"/>
-            <section title="Parallel Rendering and Large Displays" ref="Book/Book_Chapter13.html"/>
-            <section title="Scripted Control" ref="Book/Book_Chapter14.html"/>
-            <section title="In-Situ/CoProcessing" ref="Book/Book_Chapter15.html"/>
             <section title="Plugins" ref="Book/Book_Chapter16.html"/>
             <section title="Appendices" ref="Book/Book_Chapter17.html"/>
             <section title="Sources" ref="ParaViewSources.html"/>
