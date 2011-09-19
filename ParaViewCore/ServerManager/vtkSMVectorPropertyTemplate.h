@@ -146,6 +146,40 @@ public:
       this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
       }
     }
+
+  //---------------------------------------------------------------------------
+  int SetUncheckedElements(const T* values)
+    {
+    return this->SetUncheckedElements(values, this->GetNumberOfUncheckedElements());
+    }
+
+  //---------------------------------------------------------------------------
+  int SetUncheckedElements(const T* values, unsigned int numValues)
+    {
+    bool modified = false;
+    unsigned int numArgs = this->GetNumberOfUncheckedElements();
+    if(numArgs != numValues)
+      {
+      this->UncheckedValues.resize(numValues);
+      numArgs = numValues;
+      modified = true;
+      }
+    else
+      {
+      modified = !vtkstd::equal(this->UncheckedValues.begin(), this->UncheckedValues.end(), values);
+      }
+
+    if(!modified)
+      {
+      return 1;
+      }
+
+    vtkstd::copy(values, values + numArgs, this->UncheckedValues.begin());
+
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+    return 1;
+    }
+
   //---------------------------------------------------------------------------
   int SetElementAsString(unsigned int idx, const char* value)
     {

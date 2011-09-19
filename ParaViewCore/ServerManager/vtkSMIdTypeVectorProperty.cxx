@@ -170,6 +170,18 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values,
 }
 
 //---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values)
+{
+  return this->Internals->SetUncheckedElements(values);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values, unsigned int numValues)
+{
+  return this->Internals->SetUncheckedElements(values, numValues);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
                                                  vtkPVXMLElement* element)
 {

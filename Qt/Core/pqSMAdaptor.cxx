@@ -1250,135 +1250,111 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 
   if(dvp)
     {
+    double *dvalues = new double[num+1];
+    for(int i=0; i<num; i++)
+      {
+      bool ok = true;
+      double v = Value[i].toDouble(&ok);
+      dvalues[i] = ok? v : 0.0;
+      }
+
     if(Type == CHECKED)
       {
-      double *dvalues = new double[num+1];
-      for(int i=0; i<num; i++)
-        {
-        bool ok = true;
-        double v = Value[i].toDouble(&ok);
-        dvalues[i] = ok? v : 0.0;
-        }
-      dvp->SetNumberOfElements(num);
       if (num > 0)
         {
-        dvp->SetElements(dvalues);
+        dvp->SetElements(dvalues, num);
         }
-      delete[] dvalues;
       }
     else if(Type == UNCHECKED)
       {
-      for(int i=0; i<num; i++)
+      if (num > 0)
         {
-        bool ok = true;
-        double v = Value[i].toDouble(&ok);
-        if(ok)
-          {
-          dvp->SetUncheckedElement(i, v);
-          }
+        dvp->SetUncheckedElements(dvalues, num);
         }
       }
+
+    delete[] dvalues;
     }
   else if(ivp)
     {
+    int *ivalues = new int[num+1];
+    for(int i=0; i<num; i++)
+      {
+      bool ok = true;
+      int v = Value[i].toInt(&ok);
+      ivalues[i] = ok? v : 0;
+      }
+
     if(Type == CHECKED)
       {
-      int *ivalues = new int[num+1];
-      for(int i=0; i<num; i++)
-        {
-        bool ok = true;
-        int v = Value[i].toInt(&ok);
-        ivalues[i] = ok? v : 0;
-        }
-      ivp->SetNumberOfElements(num);
       if (num>0)
         {
-        ivp->SetElements(ivalues);
+        ivp->SetElements(ivalues, num);
         }
-      delete []ivalues;
       }
     else if(Type == UNCHECKED)
       {
-      for(int i=0; i<num; i++)
+      if(num > 0)
         {
-        bool ok = true;
-        int v = Value[i].toInt(&ok);
-        if(ok)
-          {
-          ivp->SetUncheckedElement(i, v);
-          }
+        ivp->SetUncheckedElements(ivalues, num);
         }
       }
+
+    delete []ivalues;
     }
   else if(svp)
     {
+    const char** cvalues = new const char*[num];
+    vtkstd::string *str_values= new vtkstd::string[num];
+    for (int cc=0; cc < num; cc++)
+      {
+      str_values[cc] = Value[cc].toString().toAscii().data();
+      cvalues[cc] = str_values[cc].c_str();
+      }
+
     if(Type == CHECKED)
       {
-      const char** cvalues = new const char*[num];
-      vtkstd::string *str_values= new vtkstd::string[num];
-      for (int cc=0; cc < num; cc++)
-        {
-        str_values[cc] = Value[cc].toString().toAscii().data();
-        cvalues[cc] = str_values[cc].c_str();
-        }
-
       svp->SetElements(num, cvalues);
-      delete []cvalues;
-      delete []str_values;
       }
     else if(Type == UNCHECKED)
       {
-      for(int i=0; i<num; i++)
-        {
-        QString v = Value[i].toString();
-        if(!v.isNull())
-          {
-          svp->SetUncheckedElement(i, v.toAscii().data());
-          }
-        }
+      svp->SetUncheckedElements(num, cvalues);
       }
+
+    delete []cvalues;
+    delete []str_values;
     }
   else if(idvp)
     {
+    vtkIdType* idvalues = new vtkIdType[num+1];
+    for(int i=0; i<num; i++)
+      {
+      bool ok = true;
+      vtkIdType v;
+#if defined(VTK_USE_64BIT_IDS)
+      v = Value[i].toLongLong(&ok);
+#else
+      v = Value[i].toInt(&ok);
+#endif
+      idvalues[i] = ok? v : 0;
+      }
+
     if(Type == CHECKED)
       {
-
-      vtkIdType* idvalues = new vtkIdType[num+1];
-      for(int i=0; i<num; i++)
-        {
-        bool ok = true;
-        vtkIdType v;
-#if defined(VTK_USE_64BIT_IDS)
-        v = Value[i].toLongLong(&ok);
-#else
-        v = Value[i].toInt(&ok);
-#endif
-        idvalues[i] = ok? v : 0;
-        }
-      idvp->SetNumberOfElements(num);
       if (num>0)
         {
         idvp->SetElements(idvalues);
         }
-      delete[] idvalues;
       }
     else if(Type == UNCHECKED)
       {
-      for(int i=0; i<num; i++)
+      if (num>0)
         {
-        bool ok = true;
-        vtkIdType v;
-#if defined(VTK_USE_64BIT_IDS)
-        v = Value[i].toLongLong(&ok);
-#else
-        v = Value[i].toInt(&ok);
-#endif
-        if(ok)
-          {
-          idvp->SetUncheckedElement(i, v);
-          }
+        idvp->SetUncheckedElements(idvalues);
         }
       }
+
+    delete[] idvalues;
     }
 
   if(Type == UNCHECKED)

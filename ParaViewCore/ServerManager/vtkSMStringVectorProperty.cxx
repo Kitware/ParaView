@@ -197,6 +197,19 @@ int vtkSMStringVectorProperty::SetElements(unsigned int count, const char* value
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetUncheckedElements(unsigned int count, const char* values[])
+{
+  vtkStdString* std_values = new vtkStdString[count+1];
+  for (unsigned int cc=0; cc < count; cc++)
+    {
+    std_values[cc] = values[cc]? values[cc] : "";
+    }
+  int ret_val = this->Internals->SetUncheckedElements(std_values, count);
+  delete[] std_values;
+  return ret_val;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 {
   if (!value)

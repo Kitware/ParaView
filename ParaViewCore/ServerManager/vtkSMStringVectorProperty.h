@@ -62,6 +62,10 @@ public:
   int SetElements(vtkStringList* newvalue);
 
   // Description:
+  // Sets the values of all the unchecked elements.
+  int SetUncheckedElements(unsigned int count, const char* values[]);
+
+  // Description:
   // Fills up the vtkStringList instance with the current value.
   void GetElements(vtkStringList* list);
 
