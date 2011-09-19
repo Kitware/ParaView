@@ -19,13 +19,22 @@
 // It maintains a map of vtkPVXMLElement (populated by the XML parser) from
 // which it can extract Hint, Documentation, Properties, Domains definition.
 //
-// Whenever the proxy definitions are updated, this class fires
-// vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
-// vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
-// when a compound proxy is registered, on CompoundProxyDefinitionsUpdated
-// event is fired.
-// .SECTION See Also
-// vtkSMXMLParser
+// This class fires the following events:
+// \li \c vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated - Fired any time
+// any definitions are updated. If a group of definitions are being updated (i.e.
+// a new definition is registered, or unregistred, or modified)
+// then this event gets fired after all of them are updated.
+// \li \c vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated - Fired
+// when a custom proxy definition is updated. Similar to
+// ProxyDefinitionsUpdated this is fired after collective updates, if
+// applicable. Note whenever CompoundProxyDefinitionsUpdated is fired,
+// ProxyDefinitionsUpdated is also fired.
+// \li \c vtkCommand::RegisterEvent - Fired when a new proxy definition is
+// registered or an old one modified (through extensions). This is fired for
+// regular proxies as well as custom proxy definitions.
+// \li \c vtkCommand::UnRegisterEvent - Fired when a proxy definition is
+// removed. Since this class only support removing custom proxies, this event is
+// fired only when a custom proxy is removed.
 
 #ifndef __vtkSIProxyDefinitionManager_h
 #define __vtkSIProxyDefinitionManager_h
@@ -233,6 +242,11 @@ protected:
   void AddElement(const char* groupName,
                   const char* proxyName, vtkPVXMLElement* element);
 
+  // Description:
+  // Implementation for add custom proxy definition.
+  bool AddCustomProxyDefinitionInternal(
+    const char* group, const char* name, vtkPVXMLElement* top );
+
   // Description
   // Integrate a ProxyDefinition into another ProxyDefinition by merging them.
   // If properties are overriden is the last property that will last. So when we build
@@ -258,12 +272,14 @@ protected:
   vtkPVXMLElement* ExtractSubProxy(vtkPVXMLElement* proxyDefinition,
                                    const char* subProxyName);
 
+
+  // Description:
+  // Called when custom definitions are updated. Fires appropriate events.
+  void InvokeCustomDefitionsUpdated();
+
 private:
   vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&); // Not implemented
   void operator=(const vtkSIProxyDefinitionManager&); // Not implemented
-
-  // Flag to disable during method calls notification calls.
-  bool TriggerNotificationEvent;
 
   class vtkInternals;
   vtkInternals* Internals;

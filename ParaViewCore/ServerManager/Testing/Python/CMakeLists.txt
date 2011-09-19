@@ -91,6 +91,7 @@ SET(PY_TESTS_NO_BASELINE
   CellIntegrator
   CSVWriterReader
   IntegrateAttributes
+  Plugins
   ProgrammableFilter
   ProxyManager
   SMPropertyAdaptor

@@ -45,16 +45,20 @@ function(determine_version source_dir git_command alternative_version_file var_p
   endif()
 
   if (NOT major)
-    # Check is file exists, use that.
-    file (STRINGS ${alternative_version_file} contents)
-    string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
-      version_matches ${contents})
-    if (CMAKE_MATCH_0) 
-      message(STATUS "Determined Source Version from file : ${CMAKE_MATCH_0}")
-      set (full ${CMAKE_MATCH_0})
-      set (major ${CMAKE_MATCH_1})
-      set (minor ${CMAKE_MATCH_2})
-      set (patch ${CMAKE_MATCH_3})
+    # Check if file exists, use that.
+    if(EXISTS "${alternative_version_file}" AND NOT IS_DIRECTORY "${alternative_version_file}")
+      file (STRINGS ${alternative_version_file} contents)
+      string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+).*"
+        version_matches ${contents})
+      if (CMAKE_MATCH_0) 
+        message(STATUS "Determined Source Version from file : ${CMAKE_MATCH_0}")
+        set (full ${CMAKE_MATCH_0})
+        set (major ${CMAKE_MATCH_1})
+        set (minor ${CMAKE_MATCH_2})
+        set (patch ${CMAKE_MATCH_3})
+      endif()
+    else(EXISTS "${alternative_version_file}" AND NOT IS_DIRECTORY "${alternative_version_file}")
+      message (STATUS "Could NOT find ${alternative_version_file} which is mandatory if Git is not found either.")
     endif()
   endif()
 

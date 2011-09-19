@@ -859,6 +859,22 @@ def LoadPlugin(filename, remote=True, ns=None):
     servermanager.LoadPlugin(filename, remote)
     _add_functions(ns)
 
+def LoadDistributedPlugin(pluginname, remote=True, ns=None):
+    """Loads a plugin that's distributed with the executable. This uses the
+    information known about plugins distributed with ParaView to locate the
+    shared library for the plugin to load. Raises a RuntimeError if the plugin
+    was not found."""
+    plm = servermanager.ProxyManager().GetSession().GetPluginManager()
+    if remote:
+        info = plm.GetRemoteInformation()
+    else:
+        info = plm.GetLocalInformation()
+    for cc in range(0, info.GetNumberOfPlugins()):
+        if info.GetPluginName(cc) == pluginname:
+            return LoadPlugin(info.GetPluginFileName(cc), remote, ns)
+    raise RuntimeError, "Plugin '%s' not found" % pluginname
+
+
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
     objects are shared between Python and the user interface. This class

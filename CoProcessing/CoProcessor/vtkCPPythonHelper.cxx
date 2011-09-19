@@ -96,8 +96,6 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
         vtkCPPythonHelper::Instance->PythonOptions);
 
 
-    vtkSMProperty::SetCheckDomains(0);
-
     // Do static initialization of python libraries
     cppythonmodules_h_LoadAllPythonModules();
 

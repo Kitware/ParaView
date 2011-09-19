@@ -3,12 +3,12 @@
   Program:   Visualization Toolkit
   Module:    vtkMantaTestSource.cxx
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -33,7 +33,7 @@ vtkMantaTestSource::vtkMantaTestSource()
   this->Resolution = 100;
 
   //Give it some geometric coherence
-  this->DriftFactor = 0.1; 
+  this->DriftFactor = 0.1;
   //Give it some memory coherence
   this->SlidingWindow = 0.01;
 }
@@ -76,7 +76,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
   int Rank = 0;
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
     {
-    Rank = 
+    Rank =
       outInfo->Get(
         vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
     }
@@ -91,7 +91,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
 
   //cerr << "I am " << Rank << "/" << Processors << endl;
 
-  vtkPolyData *outPD = 
+  vtkPolyData *outPD =
     vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (!outPD)
     {
@@ -120,13 +120,13 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
     for (vtkIdType c = 0; c < 3; c++)
       {
       //TODO: Sliding window should be a percentage
-      offset = vtkMath::Random()*this->SlidingWindow*this->Resolution - 
+      offset = vtkMath::Random()*this->SlidingWindow*this->Resolution -
         (this->SlidingWindow*this->Resolution/2.0);
       indices[c] = ((vtkIdType)((double)i+c + offset));
       //don't wrap around, because can't limit ranges per processor
       //but don't restrict to strictly within my local window either
       //because otherwise geometric would change with #processors
-      if (indices[c] < 0 || indices[c] >= this->Resolution) 
+      if (indices[c] < 0 || indices[c] >= this->Resolution)
         {
         //cerr << "BOUNCE " << indices[c] << " ";
         indices[c] = ((vtkIdType)((double)i+c - offset));
@@ -138,7 +138,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
           indices[0] == indices[2] ||
           indices[2] == indices[1])
         {
-        //cerr << "REJECT " << i << " " 
+        //cerr << "REJECT " << i << " "
         //  << indices[0] << " " << indices[1] << " " << indices[2] << endl;
         c--;
         }
@@ -160,7 +160,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
         }
 
       outPD->InsertNextCell(VTK_TRIANGLE, 3, indices);
-      //cerr << "TRI " << i << " " 
+      //cerr << "TRI " << i << " "
       //  << indices[0] << " " << indices[1] << " " << indices[2] << endl;
       }
     if (i % (this->Resolution/10) == 0)
@@ -171,7 +171,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
       }
     }
 
-  //cerr << "I refer to verts between " 
+  //cerr << "I refer to verts between "
   //  << minIndex << " and " << maxIndex << endl;
 
   //shift indices to 0, because each processor only produces local points

@@ -1,0 +1,25 @@
+
+if(WIN32)
+  set(ENV{PATH} "@PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS@;$ENV{PATH}")
+elseif(APPLE)
+  set(dyld_lib_path "@QT_LIBRARY_DIR@:$ENV{DYLD_LIBRARY_PATH}")
+  set(SEARCH_PATHS @PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS@)
+  foreach(path ${SEARCH_PATHS})
+    set(dyld_lib_path "${dyld_lib_path}:${path}")
+  endforeach()
+  set(ENV{DYLD_LIBRARY_PATH} ${dyld_lib_path})
+else(WIN32)
+  get_filename_component(PYTHON_LIB "@PYTHON_LIBRARY@" PATH)
+  get_filename_component(MPI_LIB "@MPI_LIBRARY@" PATH)
+  set(ld_lib_path "${MPI_LIB}:${PYTHON_LIB}:@QT_LIBRARY_DIR@:$ENV{LD_LIBRARY_PATH}")
+  set(SEARCH_PATHS @PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS@)
+  foreach(path ${SEARCH_PATHS})
+    set(ld_lib_path "${ld_lib_path}:${path}")
+  endforeach()
+  set(ENV{LD_LIBRARY_PATH} ${ld_lib_path})
+endif(WIN32)
+
+execute_process(
+  COMMAND "@ParaView_BINARY_DIR@/bin/${OutDir}/protoc" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
+  WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@"
+  )

@@ -558,42 +558,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
                                          reprProxy->GetProperty("BackfaceOpacity"));
     }
 
-#if 0                                       //FIXME
-  // material
-  this->Internal->StyleMaterial->blockSignals(true);
-  this->Internal->StyleMaterial->clear();
-  if(vtkMaterialLibrary::GetNumberOfMaterials() > 0)
-    {
-    this->Internal->StyleMaterial->addItem("None");
-    this->Internal->StyleMaterial->addItem("Browse...");
-    this->Internal->StyleMaterial->addItems(this->Internal->MaterialMap.keys());
-    const char* mat = this->Internal->Representation->getDisplayProxy()->GetMaterialCM();
-    if(mat)
-      {
-      QString filename = mat;
-      QMap<QString, QString>::iterator iter;
-      for(iter = this->Internal->MaterialMap.begin();
-          iter != this->Internal->MaterialMap.end();
-          ++iter)
-        {
-        if(filename == iter.value())
-          {
-          int foundidx = this->Internal->StyleMaterial->findText(iter.key());
-          this->Internal->StyleMaterial->setCurrentIndex(foundidx);
-          return;
-          }
-        }
-      }
-    }
-  else
-    {
-    this->Internal->StyleMaterial->addItem("Unavailable");
-    this->Internal->StyleMaterial->setEnabled(false);
-    }
-  this->Internal->StyleMaterial->blockSignals(false);
-#endif
-
-
   new pqStandardColorLinkAdaptor(this->Internal->ColorActorColor,
     reprProxy, "DiffuseColor");
   if (reprProxy->GetProperty("EdgeColor"))
@@ -702,9 +666,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(beginUndoSet(const QString&)));
   QObject::connect(this->Internal->AmbientColor,
     SIGNAL(endUndo()), this, SLOT(endUndoSet()));
-
-  QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(updateMaterial(int)));
 
   this->Internal->SliceDirectionAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SliceDirection);
@@ -961,52 +922,6 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
     }
 }
 
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
-{
-  // FIXME: when we enable materials.
-#if 0
-  if(idx == 0)
-    {
-    this->Internal->Representation->getDisplayProxy()->SetMaterialCM(0);
-    this->updateAllViews();
-    }
-  else if(idx == 1)
-    {
-    pqFileDialog diag(NULL, this, "Open Material File", QString(),
-                      "Material Files (*.xml)");
-    diag.setFileMode(pqFileDialog::ExistingFile);
-    if(diag.exec() == QDialog::Accepted)
-      {
-      QString filename = diag.getSelectedFiles()[0];
-      QMap<QString, QString>::iterator iter;
-      for(iter = this->Internal->MaterialMap.begin();
-          iter != this->Internal->MaterialMap.end();
-          ++iter)
-        {
-        if(filename == iter.value())
-          {
-          int foundidx = this->Internal->StyleMaterial->findText(iter.key());
-          this->Internal->StyleMaterial->setCurrentIndex(foundidx);
-          return;
-          }
-        }
-      QFileInfo fi(filename);
-      this->Internal->MaterialMap.insert(fi.fileName(), filename);
-      this->Internal->StyleMaterial->addItem(fi.fileName());
-      this->Internal->StyleMaterial->setCurrentIndex(
-        this->Internal->StyleMaterial->count() - 1);
-      }
-    }
-  else
-    {
-    QString label = this->Internal->StyleMaterial->itemText(idx);
-    this->Internal->Representation->getDisplayProxy()->SetMaterialCM(
-      this->Internal->MaterialMap[label].toAscii().data());
-    this->updateAllViews();
-    }
-#endif
-}
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::cubeAxesVisibilityChanged()
 {

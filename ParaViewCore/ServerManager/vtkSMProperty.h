@@ -147,12 +147,6 @@ public:
   void UpdateDependentDomains();
 
   // Description:
-  // Static boolean used to determine whether domain checking should
-  // be performed when setting values. On by default.
-  static int GetCheckDomains();
-  static void SetCheckDomains(int check);
-
-  // Description:
   // Is InformationOnly is set to true, this property is used to
   // get information from server instead of setting values.
   vtkGetMacro(InformationOnly, int);
@@ -344,8 +338,6 @@ protected:
   vtkSetStringMacro(XMLLabel);
 
   vtkSMDomainIterator* DomainIterator;
-
-  static int CheckDomains;
 
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;

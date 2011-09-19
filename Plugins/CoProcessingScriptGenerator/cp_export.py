@@ -172,7 +172,7 @@ def GetNextProxyToDelete():
         proxy = servermanager._getPyProxy(iter.GetProxy())
         proxygroup = iter.GetGroup()
         if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
-            tobedeleted.append(proxy)
+            return proxy
         iter.Next()
 
     return None

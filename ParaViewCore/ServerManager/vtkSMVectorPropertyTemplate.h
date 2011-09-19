@@ -162,17 +162,6 @@ public:
       return 1;
       }
 
-    if ( vtkSMProperty::GetCheckDomains() )
-      {
-      this->UncheckedValues = this->Values;
-      this->SetUncheckedElement(idx, value);
-      if (!this->Property->IsInDomains())
-        {
-        this->SetNumberOfUncheckedElements(numElems);
-        return 0;
-        }
-      }
-
     if (idx >= numElems)
       {
       this->SetNumberOfElements(idx+1);
@@ -210,15 +199,6 @@ public:
     if (!modified && this->Initialized)
       {
       return 1;
-      }
-
-    if ( vtkSMProperty::GetCheckDomains() )
-      {
-      vtkstd::copy(values, values+numArgs, this->UncheckedValues.begin());
-      if (!this->Property->IsInDomains())
-        {
-        return 0;
-        }
       }
 
     vtkstd::copy(values, values+numArgs, this->Values.begin());

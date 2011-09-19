@@ -24,7 +24,7 @@ wishing to create their own VTK classes locally.
 // files for a shared library named "@PROJECT_NAME@".  For these
 // sources we should export if building a shared library.  For other
 // sources we should import if using a shared library.
-#if defined(_WIN32) && defined(@PROJECT_NAME@_SHARED)
+#if defined(_WIN32) && defined(VTK_BUILD_SHARED_LIBS)
 # if defined(@PROJECT_NAME@_EXPORTS)
 #  define VTK_@PROJECT_NAME@_EXPORT __declspec(dllexport)
 # else

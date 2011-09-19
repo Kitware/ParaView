@@ -3,12 +3,12 @@
   Program:   Visualization Toolkit
   Module:    vtkMantaTestSource.h
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen 
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
@@ -28,12 +28,11 @@
 class VTK_vtkManta_EXPORT vtkMantaTestSource : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkMantaTestSource,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
-
   // Description:
   // Create a new instance with (50,50,50) points in the (u-v-w) directions.
   static vtkMantaTestSource *New();
+  vtkTypeMacro(vtkMantaTestSource,vtkPolyDataAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set/Get the number of triangles to produce.
@@ -42,15 +41,15 @@ public:
   vtkGetMacro(Resolution,vtkIdType);
 
   // Description:
-  // Set/Get the spatial locality 
-  // 0.0 behind infinite, 1.0 being none, 
+  // Set/Get the spatial locality
+  // 0.0 behind infinite, 1.0 being none,
   // this affects distance beteen sequential points
   // Default is 0.1
   vtkSetMacro(DriftFactor,double);
   vtkGetMacro(DriftFactor,double);
 
   // Description:
-  // Set/Get the memory locality 
+  // Set/Get the memory locality
   // 0.0 behind infinite (tri uses sequential pts),
   // 1.0 being none (tri uses any point)
   // Default is 0.01
@@ -59,7 +58,7 @@ public:
 
 protected:
   vtkMantaTestSource();
-  virtual ~vtkMantaTestSource();
+  ~vtkMantaTestSource();
 
   int RequestInformation(vtkInformation *info, vtkInformationVector **input,
                          vtkInformationVector *output);
