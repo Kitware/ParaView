@@ -192,8 +192,6 @@ void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::ClearUncheckedProxies()
 {
-  this->RemoveAllUncheckedProxies();
-
   for(unsigned int i = 0; i < this->PPInternals->Proxies.size(); i++)
     {
     this->PPInternals->UncheckedProxies.push_back(this->GetProxy(i));
@@ -220,13 +218,13 @@ bool vtkSMProxyProperty::IsProxyAdded(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
 {
-  this->RemoveAllUncheckedProxies();
-
   this->PPInternals->Proxies.push_back(vtkProxyPointer(this, proxy));
   if (modify)
     {
     this->Modified();
     }
+
+  this->ClearUncheckedProxies();
   return 1;
 }
 
@@ -251,6 +249,7 @@ unsigned int vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
         {
         this->Modified();
         }
+      this->ClearUncheckedProxies();
       break;
       }
     }
@@ -266,7 +265,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
     return 1;
     }
 
-  this->RemoveAllUncheckedProxies();
   if (this->PPInternals->Proxies.size() <= idx)
     {
     this->PPInternals->Proxies.resize(idx+1);
@@ -274,6 +272,7 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 
   this->PPInternals->Proxies[idx] = vtkProxyPointer(this, proxy);
   this->Modified();
+  this->ClearUncheckedProxies();
 
   return 1;
 }
@@ -282,8 +281,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
   vtkSMProxy* proxies[])
 {
-  this->RemoveAllUncheckedProxies();
-
   this->PPInternals->Proxies.clear();
   for (unsigned int cc=0; cc < numProxies; cc++)
     {
@@ -291,6 +288,7 @@ void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
     }
 
   this->Modified();
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------
@@ -307,6 +305,7 @@ void vtkSMProxyProperty::RemoveAllProxies(int modify)
     {
     this->Modified();
     }
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------
@@ -320,6 +319,8 @@ void vtkSMProxyProperty::SetNumberOfProxies(unsigned int num)
     {
     this->PPInternals->Proxies.clear();
     }
+
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------

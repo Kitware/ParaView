@@ -180,7 +180,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
     case pqSMAdaptor::PROXYSELECTION:
         {
         pqSMProxy p;
-        p = pqSMAdaptor::getProxyProperty(this->Internal->Property);
+        p = pqSMAdaptor::getProxyProperty(this->Internal->Property, propertyValueType);
         prop.setValue(p);
         if(prop != old)
           {
