@@ -55,7 +55,6 @@ vtkPVGlyphFilter::vtkPVGlyphFilter() :
   this->BlockPointCounter = 0;
   this->BlockNumGlyphedPts = 0;
   this->BlockGlyphAllPoints = 0;
-//   this->BlockSampleStride = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -288,8 +287,9 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
   // do not count it.
   if (this->InputIsUniformGrid)
     {
-    vtkUniformGrid* ug = static_cast<vtkUniformGrid*>(ds);
-    if(!ug->IsPointVisible(ptId))
+    //vtkUniformGrid* ug = static_cast<vtkUniformGrid*>(ds);
+    vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast( ds );
+    if(ug && !ug->IsPointVisible(ptId))
       {
       return 0;
       }
@@ -300,25 +300,31 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
   // that this point should be glyphed and compute the
   // next point.
   int pointIsVisible=0;
-  if (this->BlockNumGlyphedPts<this->BlockMaxNumPts 
-      && this->BlockPointCounter==this->BlockNextPoint)
-    {
-    this->BlockNumGlyphedPts++;
-    if (this->RandomMode)
+  if ( (this->BlockNumGlyphedPts < this->BlockMaxNumPts) && (this->BlockPointCounter==this->BlockNextPoint) )
+  {
+      this->BlockNumGlyphedPts++;
+      if (this->RandomMode)
       {
-/*     double r
-     = vtkMath::Random( (this->BlockNumGlyphedPts)*(this->BlockSampleStride), (this->BlockNumGlyphedPts+1)*(this->BlockSampleStride) - 1 );
-     this->BlockNextPoint=static_cast<vtkIdType>(r+0.5);*/
+          if( this->RandomPtsInDataset.empty() )
+          {
+              return 0;
+          }
 
-      this->BlockNextPoint = this->RandomPtsInDataset[this->BlockNumGlyphedPts];
+          if ( this->BlockNumGlyphedPts < this->BlockMaxNumPts )
+          {
+              this->BlockNextPoint = this->RandomPtsInDataset[this->BlockNumGlyphedPts];
+          }
+          else
+          {
+              this->BlockNextPoint = this->BlockMaxNumPts;
+          }
       }
-    else
+      else
       {
-//       this->BlockNextPoint=( (this->BlockNumGlyphedPts)*(this->BlockSampleStride) );
-      this->BlockNextPoint = this->BlockNumGlyphedPts;
+          this->BlockNextPoint = this->BlockNumGlyphedPts;
       }
-    pointIsVisible=1;
-    }
+      pointIsVisible=1;
+  }
 
   // Count all non-blanked points.
   ++this->BlockPointCounter;
