@@ -165,78 +165,78 @@ int vtkPVGlyphFilter::RequestData(
     vtkInformationVector **inputVector,
     vtkInformationVector *outputVector)
 {
-    this->BlockOnRatio = 0;
+  this->BlockOnRatio = 0;
 
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-    vtkCompositeDataSet *hdInput = 
-        vtkCompositeDataSet::SafeDownCast(input);
-    if (hdInput) 
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *hdInput = 
+    vtkCompositeDataSet::SafeDownCast(input);
+  if (hdInput) 
     {
-        return this->RequestCompositeData(request, inputVector, outputVector);
+    return this->RequestCompositeData(request, inputVector, outputVector);
     }
 
 
-    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(
-        inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet* dsInput = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    if (!dsInput)
+  if (!dsInput)
     {
-        if (input)
-        {
-            vtkErrorMacro("This filter cannot process input of type: "
-                << input->GetClassName());
-        }
-        return 0;
+    if (input)
+      {
+      vtkErrorMacro("This filter cannot process input of type: "
+        << input->GetClassName());
+      }
+    return 0;
     }
 
-    // Glyph everything? 
-    if (!this->UseMaskPoints)
+  // Glyph everything? 
+  if (!this->UseMaskPoints)
     {
-        // yes.
-        int retVal
-            = this->Superclass::RequestData(request, inputVector, outputVector);
-        this->BlockGlyphAllPoints= !this->UseMaskPoints;
-        return retVal;
-    }
-
-    // Glyph a subset.
-    double maxNumPts = static_cast<double> (this->MaximumNumberOfPoints);
-    vtkIdType numPts = dsInput->GetNumberOfPoints();
-    vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
-
-    // What fraction of the points will this processes get allocated?
-    maxNumPts
-        = (double)((double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
-
-    maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
-
-    vtkInformationVector* inputVs[2];
-
-    vtkInformationVector* inputV = inputVector[0];
-    inputVs[0] = vtkInformationVector::New();
-    inputVs[0]->SetNumberOfInformationObjects(1);
-    vtkInformation* newInInfo = vtkInformation::New();
-    newInInfo->Copy(inputV->GetInformationObject(0));
-    inputVs[0]->SetInformationObject(0, newInInfo);
-    newInInfo->Delete();
-    inputVs[1] = inputVector[1];
-
-
-
-    // We will glyph this many points.
-    this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
-
-    this->CalculatePtsToGlyph(dsInput, numPts );
-
-    // We have set all ofthe parameters that will be used in 
-    // our overloaded IsPoitVisible. Now let the glypher take over.
-    newInInfo->Set(vtkDataObject::DATA_OBJECT(), dsInput);
-    int retVal =
-        this->Superclass::RequestData(request, inputVs, outputVector);
-
-    inputVs[0]->Delete();
+    // yes.
+    int retVal
+      = this->Superclass::RequestData(request, inputVector, outputVector);
+    this->BlockGlyphAllPoints= !this->UseMaskPoints;
     return retVal;
+    }
+
+  // Glyph a subset.
+  double maxNumPts = static_cast<double> (this->MaximumNumberOfPoints);
+  vtkIdType numPts = dsInput->GetNumberOfPoints();
+  vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
+
+  // What fraction of the points will this processes get allocated?
+  maxNumPts
+    = (double)((double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
+
+  maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
+
+  vtkInformationVector* inputVs[2];
+
+  vtkInformationVector* inputV = inputVector[0];
+  inputVs[0] = vtkInformationVector::New();
+  inputVs[0]->SetNumberOfInformationObjects(1);
+  vtkInformation* newInInfo = vtkInformation::New();
+  newInInfo->Copy(inputV->GetInformationObject(0));
+  inputVs[0]->SetInformationObject(0, newInInfo);
+  newInInfo->Delete();
+  inputVs[1] = inputVector[1];
+
+
+
+  // We will glyph this many points.
+  this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
+
+  this->CalculatePtsToGlyph(dsInput, numPts );
+
+  // We have set all ofthe parameters that will be used in 
+  // our overloaded IsPoitVisible. Now let the glypher take over.
+  newInInfo->Set(vtkDataObject::DATA_OBJECT(), dsInput);
+  int retVal =
+    this->Superclass::RequestData(request, inputVs, outputVector);
+
+  inputVs[0]->Delete();
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
@@ -244,56 +244,56 @@ int vtkPVGlyphFilter::RequestData(
 // otehrwise we could use vtkMaskPoints filter.
 int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
-    if (this->BlockGlyphAllPoints==1)
+  if (this->BlockGlyphAllPoints==1)
     {
-        return 1;
+    return 1;
     }
 
-    // check if point has been blanked. If so skip it and
-    // do not count it.
-    if (this->InputIsUniformGrid)
+  // check if point has been blanked. If so skip it and
+  // do not count it.
+  if (this->InputIsUniformGrid)
     {
-        vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast( ds );
-        if( ug && !ug->IsPointVisible(ptId) )
-        {
-            return 0;
-        }
+    vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast( ds );
+    if( ug && !ug->IsPointVisible(ptId) )
+      {
+      return 0;
+      }
     }
 
-    // Have we glyphed enough points yet? And are we
-    // at the next point? If so we'll return 1 indicating
-    // that this point should be glyphed and compute the
-    // next point.
-    int pointIsVisible=0;
-    if ( (this->BlockNumGlyphedPts < this->BlockMaxNumPts) && (this->BlockPointCounter==this->BlockNextPoint) )
+  // Have we glyphed enough points yet? And are we
+  // at the next point? If so we'll return 1 indicating
+  // that this point should be glyphed and compute the
+  // next point.
+  int pointIsVisible=0;
+  if ( (this->BlockNumGlyphedPts < this->BlockMaxNumPts) && (this->BlockPointCounter==this->BlockNextPoint) )
     {
-        this->BlockNumGlyphedPts++;
-        if (this->RandomMode)
+    this->BlockNumGlyphedPts++;
+    if (this->RandomMode)
+      {
+      if( this->RandomPtsInDataset.empty() )
         {
-            if( this->RandomPtsInDataset.empty() )
-            {
-                return 0;
-            }
+        return 0;
+        }
 
-            if ( this->BlockNumGlyphedPts < this->BlockMaxNumPts )
-            {
-                this->BlockNextPoint = this->RandomPtsInDataset[this->BlockNumGlyphedPts];
-            }
-            else
-            {
-                this->BlockNextPoint = this->BlockMaxNumPts;
-            }
-        }
-        else
+      if ( this->BlockNumGlyphedPts < this->BlockMaxNumPts )
         {
-            this->BlockNextPoint = this->BlockNumGlyphedPts;
+        this->BlockNextPoint = this->RandomPtsInDataset[this->BlockNumGlyphedPts];
         }
-        pointIsVisible=1;
+      else
+        {
+        this->BlockNextPoint = this->BlockMaxNumPts;
+        }
+      }
+    else
+      {
+      this->BlockNextPoint = this->BlockNumGlyphedPts;
+      }
+    pointIsVisible=1;
     }
 
-    // Count all non-blanked points.
-    ++this->BlockPointCounter;
-    return pointIsVisible;
+  // Count all non-blanked points.
+  ++this->BlockPointCounter;
+  return pointIsVisible;
 }
 
 //----------------------------------------------------------------------------
@@ -301,181 +301,181 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector)
 {
-    // input
-    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    vtkCompositeDataSet *hdInput
-        =vtkCompositeDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  // input
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkCompositeDataSet *hdInput
+    =vtkCompositeDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    // output
-    vtkInformation* info = outputVector->GetInformationObject(0);
-    vtkPolyData *output
-        = vtkPolyData::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
-    if (!output)
+  // output
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkPolyData *output
+    = vtkPolyData::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
+  if (!output)
     {
-        vtkErrorMacro("Expected vtkPolyData in output.");
-        return 0;
+    vtkErrorMacro("Expected vtkPolyData in output.");
+    return 0;
     }
 
-    // Get number of points we have in this block
-    // and the number of points in all blocks.
-    vtkIdType numPts = hdInput->GetNumberOfPoints();
-    vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
+  // Get number of points we have in this block
+  // and the number of points in all blocks.
+  vtkIdType numPts = hdInput->GetNumberOfPoints();
+  vtkIdType totalNumPts = this->GatherTotalNumberOfPoints(numPts);
 
-    vtkAppendPolyData* append = vtkAppendPolyData::New();
-    int numInputs = 0;
+  vtkAppendPolyData* append = vtkAppendPolyData::New();
+  int numInputs = 0;
 
-    vtkInformationVector* inputVs[2];
+  vtkInformationVector* inputVs[2];
 
-    vtkInformationVector* inputV = inputVector[0];
-    inputVs[0] = vtkInformationVector::New();
-    inputVs[0]->SetNumberOfInformationObjects(1);
-    vtkInformation* newInInfo = vtkInformation::New();
-    newInInfo->Copy(inputV->GetInformationObject(0));
-    inputVs[0]->SetInformationObject(0, newInInfo);
-    newInInfo->FastDelete();
-    inputVs[1] = inputVector[1];
+  vtkInformationVector* inputV = inputVector[0];
+  inputVs[0] = vtkInformationVector::New();
+  inputVs[0]->SetNumberOfInformationObjects(1);
+  vtkInformation* newInInfo = vtkInformation::New();
+  newInInfo->Copy(inputV->GetInformationObject(0));
+  inputVs[0]->SetInformationObject(0, newInInfo);
+  newInInfo->FastDelete();
+  inputVs[1] = inputVector[1];
 
-    int retVal = 1;
-    this->InputIsUniformGrid = 0;
+  int retVal = 1;
+  this->InputIsUniformGrid = 0;
 
-    vtkCompositeDataIterator* iter = hdInput->NewIterator();
+  vtkCompositeDataIterator* iter = hdInput->NewIterator();
 
-    while(!iter->IsDoneWithTraversal())
+  while(!iter->IsDoneWithTraversal())
     {
-        vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        if (ds)
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
+      {
+      vtkPolyData* tmpOut = vtkPolyData::New();
+
+      // Uniform grids might be blanked, we make a note if we 
+      // have a uniform grid to facilitate blanking friendly
+      // glyph sampling.
+      vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast(ds);
+      if (ug)
         {
-            vtkPolyData* tmpOut = vtkPolyData::New();
-
-            // Uniform grids might be blanked, we make a note if we 
-            // have a uniform grid to facilitate blanking friendly
-            // glyph sampling.
-            vtkUniformGrid* ug = vtkUniformGrid::SafeDownCast(ds);
-            if (ug)
-            {
-                this->InputIsUniformGrid = 1;
-            }
-            else
-            {
-                this->InputIsUniformGrid = 0;
-            }
-
-            // Certain AMR data sets provide blanking information
-            // We will skip blanked points and glyph what's
-            // left if any.
-            vtkIdType numBlankedPts = 0;
-            vtkInformation* blockInfo = iter->GetCurrentMetaData();
-            if (blockInfo)
-            {
-                if
-                    (blockInfo->Has(vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS()))
-                {
-                    numBlankedPts
-                        = blockInfo->Get(vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS());
-                }
-            }
-
-            //Calculate the number of points on this block that need to be glyphed
-            double nPtsNotBlanked
-                = static_cast<double>(ds->GetNumberOfPoints() - numBlankedPts);
-            double nPtsVisibleOverAll
-                = static_cast<double>(this->MaximumNumberOfPoints);
-            double nPtsInDataSet
-                = static_cast<double>(totalNumPts);
-            double fractionOfPtsInBlock = nPtsNotBlanked/nPtsInDataSet;
-            double nPtsVisibleOverBlock = nPtsVisibleOverAll*fractionOfPtsInBlock;
-            nPtsVisibleOverBlock 
-                = nPtsVisibleOverBlock<1.0 ? 1.0 : nPtsVisibleOverBlock;
-            nPtsVisibleOverBlock = (  (nPtsVisibleOverBlock > nPtsNotBlanked)
-                ? nPtsNotBlanked : nPtsVisibleOverBlock );
-
-            // We will glyph this many points.
-            this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock + 0.5) ;
-
-            this->CalculatePtsToGlyph( ds, nPtsNotBlanked );
-
-            // We have set all ofthe parameters that will be used in 
-            // our overloaded IsPoitVisible. Now let the glypher take over.
-            newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
-            retVal = this->Superclass::RequestData(request, inputVs, outputVector);
-
-            //Accumulate the results.
-            tmpOut->ShallowCopy(output);
-            append->AddInput(tmpOut);
-
-            // Call FastDelete() instead of Delete() to avoid garbage
-            // collection checks. This improves the preformance significantly
-            tmpOut->FastDelete();
-
-            // Glypher failed, so we skip the rest and fail as well.
-            if (!retVal)
-            {
-                vtkErrorMacro("vtkGlyph3D failed.");
-                iter->Delete();
-                inputVs[0]->Delete();
-                append->Delete();
-                return 0;
-            }
-            numInputs++;
+        this->InputIsUniformGrid = 1;
         }
-        iter->GoToNextItem();
+      else
+        {
+        this->InputIsUniformGrid = 0;
+        }
+
+      // Certain AMR data sets provide blanking information
+      // We will skip blanked points and glyph what's
+      // left if any.
+      vtkIdType numBlankedPts = 0;
+      vtkInformation* blockInfo = iter->GetCurrentMetaData();
+      if (blockInfo)
+        {
+        if
+          (blockInfo->Has(vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS()))
+          {
+          numBlankedPts
+            = blockInfo->Get(vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS());
+          }
+        }
+
+      //Calculate the number of points on this block that need to be glyphed
+      double nPtsNotBlanked
+        = static_cast<double>(ds->GetNumberOfPoints() - numBlankedPts);
+      double nPtsVisibleOverAll
+        = static_cast<double>(this->MaximumNumberOfPoints);
+      double nPtsInDataSet
+        = static_cast<double>(totalNumPts);
+      double fractionOfPtsInBlock = nPtsNotBlanked/nPtsInDataSet;
+      double nPtsVisibleOverBlock = nPtsVisibleOverAll*fractionOfPtsInBlock;
+      nPtsVisibleOverBlock 
+        = nPtsVisibleOverBlock<1.0 ? 1.0 : nPtsVisibleOverBlock;
+      nPtsVisibleOverBlock = (  (nPtsVisibleOverBlock > nPtsNotBlanked)
+        ? nPtsNotBlanked : nPtsVisibleOverBlock );
+
+      // We will glyph this many points.
+      this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock + 0.5) ;
+
+      this->CalculatePtsToGlyph( ds, nPtsNotBlanked );
+
+      // We have set all ofthe parameters that will be used in 
+      // our overloaded IsPoitVisible. Now let the glypher take over.
+      newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
+      retVal = this->Superclass::RequestData(request, inputVs, outputVector);
+
+      //Accumulate the results.
+      tmpOut->ShallowCopy(output);
+      append->AddInput(tmpOut);
+
+      // Call FastDelete() instead of Delete() to avoid garbage
+      // collection checks. This improves the preformance significantly
+      tmpOut->FastDelete();
+
+      // Glypher failed, so we skip the rest and fail as well.
+      if (!retVal)
+        {
+        vtkErrorMacro("vtkGlyph3D failed.");
+        iter->Delete();
+        inputVs[0]->Delete();
+        append->Delete();
+        return 0;
+        }
+      numInputs++;
+      }
+    iter->GoToNextItem();
     }
 
-    // copy the accumulated results to the output.
-    if (numInputs > 0)
+  // copy the accumulated results to the output.
+  if (numInputs > 0)
     {
-        append->Update();
-        output->ShallowCopy(append->GetOutput());
+    append->Update();
+    output->ShallowCopy(append->GetOutput());
     }
 
-    // clean up
-    iter->Delete();
-    inputVs[0]->Delete();
-    append->Delete();
+  // clean up
+  iter->Delete();
+  inputVs[0]->Delete();
+  append->Delete();
 
-    return retVal;
+  return retVal;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::CalculatePtsToGlyph( vtkDataSet* ds, double PtsNotBlanked)
 {
-    // When mask points is checked, we glyph the first N points. When mask points
-    // and random mode is checked, we glyph N random points from the total number
-    // of points on the block.
+  // When mask points is checked, we glyph the first N points. When mask points
+  // and random mode is checked, we glyph N random points from the total number
+  // of points on the block.
 
-    //Reset the random points vector
-    this->RandomPtsInDataset.clear();
+  //Reset the random points vector
+  this->RandomPtsInDataset.clear();
 
-    this->BlockPointCounter = 0;
-    this->BlockNumGlyphedPts = 0;
+  this->BlockPointCounter = 0;
+  this->BlockNumGlyphedPts = 0;
 
-    //Populate Random points in the vector if random mode selected
-    if(this->RandomMode)
+  //Populate Random points in the vector if random mode selected
+  if(this->RandomMode)
     {
-        srand( time(NULL) );
-        int r;
-        for(int i = 0; i < this->BlockMaxNumPts; i++)
+    srand( time(NULL) );
+    int r;
+    for(int i = 0; i < this->BlockMaxNumPts; i++)
+      {
+      r = rand() % static_cast<int>( floor(PtsNotBlanked));
+      while( vtkstd::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
         {
-            r = rand() % static_cast<int>( floor(PtsNotBlanked));
-            while( vtkstd::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
-            {
-                r = rand() % static_cast<int>( floor(PtsNotBlanked) );
-            }
-            this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
+        r = rand() % static_cast<int>( floor(PtsNotBlanked) );
         }
-        vtkstd::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
+      this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
+      }
+    vtkstd::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
     }
 
 
-    // Identify the first point to glyph.
-    if(this->RandomMode)
+  // Identify the first point to glyph.
+  if(this->RandomMode)
     {
-        this->BlockNextPoint = this->RandomPtsInDataset[0];
+    this->BlockNextPoint = this->RandomPtsInDataset[0];
     }
-    else
+  else
     {
-        this->BlockNextPoint=0;
-    }
+    this->BlockNextPoint=0;
+    } 
 }
 
 //-----------------------------------------------------------------------------
