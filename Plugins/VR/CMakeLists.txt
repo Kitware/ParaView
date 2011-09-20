@@ -29,6 +29,7 @@ QT4_WRAP_CPP(MOC_SRCS
   vtkVRActiveObjectManipulationStyle.h
   vtkVRInteractorStyle.h
   vtkVRPropertyStyle.h
+  vtkVRStyleGrabNUpdateMatrix.h
   vtkVRStyleGrabNRotateWorld.h
   vtkVRStyleGrabNTranslateWorld.h
   vtkVRStyleGrabNRotateSliceNormal.h
@@ -70,6 +71,7 @@ SET( VR_SOURCE_FILES
   vtkVRQueue.cxx
   vtkVRQueueHandler.cxx
   vtkVRPropertyStyle.cxx
+  vtkVRStyleGrabNUpdateMatrix.cxx
   vtkVRStyleGrabNRotateWorld.cxx
   vtkVRStyleGrabNTranslateWorld.cxx
   vtkVRStyleGrabNRotateSliceNormal.cxx

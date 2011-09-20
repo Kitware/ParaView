@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRVectorPropertyStyle.h"
 #include "vtkVRStyleTracking.h"
 #include "vtkVRStyleGrabNRotateWorld.h"
+#include "vtkVRStyleGrabNUpdateMatrix.h"
 #include "vtkVRStyleGrabNTranslateWorld.h"
 #include "vtkVRStyleGrabNRotateSliceNormal.h"
 #include "vtkVRStyleGrabNTranslateSliceOrigin.h"
@@ -185,6 +186,12 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
         else if (strcmp(class_name, "vtkVRStyleTracking")==0)
           {
           vtkVRStyleTracking* style = new vtkVRStyleTracking(this);
+          style->configure(child, locator);
+          this->add(style);
+          }
+        else if (strcmp(class_name, "vtkVRStyleGrabNUpdateMatrix")==0)
+          {
+          vtkVRStyleGrabNUpdateMatrix* style = new vtkVRStyleGrabNUpdateMatrix(this);
           style->configure(child, locator);
           this->add(style);
           }
