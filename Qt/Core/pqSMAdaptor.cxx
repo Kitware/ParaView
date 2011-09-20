@@ -505,9 +505,9 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
               break;
               }
             }
-          else
+          else if(Type == CHECKED)
             {
-            if(StringName == StringProperty->GetUncheckedElement(i))
+            if(StringName == StringProperty->GetElement(i))
               {
               value = StringProperty->GetElement(i+1);
               break;
