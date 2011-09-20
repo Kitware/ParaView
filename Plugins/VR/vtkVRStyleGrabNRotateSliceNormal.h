@@ -82,8 +82,6 @@ protected:
   void SetAnalogVectorValue( std::string dest,
                              const double* value,
                              unsigned int total);
-  // void RecordOrientation(vtkSMRenderViewProxy* proxy,  const vtkVREventData& data);
-  // void UpdateOrientation(const vtkVREventData& data);
   void SetTrackerValue( std::string dest, double value );
   void SetTrackerVectorValue( std::string dest, const double value[16] );
   std::vector<std::string> tokenize( std::string input);
