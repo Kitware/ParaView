@@ -119,7 +119,7 @@ IF (VTK_USE_MPI)
     TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallel vtkPVVTKExtensions)
 
     ADD_TEST(TestDistributedSubsetSortingTable
-            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 8 ${VTK_MPI_PREFLAGS}
+            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
             ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/DistributedSubsetSortingTable
             -D ${VTK_DATA_ROOT}
             -T ${VTK_BINARY_DIR}/Testing/Temporary

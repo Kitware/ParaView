@@ -533,6 +533,7 @@ void vtkSpyPlotUniReader::PrintInformation()
     vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+dump;
     vtkDebugMacro( "  " << dump );
     vtkTypeInt64 offset = this->DumpOffset[dump];
+    static_cast<void>(offset); // unused-variable warning.
     vtkDebugMacro( "    offset:   " << offset << " number of variables: " 
                    << dp->NumVars );
     int var;

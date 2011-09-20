@@ -500,6 +500,7 @@ void vtkPVComparativeView::AddNewView()
 
     vtkSMProxy* clone =
       this->Internal->AddRepresentationClone(repr, newView);
+    static_cast<void>(clone); // unused variable warning.
     assert(clone != NULL);
     }
 }

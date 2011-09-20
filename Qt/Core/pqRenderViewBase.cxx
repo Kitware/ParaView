@@ -240,8 +240,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
   renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
   if( renderViewProxy != NULL )
     {
-    pqProgressManager* progressManager;
-    progressManager = pqApplicationCore::instance()->getProgressManager();
     // Generate Signals when interaction event occurs ??? Here ???
     this->getConnector()->Connect(
         renderViewProxy->GetInteractor(),
@@ -297,7 +295,7 @@ void pqRenderViewBase::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 
   this->restoreSettings(false);
-  this->resetCamera();
+  proxy->InvokeCommand("ResetCamera");
 }
 
 //-----------------------------------------------------------------------------

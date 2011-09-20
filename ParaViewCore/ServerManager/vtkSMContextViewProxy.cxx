@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMContextViewProxy.h"
 
+#include "vtkChart.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkObjectFactory.h"
@@ -95,6 +96,12 @@ vtkChart* vtkSMContextViewProxy::GetChart()
     this->GetClientSideObject());
   return pvview? pvview->GetChart() : NULL;
 }
+//-----------------------------------------------------------------------------
+void vtkSMContextViewProxy::ResetDisplay()
+{
+  this->GetChart()->RecalculateBounds();
+  this->GetChartView()->Render();
+}
 
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
@@ -106,9 +113,21 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetChartView()->GetRenderWindow());
   w2i->SetMagnification(magnification);
+
+  // Use front buffer on Windows for now until we can figure out
+  // the bug with Charts when using the back buffer.
+#ifdef WIN32
   w2i->Update();
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
+#else
+  // Everywhere else use back buffer.
+  w2i->ReadFrontBufferOff();
+  // ShouldRerender was turned off previously. Why? Since we told w2i to read
+  // backbuffer, shouldn't we re-render again?
+  w2i->ShouldRerenderOn();
+  w2i->Update();
+#endif
 
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());

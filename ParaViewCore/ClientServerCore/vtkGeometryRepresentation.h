@@ -124,6 +124,19 @@ public:
   // Returns the data object that is rendered from the given input port.
   virtual vtkDataObject* GetRenderedDataObject(int port);
 
+  // Description:
+  // Returns true if this class would like to get ghost-cells if available for
+  // the connection whose information object is passed as the argument.
+  static bool DoRequestGhostCells(vtkInformation* information); 
+
+  // Description:
+  // Representations that use geometry representation as the internal
+  // representation should turn this flag off so that we don't end up requesting
+  // ghost cells twice.
+  vtkSetMacro(RequestGhostCellsIfNeeded, bool);
+  vtkGetMacro(RequestGhostCellsIfNeeded, bool);
+  vtkBooleanMacro(RequestGhostCellsIfNeeded, bool);
+
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
   void SetUseOutline(int);
@@ -255,6 +268,7 @@ protected:
   int Representation;
   bool SuppressLOD;
   bool AllowSpecularHighlightingWithScalarColoring;
+  bool RequestGhostCellsIfNeeded;
 
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented

@@ -80,12 +80,7 @@ public:
 
   // This flag indicates if the QObject and the vtkSMProperty are out of synch. 
   bool OutOfSync;
-
-  // the current property being worked with (global)
-  static vtkSMProperty* SettingProperty;
 };
-
-vtkSMProperty* pqPropertyLinksConnection::pqInternal::SettingProperty = NULL;
 
 class pqPropertyLinks::pqInternal
 {
@@ -163,12 +158,7 @@ void pqPropertyLinksConnection::triggerDelayedSMLinkedPropertyChanged()
 void pqPropertyLinksConnection::smLinkedPropertyChanged() 
 {
   this->Internal->Updating = false;
-  if(this->Internal->SettingProperty == this->Internal->Property)
-    {
-    return;
-    }
   this->Internal->OutOfSync = true;
-  this->Internal->SettingProperty = this->Internal->Property;
 
   if(this->Internal->QtObject)
     {
@@ -303,18 +293,12 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
       }
     }
-  this->Internal->SettingProperty = NULL;
   emit this->smPropertyChanged();
 }
 
 void pqPropertyLinksConnection::qtLinkedPropertyChanged() 
 {
-  if(this->Internal->SettingProperty == this->Internal->Property)
-    {
-    return;
-    }
   this->Internal->OutOfSync = true;
-  this->Internal->SettingProperty = this->Internal->Property;
 
   if(this->Internal->QtObject)
     {
@@ -539,7 +523,6 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
       break;
       }
     }
-  this->Internal->SettingProperty = NULL;
   emit this->qtWidgetChanged();
 }
 

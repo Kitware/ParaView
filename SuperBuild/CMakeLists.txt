@@ -10,7 +10,7 @@ if(APPLE)
   if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
     set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "force build for 64-bit Leopard" FORCE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5" CACHE STRING "force build for 64-bit Leopard" FORCE)
-    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk" CACHE PATH "force build for 64-bit Leopard" FORCE)
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk" CACHE PATH "force build for 64-bit Leopard" FORCE)
   endif()
 
   set(pv_apple_compiler_args
@@ -44,7 +44,7 @@ set(CMAKE_MODULE_PATH
 # Enable and setup External project global properties
 #-----------------------------------------------------------------------------
 
-INCLUDE(ExternalProject)
+include(ExternalProject)
 
 #-----------------------------------------------------------------------------
 # Git protocol option
@@ -123,6 +123,10 @@ endif()
 include(CheckFortran)
 
 #------------------------------------------------------------------------------
+CONFIGURE_FILE(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CTestCustom.ctest.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/CTestCustom.ctest @ONLY)
+
+#------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
 #------------------------------------------------------------------------------
 
@@ -150,6 +154,7 @@ if(NOT APPLE)
   endif()
 
   set(MPI_ARGS
+    -DMPI_DIR:PATH=${MPI_INSTALL}
     -DPARAVIEW_USE_MPI:BOOL=ON
     -DMPIEXEC:FILEPATH=${MPIEXEC}
     -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
@@ -169,7 +174,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER)
+  if(CMAKE_Fortran_COMPILER AND NOT WIN32 AND NOT UNIX)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
@@ -211,18 +216,20 @@ else()
   find_package(MPI)
   set(MPI_ARGS
     -DPARAVIEW_USE_MPI:BOOL=ON
+    -DMPI_DIR:PATH=${MPI_INSTALL}
     -DMPIEXEC:FILEPATH=${MPIEXEC}
     -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
     -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
-    -DPARAVIEW_INSTALL_MPIEXEC:BOOL=OFF)
+    -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
 
   include(External_NUMPY)
 endif()
 
 set(MANTA_ARGS)
 # Manta doesn't compile on Windows x64 currently
-if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
+#if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
+if(NOT WIN32)
   include(External_Manta)
   set(MANTA_ARGS
     -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
@@ -273,10 +280,14 @@ list(APPEND ParaView_dependencies HDF5)
 include(External_HDF5)
 set(HDF5_ARGS
   -DVTK_USE_SYSTEM_HDF5:BOOL=ON
+  -DHDF5_DIR:PATH=${HDF5_install}
+  -DHDF5_FOUND:BOOL=ON
   -DHDF5_INCLUDE_DIRS:PATH=${HDF5_INCLUDE_DIR}
   -DHDF5_INCLUDE_DIR:PATH=${HDF5_INCLUDE_DIR}
   -DHDF5_LIBRARIES:FILEPATH=${HDF5_LIBRARY}
-  -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY})
+  -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
+  -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY})
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_install}/bin)
@@ -358,7 +369,7 @@ if(ParaView_BUILD_DOCUMENTATION)
     -DPARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
     -DGENERATE_FILTERS_DOCUMENTATION:BOOL=ON
     -DDOCUMENTATION_HTML_HELP:BOOL=ON
-    -DPARAVIEW_USERS_GUIDE:FILEPATH=${PARAVIEW_USERS_GUIDE}
+  #  -DPARAVIEW_USERS_GUIDE:FILEPATH=${PARAVIEW_USERS_GUIDE}
   )
 endif()
 
@@ -374,6 +385,8 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
+    -DCMAKE_CXX_FLAGS:STRING=${pv_cxx_flags}
+    -DCMAKE_C_FLAGS:STRING=${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
@@ -389,6 +402,7 @@ ExternalProject_Add(${proj}
     -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
     -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
     -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+    -DPARAVIEW_INSTALL_PYTHON:BOOL=ON
     # Qt
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     # MPI

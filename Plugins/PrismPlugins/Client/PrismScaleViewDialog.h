@@ -32,7 +32,7 @@ protected slots:
 
 protected:
   bool hasCustomBounds() const;
-  void modeChanged(const int& pos, const int& value);
+  void modeChanged(const int& position, const int& value);
   void setupViewInfo();
   void updateView();
 

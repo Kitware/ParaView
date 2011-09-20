@@ -160,14 +160,13 @@ bool vtkSMSessionClient::Connect(const char* url)
     "^cdsrsrc://(([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?)?");
 
   vtksys_ios::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION_FULL;
+  handshake << "handshake=paraview." << PARAVIEW_VERSION;
   // Add connect-id if needed (or maybe we extract that from url as well
   // (just like vtkNetworkAccessManager).
 
   vtkstd::string data_server_url;
   vtkstd::string render_server_url;
 
-  bool using_reverse_connect = false;
   if (pvserver.find(url))
     {
     vtkstd::string hostname = pvserver.match(1);
@@ -186,7 +185,6 @@ bool vtkSMSessionClient::Connect(const char* url)
     stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << handshake.str();
     data_server_url = stream.str();
 
-    using_reverse_connect = true;
     }
   else if (pvrenderserver.find(url))
     {
@@ -224,7 +222,6 @@ bool vtkSMSessionClient::Connect(const char* url)
     stream << "tcp://localhost:" << rsport
       << "?listen=true&nonblocking=true&" << handshake.str();
     render_server_url = stream.str();
-    using_reverse_connect = true;
     }
 
   bool need_rcontroller = render_server_url.size() > 0;

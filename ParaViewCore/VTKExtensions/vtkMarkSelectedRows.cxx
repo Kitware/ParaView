@@ -71,7 +71,6 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
     return 1;
     }
 
-  bool something_selected = false;
   // Locate the selection node that may be applicable to the input.
   // This is determined by using the existence of special array in the input
   // such as vtkOriginalIndices, vtkOriginalProcessIds, vtkCompositeIndexArray
@@ -133,7 +132,6 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
       if (node->GetSelectionList()->LookupValue(vtkVariant(originalId)) != -1)
         {
         selected->SetValue(cc, 1);
-        something_selected = true;
         }
       }
     }

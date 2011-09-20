@@ -67,6 +67,8 @@ SET (PY_TESTS
   PythonPVSimpleSphere
   PythonSMTraceTest1
   PythonSMTraceTest2
+  PythonAnimationTrack
+  GhostCellsInMergeBlocks
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )
@@ -89,6 +91,7 @@ SET(PY_TESTS_NO_BASELINE
   CellIntegrator
   CSVWriterReader
   IntegrateAttributes
+  Plugins
   ProgrammableFilter
   ProxyManager
   SMPropertyAdaptor

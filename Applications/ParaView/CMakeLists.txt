@@ -16,7 +16,7 @@ set (QT_USE_QTNETWORK TRUE)
 include(${QT_USE_FILE})
 
 include_directories(
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ParaView_SOURCE_FILES
@@ -228,32 +228,30 @@ install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 #
 if(APPLE)
 
-  set (ParaView_BUNDLE_LOCATION "" CACHE STRING
-  "Subdirectory in which to place ParaView app inside a bundle.")
+  option(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE "Build ParaView as a Mac Application Bundle" ON)
+  if(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
+    set (ParaView_BUNDLE_LOCATION "" CACHE STRING
+      "Subdirectory in which to place ParaView app inside a bundle.")
 
-  mark_as_advanced(ParaView_BUNDLE_LOCATION)
+    mark_as_advanced(ParaView_BUNDLE_LOCATION)
 
-  set(distributed_plugins ${PARAVIEW_PLUGINLIST})
-  set(PV_EXE_NAME "paraview")
-  set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
-    "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
-  set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
-    "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
+    set(distributed_plugins ${PARAVIEW_PLUGINLIST})
+    set(PV_EXE_NAME "paraview")
+    set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
+      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
+    set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
+      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
     
-  set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
+    set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
 
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
-    "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
-    "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+      "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+      "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
 
-  install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+  endif(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
 endif(APPLE)
-
-set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
-if(PARAVIEW_VERSION_RC)
-  set(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
-endif(PARAVIEW_VERSION_RC)
 
 set(_package_name "ParaView")
 if(PARAVIEW_INSTALL_DEVELOPMENT)
@@ -267,7 +265,7 @@ build_paraview_client_cpack_config_init(
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH ${_VERSION_PATCH}
+    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
     DESCRIPTION "ParaView is a scientific visualization tool"
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"

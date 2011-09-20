@@ -68,5 +68,6 @@
   <Proxy group="sources" name="WindBladeReader" />
   <Proxy group="sources" name="NetCDFCAMReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
+  <Proxy group="sources" name="PNetCDFPOPReader" />
   <Proxy group="sources" name="MPASReader" />
 </ParaViewReaders>

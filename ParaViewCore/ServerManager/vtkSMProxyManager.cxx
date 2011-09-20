@@ -440,7 +440,7 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
-    int size = 0;
+    size_t size = 0;
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
     for (; it2 != it->second.end(); ++it2)
@@ -494,6 +494,20 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
   this->RegisterProxy(protype_group.c_str(), name, proxy);
   proxy->Delete();
   return proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RemovePrototype(
+  const char* groupname, const char* proxyname)
+{
+  vtkstd::string prototype_group = groupname;
+  prototype_group += "_prototypes";
+  vtkSMProxy* proxy = this->GetProxy(prototype_group.c_str(), proxyname);
+  if (proxy)
+    {
+    // prototype exists, so remove it.
+    this->UnRegisterProxy(prototype_group.c_str(), proxyname, proxy);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1082,6 +1096,11 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
            info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
            this->InvokeEvent(event, &info);
            }
+         // Both these events imply that the definition may have somehow
+         // changed. If so, we need to ensure that any old prototypes we have
+         // for this proxy type are removed, otherwise we may end up using
+         // obsolete prototypes.
+         this->RemovePrototype(defInfo->GroupName, defInfo->ProxyName);
          break;
 
       default:

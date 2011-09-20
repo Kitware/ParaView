@@ -82,7 +82,7 @@ public:
     (int Piece, int NumPieces, double Resolution,
      double bounds[6], double &geometric_confidence,
      double &min, double &max, double &attribute_confidence,
-     unsigned long &numCells);
+     unsigned long &numCells, double **pNormal);
 
   //Description:
   //determines if the piece is in the piece cache filter's append slot

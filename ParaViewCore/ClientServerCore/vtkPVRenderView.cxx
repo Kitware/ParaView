@@ -58,6 +58,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
 #include "vtkWeakPointer.h"
@@ -813,7 +814,20 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   if (use_distributed_rendering &&
     this->OrderedCompositingBSPCutsSource->GetNumberOfInputConnections(0) > 0)
     {
-    this->OrderedCompositingBSPCutsSource->Update();
+    vtkMultiProcessController* controller =
+      vtkMultiProcessController::GetGlobalController();
+    if (controller && controller->GetNumberOfProcesses() > 1)
+      {
+      vtkStreamingDemandDrivenPipeline *sddp = vtkStreamingDemandDrivenPipeline::
+        SafeDownCast(this->OrderedCompositingBSPCutsSource->GetExecutive());
+      sddp->SetUpdateExtent
+        (0,controller->GetLocalProcessId(),controller->GetNumberOfProcesses(),0);
+      sddp->Update(0);
+      }
+    else
+      {
+      this->OrderedCompositingBSPCutsSource->Update();
+      }
     this->SynchronizedRenderers->SetKdTree(
       this->OrderedCompositingBSPCutsSource->GetPKdTree());
     this->RequestInformation->Set(KD_TREE(),
@@ -907,7 +921,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::DoDataDelivery(
-  bool using_lod_rendering, bool vtkNotUsed(using_remote_rendering))
+  bool using_lod_rendering, 
+  bool vtkNotUsed(using_remote_rendering)
+  )
 {
   if ((using_lod_rendering &&
     this->InteractiveRenderTime > this->UpdateTime) ||

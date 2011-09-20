@@ -153,7 +153,10 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     //since that breaks numerous other classes currently in ParaView
     //mainly because of subtle timing issues from QTimers that are expected
     //to expire in a certain order
-    pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
+    
+    //we are disabling this for the 3.12 release so we are sure we don't
+    //get tag mismatches in the release product 
+    //pqCoreUtilities::processEvents(QEventLoop::ExcludeUserInputEvents);
     }
   emit this->progress(message, progress_val);
   this->InUpdate = false;

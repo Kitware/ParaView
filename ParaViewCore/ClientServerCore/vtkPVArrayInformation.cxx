@@ -22,6 +22,7 @@
 #include "vtkInformationIterator.h"
 #include "vtkStringArray.h"
 #include "vtkStdString.h"
+#include "vtkPVPostFilter.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
@@ -799,31 +800,7 @@ void vtkPVArrayInformation::DetermineDefaultComponentName(
     this->DefaultComponentName = new vtkStdString();
     }
 
-  if (num_components <= 1)
-    {
-    this->DefaultComponentName->assign("");
-    }
-  else if (component_no == -1)
-    {
-    this->DefaultComponentName->assign("Magnitude");
-    }
-  else if (num_components <= 3 && component_no < 3)
-    {
-    const char* titles[] = {"X", "Y", "Z"};
-    this->DefaultComponentName->assign(titles[component_no]);
-    }
-  else if (num_components == 6)
-    {
-    const char* titles[] = {"XX", "YY", "ZZ", "XY", "YZ", "XZ"};
-    // Assume this is a symmetric matrix.
-    this->DefaultComponentName->assign(titles[component_no]);
-    }
-  else
-    {
-    vtkstd::ostringstream buffer;
-    buffer << component_no;
-    this->DefaultComponentName->assign(buffer.str());
-    }
+  this->DefaultComponentName->assign(vtkPVPostFilter::DefaultComponentName(component_no, num_components));
 }
 
 void vtkPVArrayInformation::AddInformationKeys(vtkPVArrayInformation *info)

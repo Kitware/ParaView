@@ -180,8 +180,12 @@ def CreateWriter(filename, proxy=None, **extraArgs):
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view
-    if not view: view = servermanager.GetRenderView()
-    if not view: view = CreateRenderView()
+    if not view:
+        # it's possible that there's no active view, but a render view exists.
+        # If so, locate that and return it (before trying to create a new one).
+        view = servermanager.GetRenderView()
+    if not view:
+        view = CreateRenderView()
     return view
 
 def GetRenderViews():
@@ -251,7 +255,10 @@ def ResetCamera(view=None):
     used."""
     if not view:
         view = active_objects.view
-    view.ResetCamera()
+    if hasattr(view, "ResetCamera"):
+        view.ResetCamera()
+    if hasattr(view, "ResetDisplay"):
+        view.ResetDisplay()
     Render(view)
 
 def _DisableFirstRenderCameraReset():
@@ -875,6 +882,22 @@ def LoadPlugin(filename, remote=True, ns=None):
         ns = globals()
     servermanager.LoadPlugin(filename, remote)
     _add_functions(ns)
+
+def LoadDistributedPlugin(pluginname, remote=True, ns=None):
+    """Loads a plugin that's distributed with the executable. This uses the
+    information known about plugins distributed with ParaView to locate the
+    shared library for the plugin to load. Raises a RuntimeError if the plugin
+    was not found."""
+    plm = servermanager.ProxyManager().GetSession().GetPluginManager()
+    if remote:
+        info = plm.GetRemoteInformation()
+    else:
+        info = plm.GetLocalInformation()
+    for cc in range(0, info.GetNumberOfPlugins()):
+        if info.GetPluginName(cc) == pluginname:
+            return LoadPlugin(info.GetPluginFileName(cc), remote, ns)
+    raise RuntimeError, "Plugin '%s' not found" % pluginname
+
 
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active

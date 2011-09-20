@@ -362,8 +362,8 @@ int vtkSciVizStatistics::RequestData(
       if ( ! ouModelCur )
         {
         vtkMultiBlockDataSet* outModelCur = vtkMultiBlockDataSet::New();
-        ouModelIter->GetDataSet()->SetDataSet( ouModelIter, ouModelCur );
-        ouModelCur->Delete();
+        ouModelIter->GetDataSet()->SetDataSet( ouModelIter, outModelCur );
+        outModelCur->Delete();
         }
       stat = this->RequestData(
         ouDataIter->GetCurrentDataObject(),

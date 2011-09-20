@@ -85,19 +85,25 @@ INCLUDE_DIRECTORIES(
 
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
-ADD_CUSTOM_COMMAND(
+# run it from a script so we can set necessary paths.
+
+configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
+               @ONLY)
+add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
-    COMMAND protoc_compiler
-      --cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}
-      --proto_path ${CMAKE_CURRENT_SOURCE_DIR}/Resources ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+    COMMAND ${CMAKE_COMMAND}
+    ARGS    -DOutDir=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler ${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_custom_target(
-  protobuf_code_generation ALL
-  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+  protobuf_code_generation
+  DEPENDS  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc ${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
 )
+
 #------------------------------------------------------------------------------
 
 SET(resourceFiles

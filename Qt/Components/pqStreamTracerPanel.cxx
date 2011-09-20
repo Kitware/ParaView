@@ -92,7 +92,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   
   // Get the boundaries of the new proxy ...
   double proxy_center[3] = {0.0, 0.0, 0.0};
-  double proxy_size[3] = {0.0, 0.0, 0.0};
 
   if(vtkSMInputProperty* const input_property =
     vtkSMInputProperty::SafeDownCast(
@@ -109,10 +108,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       proxy_center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
       proxy_center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
       proxy_center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
-
-      proxy_size[0] = fabs(input_bounds[1] - input_bounds[0]);
-      proxy_size[1] = fabs(input_bounds[3] - input_bounds[2]);
-      proxy_size[2] = fabs(input_bounds[5] - input_bounds[4]);
       }
     }
 

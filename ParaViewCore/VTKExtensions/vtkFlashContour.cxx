@@ -1168,9 +1168,6 @@ void vtkFlashContour::ProcessCellFinal(
   edge = triCase->edges; 
   double pt[3];
 
-  // Save the edge point ids incase we need to create a capping surface.
-  vtkIdType edgePointIds[12]; // Is six the maximum?
-
   // loop over triangles  
   while(*edge > -1)
     {
@@ -1208,7 +1205,7 @@ void vtkFlashContour::ProcessCellFinal(
           this->PassArray->InsertNextValue(value);
           }
         }
-      edgePointIds[*edge] = pointIds[ii] = ptId; 
+      pointIds[ii] = ptId; 
       }
     if (pointIds[0]!=pointIds[1] && pointIds[0]!=pointIds[2] && pointIds[1]!=pointIds[2])
       {

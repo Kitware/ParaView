@@ -27,7 +27,7 @@ SET ( EXES_LIBS_EXPORT_DIR ${VTK_DIR} )
 MARK_AS_ADVANCED ( EXES_LIBS_EXPORT_DIR )
 
 # Set specific VTK libraries to link against
-SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics)
+SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics vtkFiltering)
 IF ( VTK_USE_PARALLEL )
   SET (VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkParallel )
 ENDIF( VTK_USE_PARALLEL )
@@ -152,6 +152,7 @@ SET ( MANTA_SRCS
 # Create vtkManta libraries
 #TODO: Should we put the wrapping srcs here too? 
 #Right now, ${vtkMantaInstantiator_SRCS} is empty
+
 ADD_LIBRARY ( ${PROJECT_NAME} ${MANTA_SRCS})
 TARGET_LINK_LIBRARIES ( ${PROJECT_NAME} 
   ${VTK_LINK_LIBRARIES} ${MANTA_LINK_LIBRARIES} )

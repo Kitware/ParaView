@@ -1009,6 +1009,7 @@ void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
 
   QSet<QString> exceptions;
   exceptions.insert("Representation");
+  exceptions.insert("Visibility");
 
   vtkSMProxy* reprProxy = repr->getProxy();
   vtkSMProxy* inputReprProxy = input_repr->getProxy();
@@ -1024,7 +1025,8 @@ void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
     vtkSMProperty* source = iter->GetProperty();
     if (dest && source &&
       strcmp(dest->GetClassName(), source->GetClassName())==0 &&
-      !dest->IsA("vtkSMProxyProperty"))
+      !dest->IsA("vtkSMProxyProperty")
+      )
       {
       dest->Copy(source);
       }

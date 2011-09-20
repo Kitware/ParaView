@@ -225,7 +225,7 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
 //    property->AddObserver(vtkCommand::ModifiedEvent,
 //      this->Internals->PropertyObserver);
 //    }
-  
+
 //  this->Synchronize();
 //  this->Modified();
 //}

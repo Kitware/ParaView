@@ -44,7 +44,11 @@ void vtkSMObject::SetProxyManager(vtkSMProxyManager* pm)
     }
   if (vtkSMObject::ProxyManager)
     {
-    vtkSMObject::ProxyManager->UnRegister(0);
+    // this indirect cleanup ensures that we don't accidentally end up calling
+    // the destructor on the vtkSMObject::ProxyManager twice.
+    vtkSMProxyManager* temp = vtkSMObject::ProxyManager;
+    vtkSMObject::ProxyManager = NULL;
+    temp->UnRegister(0);
     }
   if (pm)
     {

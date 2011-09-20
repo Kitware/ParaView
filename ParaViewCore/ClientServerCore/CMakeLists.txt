@@ -125,6 +125,7 @@ ENDIF (PARAVIEW_USE_ICE_T AND VTK_USE_MPI)
 
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(Kit_SRCS ${Kit_SRCS}
+    vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
     vtkPythonProgrammableFilter.cxx
     )
@@ -159,7 +160,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVView.cxx
   vtkSession.cxx
   vtkTileDisplayHelper.cxx
-
   ABSTRACT)
 
 INCLUDE_DIRECTORIES(
@@ -170,6 +170,7 @@ INCLUDE_DIRECTORIES(
   ${PVClientServerCore_SOURCE_DIR}
   ${PVClientServerCore_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
+  ${VTK_ZLIB_INCLUDE_DIRS}
   )
 
 IF (VTK_USE_MPI)

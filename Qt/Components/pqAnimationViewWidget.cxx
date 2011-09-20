@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqAnimationViewWidget.h"
+#include "ui_pqPythonAnimationCue.h"
 
 #include <QComboBox>
 #include <QDialog>
@@ -40,9 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QLineEdit>
 #include <QPointer>
+#include <QPushButton>
 #include <QSignalMapper>
 #include <QSpinBox>
-#include <QPushButton>
+#include <QtDebug>
 #include <QVBoxLayout>
 
 #include "pqActiveView.h"
@@ -69,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkCamera.h"
+#include "vtkPVConfig.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -133,6 +136,10 @@ public:
       {
       name = "Camera";
       }
+    else if (this->pythonCue(cue))
+      {
+      name = "Python";
+      }
     else
       {
       pqServerManagerModel* model = 
@@ -194,6 +201,16 @@ public:
   bool cameraCue(pqAnimationCue* cue)
     {
     if(cue && QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
+      {
+      return true;
+      }
+    return false;
+    }
+
+  /// returns true if the cue is a python cue.
+  bool pythonCue(pqAnimationCue* cue)
+    {
+    if(QString("PythonAnimationCue") == cue->getProxy()->GetXMLName())
       {
       return true;
       }
@@ -298,6 +315,9 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
 
   this->Internal->CreateSource = new pqAnimatableProxyComboBox(w)
     << pqSetName("ProxyCombo");
+#ifdef PARAVIEW_ENABLE_PYTHON
+  this->Internal->CreateSource->addProxy(0, "Python", NULL);
+#endif
   this->Internal->CreateProperty = new pqAnimatablePropertiesComboBox(w)
     << pqSetName("PropertyCombo");
   this->Internal->CreateSource->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -492,6 +512,7 @@ void pqAnimationViewWidget::onSceneCuesChanged()
 
 }
   
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
 {
   pqAnimationCue* cue = qobject_cast<pqAnimationCue*>(cueObject);
@@ -545,6 +566,7 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updateSceneTimeRange()
 {
   pqAnimationModel* animModel =
@@ -554,6 +576,7 @@ void pqAnimationViewWidget::updateSceneTimeRange()
   animModel->setEndTime(timeRange.second);
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updateSceneTime()
 {
   double time =
@@ -564,6 +587,7 @@ void pqAnimationViewWidget::updateSceneTime()
   animModel->setCurrentTime(time);
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setCurrentTime(double t)
 {
   vtkSMPropertyHelper(
@@ -571,6 +595,7 @@ void pqAnimationViewWidget::setCurrentTime(double t)
   this->Internal->Scene->getProxy()->UpdateVTKObjects();
 }
   
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track, 
                                             pqAnimationKeyFrame* kf, 
                                             int edge, double time)
@@ -604,6 +629,7 @@ void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 {
   pqAnimationCue* cue = this->Internal->findCue(track);
@@ -622,6 +648,21 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     {
     this->Internal->Editor = 
       new pqPipelineTimeKeyFrameEditor(this->Internal->Scene, cue, NULL);
+    }
+  else if (this->Internal->pythonCue(cue))
+    {
+    QDialog dialog(this);
+    Ui::PythonAnimationCue ui;
+    ui.setupUi(&dialog);
+    ui.script->setPlainText(
+      vtkSMPropertyHelper(cue->getProxy(), "Script").GetAsString());
+    if (dialog.exec() == QDialog::Accepted)
+      {
+      vtkSMPropertyHelper(cue->getProxy(), "Script").Set(
+        ui.script->toPlainText().toAscii().data());
+      cue->getProxy()->UpdateVTKObjects();
+      }
+    return;
     }
   else
     {
@@ -653,6 +694,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
   this->Internal->Editor->show();
 }
   
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updatePlayMode()
 {
   pqAnimationModel* animModel =
@@ -708,6 +750,7 @@ void pqAnimationViewWidget::updatePlayMode()
 
 }
   
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::updateTicks()
 {
   pqAnimationModel* animModel =
@@ -755,6 +798,7 @@ void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
   END_UNDO_SET();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setActiveView(pqView* view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
@@ -765,6 +809,7 @@ void pqAnimationViewWidget::setActiveView(pqView* view)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setCurrentSelection(pqServerManagerModelItem* item)
 {
   pqProxy* pxy = qobject_cast<pqProxy*>(item);
@@ -778,6 +823,7 @@ void pqAnimationViewWidget::setCurrentSelection(pqServerManagerModelItem* item)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
 {
   if(vtkSMRenderViewProxy::SafeDownCast(pxy))
@@ -798,6 +844,7 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::createTrack()
 {
   vtkSMRenderViewProxy* ren =
@@ -817,9 +864,25 @@ void pqAnimationViewWidget::createTrack()
     pindex = 0;
     }
 
+  if(!curProxy)
+    {
+    // curProxy == NULL is only used for "Python" track for now. Of course,
+    // we only support that when python is enabled.
+    // we allow creating as many python tracks as needed, hence we don't check
+    // if there exists a track already (which is the case with others).
+#ifdef PARAVIEW_ENABLE_PYTHON
+    this->createPythonTrack();
+#endif
+    return;
+    }
+
   // check that we don't already have one
   foreach(pqAnimationCue* cue, this->Internal->TrackMap.keys())
     {
+    if (cue->getAnimatedProxy() == NULL)
+      {
+      continue; // skip Python tracks.
+      }
     if(cue->getAnimatedProxy() == curProxy &&
        cue->getAnimatedProxy()->GetPropertyName(cue->getAnimatedProperty()) == pname &&
        cue->getAnimatedPropertyIndex() == pindex)
@@ -828,12 +891,6 @@ void pqAnimationViewWidget::createTrack()
       }
     }
   
-  if(!curProxy)
-    {
-    // hmm something went wrong
-    return;
-    }
-
   pqOrbitCreatorDialog creator(this);
 
   // if mode=="orbit" show up a dialog allowing the user to customize the
@@ -888,4 +945,20 @@ void pqAnimationViewWidget::createTrack()
     }
 
   END_UNDO_SET();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::createPythonTrack()
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  BEGIN_UNDO_SET("Add Animation Track");
+
+  pqAnimationCue* cue = this->Internal->Scene->createCue("PythonAnimationCue");
+  Q_ASSERT(cue != NULL);
+  (void)cue;
+  END_UNDO_SET();
+#else
+  qCritical() << "Python support not enabled. Please recompile ParaView "
+    "with Python enabled.";
+#endif
 }

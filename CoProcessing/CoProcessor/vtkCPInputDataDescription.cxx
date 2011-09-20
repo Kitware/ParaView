@@ -95,7 +95,7 @@ const char* vtkCPInputDataDescription::GetFieldName(unsigned int fieldIndex)
     return 0;
     }
 
-  if (fieldIndex >= 
+  if (fieldIndex >=
     static_cast<unsigned int>(this->Internals->PointFields.size()))
     {
     fieldIndex -=
@@ -184,7 +184,7 @@ bool vtkCPInputDataDescription::IsInputSufficient()
     iter->Delete();
     return true;
     }
-  
+
   return false; // false because of unknown grid type
 }
 
@@ -202,7 +202,7 @@ bool vtkCPInputDataDescription::DoesGridContainNeededFields(vtkDataSet* dataSet)
       return false;
       }
     }
-  
+
   for (iter = this->Internals->CellFields.begin();
     iter != this->Internals->CellFields.end();
     ++iter)

@@ -305,6 +305,16 @@ void pqStreamingControls::updateTrackedView()
        driver, driver->GetProperty("RefinementDepth"));
 
     this->Internals->ViewLinks.addPropertyLink
+      (this->Internals->cell_pixel_factor, "value",
+       SIGNAL(valueChanged(double)),
+       driver, driver->GetProperty("CellPixelFactor"));
+
+    this->Internals->ViewLinks.addPropertyLink
+      (this->Internals->back_face_factor, "value",
+       SIGNAL(valueChanged(double)),
+       driver, driver->GetProperty("BackFaceFactor"));
+
+    this->Internals->ViewLinks.addPropertyLink
       (this->Internals->max_depth, "value", SIGNAL(valueChanged(int)),
        driver, driver->GetProperty("DepthLimit"));
 

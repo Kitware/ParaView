@@ -1,0 +1,253 @@
+SET(CTEST_CUSTOM_MEMCHECK_IGNORE
+  ${CTEST_CUSTOM_MEMCHECK_IGNORE}
+  TestSetGet
+  otherPrint-ParaView
+  Example-vtkLocal
+  Example-vtkMy
+
+  # These tests do not actually run any VTK code
+  HeaderTesting-Common
+  HeaderTesting-Filtering
+  HeaderTesting-Graphics
+  HeaderTesting-GenericFiltering
+  HeaderTesting-Imaging
+  HeaderTesting-IO
+  HeaderTesting-Rendering
+  HeaderTesting-VolumeRendering
+  HeaderTesting-Hybrid
+  HeaderTesting-Parallel
+  HeaderTesting-Widgets
+  HeaderTesting-Infovis
+  HeaderTesting-Geovis
+  HeaderTesting-Views
+
+  HeaderTesting-PVServer-Common
+  HeaderTesting-PVServer-Filters
+  HeaderTesting-PVServer-ServerManager
+  HeaderTesting-KWCommon
+  HeaderTesting-KWWidgets
+  HeaderTesting-PVGUI-Client
+
+  PrintSelf-KWWidgets
+  PrintSelf-PVGUI-Client
+  PrintSelf-PVServer-Common
+  PrintSelf-PVServer-Filters
+  PrintSelf-PVServer-ServerManager
+  PrintSelf-ParaView
+  TestSetGet-ParaView
+  TestSetObjectMacro-KWWidgets
+  TestSetObjectMacro-PVGUI-Client
+  TestSetObjectMacro-PVServer-Common
+  TestSetObjectMacro-PVServer-Filters
+  TestSetObjectMacro-PVServer-ServerManager
+  TestSetObjectMacro-ParaView
+
+  # this one runs python which then runs two program so no memory checking there
+  Sockets-image
+  )
+
+SET(CTEST_CUSTOM_WARNING_MATCH
+  ${CTEST_CUSTOM_WARNING_MATCH}
+  "{standard input}:[0-9][0-9]*: Warning: "
+  )
+
+IF("@CMAKE_SYSTEM@" MATCHES "OSF")
+  SET(CTEST_CUSTOM_WARNING_EXCEPTION
+    ${CTEST_CUSTOM_WARNING_EXCEPTION}
+    "XdmfDOM"
+    "XdmfExpr"
+    "vtkKWApplication"
+    "vtkKWObject"
+    )
+ENDIF("@CMAKE_SYSTEM@" MATCHES "OSF")
+
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "tcl8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
+  "tcl8.4.5/[^/]+/[^/]+/[^.]+.c[:\"]"
+  "tcl8.4.5/[^/]+/[^/]+.c[:\"]"
+  "tk8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
+  "tk8.4.5/[^/]+/[^/]+/[^.]+.c[:\"]"
+  "tk8.4.5/[^/]+/[^/]+.c[:\"]"
+  "VTK/Utilities/vtktiff/"
+  "VTK/Utilities/vtkmpeg2encode/"
+  "xhash.[0-9]+. : warning C4996: .+ was declard deprecated"
+  "xtree.[0-9]+. : warning C4702: unreachable code"
+  "warning LNK4221"
+  "variable .var_args[2]*. is used before its value is set"
+  "jobserver unavailable"
+  "warning: \\(Long double usage is reported only once for each file"
+  "warning: To disable this warning use"
+  "ranlib: file: .+ has no symbols"
+  "could not be inlined"
+  "qt3/include/q"
+  ".include.QtCore"
+  "include/features.h"
+  "Qt/Python/pqPythonStream"
+  "ython.+/pyconfig.h"
+  "vtkfreetype.src"
+  "vtkfreetype.include"
+  "OSServices.framework"
+  "QD.framework/Headers/Quickdraw.h"
+  "warning: argument .+ might be clobbered by .longjmp. or .vfork."
+  "Microsoft Visual Studio/VC98/include"
+  ".include.qtcore"
+  "[Xx]dmf.libsrc"
+  "[Xx]dmf2.libsrc"
+  ".include.openmpi"
+  "warning LNK4098"
+  "include/mpicxx.h"
+  "mpi4py"
+  "ClientServer.cxx"
+  "vtkexodus2.*conversion from 'size_t' to 'int', possible loss of data"
+
+  # Supress warning from Utilities, these are 3rd party code
+  # so many a times there's not much we can fix.
+  "Utilities.mpi4py"
+  "Utilities.Xdmf2.libsrc"
+  "Utilities.Xdmf2.Ice"
+  "Utilities.IceT"
+  "vtk.*tab.c"
+  "Utilities.vtksqlite"
+  "Utilities.vtkexodus2"
+  "Utilities.VPIC"
+  "Utilities.vtkpng"
+
+  # suppress warning from H5Part library.
+  ".H5Part.src"
+
+  # suppress warning from MPI library.
+  "/mpicxx.h:"
+
+  # ignore all size_t to int conversion warnings.
+  "conversion from 'size_t' to"
+
+  # ignore protobuf generated code warning
+  "vtkPVMessage.pb.h"
+  "vtkSMMessage.h.*pragma GCC diagnostic"
+  "/google/protobuf/"
+
+  # ignore VRPN warnings
+  ".*vrpn.*"
+
+  # Numpy warnings
+  "_configtest.*warning"
+  # C4244: 'conversion' conversion from 'type1' to 'type2', possible loss of data
+  # C4028: formal parameter 'number' different from declaration
+  # C4996: 'function': was declared deprecated
+  # C4133: '=' : incompatible types - from 'PyArray_Descr *' to 'PyObject *'
+  # C4146: unary minus operator applied to unsigned type, result still unsigned
+  # C4716: function '...' : must return a value
+  # C4723: Potential divide by zero
+  "numpy.(core|numarray|linalg|random).*warning (C4244|C4028|C4996|C4133|C4146|C4716|C4723)"
+  # warning: assignment from incompatible pointer type
+  # warning: ‘...’ defined but not used
+  # warning: ‘...’ may be used uninitialized in this function
+  "numpy.(core).*warning.*(assignment|defined but not used|uninitialized)"
+  "NUMPY.*Warning"
+  # Mac
+  "numpy.core.src.multiarray.descriptor.*was declared here"
+
+  # CLAPACK
+  "CLAPACK.BLAS.SRC"
+  "CLAPACK.F2CLIBS.libf2c"
+
+  # Make
+  "warning: jobserver unavailable"
+
+  # Python - Windows
+  "Modules.zlib.gzio"
+  "Modules._ctypes.libffi_msvc.ffi.*warning C4018"
+  "Modules.audioop.c.*warning C4018"
+  "Modules._multiprocessing.*warning"
+  # Python - Linux
+  "dist.py.*UserWarning.*licence.*distribution option is deprecated"
+  "Objects.unicodeobject.c.*warning:.*differ in signedness"
+  "[Ii]nclude.(string|unicodeobject).h.*note: expected ‘const char *’ but argument is of type ‘unsigned char *’"
+  "Modules.(getpath|signalmodule).c.*warning: ignoring return value of.*declared with attribute warn_unused_result"
+  "Modules.expat.xmlparse.*warning.*discards qualifiers from pointer target type"
+  # Python - Mac
+  "ranlib: file:.*libpython2.6.a.*has no symbols"
+  "python.Modules._cursesmodule.c.*warning.*may be used uninitialized in this function"
+  "python.Mac.Modules.(cf|Nav).*warning: (cast|unused)"
+  "python.Modules._ctypes.*warning: function declaration isn't a prototype"
+  "QuickTime.framework.QuickTime, missing required architecture x86_64 in file"
+  "python.Modules._ssl.*incompatible pointer type"
+  "python.Mac.Modules.carbonevt.*defined but not used"
+  "python.Mac.Modules.qt._Qtmodule.*used uninitialized in this function"
+  "Modules.main.c.*warning: format not a string literal and no format arguments"
+  # About redefinition of symbols
+  "pyconfig.h.*warning:.*redefined"
+  "features.h.*"
+
+  # Visual studio spurious warnings...
+  "The following environment variables were not found"
+
+  # Since NUMPY has test that return build errors, let's add the following exception
+  "WARNING non-zero return value in ctest from"
+  )
+
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  # Some VTK dashboards include building bits of Qt which produce lots of
+  # the following warnings when built with the MS compilers. Qt guys should
+  # fix their code. Until they do, keep the Qt chatter off the VTK dashboard
+  # results:
+  "include.[Qq]t([Cc]ore|[Gg]ui).*warning C4127: conditional expression is constant"
+  "[Qq]t.*h.*warning.*declaration of .* shadows a member of .this"
+  "[Qq]t.*h.*warning.*(copy constructor|assignment operator) could not be generated"
+
+  # disable any warning coming from Qt headers.
+  "[Qq]t.*/include/qt.*"
+
+  # Suppress warning caused when QT 'foreach' loops are combined
+  ".*warning: declaration of '_container_' shadows a previous local.*warning: shadowed declaration is here"
+
+  # disable warnings from UI files.
+  "ui_.*"
+  )
+
+IF(APPLE)
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "warning -.: directory name .* does not exist"
+  "OpenTransport.*warning.*is deprecated"
+
+  # Somebody will have to get rid of these calls eventually (bug 4001) to
+  # eliminate these warnings. For now, mask them out of dashboard results:
+  "vtkCarbonRenderWindow.cxx.*warning: .(New|Diff|Equal|Dispose)Rgn. is deprecated"
+  )
+ENDIF(APPLE)
+
+SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
+  ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
+  "Common.KWCommon.*"
+  "vtk.*CSInit.cxx"
+  "vtkKWParaViewInit.cxx"
+  "vtk[^\\.]+ClientServer.cxx"
+  "vtk[^\\.]+Python.cxx"
+  "vtkSNL"
+  "GUI/Widgets"
+  "moc_[^\\.]+.cxx"
+  "ui_[^\\.]+.h"
+  "qrc_[^\\.]+.cxx"
+  "Utilities.Xdmf2.libsrc.*"
+  "Utilities.VisItBridge.avt"
+  "Utilities.VisItBridge.CMake"
+  "Utilities.VisItBridge.common"
+  "Utilities.VisItBridge.databases"
+  "Utilities.VisItBridge.include"
+  "Utilities.VisItBridge.visit_vtk"
+  "Utilities.protobuf"
+  )
+
+set(CTEST_CUSTOM_ERROR_EXCEPTION
+  ${CTEST_CUSTOM_ERROR_EXCEPTION}
+  # Numpy errors
+  "NUMPY.*Warning"
+  "NUMPY._configtest.*undefined reference"
+  "_configtest.*error"
+  "collect2: ld returned 1 exit status"
+  # See http://www.cmake.org/pipermail/cmake/2011-May/044448.html
+  "([^ :]+):([0-9]+): ([^ \\t])"
+  )

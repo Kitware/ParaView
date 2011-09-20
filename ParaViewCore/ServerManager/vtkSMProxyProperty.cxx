@@ -204,17 +204,6 @@ bool vtkSMProxyProperty::IsProxyAdded(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
 {
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    this->RemoveAllUncheckedProxies();
-    this->AddUncheckedProxy(proxy);
-
-    if (!this->IsInDomains())
-      {
-      this->RemoveAllUncheckedProxies();
-      return 0;
-      }
-    }
   this->RemoveAllUncheckedProxies();
 
   this->PPInternals->Proxies.push_back(vtkProxyPointer(this, proxy));
@@ -261,16 +250,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
     return 1;
     }
 
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    this->SetUncheckedProxy(idx, proxy);
-
-    if (!this->IsInDomains())
-      {
-      this->RemoveAllUncheckedProxies();
-      return 0;
-      }
-    }
   this->RemoveAllUncheckedProxies();
   if (this->PPInternals->Proxies.size() <= idx)
     {
@@ -287,20 +266,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
   vtkSMProxy* proxies[])
 {
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    this->RemoveAllUncheckedProxies();
-    for (unsigned int cc=0; cc < numProxies; cc++)
-      {
-      this->PPInternals->UncheckedProxies.push_back(proxies[cc]);
-      }
-    
-    if (!this->IsInDomains())
-      {
-      this->RemoveAllUncheckedProxies();
-      return;
-      }
-    }
   this->RemoveAllUncheckedProxies();
 
   this->PPInternals->Proxies.clear();
