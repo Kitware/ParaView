@@ -18,11 +18,10 @@ find_library(VRPN_LIBRARY vrpn)
 find_library(VRPN_QUAT_LIBRARY quat)
 
 QT4_WRAP_CPP(MOC_SRCS
+  pqVRStarter.h
   vtkVRPNConnection.h
   vtkVRUIConnection.h
   vtkVRConnectionManager.h
-  pqVRStarter.h
-  vtkVRGenericStyle.h
   vtkVRStyleTracking.h
   vtkVRActiveObjectManipulationStyle.h
   vtkVRInteractorStyle.h
@@ -55,7 +54,6 @@ SET( VR_SOURCE_FILES
   vtkVRPNConnection.cxx
   vtkVRUIConnection.cxx
   vtkVRConnectionManager.cxx
-  vtkVRGenericStyle.cxx
   vtkVRStyleTracking.cxx
   vtkVRActiveObjectManipulationStyle.cxx
   vtkVRInteractorStyle.cxx
