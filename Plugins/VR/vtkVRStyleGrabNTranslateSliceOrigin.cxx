@@ -56,12 +56,14 @@ vtkVRStyleGrabNTranslateSliceOrigin::vtkVRStyleGrabNTranslateSliceOrigin(QObject
   this->Old = vtkTransform::New();
   this->Tx =  vtkTransform::New();
   this->Neo = vtkTransform::New();
+  this->InitialInvertedPose = vtkMatrix4x4::New();
 }
 
 //------------------------------------------------------------------------destr
 vtkVRStyleGrabNTranslateSliceOrigin::~vtkVRStyleGrabNTranslateSliceOrigin()
 {
   // Delete the assigned matix
+  this->InitialInvertedPose->Delete();
   Neo->Delete();
   Tx->Delete();
   Old->Delete();
@@ -213,7 +215,6 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::update()
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNTranslateSliceOrigin::HandleButton( const vtkVREventData& data )
 {
-    std::cout << data.name << std::endl;
     this->Enabled = data.data.button.state;
 }
 
@@ -228,13 +229,6 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
   // If the button is pressed then record the current position is tracking space
   if ( this->Enabled )
     {
-    if ( !this->InitialPositionRecorded )
-      {
-      this->RecordCurrentPosition( data );
-      this->InitialPositionRecorded = true;
-      return;
-      }
-    std::cout << "its time to translate " << std::endl;
     vtkSMRenderViewProxy *proxy =0;
     vtkSMDoubleVectorProperty *prop =0;
 
@@ -249,18 +243,51 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
           vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
         if ( prop )
           {
-          // Calculate the delta between the old rcorded value and new value
-          double deltaPos[3];
-          deltaPos[0] = data.data.tracker.matrix[3]  - InitialPos[0];
-          deltaPos[1] = data.data.tracker.matrix[7]  - InitialPos[1];
-          deltaPos[2] = data.data.tracker.matrix[11] - InitialPos[2];
-          this->RecordCurrentPosition(data);
+          if ( !this->InitialPositionRecorded )
+            {
+            this->RecordCurrentPosition( data );
+            // Copy the data into matrix
+            for (int i = 0; i < 4; ++i)
+              {
+              for (int j = 0; j < 4; ++j)
+                {
+                this->InitialInvertedPose->SetElement( i,j,data.data.tracker.matrix[i*4+j] );
+                }
+              }
+            // invert the matrix
+            vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
+            double wandPose[16];
+            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
+                                      wandPose,
+                                      &this->InitialInvertedPose->Element[0][0]);
+             vtkSMPropertyHelper( this->Proxy, "Origin" ).Get(this->Origin, 3 );
+             this->Origin[3] =1;
+            this->InitialPositionRecorded = true;
+            }
+          else
+            {
+            double wandPose[16];
+            double origin[4];
+            vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
+                                      &this->InitialInvertedPose->Element[0][0],
+                                      wandPose);
+            vtkMatrix4x4::MultiplyPoint( wandPose, this->Origin, origin );
+            vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
+            }
 
-          double origin[3];
-          vtkSMPropertyHelper( this->Proxy, "Origin" ).Get( origin, 3 );
-          for ( int i=0;i<3;i++ )
-            origin[i] += deltaPos[i];
-          vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
+          // // Calculate the delta between the old rcorded value and new value
+          // double deltaPos[3];
+          // deltaPos[0] = data.data.tracker.matrix[3]  - InitialPos[0];
+          // deltaPos[1] = data.data.tracker.matrix[7]  - InitialPos[1];
+          // deltaPos[2] = data.data.tracker.matrix[11] - InitialPos[2];
+          // this->RecordCurrentPosition(data);
+
+          // double origin[3];
+          // vtkSMPropertyHelper( this->Proxy, "Origin" ).Get( origin, 3 );
+          // for ( int i=0;i<3;i++ )
+          //   origin[i] += deltaPos[i];
+          // vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
           }
         }
       }
