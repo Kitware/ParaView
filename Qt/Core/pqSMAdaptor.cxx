@@ -1220,13 +1220,22 @@ QList<QVariant> pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
     return props;
     }
 
-  int i;
-  int num = VectorProperty->GetNumberOfElements();
-  for(i=0; i<num; i++)
+  int num = 0;
+
+  if(Type == CHECKED)
     {
-    props.push_back(
-       pqSMAdaptor::getMultipleElementProperty(Property, i)
-       );
+    num = VectorProperty->GetNumberOfElements();
+    }
+  else if(Type == UNCHECKED)
+    {
+    num = VectorProperty->GetNumberOfUncheckedElements();
+    }
+
+  for(int i=0; i<num; i++)
+    {
+    props.push_back(pqSMAdaptor::getMultipleElementProperty(Property,
+                                                            i,
+                                                            Type));
     }
 
   return props;
