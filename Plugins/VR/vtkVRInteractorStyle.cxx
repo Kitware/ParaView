@@ -199,3 +199,15 @@ bool vtkVRInteractorStyle::GetProperty( vtkSMProxy* proxy,
     }
   return false;
 }
+
+void vtkVRInteractorStyle::HandleButton( const vtkVREventData& vtkNotUsed( data ) )
+{
+}
+
+void vtkVRInteractorStyle::HandleAnalog( const vtkVREventData& vtkNotUsed( data ) )
+{
+}
+
+void vtkVRInteractorStyle::HandleTracker( const vtkVREventData& vtkNotUsed( data ) )
+{
+}
