@@ -65,7 +65,7 @@ vtkVRStyleGrabNRotateSliceNormal::~vtkVRStyleGrabNRotateSliceNormal()
 
 //-----------------------------------------------------------------------public
 bool vtkVRStyleGrabNRotateSliceNormal::configure(vtkPVXMLElement* child,
-                                   vtkSMProxyLocator* locator)
+                                   vtkSMProxyLocator* vtkNotUsed( locator ))
 {
   if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
     strcmp(this->metaObject()->className(),
@@ -206,17 +206,13 @@ bool vtkVRStyleGrabNRotateSliceNormal::update()
       proxy->StillRender();
       }
     }
+  return false;
 }
 
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateSliceNormal::HandleButton( const vtkVREventData& data )
 {
   this->Enabled = data.data.button.state;
-}
-
-//----------------------------------------------------------------------private
-void vtkVRStyleGrabNRotateSliceNormal::HandleAnalog( const vtkVREventData& data )
-{
 }
 
 //----------------------------------------------------------------------private

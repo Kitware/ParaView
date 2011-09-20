@@ -56,10 +56,10 @@ bool vtkVRStyleGrabNUpdateMatrix::configure(vtkPVXMLElement* child,
                 << std::endl;
       return false;
       }
-    vtkPVXMLElement* property = child->GetNestedElement(2);
-    if (property && property->GetName() && strcmp(property->GetName(), "MatrixProperty")==0)
+    vtkPVXMLElement* prop = child->GetNestedElement(2);
+    if (prop && prop->GetName() && strcmp(prop->GetName(), "MatrixProperty")==0)
       {
-      std::string propertyStr = property->GetAttributeOrEmpty("name");
+      std::string propertyStr = prop->GetAttributeOrEmpty("name");
       std::vector<std::string> token = this->tokenize( propertyStr );
       if ( token.size()!=2 )
         {
@@ -97,13 +97,13 @@ vtkPVXMLElement* vtkVRStyleGrabNUpdateMatrix::saveConfiguration() const
   child->AddNestedElement(button);
   button->FastDelete();
 
-  vtkPVXMLElement* property = vtkPVXMLElement::New();
-  property->SetName("MatrixProperty");
+  vtkPVXMLElement* prop = vtkPVXMLElement::New();
+  prop->SetName("MatrixProperty");
   std::stringstream propertyStr;
   propertyStr << this->ProxyName << "." << this->PropertyName;
-  property->AddAttribute("name", propertyStr.str().c_str() );
-  child->AddNestedElement(property);
-  property->FastDelete();
+  prop->AddAttribute("name", propertyStr.str().c_str() );
+  child->AddNestedElement(prop);
+  prop->FastDelete();
 
   return child;
 }

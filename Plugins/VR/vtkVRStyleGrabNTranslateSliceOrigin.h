@@ -75,7 +75,6 @@ public:
 
 protected:
   void HandleButton ( const vtkVREventData& data );
-  void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
   void SetButtonValue( std::string dest, int value );
   void SetAnalogValue( std::string dest, double value );

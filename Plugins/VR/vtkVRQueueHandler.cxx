@@ -219,17 +219,17 @@ void vtkVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
 {
   Q_ASSERT(root != NULL);
 
-  vtkPVXMLElement* parent = vtkPVXMLElement::New();
-  parent->SetName("VRInteractorStyles");
+  vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
+  tempParent->SetName("VRInteractorStyles");
   foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
     {
     vtkPVXMLElement* child = style->saveConfiguration();
     if (child)
       {
-      parent->AddNestedElement(child);
+      tempParent->AddNestedElement(child);
       child->Delete();
       }
     }
-  root->AddNestedElement(parent);
-  parent->Delete();
+  root->AddNestedElement(tempParent);
+  tempParent->Delete();
 }

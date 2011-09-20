@@ -141,7 +141,7 @@ struct  hostent         *hp;
         bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);
 
         client_addr.sin_family = AF_INET;
-        client_addr.sin_port = htons(atoi(port.c_str()));
+        client_addr.sin_port = htons(( uint16_t )atoi(port.c_str()));
 
         if (::connect(this->Socket, (struct sockaddr *)&client_addr, sizeof(struct sockaddr_in)) < 0) { /* TODO: why is this "sockaddr", when the type is "sockaddr_in" ?? */
                 close(this->Socket);
@@ -228,7 +228,6 @@ struct  hostent         *hp;
     this->Pipe->ReadState(this->State);
     this->StateMutex->unlock();
     bool done=false;
-    QMutex *stateLock;
     vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
     switch(m)
       {
@@ -377,7 +376,7 @@ void vtkVRUIConnection::Stop()
 // ---------------------------------------------------------------------private
 std::string vtkVRUIConnection::GetName( int eventType, int id )
 {
-  std::stringstream returnStr,connection,event;
+  std::stringstream returnStr,connection,e;
   if(this->Name.size())
     returnStr << this->Name << ".";
   else
@@ -385,25 +384,25 @@ std::string vtkVRUIConnection::GetName( int eventType, int id )
   switch (eventType )
     {
     case ANALOG_EVENT:
-      event << "analog." << id;
-      if( this->AnalogMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->AnalogMapping[event.str()];
+      e << "analog." << id;
+      if( this->AnalogMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->AnalogMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case BUTTON_EVENT:
-      event << "button." << id;
-      if( this->ButtonMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->ButtonMapping[event.str()];
+      e << "button." << id;
+      if( this->ButtonMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->ButtonMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case TRACKER_EVENT:
-      event << "tracker."<< id;
-      if( this->TrackerMapping.find( event.str())!=this->TrackerMapping.end())
-        returnStr << this->TrackerMapping[event.str()];
+      e << "tracker."<< id;
+      if( this->TrackerMapping.find( e.str())!=this->TrackerMapping.end())
+        returnStr << this->TrackerMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     }
   return returnStr.str();
@@ -431,33 +430,33 @@ bool vtkVRUIConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     {
     for ( unsigned cc=0; cc < child->GetNumberOfNestedElements();++cc )
       {
-      vtkPVXMLElement* event = child->GetNestedElement(cc);
-      if ( event && event->GetName() )
+      vtkPVXMLElement* e = child->GetNestedElement(cc);
+      if ( e && e->GetName() )
         {
-        const char* id = event->GetAttributeOrEmpty( "id" );
-        const char* name = event->GetAttributeOrEmpty( "name" );
+        const char* id = e->GetAttributeOrEmpty( "id" );
+        const char* name = e->GetAttributeOrEmpty( "name" );
         this->verifyConfig(id, name);
 
-        if ( strcmp( event->GetName(), "Button" )==0 )
+        if ( strcmp( e->GetName(), "Button" )==0 )
           {
           this->AddButton( id, name );
           }
-        else if ( strcmp( event->GetName(), "Analog" )==0 )
+        else if ( strcmp( e->GetName(), "Analog" )==0 )
           {
           this->AddAnalog( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "Tracker" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "Tracker" ) ==0 )
           {
           this->AddTracking( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "TrackerTransform" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "TrackerTransform" ) ==0 )
           {
-          this->configureTransform( event );
+          this->configureTransform( e );
           }
 
         else
           {
-          qWarning() << "Unknown Device type: \"" << event->GetName() <<"\"";
+          qWarning() << "Unknown Device type: \"" << e->GetName() <<"\"";
           }
         returnVal = true;
         }
@@ -512,15 +511,15 @@ void vtkVRUIConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "button" )==0 )
       {
-      event->SetName("Button");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Button");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
@@ -543,15 +542,15 @@ void vtkVRUIConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "analog" )==0 )
       {
-      event->SetName("Analog");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Analog");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
@@ -574,15 +573,15 @@ void vtkVRUIConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "tracker" )==0 )
       {
-      event->SetName("Tracker");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Tracker");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
@@ -681,8 +680,8 @@ void vtkVRUIConnection::NewAnalogValue(vtkstd::vector<float> *data)
   temp.name = GetName( ANALOG_EVENT);
   temp.eventType = ANALOG_EVENT;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
-  temp.data.analog.num_channel = ( *data ).size();
-  for ( int i=0 ; i<( *data ).size() ;++i )
+  temp.data.analog.num_channel = ( int )( *data ).size();
+  for ( unsigned int i=0 ; i<( *data ).size() ;++i )
     {
     temp.data.analog.channel[i] = ( *data )[i];
     }
@@ -823,7 +822,7 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
 void vtkVRUIConnection::GetAndEnqueueButtonData()
 {
   vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
-  for (int i = 0; i < ( *buttons ).size(); ++i)
+  for (unsigned int i = 0; i < ( *buttons ).size(); ++i)
     {
     NewButtonValue( ( *buttons )[i], i );
     }
@@ -840,7 +839,7 @@ void vtkVRUIConnection::GetAndEnqueueTrackerData()
   vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
-  for (int i = 0; i < ( *trackers ).size(); ++i)
+  for (unsigned int i = 0; i < ( *trackers ).size(); ++i)
     {
     NewTrackerValue( (*trackers )[i] , i);
     }

@@ -201,14 +201,14 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
 void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root )
 {
  Q_ASSERT(root != NULL);
-  vtkPVXMLElement* parent = vtkPVXMLElement::New();
-  parent->SetName("VRConnectionManager");
+  vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
+  tempParent->SetName("VRConnectionManager");
   foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)
       {
-      parent->AddNestedElement(child);
+      tempParent->AddNestedElement(child);
       child->Delete();
       }
     }
@@ -217,10 +217,10 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)
       {
-      parent->AddNestedElement(child);
+      tempParent->AddNestedElement(child);
       child->Delete();
       }
     }
-  root->AddNestedElement(parent);
-  parent->Delete();
+  root->AddNestedElement(tempParent);
+  tempParent->Delete();
 }

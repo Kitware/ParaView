@@ -48,40 +48,14 @@ class vtkVRInteractorStyle : public QObject
 public:
   vtkVRInteractorStyle(QObject* parent=0);
   virtual ~vtkVRInteractorStyle();
-
-  /// called to handle an event. If the style does not handle this event or
-  /// handles it but does not want to stop any other handlers from handlign it
-  /// as well, they should return false. Other return true. Return true
-  /// indicates that vtkVRQueueHandler the event has been "consumed".
   virtual bool handleEvent(const vtkVREventData& data);
   virtual bool update();
-
-  ///--------------------------------------------------------------------------
-  /// Identifies the device state when this style becomes active.
-
-  /// Get/Set the device name.
-  void setName(const QString& name)
-    { this->Name = name; }
-  const QString& name() const
-    { return this->Name; }
-
-  void setType(const QString& type)
-    { this->Type = type; }
-  const QString& type() const
-    { return this->Type; }
-
-  ///--------------------------------------------------------------------------
-  /// Used to save/load the style in XML for ParaView state files.
-
-  /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-
-  /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
-  virtual void HandleButton ( const vtkVREventData& data ) {}
-  virtual void HandleAnalog ( const vtkVREventData& data ) {}
-  virtual void HandleTracker( const vtkVREventData& data ) {}
+  virtual void HandleButton ( const vtkVREventData& data );
+  virtual void HandleAnalog ( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
   std::vector<std::string> tokenize( std::string input);
   bool GetProxy( std::string name, vtkSMProxy ** proxy );
   bool GetProperty( vtkSMProxy* proxy,
@@ -91,13 +65,12 @@ public:
 protected:
   bool GetOutProxyNProperty();
 
+protected:
   std::string OutProxyName;
   std::string OutPropertyName;
   vtkSMProxy *OutProxy;
   vtkSMDoubleVectorProperty *OutProperty;
   bool IsFoundOutProxyProperty;
-  QString Name;
-  QString Type;
 private:
   Q_DISABLE_COPY(vtkVRInteractorStyle)
 };

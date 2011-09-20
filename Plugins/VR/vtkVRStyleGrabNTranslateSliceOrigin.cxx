@@ -71,7 +71,7 @@ vtkVRStyleGrabNTranslateSliceOrigin::~vtkVRStyleGrabNTranslateSliceOrigin()
 
 //-----------------------------------------------------------------------public
 bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
-                                   vtkSMProxyLocator* locator)
+                                   vtkSMProxyLocator* vtkNotUsed( locator ))
 {
   if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
     strcmp(this->metaObject()->className(),
@@ -210,17 +210,13 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::update()
       proxy->StillRender();
       }
     }
+  return false;
 }
 
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNTranslateSliceOrigin::HandleButton( const vtkVREventData& data )
 {
     this->Enabled = data.data.button.state;
-}
-
-//----------------------------------------------------------------------private
-void vtkVRStyleGrabNTranslateSliceOrigin::HandleAnalog( const vtkVREventData& data )
-{
 }
 
 //----------------------------------------------------------------------private

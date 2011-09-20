@@ -44,7 +44,7 @@ void vtkVRUIPipe::Send(MessageTag m)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRUIPipe::WaitForServerReply(int msecs)
+bool vtkVRUIPipe::WaitForServerReply(int vtkNotUsed( msecs ))
 {
 #ifdef QTSOCK
   //std::cout<< "in" <<std::endl;
@@ -73,20 +73,20 @@ vtkVRUIPipe::MessageTag vtkVRUIPipe::Receive()
     bytes=read(this->Socket,reinterpret_cast<char *>(&message),
                              sizeof(MessageTagPropocol));
     if (bytes < 0) {
-	qDebug() << "Socket read error";
+        qDebug() << "Socket read error";
     }
 #endif
 #ifdef VRUI_ENABLE_DEBUG
-    if ( bytes )     
+    if ( bytes )
       cout << "bytes=" << bytes << endl;
-     
+
   cout << "sizeof=" << sizeof(MessageTagPropocol) <<  endl;
   std::cout << "Recieved : "
             << this->GetString( static_cast<MessageTag>( message ) )
-	    << static_cast<MessageTag>( message )	
+            << static_cast<MessageTag>( message )
             << std::endl;
 #endif
-    }	
+    }
   return static_cast<MessageTag>(message);
 }
 
@@ -99,11 +99,11 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState *state)
 #ifdef QTSOCK
   this->Socket->read(reinterpret_cast<char *>(&value),sizeof(int));
 #else
-  int bytes;
+  ssize_t bytes;
   bytes = read(this->Socket, reinterpret_cast<char *>(&value),sizeof(int));
     if (bytes < 0) {
 #ifdef VRUI_ENABLE_DEBUG
-	qDebug() << "Socket readlayout tracker error";
+        qDebug() << "Socket readlayout tracker error";
 #endif
     }
 #endif
@@ -122,7 +122,7 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState *state)
 #else
   bytes = read(this->Socket, reinterpret_cast<char *>(&value),sizeof(int));
     if (bytes < 0) {
-	qDebug() << "Socket readlayout buttons error";
+        qDebug() << "Socket readlayout buttons error";
     }
 #endif
   state->GetButtonStates()->resize(value);
@@ -134,7 +134,7 @@ void vtkVRUIPipe::ReadLayout(vtkVRUIServerState *state)
 #else
   bytes = read(this->Socket, reinterpret_cast<char *>(&value),sizeof(int));
     if (bytes < 0) {
-	qDebug() << "Socket readlayout valuators error";
+        qDebug() << "Socket readlayout valuators error";
     }
 #endif
   state->GetValuatorStates()->resize(value);
@@ -151,30 +151,30 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
   vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=state->GetTrackerStates();
   size_t i=0;
   size_t c=trackers->size();
-	
-  qint64 readSize;
+
+  quint64 readSize;
 
   while(i<c)
     {
     vtkVRUITrackerState *tracker=(*trackers)[i].GetPointer();
 #ifdef QTSOCK
     readSize = this->Socket->read(reinterpret_cast<char *>(tracker->GetPosition()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "position: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "position: " << readSize;}
     readSize = this->Socket->read(reinterpret_cast<char *>(tracker->GetUnitQuaternion()), 4*sizeof(float));
-    if(readSize < 4 * sizeof(float)){qDebug() << "quat:" << readSize;}	
+    if(readSize < 4 * sizeof(float)){qDebug() << "quat:" << readSize;}
     readSize = this->Socket->read(reinterpret_cast<char *>(tracker->GetLinearVelocity()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "lv: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "lv: " << readSize;}
     readSize = this->Socket->read(reinterpret_cast<char *>(tracker->GetAngularVelocity()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "av: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "av: " << readSize;}
 #else
     readSize = read(this->Socket, reinterpret_cast<char *>(tracker->GetPosition()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "position: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "position: " << readSize;}
     readSize = read(this->Socket, reinterpret_cast<char *>(tracker->GetUnitQuaternion()), 4*sizeof(float));
-    if(readSize < 4 * sizeof(float)){qDebug() << "quat:" << readSize;}	
+    if(readSize < 4 * sizeof(float)){qDebug() << "quat:" << readSize;}
     readSize = read(this->Socket, reinterpret_cast<char *>(tracker->GetLinearVelocity()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "lv: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "lv: " << readSize;}
     readSize = read(this->Socket, reinterpret_cast<char *>(tracker->GetAngularVelocity()), 3*sizeof(float));
-    if(readSize < 3 * sizeof(float)){qDebug() << "av: " << readSize;}	
+    if(readSize < 3 * sizeof(float)){qDebug() << "av: " << readSize;}
 #endif
     ++i;
     }
@@ -190,7 +190,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
 #else
     readSize = read(this->Socket, reinterpret_cast<char *>(&value), sizeof(bool));
 #endif
-    if(readSize < sizeof(bool)){qDebug() << "button : " << i <<  readSize;}	
+    if(readSize < sizeof(bool)){qDebug() << "button : " << i <<  readSize;}
     (*buttons)[i]=value;
     ++i;
     }
@@ -207,7 +207,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
 #else
     readSize  = read(this->Socket, reinterpret_cast<char *>(&value), sizeof(float));
 #endif
-    if(readSize < sizeof(float)){qDebug() << "analog : " << i <<  readSize;}	
+    if(readSize < sizeof(float)){qDebug() << "analog : " << i <<  readSize;}
     (*valuators)[i]=value;
     ++i;
     }

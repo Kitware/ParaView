@@ -44,16 +44,6 @@ bool vtkVRActiveObjectManipulationStyle::handleEvent(const vtkVREventData& data)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRActiveObjectManipulationStyle::HandleTracker( const vtkVREventData& data )
-{
-}
-
-// ----------------------------------------------------------------------------
-void vtkVRActiveObjectManipulationStyle::HandleButton( const vtkVREventData& data )
-{
-}
-
-// ----------------------------------------------------------------------------
 void vtkVRActiveObjectManipulationStyle::HandleAnalog( const vtkVREventData& data )
 {
   HandleSpaceNavigatorAnalog(data);

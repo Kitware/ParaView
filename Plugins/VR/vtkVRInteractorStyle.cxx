@@ -160,6 +160,7 @@ bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
       this->HandleTracker( data );
       break;
     }
+  return false;
 }
 
 // -----------------------------------------------------------------------public
@@ -186,14 +187,14 @@ bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
 // ---------------------------------------------------------------------private
 bool vtkVRInteractorStyle::GetProperty( vtkSMProxy* proxy,
                                         std::string name,
-                                        vtkSMDoubleVectorProperty** property )
+                                        vtkSMDoubleVectorProperty** prop )
 {
   vtkSMDoubleVectorProperty *p =0;
   p =  vtkSMDoubleVectorProperty::
       SafeDownCast( proxy->GetProperty( name.c_str()) );
   if ( p )
     {
-    *property = p;
+    *prop = p;
     return true;
     }
   return false;

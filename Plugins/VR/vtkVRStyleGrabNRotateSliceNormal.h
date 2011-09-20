@@ -78,7 +78,6 @@ protected:
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
   void SetButtonValue( std::string dest, int value );
-  void SetAnalogValue( std::string dest, double value );
   void SetAnalogVectorValue( std::string dest,
                              const double* value,
                              unsigned int total);
