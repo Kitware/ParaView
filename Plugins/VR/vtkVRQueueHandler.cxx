@@ -33,20 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkVRGenericStyle.h"
-#include "vtkVRHeadTrackingStyle.h"
-#include "vtkVRWandTrackingStyle.h"
 #include "vtkVRActiveObjectManipulationStyle.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
-#include "vtkVRVectorPropertyStyle.h"
 #include "vtkVRStyleTracking.h"
-#include "vtkVRStyleGrabNRotateWorld.h"
 #include "vtkVRStyleGrabNUpdateMatrix.h"
-#include "vtkVRStyleGrabNTranslateWorld.h"
 #include "vtkVRStyleGrabNRotateSliceNormal.h"
 #include "vtkVRStyleGrabNTranslateSliceOrigin.h"
-#include "vtkVRStyleScaleWorld.h"
 #include "pqApplicationCore.h"
 
 #include <QList>
@@ -177,13 +170,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        if (strcmp(class_name, "vtkVRPropertyStyle")==0)
-          {
-          vtkVRPropertyStyle* style = new vtkVRPropertyStyle(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleTracking")==0)
+        if (strcmp(class_name, "vtkVRStyleTracking")==0)
           {
           vtkVRStyleTracking* style = new vtkVRStyleTracking(this);
           style->configure(child, locator);
@@ -192,24 +179,6 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
         else if (strcmp(class_name, "vtkVRStyleGrabNUpdateMatrix")==0)
           {
           vtkVRStyleGrabNUpdateMatrix* style = new vtkVRStyleGrabNUpdateMatrix(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateWorld")==0)
-          {
-          vtkVRStyleGrabNTranslateWorld* style = new vtkVRStyleGrabNTranslateWorld(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNRotateWorld")==0)
-          {
-          vtkVRStyleGrabNRotateWorld* style = new vtkVRStyleGrabNRotateWorld(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleScaleWorld")==0)
-          {
-          vtkVRStyleScaleWorld* style = new vtkVRStyleScaleWorld(this);
           style->configure(child, locator);
           this->add(style);
           }
@@ -222,30 +191,6 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
         else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
           {
           vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
-          {
-          vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRGenericStyle")==0)
-          {
-          vtkVRGenericStyle* style = new vtkVRGenericStyle(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRHeadTrackingStyle")==0)
-          {
-          vtkVRHeadTrackingStyle* style = new vtkVRHeadTrackingStyle(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRWandTrackingStyle")==0)
-          {
-          vtkVRWandTrackingStyle* style = new vtkVRWandTrackingStyle(this);
           style->configure(child, locator);
           this->add(style);
           }
