@@ -24,11 +24,8 @@ QT4_WRAP_CPP(MOC_SRCS
   pqVRStarter.h
   vtkVRGenericStyle.h
   vtkVRStyleTracking.h
-  vtkVRHeadTrackingStyle.h
-  vtkVRWandTrackingStyle.h
   vtkVRActiveObjectManipulationStyle.h
   vtkVRInteractorStyle.h
-  vtkVRPropertyStyle.h
   vtkVRStyleGrabNUpdateMatrix.h
   vtkVRStyleGrabNRotateWorld.h
   vtkVRStyleGrabNTranslateWorld.h
@@ -36,7 +33,6 @@ QT4_WRAP_CPP(MOC_SRCS
   vtkVRStyleGrabNTranslateSliceOrigin.h
   vtkVRQueue.h
   vtkVRQueueHandler.h
-  vtkVRVectorPropertyStyle.h
   )
 
 SET (QT_USE_QTNETWORK TRUE)
@@ -63,20 +59,16 @@ SET( VR_SOURCE_FILES
   vtkVRConnectionManager.cxx
   vtkVRGenericStyle.cxx
   vtkVRStyleTracking.cxx
-  vtkVRHeadTrackingStyle.cxx
-  vtkVRWandTrackingStyle.cxx
   vtkVRActiveObjectManipulationStyle.cxx
   vtkVRInteractorStyle.cxx
   vtkVRPNCallBackHandlers.cxx
   vtkVRQueue.cxx
   vtkVRQueueHandler.cxx
-  vtkVRPropertyStyle.cxx
   vtkVRStyleGrabNUpdateMatrix.cxx
   vtkVRStyleGrabNRotateWorld.cxx
   vtkVRStyleGrabNTranslateWorld.cxx
   vtkVRStyleGrabNRotateSliceNormal.cxx
   vtkVRStyleGrabNTranslateSliceOrigin.cxx
-  vtkVRVectorPropertyStyle.cxx
   vtkVRUIPipe.cxx
   vtkVRUIServerState.cxx
   vtkVRUITrackerState.cxx
