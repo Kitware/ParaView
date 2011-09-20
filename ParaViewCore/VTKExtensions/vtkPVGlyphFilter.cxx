@@ -265,7 +265,8 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
   // that this point should be glyphed and compute the
   // next point.
   int pointIsVisible=0;
-  if ( (this->BlockNumGlyphedPts < this->BlockMaxNumPts) && (this->BlockPointCounter==this->BlockNextPoint) )
+  if ( (this->BlockNumGlyphedPts < this->BlockMaxNumPts) 
+    && (this->BlockPointCounter==this->BlockNextPoint) )
     {
     this->BlockNumGlyphedPts++;
     if (this->RandomMode)
@@ -277,7 +278,8 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 
       if ( this->BlockNumGlyphedPts < this->BlockMaxNumPts )
         {
-        this->BlockNextPoint = this->RandomPtsInDataset[this->BlockNumGlyphedPts];
+        this->BlockNextPoint = 
+          this->RandomPtsInDataset[this->BlockNumGlyphedPts];
         }
       else
         {
