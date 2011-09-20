@@ -98,6 +98,7 @@ protected:
   std::string NormalPropStr;
   vtkSMProxy* Proxy;
   vtkSMDoubleVectorProperty* Property;
+  double Normal[4];
 private:
   Q_DISABLE_COPY(vtkVRStyleGrabNRotateSliceNormal)
 };

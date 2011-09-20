@@ -258,20 +258,19 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
             vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
                                       wandPose,
                                       &this->InitialInvertedPose->Element[0][0]);
+             vtkSMPropertyHelper( this->Proxy, "Normal" ).Get(this->Normal, 3 );
+             this->Normal[3] =0;
             this->InitialOrientationRecored = true;
             }
           else
             {
             double wandPose[16];
+            double normal[4];
             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
                                       &this->InitialInvertedPose->Element[0][0],
                                       wandPose);
-            double normal[4];
-            vtkSMPropertyHelper( this->Proxy, "Normal" ).Get(normal, 3 );
-            normal[3] =0;
-            vtkMatrix4x4::MultiplyPoint( wandPose, normal, normal );
+            vtkMatrix4x4::MultiplyPoint( wandPose, this->Normal, normal );
             vtkSMPropertyHelper( this->Proxy, "Normal" ).Set(normal, 3 );
-            //vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
             }
           }
         }
