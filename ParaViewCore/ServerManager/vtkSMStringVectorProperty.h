@@ -55,7 +55,7 @@ public:
 
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
-  int SetElements(unsigned int count, const char* values[]);
+  int SetElements(const char* values[], unsigned int count);
 
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
@@ -63,7 +63,7 @@ public:
 
   // Description:
   // Sets the values of all the unchecked elements.
-  int SetUncheckedElements(unsigned int count, const char* values[]);
+  int SetUncheckedElements(const char* values[], unsigned int count);
 
   // Description:
   // Fills up the vtkStringList instance with the current value.
