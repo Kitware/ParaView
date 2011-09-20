@@ -211,7 +211,6 @@ bool vtkVRStyleGrabNRotateSliceNormal::update()
 //----------------------------------------------------------------------private
 void vtkVRStyleGrabNRotateSliceNormal::HandleButton( const vtkVREventData& data )
 {
-  std::cout << data.name << std::endl;
   this->Enabled = data.data.button.state;
 }
 
@@ -225,11 +224,8 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
 {
   if ( this->Enabled )
     {
-    std::cout << "its time to rotate " << std::endl;
     vtkSMRenderViewProxy *proxy =0;
     vtkSMDoubleVectorProperty *prop =0;
-    // property->SetElement( atoi(token[2].c_str() ), value );
-    // proxy->UpdateVTKObjects();
 
     pqView *view = 0;
     view = pqActiveObjects::instance().activeView();
@@ -295,89 +291,4 @@ std::vector<std::string> vtkVRStyleGrabNRotateSliceNormal::tokenize( std::string
     token.push_back(word);
     }
   return token;
-}
-
-//----------------------------------------------------------------------private
-void vtkVRStyleGrabNRotateSliceNormal::RecordOrientation(vtkSMRenderViewProxy* proxy,  const vtkVREventData& data)
-{
-  double mat[3][3];
-
-  // Collect the initial rotation matrix
-  for (int i = 0; i < 3; ++i)
-    {
-    for (int j = 0; j < 3; ++j)
-      {
-      mat[i][j] = data.data.tracker.matrix[i*4+j];
-      }
-    }
-
-  vtkMath::Matrix3x3ToQuaternion( mat, this->InitialTrackerQuat );
-
-  // Collect the current rotation matrix
-  double old[16];
-  double oldMat[3][3];
-  vtkSMPropertyHelper( proxy, "WandPose" ).Get( &old[0], 16 );
-  for (int i = 0; i < 3; ++i)
-    {
-    for (int j = 0; j < 3; ++j)
-      {
-      oldMat[i][j] = old[i*4+j];
-      }
-    }
-  // Convert rotation matrix to quaternion
-  vtkMath::Matrix3x3ToQuaternion( oldMat, this->InitialQuat );
-}
-
-//----------------------------------------------------------------------private
-void vtkVRStyleGrabNRotateSliceNormal::UpdateOrientation(const vtkVREventData& data)
-{
-  double mat[3][3];
-  double quat[4];
-  double deltaQuat[4];
-  // Collect the initial rotation matrix
-  for (int i = 0; i < 3; ++i)
-    {
-    for (int j = 0; j < 3; ++j)
-      {
-      mat[i][j] = data.data.tracker.matrix[i*4+j];
-      }
-    }
-
-  // Make quaternion
-  vtkMath::Matrix3x3ToQuaternion( mat, quat );
-
-  // Get the delta rotation
-  deltaQuat[0] = quat[0] - this->InitialTrackerQuat[0];
-  deltaQuat[1] = quat[1] - this->InitialTrackerQuat[1];
-  deltaQuat[2] = quat[2] - this->InitialTrackerQuat[2];
-  deltaQuat[3] = quat[3] - this->InitialTrackerQuat[3];
-
-  // if ( fabs( deltaQuat[0] ) > 0 &&
-  //      ( fabs( deltaQuat[1] ) > 0 ||
-  //      fabs( deltaQuat[2] ) > 0 ||
-  //      fabs( deltaQuat[3] ) > 0 ) )
-  //   {
-  // Multiply new quaternion into inital quaternion
-
-    // double mag = fabs( sqrt ( deltaQuat[0]*deltaQuat[0] +
-    //                        deltaQuat[1]*deltaQuat[1] +
-    //                        deltaQuat[2]*deltaQuat[2] +
-    //                        deltaQuat[3]*deltaQuat[3] ) );
-    // if ( mag > 0 )
-    // deltaQuat[0] = deltaQuat[0]/mag;
-    // deltaQuat[1] = deltaQuat[1]/mag;
-    // deltaQuat[2] = deltaQuat[2]/mag;
-    // deltaQuat[3] = deltaQuat[3]/mag;
-    vtkMath::MultiplyQuaternion( deltaQuat,  this->InitialQuat,  this->UpdatedQuat );
-    //vtkMath::MultiplyQuaternion( quat,  this->InitialQuat,  this->UpdatedQuat );
-    // std::cout << "deltaQuat : ["
-    //           << deltaQuat[0] << " "
-    //           << deltaQuat[1] << " "
-    //           << deltaQuat[2] << " "
-    //           << deltaQuat[3] << "]" << std::endl;
-    // this->InitialTrackerQuat[0] = quat[0];
-    // this->InitialTrackerQuat[1] = quat[1];
-    // this->InitialTrackerQuat[2] = quat[2];
-    // this->InitialTrackerQuat[3] = quat[3];
-  // }
 }
