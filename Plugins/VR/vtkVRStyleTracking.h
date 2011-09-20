@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
+class vtkTransform;
 struct vtkVREventData;
 
 class vtkVRStyleTracking : public vtkVRInteractorStyle
@@ -45,22 +46,17 @@ class vtkVRStyleTracking : public vtkVRInteractorStyle
   typedef vtkVRInteractorStyle Superclass;
 public:
   vtkVRStyleTracking(QObject* parent);
-  ~vtkVRStyleTracking() {}
+  ~vtkVRStyleTracking();
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-
-protected:
   virtual void HandleTracker( const vtkVREventData& data );
-  virtual bool GetProxyNProperty();
-  virtual bool SetProperty(const vtkVREventData &data );
+  virtual bool update();
+protected:
+  virtual void SetProperty( );
 
 protected:
-  vtkSMRenderViewProxy *Proxy;
-  vtkSMDoubleVectorProperty *Property;
-  std::string ProxyName;
-  std::string PropertyName;
   std::string Tracker;
-  bool IsFoundProxyProperty;
+  vtkTransform* OutPose;
 };
 
 #endif //__vtkVRStyleTracking.h_

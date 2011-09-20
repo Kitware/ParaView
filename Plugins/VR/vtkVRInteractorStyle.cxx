@@ -126,7 +126,7 @@ bool vtkVRInteractorStyle::GetOutProxyNProperty()
 {
   if(this->GetProxy( this->OutProxyName, &this->OutProxy ) )
     {
-    if ( !this->GetProperty( this->OutPropertyName, &this->OutProperty ) )
+    if ( !this->GetProperty( this->OutProxy, this->OutPropertyName, &this->OutProperty ) )
       {
       std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
                 << std::endl
@@ -184,12 +184,13 @@ bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
 }
 
 // ---------------------------------------------------------------------private
-bool vtkVRInteractorStyle::GetProperty( std::string name,
+bool vtkVRInteractorStyle::GetProperty( vtkSMProxy* proxy,
+                                        std::string name,
                                         vtkSMDoubleVectorProperty** property )
 {
   vtkSMDoubleVectorProperty *p =0;
   p =  vtkSMDoubleVectorProperty::
-      SafeDownCast( this->OutProxy->GetProperty( name.c_str()) );
+      SafeDownCast( proxy->GetProperty( name.c_str()) );
   if ( p )
     {
     *property = p;

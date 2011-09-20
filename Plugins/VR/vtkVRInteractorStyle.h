@@ -79,13 +79,16 @@ public:
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
-protected:
   virtual void HandleButton ( const vtkVREventData& data ) {}
   virtual void HandleAnalog ( const vtkVREventData& data ) {}
   virtual void HandleTracker( const vtkVREventData& data ) {}
   std::vector<std::string> tokenize( std::string input);
   bool GetProxy( std::string name, vtkSMProxy ** proxy );
-  bool GetProperty( std::string name, vtkSMDoubleVectorProperty** property );
+  bool GetProperty( vtkSMProxy* proxy,
+                    std::string name,
+                    vtkSMDoubleVectorProperty** property );
+
+protected:
   bool GetOutProxyNProperty();
 
   std::string OutProxyName;

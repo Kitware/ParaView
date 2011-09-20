@@ -13,17 +13,22 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkPVXMLElement.h"
+#include "vtkTransform.h"
 #include "vtkVRQueue.h"
 #include <sstream>
 #include <algorithm>
 
+// -----------------------------------------------------------------------cnstr
 vtkVRStyleTracking::vtkVRStyleTracking(QObject* parentObject) :
   Superclass(parentObject)
 {
-  this->Proxy =0;
-  this->Property =0;
-  this->PropertyName = "";
-  this->IsFoundProxyProperty = GetProxyNProperty();
+  this->OutPose = vtkTransform::New();
+}
+
+// -----------------------------------------------------------------------destr
+vtkVRStyleTracking::~vtkVRStyleTracking()
+{
+  this->OutPose->Delete();
 }
 
 //-----------------------------------------------------------------------public
@@ -32,40 +37,7 @@ bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
 {
   if ( Superclass::configure( child,locator ) )
     {
-    if ( child->GetNumberOfNestedElements() !=2 )
-      {
-      std::cerr << "vtkVRStyleTracking::configure(): "
-                << "There has to be only 2 elements present " << std::endl
-                << "<Property name=\"ProxyName.PropertyName\"/>" << std::endl
-                << "<Tracker name=\"trackerEventName\"/>"
-                << std::endl;
-      }
-    vtkPVXMLElement* property = child->GetNestedElement(0);
-    if (property && property->GetName() && strcmp(property->GetName(), "Property")==0)
-      {
-      std::string propertyStr = property->GetAttributeOrEmpty("name");
-      std::vector<std::string> token = this->tokenize( propertyStr );
-      if ( token.size()!=2 )
-        {
-        std::cerr << "Expected Property \"name\" Format:  Proxy.Property" << std::endl;
-        return false;
-        }
-      else
-        {
-        this->ProxyName = token[0];
-        this->PropertyName = token[1];
-        this->IsFoundProxyProperty = GetProxyNProperty();
-        }
-      }
-    else
-      {
-      std::cerr << "vtkVRStyleTracking::configure(): "
-                << "Please Specify Property" <<std::endl
-                << "<Property name=\"ProxyName.PropertyName\"/>"
-                << std::endl;
-      return false;
-      }
-    vtkPVXMLElement* tracker = child->GetNestedElement(1);
+    vtkPVXMLElement* tracker = child->GetNestedElement(0);
     if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Tracker")==0)
       {
       this->Tracker = tracker->GetAttributeOrEmpty("name");
@@ -87,21 +59,11 @@ bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
 vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
 {
   vtkPVXMLElement* child = Superclass::saveConfiguration();
-
-  vtkPVXMLElement* property = vtkPVXMLElement::New();
-  property->SetName("Property");
-  std::stringstream propertyStr;
-  propertyStr << this->ProxyName << "." << this->PropertyName;
-  property->AddAttribute("name", propertyStr.str().c_str() );
-  child->AddNestedElement(property);
-  property->FastDelete();
-
   vtkPVXMLElement* tracker = vtkPVXMLElement::New();
   tracker->SetName("Tracker");
   tracker->AddAttribute("name",this->Tracker.c_str() );
   child->AddNestedElement(tracker);
   tracker->FastDelete();
-
   return child;
 }
 
@@ -110,36 +72,21 @@ void vtkVRStyleTracking::HandleTracker( const vtkVREventData& data )
 {
   if ( this->Tracker == data.name)
     {
-    this->SetProperty( data );
+    this->OutPose->SetMatrix( data.data.tracker.matrix );
+    this->SetProperty( );
     }
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRStyleTracking::GetProxyNProperty()
+void vtkVRStyleTracking::SetProperty()
 {
-  pqView *view = 0;
-  view = pqActiveObjects::instance().activeView();
-  if ( view )
-    {
-    this->Proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( this->Proxy )
-      {
-      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( this->PropertyName.c_str() ) );
-      if ( this->Property )
-        {
-        return true;
-        }
-      }
-    }
+  vtkSMPropertyHelper(this->OutProxy,this->OutPropertyName.c_str())
+    .Set(&this->OutPose->GetMatrix()->Element[0][0],16 );
+}
+
+bool vtkVRStyleTracking::update()
+{
+  this->OutProxy->UpdateVTKObjects();
+  ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
   return false;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRStyleTracking::SetProperty(const vtkVREventData &data)
-{
-  for (int i = 0; i < 16; ++i)
-    {
-    this->OutProperty->SetElement( i, data.data.tracker.matrix[i] );
-    }
-  return true;
 }
