@@ -333,7 +333,9 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     vtksys::SystemTools::GetFilenameExtension(filename);
   if (extension.size() > 0)
     {
-    extension.erase(extension.begin()); // remove the first "."
+    // Find characters after last "."
+    size_t found = extension.find_last_of(".");
+    extension = extension.substr(found+1);
     }
   else
     {
@@ -358,7 +360,7 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
       }
     }
 
-  vtkErrorMacro("No matching writer found.");
+  vtkErrorMacro("No matching writer found for extension: " << extension );
   return NULL;
 }
 
