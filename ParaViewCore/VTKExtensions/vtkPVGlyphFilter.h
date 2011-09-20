@@ -80,7 +80,7 @@ protected:
   //This is a generic function that can be called per
   //block of the dataset to calculate indices of points
   //to be glyphed in the block
- void CalculatePtsToGlyph(vtkDataSet* ds, double PtsNotBlanked);
+ void CalculatePtsToGlyph(double PtsNotBlanked);
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

@@ -210,6 +210,7 @@ int vtkPVGlyphFilter::RequestData(
     = (double)((double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
 
   maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
+  maxNumPts = (maxNumPts > numPts) ? numPts : maxNumPts;
 
   vtkInformationVector* inputVs[2];
 
@@ -227,7 +228,7 @@ int vtkPVGlyphFilter::RequestData(
   // We will glyph this many points.
   this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
 
-  this->CalculatePtsToGlyph(dsInput, numPts );
+  this->CalculatePtsToGlyph( numPts );
 
   // We have set all ofthe parameters that will be used in 
   // our overloaded IsPoitVisible. Now let the glypher take over.
@@ -394,7 +395,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       // We will glyph this many points.
       this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock + 0.5) ;
 
-      this->CalculatePtsToGlyph( ds, nPtsNotBlanked );
+      this->CalculatePtsToGlyph( nPtsNotBlanked );
 
       // We have set all ofthe parameters that will be used in 
       // our overloaded IsPoitVisible. Now let the glypher take over.
@@ -439,11 +440,17 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::CalculatePtsToGlyph( vtkDataSet* ds, double PtsNotBlanked)
+void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
 {
   // When mask points is checked, we glyph the first N points. When mask points
   // and random mode is checked, we glyph N random points from the total number
   // of points on the block.
+
+  if( this->BlockMaxNumPts > PtsNotBlanked )
+    {
+    vtkErrorMacro("This filter cannot glyph points more than: " << PtsNotBlanked);
+    return;
+    }
 
   //Reset the random points vector
   this->RandomPtsInDataset.clear();
