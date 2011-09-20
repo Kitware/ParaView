@@ -6,7 +6,7 @@
                 label="AVS UCD Reader">
      <Documentation
        short_help="Read a dataset in AVS UCD format."
-       long_help="Read binary or ASCII files stored in AVS UCD format.">
+       long_help="Reads binary or ASCII files stored in AVS UCD format.">
        The AVS UCD reader reads binary or ASCII files stored in AVS UCD format.
        The default file extension is .inp. The output of this reader is
        unstructured grid.
@@ -79,7 +79,7 @@
                 label="Meta Image reader">
      <Documentation
        short_help="Read UNC meta image data."
-       long_help="Read binary UNC meta image data.">
+       long_help="Reads binary UNC meta image data.">
        The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
      </Documentation>
      <StringVectorProperty
@@ -104,7 +104,7 @@
                 label="Legacy VTK Reader">
      <Documentation
        short_help="Read legacy VTK files."
-       long_help="Read files stored in VTK's legacy file format.">
+       long_help="Reads files stored in VTK's legacy file format.">
        The Legacy VTK reader loads files stored in VTK's legacy file format. The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
      </Documentation>
      <StringVectorProperty
@@ -125,7 +125,7 @@
                 label="XML PolyData Reader">
      <Documentation
        short_help="Read VTK XML polydata files."
-       long_help="Read serial VTK XML polydata files.">
+       long_help="Reads serial VTK XML polydata files.">
        The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.
      </Documentation>
      <StringVectorProperty
@@ -206,7 +206,7 @@
                 label="XML Unstructured Grid reader">
      <Documentation
        short_help="Read VTK XML unstructured grid data files."
-       long_help="Read serial VTK XML unstructured grid data files.">
+       long_help="Reads serial VTK XML unstructured grid data files.">
        The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu.
      </Documentation>
      <StringVectorProperty
@@ -287,7 +287,7 @@
                 label="XML Image Data Reader">
      <Documentation
        short_help="Read VTK XML image data files."
-       long_help="Read serial VTK XML image data files.">
+       long_help="Reads serial VTK XML image data files.">
        The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti.
      </Documentation>
      <StringVectorProperty
@@ -369,7 +369,7 @@
                 label="XML Structured Grid Reader">
      <Documentation
        short_help="Read VTK XML structured grid data files."
-       long_help="Read serial VTK XML structured grid data files.">
+       long_help="Reads serial VTK XML structured grid data files.">
        The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts.
      </Documentation>
      <StringVectorProperty
@@ -450,7 +450,7 @@
                 label="XML Rectilinear Grid Reader">
      <Documentation
        short_help="Read VTK XML rectilinear grid data files."
-       long_help="Read serial VTK XML rectilinear grid data files.">
+       long_help="Reads serial VTK XML rectilinear grid data files.">
        The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr.
      </Documentation>
      <StringVectorProperty
@@ -531,7 +531,7 @@
                 label="XML Partitioned Polydata Reader">
      <Documentation
        short_help="Read partitioned VTK XML polydata files."
-       long_help="Read the summary file and the associated VTK XML polydata files.">
+       long_help="Reads the summary file and the associated VTK XML polydata files.">
        The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.
      </Documentation>
      <StringVectorProperty
@@ -603,7 +603,7 @@
                 label="XML Partitioned Unstructured Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML unstructured grid files."
-       long_help="Read the summary file and the associated VTK XML unstructured grid files.">
+       long_help="Reads the summary file and the associated VTK XML unstructured grid files.">
        The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu.
      </Documentation>
      <StringVectorProperty
@@ -674,7 +674,7 @@
                 label="XML Partitioned Image Data Reader">
      <Documentation
        short_help="Read partitioned VTK XML image data files."
-       long_help="Read the summary file and the associated VTK XML image data files.">
+       long_help="Reads the summary file and the associated VTK XML image data files.">
        The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti.
      </Documentation>
      <StringVectorProperty
@@ -745,7 +745,7 @@
                 label="XML Partitioned Structured Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML structured grid files."
-       long_help="Read the summary file and the associated VTK XML structured grid files.">
+       long_help="Reads the summary file and the associated VTK XML structured grid files.">
        The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts.
      </Documentation>
      <StringVectorProperty
@@ -816,7 +816,7 @@
                 label="XML Partitioned Rectilinear Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML rectilinear grid files."
-       long_help="Read the summary file and the associated VTK XML rectilinear grid files.">
+       long_help="Reads the summary file and the associated VTK XML rectilinear grid files.">
        The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr.
      </Documentation>
      <StringVectorProperty
@@ -885,7 +885,7 @@
    <SourceProxy name="stlreadercore" class="vtkSTLReader" label="STL Reader">
      <Documentation
        short_help="Read STL files."
-       long_help="Read ASCII or binary stereo lithography (STL) files.">
+       long_help="Reads ASCII or binary stereo lithography (STL) files.">
        The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset.
      </Documentation>
      <StringVectorProperty
@@ -915,7 +915,7 @@
    <SourceProxy name="CSVReaderCore" class="vtkDelimitedTextReader" label="CSV Reader">
       <Documentation
         short_help="Read a comma-separated values file."
-        long_help="Read a comma-separated values file into a 1D rectilinear grid.">
+        long_help="Reads a comma-separated values file into a 1D rectilinear grid.">
         The CSV reader reads a comma-separated values file into a 1D rectilinear
         grid. If the file was saved using the CSVWriter, then the rectilinear
         grid's points and point data can be restored as well as the cell data.
@@ -967,10 +967,10 @@
         number_of_elements="1"
         default_values=",">
         <Documentation>
-          This property lists the characters that may be used to separate fields.  For
-          example, a value of "," indicates a comma-separated value file.  A
+          This property lists the characters that may be used to separate fields. For
+          example, a value of "," indicates a comma-separated value file. A
           value of ".:;" indicates that columns may be separated by a
-          period, colon or semicolon.  The order of the characters in the text
+          period, colon or semicolon. The order of the characters in the text
           string does not matter.
         </Documentation>
       </StringVectorProperty>
@@ -981,7 +981,7 @@
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
-          Whether to merge successive delimiters.  Use this if (for example) your fields are separated
+          Whether to merge successive delimiters. Use this if (for example) your fields are separated
           by spaces but you don't know exactly how many.
         </Documentation>
       </IntVectorProperty>
@@ -1089,7 +1089,7 @@
         number_of_elements="1"
         default_values="0">
         <Documentation>
-          Set the file type.  The options are:
+          Set the file type. The options are:
           - Unknown (0) (default) the reader will attempt to determine the file
             type. If this fails then you should set the file type yourself.
           - Text (1) the file type is text.
@@ -1107,7 +1107,7 @@
         number_of_elements="1"
         default_values="10">
         <Documentation>
-          Get/Set the data type.  The options are:
+          Get/Set the data type. The options are:
           - Float (10) (default) single precision floating point.
           - Double (11) double precision floating point.
         </Documentation>
@@ -1124,7 +1124,7 @@
                 class="vtkPExodusIIReader">
      <Documentation
        short_help="Read Exodus II files."
-       long_help="Read an Exodus II file to produce an unstructured grid.">
+       long_help="Reads an Exodus II file to produce an unstructured grid.">
        The Exodus reader loads Exodus II files and produces an unstructured grid output.
        The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000.
      </Documentation>
@@ -1240,7 +1240,7 @@
        <BooleanDomain name="bool"/>
        <Documentation>
          Some simulations overload the Exodus time steps to represent mode
-         shapes.  In this case, it does not make sense to iterate over the
+         shapes. In this case, it does not make sense to iterate over the
          "time steps", because they are not meant to be played in order.
          Rather, each represents the vibration at a different "mode."
          Setting the value of this property to 1 changes the semantics of the reader to not
@@ -1258,14 +1258,14 @@
        <Documentation>
          If this flag is on and HasModeShapes is also on, then this reader
          will report a continuous time range [0,1] and animate the
-         displacements in a periodic sinusoid.  If this flag is off and
-         HasModeShapes is on, this reader ignores time.  This flag has no
+         displacements in a periodic sinusoid. If this flag is off and
+         HasModeShapes is on, this reader ignores time. This flag has no
          effect if HasModeShapes is off.
        </Documentation>
      </IntVectorProperty>
 
      <!-- The following two properties magically send time information -->
-     <!-- to the animation panel.  Usually you only need one (the former -->
+     <!-- to the animation panel. Usually you only need one (the former -->
      <!-- for discrete time, the latter for continuous time), but changing -->
      <!-- the HasModeShapes ivar switches between discrete and continuous -->
      <!-- time. -->
@@ -1922,7 +1922,7 @@
         default_values="1" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         When displacements are being applied, they are scaled by this amount.  Set to 1 for no scaling.
+         When displacements are being applied, they are scaled by this amount. Set to 1 for no scaling.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2226,7 +2226,7 @@
         default_values="1" >
      <BooleanDomain name="bool" />
        <Documentation>
-       If checked, the data will be read as the LANL Cosmo format.  If unchecked, the data will be read as Gadget-2 format.
+       If checked, the data will be read as the LANL Cosmo format. If unchecked, the data will be read as Gadget-2 format.
        </Documentation>
      </IntVectorProperty>
 
@@ -2238,7 +2238,7 @@
         default_values="100" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
+       The box side length is used to wrap particles around if they exceed rL (or less than 0) in any dimension.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2250,7 +2250,7 @@
         default_values="5" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The space (in rL units) to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       The space (in rL units) to extend processor particle ownership for ghost particles/cells. It is needed for correct halo calculation when halos cross processor boundaries in parallel computation.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2261,7 +2261,7 @@
                 label="PNG Reader">
      <Documentation
        short_help="Read a PNG file."
-       long_help="Read a PNG file into an image data.">
+       long_help="Reads a PNG file into an image data.">
        The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
      </Documentation>
      <StringVectorProperty
@@ -2287,7 +2287,7 @@
                 label="JPEG Reader">
      <Documentation
        short_help="Read a JPEG file."
-       long_help="Read a JPEG file into an image data.">
+       long_help="Reads a JPEG file into an image data.">
        The JPEG reader reads JPEG files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
      </Documentation>
      <StringVectorProperty
@@ -2314,7 +2314,7 @@
                 label="TIFF Reader">
      <Documentation
        short_help="Read a TIFF file."
-       long_help="Read a TIFF file into an image data.">
+       long_help="Reads a TIFF file into an image data.">
        The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
      </Documentation>
      <StringVectorProperty
@@ -2364,7 +2364,7 @@
           </RequiredProperties>
         </StringListDomain>
         <Documentation>
-          Load the grid with the given dimensions.  Any arrays that conform
+          Load the grid with the given dimensions. Any arrays that conform
           to these dimensions will be loaded.
         </Documentation>
       </StringVectorProperty>
@@ -2400,13 +2400,13 @@
                             number_of_elements="1"
                             default_values="1">
         <Documentation>
-          The scale of the vertical component of spherical coordinates.  It
+          The scale of the vertical component of spherical coordinates. It
           is common to write the vertical component with respect to
           something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
+          surface). In this case, it might be necessary to scale and/or
+          bias the vertical height. The height will become height*scale +
+          bias. Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated. The
           scaling will be adjusted if it results in invalid (negative)
           vertical values.
         </Documentation>
@@ -2417,13 +2417,13 @@
                             number_of_elements="1"
                             default_values="0">
         <Documentation>
-          The bias of the vertical component of spherical coordinates.  It
+          The bias of the vertical component of spherical coordinates. It
           is common to write the vertical component with respect to
           something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
+          surface). In this case, it might be necessary to scale and/or
+          bias the vertical height. The height will become height*scale +
+          bias. Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated. The
           scaling will be adjusted if it results in invalid (negative)
           vertical values.
         </Documentation>
@@ -2437,10 +2437,10 @@
         <Documentation>
           If on, any float or double variable read that has a _FillValue
           attribute will have that fill value replaced with a not-a-number
-          (NaN) value.  The advantage of setting these to NaN values is
+          (NaN) value. The advantage of setting these to NaN values is
           that, if implemented properly by the system and careful math
           operations are used, they can implicitly be ignored by
-          calculations like finding the range of the values.  That said,
+          calculations like finding the range of the values. That said,
           this option should be used with caution as VTK does not fully
           support NaN values and therefore odd calculations may occur.
         </Documentation>
@@ -2459,9 +2459,9 @@
           <Entry value="4" text="Unstructured" />
         </EnumerationDomain>
         <Documentation>
-          Specifies the type of data that the reader creates.  If
+          Specifies the type of data that the reader creates. If
           Automatic, the reader will use the most appropriate grid type for
-          the data read.  Note that not all grid types support all data.  A
+          the data read. Note that not all grid types support all data. A
           warning is issued if a mismatch occurs.
         </Documentation>
       </IntVectorProperty>
@@ -2472,7 +2472,7 @@
         <TimeStepsInformationHelper />
         <Documentation>
           This magic property sends time information to the animation
-          panel.  ParaView will then automatically set up the animation to
+          panel. ParaView will then automatically set up the animation to
           visit the time steps defined in the file.
         </Documentation>
       </DoubleVectorProperty>
@@ -2482,7 +2482,7 @@
    <SourceProxy name="P3DReaderCore" class="vtkMultiBlockPLOT3DReader">
      <Documentation
        short_help="Read PLOT3D files."
-       long_help="Read ASCII or binary PLOT3D files.">
+       long_help="Reads ASCII or binary PLOT3D files.">
        PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
      </Documentation>
      <StringVectorProperty
@@ -2626,7 +2626,7 @@
                 label="DEM Reader">
      <Documentation
        short_help="Read a dataset in DEM format"
-       long_help="Read a DEM (Digital Elevation Model) file.">
+       long_help="Reads a DEM (Digital Elevation Model) file.">
        The DEM reader reads Digital Elevation Model files containing elevation values derived from the U. S. Geologic Survey. The default file extension is .dem. This reader produces uniform rectilinear (image/volume) data output.
      </Documentation>
      <StringVectorProperty
@@ -2690,7 +2690,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of meta images."
-       long_help="Read a series of meta images.">
+       long_help="Reads a series of meta images.">
        Read a series of meta images. The file extension is .mhd
      </Documentation>
 
@@ -2716,9 +2716,9 @@
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
-         in the meta format. The standard extension is .mhd. If more than 1 file is specified,
+         in the meta format. The standard extension is .mhd. If more than one file is specified,
          the reader will switch to file series mode in which it will pretend that it can support
-         time and provide 1 file per time step.
+         time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -2746,7 +2746,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read VTK XML multi-block datasets."
-       long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
+       long_help="Reads a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
        The XML Multi-Block Data reader reads the VTK XML multi-block data file
        format. XML multi-block data files are meta-files that point to a list of
        serial VTK XML files. When reading in parallel, this reader will
@@ -2778,9 +2778,9 @@
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
          in the VTK XML polygonal dataset format. The standard extension is
-         .vtp. If more than 1 file is specified, the reader will switch to file
+         .vtp. If more than one file is specified, the reader will switch to file
          series mode in which it will pretend that it can support time and
-         provide 1 file per time step.
+         provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -2808,7 +2808,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a VTK data file containing a hierarchical box dataset."
-       long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
+       long_help="Reads a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
        The XML Hierarchical Box Data reader reads VTK's XML-based file format
        containing a vtkHierarchicalBoxDataSet. The expected file extensions is
        either .vthb or .vth.
@@ -2838,9 +2838,9 @@
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
          in the VTK XML polygonal dataset format. The standard extension is
-         .vtp. If more than 1 file is specified, the reader will switch to file
+         .vtp. If more than one file is specified, the reader will switch to file
          series mode in which it will pretend that it can support time and
-         provide 1 file per time step.
+         provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -2867,8 +2867,8 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML polydata files."
-                    long_help="Read serial VTK XML polydata files.">
-       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.  This reader also supports file series.
+                    long_help="Reads serial VTK XML polydata files.">
+       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp. This reader also supports file series.
      </Documentation>
 
      <SubProxy>
@@ -2898,7 +2898,7 @@
                            repeat_command="1">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the VTK XML polygonal dataset format. The standard extension is .vtp. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML polygonal dataset format. The standard extension is .vtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -2923,7 +2923,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML unstructured grid data files."
-                    long_help="Read serial VTK XML unstructured grid data files.">
+                    long_help="Reads serial VTK XML unstructured grid data files.">
        The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu. This reader also supports file series.
      </Documentation>
 
@@ -2955,7 +2955,7 @@
                            repeat_command="1">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the VTK XML unstructured grid data format. The standard extension is .vtu. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML unstructured grid data format. The standard extension is .vtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -2981,7 +2981,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML image data files."
-                    long_help="Read serial VTK XML image data files.">
+                    long_help="Reads serial VTK XML image data files.">
        The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti. This reader also supports file series.
      </Documentation>
 
@@ -3013,7 +3013,7 @@
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3039,7 +3039,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML structured grid data files."
-                    long_help="Read serial VTK XML structured grid data files.">
+                    long_help="Reads serial VTK XML structured grid data files.">
        The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts. This reader also supports file series.
      </Documentation>
 
@@ -3071,7 +3071,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3096,7 +3096,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML rectilinear grid data files."
-                    long_help="Read serial VTK XML rectilinear grid data files.">
+                    long_help="Reads serial VTK XML rectilinear grid data files.">
        The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr. This reader also supports file series.
      </Documentation>
 
@@ -3128,7 +3128,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3153,8 +3153,8 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML polydata files."
-                    long_help="Read the summary file and the assicoated VTK XML polydata files.">
-       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.  This reader also supports file series.
+                    long_help="Reads the summary file and the assicoated VTK XML polydata files.">
+       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp. This reader also supports file series.
      </Documentation>
 
      <SubProxy>
@@ -3184,7 +3184,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3210,7 +3210,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML unstructured grid data files."
-                    long_help="Read the summary file and the associated VTK XML unstructured grid data files.">
+                    long_help="Reads the summary file and the associated VTK XML unstructured grid data files.">
        The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu. This reader also supports file series.
      </Documentation>
 
@@ -3242,7 +3242,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3267,7 +3267,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML image data files."
-                    long_help="Read the summary file and the associated VTK XML image data files.">
+                    long_help="Reads the summary file and the associated VTK XML image data files.">
        The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti. This reader also supports file series.
      </Documentation>
 
@@ -3299,7 +3299,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3325,7 +3325,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML structured grid data files."
-                    long_help="Read the summary file and the associated VTK XML structured grid data files.">
+                    long_help="Reads the summary file and the associated VTK XML structured grid data files.">
        The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts. This reader also supports file series.
      </Documentation>
 
@@ -3357,7 +3357,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3383,7 +3383,7 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML rectilinear grid data files."
-                    long_help="Read the summary file and the associated VTK XML rectilinear grid data files.">
+                    long_help="Reads the summary file and the associated VTK XML rectilinear grid data files.">
        The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr. This reader also supports file series.
      </Documentation>
 
@@ -3415,7 +3415,7 @@
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3494,7 +3494,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read legacy VTK files."
-       long_help="Read files stored in VTK's legacy file format.">
+       long_help="Reads files stored in VTK's legacy file format.">
        The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal. This reader also supports file series.
      </Documentation>
       <SubProxy>
@@ -3519,7 +3519,7 @@
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -3545,7 +3545,7 @@
                 label="Partitioned Legacy VTK Reader">
      <Documentation
        short_help="Read partitioned legacy VTK files."
-       long_help="Read files stored in VTK partitioned legacy format.">
+       long_help="Reads files stored in VTK partitioned legacy format.">
        The Partitioned Legacy VTK reader loads files stored in VTK's partitioned legac file format (before VTK 4.2, although still supported). The expected file extension is .pvtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectilinear grid, unstructured grid, or polygonal.
      </Documentation>
      <StringVectorProperty
@@ -3571,7 +3571,7 @@
                 label="EnSight Reader">
      <Documentation
        short_help="Read EnSight files."
-       long_help="Read EnSight 6 and Gold files.">
+       long_help="Reads EnSight 6 and Gold files.">
        The EnSight reader reads files in the format produced by CEI's EnSight. EnSight 6 and Gold files (both ASCII and binary) are supported. The default extension is .case. The output of this reader is a multi-block dataset.
      </Documentation>
      <StringVectorProperty
@@ -3656,7 +3656,7 @@
                 label="Spy Plot Reader">
      <Documentation
        short_help="Read files in the Spy Plot format."
-       long_help="Read files in the SPCTH Spy Plot file format.">
+       long_help="Reads files in the SPCTH Spy Plot file format.">
        The Spy Plot reader loads an ASCII meta-file called the "case" file (extension .spcth). The case file lists all the binary files containing the dataset. This reader produces hierarchical datasets.
      </Documentation>
      <StringVectorProperty
@@ -3807,8 +3807,8 @@
                          si_class="vtkSIFileSeriesReaderProxy"
                          file_name_method="SetFileName">
     <Documentation short_help="Read SPCTH files from simulation restarts."
-                   long_help="Read collections of SPCTH files from simulations that were restarted.">
-      When a CTH simulation is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
+                   long_help="Reads collections of SPCTH files from simulations that were restarted.">
+      When a CTH simulation is restarted, typically you get a new set of output files. When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files. This reader allows you to specify a metadata file that will implicitly string the files together.
     </Documentation>
     <SubProxy>
       <Proxy name="Reader" proxygroup="sources" proxyname="spcthreader" />
@@ -3863,7 +3863,7 @@
    label="spcth history reader">
       <Documentation
         short_help="Read a comma-separated spctch history file."
-        long_help="Read a spcth history file where each row translates into a single time step
+        long_help="Reads an spcth history file where each row translates into a single time step
         and the columns are points, materials and properties.">
       </Documentation>
       <StringVectorProperty name="FileName"
@@ -3940,7 +3940,7 @@
    <SourceProxy name="plyreader" class="vtkPLYReader" label="PLY Reader">
      <Documentation
        short_help="Read PLY polygonal files."
-       long_help="Read files stored in Stanford University's PLY polygonal file format.">
+       long_help="Reads files stored in Stanford University's PLY polygonal file format.">
        The PLY reader reads files stored in the PLY polygonal file format developed at Stanford University. The PLY files that ParaView can read must have the elements "vertex" and "face" defined. The "vertex" elements must have the propertys "x", "y", and "z". The "face" elements must have the property "vertex_indices" defined. The default file extension for this reader is .ply.
      </Documentation>
      <StringVectorProperty
@@ -3963,7 +3963,7 @@
    <SourceProxy name="pdbreader" class="vtkPDBReader" label="PDB Reader">
      <Documentation
        short_help="Read PDB files."
-       long_help="Read PDB molecule files.">
+       long_help="Reads PDB molecule files.">
        The PDB reader reads files in the format used by the Protein Data Bank (an archive of experimentally determined three-dimensional structures of biological macromolecules). The expected file extension is .pdb. The output datasets are polygonal.
      </Documentation>
      <StringVectorProperty
@@ -3985,7 +3985,7 @@
    <SourceProxy name="xyzreader" class="vtkXYZMolReader" label="XYZ Reader">
      <Documentation
        short_help="Read XYZ molecular data files."
-       long_help="Read XYZ molecular data files into a polygonal dataset.">
+       long_help="Reads XYZ molecular data files into a polygonal dataset.">
        The XYZ reader reads XYZ molecular data files. The expected file extension is .xyz. The output of this reader is a polygonal dataset.
      </Documentation>
      <StringVectorProperty
@@ -4023,7 +4023,7 @@
                 label="Phasta Reader">
      <Documentation
        short_help="Read datasets stored in the Phasta format."
-       long_help="Read the parallel Phasta meta-file and the underlying Phasta files.">
+       long_help="Reads the parallel Phasta meta-file and the underlying Phasta files.">
        This Phasta reader reads files stored in the Phasta (a CFD package) format. The expected file extension is .pht. The output of this reader is a multipiece data set.
      </Documentation>
      <StringVectorProperty
@@ -4058,7 +4058,7 @@
                 label="Enzo Reader">
      <Documentation
        short_help="Read multi-block dataset from an Enzo file."
-       long_help="Read multi-block dataset from an Enzo file.">
+       long_help="Reads multi-block dataset from an Enzo file.">
          This Enzo reader loads data stored in Enzo format. The output of this reader is a multi-block dataset.
      </Documentation>
      <StringVectorProperty
@@ -4119,7 +4119,7 @@
                 label="Flash Reader">
      <Documentation
        short_help="Read multi-block dataset from a Flash file."
-       long_help="Read multi-block dataset from a Flash file.">
+       long_help="Reads multi-block dataset from a Flash file.">
          This Flash reader loads data stored in Flash format. The output of this reader is a multi-block dataset.
      </Documentation>
      <StringVectorProperty
@@ -4181,7 +4181,7 @@
                           file_name_method="SetFileName">
      <Documentation
          short_help="Read STL files."
-       long_help="Read ASCII or binary stereo lithography (STL) files.">
+       long_help="Reads ASCII or binary stereo lithography (STL) files.">
        The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset. This reader also supports file series.
      </Documentation>
 
@@ -4208,7 +4208,7 @@
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+         The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -4231,7 +4231,7 @@
    <SourceProxy name="byureader" class="vtkBYUReader" label="BYU Reader">
      <Documentation
        short_help="Read Movie.BYU files."
-       long_help="Read Movie.BYU files to produce polygonal data.">
+       long_help="Reads Movie.BYU files to produce polygonal data.">
        The BYU reader reads data stored in Movie.BYU format. The expected file extension is .g. The datasets resulting from reading these files are polygonal.
      </Documentation>
      <StringVectorProperty
@@ -4254,7 +4254,7 @@
    <SourceProxy name="objreader" class="vtkOBJReader" label="Wavefront OBJ Reader">
      <Documentation
        short_help="Read Wavefront .OBJ files."
-       long_help="Read Wavefront .OBJ files to produce polygonal and line data.">
+       long_help="Reads Wavefront .OBJ files to produce polygonal and line data.">
        The OBJ reader reads data stored in Wavefront .OBJ format.
        The expected file extension is .obj, the datasets resulting
        from reading these files are polygons and lines.
@@ -4330,7 +4330,7 @@
    <SourceProxy name="popreader" class="vtkPOPReader" label="POP Reader">
      <Documentation
        short_help="Read POP data files."
-       long_help="Read data files from the Parallel Ocean Program (POP).">
+       long_help="Reads data files from the Parallel Ocean Program (POP).">
        The POP reader reads data files from the Parallel Ocean Program (POP). The expected file extension is .pop. The output of this reader is a structured grid dataset.
      </Documentation>
      <StringVectorProperty
@@ -4389,7 +4389,7 @@
                 label="EnSight Master Server Reader">
      <Documentation
        short_help="Read parallel EnSight files."
-       long_help="Read files in EnSight's Master Server format.">
+       long_help="Reads files in EnSight's Master Server format.">
        The EnSight Master Server reader reads EnSight's parallel files. The master file ususally has a .sos extension and may point to multiple .case files. The output is a multi-block dataset.
      </Documentation>
      <StringVectorProperty
@@ -4501,8 +4501,8 @@
                 label="Image Reader">
      <Documentation
        short_help="Read raw regular rectilinear grid data from a file."
-       long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
-       The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
+       long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
+       The Image reader reads raw, regular, rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
      </Documentation>
      <!-- Unlike most readers, we need to show the "filename" so that users
           can strip off the extension and replace it in the file pattern.
@@ -4624,7 +4624,7 @@
         default_values="1" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         This property specifies the number of componenets the scalar value at each pixel or voxel has (e.g., RGB - 3 scalar components).
+         This property specifies the number of components the scalar value at each pixel or voxel has (e.g., RGB - 3 scalar components).
        </Documentation>
      </IntVectorProperty>
 
@@ -4644,7 +4644,7 @@
                         default_values="1">
        <BooleanDomain name="bool" />
        <Documentation>
-         This property determines whether the data originates in the lower left corner (on) or the upper left corner (off).  Most scientific data is written with a right-handed axes that originates in the lower left corner.  However, several 2D image file formats write the image from the upper left corner.
+         This property determines whether the data originates in the lower left corner (on) or the upper left corner (off). Most scientific data is written with a right-handed axes that originates in the lower left corner. However, several 2D image file formats write the image from the upper left corner.
        </Documentation>
      </IntVectorProperty>
    <!-- End ImageReader -->
@@ -4654,15 +4654,15 @@
                 class="vtkPNrrdReader"
                 label="Nrrd Reader">
      <Documentation short_help="Read raw image files with Nrrd meta data."
-                    long_help="Read raw image files with Nrrd meta data.">
+                    long_help="Reads raw image files with Nrrd meta data.">
        The Nrrd reader reads raw image data much like the Raw Image Reader
        except that it will also read metadata information in the Nrrd format.
        This means that the reader will automatically set information like file
        dimensions.
 
        There are several limitations on what type of nrrd files we can
-       read.  This reader only supports nrrd files in raw format.  Other
-       encodings like ascii and hex will result in errors.  When reading in
+       read. This reader only supports nrrd files in raw format. Other
+       encodings like ascii and hex will result in errors. When reading in
        detached headers, this only supports reading one file that is
        detached.
      </Documentation>
@@ -4684,10 +4684,10 @@
                         number_of_elements="6"
                         default_values="0 0 0 0 0 0">
        <Documentation>
-         The data volume of interest (VOI).  The VOI is a sub-extent of the
-         data that you want loaded.  Setting a VOI is useful when reading
+         The data volume of interest (VOI). The VOI is a sub-extent of the
+         data that you want loaded. Setting a VOI is useful when reading
          from a large data set and you are only interested in a small
-         portion of the data.  If left containing all 0's, then the reader
+         portion of the data. If left containing all 0's, then the reader
          will load in the entire data set.
        </Documentation>
      </IntVectorProperty>
@@ -4706,7 +4706,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a PNG file."
-       long_help="Read a PNG file into an image data.">
+       long_help="Reads a PNG file into an image data.">
        The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
      </Documentation>
 
@@ -4719,9 +4719,9 @@
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is specified,
+         The list of files to be read by the reader. If more than one file is specified,
          the reader will switch to file series mode in which it will pretend that it
-         can support time and provide 1 file per time step.
+         can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -4757,7 +4757,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of JPEG files."
-       long_help="Read a series of JPEG files into an time sequence of image datas.">
+       long_help="Reads a series of JPEG files into an time sequence of image datas.">
        The JPEG series reader reads JPEG files. The output is a time sequence of uniform
        rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
      </Documentation>
@@ -4771,9 +4771,9 @@
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is specified,
+         The list of files to be read by the reader. If more than one file is specified,
          the reader will switch to file series mode in which it will pretend that it
-         can support time and provide 1 file per time step.
+         can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -4808,7 +4808,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a series of TIFF files."
-       long_help="Read a series of TIFF files into an time sequence of image datas.">
+       long_help="Reads a series of TIFF files into an time sequence of image datas.">
        The TIFF series reader reads TIFF files. The output is a time sequence of uniform
        rectilinear (image/volume) dataset. The default file extension is .tif or .tiff.
      </Documentation>
@@ -4822,9 +4822,9 @@
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is specified,
+         The list of files to be read by the reader. If more than one file is specified,
          the reader will switch to file series mode in which it will pretend that it
-         can support time and provide 1 file per time step.
+         can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -4857,7 +4857,7 @@
                 label="XDMF Reader">
      <Documentation
        short_help="Read XDMF data files."
-       long_help="Read XDMF (eXtensible Data Model and Format) files.">
+       long_help="Reads XDMF (eXtensible Data Model and Format) files.">
        The XDMF reader reads files in XDMF format. The expected file extension
        is .xmf. Metadata is stored in the XDMF file using an XML format, and
        large attribute arrays are stored in a corresponding HDF5 file. The
@@ -5016,7 +5016,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read Exodus II files."
-       long_help="Read an Exodus II file to produce an unstructured grid.">
+       long_help="Reads an Exodus II file to produce an unstructured grid.">
         The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000. The file format is described fully at: http://endo.sandia.gov/SEACAS/Documentation/exodusII.pdf.
 
        Each Exodus file contains a single set of points with 2-D or 3-D coordinates plus one or more blocks, sets, and maps. Block group elements (or their bounding edges or faces) of the same type together. Sets select subsets (across all the blocks in a file) of elements, sides of elements (which may be of mixed dimensionality), bounding faces of volumetric elements, or bounding edges of volumetric or areal elements. Each block or set may have multiple result variables, each of which defines a value per element, per timestep.
@@ -5149,8 +5149,8 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
      <Documentation short_help="Read Exodus files from simulation restarts."
-                    long_help="Read collections of Exodus output files from simulations that were restarted.">
-       When a simulation that outputs exodus files is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
+                    long_help="Reads collections of Exodus output files from simulations that were restarted.">
+       When a simulation that outputs exodus files is restarted, typically you get a new set of output files. When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files. This reader allows you to specify a metadata file that will implicitly string the files together.
      </Documentation>
      <SubProxy>
        <Proxy name="Reader"
@@ -5267,7 +5267,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a dataset in AVS UCD format."
-       long_help="Read binary or ASCII files stored in AVS UCD format.">
+       long_help="Reads binary or ASCII files stored in AVS UCD format.">
        The AVS UCD reader reads binary or ASCII files stored in AVS UCD format.
        The default file extension is .inp. The output of this reader is
        unstructured grid. This supports reading a file series.
@@ -5302,9 +5302,9 @@
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is
+         The list of files to be read by the reader. If more than one file is
          specified, the reader will switch to file series mode in which it will
-         pretend that it can support time and provide 1 file per time step.
+         pretend that it can support time and provide one file per time step.
        </Documentation>
      </StringVectorProperty>
 
@@ -5329,7 +5329,7 @@
                 class="vtkFacetReader">
      <Documentation
        short_help="Read a dataset in Facet format."
-       long_help="Read ASCII files stored in Facet format.">
+       long_help="Reads ASCII files stored in Facet format.">
        The Facet Reader reads files in Facet format: a simple ASCII file format listing point coordinates and connectivity between these points. The default file extension is .facet. The output of the Facet Reader is polygonal.
      </Documentation>
      <StringVectorProperty
@@ -5355,7 +5355,7 @@
                 label="TIFF Reader">
      <Documentation
        short_help="Read a TIFF file."
-       long_help="Read a TIFF file into an image data.">
+       long_help="Reads a TIFF file into an image data.">
        The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
      </Documentation>
      <StringVectorProperty
@@ -5381,7 +5381,7 @@
                 label="SESAME Reader">
      <Documentation
        short_help="Read SESAME data files."
-       long_help="Read SESAME data files, producing rectilinear grids.">
+       long_help="Reads SESAME data files, producing rectilinear grids.">
        The SESAME reader reads SESAME data files, and outputs rectilinear grids. The expected file extension is .sesame.
      </Documentation>
      <StringVectorProperty
@@ -5430,7 +5430,7 @@
     <SourceProxy name="OpenFOAMReader" class="vtkPOpenFOAMReader">
      <Documentation
        short_help="Read OpenFOAM data files."
-       long_help="Read OpenFOAM data files, producing multi-block dataset.">
+       long_help="Reads OpenFOAM data files, producing multi-block dataset.">
        The OpenFOAM reader reads OpenFOAM data files and outputs multi-block datasets. Mesh information and time dependent data are supported.
         The OpenFOAM format is described fully at http://www.openfoam.com/docs/user/basic-file-format.php
      </Documentation>
@@ -5669,10 +5669,10 @@
         short_help="Reads a dataset in MFIX file format."
         long_help="Reads a dataset in MFIX file format." >
         vtkMFIXReader creates an unstructured grid dataset. It reads a restart
-        file and a set of sp files.  The restart file contains the mesh
-        information.  MFIX meshes are either cylindrical or rectilinear, but
-        this reader will convert them to an unstructured grid.  The sp files
-        contain transient data for the cells.  Each sp file has one or more
+        file and a set of sp files. The restart file contains the mesh
+        information. MFIX meshes are either cylindrical or rectilinear, but
+        this reader will convert them to an unstructured grid. The sp files
+        contain transient data for the cells. Each sp file has one or more
         variables stored inside it.
       </Documentation>
       <StringVectorProperty name="FileName"
@@ -5812,7 +5812,7 @@
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
      <Documentation
       short_help="Read LS-Dyna databases (d3plot)."
-      long_help="Read LS-Dyna databases (d3plot)." >
+      long_help="Reads LS-Dyna databases (d3plot)." >
       This reader reads LS-Dyna databases.
      </Documentation>
 
@@ -6076,14 +6076,14 @@
                            si_class="vtkSIFileSeriesReaderProxy"
                            file_name_method="SetFileName">
       <Documentation short_help="Read regular arrays from netCDF files."
-                     long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
-        Reads arrays from netCDF files into structured VTK data sets.  In
+                     long_help="Reads regular arrays from netCDF files. Will also read any topological information specified by the COARDS and CF conventions.">
+        Reads arrays from netCDF files into structured VTK data sets. In
         the absence of any other information, the files will be read as
-        image data.  This reader will also look for meta information
+        image data. This reader will also look for meta information
         specified by the CF convention that specify things like topology
-        and time.  This information can cause the output to be a nonuniform
-        rectilinear grid or curvilinear (structured) grid.  Details on the
-        CF convention can be found at http://cf-pcmdi.llnl.gov/.  It should
+        and time. This information can cause the output to be a nonuniform
+        rectilinear grid or curvilinear (structured) grid. Details on the
+        CF convention can be found at http://cf-pcmdi.llnl.gov/. It should
         be noted that the CF convention is a superset of the COARDS
         convention, so COARDS conventions will also be recognized.
       </Documentation>
@@ -6122,7 +6122,7 @@
         <TimeStepsInformationHelper />
         <Documentation>
           This magic property sends time information to the animation
-          panel.  ParaView will then automatically set up the animation to
+          panel. ParaView will then automatically set up the animation to
           visit the time steps defined in the file.
         </Documentation>
       </DoubleVectorProperty>
@@ -6165,7 +6165,7 @@
                             repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
-          The name of the mode files to load.  The points in the mode file should be the same as the mesh file.
+          The name of the mode files to load. The points in the mode file should be the same as the mesh file.
         </Documentation>
       </StringVectorProperty>
 
@@ -6227,7 +6227,7 @@
         <TimeStepsInformationHelper />
         <Documentation>
           This magic property sends time information to the animation
-          panel.  ParaView will then automatically set up the animation to
+          panel. ParaView will then automatically set up the animation to
           visit the time steps defined in the file.
         </Documentation>
       </DoubleVectorProperty>
@@ -6236,8 +6236,8 @@
         <TimeRangeInformationHelper/>
         <Documentation>
           This magic property sends time range information to the animation
-          panel.  ParaView uses this information to set the range of time
-          for the animation.  This property is important for when there are
+          panel. ParaView uses this information to set the range of time
+          for the animation. This property is important for when there are
           no timesteps but you still want to give ParaView a range of
           values to use.
         </Documentation>
@@ -6302,7 +6302,7 @@
                           file_name_method="SetFileName">
       <Documentation
         short_help="Read a comma-separated values file."
-        long_help="Read a comma-separated values file into a 1D rectilinear grid.">
+        long_help="Reads a comma-separated values file into a 1D rectilinear grid.">
         The CSV reader reads a comma-separated values file into a 1D rectilinear
         grid. If the file was saved using the CSVWriter, then the rectilinear
         grid's points and point data can be restored as well as the cell data.
@@ -6321,9 +6321,9 @@
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader. Each file is expected to be
-          a csv file. If more than 1 file is specified, the reader will switch to
+          a csv file. If more than one file is specified, the reader will switch to
           file series mode in which it will pretend that it can support time and
-          provide 1 file per time step.
+          provide one file per time step.
         </Documentation>
       </StringVectorProperty>
 
@@ -6372,14 +6372,14 @@
                           si_class="vtkSIFileSeriesReaderProxy"
                           file_name_method="SetFileName">
       <Documentation short_help="Read particle data."
-        long_help="Read particle data.">
+        long_help="Reads particle data.">
         vtkParticleReader reads either a binary or a text file of particles.
         Each particle can have associated with it an optional scalar value. So
         the format is: x, y, z, scalar (all floats or doubles). The text file
         can consist of a comma delimited set of values. In most cases
         vtkParticleReader can automatically determine whether the file is text
-        or binary.  The data can be either float or double.  Progress updates
-        are provided.  With respect to binary files, random access into the file
+        or binary. The data can be either float or double. Progress updates
+        are provided. With respect to binary files, random access into the file
         to read pieces is supported.
       </Documentation>
 
@@ -6440,7 +6440,7 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read files in the Tecplot ASCII file format."
-       long_help="Read files in the Tecplot ASCII file format.">
+       long_help="Reads files in the Tecplot ASCII file format.">
        The Tecplot reader extracts multiple zones (blocks) of data from a Tecplot ASCII file, in which a zone is stored in either point packing mode (i.e., tuple-based, with only point data supported) or block packing mode (i.e., component-based, with point data and cell data supported). The output of the reader is a vtkMultiBlockDataset, of which each block is either a vtkStructuredGrid or a vtkUnstructuredGrid. This supports reading a file series.
      </Documentation>
 
@@ -6499,8 +6499,8 @@
 
      <Documentation
        short_help="Read VPIC simulation files."
-       long_help="Read distributed VPIC files into an ImageData.">
-       VPIC is a 3D kinetic plasma particle-in-cell simulation.  The input file (.vpc) opened by the VPIC reader is an ASCII description of the data files which are written one file per processor, per category and per time step.  These are arranged in subdirectories per category (field data and hydrology data) and then in time step subdirectories.
+       long_help="Reads distributed VPIC files into an ImageData.">
+       VPIC is a 3D kinetic plasma particle-in-cell simulation. The input file (.vpc) opened by the VPIC reader is an ASCII description of the data files which are written one file per processor, per category and per time step. These are arranged in subdirectories per category (field data and hydrology data) and then in time step subdirectories.
      </Documentation>
 
      <StringVectorProperty
@@ -6535,7 +6535,7 @@
           </RequiredProperties>
         </ArraySelectionDomain>
         <Documentation>
-        Variables written to the data files are described in the .vpc file and are presented for selection.  Only selected variables are loaded for a time step.
+        Variables written to the data files are described in the .vpc file and are presented for selection. Only selected variables are loaded for a time step.
         </Documentation>
      </StringVectorProperty>
 
@@ -6554,7 +6554,7 @@
          default_values="1 1 1">
          <IntRangeDomain name="range" min="1"/>
          <Documentation>
-         VPIC data may be very large and not all is needed for effective visualization.  Setting the stride selects every nth data item within the files for display.
+         VPIC data may be very large and not all is needed for effective visualization. Setting the stride selects every nth data item within the files for display.
          </Documentation>
      </IntVectorProperty>
 
@@ -6564,7 +6564,7 @@
         information_only="1">
         <SimpleIntInformationHelper/>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Default extent is all files available.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Default extent is all files available.
         </Documentation>
      </IntVectorProperty>
 
@@ -6574,7 +6574,7 @@
         information_only="1">
         <SimpleIntInformationHelper/>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Default extent is all files available.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Default extent is all files available.
         </Documentation>
      </IntVectorProperty>
 
@@ -6584,7 +6584,7 @@
         information_only="1">
         <SimpleIntInformationHelper/>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Default extent is all files available.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Default extent is all files available.
         </Documentation>
      </IntVectorProperty>
 
@@ -6601,7 +6601,7 @@
              </RequiredProperties>
         </IntRangeDomain>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Ghost cell overlap is handled within the reader.  To limit the View of VPIC information the extent in the X dimension of "files" can be specified.  Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Ghost cell overlap is handled within the reader. To limit the View of VPIC information the extent in the X dimension of "files" can be specified. Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
         </Documentation>
      </IntVectorProperty>
 
@@ -6618,7 +6618,7 @@
              </RequiredProperties>
         </IntRangeDomain>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Ghost cell overlap is handled within the reader.  To limit the View of VPIC information the extent in the Y dimension of "files" can be specified.  Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Ghost cell overlap is handled within the reader. To limit the View of VPIC information the extent in the Y dimension of "files" can be specified. Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
         </Documentation>
      </IntVectorProperty>
 
@@ -6635,7 +6635,7 @@
              </RequiredProperties>
         </IntRangeDomain>
         <Documentation>
-        VPIC data is written one file per simulation processor.  This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display.  Ghost cell overlap is handled within the reader.  To limit the View of VPIC information the extent in the Z dimension of "files" can be specified.  Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
+        VPIC data is written one file per simulation processor. This coarse map of files is used in partitioning files between visualizing processors so that each ParaView processor has its own set of files to display. Ghost cell overlap is handled within the reader. To limit the View of VPIC information the extent in the Z dimension of "files" can be specified. Only the files selected will be displayed and they will be partitioned between the visualizing processors, allowing a higher resolution over a smaller area.
         </Documentation>
      </IntVectorProperty>
 
@@ -6655,8 +6655,8 @@
 
      <Documentation
        short_help="Read WindBlade simulation files."
-       long_help="Read WindBlade/Firetec simulation files possibly including wind turbines and topolgy files.">
-       WindBlade/Firetec is a simulation dealing with the effects of wind on wind turbines or on the spread of fires.  It produces three outputs - a StructuredGrid for the wind data fields, a StructuredGrid for the ground topology, and a PolyData for turning turbine blades.  The input file (.wind) opened by the WindBlade reader is an ASCII description of the data files expected.  Data is accumulated by the simulation processor and is written one file per time step.  WindBlade can deal with topology if a flag is turned on and expects (x,y) data for the ground.  It also can deal with turning wind turbines from other time step data files which gives polygon positions of segments of the blades and data for each segment.
+       long_help="Reads WindBlade/Firetec simulation files possibly including wind turbines and topolgy files.">
+       WindBlade/Firetec is a simulation dealing with the effects of wind on wind turbines or on the spread of fires. It produces three outputs - a StructuredGrid for the wind data fields, a StructuredGrid for the ground topology, and a PolyData for turning turbine blades. The input file (.wind) opened by the WindBlade reader is an ASCII description of the data files expected. Data is accumulated by the simulation processor and is written one file per time step. WindBlade can deal with topology if a flag is turned on and expects (x,y) data for the ground. It also can deal with turning wind turbines from other time step data files which gives polygon positions of segments of the blades and data for each segment.
      </Documentation>
 
      <OutputPort name="Field" index="0" />
@@ -6700,7 +6700,7 @@
           </RequiredProperties>
         </ArraySelectionDomain>
         <Documentation>
-        Variables written to the data files are described in the .wind file and are presented for selection.  Only selected variables are loaded for a time step.
+        Variables written to the data files are described in the .wind file and are presented for selection. Only selected variables are loaded for a time step.
         </Documentation>
       </StringVectorProperty>
 
@@ -6717,9 +6717,9 @@
                 label="NetCDF CAM reader">
      <Documentation
         short_help="Read unstructured grid NetCDF files in CAM format."
-        long_help="Read unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName.">
-       This reader reads in unstructured grid data from a NetCDF file.  The grid data is in a set of planes
-       as quadrilateral cells.  The reader creates hex cells in order to create a volumetric grid.
+        long_help="Reads unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName.">
+       This reader reads in unstructured grid data from a NetCDF file. The grid data is in a set of planes
+       as quadrilateral cells. The reader creates hex cells in order to create a volumetric grid.
      </Documentation>
 
      <StringVectorProperty
@@ -6759,7 +6759,7 @@
                 label="NetCDF POP reader">
      <Documentation
         short_help="Read rectilinear grid data from a NetCDF file in the POP format."
-        long_help="Read rectilinear grid data from a NetCDF POP file.">
+        long_help="Reads rectilinear grid data from a NetCDF POP file.">
        The reader reads regular rectilinear grid (image/volume) data from a NetCDF file.
      </Documentation>
 
@@ -6819,7 +6819,7 @@
                 multiprocess_support="multiple_processes">
      <Documentation
         short_help="Read rectilinear grid data from a NetCDF file in the POP format in parallel."
-        long_help="Read rectilinear grid data from a NetCDF POP file in parallel.">
+        long_help="Reads rectilinear grid data from a NetCDF POP file in parallel.">
        The reader reads regular rectilinear grid (image/volume) data from a NetCDF file.
        Only a subset of the processes actually read the file and these processes
        communicate the data to other processes.
@@ -6880,10 +6880,10 @@
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a cosmology file."
-       long_help="Read a cosmology file into a vtkUnstructuredGrid.">
+       long_help="Reads a cosmology file into a vtkUnstructuredGrid.">
        The Cosmology reader reads a binary file of particle location,
        velocity, and id creating a vtkUnstructuredGrid. The default
-       file extension is .cosmo.  Reads LANL Cosmo format or Gadget format.
+       file extension is .cosmo. Reads LANL Cosmo format or Gadget format.
      </Documentation>
 
      <SubProxy>
@@ -6936,27 +6936,27 @@
                 label="NetCDF MPAS reader">
      <Documentation
          short_help="Read unstructured grid MPAS data from a file."
-         long_help="Read unstructured grid MPAS data from a file.">
-       This reader reads unstructured grid MPAS data from a file.  It creates a dual grid
-       It assumes the grid is in the global domain.  By default, it creates a spherical
-       view of vertical layer 0.  It assumes it is ocean data.  It gives several options to
+         long_help="Reads unstructured grid MPAS data from a file.">
+       This reader reads unstructured grid MPAS data from a file. It creates a dual grid
+       It assumes the grid is in the global domain. By default, it creates a spherical
+       view of vertical layer 0. It assumes it is ocean data. It gives several options to
        change the view to multilayer (all vertical layers will have a thickness determined
        by the value in the slider), lat/lon projection or atmospheric (vertical layers go out
        away from the center of the sphere, instead of down towards the center as they do
-       for ocean data).  It doesn't handle data in the rectangular domain.  This is not a
-       parallel reader.  It expects one .nc file of data.  It can display cell or vertex-centered
-       data, but not edge data.  When converted to the dual grid, cell-centered data becomes
+       for ocean data). It doesn't handle data in the rectangular domain. This is not a
+       parallel reader. It expects one .nc file of data. It can display cell or vertex-centered
+       data, but not edge data. When converted to the dual grid, cell-centered data becomes
        vertex-centered and vice-versa.
         NOTES:
         When using this reader, it is important that you remember to do the following:
         1.  When changing a selected variable, remember to select it also in the drop
-            down box to color by.  It doesn't color by that variable automatically
+            down box to color by. It doesn't color by that variable automatically
         2.  When selecting multilayer sphere view, start with layer thickness around 100,000
         3.  When selecting multilayer lat/lon view, start with layer thickness around 10
         4.  Always click the -Z orientation after making a switch from lat/lon to sphere,
             from single to multilayer or changing thickness.
         5.  Be conservative on the number of changes you make before hitting Apply, since there
-            may be bugs in this reader.  Just make one change and then hit Apply.
+            may be bugs in this reader. Just make one change and then hit Apply.
        For problems, contact Christine Ahrens (cahrens@lanl.gov)
      </Documentation>
 
@@ -6965,7 +6965,7 @@
                            animateable="0" >
        <FileListDomain name="files"/>
        <Documentation>
-         This property specifies the file name to read.  It should be an MPAS format NetCDF file ending in .nc.
+         This property specifies the file name to read. It should be an MPAS format NetCDF file ending in .nc.
        </Documentation>
      </StringVectorProperty>
 
@@ -7034,7 +7034,7 @@
          default_values="0">
        <BooleanDomain name="bool" />
          <Documentation>
-           This property indicates whether to show multiple layers in one view, with each vertical level having the same thickness, specified by the layer thickness slider.  For ocean data, the layers correspond to data at vertical level whose number increases towards the center of the sphere.  For atmospheric data, the layers correspond to data at vertical levels increasing away from the center.
+           This property indicates whether to show multiple layers in one view, with each vertical level having the same thickness, specified by the layer thickness slider. For ocean data, the layers correspond to data at vertical level whose number increases towards the center of the sphere. For atmospheric data, the layers correspond to data at vertical levels increasing away from the center.
          </Documentation>
      </IntVectorProperty>
 
@@ -7045,7 +7045,7 @@
          default_values="0">
        <BooleanDomain name="bool" />
          <Documentation>
-           This property indicates whether data is atmospheric.  Checking this ensures the vertical levels will go up away from the sphere instead of down towards the center.
+           This property indicates whether data is atmospheric. Checking this ensures the vertical levels will go up away from the sphere instead of down towards the center.
          </Documentation>
      </IntVectorProperty>
 
@@ -7068,7 +7068,7 @@
        </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-       This property specifies how thick the layer should be if viewing the data in multilayer view.  Each layer corresponds to a vertical level.  A good starting point is 100,000 for the spherical view and 10 for the lat/lon projection.  Click on -Z after applying this change, since the scale may change drastically.
+       This property specifies how thick the layer should be if viewing the data in multilayer view. Each layer corresponds to a vertical level. A good starting point is 100,000 for the spherical view and 10 for the lat/lon projection. Click on -Z after applying this change, since the scale may change drastically.
        </Documentation>
      </IntVectorProperty>
 
@@ -7113,7 +7113,7 @@
          </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-       This property specifies which vertical level is viewed if not in multilayer view.  Only the data for that vertical level will be viewed. The grid is essentially the same for each vertical level, however at some ocean levels, especially the lower ones, due to the topography, the grid becomes more sparse where there is land.
+       This property specifies which vertical level is viewed if not in multilayer view. Only the data for that vertical level will be viewed. The grid is essentially the same for each vertical level, however at some ocean levels, especially the lower ones, due to the topography, the grid becomes more sparse where there is land.
        </Documentation>
      </IntVectorProperty>
 
@@ -7141,7 +7141,7 @@
                         file_name_method="SetQFileName">
    <Documentation
      short_help="Read PLOT3D files."
-     long_help="Read ASCII or binary PLOT3D files.">
+     long_help="Reads ASCII or binary PLOT3D files.">
      PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
    </Documentation>
    <SubProxy>
@@ -7177,10 +7177,10 @@
       information_property="FileNameInfo" >
       <FileListDomain name="files"/>
       <Documentation>
-        The list of .q (solution) files for the PLOT3D reader. This can be
-        more than 1. If more that 1 file is specified, the reader will switch
+        The list of .q (solution) files for the PLOT3D reader. There can be
+        more than one. If more that one file is specified, the reader will switch
         to file-series mode in which it will pretend that it can support time
-        and provide 1 file per time step.
+        and provide one file per time step.
      </Documentation>
    </StringVectorProperty>
 
