@@ -261,16 +261,6 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
           for ( int i=0;i<3;i++ )
             origin[i] += deltaPos[i];
           vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
-
-          // // Get the current transformation matrix
-          // std::cout<< "Gettting the wand pose" <<std::endl;
-          // double oldPose[16];
-          // vtkSMPropertyHelper(proxy, "WandPose").
-          //   Get(&oldPose[0], 16 );
-
-          // prop->SetElement( 3,  oldPose[3]  + deltaPos[0]);
-          // prop->SetElement( 7,  oldPose[7]  + deltaPos[1]);
-          // prop->SetElement( 11, oldPose[11]  + deltaPos[2]);
           }
         }
       }
@@ -303,9 +293,4 @@ void vtkVRStyleGrabNTranslateSliceOrigin::RecordCurrentPosition(const vtkVREvent
   this->InitialPos[0] = data.data.tracker.matrix[3];
   this->InitialPos[1] = data.data.tracker.matrix[7];
   this->InitialPos[2] = data.data.tracker.matrix[11];
-  std::cout << "InitialPos = ["
-            << this->InitialPos[0] << " "
-            << this->InitialPos[1] << " "
-            << this->InitialPos[2] << " ] "
-            << std::endl;
 }
