@@ -1632,7 +1632,17 @@ QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property,
 
   if (svp)
     {
-    for (unsigned int i = 0; i < svp->GetNumberOfElements(); i++)
+    int elementCount = 0;
+    if(Type == CHECKED)
+      {
+      elementCount = svp->GetNumberOfElements();
+      }
+    else if(Type == UNCHECKED)
+      {
+      elementCount = svp->GetNumberOfUncheckedElements();
+      }
+
+    for (unsigned int i = 0; i < elementCount; i++)
       {
       if(Type == CHECKED)
         {
@@ -1662,7 +1672,17 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
   unsigned int i = 0;
   foreach (const QString &file, Value)
     {
-    if (!svp->GetRepeatCommand() && i >= svp->GetNumberOfElements())
+    int elementCount = 0;
+    if(Type == CHECKED)
+      {
+      elementCount = svp->GetNumberOfElements();
+      }
+    else if(Type == UNCHECKED)
+      {
+      elementCount = svp->GetNumberOfUncheckedElements();
+      }
+
+    if (!svp->GetRepeatCommand() && i >= elementCount)
       {
       break;
       }
@@ -1677,14 +1697,6 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
       }
 
     i++;
-    }
-
-  if(Type == CHECKED)
-    {
-    if (static_cast<int>(svp->GetNumberOfElements()) != Value.size())
-      {
-      svp->SetNumberOfElements(svp->GetNumberOfElements());
-      }
     }
 
   if(Type == UNCHECKED)
