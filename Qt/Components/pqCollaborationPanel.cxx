@@ -218,7 +218,10 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
 void pqCollaborationPanel::followUserCamera(int userId)
 {
   // Update collaboration manager to know if we follow a given user or not
-  this->getCollaborationManager()->setFollowUserView(userId);
+  if(pqCollaborationManager* collabManager = this->getCollaborationManager())
+    {
+    collabManager->setFollowUserView(userId);
+    }
 
   if(this->Internal->CameraToFollowOfUserId == userId)
     {
