@@ -49,7 +49,6 @@ public:
   ~vtkVRStyleGrabNUpdateMatrix();
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-
   virtual void HandleButton( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
   virtual bool GetProxyNProperty();

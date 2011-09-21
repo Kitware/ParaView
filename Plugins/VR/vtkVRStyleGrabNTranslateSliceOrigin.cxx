@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTransform.h"
 #include "vtkMatrix4x4.h"
 
-//------------------------------------------------------------------------cnstr
+// ----------------------------------------------------------------------------
 vtkVRStyleGrabNTranslateSliceOrigin::vtkVRStyleGrabNTranslateSliceOrigin(QObject* parentObject)
   : Superclass(parentObject)
 {
@@ -59,7 +59,7 @@ vtkVRStyleGrabNTranslateSliceOrigin::vtkVRStyleGrabNTranslateSliceOrigin(QObject
   this->InitialInvertedPose = vtkMatrix4x4::New();
 }
 
-//------------------------------------------------------------------------destr
+// ----------------------------------------------------------------------------
 vtkVRStyleGrabNTranslateSliceOrigin::~vtkVRStyleGrabNTranslateSliceOrigin()
 {
   // Delete the assigned matix
@@ -69,7 +69,7 @@ vtkVRStyleGrabNTranslateSliceOrigin::~vtkVRStyleGrabNTranslateSliceOrigin()
   Old->Delete();
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* vtkNotUsed( locator ))
 {
@@ -147,7 +147,7 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
   return false;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRStyleGrabNTranslateSliceOrigin::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -170,7 +170,7 @@ vtkPVXMLElement* vtkVRStyleGrabNTranslateSliceOrigin::saveConfiguration() const
   return child;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNTranslateSliceOrigin::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
@@ -194,7 +194,7 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::handleEvent(const vtkVREventData& data
   return false;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNTranslateSliceOrigin::update()
 {
   pqView *view = 0;
@@ -213,13 +213,13 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::update()
   return false;
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRStyleGrabNTranslateSliceOrigin::HandleButton( const vtkVREventData& data )
 {
     this->Enabled = data.data.button.state;
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& data )
 {
   // If the button is pressed then record the current position is tracking space
@@ -295,7 +295,7 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
     }
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 std::vector<std::string> vtkVRStyleGrabNTranslateSliceOrigin::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
@@ -310,7 +310,7 @@ std::vector<std::string> vtkVRStyleGrabNTranslateSliceOrigin::tokenize( std::str
   return token;
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRStyleGrabNTranslateSliceOrigin::RecordCurrentPosition(const vtkVREventData& data)
 {
   this->InitialPos[0] = data.data.tracker.matrix[3];

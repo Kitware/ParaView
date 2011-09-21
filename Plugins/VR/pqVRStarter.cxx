@@ -30,13 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqVRStarter.h"
-
-// Server Manager Includes.
-
-// Qt Includes.
 #include <QtDebug>
 #include <QTimer>
-// ParaView Includes.
 #include "vtkVRPNConnection.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
@@ -45,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "vtkVRConnectionManager.h"
 
+//-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
 {
 public:

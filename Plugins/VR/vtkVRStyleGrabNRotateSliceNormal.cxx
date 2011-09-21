@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMatrix4x4.h"
 #include "vtkMath.h"
 
-//------------------------------------------------------------------------cnstr
+// ----------------------------------------------------------------------------
 vtkVRStyleGrabNRotateSliceNormal::vtkVRStyleGrabNRotateSliceNormal(QObject* parentObject)
   : Superclass(parentObject)
 {
@@ -57,13 +57,13 @@ vtkVRStyleGrabNRotateSliceNormal::vtkVRStyleGrabNRotateSliceNormal(QObject* pare
   this->InitialInvertedPose = vtkMatrix4x4::New();
 }
 
-//------------------------------------------------------------------------destr
+// ----------------------------------------------------------------------------
 vtkVRStyleGrabNRotateSliceNormal::~vtkVRStyleGrabNRotateSliceNormal()
 {
   this->InitialInvertedPose->Delete();
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNRotateSliceNormal::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* vtkNotUsed( locator ))
 {
@@ -143,7 +143,7 @@ bool vtkVRStyleGrabNRotateSliceNormal::configure(vtkPVXMLElement* child,
   return false;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRStyleGrabNRotateSliceNormal::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -166,7 +166,7 @@ vtkPVXMLElement* vtkVRStyleGrabNRotateSliceNormal::saveConfiguration() const
   return child;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNRotateSliceNormal::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
@@ -190,7 +190,7 @@ bool vtkVRStyleGrabNRotateSliceNormal::handleEvent(const vtkVREventData& data)
   return false;
 }
 
-//-----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRStyleGrabNRotateSliceNormal::update()
 {
   pqView *view = 0;
@@ -209,13 +209,13 @@ bool vtkVRStyleGrabNRotateSliceNormal::update()
   return false;
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRStyleGrabNRotateSliceNormal::HandleButton( const vtkVREventData& data )
 {
   this->Enabled = data.data.button.state;
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data )
 {
   if ( this->Enabled )
@@ -274,7 +274,7 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
     }
 }
 
-//----------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 std::vector<std::string> vtkVRStyleGrabNRotateSliceNormal::tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
