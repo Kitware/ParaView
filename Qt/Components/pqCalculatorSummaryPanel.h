@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCalculatorSummaryPanel_h
 
 #include "pqObjectPanel.h"
+#include "pqPropertyLinks.h"
 
 class QLineEdit;
 
@@ -50,6 +51,7 @@ public slots:
 private:
   QLineEdit *Expression;
   QLineEdit *ResultArrayName;
+  pqPropertyLinks Links;
 };
 
 #endif

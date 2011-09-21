@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFormLayout>
 #include <QLineEdit>
 
+#include "pqProxy.h"
 #include "pqSMAdaptor.h"
 
 pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *parent)
@@ -50,9 +51,22 @@ pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *pare
   layout->addRow("Expression:", this->Expression);
   layout->addRow("Result Array Name:", this->ResultArrayName);
 
-  setLayout(layout);
+  vtkSMProxy *smProxy = proxy->getProxy();
 
-  accept();
+  this->Links.setUseUncheckedProperties(true);
+  this->Links.addPropertyLink(this->Expression,
+                              "currentText",
+                              SIGNAL(currentTextChanged(const QString&)),
+                              smProxy,
+                              smProxy->GetProperty("Function"));
+
+  this->Links.addPropertyLink(this->ResultArrayName,
+                              "currentText",
+                              SIGNAL(currentTextChanged(const QString&)),
+                              smProxy,
+                              smProxy->GetProperty("ResultArrayName"));
+
+  setLayout(layout);
 }
 
 pqCalculatorSummaryPanel::~pqCalculatorSummaryPanel()
@@ -63,15 +77,5 @@ void pqCalculatorSummaryPanel::accept()
 {
   this->pqObjectPanel::accept();
 
-  if(!this->proxy())
-    {
-    return;
-    }
-
-  vtkSMProxy *proxy = this->proxy();
-
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Function"),
-                                  this->Expression->text());
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("ResultArrayName"),
-                                  this->ResultArrayName->text());
+  this->Links.accept();
 }
