@@ -651,7 +651,8 @@ void pqSummaryPanel::updateAcceptState()
   bool acceptable = false;
   foreach(const pqObjectPanel *panel, this->PanelStore)
     {
-    if(panel->referenceProxy()->modifiedState() != pqProxy::UNMODIFIED)
+    if(panel->referenceProxy() &&
+       panel->referenceProxy()->modifiedState() != pqProxy::UNMODIFIED)
       {
       acceptable = true;
       }
