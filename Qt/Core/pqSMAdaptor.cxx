@@ -563,7 +563,7 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
   else if(StringListDomain)
     {
     QList<QVariant> values =
-      pqSMAdaptor::getMultipleElementProperty(Property);
+      pqSMAdaptor::getMultipleElementProperty(Property, Type);
     
     if(Index < StringListDomain->GetNumberOfStrings())
       {
@@ -768,7 +768,7 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
   else if(StringListDomain)
     {
     QList<QVariant> values =
-      pqSMAdaptor::getMultipleElementProperty(Property);
+      pqSMAdaptor::getMultipleElementProperty(Property, Type);
     if(Value[1].toInt() && !values.contains(Value[0]))
       {
       pqSMAdaptor::setMultipleElementProperty(Property,
