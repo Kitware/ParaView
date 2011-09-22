@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Cone" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" /> 
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="FeatureEdges" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="0" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab" arguments="0" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
   <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="MyFeatureEdges" />
   <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
@@ -49,11 +49,11 @@
   <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyFeatureEdges" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Guess3" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Guess3" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CustomFilterList" command="mousePress" arguments="1,1,0,86,6,/0:0" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CustomFilterList" command="mouseRelease" arguments="1,0,0,86,6,/0:0" />
@@ -62,5 +62,5 @@
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevation" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView widget includes
 
 // ParaView core includes
+#include "pqActiveObjects.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
@@ -85,6 +86,12 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   QObject::connect(this->Ui->compositeTree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
     this, SLOT(onItemClicked(QTreeWidgetItem*)), Qt::QueuedConnection);
   this->updateInformation(); // initialize state.
+
+
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(portChanged(pqOutputPort*)),
+                this,
+                SLOT(setOutputPort(pqOutputPort*)));
 }
 
 //-----------------------------------------------------------------------------
