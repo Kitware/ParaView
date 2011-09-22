@@ -127,7 +127,13 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       install(DIRECTORY ${PYTHON_LIBS_DIR}
               DESTINATION ${pv_runtime_dest}
               USE_SOURCE_PERMISSIONS
-              COMPONENT Runtime)
+              COMPONENT Runtime
+              REGEX "lib2to3/" EXCLUDE
+              REGEX "lib[-]old/" EXCLUDE
+              REGEX "plat[-].*" EXCLUDE
+              REGEX "test/" EXCLUDE
+              REGEX "wsgiref*" EXCLUDE
+              REGEX "distutils/" EXCLUDE)
     endif(PARAVIEW_INSTALL_PYTHON)
   endif(PARAVIEW_ENABLE_PYTHON)
 
@@ -199,10 +205,14 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
     endforeach(pluginname ${PARAVIEW_PLUGINLIST})
   endif()
 
-  install(CODE "
-include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
-" COMPONENT BrandedRuntime)
+  set(PARAVIEW_INSTALL_APPS ${APPS} CACHE INTERNAL "" FORCE)
+  set(PARAVIEW_INSTALL_PLUGIN_LIBS ${plugin_libs} CACHE INTERNAL "" FORCE)
+  set(PARAVIEW_INSTALL_LIBRARY_SEARCH_PATH ${search_path} CACHE INTERNAL "" FORCE)
+
+#  install(CODE "
+#include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
+#fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
+#" COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
@@ -226,32 +236,32 @@ install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 
 # Call this last so the install script runs after the above targets are installed:
 #
-if(APPLE)
+#if(APPLE)
+#
+#  option(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE "Build ParaView as a Mac Application Bundle" ON)
+#  if(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
+#    set (ParaView_BUNDLE_LOCATION "" CACHE STRING
+#      "Subdirectory in which to place ParaView app inside a bundle.")
 
-  option(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE "Build ParaView as a Mac Application Bundle" ON)
-  if(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
-    set (ParaView_BUNDLE_LOCATION "" CACHE STRING
-      "Subdirectory in which to place ParaView app inside a bundle.")
+#    mark_as_advanced(ParaView_BUNDLE_LOCATION)
 
-    mark_as_advanced(ParaView_BUNDLE_LOCATION)
-
-    set(distributed_plugins ${PARAVIEW_PLUGINLIST})
-    set(PV_EXE_NAME "paraview")
-    set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
-      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
-    set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
-      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
+#    set(distributed_plugins ${PARAVIEW_PLUGINLIST})
+#    set(PV_EXE_NAME "paraview")
+#    set(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
+#      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
+#    set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
+#      "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
     
-    set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
+#    set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
 
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
-      "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
-      "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+#    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+#      "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+#    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+#      "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
 
-    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
-  endif(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
-endif(APPLE)
+#    install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+#  endif(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
+#endif(APPLE)
 
 set(_package_name "ParaView")
 if(PARAVIEW_INSTALL_DEVELOPMENT)
