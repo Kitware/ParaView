@@ -5,7 +5,7 @@
 if(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
+fixup_bundle(\"${PARAVIEW_INSTALL_APPS}\"   \"${PARAVIEW_INSTALL_PLUGIN_LIBS}\"   \"${PARAVIEW_INSTALL_LIBRARY_SEARCH_PATH}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
