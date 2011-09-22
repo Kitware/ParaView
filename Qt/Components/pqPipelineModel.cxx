@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelDataItem : public QObject
@@ -635,14 +636,17 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
   pqOutputPort* port = qobject_cast<pqOutputPort*>(item->Object);
   switch (role)
     {
+  case Qt::ToolTipRole:
+    if (source && source->getProxy()->HasAnnotation("tooltip"))
+      {
+      return QVariant(source->getProxy()->GetAnnotation("tooltip"));
+      }
   case Qt::DisplayRole:
     if (idx.column() == 1)
       {
       return QIcon(this->PixmapList[item->VisibilityIcon]);
       }
     // *** don't break.
-
-  case Qt::ToolTipRole:
   case Qt::EditRole:
     if (idx.column() == 0)
       {
