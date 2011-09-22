@@ -687,6 +687,16 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         }
       break;
       }
+  case pqPipelineModel::AnnotationFilterRole:
+      {
+      if(!this->FilterRoleAnnotationKey.isEmpty() && source)
+        {
+        return QVariant(
+            source->getProxy()->HasAnnotation(
+                this->FilterRoleAnnotationKey.toAscii().data()));
+        }
+      return QVariant(true);
+      }
 
     }
 
@@ -1240,3 +1250,18 @@ void pqPipelineModel::setModifiedFont(const QFont& font)
   this->Internal->ModifiedFont = font;
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineModel::enableFilterAnnotationKey(const QString &expectedAnnotation)
+{
+  this->FilterRoleAnnotationKey = expectedAnnotation;
+  foreach(pqPipelineModelDataItem* item, this->Internal->Root.Children)
+    {
+    this->itemDataChanged(item);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::disableFilterAnnotationKey()
+{
+  this->FilterRoleAnnotationKey.clear();
+}
