@@ -3,9 +3,17 @@
 # Call this last so the install script runs after the above targets are installed:
 #
 if(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
+
+  set(_dir "${PV_INSTALL_LIB_DIR}")
+  if(WIN32)
+    set(_dir "bin")
+  endif(WIN32)
+
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${CMAKE_EXECUTABLE_SUFFIX}")  # paths to executables
+
   install(CODE "
 include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-fixup_bundle(\"${PARAVIEW_INSTALL_APPS}\"   \"${PARAVIEW_INSTALL_PLUGIN_LIBS}\"   \"${PARAVIEW_INSTALL_LIBRARY_SEARCH_PATH}\")
+fixup_bundle(\"${APPS}\"   \"${PARAVIEW_INSTALL_PLUGIN_LIBS}\"   \"${PARAVIEW_INSTALL_LIBRARY_SEARCH_PATH}\")
 " COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
