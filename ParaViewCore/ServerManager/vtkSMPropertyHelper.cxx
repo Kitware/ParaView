@@ -111,6 +111,7 @@ inline double vtkSMPropertyHelper::GetProperty(unsigned int index) const
     }
 }
 
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 //----------------------------------------------------------------------------
 template<>
 inline vtkIdType vtkSMPropertyHelper::GetProperty(unsigned int index) const
@@ -127,6 +128,7 @@ inline vtkIdType vtkSMPropertyHelper::GetProperty(unsigned int index) const
       return 0;
     }
 }
+#endif
 
 //----------------------------------------------------------------------------
 template<>
@@ -305,6 +307,7 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, double value)
     }
 }
 
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 //----------------------------------------------------------------------------
 template<>
 inline void vtkSMPropertyHelper::SetProperty(unsigned int index, vtkIdType value)
@@ -335,6 +338,7 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, vtkIdType value
       break;
     }
 }
+#endif
 
 template<>
 inline void vtkSMPropertyHelper::SetProperty(unsigned int index, const char *value)
@@ -410,6 +414,7 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const double *values, unsigned
     }
 }
 
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 //----------------------------------------------------------------------------
 template<>
 inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsigned int count)
@@ -423,6 +428,7 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsig
     vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
+#endif
 
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
