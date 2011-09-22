@@ -387,6 +387,7 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
+    -DPARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/install_gfortran.cmake
     -DCMAKE_CXX_FLAGS:STRING=${pv_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
