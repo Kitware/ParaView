@@ -335,7 +335,16 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     {
     // Find characters after last "."
     size_t found = extension.find_last_of(".");
-    extension = extension.substr(found+1);
+    if(found != -1)
+      {
+      extension = extension.substr(found+1);
+      }
+    else
+      {
+      vtkErrorMacro("No extension. Cannot determine writer to create.");
+      return NULL;
+      }
+    
     }
   else
     {
