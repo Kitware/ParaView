@@ -18,7 +18,7 @@
 
 #include "vtkSMPropertyHelper.h"
 
-class vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
+class VTK_EXPORT vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
 {
 public:
   vtkSMUncheckedPropertyHelper(vtkSMProxy *proxy, const char *name, bool quiet = false)
@@ -32,6 +32,10 @@ public:
   {
     setUseUnchecked(true);
   }
+
+private:
+  vtkSMUncheckedPropertyHelper(const vtkSMUncheckedPropertyHelper&); // Not implemented
+  void operator=(const vtkSMUncheckedPropertyHelper&); // Not implemented
 };
 
 #endif
