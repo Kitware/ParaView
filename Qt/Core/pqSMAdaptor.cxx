@@ -1632,7 +1632,7 @@ QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property,
 
   if (svp)
     {
-    int elementCount = 0;
+    unsigned int elementCount = 0;
     if(Type == CHECKED)
       {
       elementCount = svp->GetNumberOfElements();
@@ -1672,7 +1672,7 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
   unsigned int i = 0;
   foreach (const QString &file, Value)
     {
-    int elementCount = 0;
+    unsigned int elementCount = 0;
     if(Type == CHECKED)
       {
       elementCount = svp->GetNumberOfElements();
