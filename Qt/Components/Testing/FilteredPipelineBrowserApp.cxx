@@ -146,6 +146,14 @@ void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
 
   wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
   cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
+
+  // Tooltip
+  wavelet->getProxy()->SetAnnotation("tooltip", "1+3+4");
+  clip1->getProxy()->SetAnnotation("tooltip", "1+3");
+  clip2->getProxy()->SetAnnotation("tooltip", "1+3");
+  cone->getProxy()->SetAnnotation("tooltip", "4");
+  append->getProxy()->SetAnnotation("tooltip", "2+3");
+  groupDS->getProxy()->SetAnnotation("tooltip", "2");
 }
 //-----------------------------------------------------------------------------
 int main(int argc, char** argv)
