@@ -41,7 +41,7 @@ public:
   // Description:
   // Get the number of processes used to run this filter.
   vtkGetMacro(NumberOfProcesses, int);
-  
+
   // Description:
   // Set/get whether to mask points
   void SetUseMaskPoints(int useMaskPoints);
@@ -62,8 +62,8 @@ protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
-  virtual int RequestData(vtkInformation *, 
-                          vtkInformationVector **, 
+  virtual int RequestData(vtkInformation *,
+                          vtkInformationVector **,
                           vtkInformationVector *);
   virtual int RequestCompositeData(vtkInformation* request,
                                    vtkInformationVector** inputVector,
@@ -73,28 +73,29 @@ protected:
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
-  
+
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
 
-  int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
-                     vtkDataSet* input,
-                     vtkInformation* request,
-                     vtkInformationVector** inputVector,
-                     vtkInformationVector* outputVector);
+  //Description:
+  //This is a generic function that can be called per
+  //block of the dataset to calculate indices of points
+  //to be glyphed in the block
+ void CalculatePtsToGlyph(double PtsNotBlanked);
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int NumberOfProcesses;
   int UseMaskPoints;
   int InputIsUniformGrid;
-  
+
   vtkIdType BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
-  vtkIdType BlockSampleStride;
   vtkIdType BlockPointCounter;
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
+
+  vtkstd::vector< vtkIdType > RandomPtsInDataset;
 
   int RandomMode;
 
