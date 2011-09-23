@@ -382,9 +382,6 @@ CONFIGURE_FILE(
 # used by the ParaViewConfig file to determine where the parts of the tree are located relative to the ParaViewConfig file.
 set(REL_REF "")
 
-# Perform all final configurations here
-add_subdirectory(Utilities/LastConfigureStep)
-
 #######################################################################
 # INSTALL
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)

@@ -263,6 +263,9 @@ install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 #  endif(PARAVIEW_BUILD_AS_APPLICATION_BUNDLE)
 #endif(APPLE)
 
+# Call FixupBundle in a subdirectory
+ADD_SUBDIRECTORY(LastConfigureStep)
+
 set(_package_name "ParaView")
 if(PARAVIEW_INSTALL_DEVELOPMENT)
   set(_package_name "ParaView-Development")
