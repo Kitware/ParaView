@@ -1254,10 +1254,6 @@ void pqPipelineModel::setModifiedFont(const QFont& font)
 void pqPipelineModel::enableFilterAnnotationKey(const QString &expectedAnnotation)
 {
   this->FilterRoleAnnotationKey = expectedAnnotation;
-  foreach(pqPipelineModelDataItem* item, this->Internal->Root.Children)
-    {
-    this->itemDataChanged(item);
-    }
 }
 
 //-----------------------------------------------------------------------------

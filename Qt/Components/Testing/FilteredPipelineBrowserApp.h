@@ -15,7 +15,7 @@ class MainPipelineWindow : public QMainWindow
   Q_OBJECT
 public:
   MainPipelineWindow();
-  void createPipelineWithAnnotation(pqServer* server, const QString& annotationKey);
+  void createPipelineWithAnnotation(pqServer* server);
 
 protected:
   QStringList                       FilterNames;

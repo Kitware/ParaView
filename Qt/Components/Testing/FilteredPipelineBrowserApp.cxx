@@ -11,6 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -60,10 +61,7 @@ MainPipelineWindow::MainPipelineWindow()
   this->setCentralWidget(container);
 
   // Create a complex pipeline with different annotations
-  for(int i=1; i<this->FilterNames.size(); i++)
-    {
-    createPipelineWithAnnotation(server, this->FilterNames.at(i));
-    }
+  createPipelineWithAnnotation(server);
 
   QTimer::singleShot(100, this, SLOT(processTest()));
 }
@@ -100,31 +98,54 @@ void MainPipelineWindow::processTest()
     }
 }
 //-----------------------------------------------------------------------------
-void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server, const QString& annotationKey)
+void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* ob = core->getObjectBuilder();
 
   // create source and elevation filter
-  pqPipelineSource* source;
-  pqPipelineSource* elevation;
+  pqPipelineSource* wavelet;
+  pqPipelineSource* cone;
+  pqPipelineSource* clip1;
+  pqPipelineSource* clip2;
+  pqPipelineSource* append;
+  pqPipelineSource* groupDS;
 
-  source = ob->createSource("sources", "SphereSource", server);
-  // updating source so that when elevation filter is created, the defaults
-  // are setup correctly using the correct data bounds etc.
-  vtkSMSourceProxy::SafeDownCast(source->getProxy())->UpdatePipeline();
+  wavelet = ob->createSource("sources", "RTAnalyticSource", server);
+  vtkSMSourceProxy::SafeDownCast(wavelet->getProxy())->UpdatePipeline();
 
-  elevation = ob->createFilter("filters", "ElevationFilter", source);
+  clip1 = ob->createFilter("filters", "Clip", wavelet);
+  vtkSMSourceProxy::SafeDownCast(clip1->getProxy())->UpdatePipeline();
 
-  // Add annotation
-  source->getProxy()->SetAnnotation(annotationKey.toAscii().data(),"X");
-  elevation->getProxy()->SetAnnotation(annotationKey.toAscii().data(),"X");
+  clip2 = ob->createFilter("filters", "Clip", clip1);
+  vtkSMSourceProxy::SafeDownCast(clip2->getProxy())->UpdatePipeline();
 
-  // Add tooltip annotation
-  source->getProxy()->SetAnnotation("tooltip", annotationKey.toAscii().data());
-  elevation->getProxy()->SetAnnotation("tooltip", annotationKey.toAscii().data());
+  cone = ob->createSource("sources", "ConeSource", server);
+  vtkSMSourceProxy::SafeDownCast(cone->getProxy())->UpdatePipeline();
 
-  // Rename source ???
+  append = ob->createFilter("filters", "Append", clip2);
+  vtkSMPropertyHelper(append->getProxy(), "Input").Add(cone->getProxy(), 0);
+  vtkSMSourceProxy::SafeDownCast(append->getProxy())->UpdatePipeline();
+
+  groupDS = ob->createFilter("filters", "GroupDataSets", clip2);
+  vtkSMPropertyHelper(groupDS->getProxy(), "Input").Add(cone->getProxy(), 0);
+  vtkSMSourceProxy::SafeDownCast(groupDS->getProxy())->UpdatePipeline();
+
+  // Setup annotations:
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
+
+  append->getProxy()->SetAnnotation(this->FilterNames.at(2).toAscii().data(), "-");
+  groupDS->getProxy()->SetAnnotation(this->FilterNames.at(2).toAscii().data(), "-");
+
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
+  append->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
+
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
+  cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
 }
 //-----------------------------------------------------------------------------
 int main(int argc, char** argv)
