@@ -73,16 +73,6 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
     // setup the x-series selector
     this->UseArrayIndex = new QCheckBox(this);
     this->UseArrayIndex->setChecked(true);
-    connect(this->UseArrayIndex,
-            SIGNAL(toggled(bool)),
-            this,
-            SLOT(useXAxisIndiciesToggled(bool)));
-
-    this->Links.addPropertyLink(this->UseArrayIndex,
-                                "checked",
-                                SIGNAL(toggled(bool)),
-                                proxy,
-                                proxy->GetProperty("UseIndexForXAxis"));
 
     layout->addRow("Use Indicies for X-Axis:", this->UseArrayIndex);
 
@@ -97,6 +87,17 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
                                 proxy,
                                 proxy->GetProperty("XArrayName"));
     layout->addRow("X Axis Series:", this->XSeriesSelector);
+
+    this->Links.addPropertyLink(this->UseArrayIndex,
+                                "checked",
+                                SIGNAL(toggled(bool)),
+                                proxy,
+                                proxy->GetProperty("UseIndexForXAxis"));
+
+    connect(this->UseArrayIndex,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(useXAxisIndiciesToggled(bool)));
     }
 
   // setup the y-series selector
@@ -110,6 +111,12 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
   layout->addRow("Y Axis Series:", this->YSeriesSelector);
 
   this->setLayout(layout);
+}
+
+//-----------------------------------------------------------------------------
+pqChartSummaryDisplayPanel::~pqChartSummaryDisplayPanel()
+{
+  this->Links.removeAllPropertyLinks();
 }
 
 //-----------------------------------------------------------------------------

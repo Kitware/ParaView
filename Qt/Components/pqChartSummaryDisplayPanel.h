@@ -51,6 +51,7 @@ class pqChartSummaryDisplayPanel : public QWidget
 
 public:
   pqChartSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent = 0);
+  virtual ~pqChartSummaryDisplayPanel();
 
 private slots:
   void ySeriesChanged(int index);
