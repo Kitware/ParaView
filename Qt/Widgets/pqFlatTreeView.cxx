@@ -2520,7 +2520,7 @@ bool pqFlatTreeView::event(QEvent *e)
       return true;
       }
     }
-  return QObject::event(e);
+  return QAbstractScrollArea::event(e);
 }
 
 int pqFlatTreeView::horizontalOffset() const
