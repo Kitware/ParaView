@@ -131,7 +131,6 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
               REGEX "lib2to3/" EXCLUDE
               REGEX "lib[-]old/" EXCLUDE
               REGEX "plat[-].*" EXCLUDE
-              REGEX "test/" EXCLUDE
               REGEX "wsgiref*" EXCLUDE
               REGEX "distutils/" EXCLUDE)
     endif(PARAVIEW_INSTALL_PYTHON)
@@ -174,7 +173,10 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       install(DIRECTORY ${mpi_bin_dir}/
         DESTINATION ${pv_runtime_dest}
         USE_SOURCE_PERMISSIONS
-        COMPONENT Runtime)
+        COMPONENT Runtime
+        PATTERN "mpicc*" EXCLUDE
+        PATTERN "mpicxx*" EXCLUDE
+        PATTERN "mpic++*" EXCLUDE)
     endif(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
   endif(PARAVIEW_USE_MPI)
 
@@ -208,11 +210,6 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
   set(PARAVIEW_INSTALL_APPS ${APPS} CACHE INTERNAL "" FORCE)
   set(PARAVIEW_INSTALL_PLUGIN_LIBS ${plugin_libs} CACHE INTERNAL "" FORCE)
   set(PARAVIEW_INSTALL_LIBRARY_SEARCH_PATH ${search_path} CACHE INTERNAL "" FORCE)
-
-#  install(CODE "
-#include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
-#fixup_bundle(\"${APPS}\"   \"${plugin_libs}\"   \"${search_path}\")
-#" COMPONENT BrandedRuntime)
 
 endif(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
