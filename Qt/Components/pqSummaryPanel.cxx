@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqDisplayPolicy.h"
 #include "pqApplyPropertiesManager.h"
+#include "pqServerManagerModel.h"
 
 // VTK includes
 #include "vtkSMPropertyHelper.h"
@@ -131,6 +132,19 @@ pqSummaryPanel::pqSummaryPanel(QWidget *parent)
     this->connect(applyPropertiesManager, SIGNAL(deleteStateChanged(bool)),
                   this->DeleteButton, SLOT(setEnabled(bool)));
     }
+
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
+                SIGNAL(sourceRemoved(pqPipelineSource*)),
+                this,
+                SLOT(removeProxy(pqPipelineSource*)));
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
+                SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+                this,
+                SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
+                SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
+                this,
+                SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
