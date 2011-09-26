@@ -192,6 +192,8 @@ void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::ClearUncheckedProxies()
 {
+  this->PPInternals->UncheckedProxies.clear();
+
   for(unsigned int i = 0; i < this->PPInternals->Proxies.size(); i++)
     {
     this->PPInternals->UncheckedProxies.push_back(this->GetProxy(i));
