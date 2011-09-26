@@ -625,7 +625,7 @@
         short_help="Writer that writes polydata as legacy vtk files.">
         Writer to write any type of data object in a legacy vtk data file. 
         This version is used when running in parallel. It gathers data to
-        first node and saves 1 file.
+        first node and saves one file.
       </Documentation>
 
       <SubProxy>
@@ -695,7 +695,7 @@
         representation. As for PointData and CellData, vtkPLYWriter cannot 
         handle normals or vectors. It only handles RGB PointData and CellData. 
         This version is used when running in parallel. It gathers data to
-        first node and saves 1 file.
+        first node and saves one file.
       </Documentation>
       <SubProxy>
         <Proxy name="Writer"
@@ -945,7 +945,7 @@
         <BooleanDomain name="bool" /> 
         <Documentation>
         When WriteAllTimeSteps is turned ON, the writer is executed 
-        once for each timestep available from the reader.
+        once for each time step available from the reader.
         </Documentation>
       </IntVectorProperty>
       <Hints>
@@ -1071,7 +1071,7 @@
         default_values="0.0"
         is_internal="1">
         <DoubleRangeDomain name="range" min="0" />
-        <Documentation>Write each timestep in the animation</Documentation>
+        <Documentation>Write each time step in the animation</Documentation>
       </DoubleVectorProperty>
 
       <Property name="Finish" command="Finish">
@@ -1130,7 +1130,7 @@
         <BooleanDomain name="bool" /> 
         <Documentation>
         When WriteAllTimeSteps is turned ON, the writer is executed 
-        once for each timestep available from the reader.
+        once for each time step available from the reader.
         </Documentation>
       </IntVectorProperty>
 

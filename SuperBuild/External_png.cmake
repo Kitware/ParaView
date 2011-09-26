@@ -25,8 +25,8 @@ set(png_install "${CMAKE_CURRENT_BINARY_DIR}/png-install")
 
 set(PNG_INCLUDE_DIR ${png_install}/include)
 
-if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
+if(CMAKE_CONFIGURATION_TYPES)
   set(PNG_LIBRARY optimized ${png_install}/lib/libpng${PNG_MAJOR}${PNG_MINOR}${_LINK_LIBRARY_SUFFIX} debug ${png_install}/lib/libpng${PNG_MAJOR}${PNG_MINOR}d${_LINK_LIBRARY_SUFFIX})
 else()
-  set(PNG_LIBRARY ${PNG_LIBRARY_PATH}/libpng${PNG_MAJOR}${PNG_MINOR}${_LINK_LIBRARY_SUFFIX})
+  set(PNG_LIBRARY ${png_install}/lib/libpng${PNG_MAJOR}${PNG_MINOR}${_LINK_LIBRARY_SUFFIX})
 endif()

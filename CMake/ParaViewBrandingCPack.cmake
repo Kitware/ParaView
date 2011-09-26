@@ -78,8 +78,10 @@ MACRO(build_paraview_client_cpack_config_init)
     ENDIF(_length GREATER 1)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
 
+
   SET (CPACK_INSTALL_CMAKE_PROJECTS 
     "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
+    "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
     "${ParaView_BINARY_DIR}" "HDF5 Core Library" "libraries" "/"
   )
 
@@ -127,7 +129,6 @@ MACRO(build_paraview_client_cpack_config_init)
   ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
   LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
-    "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
     "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
   )
 

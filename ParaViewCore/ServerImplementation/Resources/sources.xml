@@ -1900,14 +1900,13 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
 
 vtkDataObjectGenerator parses a string and produces dataobjects from the
 dataobject template names it sees in the string. For example, if the string
-contains &quot;ID1&quot; the generator will create a vtkImageData. &quot;UF1&quot;, &quot;RG1&quot;, 
+contains &quot;ID1&quot; the generator will create a vtkImageData. &quot;UF1&quot;, &quot;RG1&quot;,
 &quot;SG1&quot;, &quot;PD1&quot;, and &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
-vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively. 
+vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively.
 &quot;PD2&quot; will produce an alternate vtkPolydata.
-You can compose composite datasets from the atomic ones listed above
-by placing them within one of the two composite dataset identifiers
-- &quot;MB{}&quot; or &quot;HB[]&quot;. &quot;MB{ ID1 PD1 MB{} }&quot; for example will create a 
-vtkMultiBlockDataSet consisting of three blocks: image data, poly data, 
+You can compose composite datasets from the atomic ones listed above -
+&quot;MB{}&quot; or &quot;HB[]&quot;. &quot;MB{ ID1 PD1 MB{} }&quot; for example will create a
+vtkMultiBlockDataSet consisting of three blocks: image data, poly data,
 multi-block (empty). Hierarchical Box data sets additionally require
 the notion of groups, declared within &quot;()&quot; braces, to specify AMR depth.
 &quot;HB[ (UF1)(UF1)(UF1) ]&quot; will create a vtkHierarchicalBoxDataSet representing
