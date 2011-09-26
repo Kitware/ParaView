@@ -1372,8 +1372,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
 }
 
-QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Property,
-                                                                      PropertyValueType Type)
+QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Property)
 {
   QList< QList<QVariant> > domains;
   if(!Property)

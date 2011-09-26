@@ -161,8 +161,8 @@ public:
                                          PropertyValueType Type = CHECKED);
   /// get the ranges of possible values to 
   /// set the multiple elements of a property
-  static QList<QList<QVariant> > getMultipleElementPropertyDomain(vtkSMProperty* Property,
-                                                                  PropertyValueType Type = CHECKED);
+  static QList<QList<QVariant> > getMultipleElementPropertyDomain(vtkSMProperty* Property);
+
   /// get one of the multiple elements of a 
   /// property (integer, string, real, etc..)
   static QVariant getMultipleElementProperty(vtkSMProperty* Property, 
