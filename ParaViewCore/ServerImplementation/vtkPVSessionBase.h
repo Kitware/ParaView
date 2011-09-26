@@ -159,7 +159,7 @@ public:
   // b = a + 10;
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
-  virtual bool IsProcessingRemoteNotification() {return this->ProcessingRemoteNotification;}
+  virtual bool IsProcessingRemoteNotification();
 
 //BTX
 protected:
@@ -179,8 +179,8 @@ protected:
   // Methods used to monitor if we are currently processing a server notification
   // Only vtkSMSessionClient use the flag to disable ignore_synchronization
   // properties from beeing updated.
-  virtual void StartProcessingRemoteNotification(){this->ProcessingRemoteNotification = true;}
-  virtual void StopProcessingRemoteNotification(){this->ProcessingRemoteNotification = false;}
+  virtual bool StartProcessingRemoteNotification();
+  virtual void StopProcessingRemoteNotification(bool previousValue);
   bool ProcessingRemoteNotification;
 
   // Description:

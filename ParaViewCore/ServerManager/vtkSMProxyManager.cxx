@@ -244,7 +244,7 @@ void vtkSMProxyManager::UpdateFromRemote()
     {
     // For collaboration purpose at connection time we synchronize our
     // ProxyManager state with the server
-    if(this->Session->IsA("vtkSMSessionClient"))
+    if(this->Session->IsMultiClients())
       {
       vtkSMMessage msg;
       msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
@@ -258,7 +258,7 @@ void vtkSMProxyManager::UpdateFromRemote()
         // separate call.
         // Moreover, we don't want any existing states to be pushed again to
         // the server.
-        this->Session->StartProcessingRemoteNotification();
+        bool previousValue = this->Session->StartProcessingRemoteNotification();
 
         // Setup server only state/proxy Locator
         vtkNew<vtkSMDeserializerProtobuf> deserializer;
@@ -276,7 +276,7 @@ void vtkSMProxyManager::UpdateFromRemote()
         this->UpdateRegisteredProxies(0);
         vtkSMProxyProperty::DisableProxyCreation();
 
-        this->Session->StopProcessingRemoteNotification();
+        this->Session->StopProcessingRemoteNotification(previousValue);
         }
       }
     }

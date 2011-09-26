@@ -761,8 +761,10 @@ void vtkSMProxy::CreateVTKObjects()
   this->PushState(&message);
 
   // Update assigned id/location while the push
-  this->State->set_global_id(message.global_id());
-  this->State->set_location(message.location());
+  this->State->set_global_id(this->GetGlobalID());
+  // Using the real location and not the filtered one allow us to store
+  // the correct location in full state that is used in Undo/Redo.
+  this->State->set_location(this->Location);
 }
 
 //---------------------------------------------------------------------------

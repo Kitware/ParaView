@@ -212,7 +212,7 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
     }
   else if(msg->HasExtension(MousePointer::view) &&
           ( msg->GetExtension(MousePointer::forceShow) ||
-            msg->client_id() == this->UserViewToFollow))
+            static_cast<int>(msg->client_id()) == this->UserViewToFollow))
     {
     this->showMousePointer(msg->GetExtension(MousePointer::view),
                            msg->GetExtension(MousePointer::x),

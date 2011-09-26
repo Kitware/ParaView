@@ -30,6 +30,7 @@
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase()
 {
+  this->ProcessingRemoteNotification = false;
   this->SessionCore = vtkPVSessionCore::New();
 
   // initialize local process information.
@@ -304,4 +305,21 @@ vtkTypeUInt32 vtkPVSessionBase::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32
   vtkTypeUInt32 id;
   this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT).GetArgument(0,0, &id);
   return id;
+}
+//----------------------------------------------------------------------------
+bool vtkPVSessionBase::StartProcessingRemoteNotification()
+{
+  bool tmp = this->ProcessingRemoteNotification;
+  this->ProcessingRemoteNotification = true;
+  return tmp;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::StopProcessingRemoteNotification(bool previousValue)
+{
+  this->ProcessingRemoteNotification = previousValue;
+}
+//----------------------------------------------------------------------------
+bool vtkPVSessionBase::IsProcessingRemoteNotification()
+{
+  return this->ProcessingRemoteNotification;
 }

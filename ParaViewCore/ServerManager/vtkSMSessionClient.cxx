@@ -899,14 +899,14 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
 
   if(remoteObj)
     {
-    this->StartProcessingRemoteNotification();
+    bool previousValue = this->StartProcessingRemoteNotification();
     remoteObj->EnableLocalPushOnly();
     vtkSMProxyProperty::EnableProxyCreation();
     remoteObj->LoadState(&state, this->GetProxyLocator());
     UPDATE_VTK_OBJECTS(remoteObj); // If SMProxy will call UpdateVTKObjects()
     vtkSMProxyProperty::DisableProxyCreation();
     remoteObj->DisableLocalPushOnly();
-    this->StopProcessingRemoteNotification();
+    this->StopProcessingRemoteNotification(previousValue);
     }
 
   // Maybe that "share_only" message could be useful for collaboration
