@@ -103,6 +103,32 @@
 
   <ProxyGroup name="filters">
 
+   <SourceProxy 
+      name="AMRToMultiBlock" 
+      class="vtkAMRToMultiBlockFilter" 
+      label="Convert AMR dataset to Multi-block">
+      <Documentation
+          short_help="Convert AMR to Multiblock"
+          long_help="Convert AMR to Multiblock">
+      </Documentation>
+      
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+      
+   </SourceProxy>
+   
    <SourceProxy name="AMRCutPlane" class="vtkAMRCutPlane" label="AMR CutPlane">
       <Documentation
           short_help="Planar Cut of an AMR grid dataset"
