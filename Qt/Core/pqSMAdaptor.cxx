@@ -1352,14 +1352,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       {
       if (num>0)
         {
-        idvp->SetElements(idvalues);
+        idvp->SetElements(idvalues, num);
         }
       }
     else if(Type == UNCHECKED)
       {
       if (num>0)
         {
-        idvp->SetUncheckedElements(idvalues);
+        idvp->SetUncheckedElements(idvalues, num);
         }
       }
 
