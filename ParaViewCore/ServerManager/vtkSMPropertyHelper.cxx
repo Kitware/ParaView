@@ -81,8 +81,8 @@ inline int vtkSMPropertyHelper::GetProperty(unsigned int index) const
       return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
                                   this->IntVectorProperty->GetElement(index);
     case DOUBLE:
-      return this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
-                                  this->DoubleVectorProperty->GetElement(index);
+      return static_cast<int>(this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
+                                                   this->DoubleVectorProperty->GetElement(index));
     case IDTYPE:
       return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
                                   this->IdTypeVectorProperty->GetElement(index);
@@ -285,11 +285,11 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, double value)
     case INT:
       if(this->UseUnchecked)
         {
-        this->IntVectorProperty->SetUncheckedElement(index, value);
+        this->IntVectorProperty->SetUncheckedElement(index, static_cast<int>(value));
         }
       else
         {
-        this->IntVectorProperty->SetElement(index, value);
+        this->IntVectorProperty->SetElement(index, static_cast<int>(value));
         }
       break;
     case DOUBLE:
