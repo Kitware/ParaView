@@ -207,6 +207,10 @@ void pqCommandLineOptionsBehavior::playTests()
       pqCollaborationEventPlayer::wait(1000);
       }
 
+    // Make sure that the pqApplicationCore::prepareForQuit() method
+    // get called
+    QApplication::closeAllWindows();
+
     QApplication::instance()->exit(success? 0 : 1);
     }
 }

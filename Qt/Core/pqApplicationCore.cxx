@@ -186,6 +186,8 @@ void pqApplicationCore::constructor()
   QObject::connect(this->ServerManagerObserver,
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(onStateSaved(vtkPVXMLElement*)));
+  // CAUTION: We do not want to connect this slot to aboutToQuit()
+  //  => See prepareForQuit() for more details.
   QObject::connect(QCoreApplication::instance(),SIGNAL(lastWindowClosed()),
     this, SLOT(prepareForQuit()));
 
