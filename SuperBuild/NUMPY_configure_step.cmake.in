@@ -35,7 +35,7 @@ lapack_libs = lapack
 ")
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py config
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py config @fcompiler_arg@
   WORKING_DIRECTORY "@NUMPY_binary@"
   RESULT_VARIABLE res
   )

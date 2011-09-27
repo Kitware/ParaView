@@ -374,6 +374,21 @@ if(ParaView_BUILD_DOCUMENTATION)
   )
 endif()
 
+# Install FORTRAN runtime
+if(CMAKE_Fortran_COMPILER)
+  get_filename_component(fotran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
+  if("${fortran_compiler}" STREQUAL "gfortran")
+    set(FORTRAN_INSTALL_RULE_FILE
+      ${CMAKE_CURRENT_SOURCE_DIR}/install_gfortran.cmake)
+  elseif("${fortran_compiler}" STREQUAL "g77")
+    set(FORTRAN_INSTALL_RULE_FILE
+      ${CMAKE_CURRENT_SOURCE_DIR}/install_g2c.cmake)
+  elseif("${fortran_compiler}" STREQUAL "ifort")
+    #set(FORTRAN_INSTALL_RULE_FILE
+    #  ${CMAKE_CURRENT_SOURCE_DIR}/install_g2c.cmake)
+  endif()
+endif()
+
 #------------------------------------------------------------------------------
 # Configure and build ParaView
 #------------------------------------------------------------------------------
@@ -386,7 +401,7 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
-    -DPARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/install_gfortran.cmake;${CMAKE_CURRENT_SOURCE_DIR}/install_g2c.cmake
+    -DPARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=${FORTRAN_INSTALL_RULE_FILE}
     -DCMAKE_CXX_FLAGS:STRING=${pv_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
