@@ -15,7 +15,7 @@ if(APPLE)
 endif()
 
 if(CMAKE_Fortran_COMPILER)
-  get_filename_component(fotran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
+  get_filename_component(fortran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
   if("${fortran_compiler}" STREQUAL "gfortran")
     set(fcompiler_arg --fcompiler=gnu95)
   elseif("${fortran_compiler}" STREQUAL "g77")
