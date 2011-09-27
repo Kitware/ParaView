@@ -219,11 +219,13 @@ set (PARAVIEW_EXTRA_INSTALL_RULES_FILE "" CACHE FILEPATH
   "Path to site-specific install rules for ParaView.")
 mark_as_advanced(PARAVIEW_EXTRA_INSTALL_RULES_FILE)
 
-if (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
-  foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+
+foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+  if (EXISTS "${rule_file}")
     include("${rule_file}")
-  endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
-endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+  endif (EXISTS "${rule_file}")
+endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+
 
 #------------------------------------------------------------------------
 # Install the .plugins configuration file.
