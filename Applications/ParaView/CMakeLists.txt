@@ -263,12 +263,19 @@ install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 #endif(APPLE)
 
 # Call FixupBundle in a subdirectory
-ADD_SUBDIRECTORY(LastConfigureStep)
+add_subdirectory(LastConfigureStep)
 
 set(_package_name "ParaView")
 if(PARAVIEW_INSTALL_DEVELOPMENT)
   set(_package_name "ParaView-Development")
 endif(PARAVIEW_INSTALL_DEVELOPMENT)
+
+set(_paraview_version_patch_full "${PARAVIEW_VERSION_PATCH}")
+if(NOT "${PARAVIEW_VERSION_PATCH_EXTRA}" STREQUAL "")
+  set(_paraview_version_patch_full 
+    "${PARAVIEW_VERSION_PATCH}-${PARAVIEW_VERSION_PATCH_EXTRA}"
+  )
+endif(NOT "${PARAVIEW_VERSION_PATCH_EXTRA}" STREQUAL "")
 
 #------------------------------------------------------------------------
 # Install ParaView client
@@ -277,7 +284,7 @@ build_paraview_client_cpack_config_init(
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
+    VERSION_PATCH "${_paraview_version_patch_full}"
     DESCRIPTION "ParaView is a scientific visualization tool"
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
