@@ -14,6 +14,17 @@ if(APPLE)
   set(NUMPY_PREFIX_ARGS "${NUMPY_PERFIX} ${NUMPY_INSTALL_PURELIB} ${NUMPY_INSTALL_PLATLIB} ${NUMPY_INSTALL_SCRIPTS}")
 endif()
 
+if(CMAKE_Fortran_COMPILER)
+  get_filename_component(fotran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
+  if("${fortran_compiler}" STREQUAL "gfortran")
+    set(fcompiler_arg --fcompiler=gnu95)
+  elseif("${fortran_compiler}" STREQUAL "g77")
+    set(fcompiler_arg --fcompiler=gnu)
+  elseif("${fortran_compiler}" STREQUAL "ifort")
+    set(fcompiler_arg --fcompiler=intel)
+  endif()
+endif()
+
 # to configure numpy we run a cmake -P script
 # the script will create a site.cfg file
 # then run python setup.py config to verify setup
@@ -35,6 +46,8 @@ set(NUMPY_CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -DCONFIG_TYPE=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_configure_step.cmake)
 set(NUMPY_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_make_step.cmake)
 set(NUMPY_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_install_step.cmake)
+
+
 
 # create an external project to download numpy,
 # and configure and build it
