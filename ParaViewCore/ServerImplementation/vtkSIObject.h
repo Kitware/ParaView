@@ -35,6 +35,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // This method is called before the deletion of the SIObject.
+  // Basically this is used to remove all dependency with other SIObject so after
+  // a first pass on all SIObject with a AboutToDelete() we can simply delete the
+  // remaining SIObjects.
+  virtual void AboutToDelete() {};
+
+  // Description:
   // Initializes the instance. Session is the session to which this instance
   // belongs to. During initialization, the SIObject basically obtains ivars for
   // necessary components.

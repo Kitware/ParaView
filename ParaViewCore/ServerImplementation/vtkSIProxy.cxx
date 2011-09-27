@@ -48,6 +48,13 @@ struct SubProxyInfo
 class vtkSIProxy::vtkInternals
 {
 public:
+
+  void ClearDependencies()
+    {
+    this->SIProperties.clear();
+    this->SubSIProxies.clear();
+    }
+
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProperty> >
     SIPropertiesMapType;
   SIPropertiesMapType SIProperties;
@@ -570,4 +577,10 @@ void vtkSIProxy::CleanInputs(const char* method)
 void vtkSIProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+void vtkSIProxy::AboutToDelete()
+{
+  // Remove all proxy/input property that still old other SIProxy reference...
+  this->Internals->ClearDependencies();
 }

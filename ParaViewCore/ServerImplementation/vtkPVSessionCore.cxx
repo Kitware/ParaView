@@ -90,35 +90,29 @@ public:
     }
   ~vtkInternals()
     {
-    // Remove SIObject left in the right order...
+    // Remove SIObjects inter-dependency
     SIObjectMapType::iterator iter;
-    int nbFound, nbDelete;
-    nbFound = nbDelete = 1;
-    int targetRefCount = 1;
+    for(iter = this->SIObjectMap.begin();iter != this->SIObjectMap.end(); iter++)
+      {
+      if(vtkSIObject* obj = iter->second)
+        {
+        obj->AboutToDelete();
+        }
+      }
+
+    // Remove SIObject
+    int nbFound = 1;
     while(nbFound > 0)
       {
-      nbDelete = nbFound = 0;
+      nbFound = 0;
       for(iter = this->SIObjectMap.begin();iter != this->SIObjectMap.end(); iter++)
         {
-        vtkSIObject* obj = iter->second;
-        if(obj)
+        if(vtkSIObject* obj = iter->second)
           {
           nbFound++;
-          if(obj->GetReferenceCount() == targetRefCount)
-            {
-            nbDelete++;
-            obj->Delete();
-            }
+          obj->Delete();
           }
         }
-//      if(nbDelete == 0 && nbFound > 0)
-//        {
-//        targetRefCount++;
-//        }
-//      else
-//        {
-//        targetRefCount = 1;
-//        }
       }
     }
   //---------------------------------------------------------------------------
