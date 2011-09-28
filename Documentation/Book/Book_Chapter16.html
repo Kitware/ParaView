@@ -19,116 +19,6 @@
         </STYLE>
 </HEAD>
 <BODY DIR="LTR">
-<DIV ID=" What are Plugins?" DIR="LTR">
-        <P STYLE="margin-bottom: 0.15in; page-break-after: avoid"><FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=6>What
-        are Plugins?</FONT></FONT></P>
-        <DIV ID="Section20" DIR="LTR">
-                <P STYLE="margin-top: 0.3in; margin-bottom: 0.15in; page-break-after: avoid">
-                <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5 STYLE="font-size: 20pt">Introduction
-                </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>ParaView comes with
-                plethora of functionality bundled in: several readers, multitude of
-                filters, quite a few different types of views etc. However, it is
-                not uncommon for developers to add new functionality to ParaView.
-                For example to add support for their new file format, incorporate a
-                new filter, etc. ParaView makes it possible to add new functionlity
-                by using an extensive plugin mechanism. </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Plugins can be used
-                to extend ParaView in several ways: </FONT></FONT>
-                </P>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new readers </FONT></FONT>
-                        </P>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new writers </FONT></FONT>
-                        </P>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new filters </FONT></FONT>
-                        </P>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new GUI
-                        components </FONT></FONT>
-                        </P>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new views </FONT></FONT>
-                        </P>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Add new
-                        representations </FONT></FONT>
-                        </P>
-                </UL>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <DIV ID="Plugin Types " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Plugin Types </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Plugins are
-                        distributed as shared libraries (*.so on Unix, *.dylib on Mac,
-                        *.dll on Windows etc). For a plugin to be loadable in ParaView, it
-                        must be built with the same version of ParaView as it is expected
-                        to be deployed on. Plugins can be classified into two broad
-                        categories: </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Server-side plugins
-                                </FONT></FONT>
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                        <UL>
-                                <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif">These are plugins that extend
-                                the algorithmic capabilities for ParaView eg. new filters,
-                                readers, writers etc. Since in ParaView data is processed on the
-                                server-side, these plugins need to be loaded on the server. </FONT>
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Client-side plugins
-                                </FONT></FONT>
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                        <UL>
-                                <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif">These are plugins that extend
-                                the ParaView GUI eg. property panels for new filters, toolbars,
-                                views etc. These plugins need to be loaded on the client. </FONT>
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Oftentimes a plugin
-                        has both server-side as well as client-side components to it eg. a
-                        plugin that adds a new filter and a property panel that goes with
-                        that filter. Such plugins need to be loaded both on the server as
-                        well as the client. </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Generally, users
-                        don't have to worry whether a plugin is a server-side or
-                        client-side plugin. Simply load the plugin on the server as well
-                        as the client. ParaView will include relevant components from
-                        plugin on each of the processes.</FONT></FONT></P>
-                </DIV>
-        </DIV>
-</DIV>
 <DIV ID=" Included Plugins" DIR="LTR">
         <P STYLE="margin-bottom: 0.15in; page-break-after: avoid"><FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=6>Included
         Plugins</FONT></FONT></P>
@@ -143,72 +33,40 @@
                 </P>
                 <UL>
                         <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Adios </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Loads pixie format files written
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+                  SIZE=3><b>Adios</b> : Loads pixie format files written
                         with the Adios library. This reader support the staging capability
                         of Adios which allow the user to pipe simulation kernels to
                         post-processing tools : such as ParaView throw MPI communication
-                        channel and follow in live the computation with no disk IO. </FONT>
+                        channel and follow in live the computation with no disk IO. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Eye Dome Lighting </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">A non-photorealistic shading
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><b>Eye Dome Lighting</b> : A non-photorealistic shading
                         technique designed at EDF (France) to improve depth perception in
-                        scientific visualization images. </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">It relies on efficient
+                        scientific visualization images. It relies on efficient
                         post-processing passes implemented on the GPU with GLSL shaders in
-                        order to achieve interactive rendering. </FONT>
+                        order to achieve interactive rendering. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><A HREF="http://paraview.org/Wiki/index.php?title=CoProcessing">CoProcessingPlugin</A></FONT></FONT></P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Adds extensions to enable
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+                  SIZE=3><A
+                  HREF="http://paraview.org/Wiki/index.php?title=CoProcessing"><b>CoProcessingPlugin</b></A>:
+                  Adds extensions to enable
                         exporting state files that can be used by ParaView CoProcessing
-                        library. </FONT>
+                        library. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Force Time </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Overrides the VTK time requests.
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Force Time</b>: Overrides the VTK time requests.
                         This can be used to create complex animation with different
-                        datasets following independent times evolutions. </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Note: As this filter overrides
+                        datasets following independent times evolutions. Note: As this filter overrides
                         the time requests, time-aware filters such as PathLines or
                         PlotOverTime will not behave correctly if they are inserted in a
-                        pipeline after this filter. </FONT>
+                        pipeline after this filter. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>H5PartReader </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">The H5Part Reader plugin adds
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>H5PartReader </b>: The H5Part Reader plugin adds
                         support for reading particle datasets stored in H5Part format.
                         H5Part is a simple wrapper around the HDF5 library and provides a
                         number of convenience functions to manage time steps and access
@@ -217,60 +75,31 @@
                         with parallel IO enabled, the reader automatically uses hyperslabs
                         to read portions of data on each process. </FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Nifti </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Reades time varying
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Nifti</b>: Reads time varying
                         volumetric/image data from ANALYZE. Supports single (.nii) and
-                        dual (.img &amp; .hdr) file storage including zlib compression. </FONT>
+                        dual (.img &amp; .hdr) file storage including
+zlib compression. Able to write out ascii or binary
+                        files. </FONT></FONT>
                         </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Able to write out ascii or binary
-                        files. </FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Manta View </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">A view that uses the University
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Manta View</b>: A view that uses the University
                         of Utah's Manta Real Time Ray Tracer instead of OpenGL for
-                        rendering surfaces </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><A HREF="http://www.kitware.com/products/html/RenderedRealismAtNearlyRealTimeRates.html">Kitware
-                        Source Article</A></FONT></P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Moments </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Contains a set of filters that
+                        rendering surfaces <A HREF="http://www.kitware.com/products/html/RenderedRealismAtNearlyRealTimeRates.html">Kitware
+                        Source Article</A></FONT></FONT></P>
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Moments</b>: Contains a set of filters that
                         helps analysis of flux and circulation fields. Flux fields are
                         defined on 2D cells and describe flows through the area of the
                         cell. Circulation fields are defined on 1D cells and describes
-                        flows in the direction of the cell. </FONT>
+                        flows in the direction of the cell. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>PointSprite </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Adds a renderer for point
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>PointSprite</b>: Adds a renderer for point
                         geometry - in particular particle based datasets (though any point
                         based data may be rendered using the provided painter). The plugin
                         permits 3 modes of rendering, which are (in increasing order of
@@ -283,236 +112,61 @@
                         ray/sphere intersection that allow objects to intersect correctly
                         rather than ‘popping’ in and out of view as sprites do.
                         Transfer function editors can be used to map radius/opacity values
-                        if simple non-linear lookups are required </FONT>
+                        if simple non-linear lookups are required </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>SierraPlotTools </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Adds toolbar buttons to carry out
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>SierraPlotTools</b>: Adds toolbar buttons to carry out
                         convenience macros such as toggling the background color between
                         white and black, switching between surface and surface with edges
                         display mode, and opening a wizard for generating plots of global,
                         nodal, or element variables over time. This plugin works on Exodus
-                        data only </FONT>
+                        data only </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>SLACTools </FONT></FONT>
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>SLACTools</b>: An extension that streamline
+                        ParaView's user interface for Stanford Linear Accelerator users. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">An extension that streamline
-                        ParaView's user interface for Stanford Linear Accelerator users. </FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Streaming View </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Views that render in many
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Streaming View</b>: Views that render in many
                         streamed passes to reduce memory footprint and provide
                         multiresolution rendering. This plugin replaces the Streaming and
-                        Adaptive ParaView derived applications. </FONT>
+                        Adaptive ParaView derived applications. <A HREF="http://www.kitware.com/products/html/MultiResolutionStreamingInVTKAndParaView.html">Kitware
+                        Source Article</A> </FONT></FONT></P>
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>SurfaceLIC</b>: Adds support for Line Integral
+                        Convolution over arbitrary surfaces. </FONT></FONT>
                         </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><A HREF="http://www.kitware.com/products/html/MultiResolutionStreamingInVTKAndParaView.html">Kitware
-                        Source Article</A></FONT></P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>SurfaceLIC </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Adds support for Line Integral
-                        Convolution over arbitrary surfaces. </FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Prism Plugin </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">A Sandia contributed plugin for
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>Prism Plugin</b>: A Sandia contributed plugin for
                         verification and debugging of simulation results. The plugin reads
                         SESAME files to determine the inverse mapping from cartesian to
-                        phase space and allows users to visually debug simulations. </FONT>
+                        phase space and allows users to visually debug
+                        simulations. Sesame files hold material model
+                        data (Equations of State, Opacities, Conductivities) in a tabular
+                        format as described by http://t1web.lanl.gov/doc/SESAME_3Ddatabase_1992.html.
+                        </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>pvblot </FONT></FONT>
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>pvblot</b>: Implementation of a Sandia
+                        National Labs scripting language on top of ParaView. </FONT></FONT>
                         </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Implementation of a Sandia
-                        National Labs scripting language on top of ParaView. </FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>VisTrails </FONT></FONT>
-                        </P>
-                </UL>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">The VisTrails plugin for ParaView
+                       <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
+                        <FONT FACE="DejaVu Serif, serif"><FONT
+SIZE=3><b>VisTrails</b>: The VisTrails plugin for ParaView
                         incorporates the provenance management capabilities of VisTrails
-                        into ParaView. </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">All of the actions a user
+                        into ParaView. All of the actions a user
                         performs while building and modifying a pipeline in ParaView are
                         captured by the plugin. This allows navigation of all of the
-                        pipeline versions that have previously been explored. </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">For more information about this
-                        plugin see <A HREF="http://www.vistrails.org/index.php/ParaView_Plugin">[7]</A></FONT></P>
+                        pipeline versions that have previously been explored. For more information about this
+                        plugin see <A HREF="http://www.vistrails.org/index.php/ParaView_Plugin">[7]</A></FONT></FONT></P>
                 </UL>
         </DIV>
 </DIV>
-<DIV ID=" Loading Plugins" DIR="LTR">
-        <P STYLE="margin-bottom: 0.15in; page-break-after: avoid"><FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=6>Loading
-        Plugins</FONT></FONT></P>
-        <DIV ID="Loading Plugins " DIR="LTR">
-                <P STYLE="margin-top: 0.3in; margin-bottom: 0.15in; page-break-after: avoid">
-                <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5 STYLE="font-size: 20pt">Loading
-                Plugins </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>There are three ways
-                for loading plugins: </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Using the GUI
-                        (<FONT FACE="DejaVu Serif, serif"><B>Plugin Manager</B></FONT>)</FONT></FONT></P>
-                </UL>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">Plugins can be loaded into
-                        ParaView using the <FONT FACE="DejaVu Serif, serif"><B>Plugin
-                        Manager</B></FONT> accessible from <FONT FACE="DejaVu Serif, serif"><B>Tools
-                        | Manage Plugins/Extensions</B></FONT> menu. The Plugin Manager
-                        has two sections for loading local plugins and remote plugins
-                        (enabled only when connected to a server). To load a plugin on the
-                        local as well as remote side, simply browse to the plugin shared
-                        library. If the loading is successful, the plugin will appear in
-                        the list of loaded plugins. The Plugin manager also lists the
-                        paths it searched to load plugins automatically.</FONT></P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">The Plugin Manager remembers all
-                        loaded plugins, so next time to load the plugin, simply locate it
-                        in the list and click &quot;Load Selected&quot; button. </FONT>
-                        </P>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">You can set up ParaView to
-                        automatically load the plugin at startup (in case of client-side
-                        plugins) or on connecting to the server (in case of server-side
-                        plugins) by checking the &quot;Auto Load&quot; checkbox on a
-                        loaded plugin. </FONT>
-                        </P>
-                </UL>
-                <TABLE WIDTH=100% BORDER=0 CELLPADDING=0 CELLSPACING=0>
-                        <COL WIDTH=128*>
-                        <COL WIDTH=128*>
-                        <TR VALIGN=TOP>
-                                <TD WIDTH=50%>
-                                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; page-break-inside: avoid; widows: 3">
-                                        <SPAN ID="135" DIR="LTR" STYLE="float: left; width: 2.88in; border: 1.00pt solid #c0c0c0; padding: 0.04in; background: #ffffff">
-                                                <P ALIGN=CENTER><IMG SRC="Book_html_m172fb86b.jpg" NAME="136" ALIGN=LEFT WIDTH=622 HEIGHT=517 BORDER=0><FONT FACE="DejaVu Serif, serif"><FONT SIZE=2><FONT FACE="DejaVu Serif, serif"><B>Figure
-                                                1:</B></FONT> Plugin Manager when not connected to a remote
-                                                server, showing loaded plugins on the local site.</FONT></FONT></P>
-                                        </SPAN><BR>
-                                        </P>
-                                </TD>
-                                <TD WIDTH=50%>
-                                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; page-break-inside: avoid; widows: 3">
-                                        <SPAN ID="137" DIR="LTR" STYLE="float: left; width: 2.88in; border: 1.00pt solid #c0c0c0; padding: 0.04in; background: #ffffff">
-                                                <P ALIGN=CENTER><IMG SRC="Book_html_796f66.jpg" NAME="138" ALIGN=LEFT WIDTH=622 HEIGHT=482 BORDER=0><FONT FACE="DejaVu Serif, serif"><FONT SIZE=2><FONT FACE="DejaVu Serif, serif"><B>Figure
-                                                2:</B></FONT> Plugin Manager when connected to a server showing
-                                                loaded plugins on the local as well as remote sites.</FONT></FONT></P>
-                                        </SPAN><BR>
-                                        </P>
-                                </TD>
-                        </TR>
-                </TABLE>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Using environment
-                        variable (Auto-loading plugins) </FONT></FONT>
-                        </P>
-                </UL>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <UL>
-                        <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif">If one wants ParaView to
-                        automatically load a set of plugins on startup, one can use the
-                        <FONT FACE="DejaVu Serif, serif"><B>PV_PLUGIN_PATH</B></FONT>
-                        environment variable. <FONT FACE="DejaVu Serif, serif"><B>PV_PLUGIN_PATH</B></FONT>
-                        can be used to list a set of directories (separated by colon (:)
-                        or semi-colon (;)) which ParaView will search on startup to load
-                        plugins. This enviromnent variable needs to be set on both the
-                        client node to load local plugins as well as the remote server to
-                        load remote plugins. Note that plugins in PV_PLUGIN_PATH are
-                        always auto-loaded irrespective of the status of the &quot;Auto
-                        Load&quot; checkbox in the Plugin Manager.</FONT></P>
-                </UL>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-                <UL>
-                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Placing the plugins
-                        in a recognized location. Recognized locations are: </FONT></FONT>
-                        </P>
-                        <OL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>A plugins
-                                subdirectory beneath the directory containing the paraview client
-                                or server executables. This can be a system-wide location if
-                                installed as such. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>A Plugins
-                                subdirectory in the user's home area. On Unix/Linux/Mac,
-                                $HOME/.config/ParaView/ParaView&lt;version&gt;/Plugins. On
-                                Windows %APPDATA$\ParaView\ParaView&lt;version&gt;\Plugins.</FONT></FONT></P>
-                        </OL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        </P>
-                </UL>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <BR><BR>
-                </P>
-        </DIV>
-</DIV>
-
 </BODY>
 </HTML>

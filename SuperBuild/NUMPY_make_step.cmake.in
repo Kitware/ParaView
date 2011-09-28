@@ -7,7 +7,7 @@ if(APPLE)
 endif()
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py build
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py build @fcompiler_arg@
   WORKING_DIRECTORY "@NUMPY_binary@"
   RESULT_VARIABLE res
   OUTPUT_VARIABLE NUMPY_OUT
