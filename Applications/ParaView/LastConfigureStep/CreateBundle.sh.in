@@ -68,7 +68,7 @@ cp -p "@EXECUTABLE_OUTPUT_PATH@/pvserver" "$BinDir"
 
 # Copy the ".plugins" configuration file.
 echo "Copying $ParaViewExeOutputDir/.plugins to $SupportDir"
-cp -p "$ParaViewExeOutputDir/.plugins" "$SupportDir/"
+cp -p "$ParaViewExeOutputDir/.plugins" "$PluginsDir/"
 
 # Copy the python scripts into the Python directory
 #
