@@ -1,7 +1,7 @@
 
 if (UNIX AND PARAVIEW_ENABLE_PYTHON)
 
-  find_library(gfortran_library libgfortran.so)
+  find_library(gfortran_library libgfortran.so NAMES libgfortran.so.1)
 
   get_filename_component(gfortran_library_dir ${gfortran_library} PATH)
   get_filename_component(gfortran_library_name ${gfortran_library} NAME)
