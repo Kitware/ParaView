@@ -25,12 +25,14 @@ IF(QT_TESTING_WITH_PYTHON)
   SET(PYTHON_MOC_SRCS 
     pqPythonEventSourceImage.h
   )
-INCLUDE_DIRECTORIES(
-  ${PYTHON_INCLUDE_PATH}
-  ${protobuf_SOURCE_DIR}/src
-)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_PATH}
+  )
 ENDIF(QT_TESTING_WITH_PYTHON)
 
+INCLUDE_DIRECTORIES(
+  ${protobuf_SOURCE_DIR}/src
+)
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
