@@ -23,16 +23,58 @@
 #include "vtkRenderWindow.h"
 #include "vtkSMUtilities.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkAxis.h"
+#include "vtkWeakPointer.h"
+#include "vtkNew.h"
+#include "vtkEventForwarderCommand.h"
 
 //-----------------------------------------------------------------------------
 // Minimal storage class for STL containers etc.
 class vtkSMContextViewProxy::Private
 {
 public:
-  Private() { }
+  Private()
+    {
+    ViewBounds[0] = ViewBounds[2] = ViewBounds[4] = ViewBounds[6] = 0.0;
+    ViewBounds[1] = ViewBounds[3] = ViewBounds[5] = ViewBounds[7] = 1.0;
+    }
+
   ~Private()
-  {
-  }
+    {
+    if(this->Proxy && this->Proxy->GetChart() && this->Forwarder.GetPointer() != NULL)
+      {
+      this->Proxy->GetChart()->RemoveObserver(this->Forwarder.GetPointer());
+      }
+    }
+
+  void AttachCallback(vtkSMContextViewProxy* proxy)
+    {
+    this->Forwarder->SetTarget(proxy);
+    this->Proxy = proxy;
+    if(this->Proxy && this->Proxy->GetChart())
+      {
+      this->Proxy->GetChart()->AddObserver(
+          vtkChart::UpdateRange, this->Forwarder.GetPointer());
+      }
+    }
+
+  void UpdateBounds()
+    {
+    if(this->Proxy && this->Proxy->GetChart())
+      {
+      for(int i=0; i < 4; i++)
+        {
+        this->Proxy->GetChart()->GetAxis(i)->GetRange(&this->ViewBounds[i*2]);
+        }
+      }
+    }
+
+public:
+  double ViewBounds[8];
+  vtkNew<vtkEventForwarderCommand> Forwarder;
+
+private:
+  vtkWeakPointer<vtkSMContextViewProxy> Proxy;
 };
 
 vtkStandardNewMacro(vtkSMContextViewProxy);
@@ -75,6 +117,9 @@ void vtkSMContextViewProxy::CreateVTKObjects()
 
   this->Storage = new Private;
   this->ChartView = pvview->GetContextView();
+
+  // Try to attach viewport listener on chart
+  this->Storage->AttachCallback(this);
 }
 
 //----------------------------------------------------------------------------
@@ -99,8 +144,21 @@ vtkChart* vtkSMContextViewProxy::GetChart()
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
+  int previousBehaviour[4];
+  for(int i=0; i < 4; i++)
+    {
+    previousBehaviour[i] = this->GetChart()->GetAxis(i)->GetBehavior();
+    this->GetChart()->GetAxis(i)->SetBehavior(vtkAxis::AUTO);
+    }
+
   this->GetChart()->RecalculateBounds();
   this->GetChartView()->Render();
+
+  // Revert behaviour as it use to be...
+  for(int i=0; i < 4; i++)
+    {
+    this->GetChart()->GetAxis(i)->SetBehavior(previousBehaviour[i]);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -139,4 +197,45 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
 void vtkSMContextViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+double* vtkSMContextViewProxy::GetViewBounds()
+{
+  this->Storage->UpdateBounds();
+  return this->Storage->ViewBounds;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextViewProxy::SetViewBounds(double* bounds)
+{
+  if(this->GetChart())
+    {
+    // Disable notification...
+    this->Storage->Forwarder->SetTarget(NULL);
+
+    for(int i=0; i < 4; i++)
+      {
+      this->Storage->ViewBounds[i*2] = bounds[i*2];
+      this->Storage->ViewBounds[i*2+1] = bounds[i*2+1];
+
+      this->GetChart()->GetAxis(i)->SetBehavior(vtkAxis::FIXED);
+      this->GetChart()->GetAxis(i)->SetRange(bounds[i*2], bounds[i*2+1]);
+      this->GetChart()->GetAxis(i)->RecalculateTickSpacing();
+      }
+
+//    cout << "New bounds: ["
+//         << this->Storage->ViewBounds[0] << ", " << this->Storage->ViewBounds[1] << ", "
+//         << this->Storage->ViewBounds[2] << ", " << this->Storage->ViewBounds[3] << ", "
+//         << this->Storage->ViewBounds[4] << ", " << this->Storage->ViewBounds[5] << ", "
+//         << this->Storage->ViewBounds[6] << ", " << this->Storage->ViewBounds[7] << "]"
+//         << endl;
+
+    // Do the rendering with the new range
+    this->StillRender();
+    this->GetChartView()->Render();
+
+    // Bring the notification back
+    this->Storage->Forwarder->SetTarget(this);
+    }
 }

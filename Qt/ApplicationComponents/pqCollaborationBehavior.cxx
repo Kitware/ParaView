@@ -72,9 +72,16 @@ void pqCollaborationBehavior::onServerAdded(pqServer* server)
                       this->CollaborationManager, SLOT(updateEnabledState()),
                       Qt::QueuedConnection);
 
+    // We attach mouse listener on active change time otherwise when the view
+    // is just added, the widget is not yet correctly initialized...
     QObject::connect( &pqActiveObjects::instance(),
                       SIGNAL(viewChanged(pqView*)),
                       this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
+                      Qt::UniqueConnection);
+
+    QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                      SIGNAL(viewAdded(pqView*)),
+                      this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)),
                       Qt::UniqueConnection);
 
     }
@@ -95,6 +102,10 @@ void pqCollaborationBehavior::onServerRemoved(pqServer* vtkNotUsed(server))
     QObject::disconnect( &pqActiveObjects::instance(),
                          SIGNAL(viewChanged(pqView*)),
                          this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()));
+    QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
+                         SIGNAL(viewAdded(pqView*)),
+                         this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)));
+
     this->CollaborationManager->deleteLater();
     this->CollaborationManager = NULL;
     }

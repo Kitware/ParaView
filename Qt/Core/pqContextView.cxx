@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 
 #include "vtkCommand.h"
+#include "vtkNew.h"
 
 #include "pqQVTKWidget.h"
 
@@ -103,6 +104,8 @@ public:
     {
     delete this->Viewport;
     }
+
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
 };
 
 //-----------------------------------------------------------------------------
@@ -119,6 +122,9 @@ pqContextView::pqContextView(
   this->Command = command::New(*this);
   vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
+
+  this->Internal->VTKConnect->Connect( viewProxy, vtkChart::UpdateRange,
+                                       this, SLOT(onViewBoundsChange(vtkObject*,ulong,void*,void*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -468,4 +474,16 @@ void pqContextView::selectionChanged()
   selectionSource->Delete();
 
   emit this->selected(opPort);
+}
+//-----------------------------------------------------------------------------
+void pqContextView::onViewBoundsChange(vtkObject* src,
+                                       unsigned long vtkNotUsed(event),
+                                       void* vtkNotUsed(method),
+                                       void* data)
+{
+  vtkSMContextViewProxy* proxy = vtkSMContextViewProxy::SafeDownCast(src);
+  if(proxy)
+    {
+    emit viewBoundsUpdated(proxy->GetGlobalID(), proxy->GetViewBounds());
+    }
 }

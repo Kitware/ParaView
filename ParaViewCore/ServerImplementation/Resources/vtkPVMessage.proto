@@ -173,7 +173,7 @@ message LinkState {
   }
 }
 
-// Extension MousePointer Event ************************************* [70-73]
+// Extension MousePointer Event *************************************** [70-73]
 
 message MousePointer {
 
@@ -182,6 +182,16 @@ message MousePointer {
     optional double x         = 71 [default = 0];
     optional double y         = 72 [default = 0];
     optional bool   forceShow = 73 [default = false];
+  }
+}
+
+// Extension ChartViewBounds Event ************************************ [75-76]
+
+message ChartViewBounds {
+
+  extend Message {
+    required uint32 view  = 75;
+    repeated double range = 76;
   }
 }
 
@@ -213,7 +223,8 @@ message ChatMessage {
 message QtEvent {
   enum QtEventType {
     CHAT                = 1;
-    OTHER               = 2;
+    CHART_BOUNDS        = 2;
+    OTHER               = 3;
   }
 
   extend Message {

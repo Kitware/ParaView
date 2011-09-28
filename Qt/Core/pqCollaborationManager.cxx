@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 #include "pqQVTKWidget.h"
+#include "pqContextView.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -45,8 +46,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkChart.h"
+#include "vtkNew.h"
 
 #include <vtkstd/set>
+#include <vtkstd/map>
 
 // Qt includes.
 #include <QAction>
@@ -70,6 +75,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //***************************************************************************
 //                           Internal class
 //***************************************************************************
+struct ChartBounds
+{
+  void SetRange(double* otherRange)
+    {
+    for(int i=0;i<8;i++)
+      {
+      this->Range[i] = otherRange[i];
+      }
+    }
+
+  double Range[8];
+};
+
 class pqCollaborationManager::pqInternals
 {
 public:
@@ -80,6 +98,8 @@ public:
     this->CollaborativeTimer.setInterval(100);
     QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()),
                      this->Owner, SLOT(sendMousePointerLocationToOtherClients()));
+    QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()),
+                     this->Owner, SLOT(sendChartViewBoundsToOtherClients()));
     this->CollaborativeTimer.start();
     }
   //-------------------------------------------------
@@ -155,6 +175,7 @@ public:
   vtkSMMessage LastMousePointerPosition;
   bool MousePointerLocationUpdated;
   bool BroadcastMouseLocation;
+  vtkstd::map<vtkTypeUInt32, ChartBounds> ContextViewBoundsToShare;
 
 protected:
   QPointer<pqServer> Server;
@@ -205,6 +226,24 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         chatMsg =  msg->GetExtension(ChatMessage::txt).c_str();
         emit triggerChatMessage(userId, chatMsg);
         break;
+      case QtEvent::CHART_BOUNDS:
+        {
+        vtkTypeUInt32 viewId = msg->GetExtension(ChartViewBounds::view);
+        double range[8];
+        for(int i=0;i<8;i++)
+          {
+          range[i] = msg->GetExtension(ChartViewBounds::range, i);
+          }
+        vtkSMContextViewProxy* view =
+            vtkSMContextViewProxy::SafeDownCast(
+                this->collaborationManager()->GetSession()->GetRemoteObject(
+                    viewId));
+        if(view)
+          {
+          view->SetViewBounds(range);
+          }
+        break;
+        }
       case QtEvent::OTHER:
         // Custom handling
         break;
@@ -379,8 +418,58 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
                      Qt::UniqueConnection);
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::attachChartViewBoundsListener(pqView* view)
+{
+  pqContextView* chartView = qobject_cast<pqContextView*>(view);
+  if(chartView)
+    {
+    QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
+                     this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
+                     Qt::UniqueConnection);
+    }
+}
+
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::enableMousePointerSharing(bool enable)
 {
   this->Internals->BroadcastMouseLocation = enable;
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds)
+{
+//  cout << "set bounds: ["
+//       << bounds[0] << ", " << bounds[1] << ", "
+//       << bounds[2] << ", " << bounds[3] << ", "
+//       << bounds[4] << ", " << bounds[5] << ", "
+//       << bounds[6] << ", " << bounds[7] << "]"
+//       << endl;
+  this->Internals->ContextViewBoundsToShare[gid].SetRange(bounds);
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::sendChartViewBoundsToOtherClients()
+{
+  if(this->Internals->ContextViewBoundsToShare.size() > 0)
+    {
+    vtkstd::map<vtkTypeUInt32, ChartBounds>::iterator iter;
+    iter = this->Internals->ContextViewBoundsToShare.begin();
+    while(iter != this->Internals->ContextViewBoundsToShare.end())
+      {
+      vtkSMMessage msg;
+      msg.SetExtension(QtEvent::type, QtEvent::CHART_BOUNDS);
+      msg.SetExtension(ChartViewBounds::view, iter->first);
+      for(int i=0;i<8;i++)
+        {
+        msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
+        }
+
+      this->collaborationManager()->SendToOtherClients(&msg);
+
+      // Move forward
+      iter++;
+      }
+    // Clean up stack
+    this->Internals->ContextViewBoundsToShare.clear();
+    }
 }

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMessageMinimal.h"
 #include <QObject>
 
+class vtkObject;
 class pqServer;
 class pqView;
 class pqPipelineSource;
@@ -112,9 +113,17 @@ public slots:
   /// mouse location to the other clients every 100 ms
   void sendMousePointerLocationToOtherClients();
 
+  /// Method triggered by the internal collaboration Timer.
+  /// This timer prevent a network overload by only sending the latest
+  /// modified view location to the other clients every 100 ms
+  void sendChartViewBoundsToOtherClients();
+
   /// Attach a mouse listener if its a 3D view so we can share that
   /// information with other clients
   void attachMouseListenerTo3DViews();
+
+  /// Attach bounds listener if the given view is a pqContextView
+  void attachChartViewBoundsListener(pqView*);
 
   /// Enable/disable local mouse pointer location
   void enableMousePointerSharing(bool);
@@ -124,6 +133,9 @@ private slots:
   /// This method will trigger signals that will be used by other Qt classes
   /// to synchronize their state.
   void onClientMessage(vtkSMMessage* msg);
+
+  /// Called when a chart view has changed is view bounds
+  void onChartViewChange(vtkTypeUInt32 gid, double* bounds);
 
   /// Show another mouse pointer as overlay to a 3D view.
   /// x et y are normalized based on height/2 where 0 is the center of the
