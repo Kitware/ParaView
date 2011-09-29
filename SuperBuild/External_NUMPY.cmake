@@ -14,7 +14,7 @@ if(APPLE)
   set(NUMPY_PREFIX_ARGS "${NUMPY_PERFIX} ${NUMPY_INSTALL_PURELIB} ${NUMPY_INSTALL_PLATLIB} ${NUMPY_INSTALL_SCRIPTS}")
 endif()
 
-if(CMAKE_Fortran_COMPILER)
+if(CMAKE_Fortran_COMPILER AND NOT WIN32)
   get_filename_component(fortran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
   if("${fortran_compiler}" STREQUAL "gfortran")
     set(fcompiler_arg --fcompiler=gnu95)

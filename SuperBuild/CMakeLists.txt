@@ -375,7 +375,7 @@ if(ParaView_BUILD_DOCUMENTATION)
 endif()
 
 # Install FORTRAN runtime
-if(CMAKE_Fortran_COMPILER)
+if(CMAKE_Fortran_COMPILER AND NOT WIN32)
   get_filename_component(fortran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
   if("${fortran_compiler}" STREQUAL "gfortran")
     set(FORTRAN_INSTALL_RULE_FILE
