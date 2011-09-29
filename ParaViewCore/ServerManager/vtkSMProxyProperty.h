@@ -61,12 +61,9 @@ public:
   // create the corresponding missing proxy. Although when the goal is to load
   // a state on any standard proxy, we do not want that proxy property be able
   // to create new proxy based on some previous state.
-  static void EnableProxyCreation()
-    {vtkSMProxyProperty::CreateProxyAllowed = true;}
-  static void DisableProxyCreation()
-    {vtkSMProxyProperty::CreateProxyAllowed = false;}
-  static bool CanCreateProxy()
-    { return vtkSMProxyProperty::CreateProxyAllowed; }
+  static void EnableProxyCreation();
+  static void DisableProxyCreation();
+  static bool CanCreateProxy();
 
   static vtkSMProxyProperty* New();
   vtkTypeMacro(vtkSMProxyProperty, vtkSMProperty);

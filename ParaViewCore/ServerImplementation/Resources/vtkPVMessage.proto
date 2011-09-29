@@ -177,11 +177,18 @@ message LinkState {
 
 message MousePointer {
 
+  enum Ratio {
+    BOTH   = 0;
+    HEIGHT = 1;
+    WIDTH  = 2;
+  }
+
   extend Message {
     required uint32 view      = 70;
     optional double x         = 71 [default = 0];
     optional double y         = 72 [default = 0];
     optional bool   forceShow = 73 [default = false];
+    optional Ratio  ratioType = 74 [default = HEIGHT];
   }
 }
 

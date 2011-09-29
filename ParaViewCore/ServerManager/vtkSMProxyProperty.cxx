@@ -657,3 +657,18 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   this->ImmediateUpdate = prevImUpdate;
   return 1;
 }
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::EnableProxyCreation()
+{
+  vtkSMProxyProperty::CreateProxyAllowed = true;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::DisableProxyCreation()
+{
+  vtkSMProxyProperty::CreateProxyAllowed = false;
+}
+//---------------------------------------------------------------------------
+bool vtkSMProxyProperty::CanCreateProxy()
+{
+  return vtkSMProxyProperty::CreateProxyAllowed;
+}

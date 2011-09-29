@@ -140,7 +140,8 @@ private slots:
   /// Show another mouse pointer as overlay to a 3D view.
   /// x et y are normalized based on height/2 where 0 is the center of the
   /// view.
-  void showMousePointer(vtkTypeUInt32 viewId, double x, double y);
+  /// ratioToUse = [both:0, height:1, width: 2]
+  void showMousePointer(vtkTypeUInt32 viewId, double x, double y, int ratioToUse);
 
 private:
   pqCollaborationManager(const pqCollaborationManager&);  // Not implemented.

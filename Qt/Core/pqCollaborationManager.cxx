@@ -255,7 +255,8 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
     {
     this->showMousePointer(msg->GetExtension(MousePointer::view),
                            msg->GetExtension(MousePointer::x),
-                           msg->GetExtension(MousePointer::y));
+                           msg->GetExtension(MousePointer::y),
+                           msg->GetExtension(MousePointer::ratioType));
     }
   else
     {
@@ -303,9 +304,14 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
   pqQVTKWidget* widget = qobject_cast<pqQVTKWidget*>(QObject::sender());
   if(widget)
     {
+    bool isChartView =
+        (vtkSMContextViewProxy::SafeDownCast(
+            this->collaborationManager()->GetSession()->GetRemoteObject(
+                widget->getProxyId())) != NULL);
+
     double w2 = widget->width() / 2;
     double h2 = widget->height()/ 2;
-    double px = (e->x()-w2)/h2;
+    double px = (e->x()-w2)/ ( isChartView ? w2 : h2 );
     double py = (e->y()-h2)/h2;
 
     this->Internals->LastMousePointerPosition.SetExtension(
@@ -314,6 +320,9 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
         MousePointer::x, px);
     this->Internals->LastMousePointerPosition.SetExtension(
         MousePointer::y, py);
+    this->Internals->LastMousePointerPosition.SetExtension(
+        MousePointer::ratioType,
+        isChartView ? MousePointer::BOTH : MousePointer::HEIGHT);
     this->Internals->MousePointerLocationUpdated = true;
     }
   else
@@ -333,7 +342,8 @@ void pqCollaborationManager::sendMousePointerLocationToOtherClients()
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId, double x, double y)
+void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId,
+                                              double x, double y, int useBothHeightWidth)
 {
   pqServerManagerModel* smmodel =
       pqApplicationCore::instance()->getServerManagerModel();
@@ -341,10 +351,28 @@ void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId, double x, do
   pqQVTKWidget* widget = NULL;
   if(view && (widget = qobject_cast<pqQVTKWidget*>(view->getWidget())))
     {
+    double xRatioBase = 1;
+    double yRatioBase = 1;
     double w2 = widget->width() / 2;
     double h2 = widget->height()/ 2;
-    double px = h2*x + w2;
-    double py = h2*y + h2;
+    switch(useBothHeightWidth)
+      {
+      case 0: // both
+        xRatioBase = w2;
+        yRatioBase = h2;
+        break;
+      case 1: // height
+        xRatioBase = h2;
+        yRatioBase = h2;
+        break;
+      case 2: // width
+        xRatioBase = w2;
+        yRatioBase = w2;
+        break;
+      }
+
+    double px = xRatioBase*x + w2;
+    double py = yRatioBase*y + h2;
     widget->paintMousePointer(px, py);
     }
 }
