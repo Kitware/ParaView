@@ -40,6 +40,40 @@ set(NUMPY_URL http://downloads.sourceforge.net/project/numpy/NumPy/${NUMPY_MAJOR
 set(NUMPY_GZ numpy-${NUMPY_MAJOR}.${NUMPY_MINOR}.${NUMPY_PATCH}.tar.gz)
 set(NUMPY_MD5 2bce18c08fc4fce461656f0f4dd9103e)
 
+set(distribute_MAJOR 0)
+set(distribute_MINOR 6)
+set(distribute_PATCH 19)
+set(distribute_URL http://pypi.python.org/packages/source/d/distribute/)
+set(distribute_GZ distribute-${distribute_MAJOR}.${distribute_MINOR}.${distribute_PATCH}.tar.gz)
+set(distribute_MD5 45a17940eefee849d4cb8cc06d28d96f)
+
+set(yt_MAJOR 2)
+set(yt_MINOR 2)
+set(yt_PATCH "pv" )
+set(yt_URL http://yt-project.org/files/)
+set(yt_GZ yt-${yt_MAJOR}.${yt_MINOR}-${yt_PATCH}.tar.gz)
+set(yt_MD5 d4cf839afd3da3590b877cd66ab1104d)
+
+set(MPL_MAJOR 1)
+set(MPL_MINOR 0)
+set(MPL_PATCH 1)
+set(MPL_URL http://downloads.sourceforge.net/project/matplotlib/matplotlib/matplotlib-${MPL_MAJOR}.${MPL_MINOR}.${MPL_PATCH})
+set(MPL_GZ matplotlib-${MPL_MAJOR}.${MPL_MINOR}.${MPL_PATCH}.tar.gz)
+set(MPL_MD5 2196c0482d5b33dc8d33f67bbafc1323)
+
+set(Cython_MAJOR 0)
+set(Cython_MINOR 15)
+set(Cython_URL http://pypi.python.org/packages/source/C/Cython/)
+set(Cython_GZ Cython-${Cython_MAJOR}.${Cython_MINOR}.tar.gz)
+set(Cython_MD5 794b93c4c1c4cc031f90302cacd834ca)
+
+set(h5py_MAJOR 1)
+set(h5py_MINOR 3)
+set(h5py_PATCH 1)
+set(h5py_URL http://h5py.googlecode.com/files/)
+set(h5py_GZ h5py-${h5py_MAJOR}.${h5py_MINOR}.${h5py_PATCH}.tar.gz)
+set(h5py_MD5 cfef84992d33910a06371dc35becb71b)
+
 set(BLAS_URL http://www.netlib.org/blas)
 set(BLAS_GZ blas.tgz)
 

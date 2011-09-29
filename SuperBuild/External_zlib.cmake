@@ -55,6 +55,7 @@ else()
 endif()
 
 set(ZLIB_INCLUDE_DIR "${zlib_install}/include")
+set(ZLIB_LIBRARY_DIR ${zlib_install}/lib)
 
 if(WIN32)
   set(ZLIB_LIBRARY "${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}")

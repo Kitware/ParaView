@@ -1,0 +1,19 @@
+message("Installing h5py:\n@h5py_PREFIX_ARGS@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @h5py_PREFIX_ARGS@ --single-version-externally-managed --record ${CMAKE_CURRENT_BINARY_DIR}/yt.record
+  WORKING_DIRECTORY "@h5py_binary@"
+  RESULT_VARIABLE res
+)
+
+if(NOT ${res} EQUAL 0)
+  message("h5py Errors detected: \n${h5py_OUT}\n${h5py_ERR}")
+  message(FATAL_ERROR "Error in config of h5py")
+endif()
+message("h5py install succeeded.")

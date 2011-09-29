@@ -2,6 +2,8 @@
 if(UNIX)
   set(ENV{LD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
   set(ENV{CXX} "@CMAKE_CXX_COMPILER@")
+  set(ENV{CPPFLAGS} "-I@ZLIB_INCLUDE_DIR@")
+  set(ENV{LDFLAGS} "-L@ZLIB_LIBRARY_DIR@")
 
   set(library_param --enable-shared)
 
@@ -10,7 +12,7 @@ if(UNIX)
   endif()
 
   EXECUTE_PROCESS(
-    COMMAND sh configure --prefix=@CMAKE_CURRENT_BINARY_DIR@/python-build ${library_param} --enable-unicode=ucs2
+    COMMAND sh configure --prefix=@CMAKE_CURRENT_BINARY_DIR@/python-install ${library_param} --enable-unicode=ucs2
     WORKING_DIRECTORY "@python_base@"
     RESULT_VARIABLE rv
     )

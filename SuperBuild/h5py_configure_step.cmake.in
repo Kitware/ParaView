@@ -1,0 +1,18 @@
+message("Configuring h5py:\n@h5py_binary@\n@HDF5_DIR@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py configure --hdf5=@HDF5_install@
+  WORKING_DIRECTORY "@h5py_binary@"
+  RESULT_VARIABLE res
+  )
+
+if(NOT ${res} EQUAL 0)
+  message(FATAL_ERROR "Error in config of h5py")
+endif()
+message("h5py config worked.")
