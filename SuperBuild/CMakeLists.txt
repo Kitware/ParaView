@@ -51,6 +51,7 @@ include(ExternalProject)
 #-----------------------------------------------------------------------------
 
 option(GIT_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON)
+set(ENABLE_YT OFF CACHE BOOL "Install yt for astrophysics analysis")
 
 set(git_protocol "git")
 if(NOT Slicer_USE_GIT_PROTOCOL)
@@ -135,6 +136,9 @@ include(PackageVersions)
 set(python_dependencies)
 set(CLAPACK_dependencies)
 set(NUMPY_dependencies)
+set(MPL_dependencies)
+set(Cython_dependencies)
+set(h5py_dependencies)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 set(ParaView_dependencies)
@@ -142,6 +146,16 @@ set(ParaView_dependencies)
 set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 
 set(MPI_ARGS)
+
+# Build a common zlib used by several dependencies
+include(External_zlib)
+set(ZLIB_ARGS
+   -DVTK_USE_SYSTEM_ZLIB:BOOL=ON
+   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
+list(APPEND ParaView_dependencies zlib)
+list(APPEND png_dependencies zlib)
+list(APPEND python_dependencies zlib)
 
 if(NOT APPLE)
 
@@ -243,15 +257,6 @@ endif()
 include(External_Boost)
 list(APPEND ParaView_dependencies Boost)
 
-# Build a common zlib used by several dependencies
-include(External_zlib)
-set(ZLIB_ARGS
-   -DVTK_USE_SYSTEM_ZLIB:BOOL=ON
-   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
-   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
-list(APPEND ParaView_dependencies zlib)
-list(APPEND png_dependencies zlib)
-
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${zlib_install}/bin)
 else()
@@ -290,6 +295,17 @@ set(HDF5_ARGS
   -DHDF5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
   -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
   -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY})
+
+if(ENABLE_YT)
+  set(MPL_dependencies NUMPY)
+  include(External_MPL)
+
+  set(Cython_dependencies NUMPY)
+  include(External_Cython)
+
+  set(h5py_dependencies NUMPY HDF5)
+  include(External_h5py)
+endif()
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_install}/bin)
@@ -448,3 +464,9 @@ ExternalProject_Add(${proj}
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )
+
+if(ENABLE_YT)
+  set(distribute_dependencies PYTHON)
+  set(yt_dependencies NUMPY HDF5 MPL ParaView)
+  include(External_yt)
+endif()
