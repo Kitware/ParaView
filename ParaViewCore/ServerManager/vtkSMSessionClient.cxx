@@ -591,6 +591,12 @@ void vtkSMSessionClient::ExecuteStream(
   vtkTypeUInt32 location, const vtkClientServerStream& cssstream,
   bool ignore_errors)
 {
+  // Prevent to push anything during the Quit process
+  if(this->NoMoreDelete)
+    {
+    return;
+    }
+
   location = this->GetRealLocation(location);
 
   vtkMultiProcessController* controllers[2] = {NULL, NULL};
