@@ -54,6 +54,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
+#include "vtkUniformGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
@@ -61,6 +62,8 @@
 #include "vtkUnstructuredGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiPieceDataSet.h"
+#include "vtkAMRBox.h"
+#include "vtkMath.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -351,6 +354,44 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ExecuteAMRBlock(
+  vtkDataObject* input, vtkPolyData* output, int doCommunicate,
+  int updatePiece, int updateNumPieces, int updateGhosts, bool extractface[6] )
+{
+
+  if (this->UseOutline && this->MakeOutlineOfInput)
+  {
+    vtkAlgorithmOutput *pport = input->GetProducerPort();
+    vtkDataObject *insin = NULL;
+    if (pport)
+      {
+      vtkAlgorithm *alg = pport->GetProducer();
+      if (alg &&
+          alg->GetNumberOfInputPorts() &&
+          alg->GetNumberOfInputConnections(0))
+        {
+        insin = alg->GetInputDataObject(0,0);
+        }
+      }
+    if (insin)
+      {
+      input = insin;
+      }
+  }
+
+  if( !input->IsA("vtkImageData") )
+  {
+    vtkErrorMacro( "Input data must be vtkImageData for AMR!" );
+    return;
+  }
+
+  this->AMRGridExecute(
+   static_cast<vtkImageData*>( input ),output,
+   doCommunicate,updatePiece,extractface);
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
   int updatePiece, int updateNumPieces, int updateGhosts)
@@ -433,14 +474,20 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
   if (vtkCompositeDataSet::SafeDownCast(input))
     {
-    vtkGarbageCollector::DeferredCollectionPush();
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::RequestData");
-    this->RequestCompositeData(request, inputVector, outputVector);
+    if( input->IsA( "vtkHierarchicalBoxDataSet" ) )
+      {
+        this->RequestAMRData( request, inputVector, outputVector );
+      }
+    else
+      {
+        vtkGarbageCollector::DeferredCollectionPush();
+        this->RequestCompositeData(request, inputVector, outputVector);
+        vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
+        vtkGarbageCollector::DeferredCollectionPop();
+        vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
+      }
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
-
-    vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
-    vtkGarbageCollector::DeferredCollectionPop();
-    vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
     return 1;
     }
 
@@ -583,6 +630,183 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
   dsindex->FastDelete();
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGeometryFilter::IsAMRDataVisible(
+    vtkAMRBox &amrBox, vtkAMRBox &rootBox, bool extractface[6] )
+{
+  // Sanity check
+  assert( "pre: AMR box dimensionality must match!" &&
+          (amrBox.GetDimensionality() == rootBox.GetDimensionality() ) );
+  assert( "pre: AMR dimension out-of-bounds!"  &&
+          (amrBox.GetDimensionality() >= 1)    &&
+          (amrBox.GetDimensionality() <= 3) );
+
+
+
+  // STEP 1: If it's 2-D all blocks are visible
+  if( amrBox.GetDimensionality() <= 2)
+    {
+      for( int i=0; i < 6; ++i )
+        extractface[i]=true;
+      return true;
+    }
+  else
+    {
+      // By default none of the 6 block faces are visible.
+      for( int i=0; i < 6; ++i )
+       extractface[i]=false;
+    }
+
+  // STEP 2: Construct AMR box within the cartesian bounds of the rootbox,
+  // but, with the spacing of the box corresponding to the given data.
+
+  // -- Get the root cartesian box bounds
+  int ndim[3];
+  ndim[0]=ndim[1]=ndim[2]=0;
+  double min[3]; double max[3];
+  rootBox.GetMinBounds( min );
+  rootBox.GetMaxBounds( max );
+
+  // -- Get the data spacing
+  double spacing[3];
+  amrBox.GetGridSpacing( spacing );
+
+  // -- Compute the number of CELLS in tmpBox
+  for( int i=0; i < 3; ++i )
+    {
+      // Note -1 is subtracted here because the tmpBox
+      // is cell-dimensioned and we downshift to number
+      // from 0.
+      ndim[i] = vtkMath::Round( (max[i]-min[i])/spacing[i] )-1;
+    }
+
+  int lo[3];
+  lo[0]=lo[1]=lo[2]=0;
+
+  vtkAMRBox tmpBox;
+  tmpBox.SetDimensionality( 3 );
+  tmpBox.SetDataSetOrigin( min );
+  tmpBox.SetGridSpacing( spacing );
+  tmpBox.SetDimensions( lo, ndim );
+  tmpBox.SetLevel( 0 );
+  tmpBox.SetBlockId( 0 );
+  tmpBox.SetProcessId( -1 );
+
+
+  // STEP 3: Check if the box is on the boundary
+  bool render = false;
+  for( int i=0; i < 3; ++i )
+    {
+
+      if( amrBox.GetLoCorner()[i] == 0 )
+        {
+          render           = true;
+          extractface[i*2] = true;
+        }
+      if( amrBox.GetHiCorner()[i] == tmpBox.GetHiCorner()[i] )
+        {
+          render             = true;
+          extractface[i*2+1] = true;
+        }
+
+    }
+
+  return render;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::RequestAMRData(
+    vtkInformation*, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector )
+{
+  vtkTimerLog::MarkStartEvent( "vtkPVGeometryFilter::RequestAMRData" );
+
+  // STEP 0: Acquire input & output object
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outputVector,0);
+  if( output == NULL )
+    {
+      vtkErrorMacro( "Output AMR multi-block dataset is NULL" );
+      return 0;
+    }
+
+  vtkHierarchicalBoxDataSet *input=
+      vtkHierarchicalBoxDataSet::GetData(inputVector[0], 0);
+  if( input == NULL )
+    {
+      vtkErrorMacro( "Input AMR composite dataset is NULL" );
+      return 0;
+    }
+
+  // STEP 1: Construct output object, i.e., a multiblock of multiple pieces
+  // that mirrors the vtkHierarchicalBoxDataSet
+  output->SetNumberOfBlocks( input->GetNumberOfLevels() );
+  unsigned int blockIdx = 0;
+  for( ; blockIdx < output->GetNumberOfBlocks(); ++blockIdx )
+    {
+      vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
+      mpds->SetNumberOfPieces( input->GetNumberOfDataSets( blockIdx ) );
+      output->SetBlock( blockIdx, mpds );
+      mpds->Delete();
+    }
+
+  // STEP 2: Check Attributes
+  vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
+  if( this->CheckAttributes(input) )
+    {
+      vtkErrorMacro( "CheckAttributes() failed!" );
+      return 0;
+    }
+  vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::CheckAttributes");
+
+  // STEP 3: Loop through data, determine if they are visible and call
+  // execute block to get the polydata to render.
+
+  // NOTE: We assume that the root node covers the entire domain & that it
+  // is stored @ (0,0)
+  vtkAMRBox rootAMRBox;
+  input->GetRootAMRBox( rootAMRBox );
+
+  unsigned int level=0;
+  for( ; level < input->GetNumberOfLevels(); ++level )
+    {
+      unsigned int dataIdx=0;
+      for( ; dataIdx < input->GetNumberOfDataSets(level); ++dataIdx )
+        {
+
+          vtkUniformGrid *ug = input->GetDataSet( level, dataIdx );
+          vtkMultiPieceDataSet *mpds =
+           vtkMultiPieceDataSet::SafeDownCast( output->GetBlock( level ) );
+          assert( "pre: Multipiece dataset is NULL" && (mpds != NULL) );
+          if( ug == NULL )
+            {
+              mpds->SetPiece( dataIdx, NULL );
+            }
+          else
+            {
+              vtkAMRBox amrBox;
+              input->GetMetaData( level, dataIdx, amrBox );
+              bool extractface[6];
+              if( this->IsAMRDataVisible(amrBox,rootAMRBox,extractface) )
+                {
+                  vtkPolyData* tmpOut = vtkPolyData::New();
+//                  this->ExecuteBlock(ug, tmpOut, 0, 0, 1, 0);
+                  this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0,extractface);
+                  this->ExecuteCellNormals(tmpOut, 0);
+                  this->RemoveGhostCells(tmpOut);
+                  this->AddCompositeIndex(
+                   tmpOut,input->GetFlatIndex(level,dataIdx));
+                  mpds->SetPiece( dataIdx, tmpOut );
+                  tmpOut->Delete();
+                }
+            }
+
+        } // END for all data
+    } // END for all levels
+
+  vtkTimerLog::MarkEndEvent( "vtkPVGeometryFilter::RequestAMRData" );
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -943,6 +1167,73 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AMRGridExecute(
+    vtkImageData* input,vtkPolyData* output,
+    int doCommunicate,int updatePiece, bool extractface[6] )
+{
+  double *spacing;
+  double *origin;
+  int    *ext;
+  double bounds[6];
+
+  if( doCommunicate )
+    {
+      ext = input->GetWholeExtent();
+    }
+  else
+    {
+      ext = input->GetExtent();
+    }
+
+  if( !this->UseOutline )
+    {
+      if( input->GetNumberOfCells() > 0 )
+        {
+          this->DataSetSurfaceFilter->UniformGridExecute(
+            input,output,input->GetExtent(),ext, extractface );
+        }
+      this->OutlineFlag = 0;
+      return;
+    }
+
+  this->OutlineFlag = 1;
+
+  //
+  // Otherwise, let OutlineSource do all the work
+  //
+
+  if (ext[1] >= ext[0] && ext[3] >= ext[2] && ext[5] >= ext[4] &&
+    (updatePiece == 0 || !doCommunicate))
+    {
+      spacing = input->GetSpacing();
+      origin = input->GetOrigin();
+
+      bounds[0] = spacing[0] * ((float)ext[0]) + origin[0];
+      bounds[1] = spacing[0] * ((float)ext[1]) + origin[0];
+      bounds[2] = spacing[1] * ((float)ext[2]) + origin[1];
+      bounds[3] = spacing[1] * ((float)ext[3]) + origin[1];
+      bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
+      bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
+
+      vtkOutlineSource *outline = vtkOutlineSource::New();
+      outline->SetBounds(bounds);
+      outline->Update();
+
+      output->SetPoints(outline->GetOutput()->GetPoints());
+      output->SetLines(outline->GetOutput()->GetLines());
+      output->SetPolys(outline->GetOutput()->GetPolys());
+      outline->Delete();
+    }
+  else
+    {
+      vtkPoints* pts = vtkPoints::New();
+      output->SetPoints(pts);
+      pts->Delete();
+    }
+
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
                                            vtkPolyData* output,
                                            int doCommunicate,
@@ -965,14 +1256,14 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     }
 
   // If 2d then default to superclass behavior.
-//  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
-//      !this->UseOutline)
+  //  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
+  //      !this->UseOutline)
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)
       {
-      this->DataSetSurfaceFilter->StructuredExecute(input,
-        output, input->GetExtent(), ext);
+        this->DataSetSurfaceFilter->StructuredExecute(input,
+          output, input->GetExtent(), ext);
       }
     this->OutlineFlag = 0;
     return;
