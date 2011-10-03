@@ -2,20 +2,20 @@ message("Configuring MPL:\n@MPL_binary@")
 set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
-if(APPLE)
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
-endif()
-
-# As explained in site.cfg.example - See http://projects.scipy.org/numpy/browser/trunk/site.cfg.example
-# Directories listed in variable such as library_dirs or source_dirs should be separated using os.pathsep
-# On windows, the separator is ";" and ":" on unix-like platform
-set(path_sep ":")
 if(WIN32)
-  set(path_sep ";")
+  file(TO_NATIVE_PATH "@freetype_install@/include" freetype_include_win32)
+  file(TO_NATIVE_PATH "@png_install@/include" png_include_win32)
+  file(TO_NATIVE_PATH "@freetype_install@/lib" freetype_lib_win32)
+  file(TO_NATIVE_PATH "@zlib_install@/lib" z_lib_win32)
+  file(TO_NATIVE_PATH "@png_install@/lib" png_lib_win32)
+  set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
+  set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
+elseif(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
 endif()
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py config
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py config --include-dirs="@freetype_install@/include" --library-dirs="@freetype_install@/lib"
   WORKING_DIRECTORY "@MPL_binary@"
   RESULT_VARIABLE res
   )
