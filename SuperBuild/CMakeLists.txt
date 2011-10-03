@@ -158,6 +158,23 @@ list(APPEND png_dependencies zlib)
 list(APPEND python_dependencies zlib)
 
 if(NOT APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
+
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+  else()
+    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
+  endif()
+endif()
+
+if(NOT APPLE)
 
   if(WIN32)
     include(External_OpenMPI)
@@ -264,23 +281,6 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${ZLIB_DIR})
 endif()
 
-if(NOT APPLE)
-  # Build a common png used by several dependencies
-  include(External_png)
-  set(PNG_ARGS
-    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
-    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-  list(APPEND ParaView_dependencies png)
-
-  if(WIN32)
-    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
-  else()
-    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
-    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
-  endif()
-endif()
-
 # Build HDF5
 list(APPEND HDF5_dependencies zlib)
 list(APPEND ParaView_dependencies HDF5)
@@ -296,8 +296,13 @@ set(HDF5_ARGS
   -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
   -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY})
 
+set(freetype_dependencies zlib)
+list(APPEND ParaView_dependencies freetype)
+include(External_freetype)
+set(freetype_ARGS)
+
 if(ENABLE_YT)
-  set(MPL_dependencies NUMPY)
+  set(MPL_dependencies freetype NUMPY zlib png)
   include(External_MPL)
 
   set(Cython_dependencies NUMPY)
