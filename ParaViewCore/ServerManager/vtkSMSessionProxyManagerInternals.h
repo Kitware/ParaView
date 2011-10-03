@@ -489,4 +489,3 @@ struct vtkSMProxyManagerInternals
 };
 
 #endif
-
