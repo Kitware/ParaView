@@ -25,11 +25,17 @@ if(WIN32)
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
-  
+
   # the zlib library should be named zlib1.lib not zlib.lib
-  ExternalProject_Add_Step(zlib RenameLib
+  ExternalProject_Add_Step(zlib RenameLib1
     COMMAND ${CMAKE_COMMAND} -E copy ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} ${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}
     DEPENDEES install
+    )
+
+  # matplot lib doesn't provide a way to tell it the library name so rename it to what it expects (z.lib)
+  ExternalProject_Add_Step(zlib RenameLib2
+    COMMAND ${CMAKE_COMMAND} -E copy ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} ${zlib_install}/lib/z${_LINK_LIBRARY_SUFFIX}
+    DEPENDEES RenameLib1
     )
 
 else()
