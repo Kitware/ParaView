@@ -157,6 +157,13 @@ list(APPEND ParaView_dependencies zlib)
 list(APPEND png_dependencies zlib)
 list(APPEND python_dependencies zlib)
 
+# Build a common szip used by several dependencies
+include(External_szip)
+#set(ZLIB_ARGS
+#   -DVTK_USE_SYSTEM_ZLIB:BOOL=ON
+#   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+#   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
+
 if(NOT APPLE)
   # Build a common png used by several dependencies
   include(External_png)
@@ -282,7 +289,7 @@ else()
 endif()
 
 # Build HDF5
-list(APPEND HDF5_dependencies zlib)
+list(APPEND HDF5_dependencies zlib szip)
 list(APPEND ParaView_dependencies HDF5)
 include(External_HDF5)
 set(HDF5_ARGS
@@ -308,7 +315,7 @@ if(ENABLE_YT)
   set(Cython_dependencies NUMPY)
   include(External_Cython)
 
-  set(h5py_dependencies NUMPY HDF5)
+  set(h5py_dependencies NUMPY HDF5 Cython)
   include(External_h5py)
 endif()
 
