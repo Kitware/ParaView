@@ -6,6 +6,10 @@ if(APPLE)
   set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
 endif()
 
+file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
+
+set(ENV{HDF5_DIR} "${hdf5_install}")
+
 execute_process(
   COMMAND "@PYTHON_EXECUTABLE@" setup.py build
   WORKING_DIRECTORY "@h5py_binary@"

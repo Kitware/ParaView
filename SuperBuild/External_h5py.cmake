@@ -31,6 +31,8 @@ configure_file(
   h5py_install_step.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/h5py_install_step.cmake @ONLY)
 
+set(h5py_PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+    "${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/h5pyPatches/setup.py.${h5py_VERSION}" "${h5py_binary}/setup.py")
 set(h5py_CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -DCONFIG_TYPE=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/h5py_configure_step.cmake)
 set(h5py_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/h5py_make_step.cmake)
@@ -44,6 +46,7 @@ ExternalProject_Add(h5py
   DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/h5py
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/h5py
+  PATCH_COMMAND ${h5py_PATCH_COMMAND}
   CONFIGURE_COMMAND ${h5py_CONFIGURE_COMMAND}
   BUILD_COMMAND ${h5py_BUILD_COMMAND}
   UPDATE_COMMAND ""
