@@ -3,7 +3,7 @@
 # The zlib external project for ParaView
 set(zlib_source "${CMAKE_CURRENT_BINARY_DIR}/zlib")
 set(zlib_build "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
-set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}/zlib-install")
+set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
