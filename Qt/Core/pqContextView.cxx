@@ -204,7 +204,7 @@ void pqContextView::initializeInteractors()
 
   if(proxy && qvtk)
     {
-    vtkContextView* view = proxy->GetChartView();
+    vtkContextView* view = proxy->GetContextView();
     view->SetInteractor(qvtk->GetInteractor());
     qvtk->SetRenderWindow(view->GetRenderWindow());
     }
@@ -232,7 +232,7 @@ QWidget* pqContextView::getWidget()
 /// the chart rendering.
 vtkContextView* pqContextView::getVTKContextView() const
 {
-  return vtkSMContextViewProxy::SafeDownCast(this->getProxy())->GetChartView();
+  return vtkSMContextViewProxy::SafeDownCast(this->getProxy())->GetContextView();
 }
 
 //-----------------------------------------------------------------------------
@@ -433,8 +433,12 @@ void pqContextView::selectionChanged()
     }
 
   // Fill the selection source with the selection from the view
-  vtkSelection* sel = this->getContextViewProxy()->GetChart()
-                      ->GetAnnotationLink()->GetCurrentSelection();
+  vtkSelection* sel = 0;
+
+  if(vtkChart *chart = vtkChart::SafeDownCast(this->getContextViewProxy()->GetContextItem()))
+    {
+    sel = chart->GetAnnotationLink()->GetCurrentSelection();
+    }
 
   // Fill the selection source with the selection
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(

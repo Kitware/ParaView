@@ -23,6 +23,7 @@
 #include "vtkPVView.h"
 
 class vtkContextView;
+class vtkAbstractContextItem;
 class vtkRenderWindow;
 class vtkChart;
 
@@ -48,8 +49,8 @@ public:
   vtkGetObjectMacro(ContextView, vtkContextView);
 
   // Description:
-  // Get the chart.
-  virtual vtkChart* GetChart()=0;
+  // Get the context item.
+  virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   // Description:
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);

@@ -77,6 +77,8 @@ SET (Kit_SRCS
   vtkPVOptionsXMLParser.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
+  vtkPVPlotMatrixView.cxx
+  vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginTracker.cxx

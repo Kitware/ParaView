@@ -22,7 +22,8 @@
 
 #include "vtkPVContextView.h"
 
-class vtkChart;
+#include "vtkChart.h"
+
 class vtkChartView;
 class vtkPVPlotTime;
 
@@ -232,6 +233,10 @@ public:
   // Description:
   // Provides access to the chart view.
   virtual vtkChart* GetChart();
+
+  // Description:
+  // Get the context item.
+  virtual vtkAbstractContextItem* GetContextItem() { return this->GetChart(); }
 
 //BTX
 protected:

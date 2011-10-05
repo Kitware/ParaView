@@ -129,17 +129,17 @@ vtkRenderWindow* vtkSMContextViewProxy::GetRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-vtkContextView* vtkSMContextViewProxy::GetChartView()
+vtkContextView* vtkSMContextViewProxy::GetContextView()
 {
   return this->ChartView;
 }
 
 //----------------------------------------------------------------------------
-vtkChart* vtkSMContextViewProxy::GetChart()
+vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
-  return pvview? pvview->GetChart() : NULL;
+  return pvview? pvview->GetContextItem() : NULL;
 }
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
@@ -166,10 +166,10 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
 {
   this->StillRender();
 
-  this->GetChartView()->Render();
+  this->GetContextView()->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(this->GetChartView()->GetRenderWindow());
+  w2i->SetInput(this->GetContextView()->GetRenderWindow());
   w2i->SetMagnification(magnification);
 
   // Use front buffer on Windows for now until we can figure out

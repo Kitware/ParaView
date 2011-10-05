@@ -22,8 +22,8 @@
 
 #include "vtkSMViewProxy.h"
 
+class vtkAbstractContextItem;
 class vtkContextView;
-class vtkChart;
 class vtkImageData;
 class vtkRenderWindow;
 
@@ -46,11 +46,11 @@ public:
 //BTX
   // Description:
   // Provides access to the vtk chart view.
-  vtkContextView* GetChartView();
+  vtkContextView* GetContextView();
 
   // Description:
   // Provides access to the vtk chart.
-  virtual vtkChart* GetChart();
+  virtual vtkAbstractContextItem* GetContextItem();
 //ETX
 
   // Description:

@@ -135,6 +135,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
+  pqPlotMatrixDisplayPanel.h
   pqPluginTreeWidget.h
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
@@ -258,6 +259,7 @@ SET(UI_FORMS
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
+  Resources/UI/pqPlotMatrixDisplayPanel.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -542,6 +544,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.cxx
   pqPipelineTimeKeyFrameEditor.h
+  pqPlotMatrixDisplayPanel.cxx
+  pqPlotMatrixDisplayPanel.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPluginTreeWidget.h
