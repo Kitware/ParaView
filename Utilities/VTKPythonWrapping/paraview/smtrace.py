@@ -611,6 +611,10 @@ def append_trace():
           ctorMethod = "CreateComparativeXYPlotView"
         elif info.Proxy.GetXMLName() == "ComparativeBarChartView":
           ctorMethod = "CreateComparativeBarChartView"
+        elif info.Proxy.GetXMLName() == "ParallelCoordinatesChartView":
+          ctorMethod = "CreateParallelCoordinatesChartView"
+        elif info.Proxy.GetXMLName() == "2DRenderView":
+          ctorMethod = "Create2DRenderView"
         else:
           ctorMethod = "CreateRenderView"
 

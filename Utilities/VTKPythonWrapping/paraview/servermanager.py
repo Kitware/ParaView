@@ -1929,7 +1929,8 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     if not view_module:
         return None
     extraArgs['proxy'] = view_module
-    proxy = rendering.__dict__[view_module.GetXMLName()](**extraArgs)
+    python_proxy_name = _make_name_valid(view_module.GetXMLName())
+    proxy = rendering.__dict__[python_proxy_name](**extraArgs)
     return proxy
 
 def GetRepresentation(aProxy, view):
