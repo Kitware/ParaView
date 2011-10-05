@@ -1,0 +1,772 @@
+<ServerManagerConfiguration>
+
+<ProxyGroup name="internal_sources">
+   <!--  FLASH AMR Particles Reader -->
+   <SourceProxy name="FlashParticlesReaderCore"
+               class="vtkAMRFlashParticlesReader"
+               label="FLASH Particles AMR Reader" >
+      
+      <Documentation short_help="Reads AMR particles from FLASH dataset"
+                     long_help="Reads AMR particles from FLASH dataset" >
+          The Flash particles reader loads particle simulation data stored
+          in Flash format. The output of this reader is a MultiBlock dataset
+          where each block is vtkPolyData that holds the particles and
+          corresponding particle data.
+      </Documentation>
+      
+       <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="0"
+                           number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the Enzo file name
+        </Documentation>         
+      </StringVectorProperty>
+    
+     <!-- Display the number of Particles -->
+    <IntVectorProperty
+        name="NumParticles"
+        command="GetTotalNumberOfParticles"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+    <IntVectorProperty name="Frequency"
+                       command="SetFrequency"
+                       number_of_elements="1"
+                       default_values="1" >
+       <IntRangeDomain name="range" />
+       <Documentation>
+         This property sets the frequency interval for loading particles.
+       </Documentation>
+    </IntVectorProperty>
+    
+    <IntVectorProperty name="FilterLocation"
+                       command="SetFilterLocation"
+                       number_of_elements="1"
+                       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+          Turns on filtering of particles by location
+       </Documentation>
+    </IntVectorProperty>
+    
+    <DoubleVectorProperty name="MinLocation"
+                          command="SetMinLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+                                          
+     <DoubleVectorProperty name="MaxLocation"
+                          command="SetMaxLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+    
+    
+    <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="ParticleArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Particle"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="ParticleArrayStatus"
+        command="SetParticleArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ParticleArrayInfo"
+        label="Particle Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="ParticleArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which particle arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+    
+     <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="AMR flash particles dataset" />
+     </Hints>
+   </SourceProxy>
+   
+   <!--  ENZO AMR Particles Reader -->
+   <SourceProxy name="EnzoParticlesReaderCore"
+                class="vtkAMREnzoParticlesReader"
+                label="Enzo Particles AMR Reader" >
+    <Documentation short_help="Reads AMR particles from an ENZO dataset"
+                   long_help="Reads AMR particles from an ENZO dataset">
+       The Enzo particles reader loads particle simulation data stored in
+       Enzo HDF5 format. The output of this reader is MultiBlock dataset
+       where each block is a vtkPolyData that holds the particles (points)
+       and corresponding particle data.
+    </Documentation>
+    
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="0"
+                           number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the Enzo file name
+        </Documentation>         
+    </StringVectorProperty>
+    
+     <!-- Display the number of Particles -->
+    <IntVectorProperty
+        name="NumParticles"
+        command="GetTotalNumberOfParticles"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+    <IntVectorProperty name="Frequency"
+                       command="SetFrequency"
+                       number_of_elements="1"
+                       default_values="1" >
+       <IntRangeDomain name="range" />
+       <Documentation>
+         This property sets the frequency interval for loading particles.
+       </Documentation>
+    </IntVectorProperty>
+    
+    <IntVectorProperty name="FilterLocation"
+                       command="SetFilterLocation"
+                       number_of_elements="1"
+                       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+          Turns on filtering of particles by location
+       </Documentation>
+    </IntVectorProperty>
+    
+    <DoubleVectorProperty name="MinLocation"
+                          command="SetMinLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+                                          
+     <DoubleVectorProperty name="MaxLocation"
+                          command="SetMaxLocation"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out. 
+       </Documentation>
+    </DoubleVectorProperty>
+    
+    
+    <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="ParticleArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Particle"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="ParticleArrayStatus"
+        command="SetParticleArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ParticleArrayInfo"
+        label="Particle Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="ParticleArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which particle arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+    
+     <IntVectorProperty
+        name="ParticleType"
+        command="SetParticleType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="All Particles" />
+          <Entry value="1" text="Dark Matter" />
+          <Entry value="2" text="Active (Star)" />
+          <Entry value="3" text="Passive (Tracer)" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      
+     <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="Enzo AMR Particles dataset" />
+     </Hints>
+     
+   </SourceProxy>
+   
+   <!-- FLASH AMR Core Reader definition -->
+   <SourceProxy name="FlashReaderCore" 
+                class="vtkAMRFlashReader"
+                label="Flash AMR Reader">
+      <Documentation
+          short_help="Read hierarchical box dataset from a Flash dataset."
+          long_help="Read hierarchical box dataset from a Flash dataset.">
+          This Flash reader loads data stored in Flash format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+   
+      <!-- Define Flas Filename -->   
+      <StringVectorProperty
+          name="FileName"
+          command="SetFileName"
+          animateable="0" 
+          number_of_elements="1">
+          
+          <FileListDomain name="files" />
+          <Documentation>
+            This property specifies the Flash file name
+          </Documentation>        
+     </StringVectorProperty>
+            
+    <!-- Display the number of levels -->
+    <IntVectorProperty
+        name="NumLevels"
+        command="GetNumberOfLevels"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+     <!--  Display the number of blocks -->
+      <IntVectorProperty
+        name="NumBlocks"
+        command="GetNumberOfBlocks"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+      <IntVectorProperty
+        name="EnableCaching"
+        command="SetEnableCaching"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn cahcing on/off
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Define MaxLevel property -->
+     <IntVectorProperty
+        name="Level"
+        command="SetMaxLevel"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          This property specifies the desired level of
+          resolution that will be visible.
+        </Documentation>
+     </IntVectorProperty>
+          
+     <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Cell"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="PointArrays">
+       <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList" />
+        </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+          This property lists which node-based arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+     
+     <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="AMR Flash dataset" />
+     </Hints>
+     
+   </SourceProxy>
+   <!-- FLASH AMR Core Reader definition -->
+   
+   <!-- ENZO AMR Core Reader definition -->
+  <SourceProxy name="EnzoReaderCore" 
+                class="vtkAMREnzoReader"
+                label="Enzo AMR Reader">
+      <Documentation
+          short_help="Read hierarchical box dataset from an Enzo file."
+          long_help="Read hierarchical box dataset from an Enzo file.">
+          This Enzo reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+   
+      <!-- Define Enzo Filename -->   
+      <StringVectorProperty
+          name="FileName"
+          command="SetFileName"
+          animateable="0" 
+          number_of_elements="1">
+          
+          <FileListDomain name="files" />
+          <Documentation>
+            This property specifies the Enzo file name
+          </Documentation>        
+     </StringVectorProperty>
+  
+     <!-- Display the number of levels -->
+    <IntVectorProperty
+        name="NumLevels"
+        command="GetNumberOfLevels"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+     <!--  Display the number of blocks -->
+      <IntVectorProperty
+        name="NumBlocks"
+        command="GetNumberOfBlocks"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     
+      <IntVectorProperty
+        name="EnableCaching"
+        command="SetEnableCaching"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn cahcing on/off
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!--  Define MaxLevel property -->
+     <IntVectorProperty
+        name="Level"
+        command="SetMaxLevel"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          This property specifies the desired level of
+          resolution that will be visible.
+        </Documentation>
+     </IntVectorProperty>
+     
+     <!-- Set Conversion to CGS -->
+     <IntVectorProperty
+        name="ConvertToCGS"
+        command="SetConvertToCGS"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether or not units will be
+          converted to CGS.
+        </Documentation>
+     </IntVectorProperty>
+          
+     <!--  Array Selection GUI Component -->     
+     <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper 
+         attribute_name="Cell"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which cell-centered arrays to read.
+        </Documentation>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="PointArrays">
+       <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="PointArrayInfo" function="ArrayList" />
+        </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+          This property lists which node-based arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+     
+     <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="AMR Enzo Files" />
+     </Hints>
+     
+   </SourceProxy>
+   <!-- END ENZO AMR Core Reader definition -->
+</ProxyGroup>
+
+<ProxyGroup name="sources">
+   <!--  AMR Flash Particles Reader -->
+   <SourceProxy name="FlashParticlesReader"
+                class="vtkFileSeriesReader"
+                label="FLASH AMR Particles Reader"
+                file_name_method="SetFileName"
+                si_class="vtkSIFileSeriesReaderProxy" >
+       <Documentation short_help="Reads AMR particles from FLASH dataset"
+                     long_help="Reads AMR particles from FLASH dataset" >
+          The Flash particles reader loads particle simulation data stored
+          in Flash format. The output of this reader is a MultiBlock dataset
+          where each block is vtkPolyData that holds the particles and
+          corresponding particle data.
+      </Documentation>
+              
+       <SubProxy>
+          <Proxy name="Reader"
+                 proxygroup="internal_sources"
+                 proxyname="FlashParticlesReaderCore" >
+          </Proxy>
+          <ExposedProperties>
+            <Property name="NumParticles" />
+            <Property name="Frequency" />
+            <Property name="FilterLocation" />
+            <Property name="MinLocation" />
+            <Property name="MaxLocation" />
+            <Property name="ParticleArrayStatus" />
+          </ExposedProperties>
+       </SubProxy>
+       
+       <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+       </StringVectorProperty>
+     
+        <StringVectorProperty
+            name="FileNames"
+            clean_command="RemoveAllFileNames"
+            command="AddFileName"
+            animateable="0"
+            number_of_elements="0"
+            repeat_command="1">
+          <FileListDomain name="files" />
+          <Documentation>
+          The list of files to be read by the reader.
+          </Documentation>
+        </StringVectorProperty>
+    
+        <DoubleVectorProperty
+          name="TimestepValues"
+          repeatable="1"
+          information_only="1">
+          <TimeStepsInformationHelper/>
+          <Documentation>
+            Available timestep values.
+          </Documentation>
+        </DoubleVectorProperty>
+    
+      <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="FLASH AMR Particles Reader" />
+      </Hints>
+    
+   </SourceProxy>
+                
+   <!--  Enzo Particles Reader -->
+   <SourceProxy name="EnzoParticlesReader"
+                class="vtkFileSeriesReader"
+                label="ENZO AMR Particles Reader"
+                file_name_method="SetFileName"
+                si_class="vtkSIFileSeriesReaderProxy" >
+       <Documentation
+            short_help="Reads AMR particles from an ENZO dataset"
+            long_help="Reads AMR particles from an ENZO dataset" >
+            The Enzo particles reader loads particle simulation data stored in
+            Enzo HDF5 format. The output of this reader is MultiBlock dataset
+            where each block is a vtkPolyData that holds the particles (points)
+            and corresponding particle data.
+       </Documentation>
+
+       <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoParticlesReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumParticles" />
+          <Property name="Frequency" />
+          <Property name="FilterLocation" />
+          <Property name="MinLocation" />
+          <Property name="MaxLocation" />
+          <Property name="ParticleArrayStatus" />
+          <Property name="ParticleType" />
+        </ExposedProperties>
+      </SubProxy>
+      
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy enzo"
+            file_description="ENZO AMR Particles Reader" />
+    </Hints>
+     
+   </SourceProxy>
+   
+   <!--  Flash Reader -->
+   <SourceProxy name="FlashReader"
+        class="vtkFileSeriesReader"
+        label="Flash Reader"
+        file_name_method="SetFileName"
+        si_class="vtkSIFileSeriesReaderProxy" >
+       
+       <Documentation
+          short_help="Read hierarchical box dataset from a Flash dataset."
+          long_help="Read hierarchical box dataset from a Flash dataset.">
+          This Flash reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+      
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="FlashReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+        
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="Flash flash"
+            file_description="AMR Flash Files" />
+    </Hints>
+     
+  </SourceProxy>
+   <!--  END Flash Reader -->
+   
+   <!-- Enzo Reader  -->
+   <SourceProxy name="EnzoReader"
+        class="vtkFileSeriesReader"
+        label="Enzo Reader"
+        file_name_method="SetFileName"
+        si_class="vtkSIFileSeriesReaderProxy" >
+       
+       <Documentation
+          short_help="Read hierarchical box dataset from an Enzo file."
+          long_help="Read hierarchical box dataset from an Enzo file.">
+          This Enzo reader loads data stored in Enzo format. The output of this 
+          reader is a hierarchical-box dataset.
+      </Documentation>
+      
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="EnzoReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="ConvertToCGS" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+        
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1">
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+    </StringVectorProperty>
+    
+    <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+    </DoubleVectorProperty>
+    
+    <Hints>
+       <ReaderFactory 
+            extensions="boundary hierarchy"
+            file_description="AMR Enzo Files" />
+    </Hints>
+     
+  </SourceProxy>
+   <!--  END Enzo Reader -->
+</ProxyGroup>
+
+</ServerManagerConfiguration>
