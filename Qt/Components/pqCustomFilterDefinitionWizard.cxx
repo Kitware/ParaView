@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 
 
@@ -284,7 +285,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
 
   // Register the compound proxy definition with the server manager.
   vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager = source->proxyManager();
   if (numInputs > 0)
     {
     proxyManager->RegisterCustomProxyDefinition("filters",
@@ -302,7 +303,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
 void pqCustomFilterDefinitionWizard::addAutoIncludedProxies()
 {
   unsigned int num_of_proxies = this->Filter->GetNumberOfProxies();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   QSet<vtkSMProxy*> autoIncludeSet;
 
@@ -356,7 +358,8 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     }
 
   // Make sure the name is unique.
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (!this->OverwriteOK)
     {
     if (proxyManager->GetProxyDefinition("filters", filterName.toAscii().data()) || 

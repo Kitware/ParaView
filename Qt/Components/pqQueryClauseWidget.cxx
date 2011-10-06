@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSelectionNode.h"
@@ -551,10 +552,12 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
 
   ConditionMode condition_type = this->currentConditionType();
 
-  // * Create a new selection source proxy based on the criteria_type.
+  // Find the proper Proxy manager
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  vtkSMProxy* selSource =
-    vtkSMProxyManager::GetProxyManager()->NewProxy("sources",
+  // * Create a new selection source proxy based on the criteria_type.
+  vtkSMProxy* selSource = pxm->NewProxy("sources",
       "SelectionQuerySource");
 
   // * Determine FieldType.

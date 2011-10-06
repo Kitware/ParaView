@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QAction>
@@ -54,6 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+
+#include <assert.h>
 
 static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 {
@@ -141,7 +144,8 @@ void pqCPWritersMenuManager::createMenu()
   QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
     this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   vtkPVXMLElement* elem = parser->GetRootElement();
   unsigned int num_elems = elem->GetNumberOfNestedElements();
@@ -186,6 +190,8 @@ void pqCPWritersMenuManager::updateEnableState()
   const pqServerManagerSelection *selItems =
     pqApplicationCore::instance()->getSelectionModel()->selectedItems();
 
+  vtkSMSessionProxyManager *pxm = NULL;
+
   QList<pqOutputPort*> outputPorts;
   pqServerManagerModelItem* item = NULL;
   pqServerManagerSelection::ConstIterator iter = selItems->begin();
@@ -198,13 +204,15 @@ void pqCPWritersMenuManager::updateEnableState()
     if (port)
       {
       outputPorts.append(port);
+      pxm = port->getServer()->proxyManager();
       }
     }
+
+  assert("A proxy manager should have been found by now" && pxm);
 
   // Iterate over all filters in the menu and see if they can be
   // applied to the current source(s).
   bool some_enabled = false;
-  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
   QList<QAction *> menu_actions = this->Menu->findChildren<QAction *>();
   foreach( QAction* action, menu_actions)
     {
@@ -290,7 +298,8 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)

@@ -88,6 +88,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
 
@@ -97,6 +99,7 @@ class pqApplicationCore::pqInternals
 public:
   vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
   QMap<QString, QPointer<QObject> > RegisteredManagers;
+  QStringList XMLConfigToLoad;
 };
 
 //-----------------------------------------------------------------------------
@@ -326,17 +329,23 @@ void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
 //-----------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager* pqApplicationCore::getGlobalPropertiesManager()
 {
+  // FIXME: Global properties can not properly handle accross several ProxyManager
   if (!this->Internal->GlobalPropertiesManager)
     {
     // Setup the application's "GlobalProperties" proxy.
     // This is used to keep track of foreground color etc.
     this->Internal->GlobalPropertiesManager =
       vtkSmartPointer<vtkSMGlobalPropertiesManager>::New();
-    this->Internal->GlobalPropertiesManager->InitializeProperties("misc",
-      "GlobalProperties");
+
+    // Need to attach to a session
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->SetGlobalPropertiesManager("ParaViewProperties",
-      this->Internal->GlobalPropertiesManager);
+    vtkSMSessionProxyManager* spxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    this->Internal->GlobalPropertiesManager->SetSession(pxm->GetActiveSession());
+
+    this->Internal->GlobalPropertiesManager->InitializeProperties(
+        "misc", "GlobalProperties");
+    spxm->SetGlobalPropertiesManager("ParaViewProperties",
+                                     this->Internal->GlobalPropertiesManager);
 
     // load settings.
     this->loadGlobalPropertiesFromSettings();
@@ -395,7 +404,8 @@ void pqApplicationCore::loadGlobalPropertiesFromSettings()
 /// loads palette i.e. global property values given the name of the palette.
 void pqApplicationCore::loadPalette(const QString& paletteName)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
     paletteName.toAscii().data());
   if (!prototype)
@@ -471,14 +481,18 @@ QObject* pqApplicationCore::manager(const QString& function)
 void pqApplicationCore::saveState(const QString& filename)
 {
   // * Save the Proxy Manager state.
-  vtkSMObject::GetProxyManager()->SaveXMLState(filename.toAscii().data());
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  pxm->SaveXMLState(filename.toAscii().data());
 }
 
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* pqApplicationCore::saveState()
 {
   // * Save the Proxy Manager state.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   // Eventually proxy manager will save state for each connection separately.
   // For now, we only have one connection, so simply save it.
@@ -526,7 +540,7 @@ void pqApplicationCore::loadState(
 
   // TODO: this->LoadingState cannot be relied upon.
   this->LoadingState = true;
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   pxm->LoadXMLState(rootElement);
   this->LoadingState = false;
 }
@@ -705,10 +719,10 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
 
   // Load configuration files for server manager components since they don't
   // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->
-    LoadConfiguration(root);
-  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->
-    LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()
+      ->GetReaderFactory()->LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()
+      ->GetWriterFactory()->LoadConfiguration(root);
 
   emit this->loadXML(root);
 }
@@ -726,4 +740,18 @@ pqTestUtility* pqApplicationCore::testUtility()
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
 {
+}
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setConfigurationToLoad(const QStringList& filenames)
+{
+  this->Internal->XMLConfigToLoad.clear();
+  this->Internal->XMLConfigToLoad.append(filenames);
+}
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadConfigurations()
+{
+  foreach(QString filename, this->Internal->XMLConfigToLoad)
+    {
+    this->loadConfiguration(filename);
+    }
 }

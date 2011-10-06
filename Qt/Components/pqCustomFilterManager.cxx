@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 
 class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager {};
@@ -111,7 +112,8 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
   // will be selected as they're added.
   this->Form->CustomFilterList->selectionModel()->clear();
 
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QStringList::ConstIterator iter = files.begin();
   for( ; iter != files.end(); ++iter)
     {
@@ -157,7 +159,8 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
 QString pqCustomFilterManager::getUnusedFilterName(
   const QString& group, const QString &name)
 {
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   
   QString tempName = name;
   int counter = 1;
@@ -190,7 +193,8 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
   QString filter;
   vtkPVXMLElement *element = 0;
   vtkPVXMLElement *definition = 0;
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QModelIndexList::Iterator iter = selection.begin();
   for( ; iter != selection.end(); ++iter)
     {
@@ -273,7 +277,8 @@ void pqCustomFilterManager::exportSelected()
 void pqCustomFilterManager::removeSelected()
 {
   // Get the selected custom filters from the list.
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   QModelIndexList selection =
       this->Form->CustomFilterList->selectionModel()->selectedIndexes();
   QModelIndexList::Iterator iter = selection.begin();

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkPVProxyDefinitionIterator.h"
 
@@ -440,7 +441,8 @@ QAction* pqProxyGroupMenuManager::getAction(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
     pgroup.toAscii().data(), pname.toAscii().data());
   if (prototype)
@@ -535,7 +537,8 @@ vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
     }
 
   QPair<QString, QString> key (data_list[0], data_list[1]);
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   return pxm->GetPrototypeProxy(
     key.first.toAscii().data(), key.second.toAscii().data());
 }
@@ -645,14 +648,14 @@ void pqProxyGroupMenuManager::addProxyDefinitionUpdateObservers()
 void pqProxyGroupMenuManager::lookForNewDefinitions()
 {
   // Look inside the group name that are tracked
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxdm == NULL ||
-    pxdm->GetSession() == NULL)
+  if(this->Internal->ProxyDefinitionGroupToListen.size() == 0 || pxm == NULL)
     {
     return; // Nothing to look into...
     }
+  vtkSMProxyDefinitionManager* pxdm = pxm->GetProxyDefinitionManager();
 
   // Setup definition iterator
   vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
@@ -678,8 +681,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
         }
       // Old readers don't have ReaderFactory hints. To handle those, we check
       // for existence of "FileName" property.
-      if (vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy(group,
-          name)->GetProperty("FileName"))
+      if (pxm->GetPrototypeProxy(group, name)->GetProperty("FileName"))
         {
         continue;
         }

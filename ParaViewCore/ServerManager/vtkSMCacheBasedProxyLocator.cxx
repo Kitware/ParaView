@@ -18,6 +18,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -25,6 +26,8 @@
 #include "vtkCollection.h"
 
 #include <vtkstd/map>
+#include <vtkWeakPointer.h>
+#include <assert.h>
 
 class vtkSMCacheBasedProxyLocator::vtkInternal
 {
@@ -34,6 +37,7 @@ public:
 
   ProxyMap Proxies;
   CacheProxyState ProxyStates;
+  vtkWeakPointer<vtkSMSession> Session;
 };
 
 vtkStandardNewMacro(vtkSMCacheBasedProxyLocator);
@@ -55,19 +59,21 @@ vtkSMCacheBasedProxyLocator::~vtkSMCacheBasedProxyLocator()
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMCacheBasedProxyLocator::LocateProxy(vtkTypeUInt32 id)
 {
-  if( id == 0 )
+  if( id == 0 || this->Internal->Session == NULL)
     {
     return NULL;
     }
 
+  assert("A Session should be set at this point" && this->Internal->Session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Internal->Session);
   vtkSMProxy* proxy =
-      vtkSMProxy::SafeDownCast(
-          this->GetProxyManager()->GetSession()->GetRemoteObject(id));
+      vtkSMProxy::SafeDownCast(this->Internal->Session->GetRemoteObject(id));
 
   // Make sure we have a state locator
   if(!this->StateLocator)
     {
-    this->SetStateLocator(this->GetProxyManager()->GetSession()->GetStateLocator());
+    this->SetStateLocator(this->Internal->Session->GetStateLocator());
     }
 
   if(proxy)
@@ -77,7 +83,7 @@ vtkSMProxy* vtkSMCacheBasedProxyLocator::LocateProxy(vtkTypeUInt32 id)
   else
     {
     // Need to renew it
-    proxy = this->GetProxyManager()->ReNewProxy(id, this->StateLocator);
+    proxy = pxm->ReNewProxy(id, this->StateLocator);
     this->Internal->Proxies[id].TakeReference(proxy);
     }
 
@@ -106,6 +112,18 @@ void vtkSMCacheBasedProxyLocator::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMCacheBasedProxyLocator::StoreProxyState(vtkSMProxy* proxy)
 {
+  // Make sure the proxy share the same session as that class. If no session
+  // we just set our session
+  if(this->Internal->Session == NULL)
+    {
+    this->Internal->Session = proxy->GetSession();
+    }
+  if(this->Internal->Session != proxy->GetSession())
+    {
+    vtkErrorMacro("Can not store proxy state as it does not share the same session"
+                  " as the ProxyLocator class.");
+    }
+
   vtkSmartPointer<vtkPVXMLElement> proxyState;
   proxyState.TakeReference(proxy->SaveXMLState(NULL));
   //proxyState->PrintXML();

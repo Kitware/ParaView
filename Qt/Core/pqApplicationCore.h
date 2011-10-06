@@ -261,6 +261,13 @@ public slots:
   /// update their behavior.
   void loadConfiguration(const QString& filename);
 
+  /// Set the filename that will be used later to load the xml
+  /// configurations by calling loadConfigurations()
+  void setConfigurationToLoad(const QStringList& filenames);
+
+  /// Load pre-set xml configurations.
+  void loadConfigurations();
+
   /// Renders all windows
   void render();
 

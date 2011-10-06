@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 // ParaView Server Manager includes
 #include "pq3DWidget.h"
@@ -66,7 +67,8 @@ pqSignalAdaptorProxy::pqSignalAdaptorProxy(QObject* p,
 QVariant pqSignalAdaptorProxy::proxy() const
 {
   QString str = this->parent()->property(this->PropertyName).toString();
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   pqSMProxy p = pm->GetProxy(str.toAscii().data());
   QVariant ret;
   ret.setValue(p);

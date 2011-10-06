@@ -23,7 +23,10 @@
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkWeakPointer.h"
+
+#include <assert.h>
 
 class vtkSMPluginManager::vtkInternals
 {
@@ -97,8 +100,13 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 //----------------------------------------------------------------------------
 bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
 {
-  vtkSMPluginLoaderProxy* proxy = vtkSMPluginLoaderProxy::SafeDownCast(
-    vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "PluginLoader"));
+  assert("Session should already be set" && this->Internals->Session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
+          this->Internals->Session);
+
+  vtkSMPluginLoaderProxy* proxy =
+      vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
   proxy->UpdateVTKObjects();
   bool status = proxy->LoadPlugin(filename);
   if (!status)
@@ -109,8 +117,7 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
   proxy->Delete();
 
   // Refresh definitions since those may have changed.
-  vtkSMProxyManager::GetProxyManager()->GetProxyDefinitionManager()->
-    SynchronizeDefinitions();
+  pxm->GetProxyDefinitionManager()->SynchronizeDefinitions();
 
   if (status)
     {
@@ -131,15 +138,19 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
 {
   if (remote)
     {
-    vtkSMPluginLoaderProxy* proxy = vtkSMPluginLoaderProxy::SafeDownCast(
-      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "PluginLoader"));
+    assert("Session should already be set" && this->Internals->Session);
+    vtkSMSessionProxyManager* pxm =
+        vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
+            this->Internals->Session);
+
+    vtkSMPluginLoaderProxy* proxy =
+        vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
     proxy->UpdateVTKObjects();
     proxy->LoadPluginConfigurationXMLFromString(xmlcontents);
     proxy->Delete();
 
     // Refresh definitions since those may have changed.
-    vtkSMProxyManager::GetProxyManager()->GetProxyDefinitionManager()->
-      SynchronizeDefinitions();
+    pxm->GetProxyDefinitionManager()->SynchronizeDefinitions();
 
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     this->Internals->Session->GatherInformation(

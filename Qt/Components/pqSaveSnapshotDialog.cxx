@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
@@ -85,7 +86,8 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   QObject::connect(this->Internal->selectedViewOnly, SIGNAL(toggled(bool)),
     this, SLOT(updateSize()));
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (pxm->GetProxyDefinitionManager())
     {
     vtkPVProxyDefinitionIterator* iter =
