@@ -2,9 +2,7 @@ message("Configuring NUMPY:\n@NUMPY_binary@")
 set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
-if(APPLE)
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
-endif()
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
 # As explained in site.cfg.example - See http://projects.scipy.org/numpy/browser/trunk/site.cfg.example
 # Directories listed in variable such as library_dirs or source_dirs should be separated using os.pathsep
