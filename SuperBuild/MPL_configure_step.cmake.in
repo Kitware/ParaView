@@ -1,6 +1,8 @@
 message("Configuring MPL:\n@MPL_binary@")
-set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{LD_LIBRARY_PATH} "@freetype_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
 if(WIN32)
   file(TO_NATIVE_PATH "@freetype_install@/include" freetype_include_win32)
@@ -15,7 +17,7 @@ elseif(APPLE)
 endif()
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py config --include-dirs="@freetype_install@/include" --library-dirs="@freetype_install@/lib"
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py config
   WORKING_DIRECTORY "@MPL_binary@"
   RESULT_VARIABLE res
   )
