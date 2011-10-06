@@ -6,8 +6,10 @@ set(PLUGIN_NAME AMRTools)
 set(PLUGIN_VERSION "1.0")
 
 ## Find ParaView
-find_package(ParaView REQUIRED)
-include(${PARAVIEW_USE_FILE})
+if(NOT ParaView_SOURCE_DIR)
+    find_package(ParaView REQUIRED)
+    include(${PARAVIEW_USE_FILE})
+endif()
 
 ## Set the list of source
 set(SMSOURCES
