@@ -36,20 +36,6 @@ set(yt_CONFIGURE_COMMAND ${CMAKE_COMMAND}
 set(yt_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/yt_make_step.cmake)
 set(yt_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/yt_install_step.cmake)
 
-# We also do distribute here, to avoid further problems
-
-ExternalProject_Add(distribute
-  URL ${distribute_URL}/${distribute_GZ}
-  URL_MD5 ${distribute_MD5}
-  DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
-  SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/distribute
-  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/distribute
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-  INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed --record ${CMAKE_CURRENT_BINARY_DIR}/distribute.record
-  DEPENDS ${distribute_DEPENDENCIES}
-  )
-
 # create an external project to download yt,
 # and configure and build it
 ExternalProject_Add(yt
