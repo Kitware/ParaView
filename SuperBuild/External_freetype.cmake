@@ -1,7 +1,7 @@
 
 # The freetype external project for ParaView
 set(freetype_source "${CMAKE_CURRENT_BINARY_DIR}/freetype")
-set(freetype_install "${CMAKE_CURRENT_BINARY_DIR}/freetype-install")
+set(freetype_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
@@ -56,21 +56,16 @@ if(WIN32)
 
 else()
 
-  if(QT_QMAKE_EXECUTABLE)
-    get_filename_component(qt_bin_dir ${QT_QMAKE_EXECUTABLE} PATH)
-    get_filename_component(qt_dir ${qt_bin_dir} PATH)
-  endif()
-
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_patch_step.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake
-    @ONLY)
+  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_patch_step.cmake.in
+  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake
+  #  @ONLY)
   
-  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_configure_step.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake
-    @ONLY)
+  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_configure_step.cmake.in
+  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake
+  #  @ONLY)
 
-  set(freetype_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake)
-  set(freetype_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake)
+  #set(freetype_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake)
+  #set(freetype_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake)
 
   ExternalProject_Add(freetype
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -79,8 +74,10 @@ else()
     URL ${FT_URL}/${FT_GZ}
     URL_MD5 ${FT_MD5}
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND ${freetype_PATCH_COMMAND}
-    CONFIGURE_COMMAND ${freetype_CONFIGURE_COMMAND}
+    BUILD_IN_SOURCE 1
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+    BUILD_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FCFLAGS=-fPIC make
     DEPENDS ${freetype_dependencies}
   )
 
