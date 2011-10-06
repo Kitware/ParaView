@@ -54,3 +54,17 @@ ExternalProject_Add(h5py
   DEPENDS
     ${h5py_dependencies}
   )
+
+if(WIN32)
+  ExternalProject_Add_Step(h5py PatchUnistd
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/h5pyPatches/unistd.h" "${h5py_binary}/win_include/unistd.h"
+    DEPENDEES patch
+    DEPENDERS configure
+    )
+endif()
+
+ExternalProject_Add_Step(h5py RemoveEggInfo
+  COMMAND ${CMAKE_COMMAND} -E remove_directory "${h5py_binary}/h5py.egg-info"
+  DEPENDEES patch
+  DEPENDERS configure
+  )
