@@ -2,9 +2,12 @@ message("Installing h5py:\n@h5py_PREFIX_ARGS@")
 set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
-file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
-set(ENV{HDF5_DIR} "${hdf5_install}")
+if(WIN32)
+  file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
+  set(ENV{HDF5_DIR} "${hdf5_install}")
+endif()
 
 if(APPLE)
   set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
