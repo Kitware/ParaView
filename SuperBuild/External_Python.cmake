@@ -89,7 +89,7 @@ if(WIN32)
 
 elseif(UNIX)
   set(python_source ${CMAKE_CURRENT_BINARY_DIR}/python)
-  set(python_install ${CMAKE_CURRENT_BINARY_DIR}/python-install)
+  set(python_install ${CMAKE_CURRENT_BINARY_DIR})
 
   configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake

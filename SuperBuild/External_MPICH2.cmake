@@ -2,7 +2,7 @@
 # The MPICH2 external project for ParaView
 set(MPICH2_source "${CMAKE_CURRENT_BINARY_DIR}/MPICH2")
 set(MPICH2_build "${CMAKE_CURRENT_BINARY_DIR}/MPICH2-build")
-set(MPICH2_install "${CMAKE_CURRENT_BINARY_DIR}/MPICH2-install")
+set(MPICH2_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
