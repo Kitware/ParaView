@@ -2,10 +2,12 @@ message("Configuring h5py:\n@h5py_binary@\n@HDF5_DIR@")
 set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
-file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
-
-set(ENV{HDF5_DIR} "${hdf5_install}")
+if(WIN32)
+  file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
+  set(ENV{HDF5_DIR} "${hdf5_install}")
+endif()
 
 if(APPLE)
   set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
@@ -21,7 +23,7 @@ execute_process(
   )
 else()
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py configure --hdf5="${hdf5_install}" --api=18
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py configure --hdf5=@HDF5_install@ --api=18
   WORKING_DIRECTORY "@h5py_binary@"
   RESULT_VARIABLE res
   )
