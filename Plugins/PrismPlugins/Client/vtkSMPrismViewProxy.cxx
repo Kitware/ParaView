@@ -87,7 +87,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkPVXMLElement.h"
 
 
@@ -124,7 +124,7 @@ vtkSMRepresentationProxy* vtkSMPrismViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);

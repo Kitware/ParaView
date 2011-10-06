@@ -39,7 +39,7 @@ class vtkPVServerInformation;
 class vtkPVXMLElement;
 class vtkSMApplication;
 class vtkSMProxy;
-class vtkSMProxyManager;
+class vtkSMSessionProxyManager;
 class vtkSMRenderViewProxy;
 class vtkSMSession;
 
@@ -71,7 +71,7 @@ public:
   vtkIdType GetConnectionID() const;
 
   /// Returns the proxy manager for this session.
-  vtkSMProxyManager* proxyManager() const;
+  vtkSMSessionProxyManager* proxyManager() const;
 
   /// Return the number of data server partitions on this 
   /// server connection. A convenience method.

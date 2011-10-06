@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
@@ -179,7 +180,8 @@ void pqQueryDialog::setupSpreadSheet()
     {
     return;
     }
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      this->Internals->source->currentPort()->getSource()->proxyManager();
 
   vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
   // we always want to show all the blocks in the dataset, since we don't have a

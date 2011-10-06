@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 #include <QList>
@@ -96,7 +97,8 @@ void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*
   // Listen to interesting events from the proxy manager. Every time a new
   // session is created, a new proxy manager is created. So we need to do this
   // initialization of observing event every time.
-  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
     SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
     NULL, 1.0);
@@ -125,7 +127,8 @@ void pqServerManagerObserver::connectionClosed(vtkObject*, unsigned long, void*,
 
   emit this->connectionClosed(sessionId);
 
-  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   // disconnect all signals from the proxyManager since the proxy manager is
   // going to be destroyed once the session closes.
   this->Internal->VTKConnect->Disconnect(proxyManager);

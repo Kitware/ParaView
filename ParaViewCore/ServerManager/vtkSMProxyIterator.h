@@ -22,7 +22,7 @@
 #ifndef __vtkSMProxyIterator_h
 #define __vtkSMProxyIterator_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 
 //BTX
 struct vtkSMProxyIteratorInternals;
@@ -30,12 +30,17 @@ struct vtkSMProxyIteratorInternals;
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMProxyIterator : public vtkSMObject
+class VTK_EXPORT vtkSMProxyIterator : public vtkSMSessionObject
 {
 public:
   static vtkSMProxyIterator* New();
-  vtkTypeMacro(vtkSMProxyIterator, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyIterator, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Override the set sesssion so the SessionProxyManager could be cache for
+  // transversal code.
+  virtual void SetSession(vtkSMSession *);
 
   // Description:
   // Go to the beginning of the collection.
@@ -98,7 +103,6 @@ protected:
   bool SkipPrototypes;
   int Mode;
   void NextInternal();
-
 private:
   vtkSMProxyIteratorInternals* Internals;
 

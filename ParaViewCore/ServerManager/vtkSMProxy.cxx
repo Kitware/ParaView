@@ -33,6 +33,7 @@
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
 
@@ -1312,7 +1313,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
+int vtkSMProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
                                    vtkPVXMLElement* element)
 {
   this->SetXMLElement(element);
@@ -1394,7 +1395,7 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
+int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
   vtkPVXMLElement *element)
 {
   if (!element || !pm)

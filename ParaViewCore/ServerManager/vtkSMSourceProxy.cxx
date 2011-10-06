@@ -33,11 +33,14 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
 
@@ -199,7 +202,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   // this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
                                         vtkPVXMLElement* element)
 {
   const char* executiveName = element->GetAttribute("executive");
@@ -480,7 +483,8 @@ void vtkSMSourceProxy::CreateSelectionProxies()
   this->CreateOutputPorts();
 
   vtkClientServerStream stream;
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   unsigned int numOutputPorts = this->GetNumberOfOutputPorts();
   for (unsigned int cc=0; cc < numOutputPorts; cc++)
     {

@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -219,10 +220,10 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkIdType vtkNotUsed(connId))
+vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkSMSession* session)
 {
   // Create a selection source proxy
-  vtkSMProxyManager* pm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
     pm->NewProxy("sources", "PedigreeIDSelectionSource"));
 

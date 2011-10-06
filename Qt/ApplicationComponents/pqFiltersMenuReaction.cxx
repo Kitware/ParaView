@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMInputArrayDomain.h"
@@ -277,7 +277,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
     xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)

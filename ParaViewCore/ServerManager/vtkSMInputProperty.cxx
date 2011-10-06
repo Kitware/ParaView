@@ -129,9 +129,8 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
         proxyIdIter++)
       {
       // Get the proxy from proxy manager
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
       vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+          this->GetParent()->GetSession()->GetRemoteObject(*proxyIdIter));
       if(proxy)
         {
         this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);

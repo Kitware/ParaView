@@ -26,6 +26,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/algorithm>
@@ -392,9 +393,8 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
          proxyIdIter++ )
       {
       // Get the proxy from proxy manager
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
       vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+          this->GetParent()->GetSession()->GetRemoteObject(*proxyIdIter));
       if(proxy)
         {
         this->AddProxy(proxy, true);
@@ -429,7 +429,9 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src, 
   const char* exceptionClass, int proxyPropertyCopyFlag)
 {
-  vtkSMProxyManager* pxm = this->GetParent()->GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
+          this->GetParent()->GetSession());
   vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(src);
 
   this->RemoveAllProxies();

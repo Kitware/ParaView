@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
@@ -237,7 +237,7 @@ void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
 void pqPipelineSource::createProxiesForProxyListDomains()
 {
   vtkSMProxy* proxy = this->getProxy();
-  vtkSMProxyManager* pxm = proxy->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
@@ -410,7 +410,7 @@ void pqPipelineSource::createAnimationHelpersIfNeeded()
   if (helpers.size() == 0)
     {
     // Create animation helper which assists in animating display properties.
-    vtkSMProxyManager* pxm = this->getProxy()->GetProxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     int numPorts = this->getNumberOfOutputPorts();
     for (int cc=0; cc < numPorts; cc++)
       {

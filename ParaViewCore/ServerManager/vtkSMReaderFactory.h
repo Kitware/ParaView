@@ -35,18 +35,18 @@
 #ifndef __vtkSMReaderFactory_h
 #define __vtkSMReaderFactory_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 
 class vtkStringList;
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
+class VTK_EXPORT vtkSMReaderFactory : public vtkSMSessionObject
 {
 public:
   static vtkSMReaderFactory* New();
-  vtkTypeMacro(vtkSMReaderFactory, vtkSMObject);
+  vtkTypeMacro(vtkSMReaderFactory, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMVectorProperty.h"
 
 // Qt Includes.
@@ -138,7 +139,7 @@ namespace pqComparativeVisPanelNS
 
   vtkSMProxy* newCue(vtkSMProxy* proxy, const char* pname, int index)
     {
-    vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager *pxm = proxy->GetSessionProxyManager();
     pqServer* activeServer = pqActiveObjects::instance().activeServer();
 
     // Create a new cueProxy.
@@ -455,7 +456,7 @@ void pqComparativeVisPanel::removeParameter(int index)
 
   BEGIN_UNDO_SET("Remove Parameter");
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->view()->proxyManager();
   vtkSmartPointer<vtkSMProxy> cue = item->data(
     pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
   item = NULL;

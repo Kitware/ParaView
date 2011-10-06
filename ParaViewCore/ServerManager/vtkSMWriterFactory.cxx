@@ -24,6 +24,7 @@
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
 
@@ -33,6 +34,7 @@
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
+#include <assert.h>
 
 class vtkSMWriterFactory::vtkInternals
 {
@@ -44,7 +46,7 @@ public:
     vtkstd::set<vtkstd::string> Extensions;
     vtkstd::string Description;
 
-    void FillInformation(vtkSMProxyManager* pxm)
+    void FillInformation(vtkSMSessionProxyManager* pxm)
       {
       vtkSMProxy* prototype = pxm->GetPrototypeProxy(
         this->Group.c_str(), this->Name.c_str());
@@ -73,7 +75,7 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkSMProxyManager* pxm)
+    bool CanCreatePrototype(vtkSMSessionProxyManager* pxm)
       {
       return (pxm->GetPrototypeProxy(
         this->Group.c_str(), this->Name.c_str()) != NULL);
@@ -81,7 +83,7 @@ public:
 
     // Returns true if the data from the given output port can be written.
     bool CanWrite(vtkSMSourceProxy* source, unsigned int port,
-      vtkSMProxyManager* pxm)
+      vtkSMSessionProxyManager* pxm)
       {
       vtkSMProxy* prototype = pxm->GetPrototypeProxy(
         this->Group.c_str(), this->Name.c_str());
@@ -147,7 +149,6 @@ vtkStandardNewMacro(vtkSMWriterFactory);
 vtkSMWriterFactory::vtkSMWriterFactory()
 {
   this->Internals = new vtkInternals();
-  this->ProxyManager = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -166,7 +167,8 @@ void vtkSMWriterFactory::Initialize()
 void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
 {
   vtkPVProxyDefinitionIterator* iter = NULL;
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup,0);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -197,8 +199,12 @@ void vtkSMWriterFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   value.Group = xmlgroup;
   value.Name = xmlname;
   
+  // Get ProxyManager
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   // fills extension information etc. from the prototype.
-  value.FillInformation(this->ProxyManager);
+  value.FillInformation(pxm);
 
   this->Internals->Prototypes.push_front(value);
 }
@@ -216,8 +222,12 @@ void vtkSMWriterFactory::RegisterPrototype(
   value.Group = xmlgroup;
   value.Name = xmlname;
   
+  // Get ProxyManager
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   // fills extension information etc. from the prototype.
-  value.FillInformation(this->ProxyManager);
+  value.FillInformation(pxm);
   if (description)
     {
     value.Description = description;
@@ -352,15 +362,19 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     return NULL;
     }
 
+  // Get ProxyManager
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(this->ProxyManager) &&
+    if (iter->CanCreatePrototype(pxm) &&
       iter->ExtensionTest(extension.c_str()) &&
-      iter->CanWrite(source, outputport, this->ProxyManager))
+      iter->CanWrite(source, outputport, pxm))
       {
-      vtkSMProxy* proxy = this->ProxyManager->NewProxy(
+      vtkSMProxy* proxy = pxm->NewProxy(
         iter->Group.c_str(),
         iter->Name.c_str());
       vtkSMPropertyHelper(proxy, "FileName").Set(filename);
@@ -393,12 +407,16 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
 {
   vtkstd::set<vtkstd::string> sorted_types;
 
+  // Get ProxyManager
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(this->ProxyManager) &&
-      iter->CanWrite(source, outputport, this->ProxyManager))
+    if (iter->CanCreatePrototype(pxm) &&
+      iter->CanWrite(source, outputport, pxm))
       {
       if (iter->Extensions.size() > 0)
         {
@@ -431,12 +449,17 @@ bool vtkSMWriterFactory::CanWrite(vtkSMSourceProxy* source, unsigned int outputp
     {
     return false;
     }
+
+  // Get ProxyManager
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(this->ProxyManager) &&
-      iter->CanWrite(source, outputport, this->ProxyManager))
+    if (iter->CanCreatePrototype(pxm) &&
+      iter->CanWrite(source, outputport, pxm))
       {
       return true;
       }
@@ -449,5 +472,3 @@ void vtkSMWriterFactory::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

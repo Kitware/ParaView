@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
@@ -622,7 +623,7 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 //-----------------------------------------------------------------------------
 void pqAnimationScene::updateApplicationSettings()
 {
-  vtkSMProxyManager* pxm = this->getServer()->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->getServer()->proxyManager();
   vtkSMProxy* globalAnimationProperties =
     pxm->NewProxy("misc", "GlobalAnimationProperties");
   pqSMAdaptor::setElementProperty(globalAnimationProperties->GetProperty("CacheLimit"),

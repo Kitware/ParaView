@@ -17,11 +17,13 @@
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMSession.h"
 
 #include <vtkstd/map>
 #include "vtkStdString.h"
-
+#include <assert.h>
 
 struct vtkSMDomainInternals
 {
@@ -80,6 +82,9 @@ void vtkSMDomain::RemoveRequiredProperty(vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+  assert("Property and proxy should be properly set" && prop && prop->GetParent());
+  this->SetSession(prop->GetParent()->GetSession());
+
   int isOptional;
   int retVal = element->GetScalarAttribute("optional", &isOptional);
   if(retVal) 

@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -382,7 +382,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy= 0;
 
   QList<pqViewModuleInterface*> ifaces =
@@ -477,7 +477,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   vtkSMProxy* reprProxy = 0; 
 
   pqPipelineSource* source = opPort->getSource();
-  vtkSMProxyManager* pxm = source->getProxy()->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = source->proxyManager();
 
   // HACK to create correct representation for text sources/filters.
   QString srcProxyName = source->getProxy()->GetXMLName();
@@ -746,7 +746,7 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     return 0;
     }
 
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
     pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
@@ -807,7 +807,7 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 {
   if (proxy)
     {
-    vtkSMProxyManager* pxm = proxy->getProxy()->GetProxyManager();
+    vtkSMSessionProxyManager* pxm = proxy->proxyManager();
     pxm->UnRegisterProxy(proxy->getSMGroup().toAscii().data(), 
       proxy->getSMName().toAscii().data(), proxy->getProxy());
     }
@@ -974,7 +974,7 @@ void pqObjectBuilder::destroy(pqAnimationCue* cue)
     return;
     }
 
-  vtkSMProxyManager* pxm = cue->getProxy()->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = cue->proxyManager();
 
   QList<vtkSMProxy*> keyframes = cue->getKeyFrames();
   // unregister all the keyframes.

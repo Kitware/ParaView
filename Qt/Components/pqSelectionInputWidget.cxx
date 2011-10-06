@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 #include <vtkstd/string>
+#include <assert.h>
 
 #include "ui_pqSelectionInputWidget.h"
 class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget { };
@@ -277,7 +279,7 @@ void pqSelectionInputWidget::copyActiveSelection()
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = activeSelection->GetSessionProxyManager();
   vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
                                         activeSelection->GetXMLName());
   newSource->Copy(activeSelection, 0,
@@ -309,10 +311,16 @@ void pqSelectionInputWidget::onActiveSelectionChanged()
 //-----------------------------------------------------------------------------
 void pqSelectionInputWidget::postAccept()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  // Select proper ProxyManager
+  vtkSMProxy* sel_source = this->selection();
+  vtkSMSessionProxyManager* pxm = sel_source ?
+                                  sel_source->GetSessionProxyManager() : NULL;
+
+  assert("we should have a selection for postAccept" && sel_source && pxm);
 
   // Unregister any de-referenced proxy sources.
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetSession(sel_source->GetSession());
   iter->SetModeToOneGroup();
   for (iter->Begin("selection_sources"); !iter->IsAtEnd();)
     {
@@ -334,10 +342,12 @@ void pqSelectionInputWidget::postAccept()
 //-----------------------------------------------------------------------------
 void pqSelectionInputWidget::preAccept()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  // Select proper ProxyManager
+  vtkSMProxy* sel_source = this->selection();
+  vtkSMSessionProxyManager* pxm = sel_source ?
+                                  sel_source->GetSessionProxyManager() : NULL;
 
   // Register the new selection proxy.
-  vtkSMProxy* sel_source = this->selection();
   if (sel_source && pxm)
     {
     if (!pxm->GetProxyName("selection_sources", sel_source))

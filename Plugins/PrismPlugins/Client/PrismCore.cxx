@@ -18,7 +18,7 @@
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMProperty.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSelectionManager.h"
 #include "pqDataRepresentation.h"
@@ -544,7 +544,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
 
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = prismP->GetSessionProxyManager();
 
     vtkSMSourceProxy* selSource=vtkSMSourceProxy::SafeDownCast(
       pxm->NewProxy("sources", "GlobalIDSelectionSource"));
@@ -620,7 +620,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
     pqServerManagerModel* model= pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(sourceP);
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = sourceP->GetSessionProxyManager();
 
     vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
     if(!selSource)
@@ -745,7 +745,7 @@ void PrismCore::onSelectionChanged()
 
     if(source)
       {
-      vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+      vtkSMSessionProxyManager *proxyManager = source->proxyManager();
       proxyManager->InstantiateGroupPrototypes("filters");
       vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
 

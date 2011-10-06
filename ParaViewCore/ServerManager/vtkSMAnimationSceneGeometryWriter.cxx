@@ -18,10 +18,14 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMAnimationSceneGeometryWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);
@@ -53,7 +57,9 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
     return false;
     }
 
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("The session should be set by now" && this->Session);
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   this->GeometryWriter = pxm->NewProxy("writers","XMLPVAnimationWriter");
 
   vtkSMPropertyHelper(this->GeometryWriter,"FileName").Set(this->FileName);

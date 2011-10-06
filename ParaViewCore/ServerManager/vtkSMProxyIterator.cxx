@@ -16,7 +16,8 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyManagerInternals.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSessionProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyIterator);
 
@@ -24,7 +25,8 @@ struct vtkSMProxyIteratorInternals
 {
   vtkSMProxyManagerProxyListType::iterator ProxyIterator;
   vtkSMProxyManagerProxyMapType::iterator ProxyListIterator;
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator GroupIterator;
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator GroupIterator;
+  vtkWeakPointer<vtkSMSessionProxyManager> ProxyManager;
 };
 
 //---------------------------------------------------------------------------
@@ -33,7 +35,6 @@ vtkSMProxyIterator::vtkSMProxyIterator()
   this->Internals = new vtkSMProxyIteratorInternals;
   this->Mode = vtkSMProxyIterator::ALL;
   this->SkipPrototypes = true;
-  this->Begin();
 }
 
 //---------------------------------------------------------------------------
@@ -41,11 +42,20 @@ vtkSMProxyIterator::~vtkSMProxyIterator()
 {
   delete this->Internals;
 }
+//---------------------------------------------------------------------------
+void vtkSMProxyIterator::SetSession(vtkSMSession* session)
+{
+  this->Superclass::SetSession(session);
+
+  // Keep the pointer in cache (prevent search for each step)
+  this->Internals->ProxyManager = this->GetSessionProxyManager();
+}
 
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::Begin(const char* groupName)
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+
   if (!pm)
     {
     vtkWarningMacro("ProxyManager is not set. Can not perform operation: Begin()");
@@ -69,7 +79,8 @@ void vtkSMProxyIterator::Begin(const char* groupName)
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::Begin()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+
   if (!pm)
     {
     vtkWarningMacro("ProxyManager is not set. Can not perform operation: Begin()");
@@ -111,7 +122,9 @@ void vtkSMProxyIterator::Begin()
 //---------------------------------------------------------------------------
 int vtkSMProxyIterator::IsAtEnd()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be set" && this->Session);
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+
   if (this->Internals->GroupIterator == 
       pm->Internals->RegisteredProxyMap.end())
     {
@@ -143,7 +156,8 @@ void vtkSMProxyIterator::Next()
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::NextInternal()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be set" && this->Session);
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -241,7 +255,8 @@ void vtkSMProxyIterator::NextInternal()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetGroup()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be set" && this->Session);
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -254,7 +269,8 @@ const char* vtkSMProxyIterator::GetGroup()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetKey()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be set" && this->Session);
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -271,7 +287,8 @@ const char* vtkSMProxyIterator::GetKey()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyIterator::GetProxy()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be set" && this->Session);
+  vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())

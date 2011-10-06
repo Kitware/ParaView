@@ -20,6 +20,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyInternals.h"
 
 #include <vtkSmartPointer.h>
@@ -177,7 +178,7 @@ void vtkSMCompoundSourceProxy::UpdateVTKObjects()
   this->Superclass::UpdateVTKObjects();
 }
 //----------------------------------------------------------------------------
-int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
+int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
                                                  vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(pm, element))

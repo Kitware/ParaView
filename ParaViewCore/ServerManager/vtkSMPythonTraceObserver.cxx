@@ -18,6 +18,8 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkWeakPointer.h"
 
 //-----------------------------------------------------------------------------
 class vtkSMPythonTraceObserverCommandHelper : public vtkCommand
@@ -53,7 +55,7 @@ private:
 //-----------------------------------------------------------------------------
 class vtkSMPythonTraceObserver::vtkInternal {
 public:
-
+  vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
   vtkSMProxyManager::RegisteredProxyInformation LastRegisterProxyInfo;
   vtkSMProxyManager::RegisteredProxyInformation LastUnRegisterProxyInfo;
   vtkSMProxyManager::ModifiedPropertyInformation LastModifiedPropertyInfo;
@@ -70,7 +72,8 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   this->Observer = vtkSMPythonTraceObserverCommandHelper::New();
   this->Observer->SetTarget(this);
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if(!pxm)
     {
     vtkWarningMacro("No ProxyManager available. No Observation will be made");
@@ -87,12 +90,16 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
   pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
   pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer);
+
+  // Keep the session proxy manager around so we can unregiter observers
+  // to the correct one.
+  this->Internal->SessionProxyManager = pxm;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::~vtkSMPythonTraceObserver()
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->Internal->SessionProxyManager.GetPointer();
   if (pxm)
     {
     pxm->RemoveObserver(this->Observer);

@@ -21,15 +21,15 @@
 #ifndef __vtkSMAnimationSceneWriter_h
 #define __vtkSMAnimationSceneWriter_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 
 class vtkSMAnimationScene;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMAnimationSceneWriter : public vtkSMObject
+class VTK_EXPORT vtkSMAnimationSceneWriter : public vtkSMSessionObject
 {
 public:
-  vtkTypeMacro(vtkSMAnimationSceneWriter, vtkSMObject);
+  vtkTypeMacro(vtkSMAnimationSceneWriter, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

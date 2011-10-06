@@ -120,6 +120,8 @@ SET (Kit_SRCS
   vtkSMSelectionHelper.cxx
   vtkSMSession.cxx
   vtkSMSessionClient.cxx
+  vtkSMSessionObject.cxx
+  vtkSMSessionProxyManager.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx

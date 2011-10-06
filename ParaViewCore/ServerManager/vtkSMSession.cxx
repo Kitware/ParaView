@@ -63,9 +63,13 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
-  if (vtkSMObject::GetProxyManager())
+  if (vtkSMProxyManager::IsInitialized())
     {
-    vtkSMObject::GetProxyManager()->SetSession(NULL);
+    // The Weak pointer may already point to NULL
+    vtkSMProxyManager::GetProxyManager()->UnRegisterSession(NULL);
+
+    // Just in case a reference to that pointer was still around
+    vtkSMProxyManager::GetProxyManager()->UnRegisterSession(this);
     }
   this->PluginManager->Delete();
   this->PluginManager = NULL;
@@ -155,7 +159,7 @@ void vtkSMSession::Initialize()
   if (this->GetProcessRoles() & vtkPVSession::CLIENT)
     {
     // Make sure that the client as the server XML definition
-    vtkSMObject::GetProxyManager()->SetSession(this);
+    vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this);
 
     this->PluginManager->SetSession(this);
     this->PluginManager->Initialize();

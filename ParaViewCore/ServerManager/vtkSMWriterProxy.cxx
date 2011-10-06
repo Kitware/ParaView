@@ -36,7 +36,7 @@ vtkSMWriterProxy::~vtkSMWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMWriterProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMWriterProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
   vtkPVXMLElement* element)
 {
   if (element->GetAttribute("supports_parallel"))

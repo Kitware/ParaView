@@ -19,18 +19,20 @@
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
 
 #include "vtkPVSession.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMPipelineState);
 //----------------------------------------------------------------------------
 vtkSMPipelineState::vtkSMPipelineState()
 {
-  this->SetGlobalID(vtkSMProxyManager::GetReservedGlobalID());
+  this->SetGlobalID(vtkSMSessionProxyManager::GetReservedGlobalID());
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
 }
 
@@ -42,12 +44,14 @@ vtkSMPipelineState::~vtkSMPipelineState()
 //----------------------------------------------------------------------------
 const vtkSMMessage* vtkSMPipelineState::GetFullState()
 {
-  return vtkSMObject::GetProxyManager()->GetFullState();
+  assert("Session should be valid" && this->Session);
+  return this->GetSessionProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator, bool vtkNotUsed(definitionOnly))
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
+  assert("Session should be valid" && this->Session);
+  this->GetSessionProxyManager()->LoadState(msg, locator);
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()

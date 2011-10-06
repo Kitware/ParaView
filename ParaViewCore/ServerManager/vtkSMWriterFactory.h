@@ -38,17 +38,18 @@
 #ifndef __vtkSMWriterFactory_h
 #define __vtkSMWriterFactory_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMSessionProxyManager;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMWriterFactory : public vtkSMObject
+class VTK_EXPORT vtkSMWriterFactory : public vtkSMSessionObject
 {
 public:
   static vtkSMWriterFactory* New();
-  vtkTypeMacro(vtkSMWriterFactory, vtkSMObject);
+  vtkTypeMacro(vtkSMWriterFactory, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -98,13 +99,6 @@ public:
   const char* GetSupportedFileTypes(vtkSMSourceProxy* source)
     { return this->GetSupportedFileTypes(source, 0); }
 
-  // Description:
-  // Get/Set the proxy manager (not reference counted).
-  void SetProxyManager(vtkSMProxyManager* pxm)
-    { this->ProxyManager = pxm; }
-  vtkSMProxyManager* GetProxyManager()
-    { return this->ProxyManager; }
-
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
 //BTX
@@ -118,7 +112,6 @@ protected:
     const char* extensions,
     const char* description);
 
-  vtkSMProxyManager* ProxyManager;
 private:
   vtkSMWriterFactory(const vtkSMWriterFactory&); // Not implemented
   void operator=(const vtkSMWriterFactory&); // Not implemented

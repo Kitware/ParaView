@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyManager.h
+  Module:    vtkSMSessionProxyManager.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,9 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyManager - singleton responsible for creating and managing proxies
+// .NAME vtkSMSessionProxyManager
+//       responsible for creating and managing proxies for a given session
 // .SECTION Description
-// vtkSMProxyManager is a singleton that creates and manages proxies.
+// vtkSMSessionProxyManager is an instance that creates and manages proxies
+// for a given session/server.
 // It maintains a map of XML elements (populated by the XML parser) from
 // which it can create and initialize proxies and properties.
 // Once a proxy is created, it can either be managed by the user code or
@@ -22,10 +24,9 @@
 // manager with RegisterProxy() and unregister it. At destruction, proxy
 // manager deletes all managed proxies.
 //
-// vtkSMProxyManager is designed to work with one active session at a time. When
-// a session closes, it cleans up the proxy manager that releases known
-// definitions as well as registered proxies. When a new session is established
-// it updates the definitions and is the ready to create new proxies.
+// vtkSMSessionProxyManager is designed to work with only one session. When
+// the session on which is attach close, it has no meaning to live and should be
+// deleted right away.
 // .SECTION See Also
 // vtkSMProxyDefinitionManager
 //
@@ -86,10 +87,10 @@
 //           </Hints>
 //       </SourceProxy>
 
-#ifndef __vtkSMProxyManager_h
-#define __vtkSMProxyManager_h
+#ifndef __vtkSMSessionProxyManager_h
+#define __vtkSMSessionProxyManager_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkCollection;
@@ -106,7 +107,6 @@ class vtkSMProxyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManagerObserver;
 class vtkSMProxyManagerProxySet;
-class vtkSMProxySelectionModel;
 class vtkSMReaderFactory;
 class vtkSMSession;
 class vtkSMStateLoader;
@@ -116,26 +116,25 @@ class vtkSMPipelineState;
 class vtkSMStateLocator;
 
 //BTX
-struct vtkSMProxyManagerInternals;
+struct vtkSMSessionProxyManagerInternals;
 struct vtkClientServerID;
 //ETX
 
-class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
+class VTK_EXPORT vtkSMSessionProxyManager : public vtkSMSessionObject
 {
 public:
   // Description:
   // Return the GlobalID that should be used to refer to the ProxyManager state
   static vtkTypeUInt32 GetReservedGlobalID();
 
-  static vtkSMProxyManager* New();
-  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
+  static vtkSMSessionProxyManager* New();
+  vtkTypeMacro(vtkSMSessionProxyManager, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get/Set the session on which this proxymanager is working.
   // Note that session is not reference counted.
-  void SetSession(vtkSMSession*);
-  vtkGetObjectMacro(Session, vtkSMSession);
+  virtual void SetSession(vtkSMSession*);
 
   // Description:
   // Given a group and proxy name, create and return a proxy instance.
@@ -354,44 +353,6 @@ public:
   // Return true if the XML Definition was found by vtkSMProxyDefinitionManager
   bool HasDefinition( const char* groupName, const char* proxyName );
 
-//BTX
-  struct RegisteredProxyInformation
-  {
-    vtkSMProxy* Proxy;
-    const char* GroupName;
-    const char* ProxyName;
-    // Set when the register/unregister event if fired for registration of
-    // a compound proxy definition.
-    unsigned int Type;
-
-    enum
-      {
-      PROXY =0x1,
-      COMPOUND_PROXY_DEFINITION = 0x2,
-      LINK = 0x3,
-      GLOBAL_PROPERTIES_MANAGER = 0x4
-      };
-  };
-
-  struct ModifiedPropertyInformation
-    {
-    vtkSMProxy* Proxy;
-    const char* PropertyName;
-    };
-
-  struct LoadStateInformation
-    {
-    vtkPVXMLElement* RootElement;
-    vtkSMProxyLocator* ProxyLocator;
-    };
-
-  struct StateChangedInformation
-    {
-    vtkSMProxy* Proxy;
-    vtkPVXMLElement* StateChangeElement;
-    };
-//ETX
-
   // Description:
   // Get if there are any registered proxies that have their properties in
   // a modified state.
@@ -416,39 +377,6 @@ public:
   // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
   // proxies as well if the flag is set.
   vtkGetMacro(UpdateInputProxies, int);
-
-  // Description:
-  // These methods can be used to obtain the ProxyManager version number.
-  // Returns the major version number eg. if version is 2.9.1
-  // this method will return 2.
-  static int GetVersionMajor();
-
-  // Description:
-  // These methods can be used to obtain the ProxyManager version number.
-  // Returns the minor version number eg. if version is 2.9.1
-  // this method will return 9.
-  static int GetVersionMinor();
-
-  // Description:
-  // These methods can be used to obtain the ProxyManager version number.
-  // Returns the patch version number eg. if version is 2.9.1
-  // this method will return 1.
-  static int GetVersionPatch();
-
-  // Description:
-  // Returns a string with the format "paraview version x.x.x, Date: YYYY-MM-DD"
-  static const char* GetParaViewSourceVersion();
-
-  // Description:
-  // Register/UnRegister a selection model. A selection model can be typically
-  // used by applications to keep track of active sources, filters, views etc.
-  void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
-  void UnRegisterSelectionModel(const char* name);
-
-  // Description:
-  // Get a registered selection model. Will return null if no such model is
-  // registered.
-  vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
   // Description:
   // ParaView has notion of "global properties". These are application wide
@@ -525,8 +453,8 @@ public:
                                  vtkSMStateLocator* locator);
 
 protected:
-  vtkSMProxyManager();
-  ~vtkSMProxyManager();
+  vtkSMSessionProxyManager();
+  ~vtkSMSessionProxyManager();
 
   friend class vtkSMGlobalPropertiesManager;
   friend class vtkSMProxy;
@@ -584,16 +512,15 @@ protected:
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
-  vtkSMSession* Session;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;
 private:
-  vtkSMProxyManagerInternals* Internals;
+  vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
 
 private:
-  vtkSMProxyManager(const vtkSMProxyManager&); // Not implemented
-  void operator=(const vtkSMProxyManager&); // Not implemented
+  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&); // Not implemented
+  void operator=(const vtkSMSessionProxyManager&); // Not implemented
 //ETX
 };
 

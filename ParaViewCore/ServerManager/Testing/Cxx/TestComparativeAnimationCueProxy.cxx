@@ -20,6 +20,7 @@
 #include "vtkPVServerOptions.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 #include "vtkSMComparativeAnimationCueProxy.h"
@@ -40,8 +41,9 @@ int main(int argc, char* argv[])
                                       vtkProcessModule::PROCESS_CLIENT,
                                       options);
   vtkSMSession* session = vtkSMSession::New();
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   //---------------------------------------------------------------------------
 
   vtkSmartPointer<vtkSMComparativeAnimationCueProxy> cueProxy;

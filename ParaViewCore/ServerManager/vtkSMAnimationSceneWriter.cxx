@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
@@ -40,6 +41,9 @@ vtkSMAnimationSceneWriter::~vtkSMAnimationSceneWriter()
 //-----------------------------------------------------------------------------
 void vtkSMAnimationSceneWriter::SetAnimationScene(vtkSMProxy* proxy)
 {
+  // Store the corresponding session
+  this->SetSession(proxy->GetSession());
+
   this->SetAnimationScene(proxy?
     vtkSMAnimationScene::SafeDownCast(
       proxy->GetClientSideObject()) : NULL);

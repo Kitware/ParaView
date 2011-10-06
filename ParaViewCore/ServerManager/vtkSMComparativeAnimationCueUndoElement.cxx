@@ -19,6 +19,7 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
@@ -71,7 +72,7 @@ int vtkSMComparativeAnimationCueUndoElement::Redo()
     // registration time.
     if(!this->Session->GetRemoteObject(this->ComparativeAnimationCueID))
       {
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+      vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
       vtkSMProxy* proxy = pxm->ReNewProxy(this->ComparativeAnimationCueID, this->Session->GetStateLocator());
       this->UndoSetWorkingContext->AddItem(proxy);
       proxy->LoadXMLState(this->AfterState->GetNestedElement(0), NULL);

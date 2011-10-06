@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 #include <QIntValidator>
@@ -608,7 +609,7 @@ bool pqAnimationManager::saveAnimation()
   if (disconnect_and_save)
     {
     pqServer* server = this->Internals->ActiveServer;
-    vtkSMProxyManager* pxm = server->proxyManager();
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);

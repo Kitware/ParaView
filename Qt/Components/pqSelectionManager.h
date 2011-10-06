@@ -49,6 +49,7 @@ class vtkSelection;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
 class vtkSMSourceProxy;
+class vtkSMSession;
 
 /// pqSelectionManager is the nexus for introspective surface selection in 
 //  paraview. 
@@ -75,7 +76,7 @@ public:
 
   /// Make a selection source proxy for a client-side selection.
   /// Only supports pedigree id selections.
-  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkIdType connId);
+  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkSMSession* session);
 
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)

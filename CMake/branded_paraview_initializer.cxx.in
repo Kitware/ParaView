@@ -147,10 +147,13 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   // given this too much thought.
   QDir dir2(":/@BPC_NAME@/Configuration");
   QStringList files = dir2.entryList(QDir::Files);
+  QStringList fullPathfiles;
   foreach (QString file, files)
     {
-    this->PVApp->loadConfiguration(QString(":/@BPC_NAME@/Configuration/") + file);
+    fullPathfiles.append(QString(":/@BPC_NAME@/Configuration/%1").arg(file));
     }
+  this->PVApp->setConfigurationToLoad(fullPathfiles);
+  this->PVApp->loadConfigurations();
 #endif
   this->MainWindow->setWindowTitle("@BPC_TITLE@");
   

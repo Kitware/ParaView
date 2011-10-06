@@ -43,33 +43,20 @@ vtkSMRemoteObject::~vtkSMRemoteObject()
   delete [] this->GlobalIDString;
   this->GlobalIDString = NULL;
 }
-
-//----------------------------------------------------------------------------
-vtkSMSession* vtkSMRemoteObject::GetSession()
-{
-  return this->Session;
-}
-
 //----------------------------------------------------------------------------
 void vtkSMRemoteObject::SetSession(vtkSMSession* session)
 {
-  if (this->Session != session)
-    {
-    this->Session = session;
-    this->Modified();
-    }
+  this->Superclass::SetSession(session);
   // Register object if possible
   if(this->Session && this->GlobalID != 0)
     {
     this->Session->RegisterRemoteObject(this->GlobalID, this);
     }
 }
-
 //----------------------------------------------------------------------------
 void vtkSMRemoteObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Session: " << this->Session << endl;
   os << indent << "GlobalID: " << this->GlobalID << endl;
 }
 //---------------------------------------------------------------------------

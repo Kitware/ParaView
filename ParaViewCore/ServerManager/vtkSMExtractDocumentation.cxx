@@ -25,6 +25,7 @@
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include <vtkstd/list>
@@ -641,7 +642,7 @@ bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
   return domainWritten;
 }
 
-void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, vtkSMProxyManager* manager)
+void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList, vtkSMSessionProxyManager* manager)
 {
   if (elem->GetNumberOfNestedElements() == 0)
     {
@@ -864,7 +865,7 @@ void WriteProxyDocumentation(vtkSMProxy* proxy, ostream& docFile)
 }
 
 void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
-                  vtkSMProxyManager *manager, char *filePath)
+                  vtkSMSessionProxyManager *manager, char *filePath)
 {
   vtkSMProxy *proxy;
   ofstream docFile;
@@ -900,7 +901,7 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
     }
 }
 
-void WriteHTMLList(const char* groupname, vtkStringPairList *nameList, ostream &baseFile)
+void WriteHTMLList(vtkSMSessionProxyManager *manager, const char* groupname, vtkStringPairList *nameList, ostream &baseFile)
 {
   // Write header.
   TemplateMap dataMap;
@@ -911,7 +912,6 @@ void WriteHTMLList(const char* groupname, vtkStringPairList *nameList, ostream &
   WriteFromTemplate(baseFile, ProxyListTitleTemplate, dataMap);
   WriteFromTemplate(baseFile, ProxyListTableHeaderTemplate, dataMap);
 
-  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
   vtkStringPairListIterator iter;
 
   vtkStringPairList proxyListItems;
@@ -961,7 +961,7 @@ void WriteHTMLList(const char* groupname, vtkStringPairList *nameList, ostream &
   baseFile << "</html>" << endl;
 }
 
-void WriteXMLKeywords(const char* baseName, vtkStringPairList *nameList,
+void WriteXMLKeywords(vtkSMSessionProxyManager *manager, const char* baseName, vtkStringPairList *nameList,
                       istream &inFile, ostream& outFile)
 {
   char line[256];
@@ -982,7 +982,6 @@ void WriteXMLKeywords(const char* baseName, vtkStringPairList *nameList,
     inFile.getline(line, 255);
     }
 
-  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
   vtkStringPairListIterator iter;
   for (iter = nameList->begin(); iter != nameList->end(); iter++)
     {
@@ -1047,7 +1046,8 @@ int main(int argc, char *argv[])
   vtkInitializationHelper::Initialize(argv[0],
     vtkProcessModule::PROCESS_CLIENT);
   vtkSMSession* session = vtkSMSession::New();
-  vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager *manager =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkStringPairList *proxyNameList = new vtkStringPairList;
   ExtractProxyNames(rootElem, proxyNameList, manager);
   proxyNameList->sort();
@@ -1059,7 +1059,7 @@ int main(int argc, char *argv[])
 
   proxyLabelList->sort();
 
-  WriteHTMLList(proxyTypeName, proxyNameList, baseFile);
+  WriteHTMLList(manager, proxyTypeName, proxyNameList, baseFile);
 
   ifstream adpFile;
   vtksys_ios::ostringstream adpFileName;
@@ -1071,7 +1071,7 @@ int main(int argc, char *argv[])
   tmpAdpFileName << argv[1] << "/../temp.adp" << ends;
   tmpAdpFile.open(tmpAdpFileName.str().c_str());
 
-  WriteXMLKeywords(baseName, proxyNameList, adpFile, tmpAdpFile);
+  WriteXMLKeywords(manager, baseName, proxyNameList, adpFile, tmpAdpFile);
 
   adpFile.close();
   tmpAdpFile.close();

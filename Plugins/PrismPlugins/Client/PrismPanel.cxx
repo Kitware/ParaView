@@ -22,7 +22,7 @@ Module:    PrismPanel.cxx
 // VTK includes
 
 // ParaView Server Manager includes
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMArraySelectionDomain.h"
@@ -95,14 +95,14 @@ SESAMEConversionsForTable::SESAMEConversionsForTable()
 class PrismPanel::pqUI : public QObject, public Ui::PrismPanelWidget 
 {
 public:
-    pqUI(PrismPanel* p) : QObject(p)
+    pqUI(PrismPanel* p, pqProxy* object_proxy) : QObject(p)
     {
         // Make a clone of the XDMFReader proxy.
         // We'll use the clone to help us with the interdependent properties.
         // In other words, modifying properties outside of accept()/reset() is wrong.
         // We have to modify properties to get the information we need
         // and we'll do that with the clone.
-        vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
+        vtkSMSessionProxyManager* pm = object_proxy->proxyManager();
         PanelHelper.TakeReference(pm->NewProxy("misc", "PrismFilterHelper"));
         PanelHelper->InitializeAndCopyFromProxy(p->proxy());
         this->PanelHelper->UpdatePropertyInformation();
@@ -141,7 +141,7 @@ public:
 PrismPanel::PrismPanel(pqProxy* object_proxy, QWidget* p) :
 pqNamedObjectPanel(object_proxy, p)
 {
-    this->UI = new pqUI(this);
+    this->UI = new pqUI(this, object_proxy);
     this->UI->setupUi(this);
     this->UI->Table306Found=false;
     this->UI->Table401Found=false;

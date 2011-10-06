@@ -57,15 +57,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyGroupDomain.h"
-#include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMExtentDomain.h"
 #include "vtkSMFileListDomain.h"
@@ -337,7 +336,7 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
     {
-    vtkSMProxyManager* pm = Property->GetParent()->GetProxyManager();
+    vtkSMSessionProxyManager* pm = Property->GetParent()->GetSessionProxyManager();
     
     // get group domain of this property 
     // and add all proxies in those groups to our list

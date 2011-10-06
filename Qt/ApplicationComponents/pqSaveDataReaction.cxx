@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTestUtility.h"
 #include "pqWriterDialog.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterFactory.h"
 
@@ -69,8 +69,7 @@ void pqSaveDataReaction::updateEnableState()
   bool enable_state = (port != NULL);
   if (enable_state)
     {
-    vtkSMWriterFactory* writerFactory =
-      vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
+    vtkSMWriterFactory* writerFactory = port->getSource()->proxyManager()->GetWriterFactory();
     enable_state = writerFactory->CanWrite(
       vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
       port->getPortNumber());
@@ -105,8 +104,7 @@ bool pqSaveDataReaction::saveActiveData()
     return false;
     }
 
-  vtkSMWriterFactory* writerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
+  vtkSMWriterFactory* writerFactory = server->proxyManager()->GetWriterFactory();
   QString filters = writerFactory->GetSupportedFileTypes(
     vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),
     port->getPortNumber());
@@ -141,8 +139,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
     return false;
     }
 
-  vtkSMWriterFactory* writerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetWriterFactory();
+  vtkSMWriterFactory* writerFactory = server->proxyManager()->GetWriterFactory();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(writerFactory->CreateWriter(filename.toAscii().data(),
       vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()),

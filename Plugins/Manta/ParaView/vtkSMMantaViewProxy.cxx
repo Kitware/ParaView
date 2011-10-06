@@ -70,9 +70,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMantaViewProxy);
@@ -112,7 +115,8 @@ vtkSMRepresentationProxy* vtkSMMantaViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  assert("Session should be set by now" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);

@@ -164,15 +164,14 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::New();
-  vtkSMObject::SetProxyManager(pxm);
-  pxm->Delete();
+  // Make sure the ProxyManager get created...
+  vtkSMProxyManager::GetProxyManager();
 }
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  vtkSMObject::SetProxyManager(NULL);
+  vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();
 
   // Optional:  Delete all global objects allocated by libprotobuf.

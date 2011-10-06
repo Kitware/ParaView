@@ -94,7 +94,7 @@ pqServerManagerSelectionModel::~pqServerManagerSelectionModel()
 void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
 {
   this->Internal->Server = server;
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
   if (!selmodel)
     {

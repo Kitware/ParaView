@@ -25,6 +25,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/map>
@@ -189,7 +190,7 @@ struct vtkSMProxyManagerEntry
   }
 };
 //-----------------------------------------------------------------------------
-struct vtkSMProxyManagerInternals
+struct vtkSMSessionProxyManagerInternals
 {
   // This data structure stores actual proxy instances grouped in
   // collections.
@@ -212,11 +213,6 @@ struct vtkSMProxyManagerInternals
     LinkType;
   LinkType RegisteredLinkMap;
 
-  // Data structure for selection models.
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
-    SelectionModelsType;
-  SelectionModelsType SelectionModels;
-
   // Data structure for storing GlobalPropertiesManagers.
   typedef vtkstd::map<vtkstd::string,
           vtkSmartPointer<vtkSMGlobalPropertiesManager> >
@@ -231,7 +227,7 @@ struct vtkSMProxyManagerInternals
   vtkSMMessage State;
 
   // Keep ref to the proxyManager to access the session
-  vtkSMProxyManager *ProxyManager;
+  vtkSMSessionProxyManager *ProxyManager;
 
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,
@@ -329,7 +325,7 @@ struct vtkSMProxyManagerInternals
     this->RegisteredProxyTuple = resultSet;
 
     // Deal with map only (true)
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.begin();
     for (; it != this->RegisteredProxyMap.end(); it++)
       {
@@ -386,7 +382,7 @@ struct vtkSMProxyManagerInternals
       }
 
     // Deal with map
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.find(group);
     if ( it != this->RegisteredProxyMap.end() )
       {
@@ -439,7 +435,7 @@ struct vtkSMProxyManagerInternals
     this->RegisteredProxyTuple.erase(vtkSMProxyManagerEntry(group,name,proxy));
 
     // Deal with map
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.find(group);
     if ( it != this->RegisteredProxyMap.end() )
       {

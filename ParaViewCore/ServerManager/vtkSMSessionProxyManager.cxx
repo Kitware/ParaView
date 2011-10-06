@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyManager.cxx
+  Module:    vtkSMSessionProxyManager.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include "vtkCollection.h"
 #include "vtkEventForwarderCommand.h"
@@ -52,7 +52,8 @@
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
 
-#include "vtkSMProxyManagerInternals.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManagerInternals.h"
 
 #if 0 // for debugging
 class vtkSMProxyRegObserver : public vtkCommand
@@ -72,8 +73,6 @@ public:
 #endif
 
 
-#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
-
 class vtkSMProxyManagerProxySet : public vtkstd::set<vtkSMProxy*> {};
 
 //*****************************************************************************
@@ -83,7 +82,7 @@ public:
   static vtkSMProxyManagerObserver* New()
     { return new vtkSMProxyManagerObserver(); }
 
-  void SetTarget(vtkSMProxyManager* t)
+  void SetTarget(vtkSMSessionProxyManager* t)
     {
     this->Target = t;
     }
@@ -101,18 +100,18 @@ protected:
     {
     this->Target = 0;
     }
-  vtkSMProxyManager* Target;
+  vtkSMSessionProxyManager* Target;
 };
 
 //*****************************************************************************
-vtkStandardNewMacro(vtkSMProxyManager);
+vtkStandardNewMacro(vtkSMSessionProxyManager);
 //---------------------------------------------------------------------------
-vtkSMProxyManager::vtkSMProxyManager()
+vtkSMSessionProxyManager::vtkSMSessionProxyManager()
 {
   this->Session = NULL;
   this->PipelineState = NULL;
   this->UpdateInputProxies = 0;
-  this->Internals = new vtkSMProxyManagerInternals;
+  this->Internals = new vtkSMSessionProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
 #if 0 // for debugging
@@ -133,7 +132,6 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
-  this->WriterFactory->SetProxyManager(this);
 
   // Provide internal object a pointer to us
   this->Internals->ProxyManager = this;
@@ -141,7 +139,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxyManager::~vtkSMProxyManager()
+vtkSMSessionProxyManager::~vtkSMSessionProxyManager()
 {
   // This is causing a PushState() when the object is being destroyed. This
   // causes errors since the ProxyManager is destroyed only when the session is
@@ -155,7 +153,6 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->ReaderFactory->Delete();
   this->ReaderFactory = 0;
 
-  this->WriterFactory->SetProxyManager(0);
   this->WriterFactory->Delete();
   this->WriterFactory = 0;
 
@@ -170,37 +167,13 @@ vtkSMProxyManager::~vtkSMProxyManager()
 }
 
 //----------------------------------------------------------------------------
-vtkTypeUInt32 vtkSMProxyManager::GetReservedGlobalID()
+vtkTypeUInt32 vtkSMSessionProxyManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetParaViewSourceVersion()
-{
-  return PARAVIEW_SOURCE_VERSION;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMProxyManager::GetVersionMajor()
-{
-  return PARAVIEW_VERSION_MAJOR;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMProxyManager::GetVersionMinor()
-{
-  return PARAVIEW_VERSION_MINOR;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMProxyManager::GetVersionPatch()
-{
-  return PARAVIEW_VERSION_PATCH;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMProxyManager::SetSession(vtkSMSession* session)
+void vtkSMSessionProxyManager::SetSession(vtkSMSession* session)
 {
   if (this->Session == session)
     {
@@ -214,7 +187,9 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->PipelineState = NULL;
     }
 
-  this->Session = session;
+  this->Superclass::SetSession(session);
+  this->ReaderFactory->SetSession(session);
+  this->WriterFactory->SetSession(session);
 
   if (this->Session)
     {
@@ -226,7 +201,7 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
+void vtkSMSessionProxyManager::InstantiateGroupPrototypes(const char* groupName)
 {
   if (!groupName)
     {
@@ -266,7 +241,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMProxyManager::InstantiatePrototypes()
+void vtkSMSessionProxyManager::InstantiatePrototypes()
 {
   assert(this->ProxyDefinitionManager != 0);
   vtkPVProxyDefinitionIterator* iter =
@@ -280,7 +255,7 @@ void vtkSMProxyManager::InstantiatePrototypes()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy(
+vtkSMProxy* vtkSMSessionProxyManager::NewProxy(
   const char* groupName, const char* proxyName, const char* subProxyName)
 {
   if (!groupName || !proxyName)
@@ -300,7 +275,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
+vtkSMProxy* vtkSMSessionProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* groupname,
                                         const char* proxyname,
                                         const char* subProxyName)
@@ -331,7 +306,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
 
 
 //---------------------------------------------------------------------------
-vtkSMDocumentation* vtkSMProxyManager::GetProxyDocumentation(
+vtkSMDocumentation* vtkSMSessionProxyManager::GetProxyDocumentation(
   const char* groupName, const char* proxyName)
 {
   if (!groupName || !proxyName)
@@ -344,7 +319,7 @@ vtkSMDocumentation* vtkSMProxyManager::GetProxyDocumentation(
 }
 
 //---------------------------------------------------------------------------
-vtkSMDocumentation* vtkSMProxyManager::GetPropertyDocumentation(
+vtkSMDocumentation* vtkSMSessionProxyManager::GetPropertyDocumentation(
   const char* groupName, const char* proxyName, const char* propertyName)
 {
   if (!groupName || !proxyName || !propertyName)
@@ -365,7 +340,7 @@ vtkSMDocumentation* vtkSMProxyManager::GetPropertyDocumentation(
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
+vtkPVXMLElement* vtkSMSessionProxyManager::GetProxyElement(const char* groupName,
                                                     const char* proxyName,
                                                     const char* subProxyName)
 {
@@ -377,9 +352,9 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
+unsigned int vtkSMSessionProxyManager::GetNumberOfProxies(const char* group)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -398,7 +373,7 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
 //---------------------------------------------------------------------------
 // No errors are raised if a proxy definition for the requested proxy is not
 // found.
-vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
+vtkSMProxy* vtkSMSessionProxyManager::GetPrototypeProxy(const char* groupname,
   const char* name)
 {
   if (!this->ProxyDefinitionManager)
@@ -430,7 +405,6 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     {
     return 0;
     }
-  proxy->SetSession(NULL);
   proxy->SetLocation(0);
   proxy->SetPrototype(true);
   // register the proxy as a prototype.
@@ -440,7 +414,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RemovePrototype(
+void vtkSMSessionProxyManager::RemovePrototype(
   const char* groupname, const char* proxyname)
 {
   vtkstd::string prototype_group = groupname;
@@ -454,9 +428,9 @@ void vtkSMProxyManager::RemovePrototype(
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
+vtkSMProxy* vtkSMSessionProxyManager::GetProxy(const char* group, const char* name)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -474,9 +448,9 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
+vtkSMProxy* vtkSMSessionProxyManager::GetProxy(const char* name)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
@@ -494,11 +468,11 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::GetProxies(const char* group,
+void vtkSMSessionProxyManager::GetProxies(const char* group,
   const char* name, vtkCollection* collection)
 {
   collection->RemoveAllItems();
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(group);
   if(it != this->Internals->RegisteredProxyMap.end())
     {
@@ -515,7 +489,7 @@ void vtkSMProxyManager::GetProxies(const char* group,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::GetProxyNames(const char* groupname,
+void vtkSMSessionProxyManager::GetProxyNames(const char* groupname,
                                       vtkSMProxy* proxy, vtkStringList* names)
 {
   if (!names)
@@ -529,7 +503,7 @@ void vtkSMProxyManager::GetProxyNames(const char* groupname,
     return;
     }
 
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -547,7 +521,7 @@ void vtkSMProxyManager::GetProxyNames(const char* groupname,
 
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetProxyName(const char* groupname,
+const char* vtkSMSessionProxyManager::GetProxyName(const char* groupname,
                                             vtkSMProxy* proxy)
 {
   if (!groupname || !proxy)
@@ -555,7 +529,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname,
     return 0;
     }
 
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -574,7 +548,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname,
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetProxyName(const char* groupname,
+const char* vtkSMSessionProxyManager::GetProxyName(const char* groupname,
                                             unsigned int idx)
 {
   if (!groupname)
@@ -584,7 +558,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname,
 
   unsigned int counter=0;
 
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -604,14 +578,14 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname,
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::IsProxyInGroup(vtkSMProxy* proxy,
+const char* vtkSMSessionProxyManager::IsProxyInGroup(vtkSMProxy* proxy,
                                               const char* groupname)
 {
   if (!proxy || !groupname)
     {
     return 0;
     }
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -639,13 +613,14 @@ namespace
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxies()
+void vtkSMSessionProxyManager::UnRegisterProxies()
 {
 
   // Clear internal proxy containers
   vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToAll();
+  iter->SetSession(this->Session);
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxyManagerProxyInformation info;
@@ -676,7 +651,7 @@ void vtkSMProxyManager::UnRegisterProxies()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
+void vtkSMSessionProxyManager::UnRegisterProxy( const char* group, const char* name,
                                          vtkSMProxy* proxy)
 {
   // Just in case a proxy ref is NOT held outside the ProxyManager iteself
@@ -687,11 +662,11 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
   // Do something only if the given tuple was found
   if(this->Internals->RemoveTuples(group, name, proxy))
     {
-    RegisteredProxyInformation info;
+    vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = proxy;
     info.GroupName = group;
     info.ProxyName = name;
-    info.Type = RegisteredProxyInformation::PROXY;
+    info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
 
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     this->UnMarkProxyAsModified(info.Proxy);
@@ -702,7 +677,7 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy(const char* name)
+void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
 {
   // Remove entries and keep them in a set
   vtkstd::set<vtkSMProxyManagerEntry> entriesToRemove;
@@ -712,11 +687,11 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
   vtkstd::set<vtkSMProxyManagerEntry>::iterator iter = entriesToRemove.begin();
   while(iter != entriesToRemove.end())
     {
-    RegisteredProxyInformation info;
+    vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = iter->Proxy;
     info.GroupName = iter->Group.c_str();
     info.ProxyName = iter->Name.c_str();
-    info.Type = RegisteredProxyInformation::PROXY;
+    info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
 
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     this->UnMarkProxyAsModified(info.Proxy);
@@ -733,7 +708,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
+void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
 {
   // Find tuples
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToRemove;
@@ -755,7 +730,7 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterProxy(const char* groupname,
+void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
                                       const char* name,
                                       vtkSMProxy* proxy)
 {
@@ -792,11 +767,11 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
 
   // Note, these observer will be removed in the destructor of proxyInfo.
 
-  RegisteredProxyInformation info;
+  vtkSMProxyManager::RegisteredProxyInformation info;
   info.Proxy = proxy;
   info.GroupName = groupname;
   info.ProxyName = name;
-  info.Type = RegisteredProxyInformation::PROXY;
+  info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
 
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 
@@ -818,10 +793,10 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname,
+void vtkSMSessionProxyManager::UpdateRegisteredProxies(const char* groupname,
   int modified_only /*=1*/)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
@@ -844,11 +819,11 @@ void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
+void vtkSMSessionProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
 {
   vtksys::RegularExpression prototypesRe("_prototypes$");
 
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
@@ -878,7 +853,7 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UpdateRegisteredProxiesInOrder(int modified_only/*=1*/)
+void vtkSMSessionProxyManager::UpdateRegisteredProxiesInOrder(int modified_only/*=1*/)
 {
   this->UpdateInputProxies = 1;
   this->UpdateRegisteredProxies(modified_only);
@@ -886,7 +861,7 @@ void vtkSMProxyManager::UpdateRegisteredProxiesInOrder(int modified_only/*=1*/)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
+void vtkSMSessionProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
 {
   this->UpdateInputProxies = 1;
   proxy->UpdateVTKObjects();
@@ -894,20 +869,20 @@ void vtkSMProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyManager::GetNumberOfLinks()
+int vtkSMSessionProxyManager::GetNumberOfLinks()
 {
   return this->Internals->RegisteredLinkMap.size();
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetLinkName(int idx)
+const char* vtkSMSessionProxyManager::GetLinkName(int idx)
 {
   int numlinks = this->GetNumberOfLinks();
   if(idx >= numlinks)
     {
     return NULL;
     }
-  vtkSMProxyManagerInternals::LinkType::iterator it =
+  vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.begin();
   for(int i=0; i<idx; i++)
     {
@@ -917,9 +892,9 @@ const char* vtkSMProxyManager::GetLinkName(int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterLink(const char* name, vtkSMLink* link)
+void vtkSMSessionProxyManager::RegisterLink(const char* name, vtkSMLink* link)
 {
-  vtkSMProxyManagerInternals::LinkType::iterator it =
+  vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
@@ -927,18 +902,18 @@ void vtkSMProxyManager::RegisterLink(const char* name, vtkSMLink* link)
     }
   this->Internals->RegisteredLinkMap[name] = link;
 
-  RegisteredProxyInformation info;
+  vtkSMProxyManager::RegisteredProxyInformation info;
   info.Proxy = 0;
   info.GroupName = 0;
   info.ProxyName = name;
-  info.Type = RegisteredProxyInformation::LINK;
+  info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
-vtkSMLink* vtkSMProxyManager::GetRegisteredLink(const char* name)
+vtkSMLink* vtkSMSessionProxyManager::GetRegisteredLink(const char* name)
 {
-  vtkSMProxyManagerInternals::LinkType::iterator it =
+  vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
@@ -948,31 +923,31 @@ vtkSMLink* vtkSMProxyManager::GetRegisteredLink(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterLink(const char* name)
+void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
 {
-  vtkSMProxyManagerInternals::LinkType::iterator it =
+  vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
-    RegisteredProxyInformation info;
+    vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = 0;
     info.GroupName = 0;
     info.ProxyName = name;
-    info.Type = RegisteredProxyInformation::LINK;
+    info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
     this->Internals->RegisteredLinkMap.erase(it);
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterAllLinks()
+void vtkSMSessionProxyManager::UnRegisterAllLinks()
 {
   this->Internals->RegisteredLinkMap.clear();
 }
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
+void vtkSMSessionProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* data)
 {
   // Check source object
@@ -992,11 +967,11 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
            vtkSIProxyDefinitionManager::RegisteredDefinitionInformation*>(data);
          if(defInfo->CustomDefinition)
            {
-           RegisteredProxyInformation info;
+           vtkSMProxyManager::RegisteredProxyInformation info;
            info.Proxy = 0;
            info.GroupName = defInfo->GroupName;
            info.ProxyName = defInfo->ProxyName;
-           info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
+           info.Type = vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
            this->InvokeEvent(event, &info);
            }
          // Both these events imply that the definition may have somehow
@@ -1024,6 +999,7 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
       modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
 
       vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
+      undoElem->SetSession(this->Session);
       undoElem->SetLinkState( globalPropertiesManagerName,
                               modifiedInfo->GlobalPropertyName,
                               modifiedInfo->Proxy,
@@ -1042,7 +1018,7 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         {
         // Some property on the proxy has been modified.
         this->MarkProxyAsModified(proxy);
-        ModifiedPropertyInformation info;
+        vtkSMProxyManager::ModifiedPropertyInformation info;
         info.Proxy = proxy;
         info.PropertyName = reinterpret_cast<const char*>(data);
         if (info.PropertyName)
@@ -1060,7 +1036,7 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         // MarkProxyAsModified() and then UnMarkProxyAsModified() :).
         // this->MarkProxyAsModified(proxy);
 
-        StateChangedInformation info;
+        vtkSMProxyManager::StateChangedInformation info;
         info.Proxy = proxy;
         info.StateChangeElement = reinterpret_cast<vtkPVXMLElement*>(data);
         if (info.StateChangeElement)
@@ -1083,15 +1059,15 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::MarkProxyAsModified(vtkSMProxy* proxy)
+void vtkSMSessionProxyManager::MarkProxyAsModified(vtkSMProxy* proxy)
 {
   this->Internals->ModifiedProxies.insert(proxy);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
+void vtkSMSessionProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 {
-  vtkSMProxyManagerInternals::SetOfProxies::iterator it =
+  vtkSMSessionProxyManagerInternals::SetOfProxies::iterator it =
     this->Internals->ModifiedProxies.find(proxy);
   if (it != this->Internals->ModifiedProxies.end())
     {
@@ -1099,13 +1075,13 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
     }
 }
 //---------------------------------------------------------------------------
-int vtkSMProxyManager::AreProxiesModified()
+int vtkSMSessionProxyManager::AreProxiesModified()
 {
   return (this->Internals->ModifiedProxies.size() > 0)? 1: 0;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadXMLState( const char* filename,
+void vtkSMSessionProxyManager::LoadXMLState( const char* filename,
                                       vtkSMStateLoader* loader/*=NULL*/)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
@@ -1117,7 +1093,7 @@ void vtkSMProxyManager::LoadXMLState( const char* filename,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
+void vtkSMSessionProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
                                       vtkSMStateLoader* loader/*=NULL*/)
 {
   if (!rootElement)
@@ -1137,7 +1113,7 @@ void vtkSMProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
     }
   if (spLoader->LoadState(rootElement))
     {
-    LoadStateInformation info;
+    vtkSMProxyManager::LoadStateInformation info;
     info.RootElement = rootElement;
     info.ProxyLocator = spLoader->GetProxyLocator();
     this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
@@ -1145,7 +1121,7 @@ void vtkSMProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveXMLState(const char* filename)
+void vtkSMSessionProxyManager::SaveXMLState(const char* filename)
 {
   vtkPVXMLElement* rootElement = this->SaveXMLState();
   ofstream os(filename, ios::out);
@@ -1154,13 +1130,13 @@ void vtkSMProxyManager::SaveXMLState(const char* filename)
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveXMLState()
+vtkPVXMLElement* vtkSMSessionProxyManager::SaveXMLState()
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
   root->SetName("GenericParaViewApplication");
   this->AddInternalState(root);
 
-  LoadStateInformation info;
+  vtkSMProxyManager::LoadStateInformation info;
   info.RootElement = root;
   info.ProxyLocator = NULL;
   this->InvokeEvent(vtkCommand::SaveStateEvent, &info);
@@ -1168,7 +1144,7 @@ vtkPVXMLElement* vtkSMProxyManager::SaveXMLState()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::CollectReferredProxies(
+void vtkSMSessionProxyManager::CollectReferredProxies(
   vtkSMProxyManagerProxySet& setOfProxies, vtkSMProxy* proxy)
 {
   vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -1191,22 +1167,23 @@ void vtkSMProxyManager::CollectReferredProxies(
 
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::AddInternalState(vtkPVXMLElement *parentElem)
+vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *parentElem)
 {
   vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
   rootElement->SetName("ServerManagerState");
 
   // Set version number on the state element.
   vtksys_ios::ostringstream version_string;
-  version_string << this->GetVersionMajor() << "."
-    << this->GetVersionMinor() << "." << this->GetVersionPatch();
+  vtkSMProxyManager* px = vtkSMProxyManager::GetProxyManager();
+  version_string << px->GetVersionMajor() << "."
+    << px->GetVersionMinor() << "." << px->GetVersionPatch();
   rootElement->AddAttribute("version", version_string.str().c_str());
 
 
   vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
 
   // First save the state of all proxies
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
@@ -1338,14 +1315,14 @@ vtkPVXMLElement* vtkSMProxyManager::AddInternalState(vtkPVXMLElement *parentElem
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterCustomProxyDefinitions()
+void vtkSMSessionProxyManager::UnRegisterCustomProxyDefinitions()
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->ClearCustomProxyDefinitions();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
+void vtkSMSessionProxyManager::UnRegisterCustomProxyDefinition(
   const char* group, const char* name)
 {
   assert(this->ProxyDefinitionManager != 0);
@@ -1353,7 +1330,7 @@ void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterCustomProxyDefinition(
+void vtkSMSessionProxyManager::RegisterCustomProxyDefinition(
   const char* group, const char* name, vtkPVXMLElement* top)
 {
   assert(this->ProxyDefinitionManager != 0);
@@ -1362,7 +1339,7 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
 
 //---------------------------------------------------------------------------
 // Does not raise an error if definition is not found.
-vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
+vtkPVXMLElement* vtkSMSessionProxyManager::GetProxyDefinition(
   const char* group, const char* name)
 {
   if (!name || !group)
@@ -1376,14 +1353,14 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
+void vtkSMSessionProxyManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
 {
   assert(this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->LoadCustomProxyDefinitions(root);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadCustomProxyDefinitions(const char* filename)
+void vtkSMSessionProxyManager::LoadCustomProxyDefinitions(const char* filename)
 {
   assert(this->ProxyDefinitionManager != 0);
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
@@ -1398,7 +1375,7 @@ void vtkSMProxyManager::LoadCustomProxyDefinitions(const char* filename)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveCustomProxyDefinitions(
+void vtkSMSessionProxyManager::SaveCustomProxyDefinitions(
   vtkPVXMLElement* rootElement)
 {
   assert(this->ProxyDefinitionManager != 0);
@@ -1406,9 +1383,9 @@ void vtkSMProxyManager::SaveCustomProxyDefinitions(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
+void vtkSMSessionProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 {
-  vtkSMProxyManagerInternals::LinkType::iterator it =
+  vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.begin();
   for (; it != this->Internals->RegisteredLinkMap.end(); ++it)
     {
@@ -1417,9 +1394,9 @@ void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
+void vtkSMSessionProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
 {
-  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
   for (iter = this->Internals->GlobalPropertiesManagers.begin();
     iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
     {
@@ -1432,7 +1409,7 @@ void vtkSMProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::GetProxyHints(
+vtkPVXMLElement* vtkSMSessionProxyManager::GetProxyHints(
   const char* groupName, const char* proxyName)
 {
   if (!groupName || !proxyName)
@@ -1445,7 +1422,7 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyHints(
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
+vtkPVXMLElement* vtkSMSessionProxyManager::GetPropertyHints(
   const char* groupName, const char* proxyName, const char* propertyName)
 {
   if (!groupName || !proxyName || !propertyName)
@@ -1466,56 +1443,7 @@ vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterSelectionModel(
-  const char* name, vtkSMProxySelectionModel* model)
-{
-  if (!model)
-    {
-    vtkErrorMacro("Cannot register a null model.");
-    return;
-    }
-  if (!name)
-    {
-    vtkErrorMacro("Cannot register model with no name.");
-    return;
-    }
-
-  vtkSMProxySelectionModel* curmodel = this->GetSelectionModel(name);
-  if (curmodel && curmodel == model)
-    {
-    // already registered.
-    return;
-    }
-
-  if (curmodel)
-    {
-    vtkWarningMacro("Replacing existing selection model: " << name);
-    }
-  this->Internals->SelectionModels[name] = model;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterSelectionModel( const char* name)
-{
-  this->Internals->SelectionModels.erase(name);
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
-  const char* name)
-{
-  vtkSMProxyManagerInternals::SelectionModelsType::iterator iter =
-    this->Internals->SelectionModels.find(name);
-  if (iter == this->Internals->SelectionModels.end())
-    {
-    return 0;
-    }
-
-  return iter->second;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
+void vtkSMSessionProxyManager::SetGlobalPropertiesManager(const char* name,
     vtkSMGlobalPropertiesManager* mgr)
 {
   vtkSMGlobalPropertiesManager* old_mgr = this->GetGlobalPropertiesManager(name);
@@ -1528,19 +1456,19 @@ void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
   this->Internals->GlobalPropertiesManagersCallBackID[name] =
       mgr->AddObserver(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified, this->Observer);
 
-  RegisteredProxyInformation info;
+  vtkSMProxyManager::RegisteredProxyInformation info;
   info.Proxy = mgr;
   info.GroupName = NULL;
   info.ProxyName = name;
-  info.Type = RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
+  info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetGlobalPropertiesManagerName(
+const char* vtkSMSessionProxyManager::GetGlobalPropertiesManagerName(
   vtkSMGlobalPropertiesManager* mgr)
 {
-  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
   for (iter = this->Internals->GlobalPropertiesManagers.begin();
     iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
     {
@@ -1553,42 +1481,42 @@ const char* vtkSMProxyManager::GetGlobalPropertiesManagerName(
 }
 
 //---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
+vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
   const char* name)
 {
   return this->Internals->GlobalPropertiesManagers[name].GetPointer();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::RemoveGlobalPropertiesManager(const char* name)
+void vtkSMSessionProxyManager::RemoveGlobalPropertiesManager(const char* name)
 {
   vtkSMGlobalPropertiesManager* gm = this->GetGlobalPropertiesManager(name);
   if (gm)
     {
     gm->RemoveObserver(this->Internals->GlobalPropertiesManagersCallBackID[name]);
-    RegisteredProxyInformation info;
+    vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = gm;
     info.GroupName = NULL;
     info.ProxyName = name;
-    info.Type = RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
+    info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     }
   this->Internals->GlobalPropertiesManagers.erase(name);
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMProxyManager::GetNumberOfGlobalPropertiesManagers()
+unsigned int vtkSMSessionProxyManager::GetNumberOfGlobalPropertiesManagers()
 {
   return static_cast<unsigned int>(
     this->Internals->GlobalPropertiesManagers.size());
 }
 
 //---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
+vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
   unsigned int index)
 {
   unsigned int cur =0;
-  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
   for (iter = this->Internals->GlobalPropertiesManagers.begin();
     iter != this->Internals->GlobalPropertiesManagers.end(); ++iter, ++cur)
     {
@@ -1602,31 +1530,31 @@ vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
 }
 
 //---------------------------------------------------------------------------
-bool vtkSMProxyManager::LoadConfigurationXML(const char* xml)
+bool vtkSMSessionProxyManager::LoadConfigurationXML(const char* xml)
 {
   assert(this->ProxyDefinitionManager != 0);
   return this->ProxyDefinitionManager->LoadConfigurationXMLFromString(xml);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMSessionProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent <<  "UpdateInputProxies: " <<  this->UpdateInputProxies << endl;
 }
 //---------------------------------------------------------------------------
-const vtkSMMessage* vtkSMProxyManager::GetFullState()
+const vtkSMMessage* vtkSMSessionProxyManager::GetFullState()
 {
   if(!this->Internals->State.has_global_id())
     {
-    this->Internals->State.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
+    this->Internals->State.set_global_id(vtkSMSessionProxyManager::GetReservedGlobalID());
     this->Internals->State.set_location(vtkProcessModule::PROCESS_DATA_SERVER);
     }
 
   return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
+void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
 {
   // Need to compute differences and just call Register/UnRegister for those items
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
@@ -1653,7 +1581,7 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* lo
     }
 }
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
+vtkSMProxy* vtkSMSessionProxyManager::NewProxy( const vtkSMMessage* msg,
                                          vtkSMStateLocator* locator,
                                          bool definitionOnly)
 {
@@ -1686,7 +1614,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
+vtkSMProxy* vtkSMSessionProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
                                           vtkSMStateLocator* locator)
 {
   if(this->Session->GetRemoteObject(globalId))
@@ -1710,7 +1638,7 @@ vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
   return NULL;
 }
 //---------------------------------------------------------------------------
-bool vtkSMProxyManager::HasDefinition( const char* groupName,
+bool vtkSMSessionProxyManager::HasDefinition( const char* groupName,
                                        const char* proxyName )
 {
   return this->ProxyDefinitionManager &&

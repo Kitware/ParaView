@@ -47,13 +47,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkToolkits.h"
 
 // Qt includes.
 #include <QColor>
+#include <QDir>
 #include <QCoreApplication>
 #include <QtDebug>
+#include <QStringList>
 #include <QTimer>
 
 class pqServer::pqInternals
@@ -132,7 +135,7 @@ void pqServer::initialize()
   this->createTimeKeeper();
 
   // Create the GlobalMapperPropertiesProxy.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
   proxy->UpdateVTKObjects();
   pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
@@ -148,6 +151,9 @@ void pqServer::initialize()
   proxy->Delete();
 
   this->updateGlobalMapperProperties();
+
+  // Load the configuration for the current server
+  pqApplicationCore::instance()->loadConfigurations();
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +171,7 @@ vtkSMSession* pqServer::session() const
 void pqServer::createTimeKeeper()
 {
   // Set Global Time keeper.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
   proxy->UpdateVTKObjects();
   pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
@@ -487,7 +493,8 @@ void pqServer::updateGlobalMapperProperties()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxyManager* pqServer::proxyManager() const
+vtkSMSessionProxyManager* pqServer::proxyManager() const
 {
-  return vtkSMObject::GetProxyManager();
+  return
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Session);
 }

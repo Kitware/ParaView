@@ -18,6 +18,8 @@
 
 #include "vtkObject.h"
 
+class vtkSMSession;
+
 class VTK_EXPORT vtkTestingProcessModuleGUIHelper : public vtkObject
 {
 public:
@@ -27,7 +29,7 @@ public:
 
   // Description:
   // run main gui loop from process module
-  int Run();
+  int Run(vtkSMSession* session);
 
 protected:
   vtkTestingProcessModuleGUIHelper();

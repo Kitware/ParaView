@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server manager includes
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMCameraLink.h"
 #include "vtkSMPropertyLink.h"
@@ -147,14 +148,14 @@ pqLinksModel::~pqLinksModel()
 void pqLinksModel::onSessionCreated(pqServer* server)
 {
   this->Internal->Server = server;
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   pxm->AddObserver(vtkCommand::RegisterEvent, this->Internal);
   pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Internal);
 }
 
 void pqLinksModel::onSessionRemoved(pqServer* server)
 {
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   pxm->RemoveObserver(this->Internal);
 }
 
@@ -369,7 +370,7 @@ QString pqLinksModel::getLinkName(const QModelIndex& idx) const
 {
   if (this->Internal->Server)
     {
-    vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     QString linkName = pxm->GetLinkName(idx.row());
     return linkName;
     }
@@ -394,7 +395,7 @@ vtkSMLink* pqLinksModel::getLink(const QString& name) const
 {
   if (this->Internal->Server)
     {
-    vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     vtkSMLink* link = pxm->GetRegisteredLink(name.toAscii().data());
     return link;
     }
@@ -434,7 +435,7 @@ void pqLinksModel::addProxyLink(const QString& name,
                                    vtkSMProxy* inputProxy,
                                    vtkSMProxy* outputProxy)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMProxyLink* link = vtkSMProxyLink::New();
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
@@ -463,7 +464,7 @@ void pqLinksModel::addCameraLink(const QString& name,
                                  vtkSMProxy* inputProxy,
                                  vtkSMProxy* outputProxy)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
   // bi-directional link
   link->AddLinkedProxy(inputProxy, vtkSMLink::INPUT);
@@ -480,7 +481,7 @@ void pqLinksModel::addPropertyLink(const QString& name,
                                       vtkSMProxy* outputProxy,
                                       const QString& outputProp)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   vtkSMPropertyLink* link = vtkSMPropertyLink::New();
   
   // bi-directional link
@@ -520,7 +521,7 @@ void pqLinksModel::removeLink(const QString& name)
 {
   if(name != QString::null)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
     pxm->UnRegisterLink(name.toAscii().data());
     }
 }
@@ -597,7 +598,7 @@ pqLinksModelObject::pqLinksModelObject(QString linkName, pqLinksModel* p,
   this->Internal->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Internal->Server = server;
   this->Internal->Name = linkName;
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   this->Internal->Link = pxm->GetRegisteredLink(linkName.toAscii().data());
   this->Internal->Setting = false;
   this->Internal->Connection->Connect(this->Internal->Link, 
@@ -659,7 +660,7 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
 
 void pqLinksModelObject::remove()
 {
-  vtkSMProxyManager* pxm = this->Internal->Server->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->Internal->Server->proxyManager();
   pxm->UnRegisterLink(this->name().toAscii().data());
 }
 

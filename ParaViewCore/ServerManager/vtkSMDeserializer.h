@@ -21,24 +21,19 @@
 #ifndef __vtkSMDeserializer_h
 #define __vtkSMDeserializer_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMDeserializer : public vtkSMObject
+class VTK_EXPORT vtkSMDeserializer : public vtkSMSessionObject
 {
 public:
   static vtkSMDeserializer* New();
-  vtkTypeMacro(vtkSMDeserializer, vtkSMObject);
+  vtkTypeMacro(vtkSMDeserializer, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the session.
-  vtkGetObjectMacro(Session, vtkSMSession);
-  virtual void SetSession(vtkSMSession*);
 
 //BTX
 protected:
@@ -74,7 +69,6 @@ protected:
   // Default implementation is empty.
   virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
 
-  vtkSMSession* Session;
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented
   void operator=(const vtkSMDeserializer&); // Not implemented

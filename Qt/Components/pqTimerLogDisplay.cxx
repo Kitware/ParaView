@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 #include "QFile"
@@ -201,7 +202,7 @@ void pqTimerLogDisplay::clear()
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
   proxy->UpdateVTKObjects();
   proxy->InvokeCommand("ResetLog");
@@ -265,7 +266,7 @@ void pqTimerLogDisplay::setBufferLengthById(int id)
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
   vtkSMPropertyHelper(proxy, "MaxEntries").Set(
     2*LengthChoices[id].value);
@@ -289,7 +290,7 @@ void pqTimerLogDisplay::setEnable(bool state)
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "TimerLog");
   vtkSMPropertyHelper(proxy, "Enable").Set(state? 1:0);
   proxy->UpdateVTKObjects();

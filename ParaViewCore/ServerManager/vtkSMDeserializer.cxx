@@ -21,19 +21,19 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMDeserializer);
-vtkCxxSetObjectMacro(vtkSMDeserializer, Session, vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {
-  this->Session = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMDeserializer::~vtkSMDeserializer()
 {
-  this->SetSession(0);
 }
 
 //----------------------------------------------------------------------------
@@ -78,7 +78,9 @@ vtkSMProxy* vtkSMDeserializer::NewProxy(int id, vtkSMProxyLocator* locator)
 vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
                                            const char* xmlname)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("Expect a valid session" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert("Expect a valid SessionProxyManager" && pxm);
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname);
   return proxy;
 }

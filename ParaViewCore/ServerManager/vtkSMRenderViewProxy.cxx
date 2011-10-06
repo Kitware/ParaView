@@ -46,7 +46,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
@@ -334,7 +334,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = source->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = source->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
@@ -755,7 +755,7 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(&frustum[index*4]);
 
-  vtkSMProxy* selectionSource = this->GetProxyManager()->NewProxy("sources",
+  vtkSMProxy* selectionSource = this->GetSessionProxyManager()->NewProxy("sources",
     "FrustumSelectionSource");
   vtkSMPropertyHelper(selectionSource, "FieldType").Set(fieldAssociation);
   vtkSMPropertyHelper(selectionSource, "Frustum").Set(frustum, 32);

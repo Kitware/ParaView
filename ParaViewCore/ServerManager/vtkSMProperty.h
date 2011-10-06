@@ -248,7 +248,7 @@ protected:
   vtkSMProperty();
   ~vtkSMProperty();
 
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
   friend class vtkSMProxy;
   friend class vtkSMSubPropertyIterator;
   friend class vtkSMDomainIterator;
