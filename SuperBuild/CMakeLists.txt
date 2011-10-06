@@ -23,12 +23,16 @@ if(APPLE)
       message(FATAL_ERROR "error: CMAKE_OSX_SYSROOT='${CMAKE_OSX_SYSROOT}' does not exist")
     endif()
   endif()
+
+  if(APPLE)
+    set(paraview_osx_flags "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  endif()
 endif()
 
 project(ParaViewSuperBuild)
 
 set(ParaViewSuperBuild_CMAKE_SOURCE_DIR ${ParaViewSuperBuild_SOURCE_DIR})
-set(ParaViewSuperBuild_CMAKE_BINARY_DIR ${ParaViewSuperBuild_BINARY_DIR})
+set(ParaViewSuperBuild_CMAKE_BINARY_DIR ${ParaViewSuperBuild_BINARY_DIR}/CMake)
 
 #------------------------------------------------------------------------------
 # Update CMake module path
@@ -39,6 +43,13 @@ set(CMAKE_MODULE_PATH
   ${ParaViewSuperBuild_CMAKE_BINARY_DIR}
   ${CMAKE_MODULE_PATH}
   )
+
+#------------------------------------------------------------------------------
+# Configure Common environment file
+#------------------------------------------------------------------------------
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_common_environment.cmake @ONLY)
 
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
@@ -124,8 +135,8 @@ endif()
 include(CheckFortran)
 
 #------------------------------------------------------------------------------
-CONFIGURE_FILE(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CTestCustom.ctest.in
-  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/CTestCustom.ctest @ONLY)
+configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
+  ${ParaViewSuperBuild_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
@@ -159,7 +170,7 @@ list(APPEND python_dependencies zlib)
 
 # Build a common szip used by several dependencies
 include(External_szip)
-#set(ZLIB_ARGS
+#set(SZIP_ARGS
 #   -DVTK_USE_SYSTEM_ZLIB:BOOL=ON
 #   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
 #   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
@@ -184,7 +195,7 @@ endif()
 if(NOT APPLE)
 
   if(WIN32)
-    include(External_OpenMPI)
+    include(External_Opengit MPI)
     list(APPEND ParaView_dependencies OpenMPI)
   else()
     include(External_MPICH2)
@@ -303,10 +314,19 @@ set(HDF5_ARGS
   -DHDF5_hdf5_LIBRARY:FILEPATH=${HDF5_LIBRARY}
   -DHDF5_hdf5_LIBRARY_RELEASE:FILEPATH=${HDF5_LIBRARY})
 
-set(freetype_dependencies zlib)
-list(APPEND ParaView_dependencies freetype)
-include(External_freetype)
-set(freetype_ARGS)
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_install}/bin)
+else()
+  get_filename_component(HDF5_DIR "${HDF5_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
+endif()
+
+if(NOT APPLE)
+  set(freetype_dependencies zlib)
+  list(APPEND ParaView_dependencies freetype)
+  include(External_freetype)
+  set(freetype_ARGS)
+endif()
 
 if(ENABLE_YT)
   set(MPL_dependencies freetype NUMPY zlib png)
@@ -317,13 +337,12 @@ if(ENABLE_YT)
 
   set(h5py_dependencies NUMPY HDF5 Cython)
   include(External_h5py)
-endif()
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_install}/bin)
-else()
-  get_filename_component(HDF5_DIR "${HDF5_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
+  set(distribute_dependencies PYTHON)
+  include(External_distribute)
+  set(yt_dependencies NUMPY HDF5 MPL distribute)
+  include(External_yt)
+  list(APPEND ParaView_dependencie yt)
 endif()
 
 # Build Silo
@@ -476,9 +495,3 @@ ExternalProject_Add(${proj}
     ${DOC_ARGS}
   INSTALL_COMMAND ""
   )
-
-if(ENABLE_YT)
-  set(distribute_dependencies PYTHON)
-  set(yt_dependencies NUMPY HDF5 MPL ParaView)
-  include(External_yt)
-endif()
