@@ -340,7 +340,7 @@ if(ENABLE_YT)
 
   set(distribute_dependencies PYTHON)
   include(External_distribute)
-  set(yt_dependencies NUMPY HDF5 MPL distribute)
+  set(yt_dependencies NUMPY HDF5 MPL distribute h5py)
   include(External_yt)
   list(APPEND ParaView_dependencie yt)
 endif()
