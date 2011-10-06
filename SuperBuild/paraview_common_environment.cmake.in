@@ -1,0 +1,8 @@
+
+if(UNIX)
+  set(ENV{LDFLAGS} "-L@ParaViewSuperBuild_BINARY_DIR@/lib")
+  set(ENV{CFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include @paraview_osx_flags@ ${ADDITIONAL_CFLAGS}")
+  set(ENV{CPPFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include @paraview_osx_flags@ ${ADDITIONAL_CPPFLAGS}")
+  set(ENV{CXXFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include @paraview_osx_flags@ ${ADDITIONAL_CXXFLAGS}")
+  set(ENV{PKG_CONFIG_PATH} "@ParaViewSuperBuild_BINARY_DIR@/lib/pkgconfig")
+endif()
