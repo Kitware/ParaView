@@ -1,0 +1,18 @@
+message("Building yt:\n@yt_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py build
+  WORKING_DIRECTORY "@yt_binary@"
+  RESULT_VARIABLE res
+  OUTPUT_VARIABLE yt_OUT
+  OUTPUT_VARIABLE yt_ERR)
+
+if(NOT ${res} EQUAL 0)
+  message("yt Errors detected: \n${yt_OUT}\n${yt_ERR}")
+  message(FATAL_ERROR "Error in config of yt")
+endif()
+message("yt build worked.")
