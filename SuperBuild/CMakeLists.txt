@@ -175,21 +175,19 @@ include(External_szip)
 #   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
 #   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
 
-if(NOT APPLE)
-  # Build a common png used by several dependencies
-  include(External_png)
-  set(PNG_ARGS
-    -DVTK_USE_SYSTEM_PNG:BOOL=OFF
-    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-  list(APPEND ParaView_dependencies png)
+# Build a common png used by several dependencies
+include(External_png)
+set(PNG_ARGS
+  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+list(APPEND ParaView_dependencies png)
 
-  if(WIN32)
-    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
-  else()
-    get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
-    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
-  endif()
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
+else()
+  get_filename_component(PNG_DIR "${PNG_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${PNG_DIR})
 endif()
 
 if(NOT APPLE)
@@ -321,15 +319,14 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
 endif()
 
-if(NOT APPLE)
-  set(freetype_dependencies zlib)
-  list(APPEND ParaView_dependencies freetype)
-  include(External_freetype)
-  set(freetype_ARGS)
-endif()
+set(freetype_dependencies zlib)
+list(APPEND ParaView_dependencies freetype)
+include(External_freetype)
+set(freetype_ARGS)
 
 if(ENABLE_YT)
-  set(MPL_dependencies freetype NUMPY zlib png)
+  set(MPL_dependencies NUMPY zlib)
+  list(APPEND MPL_dependencies freetype png)
   include(External_MPL)
 
   set(Cython_dependencies NUMPY)
@@ -338,11 +335,15 @@ if(ENABLE_YT)
   set(h5py_dependencies NUMPY HDF5 Cython)
   include(External_h5py)
 
-  set(distribute_dependencies PYTHON)
-  include(External_distribute)
-  set(yt_dependencies NUMPY HDF5 MPL distribute h5py)
+  set(yt_dependencies NUMPY HDF5 MPL h5py)
+  if(NOT APPLE)
+    set(distribute_dependencies PYTHON)
+    include(External_distribute)
+    list(APPEND yt_dependencies distribute)
+  endif()
+
   include(External_yt)
-  list(APPEND ParaView_dependencie yt)
+  list(APPEND ParaView_dependencies yt)
 endif()
 
 # Build Silo
