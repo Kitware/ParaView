@@ -139,8 +139,8 @@ namespace pqComparativeVisPanelNS
 
   vtkSMProxy* newCue(vtkSMProxy* proxy, const char* pname, int index)
     {
-    vtkSMSessionProxyManager *pxm = proxy->GetSessionProxyManager();
     pqServer* activeServer = pqActiveObjects::instance().activeServer();
+    vtkSMSessionProxyManager *pxm = activeServer->proxyManager();
 
     // Create a new cueProxy.
     vtkSMProxy* cueProxy = pxm->NewProxy("animation", "ComparativeAnimationCue");
