@@ -356,7 +356,8 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteAMRBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
-  int updatePiece, int updateNumPieces, int updateGhosts, bool extractface[6] )
+  int updatePiece, int vtkNotUsed(updateNumPieces),
+  int vtkNotUsed(updateGhosts), bool extractface[6] )
 {
 
   if (this->UseOutline && this->MakeOutlineOfInput)

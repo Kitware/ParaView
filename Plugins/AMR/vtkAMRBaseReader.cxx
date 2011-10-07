@@ -374,9 +374,9 @@ vtkUniformGrid* vtkAMRBaseReader::GetAMRBlock( const int blockIdx )
 
 //------------------------------------------------------------------------------
 void vtkAMRBaseReader::LoadPointData(
-    const int blockIdx, vtkUniformGrid *block )
+    const int vtkNotUsed(blockIdx), vtkUniformGrid* vtkNotUsed(block) )
 {
-  // TODO: implement this
+  // TODO: implement support for node-based AMR data
 //  for( int i=0; i < this->GetNumberOfPointArrays(); ++i )
 //    {
 //      if( this->GetPointArrayStatus( this->GetPointArrayName(i) ) )

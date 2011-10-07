@@ -15,6 +15,7 @@
 
 #include "vtkAMRDataSetCache.h"
 #include "vtkObjectFactory.h"
+#include "vtkDataArray.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkUniformGrid.h"
