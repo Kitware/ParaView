@@ -88,10 +88,10 @@ def LoadServerManagerState(filename):
   if not parser.Parse(data):
     return Error("Failed to parse")
   loader = servermanager.vtkSMStateLoader()
-  loader.SetSession(servermanager.vtkSMObject.GetProxyManager().GetSession())
+  loader.SetSession(servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession())
   root = parser.GetRootElement()
   if loader.LoadState(root):
-    pxm = servermanager.vtkSMObject.GetProxyManager()
+    pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
     pxm.UpdateRegisteredProxiesInOrder(0);
     pxm.UpdateRegisteredProxies(0)
     return True
@@ -111,7 +111,7 @@ def DoRegressionTesting(rmProxy=None):
   testing.AddArgument(BaselineImage)
 
   if not rmProxy:
-    pxm = servermanager.vtkSMObject.GetProxyManager()
+    pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
     rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
   if not rmProxy:
     raise "Failed to locate view to perform regression testing."
@@ -135,7 +135,7 @@ if __name__ == "__main__":
   ret = 1
   if StateXMLFileName:
     if LoadServerManagerState(StateXMLFileName):
-      pxm = servermanager.vtkSMObject.GetProxyManager()
+      pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
       if UseSavedStateForRegressionTests:
         saved_state = os.path.join(TempDir, "temp.pvsm")
         pxm.SaveState(saved_state)

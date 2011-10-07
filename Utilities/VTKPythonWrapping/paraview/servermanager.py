@@ -1451,8 +1451,8 @@ class ProxyManager(object):
 
     def __init__(self):
         """Constructor. Assigned self.SMProxyManager to
-        vtkSMObject.GetProxyManager()."""
-        self.SMProxyManager = vtkSMObject.GetProxyManager()
+        vtkSMProxyManager.GetProxyManager()."""
+        self.SMProxyManager = vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
 
     def RegisterProxy(self, group, name, aProxy):
         """Registers a proxy (either SMProxy or proxy) with the
@@ -1636,7 +1636,7 @@ class PropertyIterator(object):
         return self.Proxy.GetProperty(self.Key)
 
     def __getattr__(self, name):
-        """returns attributes from the vtkSMProxyIterator."""
+        """returns attributes from the vtkSMPropertyIterator."""
         return getattr(self.SMIterator, name)
 
 class ProxyDefinitionIterator(object):
@@ -1688,6 +1688,7 @@ class ProxyIterator(object):
      """
     def __init__(self):
         self.SMIterator = vtkSMProxyIterator()
+        self.SMIterator.SetSession(ActiveConnection.Session)
         self.SMIterator.Begin()
         self.AProxy = None
         self.Group = None
@@ -2832,7 +2833,7 @@ def _proxyDefinitionsUpdated(caller, event):
        added or proxys are registered. We need to ensure that we update the
        modules only when definitions have changed."""
     # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #if vtkSMObject.GetProxyManager().GetProxyDefinitionsUpdated():
+    #if vtkSMProxyManager.GetProxyManager().GetProxyDefinitionsUpdated():
     #    updateModules()
     # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2844,13 +2845,13 @@ class __DefinitionUpdater(object):
         # added. Unfortunately, we don't have a specific even when a definition
         # is added. So this callback will get called even when proxy is
         # registered :(
-        self.Tag = vtkSMObject.GetProxyManager().AddObserver("RegisterEvent",
+        self.Tag = vtkSMProxyManager.GetProxyManager().AddObserver("RegisterEvent",
           _proxyDefinitionsUpdated)
         pass
 
     def __del__(self):
-        if vtkSMObject.GetProxyManager():
-            vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
+        if vtkSMProxyManager.GetProxyManager():
+            vtkSMProxyManager.GetProxyManager().RemoveObserver(self.Tag)
 
 def __InitAfterConnect__(connection):
     """
