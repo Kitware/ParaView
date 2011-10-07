@@ -22,6 +22,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkEventForwarderCommand.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtkstd/map>
@@ -40,6 +41,7 @@ public:
 
   vtkWeakPointer<vtkSMSession> ActiveSession;
   vtkSmartPointer<vtkSMUndoStackBuilder> UndoStackBuilder;
+  vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkEventForwarderCommand> > EventForwarderMap;
   vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkSMSessionProxyManager> > SessionProxyManagerMap;
 };
 //***************************************************************************
@@ -158,9 +160,15 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession
     if(!pxm)
       {
       this->PXMStorage->SessionProxyManagerMap[session].TakeReference(vtkSMSessionProxyManager::New());
+      this->PXMStorage->EventForwarderMap[session].TakeReference(vtkEventForwarderCommand::New());
       pxm = this->PXMStorage->SessionProxyManagerMap[session];
       pxm->SetSession(session);
       session->SetUndoStackBuilder(this->PXMStorage->UndoStackBuilder);
+
+      // Init event forwarder
+      vtkEventForwarderCommand* forwarder = this->PXMStorage->EventForwarderMap[session];
+      forwarder->SetTarget(this);
+      pxm->AddObserver(vtkCommand::AnyEvent, forwarder);
       }
     }
   return pxm;
@@ -168,6 +176,7 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterSession(vtkSMSession* sessionToRemove)
 {
+  this->PXMStorage->EventForwarderMap.erase(sessionToRemove);
   this->PXMStorage->SessionProxyManagerMap.erase(sessionToRemove);
 }
 
