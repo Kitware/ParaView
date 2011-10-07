@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMInputArrayDomain.h"
@@ -142,6 +143,13 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 //-----------------------------------------------------------------------------
 void pqFiltersMenuReaction::updateEnableState()
 {
+  // Impossible to validate anything without any SessionProxyManager
+  if(!vtkSMProxyManager::GetProxyManager()->HasSessionProxyManager())
+    {
+    this->Timer.start(100); // Try later
+    return;
+    }
+
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   bool enabled = activeObjects->activeServer() != NULL;
 

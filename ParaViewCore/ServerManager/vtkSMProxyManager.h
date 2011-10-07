@@ -122,6 +122,10 @@ public:
   // or any session to come.
   void AttachUndoStackBuilder(vtkSMUndoStackBuilder* undoBuilder);
 
+  // Description:
+  // Test if any SessionProxyManager is available. If any return true.
+  bool HasSessionProxyManager();
+
 //BTX
   struct RegisteredProxyInformation
   {

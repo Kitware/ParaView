@@ -41,6 +41,7 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
@@ -1643,4 +1644,21 @@ bool vtkSMSessionProxyManager::HasDefinition( const char* groupName,
 {
   return this->ProxyDefinitionManager &&
       this->ProxyDefinitionManager->HasDefinition(groupName, proxyName);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModel(const char* name)
+{
+  return vtkSMProxyManager::GetProxyManager()->GetSelectionModel(name);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSessionProxyManager::RegisterSelectionModel(const char* name, vtkSMProxySelectionModel* sm)
+{
+  vtkSMProxyManager::GetProxyManager()->RegisterSelectionModel(name, sm);
+}
+//---------------------------------------------------------------------------
+void vtkSMSessionProxyManager::UnRegisterSelectionModel(const char* name)
+{
+  vtkSMProxyManager::GetProxyManager()->UnRegisterSelectionModel(name);
 }

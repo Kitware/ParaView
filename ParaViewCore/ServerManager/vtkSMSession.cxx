@@ -65,10 +65,6 @@ vtkSMSession::~vtkSMSession()
 {
   if (vtkSMProxyManager::IsInitialized())
     {
-    // The Weak pointer may already point to NULL
-    vtkSMProxyManager::GetProxyManager()->UnRegisterSession(NULL);
-
-    // Just in case a reference to that pointer was still around
     vtkSMProxyManager::GetProxyManager()->UnRegisterSession(this);
     }
   this->PluginManager->Delete();

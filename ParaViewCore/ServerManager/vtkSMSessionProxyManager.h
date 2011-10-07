@@ -114,6 +114,7 @@ class vtkSMWriterFactory;
 class vtkStringList;
 class vtkSMPipelineState;
 class vtkSMStateLocator;
+class vtkSMProxySelectionModel;
 
 //BTX
 struct vtkSMSessionProxyManagerInternals;
@@ -413,6 +414,19 @@ public:
   // Proxy definition manager maintains all the information about proxy
   // definitions.
   vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
+
+  // Description:
+  // Get a registered selection model. Will return null if no such model is
+  // registered.
+  // This will forward the call to the ProxyManager singleton
+  vtkSMProxySelectionModel* GetSelectionModel(const char* name);
+
+  // Description:
+  // Register/UnRegister a selection model. A selection model can be typically
+  // used by applications to keep track of active sources, filters, views etc.
+  // This will forward the call to the ProxyManager singleton
+  void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
+  void UnRegisterSelectionModel(const char* name);
 
 //BTX
 

@@ -168,7 +168,6 @@ vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterSession(vtkSMSession* sessionToRemove)
 {
-  // FIXME maybe need to call aboutToDelete...
   this->PXMStorage->SessionProxyManagerMap.erase(sessionToRemove);
 }
 
@@ -272,4 +271,10 @@ void vtkSMProxyManager::AttachUndoStackBuilder(vtkSMUndoStackBuilder* undoBuilde
     // Go to the next one
     iter++;
     }
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyManager::HasSessionProxyManager()
+{
+  return (this->PXMStorage->SessionProxyManagerMap.size() > 0);
 }
