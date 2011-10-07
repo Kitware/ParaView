@@ -1,6 +1,6 @@
 # The yt external project
 
-set(distribute_binary "${CMAKE_CURRENT_BINARY_DIR}/yt/")
+set(distribute_binary "${CMAKE_CURRENT_BINARY_DIR}/distribute/")
 
 if(APPLE)
   set(distribute_PERFIX
