@@ -13,11 +13,11 @@ if(WIN32)
   set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
   set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
 elseif(APPLE)
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  #set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
 endif()
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py config
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py config --library-dirs=@freetype_install@/lib --include-dirs=@freetype_install@/include
   WORKING_DIRECTORY "@MPL_binary@"
   RESULT_VARIABLE res
   )
