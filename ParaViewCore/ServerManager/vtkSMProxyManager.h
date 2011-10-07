@@ -34,6 +34,7 @@ class vtkSMSessionProxyManager;
 class vtkSMProxyLocator;
 class vtkSMProxySelectionModel;
 class vtkSMUndoStackBuilder;
+class vtkSMGlobalPropertiesManager;
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
@@ -118,6 +119,22 @@ public:
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
   // Description:
+  // ParaView has notion of "global properties". These are application wide
+  // properties such as foreground color, text color etc. Changing values of
+  // these properties affects all objects that are linked to these properties.
+  // This class provides convenient API to setup/remove such links.
+  void SetGlobalPropertiesManager(const char* name, vtkSMGlobalPropertiesManager*);
+  void RemoveGlobalPropertiesManager(const char* name);
+
+  // Description:
+  // Accessors for global properties managers.
+  unsigned int GetNumberOfGlobalPropertiesManagers();
+  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(unsigned int index);
+  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
+  const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
+
+
+  // Description:
   // Attach an undo stack builder which will be attached to any existing session
   // or any session to come.
   void AttachUndoStackBuilder(vtkSMUndoStackBuilder* undoBuilder);
@@ -167,6 +184,12 @@ public:
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
+
+  friend class vtkSMSessionProxyManager;
+
+  // Description:
+  // Save global property managers.
+  void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
 
 private:
   class vtkPXMInternal;

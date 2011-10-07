@@ -953,8 +953,6 @@ void vtkSMSessionProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
 {
   // Check source object
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-      vtkSMGlobalPropertiesManager::SafeDownCast(obj);
 
   // Manage ProxyDefinitionManager Events
   if(obj == this->ProxyDefinitionManager)
@@ -985,29 +983,6 @@ void vtkSMSessionProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
       default:
          this->InvokeEvent(event, data);
          break;
-      }
-    }
-  // Manage vtkSMGlobalPropertiesManager to trigger UndoElement
-  else if(globalPropertiesManager)
-    {
-    const char* globalPropertiesManagerName =
-        this->GetGlobalPropertiesManagerName(globalPropertiesManager);
-    if( globalPropertiesManagerName               &&
-        this->GetSession()->GetUndoStackBuilder() &&
-        event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
-      {
-      vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
-      modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
-
-      vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
-      undoElem->SetSession(this->Session);
-      undoElem->SetLinkState( globalPropertiesManagerName,
-                              modifiedInfo->GlobalPropertyName,
-                              modifiedInfo->Proxy,
-                              modifiedInfo->PropertyName,
-                              modifiedInfo->AddLink);
-      this->GetSession()->GetUndoStackBuilder()->Add(undoElem);
-      undoElem->Delete();
       }
     }
   // Manage proxy modification call back to mark proxy dirty...
@@ -1397,16 +1372,7 @@ void vtkSMSessionProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
 {
-  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->Internals->GlobalPropertiesManagers.begin();
-    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
-    {
-    vtkPVXMLElement* elem = iter->second->SaveLinkState(root);
-    if (elem)
-      {
-      elem->AddAttribute("name", iter->first.c_str());
-      }
-    }
+  vtkSMProxyManager::GetProxyManager()->SaveGlobalPropertiesManagers(root);
 }
 
 //---------------------------------------------------------------------------
@@ -1447,87 +1413,40 @@ vtkPVXMLElement* vtkSMSessionProxyManager::GetPropertyHints(
 void vtkSMSessionProxyManager::SetGlobalPropertiesManager(const char* name,
     vtkSMGlobalPropertiesManager* mgr)
 {
-  vtkSMGlobalPropertiesManager* old_mgr = this->GetGlobalPropertiesManager(name);
-  if (old_mgr == mgr)
-    {
-    return;
-    }
-  this->RemoveGlobalPropertiesManager(name);
-  this->Internals->GlobalPropertiesManagers[name] = mgr;
-  this->Internals->GlobalPropertiesManagersCallBackID[name] =
-      mgr->AddObserver(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified, this->Observer);
-
-  vtkSMProxyManager::RegisteredProxyInformation info;
-  info.Proxy = mgr;
-  info.GroupName = NULL;
-  info.ProxyName = name;
-  info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+  vtkSMProxyManager::GetProxyManager()->SetGlobalPropertiesManager(name, mgr);
 }
 
 //---------------------------------------------------------------------------
 const char* vtkSMSessionProxyManager::GetGlobalPropertiesManagerName(
   vtkSMGlobalPropertiesManager* mgr)
 {
-  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->Internals->GlobalPropertiesManagers.begin();
-    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
-    {
-    if (iter->second == mgr)
-      {
-      return iter->first.c_str();
-      }
-    }
-  return 0;
+  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManagerName(mgr);
 }
 
 //---------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
   const char* name)
 {
-  return this->Internals->GlobalPropertiesManagers[name].GetPointer();
+  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManager(name);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::RemoveGlobalPropertiesManager(const char* name)
 {
-  vtkSMGlobalPropertiesManager* gm = this->GetGlobalPropertiesManager(name);
-  if (gm)
-    {
-    gm->RemoveObserver(this->Internals->GlobalPropertiesManagersCallBackID[name]);
-    vtkSMProxyManager::RegisteredProxyInformation info;
-    info.Proxy = gm;
-    info.GroupName = NULL;
-    info.ProxyName = name;
-    info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
-    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-    }
-  this->Internals->GlobalPropertiesManagers.erase(name);
+  vtkSMProxyManager::GetProxyManager()->RemoveGlobalPropertiesManager(name);
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMSessionProxyManager::GetNumberOfGlobalPropertiesManagers()
 {
-  return static_cast<unsigned int>(
-    this->Internals->GlobalPropertiesManagers.size());
+  return vtkSMProxyManager::GetProxyManager()->GetNumberOfGlobalPropertiesManagers();
 }
 
 //---------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
   unsigned int index)
 {
-  unsigned int cur =0;
-  vtkSMSessionProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->Internals->GlobalPropertiesManagers.begin();
-    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter, ++cur)
-    {
-    if (cur == index)
-      {
-      return iter->second;
-      }
-    }
-
-  return NULL;
+  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManager(index);
 }
 
 //---------------------------------------------------------------------------

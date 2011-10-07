@@ -213,16 +213,6 @@ struct vtkSMSessionProxyManagerInternals
     LinkType;
   LinkType RegisteredLinkMap;
 
-  // Data structure for storing GlobalPropertiesManagers.
-  typedef vtkstd::map<vtkstd::string,
-          vtkSmartPointer<vtkSMGlobalPropertiesManager> >
-            GlobalPropertiesManagersType;
-  typedef vtkstd::map<vtkstd::string,
-          unsigned long >
-            GlobalPropertiesManagersCallBackIDType;
-  GlobalPropertiesManagersType GlobalPropertiesManagers;
-  GlobalPropertiesManagersCallBackIDType GlobalPropertiesManagersCallBackID;
-
   // Data structure for storing the fullState
   vtkSMMessage State;
 

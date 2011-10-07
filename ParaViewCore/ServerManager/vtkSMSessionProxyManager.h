@@ -384,8 +384,7 @@ public:
   // properties such as foreground color, text color etc. Changing values of
   // these properties affects all objects that are linked to these properties.
   // This class provides convenient API to setup/remove such links.
-  void SetGlobalPropertiesManager(const char* name,
-    vtkSMGlobalPropertiesManager*);
+  void SetGlobalPropertiesManager(const char* name, vtkSMGlobalPropertiesManager*);
   void RemoveGlobalPropertiesManager(const char* name);
 
   // Description:
