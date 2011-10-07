@@ -84,9 +84,6 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
     return 0;
     }
 
-  // FIXME switch to the proxy session
-  this->SetSession(proxy->GetSession());
-
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   if (pxm)
     {
