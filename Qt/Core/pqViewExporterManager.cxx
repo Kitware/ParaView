@@ -127,6 +127,7 @@ QString pqViewExporterManager::getSupportedFileTypes() const
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   iter->SetSkipPrototypes(false);
+  iter->SetSession(proxy->GetSession());
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(

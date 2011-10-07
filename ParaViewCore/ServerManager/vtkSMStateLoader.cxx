@@ -89,6 +89,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     {
     // If an animation scene already exists, we use that.
     vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+    iter->SetSession(this->Session);
     vtkSMProxy* scene = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
@@ -345,6 +346,7 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
     if (!mgr)
       {
       mgr = vtkSMGlobalPropertiesManager::New();
+      mgr->SetSession(this->GetSession());
       mgr->InitializeProperties(group.c_str(), type.c_str());
       pxm->SetGlobalPropertiesManager(mgrname, mgr);
       mgr->Delete();
