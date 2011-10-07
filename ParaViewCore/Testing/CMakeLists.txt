@@ -38,7 +38,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMPropertyInternals.h
       vtkSMProxyConfigurationFileInfo.h
       vtkSMProxyInternals.h
-      vtkSMProxyManagerInternals.h
+      vtkSMSessionProxyManagerInternals.h
       vtkSMRepresentationStrategyVector.h
       vtkSMVectorPropertyTemplate.h
       vtkSpyPlotBlock.h
