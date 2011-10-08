@@ -28,6 +28,7 @@ class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
+class vtkUniformGrid;
 class vtkInformationIntegerVectorKey;
 class vtkInformationVector;
 class vtkMultiProcessController;
@@ -38,6 +39,7 @@ class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridGeometryFilter;
+class vtkAMRBox;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
@@ -133,6 +135,13 @@ protected:
   ~vtkPVGeometryFilter();
 
   // Description:
+  // A helper method which, given the AMR box of the data in question
+  // and the root AMR box, determines whether or not the block is visible.
+  bool IsAMRDataVisible( vtkAMRBox &amrBox,
+                         vtkAMRBox &rootBox,
+                         bool faceextract[6] );
+
+  // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
   virtual int RequestDataObject(vtkInformation*,
@@ -141,6 +150,9 @@ protected:
   virtual int RequestInformation(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
+  virtual int RequestAMRData(vtkInformation*  request,
+                             vtkInformationVector** inputVector,
+                             vtkInformationVector* outputVector );
   virtual int RequestCompositeData(vtkInformation* request,
                                    vtkInformationVector** inputVector,
                                    vtkInformationVector* outputVector);
@@ -150,6 +162,15 @@ protected:
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
+
+
+  void ExecuteAMRBlock(vtkDataObject* input,
+                      vtkPolyData* output,
+                      int doCommunicate,
+                      int updatePiece,
+                      int updateNumPieces,
+                      int updateGhosts,
+                      bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
                     vtkPolyData* output,
@@ -162,6 +183,13 @@ protected:
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
+
+  void AMRGridExecute(vtkImageData* input,
+                      vtkPolyData* output,
+                      int doCommunicate,
+                      int updatePiece,
+                      bool extractface[6] );
+
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
                         int doCommunicate,
