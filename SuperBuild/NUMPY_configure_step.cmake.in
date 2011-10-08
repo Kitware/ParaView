@@ -2,8 +2,10 @@ message("Configuring NUMPY:\n@NUMPY_binary@")
 set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
-if(APPLE)
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+if(NOT APPLE)
+  include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+else()
+  set(ENV{CFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ -arch i386 ${ADDITIONAL_CFLAGS}")
 endif()
 
 # As explained in site.cfg.example - See http://projects.scipy.org/numpy/browser/trunk/site.cfg.example

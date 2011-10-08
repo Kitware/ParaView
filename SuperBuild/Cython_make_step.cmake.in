@@ -1,0 +1,20 @@
+message("Building Cython:\n@Cython_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py build
+  WORKING_DIRECTORY "@Cython_binary@"
+  RESULT_VARIABLE res
+  OUTPUT_VARIABLE Cython_OUT
+  OUTPUT_VARIABLE Cython_ERR)
+
+if(NOT ${res} EQUAL 0)
+  message("Cython Errors detected: \n${Cython_OUT}\n${Cython_ERR}")
+  message(FATAL_ERROR "Error in config of Cython")
+endif()
+message("Cython build worked.")

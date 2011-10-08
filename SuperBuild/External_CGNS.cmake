@@ -1,7 +1,7 @@
 
 # The CGNS external project for ParaView
 set(CGNS_source "${CMAKE_CURRENT_BINARY_DIR}/CGNS")
-set(CGNS_install "${CMAKE_CURRENT_BINARY_DIR}/CGNS-install")
+set(CGNS_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
