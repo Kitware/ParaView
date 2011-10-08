@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWizardPage>
 
 #include <pqApplicationCore.h>
+#include <pqContextView.h>
 #include <pqFileDialog.h>
 #include <pqPipelineFilter.h>
 #include <pqPipelineSource.h>
@@ -44,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPythonManager.h>
 #include <pqRenderView.h>
 #include <pqServerManagerModel.h>
+#include <pqTwoDRenderView.h>
 
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
@@ -179,7 +181,11 @@ pqCPExportStateWizard::pqCPExportStateWizard(
                    this->Internals->imageWriteFrequencyLabel, SLOT(setVisible(bool)));
 
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  this->NumberOfViews = smModel->getNumberOfItems<pqRenderView*>();
+  // currently I only handle about 2D, 3D, and chart views.
+  this->NumberOfViews = smModel->getNumberOfItems<pqRenderView*>() +
+    smModel->getNumberOfItems<pqContextView*>() +
+    smModel->getNumberOfItems<pqTwoDRenderView*>();
+
   if(this->NumberOfViews > 1)
     {
     this->Internals->imageFileName->setText("image_%v_%t.png");
