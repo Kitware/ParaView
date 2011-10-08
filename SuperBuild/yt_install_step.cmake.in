@@ -7,7 +7,7 @@ if(APPLE)
 endif()
 
 execute_process(
-  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @yt_PREFIX_ARGS@ install --single-version-externally-managed --record "${CMAKE_CURRENT_BINARY_DIR}/distribute.record"
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @yt_PREFIX_ARGS@ --single-version-externally-managed --record "${CMAKE_CURRENT_BINARY_DIR}/distribute.record"
   WORKING_DIRECTORY "@yt_binary@"
   RESULT_VARIABLE res
 )
