@@ -193,7 +193,7 @@ endif()
 if(NOT APPLE)
 
   if(WIN32)
-    include(External_Opengit MPI)
+    include(External_OpenMPI)
     list(APPEND ParaView_dependencies OpenMPI)
   else()
     include(External_MPICH2)
