@@ -48,13 +48,13 @@ class pqOutputWindowAdapter;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
+class pqRecentlyUsedResourcesList;
 class pqServer;
+class pqServerConfigurationCollection;
 class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
 class pqServerResource;
-class pqServerResources;
-class pqServerStartups;
 class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
@@ -193,12 +193,13 @@ public:
   /// Returns the manager for the global properties such as ForegroundColor etc.
   vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
 
-  /// Returns the set of available server resources
-  pqServerResources& serverResources();
-  /// Set server resources
-  void setServerResources(pqServerResources* serverResources);
-  /// Returns an object that can start remote servers
-  pqServerStartups& serverStartups();
+  /// Returns the set of recently-used resources i.e. data files and state
+  /// files.
+  pqRecentlyUsedResourcesList& recentlyUsedResources();
+
+  /// Returns the collection of server configurations known. Server
+  /// configurations have information about connecting to different servers.
+  pqServerConfigurationCollection& serverConfigurations();
 
   /// Get the application settings.
   pqSettings* settings();
@@ -314,8 +315,8 @@ protected:
   pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerSelectionModel* SelectionModel;
   pqUndoStack* UndoStack;
-  pqServerResources* ServerResources;
-  pqServerStartups* ServerStartups;
+  pqRecentlyUsedResourcesList *RecentlyUsedResourcesList;
+  pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
   QPointer<pqTestUtility> TestUtility;
 

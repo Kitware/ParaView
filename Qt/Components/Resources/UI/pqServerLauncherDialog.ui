@@ -1,7 +1,8 @@
-<ui version="4.0" >
- <class>pqServerStartupDialog</class>
- <widget class="QDialog" name="pqServerStartupDialog" >
-  <property name="geometry" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqServerLauncherDialog</class>
+ <widget class="QDialog" name="pqServerLauncherDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,40 +10,40 @@
     <height>126</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Starting Server</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QLabel" name="message" >
-     <property name="text" >
+    <widget class="QLabel" name="message">
+     <property name="text">
       <string>Please wait while server cs://foobar starts ...</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
+    <layout class="QHBoxLayout">
+     <property name="spacing">
       <number>6</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
      </property>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -51,8 +52,8 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel" >
-       <property name="text" >
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
         <string>Cancel</string>
        </property>
       </widget>
@@ -66,14 +67,14 @@
   <connection>
    <sender>cancel</sender>
    <signal>clicked()</signal>
-   <receiver>pqServerStartupDialog</receiver>
+   <receiver>pqServerLauncherDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>329</x>
      <y>100</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>213</x>
      <y>98</y>
     </hint>
