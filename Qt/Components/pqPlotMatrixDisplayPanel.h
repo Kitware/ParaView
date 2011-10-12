@@ -46,6 +46,7 @@ public:
 
 private slots:
   void headerCheckStateChanged();
+  void dataChanged(QModelIndex topLeft, QModelIndex bottomRight);
 
 private:
   pqPlotSettingsModel* SettingsModel;

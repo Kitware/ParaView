@@ -45,6 +45,11 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
   this->SettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(representation));
   ui.Series->setModel(this->SettingsModel);
 
+  QObject::connect(this->SettingsModel,
+                   SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                   this,
+                   SLOT(dataChanged(QModelIndex, QModelIndex)));
+
   QObject::connect(ui.Series->header(),
                    SIGNAL(checkStateChanged()),
                    this,
@@ -57,4 +62,9 @@ pqPlotMatrixDisplayPanel::~pqPlotMatrixDisplayPanel()
 
 void pqPlotMatrixDisplayPanel::headerCheckStateChanged()
 {
+}
+
+void pqPlotMatrixDisplayPanel::dataChanged(QModelIndex topLeft, QModelIndex bottomRight)
+{
+  this->Representation->renderViewEventually();
 }
