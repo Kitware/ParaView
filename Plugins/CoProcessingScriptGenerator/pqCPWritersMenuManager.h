@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCPWritersMenuManager_h
 
 #include <QObject>
+#include <QTimer>
 
 class QMenu;
 class QAction;
@@ -48,6 +49,7 @@ public:
   pqCPWritersMenuManager(QObject* parent=0);
   ~pqCPWritersMenuManager();
 
+public slots:
   /// Creates a new "Writers" menu and adds the co-processing writers to it.
   /// If a "Writers" menu already exists, it typically symbolizes something
   /// fishy and hence, it simply spits an error and gives up.
@@ -68,6 +70,8 @@ private:
 private:
   pqCPWritersMenuManager(const pqCPWritersMenuManager&); // Not implemented.
   void operator=(const pqCPWritersMenuManager&); // Not implemented.
+
+  QTimer Timer;
 };
 
 #endif

@@ -32,11 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCPWritersMenuManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
+#include "pqPluginManager.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkProcessModule.h"
@@ -81,11 +84,35 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
   Superclass(parentObject)
 {
   this->Menu = 0;
+
+  // this updates the available writers whenever the active
+  // source changes
   QObject::connect(
     pqApplicationCore::instance()->getSelectionModel(),
     SIGNAL(selectionChanged(const pqServerManagerSelection&,
     const pqServerManagerSelection&)),
     this, SLOT(updateEnableState()));
+
+  // this updates the available writers whenever a filter
+  // is updated (i.e. the user hits the Apply button)
+  QObject::connect(&this->Timer, SIGNAL(timeout()),
+                   this, SLOT(updateEnableState()));
+  this->Timer.setInterval(11);
+  this->Timer.setSingleShot(true);
+  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+                   SIGNAL(dataUpdated(pqPipelineSource*)),
+                   &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(forceFilterMenuRefresh()),
+                   &this->Timer, SLOT(start()));
+
+  // this updates the available writers whenever a plugin is
+  // loaded.  if the 
+  QObject::connect(
+    pqApplicationCore::instance()->getPluginManager(),
+    SIGNAL(pluginsUpdated()),
+    this, SLOT(createMenu()));
 }
 
 //-----------------------------------------------------------------------------
@@ -117,13 +144,17 @@ void pqCPWritersMenuManager::createMenu()
   QMainWindow *mainWindow = qobject_cast<QMainWindow*>(
     pqCoreUtilities::mainWidget());
 
-  this->Menu = new QMenu("&Writers", mainWindow);
-  this->Menu->setObjectName("CoProcessingWritersMenu");
-  mainWindow->menuBar()->insertMenu(
-    ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
+  if(this->Menu == NULL)
+    {
+    this->Menu = new QMenu("&Writers", mainWindow);
+    this->Menu->setObjectName("CoProcessingWritersMenu");
+    mainWindow->menuBar()->insertMenu(
+      ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
 
-  QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
-    this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+    QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
+                     this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+    }
+  this->Menu->clear();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxyDefinitionManager* proxyDefinitions =
