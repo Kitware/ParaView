@@ -228,7 +228,7 @@ int vtkAMRBaseParticlesReader::RequestData(
 
   // STEP 2: Read blocks
   mbds->SetNumberOfBlocks( this->NumberOfBlocks );
-  for( int blkidx=0; blkidx < this->NumberOfBlocks; ++blkidx )
+  for( unsigned int blkidx=0; blkidx < this->NumberOfBlocks; ++blkidx )
     {
 
       if( this->IsBlockMine( blkidx ) )
