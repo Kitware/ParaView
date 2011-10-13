@@ -105,23 +105,21 @@ typedef  struct tagFlashReaderSimulationInformation
   char   BuildTimeStamp[80];
 } FlashReaderSimulationInformation;
 
-vtkstd::string GetSeparatedParticleName(const vtkstd::string & variable);
+static vtkstd::string GetSeparatedParticleName( const vtkstd::string & variable )
+{
+  vtkstd::string sepaName = variable;
 
-//static vtkstd::string GetSeparatedParticleName(const vtkstd::string & variable)
-//{
-//  vtkstd::string sepaName = variable;
-//
-//  if ( sepaName.length() > 9 && sepaName.substr(0,9) == "particle_" )
-//    {
-//    sepaName = vtkstd::string( "Particles/" ) + sepaName.substr( 9 );
-//    }
-//  else
-//    {
-//    sepaName = vtkstd::string( "Particles/" ) + sepaName;
-//    }
-//
-//  return sepaName;
-//}
+  if ( sepaName.length() > 9 && sepaName.substr(0,9) == "particle_" )
+    {
+    sepaName = vtkstd::string( "Particles/" ) + sepaName.substr( 9 );
+    }
+  else
+    {
+    sepaName = vtkstd::string( "Particles/" ) + sepaName;
+    }
+
+  return sepaName;
+}
 
 
 // ----------------------------------------------------------------------------
