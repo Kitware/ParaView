@@ -4052,9 +4052,9 @@
           file_description="Phasta Files" />
      </Hints>
    </SourceProxy>
-<!-- 
+
    <SourceProxy name="EnzoReader"
-               class="vtkEnzoReader"
+                class="vtkEnzoReader"
                 label="Enzo Reader">
      <Documentation
        short_help="Read multi-block dataset from an Enzo file."
@@ -4113,9 +4113,8 @@
           file_description="Enzo Files" />
      </Hints>
    </SourceProxy>
--->
 
-   <!-- <SourceProxy name="FlashReader"
+   <SourceProxy name="FlashReader"
                 class="vtkFlashReader"
                 label="Flash Reader">
      <Documentation
@@ -4174,7 +4173,7 @@
           file_description="Flash Files" />
      </Hints>
    </SourceProxy>
--->
+
    <SourceProxy name="stlreader"
                           class="vtkFileSeriesReader"
                           label="STL Reader"

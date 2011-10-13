@@ -37,7 +37,7 @@
 #include "vtkCSVExporter.h"
 #include "vtkCSVWriter.h"
 #include "vtkDataSetToRectilinearGrid.h"
-//#include "vtkEnzoReader.h"
+#include "vtkEnzoReader.h"
 #include "vtkEquivalenceSet.h"
 #include "vtkExodusFileSeriesReader.h"
 #include "vtkExtractHistogram.h"
@@ -46,7 +46,7 @@
 #include "vtkFileSeriesReader.h"
 #include "vtkFileSeriesWriter.h"
 #include "vtkFlashContour.h"
-//#include "vtkFlashReader.h"
+#include "vtkFlashReader.h"
 #include "vtkGridConnectivity.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
@@ -243,7 +243,7 @@ int main(int , char *[])
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
   PRINT_SELF(vtkDataSetToRectilinearGrid);
-//  PRINT_SELF(vtkEnzoReader);
+  PRINT_SELF(vtkEnzoReader);
   PRINT_SELF(vtkEquivalenceSet);
   PRINT_SELF(vtkExodusFileSeriesReader);
   PRINT_SELF(vtkExtractHistogram);
@@ -252,7 +252,7 @@ int main(int , char *[])
   PRINT_SELF(vtkFileSeriesReader);
   PRINT_SELF(vtkFileSeriesWriter);
   PRINT_SELF(vtkFlashContour);
-//  PRINT_SELF(vtkFlashReader);
+  PRINT_SELF(vtkFlashReader);
   PRINT_SELF(vtkGridConnectivity);
   PRINT_SELF(vtkHierarchicalFractal);
   PRINT_SELF(vtkImageCompressor);
