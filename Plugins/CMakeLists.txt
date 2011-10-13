@@ -54,7 +54,6 @@ ENDIF(PARAVIEW_BUILD_QT_GUI)
 paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analyze and NIfTI." AnalyzeNIfTIReaderWriter ON)
 paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
 paraview_build_optional_plugin(SQToolkit "SciberQuest SciViz Toolkit" SQToolkit OFF)
-paraview_build_optional_plugin(AMR "AMR Toolkit" AMR ON)
 
 #------------------------------------------------------------------------
 # Build any plugins located outside of ParaView. This mechanism makes it
