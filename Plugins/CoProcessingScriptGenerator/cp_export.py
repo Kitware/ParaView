@@ -69,6 +69,16 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     xmlname = xmlElement.GetAttribute("name")
     pxm = smtrace.servermanager.ProxyManager()
     writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
+    # a bit of a hack but we assume the filter acting as a writer
+    # came from the filters group and is nearly identical to the
+    # filter that is a writer that comes from the writers group
+    # so that we can just use that proxy instead
+    if not writer_proxy:
+        writer_proxy = pxm.GetPrototypeProxy("filters", xmlname)
+        print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+            "XML group. This is not a problem as long as the writer is available with " \
+            "the ParaView build used by the simulation code."
+
     ctorMethod =  \
       smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
     write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
