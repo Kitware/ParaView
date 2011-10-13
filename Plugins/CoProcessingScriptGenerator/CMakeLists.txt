@@ -71,8 +71,6 @@ ADD_CUSTOM_COMMAND(
        "${CMAKE_CURRENT_SOURCE_DIR}/cp_export.py"
        cp_export_py)
 
-#LoadPlugin("/media/ssddrive/BUILDS/ParaView/debug/bin/libCoProcessingPlugin.so", True, ns=globals())
-
 ADD_PARAVIEW_PLUGIN(
   CoProcessingPlugin
   #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"

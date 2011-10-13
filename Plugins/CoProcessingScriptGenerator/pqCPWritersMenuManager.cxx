@@ -108,7 +108,7 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
                    &this->Timer, SLOT(start()));
 
   // this updates the available writers whenever a plugin is
-  // loaded.  if the 
+  // loaded.
   QObject::connect(
     pqApplicationCore::instance()->getPluginManager(),
     SIGNAL(pluginsUpdated()),
