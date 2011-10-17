@@ -41,6 +41,7 @@ SET (Kit_SRCS
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
+  vtkEnzoReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
@@ -49,6 +50,7 @@ SET (Kit_SRCS
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkFlashContour.cxx
+  vtkFlashReader.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
