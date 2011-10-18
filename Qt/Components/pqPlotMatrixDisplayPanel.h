@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqDisplayPanel.h"
 #include "pqPlotSettingsModel.h"
+#include "pqPropertyLinks.h"
+#include "pqSignalAdaptors.h"
 
 class PQCOMPONENTS_EXPORT pqPlotMatrixDisplayPanel : public pqDisplayPanel
 {
@@ -50,6 +52,12 @@ private slots:
 
 private:
   pqPlotSettingsModel* SettingsModel;
+  pqPropertyLinks Links;
+  pqSignalAdaptorColor *ActivePlotColorAdaptor;
+  pqSignalAdaptorColor *ScatterPlotsColorAdaptor;
+  pqSignalAdaptorColor *HistogramColorAdaptor;
+  pqSignalAdaptorComboBox *ActivePlotMarkerStyleAdaptor;
+  pqSignalAdaptorComboBox *ScatterPlotsMarkerStyleAdaptor;
 };
 
 #endif

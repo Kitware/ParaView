@@ -56,6 +56,34 @@ public:
   void SetSeriesLabel(const char *name, const char *label);
 
   // Description:
+  // Sets the color for the scatter plots in the plot matrix.
+  void SetColor(double r, double g, double b);
+
+  // Description:
+  // Sets the color for the active plot.
+  void SetActivePlotColor(double r, double g, double b);
+
+  // Description:
+  // Sets the color for the histograms.
+  void SetHistogramColor(double r, double g, double b);
+
+  // Description:
+  // Sets the marker style for the scatter plots.
+  void SetMarkerStyle(int style);
+
+  // Description:
+  // Sets the marker style for the active plot.
+  void SetActivePlotMarkerStyle(int style);
+
+  // Description:
+  // Sets the marker size for the scatter plots.
+  void SetMarkerSize(double size);
+
+  // Description:
+  // Sets the marker size for the active plots.
+  void SetActivePlotMarkerSize(double size);
+
+  // Description:
   // Returns the scatter plot matrix.
   vtkScatterPlotMatrix* GetPlotMatrix() const;
 

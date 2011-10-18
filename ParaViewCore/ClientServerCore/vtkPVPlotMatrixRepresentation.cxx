@@ -117,11 +117,78 @@ void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char *name, bool v
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetSeriesLabel(const char *name, const char *label)
 {
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetColor(double r, double g, double b)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetColor(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotColor(double r, double g, double b)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetActivePlotColor(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetHistogramColor(double r, double g, double b)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetHistogramColor(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetMarkerStyle(int style)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetMarkerStyle(style);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotMarkerStyle(int style)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetActivePlotMarkerStyle(style);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetMarkerSize(double size)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetMarkerSize(size);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixRepresentation::SetActivePlotMarkerSize(double size)
+{
+  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+    {
+    plotMatrix->SetActivePlotMarkerSize(size);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::PrintSelf(ostream &os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------

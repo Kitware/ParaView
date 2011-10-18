@@ -3947,26 +3947,6 @@
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="LineStyleInfo"
-        number_of_elements_per_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of line style for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="LineStyle"
-        command="SetLineStyle"
-        number_of_elements_per_command="1"
-        element_types="0"
-        repeat_command="1"
-        information_property="LineStyleInfo">
-        <Documentation>
-          Set the series line style.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="SeriesLabelInfo"
         number_of_elements_per_command="2"
         repeat_command="1"
@@ -3978,7 +3958,7 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="SeriesLabel"
-        command="SetLabel"
+        command="SetSeriesLabel"
         number_of_elements_per_command="2"
         element_types="2 2"
         repeat_command="1"
@@ -4007,6 +3987,80 @@
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="ActivePlotColorInfo"
+        number_of_elements_per_command="3"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of color for the active plot.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ActivePlotColor"
+        command="SetActivePlotColor"
+        number_of_elements_per_command="3"
+        element_types="1 1 1"
+        repeat_command="1"
+        information_property="ActivePlotColorInfo" >
+        <Documentation>
+          Sets the color for the active plot.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="HistogramColorInfo"
+        number_of_elements_per_command="3"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of color for the histograms.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="HistogramColor"
+        command="SetHistogramColor"
+        number_of_elements_per_command="3"
+        element_types="1 1 1"
+        repeat_command="1"
+        information_property="ActivePlotColorInfo" >
+        <Documentation>
+          Sets the color for the histograms.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ScatterPlotMarkerStyle"
+        command="SetMarkerStyle"
+        default_values="4"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker style for the scatter plots.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ActivePlotMarkerStyle"
+        command="SetActivePlotMarkerStyle"
+        default_values="4"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker style for the active plot.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ScatterPlotMarkerSize"
+        command="SetMarkerSize"
+        default_values="5"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker size for the scatter plots.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ActivePlotMarkerSize"
+        command="SetActivePlotMarkerSize"
+        default_values="8"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker size for the active plots.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <InputProperty name="InternalInput1"
         command="SetInputConnection"
         port_index="1"
@@ -4024,17 +4078,12 @@
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
           <Property name="Color" exposed_name="SeriesColor" />
-          <Property name="LineThickness" exposed_name="SeriesLineThickness" />
-          <Property name="LineStyle" exposed_name="SeriesLineStyle" />
           <Property name="Label" exposed_name="SeriesLabel" />
           <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
           <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
           <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
-          <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
-          <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
-          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
           <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
           <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
         </ExposedProperties>

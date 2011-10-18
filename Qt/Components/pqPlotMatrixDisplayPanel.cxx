@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPlotMatrixDisplayPanel.h"
 #include "pqDataRepresentation.h"
+#include "vtkSMProxy.h"
 
 #include "ui_pqPlotMatrixDisplayPanel.h"
 
@@ -44,6 +45,67 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
   this->SettingsModel = new pqPlotSettingsModel(this);
   this->SettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(representation));
   ui.Series->setModel(this->SettingsModel);
+
+  vtkSMProxy *proxy = representation->getProxy();
+
+  // add color buttons
+  ui.ActivePlotColor->setChosenColor(Qt::black);
+  ui.ScatterPlotsColor->setChosenColor(Qt::black);
+  ui.HistogramColor->setChosenColor(Qt::black);
+
+  this->ActivePlotColorAdaptor = new pqSignalAdaptorColor(ui.ActivePlotColor,
+                                                          "chosenColor",
+                                                          SIGNAL(chosenColorChanged(const QColor&)),
+                                                          false);
+  this->ScatterPlotsColorAdaptor = new pqSignalAdaptorColor(ui.ScatterPlotsColor,
+                                                            "chosenColor",
+                                                            SIGNAL(chosenColorChanged(const QColor&)),
+                                                            false);
+  this->HistogramColorAdaptor = new pqSignalAdaptorColor(ui.HistogramColor,
+                                                         "chosenColor",
+                                                         SIGNAL(chosenColorChanged(const QColor&)),
+                                                         false);
+
+  this->Links.addPropertyLink(this->ActivePlotColorAdaptor,
+                              "color",
+                              SIGNAL(colorChanged(QVariant)),
+                              proxy,
+                              proxy->GetProperty("ActivePlotColor"));
+  this->Links.addPropertyLink(this->ScatterPlotsColorAdaptor,
+                              "color",
+                              SIGNAL(colorChanged(QVariant)),
+                              proxy,
+                              proxy->GetProperty("Color"));
+  this->Links.addPropertyLink(this->HistogramColorAdaptor,
+                              "color",
+                              SIGNAL(colorChanged(QVariant)),
+                              proxy,
+                              proxy->GetProperty("HistogramColor"));
+
+  this->Links.addPropertyLink(ui.ActivePlotMarkerSize,
+                              "value",
+                              SIGNAL(valueChanged(double)),
+                              proxy,
+                              proxy->GetProperty("ActivePlotMarkerSize"));
+  this->Links.addPropertyLink(ui.ScatterPlotMarkerSize,
+                              "value",
+                              SIGNAL(valueChanged(double)),
+                              proxy,
+                              proxy->GetProperty("ScatterPlotMarkerSize"));
+
+  this->ActivePlotMarkerStyleAdaptor = new pqSignalAdaptorComboBox(ui.ActivePlotMarkerStyle);
+  this->ScatterPlotsMarkerStyleAdaptor = new pqSignalAdaptorComboBox(ui.ScatterPlotMarkerStyle);
+
+  this->Links.addPropertyLink(this->ActivePlotMarkerStyleAdaptor,
+                              "currentIndex",
+                              SIGNAL(currentIndexChanged(int)),
+                              proxy,
+                              proxy->GetProperty("ActivePlotMarkerStyle"));
+  this->Links.addPropertyLink(this->ScatterPlotsMarkerStyleAdaptor,
+                              "currentIndex",
+                              SIGNAL(currentIndexChanged(int)),
+                              proxy,
+                              proxy->GetProperty("ScatterPlotMarkerStyle"));
 
   QObject::connect(this->SettingsModel,
                    SIGNAL(dataChanged(QModelIndex,QModelIndex)),
