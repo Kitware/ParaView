@@ -1495,5 +1495,5 @@ double Quad::Norm_beta(){
   return sum;
 }
 
-double Element::Norm_beta(){ ERR;}
+double Element::Norm_beta(){ return ERR;}
 /* ------------------------------------------------------------------------ */
