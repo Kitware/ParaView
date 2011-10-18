@@ -5,6 +5,8 @@ IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0017 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+project(Nektar)
+
 # ParaView
 if(NOT ParaView_SOURCE_DIR)
   find_package(ParaView REQUIRED)
@@ -12,6 +14,8 @@ if(NOT ParaView_SOURCE_DIR)
 endif()
 
 find_package(MPI REQUIRED)
+find_package(BLAS REQUIRED)
+#find_PACKAGE(LAPACK REQUIRED)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Nektar-PARALLEL/include
@@ -20,6 +24,10 @@ include_directories(
   )
 
 add_subdirectory(gs)
+add_subdirectory(Veclib)
+add_subdirectory(metis)
+add_subdirectory(Hlib)
+add_subdirectory(Utilities)
 
 #FIND_LIBRARY(NEKTARMOPT_LIBRARY nektarmopt REQUIRED
 #  /home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Utilities/Linux
@@ -34,8 +42,13 @@ add_paraview_plugin(pvNektarReader "1.0"
    GUI_RESOURCE_FILES pvNektarReaderGUI.xml)
 
 target_link_libraries(pvNektarReader
-  ${NEKTARMOPT_LIBRARY}
+  hybrid
+  vec
+  metis
   gs
+  nektar
+  ${BLAS_blas_LIBRARY}
+  ${LAPACK_lapack_LIBRARY}
 #  nektarobj
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Veclib/libvec.a
