@@ -37,7 +37,17 @@ using std::fill_n;
 MPI_Comm get_MPI_COMM();
 #endif
 
+#ifdef WIN32
+#include <direct.h>
+typedef std::size_t mode_t;
+int mkdir(const char *pathname, mode_t mode)
+{
+  return _mkdir(pathname);
+}
+#else
 int mkdir(const char *pathname, mode_t mode);
+#endif
+
 int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, int Nelements, int vert_ID_array_len, int Elemnt_type, char *file_name, int FLAG_DUMP_INDEX, int FLAG_GEOM);
 void write_pvd_file(int Ndumps, double *Time_all_steps, int *fieldID, char *file_name);
 extern "C"
