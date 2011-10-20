@@ -20,6 +20,6 @@ else(WIN32)
 endif(WIN32)
 
 execute_process(
-  COMMAND "@EXECUTABLE_OUTPUT_PATH@/${OutDir}/protoc" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
+  COMMAND "@PROTOC_LOCATION@" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
   WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@"
   )

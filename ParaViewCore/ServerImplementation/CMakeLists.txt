@@ -86,7 +86,7 @@ INCLUDE_DIRECTORIES(
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
 # run it from a script so we can set necessary paths.
-
+get_target_property(PROTOC_LOCATION protoc_compiler LOCATION)
 configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
                @ONLY)
