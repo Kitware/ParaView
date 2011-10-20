@@ -8,7 +8,10 @@ include_directories(
 
 if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
+else()
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O2 --std=gnu89 -w")
 endif()
+
 
 #OBJS = coarsen.o fm.o initpart.o match.o ccgraph.o memory.o \
 #       pmetis.o pqueue.o refine.o util.o timing.o debug.o \
