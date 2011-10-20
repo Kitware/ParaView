@@ -1,21 +1,24 @@
 
 project(gs)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(
+  ${gs_SOURCE_DIR}/include
+  ${MPI_INCLUDE_PATH}
+  )
 
 
-add_definitions(-DMPISRC -DSAFE)
+add_definitions(-Dr8 -DMPISRC -DSAFE -DPARALLEL)
 
 #GS = bit_mask bss_malloc ivec error comm gs queue stack # ex
 
 set(gslib_sources
   src/bit_mask.c
   src/bss_malloc.c
-  src/comm.c
-  src/error.c
-  #src/ex.c
-  src/gs.c
   src/ivec.c
+  src/error.c
+  src/comm.c
+  src/gs.c
+  #src/ex.c
   src/queue.c
   src/stack.c
   )
