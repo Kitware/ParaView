@@ -4,9 +4,9 @@
 
 #include <time.h>
 
-#ifndef __LIBCATAMOUNT__
+#ifndef __LIBCATAMOUNT__ 
 
-#if !defined(i860) && !defined(dclock)
+#if !defined(i860) && !defined(dclock) && !defined(PARALLEL)
 
 double dclock(void)
 {
