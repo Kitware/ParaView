@@ -492,6 +492,7 @@ ExternalProject_Add(${proj}
     ${VRPN_ARGS}
     # zlib
     ${ZLIB_ARGS}
+    -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
