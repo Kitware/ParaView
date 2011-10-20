@@ -17,7 +17,7 @@ set(hybrid_sources
   src/Boundary.C
   src/Coords.C
   src/Curvi.C
-  src/DButils.C
+  src/Dbutils.C
   src/Deriv.C
   src/EigenMatrix.C
   src/Element.C
