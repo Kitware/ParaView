@@ -12,6 +12,8 @@
 
 #include <metis.h>
 
+int AreAllHVwgtsBelow(int ncon, float alpha, float *vwgt1, float beta, float *vwgt2, float *limit);
+int AreAllHVwgtsAbove(int ncon, float alpha, float *vwgt1, float beta, float *vwgt2, float *limit);
 
 
 /*************************************************************************

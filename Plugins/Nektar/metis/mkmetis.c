@@ -47,7 +47,7 @@ void METIS_mCPartGraphKway(int *nvtxs, int *ncon, idxtype *xadj, idxtype *adjncy
     ctrl.dbglvl = options[OPTION_DBGLVL];
   }
   ctrl.optype = OP_KMETIS;
-  ctrl.CoarsenTo = amax((*nvtxs)/(20*log2(*nparts)), 30*(*nparts));
+  ctrl.CoarsenTo = amax((*nvtxs)/(20*ilog2(*nparts)), 30*(*nparts));
 
   ctrl.nmaxvwgt = 1.5/(1.0*ctrl.CoarsenTo);
 
