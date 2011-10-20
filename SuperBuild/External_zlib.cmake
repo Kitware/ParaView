@@ -3,7 +3,7 @@
 # The zlib external project for ParaView
 set(zlib_source "${CMAKE_CURRENT_BINARY_DIR}/zlib")
 set(zlib_build "${CMAKE_CURRENT_BINARY_DIR}/zlib-build")
-set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}/zlib-install")
+set(zlib_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
@@ -25,11 +25,17 @@ if(WIN32)
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
-  
+
   # the zlib library should be named zlib1.lib not zlib.lib
-  ExternalProject_Add_Step(zlib RenameLib
+  ExternalProject_Add_Step(zlib RenameLib1
     COMMAND ${CMAKE_COMMAND} -E copy ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} ${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}
     DEPENDEES install
+    )
+
+  # matplot lib doesn't provide a way to tell it the library name so rename it to what it expects (z.lib)
+  ExternalProject_Add_Step(zlib RenameLib2
+    COMMAND ${CMAKE_COMMAND} -E copy ${zlib_install}/lib/zlib${_LINK_LIBRARY_SUFFIX} ${zlib_install}/lib/z${_LINK_LIBRARY_SUFFIX}
+    DEPENDEES RenameLib1
     )
 
 else()
@@ -55,6 +61,7 @@ else()
 endif()
 
 set(ZLIB_INCLUDE_DIR "${zlib_install}/include")
+set(ZLIB_LIBRARY_DIR ${zlib_install}/lib)
 
 if(WIN32)
   set(ZLIB_LIBRARY "${zlib_install}/lib/zlib1${_LINK_LIBRARY_SUFFIX}")

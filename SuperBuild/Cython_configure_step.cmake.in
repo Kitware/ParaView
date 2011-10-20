@@ -1,0 +1,26 @@
+message("Configuring Cython:\n@Cython_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk")
+endif()
+
+# As explained in site.cfg.example - See http://projects.scipy.org/numpy/browser/trunk/site.cfg.example
+# Directories listed in variable such as library_dirs or source_dirs should be separated using os.pathsep
+# On windows, the separator is ";" and ":" on unix-like platform
+set(path_sep ":")
+if(WIN32)
+  set(path_sep ";")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py config
+  WORKING_DIRECTORY "@Cython_binary@"
+  RESULT_VARIABLE res
+  )
+
+if(NOT ${res} EQUAL 0)
+  message(FATAL_ERROR "Error in config of Cython")
+endif()
+message("Cython config worked.")

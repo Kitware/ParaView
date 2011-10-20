@@ -924,7 +924,8 @@
       </Documentation>
       <StringVectorProperty name="FileName"
         command="SetFileName"
-        animateable="0" >
+        animateable="0"
+        number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the CSV (Command Separated Values) reader.
@@ -2711,7 +2712,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1">
        <FileListDomain name="files"/>
        <Documentation>
@@ -2771,7 +2772,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
@@ -2831,7 +2832,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
@@ -2893,7 +2894,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
@@ -2950,7 +2951,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
@@ -3008,7 +3009,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -3066,7 +3067,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3123,7 +3124,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3179,7 +3180,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3237,7 +3238,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3294,7 +3295,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3352,7 +3353,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3410,7 +3411,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3514,7 +3515,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -3868,7 +3869,8 @@
       </Documentation>
       <StringVectorProperty name="FileName"
         command="SetFileName"
-        animateable="0" >
+        animateable="0"
+        number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VRML reader.
@@ -4203,7 +4205,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -4715,7 +4717,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
@@ -4767,7 +4769,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
@@ -4818,7 +4820,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1">
         <FileListDomain name="files"/>
        <Documentation>
@@ -5105,7 +5107,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files" />
@@ -5297,7 +5299,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -6092,7 +6094,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
@@ -6161,7 +6163,7 @@
                             clean_command="RemoveAllModeFileNames"
                             command="AddModeFileName"
                             animateable="0"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
@@ -6272,7 +6274,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
@@ -6315,7 +6317,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             repeat_command="1"
                             information_property="FileNameInfo">
         <FileListDomain name="files"/>
@@ -6387,7 +6389,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             repeat_command="1"
                             information_property="FileNameInfo">
         <FileListDomain name="files"/>
@@ -6449,7 +6451,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0"
+        number_of_elements="1"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -6665,7 +6667,8 @@
 
       <StringVectorProperty name="Filename"
         command="SetFilename"
-        animateable="0" >
+        animateable="0"
+        number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
         ASCII .wind file describes locations of data files, grid sizes and variable deltas, time step sizes, whether topology is used, whether turbines are used, and type and order of data written to the files.
@@ -6786,7 +6789,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -6848,7 +6851,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -6908,7 +6911,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0"
+                           number_of_elements="1"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -6962,7 +6965,8 @@
 
      <StringVectorProperty name="FileName"
                            command="SetFileName"
-                           animateable="0" >
+                           animateable="0"
+                           number_of_elements="1">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the file name to read. It should be an MPAS format NetCDF file ending in .nc.
@@ -7172,7 +7176,7 @@
       clean_command="RemoveAllFileNames"
       command="AddFileName"
       animateable="0"
-      number_of_elements="0"
+      number_of_elements="1"
       repeat_command="1"
       information_property="FileNameInfo" >
       <FileListDomain name="files"/>

@@ -1,6 +1,0 @@
-<ParaViewFilters>
-<Category name="Cosmology" menu_label="Cosmology">
-    <Proxy group="filters" name="HaloFinder" />
-</Category>
-</ParaViewFilters>
-

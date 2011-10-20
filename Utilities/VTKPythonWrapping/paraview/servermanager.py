@@ -1902,6 +1902,14 @@ def GetRenderViews(connection=None):
             render_modules.append(aProxy)
     return render_modules
 
+def GetContextViews(connection=None):
+    """Returns the set of all context views."""
+    context_modules = []
+    for aProxy in ProxyManager():
+        if aProxy.IsA("vtkSMContextViewProxy"):
+            context_modules.append(aProxy)
+    return context_modules
+
 def CreateRenderView(session=None, **extraArgs):
     """Creates a render window on the particular session. If session
     is not specified, then the active session is used, if available.
@@ -1929,7 +1937,8 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     if not view_module:
         return None
     extraArgs['proxy'] = view_module
-    proxy = rendering.__dict__[view_module.GetXMLName()](**extraArgs)
+    python_proxy_name = _make_name_valid(view_module.GetXMLName())
+    proxy = rendering.__dict__[python_proxy_name](**extraArgs)
     return proxy
 
 def GetRepresentation(aProxy, view):
