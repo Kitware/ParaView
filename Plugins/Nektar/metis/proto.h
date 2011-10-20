@@ -430,7 +430,7 @@ idxtype *idxmalloc(int, char *);
 float *fmalloc(int, char *);
 int *ismalloc(int, int, char *);
 idxtype *idxsmalloc(int, idxtype, char *);
-void *GKmalloc(int, char *);
+void *GKmalloc(int nbytes, char *msg);
 #endif
 /*void GKfree(void **,...); */
 int *iset(int n, int val, int *x);
@@ -459,7 +459,7 @@ double drand48();
 void srand48(long);
 int ispow2(int);
 void InitRandom(int);
-int log2(int);
+int ilog2(int);
 
 
 
