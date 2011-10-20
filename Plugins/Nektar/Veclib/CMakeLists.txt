@@ -3,6 +3,8 @@ project(vec)
 
 include_directories(${Nektar_SOURCE_DIR}/include)
 
+add_definitions(-DPARALLEL)
+
 set(veclib_math_sources
   math/xfft.c
   math/xvrand.c
