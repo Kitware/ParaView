@@ -5,6 +5,12 @@ IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0017 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
+if(NOT WIN32)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3 -fpermissive -ffast-math -funroll-loops -fstrict-aliasing -w")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3 -fpermissive -ffast-math -funroll-loops -fstrict-aliasing -w")
+endif()
+
+
 project(Nektar)
 
 # ParaView
@@ -14,11 +20,11 @@ if(NOT ParaView_SOURCE_DIR)
 endif()
 
 find_package(MPI REQUIRED)
-find_package(BLAS REQUIRED)
+find_package(BLAS)
 #find_PACKAGE(LAPACK REQUIRED)
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/Nektar-PARALLEL/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${MPI_INCLUDE_PATH}
   )
@@ -28,12 +34,6 @@ add_subdirectory(Veclib)
 add_subdirectory(metis)
 add_subdirectory(Hlib)
 add_subdirectory(Utilities)
-
-#FIND_LIBRARY(NEKTARMOPT_LIBRARY nektarmopt REQUIRED
-#  /home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Utilities/Linux
-#)
-
-#add_library(nektarobj nektarObject.C)
 
 
 add_paraview_plugin(pvNektarReader "1.0"
