@@ -15,6 +15,7 @@
 
 #include <metis.h>
 
+int MlevelRecursiveBisection(CtrlType *ctrl, GraphType *graph, int nparts, idxtype *part, float *tpwgts, float ubfactor, int fpart);
 
 /*************************************************************************
 * This function is the entry point for PMETIS

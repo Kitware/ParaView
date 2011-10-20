@@ -15,6 +15,7 @@
 
 #include <metis.h>
 
+int MCMlevelRecursiveBisection(CtrlType *ctrl, GraphType *graph, int nparts, idxtype *part, float ubfactor, int fpart);
 
 
 /*************************************************************************

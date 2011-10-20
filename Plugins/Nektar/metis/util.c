@@ -13,6 +13,9 @@
 
 #include <metis.h>
 
+void *GKmalloc(int nbytes, char *msg);
+int *iset(int n, int val, int *x);
+idxtype *idxset(int n, idxtype val, idxtype *x);
 
 /*************************************************************************
 * This function prints an error message and exits
@@ -507,9 +510,9 @@ void InitRandom(int seed)
 }
 
 /*************************************************************************
-* This function returns the log2(x)
+* This function returns the integer log2(x)
 **************************************************************************/
-int log2(int a)
+int ilog2(int a)
 {
   int i;
 
