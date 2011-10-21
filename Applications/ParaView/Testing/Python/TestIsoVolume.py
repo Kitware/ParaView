@@ -2,6 +2,7 @@
 
 import QtTesting
 import QtTestingImage
+import time
 
 #----------------- NEXT TEST -----------
 # Test isovolume of point data for vtkImageData.
@@ -16,7 +17,9 @@ object4 = 'pqClientMainWindow/menubar/menuFilters/Alphabetical'
 QtTesting.playCommand(object4, 'activate', 'IsoVolume')
 object5 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThresholdBetween_0/LineEdit'
 object6 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThresholdBetween_1/LineEdit'
+time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Mac
 QtTesting.playCommand(object6, 'set_string', '150')
+time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Mac
 QtTesting.playCommand(object5, 'set_string', '140')
 QtTesting.playCommand(object3, 'activate', '')
 # DO_IMAGE_COMPARE
@@ -57,6 +60,7 @@ object11 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object11, 'activate', 'actionFileOpen')
 object12 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object12, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/disk_out_ref.ex2')
+time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Mac
 object13 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables'
 QtTesting.playCommand(object13, 'setCurrent', '0.0')
 object14 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0'
@@ -65,6 +69,7 @@ QtTesting.playCommand(object14, 'mouseRelease', '1,0,0,0,0,0')
 QtTesting.playCommand(object3, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'menuFilters')
 QtTesting.playCommand(object4, 'activate', 'IsoVolume')
+time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Mac
 object16 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThresholdBetween_0/Slider'
 QtTesting.playCommand(object16, 'set_int', '35')
 object17 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThresholdBetween_1/Slider'
@@ -114,6 +119,7 @@ QtTesting.playCommand(object7, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'menu_File')
 QtTesting.playCommand(object11, 'activate', 'actionFileOpen')
 QtTesting.playCommand(object12, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/amr/spcth.0')
+time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Mac
 object25 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus'
 QtTesting.playCommand(object25, 'setCurrent', '0.0')
 object26 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus/1QHeaderView0'
