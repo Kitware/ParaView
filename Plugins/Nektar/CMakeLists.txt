@@ -18,6 +18,25 @@ find_package(BLAS)
 #find_PACKAGE(LAPACK REQUIRED)
 
 find_library(F2C_LIBRARY f2c)
+find_library(SCALAPACK_LIBRARY 
+  NAMES scalapack scalapackd
+  )
+
+find_library(SCALAPACK_LIBRARY 
+  NAMES scalapack scalapackd
+  )
+
+find_library(BLACS_LIBRARY
+  NAMES blacs blacsd
+  )
+  
+find_library(BLACS_C_init_LIBRARY 
+  NAMES BLACS_Cinit BLACS_Cinitd
+  )
+
+find_library(BLACS_F_init_LIBRARY 
+  NAMES BLACS_Finit BLACS_Finitd
+  )
 
 add_subdirectory(gs)
 add_subdirectory(Veclib)
@@ -52,6 +71,9 @@ target_link_libraries(pvNektarReader
   ${BLAS_blas_LIBRARY}
   ${LAPACK_lapack_LIBRARY}
   ${F2C_LIBRARY}
+  ${BLACS_C_init_LIBRARY}
+  ${BLACS_LIBRARY}
+  ${SCALAPACK_LIBRARY}
 #  nektarobj
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Veclib/libvec.a
