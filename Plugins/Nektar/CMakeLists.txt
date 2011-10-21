@@ -13,27 +13,29 @@ endif()
 
 project(Nektar)
 
-# ParaView
-if(NOT ParaView_SOURCE_DIR)
-  find_package(ParaView REQUIRED)
-  include(${PARAVIEW_USE_FILE})
-endif()
-
 find_package(MPI REQUIRED)
 find_package(BLAS)
 #find_PACKAGE(LAPACK REQUIRED)
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${MPI_INCLUDE_PATH}
-  )
+find_library(F2C_LIBRARY f2c)
 
 add_subdirectory(gs)
 add_subdirectory(Veclib)
 add_subdirectory(metis)
 add_subdirectory(Hlib)
 add_subdirectory(Utilities)
+
+# ParaView
+if(NOT ParaView_SOURCE_DIR)
+  find_package(ParaView REQUIRED)
+  include(${PARAVIEW_USE_FILE})
+endif()
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${MPI_INCLUDE_PATH}
+  )
 
 
 add_paraview_plugin(pvNektarReader "1.0"
@@ -49,6 +51,7 @@ target_link_libraries(pvNektarReader
   nektar
   ${BLAS_blas_LIBRARY}
   ${LAPACK_lapack_LIBRARY}
+  ${F2C_LIBRARY}
 #  nektarobj
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Veclib/libvec.a
