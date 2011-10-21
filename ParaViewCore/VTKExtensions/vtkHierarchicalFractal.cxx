@@ -15,6 +15,7 @@
 #include "vtkHierarchicalFractal.h"
 
 #include "vtkAMRBox.h"
+#include "vtkAMRUtilities.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
@@ -522,8 +523,11 @@ int vtkHierarchicalFractal::RequestData(
     this->AddVectorArray(output);
     this->AddTestArray(output);
     this->AddBlockIdArray(output);
-    this->AddDepthArray(
-      vtkHierarchicalBoxDataSet::SafeDownCast(output));
+    vtkHierarchicalBoxDataSet *hset = vtkHierarchicalBoxDataSet::SafeDownCast(output);
+    vtkAMRUtilities::GenerateMetaData(hset ,NULL);
+    this->AddDepthArray(hset);
+    hset->GenerateVisibilityArrays();
+    info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),hset);
     }
   this->AddFractalArray(output);
   
@@ -685,7 +689,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 {
   double bds[6];
   int x1, x2, y1, y2, z1, z2;
-  
+  int nextLevel = level+1;
   if (this->TwoDimensional)
     {
     z0 = z3 = 0;
@@ -726,7 +730,6 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         {
         generateBlock = 0;
         }
-      ++level;
       // Traverse the 4 new blocks.
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
@@ -734,22 +737,22 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       subOnFace[3]=0;
       subOnFace[4]=1;
       subOnFace[5]=1;
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z0,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y0,y1,z0,z0,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnFace[2]=onFace[2];
 //      subOnFace[3]=0;
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z0,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y0,y1,z0,z0,subOnFace);
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
       subOnFace[2]=0;
       subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z0,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y2,y3,z0,z0,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnFace[2]=0;
 //      subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z0,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y2,y3,z0,z0,subOnFace);
       }
     if (generateBlock)
       {
@@ -759,14 +762,14 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          this->AppedDataSetToLevel(output, level, ext, grid);
+          this->AppendDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          this->AppedDataSetToLevel(output, level, ext, grid);
+          this->AppendDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetBlockInfo(grid, level, ext,onFace);
           }
@@ -775,7 +778,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         }
       else if (this->EndBlock != -1)
         {
-        this->AppedDataSetToLevel(output, level, ext, NULL);
+        this->AppendDataSetToLevel(output, level, ext, NULL);
         }
       ++this->BlockCount;
       }
@@ -791,7 +794,6 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         {
         generateBlock = 0;
         }
-      ++level;
       // Traverse the 8 new blocks.
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
@@ -799,22 +801,22 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       subOnFace[3]=0;
       subOnFace[4]=onFace[4];
       subOnFace[5]=0;
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z1,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y0,y1,z0,z1,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnFace[2]=onFace[2];
 //      subOnFace[3]=0;
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z1,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y0,y1,z0,z1,subOnFace);
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
       subOnFace[2]=0;
       subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z1,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y2,y3,z0,z1,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnface[2]=0;
 //      subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z1,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y2,y3,z0,z1,subOnFace);
       
       
       subOnFace[0]=onFace[0];
@@ -823,22 +825,22 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       subOnFace[3]=0;
       subOnFace[4]=0;
       subOnFace[5]=onFace[5];
-      this->Traverse(blockId, level, output, x0,x1,y0,y1,z2,z3,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y0,y1,z2,z3,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnFace[2]=onFace[2];
 //      subOnFace[3]=0;
-      this->Traverse(blockId, level, output, x2,x3,y0,y1,z2,z3,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y0,y1,z2,z3,subOnFace);
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
       subOnFace[2]=0;
       subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x0,x1,y2,y3,z2,z3,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x0,x1,y2,y3,z2,z3,subOnFace);
       subOnFace[0]=0;
       subOnFace[1]=onFace[1];
 //      subOnFace[2]=0;
 //      subOnFace[3]=onFace[3];
-      this->Traverse(blockId, level, output, x2,x3,y2,y3,z2,z3,subOnFace);
+      this->Traverse(blockId, nextLevel, output, x2,x3,y2,y3,z2,z3,subOnFace);
       }
     if (generateBlock)
       {
@@ -848,14 +850,14 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          this->AppedDataSetToLevel(output, level, ext, grid);
+          this->AppendDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          this->AppedDataSetToLevel(output, level, ext, grid);
+          this->AppendDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetBlockInfo(grid, level, ext,onFace);
           }
@@ -1449,7 +1451,7 @@ void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkHierarchicalFractal::AppedDataSetToLevel(
+unsigned int vtkHierarchicalFractal::AppendDataSetToLevel(
   vtkCompositeDataSet* composite,
   unsigned int level,
   int extents[6],
@@ -1474,10 +1476,11 @@ unsigned int vtkHierarchicalFractal::AppedDataSetToLevel(
     }
   else if (hbDS)
     {
-    int dim=this->TwoDimensional? 2:3;
-    vtkAMRBox box(dim,extents);
+    // int dim=this->TwoDimensional? 2:3;
+    // vtkAMRBox box(dim,extents);
     index = hbDS->GetNumberOfDataSets(level);
-    hbDS->SetDataSet(level, index, box, vtkUniformGrid::SafeDownCast(dataset));
+    // hbDS->SetDataSet(level, index, box, vtkUniformGrid::SafeDownCast(dataset));
+    hbDS->SetDataSet(level, index, vtkUniformGrid::SafeDownCast(dataset));
     }
 
   return index;
