@@ -4822,68 +4822,7 @@
      </Hints>
    </SourceProxy>
 
-
-   <SourceProxy name="FlashReader2"
-                class="vtkFlashReader"
-                label="Flash Reader">
-     <Documentation
-       short_help="Read multi-block dataset from a Flash file."
-       long_help="Reads multi-block dataset from a Flash file.">
-         This Flash reader loads data stored in Flash format. The output of this reader is a multi-block dataset.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-            This property specifies the file name for the Flash reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-       name="BlockOutputType"
-       command="SetBlockOutputType"
-       number_of_elements="1"
-       default_values="0"
-       animateable="0">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Image Data"/>
-         <Entry value="1" text="Rectilinear Grid"/>
-       </EnumerationDomain>
-       <Documentation>
-         The property indicates the output type of each block, either vtkImageData (by default) or vtkRectilinearGrid.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="LoadParticles"
-       command="SetLoadParticles"
-       number_of_elements="1"
-       default_values="1">
-       <BooleanDomain name="bool" />
-       <Documentation>
-         Load particles when on.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="LoadMortonCurve"
-       command="SetLoadMortonCurve"
-       number_of_elements="1"
-       default_values="0">
-       <BooleanDomain name="bool" />
-       <Documentation>
-         Generate morton curve when on.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="Flash flash"
-          file_description="Flash Files" />
-     </Hints>
-   </SourceProxy>
-
-   <SourceProxy name="stlreader"
+  <SourceProxy name="stlreader"
                           class="vtkFileSeriesReader"
                           label="STL Reader"
                           si_class="vtkSIFileSeriesReaderProxy"
