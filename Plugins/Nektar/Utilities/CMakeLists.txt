@@ -9,7 +9,10 @@
 
 project(nektar)
 
-include_directories(${Nektar_SOURCE_DIR}/include)
+include_directories(
+  ${Nektar_SOURCE_DIR}/include
+  ${MPI_INCLUDE_PATH}
+  )
 
 add_definitions(-DPARALLEL -DMETIS)
 
@@ -28,4 +31,10 @@ set(nektar_sources
   )
 
 add_library(nektar STATIC ${nektar_sources})
-target_link_libraries(nektar metis gs)
+target_link_libraries(nektar 
+  metis
+  gs
+  ${BLACS_C_init_LIBRARY}
+  ${BLACS_LIBRARY}
+  ${SCALAPACK_LIBRARY}
+  )
