@@ -3,7 +3,6 @@ project(metis)
 
 include_directories(
   ${metis_SOURCE_DIR}
-  ${Nektar_SOURCE_DIR}/include
   )
 
 if(WIN32)
