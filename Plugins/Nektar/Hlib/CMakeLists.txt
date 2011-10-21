@@ -1,7 +1,10 @@
 
 project(hybrid)
 
-include_directories(${Nektar_SOURCE_DIR}/include)
+include_directories(
+  ${Nektar_SOURCE_DIR}/include
+  ${MPI_INCLUDE_PATH}
+  )
 
 if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
