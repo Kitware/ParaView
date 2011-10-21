@@ -241,8 +241,8 @@
      
    </SourceProxy>
    
-   <SourceProxy name="AMRToGrid" class="vtkAMRToGrid"
-                label="Extract ROI from AMR dataset" >
+   <SourceProxy name="AMRResampleFilter" class="vtkAMRResampleFilter"
+                label="Resample AMR" >
       <Documentaion
           short_help="Converts AMR data to a uniform grid"
           long_help="Converts AMR data to a uniform grid">
