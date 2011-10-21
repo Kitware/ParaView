@@ -13,8 +13,8 @@
  */
 
 /* balance.c */
-void Balance2Way(CtrlType *, GraphType *, int *, float);
-void Bnd2WayBalance(CtrlType *, GraphType *, int *);
+void Balance2Way(CtrlType *ctrl, GraphType *graph, int *tpwgts, float ubfactor);
+void Bnd2WayBalance(CtrlType *ctrl, GraphType *graph, int *tpwgts);
 void General2WayBalance(CtrlType *, GraphType *, int *);
 
 /* bucketsort.c */
@@ -162,11 +162,11 @@ void Greedy_KWayEdgeBalance(CtrlType *, GraphType *, int, float *, float, int);
 /* kwayrefine.c */
 void RefineKWay(CtrlType *, GraphType *, GraphType *, int, float *, float);
 void AllocateKWayPartitionMemory(CtrlType *, GraphType *, int);
-void ComputeKWayPartitionParams(CtrlType *, GraphType *, int);
+void ComputeKWayPartitionParams(CtrlType *ctrl, GraphType *graph, int nparts);
 void ProjectKWayPartition(CtrlType *, GraphType *, int);
 int IsBalanced(idxtype *, int, float *, float);
-void ComputeKWayBoundary(CtrlType *, GraphType *, int);
-void ComputeKWayBalanceBoundary(CtrlType *, GraphType *, int);
+void ComputeKWayBoundary(CtrlType *ctrl, GraphType *graph, int nparts);
+void ComputeKWayBalanceBoundary(CtrlType *ctrl, GraphType *graph, int nparts);
 
 /* kwayvolfm.c */
 void Random_KWayVolRefine(CtrlType *, GraphType *, int, float *, float, int, int);
@@ -201,8 +201,8 @@ void MocBalance2Way(CtrlType *, GraphType *, float *, float);
 void MocGeneral2WayBalance(CtrlType *, GraphType *, float *, float);
 
 /* mbalance2.c */
-void MocBalance2Way2(CtrlType *, GraphType *, float *, float *);
-void MocGeneral2WayBalance2(CtrlType *, GraphType *, float *, float *);
+void MocBalance2Way2(CtrlType *ctrl, GraphType *graph, float *tpwgts, float *ubvec);
+void MocGeneral2WayBalance2(CtrlType *ctrl, GraphType *graph, float *tpwgts, float *ubvec);
 void SelectQueue3(int, float *, float *, int *, int *, PQueueType [MAXNCON][2], float *);
 
 /* mcoarsen.c */
@@ -275,7 +275,7 @@ void MCRandom_KWayEdgeRefineHorizontal(CtrlType *, GraphType *, int, float *, in
 void MCGreedy_KWayEdgeBalanceHorizontal(CtrlType *, GraphType *, int, float *, int);
 int AreAllHVwgtsBelow(int, float, float *, float, float *, float *);
 int AreAllHVwgtsAbove(int, float, float *, float, float *, float *);
-void ComputeHKWayLoadImbalance(int, int, float *, float *);
+void ComputeHKWayLoadImbalance(int ncon, int nparts, float *npwgts, float *lbvec);
 int MocIsHBalanced(int, int, float *, float *);
 int IsHBalanceBetterFT(int, int, float *, float *, float *, float *);
 int IsHBalanceBetterTT(int, int, float *, float *, float *, float *);
@@ -380,7 +380,7 @@ int CheckHeap(PQueueType *);
 /* refine.c */
 void Refine2Way(CtrlType *, GraphType *, GraphType *, int *, float ubfactor);
 void Allocate2WayPartitionMemory(CtrlType *, GraphType *);
-void Compute2WayPartitionParams(CtrlType *, GraphType *);
+void Compute2WayPartitionParams(CtrlType *ctrl, GraphType *graph);
 void Project2WayPartition(CtrlType *, GraphType *);
 
 /* separator.c */
