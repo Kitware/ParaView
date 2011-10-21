@@ -1,7 +1,7 @@
 
 # The HDF5 external project for ParaView
 set(HDF5_source "${CMAKE_CURRENT_BINARY_DIR}/HDF5")
-set(HDF5_install "${CMAKE_CURRENT_BINARY_DIR}/HDF5-install")
+set(HDF5_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(HDF5_binary "${CMAKE_CURRENT_BINARY_DIR}/HDF5-build")
 

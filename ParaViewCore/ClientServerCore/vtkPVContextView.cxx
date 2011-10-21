@@ -15,6 +15,7 @@
 #include "vtkPVContextView.h"
 
 #include "vtkCamera.h"
+#include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageData.h"
@@ -26,6 +27,7 @@
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
@@ -39,6 +41,24 @@ vtkPVContextView::vtkPVContextView()
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
   this->ContextView = vtkContextView::New();
   this->ContextView->SetRenderWindow(this->RenderWindow);
+
+  // Disable interactor on server processes (or batch processes), since
+  // otherwise the vtkContextInteractorStyle triggers renders on changes to the
+  // vtkContextView which is bad and can cause deadlock (BUG #122651).
+  if (this->SynchronizedWindows->GetMode() !=
+    vtkPVSynchronizedRenderWindows::BUILTIN &&
+    this->SynchronizedWindows->GetMode() !=
+    vtkPVSynchronizedRenderWindows::CLIENT)
+    {
+    vtkContextInteractorStyle* style = vtkContextInteractorStyle::SafeDownCast(
+      this->ContextView->GetInteractor()->GetInteractorStyle());
+    if (style)
+      {
+      style->SetScene(NULL);
+      }
+    this->ContextView->SetInteractor(NULL);
+    }
+
 }
 
 //----------------------------------------------------------------------------

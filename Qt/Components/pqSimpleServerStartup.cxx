@@ -601,12 +601,15 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     bool option_readonly;
     option_readonly = QString(xml_option->GetAttribute("readonly")) == "true";
     this->Implementation->Options[option_name] = val;
-    if (!option_readonly)
-      {
-      // only update the default if the readonly attribute is false
-      xml_option->GetNestedElement(0)->SetAttribute("default",
-        val.toAscii().data());
-      }
+    // BUG #12638. I cannot understand why in the world would we ever want to
+    // change the "default". We do save the value in the registry. This is
+    // causing the BUG where we end up loosing the "random"ness of the default.
+    //if (!option_readonly)
+    //  {
+    //  // only update the default if the readonly attribute is false
+    //  xml_option->GetNestedElement(0)->SetAttribute("default",
+    //    val.toAscii().data());
+    //  }
 
     const bool save_option = xml_option->GetAttribute("save")?
       QVariant(xml_option->GetAttribute("save")).toBool() : true;

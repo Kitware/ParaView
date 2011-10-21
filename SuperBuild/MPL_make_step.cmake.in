@@ -1,0 +1,28 @@
+message("Building MPL:\n@MPL_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+if(WIN32)
+  file(TO_NATIVE_PATH "@freetype_install@/include" freetype_include_win32)
+  file(TO_NATIVE_PATH "@png_install@/include" png_include_win32)
+  file(TO_NATIVE_PATH "@freetype_install@/lib" freetype_lib_win32)
+  file(TO_NATIVE_PATH "@zlib_install@/lib" z_lib_win32)
+  file(TO_NATIVE_PATH "@png_install@/lib" png_lib_win32)
+  set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
+  set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py build
+  WORKING_DIRECTORY "@MPL_binary@"
+  RESULT_VARIABLE res
+  OUTPUT_VARIABLE MPL_OUT
+  OUTPUT_VARIABLE MPL_ERR)
+
+if(NOT ${res} EQUAL 0)
+  message("MPL Errors detected: \n${MPL_OUT}\n${MPL_ERR}")
+  message(FATAL_ERROR "Error in config of MPL")
+endif()
+message("Matplotlib build worked.")

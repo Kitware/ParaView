@@ -1,0 +1,24 @@
+message("Configuring yt:\n@yt_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+if(APPLE)
+  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+endif()
+
+# setup the site.cfg file
+file(WRITE "@yt_binary@/png.cfg"
+"@png_install@
+")
+
+# setup the site.cfg file
+file(WRITE "@yt_binary@/freetype.cfg"
+"@freetype_install@
+")
+
+# setup the site.cfg file
+file(WRITE "@yt_binary@/hdf5.cfg"
+"@HDF5_install@
+")
+
+message("yt config worked.")

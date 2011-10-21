@@ -149,12 +149,13 @@ def DoCoProcessing(datadescription):
             writer.UpdatePipeline()
 
     if timestep %% %s == 0 or datadescription.GetForceOutput() == True:
-        renderviews = servermanager.GetRenderViews()
+        views = servermanager.GetRenderViews()
+        views += servermanager.GetContextViews()
         imagefilename = "%s"
-        for view in range(len(renderviews)):
+        for view in range(len(views)):
             fname = imagefilename.replace("%%v", str(view))
             fname = fname.replace("%%t", str(timestep))
-            WriteImage(fname, renderviews[view])
+            WriteImage(fname, views[view])
 
     # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
     tobedeleted = GetNextProxyToDelete()

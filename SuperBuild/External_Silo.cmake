@@ -1,7 +1,7 @@
 
 # The Silo external project for ParaView
 set(Silo_source "${CMAKE_CURRENT_BINARY_DIR}/Silo")
-set(Silo_install "${CMAKE_CURRENT_BINARY_DIR}/Silo-install")
+set(Silo_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)

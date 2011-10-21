@@ -2,7 +2,7 @@
 
 set(ffmpeg_source "${CMAKE_CURRENT_BINARY_DIR}/FFMPEG")
 set(ffmpeg_binary "${CMAKE_CURRENT_BINARY_DIR}/FFMPEG-build")
-set(ffmpeg_install "${CMAKE_CURRENT_BINARY_DIR}/FFMPEG-install")
+set(ffmpeg_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg_configure_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg_configure_step.cmake

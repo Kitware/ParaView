@@ -1,0 +1,18 @@
+
+if(WIN32)
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/freetypePatches/freetype.vcproj" "@freetype_source@/builds/win32/vc2008/freetype.vcproj"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/freetypePatches/freetype.sln" "@freetype_source@/builds/win32/vc2008/freetype.sln"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/freetypePatches/ftoption.h" "@freetype_source@/include/freetype/config/ftoption.h"
+    )
+
+else()
+
+endif()

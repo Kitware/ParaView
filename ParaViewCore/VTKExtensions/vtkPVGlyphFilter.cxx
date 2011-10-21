@@ -209,7 +209,6 @@ int vtkPVGlyphFilter::RequestData(
   maxNumPts
     = (double)((double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
 
-  maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
   maxNumPts = (maxNumPts > numPts) ? numPts : maxNumPts;
 
   vtkInformationVector* inputVs[2];
@@ -227,7 +226,10 @@ int vtkPVGlyphFilter::RequestData(
 
   // We will glyph this many points.
   this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
-
+  if (this->BlockMaxNumPts == 0)
+    {
+    return 1;
+    }
   this->CalculatePtsToGlyph( numPts );
 
   // We have set all ofthe parameters that will be used in 
@@ -387,14 +389,16 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         = static_cast<double>(totalNumPts);
       double fractionOfPtsInBlock = nPtsNotBlanked/nPtsInDataSet;
       double nPtsVisibleOverBlock = nPtsVisibleOverAll*fractionOfPtsInBlock;
-      nPtsVisibleOverBlock 
-        = nPtsVisibleOverBlock<1.0 ? 1.0 : nPtsVisibleOverBlock;
       nPtsVisibleOverBlock = (  (nPtsVisibleOverBlock > nPtsNotBlanked)
         ? nPtsNotBlanked : nPtsVisibleOverBlock );
 
       // We will glyph this many points.
       this->BlockMaxNumPts = static_cast<vtkIdType>(nPtsVisibleOverBlock + 0.5) ;
-
+      if(this->BlockMaxNumPts == 0)
+        {
+        iter->GoToNextItem();
+        continue;
+        }
       this->CalculatePtsToGlyph( nPtsNotBlanked );
 
       // We have set all ofthe parameters that will be used in 

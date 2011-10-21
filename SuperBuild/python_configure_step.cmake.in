@@ -1,7 +1,7 @@
 
 if(UNIX)
   set(ENV{LD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
-  set(ENV{CXX} "@CMAKE_CXX_COMPILER@")
+  include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
   set(library_param --enable-shared)
 
@@ -10,7 +10,7 @@ if(UNIX)
   endif()
 
   EXECUTE_PROCESS(
-    COMMAND sh configure --prefix=@CMAKE_CURRENT_BINARY_DIR@/python-build ${library_param} --enable-unicode=ucs2
+    COMMAND sh configure --prefix=@python_install@ ${library_param} --enable-unicode=ucs2
     WORKING_DIRECTORY "@python_base@"
     RESULT_VARIABLE rv
     )

@@ -89,7 +89,7 @@ if(WIN32)
 
 elseif(UNIX)
   set(python_source ${CMAKE_CURRENT_BINARY_DIR}/python)
-  set(python_install ${CMAKE_CURRENT_BINARY_DIR}/python-install)
+  set(python_install ${CMAKE_CURRENT_BINARY_DIR})
 
   configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake
@@ -107,9 +107,9 @@ elseif(UNIX)
     ${CMAKE_CURRENT_BINARY_DIR}/python_install_step.cmake
     @ONLY)
 
-  #set(python_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake)
-  #set(python_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_configure_step.cmake)
-  #set(python_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_make_step.cmake)
+  set(python_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake)
+  set(python_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_configure_step.cmake)
+  set(python_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_make_step.cmake)
   set(python_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/python_install_step.cmake)
 
   ExternalProject_Add(python
@@ -119,8 +119,9 @@ elseif(UNIX)
     SOURCE_DIR ${python_source}
     INSTALL_DIR ${python_install}
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND ""
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --enable-shared --enable-unicode=ucs2
+    PATCH_COMMAND ${python_PATCH_COMMAND}
+    CONFIGURE_COMMAND ${python_CONFIGURE_COMMAND}
+    BUILD_COMMAND ${python_BUILD_COMMAND}
     INSTALL_COMMAND ${python_INSTALL_COMMAND}
     DEPENDS
       ${python_DEPENDENCIES}

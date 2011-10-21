@@ -112,6 +112,12 @@ def CreateComparativeXYPlotView():
 def CreateComparativeBarChartView():
     return _create_view("ComparativeBarChartView")
 
+def CreateParallelCoordinatesChartView():
+    return _create_view("ParallelCoordinatesChartView")
+
+def Create2DRenderView():
+    return _create_view("2DRenderView")
+
 def OpenDataFile(filename, **extraArgs):
     """Creates a reader to read the give file, if possible.
        This uses extension matching to determine the best reader possible.

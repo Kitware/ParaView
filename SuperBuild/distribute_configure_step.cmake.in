@@ -1,0 +1,7 @@
+message("Configuring yt:\n@yt_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+z
+
+message("yt config worked.")

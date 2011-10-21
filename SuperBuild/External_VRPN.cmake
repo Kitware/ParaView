@@ -2,7 +2,7 @@
 # The VRPN external project for ParaView
 set(VRPN_source "${CMAKE_CURRENT_BINARY_DIR}/VRPN")
 set(VRPN_binary "${CMAKE_CURRENT_BINARY_DIR}/VRPN-build")
-set(VRPN_install "${CMAKE_CURRENT_BINARY_DIR}/VRPN-install")
+set(VRPN_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 ExternalProject_Add(VRPN
   SOURCE_DIR ${VRPN_source}

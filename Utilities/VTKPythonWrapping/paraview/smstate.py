@@ -42,7 +42,11 @@ def get_all_inputs_registered(proxy):
             # Don't worry about input properties with ProxyListDomains,
             # these input proxies do not need to be constructed by python.
             if prop.GetDomain("proxy_list") is not None:
-                return True
+                continue
+            # Some representations have an InternalInput property which does
+            # not need to be managed by python, so ignore these
+            if proxy.GetPropertyName(prop).startswith("InternalInput"):
+                continue
             for i in xrange(prop.GetNumberOfProxies()):
                 input_proxy = prop.GetProxy(i)
                 info = smtrace.get_proxy_info(input_proxy, search_existing=False)

@@ -1,0 +1,18 @@
+message("Building distribute:\n@yt_binary@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py build
+  WORKING_DIRECTORY "@distribute_binary@"
+  RESULT_VARIABLE res
+  OUTPUT_VARIABLE distribute_OUT
+  OUTPUT_VARIABLE distribute_ERR)
+
+if(NOT ${res} EQUAL 0)
+  message("distribute Errors detected: \n${distribute_OUT}\n${distribute_ERR}")
+  message(FATAL_ERROR "Error in config of distribute")
+endif()
+message("distribute build worked.")

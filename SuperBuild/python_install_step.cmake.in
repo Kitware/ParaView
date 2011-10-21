@@ -1,5 +1,6 @@
 
 if(UNIX)
+  include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
   if(APPLE)
     set(ENV{DYLD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
