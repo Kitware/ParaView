@@ -10,14 +10,14 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox" command="set_string" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox" command="set_string" arguments="Surface" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
@@ -25,9 +25,9 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
-  <!--<pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="cellNormals" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
+  <!--<pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="cellNormals" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />-->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
@@ -66,7 +66,7 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
@@ -135,8 +135,8 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox" command="set_string" arguments="Wireframe" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox" command="set_string" arguments="Wireframe" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />

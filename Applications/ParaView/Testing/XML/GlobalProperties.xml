@@ -8,36 +8,33 @@
 -->
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/scaleX" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/show3DWidget" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector" command="mousePress" arguments="1,1,0,62,29" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector" command="mouseRelease" arguments="1,0,0,62,29" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector" command="mousePress" arguments="1,1,0,62,28" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector" command="mouseRelease" arguments="1,0,0,62,28" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/scaleX" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector" command="mousePress" arguments="1,1,0,62,29" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector" command="mouseRelease" arguments="1,0,0,62,29" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector" command="mousePress" arguments="1,1,0,62,28" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector" command="mouseRelease" arguments="1,0,0,62,28" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,9,13,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,9,13,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,37,8,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,37,8,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/axesToolbar/1QToolButton0" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_hcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,126,8" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_hcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,199,9" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_hcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,199,9" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="TextAnnotationColor" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="EdgeColor" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="SelectionColor" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="TextAnnotationColor" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="EdgeColor" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="SelectionColor" />
 
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
+  <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/SolidColorPage/ColorActorColor/StandardColorMenu" command="activate" arguments="ForegroundColor" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />

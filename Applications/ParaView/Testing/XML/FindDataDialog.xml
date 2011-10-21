@@ -4,10 +4,10 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected"
     arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
@@ -15,7 +15,7 @@
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/multiBlock/value_block" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/extractSelection" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Global ID" />
