@@ -19,7 +19,14 @@ else(WIN32)
   set(ENV{LD_LIBRARY_PATH} ${ld_lib_path})
 endif(WIN32)
 
-execute_process(
-  COMMAND "@PROTOC_LOCATION@" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
-  WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@"
-  )
+if (CMAKE_CROSSCOMPILING)
+  execute_process(
+    COMMAND "@PROTOC_LOCATION@" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
+    WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@"
+    )
+elseif (CMAKE_CROSSCOMPILING)
+  execute_process(
+    COMMAND "@EXECUTABLE_OUTPUT_PATH@/${OutDir}/protoc" "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:@CMAKE_CURRENT_BINARY_DIR@" --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources" "@CMAKE_CURRENT_SOURCE_DIR@/Resources/vtkPVMessage.proto"
+    WORKING_DIRECTORY "@CMAKE_CURRENT_BINARY_DIR@"
+    )
+endif (CMAKE_CROSSCOMPILING)
