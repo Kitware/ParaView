@@ -652,5 +652,4 @@ void get_proc_grid(int Nproc, int *nrow, int *ncol);
 void update_inva_LOC( SMatrix *SM ,int *BLACS_PARAMS, double **inva_LOC, char storage_type);
 void get_gather_map(int *BLACS_PARAMS, char dir, int *map);
 
-
 #endif /* end of hotel.h declarations */
