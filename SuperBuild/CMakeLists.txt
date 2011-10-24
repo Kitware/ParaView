@@ -177,8 +177,10 @@ include(External_szip)
 
 # Build a common png used by several dependencies
 include(External_png)
+# can't get paraview to build SMExtractDocumentation with externally built png
+# until then ParaView will still use the system png.
 set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=OFF
+  -DVTK_USE_SYSTEM_PNG:BOOL=ON
   -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
   -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
 list(APPEND ParaView_dependencies png)
@@ -191,7 +193,6 @@ else()
 endif()
 
 if(NOT APPLE)
-
   if(WIN32)
     include(External_OpenMPI)
     list(APPEND ParaView_dependencies OpenMPI)
@@ -436,6 +437,8 @@ if(CMAKE_Fortran_COMPILER AND NOT WIN32)
     #  ${CMAKE_CURRENT_SOURCE_DIR}/install_g2c.cmake)
   endif()
 endif()
+
+list(REMOVE_DUPLICATES PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 
 #------------------------------------------------------------------------------
 # Configure and build ParaView
