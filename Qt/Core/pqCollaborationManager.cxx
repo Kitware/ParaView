@@ -371,8 +371,8 @@ void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId,
         break;
       }
 
-    double px = xRatioBase*x + w2;
-    double py = yRatioBase*y + h2;
+    int px = static_cast<int>(xRatioBase*x + w2);
+    int py = static_cast<int>(yRatioBase*y + h2);
     widget->paintMousePointer(px, py);
     }
 }
