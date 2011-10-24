@@ -10,7 +10,8 @@ elseif(APPLE)
   foreach(path ${SEARCH_PATHS})
     set(dyld_lib_path "${dyld_lib_path}:${path}")
   endforeach()
-  set(ENV{DYLD_LIBRARY_PATH} ${dyld_lib_path})
+  # Macs are stupid and will try to load an external png before loading the system libPng.dylib if something linked against it.
+  set(ENV{DYLD_LIBRARY_PATH} /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/ImageIO.framework/Versions/A/Resources:${dyld_lib_path})
 else(WIN32)
   get_filename_component(PYTHON_LIB "@PYTHON_LIBRARY@" PATH)
   get_filename_component(MPI_LIB "@MPI_LIBRARY@" PATH)
@@ -24,4 +25,5 @@ endif(WIN32)
 
 execute_process(
   COMMAND "@ParaView_BINARY_DIR@/bin/${OutDir}/vtkSMExtractDocumentation" "@ParaView_BINARY_DIR@/Documentation" "${fullXMLFile}"
+  WORKING_DIR @ParaView_BINARY_DIR@
   )
