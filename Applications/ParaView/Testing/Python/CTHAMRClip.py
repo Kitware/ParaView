@@ -25,4 +25,4 @@ object9 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwi
 QtTesting.playCommand(object9, 'set_boolean', 'false')
 # DO_IMAGE_COMPARE
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTestingImage.compareImage(snapshotWidget, 'CTHAMRClip.png', 300, 300);
+QtTestingImage.compareImage(snapshotWidget, 'CTHAMRClip.png', 300, 300)

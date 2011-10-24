@@ -20,6 +20,6 @@ object7 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object7, 'set_string', 'Pressure (dynes/cm^2^)')
 # DO_IMAGE_COMPARE
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTestingImage.compareImage(snapshotWidget, 'CTHAMRBaseline.png', 300, 300);
+QtTestingImage.compareImage(snapshotWidget, 'CTHAMRBaseline.png', 300, 300)
 
 

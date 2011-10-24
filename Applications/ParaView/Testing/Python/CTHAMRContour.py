@@ -29,5 +29,5 @@ QtTesting.playCommand(object4, 'activate', '')
 QtTesting.playCommand(object7, 'set_string', 'Pressure (dynes/cm^2^) (partial)')
 # DO_IMAGE_COMPARE
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
-QtTestingImage.compareImage(snapshotWidget, 'CTHAMRContour.png', 300, 300);
+QtTestingImage.compareImage(snapshotWidget, 'CTHAMRContour.png', 300, 300)
 
