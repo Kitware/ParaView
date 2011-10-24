@@ -1,6 +1,7 @@
 #/usr/bin/env python
 
 import QtTesting
+import QtTestingImage
 
 object1 = 'pqClientMainWindow/MainControlsToolbar/actionOpenData'
 QtTesting.playCommand(object1, 'activate', '')
