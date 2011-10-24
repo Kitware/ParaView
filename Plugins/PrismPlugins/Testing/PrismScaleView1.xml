@@ -1,10 +1,8 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+<pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismClientPlugin" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismServerPlugin" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismPlugin" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
@@ -58,4 +56,30 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,13,/0:0/0:0/0:0/2:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,12,7,/0:0/0:0/0:0/1:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,12,7,/0:0/0:0/0:0/1:1" />
+
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalAction" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/3D View" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,9,8,/0:0/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,9,8,/0:0/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,28,8,/0:0/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,28,8,/0:0/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.633136,0.106667,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.633136,0.106667,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.633136,0.106667,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mousePress" arguments="(0.171598,0.135238,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseMove" arguments="(0.171598,0.135238,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseRelease" arguments="(0.171598,0.135238,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.701183,0.131429,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.701183,0.131429,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.701183,0.131429,1,0,0)" />
+
+  <pqevent object="pqClientMainWindow/PrismToolBarActions0/QAction2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseXThresholdBounds" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseYThresholdBounds" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseZThresholdBounds" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 </pqevents>

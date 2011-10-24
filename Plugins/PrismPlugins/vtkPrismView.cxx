@@ -14,18 +14,20 @@
 =========================================================================*/
 #include "vtkPrismView.h"
 
+#include "vtk3DWidgetRepresentation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCubeAxesRepresentation.h"
-#include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPrismRepresentation.h"
 #include "vtkPVCompositeRepresentation.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkSelectionRepresentation.h"
 #include "vtkTransform.h"
-#include "vtk3DWidgetRepresentation.h"
 
 vtkStandardNewMacro(vtkPrismView);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
@@ -81,13 +83,8 @@ void vtkPrismView::RemoveRepresentation(vtkDataRepresentation* rep)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
-  const vtkBoundingBox& thresholdBounds)
+bool vtkPrismView::UpdateWorldScale()
 {
-  //update the world and threshold ivars
-  worldBounds.GetBounds(this->FullWorldBounds);
-  thresholdBounds.GetBounds(this->ThresholdWorldBounds);
-
   //now calculate out the new 4x4 matrix for the transform
   double matrix[16] =
     {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
@@ -99,12 +96,12 @@ bool vtkPrismView::UpdateWorldScale(const vtkBoundingBox& worldBounds,
     switch(this->WorldScaleMode[i])
       {
       case vtkPrismView::FullBounds:
-        bounds[index] = worldBounds.GetBound(index);
-        bounds[index+1] = worldBounds.GetBound(index+1);
+        bounds[index] = this->FullWorldBounds[index];
+        bounds[index+1] =this->FullWorldBounds[index+1];
         break;
       case vtkPrismView::ThresholdBounds:
-        bounds[index] = thresholdBounds.GetBound(index);
-        bounds[index+1] = thresholdBounds.GetBound(index+1);
+        bounds[index] = this->ThresholdWorldBounds[index];
+        bounds[index+1] = this->ThresholdWorldBounds[index+1];
         break;
       case vtkPrismView::CustomBounds:
         bounds[index] = this->CustomWorldBounds[index];
@@ -134,8 +131,8 @@ void vtkPrismView::GatherRepresentationInformation()
 
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   vtkBoundingBox worldBounds, thresholdBounds;
+  bool has_reps  = false;
   
-
   //This is what we want to do:
   //go through all the reps with the prism bounds key and determine what the world space
   //apply this scaling to everything in the view. Handle the cube axis as a special case
@@ -154,9 +151,26 @@ void vtkPrismView::GatherRepresentationInformation()
       vtkBoundingBox tBounds;
       tBounds.AddBounds(info->Get(vtkPrismView::PRISM_THRESHOLD_BOUNDS()));
       thresholdBounds.AddBox(tBounds);
+      has_reps = true;
       }
     }
-  bool updatedWorldScale = this->UpdateWorldScale(worldBounds, thresholdBounds);
+  if (has_reps)
+    {
+    worldBounds.GetBounds(this->FullWorldBounds);
+    thresholdBounds.GetBounds(this->ThresholdWorldBounds);
+    }
+  else
+    {
+    vtkMath::UninitializeBounds(this->FullWorldBounds);
+    vtkMath::UninitializeBounds(this->ThresholdWorldBounds);
+    }
+  //update the world and threshold ivars
+  worldBounds.GetBounds(this->FullWorldBounds);
+  thresholdBounds.GetBounds(this->ThresholdWorldBounds);
+
+  this->SynchronizedWindows->SynchronizeBounds(this->FullWorldBounds);
+  this->SynchronizedWindows->SynchronizeBounds(this->ThresholdWorldBounds);
+  bool updatedWorldScale = this->UpdateWorldScale();
 
   //now set the scale on each item
   double *scale = this->Transform->GetScale();

@@ -41,7 +41,13 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 //----------------------------------------------------------------------------
 bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInformation* outInfo)
 {
-  this->Superclass::GenerateMetaData(inInfo, outInfo);
+  bool ret_val = this->Superclass::GenerateMetaData(inInfo, outInfo);
+
+  if (!ret_val ||
+    this->GeometryFilter->GetTotalNumberOfInputConnections() == 0)
+    {
+    return false;
+    }
 
   //we need to verify the input object has the correct field data "key"
   //Only those with the key are valid items to be used to determine
