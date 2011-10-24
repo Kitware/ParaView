@@ -83,7 +83,7 @@ void pqCollaborationEventPlayer::wait(int ms)
 
 //-----------------------------------------------------------------------------
 bool pqCollaborationEventPlayer::playEvent(QObject* , 
-  const QString& command, const QString& arguments, bool& error)
+  const QString& command, const QString& vtkNotUsed(arguments), bool& vtkNotUsed(error))
 {
   if (command == "waitForMaster")
     {

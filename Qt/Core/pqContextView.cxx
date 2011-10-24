@@ -479,7 +479,7 @@ void pqContextView::selectionChanged()
 void pqContextView::onViewBoundsChange(vtkObject* src,
                                        unsigned long vtkNotUsed(event),
                                        void* vtkNotUsed(method),
-                                       void* data)
+                                       void* vtkNotUsed(data))
 {
   vtkSMContextViewProxy* proxy = vtkSMContextViewProxy::SafeDownCast(src);
   if(proxy)
