@@ -493,7 +493,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 
     // For collaboration purpose we might need to share the proxy state with
     // other clients
-    if( num_controllers == 0 )
+    if( num_controllers == 0 && this->IsMultiClients())
       {
       vtkSMRemoteObject* remoteObject =
           vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(message->global_id()));
