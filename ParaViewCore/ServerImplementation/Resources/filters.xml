@@ -265,6 +265,17 @@
            </Documentation>
      </InputProperty>
      
+     <IntVectorProperty
+        name="Demand-Driven Mode"
+        command="SetDemandDrivenMode"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the resampling filter will operate in
+          demand-driven mode or not.
+        </Documentation>
+     </IntVectorProperty>
      
      <IntVectorProperty
         name="TransferToNodes"
