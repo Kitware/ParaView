@@ -22,6 +22,11 @@ ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
 
 SET (TESTS_WITH_BASELINES
   ${TESTS_WITH_BASELINES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRContour.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRDualClip.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
@@ -115,6 +120,26 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
+
+# Set properties for CTH tests
+set(CTHAMRBaseline_BREAK TRUE)
+
+set(CTHAMRContour_BREAK TRUE)
+set(CTHAMRContour_DISABLE_CS TRUE)
+set(CTHAMRContour_DISABLE_CRS TRUE)
+
+set(CTHAMRDualClip_BREAK TRUE)
+set(CTHAMRDualClip_DISABLE_CS TRUE)
+set(CTHAMRDualClip_DISABLE_CRS TRUE)
+
+set(CTHAMRClip_BREAK TRUE)
+set(CTHAMRClip_DISABLE_CS TRUE)
+set(CTHAMRClip_DISABLE_CRS TRUE)
+
+set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
+set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
+set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
+
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
