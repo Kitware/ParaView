@@ -194,7 +194,10 @@ public:
       {
       alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
       }
-    this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
+    if(alivedClients.size() > 0)
+      {
+      this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
+      }
     }
   //-----------------------------------------------------------------
   void CallBackProxyDefinitionManagerHasChanged(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
