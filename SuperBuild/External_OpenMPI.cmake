@@ -2,7 +2,7 @@
 # The OpenMPI external project for ParaView
 set(OpenMPI_source "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI")
 set(OpenMPI_build "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-build")
-set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-install")
+set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
@@ -19,6 +19,8 @@ if(WIN32)
 #      -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
 #      -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
+      -DOMPI_WANT_F77_BINDINGS:BOOL=ON
+      -DOMPI_WANT_F90_BINDINGS:BOOL=ON
 #      ${pv_tpl_compiler_args}
       ${OpenMPI_EXTRA_ARGS}
     CMAKE_ARGS
