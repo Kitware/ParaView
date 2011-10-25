@@ -35,14 +35,15 @@ vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeUInt32 id)
+vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(vtkTypeUInt32 id_)
 {
   if (!this->RootElement)
     {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-                  << id);
+                  << id_);
     return 0;
     }
+  vtkIdType id = static_cast<vtkIdType>(id_);
 
   vtkPVXMLElement* root = this->RootElement;
   unsigned int numElems = root->GetNumberOfNestedElements();

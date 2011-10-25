@@ -138,5 +138,5 @@ void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkPVSession::IsMultiClients()
 {
-  return this->GetServerInformation()->GetMultiClientsEnable();
+  return (this->GetServerInformation()->GetMultiClientsEnable() != 0);
 }

@@ -178,14 +178,15 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(vtkTypeUInt32 id)
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
-  vtkPVXMLElement* root, vtkTypeUInt32 id)
+  vtkPVXMLElement* root, vtkTypeUInt32 id_)
 {
   if (!root)
     {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-      << id);
+      << id_);
     return 0;
     }
+  vtkIdType id = static_cast<vtkIdType>(id_);
 
   unsigned int numElems = root->GetNumberOfNestedElements();
   unsigned int i=0;

@@ -125,7 +125,7 @@ void vtkSMLink::PushStateToSession()
   if(!this->IsLocalPushOnly() && this->GetSession())
     {
     this->State->SetExtension(DefinitionHeader::client_class, this->GetClassName());
-    this->State->SetExtension(LinkState::propagate_update, this->PropagateUpdateVTKObjects);
+    this->State->SetExtension(LinkState::propagate_update, (this->PropagateUpdateVTKObjects != 0));
     this->State->SetExtension(LinkState::enabled, this->Enabled);
     this->PushState(this->State);
     }
