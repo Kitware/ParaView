@@ -46,6 +46,9 @@ protected:
   vtkSICollaborationManager();
   virtual ~vtkSICollaborationManager();
 
+  friend class vtkInternal;
+  void BroadcastToClients(vtkSMMessage* msg);
+
 private:
   vtkSICollaborationManager(const vtkSICollaborationManager&);    // Not implemented
   void operator=(const vtkSICollaborationManager&); // Not implemented

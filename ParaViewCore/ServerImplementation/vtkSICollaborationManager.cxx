@@ -38,13 +38,14 @@
 class vtkSICollaborationManager::vtkInternal : public vtkCommand
 {
 public:
-  static vtkInternal* New()
+  static vtkInternal* New(vtkSICollaborationManager* owner)
     {
-    return new vtkInternal();
+    return new vtkInternal(owner);
     }
 
-  vtkInternal()
+  vtkInternal(vtkSICollaborationManager* owner)
     {
+    this->Owner = owner;
     this->DisableBroadcast = false;
     this->ServerState.set_location(vtkPVSession::DATA_SERVER_ROOT);
     this->ServerState.set_global_id(vtkReservedRemoteObjectIds::RESERVED_COLLABORATION_COMMUNICATOR_ID);
@@ -119,26 +120,27 @@ public:
     return &this->ServerState;
     }
 
-  void BroadcastToClients(vtkSMMessage* msg)
+  bool CanBroadcast()
     {
-    if(this->ServerSession && !this->DisableBroadcast)
-      {
-      this->ServerSession->BroadcastToClients(msg);
-      }
+    return (this->ServerSession && !this->DisableBroadcast);
     }
 
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData))
     {
     // A client has disconnect, let's notify the clients left
-    this->BroadcastToClients(this->BuildServerStateMessage());
+    if(this->Owner)
+      {
+      this->Owner->BroadcastToClients(this->BuildServerStateMessage());
+      }
     }
 
   vtkWeakPointer<vtkPVSessionServer>   ServerSession;
   vtkNew<vtkPVMultiClientsInformation> ServerInformations;
   vtkSMMessage                         ServerState;
   vtkstd::map<int, vtkstd::string>     UserNames;
-  vtkWeakPointer<vtkCompositeMultiProcessController>   MultiProcessController;
   bool                                 DisableBroadcast;
+  vtkWeakPointer<vtkSICollaborationManager>            Owner;
+  vtkWeakPointer<vtkCompositeMultiProcessController>   MultiProcessController;
 };
 
 //****************************************************************************
@@ -146,7 +148,7 @@ vtkStandardNewMacro(vtkSICollaborationManager);
 //----------------------------------------------------------------------------
 vtkSICollaborationManager::vtkSICollaborationManager()
 {
-  this->Internal = vtkInternal::New();
+  this->Internal = vtkInternal::New(this);
 }
 
 //----------------------------------------------------------------------------
@@ -165,9 +167,9 @@ void vtkSICollaborationManager::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSICollaborationManager::Push(vtkSMMessage* msg)
 {
-  if(this->Internal->UpdateUserNamesAndMaster(msg))
+  if(this->Internal->UpdateUserNamesAndMaster(msg) && this->Internal->CanBroadcast()  )
     {
-    this->Internal->BroadcastToClients(this->Internal->BuildServerStateMessage());
+    this->BroadcastToClients(this->Internal->BuildServerStateMessage());
     }
 }
 
@@ -175,4 +177,9 @@ void vtkSICollaborationManager::Push(vtkSMMessage* msg)
 void vtkSICollaborationManager::Pull(vtkSMMessage* msg)
 {
   msg->CopyFrom(*this->Internal->BuildServerStateMessage());
+}
+//----------------------------------------------------------------------------
+void vtkSICollaborationManager::BroadcastToClients(vtkSMMessage* msg)
+{
+  this->Internal->ServerSession->BroadcastToClients(msg);
 }
