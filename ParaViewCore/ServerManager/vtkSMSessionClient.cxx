@@ -505,7 +505,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
                          << ") does not support properly GetFullState() so no "
                          << "collaboration mechanisme could be applied to it.");
         }
-      else if(!remoteObject->IsLocalPushOnly())
+      else if(remoteObject && !remoteObject->IsLocalPushOnly())
         {
         msg.CopyFrom( remoteObject ? *remoteObject->GetFullState(): *message);
         msg.set_global_id(message->global_id());
@@ -523,6 +523,11 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         this->DataServerController->TriggerRMIOnAllChildren(
             &raw_message[0], static_cast<int>(raw_message.size()),
             vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+        }
+      else if(!remoteObject)
+        {
+        vtkErrorMacro("No remote object found for corresponding state: " << message->global_id());
+        message->PrintDebugString();
         }
       }
     }
