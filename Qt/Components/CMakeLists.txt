@@ -197,6 +197,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.h
   pqComponentsTestUtility.h
+  pqTransferFunctionChartViewWidget.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
 )
 
@@ -649,6 +650,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.cxx
   pqXYChartOptionsEditor.h
+  pqTransferFunctionChartViewWidget.cxx
+  pqTransferFunctionChartViewWidget.h 
   ${EXTRA_PQ_COMPONENT_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
