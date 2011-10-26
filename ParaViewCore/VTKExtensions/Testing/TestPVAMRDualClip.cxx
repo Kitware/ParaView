@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   typedef vtkSmartPointer<vtkRenderWindowInteractor> vtkRenderWindowInteractorRefPtr;
 
   const char* fname =
-    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/SPCTH/restarted/spcth.0");
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/SPCTH/Dave_Karelitz_Small/spcth.0");
 
   if(!fname)
     {
