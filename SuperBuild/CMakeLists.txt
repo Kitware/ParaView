@@ -407,6 +407,9 @@ if(NOT WIN32)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
+include(External_VisTrails)
+list(APPEND ParaView_dependencies VisTrails)
+
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
 set(DOC_ARGS)
 if(ParaView_BUILD_DOCUMENTATION)
