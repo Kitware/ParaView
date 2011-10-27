@@ -195,7 +195,7 @@ vtkStandardNewMacro(vtkPVSessionCore);
 vtkPVSessionCore::vtkPVSessionCore()
 {
   this->Interpreter =
-    vtkClientServerInterpreterInitializer::GetInterpreter();
+    vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
   this->MPIMToNSocketConnection = NULL;
   this->SymmetricMPIMode = false;
 
@@ -270,6 +270,7 @@ vtkPVSessionCore::~vtkPVSessionCore()
          << vtkClientServerID(1)
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
+  this->Interpreter->Delete();
   this->Interpreter = 0;
 
   // Manage controller

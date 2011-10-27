@@ -468,7 +468,7 @@ int vtkFileSeriesReader::CanReadFile(vtkAlgorithm *reader, const char *filename)
     {
     int canRead = 1;
     vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetInterpreter();
+        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
 
     // Build stream request
     vtkClientServerStream stream;
@@ -724,7 +724,7 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
   if (this->Reader && this->FileNameMethod)
     {
     vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetInterpreter();
+        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
 
     // We want to suppress the modification time change in the Reader.  See
     // vtkFileSeriesReader::GetMTime() for details on how this works.

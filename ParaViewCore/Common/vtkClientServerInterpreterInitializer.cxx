@@ -73,7 +73,8 @@ vtkClientServerInterpreterInitializer::GetInitializer()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::GetInterpreter()
+vtkClientServerInterpreter*
+vtkClientServerInterpreterInitializer::GetGlobalInterpreter()
 {
   static vtkSmartPointer<vtkClientServerInterpreter> Singleton;
   if (!Singleton)

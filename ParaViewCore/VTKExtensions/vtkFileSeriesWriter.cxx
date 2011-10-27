@@ -46,7 +46,7 @@ vtkFileSeriesWriter::vtkFileSeriesWriter()
   this->NumberOfTimeSteps = 1;
   this->CurrentTimeIndex = 0;
   this->Interpreter = 0;
-  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetInterpreter());
+  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
 //-----------------------------------------------------------------------------
