@@ -106,6 +106,10 @@ protected slots:
   /// called to proceed to page that allows the user to edit the startup.
   void editServerStartup();
 
+  // called when the "name" on the edit server page changes. We ensure that the
+  // user cannot set a duplicate name.
+  void onNameChanged();
+
   /// called to delete a server.
   void deleteServer();
 

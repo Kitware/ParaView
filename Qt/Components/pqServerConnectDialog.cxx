@@ -172,6 +172,9 @@ pqServerConnectDialog::pqServerConnectDialog(
   QObject::connect(this->Internals->editServer, SIGNAL(clicked()),
     this, SLOT(editServer()));
 
+  QObject::connect(this->Internals->name, SIGNAL(textChanged(const QString&)),
+    this, SLOT(onNameChanged()));
+
   QObject::connect(this->Internals->type, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateServerType()));
 
@@ -412,6 +415,31 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
     }
   this->Internals->type->setCurrentIndex(type);
   this->updateServerType();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConnectDialog::onNameChanged()
+{
+  bool acceptable = true;
+  QString current_name = this->Internals->name->text();
+  if (current_name != this->Internals->OriginalName)
+    {
+    foreach (const pqServerConfiguration& config,
+      this->Internals->Configurations)
+      {
+      if (config.name() == current_name)
+        {
+        acceptable = false;
+        break;
+        }
+      }
+    }
+  else if (current_name.trimmed().isEmpty() ||
+    current_name == "unknown")
+    {
+    acceptable = false;
+    }
+  this->Internals->okButton->setEnabled(acceptable);
 }
 
 //-----------------------------------------------------------------------------
