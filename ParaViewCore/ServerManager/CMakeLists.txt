@@ -165,6 +165,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx
   vtkSMLink.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyManager.cxx # since New() is protected.
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
   vtkSMStateVersionControllerBase.cxx

@@ -39,6 +39,9 @@ class vtkSMGlobalPropertiesManager;
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
+  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
   // Description:
   // Provides access to the global ProxyManager.
   static vtkSMProxyManager* GetProxyManager();
@@ -51,10 +54,6 @@ public:
   // Allow to check if the Singleton has been initialized and has a reference
   // to a valid ProxyManager
   static bool IsInitialized();
-
-  static vtkSMProxyManager* New();
-  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
@@ -179,11 +178,12 @@ public:
     vtkSMProxy* Proxy;
     vtkPVXMLElement* StateChangeElement;
     };
-//ETX
 
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
+
+  static vtkSMProxyManager* New();
 
   friend class vtkSMSessionProxyManager;
 

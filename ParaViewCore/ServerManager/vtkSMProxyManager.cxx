@@ -95,7 +95,16 @@ public:
 // Statics...
 vtkSmartPointer<vtkSMProxyManager> vtkSMProxyManager::Singleton;
 //***************************************************************************
-vtkStandardNewMacro(vtkSMProxyManager);
+vtkSMProxyManager* vtkSMProxyManager::New()
+{
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkSMProxyManager");
+  if (ret)
+    {
+    return static_cast<vtkSMProxyManager*>(ret);
+    }
+  return new vtkSMProxyManager;
+}
+
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -106,8 +115,8 @@ vtkSMProxyManager* vtkSMProxyManager::GetProxyManager()
 {
   if(!vtkSMProxyManager::Singleton)
     {
-    vtkSMProxyManager::Singleton =
-        vtkSmartPointer<vtkSMProxyManager>::New();
+    vtkSMProxyManager* pxm = vtkSMProxyManager::New();
+    vtkSMProxyManager::Singleton.TakeReference(pxm);
     }
   return vtkSMProxyManager::Singleton.GetPointer();
 }
