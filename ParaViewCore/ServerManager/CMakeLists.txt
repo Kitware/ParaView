@@ -168,6 +168,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMProxyManager.cxx # since New() is protected.
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
+  vtkSMSessionProxyManager.cxx # since New() is non-standard.
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx

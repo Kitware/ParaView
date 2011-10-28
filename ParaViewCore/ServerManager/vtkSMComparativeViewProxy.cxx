@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVComparativeView.h"
 #include "vtkPVSession.h"
-#include "vtkSMSession.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
 
 #include <assert.h>
@@ -44,12 +44,14 @@ void vtkSMComparativeViewProxy::Update()
 {
   // Make sure we don't track in Undo/Redo the proxy update that we have set in
   // the comparative view
-  if(this->GetSession() && this->GetSession()->GetUndoStackBuilder())
+  vtkSMUndoStackBuilder* usb =
+    vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+  if (usb)
     {
-    bool prev = this->GetSession()->GetUndoStackBuilder()->GetIgnoreAllChanges();
-    this->GetSession()->GetUndoStackBuilder()->SetIgnoreAllChanges(true);
+    bool prev = usb->GetIgnoreAllChanges();
+    usb->SetIgnoreAllChanges(true);
     this->Superclass::Update();
-    this->GetSession()->GetUndoStackBuilder()->SetIgnoreAllChanges(prev);
+    usb->SetIgnoreAllChanges(prev);
     }
   else
     {

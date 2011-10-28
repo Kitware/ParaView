@@ -31,25 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqUndoStack.h"
 
-#include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMUndoStackBuilder.h"
-#include "vtkSMUndoStack.h"
-
-#include "vtkUndoSet.h"
-#include "vtkSMUndoElement.h"
-#include "vtkSMRemoteObjectUpdateUndoElement.h"
-
-
-#include <QtDebug>
-#include <QPointer>
-
 #include "pqApplicationCore.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqServer.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMUndoElement.h"
+#include "vtkSMUndoStackBuilder.h"
+#include "vtkSMUndoStack.h"
+#include "vtkUndoSet.h"
+
+#include <QtDebug>
+#include <QPointer>
 
 //-----------------------------------------------------------------------------
 class pqUndoStack::pqImplementation
@@ -201,8 +199,17 @@ void pqUndoStack::endUndoSet()
 void pqUndoStack::undo()
 {
   this->beginNonUndoableChanges();
+
   this->Implementation->UndoStack->Undo();
-  vtkSMProxyManager::GetProxyManager()->UpdateAllRegisteredProxiesInOrder();
+
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  // Update of proxies have to happen in order.
+  pxm->UpdateRegisteredProxies("sources", 1);
+  pxm->UpdateRegisteredProxies("lookup_tables", 1);
+  pxm->UpdateRegisteredProxies("representations", 1);
+  pxm->UpdateRegisteredProxies("scalar_bars", 1);
+  pxm->UpdateRegisteredProxies(1);
   this->endNonUndoableChanges();
 
   pqApplicationCore::instance()->render();
@@ -215,7 +222,17 @@ void pqUndoStack::redo()
 {
   this->beginNonUndoableChanges();
   this->Implementation->UndoStack->Redo();
-  vtkSMProxyManager::GetProxyManager()->UpdateAllRegisteredProxiesInOrder();
+
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  // Update of proxies have to happen in order.
+  pxm->UpdateRegisteredProxies("sources", 1);
+  pxm->UpdateRegisteredProxies("lookup_tables", 1);
+  pxm->UpdateRegisteredProxies("representations", 1);
+  pxm->UpdateRegisteredProxies("scalar_bars", 1);
+  pxm->UpdateRegisteredProxies(1);
+  this->endNonUndoableChanges();
+
   this->endNonUndoableChanges();
 
   pqApplicationCore::instance()->render();

@@ -15,8 +15,10 @@
 #include "vtkSMSessionProxyManager.h"
 
 #include "vtkCollection.h"
+#include "vtkDebugLeaks.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkInstantiator.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModule.h"
@@ -34,16 +36,18 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMWriterFactory.h"
-#include "vtkSMProxySelectionModel.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+#include "vtkVersion.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -53,7 +57,6 @@
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
 
-#include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManagerInternals.h"
 
 #if 0 // for debugging
@@ -105,14 +108,24 @@ protected:
 };
 
 //*****************************************************************************
-vtkStandardNewMacro(vtkSMSessionProxyManager);
 //---------------------------------------------------------------------------
-vtkSMSessionProxyManager::vtkSMSessionProxyManager()
+vtkSMSessionProxyManager* vtkSMSessionProxyManager::New(vtkSMSession* session)
 {
-  this->Session = NULL;
-  this->PipelineState = NULL;
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkSMSessionProxyManager");
+#endif
+  return new vtkSMSessionProxyManager(session);
+}
+
+//---------------------------------------------------------------------------
+vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
+{
+  this->Superclass::SetSession(session);
+
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMSessionProxyManagerInternals;
+  this->Internals->ProxyManager = this;
+
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
 #if 0 // for debugging
@@ -130,13 +143,23 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager()
     vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated, this->Observer);
   this->ProxyDefinitionManager->AddObserver(
     vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Observer);
+  this->ProxyDefinitionManager->SetSession(session);
 
   this->ReaderFactory = vtkSMReaderFactory::New();
+  this->ReaderFactory->SetSession(this->Session);
+
   this->WriterFactory = vtkSMWriterFactory::New();
+  this->WriterFactory->SetSession(this->Session);
 
-  // Provide internal object a pointer to us
-  this->Internals->ProxyManager = this;
+  this->PipelineState = vtkSMPipelineState::New();
+  this->PipelineState->SetSession(this->Session);
 
+  // setup event forwarder so that it forwards all events fired by this class via
+  // the global proxy manager.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkNew<vtkEventForwarderCommand> forwarder;
+  forwarder->SetTarget(pxm);
+  this->AddObserver(vtkCommand::AnyEvent, forwarder.GetPointer());
 }
 
 //---------------------------------------------------------------------------
@@ -160,45 +183,14 @@ vtkSMSessionProxyManager::~vtkSMSessionProxyManager()
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
 
-  if(this->PipelineState)
-    {
-    this->PipelineState->Delete();
-    this->PipelineState = NULL;
-    }
+  this->PipelineState->Delete();
+  this->PipelineState = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMSessionProxyManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_MANAGER_ID;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSessionProxyManager::SetSession(vtkSMSession* session)
-{
-  if (this->Session == session)
-    {
-    return;
-    }
-  if (this->Session)
-    {
-    this->UnRegisterAllLinks();
-    this->UnRegisterProxies();
-    this->PipelineState->Delete();
-    this->PipelineState = NULL;
-    }
-
-  this->Superclass::SetSession(session);
-  this->ReaderFactory->SetSession(session);
-  this->WriterFactory->SetSession(session);
-
-  if (this->Session)
-    {
-    // This will also register the RemoteObject to the Session
-    this->PipelineState = vtkSMPipelineState::New();
-    this->PipelineState->SetSession(this->Session);
-    }
-  this->ProxyDefinitionManager->SetSession(session);
 }
 
 //----------------------------------------------------------------------------

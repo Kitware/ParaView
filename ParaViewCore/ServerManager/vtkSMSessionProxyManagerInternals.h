@@ -37,6 +37,8 @@
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
 public:
+  vtkTypeMacro(vtkSMProxyManagerProxyInfo, vtkObjectBase);
+
   vtkSmartPointer<vtkSMProxy> Proxy;
   unsigned long ModifiedObserverTag;
   unsigned long StateChangedObserverTag;
@@ -45,26 +47,13 @@ public:
 
   static vtkSMProxyManagerProxyInfo* New()
     {
+    // This is required everytime we're implementing our own New() to avoid
+    // "Deleting unknown object" warning from vtkDebugLeaks.
+#ifdef VTK_DEBUG_LEAKS
+    vtkDebugLeaks::ConstructClass("vtkSMProxyManagerProxyInfo");
+#endif
     return new vtkSMProxyManagerProxyInfo();
     }
-
-  // Description:
-  // this needs to be overridden otherwise vtkDebugLeaks warnings are objects
-  // are destroyed.
-  void UnRegister()
-    {
-    int refcount = this->GetReferenceCount()-1;
-    this->SetReferenceCount(refcount);
-    if (refcount <= 0)
-      {
-#ifdef VTK_DEBUG_LEAKS
-      vtkDebugLeaks::DestructClass("vtkSMProxyManagerProxyInfo");
-#endif
-      delete this;
-      }
-    }
-  virtual void UnRegister(vtkObjectBase *)
-    { this->UnRegister(); }
 
 private:
   vtkSMProxyManagerProxyInfo()

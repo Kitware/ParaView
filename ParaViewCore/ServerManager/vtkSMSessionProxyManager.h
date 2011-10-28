@@ -125,17 +125,15 @@ class VTK_EXPORT vtkSMSessionProxyManager : public vtkSMSessionObject
 {
 public:
   // Description:
-  // Return the GlobalID that should be used to refer to the ProxyManager state
-  static vtkTypeUInt32 GetReservedGlobalID();
-
-  static vtkSMSessionProxyManager* New();
+  // vtkSMSessionProxyManager requires a session and cannot be created without
+  // one.
+  static vtkSMSessionProxyManager* New(vtkSMSession* session);
   vtkTypeMacro(vtkSMSessionProxyManager, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the session on which this proxymanager is working.
-  // Note that session is not reference counted.
-  virtual void SetSession(vtkSMSession*);
+  // Return the GlobalID that should be used to refer to the ProxyManager state
+  static vtkTypeUInt32 GetReservedGlobalID();
 
   // Description:
   // Given a group and proxy name, create and return a proxy instance.
@@ -466,7 +464,7 @@ public:
                                  vtkSMStateLocator* locator);
 
 protected:
-  vtkSMSessionProxyManager();
+  vtkSMSessionProxyManager(vtkSMSession*);
   ~vtkSMSessionProxyManager();
 
   friend class vtkSMGlobalPropertiesManager;
@@ -530,6 +528,9 @@ protected:
 private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
+
+  static vtkSMSessionProxyManager* New()
+    { return NULL; }
 
 private:
   vtkSMSessionProxyManager(const vtkSMSessionProxyManager&); // Not implemented

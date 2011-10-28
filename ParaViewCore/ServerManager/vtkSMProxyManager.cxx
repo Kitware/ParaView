@@ -14,23 +14,24 @@
 =========================================================================*/
 #include "vtkSMProxyManager.h"
 
-#include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkWeakPointer.h"
+#include "vtkProcessModule.h"
+#include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
+#include "vtkPVXMLElement.h"
+#include "vtkSessionIterator.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMGlobalPropertiesLinkUndoElement.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
-#include "vtkEventForwarderCommand.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkPVXMLElement.h"
+#include "vtkWeakPointer.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtkstd/map>
-#include <vtkSmartPointer.h>
-#include <vtkWeakPointer.h>
 
 #define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
 //***************************************************************************
@@ -43,9 +44,6 @@ public:
   SelectionModelsType SelectionModels;
 
   vtkWeakPointer<vtkSMSession> ActiveSession;
-  vtkSmartPointer<vtkSMUndoStackBuilder> UndoStackBuilder;
-  vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkEventForwarderCommand> > EventForwarderMap;
-  vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkSMSessionProxyManager> > SessionProxyManagerMap;
 
   // Data structure for storing GlobalPropertiesManagers.
   typedef vtkstd::map<vtkstd::string,
@@ -60,40 +58,44 @@ public:
   // GlobalPropertiesManagerObserver
   void GlobalPropertyEvent(vtkObject* src, unsigned long event, void* data)
     {
-    vtkSMGlobalPropertiesManager* globalPropertiesManager =
-        vtkSMGlobalPropertiesManager::SafeDownCast(src);
+    // FIXME: FIXME_MULTI_SERVER
+    //vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    //    vtkSMGlobalPropertiesManager::SafeDownCast(src);
 
-    // We are only managing UndoElements on GlobalPropertyManager when only one
-    // server is involved !!!
-    if(globalPropertiesManager && this->SessionProxyManagerMap.size() == 1)
-      {
-      vtkSMSession* session = this->SessionProxyManagerMap.begin()->first;
-      vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
-      const char* globalPropertiesManagerName =
-          pxm->GetGlobalPropertiesManagerName(globalPropertiesManager);
-      if( globalPropertiesManagerName &&
-          this->UndoStackBuilder &&
-          event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
-        {
-        vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
-        modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
+    //// We are only managing UndoElements on GlobalPropertyManager when only one
+    //// server is involved !!!
+    //if(globalPropertiesManager && this->SessionProxyManagerMap.size() == 1)
+    //  {
+    //  vtkSMSession* session = this->SessionProxyManagerMap.begin()->first;
+    //  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
+    //  const char* globalPropertiesManagerName =
+    //      pxm->GetGlobalPropertiesManagerName(globalPropertiesManager);
+    //  if( globalPropertiesManagerName &&
+    //      this->UndoStackBuilder &&
+    //      event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
+    //    {
+    //    vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
+    //    modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
 
-        vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
-        undoElem->SetSession(session);
-        undoElem->SetLinkState( globalPropertiesManagerName,
-                                modifiedInfo->GlobalPropertyName,
-                                modifiedInfo->Proxy,
-                                modifiedInfo->PropertyName,
-                                modifiedInfo->AddLink);
-        this->UndoStackBuilder->Add(undoElem);
-        undoElem->Delete();
-        }
-      }
+    //    vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
+    //    undoElem->SetSession(session);
+    //    undoElem->SetLinkState( globalPropertiesManagerName,
+    //                            modifiedInfo->GlobalPropertyName,
+    //                            modifiedInfo->Proxy,
+    //                            modifiedInfo->PropertyName,
+    //                            modifiedInfo->AddLink);
+    //    this->UndoStackBuilder->Add(undoElem);
+    //    undoElem->Delete();
+    //    }
+    //  }
     }
 };
 //***************************************************************************
 // Statics...
 vtkSmartPointer<vtkSMProxyManager> vtkSMProxyManager::Singleton;
+
+vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStackBuilder,
+  vtkSMUndoStackBuilder);
 //***************************************************************************
 vtkSMProxyManager* vtkSMProxyManager::New()
 {
@@ -109,7 +111,18 @@ vtkSMProxyManager* vtkSMProxyManager::New()
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->PXMStorage = new vtkPXMInternal();
+  this->UndoStackBuilder = NULL;
 }
+
+//---------------------------------------------------------------------------
+vtkSMProxyManager::~vtkSMProxyManager()
+{
+  this->SetUndoStackBuilder(NULL);
+
+  delete this->PXMStorage;
+  this->PXMStorage = NULL;
+}
+
 //----------------------------------------------------------------------------
 vtkSMProxyManager* vtkSMProxyManager::GetProxyManager()
 {
@@ -131,13 +144,6 @@ void vtkSMProxyManager::Finalize()
 bool vtkSMProxyManager::IsInitialized()
 {
   return (vtkSMProxyManager::Singleton != NULL);
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxyManager::~vtkSMProxyManager()
-{
-  delete this->PXMStorage;
-  this->PXMStorage = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -167,108 +173,68 @@ int vtkSMProxyManager::GetVersionPatch()
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMProxyManager::GetActiveSession()
 {
+  // If no active session, find the first available session and set it to active
+  if (this->PXMStorage->ActiveSession == NULL)
+    {
+    vtkSMSession* session = 0;
+    vtkSmartPointer<vtkSessionIterator> iter;
+    iter.TakeReference(
+      vtkProcessModule::GetProcessModule()->NewSessionIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+      iter->GoToNextItem())
+      {
+      vtkSMSession* temp = vtkSMSession::SafeDownCast(
+        iter->GetCurrentSession());
+      if (temp && session)
+        {
+        // more than 1 vtkSMSession is present. In that case, user has to
+        // explicitly set the active session.
+        return NULL;
+        }
+      session = temp;
+      }
+    this->PXMStorage->ActiveSession = session;
+    }
+
   return this->PXMStorage->ActiveSession;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::SetActiveSession(vtkIdType sid)
+{
+  this->SetActiveSession(
+    vtkSMSession::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetSession(sid)));
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkSMSession* session)
 {
   this->PXMStorage->ActiveSession = session;
+
+  // ensures that the active session is updated if session == NULL.
+  this->GetActiveSession();
 }
 
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMProxyManager::GetActiveSessionProxyManager()
 {
-  // If no active session, find the first available session and set it to active
-  if(!this->PXMStorage->ActiveSession)
-    {
-    vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkSMSessionProxyManager> >::iterator iter;
-    iter = this->PXMStorage->SessionProxyManagerMap.begin();
-
-    // Loop over all Session
-    while(iter != this->PXMStorage->SessionProxyManagerMap.end())
-      {
-      if(vtkSMSession* session = iter->first)
-        {
-        this->SetActiveSession(session);
-        return this->GetSessionProxyManager(this->GetActiveSession());
-        }
-
-      // Go to the next one
-      iter++;
-      }
-    }
   return this->GetSessionProxyManager(this->GetActiveSession());
 }
 
 //----------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMProxyManager::GetSessionProxyManager(vtkSMSession* session)
 {
-  vtkSMSessionProxyManager* pxm = NULL;
-  if(session)
-    {
-    if(this->PXMStorage->ActiveSession == NULL)
-      {
-      this->SetActiveSession(session);
-      }
-
-    pxm = this->PXMStorage->SessionProxyManagerMap[session];
-    if(!pxm)
-      {
-      this->PXMStorage->SessionProxyManagerMap[session].TakeReference(vtkSMSessionProxyManager::New());
-      this->PXMStorage->EventForwarderMap[session].TakeReference(vtkEventForwarderCommand::New());
-      pxm = this->PXMStorage->SessionProxyManagerMap[session];
-      pxm->SetSession(session);
-      session->SetUndoStackBuilder(this->PXMStorage->UndoStackBuilder);
-
-      // Init event forwarder
-      vtkEventForwarderCommand* forwarder = this->PXMStorage->EventForwarderMap[session];
-      forwarder->SetTarget(this);
-      pxm->AddObserver(vtkCommand::AnyEvent, forwarder);
-      }
-    }
-  return pxm;
-}
-//----------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterSession(vtkSMSession* sessionToRemove)
-{
-  this->PXMStorage->EventForwarderMap.erase(sessionToRemove);
-  this->PXMStorage->SessionProxyManagerMap.erase(sessionToRemove);
+  return session? session->GetSessionProxyManager() : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "UndoStackBuilder: " << this->UndoStackBuilder << endl;
 }
 
-//----------------------------------------------------------------------------
-void vtkSMProxyManager::UpdateAllRegisteredProxiesInOrder()
-{
-  // Consts
-  const char* groupsOrder[4] =
-    {"sources", "lookup_tables", "representations", "scalar_bars"};
-
-  // Vars
-  vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkSMSessionProxyManager> >::iterator iter;
-  iter = this->PXMStorage->SessionProxyManagerMap.begin();
-
-  // Loop over all SessionProxyManager
-  while(iter != this->PXMStorage->SessionProxyManagerMap.end())
-    {
-    if(vtkSMSessionProxyManager* pxm = iter->second.GetPointer())
-      {
-      for(int i=0; i < 4; i++)
-        {
-        pxm->UpdateRegisteredProxies(groupsOrder[i], 1);
-        }
-      pxm->UpdateRegisteredProxies(1);
-      }
-
-    // Go to the next one
-    iter++;
-    }
-}
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::RegisterSelectionModel(
   const char* name, vtkSMProxySelectionModel* model)
@@ -318,31 +284,6 @@ vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
   return iter->second;
 }
 
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::AttachUndoStackBuilder(vtkSMUndoStackBuilder* undoBuilder)
-{
-  this->PXMStorage->UndoStackBuilder = undoBuilder;
-  vtkstd::map<vtkSMSession*, vtkSmartPointer<vtkSMSessionProxyManager> >::iterator iter;
-  iter = this->PXMStorage->SessionProxyManagerMap.begin();
-
-  // Loop over all Session
-  while(iter != this->PXMStorage->SessionProxyManagerMap.end())
-    {
-    if(vtkSMSession* session = iter->first)
-      {
-      session->SetUndoStackBuilder(this->PXMStorage->UndoStackBuilder);
-      }
-
-    // Go to the next one
-    iter++;
-    }
-}
-
-//---------------------------------------------------------------------------
-bool vtkSMProxyManager::HasSessionProxyManager()
-{
-  return (this->PXMStorage->SessionProxyManagerMap.size() > 0);
-}
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
     vtkSMGlobalPropertiesManager* mgr)

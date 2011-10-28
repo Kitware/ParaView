@@ -144,7 +144,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 void pqFiltersMenuReaction::updateEnableState()
 {
   // Impossible to validate anything without any SessionProxyManager
-  if(!vtkSMProxyManager::GetProxyManager()->HasSessionProxyManager())
+  if(!vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
     {
     this->Timer.start(100); // Try later
     return;

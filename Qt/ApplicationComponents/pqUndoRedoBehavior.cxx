@@ -56,7 +56,7 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   // setup Undo Stack.
   pqUndoStackBuilder* builder = pqUndoStackBuilder::New();
   pqUndoStack* stack = new pqUndoStack(builder, this);
-  vtkSMProxyManager::GetProxyManager()->AttachUndoStackBuilder(builder);
+  vtkSMProxyManager::GetProxyManager()->SetUndoStackBuilder(builder);
   builder->Delete();
   core->setUndoStack(stack);
 

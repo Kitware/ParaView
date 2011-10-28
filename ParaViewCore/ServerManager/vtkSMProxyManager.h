@@ -25,16 +25,16 @@
 
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // Needed for the singleton
+#include "vtkSMSessionProxyManager.h" // Needed for forwarding calls.
 
 class vtkPVXMLElement;
-class vtkSMSession;
-class vtkSMStateLoader;
+class vtkSMGlobalPropertiesManager;
 class vtkSMProxy;
-class vtkSMSessionProxyManager;
 class vtkSMProxyLocator;
 class vtkSMProxySelectionModel;
+class vtkSMSession;
+class vtkSMStateLoader;
 class vtkSMUndoStackBuilder;
-class vtkSMGlobalPropertiesManager;
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
@@ -78,33 +78,26 @@ public:
   static const char* GetParaViewSourceVersion();
 
   // Description:
-  // Return the current active session if any otherwise, return NULL.
+  // Returns the current active session. If no active session is set, and
+  // there's only one registered vtkSMSession with vtkProcessModule, then that
+  // session is automatically treated as the active session.
   vtkSMSession* GetActiveSession();
 
   // Description:
-  // Set a new active session and register an associated vtkSMSessionProxyManager
-  // if none was attached to that given session.
+  // Set the active session. It's acceptable to set the active session as NULL
+  // (or 0 in case of sessionId), however GetActiveSession() may automatically
+  // pick an active session if none is provided.
   void SetActiveSession(vtkSMSession* session);
+  void SetActiveSession(vtkIdType sessionId);
 
   // Description:
-  // Convenient method to get the active vtkSMSessionProxyManager
+  // Convenient method to get the active vtkSMSessionProxyManager. If no
   vtkSMSessionProxyManager* GetActiveSessionProxyManager();
 
   // Description:
   // Return the corresponding vtkSMSessionProxyManager and if any,
   // then create a new one.
   vtkSMSessionProxyManager* GetSessionProxyManager(vtkSMSession* session);
-
-  // Description:
-  // Need to be called when a session get removed so we can cleanup the
-  // corresponding vtkSMSessionProxyManager
-  void UnRegisterSession(vtkSMSession*);
-
-  // Description:
-  // This will update each pipeline for each session in the proper order.
-  // This method is used after a undo/redo action to ensure that every changes
-  // have been properly pushed.
-  void UpdateAllRegisteredProxiesInOrder();
 
   // Description:
   // Register/UnRegister a selection model. A selection model can be typically
@@ -132,15 +125,11 @@ public:
   vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
   const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
 
-
   // Description:
-  // Attach an undo stack builder which will be attached to any existing session
-  // or any session to come.
-  void AttachUndoStackBuilder(vtkSMUndoStackBuilder* undoBuilder);
-
-  // Description:
-  // Test if any SessionProxyManager is available. If any return true.
-  bool HasSessionProxyManager();
+  // Get/Set the undo-stack builder if the application is using undo-redo
+  // mechanism to track changes.
+  void SetUndoStackBuilder(vtkSMUndoStackBuilder* builder);
+  vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
 
 //BTX
   struct RegisteredProxyInformation
@@ -190,6 +179,8 @@ protected:
   // Description:
   // Save global property managers.
   void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
+
+  vtkSMUndoStackBuilder* UndoStackBuilder;
 
 private:
   class vtkPXMInternal;

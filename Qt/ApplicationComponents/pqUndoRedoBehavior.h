@@ -44,6 +44,9 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqUndoRedoBehavior : public QObject
 public:
   pqUndoRedoBehavior(QObject* parent=0);
 
+protected:
+
+
 private:
   Q_DISABLE_COPY(pqUndoRedoBehavior)
 };
