@@ -544,6 +544,11 @@ protected:
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
 
+  // Used in collaboration mode to ensure that views are in the same state
+  // (as far as representations added/removed goes) before rendering.
+  int SynchronizationCounter;
+  bool CounterSynchronizedSuccessfully;
+
   // In mega-bytes.
   double LocalGeometrySize;
   double GeometrySize;

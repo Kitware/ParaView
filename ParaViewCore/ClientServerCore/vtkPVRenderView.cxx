@@ -134,6 +134,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseInteractiveRenderingForSceenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->Selector = vtkPVHardwareSelector::New();
+  this->SynchronizationCounter  = 0;
 
   this->LastComputedBounds[0] = this->LastComputedBounds[2] =
     this->LastComputedBounds[4] = -1.0;
@@ -326,6 +327,7 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
     this->Internals->IdToRepMap[id] = rep;
     }
   this->Superclass::AddRepresentationInternal(rep);
+  this->SynchronizationCounter++;
 }
 
 //----------------------------------------------------------------------------
@@ -340,6 +342,7 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
     }
 
   this->Superclass::RemoveRepresentationInternal(rep);
+  this->SynchronizationCounter++;
 }
 
 //----------------------------------------------------------------------------
@@ -653,6 +656,8 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeForCollaboration()
 {
+  this->CounterSynchronizedSuccessfully = false;
+
   // Also, can we optimize this further? This happens on every render in
   // collaborative mode.
   vtkMultiProcessController* p_controller =
@@ -661,32 +666,43 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     this->SynchronizedWindows->GetClientDataServerController();
   vtkMultiProcessController* r_controller =
     this->SynchronizedWindows->GetClientServerController();
+  if (d_controller != NULL)
+    {
+    vtkErrorMacro("RenderServer-DataServer configuration is not supported in "
+      "collabortion mode.");
+    abort();
+    }
 
   if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
     {
-    if (d_controller)
-      {
-      d_controller->Send(&this->RemoteRenderingThreshold, 1, 1, 41000);
-      }
-    if (r_controller)
-      {
-      r_controller->Send(&this->RemoteRenderingThreshold, 1, 1, 41000);
-      }
+    vtkMultiProcessStream stream;
+    stream << this->SynchronizationCounter << this->RemoteRenderingThreshold;
+    r_controller->Send(stream, 1, 41000);
+    int server_sync_counter;
+    r_controller->Receive(&server_sync_counter, 1, 1, 41001);
+    this->CounterSynchronizedSuccessfully =
+      (server_sync_counter == this->SynchronizationCounter);
     }
   else
     {
-    if (d_controller)
-      {
-      d_controller->Receive(&this->RemoteRenderingThreshold, 1, 1, 41000);
-      }
     if (r_controller)
       {
-      r_controller->Receive(&this->RemoteRenderingThreshold, 1, 1, 41000);
+      vtkMultiProcessStream stream;
+      r_controller->Receive(stream, 1, 41000);
+      int client_sync_counter;
+      stream >> client_sync_counter >> this->RemoteRenderingThreshold;
+      r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
+      this->CounterSynchronizedSuccessfully =
+        (client_sync_counter == this->SynchronizationCounter);
       }
-    }
-  if (p_controller)
-    {
-    p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
+
+    if (p_controller)
+      {
+      p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
+      int temp = this->CounterSynchronizedSuccessfully? 1 : 0;
+      p_controller->Broadcast(&temp, 1, 0);
+      this->CounterSynchronizedSuccessfully = (temp == 1);
+      }
     }
   // Force DoDataDelivery(). That should happen every time in collaborative
   // mode.
@@ -931,6 +947,12 @@ void vtkPVRenderView::DoDataDelivery(
      this->StillRenderTime > this->UpdateTime))
     {
     //cout << "skipping delivery" << endl;
+    return;
+    }
+
+  if (!this->CounterSynchronizedSuccessfully)
+    {
+    // Skip data-delivery for this render.
     return;
     }
 
