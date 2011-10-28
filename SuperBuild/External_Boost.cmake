@@ -35,10 +35,14 @@ ExternalProject_Add(Boost
     -DBUILD_EXAMPLES:BOOL=OFF
     -DBUILD_TESTING:BOOL=OFF
     -DBUILD_VERSIONED:BOOL=OFF
-    -DINSTALL_VERSIONED:BOOL=ON
+    -DINSTALL_VERSIONED:BOOL=OFF
     -DWINMANGLE_LIBNAMES:BOOL=ON
     -DWITH_MPI:BOOL=OFF
     -DWITH_PYTHON:BOOL=OFF
+    -DRYPPL_LIB_INSTALL_DIR:PATH=${boost_install}/lib
+    -DRYPPL_INCLUDE_INSTALL_DIR:PATH=${boost_install}/include/boost-${BOOST_MAJOR}_${BOOST_MINOR}
+    -DRYPPL_CMAKE_INFRASTRUCTURE_INSTALL_DIR:PATH=${boost_install}/share/boost-${BOOST_VERSION}/cmake
+    -DRYPPL_EXPORTS_INSTALL_DIR:PATH=${boost_install}/lib/boost-${BOOST_VERSION}
     -DCMAKE_INSTALL_PREFIX:PATH=${boost_install}
     ${Boost_EXTRA_ARGS}
   )
@@ -49,5 +53,5 @@ ExternalProject_Add(Boost
   )
 
 # These variables are used to find Boost by other projects
-set(Boost_INCLUDE_DIR "${boost_install}/include" CACHE PATH "" FORCE)
+set(Boost_INCLUDE_DIR "${boost_install}/include/boost-${BOOST_MAJOR}_${BOOST_MINOR}" CACHE PATH "" FORCE)
 set(BOOST_LIBRARYDIR "${boost_install}/lib" CACHE PATH "" FORCE)
