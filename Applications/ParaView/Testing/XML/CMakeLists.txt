@@ -270,7 +270,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 
 OPTION(PARAVIEW_COLLABORATION_TESTING
     "Add Collaboration testing"
-    OFF)
+    ON)
 MARK_AS_ADVANCED(PARAVIEW_COLLABORATION_TESTING)
 
 # The create/delete test was only meant for collaboration
