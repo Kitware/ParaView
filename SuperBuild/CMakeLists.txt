@@ -468,6 +468,7 @@ ExternalProject_Add(${proj}
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
+    -DBOOST_ROOT:PATH=${CMAKE_CURRENT_BINARY_DIR}
     # png
     ${PNG_ARGS}
     # Python
