@@ -9,6 +9,7 @@ if(WIN32)
   EXECUTE_PROCESS(
     COMMAND copysilo.bat
     WORKING_DIRECTORY "@Silo_source@/SiloWindows"
+    RESULT_VARIABLE res
     )
 else()
 
@@ -21,6 +22,12 @@ else()
   EXECUTE_PROCESS(
     COMMAND sh configure --prefix=@Silo_install@ --disable-fortran --with-zlib=@ZLIB_INCLUDE_DIR@,@zlib_install@/lib --with-hdf5=@HDF5_INCLUDE_DIR@,@HDF5_install@/lib --with-qt=@qt_dir@ --disable-silex --disable-static --enable-shared --disable-browser --without-readline
     WORKING_DIRECTORY "@Silo_source@"
+    RESULT_VARIABLE res
     )
 
+endif()
+
+if(NOT ${res} EQUAL 0)
+  message("NUMPY Errors detected: \n${NUMPY_OUT}\n${NUMPY_ERR}")
+  message(FATAL_ERROR "Error in config of NUMPY")
 endif()
