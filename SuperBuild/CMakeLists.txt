@@ -389,8 +389,15 @@ set(VRPN_ARGS
   -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
 
 # Build AcuSolveReaderPlugin
-list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
-include(External_AcuSolveReaderPlugin)
+option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
+set(DOC_ARGS)
+if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+  list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
+  include(External_AcuSolveReaderPlugin)
+  set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
+      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source})
+endif()
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
@@ -501,8 +508,7 @@ ExternalProject_Add(${proj}
     # zlib
     ${ZLIB_ARGS}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
-    -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
-    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source}
+    ${AcuSolve_ARGS}
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
