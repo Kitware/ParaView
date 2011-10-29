@@ -24,4 +24,5 @@
   <Plugin name="NIfTIWriter" auto_load="0"/>
   <Plugin name="ForceTime" auto_load="0"/>
   <Plugin name="SQToolkit" auto_load="0"/>
+  <Plugin name="AcuSolveReader" auto_load="0"/>
 </Plugins>
