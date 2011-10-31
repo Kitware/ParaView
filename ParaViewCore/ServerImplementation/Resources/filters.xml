@@ -4247,6 +4247,8 @@ The Transform filter allows you to specify the position, size, and orientation o
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkPointSet"/>
+            <DataType value="vtkImageData"/>
+            <DataType value="vtkRectilinearGrid"/>
           </DataTypeDomain>
           <Documentation>
             This property specifies the input to the Transform filter.
@@ -4469,6 +4471,8 @@ The Warp (scalar) filter translates the points of the input data set along a vec
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
              <DataType value="vtkPointSet"/>
+             <DataType value="vtkImageData"/>
+             <DataType value="vtkRectilinearGrid"/>
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="1"/>
@@ -4557,6 +4561,8 @@ The Warp (vector) filter translates the points of the input dataset using a spec
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
              <DataType value="vtkPointSet"/>
+             <DataType value="vtkImageData"/>
+             <DataType value="vtkRectilinearGrid"/>
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
                              number_of_components="3"/>
@@ -7872,6 +7878,44 @@ Tessellate a higher-order dataset.
     </SourceProxy>
 
    <!-- ==================================================================== -->
+    <SourceProxy name="ImageDataToPointSet"
+                 class="vtkImageDataToPointSet"
+                 label="Image Data to Point Set">
+      <Documentation>
+        The Image Data to Point Set filter takes an image data (uniform rectilinear grid) object and outputs an equivalent structured grid (which as a type of point set).  This brings the data to a broader category of data storage but only adds a small amount of overhead.  This filter can be helpful in applying filters that expect or manipulate point coordinates.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+
+   <!-- ==================================================================== -->
+    <SourceProxy name="RectilinearGridToPointSet"
+                 class="vtkRectilinearGridToPointSet"
+                 label="Rectilinear Data to Point Set">
+      <Documentation>
+        The Rectilinear Grid to Point Set filter takes an rectilinear grid object and outputs an equivalent structured grid (which as a type of point set).  This brings the data to a broader category of data storage but only adds a small amount of overhead.  This filter can be helpful in applying filters that expect or manipulate point coordinates.
+      </Documentation>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+
+   <!-- ==================================================================== -->
     <SourceProxy name="FlattenFilter" class="vtkMergeCompositeDataSet">
       <InputProperty
         name="Input"
@@ -7890,6 +7934,7 @@ Tessellate a higher-order dataset.
           </Documentation>
       </InputProperty>
     </SourceProxy>
+
    <!-- ==================================================================== -->
     <SourceProxy name="OrderedCompositeDistributor"
                  class="vtkOrderedCompositeDistributor">
