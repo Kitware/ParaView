@@ -3835,7 +3835,7 @@
     </ParallelCoordinatesRepresentationProxy>
 
     <!-- =================================================================== -->
-    <PlotMatrixRepresentationProxy name="PlotMatrixRepresentation"
+    <ChartRepresentationProxy name="PlotMatrixRepresentation"
       base_proxygroup="representations"
       class="vtkPVPlotMatrixRepresentation"
       processes="client|dataserver|renderserver" >
@@ -4100,7 +4100,7 @@
         </ExposedProperties>
       </SubProxy>
 
-    </PlotMatrixRepresentationProxy>
+    </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
     <!-- New representation for ContextView based charts. -->
