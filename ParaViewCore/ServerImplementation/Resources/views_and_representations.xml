@@ -3979,62 +3979,35 @@
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="ColorInfo"
-        number_of_elements_per_command="3"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of line color for the series.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="Color"
+      <DoubleVectorProperty name="Color"
         command="SetColor"
         number_of_elements_per_command="3"
-        element_types="1 1 1"
         repeat_command="1"
-        information_property="ColorInfo" >
+        default_values="0 0 0">
         <Documentation>
           Sets the color.
         </Documentation>
-      </StringVectorProperty>
+      </DoubleVectorProperty>
 
-      <StringVectorProperty name="ActivePlotColorInfo"
-        number_of_elements_per_command="3"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of color for the active plot.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ActivePlotColor"
+      <DoubleVectorProperty name="ActivePlotColor"
         command="SetActivePlotColor"
         number_of_elements_per_command="3"
-        element_types="1 1 1"
         repeat_command="1"
-        information_property="ActivePlotColorInfo" >
+        default_values="0 0 0">
         <Documentation>
           Sets the color for the active plot.
         </Documentation>
-      </StringVectorProperty>
+      </DoubleVectorProperty>
 
-      <StringVectorProperty name="HistogramColorInfo"
-        number_of_elements_per_command="3"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of color for the histograms.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="HistogramColor"
+      <DoubleVectorProperty name="HistogramColor"
         command="SetHistogramColor"
         number_of_elements_per_command="3"
-        element_types="1 1 1"
         repeat_command="1"
-        information_property="ActivePlotColorInfo" >
+        default_values="0 0 0">
         <Documentation>
           Sets the color for the histograms.
         </Documentation>
-      </StringVectorProperty>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="ScatterPlotMarkerStyle"
         command="SetMarkerStyle"
