@@ -25,7 +25,6 @@
 
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // Needed for the singleton
-#include "vtkSMSessionProxyManager.h" // Needed for forwarding calls.
 
 class vtkPVXMLElement;
 class vtkSMGlobalPropertiesManager;
@@ -33,6 +32,7 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMProxySelectionModel;
 class vtkSMSession;
+class vtkSMSessionProxyManager;
 class vtkSMStateLoader;
 class vtkSMUndoStackBuilder;
 
@@ -98,6 +98,16 @@ public:
   // Return the corresponding vtkSMSessionProxyManager and if any,
   // then create a new one.
   vtkSMSessionProxyManager* GetSessionProxyManager(vtkSMSession* session);
+
+  // Description:
+  // Calls forwarded to the active vtkSMSessionProxyManager, if any. Raises
+  // errors if no active session manager can be determined (using
+  // GetActiveSessionProxyManager()).
+  vtkSMProxy* NewProxy(const char* groupName,
+    const char* proxyName, const char* subProxyName = NULL);
+  void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
+  vtkSMProxy* GetProxy(const char* groupname, const char* name);
+  void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
 
   // Description:
   // Register/UnRegister a selection model. A selection model can be typically

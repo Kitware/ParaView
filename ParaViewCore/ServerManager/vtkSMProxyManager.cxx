@@ -385,3 +385,54 @@ void vtkSMProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
       }
     }
 }
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::NewProxy(const char* groupName,
+  const char* proxyName, const char* subProxyName)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->NewProxy(groupName, proxyName, subProxyName);
+    }
+  vtkErrorMacro("No active session found.");
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RegisterProxy(
+  const char* groupname, const char* name, vtkSMProxy* proxy)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    pxm->RegisterProxy(groupname, name, proxy);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, const char* name)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->GetProxy(groupname, name);
+    }
+  vtkErrorMacro("No active session found.");
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxy(
+  const char* groupname, const char* name, vtkSMProxy* proxy)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    pxm->UnRegisterProxy(groupname, name, proxy);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+}
