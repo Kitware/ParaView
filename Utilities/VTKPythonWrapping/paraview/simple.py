@@ -38,8 +38,18 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 5
 import servermanager
 
+def enableMultiServer():
+    servermanager.enableMultiServer()
+
+def switchActiveConnection(newActiveConnection=None, ns=None):
+    if not ns:
+       ns = globals()
+    _remove_functions(ns)
+    servermanager.switchActiveConnection(newActiveConnection)
+    _add_functions(ns)
+
 def _disconnect():
-    if servermanager.ActiveConnection:
+    if servermanager.ActiveConnection and servermanager.MultiServerConnections == None:
         servermanager.ProxyManager().UnRegisterProxies()
         active_objects.view = None
         active_objects.source = None
@@ -53,26 +63,26 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     _disconnect()
-    session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
 
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return session
+    return connection
 
 def ReverseConnect(port=11111):
     """Create a reverse connection to a server.  Listens on port and waits for
     an incoming connection from the server."""
     _disconnect()
-    session = servermanager.ReverseConnect(port)
+    connection = servermanager.ReverseConnect(port)
     _add_functions(globals())
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return session
+    return connection
 
 def _create_view(view_xml_name):
     "Creates and returns a 3D render view."
@@ -647,15 +657,30 @@ def _func_name_valid(name):
     return valid
 
 def _add_functions(g):
-    for m in [servermanager.filters, servermanager.sources,
-              servermanager.writers, servermanager.animation]:
+    activeModule = servermanager.ActiveConnection.Modules
+    for m in [activeModule.filters, activeModule.sources,
+              activeModule.writers, activeModule.animation]:
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str):
                 if not key in g and _func_name_valid(key):
+                    #print "add %s function" % key
                     g[key] = _create_func(key, m)
                     exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
+
+def _remove_functions(g):
+    list = []
+    if servermanager.ActiveConnection:
+       list = [m for m in dir(servermanager.ActiveConnection.Modules) if m[0] != '_']
+
+    for m in list:
+        dt = servermanager.ActiveConnection.Modules.__dict__[m].__dict__
+        for key in dt.keys():
+            cl = dt[key]
+            if not isinstance(cl, str) and g.has_key(key):
+                g.pop(key)
+                #print "remove %s function" % key
 
 def GetActiveView():
     "Returns the active view."
@@ -889,9 +914,11 @@ class ActiveObjects(object):
     objects are shared between Python and the user interface. This class
     is for internal use. Use the Set/Get methods for setting and getting
     active objects."""
-    def __get_selection_model(self, name):
+    def __get_selection_model(self, name, session=None):
         "Internal method."
-        pxm = servermanager.ProxyManager()
+        if session and session != servermanager.ActiveConnection.Session:
+            raise RuntimeError, "Try to set an active object with invalid active connection."
+        pxm = servermanager.ProxyManager(session)
         model = pxm.GetSelectionModel(name)
         if not model:
             model = servermanager.vtkSMProxySelectionModel()
@@ -900,10 +927,11 @@ class ActiveObjects(object):
 
     def set_view(self, view):
         "Sets the active view."
-        active_view_model = self.__get_selection_model("ActiveView") 
         if view:
+            active_view_model = self.__get_selection_model("ActiveView", view.GetSession())
             active_view_model.SetCurrentProxy(view.SMProxy, 0)
         else:
+            active_view_model = self.__get_selection_model("ActiveView")
             active_view_model.SetCurrentProxy(None, 0)
 
     def get_view(self):
@@ -913,11 +941,12 @@ class ActiveObjects(object):
 
     def set_source(self, source):
         "Sets the active source."
-        active_sources_model = self.__get_selection_model("ActiveSources") 
         if source:
             # 3 == CLEAR_AND_SELECT
+            active_sources_model = self.__get_selection_model("ActiveSources", source.GetSession())
             active_sources_model.SetCurrentProxy(source.SMProxy, 3)
         else:
+            active_sources_model = self.__get_selection_model("ActiveSources")
             active_sources_model.SetCurrentProxy(None, 3)
 
     def __convert_proxy(self, px):
