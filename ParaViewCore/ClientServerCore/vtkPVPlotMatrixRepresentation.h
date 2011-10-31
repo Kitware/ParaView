@@ -102,6 +102,15 @@ protected:
   // Description:
   // Remove the plot matrix representation from the view.
   virtual bool RemoveFromView(vtkView *view);
+
+private:
+  double ActivePlotColor[3];
+  double ScatterPlotColor[3];
+  double HistogramColor[3];
+  int ScatterPlotMarkerStyle;
+  int ActivePlotMarkerStyle;
+  double ScatterPlotMarkerSize;
+  double ActivePlotMarkerSize;
 };
 
 #endif
