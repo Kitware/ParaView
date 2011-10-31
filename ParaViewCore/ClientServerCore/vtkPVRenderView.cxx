@@ -104,6 +104,7 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 vtkPVRenderView::vtkPVRenderView()
 {
   this->Internals = new vtkInternals();
+  this->CounterSynchronizedSuccessfully = true;
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
