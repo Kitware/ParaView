@@ -24,7 +24,6 @@
 #define __vtkPVView_h
 
 #include "vtkView.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkInformation;
 class vtkInformationRequestKey;
@@ -198,8 +197,7 @@ private:
   vtkPVView(const vtkPVView&); // Not implemented
   void operator=(const vtkPVView&); // Not implemented
 
-  static vtkWeakPointer<vtkPVSynchronizedRenderWindows>
-    SingletonSynchronizedWindows;
+  class vtkInternals;
 
   bool ViewTimeValid;
   bool LastRenderOneViewAtATime;

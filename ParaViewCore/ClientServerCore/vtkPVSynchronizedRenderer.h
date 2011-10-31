@@ -25,6 +25,7 @@
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
 class vtkPKdTree;
+class vtkPVSession;
 class vtkRenderer;
 class vtkRenderPass;
 class vtkSynchronizedRenderers;
@@ -44,7 +45,7 @@ public:
 
   // Description:
   // Must be called once to initialize the class.
-  void Initialize();
+  void Initialize(vtkPVSession* session);
 
   // Description:
   // kd tree that gives processes ordering. Initial value is a NULL pointer.

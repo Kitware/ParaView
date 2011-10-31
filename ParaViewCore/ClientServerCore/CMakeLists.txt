@@ -156,6 +156,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVPythonPluginInterface.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVSession.cxx
+  vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkSession.cxx
   vtkTileDisplayHelper.cxx
