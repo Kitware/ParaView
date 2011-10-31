@@ -323,12 +323,15 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
 {
   if (vtk3DWidgetRepresentation::SafeDownCast(rep) == NULL)
     {
+    // We only increase that counter when widget are not involved as in
+    // collaboration mode only the master has the widget in its representation
+    this->SynchronizationCounter++;
+
     unsigned int id = this->Internals->UniqueId++;
     this->Internals->RepToIdMap[rep] = id;
     this->Internals->IdToRepMap[id] = rep;
     }
   this->Superclass::AddRepresentationInternal(rep);
-  this->SynchronizationCounter++;
 }
 
 //----------------------------------------------------------------------------
@@ -340,10 +343,13 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
     this->Internals->IdToRepMap.erase(
       this->Internals->RepToIdMap[rep]);
     this->Internals->RepToIdMap.erase(rep);
+
+    // We only increase that counter when widget are not involved as in
+    // collaboration mode only the master has the widget in its representation
+    this->SynchronizationCounter++;
     }
 
   this->Superclass::RemoveRepresentationInternal(rep);
-  this->SynchronizationCounter++;
 }
 
 //----------------------------------------------------------------------------
