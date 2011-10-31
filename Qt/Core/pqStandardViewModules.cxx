@@ -83,7 +83,8 @@ QStringList pqStandardViewModules::displayTypes() const
   return QStringList()
     << "XYChartRepresentation"
     << "XYBarChartRepresentation"
-    << "TextSourceRepresentation";
+    << "TextSourceRepresentation"
+    << "PlotMatrixRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
@@ -289,7 +290,8 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   QObject* p)
 {
   if (display_type == "XYChartRepresentation" ||
-      display_type == "XYBarChartRepresentation")
+      display_type == "XYBarChartRepresentation" ||
+      display_type == "PlotMatrixRepresentation")
     {
     // new chart representations.
     return new pqChartRepresentation(group, n, proxy, server, p);

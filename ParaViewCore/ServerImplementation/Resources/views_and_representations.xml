@@ -3836,6 +3836,7 @@
 
     <!-- =================================================================== -->
     <PlotMatrixRepresentationProxy name="PlotMatrixRepresentation"
+      base_proxygroup="representations"
       class="vtkPVPlotMatrixRepresentation"
       processes="client|dataserver|renderserver" >
       <Documentation>
@@ -3965,6 +3966,16 @@
         information_property="LabelInfo">
         <Documentation>
           Set the series labels.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        information_only="1"
+        si_class="vtkSIContextArraysProperty" >
+        <Documentation>
+          Property providing list of available series that can be plotted.
         </Documentation>
       </StringVectorProperty>
 
