@@ -16,16 +16,17 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
+#include "vtkNew.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
-#include "vtkNew.h"
+#include "vtkSMViewProxy.h"
 
 int main(int argc, char* argv[])
 {
@@ -34,23 +35,37 @@ int main(int argc, char* argv[])
     vtkProcessModule::PROCESS_CLIENT, options.GetPointer());
   
   vtkIdType session1ID = vtkSMSession::ConnectToSelf();
-  vtkIdType session2ID = vtkSMSession::ConnectToSelf();
+  vtkIdType session2ID = vtkSMSession::ConnectToRemote("localhost", 11111);
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMSessionProxyManager* spxm1 = pxm->GetSessionProxyManager(
-    vtkSMSession::SafeDownCast(pm->GetSession(session1ID)));
-  vtkSMSessionProxyManager* spxm2 = pxm->GetSessionProxyManager(
-    vtkSMSession::SafeDownCast(pm->GetSession(session2ID)));
-  
-  vtkSMProxy* sphere1 = spxm1->NewProxy("sources", "SphereSource");
+
+  pxm->SetActiveSession(session1ID);
+  vtkSMProxy* sphere1 = pxm->NewProxy("sources", "SphereSource");
   sphere1->UpdateVTKObjects();
 
-  vtkSMProxy* sphere2 = spxm2->NewProxy("sources", "SphereSource");
+  vtkSMProxy* view1 = pxm->NewProxy("views", "RenderView");
+  view1->UpdateVTKObjects();
+
+  pxm->SetActiveSession(session2ID);
+  vtkSMProxy* sphere2 = pxm->NewProxy("sources", "SphereSource");
   sphere2->UpdateVTKObjects();
+
+  vtkSMProxy* view2 = pxm->NewProxy("views", "RenderView");
+  vtkSMPropertyHelper(view2, "RemoteRenderThreshold").Set(0);
+  view2->UpdateVTKObjects();
+
+  vtkSMViewProxy::SafeDownCast(view1)->StillRender();
+  vtkSMViewProxy::SafeDownCast(view2)->StillRender();
+  int foo; cin >> foo;
+
+  vtkSMViewProxy::SafeDownCast(view1)->StillRender();
+  vtkSMViewProxy::SafeDownCast(view2)->StillRender();
+  cin >> foo;
 
   sphere1->Delete();
   sphere2->Delete();
+  view1->Delete();
+  view2->Delete();
 
   vtkInitializationHelper::Finalize();
   return 0;
