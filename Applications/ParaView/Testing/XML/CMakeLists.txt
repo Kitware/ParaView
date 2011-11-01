@@ -266,6 +266,9 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - ComparativeVisPanel
 #     - LoadSaveStateAnimation: The time get reset by collab
 #
+#   Timing issues (Works on speedy computer)
+#     - 3DWidgetInCustomFilter, CustomFilter
+#
 ##########################################################
 
 OPTION(PARAVIEW_COLLABORATION_TESTING
@@ -280,7 +283,6 @@ SET (CreateDelete_DISABLE_CRS TRUE)
 
 # List of test Enable for collaboration
 set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (3DWidgetInCustomFilter_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
@@ -291,7 +293,6 @@ set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Contour_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ContourRange_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CreateDelete_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (CustomFilter_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CustomSourceProbe_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (D3SmallCells_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (DualSphereAnimation_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
