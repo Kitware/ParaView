@@ -1,0 +1,23 @@
+message("Installing h5py:\n@h5py_PREFIX_ARGS@")
+set(ENV{LD_LIBRARY_PATH} "@HDF5_install@/lib")
+set(ENV{DYLD_LIBRARY_PATH} "@HDF5_install@/lib;")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+if(WIN32)
+  file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
+  set(ENV{HDF5_DIR} "${hdf5_install}")
+endif()
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @h5py_PREFIX_ARGS@
+  WORKING_DIRECTORY "@h5py_binary@"
+  RESULT_VARIABLE res
+)
+
+if(NOT ${res} EQUAL 0)
+  message("h5py Errors detected: \n${h5py_OUT}\n${h5py_ERR}")
+  message(FATAL_ERROR "Error in config of h5py")
+endif()
+message("h5py install succeeded.")

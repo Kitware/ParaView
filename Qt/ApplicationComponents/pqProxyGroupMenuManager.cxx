@@ -54,6 +54,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPair>
 #include <QSet>
 
+namespace
+{
+  bool findFileNameProperty(vtkPVXMLElement* proxyXML)
+    {
+    for (unsigned int cc=0; cc < proxyXML->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = proxyXML->GetNestedElement(cc);
+      if (child && child->GetAttribute("name") &&
+        strcmp(child->GetAttribute("name"), "FileName") == 0)
+        {
+        return true;
+        }
+      }
+    return false;
+    }
+}
+
 class pqProxyGroupMenuManager::pqInternal
 {
 public:
@@ -679,12 +696,14 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
         // skip readers.
         continue;
         }
+
       // Old readers don't have ReaderFactory hints. To handle those, we check
       // for existence of "FileName" property.
-      if (pxm->GetPrototypeProxy(group, name)->GetProperty("FileName"))
+      if (findFileNameProperty(iter->GetProxyDefinition()))
         {
         continue;
         }
+
       vtkNew<vtkCollection> collection;
       hints->FindNestedElementByName("ShowInMenu", collection.GetPointer());
       int size = collection->GetNumberOfItems();

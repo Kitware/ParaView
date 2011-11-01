@@ -1,0 +1,17 @@
+message("Installing MPL:\n@MPL_PREFIX_ARGS@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @MPL_PREFIX_ARGS@
+  WORKING_DIRECTORY "@MPL_binary@"
+  RESULT_VARIABLE res
+)
+
+if(NOT ${res} EQUAL 0)
+  message("MPL Errors detected: \n${MPL_OUT}\n${MPL_ERR}")
+  message(FATAL_ERROR "Error in config of MPL")
+endif()
+message("Matplotlib install succeeded.")

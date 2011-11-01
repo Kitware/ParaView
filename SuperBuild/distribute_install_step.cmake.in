@@ -1,0 +1,17 @@
+message("Installing distribute:\n@distribute_PREFIX_ARGS@")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
+set(ENV{VS_UNICODE_OUTPUT} "")
+
+include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
+execute_process(
+  COMMAND "@PYTHON_EXECUTABLE@" setup.py install @distribute_PREFIX_ARGS@ --single-version-externally-managed --record "${CMAKE_CURRENT_BINARY_DIR}/distribute.record"
+  WORKING_DIRECTORY "@distribute_binary@"
+  RESULT_VARIABLE res
+)
+
+if(NOT ${res} EQUAL 0)
+  message("distribute Errors detected: \n${distribute_OUT}\n${distribute_ERR}")
+  message(FATAL_ERROR "Error in config of distribute")
+endif()
+message("distribute install succeeded.")
