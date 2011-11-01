@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqRecentlyUsedResourcesList.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqServerResources.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -255,8 +255,8 @@ pqPipelineSource* pqLoadDataReaction::LoadFile(
       {
       resource.addData(QString("file.%1").arg(cc-1), files[cc]);
       }
-    core->serverResources().add(resource);
-    core->serverResources().save(*core->settings());
+    core->recentlyUsedResources().add(resource);
+    core->recentlyUsedResources().save(*core->settings());
     }
   
   return reader;

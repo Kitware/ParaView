@@ -75,7 +75,7 @@ pqFileChooserWidget::~pqFileChooserWidget()
 }
 
 
-QStringList pqFileChooserWidget::filenames()
+QStringList pqFileChooserWidget::filenames() const
 {
   if (this->UseFilenameList)
     {
@@ -128,7 +128,7 @@ void pqFileChooserWidget::setFilenames(const QStringList& files)
     }
 }
 
-QString pqFileChooserWidget::singleFilename()
+QString pqFileChooserWidget::singleFilename() const
 {
   QStringList files = this->filenames();
   if (files.isEmpty())

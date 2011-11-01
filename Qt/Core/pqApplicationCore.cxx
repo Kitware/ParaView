@@ -61,13 +61,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
+#include "pqRecentlyUsedResourcesList.h"
 #include "pqRenderView.h"
+#include "pqServerConfigurationCollection.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqServerResources.h"
-#include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardServerManagerModelInterface.h"
@@ -141,8 +141,8 @@ void pqApplicationCore::constructor()
 
   this->LookupTableManager = NULL;
   this->UndoStack = NULL;
-  this->ServerResources = NULL;
-  this->ServerStartups = NULL;
+  this->RecentlyUsedResourcesList = NULL;
+  this->ServerConfigurations = NULL;
   this->Settings = NULL;
 
   // initialize statics in case we're a static library
@@ -209,8 +209,8 @@ pqApplicationCore::~pqApplicationCore()
   this->InterfaceTracker = 0;
 
   // give chance to save before pqApplicationCore is gone
-  delete this->ServerStartups;
-  this->ServerStartups = 0;
+  delete this->ServerConfigurations;
+  this->ServerConfigurations = 0;
 
   // Ensure that all managers are deleted.
   delete this->WidgetFactory;
@@ -234,13 +234,11 @@ pqApplicationCore::~pqApplicationCore()
   delete this->SelectionModel;
   this->SelectionModel = 0;
 
-
-  delete this->ServerResources;
-  this->ServerResources = 0;
+  delete this->RecentlyUsedResourcesList;
+  this->RecentlyUsedResourcesList= 0;
 
   delete this->Settings;
   this->Settings = 0;
-
 
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
@@ -579,36 +577,25 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
-pqServerResources& pqApplicationCore::serverResources()
+pqRecentlyUsedResourcesList& pqApplicationCore::recentlyUsedResources()
 {
-  if(!this->ServerResources)
+  if (!this->RecentlyUsedResourcesList)
     {
-    this->ServerResources = new pqServerResources(this);
-    this->ServerResources->load(*this->settings());
+    this->RecentlyUsedResourcesList = new pqRecentlyUsedResourcesList(this);
+    this->RecentlyUsedResourcesList->load(*this->settings());
     }
 
-  return *this->ServerResources;
+  return *this->RecentlyUsedResourcesList;
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::setServerResources(
-  pqServerResources* aserverResources)
+pqServerConfigurationCollection& pqApplicationCore::serverConfigurations()
 {
-  this->ServerResources = aserverResources;
-  if(this->ServerResources)
+  if (!this->ServerConfigurations)
     {
-    this->ServerResources->load(*this->settings());
+    this->ServerConfigurations = new pqServerConfigurationCollection(this);
     }
-}
-
-//-----------------------------------------------------------------------------
-pqServerStartups& pqApplicationCore::serverStartups()
-{
-  if(!this->ServerStartups)
-    {
-    this->ServerStartups = new pqServerStartups(this);
-    }
-  return *this->ServerStartups;
+  return *this->ServerConfigurations;
 }
 
 //-----------------------------------------------------------------------------
