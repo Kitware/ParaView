@@ -290,10 +290,10 @@
      </IntVectorProperty>
      
      <IntVectorProperty
-        name="NumberOfSubdivisions"
-        command="SetNumberOfSubdivisions"
+        name="NumberOfPartitions"
+        command="SetNumberOfPartitions"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <IntRangeDomain name="range" />
         <Documentation>
           Set the number of subdivisions for recursive
