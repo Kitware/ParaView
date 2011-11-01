@@ -257,7 +257,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
-#     - ViewSettingsDialog, ColorEditor3
+#     - ViewSettingsDialog, ColorEditor3, RectilinearFractal
 #
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
@@ -321,7 +321,6 @@ set (PropertyConversion1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (RectilinearFractal_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (RepresentationSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (SaveColorMap_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (SaveCSV_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
