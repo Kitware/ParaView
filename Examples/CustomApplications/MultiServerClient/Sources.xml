@@ -1,0 +1,27 @@
+<ParaViewSources>
+  <Proxy group="sources" name="GlyphSource2D" />
+  <Proxy group="sources" name="VectorText" />
+  <Proxy group="sources" name="TimeToTextConvertorSource" />
+  <Proxy group="sources" name="ArrowSource" />
+  <Proxy group="sources" name="Axes" />
+  <Proxy group="sources" name="CubeSource" />
+  <Proxy group="sources" name="ConeSource" />
+  <Proxy group="sources" name="CylinderSource" />
+  <Proxy group="sources" name="DataObjectGenerator" />
+  <Proxy group="sources" name="DiskSource" />
+  <Proxy group="sources" name="HierarchicalFractal" />
+  <Proxy group="sources" name="LineSource" />
+  <Proxy group="sources" name="ImageMandelbrotSource" />
+  <Proxy group="sources" name="OctreeFractal" />
+  <Proxy group="sources" name="OutlineSource" />
+  <Proxy group="sources" name="PlaneSource" />
+  <Proxy group="sources" name="PointSource" />
+  <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="SphereSource" />
+  <Proxy group="sources" name="SplineSource" />
+  <Proxy group="sources" name="SuperquadricSource" />
+  <Proxy group="sources" name="TextSource" />
+  <Proxy group="sources" name="TimeSource" />
+  <Proxy group="sources" name="Ruler" />
+  <Proxy group="sources" name="RTAnalyticSource" />
+</ParaViewSources>
