@@ -20,10 +20,10 @@ object4 = 'pqClientMainWindow/pqPluginDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object4, 'activate', '')
 object5 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object5, 'activate', 'Cone')
-object7 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object7 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object7, 'activate', '')
 
-object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel0'
+object8 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel0'
 
 text = QtTesting.getProperty(object8, 'text')
 print text

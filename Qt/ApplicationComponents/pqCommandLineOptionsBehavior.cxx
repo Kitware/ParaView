@@ -226,10 +226,6 @@ void pqCommandLineOptionsBehavior::resetApplication()
   // reset animation time.
   pqActiveObjects::instance().activeServer()->getTimeKeeper()->setTime(0.0);
 
-  // restore panels etc.
-  pqPersistentMainWindowStateBehavior::restoreState(
-    qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()));
-
   pqEventDispatcher::processEventsAndWait(10);
 
   END_UNDO_EXCLUDE();

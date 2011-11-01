@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -102,18 +102,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="proxyTabDock">
-   <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Object Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="pqProxyTabWidget" name="proxyTabWidget"/>
-  </widget>
   <widget class="QDockWidget" name="statisticsDock">
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -153,18 +141,91 @@
    </attribute>
    <widget class="pqComparativeVisPanel" name="comparativeVisPanel"/>
   </widget>
+  <widget class="QDockWidget" name="objectInspectorDock">
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqObjectInspectorWidget" name="objectInspector"/>
+  </widget>
+  <widget class="QDockWidget" name="displayDock">
+   <property name="windowTitle">
+    <string>Display</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="displayWidgetFrame">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QScrollArea" name="displayScrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="pqDisplayProxyEditorWidget" name="displayWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>100</width>
+          <height>125</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="informationDock">
+   <property name="windowTitle">
+    <string>Information</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="informationWidgetFrame">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QScrollArea" name="informationScrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="pqProxyInformationWidget" name="informationWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>100</width>
+          <height>125</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
    <class>pqPipelineBrowserWidget</class>
    <extends>QWidget</extends>
    <header>pqPipelineBrowserWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqProxyTabWidget</class>
-   <extends>QWidget</extends>
-   <header>pqProxyTabWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -200,6 +261,24 @@
    <class>pqComparativeVisPanel</class>
    <extends>QWidget</extends>
    <header>pqComparativeVisPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqObjectInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqObjectInspectorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayProxyEditorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayProxyEditorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqProxyInformationWidget</class>
+   <extends>QWidget</extends>
+   <header>pqProxyInformationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

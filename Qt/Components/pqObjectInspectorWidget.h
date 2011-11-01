@@ -52,6 +52,7 @@ class QPushButton;
 class pqPipelineSource;
 class pqObjectPanel;
 class pqView;
+class pqOutputPort;
 class pqObjectPanelInterface;
 
 
@@ -108,6 +109,8 @@ public slots:
   /// sets the enabled state of the delete button.
   void updateDeleteButtonState();
 
+  void setOutputPort(pqOutputPort *port);
+
 signals:
   /// emitted before accept.
   void preaccept();
@@ -157,6 +160,7 @@ private:
   QTimer AutoAcceptTimer;
   static bool AutoAccept;
   bool ShowOnAccept;
+  pqOutputPort *OutputPort;
   
   pqObjectPanel* CurrentPanel;
 
