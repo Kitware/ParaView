@@ -199,7 +199,7 @@ SET (VTK_INSTALL_NO_PYTHON ON)
 SET (VTK_INSTALL_NO_VTKPYTHON ON)
 # Tell VTK to install python extension modules using CMake so they get installed
 # with the other python extension modules ParaView creates.
-SET (VTK_INSTALL_PYTHON_USING_CMAKE ON)
+SET (VTK_INSTALL_PYTHON_USING_CMAKE OFF)
 SET (VTK_INSTALL_NO_QT_PLUGIN ON)
 SET (VTK_INSTALL_NO_LIBRARIES ${PV_INSTALL_NO_LIBRARIES})
 
@@ -573,7 +573,7 @@ IF(VTK_USE_MPI)
   OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" ON)
   MARK_AS_ADVANCED(PARAVIEW_USE_ICE_T)
   IF (BUILD_TESTING)
-    OPTION(ICET_BUILD_TESTING "Build and run the IceT tests." OFF)
+    OPTION(ICET_BUILD_TESTING "Build and run the IceT tests." ON)
     MARK_AS_ADVANCED(ICET_BUILD_TESTING)
     IF (PARAVIEW_TEST_COMPOSITING)
       # Force the testing of IceT if we are testing compositing.
