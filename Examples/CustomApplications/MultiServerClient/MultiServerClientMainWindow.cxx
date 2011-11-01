@@ -32,8 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MultiServerClientMainWindow.h"
 #include "ui_MultiServerClientMainWindow.h"
 
+#include "pqApplicationCore.h"
+#include "pqDefaultViewBehavior.h"
+#include "pqObjectBuilder.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqServerConfiguration.h"
 #include "pqServerConnectReaction.h"
 
 //-----------------------------------------------------------------------------
@@ -47,6 +51,15 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
 
   pqParaViewMenuBuilders::buildSourcesMenu(*ui.menu_Sources, this);
   new pqParaViewBehaviors(this, this);
+
+  QList<pqDefaultViewBehavior*> children =
+    this->findChildren<pqDefaultViewBehavior*>();
+  foreach (QObject* obj, children)
+    {
+    delete obj;
+    }
+
+  pqApplicationCore::instance()->getObjectBuilder()->setMultipleConnectionsSupport(true);
 }
 
 //-----------------------------------------------------------------------------

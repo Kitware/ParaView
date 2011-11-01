@@ -74,11 +74,27 @@ public:
   pqObjectBuilder(QObject* parent=0);
   virtual ~pqObjectBuilder();
   
-  /// Create a server connection give a server resource
+  /// Create a server connection give a server resource.
+  /// By default, this method does not create a new connection if one already
+  /// exists. Also it disconnects from any existing server connection before
+  /// connecting to a new one. This behavior can be changed by setting
+  /// MultipleConnectionsSupport to true. In that case
+  /// this will always try to connect the server using the details specified in
+  /// the resource irrespective if the server is already connected or any other
+  /// server connections exists. 
+  /// Calling this method while waiting for a previous server connection to be
+  /// established raises errors.
   pqServer* createServer(const pqServerResource& resource);
  
   /// Destroy a server connection 
   void removeServer(pqServer *server);
+
+  /// Set to true if application supports multiple server sessions. Default is
+  /// false.
+  bool multipleConnectionsSupport() const
+    { return this->MultipleConnectionsSupport; }
+  void setMultipleConnectionsSupport(bool val)
+    { this->MultipleConnectionsSupport = val; }
 
   /// Creates a source of the given server manager group (\c sm_group) and 
   /// name (\c sm_name) on the given \c server. On success, returns the
@@ -303,6 +319,7 @@ private:
   void operator=(const pqObjectBuilder&); // Not implemented.
 
   bool WaitingForConnection;
+  bool MultipleConnectionsSupport;
 };
 
 #endif

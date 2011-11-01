@@ -495,6 +495,5 @@ void pqServer::updateGlobalMapperProperties()
 //-----------------------------------------------------------------------------
 vtkSMSessionProxyManager* pqServer::proxyManager() const
 {
-  return
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Session);
+  return this->Session->GetSessionProxyManager();
 }
