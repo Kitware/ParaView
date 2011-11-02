@@ -1891,7 +1891,7 @@ def Disconnect(session=None):
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
-    if not session or session == ActiveConnection.Session:
+    if ActiveConnection and (not session or session == ActiveConnection.Session):
         session = ActiveConnection.Session
         if MultiServerConnections:
            MultiServerConnections.remove(ActiveConnection)
