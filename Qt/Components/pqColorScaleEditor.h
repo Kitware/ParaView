@@ -85,7 +85,8 @@ private slots:
   void setOpacityFromText();
   void setSingleOpacityFromText();
   void setOpacityScalarFromText();
-  void updateSingleScalarUI(double scalarVal);
+  void setOpacityControlsVisibility(bool visible);
+  void updateDisplay();
 
   void setColorSpace(int index);
   void internalSetColorSpace(int index,

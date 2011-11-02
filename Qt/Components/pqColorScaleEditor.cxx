@@ -161,6 +161,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
     this, SLOT(setScalarColor(const QColor &)));
   this->connect(this->Form->opacityScalar, SIGNAL(editingFinished()),
     this, SLOT(setOpacityScalarFromText()));
+  this->connect(this->Form->pushButtonApply, SIGNAL(clicked()),
+    this, SLOT(updateDisplay()));
 
   QVBoxLayout* tfLayout = new QVBoxLayout(this->Form->frameColorTF);
   this->ColorMapViewer = new pqTransferFunctionChartViewWidget(
@@ -213,6 +215,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->ScalarValue->setValidator(new QDoubleValidator(this));
   QDoubleValidator* opacityValid = new QDoubleValidator(this);
   opacityValid->setRange(0.0, 1.0);
+  opacityValid->setDecimals(6);
   this->Form->Opacity->setValidator(opacityValid);
   this->Form->opacityScalar->setValidator(new QDoubleValidator(this));
   this->Form->ScalarOpacityUnitDistance->setValidator(
@@ -1405,19 +1408,6 @@ void pqColorScaleEditor::initColorScale()
     }
 
   bool usingOpacity = this->OpacityFunction != 0;
-  bool hasOpacity = this->Form->ScalarOpacityUnitDistance->isEnabled();
-  if(usingOpacity != hasOpacity)
-    {
-    if(this->OpacityFunction)
-      {
-      this->OpacityFunctionViewer->setEnabled(1);
-      }
-    else
-      {
-      this->OpacityFunctionViewer->setEnabled(0);
-      }
-    }
-
   if(this->OpacityFunction)
     {
     this->Form->frameOpacity->setVisible(1);
@@ -1439,9 +1429,7 @@ void pqColorScaleEditor::initColorScale()
       QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->Form->frameOpacity->setVisible(0);
     }
-
-  this->Form->ScaleLabel->setEnabled(usingOpacity);
-  this->Form->ScalarOpacityUnitDistance->setEnabled(usingOpacity);
+  this->setOpacityControlsVisibility(usingOpacity);
 
   if(this->ColorMap)
     {
@@ -2091,7 +2079,37 @@ void pqColorScaleEditor::restoreOptionalUserSettings()
 }
 
 // ----------------------------------------------------------------------------
-void pqColorScaleEditor::updateSingleScalarUI(double scalarVal)
+void pqColorScaleEditor::setOpacityControlsVisibility(bool visible)
 {
+  this->Form->ScaleLabel->setVisible(visible);
+  this->Form->ScalarOpacityUnitDistance->setVisible(visible);
+  this->Form->opacityScalar->setVisible(visible);
+  this->Form->labelOpacityScalar->setVisible(visible);
+  this->Form->OpacityLabel->setVisible(visible);
+  this->Form->Opacity->setVisible(visible);
+}
+// ----------------------------------------------------------------------------
+void pqColorScaleEditor::updateDisplay()
+{
+  if(this->Form->InSetColors)
+    {
+    return;
+    }
+  if(this->Display)
+    {
+    this->Form->InSetColors = true;
+    if(this->ColorMap)
+      {
+      vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+      lookupTable->UpdateVTKObjects();
+      }
+    if(this->OpacityFunction)
+      {
+      vtkSMProxy *points = this->OpacityFunction->getProxy();
+      points->UpdateVTKObjects();
+      }
 
+    this->Form->InSetColors = false;
+    this->Display->renderViewEventually();
+    }
 }
