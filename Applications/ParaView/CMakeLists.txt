@@ -124,7 +124,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
-      install(DIRECTORY ${PYTHON_LIBS_DIR}
+      install(DIRECTORY ${PYTHON_LIBS_DIR}/
               DESTINATION ${pv_runtime_dest}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime
