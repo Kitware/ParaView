@@ -397,8 +397,13 @@ if(NOT APPLE)
     include(External_AcuSolveReaderPlugin)
     set(AcuSolve_ARGS
       -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
-      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source})
+      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source}
+    )
   endif()
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
+    )
+  else()
 endif()
 
 if(WIN32)
@@ -429,6 +434,10 @@ if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   set(VisTrails_ARGS
     -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
     -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source}
+  )
+else()
+  set(VisTrails_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=OFF
   )
 endif()
 
