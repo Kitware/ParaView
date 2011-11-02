@@ -234,23 +234,6 @@ if(NOT APPLE)
   endif()
 
   include(External_NUMPY)
-
-  if(NOT WIN32)
-    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Dependencies for VisTrails" FALSE)
-    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-    if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-      # Build SIP and PyQt for vistrails plugin.
-      set(SIP_dependencies python)
-      include(External_SIP)
-      list(APPEND PyQt_dependencies SIP)
-      set(PyQt_dependencies python SIP)
-      include(External_PyQt)
-      list(APPEND ParaView_dependencies PyQt)
-
-      set(VISTRAILS_ARGS
-        -DPARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON)
-    endif()
-  endif()
 else()
 
   find_package(PythonInterp)
@@ -388,15 +371,22 @@ set(VRPN_ARGS
   -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
   -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
 
-# Build AcuSolveReaderPlugin
-option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
-set(DOC_ARGS)
-if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
-  list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
-  include(External_AcuSolveReaderPlugin)
-  set(AcuSolve_ARGS
+if(NOT APPLE)
+  # Build AcuSolveReaderPlugin
+  option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
+  set(AcuSolve_ARGS)
+  if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+    list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
+    include(External_AcuSolveReaderPlugin)
+    set(AcuSolve_ARGS
       -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
-      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source})
+      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source}
+    )
+  else()
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
+    )
+  endif()
 endif()
 
 if(WIN32)
@@ -418,8 +408,30 @@ if(NOT WIN32)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
-include(External_VisTrails)
-list(APPEND ParaView_dependencies VisTrails)
+# Build VisTrailsPlugin
+option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
+set(VisTrails_ARGS)
+if(PARAVIEW_BUILD_PLUGIN_VisTrails)
+  include(External_VisTrails)
+  list(APPEND ParaView_dependencies VisTrails)
+  set(VisTrails_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
+    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source}
+  )
+
+  # Build SIP and PyQt for vistrails plugin.
+  set(SIP_dependencies python)
+  include(External_SIP)
+  list(APPEND PyQt_dependencies SIP)
+  set(PyQt_dependencies python SIP)
+  include(External_PyQt)
+  list(APPEND ParaView_dependencies PyQt)
+
+else()
+  set(VisTrails_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=OFF
+  )
+endif()
 
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
 set(DOC_ARGS)
@@ -507,7 +519,7 @@ ExternalProject_Add(${proj}
     # VisIt - Silo
     ${Silo_ARGS}
     # VisTrails
-    ${VISTRAILS_ARGS}
+    ${VisTrails_ARGS}
     # VRPN Plugin
     ${VRPN_ARGS}
     # zlib
