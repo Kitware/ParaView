@@ -390,7 +390,7 @@ set(VRPN_ARGS
 
 # Build AcuSolveReaderPlugin
 option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
-set(DOC_ARGS)
+set(AcuSolve_ARGS)
 if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
   list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
   include(External_AcuSolveReaderPlugin)
@@ -418,8 +418,16 @@ if(NOT WIN32)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
-include(External_VisTrails)
-list(APPEND ParaView_dependencies VisTrails)
+# Build VisTrailsPlugin
+option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
+set(VisTrails_ARGS)
+if(PARAVIEW_BUILD_PLUGIN_VisTrails)
+  include(External_VisTrails)
+  list(APPEND ParaView_dependencies VisTrails)
+  set(VisTrails_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
+      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source})
+endif()
 
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
 set(DOC_ARGS)
@@ -514,6 +522,7 @@ ExternalProject_Add(${proj}
     ${ZLIB_ARGS}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
     ${AcuSolve_ARGS}
+    ${VisTrails_ARGS}
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
