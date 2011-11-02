@@ -125,11 +125,15 @@ public:
   void clearPlots();
   vtkControlPointsItem* currentControlPointsItem();
   QVTKWidget* chartWidget();
+  /// Utility function that returns the view chart. It can be used for customizing
+  /// the chart display options (axes, legend...)
+  vtkChartXY* chart()const;
   //void setCurrentControlPointsItem(vtkControlPointsItem* item);
 
 signals:
     void plotAdded(vtkPlot* plot);
     void boundsChanged();
+    void currentPointEdited();
 
 public slots:
     void editPoint();
@@ -145,6 +149,7 @@ public slots:
     void spreadAllPoints(double factor = 1.);
 
     void resetView();
+    void renderView();
 
 protected slots:
     void onBoundsChanged();
@@ -155,9 +160,6 @@ protected:
   virtual void onChartUpdated();
   void chartBoundsToPlotBounds(double bounds[8], double plotBounds[4])const;
 
-  /// Utility function that returns the view chart. It can be used for customizing
-  /// the chart display options (axes, legend...)
-  vtkChartXY* chart()const;
   vtkContextScene* scene()const;
 
 private:

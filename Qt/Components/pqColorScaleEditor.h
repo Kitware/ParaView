@@ -49,7 +49,6 @@ class QHideEvent;
 class QShowEvent;
 class QString;
 class pqTransferFunctionChartViewWidget;
-class vtkTransferFunctionViewer;
 class vtkPlot;
 class vtkObject;
 class vtkColorTransferFunction;
@@ -84,12 +83,16 @@ private slots:
 
   void setScalarFromText();
   void setOpacityFromText();
+  void setSingleOpacityFromText();
+  void setOpacityScalarFromText();
+  void updateSingleScalarUI(double scalarVal);
 
   void setColorSpace(int index);
   void internalSetColorSpace(int index,
     vtkColorTransferFunction*);
 
   void setNanColor(const QColor &color);
+  void setScalarColor(const QColor &color);
 
   void savePreset();
   void loadPreset();
@@ -137,6 +140,9 @@ private slots:
   void updateCurrentOpacityPoint();
   void enableColorPointControls();
   void enableOpacityPointControls();
+  void renderViewOptionally();
+  void saveOptionalUserSettings();
+  void restoreOptionalUserSettings();
 
 private:
   void loadBuiltinColorPresets();
@@ -158,12 +164,12 @@ private:
   void addRepClientColorFunction();
   void addRepClientOpacityFunction();
   bool internalComputeRange(double* range);
+  void renderTransferFunctionViews();
 
 private:
   pqColorScaleEditorForm *Form;
   pqTransferFunctionChartViewWidget* ColorMapViewer;
   pqTransferFunctionChartViewWidget* OpacityFunctionViewer;
-  //vtkTransferFunctionViewer *Viewer;
   pqDataRepresentation *Display;
   pqScalarsToColors *ColorMap;
   pqScalarOpacityFunction *OpacityFunction;

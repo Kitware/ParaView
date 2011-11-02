@@ -97,6 +97,7 @@ public:
     }
   void init()
     {
+    this->Chart->SetAutoSize(true);
     this->ContextView->GetScene()->AddItem(this->Chart);
     this->ContextView->SetInteractor(this->ChartView->GetInteractor());
     this->ChartView->SetRenderWindow(this->ContextView->GetRenderWindow());
@@ -107,14 +108,10 @@ public:
     this->ChartView->setAutomaticImageCacheEnabled(true);
 
     vtkChartXY* chart = this->Chart;
-    chart->SetAutoAxes(true);
+    chart->SetAutoAxes(false);
     chart->SetHiddenAxisBorder(0);
     chart->SetActionToButton(vtkChart::PAN, vtkContextMouseEvent::MIDDLE_BUTTON);
     chart->SetActionToButton(vtkChart::SELECT, vtkContextMouseEvent::RIGHT_BUTTON);
-    this->showBorders(true);
-    //QObject::connect(this->Widget_ptr, SIGNAL(boundsChanged()),
-    //  this->Widget_ptr, SLOT(onBoundsChanged()));
-    //this->Widget_ptr->onChartUpdated();
     }
 
   void showBorders(bool visible)
@@ -122,20 +119,13 @@ public:
     vtkChartXY* chart = this->Chart;
     for (int i = 0; i < 4; ++i)
       {
-      chart->GetAxis(i)->SetVisible(true);
+      chart->GetAxis(i)->SetVisible(visible);
       chart->GetAxis(i)->GetPen()->SetOpacityF(0.3);
+      chart->GetAxis(i)->SetNumberOfTicks(0);
+      chart->GetAxis(i)->SetBehavior(2);
+      chart->GetAxis(i)->SetLabelsVisible(false);
+      chart->GetAxis(i)->SetMargins(1.,1.);
       chart->GetAxis(i)->SetTitle("");
-      chart->GetAxis(i)->SetNumberOfTicks(5);
-      chart->GetAxis(i)->SetLabelsVisible(true);
-      chart->GetAxis(i)->SetMargins(7.,7.);
-      if (visible)
-        {
-        //chart->GetAxis(i)->SetBehavior(2);
-        }
-      else
-        {
-        //chart->GetAxis(i)->SetBehavior(1);
-        }
       }
     }
 
@@ -245,6 +235,7 @@ pqTransferFunctionChartViewWidget::pqTransferFunctionChartViewWidget(
   this->Internal = new pqTransferFunctionChartViewWidget::pqInternal(*this);
   this->Internal->init();
   QVBoxLayout* vLayout = new QVBoxLayout(this);
+  vLayout->setMargin(0);
   vLayout->addWidget(this->Internal->ChartView);
 }
 
@@ -271,14 +262,9 @@ void pqTransferFunctionChartViewWidget::addPlot(vtkPlot* plot)
     {
     this->Internal->VTKConnect->Disconnect();
     this->Internal->CurrentControlPointsItem =currenItem;
-//    this->Internal->CurrentControlPointsItem->SetCurrentPoint(0);
     this->Internal->VTKConnect->Connect(
       currenItem, vtkControlPointsItem::CurrentPointEditEvent,
       this, SLOT(editPoint()));
-    //this->Internal->VTKConnect->Connect(
-    //  currenItem, vtkCommand::ModifiedEvent,
-    //  this, SLOT(editPoint()));
-    //this->editPoint();
     }
   this->onChartUpdated();
   emit this->plotAdded(plot);
@@ -376,7 +362,11 @@ vtkPlot* pqTransferFunctionChartViewWidget
 {
   vtkNew<vtkColorTransferControlPointsItem> controlPointsItem;
   controlPointsItem->SetColorTransferFunction(colorTF);
+  controlPointsItem->SetColorFill(true);
   controlPointsItem->SetValidBounds(this->Internal->ValidBounds);
+  controlPointsItem->SetEndPointsXMovable(false);
+  controlPointsItem->SetEndPointsYMovable(false);
+
   this->addPlot(controlPointsItem.GetPointer());
   return controlPointsItem.GetPointer();
 }
@@ -397,6 +387,8 @@ vtkPlot* pqTransferFunctionChartViewWidget
   controlPointsItem->SetColorTransferFunction(colorTF);
   controlPointsItem->SetOpacityFunction(opacityTF);
   controlPointsItem->SetValidBounds(this->Internal->ValidBounds);
+  controlPointsItem->SetEndPointsXMovable(false);
+
   this->addPlot(controlPointsItem.GetPointer());
   return controlPointsItem.GetPointer();
 }
@@ -721,6 +713,7 @@ void pqTransferFunctionChartViewWidget::editPoint()
       xrgbms[2] = newColor.greenF();
       xrgbms[3] = newColor.blueF();
       colorTF->SetNodeValue(pointToEdit, xrgbms);
+      emit this->currentPointEdited();
       }
     }
 }
@@ -848,7 +841,6 @@ void pqTransferFunctionChartViewWidget::chartBounds(double* bounds)const
     this->chartUserBounds(bounds);
     }
   
-  //bounds[0]=0; bounds[1]=1; bounds[2]=0;bounds[3]=1;
   memcpy(this->Internal->OldBounds, bounds, 8 * sizeof(double));
 }
 
@@ -881,8 +873,24 @@ void pqTransferFunctionChartViewWidget::setAxesToChartBounds()
     {
     if (bounds[2*i] != VTK_DOUBLE_MAX)
       {
-      chart->GetAxis(i)->SetRange(bounds[2*i], bounds[2*i+1]);
-      chart->GetAxis(i)->SetBehavior(2);
+      double deltarange=bounds[2*i+1]-bounds[2*i];
+      if(deltarange==0)
+        {
+        double range= 1.0;
+        chart->GetAxis(i)->SetRange(0,range);
+        //if(bounds[2*i+1]==0)
+        //  {
+        //  this->moveAllPoints(range/2);
+        //  }
+        chart->GetAxis(i)->SetBehavior(2);
+        }
+      else
+        {
+        deltarange *= (deltarange <=1) ? 0.05 : 0.02;
+        chart->GetAxis(i)->SetRange(bounds[2*i]-deltarange,
+          bounds[2*i+1]+deltarange);
+        chart->GetAxis(i)->SetBehavior(2);
+        }
       }
     }
 }
@@ -899,7 +907,13 @@ void pqTransferFunctionChartViewWidget::chartBoundsToPlotBounds(double bounds[8]
 // ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::resetView()
 {
-  //this->Internal->ChartView->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
   this->Internal->Chart->RecalculateBounds();
+  this->setAxesToChartBounds();
+  this->setBordersVisible(true);
+  this->renderView();
+}
+// ----------------------------------------------------------------------------
+void pqTransferFunctionChartViewWidget::renderView()
+{
   this->Internal->ChartView->GetRenderWindow()->Render();
 }
