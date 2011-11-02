@@ -897,7 +897,7 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     was not found."""
     if not servermanager.ActiveConnection:
         raise RuntimeError, "Cannot load a plugin without a session."
-    plm = servermanager.ProxyManager().GetPluginManager()
+    plm = servermanager.vtkSMProxyManager.GetProxyManager().GetPluginManager()
     if remote:
         session = servermanager.ActiveConnection.Session
         info = plm.GetRemoteInformation(session)

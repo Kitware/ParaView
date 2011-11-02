@@ -95,6 +95,7 @@ SET(PY_TESTS_NO_BASELINE
   ProxyManager
   SMPropertyAdaptor
   VRMLSource
+  MultiServer
 )
 
 if(PARAVIEW_BUILD_PLUGIN_SurfaceLIC AND PARAVIEW_BUILD_PLUGIN_SLACTools)
