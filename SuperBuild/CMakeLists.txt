@@ -388,15 +388,17 @@ set(VRPN_ARGS
   -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
   -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
 
-# Build AcuSolveReaderPlugin
-option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
-set(AcuSolve_ARGS)
-if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
-  list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
-  include(External_AcuSolveReaderPlugin)
-  set(AcuSolve_ARGS
+if(NOT APPLE)
+  # Build AcuSolveReaderPlugin
+  option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
+  set(AcuSolve_ARGS)
+  if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+    list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
+    include(External_AcuSolveReaderPlugin)
+    set(AcuSolve_ARGS
       -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
       -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source})
+  endif()
 endif()
 
 if(WIN32)
