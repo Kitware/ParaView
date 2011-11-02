@@ -28,6 +28,7 @@
 
 class vtkPVXMLElement;
 class vtkSMGlobalPropertiesManager;
+class vtkSMPluginManager;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMProxySelectionModel;
@@ -141,6 +142,11 @@ public:
   void SetUndoStackBuilder(vtkSMUndoStackBuilder* builder);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
 
+  // Description:
+  // PluginManager keeps track of plugins loaded on various sessions.
+  // This provides access to the application-wide plugin manager.
+  vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
+
 //BTX
   struct RegisteredProxyInformation
   {
@@ -191,6 +197,7 @@ protected:
   void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
 
   vtkSMUndoStackBuilder* UndoStackBuilder;
+  vtkSMPluginManager* PluginManager;
 
 private:
   class vtkPXMInternal;

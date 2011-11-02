@@ -79,20 +79,20 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   QObject::connect(this->loadLocal, SIGNAL(clicked(bool)),
                    this, SLOT(loadLocalPlugin()));
 
-  if(!this->Server || !this->Server->isRemote())
+  if (!this->Server || !this->Server->isRemote())
     {
     this->remoteGroup->setEnabled(false);
     helpText = "Local plugins are automatically searched for in %1.";
-    QStringList serverPaths = pm->pluginPaths(false);
+    QStringList serverPaths = pm->pluginPaths(NULL, false);
     helpText = helpText.arg(serverPaths.join(", "));
     }
   else
     {
     helpText = "Remote plugins are automatically searched for in %1.\n"
                "Local plugins are automatically searched for in %2.";
-    QStringList serverPaths = pm->pluginPaths(true);
+    QStringList serverPaths = pm->pluginPaths(this->Server, true);
     helpText = helpText.arg(serverPaths.join(", "));
-    QStringList localPaths = pm->pluginPaths(false);
+    QStringList localPaths = pm->pluginPaths(this->Server, false);
     helpText = helpText.arg(localPaths.join(", "));
     }
 
@@ -181,7 +181,7 @@ void pqPluginDialog::onRefresh()
 void pqPluginDialog::refresh()
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pm->verifyPlugins();
+  pm->verifyPlugins(this->Server);
 
   this->refreshLocal();
   this->refreshRemote();
@@ -191,7 +191,8 @@ void pqPluginDialog::refresh()
 void pqPluginDialog::refreshLocal()
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  vtkPVPluginsInformation* extensions = pm->loadedExtensions(false);
+  vtkPVPluginsInformation* extensions = pm->loadedExtensions(
+    this->Server, false);
   this->populatePluginTree(this->localPlugins, extensions, false);
   this->localPlugins->resizeColumnToContents(ValueCol);  
 }
@@ -202,7 +203,7 @@ void pqPluginDialog::refreshRemote()
   if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-    vtkPVPluginsInformation* extensions = pm->loadedExtensions(true);
+    vtkPVPluginsInformation* extensions = pm->loadedExtensions(this->Server, true);
     this->populatePluginTree(this->remotePlugins, extensions, true);
     this->remotePlugins->resizeColumnToContents(ValueCol);  
     }
@@ -264,7 +265,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
   QTreeWidgetItem* pluginNode, unsigned int &index)
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  vtkPVPluginsInformation* info = pm->loadedExtensions(
+  vtkPVPluginsInformation* info = pm->loadedExtensions(this->Server,
     (pluginNode->treeWidget() == this->remotePlugins)?
     true : false);
 

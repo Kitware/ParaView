@@ -23,7 +23,6 @@
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkProcessModuleAutoMPI;
-class vtkSMPluginManager;
 class vtkSMSessionProxyManager;
 class vtkSMStateLocator;
 
@@ -42,10 +41,6 @@ public:
   // Return the URL that define where the session is connected to. URI has
   // enough information to know the type of connection, server hosts and ports.
   virtual const char* GetURI() { return "builtin:"; }
-
-  // Description:
-  // Returns the vtkSMPluginManager attached to this session.
-  vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
 
   // Description:
   // Returns the vtkSMSessionProxyManager associated with this session.
@@ -196,7 +191,6 @@ protected:
   void UpdateStateHistory(vtkSMMessage* msg);
 
   vtkSMSessionProxyManager* SessionProxyManager;
-  vtkSMPluginManager* PluginManager;
   vtkSMStateLocator* StateLocator;
 
   // GlobalID managed locally

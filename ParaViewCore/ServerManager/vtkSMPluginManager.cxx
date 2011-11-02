@@ -18,6 +18,7 @@
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginsInformation.h"
 #include "vtkPVPluginTracker.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -27,11 +28,14 @@
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
+#include <vtkstd/map>
 
 class vtkSMPluginManager::vtkInternals
 {
 public:
-  vtkWeakPointer<vtkSMSession> Session;
+  typedef vtkstd::map<vtkSMSession*,
+          vtkSmartPointer<vtkPVPluginsInformation> > RemoteInfoMapType;
+  RemoteInfoMapType RemoteInformations;
 };
 
 vtkStandardNewMacro(vtkSMPluginManager);
@@ -39,8 +43,10 @@ vtkStandardNewMacro(vtkSMPluginManager);
 vtkSMPluginManager::vtkSMPluginManager()
 {
   this->Internals = new vtkInternals();
+
+  // Setup and update local plugins information.
   this->LocalInformation = vtkPVPluginsInformation::New();
-  this->RemoteInformation = vtkPVPluginsInformation::New();
+  this->LocalInformation->CopyFromObject(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -50,28 +56,38 @@ vtkSMPluginManager::~vtkSMPluginManager()
   this->Internals = NULL;
 
   this->LocalInformation->Delete();
-  this->RemoteInformation->Delete();
+  this->LocalInformation = NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPluginManager::SetSession(vtkSMSession* session)
+void vtkSMPluginManager::RegisterSession(vtkSMSession* session)
 {
-  this->Internals->Session = session;
-}
+  assert(session != NULL);
 
-//----------------------------------------------------------------------------
-void vtkSMPluginManager::Initialize()
-{
-  if (!this->Internals->Session)
+  if (this->Internals->RemoteInformations.find(session) !=
+    this->Internals->RemoteInformations.end())
     {
-    vtkErrorMacro("Session must be initialized.");
-    return;
+    vtkWarningMacro("Session already registered!!!");
     }
+  else
+    {
+    vtkPVPluginsInformation* remoteInfo = vtkPVPluginsInformation::New();
+    this->Internals->RemoteInformations[session].TakeReference(remoteInfo);
+    session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, remoteInfo, 0);
+    }
+}
 
-  this->Internals->Session->GatherInformation(
-    vtkPVSession::CLIENT, this->LocalInformation, 0);
-  this->Internals->Session->GatherInformation(
-    vtkPVSession::DATA_SERVER_ROOT, this->RemoteInformation, 0);
+//----------------------------------------------------------------------------
+void vtkSMPluginManager::UnRegisterSession(vtkSMSession* session)
+{
+  this->Internals->RemoteInformations.erase(session);
+}
+
+//----------------------------------------------------------------------------
+vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(
+  vtkSMSession* session)
+{
+  return (session)? this->Internals->RemoteInformations[session] : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -84,8 +100,9 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     {
     // Update local-plugin information.
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-    this->Internals->Session->GatherInformation(
-      vtkPVSession::CLIENT, temp, 0);
+    temp->CopyFromObject(NULL);
+    // we use Update so that any auto-load state changes done in
+    // this->LocalInformation are preserved.
     this->LocalInformation->Update(temp);
     temp->Delete();
 
@@ -98,13 +115,12 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
+bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
+  vtkSMSession* session)
 {
-  assert("Session should already be set" && this->Internals->Session);
-  vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
-          this->Internals->Session);
+  assert("Session cannot be NULL" && session != NULL);
 
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSMPluginLoaderProxy* proxy =
       vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
   proxy->UpdateVTKObjects();
@@ -123,9 +139,9 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
     {
     // Refresh the remote plugin information
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-    this->Internals->Session->GatherInformation(
+    session->GatherInformation(
       vtkPVSession::DATA_SERVER_ROOT, temp, 0);
-    this->RemoteInformation->Update(temp);
+    this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
     }
@@ -134,15 +150,12 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
 
 //----------------------------------------------------------------------------
 void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
-  const char* xmlcontents, bool remote)
+  const char* xmlcontents, vtkSMSession* session, bool remote)
 {
   if (remote)
     {
-    assert("Session should already be set" && this->Internals->Session);
-    vtkSMSessionProxyManager* pxm =
-        vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
-            this->Internals->Session);
-
+    assert("Session should already be set" && (session != NULL));
+    vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
     vtkSMPluginLoaderProxy* proxy =
         vtkSMPluginLoaderProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
     proxy->UpdateVTKObjects();
@@ -153,9 +166,8 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
     pxm->GetProxyDefinitionManager()->SynchronizeDefinitions();
 
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-    this->Internals->Session->GatherInformation(
-      vtkPVSession::DATA_SERVER_ROOT, temp, 0);
-    this->RemoteInformation->Update(temp);
+    session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, temp, 0);
+    this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
     }
   else
@@ -164,8 +176,7 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
       xmlcontents);
 
     vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
-    this->Internals->Session->GatherInformation(
-      vtkPVSession::CLIENT, temp, 0);
+    temp->CopyFromObject(NULL);
     this->LocalInformation->Update(temp);
     temp->Delete();
     }
@@ -174,10 +185,15 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMPluginManager::GetPluginSearchPaths(bool remote)
+const char* vtkSMPluginManager::GetLocalPluginSearchPaths()
 {
-  return remote? this->RemoteInformation->GetSearchPaths() :
-    this->LocalInformation->GetSearchPaths();
+  return this->LocalInformation->GetSearchPaths();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMPluginManager::GetRemotePluginSearchPaths(vtkSMSession* session)
+{
+  return this->Internals->RemoteInformations[session]->GetSearchPaths();
 }
 
 //----------------------------------------------------------------------------

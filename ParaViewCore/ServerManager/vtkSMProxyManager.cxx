@@ -21,9 +21,9 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSessionIterator.h"
 #include "vtkSmartPointer.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -111,6 +111,7 @@ vtkSMProxyManager* vtkSMProxyManager::New()
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->PXMStorage = new vtkPXMInternal();
+  this->PluginManager = vtkSMPluginManager::New();
   this->UndoStackBuilder = NULL;
 }
 
@@ -118,6 +119,9 @@ vtkSMProxyManager::vtkSMProxyManager()
 vtkSMProxyManager::~vtkSMProxyManager()
 {
   this->SetUndoStackBuilder(NULL);
+
+  this->PluginManager->Delete();
+  this->PluginManager = NULL;
 
   delete this->PXMStorage;
   this->PXMStorage = NULL;

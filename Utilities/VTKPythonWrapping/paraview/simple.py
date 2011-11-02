@@ -870,9 +870,12 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     information known about plugins distributed with ParaView to locate the
     shared library for the plugin to load. Raises a RuntimeError if the plugin
     was not found."""
-    plm = servermanager.ProxyManager().GetSession().GetPluginManager()
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Cannot load a plugin without a session."
+    plm = servermanager.ProxyManager().GetPluginManager()
     if remote:
-        info = plm.GetRemoteInformation()
+        session = servermanager.ActiveConnection.Session
+        info = plm.GetRemoteInformation(session)
     else:
         info = plm.GetLocalInformation()
     for cc in range(0, info.GetNumberOfPlugins()):

@@ -45,8 +45,6 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 {
   this->SessionProxyManager = NULL;
   this->StateLocator = vtkSMStateLocator::New();
-  this->PluginManager = vtkSMPluginManager::New();
-  this->PluginManager->SetSession(this);
   this->IsAutoMPI = false;
 
   // Start after the reserved one
@@ -61,8 +59,11 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
-  this->PluginManager->Delete();
-  this->PluginManager = NULL; 
+  if (vtkSMProxyManager::IsInitialized())
+    {
+    vtkSMProxyManager::GetProxyManager()->GetPluginManager()->UnRegisterSession(this);
+    }
+
   this->StateLocator->Delete();
   if (this->SessionProxyManager)
     {
@@ -160,8 +161,7 @@ void vtkSMSession::Initialize()
   this->SessionProxyManager = vtkSMSessionProxyManager::New(this);
 
   // Initialize the plugin manager.
-  this->PluginManager->SetSession(this);
-  this->PluginManager->Initialize();
+  vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
 }
 
 //----------------------------------------------------------------------------
