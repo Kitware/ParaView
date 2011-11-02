@@ -234,23 +234,6 @@ if(NOT APPLE)
   endif()
 
   include(External_NUMPY)
-
-  if(NOT WIN32)
-    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Dependencies for VisTrails" FALSE)
-    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-    if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-      # Build SIP and PyQt for vistrails plugin.
-      set(SIP_dependencies python)
-      include(External_SIP)
-      list(APPEND PyQt_dependencies SIP)
-      set(PyQt_dependencies python SIP)
-      include(External_PyQt)
-      list(APPEND ParaView_dependencies PyQt)
-
-      set(VISTRAILS_ARGS
-        -DPARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON)
-    endif()
-  endif()
 else()
 
   find_package(PythonInterp)
@@ -399,11 +382,11 @@ if(NOT APPLE)
       -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
       -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source}
     )
-  endif()
+  else()
     set(AcuSolve_ARGS
       -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
     )
-  else()
+  endif()
 endif()
 
 if(WIN32)
@@ -435,6 +418,15 @@ if(PARAVIEW_BUILD_PLUGIN_VisTrails)
     -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
     -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source}
   )
+
+  # Build SIP and PyQt for vistrails plugin.
+  set(SIP_dependencies python)
+  include(External_SIP)
+  list(APPEND PyQt_dependencies SIP)
+  set(PyQt_dependencies python SIP)
+  include(External_PyQt)
+  list(APPEND ParaView_dependencies PyQt)
+
 else()
   set(VisTrails_ARGS
     -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=OFF
@@ -527,14 +519,13 @@ ExternalProject_Add(${proj}
     # VisIt - Silo
     ${Silo_ARGS}
     # VisTrails
-    ${VISTRAILS_ARGS}
+    ${VisTrails_ARGS}
     # VRPN Plugin
     ${VRPN_ARGS}
     # zlib
     ${ZLIB_ARGS}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
     ${AcuSolve_ARGS}
-    ${VisTrails_ARGS}
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ""
