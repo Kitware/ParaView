@@ -425,8 +425,9 @@ if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   include(External_VisTrails)
   list(APPEND ParaView_dependencies VisTrails)
   set(VisTrails_ARGS
-      -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
-      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source})
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
+    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source}
+  )
 endif()
 
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
