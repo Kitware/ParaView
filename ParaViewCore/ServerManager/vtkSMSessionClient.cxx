@@ -526,7 +526,13 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         }
       else if(!remoteObject)
         {
-        vtkErrorMacro("No remote object found for corresponding state: " << message->global_id());
+        // This issue seems to happen only sometime on amber12 in collaboration
+        // and are hard to reproduce
+        // If we get time to figure out how this situation happen and why that
+        // would be nice but for now, we'll just keep a warning arround as
+        // this case is harmless.
+        vtkWarningMacro( "No remote object found for corresponding state: "
+                         << message->global_id());
         message->PrintDebugString();
         }
       }
