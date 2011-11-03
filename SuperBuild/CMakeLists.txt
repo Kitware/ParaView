@@ -430,12 +430,12 @@ if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   )
   list(APPEND PARAVIEW_EXTERNAL_PLUGIN_DIRS ${VisTrails_source})
   # Build SIP and PyQt for vistrails plugin.
-  set(SIP_dependencies python)
-  include(External_SIP)
-  list(APPEND PyQt_dependencies SIP)
-  set(PyQt_dependencies python SIP)
-  include(External_PyQt)
-  list(APPEND ParaView_dependencies PyQt)
+  #set(SIP_dependencies python)
+  #include(External_SIP)
+  #list(APPEND PyQt_dependencies SIP)
+  #set(PyQt_dependencies python SIP)
+  #include(External_PyQt)
+  #list(APPEND ParaView_dependencies PyQt)
 
 else()
   set(VisTrails_ARGS
