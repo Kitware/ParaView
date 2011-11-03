@@ -528,5 +528,5 @@ ExternalProject_Add(${proj}
     ${AcuSolve_ARGS}
     # Documentation
     ${DOC_ARGS}
-  INSTALL_COMMAND ""
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ParaViewSuperBuild_SOURCE_DIR}/.plugins <BINARY_DIR>/bin/
   )
