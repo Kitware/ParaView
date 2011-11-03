@@ -507,6 +507,20 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       reprProxy, reprProxy->GetProperty("SelectMapper"));
     }
+  else  if (reprProxy->GetProperty("VolumeRenderingMode"))
+    {
+    QList<QVariant> mapperNames =
+      pqSMAdaptor::getEnumerationPropertyDomain(
+        reprProxy->GetProperty("VolumeRenderingMode"));
+    foreach(QVariant item, mapperNames)
+      {
+      this->Internal->SelectMapper->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+      this->Internal->SelectedMapperAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, reprProxy->GetProperty("VolumeRenderingMode"));
+    }
 
   this->Internal->BackfaceStyleRepresentation->clear();
   if ((prop = reprProxy->GetProperty("BackfaceRepresentation")) != NULL)
@@ -574,23 +588,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->DisableSlots = 0;
   //QTimer::singleShot(0, this, SLOT(updateEnableState()));
 
-
-  //
-  if(reprProxy->GetProperty("SampleDistance"))
-    {
-    this->Internal->Links->addPropertyLink(this->Internal->SampleDistanceValue,
-      "text", SIGNAL(editingFinished()),
-      reprProxy, reprProxy->GetProperty("SampleDistance"));
-    validator = new QDoubleValidator(this);
-    this->Internal->SampleDistanceValue->setValidator(validator);
-    }
-
-  if(reprProxy->GetProperty("AutoAdjustSampleDistances"))
-    {
-    this->Internal->Links->addPropertyLink(this->Internal->AutoAdjustSampleDistances,
-      "checked", SIGNAL(toggled(bool)),
-      reprProxy, reprProxy->GetProperty("AutoAdjustSampleDistances"));
-    }
   if (reprProxy->GetProperty("Shade"))
     {
     this->Internal->Links->addPropertyLink(this->Internal->Shading,
@@ -675,9 +672,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
-  QObject::connect(this->Internal->SelectedMapperAdaptor,
-    SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(selectedMapperChanged()), Qt::QueuedConnection);
 
   this->Internal->BackfaceRepresentationAdaptor = new pqSignalAdaptorComboBox(
                                    this->Internal->BackfaceStyleRepresentation);
@@ -694,11 +688,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(beginUndoSet(const QString&)));
   QObject::connect(this->Internal->BackfaceActorColor,
     SIGNAL(endUndo()), this, SLOT(endUndoSet()));
-
-  QObject::connect(this->Internal->AutoAdjustSampleDistances,
-                   SIGNAL(toggled(bool)),
-                   this,
-                   SLOT(setAutoAdjustSampleDistances(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -766,7 +755,8 @@ void pqDisplayProxyEditor::updateEnableState()
 
   this->Internal->SelectMapper->setEnabled(
     reprType == "Volume"
-    && this->Internal->Representation->getProxy()->GetProperty("SelectMapper"));
+    && (this->Internal->Representation->getProxy()->GetProperty("SelectMapper") ||
+        this->Internal->Representation->getProxy()->GetProperty("VolumeRenderingMode")));
 
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
@@ -1022,36 +1012,6 @@ void pqDisplayProxyEditor::setBackfaceSolidColor(const QColor& color)
   // If specular white is off, then we want to update the specular color as
   // well.
   emit this->specularColorChanged();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::setAutoAdjustSampleDistances(bool flag)
-{
-  this->Internal->SampleDistanceValue->setEnabled(!flag);
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::selectedMapperChanged()
-{
-  if(!this->Internal->SelectMapper->currentText().compare(
-      QString("Fixed Point"), Qt::CaseInsensitive))
-    {
-    // Fixed point does not uses sample distance.
-    this->Internal->SampleDistance->setEnabled(0);
-    this->Internal->SampleDistanceValue->setEnabled(0);
-    this->Internal->AutoAdjustSampleDistances->setEnabled(0);
-    }
-  else if(!this->Internal->SelectMapper->currentText().compare(
-      QString("GPU"), Qt::CaseInsensitive))
-    {
-    this->Internal->SampleDistance->setEnabled(1);
-    this->Internal->SampleDistanceValue->setEnabled(0);
-    this->Internal->AutoAdjustSampleDistances->setEnabled(1);
-    }
-  else
-    {
-      // Do nothing.
-    }
 }
 
 //-----------------------------------------------------------------------------

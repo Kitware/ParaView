@@ -36,7 +36,7 @@ class vtkPVCacheKeeper;
 class vtkPVLODVolume;
 class vtkPVUpdateSuppressor;
 class vtkUnstructuredDataDeliveryFilter;
-class vtkVolumeMapper;
+class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
 class VTK_EXPORT vtkImageVolumeRepresentation : public vtkPVDataRepresentation
@@ -66,13 +66,9 @@ public:
   vtkGetStringMacro(ColorArrayName);
 
   // Description:
-  // Register a volume mapper with the representation.
-  void AddVolumeMapper(const char* name, vtkVolumeMapper*);
-
-  // Description:
-  // Set the active volume mapper to use.
-  virtual void SetActiveVolumeMapper(const char*);
-  vtkVolumeMapper* GetActiveVolumeMapper();
+  //Select the type of rendering approach to use.
+  vtkSetMacro(RequestedRenderMode, int);
+  vtkGetMacro(RequestedRenderMode, int);
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -153,7 +149,7 @@ protected:
 
   vtkImageData* Cache;
   vtkPVCacheKeeper* CacheKeeper;
-  vtkFixedPointVolumeRayCastMapper* DefaultMapper;
+  vtkSmartVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
 
@@ -164,13 +160,12 @@ protected:
 
   int ColorAttributeType;
   char* ColorArrayName;
+  int RequestedRenderMode;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented
   void operator=(const vtkImageVolumeRepresentation&); // Not implemented
 
-  class vtkInternals;
-  vtkInternals* Internals;
 //ETX
 };
 
