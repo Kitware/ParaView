@@ -155,7 +155,7 @@ set(OpenMPI_dependencies)
 set(ParaView_dependencies)
 
 set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
-
+set(PARAVIEW_EXTERNAL_PLUGIN_DIRS)
 set(MPI_ARGS)
 
 # Build a common zlib used by several dependencies
@@ -306,7 +306,19 @@ endif()
 set(freetype_dependencies zlib)
 list(APPEND ParaView_dependencies freetype)
 include(External_freetype)
-set(freetype_ARGS)
+set(freetype_ARGS
+  -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
+  -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
+  -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
+  -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
+  )
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
+else()
+  get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+endif()
 
 if(ENABLE_YT)
   set(MPL_dependencies NUMPY zlib)
@@ -362,40 +374,6 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
 endif()
 
-
-# Build VRPN
-list(APPEND ParaView_dependencies VRPN)
-include(External_VRPN)
-set(VRPN_ARGS
-  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
-  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
-  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
-
-if(NOT APPLE)
-  # Build AcuSolveReaderPlugin
-  option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
-  set(AcuSolve_ARGS)
-  if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
-    list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
-    include(External_AcuSolveReaderPlugin)
-    set(AcuSolve_ARGS
-      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
-      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source}
-    )
-  else()
-    set(AcuSolve_ARGS
-      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
-    )
-  endif()
-endif()
-
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
-else()
-  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
-endif()
-
 if(NOT WIN32)
   include(External_FFMPEG)
   set(FFMPEG_ARGS
@@ -408,6 +386,39 @@ if(NOT WIN32)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
+# Build VRPN
+list(APPEND ParaView_dependencies VRPN)
+include(External_VRPN)
+set(VRPN_ARGS
+  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
+  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
+else()
+  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
+endif()
+
+# Build AcuSolveReaderPlugin
+if(NOT APPLE)
+  option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
+  set(AcuSolve_ARGS)
+  if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+    list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
+    include(External_AcuSolveReaderPlugin)
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
+    )
+    list(APPEND PARAVIEW_EXTERNAL_PLUGIN_DIRS ${AcuSolveReaderPlugin_source})
+  else()
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
+    )
+  endif()
+endif()
+
 # Build VisTrailsPlugin
 option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
 set(VisTrails_ARGS)
@@ -416,16 +427,15 @@ if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   list(APPEND ParaView_dependencies VisTrails)
   set(VisTrails_ARGS
     -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
-    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${VisTrails_source}
   )
-
+  list(APPEND PARAVIEW_EXTERNAL_PLUGIN_DIRS ${VisTrails_source})
   # Build SIP and PyQt for vistrails plugin.
-  set(SIP_dependencies python)
-  include(External_SIP)
-  list(APPEND PyQt_dependencies SIP)
-  set(PyQt_dependencies python SIP)
-  include(External_PyQt)
-  list(APPEND ParaView_dependencies PyQt)
+  #set(SIP_dependencies python)
+  #include(External_SIP)
+  #list(APPEND PyQt_dependencies SIP)
+  #set(PyQt_dependencies python SIP)
+  #include(External_PyQt)
+  #list(APPEND ParaView_dependencies PyQt)
 
 else()
   set(VisTrails_ARGS
@@ -487,6 +497,7 @@ ExternalProject_Add(${proj}
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
     -DPARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES:BOOL=ON
     -DPARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS:STRING=${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}
+    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${PARAVIEW_EXTERNAL_PLUGIN_DIRS}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}

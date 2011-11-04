@@ -6,8 +6,6 @@ set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-install")
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
-  
-
   ExternalProject_Add(OpenMPI
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${OpenMPI_source}
