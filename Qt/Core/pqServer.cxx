@@ -47,8 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkToolkits.h"
 
 // Qt includes.
@@ -128,6 +129,27 @@ pqServer::~pqServer()
 //-----------------------------------------------------------------------------
 void pqServer::initialize()
 {
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
+
+  // setup the active-view and active-sources selection models.
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveSources", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveSources = selmodel;
+
+  selmodel = pxm->GetSelectionModel("ActiveView");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveView", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveView = selmodel;
+
   // Setup the Connection TimeKeeper.
   // Currently, we are keeping seperate times per connection. Once we start
   // supporting multiple connections, we may want to the link the
@@ -135,7 +157,6 @@ void pqServer::initialize()
   this->createTimeKeeper();
 
   // Create the GlobalMapperPropertiesProxy.
-  vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
   proxy->UpdateVTKObjects();
   pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
@@ -167,6 +188,19 @@ vtkSMSession* pqServer::session() const
 {
   return this->Session.GetPointer();
 }
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeSourcesSelectionModel() const
+{
+  return this->ActiveSources;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeViewSelectionModel() const
+{
+  return this->ActiveView;
+}
+
 //-----------------------------------------------------------------------------
 void pqServer::createTimeKeeper()
 {

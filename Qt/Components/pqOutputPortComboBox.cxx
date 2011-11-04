@@ -36,16 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
+#include "pqActiveObjects.h"
 
 //-----------------------------------------------------------------------------
 pqOutputPortComboBox::pqOutputPortComboBox(QWidget* _parent) : Superclass(_parent)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
 
-  QObject::connect(core->getSelectionModel(),
-    SIGNAL(currentChanged(pqServerManagerModelItem*)),
-    this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(portChanged(pqOutputPort*)),
+    this, SLOT(portChanged(pqOutputPort*)));
+
   QObject::connect(this, SIGNAL(currentIndexChanged(int)),
     this, SLOT(onCurrentIndexChanged(int)));
 
@@ -170,21 +171,14 @@ void pqOutputPortComboBox::setCurrentPort(pqOutputPort* port)
 }
 
 //-----------------------------------------------------------------------------
-void pqOutputPortComboBox::onCurrentChanged(pqServerManagerModelItem* item)
+void pqOutputPortComboBox::portChanged(pqOutputPort* item)
 {
   if (!this->AutoUpdateIndex)
     {
     return;
     }
 
-  pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
-  if (src)
-    {
-    port = src->getOutputPort(0);
-    }
-
-  this->setCurrentPort(port);
+  this->setCurrentPort(item);
 }
 
 //-----------------------------------------------------------------------------

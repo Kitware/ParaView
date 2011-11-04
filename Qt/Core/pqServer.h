@@ -39,9 +39,10 @@ class vtkPVServerInformation;
 class vtkPVXMLElement;
 class vtkSMApplication;
 class vtkSMProxy;
-class vtkSMSessionProxyManager;
+class vtkSMProxySelectionModel;
 class vtkSMRenderViewProxy;
 class vtkSMSession;
+class vtkSMSessionProxyManager;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
@@ -72,6 +73,13 @@ public:
 
   /// Returns the proxy manager for this session.
   vtkSMSessionProxyManager* proxyManager() const;
+
+  /// Sources selection model is used to keep track of sources currently
+  /// selected on this session/server-connection.
+  vtkSMProxySelectionModel* activeSourcesSelectionModel() const;
+
+  /// View selection model is used to keep track of active view.
+  vtkSMProxySelectionModel* activeViewSelectionModel() const;
 
   /// Return the number of data server partitions on this 
   /// server connection. A convenience method.
@@ -170,6 +178,8 @@ private:
   vtkIdType ConnectionID;
   vtkWeakPointer<vtkSMProxy> GlobalMapperPropertiesProxy;
   vtkWeakPointer<vtkSMSession> Session;
+  vtkWeakPointer<vtkSMProxySelectionModel> ActiveSources;
+  vtkWeakPointer<vtkSMProxySelectionModel> ActiveView;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

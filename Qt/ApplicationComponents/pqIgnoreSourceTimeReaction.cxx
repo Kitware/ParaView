@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqIgnoreSourceTimeReaction.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 
@@ -46,10 +46,8 @@ pqIgnoreSourceTimeReaction::pqIgnoreSourceTimeReaction(QAction* parentObject)
 {
   parentObject->setCheckable(true);
 
-  pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::connect(core->getSelectionModel(),
-    SIGNAL(selectionChanged(const pqServerManagerSelection&,
-        const pqServerManagerSelection&)),
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(sourceChanged(pqPipelineSource*)),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
@@ -57,10 +55,7 @@ pqIgnoreSourceTimeReaction::pqIgnoreSourceTimeReaction(QAction* parentObject)
 //-----------------------------------------------------------------------------
 void pqIgnoreSourceTimeReaction::updateEnableState()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
-  if (selection.size() < 1)
+  if (!pqActiveObjects::instance().activeSource())
     {
     this->parentAction()->setEnabled(false);
     return;
@@ -73,22 +68,15 @@ void pqIgnoreSourceTimeReaction::updateEnableState()
   bool checked = false;
 
   // Now determine the check state for the action.
-  foreach (pqServerManagerModelItem* item, selection)
+  pqPipelineSource* source = pqActiveObjects::instance().activeSource();
+  if (!source)
     {
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = port? port->getSource():
-      qobject_cast<pqPipelineSource*>(item);
-    if (!source)
-      {
-      enabled = false;
-      break;
-      }
+    enabled = false;
+    }
+  else
+    {
     pqTimeKeeper* timekeeper = source->getServer()->getTimeKeeper();
     checked = checked || !timekeeper->isSourceAdded(source);
-    if (checked)
-      {
-      break;
-      }
     }
   action->setChecked(checked);
   action->blockSignals(prev);
@@ -99,20 +87,9 @@ void pqIgnoreSourceTimeReaction::updateEnableState()
 void pqIgnoreSourceTimeReaction::ignoreSourceTime(bool ignore)
 {
   BEGIN_UNDO_SET("Toggle Ignore Time");
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
-
-  // Now determine the check state for the action.
-  foreach (pqServerManagerModelItem* item, selection)
+  pqPipelineSource* source = pqActiveObjects::instance().activeSource();
+  if (source)
     {
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = port? port->getSource():
-      qobject_cast<pqPipelineSource*>(item);
-    if (!source)
-      {
-      continue;
-      }
     pqIgnoreSourceTimeReaction::ignoreSourceTime(source, ignore);
     }
   END_UNDO_SET();

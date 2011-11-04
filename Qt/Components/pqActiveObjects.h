@@ -33,14 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqActiveObjects_h
 
 #include <QObject>
+#include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqView;
-class pqPipelineSource;
-class pqServer;
-class pqOutputPort;
-class pqDataRepresentation;
-class pqRepresentation;
+/// needed for inline get-methods.
+#include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
+#include "pqServer.h"
+#include "pqView.h"
+
+class vtkEventQtSlotConnect;
+class vtkSMProxySelectionModel;
 
 /// pqActiveObjects is a singleton that keeps track of "active objects"
 /// including active view, active source, active representation etc. 
@@ -53,24 +57,26 @@ public:
   static pqActiveObjects& instance();
 
   /// Returns the active view.
-  pqView* activeView()
-    { return this->CachedView; }
+  pqView* activeView() const { return this->ActiveView; }
 
   /// Returns the active source
-  pqPipelineSource* activeSource()
-    { return this->CachedSource; }
+  pqPipelineSource* activeSource() const { return this->ActiveSource; }
 
   /// Returns the active port.
-  pqOutputPort* activePort()
-    { return this->CachedPort; }
+  pqOutputPort* activePort() const { return this->ActivePort; }
 
   /// Returns the active server.
-  pqServer* activeServer()
-    { return this->CachedServer; }
+  pqServer* activeServer() const { return this->ActiveServer; }
 
   /// Returns the active representation.
-  pqDataRepresentation* activeRepresentation()
-    { return this->CachedRepresentation; }
+  pqDataRepresentation* activeRepresentation() const
+    { return this->ActiveRepresentation; }
+
+  vtkSMProxySelectionModel* activeSourcesSelectionModel() const
+    {
+    return this->activeServer()?
+      this->activeServer()->activeSourcesSelectionModel() : NULL;
+    }
 
 public slots:
   void setActiveView(pqView * view);
@@ -79,35 +85,62 @@ public slots:
   void setActiveServer(pqServer*);
 
 signals:
-  /// fired when active view changes \c view is the new active view.
-  void viewChanged(pqView* view);
-
-  void sourceChanged(pqPipelineSource*);
-
-  void portChanged(pqOutputPort*);
-
+  /// These signals are fired when any of the corresponding active items change.
   void serverChanged(pqServer*);
-
+  void viewChanged(pqView* view);
+  void sourceChanged(pqPipelineSource*);
+  void portChanged(pqOutputPort*);
   void representationChanged(pqDataRepresentation*);
   void representationChanged(pqRepresentation*);
 
+  /// signals fired as a consequence of serverChanged() to make it easier to
+  /// components that depend on selection models.
+  void sourcesSelectionModelChanged(vtkSMProxySelectionModel*);
+
 private slots:
-  void activeViewChanged(pqView*);
-  void onSelectionChanged();
-  void onServerChanged();
+  /// if a new server connection was established, and no active server is set,
+  /// this makes the new server active by default. This helps with single-session
+  /// clients.
+  void serverAdded(pqServer*);
+
+  /// if the active server connection was closed, this ensures that the
+  /// application is notified.
+  void serverRemoved(pqServer*);
+
+  /// if any of the active proxies is removed, we fire appropriate signals.
+  void proxyRemoved(pqServerManagerModelItem*);
+
+  /// called to update representation
   void updateRepresentation();
 
-private:
+  void sourceSelectionChanged();
+  void viewSelectionChanged();
+ 
+protected:
   pqActiveObjects();
   ~pqActiveObjects();
-  pqActiveObjects(const pqActiveObjects&); // Not implemented.
-  void operator=(const pqActiveObjects&); // Not implemented.
 
-  pqServer* CachedServer;
-  pqPipelineSource* CachedSource;
-  pqOutputPort* CachedPort;
-  pqView* CachedView;
-  pqDataRepresentation* CachedRepresentation;
+  /// single method that fires appropriate signals based on state changes. This
+  /// also ensures that the Cached* variables are updated correctly.
+  void triggerSignals();
+
+private:
+  Q_DISABLE_COPY(pqActiveObjects);
+
+  QPointer<pqServer> ActiveServer;
+  QPointer<pqPipelineSource> ActiveSource;
+  QPointer<pqOutputPort> ActivePort;
+  QPointer<pqView> ActiveView;
+  QPointer<pqDataRepresentation> ActiveRepresentation;
+
+  // these are void* maintained to detect when values have changed.
+  void* CachedServer;
+  void* CachedSource;
+  void* CachedPort;
+  void* CachedView;
+  void* CachedRepresentation;
+
+  vtkEventQtSlotConnect* VTKConnector;
 };
 
 #endif

@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqRenderView.h"
-#include "pqServerManagerSelectionModel.h"
+#include "pqServer.h"
 
 // Qt Includes.
 #include <QCursor>
@@ -46,12 +46,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 // ParaView includes.
-#include "vtkPVRenderView.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkMemberFunctionCommand.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
 
 #include "zoom.xpm"
@@ -411,9 +413,14 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
   case PICK:
       {
       pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
-      pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
-        picked? picked->getOutputPortFromInput(): NULL,
-        pqServerManagerSelectionModel::ClearAndSelect);
+      vtkSMProxySelectionModel* selModel = 
+        this->Internal->RenderView->getServer()->activeSourcesSelectionModel();
+      if (selModel)
+        {
+        selModel->SetCurrentProxy(
+          picked? picked->getOutputPortFromInput()->getOutputPortProxy(): NULL,
+          vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+        }
       }
     break;
 
@@ -425,9 +432,14 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
       // a blank area. BUG #11428.
       if (picked)
         {
-        pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
-          picked->getOutputPortFromInput(),
-          pqServerManagerSelectionModel::ClearAndSelect);
+        vtkSMProxySelectionModel* selModel = 
+          this->Internal->RenderView->getServer()->activeSourcesSelectionModel();
+        if (selModel)
+          {
+          selModel->SetCurrentProxy(
+            picked->getOutputPortFromInput()->getOutputPortProxy(),
+            vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+          }
         }
       }
     break;

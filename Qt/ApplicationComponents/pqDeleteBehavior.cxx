@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqView.h"
+#include "vtkSMProxySelectionModel.h"
 
 //-----------------------------------------------------------------------------
 pqDeleteBehavior::pqDeleteBehavior(QObject* parentObject):
@@ -56,22 +56,23 @@ void pqDeleteBehavior::removeSource(pqPipelineSource* source)
   // FIXME: updating of selection must happen even is the source is removed
   // from python script or undo redo.
   // If the source is selected, remove it from the selection.
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqServerManagerSelectionModel *selectionModel = core->getSelectionModel();
+  vtkSMProxySelectionModel *selectionModel =
+    source->getServer()->activeSourcesSelectionModel();
   pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source);
-  if (selectionModel->isSelected(source) && selectionModel->selectedItems()->size() == 1)
+  if (selectionModel->IsSelected(source->getProxy()) &&
+    selectionModel->GetNumberOfSelectedProxies() == 1)
     {
     // If the item is a filter and has only one input, set the
     // input as the current item. Otherwise, select the server.
     if (filter && filter->getInputCount() == 1)
       {
-      selectionModel->setCurrentItem(filter->getInput(0),
-        pqServerManagerSelectionModel::ClearAndSelect);
+      selectionModel->SetCurrentProxy(filter->getInput(0)->getProxy(),
+        vtkSMProxySelectionModel::CLEAR_AND_SELECT);
       }
     else
       {
-      selectionModel->setCurrentItem(source->getServer(),
-        pqServerManagerSelectionModel::ClearAndSelect);
+      selectionModel->SetCurrentProxy(NULL,
+        vtkSMProxySelectionModel::CLEAR_AND_SELECT);
       }
     }
 

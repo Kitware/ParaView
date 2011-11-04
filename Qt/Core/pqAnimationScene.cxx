@@ -31,6 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnimationScene.h"
 
+#include "pqAnimationCue.h"
+#include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
+#include "pqSettings.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqTimeKeeper.h"
 #include "vtkAnimationCue.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
@@ -40,8 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 
@@ -50,16 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QSize>
 
-#include "pqAnimationCue.h"
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
-#include "pqSettings.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
-#include "pqTimeKeeper.h"
 
 template<class T>
 static uint qHash(QPointer<T> p)
@@ -448,7 +448,7 @@ void pqAnimationScene::initializeCue(
     kf1->UpdateVTKObjects();
 
     double bounds[6] = {-1, 1, -1, 1, -1, 1};
-    pqApplicationCore::instance()->getSelectionModel()->getSelectionDataBounds(
+    cue->getServer()->activeSourcesSelectionModel()->GetSelectionDataBounds(
       bounds);
 
     vtkBoundingBox bbox(bounds);

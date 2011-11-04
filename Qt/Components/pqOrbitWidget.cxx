@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerSelectionModel.h"
 #include "vtkBoundingBox.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPropertyHelper.h"

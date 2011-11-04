@@ -202,6 +202,11 @@ struct vtkSMSessionProxyManagerInternals
     LinkType;
   LinkType RegisteredLinkMap;
 
+  // Data structure for selection models.
+  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
+    SelectionModelsType;
+  SelectionModelsType SelectionModels;
+
   // Data structure for storing the fullState
   vtkSMMessage State;
 

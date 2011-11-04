@@ -100,7 +100,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.h
   pqSettings.h
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.h
@@ -318,8 +317,6 @@ VTK_ADD_LIBRARY(pqCore
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.cxx
-  pqServerManagerSelectionModel.h
   pqServerResource.cxx
   pqServerResource.h
   pqSettings.cxx

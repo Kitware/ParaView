@@ -77,7 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSettings.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"

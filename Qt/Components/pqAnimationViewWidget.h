@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
+class pqAnimationKeyFrame;
 class pqAnimationScene;
 class pqAnimationTrack;
-class pqAnimationKeyFrame;
+class pqPipelineSource;
 class pqView;
-class pqServerManagerModelItem;
 class vtkSMProxy;
 
 /// This is the Animation panel widget. It controls the behavior
@@ -96,7 +96,7 @@ protected slots:
   // set active view changed
   void setActiveView(pqView*);
   // set the current proxy selection
-  void setCurrentSelection(pqServerManagerModelItem*);
+  void setCurrentSelection(pqPipelineSource *);
   void setCurrentProxy(vtkSMProxy* pxy);
   
   // sets the current time

@@ -48,7 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject),
+  SelectionAdaptor(NULL)
 {
   this->PipelineModel = new pqPipelineModel(this);
 
@@ -90,12 +91,14 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   modifiedFont.setBold(true);
   this->PipelineModel->setModifiedFont(modifiedFont);
 
-  // Create the selection adaptor.
-  new pqPipelineModelSelectionAdaptor(this->getSelectionModel(),
-    pqApplicationCore::instance()->getSelectionModel(), this);
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
+  QObject::connect(
+    &pqActiveObjects::instance(),
+    SIGNAL(sourcesSelectionModelChanged(vtkSMProxySelectionModel*)),
+    this, SLOT(setProxySelectionModel(vtkSMProxySelectionModel*)));
+
 
   // Make sure the tree items get expanded when new descendents
   // are added.
@@ -106,6 +109,22 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
 {
+  delete this->SelectionAdaptor;
+  this->SelectionAdaptor = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::setProxySelectionModel(
+  vtkSMProxySelectionModel* selModel)
+{
+  delete this->SelectionAdaptor;
+  this->SelectionAdaptor = NULL;
+  // Create the selection adaptor.
+  if (selModel)
+    {
+    new pqPipelineModelSelectionAdaptor(
+      this->getSelectionModel(), selModel, this);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -1558,18 +1558,50 @@ bool vtkSMSessionProxyManager::HasDefinition( const char* groupName,
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModel(const char* name)
+void vtkSMSessionProxyManager::RegisterSelectionModel(
+  const char* name, vtkSMProxySelectionModel* model)
 {
-  return vtkSMProxyManager::GetProxyManager()->GetSelectionModel(name);
+  if (!model)
+    {
+    vtkErrorMacro("Cannot register a null model.");
+    return;
+    }
+  if (!name)
+    {
+    vtkErrorMacro("Cannot register model with no name.");
+    return;
+    }
+
+  vtkSMProxySelectionModel* curmodel = this->GetSelectionModel(name);
+  if (curmodel && curmodel == model)
+    {
+    // already registered.
+    return;
+    }
+
+  if (curmodel)
+    {
+    vtkWarningMacro("Replacing existing selection model: " << name);
+    }
+  this->Internals->SelectionModels[name] = model;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::RegisterSelectionModel(const char* name, vtkSMProxySelectionModel* sm)
+void vtkSMSessionProxyManager::UnRegisterSelectionModel( const char* name)
 {
-  vtkSMProxyManager::GetProxyManager()->RegisterSelectionModel(name, sm);
+  this->Internals->SelectionModels.erase(name);
 }
+
 //---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::UnRegisterSelectionModel(const char* name)
+vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModel(
+  const char* name)
 {
-  vtkSMProxyManager::GetProxyManager()->UnRegisterSelectionModel(name);
+  vtkSMSessionProxyManagerInternals::SelectionModelsType::iterator iter =
+    this->Internals->SelectionModels.find(name);
+  if (iter == this->Internals->SelectionModels.end())
+    {
+    return 0;
+    }
+
+  return iter->second;
 }

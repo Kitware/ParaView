@@ -36,13 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqServerManagerSelectionModel.h"
+#include "pqApplicationCore.h"
+#include "pqOutputPort.h"
 #include "pqPipelineModel.h"
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMProxySelectionModel.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
   QItemSelectionModel* pipelineSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* _parent/*=0*/)
+    vtkSMProxySelectionModel* smSelectionModel, QObject* _parent/*=0*/)
 : pqSelectionAdaptor(pipelineSelectionModel, smSelectionModel, _parent)
 {
   if (!qobject_cast<const pqPipelineModel*>(this->getQModel()))
@@ -59,20 +64,22 @@ pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqPipelineModelSelectionAdaptor::mapFromSMModel(
-    pqServerManagerModelItem* item) const
+QModelIndex pqPipelineModelSelectionAdaptor::mapFromProxy(vtkSMProxy* proxy) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
-  return pM->getIndexFor(item);
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  return pM->getIndexFor(smmodel->findItem<pqServerManagerModelItem*>(proxy));
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelItem* pqPipelineModelSelectionAdaptor::mapToSMModel(
-    const QModelIndex& index) const
+vtkSMProxy* pqPipelineModelSelectionAdaptor::mapToProxy(const QModelIndex& index) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
-  return pM->getItemFor(index); 
+  pqServerManagerModelItem* item = pM->getItemFor(index);
+  pqProxy* proxy = qobject_cast<pqProxy*>(item);
+  pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+  return proxy? proxy->getProxy() : (port? port->getOutputPortProxy()  : NULL);
 }
-

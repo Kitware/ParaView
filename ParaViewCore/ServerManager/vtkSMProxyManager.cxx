@@ -24,7 +24,6 @@
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPluginManager.h"
-#include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
@@ -38,11 +37,6 @@
 class vtkSMProxyManager::vtkPXMInternal
 {
 public:
-  // Data structure for selection models.
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
-    SelectionModelsType;
-  SelectionModelsType SelectionModels;
-
   vtkWeakPointer<vtkSMSession> ActiveSession;
 
   // Data structure for storing GlobalPropertiesManagers.
@@ -237,55 +231,6 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UndoStackBuilder: " << this->UndoStackBuilder << endl;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::RegisterSelectionModel(
-  const char* name, vtkSMProxySelectionModel* model)
-{
-  if (!model)
-    {
-    vtkErrorMacro("Cannot register a null model.");
-    return;
-    }
-  if (!name)
-    {
-    vtkErrorMacro("Cannot register model with no name.");
-    return;
-    }
-
-  vtkSMProxySelectionModel* curmodel = this->GetSelectionModel(name);
-  if (curmodel && curmodel == model)
-    {
-    // already registered.
-    return;
-    }
-
-  if (curmodel)
-    {
-    vtkWarningMacro("Replacing existing selection model: " << name);
-    }
-  this->PXMStorage->SelectionModels[name] = model;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterSelectionModel( const char* name)
-{
-  this->PXMStorage->SelectionModels.erase(name);
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
-  const char* name)
-{
-  vtkSMProxyManager::vtkPXMInternal::SelectionModelsType::iterator iter =
-    this->PXMStorage->SelectionModels.find(name);
-  if (iter == this->PXMStorage->SelectionModels.end())
-    {
-    return 0;
-    }
-
-  return iter->second;
 }
 
 //---------------------------------------------------------------------------

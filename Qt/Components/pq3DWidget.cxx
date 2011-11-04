@@ -44,7 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt includes.
@@ -66,10 +69,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
+
+namespace
+{
+  vtkSMProxySelectionModel* getSelectionModel(vtkSMProxy* proxy)
+    {
+    vtkSMSessionProxyManager* pxm =
+      proxy->GetSession()->GetSessionProxyManager();
+    return pxm->GetSelectionModel("ActiveSources");
+    }
+}
 
 //-----------------------------------------------------------------------------
 class pq3DWidget::pqStandardWidgets : public pq3DWidgetInterface
@@ -656,8 +668,9 @@ void pq3DWidget::resetBounds()
   double input_bounds[6];
   if (this->UseSelectionDataBounds)
     {
-    if (!pqApplicationCore::instance()->getSelectionModel()->
-      getSelectionDataBounds(input_bounds))
+    vtkSMProxySelectionModel* selModel = getSelectionModel(widget);
+
+    if (!selModel->GetSelectionDataBounds(input_bounds))
       {
       return;
       }

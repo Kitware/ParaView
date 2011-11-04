@@ -67,7 +67,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardServerManagerModelInterface.h"
@@ -167,10 +166,6 @@ void pqApplicationCore::constructor()
   // * Create various factories.
   this->WidgetFactory = new pq3DWidgetFactory(this);
 
-  // * Setup the selection model.
-  this->SelectionModel = new pqServerManagerSelectionModel(
-    this->ServerManagerModel, this);
-
   this->DisplayPolicy = new pqDisplayPolicy(this);
 
   this->ProgressManager = new pqProgressManager(this);
@@ -230,9 +225,6 @@ pqApplicationCore::~pqApplicationCore()
 
   delete this->ServerManagerObserver;
   this->ServerManagerObserver = 0;
-
-  delete this->SelectionModel;
-  this->SelectionModel = 0;
 
   delete this->RecentlyUsedResourcesList;
   this->RecentlyUsedResourcesList= 0;

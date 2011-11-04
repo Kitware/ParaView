@@ -107,6 +107,14 @@ public:
   // vtkCommand::SelectionChangedEvent.
   vtkGetObjectMacro(NewlySelected, vtkCollection);
   vtkGetObjectMacro(NewlyDeselected, vtkCollection);
+
+  // Description:
+  // Utility method to get the data bounds for the currently selected items.
+  // This only makes sense for selections comprising of source-proxies or
+  // output-port proxies.
+  // Returns true is the bounds are valid.
+  bool GetSelectionDataBounds(double bounds[6]);
+
 //BTX 
 protected:
   vtkSMProxySelectionModel();

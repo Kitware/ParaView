@@ -37,30 +37,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqPipelineModelSelectionAdaptor is an adaptor that connects a
 // QItemSelectionModel for a pqPipelineModel to a 
-// pqServerManagerSelectionModel. When the selection in the QItemSelectionModel
-// changes, the pqServerManagerSelectionModel will be updated and vice versa.
+// vtkSMProxySelectionModel. When the selection in the QItemSelectionModel
+// changes, the vtkSMProxySelectionModel will be updated and vice versa.
 // Every model implemented on top of pqServerManagerModel that should
 // participate in synchronized selections would typically define such 
 // an adaptor.
-class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : 
-  public pqSelectionAdaptor
+class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : public pqSelectionAdaptor
 {
   Q_OBJECT
 
 public:
   pqPipelineModelSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* parent=0);
+    vtkSMProxySelectionModel* smSelectionModel, QObject* parent=0);
   virtual ~pqPipelineModelSelectionAdaptor();
 
 protected:
-  // Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
-  // Subclass must implement this method.
-  QModelIndex mapFromSMModel( pqServerManagerModelItem* item) const;
 
-  // Maps a QModelIndex to a pqServerManagerModelItem.
-  // Subclass must implement this method.
-  virtual pqServerManagerModelItem* mapToSMModel(
-    const QModelIndex& index) const;
+  /// Maps a vtkSMProxy to an index in the QAbstractItemModel.
+  virtual QModelIndex mapFromProxy(vtkSMProxy* proxy) const;
+
+  /// Maps a QModelIndex to a vtkSMProxy.
+  virtual vtkSMProxy* mapToProxy(const QModelIndex& index) const;
 
 };
 

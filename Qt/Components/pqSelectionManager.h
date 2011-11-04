@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSelectionManager_h
 
 #include "pqComponentsExport.h"
-#include "pqServerManagerSelectionModel.h"
 
 #include <QObject>
 #include <QPair>
@@ -43,13 +42,14 @@ class pqOutputPort;
 class pqPipelineSource;
 class pqRenderView;
 class pqSelectionManagerImplementation;
+class pqServerManagerModelItem;
 class pqView;
 class vtkDataObject;
 class vtkSelection;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
-class vtkSMSourceProxy;
 class vtkSMSession;
+class vtkSMSourceProxy;
 
 /// pqSelectionManager is the nexus for introspective surface selection in 
 //  paraview. 

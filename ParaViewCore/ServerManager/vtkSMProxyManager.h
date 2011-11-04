@@ -111,17 +111,6 @@ public:
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
 
   // Description:
-  // Register/UnRegister a selection model. A selection model can be typically
-  // used by applications to keep track of active sources, filters, views etc.
-  void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
-  void UnRegisterSelectionModel(const char* name);
-
-  // Description:
-  // Get a registered selection model. Will return null if no such model is
-  // registered.
-  vtkSMProxySelectionModel* GetSelectionModel(const char* name);
-
-  // Description:
   // ParaView has notion of "global properties". These are application wide
   // properties such as foreground color, text color etc. Changing values of
   // these properties affects all objects that are linked to these properties.

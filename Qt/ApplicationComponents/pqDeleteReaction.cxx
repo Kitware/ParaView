@@ -31,14 +31,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqDeleteReaction.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
-#include "pqObjectBuilder.h"
+#include "vtkSMProxySelectionModel.h"
 
 #include <QDebug>
 #include <QSet>
@@ -50,15 +52,13 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
   this->DeleteAll = delete_all;
   if (!this->DeleteAll)
     {
-    pqApplicationCore* core = pqApplicationCore::instance();
-    QObject::connect(core->getSelectionModel(),
-      SIGNAL(selectionChanged(const pqServerManagerSelection&,
-          const pqServerManagerSelection&)),
+    QObject::connect(&pqActiveObjects::instance(),
+      SIGNAL(portChanged(pqOutputPort*)),
       this, SLOT(updateEnableState()));
 
     //needed for when you delete the only consumer of an item. The selection
     //signal is emitted before the consumer is removed
-    QObject::connect( core->getServerManagerObserver(),
+    QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
       SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*) ),
       this, SLOT(updateEnableState()) );
     }
@@ -80,11 +80,16 @@ void pqDeleteReaction::updateEnableState()
 
 //-----------------------------------------------------------------------------
 static void pqDeleteReactionGetSelectedSet(
-  const pqServerManagerSelection& selection,
+  vtkSMProxySelectionModel* selModel,
   QSet<pqPipelineSource*>& selectedSources)
 {
-  foreach (pqServerManagerModelItem* item, selection)
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
     {
+    vtkSMProxy* proxy = selModel->GetSelectedProxy(cc);
+    pqServerManagerModelItem* item =
+      smmodel->findItem<pqServerManagerModelItem*>(proxy);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource* source = port? port->getSource():
       qobject_cast<pqPipelineSource*>(item);
@@ -98,16 +103,15 @@ static void pqDeleteReactionGetSelectedSet(
 //-----------------------------------------------------------------------------
 bool pqDeleteReaction::canDeleteSelected()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
-  if (selection.size() == 0)
+  vtkSMProxySelectionModel* selModel =
+    pqActiveObjects::instance().activeSourcesSelectionModel();
+  if (selModel == NULL || selModel->GetNumberOfSelectedProxies() == 0)
     {
     return false;
     }
 
   QSet<pqPipelineSource*> selectedSources;
-  ::pqDeleteReactionGetSelectedSet(selection, selectedSources);
+  ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
 
   if (selectedSources.size() == 0)
     {
@@ -151,11 +155,12 @@ void pqDeleteReaction::deleteSelected()
     return;
     }
 
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
+
+  vtkSMProxySelectionModel* selModel =
+    pqActiveObjects::instance().activeSourcesSelectionModel();
+
   QSet<pqPipelineSource*> selectedSources;
-  ::pqDeleteReactionGetSelectedSet(selection, selectedSources);
+  ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
 
   if (selectedSources.size() == 1)
     {

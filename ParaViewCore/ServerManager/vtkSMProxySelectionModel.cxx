@@ -14,11 +14,14 @@
 =========================================================================*/
 #include "vtkSMProxySelectionModel.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMSourceProxy.h"
 
 #include <vtkstd/vector>
 
@@ -179,6 +182,36 @@ void vtkSMProxySelectionModel::InvokeCurrentChanged(vtkSMProxy*  proxy)
 void vtkSMProxySelectionModel::InvokeSelectionChanged()
 {
   this->InvokeEvent(vtkCommand::SelectionChangedEvent);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMProxySelectionModel::GetSelectionDataBounds(double bounds[6])
+{
+  vtkBoundingBox bbox;
+  for (unsigned int cc=0; cc < this->GetNumberOfSelectedProxies(); cc++)
+    {
+    vtkSMProxy* proxy = this->GetSelectedProxy(cc);
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+    vtkSMOutputPort* opPort = vtkSMOutputPort::SafeDownCast(proxy);
+    if (source)
+      {
+      for (unsigned int kk=0; kk <  source->GetNumberOfOutputPorts(); kk++)
+        {
+        bbox.AddBounds(source->GetDataInformation(kk)->GetBounds());
+        }
+      }
+    else if (opPort)
+      {
+      bbox.AddBounds(opPort->GetDataInformation()->GetBounds());
+      }
+    }
+  if (bbox.IsValid())
+    {
+    bbox.GetBounds(bounds);
+    return true;
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------

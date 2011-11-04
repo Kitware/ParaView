@@ -32,10 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOrbitCreatorDialog.h"
 #include "ui_pqOrbitCreatorDialog.h"
 
-#include "pqApplicationCore.h"
-#include "pqServerManagerSelectionModel.h"
+#include "pqActiveObjects.h"
+#include "pqServer.h"
 #include "vtkBoundingBox.h"
 #include "vtkPoints.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMUtilities.h"
 
 #include <QDoubleValidator>
@@ -102,8 +103,9 @@ void pqOrbitCreatorDialog::setCenter(double xyz[3])
 void pqOrbitCreatorDialog::resetBounds()
 {
   double input_bounds[6];
-  if (pqApplicationCore::instance()->getSelectionModel()->
-    getSelectionDataBounds(input_bounds))
+  vtkSMProxySelectionModel* selModel =
+    pqActiveObjects::instance().activeServer()->activeSourcesSelectionModel();
+  if (selModel->GetSelectionDataBounds(input_bounds))
     {
     vtkBoundingBox box;
     box.SetBounds(input_bounds);

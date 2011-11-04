@@ -42,11 +42,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDataInformationModel.h"
-#include "pqDataInformationModelSelectionAdaptor.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqSectionVisibilityContextMenu.h"
+#include "pqSelectionAdaptor.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
+#include "vtkSMOutputPort.h"
 
+namespace
+{
+  class pqDataInformationModelSelectionAdaptor : public pqSelectionAdaptor
+  {
+public:
+  pqDataInformationModelSelectionAdaptor(
+    QItemSelectionModel* diModel, vtkSMProxySelectionModel* smModel, QObject* parentObject)
+    : pqSelectionAdaptor(diModel, smModel, parentObject)
+    {
+    }
+
+protected:
+  /// subclasses can override this method to provide model specific selection 
+  /// overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
+  virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const
+    { return QItemSelectionModel::Rows; }
+
+    /// Maps a vtkSMProxy to an index in the QAbstractItemModel.
+  virtual QModelIndex mapFromProxy(vtkSMProxy* proxy) const
+    {
+    const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
+      this->getQModel());
+
+    pqServerManagerModelItem* item =
+      pqApplicationCore::instance()->getServerManagerModel()->
+      findItem<pqServerManagerModelItem*>(proxy);
+
+    pqOutputPort* outputPort = qobject_cast<pqOutputPort*>(item);
+    if (outputPort)
+      {
+      return pM->getIndexFor(outputPort);
+      }
+    pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
+    return pM->getIndexFor(src? src->getOutputPort(0) : 0);
+    }
+
+  /// Maps a QModelIndex to a vtkSMProxy.
+  virtual vtkSMProxy* mapToProxy(const QModelIndex& index) const
+    {
+    const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
+      this->getQModel());
+    pqServerManagerModelItem* item = pM->getItemFor(index);
+    pqProxy* proxy = qobject_cast<pqProxy*>(item);
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+    if (proxy)
+      {
+      return proxy->getProxy();
+      }
+    return port? port->getOutputPortProxy() : NULL;
+    }
+  };
+}
 //-----------------------------------------------------------------------------
 pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   : QWidget(_parent)
@@ -101,8 +156,8 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
     SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(showBodyContextMenu(const QPoint&)));
 
-  new pqDataInformationModelSelectionAdaptor(this->View->selectionModel(),
-    pqApplicationCore::instance()->getSelectionModel(), this);
+  //new pqDataInformationModelSelectionAdaptor(this->View->selectionModel(),
+  //  pqApplicationCore::instance()->getSelectionModel(), this);
 }
 
 //-----------------------------------------------------------------------------
