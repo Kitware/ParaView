@@ -914,6 +914,9 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
 
+  // ProcessingRemoteNotification = true prevent
+  // "ignore_synchronization" properties to be loaded...
+  // Therefore camera properties won't be shared
   if(remoteObj)
     {
     bool previousValue = this->StartProcessingRemoteNotification();

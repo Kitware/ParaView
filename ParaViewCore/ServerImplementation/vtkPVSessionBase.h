@@ -159,6 +159,11 @@ public:
   // b = a + 10;
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
+  // Description:
+  // This propertie is used to discard ignore_synchronization proxy property
+  // when we load protobuf states.
+  // Therefore, if we load any camera state while that property is true, this
+  // won't affect the proxy/property state at all. It will simply remain the same.
   virtual bool IsProcessingRemoteNotification();
 
 //BTX

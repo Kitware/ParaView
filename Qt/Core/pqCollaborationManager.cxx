@@ -126,10 +126,11 @@ public:
     this->Server = s;
     if(s)
       {
+      // DO NOT put Qt::QueuedConnection otherwise Camera synchro may failed as
+      // it could happen in-between a Session::ProcessingRemoteNotification
       QObject::connect( s,
                         SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this->Owner, SLOT(onClientMessage(vtkSMMessage*)),
-                        Qt::QueuedConnection);
+                        this->Owner, SLOT(onClientMessage(vtkSMMessage*)));
       QObject::connect( s,
                         SIGNAL(triggeredMasterUser(int)),
                         this->Owner, SIGNAL(triggeredMasterUser(int)));
