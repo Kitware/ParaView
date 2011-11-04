@@ -32,8 +32,12 @@ int main( int argc, char* argv[] )
   vtkMultiProcessController::SetGlobalController(controller);
 
   int rc            = 0;
+//  const char *fname =
+//      "/media/shared/Data/ParaViewData/Data/SPCTH/Dave_Karelitz_Small/spcth.0";
+
   const char *fname =
-      "/media/shared/Data/ParaViewData/Data/SPCTH/Dave_Karelitz_Small/spcth.0";
+      vtkTestUtilities::ExpandDataFileName(
+          argc, argv, "Data/Dave_Karelitz_Small/spcth.0" );
 
   vtkSpyPlotReaderRefPtr reader = vtkSpyPlotReaderRefPtr::New();
   reader->SetFileName( fname );
