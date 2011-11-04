@@ -36,7 +36,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkPVAMRDualContour();
-  ~vtkPVAMRDualContour();
+  virtual ~vtkPVAMRDualContour();
 
   // Description:
   // Add to list of cell arrays which are used for generating contours.

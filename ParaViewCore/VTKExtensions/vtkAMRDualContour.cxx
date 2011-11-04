@@ -1599,6 +1599,7 @@ void vtkAMRDualContour::InitializeCopyAttributes(
     vtkErrorMacro("Expecting a uniform grid.");
     }
   mesh->GetPointData()->CopyAllocate(uGrid->GetCellData());
+  iter->Delete();
 }
 
 //----------------------------------------------------------------------------
