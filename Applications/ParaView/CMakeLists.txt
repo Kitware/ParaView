@@ -117,14 +117,15 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
 
         # install pyconfig.h
-        string(REGEX MATCH "python[0-9].[0-9]" py_inc_dir ${PYTHON_INCLUDE_DIR})
+        string(REGEX MATCH "python[0-9].[0-9]" py_ver_dir ${PYTHON_INCLUDE_DIR})
         install(FILES ${PYTHON_INCLUDE_DIR}/pyconfig.h
-                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_inc_dir}
+                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_ver_dir}
                 COMPONENT Runtime)
+        set(PYTHON_LIBS_DIR ${PYTHON_LIBS_DIR}/${py_ver_dir})
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
-      install(DIRECTORY ${PYTHON_LIBS_DIR}/
+      install(DIRECTORY ${PYTHON_LIBS_DIR}
               DESTINATION ${pv_runtime_dest}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime
@@ -176,7 +177,8 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         COMPONENT Runtime
         PATTERN "mpicc*" EXCLUDE
         PATTERN "mpicxx*" EXCLUDE
-        PATTERN "mpic++*" EXCLUDE)
+        PATTERN "mpic++*" EXCLUDE
+        PATTERN "python*" EXCLUDE)
     endif(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
   endif(PARAVIEW_USE_MPI)
 
