@@ -12,7 +12,7 @@ if(MSVC)
 else()
   set(boost_lib_args
     -DENABLE_SHARED:BOOL=ON
-    -DENABLE_STATIC:BOOL=OFF
+    -DENABLE_STATIC:BOOL=ON
   )
 endif()
 
