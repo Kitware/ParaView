@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="pqViewManager" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -61,6 +61,12 @@
    <class>pqPipelineBrowserWidget</class>
    <extends>QWidget</extends>
    <header>pqPipelineBrowserWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqViewManager</class>
+   <extends>QWidget</extends>
+   <header>pqViewManager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
