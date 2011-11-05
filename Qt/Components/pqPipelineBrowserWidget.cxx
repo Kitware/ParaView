@@ -48,8 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
-  : Superclass(parentObject),
-  SelectionAdaptor(NULL)
+  : Superclass(parentObject)
 {
   this->PipelineModel = new pqPipelineModel(this);
 
@@ -94,10 +93,8 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
-  QObject::connect(
-    &pqActiveObjects::instance(),
-    SIGNAL(sourcesSelectionModelChanged(vtkSMProxySelectionModel*)),
-    this, SLOT(setProxySelectionModel(vtkSMProxySelectionModel*)));
+
+  new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
 
 
   // Make sure the tree items get expanded when new descendents
@@ -109,22 +106,6 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::~pqPipelineBrowserWidget()
 {
-  delete this->SelectionAdaptor;
-  this->SelectionAdaptor = NULL;
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::setProxySelectionModel(
-  vtkSMProxySelectionModel* selModel)
-{
-  delete this->SelectionAdaptor;
-  this->SelectionAdaptor = NULL;
-  // Create the selection adaptor.
-  if (selModel)
-    {
-    new pqPipelineModelSelectionAdaptor(
-      this->getSelectionModel(), selModel, this);
-    }
 }
 
 //-----------------------------------------------------------------------------

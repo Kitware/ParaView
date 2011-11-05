@@ -32,11 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
-#include "vtkSMProxySelectionModel.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -49,7 +47,7 @@ pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject
     SIGNAL(portChanged(pqOutputPort*)),
     this, SLOT(updateEnableState()));
   QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(serverChanged(pqServer*)),
+    SIGNAL(selectionChanged(const pqProxySelection&)),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
@@ -57,11 +55,8 @@ pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject
 //-----------------------------------------------------------------------------
 void pqCreateCustomFilterReaction::updateEnableState()
 {
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMProxySelectionModel* selModel= server?
-    server->activeSourcesSelectionModel() : NULL;
   this->parentAction()->setEnabled(
-    selModel && (selModel->GetNumberOfSelectedProxies() > 0));
+    pqActiveObjects::instance().selection().size() > 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,10 +66,7 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   // if the selection is empty.
   QWidget *mainWin = pqCoreUtilities::mainWidget();
 
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMProxySelectionModel* selModel= server?
-    server->activeSourcesSelectionModel() : NULL;
-  if (selModel->GetNumberOfSelectedProxies() == 0)
+  if (pqActiveObjects::instance().selection().size() == 0)
     {
     qCritical() <<
       "No pipeline objects are selected."
@@ -87,7 +79,7 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   // selection. The model only accepts pipeline sources. Notify the
   // user if the model is empty.
   pqCustomFilterDefinitionModel custom;
-  custom.setContents(selModel->GetSelection());
+  custom.setContents(pqActiveObjects::instance().selection());
   if (!custom.hasChildren(QModelIndex()))
     {
     QMessageBox::warning(mainWin, "Create Custom Filter Error",

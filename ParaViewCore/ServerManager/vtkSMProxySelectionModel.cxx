@@ -15,68 +15,35 @@
 #include "vtkSMProxySelectionModel.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMSourceProxy.h"
 
-#include <vtkstd/vector>
-
-//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
-
-//-----------------------------------------------------------------------------
-class vtkSMProxySelectionModel::vtkInternal
-{
-public:
-  typedef  vtkstd::vector< vtkSmartPointer<vtkSMProxy> >   vtkSMSelection;
-  vtkSMSelection  Selection;
-  vtkSmartPointer<vtkSMProxy>  Current;
-
-  void ExportSelection(vtkCollection* src, vtkCollection* dst)
-    {
-    dst->RemoveAllItems();
-    src->InitTraversal();
-    while (vtkObject* obj = src->GetNextItemAsObject())
-      {
-      dst->AddItem(obj);
-      }
-    }
-};
-
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::vtkSMProxySelectionModel()
 {
-  this->NewlySelected = vtkCollection::New();
-  this->NewlyDeselected = vtkCollection::New();
-  this->Selection = vtkCollection::New();
-  this->Internal = new vtkSMProxySelectionModel::vtkInternal();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::~vtkSMProxySelectionModel()
 {
-  this->NewlySelected->Delete();
-  this->NewlyDeselected->Delete();
-  this->Selection->Delete();
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxySelectionModel::GetCurrentProxy()
 {
-  return this->Internal->Current;
+  return this->Current;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command)
 { 
-  if (this->Internal->Current != proxy)
+  if (this->Current != proxy)
     {
-    this->Internal->Current = proxy;
+    this->Current = proxy;
     this->Select(proxy, command);
     this->InvokeCurrentChanged(proxy);
     }
@@ -85,13 +52,13 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command
 //-----------------------------------------------------------------------------
 bool vtkSMProxySelectionModel::IsSelected(vtkSMProxy*  proxy)
 {
-  return this->Selection->IsItemPresent(proxy) != 0;
+  return this->Selection.find(proxy) != this->Selection.end();
 }
 
 //-----------------------------------------------------------------------------
 unsigned int vtkSMProxySelectionModel::GetNumberOfSelectedProxies()
 {
-  return static_cast<unsigned int>(this->Selection->GetNumberOfItems());
+  return static_cast<unsigned int>(this->Selection.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -99,77 +66,68 @@ vtkSMProxy* vtkSMProxySelectionModel::GetSelectedProxy(unsigned int idx)
 {
   if (idx < this->GetNumberOfSelectedProxies())
     {
-    return vtkSMProxy::SafeDownCast(this->Selection->GetItemAsObject(idx));
+    SelectionType::iterator iter = this->Selection.begin();
+    for (unsigned int cc=0; cc < idx; ++cc, ++iter)
+      {
+      }
+    return vtkSMProxy::SafeDownCast(iter->GetPointer());
     }
-  return 0;
+
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::Select(vtkSMProxy* proxy, int command)
 {
-  vtkCollection* collection = vtkCollection::New();
+  SelectionType selection;
   if (proxy)
     {
-    collection->AddItem(proxy);
+    selection.insert(proxy);
     }
-  this->Select(collection, command);
-  collection->Delete();
+  this->Select(selection, command);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
+void vtkSMProxySelectionModel::Select(
+  const vtkSMProxySelectionModel::SelectionType& proxies, int command)
 { 
   if (command == vtkSMProxySelectionModel::NO_UPDATE)
     {
     return;
     }
 
-  bool changed = false;
-
-  this->NewlyDeselected->RemoveAllItems();
-  this->NewlySelected->RemoveAllItems();
+  SelectionType new_selection;
 
   if (command & vtkSMProxySelectionModel::CLEAR)
     {
-    this->Internal->ExportSelection(this->Selection, this->NewlyDeselected);
-    this->Selection->RemoveAllItems();
-    changed = true;
+    // everything from old-selection needs to be removed. 
     }
-
-  vtkSMProxy* proxy;
-  for (proxies->InitTraversal();
-    (proxy = vtkSMProxy::SafeDownCast(proxies->GetNextItemAsObject())) != 0; )
+  else
     {
-    if ((command & vtkSMProxySelectionModel::SELECT) &&
-      !this->Selection->IsItemPresent(proxy))
-      {
-      this->Selection->AddItem(proxy);
-      if (!this->NewlySelected->IsItemPresent(proxy))
-        {
-        this->NewlySelected->AddItem(proxy);
-        changed = true;
-        }
-      }
+    // start with existing selection.
+    new_selection = this->Selection;
+    }
 
-    if ((command & vtkSMProxySelectionModel::DESELECT)  &&
-      this->Selection->IsItemPresent(proxy))
+  for (SelectionType::iterator iter = proxies.begin();
+    iter != proxies.end(); ++iter)
+    {
+    vtkSMProxy* proxy = iter->GetPointer();
+    if (proxy && (command & vtkSMProxySelectionModel::SELECT) !=0)
       {
-      this->Selection->RemoveItem(proxy);
-      if (!this->NewlyDeselected->IsItemPresent(proxy))
-        {
-        this->NewlyDeselected->AddItem(proxy);
-        changed = true;
-        }
+      new_selection.insert(proxy);
+      }
+    if (proxy && (command & vtkSMProxySelectionModel::DESELECT) !=0)
+      {
+      new_selection.erase(proxy);
       }
     }
 
+  bool changed = (this->Selection != new_selection);
   if (changed)
     {
+    this->Selection = new_selection;
     this->InvokeSelectionChanged();
     }
-
-  this->NewlyDeselected->RemoveAllItems();
-  this->NewlySelected->RemoveAllItems();
 }
 
 //-----------------------------------------------------------------------------
@@ -188,9 +146,10 @@ void vtkSMProxySelectionModel::InvokeSelectionChanged()
 bool vtkSMProxySelectionModel::GetSelectionDataBounds(double bounds[6])
 {
   vtkBoundingBox bbox;
-  for (unsigned int cc=0; cc < this->GetNumberOfSelectedProxies(); cc++)
+  for (SelectionType::iterator iter = this->Selection.begin();
+    iter != this->Selection.end(); ++iter)
     {
-    vtkSMProxy* proxy = this->GetSelectedProxy(cc);
+    vtkSMProxy* proxy = iter->GetPointer();
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
     vtkSMOutputPort* opPort = vtkSMOutputPort::SafeDownCast(proxy);
     if (source)
@@ -219,5 +178,3 @@ void vtkSMProxySelectionModel::PrintSelf(ostream&  os,  vtkIndent  indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

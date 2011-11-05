@@ -24,10 +24,12 @@
 #define __vtkSMProxySelectionModel_h
 
 #include "vtkSMObject.h"
-
-class vtkSMProxySelectionModelInternal;
-class vtkCollection;
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 class vtkSMProxy;
+
+//BTX
+#include <vtkstd/set> // needed for vtkset::set.
+//ETX
 
 class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMObject
 {
@@ -37,6 +39,10 @@ public:
   void PrintSelf(ostream&  os,  vtkIndent  indent);
  
 //BTX
+  // Description:
+  // Type for selection.
+  typedef vtkstd::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
+
   // vtkSMProxy selection flags
   enum ProxySelectionFlag {
     NO_UPDATE        = 0,
@@ -72,10 +78,11 @@ public:
   // Returns the selected proxy at the given index.
   vtkSMProxy* GetSelectedProxy(unsigned int  index);
 
+  //BTX
   // Description:
-  // Get the collection of proxies that are currently selected.
-  // WARNING: Do not modify the returned collection.
-  vtkGetObjectMacro(Selection, vtkCollection);
+  // Returns the selection set. 
+  const SelectionType& GetSelection() { return this->Selection; }
+  //ETX
 
   // Description:
   // Update the selected set of proxies. \c command affects how the selection is
@@ -86,27 +93,21 @@ public:
   // \li DESELECT: deselect the proxies
   // \li CLEAR_AND_SELECT: clear selection and then add the specified proxies as
   // the selection.
-  void Select(vtkCollection*  proxies,  int  command);
-  void Select(vtkSMProxy*  proxy,  int  command);
+  //BTX
+  void Select(const SelectionType &proxies,  int command);
+  //ETX
+  void Select(vtkSMProxy* proxy,  int command);
  
   // Description:
   // Wrapper friendly methods to doing what Select() can do.
-  void NoUpdate(vtkSMProxy*  proxy)
-    { this->Select(proxy, NO_UPDATE); }
-  void Clear(vtkSMProxy*  proxy)
-    { this->Select(proxy, CLEAR); }
+  void Clear()
+    { this->Select(NULL, CLEAR); }
   void Select(vtkSMProxy*  proxy)
     { this->Select(proxy, SELECT); }
   void Deselect(vtkSMProxy*  proxy)
     { this->Select(proxy, DESELECT); }
   void ClearAndSelect(vtkSMProxy*  proxy)
     { this->Select(proxy, CLEAR_AND_SELECT); }
-
-  // Description:
-  // These are valid only in the event handlers for
-  // vtkCommand::SelectionChangedEvent.
-  vtkGetObjectMacro(NewlySelected, vtkCollection);
-  vtkGetObjectMacro(NewlyDeselected, vtkCollection);
 
   // Description:
   // Utility method to get the data bounds for the currently selected items.
@@ -122,20 +123,14 @@ protected:
 
   void InvokeCurrentChanged(vtkSMProxy*  proxy);
   void InvokeSelectionChanged();
-  
-  vtkCollection* NewlySelected;
-  vtkCollection* NewlyDeselected;
-  vtkCollection* Selection;
+
+  vtkSmartPointer<vtkSMProxy> Current;
+  SelectionType Selection;
 
 private:
   vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&); // Not implemented
   void operator = (const  vtkSMProxySelectionModel&); // Not implemented
-
-  class vtkInternal;
-  vtkInternal* Internal;
 //ETX
 };
 
 #endif
-
-

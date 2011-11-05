@@ -36,10 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqPipelineModel;
-class pqPipelineModelSelectionAdaptor;
 class pqPipelineSource;
 class pqView;
-class vtkSMProxySelectionModel;
 
 /// pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
 /// replacement for pqPipelineBrowser.
@@ -70,13 +68,11 @@ public slots:
 
 protected slots:
   void handleIndexClicked(const QModelIndex& index);
-  void setProxySelectionModel(vtkSMProxySelectionModel*);
 
 protected:
   /// sets the visibility for items in the indices list.
   void setVisibility(bool visible, const QModelIndexList& indices);
   pqPipelineModel* PipelineModel;
-  pqPipelineModelSelectionAdaptor* SelectionAdaptor;
 
 private:
   Q_DISABLE_COPY(pqPipelineBrowserWidget)

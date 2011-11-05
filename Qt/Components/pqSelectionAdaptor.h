@@ -36,19 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QItemSelectionModel> //need for qtSelectionFlags
 
+class pqServerManagerModelItem;
 class QAbstractItemModel;
-class QItemSelection;
-class QItemSelectionModel;
 class QModelIndex;
-class vtkSMProxy;
-class vtkSMProxySelectionModel;
 
 /// pqSelectionAdaptor is the abstract base class for an adaptor that connects a
-/// QItemSelectionModel of any QAbstractItemModel to a vtkSMProxySelectionModel.
-/// When the selection in the QItemSelectionModel
-/// changes, the vtkSMProxySelectionModel will be updated and vice versa.
-/// Subclass typically only need to implement
-/// mapToProxy() and mapFromProxy().
+/// QItemSelectionModel to pqActiveObjects making it possible to update the
+/// pqActiveObjects source selection when the QItemSelectionModel changes and
+/// vice-versa.
+/// Subclass typically only need to implement mapToItem() and mapFromItem().
 class PQCOMPONENTS_EXPORT pqSelectionAdaptor : public QObject
 {
   Q_OBJECT
@@ -56,20 +52,17 @@ public:
   virtual ~pqSelectionAdaptor();
 
   // Returns a pointer to the QItemSelectionModel.
-  QItemSelectionModel* getQSelectionModel() const;
-
-  // Reurns a pointer to the pqServerManagerSelectionModel.
-  vtkSMProxySelectionModel* getProxySelectionModel() const;
+  QItemSelectionModel* getQSelectionModel() const
+    { return this->QSelectionModel; }
 
 protected:
-  pqSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel,
-    vtkSMProxySelectionModel* smSelectionModel, QObject* parent=0);
+  pqSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel);
 
-  /// Maps a vtkSMProxy to an index in the QAbstractItemModel.
-  virtual QModelIndex mapFromProxy(vtkSMProxy* proxy) const = 0;
+  /// Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
+  virtual QModelIndex mapFromItem(pqServerManagerModelItem* item) const = 0;
 
-  /// Maps a QModelIndex to a vtkSMProxy.
-  virtual vtkSMProxy* mapToProxy(const QModelIndex& index) const =0;
+  /// Maps a QModelIndex to a pqServerManagerModelItem.
+  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const =0;
 
   /// Returns the QAbstractItemModel used by the QSelectionModel.
   /// If QSelectionModel uses a QAbstractProxyModel, this method skips
@@ -78,7 +71,6 @@ protected:
   const QAbstractItemModel* getQModel() const;
 
 protected slots:
-  virtual void currentChanged(const QModelIndex& current);
   virtual void selectionChanged();
 
   virtual void currentProxyChanged();
@@ -90,9 +82,6 @@ protected slots:
     { return QItemSelectionModel::NoUpdate; }
 
 private:
-  class pqSelectionAdaptorInternal;
-  pqSelectionAdaptorInternal* Internal;
-
   /// Given a QModelIndex for the QAbstractItemModel under the QItemSelectionModel,
   /// this returns the QModelIndex for the inner most non-proxy 
   /// QAbstractItemModel.
@@ -103,6 +92,9 @@ private:
   /// QItemSelectionModel.
   QModelIndex mapFromSource(const QModelIndex& inIndex, 
     const QAbstractItemModel* model) const;
+
+  QItemSelectionModel* QSelectionModel;
+  bool IgnoreSignals;
 };
 
 

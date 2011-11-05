@@ -35,11 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCustomFilterDefinitionModel.h"
 
-#include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel.h"
-#include "vtkCollection.h"
+#include "pqProxySelection.h"
 #include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMOutputPort.h"
 
@@ -313,39 +311,24 @@ Qt::ItemFlags pqCustomFilterDefinitionModel::flags(const QModelIndex &) const
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-void pqCustomFilterDefinitionModel::setContents(vtkCollection *items)
+void pqCustomFilterDefinitionModel::setContents(
+  const pqProxySelection& items)
 {
   delete this->Root;
   this->Root = new pqCustomFilterDefinitionModelItem();
-  if(!items)
+  if (items.size() == 0)
     {
     this->reset();
     return;
     }
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-
   // locate pqPipelineSource instances for all the proxies in items.
   QSet<pqPipelineSource*> selectedSources;
-  for (int cc=0; cc < items->GetNumberOfItems(); cc++)
+  foreach (pqServerManagerModelItem* item, items)
     {
-    vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(items->GetItemAsObject(cc));
-    if (!proxy)
-      {
-      continue;
-      }
-
-    pqPipelineSource *source = NULL; 
-    if (proxy->IsA("vtkSMOutputPort"))
-      {
-      source = smmodel->findItem<pqPipelineSource*>(
-          vtkSMOutputPort::SafeDownCast(proxy)->GetSourceProxy());
-      }
-    else
-      {
-      source = smmodel->findItem<pqPipelineSource*>(proxy);
-      }
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+    pqPipelineSource *source = port? port->getSource() :
+      qobject_cast<pqPipelineSource*>(item);
     if (source)
       {
       selectedSources.insert(source);

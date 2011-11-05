@@ -36,19 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqApplicationCore.h"
-#include "pqOutputPort.h"
 #include "pqPipelineModel.h"
-#include "pqProxy.h"
-#include "pqServerManagerModel.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMProxySelectionModel.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
-  QItemSelectionModel* pipelineSelectionModel,
-    vtkSMProxySelectionModel* smSelectionModel, QObject* _parent/*=0*/)
-: pqSelectionAdaptor(pipelineSelectionModel, smSelectionModel, _parent)
+  QItemSelectionModel* pipelineSelectionModel)
+: pqSelectionAdaptor(pipelineSelectionModel)
 {
   if (!qobject_cast<const pqPipelineModel*>(this->getQModel()))
     {
@@ -64,22 +57,19 @@ pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqPipelineModelSelectionAdaptor::mapFromProxy(vtkSMProxy* proxy) const
+QModelIndex pqPipelineModelSelectionAdaptor::mapFromItem(
+  pqServerManagerModelItem* item) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  return pM->getIndexFor(smmodel->findItem<pqServerManagerModelItem*>(proxy));
+  return pM->getIndexFor(item);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineModelSelectionAdaptor::mapToProxy(const QModelIndex& index) const
+pqServerManagerModelItem*
+pqPipelineModelSelectionAdaptor::mapToItem(const QModelIndex& index) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
-  pqServerManagerModelItem* item = pM->getItemFor(index);
-  pqProxy* proxy = qobject_cast<pqProxy*>(item);
-  pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-  return proxy? proxy->getProxy() : (port? port->getOutputPortProxy()  : NULL);
+  return pM->getItemFor(index);
 }

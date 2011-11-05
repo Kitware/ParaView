@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqProxySelection.h"
 #include "pqServer.h"
 #include "pqView.h"
 
@@ -47,7 +48,10 @@ class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
 
 /// pqActiveObjects is a singleton that keeps track of "active objects"
-/// including active view, active source, active representation etc. 
+/// including active view, active source, active representation etc.
+/// pqActiveObjects also keeps track of selected sources (known as 'selection').
+/// setActiveSource/setActivePort will affect the selection but not vice-versa
+/// (unless dealing with multiple server sessions).
 class PQCOMPONENTS_EXPORT pqActiveObjects : public QObject
 {
   Q_OBJECT
@@ -78,11 +82,22 @@ public:
       this->activeServer()->activeSourcesSelectionModel() : NULL;
     }
 
+  /// Returns the current source selection.
+  const pqProxySelection& selection() const
+    { return this->Selection; }
+
 public slots:
   void setActiveView(pqView * view);
   void setActiveSource(pqPipelineSource * source);
   void setActivePort(pqOutputPort * port);
   void setActiveServer(pqServer*);
+
+  /// Sets the selected set of proxies. All proxies in the selection must be on
+  /// the same server/session. This generally doesn't affect the activeSource
+  /// etc. unless the server is different from the active server. In which case,
+  /// the active server is changed before the selection is updated.
+  void setSelection(const pqProxySelection& selection,
+    pqServerManagerModelItem* current);
 
 signals:
   /// These signals are fired when any of the corresponding active items change.
@@ -92,10 +107,7 @@ signals:
   void portChanged(pqOutputPort*);
   void representationChanged(pqDataRepresentation*);
   void representationChanged(pqRepresentation*);
-
-  /// signals fired as a consequence of serverChanged() to make it easier to
-  /// components that depend on selection models.
-  void sourcesSelectionModelChanged(vtkSMProxySelectionModel*);
+  void selectionChanged(const pqProxySelection&);
 
 private slots:
   /// if a new server connection was established, and no active server is set,
@@ -127,11 +139,15 @@ protected:
 private:
   Q_DISABLE_COPY(pqActiveObjects);
 
+  /// method used to reset all active items.
+  void resetActives();
+
   QPointer<pqServer> ActiveServer;
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqOutputPort> ActivePort;
   QPointer<pqView> ActiveView;
   QPointer<pqDataRepresentation> ActiveRepresentation;
+  pqProxySelection Selection;
 
   // these are void* maintained to detect when values have changed.
   void* CachedServer;
@@ -139,6 +155,7 @@ private:
   void* CachedPort;
   void* CachedView;
   void* CachedRepresentation;
+  pqProxySelection CachedSelection;
 
   vtkEventQtSlotConnect* VTKConnector;
 };

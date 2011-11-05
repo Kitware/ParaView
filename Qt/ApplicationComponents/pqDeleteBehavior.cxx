@@ -31,11 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqDeleteBehavior.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
+#include "pqPipelineSource.h"
+#include "pqProxySelection.h"
 #include "pqServer.h"
 #include "pqView.h"
 #include "vtkSMProxySelectionModel.h"
@@ -56,25 +59,22 @@ void pqDeleteBehavior::removeSource(pqPipelineSource* source)
   // FIXME: updating of selection must happen even is the source is removed
   // from python script or undo redo.
   // If the source is selected, remove it from the selection.
-  vtkSMProxySelectionModel *selectionModel =
-    source->getServer()->activeSourcesSelectionModel();
+
   pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source);
-  if (selectionModel->IsSelected(source->getProxy()) &&
-    selectionModel->GetNumberOfSelectedProxies() == 1)
+  pqServerManagerModelItem* new_current =
+    pqActiveObjects::instance().activeSource();
+  if (new_current == source)
     {
-    // If the item is a filter and has only one input, set the
-    // input as the current item. Otherwise, select the server.
-    if (filter && filter->getInputCount() == 1)
-      {
-      selectionModel->SetCurrentProxy(filter->getInput(0)->getProxy(),
-        vtkSMProxySelectionModel::CLEAR_AND_SELECT);
-      }
-    else
-      {
-      selectionModel->SetCurrentProxy(NULL,
-        vtkSMProxySelectionModel::CLEAR_AND_SELECT);
-      }
+    new_current = filter? filter->getInput(filter->getInputPortName(0), 0) : NULL;
     }
+
+  pqProxySelection new_selection = pqActiveObjects::instance().selection();
+  new_selection.remove(source);
+  foreach (pqOutputPort* port, source->getOutputPorts())
+    {
+    new_selection.remove(port);
+    }
+  pqActiveObjects::instance().setSelection(new_selection, new_current);
 
   QList<pqView*> views = source->getViews();
   if (filter)

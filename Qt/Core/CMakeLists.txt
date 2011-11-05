@@ -280,6 +280,8 @@ VTK_ADD_LIBRARY(pqCore
   pqProxy.h
   pqProxyModifiedStateUndoElement.cxx
   pqProxyModifiedStateUndoElement.h
+  pqProxySelection.cxx
+  pqProxySelection.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h

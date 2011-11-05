@@ -56,8 +56,8 @@ namespace
   {
 public:
   pqDataInformationModelSelectionAdaptor(
-    QItemSelectionModel* diModel, vtkSMProxySelectionModel* smModel, QObject* parentObject)
-    : pqSelectionAdaptor(diModel, smModel, parentObject)
+    QItemSelectionModel* diModel)
+    : pqSelectionAdaptor(diModel)
     {
     }
 
@@ -67,15 +67,11 @@ protected:
   virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const
     { return QItemSelectionModel::Rows; }
 
-    /// Maps a vtkSMProxy to an index in the QAbstractItemModel.
-  virtual QModelIndex mapFromProxy(vtkSMProxy* proxy) const
+  /// Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
+  virtual QModelIndex mapFromItem(pqServerManagerModelItem* item) const
     {
     const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
       this->getQModel());
-
-    pqServerManagerModelItem* item =
-      pqApplicationCore::instance()->getServerManagerModel()->
-      findItem<pqServerManagerModelItem*>(proxy);
 
     pqOutputPort* outputPort = qobject_cast<pqOutputPort*>(item);
     if (outputPort)
@@ -86,19 +82,12 @@ protected:
     return pM->getIndexFor(src? src->getOutputPort(0) : 0);
     }
 
-  /// Maps a QModelIndex to a vtkSMProxy.
-  virtual vtkSMProxy* mapToProxy(const QModelIndex& index) const
+  /// Maps a QModelIndex to a pqServerManagerModelItem.
+  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const
     {
     const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
       this->getQModel());
-    pqServerManagerModelItem* item = pM->getItemFor(index);
-    pqProxy* proxy = qobject_cast<pqProxy*>(item);
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    if (proxy)
-      {
-      return proxy->getProxy();
-      }
-    return port? port->getOutputPortProxy() : NULL;
+    return pM->getItemFor(index);
     }
   };
 }
@@ -156,8 +145,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
     SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(showBodyContextMenu(const QPoint&)));
 
-  //new pqDataInformationModelSelectionAdaptor(this->View->selectionModel(),
-  //  pqApplicationCore::instance()->getSelectionModel(), this);
+  new pqDataInformationModelSelectionAdaptor(this->View->selectionModel());
 }
 
 //-----------------------------------------------------------------------------
