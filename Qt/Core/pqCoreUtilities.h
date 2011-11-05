@@ -44,6 +44,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QFileInfo>
 
+class vtkObject;
+
+/// INTERNAL CLASS (DO NOT USE). This is used by
+/// pqCoreUtilities::connectWithVTK() methods.
+class PQCORE_EXPORT pqCoreUtilitiesEventHelper : public QObject
+{
+  Q_OBJECT;
+  typedef QObject Superclass;
+public:
+  pqCoreUtilitiesEventHelper(QObject* parent);
+  ~pqCoreUtilitiesEventHelper();
+
+signals:
+  void eventInvoked(vtkObject*, unsigned long, void*);
+
+private:
+  Q_DISABLE_COPY(pqCoreUtilitiesEventHelper);
+
+  void executeEvent(vtkObject*, unsigned long, void*);
+  class pqInternal;
+  pqInternal* Interal;
+  friend class pqCoreUtilities;
+};
+
 /// pqCoreUtilities is a collection of arbitrary utility functions that can be
 /// used by the application.
 class PQCORE_EXPORT pqCoreUtilities 
@@ -85,6 +109,18 @@ public:
                                        bool lookupInAppDir,
                                        bool lookupInUserDir);
   static QString getNoneExistingFileName(QString expectedFilePath);
+
+  /// Method used to connect VTK events to Qt slots (or signals).
+  /// This is an alternative to using vtkEventQtSlotConnect. This method gives a
+  /// cleaner API to connect vtk-events to Qt slots. It manages cleanup
+  /// correctly i.e. either vtk-object or the qt-object can be deleted and the
+  /// observers will be cleaned up correctly. One can disconnect the connection
+  /// made explicitly by vtk_object->RemoveObserver(eventId) where eventId is
+  /// the returned value.
+  static unsigned long connect(
+    vtkObject* vtk_object, int vtk_event_id,
+    QObject* qobject, const char* signal_or_slot,
+    Qt::ConnectionType type = Qt::AutoConnection);
 
 private:
   static QWidget* findMainWindow();

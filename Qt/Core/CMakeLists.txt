@@ -51,6 +51,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComparativeXYBarChartView.h
   pqComparativeXYChartView.h
   pqCoreTestUtility.h
+  pqCoreUtilities.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
   pqFileDialog.h
