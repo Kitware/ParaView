@@ -529,6 +529,8 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
       vtkSMProxy* proxy = locator->LocateProxy(cameraId);
       if(proxy)
         {
+        assert("Impossible to update camera as the session is in ProcessingRemoteNotification state" &&
+               !proxy->GetSession()->IsProcessingRemoteNotification());
         // Update Proxy
         proxy->EnableLocalPushOnly();
         proxy->LoadState(msg, locator);
