@@ -45,6 +45,12 @@
    </attribute>
    <widget class="pqPipelineBrowserWidget" name="pipelineBrowserWidget"/>
   </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqProxyTabWidget" name="proxyTabWidget"/>
+  </widget>
   <action name="actionE_xit">
    <property name="text">
     <string>E&amp;xit</string>
@@ -67,6 +73,12 @@
    <class>pqViewManager</class>
    <extends>QWidget</extends>
    <header>pqViewManager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqProxyTabWidget</class>
+   <extends>QWidget</extends>
+   <header>pqProxyTabWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
