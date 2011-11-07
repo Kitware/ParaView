@@ -60,7 +60,8 @@ void pqServerConnectReaction::connectToServerWithWarning()
 
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  if (smmodel->findItems<pqPipelineSource*>(server).size() > 0)
+  if (core->getObjectBuilder()->multipleConnectionsSupport() == false &&
+    smmodel->findItems<pqPipelineSource*>(server).size() > 0)
     {
     int ret = QMessageBox::warning(
       pqCoreUtilities::mainWidget(),
