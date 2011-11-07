@@ -125,7 +125,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         set(PYTHON_LIBS_DIR ${PYTHON_LIBS_DIR}/${py_ver_dir})
         set(PYTHON_LIBS_DEST ${pv_runtime_dest}/lib)
         
-        file(GLOB python_modules "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/*Python.so")
+        file(GLOB python_modules "${ParaView_BINARY_DIR}/bin/*Python.so")
 
         install(FILES ${python_modules}
           DESTINATION ${pv_runtime_dest}
