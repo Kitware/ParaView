@@ -196,7 +196,7 @@ void pqTimeKeeper::setTime(double time)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
-  if (!source || source->getServer() == this->getServer())
+  if (!source || source->getServer() != this->getServer())
     {
     return;
     }
@@ -213,7 +213,7 @@ void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
-  if (!source || source->getServer() == this->getServer())
+  if (!source || source->getServer() != this->getServer())
     {
     return;
     }
@@ -227,7 +227,7 @@ void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
 {
-  if (!source || source->getServer() == this->getServer())
+  if (!source || source->getServer() != this->getServer())
     {
     return false;
     }
