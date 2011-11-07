@@ -103,8 +103,15 @@ set(pv_compiler_args
 
 set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
-set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
-set(pv_c_flags ${CMAKE_C_FLAGS})
+
+
+if(WIN32)
+  set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
+  set(pv_c_flags ${CMAKE_C_FLAGS})
+else()
+  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
+  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
+endif()
 
 if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
@@ -210,13 +217,6 @@ if(NOT APPLE)
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
     -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
     -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
-
-  if(NOT WIN32)
-    set(MPI_COMPILER_ARGS
-       -DCMAKE_C_COMPILER:FILEPTH=${MPI_C_COMPILER}
-       -DCMAKE_CXX_COMPILER:FILEPATH=${MPI_CXX_COMPILER})
-    list(APPEND MPI_ARGS ${MPI_COMPILER_ARGS})
-  endif()
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
