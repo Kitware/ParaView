@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqSelectionAdaptor : public QObject
 public:
   virtual ~pqSelectionAdaptor();
 
-  // Returns a pointer to the QItemSelectionModel.
+  /// Returns a pointer to the QItemSelectionModel.
   QItemSelectionModel* getQSelectionModel() const
     { return this->QSelectionModel; }
 
@@ -71,13 +71,15 @@ protected:
   const QAbstractItemModel* getQModel() const;
 
 protected slots:
+  /// called when the selection in the Qt-model changes.
   virtual void selectionChanged();
 
+  /// called when the ServerManager level selection (or current) changes.
   virtual void currentProxyChanged();
   virtual void proxySelectionChanged();
 
-  // subclasses can override this method to provide model specific selection 
-  // overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
+  /// subclasses can override this method to provide model specific selection 
+  /// overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
   virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const 
     { return QItemSelectionModel::NoUpdate; }
 
