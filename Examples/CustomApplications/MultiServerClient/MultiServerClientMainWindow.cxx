@@ -53,6 +53,9 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
 
   pqParaViewMenuBuilders::buildSourcesMenu(*ui.menu_Sources, this);
   new pqParaViewBehaviors(this, this);
+
+  // tells the ParaView libraries to enable support for multiple simultaneous
+  // server connections.
   pqApplicationCore::instance()->getObjectBuilder()->setMultipleConnectionsSupport(true);
 }
 
