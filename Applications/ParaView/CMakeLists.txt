@@ -124,6 +124,14 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
                 COMPONENT Runtime)
         set(PYTHON_LIBS_DIR ${PYTHON_LIBS_DIR}/${py_ver_dir})
         set(PYTHON_LIBS_DEST ${pv_runtime_dest}/lib)
+        
+        foreach(py_vtk_kit ${VTK_LIBRARIES})
+          install(TARGETS ${py_vtk_kit}Python
+            EXPORT ${VTK_INSTALL_EXPORT_NAME}
+            RUNTIME DESTINATION ${VTK_INSTALL_BIN_DIR_CM24} COMPONENT RuntimeLibraries
+            LIBRARY DESTINATION ${VTK_INSTALL_LIB_DIR_CM24} COMPONENT RuntimeLibraries
+            ARCHIVE DESTINATION ${VTK_INSTALL_LIB_DIR_CM24} COMPONENT Development)
+        endforeach()
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
