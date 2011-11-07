@@ -41,6 +41,7 @@ vtkPVSessionBase::vtkPVSessionBase()
   // controller, this session is marked active. This is essential for
   // satellites when running in parallel.
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  this->ActivateObserverTag = this->DesactivateObserverTag = 0;
 
   if(!controller)
     {
@@ -48,15 +49,23 @@ vtkPVSessionBase::vtkPVSessionBase()
     return;
     }
 
-  controller->AddObserver(vtkCommand::StartEvent,
+  this->ActivateObserverTag = controller->AddObserver(vtkCommand::StartEvent,
     this, &vtkPVSessionBase::Activate);
-  controller->AddObserver(vtkCommand::EndEvent,
+  this->DesactivateObserverTag = controller->AddObserver(vtkCommand::EndEvent,
     this, &vtkPVSessionBase::DeActivate);
 }
 
 //----------------------------------------------------------------------------
 vtkPVSessionBase::~vtkPVSessionBase()
 {
+  // Make sure we disable Activate/Desactivate observer
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  if(controller && this->ActivateObserverTag && this->DesactivateObserverTag)
+    {
+    controller->RemoveObserver(this->ActivateObserverTag);
+    controller->RemoveObserver(this->DesactivateObserverTag);
+    }
+
   if(vtkProcessModule::GetProcessModule())
     {
     vtkProcessModule::GetProcessModule()->InvokeEvent(vtkCommand::ExitEvent);

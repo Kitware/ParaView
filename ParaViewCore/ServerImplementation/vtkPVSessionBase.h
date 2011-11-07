@@ -204,6 +204,8 @@ private:
   void operator=(const vtkPVSessionBase&); // Not implemented
 
   vtkPVServerInformation* LocalServerInformation;
+  unsigned long ActivateObserverTag;
+  unsigned long DesactivateObserverTag;
 //ETX
 };
 

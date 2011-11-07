@@ -23,6 +23,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -246,7 +247,10 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
     }
   else
     {
-    vtkMultiProcessController* controller =
+    // We use smart pointer here to make sure the controller will live
+    // during the whole ProcessRMIs call. As that call can release
+    // the controller while executing.
+    vtkSmartPointer<vtkMultiProcessController> controller =
       vtkMultiProcessController::SafeDownCast(
         controller_or_server_socket[selected_index]);
     result = controller->ProcessRMIs(0, 1);
