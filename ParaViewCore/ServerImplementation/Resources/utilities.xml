@@ -2000,7 +2000,6 @@
         command="AddView"
         remove_command="RemoveView"
         argument_type="SMProxy"
-        state_ignored="1"
         repeatable="1">
         <Documentation>
           Views with their view time linked with this time keeper.
