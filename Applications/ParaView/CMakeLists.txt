@@ -131,7 +131,6 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
           DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
 
-        endforeach()
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
