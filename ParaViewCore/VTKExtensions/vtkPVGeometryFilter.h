@@ -173,6 +173,7 @@ protected:
                       bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
+                    vtkAlgorithm* inputAlg,
                     vtkPolyData* output,
                     int doCommunicate,
                     int updatePiece,

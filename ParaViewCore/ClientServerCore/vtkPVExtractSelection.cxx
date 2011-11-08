@@ -96,7 +96,7 @@ int vtkPVExtractSelection::RequestDataObject(
         vtkErrorMacro("Could not create vtkSelectionOutput");
         return 0;
         }
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       this->GetOutputPortInformation(i)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       newOutput->Delete();

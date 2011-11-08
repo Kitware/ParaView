@@ -142,7 +142,7 @@ int vtkDataSetToRectilinearGrid::RequestData(vtkInformation* /*request*/,
       if (ds && ds->GetNumberOfPoints() > 0)
         {
         foundone = true;
-        af->AddInput(ds);
+        af->AddInputData(ds);
         }
       cdit->GoToNextItem();
       }

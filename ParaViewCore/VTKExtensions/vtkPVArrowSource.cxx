@@ -15,13 +15,15 @@
 #include "vtkPVArrowSource.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkInformation.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVArrowSource);
 
 
 void vtkPVArrowSource::ExecuteInformation()
 {
-  this->GetOutput()->SetMaximumNumberOfPieces(-1);
+  this->GetOutputInformation(0)->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
 }
 
 

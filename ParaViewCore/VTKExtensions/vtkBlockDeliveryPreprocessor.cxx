@@ -77,7 +77,7 @@ int vtkBlockDeliveryPreprocessor::RequestDataObject(
     }
   if (newOutput)
     {
-    newOutput->SetPipelineInformation(outInfo);
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), newOutput);
     newOutput->Delete();
     this->GetOutputPortInformation(0)->Set(
       vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -103,7 +103,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
 
   vtkSmartPointer<vtkAttributeDataToTableFilter> adtf =
     vtkSmartPointer<vtkAttributeDataToTableFilter>::New();
-  adtf->SetInput(clone);
+  adtf->SetInputData(clone);
   adtf->SetAddMetaData(true);
   adtf->SetFieldAssociation(this->FieldAssociation);
   adtf->SetGenerateOriginalIds(this->GenerateOriginalIds);

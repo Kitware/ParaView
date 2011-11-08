@@ -77,7 +77,7 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
     return 0;
     }
   // We need the extent translator and the whole extents from the data.
-  vtkInformation* info = data->GetPipelineInformation();
+  vtkInformation* info = data->GetInformation();
   vtkStreamingDemandDrivenPipeline* sddp = 
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       vtkExecutive::PRODUCER()->GetExecutive(info));

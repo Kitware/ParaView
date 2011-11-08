@@ -356,7 +356,7 @@ void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         line->SetMarkerStyle(plotInfo.MarkerStyle);
         }
       plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      plot->SetInput(this->Internals->Table,
+      plot->SetInputData(this->Internals->Table,
                       this->Internals->XSeriesName.c_str(),
                       seriesName);
       }
