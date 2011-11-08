@@ -63,7 +63,7 @@ message DefinitionHeader
   }
 }
 
-// Extension ProxyState *********************************************** [20-24]
+// Extension ProxyState *********************************************** [20-26]
 
 message ProxyState
 {
@@ -75,8 +75,14 @@ message ProxyState
 
   message SubProxy
     {
-    required string name = 1;
+    required string name      = 1;
     required uint32 global_id = 2;
+    }
+
+  message Annotation
+    {
+    required string key   = 1;
+    required string value = 2;
     }
 
   extend Message {
@@ -85,6 +91,8 @@ message ProxyState
     optional string   xml_sub_proxy_name  = 22;
     repeated Property property            = 23;
     repeated SubProxy subproxy            = 24;
+    repeated Annotation annotation        = 25;
+    optional bool       has_annotation    = 26 [default = false];
   }
 }
 

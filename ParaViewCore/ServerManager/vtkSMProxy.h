@@ -152,6 +152,36 @@ public:
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Descritpion:
+  // Set or override a key/value pair as annotation to that proxy.
+  // If the value is NULL, this method is equivalent to RemoveAnnotation(key)
+  void SetAnnotation(const char* key, const char* value);
+
+  // Description:
+  // Retreive an annotation with a given key.
+  // If not found, this will return NULL.
+  const char* GetAnnotation(const char* key);
+
+  // Description:
+  // Remove a given annotation based on its key to the proxy.
+  void RemoveAnnotation(const char* key);
+
+  // Description:
+  // Remove all proxy annotations.
+  void RemoveAllAnnotations();
+
+  // Description:
+  // Return true if a given annotation exists.
+  bool HasAnnotation(const char* key);
+
+  // Description:
+  // Return the number of available annotations.
+  int GetNumberOfAnnotations();
+
+  // Description:
+  // Return the nth key of the available annotations.
+  const char* GetAnnotationKeyAt(int index);
+
   // Description:
   // Get/Set the location where the underlying VTK-objects are created. The
   // value can be contructed by or-ing vtkSMSession::ServerFlags
@@ -420,6 +450,11 @@ protected:
   void ExecuteStream(const vtkClientServerStream& msg,
                      bool ignore_errors = false,
                      vtkTypeUInt32 location = 0);
+
+  // Any method changing the annotations will trigger this method that will
+  // update the local full state as well as sending the annotation state part
+  // to the session.
+  virtual void UpdateAndPushAnnotationState();
 
   // Description:
   // Get the last result

@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelDataItem : public QObject
@@ -635,14 +636,17 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
   pqOutputPort* port = qobject_cast<pqOutputPort*>(item->Object);
   switch (role)
     {
+  case Qt::ToolTipRole:
+    if (source && source->getProxy()->HasAnnotation("tooltip"))
+      {
+      return QVariant(source->getProxy()->GetAnnotation("tooltip"));
+      }
   case Qt::DisplayRole:
     if (idx.column() == 1)
       {
       return QIcon(this->PixmapList[item->VisibilityIcon]);
       }
     // *** don't break.
-
-  case Qt::ToolTipRole:
   case Qt::EditRole:
     if (idx.column() == 0)
       {
@@ -682,6 +686,16 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         return qVariantFromValue<QFont>(this->Internal->ModifiedFont);
         }
       break;
+      }
+  case pqPipelineModel::AnnotationFilterRole:
+      {
+      if(!this->FilterRoleAnnotationKey.isEmpty() && source)
+        {
+        return QVariant(
+            source->getProxy()->HasAnnotation(
+                this->FilterRoleAnnotationKey.toAscii().data()));
+        }
+      return QVariant(true);
       }
 
     }
@@ -1236,3 +1250,14 @@ void pqPipelineModel::setModifiedFont(const QFont& font)
   this->Internal->ModifiedFont = font;
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineModel::enableFilterAnnotationKey(const QString &expectedAnnotation)
+{
+  this->FilterRoleAnnotationKey = expectedAnnotation;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::disableFilterAnnotationKey()
+{
+  this->FilterRoleAnnotationKey.clear();
+}

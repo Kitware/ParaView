@@ -131,6 +131,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
   pqPQLookupTableManager.h
+  pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
@@ -504,6 +505,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.cxx
 #  pqParticleTracerPanel.h
+  pqPipelineAnnotationFilterModel.cxx
+  pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.cxx
   pqPipelineBrowserWidget.h
   pqPipelineModel.cxx
@@ -684,3 +687,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
     "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/Icons"
     "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+
+IF(BUILD_TESTING)
+  ADD_SUBDIRECTORY(Testing)
+ENDIF(BUILD_TESTING)
