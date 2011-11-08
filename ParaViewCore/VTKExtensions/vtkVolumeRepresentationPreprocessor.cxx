@@ -108,12 +108,12 @@ vtkUnstructuredGrid *vtkVolumeRepresentationPreprocessor::TriangulateDataSet(
   // shallow copy the input and connect to triangle filter
   vtkDataSet *clone = input->NewInstance();
   clone->ShallowCopy(input);
-  this->DataSetTriangleFilter->SetInput(clone);
+  this->DataSetTriangleFilter->SetInputData(clone);
   clone->Delete();
 
   // update the triangulate filter
   this->DataSetTriangleFilter->Update();
-  this->DataSetTriangleFilter->SetInput(0);
+  this->DataSetTriangleFilter->SetInputData(0);
 
   // return output of triangle filter
   return this->DataSetTriangleFilter->GetOutput();
@@ -128,12 +128,12 @@ vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
   // shallow copy the input and connect to extract block filter
   vtkMultiBlockDataSet *clone = input->NewInstance();
   clone->ShallowCopy(input);
-  this->ExtractBlockFilter->SetInput(clone);
+  this->ExtractBlockFilter->SetInputData(clone);
   clone->Delete();
 
   // update extract block filter
   this->ExtractBlockFilter->Update();
-  this->ExtractBlockFilter->SetInput(0);
+  this->ExtractBlockFilter->SetInputData(0);
 
   // output is a vtkMultiBlockDataSet with a single leaf node.
   vtkMultiBlockDataSet *output = this->ExtractBlockFilter->GetOutput();
