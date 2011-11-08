@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Plugins>
+  <Plugin name="EyeDomeLightingView" auto_load="0"/>
+  <Plugin name="MantaView" auto_load="0"/>
+  <Plugin name="Moments" auto_load="0"/>
+  <Plugin name="PrismPlugin" auto_load="0"/>
+  <Plugin name="PacMan" auto_load="0"/>
+  <Plugin name="PointSprite_Plugin" auto_load="0"/>
+  <Plugin name="pvblot" auto_load="0"/>
+  <Plugin name="SierraPlotTools" auto_load="0"/>
+  <Plugin name="SLACTools" auto_load="0"/>
+  <Plugin name="StreamingView" auto_load="0"/>
+  <Plugin name="SurfaceLIC" auto_load="0"/>
+  <Plugin name="VDFReaderPlugin" auto_load="0"/>
+  <Plugin name="H5PartReader" auto_load="0"/>
+  <Plugin name="AdiosReaderPlugin" auto_load="0"/>
+  <Plugin name="AdiosReaderPluginMPI" auto_load="0"/>
+  <Plugin name="CoProcessingPlugin" auto_load="0"/>
+  <Plugin name="VisTrailsPlugin" auto_load="0"/>
+  <Plugin name="VRPlugin" auto_load="0"/>
+  <Plugin name="AnalyzeReader" auto_load="0"/>
+  <Plugin name="AnalyzeWriter" auto_load="0"/>
+  <Plugin name="NIfTIReader" auto_load="0"/>
+  <Plugin name="NIfTIWriter" auto_load="0"/>
+  <Plugin name="ForceTime" auto_load="0"/>
+  <Plugin name="SQToolkit" auto_load="0"/>
+  <Plugin name="AcuSolveReader" auto_load="0"/>
+  <Plugin name="pvNektarReader" auto_load="0"/>
+</Plugins>
