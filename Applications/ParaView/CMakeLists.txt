@@ -121,6 +121,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         string(REGEX MATCH "python[0-9].[0-9]" py_ver_dir ${PYTHON_INCLUDE_DIR})
         install(FILES ${PYTHON_INCLUDE_DIR}/pyconfig.h
                 DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_ver_dir}
+                USE_SOURCE_PERMISSIONS
                 COMPONENT Runtime)
         set(PYTHON_LIBS_DIR ${PYTHON_LIBS_DIR}/${py_ver_dir})
         set(PYTHON_LIBS_DEST ${pv_runtime_dest}/lib)
