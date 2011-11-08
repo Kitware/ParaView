@@ -147,9 +147,8 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
     mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
     if (mapper)
       {
+      mapper->Update();
       input = mapper->GetInput();
-      input->Update();
-
       output = vtkPolyData::New();
 
       if (!append)
@@ -159,11 +158,11 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
 
       vtkTransformPolyDataFilter *tf = vtkTransformPolyDataFilter::New();
       vtkTransform *trans = vtkTransform::New();
-      tf->SetInput(input);
+      tf->SetInputData(input);
       tf->SetTransform(trans);
+      tf->Update();
       trans->SetMatrix(actor->GetMatrix());
       input = tf->GetOutput();
-      input->Update();
 
       output->CopyStructure(input);
       // Only copy well formed arrays.
@@ -222,7 +221,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
         }
       if (append)
         {
-        append->AddInput(output);
+        append->AddInputData(output);
         }
       output->Delete();
       output = NULL;
