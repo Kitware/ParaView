@@ -23,6 +23,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
@@ -120,7 +121,7 @@ int vtkReductionFilter::RequestDataObject(
         return 0;
         }
       vtkDataObject* newOutput = vtkDataObject::SafeDownCast(anObj);
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       newOutput->Delete();
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -143,7 +144,7 @@ int vtkReductionFilter::RequestDataObject(
         if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
-          newOutput->SetPipelineInformation(info);
+          info->Set(vtkDataObject::DATA_OBJECT(),newOutput);
           newOutput->Delete();
           this->GetOutputPortInformation(0)->Set(
             vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -204,8 +205,18 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
     this->PreGatherHelper->RemoveAllInputs();
     vtkDataObject *incopy = input->NewInstance();
     incopy->ShallowCopy(input);
-    this->PreGatherHelper->AddInputConnection(0, incopy->GetProducerPort());
+    vtkExecutive* producer;
+    int producerPort;
+    vtkExecutive::PRODUCER()->Get(incopy->GetInformation(), producer, producerPort);
+    vtkAlgorithm* incopyAlg = NULL;
+    if(producer)
+      {
+      incopyAlg = producer->GetAlgorithm();
+      }
+    this->PreGatherHelper->AddInputConnection(0, incopyAlg->GetOutputPort());
     this->PreGatherHelper->Update();
+    producer->Delete();
+    incopyAlg->Delete();
     result = this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
 
@@ -253,13 +264,24 @@ void vtkReductionFilter::PostProcess(vtkDataObject* output,
     this->PostGatherHelper->RemoveAllInputs();
     //connect all (or just the selected) datasets to the reduction
     //algorithm
+    vtkExecutive* producer;
+    int producerPort;
+    vtkAlgorithm* alg;
+  
     for (unsigned int cc = 0; cc < num_inputs; ++cc)
       {
-      this->PostGatherHelper->AddInputConnection(
-        inputs[cc]->GetProducerPort());
+      vtkExecutive::PRODUCER()->Get(inputs[cc]->GetInformation(), producer, producerPort);
+      alg = NULL;
+      if(producer)
+        {
+        alg = producer->GetAlgorithm();  
+        }
+      this->PostGatherHelper->AddInputConnection(alg->GetOutputPort());
       }
     this->PostGatherHelper->Update();
     this->PostGatherHelper->RemoveAllInputs();
+    producer->Delete();
+    alg->Delete();
 
     vtkDataObject* reduced_output =
       this->PostGatherHelper->GetOutputDataObject(0);

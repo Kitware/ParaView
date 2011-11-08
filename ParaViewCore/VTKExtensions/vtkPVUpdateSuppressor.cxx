@@ -106,7 +106,7 @@ int vtkPVUpdateSuppressor::RequestDataObject(
       if (!output || !output->IsA(input->GetClassName())) 
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(outInfo);
+        outInfo->Set(vtkDataObject::DATA_OBJECT(), newOutput);
         newOutput->Delete();
         this->GetOutputPortInformation(i)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());

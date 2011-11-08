@@ -64,7 +64,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
 
   this->TickMarks = vtkPolyData::New();
   this->TickMarksMapper = vtkPolyDataMapper2D::New();
-  this->TickMarksMapper->SetInput(this->TickMarks);
+  this->TickMarksMapper->SetInputData(this->TickMarks);
   this->TickMarksActor = vtkActor2D::New();
   this->TickMarksActor->SetMapper(this->TickMarksMapper);
   this->TickMarksActor->GetPositionCoordinate()
@@ -957,12 +957,11 @@ void vtkPVScalarBarActor::BuildScalarBarTexture()
     }
   VTK_CREATE(vtkImageData, colorMapImage);
   colorMapImage->SetExtent(0, COLOR_TEXTURE_MAP_SIZE-1, 0, 0, 0, 0);
-  colorMapImage->SetNumberOfScalarComponents(4);
-  colorMapImage->SetScalarTypeToUnsignedChar();
+  colorMapImage->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
   vtkDataArray *colors
     = this->LookupTable->MapScalars(tmp, VTK_COLOR_MODE_MAP_SCALARS, 0);
   colorMapImage->GetPointData()->SetScalars(colors);
   colors->Delete();
 
-  this->ScalarBarTexture->SetInput(colorMapImage);
+  this->ScalarBarTexture->SetInputData(colorMapImage);
 }

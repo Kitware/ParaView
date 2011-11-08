@@ -152,6 +152,7 @@ protected:
   virtual vtkExecutive* CreateDefaultExecutive();
 
   void ExecuteBlock(vtkDataObject* input,
+                    vtkAlgorithm* inputAlg,
                     vtkPolyData* output,
                     int doCommunicate,
                     int updatePiece,

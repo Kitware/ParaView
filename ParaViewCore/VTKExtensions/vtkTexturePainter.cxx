@@ -29,6 +29,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredData.h"
 #include "vtkTexture.h"
 
@@ -219,7 +220,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
     // we deliberately use whole extent here. So on processes where the slice is
     // not available, the vtkExtractVOI filter will simply yield an empty
     // output.
-    input->GetWholeExtent(inextent);
+    input->GetInformation()->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inextent);
     memcpy(outextent, inextent, sizeof(int)*6);
     int numdims = ::vtkGetDataDimension(inextent);
     int dims[3];
@@ -294,7 +295,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
     vtkSmartPointer<vtkExtractVOI> extractVOI = 
       vtkSmartPointer<vtkExtractVOI>::New();
     extractVOI->SetVOI(outextent);
-    extractVOI->SetInput(clone);
+    extractVOI->SetInputData(clone);
     extractVOI->Update();
     
     int evoi[6];
@@ -303,14 +304,14 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
       {
       // if vtkExtractVOI did not produce a valid output, that means there's no
       // image slice to display.
-      this->Texture->SetInput(0);
+      this->Texture->SetInputData(0);
       return;
       }
 
     // TODO: Here we would have change the input scalars if the user asked us to.
     // The LUT can be simply passed to the vtkTexture. It can handle scalar
     // mapping.
-    this->Texture->SetInput(extractVOI->GetOutput());
+    this->Texture->SetInputConnection(extractVOI->GetOutputPort());
     double outputbounds[6];
 
     // TODO: vtkExtractVOI is not passing correct origin. Until that's fixed, I

@@ -190,7 +190,6 @@ int vtkSciVizStatistics::RequestDataObject(
     if ( ! mbModel )
       {
       mbModel = vtkMultiBlockDataSet::New();
-      mbModel->SetPipelineInformation( oinfom );
       oinfom->Set( vtkDataObject::DATA_OBJECT(), mbModel );
       oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbModel->GetExtentType() );
       mbModel->FastDelete();
@@ -201,7 +200,6 @@ int vtkSciVizStatistics::RequestDataObject(
     if ( ! ouModel || ! ouModel->IsA( "vtkMultiBlockDataSet" ) )
       {
       vtkMultiBlockDataSet* modelObj = vtkMultiBlockDataSet::New();
-      modelObj->SetPipelineInformation( oinfom );
       oinfom->Set( vtkDataObject::DATA_OBJECT(), modelObj );
       oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), modelObj->GetExtentType() );
       modelObj->FastDelete();
@@ -216,7 +214,6 @@ int vtkSciVizStatistics::RequestDataObject(
   if ( ! ouData || ! ouData->IsA( inData->GetClassName() ) )
     {
     ouData = inData->NewInstance();
-    ouData->SetPipelineInformation( oinfod );
     oinfod->Set( vtkDataObject::DATA_OBJECT(), ouData );
     //oinfod->Set( vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType() );
     ouData->FastDelete();

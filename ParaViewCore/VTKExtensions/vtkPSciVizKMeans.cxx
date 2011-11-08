@@ -35,7 +35,7 @@ int vtkPSciVizKMeans::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable* i
 {
   // Create the statistics filter and run it
   vtkPKMeansStatistics* stats = vtkPKMeansStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, inData );
   stats->SetDefaultNumberOfClusters( this->K );
   stats->SetMaxNumIterations( this->MaxNumIterations );
   stats->SetTolerance( this->Tolerance );
@@ -78,8 +78,8 @@ int vtkPSciVizKMeans::AssessData( vtkTable* observations, vtkDataObject* assesse
 
   // Create the statistics filter and run it
   vtkPKMeansStatistics* stats = vtkPKMeansStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, observations );
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, observations );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
   stats->SetDefaultNumberOfClusters( this->K );
   stats->SetMaxNumIterations( this->MaxNumIterations );
   stats->SetTolerance( this->Tolerance );

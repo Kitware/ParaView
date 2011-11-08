@@ -216,7 +216,7 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
   vtkTable* output = vtkTable::GetData(outputVector, 0);
   vtkSmartPointer<vtkTable> copy = vtkSmartPointer<vtkTable>::New();
   copy->ShallowCopy(output);
-  reduceFilter->SetInput(copy);
+  reduceFilter->SetInputData(copy);
   reduceFilter->Update();
   if (isRoot)
     {

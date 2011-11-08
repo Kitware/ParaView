@@ -689,7 +689,7 @@ void vtkPlotEdges::ReducePolyData(vtkPolyData* polyData, vtkPolyData* output)
 
   vtkSmartPointer<vtkPolyData> inputPD = vtkSmartPointer<vtkPolyData>::New();
   inputPD->ShallowCopy(vtkPolyData::SafeDownCast(polyData));
-  md->SetInput(inputPD);
+  md->SetInputData(inputPD);
 
   md->Update();
 
@@ -712,7 +712,7 @@ void vtkPlotEdges::ExtractSegments(vtkPolyData* input,
 {
   vtkSmartPointer<vtkCleanPolyData> cleanPolyData =
     vtkSmartPointer<vtkCleanPolyData>::New();
-  cleanPolyData->SetInput (input);
+  cleanPolyData->SetInputData(input);
   // set the tolerance at 0 to use vtkMergePoints (faster)
   cleanPolyData->SetTolerance (0.0);
   cleanPolyData->Update();

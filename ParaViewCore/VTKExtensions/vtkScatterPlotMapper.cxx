@@ -32,6 +32,7 @@
 #include "vtkHardwareSelector.h"
 #include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
 #include "vtkLookupTable.h"
@@ -481,7 +482,7 @@ void vtkScatterPlotMapper::ComputeBounds()
     return;
     }
 
-  input->Update();
+//   input->Update();
 
   // We do have hierarchical data - so we need to loop over
   // it and get the total bounds.
@@ -766,7 +767,7 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
     if (ss == 0)
       {
       ss = vtkPolyData::New();
-      polyDataMapper->SetInput(ss);
+      polyDataMapper->SetInputData(ss);
       ss->Delete();
       ss->ShallowCopy(source);      
       }
@@ -808,8 +809,25 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultSource->SetPoints(defaultPoints);
 
   defaultSource->InsertNextCell(VTK_POLY_LINE, 4, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkStreamingDemandDrivenPipeline::SetUpdateExtent(defaultSource->GetInformation(), 0, 1, 0);
+  vtkExecutive* TriangleProducer;
+  int producerPort;
+  vtkExecutive::PRODUCER()->Get(defaultSource->GetInformation(), TriangleProducer, producerPort);
+  vtkAlgorithm* TriangleAlg = NULL;
+  if(TriangleProducer)
+    {
+    TriangleAlg = TriangleProducer->GetAlgorithm();
+    }
+  if(TriangleAlg)
+    {
+    this->AddGlyphSourceConnection(TriangleAlg->GetOutputPort());
+    }
+  else
+    {
+    vtkErrorMacro(<<"Error in obtaining the producer port for Triangle defaultSource");
+    }
+  TriangleProducer->Delete();
+  TriangleAlg->Delete();
   defaultSource->Delete();
   defaultPoints->Delete();
 
@@ -825,8 +843,24 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultPoints->InsertNextPoint(-0.1, -0.1, 0);
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, 5, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkStreamingDemandDrivenPipeline::SetUpdateExtent(defaultSource->GetInformation(), 0, 1, 0);
+  vtkExecutive* SquareProducer;
+  vtkExecutive::PRODUCER()->Get(defaultSource->GetInformation(), SquareProducer, producerPort);
+  vtkAlgorithm* SquareAlg = NULL;
+  if(SquareProducer)
+  {
+    SquareAlg = SquareProducer->GetAlgorithm();
+  }
+  if(SquareAlg)
+  {
+    this->AddGlyphSourceConnection(SquareAlg->GetOutputPort());
+  }
+  else
+  {
+    vtkErrorMacro(<<"Error in obtaining the producer port for Square defaultSource");
+  }
+  SquareProducer->Delete();
+  SquareAlg->Delete();
   defaultSource->Delete();
   defaultPoints->Delete();
 
@@ -849,8 +883,24 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultPoints->InsertNextPoint(0.0, 0.1, 0);
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, 11, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkStreamingDemandDrivenPipeline::SetUpdateExtent(defaultSource->GetInformation(), 0, 1, 0);
+  vtkExecutive* PentagonProducer;
+  vtkExecutive::PRODUCER()->Get(defaultSource->GetInformation(), PentagonProducer, producerPort);
+  vtkAlgorithm* PentagonAlg = NULL;
+  if(PentagonProducer)
+  {
+    PentagonAlg = PentagonProducer->GetAlgorithm();
+  }
+  if(PentagonAlg)
+  {
+    this->AddGlyphSourceConnection(PentagonAlg->GetOutputPort());
+  }
+  else
+  {
+    vtkErrorMacro(<<"Error in obtaining the producer port for Pentagon defaultSource");
+  }
+  PentagonProducer->Delete();
+  PentagonAlg->Delete();
   defaultSource->Delete();
   defaultPoints->Delete();
 
@@ -868,8 +918,24 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
     }
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, points + 1, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkStreamingDemandDrivenPipeline::SetUpdateExtent(defaultSource->GetInformation(), 0, 1, 0);
+  vtkExecutive* CircleProducer;
+  vtkExecutive::PRODUCER()->Get(defaultSource->GetInformation(), CircleProducer, producerPort);
+  vtkAlgorithm* CircleAlg = NULL;
+  if(CircleProducer)
+  {
+    CircleAlg = CircleProducer->GetAlgorithm();
+  }
+  if(CircleAlg)
+  {
+    this->AddGlyphSourceConnection(CircleAlg->GetOutputPort());
+  }
+  else
+  {
+    vtkErrorMacro(<<"Error in obtaining the producer port for Circle defaultSource");
+  }
+  CircleProducer->Delete();
+  CircleAlg->Delete();
   defaultSource->Delete();
   defaultPoints->Delete();
 

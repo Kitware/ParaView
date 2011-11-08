@@ -81,7 +81,7 @@ vtkDataSet* vtkIntegrateFlowThroughSurface::GenerateSurfaceVectors(
     input->GetCellData()->GetArray("vtkGhostLevels"));
 
   vtkSurfaceVectors* dot = vtkSurfaceVectors::New();
-  dot->SetInput(inputCopy);
+  dot->SetInputData(inputCopy);
   dot->SetConstraintModeToPerpendicularScale();
   dot->Update();
 

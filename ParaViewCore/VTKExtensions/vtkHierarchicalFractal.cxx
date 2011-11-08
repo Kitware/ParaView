@@ -92,9 +92,8 @@ int vtkHierarchicalFractal::RequestDataObject(vtkInformation *,
     outData = vtkHierarchicalBoxDataSet::New();
     }
 
-  outData->SetPipelineInformation(outInfo);
-  outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), outData->GetExtentType());
   outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
+  outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), outData->GetExtentType());
   outData->Delete();
   return 1;
 }

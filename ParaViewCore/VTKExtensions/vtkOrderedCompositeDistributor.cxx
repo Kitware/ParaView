@@ -165,7 +165,7 @@ int vtkOrderedCompositeDistributor::RequestDataObject(
         {
         return 0;
         }
-      output->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), output);
       output->Delete();
       this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
                                              output->GetExtentType());
@@ -269,7 +269,7 @@ int vtkOrderedCompositeDistributor::RequestData(
   this->D3->AddObserver(vtkCommand::ProgressEvent, cbc);
 
   this->D3->SetBoundaryModeToSplitBoundaryCells();
-  this->D3->SetInput(input);
+  this->D3->SetInputData(input);
   this->D3->SetCuts(cuts);
   // We need to pass the region assignments from PKdTree to D3
   // (Refer to BUG #10828).

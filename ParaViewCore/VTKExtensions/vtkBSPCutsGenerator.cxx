@@ -46,7 +46,8 @@ int vtkBSPCutsGenerator::RequestDataObject(
   if (!output)
     {
     output = vtkBSPCuts::New();
-    output->SetPipelineInformation(outputVector->GetInformationObject(0));
+    outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(),
+output);
     outputVector->GetInformationObject(0)->Set(
       vtkDataObject::DATA_EXTENT_TYPE(),
       output->GetExtentType());
@@ -87,11 +88,11 @@ int vtkBSPCutsGenerator::RequestData(vtkInformation *,
       //clone->ShallowCopy(input);
       if (input->GetExtentType() == VTK_3D_EXTENT)
         {
-        mgr->SetStructuredProducer(input->GetProducerPort()->GetProducer());
+        mgr->SetStructuredProducer(this->GetInputAlgorithm());
         }
       else
         {
-        mgr->AddProducer(input->GetProducerPort()->GetProducer());
+        mgr->AddProducer(this->GetInputAlgorithm());
         }
       //clone->FastDelete();
       }

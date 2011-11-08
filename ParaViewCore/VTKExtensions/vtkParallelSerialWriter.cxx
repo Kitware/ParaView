@@ -27,6 +27,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTrivialProducer.h"
 
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
@@ -232,7 +233,10 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   md->SetPostGatherHelper(this->PostGatherHelper);
   if (input)
     {
-    md->SetInputConnection(0, input->GetProducerPort());
+    vtkTrivialProducer* tp = vtkTrivialProducer::New();
+    tp->SetOutput(input);
+    md->SetInputConnection(0, tp->GetOutputPort());
+    tp->Delete();
     }
   md->UpdateInformation();
   vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
@@ -272,7 +276,10 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
         {
         fname << filename;
         }
-      this->Writer->SetInputConnection(outputCopy->GetProducerPort());
+      vtkTrivialProducer* tp = vtkTrivialProducer::New();
+      tp->SetOutput(outputCopy);
+      this->Writer->SetInputConnection(tp->GetOutputPort());
+      tp->Delete();
       this->SetWriterFileName(fname.str().c_str());
       this->WriteInternal();
       this->Writer->SetInputConnection(0);

@@ -347,9 +347,10 @@ int vtkIntersectFragments::Intersect()
       vtkPolyData *fragment
         = dynamic_cast<vtkPolyData *>(fragments->GetPiece(globalId));
       // cut
-      this->Cutter->SetInput(fragment);
+      this->Cutter->SetInputData(fragment);
+      this->Cutter->Update();
       vtkPolyData *intersection=this->Cutter->GetOutput();
-      intersection->Update();
+      
       if (intersection->GetNumberOfPoints()>0)
         {
         ids.push_back(globalId);

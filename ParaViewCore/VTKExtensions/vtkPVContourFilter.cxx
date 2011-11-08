@@ -117,7 +117,7 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
       vtkSmartPointer<vtkAMRDualContour> amrDC(
         vtkSmartPointer<vtkAMRDualContour>::New());
 
-      amrDC->SetInput(0, inDataObj);
+      amrDC->SetInputData(0, inDataObj);
       amrDC->SetInputArrayToProcess(0, inArrayInfo);
       amrDC->SetEnableCapping(1);
       amrDC->SetEnableDegenerateCells(1);
@@ -162,7 +162,7 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkMultiBlockDataSet::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->Delete();
@@ -175,7 +175,7 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkPolyData::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->Delete();
