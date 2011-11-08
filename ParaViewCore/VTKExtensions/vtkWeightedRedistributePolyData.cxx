@@ -95,7 +95,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
   // get total number of polys and figure out how many each processor should have
 
-  vtkPolyData *input = this->GetInput();
+  vtkPolyData *input = vtkPolyData::SafeDownCast(this->GetInput());
 
   int type;
   vtkCellArray* inputCellArrays[NUM_CELL_TYPES];
