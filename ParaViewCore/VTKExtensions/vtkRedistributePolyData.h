@@ -23,7 +23,7 @@
 #ifndef __vtkRedistributePolyData_h
 #define __vtkRedistributePolyData_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
 //*******************************************************************
 class vtkDataArray;
@@ -31,10 +31,10 @@ class vtkDataSetAttributes;
 class vtkMultiProcessController;
 class vtkSocketController;
 
-class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
+class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
