@@ -1,7 +1,7 @@
 
 if (UNIX AND PARAVIEW_ENABLE_PYTHON)
 
-  find_file(bz2_library NAMES libbz2 libbz2.so libbz2.so.1 HINTS /usr/lib /usr/lib64 /lib /lib64)
+  find_file(bz2_library NAMES libbz2 libbz2.so libbz2.so.1 PATHS /lib /lib64)
 
   get_filename_component(bz2_library_dir ${bz2_library} PATH)
   get_filename_component(bz2_library_name ${bz2_library} NAME)
