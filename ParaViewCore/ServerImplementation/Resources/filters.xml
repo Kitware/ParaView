@@ -300,7 +300,7 @@
           coordinate bisection.
         </Documentation>
      </IntVectorProperty>
-     
+     <!-- 
      <IntVectorProperty
         name="LevelOfResolution"
         command="SetLevelOfResolution"
@@ -312,6 +312,19 @@
         </Documentation>
       </IntVectorProperty>
       
+      -->
+      <IntVectorProperty 
+        name="Number of Samples"
+        command="SetNumberOfSamples"
+        number_of_elements="3"
+        animateable="1"
+        default_values = "10 10 10">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Sets the number of samples in each dimension
+        </Documentation>
+      </IntVectorProperty>  
+                
       <DoubleVectorProperty name="Min"
                           command="SetMin"
                           number_of_elements="3"
