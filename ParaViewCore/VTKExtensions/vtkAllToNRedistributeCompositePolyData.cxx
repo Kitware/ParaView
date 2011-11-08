@@ -70,7 +70,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestDataObject(vtkInformation*,
       // Some developers have sub-classed vtkMultiBlockDataSet, in which
       // case, we try to preserve the type.
       output = input->NewInstance();
-      output->SetPipelineInformation(outputVector->GetInformationObject(0));
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
       output->FastDelete();
       return 1;
       }
@@ -78,7 +78,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestDataObject(vtkInformation*,
     if (vtkPolyData::SafeDownCast(output) == NULL)
       {
       output = vtkPolyData::New();
-      output->SetPipelineInformation(outputVector->GetInformationObject(0));
+      outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
       output->FastDelete();
       }
     return 1;
@@ -104,7 +104,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
     vtkAllToNRedistributePolyData* allToN = vtkAllToNRedistributePolyData::New();
     allToN->SetController(this->Controller);
     allToN->SetNumberOfProcesses(this->NumberOfProcesses);
-    allToN->SetInput(inputCopy);
+    allToN->SetInputData(inputCopy);
     allToN->Update();
     output->ShallowCopy(allToN->GetOutput());
     inputCopy->Delete();
@@ -132,7 +132,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
       cdOutput->SetDataSet(iter, pdOutput);
       pdOutput->FastDelete();
 
-      allToN->SetInput(pdInput);
+      allToN->SetInputData(pdInput);
       allToN->Modified(); //essential to force modification just in case the two
           // blocks are the same polydata instance on any one of the processes.
       allToN->Update();

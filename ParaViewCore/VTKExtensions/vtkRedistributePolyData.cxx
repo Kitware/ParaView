@@ -75,7 +75,7 @@ void vtkRedistributePolyData::Execute()
   timerInfo8.timer->StartTimer();
 #endif
 
-  vtkPolyData *tmp = this->GetInput();
+  vtkPolyData *tmp = vtkPolyData::SafeDownCast(this->GetInput());
   vtkPolyData *output = this->GetOutput();
   vtkPolyData* input = vtkPolyData::New();
   input->ShallowCopy(tmp);
@@ -604,7 +604,7 @@ void vtkRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   // get total number of polys and figure out how many each 
   // processor should have
 
-  vtkPolyData *input = this->GetInput();
+  vtkPolyData *input = vtkPolyData::SafeDownCast(this->GetInput());
 
   vtkCellArray *cellArrays[NUM_CELL_TYPES];
   cellArrays[0] = input->GetVerts();
