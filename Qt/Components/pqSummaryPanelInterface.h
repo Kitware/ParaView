@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 
+#include "pqComponentsExport.h"
+
 class QWidget;
 
 class pqProxy;
@@ -43,7 +45,7 @@ class pqRepresentation;
 
 // Interface class for plugins that create widgets to be shown on
 // the summary panel.
-class pqSummaryPanelInterface
+class PQCOMPONENTS_EXPORT pqSummaryPanelInterface
 {
 public:
   // Destroys the summary panel interface object.

@@ -39,13 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QCheckBox>
 
+#include "pqComponentsExport.h"
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 #include "pqPlotSettingsModel.h"
 #include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
 
-class pqChartSummaryDisplayPanel : public QWidget
+class PQCOMPONENTS_EXPORT pqChartSummaryDisplayPanel : public QWidget
 {
   Q_OBJECT
 
