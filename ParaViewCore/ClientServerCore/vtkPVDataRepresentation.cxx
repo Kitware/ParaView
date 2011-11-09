@@ -176,8 +176,8 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
   exec->UnRegister(0);
   tprod->SetOutput(dobj);
   tprod->UnRegister(0);
-
-  return dobj->GetProducerPort();
+  
+  return prevOutput->GetProducer()->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------

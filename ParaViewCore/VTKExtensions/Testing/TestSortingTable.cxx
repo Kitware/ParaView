@@ -72,7 +72,7 @@ int sortWithSimilarValues(bool debug)
   input->AddColumn(dataToSort);;
   vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
 
-  sortingfilter->SetInput(input.GetPointer());
+  sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(0);
   sortingfilter->SetColumnNameToSort("data");
 
@@ -107,7 +107,7 @@ int sortWithEpsilonValues(bool debug)
   input->AddColumn(dataToSort);;
   vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
 
-  sortingfilter->SetInput(input.GetPointer());
+  sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(0);
   sortingfilter->SetColumnNameToSort("data");
 
@@ -145,7 +145,7 @@ int sortMagnitudeOnUnsignedCharVector()
   input->AddColumn(dataToSort);;
   vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
 
-  sortingfilter->SetInput(input.GetPointer());
+  sortingfilter->SetInputData(input.GetPointer());
   sortingfilter->SetSelectedComponent(-1); // Magnitude
   sortingfilter->SetColumnNameToSort("data");
 

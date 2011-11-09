@@ -29,6 +29,7 @@
 #include "vtkImageAppend.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMergeGraphs.h"
 #include "vtkMPIMToNSocketConnection.h"
@@ -76,7 +77,7 @@ namespace
       vtkImageData* id = vtkImageData::SafeDownCast(pieces[0]);
       if (id)
         {
-        result->SetWholeExtent(
+        vtkStreamingDemandDrivenPipeline::SetWholeExtent(result->GetInformation(),
           static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
         }
       return true;
@@ -103,19 +104,19 @@ namespace
       // graph has to be handled separately because it doesn't have the standard
       // append-filter API.
       vtkMergeGraphs* mergegraphs = vtkMergeGraphs::New();
-      mergegraphs->SetInput(0, pieces[0]);
+      mergegraphs->SetInputData(0, pieces[0]);
       std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter =
         pieces.begin();
       iter++;
       for ( ; iter != pieces.end(); ++iter)
         {
-        mergegraphs->SetInput(1, iter->GetPointer());
+        mergegraphs->SetInputData(1, iter->GetPointer());
         mergegraphs->Update();
 
         vtkGraph* mergeResult = mergegraphs->GetOutput();
         vtkGraph* clone = mergeResult->NewInstance();
         clone->ShallowCopy(mergeResult);
-        mergegraphs->SetInput(0, clone);
+        mergegraphs->SetInputData(0, clone);
         clone->FastDelete();
         }
       vtkDataObject* mergeResult = mergegraphs->GetInputDataObject(0, 0);
@@ -137,6 +138,9 @@ namespace
       }
 
     std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
+    vtkExecutive* producer = NULL;
+    int producerPort;
+    vtkAlgorithm* alg = NULL;
     for (iter = pieces.begin(); iter != pieces.end(); ++iter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
@@ -145,9 +149,26 @@ namespace
         // skip empty pieces.
         continue;
         }
-      appender->AddInputConnection(0, iter->GetPointer()->GetProducerPort());
+      producer = NULL;
+      alg = NULL;
+      vtkExecutive::PRODUCER()->Get(iter->GetPointer()->GetInformation(), producer, producerPort);
+      if (producer)
+        {
+        alg = producer->GetAlgorithm();
+        }
+      if (alg)
+        {
+        appender->AddInputConnection(0, alg->GetOutputPort());
+        }
+      else
+        {
+        appender->AddInputConnection(0, NULL);
+        }
+        
       }
     appender->Update();
+    producer->Delete();
+    alg->Delete();
     result->ShallowCopy(appender->GetOutputDataObject(0));
     appender->Delete();
     return true;
@@ -326,8 +347,7 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
                   << ". Cannot create output.");
     return 0;
     }
-
-  outputCopy->SetPipelineInformation(outputVector->GetInformationObject(0));
+  outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), outputCopy);
   outputCopy->Delete();
   return 1;
 }
@@ -645,7 +665,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input,
    AllToN = vtkAllToNRedistributeCompositePolyData::New();
    AllToN->SetController(controller);
    AllToN->SetNumberOfProcesses(n);
-   AllToN->SetInput(inputCopy);
+   AllToN->SetInputData(inputCopy);
    inputCopy->Delete();
    AllToN->Update();
    output->ShallowCopy(AllToN->GetOutputDataObject(0));
@@ -944,7 +964,7 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
         clone->ShallowCopy(output);
 
         vtkOutlineFilter* filter = vtkOutlineFilter::New();
-        filter->SetInput(clone);
+        filter->SetInputData(clone);
         filter->Update();
         tosend = filter->GetOutputDataObject(0);
         filter->Delete();
@@ -1102,7 +1122,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
   vtkDataWriter* writer = vtkGenericDataObjectWriter::New();
   vtkDataObject* d = data->NewInstance();
   d->ShallowCopy(data);
-  writer->SetInput(d);
+  writer->SetInputData(d);
   d->Delete();
   if (imageData)
     {
