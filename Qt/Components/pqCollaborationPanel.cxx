@@ -546,7 +546,7 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
         }
       else if(proxy->GetSession()->IsProcessingRemoteNotification())
         {
-        emit delayUpdateCamera(msg);
+        emit delayUpdateCamera(&this->Internal->LocalCameraStateCache[currentUserId]);
         }
       }
     }
