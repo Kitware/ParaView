@@ -165,6 +165,9 @@ public:
   // This value is cached after the first call.
   virtual unsigned int GetNumberOfAlgorithmRequiredInputPorts();
 
+  // Description:
+  // Overridden to reserve additional IDs for use by "ExtractSelection" proxies.
+  virtual vtkTypeUInt32 GetGlobalID();
 
 //BTX
 
@@ -225,12 +228,17 @@ protected:
   void SetOutputPort(unsigned int index, const char* name, 
     vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();
+  void SetExtractSelectionProxy(unsigned int index,
+    vtkSMSourceProxy* proxy);
+  void RemoveAllExtractSelectionProxies();
 
   // Description:
   // Overwritten from superclass to invoke 
   virtual void PostUpdateData();
 
-  bool SelectionProxiesCreated;
+  // flag used to avoid creation of extract selection proxies for this source
+  // proxy.
+  bool DisableSelectionProxies;
 private:
   vtkSMSourceProxyInternals* PInternals;
 

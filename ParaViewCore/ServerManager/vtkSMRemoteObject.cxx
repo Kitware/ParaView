@@ -84,9 +84,7 @@ vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
 {
   if (this->Session != NULL && this->GlobalID == 0)
     {
-    this->GlobalID = this->GetSession()->GetNextGlobalUniqueIdentifier();
-    // Register object
-    this->Session->RegisterRemoteObject(this->GlobalID, this->Location, this);
+    this->SetGlobalID(this->GetSession()->GetNextGlobalUniqueIdentifier());
     }
 
   return this->GlobalID;

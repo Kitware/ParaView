@@ -65,9 +65,8 @@ public:
 
   typedef vtkstd::vector<SubProxyInfo> SubProxiesVectorType;
   SubProxiesVectorType SubProxyInfoVector;
-
-  vtkstd::vector<vtkTypeUInt32> SelectionProxies;
 };
+
 //****************************************************************************
 vtkStandardNewMacro(vtkSIProxy);
 //----------------------------------------------------------------------------
@@ -134,20 +133,6 @@ void vtkSIProxy::Push(vtkSMMessage* message)
         return;
         }
       }
-    }
-
-  // Handle selection proxy if any
-  cc = 0;
-  size = message->ExtensionSize(ProxyState::selection_proxy);
-  if(size > 0)
-    {
-    this->Internals->SelectionProxies.clear();
-    }
-  for (;cc < size; cc++)
-    {
-    vtkTypeUInt32 selectionProxyID =
-        message->GetExtension(ProxyState::selection_proxy, cc);
-    this->Internals->SelectionProxies.push_back(selectionProxyID);
     }
 
   // Execute post_push if any
@@ -232,13 +217,6 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       ProxyState_SubProxy *subproxy = message->AddExtension(ProxyState::subproxy);
       subproxy->set_name(it2->Name.c_str());
       subproxy->set_global_id(it2->GlobalID);
-      }
-
-    // Add selection proxy to the message
-    for (int cc=0,end=this->Internals->SelectionProxies.size(); cc < end; cc++)
-      {
-      message->AddExtension( ProxyState::selection_proxy,
-                             this->Internals->SelectionProxies[cc]);
       }
     }
 }

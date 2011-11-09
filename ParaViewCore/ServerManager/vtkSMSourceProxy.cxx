@@ -31,10 +31,11 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMMessage.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/string>
@@ -65,6 +66,7 @@ struct vtkSMSourceProxyInternals
   void ResizeOutputPorts(unsigned int newsize)
     {
     this->OutputPorts.resize(newsize);
+
     VectorOfPorts::iterator it = this->OutputPorts.begin();
     for (unsigned int idx=0; it != this->OutputPorts.end(); it++, idx++)
       {
@@ -97,7 +99,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
-  this->SelectionProxiesCreated = false;
+  this->DisableSelectionProxies = false;
 
   this->NumberOfAlgorithmOutputPorts = VTK_UNSIGNED_INT_MAX;
   this->NumberOfAlgorithmRequiredInputPorts = VTK_UNSIGNED_INT_MAX;
@@ -110,6 +112,21 @@ vtkSMSourceProxy::~vtkSMSourceProxy()
   delete this->PInternals;
 
   this->SetExecutiveName(0);
+}
+
+//---------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMSourceProxy::GetGlobalID()
+{
+  bool has_gid = this->HasGlobalID();
+
+  if (!has_gid && this->Session != NULL)
+    {
+    // reserve 1+10 contiguous IDs for the source proxies and possible extract
+    // selection proxies.
+    this->SetGlobalID(
+      this->GetSession()->GetNextChunkGlobalUniqueIdentifier(1 + 10));
+    }
+  return this->GlobalID;
 }
 
 //---------------------------------------------------------------------------
@@ -265,6 +282,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
         }
       }
     }
+
   return this->Superclass::ReadXMLAttributes(pm, element);
 }
 
@@ -399,6 +417,48 @@ void vtkSMSourceProxy::CreateOutputPorts()
     this->PInternals->OutputPorts[j].Port = opPort;
     opPort->Delete();
     }
+
+  // Setup selection proxies
+  if (this->DisableSelectionProxies == false)
+    {
+    if (numOutputs > 10)
+      {
+      vtkErrorMacro(
+        "vtkSMSourceProxy was not designed to handle more than 10 output ports. "
+        "In general, that's not a good practice. Try  reducing the number of "
+        "output ports. Aborting for debugging purposes.");
+      abort();
+      }
+    this->PInternals->SelectionProxies.resize(numOutputs);
+    
+    vtkSMProxyManager* pxm = this->GetProxyManager();
+    vtkClientServerStream stream;
+    for (int j=0; j<numOutputs; j++)
+      {
+      vtkSmartPointer<vtkSMSourceProxy> esProxy;
+      esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
+          pxm->NewProxy("filters", "PVExtractSelection")));
+      if (esProxy)
+        {
+        esProxy->DisableSelectionProxies = true;
+        esProxy->SetLocation(this->Location);
+        esProxy->SetGlobalID(this->GetGlobalID()+j+1);
+        esProxy->UpdateVTKObjects();
+
+        this->PInternals->SelectionProxies[j] = esProxy;
+
+        // We don't use input property since that leads to reference loop cycles
+        // and I don't feel like doing the garbage collection thing right now.
+        stream << vtkClientServerStream::Invoke
+          << SIPROXY(this)
+          << "SetupSelectionProxy"
+          << j
+          << SIPROXY(esProxy)
+          << vtkClientServerStream::End;
+        }
+      }
+    this->ExecuteStream(stream);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -419,6 +479,24 @@ void vtkSMSourceProxy::SetOutputPort(unsigned int index, const char* name,
 void vtkSMSourceProxy::RemoveAllOutputPorts()
 {
   this->PInternals->OutputPorts.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::SetExtractSelectionProxy(unsigned int index, 
+  vtkSMSourceProxy* proxy)
+{
+  if (this->PInternals->SelectionProxies.size() <= index+1)
+    {
+    this->PInternals->SelectionProxies.resize(index+1);
+    }
+
+  this->PInternals->SelectionProxies[index] = proxy;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::RemoveAllExtractSelectionProxies()
+{
+  this->PInternals->SelectionProxies.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -475,50 +553,7 @@ void vtkSMSourceProxy::InvalidateDataInformation()
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::CreateSelectionProxies()
 {
-  if (this->SelectionProxiesCreated)
-    {
-    return;
-    }
   this->CreateOutputPorts();
-
-  vtkClientServerStream stream;
-  vtkSMMessage selectionProxyMessage;
-  vtkSMProxyManager* pxm = this->GetProxyManager();
-  unsigned int numOutputPorts = this->GetNumberOfOutputPorts();
-  for (unsigned int cc=0; cc < numOutputPorts; cc++)
-    {
-    vtkSmartPointer<vtkSMSourceProxy> esProxy;
-    esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        pxm->NewProxy("filters", "PVExtractSelection")));
-    if (esProxy)
-      {
-      esProxy->SetLocation(this->Location);
-      // since we don't want the ExtractSelection proxy to further create
-      // extract selection proxies even by accident :).
-      esProxy->SelectionProxiesCreated = true;
-      esProxy->UpdateVTKObjects();
-
-      // We don't use input property since that leads to reference loop cycles
-      // and I don't feel like doing the garbage collection thing right now.
-      stream << vtkClientServerStream::Invoke
-             << SIPROXY(this)
-             << "SetupSelectionProxy"
-             << cc
-             << SIPROXY(esProxy)
-             << vtkClientServerStream::End;
-
-      // Add selection proxy information in the state
-      this->State->AddExtension(ProxyState::selection_proxy, esProxy->GetGlobalID());
-      selectionProxyMessage.AddExtension( ProxyState::selection_proxy,
-                                          esProxy->GetGlobalID());
-      }
-
-    this->PInternals->SelectionProxies.push_back(esProxy);
-    }
-  this->ExecuteStream(stream);
-  // Push only the selection information
-  this->PushState(&selectionProxyMessage);
-  this->SelectionProxiesCreated = true;
 }
 
 //---------------------------------------------------------------------------
@@ -623,6 +658,16 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
 {
   this->Superclass::LoadState(message, locator);
 
+#if 0
+  int size = message->ExtensionSize(ProxyState::selection_proxy);
+  if (size > 0 && this->SelectionProxiesCreated)
+    {
+    cout << "Something maybe amiss!!!" << endl;
+    message->PrintDebugString();
+    abort();
+    }
+
+
   // Handle selection proxy if any
   if(!this->SelectionProxiesCreated)
     {
@@ -670,4 +715,5 @@ void vtkSMSourceProxy::LoadState( const vtkSMMessage* message,
       this->ExecuteStream(stream);
       }
     }
+#endif
 }

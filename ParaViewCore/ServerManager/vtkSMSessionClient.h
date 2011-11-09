@@ -161,6 +161,13 @@ public:
   // vtkPVSessionBase instance.
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
 
+  // Description:
+  // Return the first Id of the requested chunk.
+  // 1 = ReverveNextIdChunk(10); | Reserved ids [1,2,3,4,5,6,7,8,9,10]
+  // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
+  // b = a + 10;
+  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
+
 //BTX
   void OnServerNotificationMessageRMI(void* message, int message_length);
 

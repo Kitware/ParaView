@@ -106,6 +106,8 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
   this->OutputPortsCreated = 1;
 
   this->RemoveAllOutputPorts();
+  this->RemoveAllExtractSelectionProxies();
+
   this->CreateVTKObjects();
 
   unsigned int index = 0;
@@ -125,16 +127,17 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
     source->CreateOutputPorts();
     vtkSMOutputPort* port = 0;
     vtkSMDocumentation* doc = 0;
+    unsigned int port_index = 0;
     if (iter->HasPortIndex())
       {
-      port = source->GetOutputPort(iter->PortIndex);
-      doc = source->GetOutputPortDocumentation(iter->PortIndex);
+      port_index = iter->PortIndex;
       }
     else
       {
-      port = source->GetOutputPort(iter->PortName.c_str());
-      doc = source->GetOutputPortDocumentation(iter->PortName.c_str());
+      port_index = source->GetOutputPortIndex(iter->PortName.c_str());
       }
+    port = source->GetOutputPort(port_index);
+    doc = source->GetOutputPortDocumentation(port_index);
     if (!port)
       {
       vtkErrorMacro( "Failed to locate requested output port of subproxy "
@@ -142,6 +145,9 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
       continue;
       }
     this->SetOutputPort(index, iter->ExposedName.c_str(), port, doc);
+    this->SetExtractSelectionProxy(index,
+      source->GetSelectionOutput(port_index));
+
     index++;
 
     // Move forward

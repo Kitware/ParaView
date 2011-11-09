@@ -884,17 +884,25 @@ void vtkSMSessionClient::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMSessionClient::GetNextGlobalUniqueIdentifier()
 {
-  if(this->LastGlobalID == this->LastGlobalIDAvailable)
-    {
-    cout << "Request chunk from client " <<  this->LastGlobalID << " to " << this->LastGlobalIDAvailable << endl;
-    vtkTypeUInt32 chunkSizeRequest = 500;
-    this->LastGlobalID = this->GetNextChunkGlobalUniqueIdentifier(chunkSizeRequest);
-    this->LastGlobalIDAvailable = this->LastGlobalID + chunkSizeRequest;
-    cout << "Updated status: " <<  this->LastGlobalID << " to " << this->LastGlobalIDAvailable << endl;
-    }
-  return this->LastGlobalID++;
+  return this->GetNextChunkGlobalUniqueIdentifier(1);
 }
 
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMSessionClient::GetNextChunkGlobalUniqueIdentifier(
+  vtkTypeUInt32 chunkSize)
+{
+  if ( (this->LastGlobalID + chunkSize) >= this->LastGlobalIDAvailable)
+    {
+    // we have run out of contiguous ids, request a bunch.
+    vtkTypeUInt32 chunkSizeRequest = chunkSize > 500? chunkSize : 500;
+    this->LastGlobalID = this->Superclass::GetNextChunkGlobalUniqueIdentifier(chunkSizeRequest);
+    this->LastGlobalIDAvailable = this->LastGlobalID + chunkSizeRequest;
+    }
+
+  vtkTypeUInt32 gid = this->LastGlobalID;
+  this->LastGlobalID += chunkSize;
+  return gid;
+}
 
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
@@ -906,13 +914,15 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
   vtkSMMessage state;
   state.ParseFromString(data);
   vtkTypeUInt32 id = state.global_id();
-
-  // cout << "##########     Server notification    ##########" << id << endl;
-  // state.PrintDebugString();
-  // cout << "###################################################" << endl;
-
+ 
   vtkSMRemoteObject* remoteObj =
       vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
+
+  //cout << "##########     Server notification    ##########" << endl;
+  //cout << id << " = " << remoteObj << "(" << (remoteObj?
+  //    remoteObj->GetClassName() : "null") << ")" << endl;
+  //state.PrintDebugString();
+  //cout << "###################################################" << endl;
 
   // ProcessingRemoteNotification = true prevent
   // "ignore_synchronization" properties to be loaded...
