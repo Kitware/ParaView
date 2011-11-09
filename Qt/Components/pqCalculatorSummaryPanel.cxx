@@ -55,14 +55,14 @@ pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *pare
 
   this->Links.setUseUncheckedProperties(true);
   this->Links.addPropertyLink(this->Expression,
-                              "currentText",
-                              SIGNAL(currentTextChanged(const QString&)),
+                              "text",
+                              SIGNAL(textChanged(const QString&)),
                               smProxy,
                               smProxy->GetProperty("Function"));
 
   this->Links.addPropertyLink(this->ResultArrayName,
-                              "currentText",
-                              SIGNAL(currentTextChanged(const QString&)),
+                              "text",
+                              SIGNAL(textChanged(const QString&)),
                               smProxy,
                               smProxy->GetProperty("ResultArrayName"));
 

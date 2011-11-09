@@ -139,13 +139,13 @@ pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
   // the panel.
   this->propertyManager()->registerLink
         (   this->Internal->Function, "text", 
-            SIGNAL( editingFinished() ),
+            SIGNAL(textChanged(const QString&)),
             this->proxy(), 
             this->proxy()->GetProperty( "Function" )   );
            
   this->propertyManager()->registerLink
         (   this->Internal->ResultArrayName, "text", 
-            SIGNAL( editingFinished() ),
+            SIGNAL(textChanged(const QString&)),
             this->proxy(), 
             this->proxy()->GetProperty( "ResultArrayName" )   );
            
