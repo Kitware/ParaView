@@ -114,6 +114,10 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
                     SIGNAL(preViewRemoved(pqView*)),
                     this, SLOT(disconnectViewLocalSlots(pqView*)));
 
+  QObject::connect( this,
+                    SIGNAL(delayUpdateCamera(vtkSMMessage*)),
+                    this, SLOT(onShareOnlyMessage(vtkSMMessage*)),
+                    Qt::QueuedConnection);
 
 }
 
@@ -527,16 +531,22 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
       vtkSMProxyLocator* locator =
           core->getActiveServer()->session()->GetProxyLocator();
       vtkSMProxy* proxy = locator->LocateProxy(cameraId);
-      if(proxy)
+
+      // As camera do not synch its properties while IsProcessingRemoteNotification
+      // there is no point of updating it when we are in that case.
+      // So we just push back that request to later...
+      if(proxy && !proxy->GetSession()->IsProcessingRemoteNotification())
         {
-        assert("Impossible to update camera as the session is in ProcessingRemoteNotification state" &&
-               !proxy->GetSession()->IsProcessingRemoteNotification());
         // Update Proxy
         proxy->EnableLocalPushOnly();
         proxy->LoadState(msg, locator);
         proxy->UpdateVTKObjects();
         proxy->DisableLocalPushOnly();
         core->render();
+        }
+      else if(proxy->GetSession()->IsProcessingRemoteNotification())
+        {
+        emit delayUpdateCamera(msg);
         }
       }
     }

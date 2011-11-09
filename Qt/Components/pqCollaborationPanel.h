@@ -62,6 +62,10 @@ signals:
   /// shared and send to the other clients
   void shareLocalMousePointer(bool);
 
+  /// This get triggered internally when it's not a good time to update the camera
+  /// so the request get pushed to QueuedConnection
+  void delayUpdateCamera(vtkSMMessage* msg);
+
 public slots:
   /// Called by pqCollaborationManager when a message is received
   void writeChatMessage(int userId, QString& txt);
