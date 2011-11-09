@@ -13,14 +13,15 @@
 
 =========================================================================*/
 #include "vtkSMCompoundSourceProxy.h"
+#include "vtkSMProxyInternals.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMMessage.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyInternals.h"
 
 #include <vtkSmartPointer.h>
 
@@ -98,15 +99,14 @@ void vtkSMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::CreateOutputPorts()
 {
-  if (this->Location == 0 ||
-      (this->OutputPortsCreated && this->GetNumberOfOutputPorts() > 0))
+  if (this->Location == 0 || this->OutputPortsCreated)
     {
     return;
     }
+
   this->OutputPortsCreated = 1;
 
   this->RemoveAllOutputPorts();
-  this->RemoveAllExtractSelectionProxies();
 
   this->CreateVTKObjects();
 
@@ -145,8 +145,6 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
       continue;
       }
     this->SetOutputPort(index, iter->ExposedName.c_str(), port, doc);
-    this->SetExtractSelectionProxy(index,
-      source->GetSelectionOutput(port_index));
 
     index++;
 
@@ -154,6 +152,33 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
     iter++;
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::CreateSelectionProxies()
+{
+  if (this->DisableSelectionProxies || this->SelectionProxiesCreated)
+    {
+    return;
+    }
+
+  this->SelectionProxiesCreated = true;
+  this->RemoveAllExtractSelectionProxies();
+
+  unsigned int numOutputs = this->GetNumberOfOutputPorts();
+
+  for (unsigned int cc=0; cc < numOutputs; cc++)
+    {
+    vtkSMOutputPort* port = this->GetOutputPort(cc);
+    vtkSMSourceProxy* source = port->GetSourceProxy();
+    if (source && source != this)
+      {
+      source->CreateSelectionProxies();
+      this->SetExtractSelectionProxy(cc,
+        source->GetSelectionOutput(port->GetPortIndex()));
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::UpdateVTKObjects()
 {

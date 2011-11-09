@@ -125,7 +125,7 @@ public:
   // Description:
   // Creates extract selection proxies for each output port if not already
   // created.
-  void CreateSelectionProxies();
+  virtual void CreateSelectionProxies();
 
   // Description:
   // Set/Get the selection input. This is used to set the selection input to the

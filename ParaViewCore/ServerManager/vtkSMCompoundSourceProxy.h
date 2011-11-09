@@ -106,6 +106,11 @@ public:
   virtual void CreateOutputPorts();
 
   // Description:
+  // Creates extract selection proxies for each output port if not already
+  // created. Overridden to update the selection proxies.
+  virtual void CreateSelectionProxies();
+
+  // Description:
   // Update the VTK object on the server by pushing the values of
   // all modifed properties (un-modified properties are ignored).
   // If the object has not been created, it will be created first.
