@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMainWindow>
 
+class pqServer;
+class pqPipelineBrowserWidget;
+class QComboBox;
+
 class MultiServerClientMainWindow : public QMainWindow
 {
   Q_OBJECT
@@ -42,7 +46,14 @@ public:
   MultiServerClientMainWindow(QWidget* parent = 0, Qt::WindowFlags flags=0);
   ~MultiServerClientMainWindow();
 
+protected slots:
+  void addServerInFiltering(pqServer*);
+  void applyPipelineFiltering(int);
+
 private:
   Q_DISABLE_COPY(MultiServerClientMainWindow);
+
+  pqPipelineBrowserWidget* pipelineBrowser;
+  QComboBox* comboBox;
 };
 #endif

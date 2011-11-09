@@ -43,7 +43,16 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqPipelineBrowserWidget" name="pipelineBrowserWidget"/>
+   <widget class="QWidget" name="pipeline">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QComboBox" name="filteringServer"/>
+     </item>
+     <item>
+      <widget class="pqPipelineBrowserWidget" name="pipelineBrowser" native="true"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidget_2">
    <attribute name="dockWidgetArea">

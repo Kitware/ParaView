@@ -46,7 +46,9 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${PARAVIEW_INCLUDE_DIRS}
+)
 
 #------------------------------------------------------------------------------
 # Build the client

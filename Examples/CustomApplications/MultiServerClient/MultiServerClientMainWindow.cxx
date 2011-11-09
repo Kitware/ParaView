@@ -32,12 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MultiServerClientMainWindow.h"
 #include "ui_MultiServerClientMainWindow.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 #include "pqServerConfiguration.h"
 #include "pqServerConnectReaction.h"
+#include "pqPipelineBrowserWidget.h"
+#include "pqServerManagerModel.h"
+#include "pqServer.h"
+
+#include "vtkProcessModule.h"
+#include "vtkSession.h"
+#include "vtkSMSession.h"
+
+#include <QComboBox>
 
 //-----------------------------------------------------------------------------
 MultiServerClientMainWindow::MultiServerClientMainWindow(
@@ -57,9 +67,57 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
   // tells the ParaView libraries to enable support for multiple simultaneous
   // server connections.
   pqApplicationCore::instance()->getObjectBuilder()->setMultipleConnectionsSupport(true);
+
+  // Keep arround GUI components
+  this->pipelineBrowser = ui.pipelineBrowser;
+  this->comboBox = ui.filteringServer;
+
+  // Add empty filtering
+  this->comboBox->addItem("No filtering",QVariant());
+
+  // Add current server in filtering
+  addServerInFiltering(pqActiveObjects::instance().activeServer());
+
+  // Listen when new connection occurs
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+                   SIGNAL(serverAdded(pqServer*)),
+                   this, SLOT(addServerInFiltering(pqServer*)),
+                   Qt::QueuedConnection);
+
+  // Listen when we filter with different criteria
+  QObject::connect(this->comboBox, SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(applyPipelineFiltering(int)),
+                   Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
 MultiServerClientMainWindow::~MultiServerClientMainWindow()
 {
+}
+
+//-----------------------------------------------------------------------------
+void MultiServerClientMainWindow::applyPipelineFiltering(int index)
+{
+  QVariant sessionIdFiltering = this->comboBox->itemData(index);
+  if(sessionIdFiltering.isValid())
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    this->pipelineBrowser->enableSessionFilter(pm->GetSession(static_cast<vtkIdType>(sessionIdFiltering.toInt())));
+    this->pipelineBrowser->expandAll();
+    }
+  else
+    {
+    this->pipelineBrowser->disableAnnotationFilter();
+    this->pipelineBrowser->disableSessionFilter();
+    this->pipelineBrowser->expandAll();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void MultiServerClientMainWindow::addServerInFiltering(pqServer* server)
+{
+  QVariant sessionID = vtkProcessModule::GetProcessModule()->GetSessionID(server->session());
+  QString label = "Server ";
+  label.append(sessionID.toString());
+  this->comboBox->addItem(label, sessionID);
 }
