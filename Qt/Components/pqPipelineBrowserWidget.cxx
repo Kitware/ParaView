@@ -105,7 +105,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   // Make sure the tree items get expanded when new descendents
   // are added.
   QObject::connect(this->PipelineModel, SIGNAL(firstChildAdded(const QModelIndex &)),
-      this, SLOT(expand(const QModelIndex &)));
+      this, SLOT(expandWithModelIndexTranslation(const QModelIndex &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -301,4 +301,10 @@ const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelInd
 
   // Make a recusrive call to support unknown filter depth
   return this->getPipelineModel(filterModel->mapToSource(index));
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex &index)
+{
+  this->expand(this->FilteredPipelineModel->mapFromSource(index));
 }

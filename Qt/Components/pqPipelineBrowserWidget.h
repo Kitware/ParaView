@@ -82,6 +82,7 @@ public slots:
 
 protected slots:
   void handleIndexClicked(const QModelIndex& index);
+  void expandWithModelIndexTranslation(const QModelIndex &);
 
 protected:
   /// sets the visibility for items in the indices list.
