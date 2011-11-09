@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QSortFilterProxyModel>
 
+class vtkSession;
+
 
 /// \class pqPipelineAnnotationFilterModel
 /// \brief
@@ -59,12 +61,16 @@ public:
   void enableAnnotationFilter(const QString &annotationKey);
   void disableAnnotationFilter();
 
+  void enableSessionFilter(vtkSession* session);
+  void disableSessionFilter();
+
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
   bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 
 private:
-  QString AnnotationFilter;
+  bool FilterAnnotation;
+  bool FilterSession;
 };
 
 #endif

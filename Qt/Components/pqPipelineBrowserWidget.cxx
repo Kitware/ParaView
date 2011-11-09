@@ -262,6 +262,17 @@ void pqPipelineBrowserWidget::disableAnnotationFilter()
 {
   this->FilteredPipelineModel->disableAnnotationFilter();
 }
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::enableSessionFilter(vtkSession* session)
+{
+  this->FilteredPipelineModel->enableSessionFilter(session);
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::disableSessionFilter()
+{
+  this->FilteredPipelineModel->disableSessionFilter();
+}
 
 //----------------------------------------------------------------------------
 const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const

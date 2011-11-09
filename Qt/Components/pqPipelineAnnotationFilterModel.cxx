@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent)
   : QSortFilterProxyModel(parent)
 {
+  this->FilterAnnotation = this->FilterSession = false;
 }
 //-----------------------------------------------------------------------------
 
@@ -52,7 +53,12 @@ bool pqPipelineAnnotationFilterModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
     QModelIndex index = sourceModel()->index(sourceRow, 1, sourceParent);
-    return sourceModel()->data(index, pqPipelineModel::AnnotationFilterRole).toBool();
+    return (this->FilterAnnotation ?
+              sourceModel()->data(index, pqPipelineModel::AnnotationFilterRole).toBool() :
+              true)
+        && (this->FilterSession ?
+              sourceModel()->data(index, pqPipelineModel::SessionFilterRole).toBool() :
+              true);
 }
 //-----------------------------------------------------------------------------
 
@@ -68,18 +74,52 @@ void pqPipelineAnnotationFilterModel::enableAnnotationFilter(const QString &anno
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->FilterAnnotation = true;
     model->enableFilterAnnotationKey(annotationKey);
     reset();
+    }
+  else
+    {
+    this->FilterAnnotation = false;
     }
 }
 //-----------------------------------------------------------------------------
 
 void pqPipelineAnnotationFilterModel::disableAnnotationFilter()
 {
+  this->FilterAnnotation = false;
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
     model->disableFilterAnnotationKey();
+    reset();
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqPipelineAnnotationFilterModel::enableSessionFilter(vtkSession *session)
+{
+  pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
+  if(model)
+    {
+    this->FilterSession = true;
+    model->enableFilterSession(session);
+    reset();
+    }
+  else
+    {
+    this->FilterSession = false;
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqPipelineAnnotationFilterModel::disableSessionFilter()
+{
+  this->FilterSession = false;
+  pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
+  if(model)
+    {
+    model->disableFilterSession();
     reset();
     }
 }
