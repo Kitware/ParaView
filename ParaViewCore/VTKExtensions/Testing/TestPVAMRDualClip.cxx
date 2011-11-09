@@ -48,22 +48,24 @@ int main(int argc, char* argv[])
   reader->Update();
 
   vtkPVAMRDualClipRefPtr filter = vtkPVAMRDualClipRefPtr::New();
-  filter->SetInput(reader->GetOutputDataObject(0));
+  filter->SetInputConnection(reader->GetOutputPort(0));
+//   filter->SetInput(reader->GetOutputDataObject(0));
   filter->SetVolumeFractionSurfaceValue(0.1);
   filter->SetEnableMergePoints(1);
   filter->SetEnableDegenerateCells(1);
   filter->SetEnableMultiProcessCommunication(1);
   filter->AddInputCellArrayToProcess("Material volume fraction - 3");
-  filter->Update();
+//   filter->Update();
 
   vtkPVGeometryFilterRefPtr surface (vtkPVGeometryFilterRefPtr::New());
   surface->SetUseOutline(0);
-  surface->SetInput(filter->GetOutputDataObject(0));
-  surface->Update();
+  surface->SetInputConnection(filter->GetOutputPort(0));
+//   surface->SetInput(filter->GetOutputDataObject(0));
+//   surface->Update();
 
   vtkPolyDataMapperRefPtr mapper (vtkPolyDataMapperRefPtr::New());
   mapper->SetInputConnection(surface->GetOutputPort());
-  mapper->Update();
+//   mapper->Update();
 
   vtkActorRefPtr actor (vtkActorRefPtr::New());
   actor->SetMapper(mapper);

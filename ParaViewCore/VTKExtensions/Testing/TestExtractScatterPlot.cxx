@@ -37,9 +37,9 @@ int main(int, char*[])
   extraction->SetYComponent(1);
   extraction->SetXBinCount(bin_count);
   extraction->SetYBinCount(bin_count);
+  extraction->Update();
   
   vtkPolyData* const scatter_plot = extraction->GetOutput();
-  scatter_plot->Update();
 
   vtkDoubleArray* const x_bin_extents = vtkDoubleArray::SafeDownCast(scatter_plot->GetCellData()->GetArray("x_bin_extents"));
   if(!x_bin_extents)

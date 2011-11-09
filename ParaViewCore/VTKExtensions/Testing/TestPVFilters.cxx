@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   delete [] fname;
   
   vtkCleanUnstructuredGrid* clean = vtkCleanUnstructuredGrid::New();
-  clean->SetInput( reader->GetOutput() );
+  clean->SetInputConnection( reader->GetOutputPort() );
   
   vtkGlyphSource2D *gs = vtkGlyphSource2D::New();
   gs->SetGlyphTypeToThickArrow();
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
   vtkPVGlyphFilter *glyph = vtkPVGlyphFilter::New();
   glyph->SetInputConnection( clean->GetOutputPort() );
-  glyph->SetSource( gs->GetOutput());
+  glyph->SetSourceConnection( gs->GetOutputPort());
   glyph->SetScaleFactor( 0.75 );
 
   vtkContourFilter *contour = vtkContourFilter::New();

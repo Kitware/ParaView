@@ -21,13 +21,13 @@
 int main(int , char* [])
 {
   vtkConeSource *cone = vtkConeSource::New();
-  cone->Update(); //For GetCenter
+//   cone->Update(); //For GetCenter
   
   vtkPVConnectivityFilter *connect = vtkPVConnectivityFilter::New();
-  connect->SetInput( cone->GetOutput() );
+  connect->SetInputConnection( cone->GetOutputPort() );
   
   vtkMPIMoveData *move = vtkMPIMoveData::New();
-  move->SetInput( connect->GetOutput() );
+  move->SetInputConnection( connect->GetOutputPort() );
   move->SetMoveModeToPassThrough ();
   move->Update();
 

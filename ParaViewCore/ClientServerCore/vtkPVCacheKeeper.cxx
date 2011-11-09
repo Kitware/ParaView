@@ -138,7 +138,7 @@ int vtkPVCacheKeeper::RequestDataObject(
       if (!output || !output->IsA(input->GetClassName())) 
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(outputVector->GetInformationObject(0));
+        outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), newOutput);
         newOutput->Delete();
         this->GetOutputPortInformation(i)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());

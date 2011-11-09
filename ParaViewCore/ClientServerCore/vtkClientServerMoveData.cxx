@@ -85,7 +85,7 @@ int vtkClientServerMoveData::RequestDataObject(
                     << outTypeStr);
       return 0;
       }
-    newOutput->SetPipelineInformation(info);
+    info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
     this->GetOutputPortInformation(0)->Set(
       vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
     newOutput->Delete();
@@ -180,7 +180,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
           }
         else
           {
-          data->SetPipelineInformation(outputVector->GetInformationObject(0));
+          outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), data);
           }
         data->Delete();
         return 1;

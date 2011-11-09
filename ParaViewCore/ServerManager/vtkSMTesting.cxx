@@ -20,6 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkTesting.h"
+#include "vtkTrivialProducer.h"
 
 vtkStandardNewMacro(vtkSMTesting);
 vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
@@ -57,7 +58,10 @@ int vtkSMTesting::RegressionTest(float thresh)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     if (pm->GetPartitionId() == 0)
       {
-      res = this->Testing->RegressionTest(image, thresh);
+      vtkTrivialProducer* producer = vtkTrivialProducer::New();
+      producer->SetOutput(image);
+      res = this->Testing->RegressionTest(producer, thresh);
+      producer->Delete();
       }
     else
       {

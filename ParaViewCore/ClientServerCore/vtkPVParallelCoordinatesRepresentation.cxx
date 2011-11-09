@@ -50,7 +50,7 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
   if (this->GetChart())
     {
     // Set the table, in case it has changed.
-    this->GetChart()->GetPlot(0)->SetInput(this->GetLocalOutput());
+    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
     this->GetChart()->SetVisible(this->GetVisibility());
     }
 
@@ -62,7 +62,7 @@ bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
     {
-    this->GetChart()->GetPlot(0)->SetInput(0);
+    this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
     }
   return this->Superclass::RemoveFromView(view);
@@ -161,7 +161,7 @@ int vtkPVParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
     //this->GetChart()->SetAnnotationLink(AnnLink);
 
     // Set the table, in case it has changed.
-    this->GetChart()->GetPlot(0)->SetInput(this->GetLocalOutput());
+    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
     }
 
   return 1;

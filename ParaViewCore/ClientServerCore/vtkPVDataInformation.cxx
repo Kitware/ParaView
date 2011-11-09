@@ -30,6 +30,7 @@
 #include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -39,7 +40,6 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSelection.h"
-#include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
@@ -351,7 +351,9 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data)
 {
   // Gather some common stuff
-  vtkInformation *pinfo = data->GetPipelineInformation();
+//   vtkInformation *pinfo = data->GetPipelineInformation();
+  vtkInformation* pinfo;
+  pinfo->Set(vtkDataObject::DATA_OBJECT(), data);
   if (!pinfo)
     {
     return;
@@ -614,11 +616,15 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
-  if (strcmp(dobj->GetProducerPort()->GetProducer()->GetClassName(), "vtkPVNullSource") == 0)
+  vtkExecutive* producer;
+  int producerPort;
+  vtkExecutive::PRODUCER()->Get(dobj->GetInformation(), producer, producerPort);
+  if (strcmp(producer->GetClassName(), "vtkPVNullSource") == 0)
     {
     // Don't gather any data information from the hypothetical null source.
     return;
     }
+  producer->Delete();
 
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)

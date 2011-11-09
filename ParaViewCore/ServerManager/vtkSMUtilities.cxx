@@ -76,7 +76,7 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
     return vtkErrorCode::UnrecognizedFileTypeError;
     }
 
-  writer->SetInput(image);
+  writer->SetInputData(image);
   writer->SetFileName(filename);
   writer->Write();
   int error_code = writer->GetErrorCode();
@@ -109,7 +109,7 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
     return vtkErrorCode::UnknownError;
     }
 
-  writer->SetInput(image);
+  writer->SetInputData(image);
   writer->SetFileName(filename);
   writer->Write();
   int error_code = writer->GetErrorCode();

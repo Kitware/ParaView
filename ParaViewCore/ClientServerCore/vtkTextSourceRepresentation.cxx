@@ -57,7 +57,7 @@ vtkTextSourceRepresentation::vtkTextSourceRepresentation()
   this->DummyPolyData->ShallowCopy(source->GetOutputDataObject(0));
   source->Delete();
 
-  this->CacheKeeper->SetInput(this->DummyPolyData);
+  this->CacheKeeper->SetInputData(this->DummyPolyData);
 }
 
 //----------------------------------------------------------------------------

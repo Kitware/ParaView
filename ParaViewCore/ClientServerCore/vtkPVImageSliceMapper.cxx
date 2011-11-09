@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkTexturePainter.h"
 #include "vtkImageData.h"
 #include "vtkCommand.h"
@@ -24,6 +25,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkExecutive.h"
 #include "vtkDataArray.h"
+#include <vtkStreamingDemandDrivenPipeline.h>
+
 //-----------------------------------------------------------------------------
 class vtkPVImageSliceMapper::vtkObserver : public vtkCommand
 {
@@ -120,7 +123,7 @@ void vtkPVImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
   for (int cc=0; cc < this->NumberOfSubPieces; cc++)
     {
     int currentPiece = this->NumberOfSubPieces * this->Piece + cc;
-    input->SetUpdateExtent(currentPiece, nPieces, this->GhostLevel);
+    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(input->GetInformation(), currentPiece, nPieces, this->GhostLevel);
     this->RenderPiece(ren, act);
     }
 
@@ -129,7 +132,24 @@ void vtkPVImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::SetInput(vtkImageData* input)
 {
-  this->SetInputConnection(0, input? input->GetProducerPort(): NULL);
+  vtkExecutive* producer;
+  int producerPort;
+  vtkExecutive::PRODUCER()->Get(input->GetInformation(), producer, producerPort);
+  vtkAlgorithm* alg = NULL;
+  if (producer)
+    {
+    alg = producer->GetAlgorithm();
+    }
+  if(alg)
+    {
+    this->SetInputConnection(0, alg->GetOutputPort());
+    }
+  else
+    {
+    this->SetInputConnection(0, NULL);
+    }
+  producer->Delete();
+  alg->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -154,8 +174,7 @@ void vtkPVImageSliceMapper::Update()
   if (input) 
     {
     currentPiece = this->NumberOfSubPieces * this->Piece;
-    input->SetUpdateExtent(currentPiece, this->NumberOfSubPieces*nPieces, 
-                           this->GhostLevel);
+    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(input->GetInformation(), currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
     }
 
   this->Superclass::Update();
@@ -312,7 +331,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
     this->InvokeEvent(vtkCommand::StartEvent,NULL);
     if (!this->Static)
       {
-      input->Update();
+      this->Update();
       }
     this->InvokeEvent(vtkCommand::EndEvent,NULL);
 

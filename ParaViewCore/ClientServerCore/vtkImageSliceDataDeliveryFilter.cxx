@@ -71,9 +71,9 @@ int vtkImageSliceDataDeliveryFilter::RequestDataObject(
   if (!output || !output->IsA("vtkImageData"))
     {
     output = vtkImageData::New();
-    output->SetPipelineInformation(outputVector->GetInformationObject(0));
+    outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
     this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
-      output->GetExtentType());
+    output->GetExtentType());
     output->FastDelete();
     }
   return 1;
@@ -95,7 +95,7 @@ int vtkImageSliceDataDeliveryFilter::RequestData(
     inputClone.TakeReference(input->NewInstance());
     inputClone->ShallowCopy(input);
     }
-  this->MoveData->SetInput(inputClone);
+  this->MoveData->SetInputData(inputClone);
   this->MoveData->Modified();
   this->MoveData->Update();
   output->ShallowCopy(this->MoveData->GetOutputDataObject(0));

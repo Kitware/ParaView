@@ -39,7 +39,7 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
 
   this->SliceData = vtkImageData::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->CacheKeeper->SetInput(this->SliceData);
+  this->CacheKeeper->SetInputData(this->SliceData);
 
   this->DeliveryFilter = vtkImageSliceDataDeliveryFilter::New();
   this->SliceMapper = vtkPVImageSliceMapper::New();
@@ -261,7 +261,7 @@ void vtkImageSliceRepresentation::UpdateSliceData(
 
   vtkExtractVOI* voi = vtkExtractVOI::New();
   voi->SetVOI(outExt);
-  voi->SetInput(clone);
+  voi->SetInputData(clone);
   voi->Update();
 
   this->SliceData->ShallowCopy(voi->GetOutput());
