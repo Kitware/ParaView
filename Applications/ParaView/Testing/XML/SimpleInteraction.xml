@@ -24,7 +24,7 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Text" command="key" arguments="16777248" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Text" command="set_string" arguments="Text&#xA;This is a testing" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Display" />
   <pqevent
   object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqTextDisplayPropertiesWidget/TextPropertyFrame/buttonColor/StandardColorMenu"
    command="activate" arguments="EdgeColor" />
