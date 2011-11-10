@@ -1023,7 +1023,6 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 {
-  //cout << this->XMLName << this << ".AddConsumer(" << proxy->XMLName << proxy <<")" << endl;
   int found=0;
   vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
     this->Internals->Consumers.begin();
@@ -1047,8 +1046,7 @@ void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy*)
 {
-  //cout << this->XMLName << this << ".RemoveConsumer(" << property->GetParent()->GetXMLName() << property->GetParent() << ")" << endl;
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
+  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Consumers.begin();
   for(; i != this->Internals->Consumers.end(); i++)
     {

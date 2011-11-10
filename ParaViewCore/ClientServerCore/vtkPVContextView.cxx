@@ -154,8 +154,6 @@ void vtkPVContextView::Update()
       this->GetRepresentation(index));
     if (repr)
       {
-      cout << "Requesting Delivery: " << index << ": " << repr->GetClassName()
-        << endl;
       repr->MarkModified();
       }
     }

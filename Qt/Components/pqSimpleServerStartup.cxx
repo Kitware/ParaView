@@ -797,7 +797,6 @@ void pqSimpleServerStartup::startConnection()
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::connectServer()
 {
-  cout << "pqSimpleServerStartup::connectServer" << endl;
   this->disconnectAllServers();
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();

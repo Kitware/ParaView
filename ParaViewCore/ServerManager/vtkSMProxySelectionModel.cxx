@@ -242,7 +242,6 @@ void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
                                  port->GetSourceProxy()->GetGlobalID());
       this->State->AddExtension( ProxySelectionModelState::port,
                                  port->GetPortIndex());
-      cout << "add output port in state " << port << endl;
       }
     else
       {

@@ -147,7 +147,6 @@ void pqServer::initialize()
   // Update ProxyManager based on its remote state
   pxm->UpdateFromRemote();
 
-  cout << "pqServer::initialize" << endl;
   // Setup the Connection TimeKeeper.
   // Currently, we are keeping seperate times per connection. Once we start
   // supporting multiple connections, we may want to the link the

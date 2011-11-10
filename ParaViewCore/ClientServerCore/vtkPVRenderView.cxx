@@ -953,7 +953,7 @@ void vtkPVRenderView::DoDataDelivery(
     (!using_lod_rendering &&
      this->StillRenderTime > this->UpdateTime))
     {
-    //cout << "skipping delivery" << endl;
+    // skipping delivery
     return;
     }
 
@@ -1034,8 +1034,6 @@ void vtkPVRenderView::DoDataDelivery(
       vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
     if (repr)
       {
-      //cout << "Requesting Delivery: " << index << ": " << repr->GetClassName()
-      //  << endl;
       repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
       }
     }
