@@ -1,0 +1,6 @@
+#ifndef __vtkcp_UseFortran_h
+#define __vtkcp_UseFortran_h
+
+#cmakedefine COPROCESSOR_MANGLE_FORTRAN
+
+#endif
