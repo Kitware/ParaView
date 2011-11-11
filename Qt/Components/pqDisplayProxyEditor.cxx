@@ -522,6 +522,30 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       reprProxy, reprProxy->GetProperty("VolumeRenderingMode"));
     }
 
+  // setup for number of samples
+  if (reprProxy->GetProperty("NumberOfSamples"))
+    {
+    this->Internal->Links->
+      addPropertyLink(this->Internal->ISamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 0);
+    QIntValidator* validator = new QIntValidator(this);
+    validator->setBottom(10);
+    this->Internal->ISamples->setValidator(validator);
+
+    this->Internal->Links->
+      addPropertyLink(this->Internal->JSamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 1);
+    this->Internal->JSamples->setValidator(validator);
+    
+    this->Internal->Links->
+      addPropertyLink(this->Internal->KSamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 2);
+    this->Internal->KSamples->setValidator(validator);
+    }
+
   this->Internal->BackfaceStyleRepresentation->clear();
   if ((prop = reprProxy->GetProperty("BackfaceRepresentation")) != NULL)
     {
@@ -758,6 +782,12 @@ void pqDisplayProxyEditor::updateEnableState()
     && (this->Internal->Representation->getProxy()->GetProperty("SelectMapper") ||
         this->Internal->Representation->getProxy()->GetProperty("VolumeRenderingMode")));
 
+  bool hasNumberOfSamples = 
+    this->Internal->Representation->getProxy()->GetProperty("NumberOfSamples");
+  this->Internal->ISamples->setEnabled(hasNumberOfSamples);
+  this->Internal->JSamples->setEnabled(hasNumberOfSamples);
+  this->Internal->KSamples->setEnabled(hasNumberOfSamples);
+  
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
   if (   !backfaceRepProperty

@@ -1423,6 +1423,55 @@
     </PVRepresentationProxy>
 
     <!-- ================================================================== -->
+    <PVRepresentationProxy name="AMRRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           processes="client|renderserver|dataserver"
+                           base_proxygroup="representations"
+                           base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show AMR data as
+        Surface/Outline/Points/Wireframe/Volume.
+      </Documentation>
+
+      <!-- this adds to the types already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHierarchicalBoxDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_cell" attribute_type="cell"
+          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain name="input_array_point" attribute_type="point"
+          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+          proxygroup="representations"
+          proxyname="AMRVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityFunction" />
+          <Property name="VolumeRenderingMode" />
+          <Property name="NumberOfSamples" />
+          <Property name="Shade"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of AMRRepresentation -->
+    </PVRepresentationProxy>
+
+    <!-- ================================================================== -->
     <RepresentationProxy name="UnstructuredGridVolumeRepresentation"
                          class="vtkUnstructuredGridVolumeRepresentation"
                          si_class="vtkSIUnstructuredGridVolumeRepresentationProxy"
@@ -1781,7 +1830,7 @@
       <IntVectorProperty name="InterpolationType"
         command="SetInterpolationType"
         number_of_elements="1"
-        default_values="1">
+        default_values="2">
         <EnumerationDomain name="enum" >
           <Entry value="0" text="Nearest" />
           <Entry value="1" text="Linear" />
@@ -1861,6 +1910,221 @@
       </DoubleVectorProperty>
 
       <!-- end of UniformGridVolumeRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy name="AMRVolumeRepresentation"
+                          class="vtkAMRVolumeRepresentation"
+                          si_class="vtkSIAMRVolumeRepresentationProxy"
+                          processes="client|renderserver|dataserver">
+      <Documentation>
+        Representation for rendering Overlapping AMR as volume.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkHierarchicalBoxDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="InterpolationType"
+        command="SetInterpolationType"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Nearest" />
+          <Entry value="1" text="Linear" />
+          <Entry value="2" text="Cubic" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <ProxyProperty name="LookupTable"
+        command="SetColor">
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <DoubleVectorProperty name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SpecularPower"
+        command="SetSpecularPower"
+        number_of_elements="1"
+        default_values="100.0">
+        <DoubleRangeDomain name="range" min="0" max="100" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Shade"
+        command="SetShade"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable shading.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Number Of Samples"
+        command="SetNumberOfSamples"
+        number_of_elements="3"
+        default_values="20 20 20">
+        <Documentation>
+          Set the number of samples used to create an uniform grid from the AMR.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="ScalarOpacityFunction"
+        command="SetScalarOpacity">
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="VolumeRenderingMode"
+        command="SetRequestedRenderMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Smart" />
+          <Entry value="1" text="Ray Cast and Texture Mapping" />
+          <Entry value="2" text="Ray Cast Only" />
+          <Entry value="3" text="Texture Mapping Only" />
+          <Entry value="4" text="GPU Based" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ScalarOpacityUnitDistance"
+        command="SetScalarOpacityUnitDistance"
+        number_of_elements="1"
+        default_values="1">
+      </DoubleVectorProperty>
+
+      <!-- end of AMRVolumeRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->
