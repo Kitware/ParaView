@@ -257,13 +257,31 @@ void pq3DWidget::setView(pqView* pqview)
     return;
     }
 
+  // This test has been added to support proxy that have been created on
+  // different servers. We return if we switch from a view from a server
+  // to another view from another server.
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if ((widget && pqview &&
+       pqview->getProxy()->GetSession() != widget->GetSession())
+      ||
+      (rview && pqview &&
+       rview->getProxy()->GetSession() != pqview->getProxy()->GetSession()))
+    {
+    return;
+    }
+
+  cout << "pq3DWidget::setView()" << endl;
+  if(pqview) cout << " - pqview->getProxy()->GetSession(): " << pqview->getProxy()->GetSession() << endl;
+  if(rview) cout << " - rview->getProxy()->GetSession(): " << rview->getProxy()->GetSession() << endl;
+  if(widget) cout << " - widget->GetSession(): " << widget->GetSession() << endl;
+
+
   // get rid of old shortcut.
   delete this->Internal->PickShortcut;
 
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
-  vtkSMProxy* widget = this->getWidgetProxy();
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.

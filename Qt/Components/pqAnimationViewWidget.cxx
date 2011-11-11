@@ -357,6 +357,10 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
     &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
     this, SLOT(setCurrentSelection(pqPipelineSource*)));
 
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
+    this, SLOT(onSceneCuesChanged()));
+
   QObject::connect(this->Internal->CreateSource,
     SIGNAL(currentProxyChanged(vtkSMProxy*)),
     this, SLOT(setCurrentProxy(vtkSMProxy*)));

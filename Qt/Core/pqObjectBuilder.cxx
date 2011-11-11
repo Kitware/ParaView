@@ -95,7 +95,7 @@ pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
   QObject(_parent),
   NameGenerator(new pqNameCount()),
   WaitingForConnection(false),
-  MultipleConnectionsSupport(false)
+  MultipleConnectionsSupport(true) // Set MULTI-SERVER to true as DEFAULT
 {
 }
 
