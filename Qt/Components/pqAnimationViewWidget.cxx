@@ -454,6 +454,12 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::onSceneCuesChanged()
 {
+  if(!this->Internal->Scene)
+    {
+    // No scene, so do nothing
+    return;
+    }
+
   QSet<pqAnimationCue*> cues = this->Internal->Scene->getCues();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();

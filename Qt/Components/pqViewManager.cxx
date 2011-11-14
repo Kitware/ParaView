@@ -1235,11 +1235,19 @@ void pqViewManager::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqViewManager::onServerDisconnect()
 {
-  QList<QWidget*> removed;
-  this->reset(removed);
-  foreach (QWidget* _widget, removed)
+  pqObjectBuilder* builder = pqApplicationCore::instance()-> getObjectBuilder();
+
+  // We only cleanup views if only one server at a time is supported,
+  // otherwise we keep the layout and just remove content that depend on the
+  // deleted server.
+  if(!builder->multipleConnectionsSupport())
     {
-    delete _widget;
+      QList<QWidget*> removed;
+      this->reset(removed);
+      foreach (QWidget* _widget, removed)
+        {
+        delete _widget;
+        }
     }
 }
 
