@@ -2089,7 +2089,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Number Of Samples"
+      <IntVectorProperty name="NumberOfSamples"
         command="SetNumberOfSamples"
         number_of_elements="3"
         default_values="20 20 20">
