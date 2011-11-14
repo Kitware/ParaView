@@ -283,17 +283,6 @@ protected:
   int UpdateMetaData(vtkInformation* request,
                      vtkInformationVector* outputVector);
 
-  // Description:
-  // This does the updating of the meta data of the case file
-  int UpdateCaseFile(const char *fname,
-                     vtkInformation* request, 
-                     vtkInformationVector* outputVector);
-
-  // Description:
-  // This does the updating of the meta data for a series, when no case file provided
-  int UpdateSpyDataFile(vtkInformation* request, 
-                        vtkInformationVector* outputVector);
-
   int UpdateFile(vtkInformation *request, 
                  vtkInformationVector *outputVector);
 
@@ -304,17 +293,12 @@ protected:
 
   // Have all the readers have the same global level structure
   void SetGlobalLevels(vtkCompositeDataSet *cds);
-  // Description:
-  // Get and set the current file name. Protected because
-  // this method should only be used internally
-  vtkSetStringMacro(CurrentFileName);
-  vtkGetStringMacro(CurrentFileName);
 
   // The observer to modify this object when the array selections are
   // modified.
   vtkCallbackCommand *SelectionObserver;
   char *FileName;
-  char *CurrentFileName;
+
   int TimeStep; // set by the user
   int TimeStepRange[2];
   int CurrentTimeStep; // computed
@@ -368,11 +352,17 @@ protected:
 
   int MergeXYZComponents;
 
-  int UpdateFileCallCount;
+  // This flag is used to determine if core meta-data needs to be re-read.
+  bool FileNameChanged;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
   void operator=(const vtkSpyPlotReader&);  // Not implemented.
+
+  class VectorOfDoubles;
+
+  VectorOfDoubles* TimeSteps;
+  void SetTimeSteps(const VectorOfDoubles&);
 };
 
 #endif
