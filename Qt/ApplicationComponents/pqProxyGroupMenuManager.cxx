@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqProxyGroupMenuManager.h"
 
+#include "pqActiveObjects.h"
 #include "pqPVApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqSetData.h"
@@ -147,6 +148,10 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this, SLOT(addProxyDefinitionUpdateObservers()));
+
+  QObject::connect(&pqActiveObjects::instance(),
+                   SIGNAL(serverChanged(pqServer*)),
+                   this, SLOT(lookForNewDefinitions()));
 }
 
 //-----------------------------------------------------------------------------
