@@ -53,12 +53,6 @@ class vtkSMReaderFactory::vtkInternals
 public:
   struct vtkValue
     {
-    vtkValue(vtkSMSession* session)
-      {
-      assert("Session need to be valid" && session);
-      this->Session = session;
-      }
-
     vtkWeakPointer<vtkSMSession> Session;
     vtkstd::string Group;
     vtkstd::string Name;
@@ -67,25 +61,21 @@ public:
     vtkstd::vector<vtkstd::string> FilenamePatterns;
     vtkstd::string Description;
 
-    vtkSMSessionProxyManager* GetProxyManager()
-      {
-      return this->GetProxyManager(this->Session);
-      }
-
     vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
       {
       return vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
       }
 
-    vtkSMProxy* GetPrototypeProxy(const char* groupName, const char* proxyName)
+    vtkSMProxy* GetPrototypeProxy(vtkSMSession* session, const char* groupName, const char* proxyName)
       {
-      return this->GetProxyManager()->GetPrototypeProxy(groupName, proxyName);
+      return session->GetSessionProxyManager()->GetPrototypeProxy(groupName, proxyName);
       }
 
-    void FillInformation()
+    void FillInformation(vtkSMSession* session)
       {
 
-      vtkSMProxy* prototype = this->GetPrototypeProxy(this->Group.c_str(),
+      vtkSMProxy* prototype = this->GetPrototypeProxy(session,
+                                                      this->Group.c_str(),
                                                       this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
@@ -126,9 +116,10 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkSMSession* vtkNotUsed(session))
+    bool CanCreatePrototype(vtkSMSession* session)
       {
-      return (this->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str())
+      return (this->GetPrototypeProxy(session,
+                                      this->Group.c_str(), this->Name.c_str())
               != NULL);
       }
 
@@ -247,7 +238,8 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   bool skip_filename_test/*=false*/)
 {
   vtkSMSessionProxyManager* pxm = this->GetProxyManager(session);
-  vtkSMProxy* prototype = this->GetPrototypeProxy( this->Group.c_str(),
+  vtkSMProxy* prototype = this->GetPrototypeProxy( session,
+                                                   this->Group.c_str(),
                                                    this->Name.c_str() );
   if (!prototype)
     {
@@ -256,6 +248,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 
   if (!skip_filename_test)
     {
+    this->FillInformation(session);
     if (!this->ExtensionTest(extensions) &&
       !this->FilenameRegExTest(filename))
       {
@@ -304,9 +297,9 @@ void vtkSMReaderFactory::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
+void vtkSMReaderFactory::RegisterPrototypes(vtkSMSession* session, const char* xmlgroup)
 {
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkPVProxyDefinitionIterator* iter;
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -333,12 +326,9 @@ void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   // If already present, we remove old one and append again so that the priority
   // rule still works.
   this->UnRegisterPrototype(xmlgroup, xmlname);
-  vtkInternals::vtkValue value(this->Session);
+  vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
-
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
 
   this->Internals->Prototypes.push_front(value);
 }
@@ -352,12 +342,10 @@ void vtkSMReaderFactory::RegisterPrototype(
   // If already present, we remove old one and append again so that the priority
   // rule still works.
   this->UnRegisterPrototype(xmlgroup, xmlname);
-  vtkInternals::vtkValue value(this->Session);
+  vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
 
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
   if (description)
     {
     value.Description = description;
@@ -482,6 +470,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
         iter->CanReadFile(filename, extensions, session))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -513,6 +502,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
       (!filename || iter->CanReadFile(filename, extensions, session, true)))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -578,6 +568,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
     {
     if (iter->CanCreatePrototype(session))
       {
+      iter->FillInformation(session);
       vtkstd::string ext_list;
       if (iter->Extensions.size() > 0)
         {

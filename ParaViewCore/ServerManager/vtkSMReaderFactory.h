@@ -35,18 +35,18 @@
 #ifndef __vtkSMReaderFactory_h
 #define __vtkSMReaderFactory_h
 
-#include "vtkSMSessionObject.h"
+#include "vtkSMObject.h"
 
 class vtkStringList;
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMReaderFactory : public vtkSMSessionObject
+class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
 public:
   static vtkSMReaderFactory* New();
-  vtkTypeMacro(vtkSMReaderFactory, vtkSMSessionObject);
+  vtkTypeMacro(vtkSMReaderFactory, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -61,7 +61,7 @@ public:
   // Description:
   // Registers all prototypes from a particular group that have the
   // "ReaderFactory" hint.
-  void RegisterPrototypes(const char* xmlgroup);
+  void RegisterPrototypes(vtkSMSession* session, const char* xmlgroup);
 
   // Description:
   // Load configuration XML. This adds the prototypes specified in the

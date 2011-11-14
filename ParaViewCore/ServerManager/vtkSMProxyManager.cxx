@@ -24,9 +24,11 @@
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkSMWriterFactory.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
@@ -107,6 +109,9 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->PXMStorage = new vtkPXMInternal();
   this->PluginManager = vtkSMPluginManager::New();
   this->UndoStackBuilder = NULL;
+
+  this->ReaderFactory = vtkSMReaderFactory::New();
+  this->WriterFactory = vtkSMWriterFactory::New();
 }
 
 //---------------------------------------------------------------------------
@@ -116,6 +121,12 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->PluginManager->Delete();
   this->PluginManager = NULL;
+
+  this->ReaderFactory->Delete();
+  this->ReaderFactory = 0;
+
+  this->WriterFactory->Delete();
+  this->WriterFactory = 0;
 
   delete this->PXMStorage;
   this->PXMStorage = NULL;

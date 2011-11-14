@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 
 #include <QDebug>
@@ -73,7 +73,8 @@ void pqLoadDataReaction::updateEnableState()
 QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  vtkSMReaderFactory* readerFactory = server->proxyManager()->GetReaderFactory();
+  vtkSMReaderFactory* readerFactory =
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   QString filters = readerFactory->GetSupportedFileTypes(
     server->session());
   if (!filters.isEmpty())
@@ -121,7 +122,8 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
     return NULL;
     }
 
-  vtkSMReaderFactory* readerFactory = server->proxyManager()->GetReaderFactory();
+  vtkSMReaderFactory* readerFactory =
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   pqPipelineSource* reader = NULL;
 
   //Extension to ReaderType,ReaderGroup Hash table

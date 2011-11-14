@@ -107,10 +107,8 @@ class vtkSMProxyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManagerObserver;
 class vtkSMProxyManagerProxySet;
-class vtkSMReaderFactory;
 class vtkSMSession;
 class vtkSMStateLoader;
-class vtkSMWriterFactory;
 class vtkStringList;
 class vtkSMPipelineState;
 class vtkSMStateLocator;
@@ -393,16 +391,6 @@ public:
   const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
 
   // Description:
-  // Provides access to the reader factory. Before using the reader factory, it
-  // is essential that it's configured correctly.
-  vtkGetObjectMacro(ReaderFactory, vtkSMReaderFactory);
-
-  // Description:
-  // Provides access to the writer factory. Before using the reader factory, it
-  // is essential that it's configured correctly.
-  vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
-
-  // Description:
   // Loads server-manager configuration xml.
   bool LoadConfigurationXML(const char* xmlcontents);
 
@@ -519,9 +507,6 @@ protected:
                                vtkSMProxy* proxy);
 
   int UpdateInputProxies;
-
-  vtkSMReaderFactory* ReaderFactory;
-  vtkSMWriterFactory* WriterFactory;
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;

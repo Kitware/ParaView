@@ -98,7 +98,6 @@ class pqApplicationCore::pqInternals
 public:
   vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
   QMap<QString, QPointer<QObject> > RegisteredManagers;
-  QStringList XMLConfigToLoad;
 };
 
 //-----------------------------------------------------------------------------
@@ -698,10 +697,8 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
 
   // Load configuration files for server manager components since they don't
   // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()
-      ->GetReaderFactory()->LoadConfiguration(root);
-  vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()
-      ->GetWriterFactory()->LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->LoadConfiguration(root);
 
   emit this->loadXML(root);
 }
@@ -719,18 +716,4 @@ pqTestUtility* pqApplicationCore::testUtility()
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
 {
-}
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setConfigurationToLoad(const QStringList& filenames)
-{
-  this->Internal->XMLConfigToLoad.clear();
-  this->Internal->XMLConfigToLoad.append(filenames);
-}
-//-----------------------------------------------------------------------------
-void pqApplicationCore::loadConfigurations()
-{
-  foreach(QString filename, this->Internal->XMLConfigToLoad)
-    {
-    this->loadConfiguration(filename);
-    }
 }

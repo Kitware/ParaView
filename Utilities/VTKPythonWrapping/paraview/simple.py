@@ -132,17 +132,19 @@ def OpenDataFile(filename, **extraArgs):
     """Creates a reader to read the give file, if possible.
        This uses extension matching to determine the best reader possible.
        If a reader cannot be identified, then this returns None."""
-    reader_factor = servermanager.ProxyManager().GetReaderFactory()
-    if  reader_factor.GetNumberOfRegisteredPrototypes() == 0:
-      reader_factor.RegisterPrototypes("sources")
     session = servermanager.ActiveConnection.Session
+    reader_factor = servermanager.vtkSMProxyManager.GetProxyManager().GetReaderFactory()
+    if reader_factor.GetNumberOfRegisteredPrototypes() == 0:
+      reader_factor.RegisterPrototypes(session, "sources")
     first_file = filename
     if type(filename) == list:
         first_file = filename[0]
     if not reader_factor.TestFileReadability(first_file, session):
-        raise RuntimeError, "File not readable: %s " % first_file
+        msg = "File not readable: %s " % first_file
+        raise RuntimeError, msg
     if not reader_factor.CanReadFile(first_file, session):
-        raise RuntimeError, "File not readable. No reader found for '%s' " % first_file
+        msg = "File not readable. No reader found for '%s' " % first_file
+        raise RuntimeError, msg
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
@@ -159,9 +161,10 @@ def CreateWriter(filename, proxy=None, **extraArgs):
        data, it simply creates the writer and returns it."""
     if not filename:
        raise RuntimeError, "filename must be specified"
-    writer_factory = servermanager.ProxyManager().GetWriterFactory()
+    session = servermanager.ActiveConnection.Session
+    writer_factory = servermanager.vtkSMProxyManager.GetProxyManager().GetWriterFactory()
     if writer_factory.GetNumberOfRegisteredPrototypes() == 0:
-        writer_factory.RegisterPrototypes("writers")
+        writer_factory.RegisterPrototypes(session, "writers")
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:

@@ -172,9 +172,6 @@ void pqServer::initialize()
   proxy->Delete();
 
   this->updateGlobalMapperProperties();
-
-  // Load the configuration for the current server
-  pqApplicationCore::instance()->loadConfigurations();
 }
 
 //-----------------------------------------------------------------------------

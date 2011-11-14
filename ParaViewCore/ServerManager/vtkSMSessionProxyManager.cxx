@@ -39,12 +39,10 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMReaderFactory.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
-#include "vtkSMWriterFactory.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkVersion.h"
@@ -145,12 +143,6 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
     vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Observer);
   this->ProxyDefinitionManager->SetSession(session);
 
-  this->ReaderFactory = vtkSMReaderFactory::New();
-  this->ReaderFactory->SetSession(this->Session);
-
-  this->WriterFactory = vtkSMWriterFactory::New();
-  this->WriterFactory->SetSession(this->Session);
-
   this->PipelineState = vtkSMPipelineState::New();
   this->PipelineState->SetSession(this->Session);
 
@@ -173,12 +165,6 @@ vtkSMSessionProxyManager::~vtkSMSessionProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
-
-  this->ReaderFactory->Delete();
-  this->ReaderFactory = 0;
-
-  this->WriterFactory->Delete();
-  this->WriterFactory = 0;
 
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;

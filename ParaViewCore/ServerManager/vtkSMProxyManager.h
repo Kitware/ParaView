@@ -32,10 +32,12 @@ class vtkSMPluginManager;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMProxySelectionModel;
+class vtkSMReaderFactory;
 class vtkSMSession;
 class vtkSMSessionProxyManager;
 class vtkSMStateLoader;
 class vtkSMUndoStackBuilder;
+class vtkSMWriterFactory;
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
@@ -136,6 +138,16 @@ public:
   // This provides access to the application-wide plugin manager.
   vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
 
+  // Description:
+  // Provides access to the reader factory. Before using the reader factory, it
+  // is essential that it's configured correctly.
+  vtkGetObjectMacro(ReaderFactory, vtkSMReaderFactory);
+
+  // Description:
+  // Provides access to the writer factory. Before using the reader factory, it
+  // is essential that it's configured correctly.
+  vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
+
 //BTX
   struct RegisteredProxyInformation
   {
@@ -187,6 +199,8 @@ protected:
 
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
+  vtkSMReaderFactory* ReaderFactory;
+  vtkSMWriterFactory* WriterFactory;
 
 private:
   class vtkPXMInternal;
