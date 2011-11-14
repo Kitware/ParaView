@@ -4641,9 +4641,6 @@ This filter extracts the portion of the input dataset that lies along the specif
            <Documentation>
              This property sets the parameters of the slice function.
            </Documentation>
-           <Hints>
-            <ShowInSummaryPanel/>
-          </Hints>
      </ProxyProperty>
 
      <DoubleVectorProperty
