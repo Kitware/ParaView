@@ -19,6 +19,7 @@
 #include "vtkScatterPlotMatrix.h"
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
+#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixView);
 
@@ -26,6 +27,9 @@ vtkStandardNewMacro(vtkPVPlotMatrixView);
 vtkPVPlotMatrixView::vtkPVPlotMatrixView()
 {
   this->PlotMatrix = vtkScatterPlotMatrix::New();
+  this->PlotMatrix->AddObserver(
+    vtkCommand::SelectionChangedEvent, this,
+    &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
 
   this->ContextView->GetScene()->AddItem(this->PlotMatrix);
 }
@@ -34,6 +38,13 @@ vtkPVPlotMatrixView::vtkPVPlotMatrixView()
 vtkPVPlotMatrixView::~vtkPVPlotMatrixView()
 {
   this->PlotMatrix->Delete();
+}
+
+void vtkPVPlotMatrixView::PlotMatrixSelectionCallback(vtkObject*,
+  unsigned long event, void*)
+{
+  // forward the SelectionChangedEvent
+  this->InvokeEvent(event);
 }
 
 //----------------------------------------------------------------------------

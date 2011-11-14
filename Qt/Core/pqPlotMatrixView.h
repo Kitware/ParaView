@@ -49,6 +49,12 @@ public:
   
   static QString viewType() { return "PlotMatrixView"; }
   static QString viewTypeName() { return "Plot Matrix View"; }
+
+protected:
+
+  /// Listen for new selection events, and pass them back to ParaView
+  virtual void selectionChanged();
+
 };
 
 #endif

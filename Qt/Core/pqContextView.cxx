@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkScatterPlotMatrix.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -392,6 +393,23 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
 
 void pqContextView::selectionChanged()
 {
+  // Fill the selection source with the selection from the view
+  vtkSelection* sel = 0;
+
+  if(vtkChart *chart = vtkChart::SafeDownCast(this->getContextViewProxy()->GetContextItem()))
+    {
+    sel = chart->GetAnnotationLink()->GetCurrentSelection();
+    }
+
+  if(!sel)
+    {
+    return;
+    }
+  this->setSelection(sel);
+}
+
+void pqContextView::setSelection(vtkSelection* sel)
+{
   // Get the representation's source
   pqDataRepresentation* pqRepr = 0;
 
@@ -430,14 +448,6 @@ void pqContextView::selectionChanged()
   else
     {
     selectionSource->Register(repSource);
-    }
-
-  // Fill the selection source with the selection from the view
-  vtkSelection* sel = 0;
-
-  if(vtkChart *chart = vtkChart::SafeDownCast(this->getContextViewProxy()->GetContextItem()))
-    {
-    sel = chart->GetAnnotationLink()->GetCurrentSelection();
     }
 
   // Fill the selection source with the selection

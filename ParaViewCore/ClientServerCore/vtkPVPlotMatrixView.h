@@ -33,6 +33,11 @@ protected:
   vtkPVPlotMatrixView();
   ~vtkPVPlotMatrixView();
 
+  // Description:
+  // The callback function when SelectionChangedEvent is invoked from
+  // the Big chart in vtkScatterPlotMatrix.
+  void PlotMatrixSelectionCallback(vtkObject*, unsigned long, void*);
+
 private:
   vtkPVPlotMatrixView(const vtkPVPlotMatrixView&); // Not implemented.
   void operator=(const vtkPVPlotMatrixView&); // Not implemented.

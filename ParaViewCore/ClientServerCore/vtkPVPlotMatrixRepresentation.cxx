@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTable.h"
 #include "vtkStdString.h"
 #include "vtkPlotPoints.h"
+#include "vtkAnnotationLink.h"
+#include "vtkSelectionDeliveryFilter.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixRepresentation);
 
@@ -119,6 +121,12 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
     plotMatrix->SetInput(this->GetLocalOutput());
+    if(vtkAnnotationLink* annLink = plotMatrix->GetActiveAnnotationLink())
+      {
+      vtkSelection* sel = vtkSelection::SafeDownCast(
+        this->SelectionDeliveryFilter->GetOutputDataObject(0));
+      annLink->SetCurrentSelection(sel);
+      }
     }
 
   return 1;
