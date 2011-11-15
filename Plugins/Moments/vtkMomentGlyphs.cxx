@@ -141,7 +141,7 @@ void vtkMomentGlyphs::MakeMomentVectors(vtkSmartPointer<vtkDataSet> &input,
   // Use a vtkMomentVectors filter to convert flux/circulation scalars to
   // vectors.
   VTK_CREATE(vtkMomentVectors, makeVectors);
-  makeVectors->SetInput(input);
+  makeVectors->SetInputData(input);
   makeVectors->SetInputMoment(inputArray->GetName());
   makeVectors->SetInputMomentIsDensity(this->InputMomentIsDensity);
 
@@ -231,7 +231,7 @@ vtkSmartPointer<vtkPolyData> vtkMomentGlyphs::MakeGlyphs(
 
   // Find the parametric center of the cells.
   VTK_CREATE(vtkCellCenters, cellCenters);
-  cellCenters->SetInput(inputCopy);
+  cellCenters->SetInputData(inputCopy);
 
   // Create the glyph source.  Make the arrow shifted so that it is centered in
   // the cell.

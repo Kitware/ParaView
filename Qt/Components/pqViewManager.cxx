@@ -1169,9 +1169,7 @@ vtkImageData* pqViewManager::captureImage(int _width, int _height)
   // Create full image data.
   vtkImageData* fullImage = vtkImageData::New();
   fullImage->SetDimensions(_width, _height, 1);
-  fullImage->SetScalarTypeToUnsignedChar();
-  fullImage->SetNumberOfScalarComponents(3);
-  fullImage->AllocateScalars();
+  fullImage->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
   unsigned char rgb[3] = {0, 0, 0};
   vtkImageIterator<unsigned char> it(fullImage, fullImage->GetExtent());
   while (!it.IsAtEnd())

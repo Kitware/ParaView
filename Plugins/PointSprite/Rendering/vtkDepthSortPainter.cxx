@@ -154,7 +154,7 @@ void vtkDepthSortPainter::Sort(vtkDataSet* output,
     vtkRenderer* vtkNotUsed(renderer),
     vtkActor* vtkNotUsed(actor))
 {
-  this->DepthSortPolyData->SetInput(input);
+  this->DepthSortPolyData->SetInputData(input);
 
   this->DepthSortPolyData->Update();
 

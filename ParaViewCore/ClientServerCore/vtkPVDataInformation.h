@@ -35,6 +35,7 @@ class vtkDataObject;
 class vtkDataSet;
 class vtkGenericDataSet;
 class vtkGraph;
+class vtkInformation;
 class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
 class vtkPVDataSetAttributesInformation;
@@ -186,7 +187,7 @@ protected:
   void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);
   void CopyFromSelection(vtkSelection* selection);
-  void CopyCommonMetaData(vtkDataObject*);
+  void CopyCommonMetaData(vtkDataObject*, vtkInformation*);
 
   // Data information collected from remote processes.
   int            DataSetType;

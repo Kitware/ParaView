@@ -76,6 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 #include "vtkTesting.h"
 #include "vtkTIFFWriter.h"
+#include "vtkTrivialProducer.h"
 #include "vtkWindowToImageFilter.h"
 
 #ifdef QT_TESTING_WITH_PYTHON
@@ -87,7 +88,7 @@ template<typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
   WriterT* const writer = WriterT::New();
-  writer->SetInput(Capture->GetOutput());
+  writer->SetInputConnection(Capture->GetOutputPort());
   writer->SetFileName(File.filePath().toAscii().data());
   writer->Write();
   const bool result = writer->GetErrorCode() == vtkErrorCode::NoError;
@@ -225,7 +226,9 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
   testing->AddArgument(TempDirectory.toAscii().data());
   testing->AddArgument("-V");
   testing->AddArgument(ReferenceImage.toAscii().data());
-  if (testing->RegressionTest(testImage, Threshold) == vtkTesting::PASSED)
+  vtkSmartPointer<vtkTrivialProducer> tp = vtkSmartPointer<vtkTrivialProducer>::New();
+  tp->SetOutput(testImage);
+  if (testing->RegressionTest(tp, Threshold) == vtkTesting::PASSED)
     {
     return true;
     }

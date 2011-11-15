@@ -185,7 +185,8 @@ void vtkKdTreeManager::Update()
     vtkKdTreeGenerator* generator = vtkKdTreeGenerator::New();
     generator->SetKdTree(this->KdTree);
     generator->SetNumberOfPieces(this->NumberOfPieces);
-    generator->BuildTree(this->StructuredProducer->GetOutputDataObject(0));
+    generator->BuildTree(this->StructuredProducer->GetOutputDataObject(0),
+                         this->StructuredProducer->GetOutputInformation(0));
     generator->Delete();
     }
   else

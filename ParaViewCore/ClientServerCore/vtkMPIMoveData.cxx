@@ -29,7 +29,6 @@
 #include "vtkImageAppend.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMergeGraphs.h"
 #include "vtkMPIMToNSocketConnection.h"
@@ -46,6 +45,7 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
+#include "vtkTrivialProducer.h"
 #include "vtkToolkits.h"
 #include "vtkUndirectedGraph.h"
 #include "vtkUnstructuredGrid.h"
@@ -58,6 +58,7 @@
 #endif
 
 #include <vtkstd/vector>
+#include <vtkTrivialProducer.h>
 
 bool vtkMPIMoveData::UseZLibCompression = false;
 
@@ -75,11 +76,12 @@ namespace
       {
       result->ShallowCopy(pieces[0]);
       vtkImageData* id = vtkImageData::SafeDownCast(pieces[0]);
-      if (id)
-        {
-        vtkStreamingDemandDrivenPipeline::SetWholeExtent(result->GetInformation(),
-          static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
-        }
+//       if (id)
+//         {
+//           FIXME: Check whether to pass-in pipeline info?
+//         result->SetWholeExtent(
+//           static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
+//         }
       return true;
       }
 
@@ -136,39 +138,24 @@ namespace
       result->ShallowCopy(pieces[0]);
       return false;
       }
-
+    vtkstd::vector< vtkSmartPointer<vtkTrivialProducer> > pieceProducers(pieces.size());
+    vtkstd::vector< vtkSmartPointer<vtkTrivialProducer> >::iterator producerIter;
     vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
-    vtkExecutive* producer = NULL;
-    int producerPort;
-    vtkAlgorithm* alg = NULL;
-    for (iter = pieces.begin(); iter != pieces.end(); ++iter)
+    for (iter = pieces.begin(), producerIter = pieceProducers.begin();
+         iter != pieces.end(), producerIter != pieceProducers.end();
+        ++iter, ++producerIter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
+      
       if (ds && ds->GetNumberOfPoints() == 0)
         {
         // skip empty pieces.
         continue;
         }
-      producer = NULL;
-      alg = NULL;
-      vtkExecutive::PRODUCER()->Get(iter->GetPointer()->GetInformation(), producer, producerPort);
-      if (producer)
-        {
-        alg = producer->GetAlgorithm();
-        }
-      if (alg)
-        {
-        appender->AddInputConnection(0, alg->GetOutputPort());
-        }
-      else
-        {
-        appender->AddInputConnection(0, NULL);
-        }
-        
+      producerIter->GetPointer()->SetOutput(iter->GetPointer());
+      appender->AddInputConnection(0, producerIter->GetPointer()->GetOutputPort());
       }
     appender->Update();
-    producer->Delete();
-    alg->Delete();
     result->ShallowCopy(appender->GetOutputDataObject(0));
     appender->Delete();
     return true;
@@ -347,6 +334,7 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
                   << ". Cannot create output.");
     return 0;
     }
+
   outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), outputCopy);
   outputCopy->Delete();
   return 1;

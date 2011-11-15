@@ -150,7 +150,7 @@ void vtkPTemporalRanges::Reduce(vtkTable *table)
 
   VTK_CREATE(vtkTable, copy);
   copy->ShallowCopy(table);
-  reduceFilter->SetInput(copy);
+  reduceFilter->SetInputData(copy);
   reduceFilter->Update();
 
   if (this->Controller->GetLocalProcessId() == 0)

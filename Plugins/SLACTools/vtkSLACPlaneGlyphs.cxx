@@ -95,14 +95,14 @@ int vtkSLACPlaneGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
 
   // Create a plane that we will use to place the glyphs.
   VTK_CREATE(vtkSamplePlaneSource, plane);
-  plane->SetInput(inputCopy);
+  plane->SetInputData(inputCopy);
   plane->SetCenter(this->Center);
   plane->SetNormal(this->Normal);
   plane->SetResolution(this->Resolution);
 
   // Create a probe that will extract the points of the plane.
   VTK_CREATE(vtkCompositeDataProbeFilter, probe);
-  probe->SetSource(inputCopy);
+  probe->SetSourceData(inputCopy);
   probe->SetInputConnection(plane->GetOutputPort());
 
   // Extract the points that are actually in the geometry.

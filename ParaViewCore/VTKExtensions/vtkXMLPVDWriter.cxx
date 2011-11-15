@@ -20,7 +20,6 @@
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -137,27 +136,7 @@ void vtkXMLPVDWriter::SetWriteCollectionFile(int flag)
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::AddInputData(vtkDataObject *input)
 {
-  if(input)
-    {
-    vtkExecutive* producer;
-    int producerPort;
-    vtkExecutive::PRODUCER()->Get(input->GetInformation(), producer, producerPort);
-    vtkAlgorithm* alg = NULL;
-    if(producer)
-      {
-      alg = producer->GetAlgorithm();
-      }
-    if(alg)
-      {
-      this->AddInputConnection(0, alg->GetOutputPort());
-      }
-    else
-      {
-      vtkErrorMacro(<<"Error in obtaining producerPort for input");
-      }
-    producer->Delete();
-    alg->Delete();
-    }
+  this->AddInputDataInternal(0, input);
 }
 
 //----------------------------------------------------------------------------

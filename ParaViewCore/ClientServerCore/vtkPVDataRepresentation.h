@@ -178,6 +178,9 @@ private:
   double ForcedCacheKey;
   bool NeedUpdate;
 
+  class Internals;
+  Internals* Implementation;
+
 //ETX
 };
 

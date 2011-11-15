@@ -624,7 +624,8 @@ int vtkRawStridedReader1::RequestInformation(
     //save split path in translator
     vtkImageData *outData = vtkImageData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
-    vtkExtentTranslator *et = outData->GetExtentTranslator();
+    vtkExtentTranslator *et = vtkExtentTranslator::SafeDownCast(
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::EXTENT_TRANSLATOR()));
     et->SetSplitPath(pathLen, splitPath);
 
     this->GridSampler->SetSpacing(sSpacing);
@@ -751,7 +752,7 @@ int vtkRawStridedReader1::RequestData(
 
   //Todo We need to be able to have user definable data type
   //Todo also multiple arrays/multiple scalarComponents
-  outData->AllocateScalars();
+  outData->AllocateScalars(outInfo);
   outData->GetPointData()->GetScalars()->SetName("PointCenteredData");
   float *myfloats = (float*)outData->GetScalarPointer();
 //  double c_alloc = clock();

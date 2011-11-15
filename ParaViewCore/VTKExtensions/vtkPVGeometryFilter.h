@@ -165,12 +165,14 @@ protected:
                              int doCommunicate);
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
+                        int* wholeExtent,
                         int doCommunicate,
                         int updatePiece);
 
   void StructuredGridExecute(
     vtkStructuredGrid* input,
     vtkPolyData* output,
+    int* wholeExtent,
     int updatePiece,
     int updateNumPieces,
     int updateGhosts);
@@ -178,6 +180,7 @@ protected:
   void RectilinearGridExecute(
     vtkRectilinearGrid* input,
     vtkPolyData* output,
+    int* wholeExtent,
     int updatePiece,
     int updateNumPieces,
     int updateGhosts);

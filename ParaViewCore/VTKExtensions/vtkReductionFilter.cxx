@@ -35,6 +35,7 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkToolkits.h"
+#include "vtkTrivialProducer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 
@@ -205,20 +206,13 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
     this->PreGatherHelper->RemoveAllInputs();
     vtkDataObject *incopy = input->NewInstance();
     incopy->ShallowCopy(input);
-    vtkExecutive* producer;
-    int producerPort;
-    vtkExecutive::PRODUCER()->Get(incopy->GetInformation(), producer, producerPort);
-    vtkAlgorithm* incopyAlg = NULL;
-    if(producer)
-      {
-      incopyAlg = producer->GetAlgorithm();
-      }
-    this->PreGatherHelper->AddInputConnection(0, incopyAlg->GetOutputPort());
+    vtkTrivialProducer* incopyProducer = vtkTrivialProducer::New();
+    incopyProducer->SetOutput(incopy);
+    this->PreGatherHelper->AddInputConnection(0, incopyProducer->GetOutputPort());
     this->PreGatherHelper->Update();
-    producer->Delete();
-    incopyAlg->Delete();
     result = this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
+    incopyProducer->Delete();
 
     // If a PostGatherHelper is present, we need to ensure that the result produced
     // by this pre-processing stage is acceptable to the PostGatherHelper.
@@ -264,24 +258,17 @@ void vtkReductionFilter::PostProcess(vtkDataObject* output,
     this->PostGatherHelper->RemoveAllInputs();
     //connect all (or just the selected) datasets to the reduction
     //algorithm
-    vtkExecutive* producer;
-    int producerPort;
-    vtkAlgorithm* alg;
-  
+    vtkSmartPointer<vtkTrivialProducer> inputProducers[num_inputs];
     for (unsigned int cc = 0; cc < num_inputs; ++cc)
       {
-      vtkExecutive::PRODUCER()->Get(inputs[cc]->GetInformation(), producer, producerPort);
-      alg = NULL;
-      if(producer)
-        {
-        alg = producer->GetAlgorithm();  
-        }
-      this->PostGatherHelper->AddInputConnection(alg->GetOutputPort());
+      inputProducers[cc]->SetOutput(inputs[cc]);
+      }
+    for (unsigned int cc = 0; cc < num_inputs; ++cc)
+      {
+      this->PostGatherHelper->AddInputConnection(inputProducers[cc]->GetOutputPort());
       }
     this->PostGatherHelper->Update();
     this->PostGatherHelper->RemoveAllInputs();
-    producer->Delete();
-    alg->Delete();
 
     vtkDataObject* reduced_output =
       this->PostGatherHelper->GetOutputDataObject(0);

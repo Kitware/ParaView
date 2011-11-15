@@ -220,7 +220,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
     // we deliberately use whole extent here. So on processes where the slice is
     // not available, the vtkExtractVOI filter will simply yield an empty
     // output.
-    input->GetInformation()->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inextent);
+    this->GetInformation()->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inextent);
     memcpy(outextent, inextent, sizeof(int)*6);
     int numdims = ::vtkGetDataDimension(inextent);
     int dims[3];
