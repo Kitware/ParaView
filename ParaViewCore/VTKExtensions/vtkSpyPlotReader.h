@@ -158,11 +158,6 @@ public:
   vtkGetVector2Macro(TimeStepRange, int);
 
   // Description:
-  // Get the data array selection tables used to configure which data
-  // arrays are loaded by the reader.
-  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
-
-  // Description:
   // Cell array selection
   int GetNumberOfCellArrays();
   const char* GetCellArrayName(int idx);
@@ -270,10 +265,6 @@ protected:
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);
 
-  // Callback registered with the SelectionObserver.
-  static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
-                                        void *clientdata, void *calldata);
-
   // Description:
   // This does the updating of meta data of the dataset from the
   // first binary file registered in the map:
@@ -296,7 +287,6 @@ protected:
 
   // The observer to modify this object when the array selections are
   // modified.
-  vtkCallbackCommand *SelectionObserver;
   char *FileName;
 
   int TimeStep; // set by the user
@@ -330,8 +320,14 @@ protected:
   int ComputeDerivedVariables;
   int ComputeDerivedVars(vtkCellData* data, 
     vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
-  
 
+  // Description:
+  // Get the data array selection tables used to configure which data
+  // arrays are loaded by the reader.
+  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
+
+  // vtkSpyPlotReaderMap needs access to GetCellDataArraySelection().
+  friend class vtkSpyPlotReaderMap;
   vtkSpyPlotReaderMap *Map;
   
   int DistributeFiles;
@@ -362,7 +358,7 @@ private:
   class VectorOfDoubles;
 
   VectorOfDoubles* TimeSteps;
-  void SetTimeSteps(const VectorOfDoubles&);
+  void SetTimeStepsInternal(const VectorOfDoubles&);
 };
 
 #endif

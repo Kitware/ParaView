@@ -82,14 +82,6 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->BoxSize[2] = -1;
   this->FileName = 0;
   this->CellDataArraySelection = vtkDataArraySelection::New();
-  // Setup the selection callback to modify this object when an array
-  // selection is changed.
-  this->SelectionObserver = vtkCallbackCommand::New();
-  this->SelectionObserver->SetCallback(
-    &vtkSpyPlotReader::SelectionModifiedCallback);
-  this->SelectionObserver->SetClientData(this);
-  this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
-                                            this->SelectionObserver);
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
@@ -116,8 +108,6 @@ vtkSpyPlotReader::vtkSpyPlotReader()
 vtkSpyPlotReader::~vtkSpyPlotReader()
 {
   this->SetFileName(0);
-  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
-  this->SelectionObserver->Delete();
   this->CellDataArraySelection->Delete();
   this->Map->Clean(0);
   delete this->Map;
@@ -129,10 +119,10 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
 
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotReader::SetTimeSteps(const vtkSpyPlotReader::VectorOfDoubles& doubles)
+void vtkSpyPlotReader::SetTimeStepsInternal(const vtkSpyPlotReader::VectorOfDoubles& doubles)
 {
   *this->TimeSteps = doubles;
-  this->TimeStepRange[1] = static_cast<int>(doubles.size());
+  this->TimeStepRange[1] = static_cast<int>(doubles.size()-1);
 }
 
 //-----------------------------------------------------------------------------
@@ -338,7 +328,7 @@ int vtkSpyPlotReader::UpdateMetaData(
         }
       }
     }
-  this->SetTimeSteps(timesteps);
+  this->SetTimeStepsInternal(timesteps);
 
   // I am not bothering syncing array names between processes since all enabled
   // arrays will be marked explicitly on all processes any ways.
@@ -872,12 +862,6 @@ void vtkSpyPlotReader::AddGhostLevelArray(int numLevels)
   */
 }
 
-//----------------------------------------------------------------------------
-void vtkSpyPlotReader::SelectionModifiedCallback(vtkObject*, unsigned long,
-                                                 void* clientdata, void*)
-{
-  static_cast<vtkSpyPlotReader*>(clientdata)->Modified();
-}
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::GetNumberOfCellArrays()
 {
@@ -900,6 +884,11 @@ int vtkSpyPlotReader::GetCellArrayStatus(const char* name)
 void vtkSpyPlotReader::SetCellArrayStatus(const char* name, int status)
 {
   vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if (this->CellDataArraySelection->ArrayIsEnabled(name) == (status? 1 : 0))
+    {
+    return;
+    }
+
   if(status)
     {
     this->CellDataArraySelection->EnableArray(name);
@@ -908,6 +897,8 @@ void vtkSpyPlotReader::SetCellArrayStatus(const char* name, int status)
     {
     this->CellDataArraySelection->DisableArray(name);
     }
+
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
