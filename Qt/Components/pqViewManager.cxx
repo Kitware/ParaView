@@ -455,7 +455,10 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   for(; iter != this->Internal->Frames.end(); ++iter)
     {
     pqView* view = iter.value();
-    elem->GetViewStateCache()->StoreProxyState(view->getProxy());
+    if(view) // View can be NULL when it does not come from the same server
+      {
+      elem->GetViewStateCache()->StoreProxyState(view->getProxy());
+      }
     }
 }
 
@@ -862,6 +865,8 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
   // Save the window layout.
   this->pqMultiView::saveState(rwRoot);
 
+  vtkSMSession* session = pqActiveObjects::instance().activeServer()->session();
+
   // Save the render module - window mapping.
   pqInternals::FrameMapType::Iterator iter = this->Internal->Frames.begin();
   for(; iter != this->Internal->Frames.end(); ++iter)
@@ -869,13 +874,18 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
     pqMultiViewFrame* frame = iter.key();
     pqView* view = iter.value();
 
-    pqMultiView::Index index = this->indexOf(frame);
-    vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
-    frameElem->SetName("Frame");
-    frameElem->AddAttribute("index", index.getString().toAscii().data());
-    frameElem->AddAttribute("view_module", view->getProxy()->GetGlobalIDAsString());
-    rwRoot->AddNestedElement(frameElem);
-    frameElem->Delete();
+    // Make sure we only save views that are part of our active server
+    if(view && view->getProxy()->GetSession() == session)
+      {
+      pqMultiView::Index index = this->indexOf(frame);
+      vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
+      frameElem->SetName("Frame");
+      frameElem->AddAttribute("index", index.getString().toAscii().data());
+
+      frameElem->AddAttribute("view_module", view->getProxy()->GetGlobalIDAsString());
+      rwRoot->AddNestedElement(frameElem);
+      frameElem->Delete();
+      }
     }
 }
 
@@ -891,6 +901,16 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   if (strcmp(rwRoot->GetName(), "ViewManager") != 0)
     {
     return this->loadState(rwRoot->FindNestedElementByName("ViewManager"), locator);
+    }
+
+  // Special use-case when multi-server is involved.
+  // - Basically we forget the layout and only focus on available views that
+  //   get simply added to new frame as we discover them. This is achieved by
+  //   the proxy manager itself, we don't need to do anything here.
+  pqObjectBuilder* builder = pqApplicationCore::instance()-> getObjectBuilder();
+  if(builder->multipleConnectionsSupport())
+    {
+    return true; // We are done, no need to try to load the layout...
     }
 
   // When state is loaded by the server manager,
