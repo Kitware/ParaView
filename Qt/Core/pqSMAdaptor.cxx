@@ -77,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 
-static const int metaId = qRegisterMetaType<QList<QList<QVariant> > >("ListOfList");
+static const int metaId = qRegisterMetaType<QList<QList<QVariant> > >();
 
 pqSMAdaptor::pqSMAdaptor()
 {
