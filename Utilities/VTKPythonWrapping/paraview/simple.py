@@ -1025,5 +1025,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
 
 if not servermanager.ActiveConnection:
     Connect()
+else:
+    _add_functions(globals())
 
 active_objects = ActiveObjects()
