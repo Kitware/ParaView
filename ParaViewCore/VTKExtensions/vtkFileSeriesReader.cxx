@@ -326,6 +326,36 @@ vtkstd::vector<double> vtkFileSeriesReaderTimeRanges::GetTimesForInput(
   return times;
 }
 
+namespace
+{
+  // Helper class used to ensure that ProcessRequest() never results in change
+  // in MTime as that can have disastrous effects.
+  class vtkEnsureMTime
+    {
+    vtkObject* Object;
+    unsigned long MTime;
+  public:
+    vtkEnsureMTime(vtkObject* object):
+      Object(object),
+      MTime(object? object->GetMTime() : 0)
+    {
+    }
+    ~vtkEnsureMTime()
+      {
+      if (this->Object &&
+        this->Object->GetMTime() != this->MTime)
+        {
+        cerr << this->Object->GetClassName() <<
+          "'s MTime was changed unexpectedly.\n"
+          "This can imply serious problem in the reader logic and cause\n"
+          "unexpected issues when running in parallel. \n"
+          "Please address the issues." << endl;
+        abort();
+        }
+      }
+    };
+}
+
 //=============================================================================
 struct vtkFileSeriesReaderInternals
 {
@@ -491,6 +521,8 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
                                         vtkInformationVector** inputVector,
                                         vtkInformationVector* outputVector)
 {
+  vtkEnsureMTime check(this);
+
   this->UpdateMetaData();
 
   if (this->Reader)
@@ -836,10 +868,13 @@ void vtkFileSeriesReader::UpdateMetaData()
       return;
       }
 
-    this->RemoveAllFileNames();
+    // essential that we don't use the public methods AddFileName(),
+    // RemoveAllFileNames() since those change the MTime of this class in
+    // ProcessRequest() method.
+    this->Internal->FileNames.clear();
     for (int i = 0; i < dataFiles->GetNumberOfValues(); i++)
       {
-      this->AddFileName(dataFiles->GetValue(i).c_str());
+      this->Internal->FileNames.push_back(dataFiles->GetValue(i));
       }
 
     this->MetaFileReadTime.Modified();
