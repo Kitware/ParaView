@@ -1016,7 +1016,7 @@
     <!-- ================================================================== -->
     <Proxy name="DistanceRepresentation2D"
            class="vtkDistanceRepresentation2D"
-           post_create="InstantiateHandleRepresentation">
+           post_creation="InstantiateHandleRepresentation">
 
      <IntVectorProperty name="Visibility"
         command="SetVisibility"
@@ -1431,7 +1431,8 @@
     </Proxy>
 
     <Proxy name="DistanceWidget" class="vtkDistanceWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
+      base_proxygroup="3d_widgets" base_proxyname="WidgetBase"
+      post_creation="SetWidgetStateToManipulate" >
       <IntVectorProperty name="ProcessEvents"
                          command="SetProcessEvents"
                          number_of_elements="1"

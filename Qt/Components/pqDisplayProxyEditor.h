@@ -75,11 +75,9 @@ protected slots:
   virtual void editCubeAxes();
   virtual void cubeAxesVisibilityChanged();
   void sliceDirectionChanged();
-  void selectedMapperChanged();
   void volumeBlockSelected();
   void setSolidColor(const QColor& color);
   void setBackfaceSolidColor(const QColor& color);
-  void setAutoAdjustSampleDistances(bool flag);
 
   void beginUndoSet(const QString&);
   void endUndoSet();

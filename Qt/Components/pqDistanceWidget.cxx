@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqDistanceWidget::pqDistanceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
-  :Superclass(o, pxy, p, "LineWidgetRepresentation")
+  :Superclass(o, pxy, p, "DistanceWidgetRepresentation")
 {
   QVBoxLayout* l = qobject_cast<QVBoxLayout*>(this->layout());
   if (l)

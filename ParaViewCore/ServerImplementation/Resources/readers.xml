@@ -5327,7 +5327,7 @@
    <!-- End of AVSucdSeriesReader -->
    </SourceProxy>
 
-   <SourceProxy name="Facet Reader"
+   <SourceProxy name="FacetReader"
                 class="vtkFacetReader">
      <Documentation
        short_help="Read a dataset in Facet format."

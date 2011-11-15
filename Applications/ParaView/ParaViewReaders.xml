@@ -45,7 +45,7 @@
   <Proxy group="sources" name="AVSucdSeriesReader" />
   <Proxy group="sources" name="MetaImageReader" />
   <Proxy group="sources" name="NrrdReader" />
-  <Proxy group="sources" name="Facet Proxy" />
+  <Proxy group="sources" name="FacetReader" />
   <Proxy group="sources" name="PNGSeriesReader" />
   <Proxy group="sources" name="JPEGSeriesReader" />
   <Proxy group="sources" name="TIFFSeriesReader" />

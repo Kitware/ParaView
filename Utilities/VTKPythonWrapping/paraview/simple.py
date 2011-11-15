@@ -148,10 +148,11 @@ def OpenDataFile(filename, **extraArgs):
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
+    reader_func = _create_func(xml_name, servermanager.sources)
     if prototype.GetProperty("FileNames"):
-      reader = globals()[xml_name](FileNames=filename, **extraArgs)
+      reader = reader_func(FileNames=filename, **extraArgs)
     else :
-      reader = globals()[xml_name](FileName=filename, **extraArgs)
+      reader = reader_func(FileName=filename, **extraArgs)
     return reader
 
 def CreateWriter(filename, proxy=None, **extraArgs):
@@ -1059,5 +1060,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
 
 if not servermanager.ActiveConnection:
     Connect()
+else:
+    _add_functions(globals())
 
 active_objects = ActiveObjects()

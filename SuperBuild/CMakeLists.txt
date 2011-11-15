@@ -103,8 +103,15 @@ set(pv_compiler_args
 
 set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
-set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
-set(pv_c_flags ${CMAKE_C_FLAGS})
+
+
+if(WIN32)
+  set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
+  set(pv_c_flags ${CMAKE_C_FLAGS})
+else()
+  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
+  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
+endif()
 
 if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
@@ -155,7 +162,7 @@ set(OpenMPI_dependencies)
 set(ParaView_dependencies)
 
 set(PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
-
+set(PARAVIEW_EXTERNAL_PLUGIN_DIRS)
 set(MPI_ARGS)
 
 # Build a common zlib used by several dependencies
@@ -211,13 +218,6 @@ if(NOT APPLE)
     -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
     -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
 
-  if(NOT WIN32)
-    set(MPI_COMPILER_ARGS
-       -DCMAKE_C_COMPILER:FILEPTH=${MPI_C_COMPILER}
-       -DCMAKE_CXX_COMPILER:FILEPATH=${MPI_CXX_COMPILER})
-    list(APPEND MPI_ARGS ${MPI_COMPILER_ARGS})
-  endif()
-
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
 
@@ -234,23 +234,6 @@ if(NOT APPLE)
   endif()
 
   include(External_NUMPY)
-
-  if(NOT WIN32)
-    option(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin "Build Dependencies for VisTrails" FALSE)
-    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-    if(PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin)
-      # Build SIP and PyQt for vistrails plugin.
-      set(SIP_dependencies python)
-      include(External_SIP)
-      list(APPEND PyQt_dependencies SIP)
-      set(PyQt_dependencies python SIP)
-      include(External_PyQt)
-      list(APPEND ParaView_dependencies PyQt)
-
-      set(VISTRAILS_ARGS
-        -DPARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON)
-    endif()
-  endif()
 else()
 
   find_package(PythonInterp)
@@ -323,7 +306,19 @@ endif()
 set(freetype_dependencies zlib)
 list(APPEND ParaView_dependencies freetype)
 include(External_freetype)
-set(freetype_ARGS)
+set(freetype_ARGS
+  -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
+  -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
+  -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
+  -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
+  )
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
+else()
+  get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+endif()
 
 if(ENABLE_YT)
   set(MPL_dependencies NUMPY zlib)
@@ -379,33 +374,6 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
 endif()
 
-
-# Build VRPN
-list(APPEND ParaView_dependencies VRPN)
-include(External_VRPN)
-set(VRPN_ARGS
-  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
-  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
-  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
-
-# Build AcuSolveReaderPlugin
-option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
-set(DOC_ARGS)
-if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
-  list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
-  include(External_AcuSolveReaderPlugin)
-  set(AcuSolve_ARGS
-      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
-      -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${AcuSolveReaderPlugin_source})
-endif()
-
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
-else()
-  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
-endif()
-
 if(NOT WIN32)
   include(External_FFMPEG)
   set(FFMPEG_ARGS
@@ -418,8 +386,62 @@ if(NOT WIN32)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
-include(External_VisTrails)
-list(APPEND ParaView_dependencies VisTrails)
+# Build VRPN
+list(APPEND ParaView_dependencies VRPN)
+include(External_VRPN)
+set(VRPN_ARGS
+  -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
+  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
+
+if(WIN32)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_install}/lib)
+else()
+  get_filename_component(VRPN_DIR "${VRPN_LIBRARY}" PATH)
+  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${VRPN_DIR})
+endif()
+
+# Build AcuSolveReaderPlugin
+if(NOT APPLE)
+  option(PARAVIEW_BUILD_PLUGIN_AcuSolveReader "Build AcuSolveReader Plugin" FALSE)
+  set(AcuSolve_ARGS)
+  if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+    list(APPEND ParaView_dependencies AcuSolveReaderPlugin)
+    include(External_AcuSolveReaderPlugin)
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=ON
+    )
+    list(APPEND PARAVIEW_EXTERNAL_PLUGIN_DIRS ${AcuSolveReaderPlugin_source})
+  else()
+    set(AcuSolve_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_AcuSolveReader:BOOL=OFF
+    )
+  endif()
+endif()
+
+# Build VisTrailsPlugin
+option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
+set(VisTrails_ARGS)
+if(PARAVIEW_BUILD_PLUGIN_VisTrails)
+  include(External_VisTrails)
+  list(APPEND ParaView_dependencies VisTrails)
+  set(VisTrails_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=ON
+  )
+  list(APPEND PARAVIEW_EXTERNAL_PLUGIN_DIRS ${VisTrails_source})
+  # Build SIP and PyQt for vistrails plugin.
+  #set(SIP_dependencies python)
+  #include(External_SIP)
+  #list(APPEND PyQt_dependencies SIP)
+  #set(PyQt_dependencies python SIP)
+  #include(External_PyQt)
+  #list(APPEND ParaView_dependencies PyQt)
+
+else()
+  set(VisTrails_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_VisTrails:BOOL=OFF
+  )
+endif()
 
 option(ParaView_BUILD_DOCUMENTATION "Build ParaView Documentation" FALSE)
 set(DOC_ARGS)
@@ -437,6 +459,13 @@ if(ParaView_BUILD_DOCUMENTATION)
   )
 endif()
 
+set(PARAVIEW_EXTRA_INSTALL_RULES)
+
+# Install libz2 until we start building it ourselves.
+if(UNIX AND NOT APPLE)
+  list(APPEND PARAVIEW_EXTRA_INSTALL_RULES ${CMAKE_CURRENT_SOURCE_DIR}/install_bz2.cmake)
+endif()
+
 # Install FORTRAN runtime
 if(CMAKE_Fortran_COMPILER AND NOT WIN32)
   get_filename_component(fortran_compiler ${CMAKE_Fortran_COMPILER} NAME_WE)
@@ -450,6 +479,7 @@ if(CMAKE_Fortran_COMPILER AND NOT WIN32)
     #set(FORTRAN_INSTALL_RULE_FILE
     #  ${CMAKE_CURRENT_SOURCE_DIR}/install_g2c.cmake)
   endif()
+  list(APPEND PARAVIEW_EXTRA_INSTALL_RULES ${FORTRAN_INSTALL_RULE_FILE})
 endif()
 
 list(REMOVE_DUPLICATES PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
@@ -466,7 +496,7 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
     ${pv_compiler_args}
-    -DPARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=${FORTRAN_INSTALL_RULE_FILE}
+    -DPARAVIEW_EXTRA_INSTALL_RULES_FILE:FILEPATH=${PARAVIEW_EXTRA_INSTALL_RULES}
     -DCMAKE_CXX_FLAGS:STRING=${pv_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
@@ -475,6 +505,7 @@ ExternalProject_Add(${proj}
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
     -DPARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES:BOOL=ON
     -DPARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS:STRING=${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}
+    -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${PARAVIEW_EXTERNAL_PLUGIN_DIRS}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
@@ -507,7 +538,7 @@ ExternalProject_Add(${proj}
     # VisIt - Silo
     ${Silo_ARGS}
     # VisTrails
-    ${VISTRAILS_ARGS}
+    ${VisTrails_ARGS}
     # VRPN Plugin
     ${VRPN_ARGS}
     # zlib
@@ -516,5 +547,5 @@ ExternalProject_Add(${proj}
     ${AcuSolve_ARGS}
     # Documentation
     ${DOC_ARGS}
-  INSTALL_COMMAND ""
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ParaViewSuperBuild_SOURCE_DIR}/.plugins <BINARY_DIR>/bin/
   )

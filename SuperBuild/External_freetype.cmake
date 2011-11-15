@@ -90,6 +90,3 @@ if(WIN32)
 else()
   set(FT_LIBRARY ${freetype_install}/lib/libfreetype${_LINK_LIBRARY_SUFFIX})
 endif()
-
-set(freetype_DIR "${freetype_binary}" CACHE PATH "freetype binary directory" FORCE)
-mark_as_advanced(freetype_DIR)
