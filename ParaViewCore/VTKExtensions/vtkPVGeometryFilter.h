@@ -117,9 +117,9 @@ public:
   // If off, which is the default, extracts the surface of the data fed
   // into the geometry filter. If on, it produces a bounding box for the
   // input to the filter that is producing that data instead.
-  vtkSetMacro(MakeOutlineOfInput,int);
-  vtkGetMacro(MakeOutlineOfInput,int);
-  vtkBooleanMacro(MakeOutlineOfInput,int);
+//   vtkSetMacro(MakeOutlineOfInput,int);
+//   vtkGetMacro(MakeOutlineOfInput,int);
+//   vtkBooleanMacro(MakeOutlineOfInput,int);
 
   // Description:
   // These keys are put in the output composite-data metadata for multipieces
@@ -173,12 +173,12 @@ protected:
                       bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
-                    vtkAlgorithm* inputAlg,
                     vtkPolyData* output,
                     int doCommunicate,
                     int updatePiece,
                     int updateNumPieces,
-                    int updateGhosts);
+                    int updateGhosts,
+                    int* wholeExtent);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
@@ -193,25 +193,25 @@ protected:
 
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
-                        int* wholeExtent,
                         int doCommunicate,
-                        int updatePiece);
+                        int updatePiece,
+                        int* ext);
 
   void StructuredGridExecute(
     vtkStructuredGrid* input,
     vtkPolyData* output,
-    int* wholeExtent,
     int updatePiece,
     int updateNumPieces,
-    int updateGhosts);
+    int updateGhosts,
+    int* wholeExtent);
 
   void RectilinearGridExecute(
     vtkRectilinearGrid* input,
     vtkPolyData* output,
-    int* wholeExtent,
     int updatePiece,
     int updateNumPieces,
-    int updateGhosts);
+    int updateGhosts,
+    int* wholeExtent);
 
   void UnstructuredGridExecute(
     vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);
@@ -271,7 +271,7 @@ protected:
   int ForceUseStrips;
   vtkTimeStamp     StripSettingMTime;
   int StripModFirstPass;
-  int MakeOutlineOfInput;
+//   int MakeOutlineOfInput;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
