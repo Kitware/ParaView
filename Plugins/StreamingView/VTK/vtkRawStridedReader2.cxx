@@ -377,7 +377,8 @@ int vtkRawStridedReader2::RequestInformation
     splitPath = ia->GetPointer(0);
 
     //save split path in translator
-    vtkExtentTranslator *et = outData->GetExtentTranslator();
+    vtkExtentTranslator *et = vtkExtentTranslator::SafeDownCast(
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::EXTENT_TRANSLATOR()));
     et->SetSplitPath(pathLen, splitPath);
 
     // set the parameters
@@ -449,7 +450,7 @@ int vtkRawStridedReader2::RequestData(
 
   //TODO: We need to be able to have user definable data type
   //TODO: also multiple arrays/multiple scalarComponents
-  outData->AllocateScalars();
+  outData->AllocateScalars(outInfo);
   outData->GetPointData()->GetScalars()->SetName("point_scalars");
 
   // file stuff

@@ -45,6 +45,7 @@
 
 class vtkDataObject;
 class vtkExtentTranslator;
+class vtkInformation;
 class vtkKdNode;
 class vtkKdTreeGeneratorVector;
 class vtkPKdTree;
@@ -63,7 +64,7 @@ public:
 
   // Description:
   // Builds the KdTree using the partitioning of the data.
-  int BuildTree(vtkDataObject* data);
+  int BuildTree(vtkDataObject* data, vtkInformation* info);
 
   // Description:
   // Get/Set the number of pieces.

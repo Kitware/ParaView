@@ -212,8 +212,8 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
     trivialProducer->SetWholeExtent(extent);
     trivialProducer->GatherExtents();
 
-    clone->GetInformation()->Set(
-      vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
+//     clone->GetInformation()->Set(
+//       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
     }
   vtkTrivialProducer* tp  = vtkTrivialProducer::New();
   tp->SetOutput(clone);

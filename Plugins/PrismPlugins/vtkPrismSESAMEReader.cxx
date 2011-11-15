@@ -365,7 +365,7 @@ static int TableIndex(int tableId)
 }
 
 
-vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkPolyDataSource()
+vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkPolyDataAlgorithm()
 {
   this->Internal = new MyInternal();
 }
@@ -1109,7 +1109,7 @@ void vtkPrismSESAMEReader::ReadTable()
   rGrid->Squeeze();
 
 
-  this->Internal->RectGridGeometry->SetInput(rGrid);
+  this->Internal->RectGridGeometry->SetInputData(rGrid);
   this->Internal->RectGridGeometry->Update();
 
 

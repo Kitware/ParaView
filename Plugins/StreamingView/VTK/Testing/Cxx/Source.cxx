@@ -67,7 +67,8 @@ int Source(int argc, char *argv[])
   sms->SetOriginCX(-1.75,-1.25,0,0);
 
   vtkDataObject *input = sms->GetOutput();
-  vtkInformation* info = input->GetPipelineInformation();
+  vtkInformation* info;
+  info->Set(vtkDataObject::DATA_OBJECT(), input);
   vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast
     (vtkExecutive::PRODUCER()->GetExecutive(info));
@@ -91,11 +92,13 @@ int Source(int argc, char *argv[])
       sms->Modified();
       sddp->SetUpdateResolution(info, res);
       sddp->SetUpdateExtent(info, numers[pieceChoice], denoms[pieceChoice], 0);
-      input->Update();
+      sms->Update();
+      input = sms->GetOutput();
       sms->Modified();
       sddp->SetUpdateResolution(info, res);
       sddp->SetUpdateExtent(info, numers[pieceChoice], denoms[pieceChoice], 0);
-      input->Update();
+      sms->Update();
+      input = sms->GetOutput();
 
       //don't let contour request entire extent
       vtkSmartPointer<vtkImageData> id = vtkSmartPointer<vtkImageData>::New();
@@ -103,7 +106,7 @@ int Source(int argc, char *argv[])
 
       vtkSmartPointer<vtkContourFilter> contour =
         vtkSmartPointer<vtkContourFilter>::New();
-      contour->SetInput(id);
+      contour->SetInputData(id);
       contour->SetValue(0,50.0);
       contour->Update();
 

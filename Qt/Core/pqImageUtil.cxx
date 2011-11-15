@@ -53,14 +53,11 @@ bool pqImageUtil::toImageData(const QImage& img, vtkImageData* vtkimage)
   int height = img.height();
   int width = img.width();
   int numcomponents = img.hasAlphaChannel() ? 4 : 3;
-  
-  vtkimage->SetWholeExtent(0, width-1, 0, height-1, 0, 0); 
+
+  vtkimage->SetExtent(0, width-1, 0, height-1, 0, 0);
   vtkimage->SetSpacing(1.0, 1.0, 1.0);
   vtkimage->SetOrigin(0.0, 0.0, 0.0);
-  vtkimage->SetNumberOfScalarComponents(numcomponents);
-  vtkimage->SetScalarType(VTK_UNSIGNED_CHAR);
-  vtkimage->SetExtent(vtkimage->GetWholeExtent());
-  vtkimage->AllocateScalars();
+  vtkimage->AllocateScalars(VTK_UNSIGNED_CHAR, numcomponents);
   for(int i=0; i<height; i++)
     {
     unsigned char* row;

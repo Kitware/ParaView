@@ -25,15 +25,15 @@
 #ifndef __vtkPrismSESAMEReader_h
 #define __vtkPrismSESAMEReader_h
 
-#include <vtkPolyDataSource.h>
+#include <vtkPolyDataAlgorithm.h>
 
 class vtkIntArray;
 
-class VTK_EXPORT vtkPrismSESAMEReader : public vtkPolyDataSource
+class VTK_EXPORT vtkPrismSESAMEReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPrismSESAMEReader *New();
-  vtkTypeMacro(vtkPrismSESAMEReader, vtkPolyDataSource);
+  vtkTypeMacro(vtkPrismSESAMEReader, vtkPolyDataAlgorithm);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 

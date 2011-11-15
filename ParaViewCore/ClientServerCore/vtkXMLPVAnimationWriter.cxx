@@ -19,7 +19,6 @@
 #include "vtkErrorCode.h"
 #include "vtkExecutive.h"
 #include "vtkInformation.h"
-#include "vtkInformationExecutivePortKey.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
@@ -147,14 +146,10 @@ void vtkXMLPVAnimationWriter::AddRepresentation(vtkAlgorithm* repr,
   if (repr)
     {
     vtkCompleteArrays* complete_arrays = vtkCompleteArrays::New();
-    vtkExecutive* producer;
-    int producerPort;
-    vtkExecutive::PRODUCER()->Get(pvrepr->GetOutputInformation(0), producer, producerPort);
-    complete_arrays->SetInputConnection(producer->GetAlgorithm()->GetOutputPort());
+    complete_arrays->SetInputData(pvrepr->GetRenderedDataObject(0));
     this->AddInputConnection(complete_arrays->GetOutputPort());
     this->AddInputInternal(groupname);
     complete_arrays->Delete();
-    producer->Delete();
     }
 }
 
@@ -227,20 +222,18 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     vtkDataObject* dataObject = exec->GetInputData(0, i);
     // Make sure the pipeline mtime is up to date.
     exec->UpdateInformation();
-//     exec->GetInputData(0, i)->UpdateInformation();
     
     // If the input has been modified since the last animation step,
     // increment its file number.
     int changed = 0;
-    if(exec->GetInputInformation(0, i)->GetMTime() >
-      this->Internal->InputMTimes[i])
-//     if(exec->GetInputData(0, i)->GetPipelineMTime() > 
-//        this->Internal->InputMTimes[i])
+     
+  if(vtkStreamingDemandDrivenPipeline::SafeDownCast(
+    this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime() >
+    this->Internal->InputMTimes[i])
       {
-      this->Internal->InputMTimes[i] =
-        exec->GetInputInformation(0, i)->GetMTime();
-//       this->Internal->InputMTimes[i] = 
-//         exec->GetInputData(0, i)->GetPipelineMTime();
+      this->Internal->InputMTimes[i] = 
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(
+        this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime();
       changed = 1;
       }
 
