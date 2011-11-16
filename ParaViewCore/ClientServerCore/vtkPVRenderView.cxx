@@ -1034,7 +1034,17 @@ void vtkPVRenderView::DoDataDelivery(
       vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
     if (repr)
       {
+      // it is essential that the representation is made visible for this pass.
+      bool visible = repr->GetVisibility();
+      if (visible == false)
+        {
+        repr->SetVisibility(true);
+        }
       repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
+      if (visible == false)
+        {
+        repr->SetVisibility(visible);
+        }
       }
     }
 }
