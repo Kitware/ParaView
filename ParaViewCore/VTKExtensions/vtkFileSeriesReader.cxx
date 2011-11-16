@@ -354,6 +354,25 @@ namespace
         }
       }
     };
+
+  class vtkRecordMTime
+    {
+    vtkObject* Object;
+    unsigned long &MTime;
+  public:
+    vtkRecordMTime(vtkObject* obj, unsigned long &mtime):
+      Object(obj), MTime(mtime)
+    {
+    this->MTime = 0;
+    }
+    ~vtkRecordMTime()
+      {
+      if (this->Object)
+        {
+        this->MTime = this->Object->GetMTime();
+        }
+      }
+    };
 }
 
 //=============================================================================
@@ -539,6 +558,11 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
 
   if (this->Reader)
     {
+    // We want to suppress the modification time change in the Reader.  See
+    // vtkFileSeriesReader::GetMTime() for details on how this works.
+    this->SavedReaderModification = this->GetMTime();
+    vtkRecordMTime record_time(this->Reader, this->HiddenReaderModification);
+
     // Make sure that there is a file to get information from.
     if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
       {
@@ -770,10 +794,6 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
     vtkClientServerInterpreter *interpreter =
         vtkClientServerInterpreterInitializer::GetInterpreter();
 
-    // We want to suppress the modification time change in the Reader.  See
-    // vtkFileSeriesReader::GetMTime() for details on how this works.
-    this->SavedReaderModification = this->GetMTime();
-
     // Build stream request
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
@@ -784,8 +804,6 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
 
     // Process stream and delete interpreter
     interpreter->ProcessStream(stream);
-
-    this->HiddenReaderModification = this->Reader->GetMTime();
     }
   this->SetCurrentFileName(fname);
 }
