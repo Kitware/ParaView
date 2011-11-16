@@ -17,7 +17,7 @@
 #include "vtkstd/vector"
 
 // Pipeline & VTK
-#include "vtkMarchingCubesCases.h"
+#include "vtkMarchingCubesTriangleCases.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
