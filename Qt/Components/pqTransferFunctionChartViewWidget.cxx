@@ -366,6 +366,7 @@ vtkPlot* pqTransferFunctionChartViewWidget
   controlPointsItem->SetValidBounds(this->Internal->ValidBounds);
   controlPointsItem->SetEndPointsXMovable(false);
   controlPointsItem->SetEndPointsYMovable(false);
+  controlPointsItem->SetEndPointsRemovable(false);
 
   this->addPlot(controlPointsItem.GetPointer());
   return controlPointsItem.GetPointer();
@@ -388,7 +389,8 @@ vtkPlot* pqTransferFunctionChartViewWidget
   controlPointsItem->SetOpacityFunction(opacityTF);
   controlPointsItem->SetValidBounds(this->Internal->ValidBounds);
   controlPointsItem->SetEndPointsXMovable(false);
-
+  controlPointsItem->SetUseOpacityPointHandles(true);
+  controlPointsItem->SetEndPointsRemovable(false);
   this->addPlot(controlPointsItem.GetPointer());
   return controlPointsItem.GetPointer();
 }
@@ -400,6 +402,7 @@ vtkPlot* pqTransferFunctionChartViewWidget
   vtkNew<vtkPiecewiseControlPointsItem> controlPointsItem;
   controlPointsItem->SetPiecewiseFunction(piecewiseTF);
   controlPointsItem->SetValidBounds(this->Internal->ValidBounds);
+  controlPointsItem->SetEndPointsRemovable(false);
   this->addPlot(controlPointsItem.GetPointer());
   return controlPointsItem.GetPointer();
 }
@@ -780,6 +783,10 @@ void pqTransferFunctionChartViewWidget::clearPlots()
 {
   this->blockSignals(true);
   this->setLookuptTableToPlots(0);
+  if(this->currentControlPointsItem())
+    {
+    this->currentControlPointsItem()->SetVisible(false);
+    }
   this->setOpacityFunctionToPlots(0);
   this->setPiecewiseFunctionToPlots(0);
   this->setColorTransferFunctionToPlots(0);

@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPVTemporalDataInformation.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -333,7 +334,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
     if(this->OpacityFunction)
       {
       this->Form->Listener->Disconnect(
-          this->OpacityFunction->getProxy()->GetProperty("Points"));
+          this->OpacityFunction->getProxy()->GetProperty("CurvedPoints"));
       }
     }
 
@@ -478,13 +479,15 @@ void pqColorScaleEditor::setOpacity()
     for(int i = 0; i < total; i++)
       {
       pwf->GetNodeValue(i, scalar);
-      opacityPoints << scalar[0] << scalar[1];
+      opacityPoints << scalar[0] << scalar[1] << scalar[2] << scalar[3];
       }
     }
     
   vtkSMProxy *points = this->OpacityFunction->getProxy();
-  pqSMAdaptor::setMultipleElementProperty(points->GetProperty("Points"),
-      opacityPoints);
+  vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    points->GetProperty("CurvedPoints"));
+  smProp->SetNumberOfElementsPerCommand(4);
+  pqSMAdaptor::setMultipleElementProperty(smProp, opacityPoints);
   points->UpdateVTKObjects();
 
   this->Form->InSetColors = false;
@@ -690,11 +693,13 @@ void pqColorScaleEditor::setSingleOpacityFromText()
       {
       pwf->GetNodeValue(i, scalar);
       scalar[1]=opacity;
-      opacityPoints << scalar[0] << scalar[1];
+      opacityPoints << scalar[0] << scalar[1] << scalar[2] << scalar[3];
       }
     vtkSMProxy *points = this->OpacityFunction->getProxy();
-    pqSMAdaptor::setMultipleElementProperty(points->GetProperty("Points"),
-      opacityPoints);
+    vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      points->GetProperty("CurvedPoints"));
+    smProp->SetNumberOfElementsPerCommand(4);
+    pqSMAdaptor::setMultipleElementProperty(smProp, opacityPoints);
     points->UpdateVTKObjects();
 
     this->Form->InSetColors = false;
@@ -1383,11 +1388,21 @@ void pqColorScaleEditor::loadOpacityPoints()
   // Add the new data to the editor.
   QList<QVariant> list;
     {
-    list = pqSMAdaptor::getMultipleElementProperty(
-        this->OpacityFunction->getProxy()->GetProperty("Points"));
-    for(int j = 0; (j + 1) < list.size(); j += 2)
+    vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->OpacityFunction->getProxy()->GetProperty("CurvedPoints"));
+    int numPerCmd = smProp->GetNumberOfElementsPerCommand();
+    list = pqSMAdaptor::getMultipleElementProperty(smProp);
+    for(int j = 0; (j + numPerCmd) < list.size(); j += numPerCmd)
       {
-      opacities->AddPoint(list[j].toDouble(), list[j + 1].toDouble());
+      if(numPerCmd==2)
+        {
+        opacities->AddPoint(list[j].toDouble(), list[j+1].toDouble());
+        }
+      else if(numPerCmd == 4)
+        {
+        opacities->AddPoint(list[j].toDouble(), list[j+1].toDouble(),
+          list[j+2].toDouble(), list[j+3].toDouble());
+        }
       }
     }
 }
@@ -1416,7 +1431,7 @@ void pqColorScaleEditor::initColorScale()
     this->addRepClientOpacityFunction();
 
     this->Form->Listener->Connect(
-        this->OpacityFunction->getProxy()->GetProperty("Points"),
+        this->OpacityFunction->getProxy()->GetProperty("CurvedPoints"),
         vtkCommand::ModifiedEvent, this, SLOT(handleOpacityPointsChanged()));
     this->Form->ReprLinks.addPropertyLink(
       this->Form->ScalarOpacityUnitDistance, "text", SIGNAL(editingFinished()),
