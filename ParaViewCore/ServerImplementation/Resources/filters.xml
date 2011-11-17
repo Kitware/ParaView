@@ -1507,12 +1507,6 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
              <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Hints>
-          <!-- This overrides the GUI's default mechanism to
-            not set the default value for this property
-            using the domain when the proxy is created -->
-          <NoDefault />
-        </Hints>
      </StringVectorProperty>
 
      <DoubleVectorProperty

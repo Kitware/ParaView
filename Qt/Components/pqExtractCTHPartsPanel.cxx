@@ -74,9 +74,9 @@ pqExtractCTHPartsPanel::pqExtractCTHPartsPanel(pqProxy* object_proxy, QWidget* p
   //disable all arrays to start off in order to make sure we don't have
   //selections in more than one group
   //also select arrays that have "Material volume fraction" in the name
-  this->enableMaterialNamedArrays(0);
-  this->enableMaterialNamedArrays(1);
-  this->enableMaterialNamedArrays(2);
+  //this->enableMaterialNamedArrays(0);
+  //this->enableMaterialNamedArrays(1);
+  //this->enableMaterialNamedArrays(2);
 }
 
 //-----------------------------------------------------------------------------
