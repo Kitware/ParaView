@@ -1428,6 +1428,9 @@ void pqColorScaleEditor::initColorScale()
     this->Form->frameOpacity->setVisible(1);
     this->ColorMapViewer->setSizePolicy(
       QSizePolicy::Expanding, QSizePolicy::Fixed);
+    this->Form->verticalSpacer->changeSize(20, 10,
+      QSizePolicy::Expanding, QSizePolicy::Ignored);
+
     this->addRepClientOpacityFunction();
 
     this->Form->Listener->Connect(
@@ -1440,9 +1443,11 @@ void pqColorScaleEditor::initColorScale()
     }
   else
     {
-    this->ColorMapViewer->setSizePolicy(
-      QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //this->ColorMapViewer->setSizePolicy(
+    //  QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->Form->frameOpacity->setVisible(0);
+    this->Form->verticalSpacer->changeSize(20, 10,
+      QSizePolicy::Expanding, QSizePolicy::Expanding);
     }
   this->setOpacityControlsVisibility(usingOpacity);
 
@@ -2032,10 +2037,14 @@ void pqColorScaleEditor::addRepClientOpacityFunction()
     if(range[0]==range[1])
       {
       this->Form->frameOpacity->setVisible(0);
+      this->Form->verticalSpacer->changeSize(20, 10,
+        QSizePolicy::Expanding, QSizePolicy::Expanding);
       }
     else
       {
       this->Form->frameOpacity->setVisible(1);
+      this->Form->verticalSpacer->changeSize(20, 10,
+        QSizePolicy::Expanding, QSizePolicy::Ignored);
       }
     vtkPiecewiseFunction* otf = vtkPiecewiseFunction::SafeDownCast(
       this->OpacityFunction->getProxy()->GetClientSideObject());
