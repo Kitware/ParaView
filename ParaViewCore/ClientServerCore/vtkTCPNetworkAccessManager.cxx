@@ -213,7 +213,6 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
 
     vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
       controller->GetCommunicator());
-    cout << "GetIsConnected " << comm->GetIsConnected() << endl;
     // Processing error or connection was closed.
     // TODO: handle this.
     return -1;
