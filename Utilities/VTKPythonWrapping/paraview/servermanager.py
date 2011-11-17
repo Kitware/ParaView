@@ -1731,6 +1731,11 @@ class ProxyIterator(object):
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
+# Caution: Observers must be global methods otherwise we run into memory
+#          leak when the interpreter get reset from the C++ layer.
+def _update_definitions(caller, event):
+    updateModules(ActiveConnection.Modules)
+
 class Connection(object):
     """
       This is a python representation for a session/connection.
@@ -1743,21 +1748,20 @@ class Connection(object):
         self.ID = connectionId
         self.Session = session
         self.Modules = PVModule()
+        self.Alive = True
         self.DefinitionObserverTag = 0
         self.CustomDefinitionObserverTag = 0
         if MultiServerConnections == None and ActiveConnection:
             raise RuntimeError, "Concurrent connections not supported!"
-        if MultiServerConnections != None:
+        if MultiServerConnections != None and not self in MultiServerConnections:
            MultiServerConnections.append(self)
         ActiveConnection = self
         __InitAfterConnect__(self)
         __exposeActiveModules__()
-        return
 
     def __eq__(self, other):
         "Returns true if the connection ids are the same."
-        return (self.ID == other.ID and self.Session == other.Session)
-
+        return (self.ID == other.ID)
 
     def __repr__(self):
         """User friendly string representation"""
@@ -1782,20 +1786,22 @@ class Connection(object):
     def AttachDefinitionUpdater(self):
         """Attach observer to automatically update modules when needed."""
         # ProxyDefinitionsUpdated = 2000
-        self.DefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2000, self._updateModule)
+        self.DefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2000, _update_definitions)
         # CompoundProxyDefinitionsUpdated = 2001
-        self.CustomDefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2001, self._updateModule)
+        self.CustomDefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2001, _update_definitions)
         pass
 
-    def _updateModule(self, caller, event):
-        """callback that gets called by vtkSIProxyDefinitionManager when it get
-        updated."""
-        updateModules(self.Modules)
-
-    def __del__(self):
+    def close(self):
         if self.DefinitionObserverTag:
             self.Session.GetProxyDefinitionManager().RemoveObserver(self.DefinitionObserverTag)
             self.Session.GetProxyDefinitionManager().RemoveObserver(self.CustomDefinitionObserverTag)
+        self.Session = None
+        self.Modules = None
+        self.Alive = False
+
+    def __del__(self):
+        if self.Alive:
+           self.close()
 
 def SaveState(filename):
     """Given a state filename, saves the state of objects registered
@@ -1825,13 +1831,25 @@ def InitFromGUI():
     """
     Method used to initialize the Python Shell from the ParaView GUI.
     """
-    global fromGUI
+    global fromGUI, ActiveConnection
+    print "--- Init from the GUI ---"
+    if not fromGUI:
+       print "from paraview.simple import *"
     fromGUI = True
     # ToggleProgressPrinting() ### FIXME COLLABORATION
-    session = vtkProcessModule.GetProcessModule().GetSession();
-    Connection(\
-      vtkProcessModule.GetProcessModule().GetSessionID(session),\
-      session)
+    enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
+    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
+    iter.InitTraversal()
+    ActiveConnection = None
+    activeSession = vtkProcessModule.GetProcessModule().GetSession()
+    tmpActiveConnection = None
+    while not iter.IsDoneWithTraversal():
+      c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
+      if c.Session == activeSession:
+         tmpActiveConnection = c
+      iter.GoToNextItem()
+    iter.UnRegister(None)
+    ActiveConnection = tmpActiveConnection
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
@@ -1895,13 +1913,16 @@ def Disconnect(session=None):
         session = ActiveConnection.Session
         if MultiServerConnections:
            MultiServerConnections.remove(ActiveConnection)
+           ActiveConnection.close()
            ActiveConnection = None
            switchActiveConnection()
         else:
+           ActiveConnection.close()
            ActiveConnection = None
     elif MultiServerConnections:
         for connection in MultiServerConnections:
           if connection.Session == session:
+            connection.close()
             MultiServerConnections.remove(connection)
     if session:
       vtkProcessModule.GetProcessModule().UnRegisterSession(session)
@@ -2851,12 +2872,7 @@ def enableMultiServer(multiServer=True):
   connections. Once we enable the multi-server support, the user can create
   as many connection as he want and switch from one to another in order to
   create and manage proxy."""
-  global MultiServerConnections
-  global ActiveConnection
-  global fromGUI
-  if fromGUI:
-      raise RuntimeError, "Cannot enable Multi-Server support through python when setup from the GUI."
-
+  global MultiServerConnections, ActiveConnection
   if not multiServer and MultiServerConnections:
       raise RuntimeError, "Once we enable Multi-Server support we can not get back"
   MultiServerConnections = []
@@ -2924,6 +2940,7 @@ def __InitAfterConnect__(connection):
         # fromFilter is set when this module is imported from the programmable
         # filter
         connection.AttachDefinitionUpdater()
+        pass
 
 def __exposeActiveModules__():
     """Update servermanager submodules to point to the current

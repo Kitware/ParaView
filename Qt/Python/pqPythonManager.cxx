@@ -174,8 +174,7 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-    this->Internal->PythonDialog->print(
-      "from paraview.simple import *\n");
+    //this->Internal->PythonDialog->print("from paraview.simple import *\n");
     this->Internal->PythonDialog->shell()->executeInitFromGUI();
     emit this->paraviewPythonModulesImported();
     }

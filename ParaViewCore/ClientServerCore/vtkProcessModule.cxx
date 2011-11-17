@@ -232,6 +232,7 @@ vtkProcessModule::vtkProcessModule()
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
+  this->MultipleSessionsSupport = true; // Set MULTI-SERVER to true as DEFAULT
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);

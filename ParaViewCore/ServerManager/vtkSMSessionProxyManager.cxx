@@ -1332,7 +1332,8 @@ void vtkSMSessionProxyManager::LoadCustomProxyDefinitions(const char* filename)
 void vtkSMSessionProxyManager::SaveCustomProxyDefinitions(
   vtkPVXMLElement* rootElement)
 {
-  assert(this->ProxyDefinitionManager != 0);
+  assert("Session should exist" && this->Session != 0);
+  assert("Definition Manager should exist" && this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->SaveCustomProxyDefinitions(rootElement);
 }
 

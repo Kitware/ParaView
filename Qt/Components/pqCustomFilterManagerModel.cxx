@@ -226,6 +226,13 @@ void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
   // Store the custom filters for a subsequent ParaView session
   vtkSMSessionProxyManager *proxyManager =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  if(!proxyManager)
+    {
+    // No active session
+    return;
+    }
+
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("CustomFilterDefinitions");
   proxyManager->SaveCustomProxyDefinitions(root);

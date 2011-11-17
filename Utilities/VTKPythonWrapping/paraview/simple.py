@@ -48,21 +48,24 @@ def switchActiveConnection(newActiveConnection=None, ns=None):
     servermanager.switchActiveConnection(newActiveConnection)
     _add_functions(ns)
 
-def _disconnect():
-    if servermanager.ActiveConnection and servermanager.MultiServerConnections == None:
+def Disconnect(ns=None, force=True):
+    if servermanager.ActiveConnection and (force or servermanager.MultiServerConnections == None):
+        if ns:
+           _remove_functions(ns)
+        _remove_functions(globals())
         servermanager.ProxyManager().UnRegisterProxies()
         active_objects.view = None
         active_objects.source = None
         import gc
-        gc.collect()
         servermanager.Disconnect()
+        gc.collect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage:
     > Connect("amber") # Connect to a single server at default port
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
-    _disconnect()
+    Disconnect(globals(), False)
     connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
 
@@ -75,7 +78,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
 def ReverseConnect(port=11111):
     """Create a reverse connection to a server.  Listens on port and waits for
     an incoming connection from the server."""
-    _disconnect()
+    Disconnect(globals(), False)
     connection = servermanager.ReverseConnect(port)
     _add_functions(globals())
     tk =  servermanager.misc.TimeKeeper()

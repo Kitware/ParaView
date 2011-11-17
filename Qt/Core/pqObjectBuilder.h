@@ -89,13 +89,6 @@ public:
   /// Destroy a server connection 
   void removeServer(pqServer *server);
 
-  /// Set to true if application supports multiple server sessions. Default is
-  /// false.
-  bool multipleConnectionsSupport() const
-    { return this->MultipleConnectionsSupport; }
-  void setMultipleConnectionsSupport(bool val)
-    { this->MultipleConnectionsSupport = val; }
-
   /// Creates a source of the given server manager group (\c sm_group) and 
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
@@ -319,7 +312,6 @@ private:
   void operator=(const pqObjectBuilder&); // Not implemented.
 
   bool WaitingForConnection;
-  bool MultipleConnectionsSupport;
 };
 
 #endif

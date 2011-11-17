@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkImageIterator.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMAnimationSceneImageWriter.h"
@@ -865,6 +866,12 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
   // Save the window layout.
   this->pqMultiView::saveState(rwRoot);
 
+  if(!pqActiveObjects::instance().activeServer())
+    {
+    // No active server
+    return;
+    }
+
   vtkSMSession* session = pqActiveObjects::instance().activeServer()->session();
 
   // Save the render module - window mapping.
@@ -907,8 +914,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   // - Basically we forget the layout and only focus on available views that
   //   get simply added to new frame as we discover them. This is achieved by
   //   the proxy manager itself, we don't need to do anything here.
-  pqObjectBuilder* builder = pqApplicationCore::instance()-> getObjectBuilder();
-  if(builder->multipleConnectionsSupport())
+  if(vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport())
     {
     return true; // We are done, no need to try to load the layout...
     }
@@ -1260,7 +1266,7 @@ void pqViewManager::onServerDisconnect()
   // We only cleanup views if only one server at a time is supported,
   // otherwise we keep the layout and just remove content that depend on the
   // deleted server.
-  if(!builder->multipleConnectionsSupport())
+  if(!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport())
     {
       QList<QWidget*> removed;
       this->reset(removed);

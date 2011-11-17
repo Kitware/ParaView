@@ -94,8 +94,7 @@ namespace pqObjectBuilderNS
 pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
   QObject(_parent),
   NameGenerator(new pqNameCount()),
-  WaitingForConnection(false),
-  MultipleConnectionsSupport(true) // Set MULTI-SERVER to true as DEFAULT
+  WaitingForConnection(false)
 {
 }
 
@@ -885,7 +884,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
 
   pqServerManagerModel *smModel = pqApplicationCore::instance()->getServerManagerModel();
 
-  if (!this->MultipleConnectionsSupport)
+  if (!vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport())
     {
     // If multiple connections are not supported, then we only connect to the
     // new server if no already connected and ensure that any previously
