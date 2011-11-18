@@ -13,13 +13,13 @@ ADD_EXECUTABLE(TestSubProxy
 TARGET_LINK_LIBRARIES(TestSubProxy
   vtkPVServerManager)
 
-
 ################################################################################
 SET(ServersServerManager_SRCS
   ParaViewCoreServerManagerPrintSelf
   TestComparativeAnimationCueProxy 
   TestXMLSaveLoadState
   TestProxyAnnotation
+  TestSMIntVectorProperty
   )
 
 FOREACH(name ${ServersServerManager_SRCS})

@@ -73,9 +73,10 @@ ParaViewMainWindow::ParaViewMainWindow()
     this->Internals->statisticsDock);
 
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
-  this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->displayDock);
-  this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->informationDock);
-  this->Internals->objectInspectorDock->raise();
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->objectInspectorDock);
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->displayDock);
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->informationDock);
+  this->Internals->summaryDock->raise();
 
   // Enable automatic creation of representation on accept.
   this->Internals->objectInspector->setShowOnAccept(true);

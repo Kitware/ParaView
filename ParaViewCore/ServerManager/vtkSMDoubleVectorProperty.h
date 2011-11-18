@@ -59,6 +59,11 @@ public:
   double *GetElements();
 
   // Description:
+  // Sets the values of all the unchecked elements.
+  int SetUncheckedElements(const double* values);
+  int SetUncheckedElements(const double* values, unsigned int numValues);
+
+  // Description:
   // Set the value of 1st element. The vector is resized as necessary.
   // Returns 0 if Set fails either because the property is read only
   // or one or more of the values is not in all domains.
@@ -135,6 +140,8 @@ public:
   // Description: 
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
+
+  virtual void ClearUncheckedElements();
 
 protected:
   vtkSMDoubleVectorProperty();

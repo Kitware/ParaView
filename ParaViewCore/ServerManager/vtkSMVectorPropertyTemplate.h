@@ -24,7 +24,9 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
+#include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
+#include "vtkSMProperty.h"
 #include <typeinfo>
 
 class vtkSMProperty;
@@ -61,6 +63,7 @@ public:
   void SetNumberOfUncheckedElements(unsigned int num)
     {
     this->UncheckedValues.resize(num);
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 
   //---------------------------------------------------------------------------
@@ -134,10 +137,49 @@ public:
     {
     if (idx >= this->GetNumberOfUncheckedElements())
       {
-      this->SetNumberOfUncheckedElements(idx+1);
+      this->UncheckedValues.resize(idx+1);
       }
-    this->UncheckedValues[idx] = value;
+
+    if(this->UncheckedValues[idx] != value)
+      {
+      this->UncheckedValues[idx] = value;
+      this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+      }
     }
+
+  //---------------------------------------------------------------------------
+  int SetUncheckedElements(const T* values)
+    {
+    return this->SetUncheckedElements(values, this->GetNumberOfUncheckedElements());
+    }
+
+  //---------------------------------------------------------------------------
+  int SetUncheckedElements(const T* values, unsigned int numValues)
+    {
+    bool modified = false;
+    unsigned int numArgs = this->GetNumberOfUncheckedElements();
+    if(numArgs != numValues)
+      {
+      this->UncheckedValues.resize(numValues);
+      numArgs = numValues;
+      modified = true;
+      }
+    else
+      {
+      modified = !vtkstd::equal(this->UncheckedValues.begin(), this->UncheckedValues.end(), values);
+      }
+
+    if(!modified)
+      {
+      return 1;
+      }
+
+    vtkstd::copy(values, values + numArgs, this->UncheckedValues.begin());
+
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+    return 1;
+    }
+
   //---------------------------------------------------------------------------
   int SetElementAsString(unsigned int idx, const char* value)
     {
@@ -167,10 +209,13 @@ public:
       this->SetNumberOfElements(idx+1);
       }
     this->Values[idx] = value;
+
     // Make sure to initialize BEFORE Modified() is called. Otherwise,
     // the value would not be pushed.
     this->Initialized = true;
     this->Property->Modified();
+
+    this->ClearUncheckedElements();
     return 1;
     }
 
@@ -202,8 +247,11 @@ public:
       }
 
     vtkstd::copy(values, values+numArgs, this->Values.begin());
+
     this->Initialized = true;
     this->Property->Modified();
+
+    this->ClearUncheckedElements();
     return 1;
     }
 
@@ -225,10 +273,10 @@ public:
       modified = modified || !this->Initialized;
       this->Initialized = true;
 
-      this->UncheckedValues = dsrc->UncheckedValues;
       if (modified)
         {
         this->Property->Modified();
+        this->ClearUncheckedElements();
         }
       }
     }
@@ -243,6 +291,7 @@ public:
       // the value would not be pushed.
       this->Initialized = true;
       this->Property->Modified();
+      this->ClearUncheckedElements();
       }
     }
   //---------------------------------------------------------------------------
@@ -265,6 +314,13 @@ public:
       propertyElement->AddNestedElement(elementElement);
       elementElement->Delete();
       }
+    }
+
+  void ClearUncheckedElements()
+    {
+    // copy values to unchecked values
+    this->UncheckedValues = this->Values;
+    this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 };
 #endif

@@ -55,11 +55,15 @@ public:
 
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
-  int SetElements(unsigned int count, const char* values[]);
+  int SetElements(const char* values[], unsigned int count);
 
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
   int SetElements(vtkStringList* newvalue);
+
+  // Description:
+  // Sets the values of all the unchecked elements.
+  int SetUncheckedElements(const char* values[], unsigned int count);
 
   // Description:
   // Fills up the vtkStringList instance with the current value.
@@ -114,6 +118,8 @@ public:
   // Description:
   // Returns the default value, if any, specified in the XML.
   const char* GetDefaultValue(int idx);
+
+  virtual void ClearUncheckedElements();
 
 protected:
   vtkSMStringVectorProperty();

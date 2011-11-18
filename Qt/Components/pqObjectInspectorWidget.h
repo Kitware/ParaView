@@ -165,7 +165,7 @@ private:
   pqObjectPanel* CurrentPanel;
 
   // This keeps all the panels created. 
-  QMap<pqProxy*, pqObjectPanel*> PanelStore;
+  QMap<pqProxy*, QPointer<pqObjectPanel> > PanelStore;
 };
 
 #endif

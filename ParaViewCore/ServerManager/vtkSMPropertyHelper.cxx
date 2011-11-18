@@ -54,10 +54,7 @@
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
-inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
-{
-  return x < y? x : y;
-}
+#include <algorithm>
 
 #define vtkSMPropertyHelperWarningMacro(blah)\
   if (this->Quiet == false) \
@@ -65,441 +62,618 @@ inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
     vtkGenericWarningMacro(blah)\
   }
 
+//----------------------------------------------------------------------------
+template<typename T>
+inline T vtkSMPropertyHelper::GetProperty(unsigned int index) const
+{
+  (void) index;
+
+  return T();
+}
 
 //----------------------------------------------------------------------------
-vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
-  bool quiet)
+template<>
+inline int vtkSMPropertyHelper::GetProperty(unsigned int index) const
 {
-  this->Proxy = proxy;
-  this->Property = proxy->GetProperty(pname);
-  this->Type = vtkSMPropertyHelper::NONE;
-  this->DoubleValues = NULL;
-  this->IntValues = NULL;
-  this->IdTypeValues = NULL;
-  this->Quiet = quiet;
-
-  if (!this->Property)
+  switch(this->Type)
     {
-    vtkSMPropertyHelperWarningMacro("Failed to locate property: " << pname);
-    }
-  else if (this->Property->IsA("vtkSMIntVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::INT;
-    }
-  else if (this->Property->IsA("vtkSMDoubleVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::DOUBLE;
-    }
-  else if (this->Property->IsA("vtkSMIdTypeVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::IDTYPE;
-    }
-  else if (this->Property->IsA("vtkSMStringVectorProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::STRING;
-    }
-  else if (this->Property->IsA("vtkSMInputProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::INPUT;
-    }
-  else if (this->Property->IsA("vtkSMProxyProperty"))
-    {
-    this->Type = vtkSMPropertyHelper::PROXY;
-    }
-  else
-    {
-    vtkSMPropertyHelperWarningMacro("Unhandled property type : " << this->Property->GetClassName());
+    case INT:
+      return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                                  this->IntVectorProperty->GetElement(index);
+    case DOUBLE:
+      return static_cast<int>(this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
+                                                   this->DoubleVectorProperty->GetElement(index));
+    case IDTYPE:
+      return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
+                                  this->IdTypeVectorProperty->GetElement(index);
+    default:
+      return 0;
     }
 }
 
 //----------------------------------------------------------------------------
-vtkSMPropertyHelper::~vtkSMPropertyHelper()
+template<>
+inline double vtkSMPropertyHelper::GetProperty(unsigned int index) const
 {
-  delete [] this->IntValues;
-  delete [] this->IdTypeValues;
-  delete [] this->DoubleValues;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::UpdateValueFromServer()
-{
-  this->Proxy->UpdatePropertyInformation(this->Property);
-}
-
-#define SM_CASE_MACRO(typeN, type, ctype, call) \
-  case typeN: \
-    { \
-    typedef ctype VTK_TT; \
-    type* SMProperty = static_cast<type*>(this->Property); \
-    call; \
-    }; \
-  break
-
-#define SM_TEMPLATE_MACRO_NUM(call) \
-  SM_CASE_MACRO(vtkSMPropertyHelper::INT, vtkSMIntVectorProperty, int, call);\
-  SM_CASE_MACRO(vtkSMPropertyHelper::DOUBLE, vtkSMDoubleVectorProperty, double, call);\
-  SM_CASE_MACRO(vtkSMPropertyHelper::IDTYPE, vtkSMIdTypeVectorProperty, vtkIdType, call)
-
-#define SM_TEMPLATE_MACRO_VP(call) \
-  SM_TEMPLATE_MACRO_NUM(call); \
-  SM_CASE_MACRO(vtkSMPropertyHelper::STRING, vtkSMIdTypeVectorProperty, const char*, call)
-
-#define SM_TEMPLATE_MACRO_PP(call) \
-  SM_CASE_MACRO(vtkSMPropertyHelper::PROXY, vtkSMProxyProperty, vtkSMProxy*, call);\
-  SM_CASE_MACRO(vtkSMPropertyHelper::INPUT, vtkSMInputProperty, vtkSMProxy*, call)
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::SetNumberOfElements(unsigned int elems)
-{
-  switch (this->Type)
+  switch(this->Type)
     {
-    SM_TEMPLATE_MACRO_VP(SMProperty->SetNumberOfElements(elems));
-    SM_TEMPLATE_MACRO_PP(SMProperty->SetNumberOfProxies(elems));
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::GetNumberOfElements()
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_VP(return SMProperty->GetNumberOfElements());
-    SM_TEMPLATE_MACRO_PP(return SMProperty->GetNumberOfProxies());
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(unsigned int index, int value)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkSMPropertyHelper::GetAsInt(unsigned int index /*=0*/)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      return static_cast<int>(SMProperty->GetElement(index)));
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count /*=1*/)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        values[cc] = static_cast<int>(SMProperty->GetElement(cc));
-        }
-      return count;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-const int* vtkSMPropertyHelper::GetAsIntPtr()
-{
-  delete [] this->IntValues;
-  this->IntValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
-    {
-    this->IntValues = new int[num_elems];
-    this->Get(this->IntValues, num_elems);
-    }
-  return this->IntValues;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      SMProperty->SetNumberOfElements(count);
-      VTK_TT* clone = new VTK_TT[count];
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        clone[cc] = static_cast<VTK_TT>(values[cc]);
-        }
-      SMProperty->SetElements(clone);
-      delete []clone;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(unsigned int index, double value)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-double vtkSMPropertyHelper::GetAsDouble(unsigned int index /*=0*/)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      return static_cast<double>(SMProperty->GetElement(index)));
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count /*=1*/)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        values[cc] = static_cast<double>(SMProperty->GetElement(cc));
-        }
-      return count;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-const double* vtkSMPropertyHelper::GetAsDoublePtr()
-{
-  delete [] this->DoubleValues;
-  this->DoubleValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
-    {
-    this->DoubleValues= new double[num_elems];
-    this->Get(this->DoubleValues, num_elems);
-    }
-  return this->DoubleValues;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(const double* values, unsigned int count)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      SMProperty->SetNumberOfElements(count);
-      VTK_TT* clone = new VTK_TT[count];
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        clone[cc] = static_cast<VTK_TT>(values[cc]);
-        }
-      SMProperty->SetElements(clone);
-      delete []clone;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    case INT:
+      return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                                  this->IntVectorProperty->GetElement(index);
+    case DOUBLE:
+      return this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
+                                  this->DoubleVectorProperty->GetElement(index);
+    case IDTYPE:
+      return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
+                                  this->IdTypeVectorProperty->GetElement(index);
+    default:
+      return 0;
     }
 }
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 //----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(unsigned int index, vtkIdType value)
+template<>
+inline vtkIdType vtkSMPropertyHelper::GetProperty(unsigned int index) const
 {
-  switch (this->Type)
+  switch(this->Type)
     {
-    SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    case INT:
+      return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                                  this->IntVectorProperty->GetElement(index);
+    case IDTYPE:
+      return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
+                                  this->IdTypeVectorProperty->GetElement(index);
+    default:
+      return 0;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      SMProperty->SetNumberOfElements(count);
-      VTK_TT* clone = new VTK_TT[count];
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        clone[cc] = static_cast<VTK_TT>(values[cc]);
-        }
-      SMProperty->SetElements(clone);
-      delete []clone;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count /*=1*/)
-{
-  switch (this->Type)
-    {
-    SM_TEMPLATE_MACRO_NUM(
-      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
-      for (unsigned int cc=0; cc < count; cc++)
-        {
-        values[cc] = static_cast<vtkIdType>(SMProperty->GetElement(cc));
-        }
-      return count;
-    );
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-
-  return 0;
 }
 #endif
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMPropertyHelper::GetAsIdType(unsigned int index /*=0*/)
-{
-  switch (this->Type)
+template<>
+inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
+  {
+  if(this->Type == STRING)
     {
-    SM_TEMPLATE_MACRO_NUM(
-      return static_cast<vtkIdType>(SMProperty->GetElement(index)));
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    return this->UseUnchecked ? this->StringVectorProperty->GetUncheckedElement(index) :
+                                this->StringVectorProperty->GetElement(index);
     }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-const vtkIdType* vtkSMPropertyHelper::GetAsIdTypePtr()
-{
-  delete [] this->IdTypeValues;
-  this->IdTypeValues = NULL;
-  int num_elems = this->GetNumberOfElements();
-  if (num_elems)
-    {
-    this->IdTypeValues = new vtkIdType[num_elems];
-    this->Get(this->IdTypeValues, num_elems);
-    }
-  return this->IdTypeValues;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
-{
-  if (this->Type == vtkSMPropertyHelper::STRING)
-    {
-    vtkSMStringVectorProperty* svp = static_cast<vtkSMStringVectorProperty*>(
-      this->Property);
-    svp->SetElement(index, value);
-    }
-  else if (this->Type == vtkSMPropertyHelper::INT)
+  else if(this->Type == INT)
     {
     // enumeration domain
     vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
-      this->Property->FindDomain("vtkSMEnumerationDomain"));
-    if (domain != NULL && domain->HasEntryText(value))
+          this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if(domain != NULL)
       {
-      vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
-        this->Property);
-      int valid; // We already know that the entry exist...
-      ivp->SetElement(index, domain->GetEntryValue(value, valid));
-      }
-    else
-      {
-      vtkSMPropertyHelperWarningMacro(
-        "'" << value <<"' could not be converted to int.");
-      }
-    }
-  else
-    {
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
-{
-  if (this->Type == vtkSMPropertyHelper::STRING)
-    {
-    vtkSMStringVectorProperty* svp = static_cast<vtkSMStringVectorProperty*>(
-      this->Property);
-    return svp->GetElement(index);
-    }
-  else if (this->Type == vtkSMPropertyHelper::INT)
-    {
-    // enumeration domain
-    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
-      this->Property->FindDomain("vtkSMEnumerationDomain"));
-    if (domain != NULL)
-      {
-      vtkSMIntVectorProperty* ivp = static_cast<vtkSMIntVectorProperty*>(
-        this->Property);
-      const char* entry = domain->GetEntryTextForValue(ivp->GetElement(index));
-      if (entry)
+      const char* entry = domain->GetEntryTextForValue(this->IntVectorProperty->GetElement(index));
+      if(entry)
         {
         return entry;
         }
       }
     }
 
-  vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
   return 0;
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline vtkSMProxy* vtkSMPropertyHelper::GetProperty(unsigned int index) const
+{
+  switch(this->Type)
+    {
+    case PROXY:
+    case INPUT:
+      return this->UseUnchecked ? this->ProxyProperty->GetUncheckedProxy(index) :
+                                  this->ProxyProperty->GetProxy(index);
+    default:
+      return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline vtkVariant vtkSMPropertyHelper::GetProperty(unsigned int index) const
+{
+  switch(this->Type)
+    {
+    case INT:
+      return this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                                  this->IntVectorProperty->GetElement(index);
+    case DOUBLE:
+      return this->UseUnchecked ? this->DoubleVectorProperty->GetUncheckedElement(index) :
+                                  this->DoubleVectorProperty->GetElement(index);
+    case IDTYPE:
+      return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
+                                  this->IdTypeVectorProperty->GetElement(index);
+    case STRING:
+      return this->UseUnchecked ? this->StringVectorProperty->GetUncheckedElement(index) :
+                                  this->StringVectorProperty->GetElement(index);
+    case PROXY:
+    case INPUT:
+      return this->UseUnchecked ? this->ProxyProperty->GetUncheckedProxy(index) :
+                                  this->ProxyProperty->GetProxy(index);
+    default:
+      return vtkVariant();
+    }
+}
+
+//----------------------------------------------------------------------------
+template<typename T>
+inline std::vector<T> vtkSMPropertyHelper::GetPropertyArray() const
+{
+  std::vector<T> array;
+
+  for(unsigned int i = 0; i < this->GetNumberOfElements(); i++)
+    {
+    array.push_back(this->GetProperty<T>(i));
+    }
+
+  return array;
+}
+
+//----------------------------------------------------------------------------
+template<typename T>
+unsigned int vtkSMPropertyHelper::GetPropertyArray(T *values, unsigned int count)
+{
+  count = std::min(count, this->GetNumberOfElements());
+
+  for(unsigned int i = 0; i < count; i++)
+    {
+    values[i] = this->GetProperty<T>(i);
+    }
+
+  return count;
+}
+
+//----------------------------------------------------------------------------
+template<typename T>
+inline void vtkSMPropertyHelper::SetProperty(unsigned int index, T value)
+{
+  (void) index;
+  (void) value;
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetProperty(unsigned int index, int value)
+{
+  switch(this->Type)
+    {
+    case INT:
+      if(this->UseUnchecked)
+        {
+        this->IntVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->IntVectorProperty->SetElement(index, value);
+        }
+      break;
+    case DOUBLE:
+      if(this->UseUnchecked)
+        {
+        this->DoubleVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->DoubleVectorProperty->SetElement(index, value);
+        }
+      break;
+    case IDTYPE:
+      if(this->UseUnchecked)
+        {
+        this->IdTypeVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->IdTypeVectorProperty->SetElement(index, value);
+        }
+      break;
+    default:
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetProperty(unsigned int index, double value)
+{
+  switch(this->Type)
+    {
+    case INT:
+      if(this->UseUnchecked)
+        {
+        this->IntVectorProperty->SetUncheckedElement(index, static_cast<int>(value));
+        }
+      else
+        {
+        this->IntVectorProperty->SetElement(index, static_cast<int>(value));
+        }
+      break;
+    case DOUBLE:
+      if(this->UseUnchecked)
+        {
+        this->DoubleVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->DoubleVectorProperty->SetElement(index, value);
+        }
+      break;
+    default:
+      break;
+    }
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetProperty(unsigned int index, vtkIdType value)
+{
+  switch(this->Type)
+    {
+    case INT:
+      if(this->UseUnchecked)
+        {
+        this->IntVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->IntVectorProperty->SetElement(index, value);
+        }
+      break;
+    case IDTYPE:
+      if(this->UseUnchecked)
+        {
+        this->IdTypeVectorProperty->SetUncheckedElement(index, value);
+        }
+      else
+        {
+        this->IdTypeVectorProperty->SetElement(index, value);
+        }
+      break;
+    default:
+      break;
+    }
+}
+#endif
+
+template<>
+inline void vtkSMPropertyHelper::SetProperty(unsigned int index, const char *value)
+{
+  if(this->Type == STRING)
+    {
+    if(this->UseUnchecked)
+      {
+      this->StringVectorProperty->SetUncheckedElement(index, value);
+      }
+    else
+      {
+      this->StringVectorProperty->SetElement(index, value);
+      }
+    }
+  else if(this->Type == INT)
+    {
+    // enumeration domain
+    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
+      this->Property->FindDomain("vtkSMEnumerationDomain"));
+    if (domain != NULL && domain->HasEntryText(value))
+      {
+      int valid; // We already know that the entry exist...
+      if(this->UseUnchecked)
+        {
+        this->IntVectorProperty->SetUncheckedElement(index, domain->GetEntryValue(value, valid));
+        }
+      else
+        {
+        this->IntVectorProperty->SetElement(index, domain->GetEntryValue(value, valid));
+        }
+      }
+    }
+  else
+    {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+
+//----------------------------------------------------------------------------
+template<typename T>
+inline void vtkSMPropertyHelper::SetPropertyArray(const T *values, unsigned int count)
+{
+  (void) values;
+  (void) count;
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetPropertyArray(const int *values, unsigned int count)
+{
+  if(this->Type == INT)
+    {
+    this->IntVectorProperty->SetElements(values, count);
+    }
+  else
+    {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetPropertyArray(const double *values, unsigned int count)
+{
+  if(this->Type == DOUBLE)
+    {
+    this->DoubleVectorProperty->SetElements(values, count);
+    }
+  else
+    {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsigned int count)
+{
+  if(this->Type == IDTYPE)
+    {
+    this->IdTypeVectorProperty->SetElements(values, count);
+    }
+  else
+    {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+#endif
+
+//----------------------------------------------------------------------------
+vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
+  bool quiet)
+{
+  this->Proxy = proxy;
+  this->Quiet = quiet;
+
+  vtkSMProperty *property = proxy->GetProperty(pname);
+
+  if(!property)
+    {
+    vtkSMPropertyHelperWarningMacro("Failed to locate property: " << pname);
+    }
+
+  this->Initialize(property);
+}
+
+//----------------------------------------------------------------------------
+vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProperty *property, bool quiet)
+{
+  this->Proxy = 0;
+  this->Quiet = quiet;
+
+  this->Initialize(property);
+}
+
+//----------------------------------------------------------------------------
+vtkSMPropertyHelper::~vtkSMPropertyHelper()
+{
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Initialize(vtkSMProperty *property)
+{
+  this->Property = property;
+  this->Type = vtkSMPropertyHelper::NONE;
+  this->UseUnchecked = false;
+
+  if(property != NULL)
+    {
+    if (property->IsA("vtkSMIntVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::INT;
+      }
+    else if (property->IsA("vtkSMDoubleVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::DOUBLE;
+      }
+    else if (property->IsA("vtkSMIdTypeVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::IDTYPE;
+      }
+    else if (property->IsA("vtkSMStringVectorProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::STRING;
+      }
+    else if (property->IsA("vtkSMInputProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::INPUT;
+      }
+    else if (property->IsA("vtkSMProxyProperty"))
+      {
+      this->Type = vtkSMPropertyHelper::PROXY;
+      }
+    else
+      {
+      vtkSMPropertyHelperWarningMacro("Unhandled property type : " << property->GetClassName());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::UpdateValueFromServer()
+{
+  if(this->Proxy)
+    {
+    this->Proxy->UpdatePropertyInformation(this->Property);
+    }
+  else
+    {
+    vtkGenericWarningMacro("No proxy set.");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetNumberOfElements(unsigned int elems)
+{
+  switch (this->Type)
+    {
+    case INT:
+    case DOUBLE:
+    case IDTYPE:
+    case STRING:
+      this->VectorProperty->SetNumberOfElements(elems);
+      break;
+    case PROXY:
+    case INPUT:
+      this->ProxyProperty->SetNumberOfProxies(elems);
+      break;
+    default:
+      vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::GetNumberOfElements() const
+{
+  switch (this->Type)
+    {
+    case INT:
+    case DOUBLE:
+    case IDTYPE:
+    case STRING:
+      return this->VectorProperty->GetNumberOfElements();
+    case PROXY:
+    case INPUT:
+      return this->ProxyProperty->GetNumberOfProxies();
+    default:
+      vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+      return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkVariant vtkSMPropertyHelper::GetAsVariant(unsigned int index)
+{
+  return GetProperty<vtkVariant>(index);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(unsigned int index, int value)
+{
+  this->SetProperty<int>(index, value);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPropertyHelper::GetAsInt(unsigned int index /*=0*/)
+{
+  return this->GetProperty<int>(index);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count /*=1*/)
+{
+  return this->GetPropertyArray<int>(values, count);
+}
+
+//----------------------------------------------------------------------------
+std::vector<int> vtkSMPropertyHelper::GetIntArray()
+{
+  return this->GetPropertyArray<int>();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
+{
+  this->SetPropertyArray<int>(values, count);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(unsigned int index, double value)
+{
+  this->SetProperty<double>(index, value);
+}
+
+//----------------------------------------------------------------------------
+double vtkSMPropertyHelper::GetAsDouble(unsigned int index /*=0*/)
+{
+  return this->GetProperty<double>(index);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count /*=1*/)
+{
+  return this->GetPropertyArray<double>(values, count);
+}
+
+//----------------------------------------------------------------------------
+std::vector<double> vtkSMPropertyHelper::GetDoubleArray()
+{
+  return this->GetPropertyArray<double>();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(const double* values, unsigned int count)
+{
+  this->SetPropertyArray<double>(values, count);
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(unsigned int index, vtkIdType value)
+{
+  this->SetProperty<vtkIdType>(index, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
+{
+  this->SetPropertyArray<vtkIdType>(values, count);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count /*=1*/)
+{
+  return this->GetPropertyArray<vtkIdType>(values, count);
+}
+#endif
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMPropertyHelper::GetAsIdType(unsigned int index /*=0*/)
+{
+  return this->GetProperty<vtkIdType>(index);
+}
+
+//----------------------------------------------------------------------------
+std::vector<vtkIdType> vtkSMPropertyHelper::GetIdTypeArray()
+{
+  return this->GetPropertyArray<vtkIdType>();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
+{
+  this->SetProperty<const char*>(index, value);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
+{
+  return this->GetProperty<const char*>(index);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value, 
   unsigned int outputport/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->SetProxy(index, value);
+    this->ProxyProperty->SetProxy(index, value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->SetInputConnection(index, value, outputport);
+    this->InputProperty->SetInputConnection(index, value, outputport);
     }
   else
     {
@@ -511,15 +685,13 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value,
 void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count, 
   unsigned int *outputports/*=NULL*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->SetProxies(count, value);
+    this->ProxyProperty->SetProxies(count, value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->SetProxies(count, value, outputports);
+    this->InputProperty->SetProxies(count, value, outputports);
     }
   else
     {
@@ -530,15 +702,13 @@ void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count,
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY)
+  if (this->Type == PROXY)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->AddProxy(value);
+    this->ProxyProperty->AddProxy(value);
     }
-  else if (this->Type == vtkSMPropertyHelper::INPUT)
+  else if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    ip->AddInputConnection(value, outputport);
+    this->InputProperty->AddInputConnection(value, outputport);
     }
   else
     {
@@ -549,11 +719,10 @@ void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 {
-  if (this->Type == vtkSMPropertyHelper::PROXY ||
-    this->Type == vtkSMPropertyHelper::INPUT)
+  if(this->Type == PROXY ||
+     this->Type == INPUT)
     {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    pp->RemoveProxy(value);
+    this->ProxyProperty->RemoveProxy(value);
     }
   else
     {
@@ -564,28 +733,15 @@ void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
 {
-  switch (this->Type)
-    {
-  case vtkSMPropertyHelper::PROXY:
-  case vtkSMPropertyHelper::INPUT:
-    {
-    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
-    return pp->GetProxy(index);
-    }
-
-  default:
-    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
-    }
-  return 0;
+  return this->GetProperty<vtkSMProxy*>(index);
 }
 
 //----------------------------------------------------------------------------
 unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 {
-  if (this->Type == vtkSMPropertyHelper::INPUT)
+  if (this->Type == INPUT)
     {
-    vtkSMInputProperty* ip = static_cast<vtkSMInputProperty*>(this->Property);
-    return ip->GetOutputPortForConnection(index);
+    return this->InputProperty->GetOutputPortForConnection(index);
     }
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
