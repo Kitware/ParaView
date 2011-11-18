@@ -25,11 +25,14 @@ IF(QT_TESTING_WITH_PYTHON)
   SET(PYTHON_MOC_SRCS 
     pqPythonEventSourceImage.h
   )
-INCLUDE_DIRECTORIES(
-  ${PYTHON_INCLUDE_PATH}
-)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_PATH}
+  )
 ENDIF(QT_TESTING_WITH_PYTHON)
 
+INCLUDE_DIRECTORIES(
+  ${protobuf_SOURCE_DIR}/src
+)
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
@@ -44,6 +47,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqContextView.h
+  pqCollaborationEventPlayer.h
+  pqCollaborationManager.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.h
@@ -184,6 +189,10 @@ VTK_ADD_LIBRARY(pqCore
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
+  pqCollaborationEventPlayer.cxx
+  pqCollaborationEventPlayer.h
+  pqCollaborationManager.cxx
+  pqCollaborationManager.h
   pqColorButtonEventPlayer.cxx
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
@@ -397,6 +406,7 @@ TARGET_LINK_LIBRARIES(pqCore
   QVTK
   vtkCharts
   vtkPVServerManager
+  protobuf
 )
 
 IF(VTK_USE_INFOVIS)

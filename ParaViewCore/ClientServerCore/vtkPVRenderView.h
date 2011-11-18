@@ -339,6 +339,8 @@ public:
   // Description:
   // Returns if remote-rendering is possible on the current group of processes.
   vtkGetMacro(RemoteRenderingAvailable, bool);
+  void RemoteRenderingAvailableOff()
+    { this->RemoteRenderingAvailable = false; }
 
   // Description:
   // Returns true if the most recent render used LOD.
@@ -445,6 +447,17 @@ protected:
   ~vtkPVRenderView();
 
   // Description:
+  // Overridden to assign IDs to each representation. This assumes that
+  // representations will be added/removed in a consistent fashion across
+  // processes even in multi-client modes. The only exception is
+  // vtk3DWidgetRepresentation. However, since vtk3DWidgetRepresentation never
+  // does any data-delivery, we don't assign IDs for these, nor affect the ID
+  // uniquifier when a vtk3DWidgetRepresentation is added.
+  virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
+  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
+
+
+  // Description:
   // Actual render method.
   virtual void Render(bool interactive, bool skip_rendering);
 
@@ -509,6 +522,10 @@ protected:
   // displaying an image in a viewport.
   bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
 
+  // Description:
+  // Synchronizes core ivars for multi-client setups.
+  virtual void SynchronizeForCollaboration();
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
@@ -526,6 +543,11 @@ protected:
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
+
+  // Used in collaboration mode to ensure that views are in the same state
+  // (as far as representations added/removed goes) before rendering.
+  int SynchronizationCounter;
+  bool CounterSynchronizedSuccessfully;
 
   // In mega-bytes.
   double LocalGeometrySize;
@@ -562,6 +584,9 @@ private:
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.
   bool RemoteRenderingAvailable;
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

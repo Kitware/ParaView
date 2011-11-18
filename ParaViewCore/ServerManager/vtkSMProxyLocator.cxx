@@ -17,7 +17,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDeserializer.h"
+#include "vtkSMSession.h"
 #include "vtkSMProxy.h"
+#include "vtkCollection.h"
 
 #include <vtkstd/map>
 
@@ -35,6 +37,8 @@ vtkSMProxyLocator::vtkSMProxyLocator()
 {
   this->Internal = new vtkInternal();
   this->Deserializer = 0;
+  this->Session = 0;
+  this->LocateProxyWithSessionToo = false;
 }
 
 //----------------------------------------------------------------------------
@@ -42,23 +46,39 @@ vtkSMProxyLocator::~vtkSMProxyLocator()
 {
   delete this->Internal;
   this->SetDeserializer(0);
+  this->SetSession(0);
 }
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyLocator::LocateProxy(vtkTypeUInt32 id)
 {
+  // Look in the cache first
   vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.find(id);
   if (iter != this->Internal->Proxies.end())
     {
     return iter->second.GetPointer();
     }
- 
-  vtkSMProxy* newProxy = this->NewProxy(id);
-  if (newProxy)
+
+  // Try to lookup in session (if we setup the locator to use the session too)
+  vtkSMProxy* proxy;
+  if(this->LocateProxyWithSessionToo && this->Session)
     {
-    this->Internal->Proxies[id].TakeReference(newProxy);
+    proxy = vtkSMProxy::SafeDownCast(this->Session->GetRemoteObject(id));
+    if(proxy)
+      {
+      this->Internal->Proxies[id] = proxy;
+      return proxy;
+      }
     }
-  return newProxy;
+
+  // Create a brand new proxy
+  proxy = this->NewProxy(id);
+  if (proxy)
+    {
+    this->Internal->Proxies[id].TakeReference(proxy);
+    }
+
+  return proxy;
 }
 
 //----------------------------------------------------------------------------
@@ -73,8 +93,8 @@ vtkSMProxy* vtkSMProxyLocator::NewProxy(vtkTypeUInt32 id)
   if (this->Deserializer)
     {
     // Ask the deserializer to create a new proxy with the given id. The
-    // deserializer will locate the XML for the proxy with that id, and load the
-    // state on it and then return this fresh proxy, if possible.
+    // deserializer will locate the State(XML/Protobuf) for the proxy with
+    // that id, and load the state on it and then return this fresh proxy, if possible.
     return this->Deserializer->NewProxy(id, this);
     }
   return 0;
@@ -86,5 +106,32 @@ void vtkSMProxyLocator::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Deserializer: " << this->Deserializer << endl;
 }
+//----------------------------------------------------------------------------
+void vtkSMProxyLocator::GetLocatedProxies(vtkCollection* collectionToFill)
+{
+  if(!collectionToFill)
+    {
+    return;
+    }
 
-
+  vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.begin();
+  while(iter != this->Internal->Proxies.end())
+    {
+    collectionToFill->AddItem(iter->second.GetPointer());
+    iter++;
+    }
+}
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMProxyLocator::GetSession()
+{
+  return this->Session.GetPointer();
+}
+//----------------------------------------------------------------------------
+void vtkSMProxyLocator::SetSession(vtkSMSession* s)
+{
+  this->Session = s;
+  if(this->Deserializer && s)
+    {
+    this->Deserializer->SetSession(s);
+    }
+}

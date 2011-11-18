@@ -53,7 +53,8 @@ public:
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  virtual void updateEnableState();
+  void updateEnableState(bool);
 
 protected slots:
   /// Called when the action is triggered.

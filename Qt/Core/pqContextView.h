@@ -33,9 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqContextView_h
 
 #include "pqView.h"
+#include "vtkType.h"
 
 class vtkSMContextViewProxy;
 class vtkContextView;
+class vtkObject;
 
 /// pqContextView is an abstract base class for all charting views based on the
 /// VTK context charting library.
@@ -87,11 +89,19 @@ public:
   /// Returns true if data on the given output port can be displayed by this view.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
+signals:
+  void viewBoundsUpdated(vtkTypeUInt32, double*);
+
 protected slots:
   virtual void initializeAfterObjectsCreated();
 
   /// Sets up the interactors correctly.
   virtual void initializeInteractors();
+
+  /// Called when view bounds dynamically change
+  /// This will
+  /// emit viewBoundsUpdated(vtkTypeUInt32 proxyId, double bounds[8]) signal.
+  virtual void onViewBoundsChange(vtkObject*, unsigned long, void*, void*);
 
 protected:
   /// Constructor:

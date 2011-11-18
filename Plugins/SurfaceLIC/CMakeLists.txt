@@ -15,10 +15,12 @@ IF (PARAVIEW_BUILD_QT_GUI)
 
   QT4_WRAP_CPP( MOC_SRCS 
     pqSurfaceLICDisplayPanelDecorator.h
+    pqSurfaceLICSummaryDisplayPanel.h
     )
 
   QT4_WRAP_UI( UI_SRCS 
     pqSurfaceLICDisplayPanelDecorator.ui
+    pqSurfaceLICSummaryDisplayPanel.ui
     )
     
   INCLUDE_DIRECTORIES(
@@ -35,6 +37,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
     
   SET( SURFACE_LIC_SOURCES
     pqSurfaceLICDisplayPanelDecorator.cxx
+    pqSurfaceLICSummaryDisplayPanel.cxx
     )
 
   # server manager
@@ -58,6 +61,14 @@ IF (PARAVIEW_BUILD_QT_GUI)
        # Our decorator will only be instantiated for the panel types indicated here
   )
 
+  # add summary display panel
+  ADD_PARAVIEW_SUMMARY_DISPLAY_PANEL(
+    SUMMARY_IFACES 
+    SUMMARY_IFACE_SRCS 
+    "representations, GeometryRepresentation, Surface LIC;representations, UniformGridRepresentation, Surface LIC;representations, UnstructuredGridRepresentation, Surface LIC"
+    pqSurfaceLICSummaryDisplayPanel
+  )
+
 
   ADD_PARAVIEW_PLUGIN( SurfaceLIC "1.0"
     SERVER_MANAGER_XML 
@@ -68,11 +79,13 @@ IF (PARAVIEW_BUILD_QT_GUI)
       
     GUI_INTERFACES 
       ${IFACES} 
+      ${SUMMARY_IFACES}
     GUI_SOURCES 
       ${MOC_SRCS}
       ${SURFACE_LIC_SOURCES}
       ${UI_SRCS}
       ${IFACE_SRCS}
+      ${SUMMARY_IFACE_SRCS}
     )
     
 ENDIF (PARAVIEW_BUILD_QT_GUI)

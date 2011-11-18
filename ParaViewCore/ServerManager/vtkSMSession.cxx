@@ -16,22 +16,25 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkProcessModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVServerInformation.h"
+#include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
-#include "vtkProcessModuleAutoMPI.h"
 #include "vtkWeakPointer.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVServerInformation.h"
-#include "vtkReservedRemoteObjectIds.h"
 
 #include <vtksys/ios/sstream>
+#include <vtkNew.h>
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -40,7 +43,6 @@ vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
     vtkSmartPointer<vtkProcessModuleAutoMPI>::New();
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
-vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 {
@@ -51,13 +53,21 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
   this->UndoStackBuilder = NULL;
   this->IsAutoMPI = false;
 
-  // Start after the reserved one
-  this->LastGUID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
-
   if (initialize_during_constructor)
     {
     this->Initialize();
     }
+
+  // Create and setup deserializer for the local ProxyLocator
+  vtkNew<vtkSMDeserializerProtobuf> deserializer;
+  deserializer->SetStateLocator(this->StateLocator);
+  deserializer->SetSession(this);
+
+  // Create and setup proxy locator
+  this->ProxyLocator = vtkSMProxyLocator::New();
+  this->ProxyLocator->SetDeserializer(deserializer.GetPointer());
+  this->ProxyLocator->UseSessionToLocateProxy(true);
+  this->ProxyLocator->SetSession(this);
 }
 
 //----------------------------------------------------------------------------
@@ -71,6 +81,18 @@ vtkSMSession::~vtkSMSession()
   this->PluginManager = NULL;
   this->SetUndoStackBuilder(0);
   this->StateLocator->Delete();
+  this->ProxyLocator->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::SetUndoStackBuilder(vtkSMUndoStackBuilder *undostackBuilder)
+{
+  // Init garbage collection for StateLocator
+  if(undostackBuilder)
+    {
+    this->StateLocator->InitGarbageCollector(this, undostackBuilder->GetUndoStack());
+    }
+
+  vtkSetObjectBodyMacro(UndoStackBuilder, vtkSMUndoStackBuilder, undostackBuilder);
 }
 
 //----------------------------------------------------------------------------
@@ -107,7 +129,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
     //cout << "UpdateStateHistory: " << globalId << endl;
 
-    if(remoteObj && !remoteObj->IsPrototype())
+    if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
       {
       vtkSMMessage newState;
       newState.CopyFrom(*remoteObj->GetFullState());
@@ -118,7 +140,8 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
       // Store state in cache
       vtkSMMessage oldState;
-      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
+      bool createAction = !this->StateLocator->FindState( globalId, &oldState,
+      /* We want only a local lookup => false */          false );
 
       // This is a filtering Hack, I don't like it. :-(
       if(newState.GetExtension(ProxyState::xml_name) != "Camera")

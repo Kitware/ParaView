@@ -30,7 +30,6 @@
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMBoxRepresentationProxy.h"
-#include "vtkSMCacheBasedProxyLocator.h"
 #include "vtkSMCameraConfigurationReader.h"
 #include "vtkSMCameraConfigurationWriter.h"
 #include "vtkSMCameraLink.h"
@@ -163,7 +162,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMBooleanDomain);
   PRINT_SELF(vtkSMBoundsDomain);
   PRINT_SELF(vtkSMBoxRepresentationProxy);
-  PRINT_SELF(vtkSMCacheBasedProxyLocator);
   PRINT_SELF(vtkSMCameraConfigurationReader);
   PRINT_SELF(vtkSMCameraConfigurationWriter);
   PRINT_SELF(vtkSMCameraLink);

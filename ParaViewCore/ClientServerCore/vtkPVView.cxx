@@ -75,6 +75,11 @@ vtkPVView::~vtkPVView()
 //----------------------------------------------------------------------------
 void vtkPVView::Initialize(unsigned int id)
 {
+  if (this->Identifier == id)
+    {
+    // already initialized
+    return;
+    }
   assert(this->Identifier == 0 && id != 0);
 
   this->Identifier = id;

@@ -33,6 +33,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
+  // Description:
   // Toggle the visibility of the original mesh.
   // If this->GetVisibility() is false, then this has no effect.
   void SetMeshVisibility(bool visible);
@@ -86,6 +94,9 @@ protected:
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
+  vtkPVUpdateSuppressor* GlyphUpdateSuppressor;
+  vtkPVUpdateSuppressor* LODGlyphUpdateSuppressor;
+
   vtkPVLODActor* GlyphActor;
   vtkQuadricClustering* GlyphDecimator;
   vtkUnstructuredDataDeliveryFilter* DataCollector;

@@ -20,9 +20,11 @@
 #include "vtkExtractVOI.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataRepresentation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
@@ -73,9 +75,89 @@ vtkPVContextView::~vtkPVContextView()
 //----------------------------------------------------------------------------
 void vtkPVContextView::Initialize(unsigned int id)
 {
+  if (this->Identifier == id)
+    {
+    // already initialized
+    return;
+    }
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderWindow);
   this->SynchronizedWindows->AddRenderer(id, this->ContextView->GetRenderer());
   this->Superclass::Initialize(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContextView::Update()
+{
+  vtkMultiProcessController* s_controller =
+    this->SynchronizedWindows->GetClientServerController();
+  vtkMultiProcessController* d_controller =
+    this->SynchronizedWindows->GetClientDataServerController();
+  vtkMultiProcessController* p_controller =
+    vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessStream stream;
+
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    vtkstd::vector<int> need_delivery;
+    int num_reprs = this->GetNumberOfRepresentations();
+    for (int cc=0; cc < num_reprs; cc++)
+      {
+      vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
+        this->GetRepresentation(cc));
+      if (repr && repr->GetNeedUpdate())
+        {
+        need_delivery.push_back(cc);
+        }
+      }
+    stream << static_cast<int>(need_delivery.size());
+    for (size_t cc=0; cc < need_delivery.size(); cc++)
+      {
+      stream << need_delivery[cc];
+      }
+
+    if (s_controller)
+      {
+      s_controller->Send(stream, 1, 9998878);
+      }
+    if (d_controller)
+      {
+      d_controller->Send(stream, 1, 9998878);
+      }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    }
+  else
+    {
+    if (s_controller)
+      {
+      s_controller->Receive(stream, 1, 9998878);
+      }
+    if (d_controller)
+      {
+      d_controller->Receive(stream, 1, 9998878);
+      }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    }
+
+  int size;
+  stream >> size;
+  for (int cc=0; cc < size; cc++)
+    {
+    int index;
+    stream >> index;
+    vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
+      this->GetRepresentation(index));
+    if (repr)
+      {
+      repr->MarkModified();
+      }
+    }
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------

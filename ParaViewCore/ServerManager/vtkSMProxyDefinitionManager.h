@@ -25,7 +25,9 @@
 #include "vtkSMRemoteObject.h"
 #include "vtkSIProxyDefinitionManager.h" // needed for enums
 #include "vtkWeakPointer.h" // needed for weak pointer.
+#include "vtkSMMessageMinimal.h" // needed
 
+class vtkSMProxyLocator;
 class vtkEventForwarderCommand;
 
 class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkSMRemoteObject
@@ -175,6 +177,15 @@ public:
   bool LoadConfigurationXMLFromString(const char* xmlContent);
 
 //BTX
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMProxyDefinitionManager();
   ~vtkSMProxyDefinitionManager();

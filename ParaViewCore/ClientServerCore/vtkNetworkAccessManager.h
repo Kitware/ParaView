@@ -69,6 +69,12 @@ public:
   virtual int ProcessEvents(unsigned long timeout_msecs)=0;
 
   // Description:
+  // Peeks to check if any activity is available. When this call returns true,
+  // ProcessEvents() will always result in some activity processing if called
+  // afterword.
+  virtual bool GetNetworkEventsAvailable()=0;
+
+  // Description:
   // Returns true is the manager is currently waiting for any connections.
   virtual bool GetPendingConnectionsPresent()=0;
 

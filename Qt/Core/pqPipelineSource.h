@@ -190,7 +190,8 @@ protected:
   void processProxyListHints(vtkSMProxy *proxy_list_proxy);
 
   /// Overridden to add the proxies to the domain as well.
-  virtual void addHelperProxy(const QString& key, vtkSMProxy*);
+  virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
+  virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
 
   /// called by pqPipelineFilter when the connections change.
   void removeConsumer(int outputport, pqPipelineSource *);

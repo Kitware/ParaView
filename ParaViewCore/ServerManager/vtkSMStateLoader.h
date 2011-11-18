@@ -22,7 +22,7 @@
 #ifndef __vtkSMStateLoader_h
 #define __vtkSMStateLoader_h
 
-#include "vtkSMDeserializer.h"
+#include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -32,11 +32,11 @@ class vtkSMProxyLocator;
 struct vtkSMStateLoaderInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializer
+class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializerXML
 {
 public:
   static vtkSMStateLoader* New();
-  vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializerXML);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -63,12 +63,13 @@ protected:
   // Description:
   // Called after a new proxy is created.
   // We register all created proxies.
-  virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
+  virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
   // Description:
   // Overridden so that when new views are to be created, we create views
   // suitable for the connection. 
-  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname);
+  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
+                                  const char* subProxyName = NULL);
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
@@ -85,7 +86,7 @@ protected:
   // The DS keeps info
   // about each proxy ID and the groups and names 
   // the proxy should be registered as (as indicated in the state file).
-  virtual void RegisterProxy(int id, vtkSMProxy* proxy);
+  virtual void RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
@@ -93,12 +94,12 @@ protected:
   // Return the xml element for the state of the proxy with the given id.
   // This is used by NewProxy() when the proxy with the given id
   // is not located in the internal CreatedProxies map.
-  virtual vtkPVXMLElement* LocateProxyElement(int id);
+  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
 
   // Description:
   // Used by LocateProxyElement(). Recursively tries to locate the
   // proxy state element for the proxy.
-  vtkPVXMLElement* LocateProxyElementInternal(vtkPVXMLElement* root, int id);
+  vtkPVXMLElement* LocateProxyElementInternal(vtkPVXMLElement* root, vtkTypeUInt32 id);
 
   // Description:
   // Checks the root element for version. If failed, return false.

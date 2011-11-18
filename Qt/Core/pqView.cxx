@@ -193,7 +193,8 @@ void pqView::render()
 //-----------------------------------------------------------------------------
 void pqView::tryRender()
 {
-  if (this->getProxy()->GetSession()->GetPendingProgress())
+  if ( this->getProxy()->GetSession()->GetPendingProgress() ||
+       this->getServer()->isProcessingPending())
     {
     this->render();
     }

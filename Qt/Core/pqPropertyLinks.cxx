@@ -146,6 +146,11 @@ void pqPropertyLinksConnection::clearOutOfSync() const
   this->Internal->OutOfSync = false;
 }
 
+void pqPropertyLinksConnection::clearUncheckedProperties()
+{
+  pqSMAdaptor::clearUncheckedProperties(this->Internal->Property);
+}
+
 void pqPropertyLinksConnection::triggerDelayedSMLinkedPropertyChanged()
 {
   if(this->Internal->Updating == false)
@@ -160,6 +165,9 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
   this->Internal->Updating = false;
   this->Internal->OutOfSync = true;
 
+  pqSMAdaptor::PropertyValueType propertyValueType =
+      this->Internal->UseUncheckedProperties ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED;
+
   if(this->Internal->QtObject)
     {
     // get the property of the object
@@ -172,7 +180,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
     case pqSMAdaptor::PROXYSELECTION:
         {
         pqSMProxy p;
-        p = pqSMAdaptor::getProxyProperty(this->Internal->Property);
+        p = pqSMAdaptor::getProxyProperty(this->Internal->Property, propertyValueType);
         prop.setValue(p);
         if(prop != old)
           {
@@ -183,7 +191,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::ENUMERATION:
         {
-        prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
+        prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Property, propertyValueType);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -193,7 +201,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::SINGLE_ELEMENT:
         {
-        prop = pqSMAdaptor::getElementProperty(this->Internal->Property);
+        prop = pqSMAdaptor::getElementProperty(this->Internal->Property, propertyValueType);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -203,7 +211,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::FILE_LIST:
         {
-        prop = pqSMAdaptor::getFileListProperty(this->Internal->Property);
+        prop = pqSMAdaptor::getFileListProperty(this->Internal->Property, propertyValueType);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty,
@@ -216,7 +224,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         if(this->Internal->Index == -1)
           {
           QList<QList<QVariant> > newVal =
-            pqSMAdaptor::getSelectionProperty(this->Internal->Property);
+            pqSMAdaptor::getSelectionProperty(this->Internal->Property, propertyValueType);
           if(newVal != old.value<QList<QList<QVariant> > >())
             {
             prop.setValue(newVal);
@@ -227,8 +235,9 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         else
           {
           QList<QVariant> sel;
-          sel = pqSMAdaptor::getSelectionProperty(this->Internal->Property, 
-            this->Internal->Index);
+          sel = pqSMAdaptor::getSelectionProperty(this->Internal->Property,
+                                                  this->Internal->Index,
+                                                  propertyValueType);
 
           if(sel.size() == 2 && sel[1] != old)
             {
@@ -244,19 +253,21 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         {
         if(this->Internal->Index == -1)
           {
-          prop = pqSMAdaptor::getMultipleElementProperty(
-            this->Internal->Property);
+            prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Property,
+                                                           propertyValueType);
+
           if(prop != old)
             {
-            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty,
               prop);
             }
           }
         else
           {
-          prop = pqSMAdaptor::getMultipleElementProperty(
-            this->Internal->Property, 
-            this->Internal->Index);
+            prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Property,
+                                                           this->Internal->Index,
+                                                           propertyValueType);
+
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -269,8 +280,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         {
         if(this->Internal->Index == 0)
           {
-          prop = pqSMAdaptor::getFieldSelectionMode(
-            this->Internal->Property);
+          prop = pqSMAdaptor::getFieldSelectionMode(this->Internal->Property, propertyValueType);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -279,8 +289,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
           }
         else
           {
-          prop = pqSMAdaptor::getFieldSelectionScalar(
-            this->Internal->Property);
+          prop = pqSMAdaptor::getFieldSelectionScalar(this->Internal->Property, propertyValueType);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -299,6 +308,9 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
 void pqPropertyLinksConnection::qtLinkedPropertyChanged() 
 {
   this->Internal->OutOfSync = true;
+
+  pqSMAdaptor::PropertyValueType propertyValueType =
+      this->Internal->UseUncheckedProperties ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED;
 
   if(this->Internal->QtObject)
     {
@@ -325,199 +337,134 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
             }
           }
         }
+
       break;
     case pqSMAdaptor::ENUMERATION:
-        {
-        if(this->Internal->UseUncheckedProperties)
+        pqSMAdaptor::setEnumerationProperty(this->Internal->Property,
+                                            prop,
+                                            propertyValueType);
+
+        if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
           {
-          pqSMAdaptor::setUncheckedEnumerationProperty(
-            this->Internal->Property, prop);
+          this->Internal->Proxy->UpdateVTKObjects();
           }
-        else
-          {
-          pqSMAdaptor::setEnumerationProperty(
-            this->Internal->Property, prop);
-          if(this->Internal->AutoUpdate)
-            {
-            this->Internal->Proxy->UpdateVTKObjects();
-            }
-          }
-        }
-      break;
+
+        break;
     case pqSMAdaptor::SINGLE_ELEMENT:
-        {
-        if(this->Internal->UseUncheckedProperties)
+        pqSMAdaptor::setElementProperty(this->Internal->Property,
+                                        prop,
+                                        propertyValueType);
+
+        if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
           {
-          pqSMAdaptor::setUncheckedElementProperty(
-            this->Internal->Property, prop);
+          this->Internal->Proxy->UpdateVTKObjects();
           }
-        else
-          {
-          pqSMAdaptor::setElementProperty(
-            this->Internal->Property, prop);
-          if(this->Internal->AutoUpdate)
-            {
-            this->Internal->Proxy->UpdateVTKObjects();
-            }
-          }
-        }
+
       break;
     case pqSMAdaptor::FILE_LIST:
-        {
-        if(this->Internal->UseUncheckedProperties)
+        if (!prop.canConvert<QStringList>())
           {
-          if (!prop.canConvert<QStringList>())
-            {
-            qWarning() << "File list is not a list.";
-            }
-          else
-            {
-            pqSMAdaptor::setUncheckedFileListProperty(
-                           this->Internal->Property, prop.value<QStringList>());
-            }
+          qWarning() << "File list is not a list.";
           }
         else
           {
-          if (!prop.canConvert<QStringList>())
-            {
-            qWarning() << "File list is not a list.";
-            }
-          else
-            {
-            pqSMAdaptor::setFileListProperty(
-                           this->Internal->Property, prop.value<QStringList>());
-            }
-          if(this->Internal->AutoUpdate)
+          pqSMAdaptor::setFileListProperty(this->Internal->Property,
+                                           prop.value<QStringList>(),
+                                           propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
             this->Internal->Proxy->UpdateVTKObjects();
             }
           }
-        }
+
       break;
     case pqSMAdaptor::SELECTION:
-        {
         if(this->Internal->Index == -1)
           {
           QList<QList<QVariant> > theProp = prop.value<QList<QList<QVariant> > >();
-          if(this->Internal->UseUncheckedProperties)
+
+          pqSMAdaptor::setSelectionProperty(this->Internal->Property,
+                                            theProp,
+                                            propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedSelectionProperty(
-              this->Internal->Property, theProp);
-            }
-          else
-            {
-            pqSMAdaptor::setSelectionProperty(
-              this->Internal->Property, theProp);
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
         else
           {
           QList<QVariant> domain;
-          domain = pqSMAdaptor::getSelectionPropertyDomain(
-            this->Internal->Property);
+          domain = pqSMAdaptor::getSelectionPropertyDomain(this->Internal->Property);
           QList<QVariant> selection;
           selection.append(domain[this->Internal->Index]);
           selection.append(prop);
 
-          if(this->Internal->UseUncheckedProperties)
+          pqSMAdaptor::setSelectionProperty(this->Internal->Property,
+                                            selection,
+                                            propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedSelectionProperty(
-              this->Internal->Property, selection);
-            }
-          else
-            {
-            pqSMAdaptor::setSelectionProperty(
-              this->Internal->Property, selection);
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
-        }
+
       break;
     case pqSMAdaptor::SIL:
     case pqSMAdaptor::MULTIPLE_ELEMENTS:
     case pqSMAdaptor::COMPOSITE_TREE:
-        {
         if(this->Internal->Index == -1)
           {
-          if(this->Internal->UseUncheckedProperties)
+          pqSMAdaptor::setMultipleElementProperty(this->Internal->Property,
+                                                  prop.toList(),
+                                                  propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedMultipleElementProperty(
-              this->Internal->Property, prop.toList());
-            }
-          else
-            {
-            pqSMAdaptor::setMultipleElementProperty(
-              this->Internal->Property, prop.toList());
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
         else
           {
-          if(this->Internal->UseUncheckedProperties)
+          pqSMAdaptor::setMultipleElementProperty(this->Internal->Property,
+                                                  this->Internal->Index,
+                                                  prop,
+                                                  propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedMultipleElementProperty(
-              this->Internal->Property, this->Internal->Index, prop);
-            }
-          else
-            {
-            pqSMAdaptor::setMultipleElementProperty(
-              this->Internal->Property, this->Internal->Index, prop);
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
-        }
+
       break;
     case pqSMAdaptor::FIELD_SELECTION:
-        {
         if(this->Internal->Index == 0)
           {
-          if(this->Internal->UseUncheckedProperties)
+          pqSMAdaptor::setFieldSelectionMode(this->Internal->Property,
+                                             prop.toString(),
+                                             propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedFieldSelectionMode(
-              this->Internal->Property, prop.toString());
-            }
-          else
-            {
-            pqSMAdaptor::setFieldSelectionMode(
-              this->Internal->Property, prop.toString());
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
         else
           {
-          if(this->Internal->UseUncheckedProperties)
+          pqSMAdaptor::setFieldSelectionScalar(this->Internal->Property,
+                                               prop.toString(),
+                                               propertyValueType);
+
+          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
-            pqSMAdaptor::setUncheckedFieldSelectionScalar(
-              this->Internal->Property, prop.toString());
-            }
-          else
-            {
-            pqSMAdaptor::setFieldSelectionScalar(
-              this->Internal->Property, prop.toString());
-            if(this->Internal->AutoUpdate)
-              {
-              this->Internal->Proxy->UpdateVTKObjects();
-              }
+            this->Internal->Proxy->UpdateVTKObjects();
             }
           }
-        }
-      break;
+
+        break;
     case pqSMAdaptor::UNKNOWN:
     case pqSMAdaptor::PROXYLIST:
       break;
@@ -577,9 +524,19 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   pqPropertyLinksConnection *conn = 
     new pqPropertyLinksConnection(this, Proxy, Property, Index, qObject, qProperty);
   this->Internal->Links.push_back(conn);
-  this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
-                                          conn, 
-                                          SLOT(triggerDelayedSMLinkedPropertyChanged()));
+
+  if(this->Internal->UseUncheckedProperties)
+    {
+    this->Internal->VTKConnections->Connect(Property, vtkCommand::UncheckedPropertyModifiedEvent,
+                                            conn,
+                                            SLOT(triggerDelayedSMLinkedPropertyChanged()));
+    }
+  else
+    {
+    this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
+                                            conn,
+                                            SLOT(triggerDelayedSMLinkedPropertyChanged()));
+    }
   
   QObject::connect(qObject, signal,conn, SLOT(qtLinkedPropertyChanged()));
 
@@ -605,8 +562,19 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject,
     {
     if (conn && conn->isEqual(Proxy, Property, Index, qObject, qProperty))
       {
-      this->Internal->VTKConnections->Disconnect(conn->Internal->Property, 
-        vtkCommand::ModifiedEvent, conn);
+      if(this->Internal->UseUncheckedProperties)
+        {
+        this->Internal->VTKConnections->Disconnect(conn->Internal->Property,
+                                                   vtkCommand::UncheckedPropertyModifiedEvent,
+                                                   conn);
+        }
+      else
+        {
+        this->Internal->VTKConnections->Disconnect(conn->Internal->Property,
+                                                   vtkCommand::ModifiedEvent,
+                                                   conn);
+        }
+
       QObject::disconnect(conn->Internal->QtObject, signal, conn, 
         SLOT(qtLinkedPropertyChanged()));
       QObject::disconnect(conn, 0, this, 0);
@@ -640,6 +608,7 @@ void pqPropertyLinks::reset()
     {
     if (conn && conn->getOutOfSync())
       {
+      conn->clearUncheckedProperties();
       conn->smLinkedPropertyChanged();
       conn->clearOutOfSync();
       }

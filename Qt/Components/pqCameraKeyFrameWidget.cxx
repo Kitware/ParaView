@@ -250,11 +250,11 @@ bool pqCameraKeyFrameWidget::usePathBasedMode() const
 void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
 {
   this->Internal->setPosition(
-    vtkSMPropertyHelper(keyFrame, "Position").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray()[0]);
   this->Internal->setFocalPoint(
-    vtkSMPropertyHelper(keyFrame, "FocalPoint").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray()[0]);
   this->Internal->setViewUp(
-    vtkSMPropertyHelper(keyFrame, "ViewUp").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
   this->Internal->setViewAngle(
     vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
 

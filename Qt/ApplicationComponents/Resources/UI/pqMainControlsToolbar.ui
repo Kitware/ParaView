@@ -21,6 +21,9 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
      <normaloff>:/pqWidgets/Icons/pqOpen24.png</normaloff>:/pqWidgets/Icons/pqOpen24.png</iconset>
    </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -35,6 +38,9 @@
    </property>
    <property name="text">
     <string>Save Data</string>
+   </property>
+   <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionServerConnect">
