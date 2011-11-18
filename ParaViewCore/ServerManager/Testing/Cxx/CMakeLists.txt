@@ -19,6 +19,7 @@ SET(ServersServerManager_SRCS
   ParaViewCoreServerManagerPrintSelf
   TestComparativeAnimationCueProxy 
   TestXMLSaveLoadState
+  TestProxyAnnotation
   )
 
 FOREACH(name ${ServersServerManager_SRCS})
@@ -48,7 +49,6 @@ ADD_EXECUTABLE(ServerManagerStateLoader
 
 TARGET_LINK_LIBRARIES(ServerManagerStateLoader
   vtkPVServerManager)
-
 
 ################################################################################
 # Add the *.pvsm file names to load and test.

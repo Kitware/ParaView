@@ -765,6 +765,11 @@ void vtkSMProxy::CreateVTKObjects()
   // Using the real location and not the filtered one allow us to store
   // the correct location in full state that is used in Undo/Redo.
   this->State->set_location(this->Location);
+
+  bool oldPushState = this->Internals->EnableAnnotationPush;
+  this->Internals->EnableAnnotationPush = false;
+  this->UpdateAndPushAnnotationState();
+  this->Internals->EnableAnnotationPush = oldPushState;
 }
 
 //---------------------------------------------------------------------------
@@ -1783,6 +1788,22 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root,
       }
     }
 
+  // Add proxy annotation in XML state
+  vtkSMProxyInternals::AnnotationMap::iterator annotationIterator =
+      this->Internals->Annotations.begin();
+  while(annotationIterator != this->Internals->Annotations.end())
+    {
+    vtkNew<vtkPVXMLElement> annotation;
+    annotation->SetName("Annotation");
+    annotation->AddAttribute("key", annotationIterator->first.c_str());
+    annotation->AddAttribute("value", annotationIterator->second.c_str());
+    proxyXml->AddNestedElement(annotation.GetPointer());
+
+    // move forward
+    annotationIterator++;
+    }
+
+
   if (root)
     {
     root->AddNestedElement(proxyXml);
@@ -1827,6 +1848,11 @@ int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
         {
         return 0;
         }
+      }
+    if (strcmp(name, "Annotation") == 0)
+      {
+      this->SetAnnotation( currentElement->GetAttribute("key"),
+                           currentElement->GetAttribute("value"));
       }
     }
   return 1;
@@ -1966,6 +1992,21 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
   for (int i=0, nb=touchedProperties.size(); i < nb; i++)
     {
     touchedProperties[i]->UpdateDependentDomains();
+    }
+
+  // Manage annotation
+  if(message->GetExtension(ProxyState::has_annotation))
+    {
+    int nbAnnotation = message->ExtensionSize(ProxyState::annotation);
+    bool previousAnnotationPush = this->Internals->EnableAnnotationPush;
+    this->RemoveAllAnnotations();
+    for(int idx=0; idx < nbAnnotation; idx++)
+      {
+      const ProxyState_Annotation *annotation =
+          &message->GetExtension(ProxyState::annotation, idx);
+      this->SetAnnotation(annotation->key().c_str(), annotation->value().c_str());
+      }
+    this->Internals->EnableAnnotationPush = previousAnnotationPush;
     }
 }
 //---------------------------------------------------------------------------
@@ -2116,6 +2157,120 @@ vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   return stream;
 }
 
+//---------------------------------------------------------------------------
+//                       Annotation management
+//---------------------------------------------------------------------------
+
+void vtkSMProxy::SetAnnotation(const char* key, const char* value)
+{
+  assert("We expect a valid key for proxy annotation." && key);
+  if(value)
+    {
+    this->Internals->Annotations[key] = value;
+    this->UpdateAndPushAnnotationState();
+    }
+  else
+    {
+    this->RemoveAnnotation(key);
+    }
+}
+//---------------------------------------------------------------------------
+
+const char* vtkSMProxy::GetAnnotation(const char* key)
+{
+  vtkSMProxyInternals::AnnotationMap::iterator iter =
+      this->Internals->Annotations.find(key);
+  if(iter != this->Internals->Annotations.end())
+    {
+    return iter->second.c_str();
+    }
+  return NULL;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxy::RemoveAnnotation(const char* key)
+{
+  this->Internals->Annotations.erase(key);
+  this->UpdateAndPushAnnotationState();
+}
+//---------------------------------------------------------------------------
+
+void vtkSMProxy::RemoveAllAnnotations()
+{
+  this->Internals->Annotations.clear();
+  this->UpdateAndPushAnnotationState();
+}
+//---------------------------------------------------------------------------
+
+bool vtkSMProxy::HasAnnotation(const char* key)
+{
+  return ( this->Internals->Annotations.find(key) !=
+           this->Internals->Annotations.end() );
+}
+//---------------------------------------------------------------------------
+
+int vtkSMProxy::GetNumberOfAnnotations()
+{
+  return static_cast<int>(this->Internals->Annotations.size());
+}
+//---------------------------------------------------------------------------
+
+const char* vtkSMProxy::GetAnnotationKeyAt(int index)
+{
+  vtkSMProxyInternals::AnnotationMap::iterator iter =
+      this->Internals->Annotations.begin();
+  int searchIndex = 0;
+  while(searchIndex < index && iter != this->Internals->Annotations.end())
+    {
+    iter++;
+    searchIndex++;
+    }
+  if(searchIndex == index && iter != this->Internals->Annotations.end())
+    {
+    return iter->first.c_str();
+    }
+  return NULL;
+}
+//---------------------------------------------------------------------------
+
+void vtkSMProxy::UpdateAndPushAnnotationState()
+{
+  if (!this->ObjectsCreated)
+    {
+    return;
+    }
+
+  // Update state
+  vtkSMMessage localAnnotationState;
+  localAnnotationState.SetExtension(ProxyState::has_annotation, true);
+
+  this->State->ClearExtension(ProxyState::annotation);
+  this->State->SetExtension(ProxyState::has_annotation, true);
+
+  vtkSMProxyInternals::AnnotationMap::iterator iter =
+      this->Internals->Annotations.begin();
+  ProxyState_Annotation* annotation = NULL;
+  while(iter != this->Internals->Annotations.end())
+    {
+    // Add in full state
+    annotation = this->State->AddExtension(ProxyState::annotation);
+    annotation->set_key(iter->first);
+    annotation->set_value(iter->second);
+
+    // Add in local tmp state
+    annotation = localAnnotationState.AddExtension(ProxyState::annotation);
+    annotation->set_key(iter->first);
+    annotation->set_value(iter->second);
+
+    // move forward
+    iter++;
+    }
+
+  // Push annotation state to the session
+  if(this->Internals->EnableAnnotationPush)
+    {
+    this->PushState(&localAnnotationState);
+    }
+}
 
 //---------------------------------------------------------------------------
 //                          Deprecated API
