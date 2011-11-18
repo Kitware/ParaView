@@ -178,6 +178,7 @@ void pqPythonManager::initializeParaviewPythonModules()
     this->Internal->PythonDialog->print(
       "from paraview.simple import *\n");
     this->Internal->PythonDialog->shell()->executeInitFromGUI();
+    this->Internal->PythonDialog->shell()->promptForInput();
     emit this->paraviewPythonModulesImported();
     }
 }
