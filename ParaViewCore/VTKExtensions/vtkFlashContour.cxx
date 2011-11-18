@@ -27,7 +27,7 @@
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkMarchingCubesCases.h"
+#include "vtkMarchingCubesTriangleCases.h"
 
 vtkStandardNewMacro(vtkFlashContour);
 
