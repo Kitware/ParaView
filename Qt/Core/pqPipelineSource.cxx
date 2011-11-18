@@ -217,9 +217,9 @@ int pqPipelineSource::getNumberOfOutputPorts() const
 
 //-----------------------------------------------------------------------------
 // Overridden to add the proxies to the domain as well.
-void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
+void pqPipelineSource::addInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
 {
-  this->Superclass::addHelperProxy(key, helper);
+  this->Superclass::addInternalHelperProxy(key, helper);
 
   vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
   if (prop)
@@ -229,6 +229,23 @@ void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
     if (pld && !pld->HasProxy(helper))
       {
       pld->AddProxy(helper);
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+// Overridden to add the proxies to the domain as well.
+void pqPipelineSource::removeInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
+{
+  this->Superclass::removeInternalHelperProxy(key, helper);
+
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  if (prop)
+    {
+     vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+      prop->GetDomain("proxy_list"));
+    if (pld && pld->HasProxy(helper))
+      {
+      pld->RemoveProxy(helper);
       }
     }
 }
@@ -439,9 +456,11 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getOutputPort("
+        << outputport
+        << "). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
+    abort();
     return NULL;
     }
   return this->Internal->OutputPorts[outputport];
@@ -476,9 +495,10 @@ pqPipelineSource *pqPipelineSource::getConsumer(int outputport, int index) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getConsumer("
+        << outputport << ", " << index
+        << "). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return NULL;
     }
 
@@ -516,9 +536,10 @@ pqDataRepresentation* pqPipelineSource::getRepresentation(
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getRepresentation("
+        << outputport << ", view)"
+        << ". Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return 0;
     }
   return this->Internal->OutputPorts[outputport]->getRepresentation(view);
@@ -530,9 +551,10 @@ QList<pqDataRepresentation*> pqPipelineSource::getRepresentations(
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    qCritical() << "Invalid output port : " << outputport
-      << ". Available number of output ports: " 
-      << this->Internal->OutputPorts.size();
+    qCritical() << "Invalid output port : pqPipelineSource::getRepresentations("
+        << outputport
+        << ", view). Available number of output ports: "
+        << this->Internal->OutputPorts.size();
     return QList<pqDataRepresentation*>();
     }
 

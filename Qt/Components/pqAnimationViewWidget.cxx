@@ -200,7 +200,7 @@ public:
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)
     {
-    if(QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
+    if(cue && QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
       {
       return true;
       }
@@ -462,6 +462,10 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   // add new tracks
   foreach(pqAnimationCue* cue, cues)
     {
+    if(cue == NULL)
+      {
+      continue;
+      }
     QString completeName = this->Internal->cueName(cue);
 
     iter = this->Internal->TrackMap.find(cue);

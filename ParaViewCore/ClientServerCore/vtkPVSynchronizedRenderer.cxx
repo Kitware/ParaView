@@ -55,6 +55,11 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::Initialize()
 {
+  if(this->Mode != INVALID)
+    {
+    vtkWarningMacro("vtkPVSynchronizedRenderer is already initialized...");
+    return;
+    }
   assert(this->Mode == INVALID);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)

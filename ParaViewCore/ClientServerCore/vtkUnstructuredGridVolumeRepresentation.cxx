@@ -245,8 +245,8 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
 
     if (inInfo->Has(vtkPVRenderView::USE_LOD()))
       {
-      this->LODDeliveryFilter->ProcessViewRequest(inInfo);
       this->Actor->SetEnableLOD(1);
+      this->LODDeliveryFilter->ProcessViewRequest(inInfo);
       if (this->LODDeliverySuppressor->GetForcedUpdateTimeStamp() <
         this->LODDeliveryFilter->GetMTime())
         {
@@ -255,8 +255,8 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
       }
     else
       {
-      this->DeliveryFilter->ProcessViewRequest(inInfo);
       this->Actor->SetEnableLOD(0);
+      this->DeliveryFilter->ProcessViewRequest(inInfo);
       if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
         this->DeliveryFilter->GetMTime())
         {
@@ -295,13 +295,13 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
       this->Distributor->SetPassThrough(1);
       }
     this->UpdateMapperParameters();
-    if (!this->Actor->GetEnableLOD())
+    if (this->Actor->GetEnableLOD())
       {
-      this->UpdateSuppressor->ForceUpdate();
+      this->LODUpdateSuppressor->ForceUpdate();
       }
     else
       {
-      this->LODUpdateSuppressor->ForceUpdate();
+      this->UpdateSuppressor->ForceUpdate();
       }
     }
 

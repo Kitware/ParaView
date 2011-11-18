@@ -60,10 +60,6 @@ protected:
   virtual bool Push(vtkSMMessage*, int);
 
   // Description:
-  // Pull the current state of the underneath implementation
-  virtual bool Pull(vtkSMMessage*);
-
-  // Description:
   // Parse the xml for the property.
   virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
 

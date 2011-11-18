@@ -66,6 +66,3 @@ void pqManageCustomFiltersReaction::manageCustomFilters()
   pqCustomFilterManager dialog(this->Model, pqCoreUtilities::mainWidget());
   dialog.exec();
 }
-
-
-

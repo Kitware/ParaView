@@ -168,6 +168,9 @@ protected slots:
   /// Called on each pick, default implementation does nothing.
   virtual void pick(double, double, double) {};
 
+  /// Called when master/slave change
+  virtual void updateMasterEnableState(bool);
+
 protected:
   /// Subclasses can override this method to map properties to
   /// GUI. Default implementation updates the internal datastructures

@@ -39,6 +39,9 @@ public:
   // Sets the size of the vector.
   virtual void SetNumberOfElements(unsigned int num) = 0;
 
+  virtual unsigned int GetNumberOfUncheckedElements() { return 0; }
+  virtual void SetNumberOfUncheckedElements(unsigned int num) { (void) num; }
+
   // Description:
   // If RepeatCommand is true, the command is invoked multiple times,
   // each time with NumberOfElementsPerCommand values. For example, if
@@ -99,6 +102,8 @@ public:
   // with the number of arguments as the parameter.
   vtkSetStringMacro(SetNumberCommand);
   vtkGetStringMacro(SetNumberCommand);
+
+  virtual void ClearUncheckedElements();
 
   char* SetNumberCommand;
 

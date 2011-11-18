@@ -27,6 +27,7 @@
 #include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
 #include "vtkStdString.h"
+#include "vtkCommand.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
@@ -36,8 +37,10 @@
 
 #include <assert.h>
 
-vtkStandardNewMacro(vtkSMProxyProperty);
 
+//***************************************************************************
+//                          Internal classes
+//***************************************************************************
 class vtkSMProxyProperty::vtkProxyPointer
 {
 public:
@@ -97,7 +100,7 @@ public:
     return (this->Self == other.Self && this->Value == other.Value);
     }
 };
-
+//***************************************************************************
 struct vtkSMProxyPropertyInternals
 {
   typedef vtkstd::vector<vtkSMProxyProperty::vtkProxyPointer> VectorOfProxies;
@@ -117,7 +120,9 @@ struct vtkSMProxyPropertyInternals
   vtkstd::vector<vtkSMProxy*> UncheckedProxies;
   vtkstd::map<void*, int> ProducerCounts;
 };
-
+//***************************************************************************
+vtkStandardNewMacro(vtkSMProxyProperty);
+bool vtkSMProxyProperty::CreateProxyAllowed = false; // static init
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
@@ -145,6 +150,7 @@ vtkSMProxyProperty::~vtkSMProxyProperty()
 void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 {
   this->PPInternals->UncheckedProxies.push_back(proxy);
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
@@ -160,6 +166,7 @@ unsigned int vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
     if (*it == proxy)
       {
       this->PPInternals->UncheckedProxies.erase(it);
+      this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
       break;
       }
     }
@@ -174,12 +181,29 @@ void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
     this->PPInternals->UncheckedProxies.resize(idx+1);
     }
   this->PPInternals->UncheckedProxies[idx] = proxy;
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 {
   this->PPInternals->UncheckedProxies.clear();
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::ClearUncheckedProxies()
+{
+  this->PPInternals->UncheckedProxies.clear();
+
+  for(unsigned int i = 0; i < this->PPInternals->Proxies.size(); i++)
+    {
+    this->PPInternals->UncheckedProxies.push_back(this->GetProxy(i));
+    }
+
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
@@ -200,13 +224,13 @@ bool vtkSMProxyProperty::IsProxyAdded(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
 {
-  this->RemoveAllUncheckedProxies();
-
   this->PPInternals->Proxies.push_back(vtkProxyPointer(this, proxy));
   if (modify)
     {
     this->Modified();
     }
+
+  this->ClearUncheckedProxies();
   return 1;
 }
 
@@ -231,6 +255,7 @@ unsigned int vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
         {
         this->Modified();
         }
+      this->ClearUncheckedProxies();
       break;
       }
     }
@@ -246,7 +271,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
     return 1;
     }
 
-  this->RemoveAllUncheckedProxies();
   if (this->PPInternals->Proxies.size() <= idx)
     {
     this->PPInternals->Proxies.resize(idx+1);
@@ -254,6 +278,7 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 
   this->PPInternals->Proxies[idx] = vtkProxyPointer(this, proxy);
   this->Modified();
+  this->ClearUncheckedProxies();
 
   return 1;
 }
@@ -262,8 +287,6 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
   vtkSMProxy* proxies[])
 {
-  this->RemoveAllUncheckedProxies();
-
   this->PPInternals->Proxies.clear();
   for (unsigned int cc=0; cc < numProxies; cc++)
     {
@@ -271,6 +294,7 @@ void vtkSMProxyProperty::SetProxies(unsigned int numProxies,
     }
 
   this->Modified();
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------
@@ -287,6 +311,7 @@ void vtkSMProxyProperty::RemoveAllProxies(int modify)
     {
     this->Modified();
     }
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------
@@ -300,6 +325,8 @@ void vtkSMProxyProperty::SetNumberOfProxies(unsigned int num)
     {
     this->PPInternals->Proxies.clear();
     }
+
+  this->ClearUncheckedProxies();
 }
 
 //---------------------------------------------------------------------------
@@ -350,7 +377,8 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
+void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
+                                  vtkSMProxyLocator* locator)
 {
   // FIXME this method is REALLY close to its vtkSMInputProperty subClass
   // Please keep them in sync
@@ -393,8 +421,19 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
       {
       // Get the proxy from proxy manager
       vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+
+      vtkSMProxy* proxy;
+      if(locator && vtkSMProxyProperty::CanCreateProxy())
+        {
+        proxy = locator->LocateProxy(*proxyIdIter);
+        }
+      else
+        {
+        proxy =
+            vtkSMProxy::SafeDownCast(
+                pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+        }
+
       if(proxy)
         {
         this->AddProxy(proxy, true);
@@ -469,6 +508,7 @@ void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src,
   if (this->ImmediateUpdate)
     {
     this->Modified();
+    this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
 }
 
@@ -501,6 +541,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     }
 
   this->Modified();
+  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }
 
 //---------------------------------------------------------------------------
@@ -640,4 +681,19 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   this->Modified();
   this->ImmediateUpdate = prevImUpdate;
   return 1;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::EnableProxyCreation()
+{
+  vtkSMProxyProperty::CreateProxyAllowed = true;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::DisableProxyCreation()
+{
+  vtkSMProxyProperty::CreateProxyAllowed = false;
+}
+//---------------------------------------------------------------------------
+bool vtkSMProxyProperty::CanCreateProxy()
+{
+  return vtkSMProxyProperty::CreateProxyAllowed;
 }

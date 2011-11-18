@@ -100,6 +100,10 @@ public:
     Link
   };
 
+  enum ItemRole {
+    AnnotationFilterRole = 33
+    };
+
 public:
   pqPipelineModel(QObject *parent=0);
 
@@ -250,6 +254,20 @@ public:
   /// \param font The font to use for modified items.
   void setModifiedFont(const QFont &font);
 
+  /// \brief
+  ///   Store the annotation key that will be used when
+  ///   "this->data( ... , pqPipelineMode::AnnotationFilterRole)"
+  ///   get called.
+  /// \param annotation key that will be lookup inside the above code.
+  void enableFilterAnnotationKey(const QString &expectedAnnotation);
+
+  /// \brief
+  ///   Disable annotation key, so
+  ///   "this->data( ... , pqPipelineMode::AnnotationFilterRole)"
+  ///   will always return a QVariant("true")
+  /// \param font The font to use for modified items.
+  void disableFilterAnnotationKey();
+
 public slots:
   /// Called when a new server connection is detected. Adds the connection to the
   /// list.
@@ -325,7 +343,7 @@ private:
   QPixmap *PixmapList;               ///< Stores the item icons.
   pqView* View;
   bool Editable;
-
+  QString FilterRoleAnnotationKey;
   void constructor();
 };
 

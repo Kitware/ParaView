@@ -58,7 +58,7 @@ void pqCreateCustomFilterReaction::updateEnableState()
   pqServerManagerSelectionModel* selModel=
     pqApplicationCore::instance()->getSelectionModel();
   const pqServerManagerSelection& selection = *(selModel->selectedItems());
-  this->parentAction()->setEnabled(selection.size() > 0);
+  this->parentAction()->setEnabled(selection.size() > 0 && this->IsMaster);
 }
 
 //-----------------------------------------------------------------------------

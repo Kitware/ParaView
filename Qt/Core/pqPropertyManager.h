@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 class vtkSMProperty;
+class pqPropertyLinks;
 
 /// Manages links between Qt properties and unchecked proxy properties
 /// This is useful if more than one QWidget exposes a single proxy property
@@ -93,55 +94,8 @@ public slots:
   void propertyChanged();
   
 protected:
-  class pqInternal;
-  pqInternal* Internal;
-
+  pqPropertyLinks* Links;
+  bool Modified;
 };
-
-class pqPropertyManagerProperty;
-
-class PQCORE_EXPORT pqPropertyManagerPropertyLink : public QObject
-{
-  Q_OBJECT
-public:
-  pqPropertyManagerPropertyLink(pqPropertyManagerProperty* p, 
-                                QObject* o, 
-                                const char* property, 
-                                const char* signal);
-  QObject* object() const;
-  QByteArray property() const;
-private slots:
-  void guiPropertyChanged();
-  void managerPropertyChanged();
-private:
-  QPointer<QObject> QtObject;
-  QByteArray QtProperty;
-  int Block;
-};
-
-class PQCORE_EXPORT pqPropertyManagerProperty : public QObject
-{
-  Q_OBJECT
-  Q_PROPERTY(QVariant value READ value WRITE setValue)
-  friend class pqPropertyManager;
-  friend class pqPropertyManagerPropertyLink;
-public:
-  pqPropertyManagerProperty(QObject* p);
-  ~pqPropertyManagerProperty();
-  QVariant value() const;
-  void setValue(const QVariant&);
-  void addLink(QObject* o, const char* property, const char* signal);
-  void removeLink(QObject* o, const char* property, const char* signal);
-  void removeAllLinks();
-  int numberOfLinks() const { return Links.size(); }
-signals:
-  void propertyChanged();
-  void guiPropertyChanged();
-  void flushProperty();
-private:
-  QVariant Value;
-  QList<pqPropertyManagerPropertyLink*> Links;
-};
-
 #endif // !_pqPropertyManager_h
 

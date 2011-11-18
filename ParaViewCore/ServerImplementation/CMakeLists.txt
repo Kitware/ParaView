@@ -26,6 +26,7 @@ SET (Kit_SRCS
   vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
+  vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIContextArraysProperty.cxx
   vtkSIDataArrayProperty.cxx
@@ -64,7 +65,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVProxyDefinitionIterator.cxx
-  vtkSIObject.cxx
   vtkSIVectorProperty.cxx
   vtkPVSessionBase.cxx
   vtkSMMessage.cxx

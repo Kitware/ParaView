@@ -21,7 +21,7 @@
       <DoubleVectorProperty name="CacheKey"
         command="SetCacheKey"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -33,7 +33,7 @@
       <IntVectorProperty name="UseCache"
         command="SetUseCache"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -54,6 +54,7 @@
         command="SetSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.
@@ -81,6 +82,7 @@
       <IntVectorProperty name="UseOffscreenRendering"
         command="SetUseOffscreenRendering"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -165,6 +167,7 @@
       <DoubleVectorProperty name="RemoteRenderThreshold"
         command="SetRemoteRenderingThreshold"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="20.0">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
@@ -4146,7 +4149,7 @@
 
       <DoubleVectorProperty name="CacheKey"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -4157,7 +4160,7 @@
 
       <IntVectorProperty name="UseCache"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -4178,6 +4181,7 @@
         command="SetViewSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.

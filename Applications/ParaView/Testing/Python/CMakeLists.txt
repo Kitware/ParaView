@@ -66,7 +66,7 @@ SET (StreamingServerSideTest_BREAK TRUE)
 SET(SaveLargeScreenshot_THRESHOLD 10000)
 SET(SLACTools_THRESHOLD 20)
 
-add_client_tests(
+add_client_tests("pypv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   PARALLEL)
 

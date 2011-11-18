@@ -79,7 +79,13 @@ public:
   // Notify that the given SIObject is not used anymore .
   // This does not necessary delete the SIObject specially if this one is
   // used by other local SIObject. It only decrease its reference count.
-  virtual void DeleteSIObject(vtkSMMessage* message);
+  virtual void UnRegisterSIObject(vtkSMMessage* message);
+
+  // Description:
+  // Notify that the given SIObject is used.
+  // It only increase its reference count.
+  virtual void RegisterSIObject(vtkSMMessage* message);
+
   //ETX
 
   // Description:
@@ -118,26 +124,48 @@ public:
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
   vtkGetObjectMacro(MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
 
+  // Description:
+  // Provides the next available identifier. This implementation works locally.
+  // without any code distribution. To support the distributed architecture
+  // the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+  // vtkPVSessionBase instance.
+  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
+
+  // Description:
+  // Return the first Id of the requested chunk.
+  // 1 = ReverveNextIdChunk(10); | Reserved ids [1,2,3,4,5,6,7,8,9,10]
+  // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
+  // b = a + 10;
+  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
+
 //BTX
+
   enum MessageTypes
     {
     PUSH_STATE         = 12,
     PULL_STATE         = 13,
     EXECUTE_STREAM     = 14,
     GATHER_INFORMATION = 15,
-    DELETE_SI          = 16
+    REGISTER_SI        = 16,
+    UNREGISTER_SI      = 17,
     };
   // Methods used to managed MPI satellite
   void PushStateSatelliteCallback();
   void ExecuteStreamSatelliteCallback();
   void GatherInformationStatelliteCallback();
-  void DeleteSIObjectSatelliteCallback();
+  void RegisterSIObjectSatelliteCallback();
+  void UnRegisterSIObjectSatelliteCallback();
 
   // Description:
   // Allow the user to fill a vtkCollection with all RemoteObjects
   // This is usefull when you want to hold a reference to them to
   // prevent any deletion across several method call.
   virtual void GetAllRemoteObjects(vtkCollection* collection);
+
+  // Description:
+  // Delete SIObject that are held by clients that disapeared
+  // from the given list.
+  void GarbageCollectSIObject(int* clientIds, int nbClients);
 
 protected:
   vtkPVSessionCore();
@@ -165,10 +193,14 @@ protected:
   bool CollectInformation(vtkPVInformation*);
 
   // Description:
+  // Increment reference count of a local vtkSIObject.
+  virtual void RegisterSIObjectInternal(vtkSMMessage* message);
+
+  // Description:
   // Decrement reference count of a local vtkSIObject. This might not result
   // in an actual deletion of the object if this one is used by another
   // SIObject.
-  virtual void DeleteSIObjectInternal(vtkSMMessage* message);
+  virtual void UnRegisterSIObjectInternal(vtkSMMessage* message);
 
   // Description:
   // Callback for reporting interpreter errors.
@@ -192,6 +224,9 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool SymmetricMPIMode;
+
+  // Local counter for global Ids
+  vtkTypeUInt32 LocalGlobalID;
 
   ostream *LogStream;
 //ETX

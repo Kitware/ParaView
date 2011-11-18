@@ -12,7 +12,7 @@ ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
-  
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/Resources)
 
 # Plugins for ParaView that add support to export state for CoProcessing etc.
@@ -27,9 +27,6 @@ SET (CP_SOURCES
   pqCPExportStateWizard.cxx
   pqCPExportStateWizard.h
 )
-
-SET (CP_RESOURCES
-  Resources/Writers.xml)
 
 SET (UI_RESOURCES
   Resources/ExportStateWizard.ui)
@@ -75,21 +72,19 @@ ADD_CUSTOM_COMMAND(
        cp_export_py)
 
 ADD_PARAVIEW_PLUGIN(
-  CoProcessingPlugin 
+  CoProcessingPlugin
   #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"
   "0.1.0"
   SERVER_MANAGER_XML Resources/servermanager.xml
-  GUI_INTERFACES 
+  GUI_INTERFACES
     ${PARAVIEW_PLUGIN_IFACES}
     ${PARAVIEW_PLUGIN_IFACES2}
-  GUI_SOURCES 
+  GUI_SOURCES
     ${CP_SOURCES}
     ${MOC_SRCS}
     ${UI_RESOURCES}
     ${PARAVIEW_PLUGIN_SRCS}
     ${PARAVIEW_PLUGIN_SRCS2}
     cp_export_py.cxx
-  GUI_RESOURCE_FILES
-    ${CP_RESOURCES}
 )
 
