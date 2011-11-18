@@ -219,10 +219,16 @@ void vtkSMProxyManager::SetActiveSession(vtkIdType sid)
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkSMSession* session)
 {
+  bool changeDetected = (this->PXMStorage->ActiveSession != session);
   this->PXMStorage->ActiveSession = session;
 
   // ensures that the active session is updated if session == NULL.
-  this->GetActiveSession();
+  session = this->GetActiveSession();
+
+  if(changeDetected)
+    {
+    this->InvokeEvent(ActiveSessionChanged, session);
+    }
 }
 
 //----------------------------------------------------------------------------

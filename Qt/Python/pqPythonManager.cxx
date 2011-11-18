@@ -103,6 +103,9 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
   this->connect(core->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
+  this->connect(core->getObjectBuilder(),
+    SIGNAL(activeServerChanged(pqServer*)),
+    this, SLOT(onServerCreationFinished(pqServer*)));
 
   // Init Python tracing ivar
   this->Internal->IsPythonTracing = false;

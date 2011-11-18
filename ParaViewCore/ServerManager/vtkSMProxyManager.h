@@ -149,6 +149,12 @@ public:
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
 
 //BTX
+
+  enum eventId
+    {
+    ActiveSessionChanged = 9753
+    };
+
   struct RegisteredProxyInformation
   {
     vtkSMProxy* Proxy;

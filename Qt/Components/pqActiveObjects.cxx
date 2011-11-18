@@ -70,6 +70,10 @@ pqActiveObjects::pqActiveObjects() :
   QObject::connect(this, SIGNAL(portChanged(pqOutputPort*)),
     this, SLOT(updateRepresentation()));
 
+  this->VTKConnector->Connect(vtkSMProxyManager::GetProxyManager(),
+                              vtkSMProxyManager::ActiveSessionChanged,
+                              this, SLOT(onActiveServerChanged()));
+
   QList<pqServer*> servers = smmodel->findItems<pqServer*>();
   if (servers.size() ==1)
     {
@@ -281,6 +285,25 @@ void pqActiveObjects::sourceSelectionChanged()
 }
 
 //-----------------------------------------------------------------------------
+void pqActiveObjects::onActiveServerChanged()
+{
+  vtkSMSession* activeSession = vtkSMProxyManager::GetProxyManager()->GetActiveSession();
+  if(activeSession == NULL)
+    {
+    return;
+    }
+
+  pqServerManagerModel* smmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+  pqServer* activeServer = smmodel->findServer(activeSession);
+
+  if(this->ActiveServer != activeServer)
+    {
+    this->setActiveServer(activeServer);
+    }
+}
+//-----------------------------------------------------------------------------
+
 void pqActiveObjects::setActiveServer(pqServer* server)
 {
   if (this->ActiveServer == server)
@@ -291,6 +314,12 @@ void pqActiveObjects::setActiveServer(pqServer* server)
   bool prev = this->blockSignals(true);
 
   this->VTKConnector->Disconnect();
+
+  // Need to connect it back to know if python is changing the active one
+  this->VTKConnector->Connect(vtkSMProxyManager::GetProxyManager(),
+                              vtkSMProxyManager::ActiveSessionChanged,
+                              this, SLOT(onActiveServerChanged()));
+
   this->ActiveServer = server;
 
   // FIXME: vtkSMProxyManager must fire an event when the active session is

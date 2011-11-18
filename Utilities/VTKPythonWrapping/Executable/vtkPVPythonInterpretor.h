@@ -133,6 +133,11 @@ protected:
   void DumpError(const char* string);
   void DumpOutput(const char* string);
   vtkStdString GetInputLine();
+
+  // Need to be called before releasing the interpretor, otherwise
+  // active session VTK callback will be trigger while the interpretor
+  // is shutting down which will make the application crash.
+  void DetachActiveSessionObserver();
   
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.

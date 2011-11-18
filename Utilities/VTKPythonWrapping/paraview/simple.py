@@ -1067,3 +1067,19 @@ else:
     _add_functions(globals())
 
 active_objects = ActiveObjects()
+
+def _switchToActiveConnectionCallback(caller, event):
+   if servermanager:
+      session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
+      if session and ((not servermanager.ActiveConnection) or session != servermanager.ActiveConnection.Session):
+         switchActiveConnection(servermanager.GetConnectionFromSession(session))
+
+class ActiveSessionObserver:
+    def __init__(self):
+        self.ObserverTag = servermanager.vtkSMProxyManager.GetProxyManager().AddObserver(9753, _switchToActiveConnectionCallback)
+
+    def __del__(self):
+        if servermanager:
+            servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
+
+active_session_observer = ActiveSessionObserver()

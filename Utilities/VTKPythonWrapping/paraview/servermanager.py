@@ -1832,7 +1832,6 @@ def InitFromGUI():
     Method used to initialize the Python Shell from the ParaView GUI.
     """
     global fromGUI, ActiveConnection
-    print "--- Init from the GUI ---"
     if not fromGUI:
        print "from paraview.simple import *"
     fromGUI = True
@@ -1841,15 +1840,16 @@ def InitFromGUI():
     iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
     iter.InitTraversal()
     ActiveConnection = None
-    activeSession = vtkProcessModule.GetProcessModule().GetSession()
+    activeSession = vtkSMProxyManager.GetProxyManager().GetActiveSession()
     tmpActiveConnection = None
     while not iter.IsDoneWithTraversal():
-      c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
-      if c.Session == activeSession:
-         tmpActiveConnection = c
-      iter.GoToNextItem()
+       c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
+       if c.Session == activeSession:
+          tmpActiveConnection = c
+       iter.GoToNextItem()
     iter.UnRegister(None)
-    ActiveConnection = tmpActiveConnection
+    if tmpActiveConnection:
+       ActiveConnection = tmpActiveConnection
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
@@ -2882,8 +2882,7 @@ def enableMultiServer(multiServer=True):
 def switchActiveConnection(newActiveConnection=None):
   """Switch active connection to be the provided one or if none just pick the
   other one"""
-  global MultiServerConnections
-  global ActiveConnection
+  global MultiServerConnections, ActiveConnection
   if MultiServerConnections == None:
     raise RuntimeError, "enableMultiServer() must be called before"
 
@@ -2891,12 +2890,20 @@ def switchActiveConnection(newActiveConnection=None):
   if newActiveConnection:
     ActiveConnection = newActiveConnection
     __exposeActiveModules__()
+    # Update active session for ParaView
+    if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
+       vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
+    return ActiveConnection
   else:
     for connection in MultiServerConnections:
       if connection != ActiveConnection:
          ActiveConnection = connection
          __exposeActiveModules__()
-         return
+         # Update active session for ParaView
+         if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
+            vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
+         return ActiveConnection
+  return None
 
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.
@@ -2953,3 +2960,21 @@ def __exposeActiveModules__():
 if hasattr(sys, "ps1"):
     # session is interactive.
     print vtkSMProxyManager.GetParaViewSourceVersion();
+
+def GetConnectionFromId(id):
+   for connection in MultiServerConnections:
+      if connection.ID == id:
+         return connection
+   return None
+
+def GetConnectionFromSession(session):
+   for connection in MultiServerConnections:
+      if connection.Session == session:
+         return connection
+   return None
+
+def GetConnectionAt(index):
+   return MultiServerConnections[index]
+
+def GetNumberOfConnections():
+   return len(MultiServerConnections)

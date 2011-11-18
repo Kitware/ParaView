@@ -91,6 +91,7 @@ public slots:
   void setActiveSource(pqPipelineSource * source);
   void setActivePort(pqOutputPort * port);
   void setActiveServer(pqServer*);
+  void onActiveServerChanged();
 
   /// Sets the selected set of proxies. All proxies in the selection must be on
   /// the same server/session. This generally doesn't affect the activeSource
