@@ -18,7 +18,7 @@
 
 #include "vtkPVContextView.h"
 
-#include "vtkScatterPlotMatrix.h"
+class vtkScatterPlotMatrix
 
 class VTK_EXPORT vtkPVPlotMatrixView : public vtkPVContextView
 {

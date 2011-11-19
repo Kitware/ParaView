@@ -22,8 +22,7 @@
 
 #include "vtkPVContextView.h"
 
-#include "vtkChart.h"
-
+class vtkChart;
 class vtkChartView;
 class vtkPVPlotTime;
 
