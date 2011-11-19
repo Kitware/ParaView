@@ -40,6 +40,13 @@ vtkPVPlotMatrixView::~vtkPVPlotMatrixView()
   this->PlotMatrix->Delete();
 }
 
+//----------------------------------------------------------------------------
+vtkAbstractContextItem* vtkPVPlotMatrixView::GetContextItem()
+{
+  return this->PlotMatrix;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::PlotMatrixSelectionCallback(vtkObject*,
   unsigned long event, void*)
 {

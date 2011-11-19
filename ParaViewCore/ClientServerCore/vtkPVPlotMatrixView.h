@@ -18,7 +18,7 @@
 
 #include "vtkPVContextView.h"
 
-class vtkScatterPlotMatrix
+class vtkScatterPlotMatrix;
 
 class VTK_EXPORT vtkPVPlotMatrixView : public vtkPVContextView
 {
@@ -27,7 +27,7 @@ public:
   vtkTypeMacro(vtkPVPlotMatrixView, vtkPVContextView);
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  vtkAbstractContextItem* GetContextItem() { return this->PlotMatrix; }
+  vtkAbstractContextItem* GetContextItem();
 
 protected:
   vtkPVPlotMatrixView();

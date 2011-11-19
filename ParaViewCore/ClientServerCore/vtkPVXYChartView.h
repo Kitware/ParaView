@@ -235,7 +235,7 @@ public:
 
   // Description:
   // Get the context item.
-  virtual vtkAbstractContextItem* GetContextItem() { return this->GetChart(); }
+  virtual vtkAbstractContextItem* GetContextItem();
 
 //BTX
 protected:
