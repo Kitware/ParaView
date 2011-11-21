@@ -104,6 +104,10 @@ protected:
   virtual bool RemoveFromView(vtkView *view);
 
 private:
+  vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&); // Not implemented
+  void operator=(const vtkPVPlotMatrixRepresentation&); // Not implemented
+
+private:
   double ActivePlotColor[3];
   double ScatterPlotColor[3];
   double HistogramColor[3];
