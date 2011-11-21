@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -184,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>76</width>
-          <height>183</height>
+          <width>90</width>
+          <height>199</height>
          </rect>
         </property>
        </widget>
@@ -219,8 +219,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>76</width>
-          <height>183</height>
+          <width>90</width>
+          <height>198</height>
          </rect>
         </property>
        </widget>
@@ -238,7 +238,7 @@
    </attribute>
    <widget class="pqSummaryPanel" name="summaryWidget"/>
   </widget>
-  <widget class="QDockWidget" name="memoryInspectorWidget">
+  <widget class="QDockWidget" name="memoryInspectorDock">
    <property name="windowTitle">
     <string>Memory Inspector</string>
    </property>

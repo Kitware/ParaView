@@ -43,6 +43,13 @@ public:
   pqMemoryInspector(QWidget* parent=0, Qt::WindowFlags f=0);
   virtual ~pqMemoryInspector();
 
+protected slots:
+  /// refreshes information.
+  void refresh();
+  void physicalMemoryToggled();
+  void exportToCSV();
+  void updateSummary();
+
 private:
   Q_DISABLE_COPY(pqMemoryInspector)
   class pqIntenals;
