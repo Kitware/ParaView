@@ -56,6 +56,7 @@ vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
   // By default a vtkSphereSource will be used to define the cursor shape
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->SetThetaResolution(12);
+  sphere->Update();
   this->CursorShape = sphere->GetOutput();
   this->CursorShape->Register(this);
   sphere->Delete();

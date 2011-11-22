@@ -77,7 +77,7 @@ int vtkPythonCalculator::RequestDataObject(
       if (!output || !output->IsA(input->GetClassName())) 
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(info);
+        info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
         newOutput->Delete();
         this->GetOutputPortInformation(0)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());

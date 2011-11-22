@@ -193,9 +193,9 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
   vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
   tprod->SetExecutive(exec);
+  tprod->SetOutput(dobj);
   vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
   portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
-  tprod->SetOutput(dobj);
   this->Implementation->InputInternal[p].second = tprod;
   tprod->Delete();
   exec->Delete();

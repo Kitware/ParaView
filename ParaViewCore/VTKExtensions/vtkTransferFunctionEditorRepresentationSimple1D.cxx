@@ -759,6 +759,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
       {
       if (i == this->ActiveHandle)
         {
+        this->ActiveHandleFilter->Update();
         rep->SetCursorShape(this->ActiveHandleFilter->GetOutput());
         rep->Highlight(1);
         }
