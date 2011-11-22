@@ -128,7 +128,7 @@ int vtkPythonProgrammableFilter::RequestDataObject(
         if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
-          newOutput->SetPipelineInformation(info);
+          info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
           newOutput->Delete();
           this->GetOutputPortInformation(0)->Set(
             vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -157,7 +157,7 @@ int vtkPythonProgrammableFilter::RequestDataObject(
                       << outTypeStr);
         return 0;
         }
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       newOutput->Delete();
