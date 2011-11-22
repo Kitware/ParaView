@@ -4,7 +4,7 @@
     <virtualFolder>paraview</virtualFolder>
     <filterSection>
         <toc>
-          <section title="ParaView" ref="index.html">
+          <section title="ParaView User Manual" ref="index.html">
             <section title="Introduction" ref="Book/Book_Chapter1.html"/>
             <section title="Plugins" ref="Book/Book_Chapter16.html"/>
             <section title="Appendices" ref="Book/Book_Chapter17.html"/>
@@ -17,12 +17,14 @@
         <keywords>
         </keywords>
         <files>
-          <!-- CMake will automatically set this DOCUMENTATION_FILES variable to
-               list all the files in the documentation directory. We need to
-               ensure that those get added here. Custom apps are ofcourse free
-               to create this list on their own
-          -->
-          @DOCUMENTATION_FILES@
+          <file>*.html</file>
+          <file>*.css</file>
+          <file>*.png</file>
+          <file>*.jpg</file>
+          <file>Book/*.html</file>
+          <file>Book/*.css</file>
+          <file>Book/*.png</file>
+          <file>Book/*.jpg</file>
         </files>
     </filterSection>
 </QtHelpProject>
