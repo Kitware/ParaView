@@ -33,12 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QDebug>
-#include <QDir>
+#include <QHelpEngine>
 #include <QPointer>
 #include <QStringList>
 
 #include "pqCoreUtilities.h"
 #include "pqHelpWindow.h"
+#include "pqApplicationCore.h"
 
 //-----------------------------------------------------------------------------
 pqHelpReaction::pqHelpReaction(QAction* parentObject)
@@ -68,35 +69,18 @@ void pqHelpReaction::showHelp(const QString& url)
     return;
     }
 
-  // * Discover help project files from the resources.
-  QDir dir(QString(":/%1/Documentation").arg(QApplication::applicationName()));
-  QStringList help_files;
-  if (dir.exists())
-    {
-    QStringList filters;
-    filters << "*.qch";
-    help_files = dir.entryList(filters, QDir::Files);
-    }
-  if (help_files.size() == 0)
-    {
-    qWarning() << "No Qt compressed help file (*.qch) was located.";
-    return;
-    }
+  QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
+  helpWindow = new pqHelpWindow(engine, pqCoreUtilities::mainWidget());
+  helpWindow->setWindowTitle(
+    QString("%1 Online Help").arg(QApplication::applicationName()));
 
-  QString file = 
-    QString(":/%1/Documentation/%2").arg(QApplication::applicationName()).arg(help_files[0]);
-  helpWindow = new pqHelpWindow(
-    QString("%1 Online Help").arg(QApplication::applicationName()),
-    pqCoreUtilities::mainWidget());
-  QString namespace_name = helpWindow->registerDocumentation(file);
-
-  help_files.pop_front();
-  foreach (file, help_files)
+  // show some home page. Pick the first registered documentation and show its
+  // home page.
+  QStringList registeredDocumentations = engine->registeredDocumentations();
+  if (registeredDocumentations.size() > 0)
     {
-    helpWindow->registerDocumentation(file);
+    helpWindow->showHomePage(registeredDocumentations[0]);
     }
-
-  helpWindow->showHomePage(namespace_name);
   helpWindow->show();
   helpWindow->raise();
   if (!url.isEmpty())

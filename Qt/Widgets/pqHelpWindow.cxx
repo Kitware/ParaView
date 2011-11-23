@@ -72,22 +72,19 @@ private:
 
 //-----------------------------------------------------------------------------
 pqHelpWindow::pqHelpWindow(
-  const QString& wtitle, QWidget* parentObject, Qt::WindowFlags parentFlags)
-  : Superclass(parentObject, parentFlags)
+  QHelpEngine* engine, QWidget* parentObject, Qt::WindowFlags parentFlags)
+  : Superclass(parentObject, parentFlags), HelpEngine(engine)
 {
+  Q_ASSERT(engine != NULL);
+
   Ui::pqHelpWindow ui;
   ui.setupUi(this);
 
-  this->setWindowTitle(wtitle);
-
   QTemporaryFile tFile;
   tFile.open();
-  this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
 
   QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
     this, SIGNAL(helpWarnings(const QString&)));
-
-  this->HelpEngine->setupData();
 
   ui.contentsDock->setWidget(this->HelpEngine->contentWidget());
   ui.indexDock->setWidget(this->HelpEngine->indexWidget());
@@ -105,9 +102,6 @@ pqHelpWindow::pqHelpWindow(
 //-----------------------------------------------------------------------------
 pqHelpWindow::~pqHelpWindow()
 {
-  QString collectionFile = this->HelpEngine->collectionFile();
-  delete this->HelpEngine;
-  QFile::remove(collectionFile);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,21 +126,3 @@ void pqHelpWindow::showHomePage(const QString& namespace_name)
     }
   qWarning() << "Could not locate index.html";
 }
-
-//-----------------------------------------------------------------------------
-QString pqHelpWindow::registerDocumentation(const QString& qchfilename)
-{
-  QString filename = qchfilename;
-  // this piece of code handles the case where a resource file name is passed.
-  QFile file(qchfilename);
-  QTemporaryFile *tFile =QTemporaryFile::createLocalFile(file);
-  if (tFile)
-    {
-    filename = tFile->fileName();
-    tFile->setParent(this);
-    tFile->setAutoRemove(true);
-    }
-  this->HelpEngine->registerDocumentation(filename);
-  return this->HelpEngine->namespaceName(filename);
-}
-

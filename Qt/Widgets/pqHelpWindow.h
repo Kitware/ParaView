@@ -38,35 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QHelpEngine;
 class QTextBrowser;
 
-/// pqHelpWindow provides a assistant-like window  for showing embedded
-/// documentation in any application. It supports showing of Qt compressed help 
-/// files (*.qch files generated from *.qhp files). The qch file can be
-/// either on disk or an embedded qt-resource.
+/// pqHelpWindow provides a assistant-like window  for showing help provided by
+/// a QHelpEngine.
 class QTWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
 public:
-  pqHelpWindow(
-    const QString& window_title, QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqHelpWindow(QHelpEngine* engine,
+    QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqHelpWindow();
-
-  /// Register a *.qch documentation file.
-  /// This can be a file in the qt-resource space as well.
-  /// Note these are Qt compressed help files i.e. *.qch files generated
-  /// from *.qhp and not the help collection files (*.qhc generated from *.qhcp)
-  /// which have the assistant configuration details.
-  /// Unlike registering the documentation with the Qt assistant, this is not
-  /// remembered across sessions and must be done each time.
-  /// On successful loading, returns the namespace name provided by the help
-  /// file.
-  virtual QString registerDocumentation(const QString& qchfilename);
 
   /// Requests showing of a particular page. The url must begin with "qthelp:"
   /// scheme when referring to pages from the help files.
   virtual void showPage(const QString& url);
 
-  /// Experimental. I am not sure how to reliably determine the home page.
+  /// Tires to locate a file name index.html in the given namespace and then
+  /// shows that page.
   virtual void showHomePage(const QString& namespace_name);
 
 signals:
