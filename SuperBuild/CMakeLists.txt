@@ -141,6 +141,10 @@ endif()
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
 
+if(CMAKE_Fortran_COMPILER)
+  enable_language(Fortran)
+endif()
+
 #------------------------------------------------------------------------------
 configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
   ${ParaViewSuperBuild_BINARY_DIR}/CTestCustom.ctest @ONLY)
