@@ -177,7 +177,7 @@ set(SZIP_PATCH)
 set(SZIP_VERSION ${SZIP_MAJOR}.${SZIP_MINOR})
 set(SZIP_URL http://www.hdfgroup.org/ftp/lib-external/szip/2.1/src)
 set(SZIP_GZ szip-${SZIP_VERSION}.tar.gz)
-set(SZIP_MD5 0d6a55bb7787f9ff8b9d608f23ef5be0)
+set(SZIP_MD5 902f831bcefb69c6b635374424acbead)
 
 set(ZLIB_MAJOR 1)
 set(ZLIB_MINOR 2)
