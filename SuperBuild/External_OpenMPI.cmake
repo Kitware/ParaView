@@ -4,6 +4,19 @@ set(OpenMPI_source "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI")
 set(OpenMPI_build "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-build")
 set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}")
 
+if(CMAKE_Fortran_COMPILER)
+  if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel" AND WIN32)
+    include(DetectIntelFortranEnvironment)
+    set(OpenMPI_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILE_PATH=${intel_ifort_path}/ifort.exe
+    )
+  else()
+    set(OpenMPI_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILE_PATH=${CMAKE_Fortran_COMPILER}
+    )
+  endif()
+endif()
+
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
   ExternalProject_Add(OpenMPI
