@@ -82,7 +82,6 @@ protected slots:
   void connectGUI();
 
   // Setters for the axis elements of the form
-  void setAxisVisibility(bool visible);
   void setGridVisibility(bool visible);
   void setChartBackgroundColor(const QColor& color);
   void setAxisColor(const QColor& color);

@@ -83,7 +83,6 @@ public:
   int Precision;
   int ToolTipNotation;
   int ToolTipPrecision;
-  bool ShowAxis;
   bool ShowGrid;
   bool ShowLabels;
 };
@@ -122,7 +121,6 @@ pqPlotMatrixOptionsChartSetting::pqPlotMatrixOptionsChartSetting()
   this->Precision = 2;
   this->ToolTipNotation = 0;
   this->ToolTipPrecision = 2;
-  this->ShowAxis = true;
   this->ShowGrid = true;
   this->ShowLabels = true;
   
@@ -231,9 +229,11 @@ pqPlotMatrixOptionsEditor::pqPlotMatrixOptionsEditor(QWidget *widgetParent)
     this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->Form->GutterY, SIGNAL(valueChanged(double)),
     this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->Form->selRowColBackgroundColor, SIGNAL(valueChanged(double)),
+  QObject::connect(this->Internal->Form->selRowColBackgroundColor, 
+    SIGNAL(chosenColorChanged(QColor)),
     this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->Form->selActiveBackgroundColor, SIGNAL(valueChanged(double)),
+  QObject::connect(this->Internal->Form->selActiveBackgroundColor,
+    SIGNAL(chosenColorChanged(QColor)),
     this, SIGNAL(changesAvailable()));
 
 }
@@ -344,16 +344,8 @@ void pqPlotMatrixOptionsEditor::connectGUI()
 
 void pqPlotMatrixOptionsEditor::resetChanges()
 {
-  // TODO
-}
-void pqPlotMatrixOptionsEditor::setAxisVisibility(bool visible)
-{
-  if(this->Internal->Form->CurrentPlot != vtkScatterPlotMatrix::NOPLOT)
-    {
-    this->Internal->Form->PlotData[this->Internal->Form->CurrentPlot]->ShowAxis
-        = visible;
-    this->changesAvailable();
-    }
+  //this->updateOptions();
+  this->loadChartPage();
 }
 
 void pqPlotMatrixOptionsEditor::setGridVisibility(bool visible)
@@ -483,123 +475,67 @@ void pqPlotMatrixOptionsEditor::updateOptions()
   this->blockSignals(true);
 
   // Use the server properties to update the options on the charts
-  QList<QVariant> values;
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ChartTitleFont"));
-  if(values.size() == 4)
-    {
-    this->Internal->Form->TitleFont = QFont(values[0].toString(), values[1].toInt(),
-                                            values[2].toInt() != 0 ? QFont::Bold : -1,
-                                            values[3].toInt() != 0);
-    this->updateDescription(this->Internal->Form->ChartTitleFont,
-                            this->Internal->Form->TitleFont);
-    }
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ChartTitleColor"));
-  if(values.size() == 3)
-    {
-    this->Internal->Form->ChartTitleColor->setChosenColor(
-        QColor::fromRgbF(values[0].toDouble(), values[1].toDouble(),
-                         values[2].toDouble()));
-    }
+  this->Internal->Form->Title = proxy->GetScatterPlotTitle();
+  this->Internal->Form->TitleFont = 
+    QFont(proxy->GetScatterPlotTitleFontFamily(),
+    proxy->GetScatterPlotTitleFontSize(),
+    proxy->GetScatterPlotTitleFontBold() ? QFont::Bold : -1,
+    proxy->GetScatterPlotTitleFontItalic());
+  this->updateDescription(this->Internal->Form->ChartTitleFont,
+                          this->Internal->Form->TitleFont);
+  double rgba[4];
+  proxy->GetScatterPlotTitleColor(rgba);
+  this->Internal->Form->TitleColor = QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+  this->Internal->Form->TitleAlignment =
+      proxy->GetScatterPlotTitleAlignment();
+ 
+  proxy->GetScatterPlotSelectedRowColumnColor(rgba);
+  this->Internal->Form->SelectedRowColumnScatterChartBGColor=
+    QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+  proxy->GetScatterPlotSelectedActiveColor(rgba);
+  this->Internal->Form->SelectedActiveScatterChartBGColor=
+    QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+  
+  float gutter[2];
+  proxy->GetGutter(gutter);
+  this->Internal->Form->Gutter.Set(gutter[0], gutter[1]);
+  
+  int borders[4];
+  proxy->GetBorders(borders);
+  memcpy(this->Internal->Form->Borders, borders, sizeof(int));
 
-  this->Internal->Form->ChartTitleAlignment->setCurrentIndex(
-      pqSMAdaptor::getElementProperty(
-          proxy->GetProperty("ChartTitleAlignment")).toInt());
-
-  // Get the general axis parameters.
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ShowAxis"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
+  for(QMap<int, pqPlotMatrixOptionsChartSetting*>::iterator dataIt=
+    this->Internal->Form->PlotData.begin(); 
+    dataIt!=this->Internal->Form->PlotData.end(); ++dataIt)
     {
-    this->Internal->Form->PlotData[i]->ShowAxis = values[i].toInt() != 0;
-    }
+    int plotType = dataIt.key();
+    pqPlotMatrixOptionsChartSetting* settings = dataIt.value();
+    proxy->GetAxisColor(plotType, rgba);
+    settings->AxisColor =
+      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+    proxy->GetBackgroundColor(plotType, rgba);
+    settings->BackGroundColor =
+      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+    proxy->GetGridColor(plotType, rgba);
+    settings->GridColor =
+      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+    proxy->GetAxisLabelColor(plotType, rgba);
+    settings->LabelColor =
+      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+    settings->Notation = proxy->GetAxisLabelNotation(plotType);
+    settings->Precision = proxy->GetAxisLabelPrecision(plotType);
+    settings->ShowGrid = proxy->GetGridVisibility(plotType);
+    settings->ShowLabels = proxy->GetAxisLabelVisibility(plotType);
+    settings->ToolTipNotation = proxy->GetTooltipNotation(plotType);
+    settings->ToolTipPrecision = proxy->GetTooltipPrecision(plotType);
 
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ShowAxisGrid"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->PlotData[i]->ShowGrid = values[i].toInt() != 0;
+    settings->LabelFont = 
+      QFont(proxy->GetAxisLabelFontFamily(plotType),
+      proxy->GetAxisLabelFontSize(plotType),
+      proxy->GetAxisLabelFontBold(plotType) ? QFont::Bold : -1,
+      proxy->GetAxisLabelFontItalic(plotType));   
     }
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisColor"));
-  if(values.size() == 12)
-    {
-    for(int i = 0; i < 4; ++i)
-      {
-      this->Internal->Form->PlotData[i]->AxisColor = QColor::fromRgbF(
-          values[3*i].toDouble(), values[3*i + 1].toDouble(),
-          values[3*i + 2].toDouble());
-      }
-    }
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisGridColor"));
-  if(values.size() == 12)
-    {
-    for(int i = 0; i < 4; ++i)
-      {
-      this->Internal->Form->PlotData[i]->GridColor = QColor::fromRgbF(
-          values[3*i].toDouble(), values[3*i + 1].toDouble(),
-          values[3*i + 2].toDouble());
-      }
-    }
-
-  // Axis label parameters
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ShowAxisLabels"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->PlotData[i]->ShowLabels = values[i].toInt() != 0;
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisLabelFont"));
-  if (values.size() == 16)
-    {
-    for(int i = 0; i < 4; ++i)
-      {
-      int j = 4*i;
-      this->Internal->Form->PlotData[i]->LabelFont =
-          QFont(values[j].toString(), values[j + 1].toInt(),
-                values[j + 2].toInt() != 0 ? QFont::Bold : -1,
-                values[j + 3].toInt() != 0);
-      }
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisLabelColor"));
-  if (values.size() == 12)
-    {
-    for(int i = 0; i < 4; ++i)
-      {
-      this->Internal->Form->PlotData[i]->LabelColor = QColor::fromRgbF(
-          values[3*i].toDouble(), values[3*i + 1].toDouble(),
-          values[3*i + 2].toDouble());
-      }
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisLabelNotation"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->PlotData[i]->Notation = values[i].toInt();
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisLabelPrecision"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->PlotData[i]->Precision = values[i].toInt();
-    }
-
-  this->Internal->Form->TooltipNotation->setCurrentIndex(
-    pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipNotation")).toInt());
-
-  this->Internal->Form->TooltipPrecision->setValue(
-    pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipPrecision")).toInt());
-
   this->blockSignals(false);
-
 }
 
 void pqPlotMatrixOptionsEditor::applyChartOptions()

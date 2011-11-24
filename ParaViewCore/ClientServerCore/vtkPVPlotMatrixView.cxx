@@ -216,6 +216,26 @@ void vtkPVPlotMatrixView::SetTooltipPrecision(int plotType, int precision)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetScatterPlotSelectedRowColumnColor(
+  double red, double green, double blue, double alpha)
+{
+  if(this->PlotMatrix)
+    {
+    this->PlotMatrix->SetScatterPlotSelectedRowColumnColor(red, green, blue, alpha);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetScatterPlotSelectedActiveColor(
+  double red, double green, double blue, double alpha)
+{
+  if(this->PlotMatrix)
+    {
+    this->PlotMatrix->SetScatterPlotSelectedActiveColor(red, green, blue, alpha);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -223,4 +243,159 @@ void vtkPVPlotMatrixView::PrintSelf(ostream &os, vtkIndent indent)
     {
     this->PlotMatrix->PrintSelf(os, indent);
     }
+}
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::UpdateSettings()
+{
+  if(this->PlotMatrix)
+    {
+    this->PlotMatrix->UpdateSettings();
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPlotMatrixView::GetScatterPlotTitleFontFamily()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleFontFamily() : NULL;
+}
+int vtkPVPlotMatrixView::GetScatterPlotTitleFontSize()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleFontSize() : -1;
+}
+int vtkPVPlotMatrixView::GetScatterPlotTitleFontBold()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleFontBold() : 0;
+}
+int vtkPVPlotMatrixView::GetScatterPlotTitleFontItalic()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleFontItalic() : 0;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetScatterPlotTitleColor()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleColor() : NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPlotMatrixView::GetScatterPlotTitle()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitle() : NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetScatterPlotTitleAlignment()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotTitleAlignment() : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetGridVisibility(int plotType)
+{
+  return this->PlotMatrix ? 
+    (this->PlotMatrix->GetGridVisibility(plotType)?1:0) : 0;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetBackgroundColor(plotType) : NULL;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetAxisColor(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisColor(plotType) : NULL;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetGridColor(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetGridColor(plotType) : NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetAxisLabelVisibility(int plotType)
+{
+  return this->PlotMatrix ? 
+    (this->PlotMatrix->GetAxisLabelVisibility(plotType)?1:0) : 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPlotMatrixView::GetAxisLabelFontFamily(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelFontFamily(plotType) : NULL;
+}
+int vtkPVPlotMatrixView::GetAxisLabelFontSize(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelFontSize(plotType) : -1;
+}
+int vtkPVPlotMatrixView::GetAxisLabelFontBold(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelFontBold(plotType) : 0;
+}
+int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelFontItalic(plotType) : 0;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelColor(plotType) : NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetAxisLabelNotation(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelNotation(plotType) : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetAxisLabelPrecision(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetAxisLabelPrecision(plotType) : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetTooltipNotation(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetTooltipNotation(plotType) : 0;
+}
+int vtkPVPlotMatrixView::GetTooltipPrecision(int plotType)
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetTooltipPrecision(plotType) : 0;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotSelectedRowColumnColor() : NULL;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
+{
+  return this->PlotMatrix ? 
+    this->PlotMatrix->GetScatterPlotSelectedActiveColor() : NULL;
 }

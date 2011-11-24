@@ -81,40 +81,32 @@ void vtkSMPlotMatrixViewProxy::SendIntValue(const char *func,
   this->ExecuteStream(stream);
   this->MarkModified(this);
 }
+//----------------------------------------------------------------------------
+int vtkSMPlotMatrixViewProxy::ReceiveIntValue(const char *func, 
+                                               int plotType)
+{
+  vtkClientServerStream values = this->InvokeTypeServerMethod(func, plotType);
+  int val;
+  values.GetArgument(0, 0, &val);
+  return val;
+}
 
 //----------------------------------------------------------------------------
-void vtkSMPlotMatrixViewProxy::ReceiveDouble3Vector(const char *func, 
+void vtkSMPlotMatrixViewProxy::ReceiveTypeDouble4Vector(const char *func, 
                                                          int plotType, 
                                                          double *data)
 {
-  vtkClientServerStream stream;
-
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this) << func  << plotType 
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-
-  vtkClientServerStream values = this->GetLastResult();
-
-  if (values.GetNumberOfArguments(0) < 0)
-    {
-    vtkErrorMacro("Error getting array from server.");
-    return;
-    }
-  
-  vtkTypeUInt32 length;
-  values.GetArgumentLength(0, 0, &length);
-  if (length != 3)
-    {
-    vtkErrorMacro("Error getting array from server - incorrect size returned.");
-    return;
-    }
-  int status = values.GetArgument(0, 0, data, 3);
-  if (!status)
-    {
-    vtkErrorMacro("Error getting double vector 3.");
-    }
+  vtkClientServerStream values = this->InvokeTypeServerMethod(func, plotType);
+  values.GetArgument(0, 0, data, 4);
 }
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::ReceiveDouble4Vector(const char *func, 
+                                                         double *data)
+{
+  vtkClientServerStream values = this->InvokeServerMethod(func);
+  values.GetArgument(0, 0, data, 4);
+}
+
 //----------------------------------------------------------------------------
 void vtkSMPlotMatrixViewProxy::SetGutter(float x, float y)
 {
@@ -314,5 +306,186 @@ void vtkSMPlotMatrixViewProxy::UpdateSettings()
   this->ExecuteStream(stream);
   this->MarkModified(this);
 }
+//----------------------------------------------------------------------------
+const char* vtkSMPlotMatrixViewProxy::GetScatterPlotTitleFontFamily()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitleFontFamily");
+  const char* fontfamily=NULL;  
+  values.GetArgument(0, 0, &fontfamily);
+  return fontfamily;
+}
+int vtkSMPlotMatrixViewProxy::GetScatterPlotTitleFontSize()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitleFontSize");
+  int fsize;
+  values.GetArgument(0, 0, &fsize);
+  return fsize;
+}
+bool vtkSMPlotMatrixViewProxy::GetScatterPlotTitleFontBold()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitleFontBold");
+  int bold=0;
+  values.GetArgument(0, 0, &bold);
+  return bold >0 ? true : false ;
+}
+bool vtkSMPlotMatrixViewProxy::GetScatterPlotTitleFontItalic()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitleFontItalic");
+  int italic=0;
+  values.GetArgument(0, 0, &italic);
+  return italic >0 ? true : false ;
+}
 
 //----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetScatterPlotTitleColor(double* rgba)
+{
+  this->ReceiveDouble4Vector(
+    "GetScatterPlotTitleColor", rgba);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMPlotMatrixViewProxy::GetScatterPlotTitle()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitle");
+  const char* title=NULL;  
+  values.GetArgument(0, 0, &title);
+  return title;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPlotMatrixViewProxy::GetScatterPlotTitleAlignment()
+{
+  vtkClientServerStream values = this->InvokeServerMethod(
+    "GetScatterPlotTitleAlignment");
+  int val;  
+  values.GetArgument(0, 0, &val);
+  return val;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPlotMatrixViewProxy::GetGridVisibility(int plotType)
+{
+  return this->ReceiveIntValue("GetGridVisibility", plotType)>0 ? true : false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetBackgroundColor(int plotType, double* rgba)
+{
+  this->ReceiveTypeDouble4Vector("GetBackgroundColor", plotType, rgba);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetAxisColor(int plotType, double* rgba)
+{
+  this->ReceiveTypeDouble4Vector("GetBackgroundColor", plotType, rgba);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetGridColor(int plotType, double* rgba)
+{
+  this->ReceiveTypeDouble4Vector("GetGridColor", plotType, rgba);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPlotMatrixViewProxy::GetAxisLabelVisibility(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelVisibility", plotType)>0 ? true : false;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMPlotMatrixViewProxy::GetAxisLabelFontFamily(int plotType)
+{
+  vtkClientServerStream values = this->InvokeTypeServerMethod(
+    "GetAxisLabelFontFamily", plotType);
+  const char* fontfamily=NULL;  
+  values.GetArgument(0, 0, &fontfamily);
+  return fontfamily;
+}
+int vtkSMPlotMatrixViewProxy::GetAxisLabelFontSize(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelFontSize", plotType);
+}
+bool vtkSMPlotMatrixViewProxy::GetAxisLabelFontBold(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelFontBold", plotType)>0 ? true : false;
+}
+bool vtkSMPlotMatrixViewProxy::GetAxisLabelFontItalic(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelFontItalic", plotType)>0 ? true : false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetAxisLabelColor(int plotType, double* rgba)
+{
+  this->ReceiveTypeDouble4Vector("GetAxisLabelColor", plotType, rgba);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPlotMatrixViewProxy::GetAxisLabelNotation(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelNotation", plotType);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPlotMatrixViewProxy::GetAxisLabelPrecision(int plotType)
+{
+  return this->ReceiveIntValue("GetAxisLabelPrecision", plotType);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPlotMatrixViewProxy::GetTooltipNotation(int plotType)
+{
+  return this->ReceiveIntValue("GetTooltipNotation", plotType);
+}
+int vtkSMPlotMatrixViewProxy::GetTooltipPrecision(int plotType)
+{
+  return this->ReceiveIntValue("GetTooltipPrecision", plotType);
+}
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetGutter(float* xy)
+{
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetBorders(int* borders)
+{
+}
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetScatterPlotSelectedRowColumnColor(double* rgba)
+{
+  return this->ReceiveDouble4Vector("GetScatterPlotSelectedRowColumnColor",rgba);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::GetScatterPlotSelectedActiveColor(double* rgba)
+{
+  return this->ReceiveDouble4Vector("GetScatterPlotSelectedActiveColor",rgba);
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkSMPlotMatrixViewProxy::InvokeServerMethod(
+  const char* method)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << VTKOBJECT(this) << method
+    << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  return this->GetLastResult();
+}
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkSMPlotMatrixViewProxy::InvokeTypeServerMethod(
+  const char* method,  int chartType)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << VTKOBJECT(this) << method << chartType
+    << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+  return this->GetLastResult();
+}
