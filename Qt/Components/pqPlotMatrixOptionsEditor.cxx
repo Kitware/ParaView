@@ -337,14 +337,14 @@ void pqPlotMatrixOptionsEditor::connectGUI()
   this->blockSignals(true);
 
   // TODO
-  //this->updateOptions();
+  this->updateOptions();
 
   this->blockSignals(false);
 }
 
 void pqPlotMatrixOptionsEditor::resetChanges()
 {
-  //this->updateOptions();
+  this->updateOptions();
   this->loadChartPage();
 }
 
@@ -465,12 +465,18 @@ void pqPlotMatrixOptionsEditor::pickTitleFont()
 
 void pqPlotMatrixOptionsEditor::updateOptions()
 {
-  vtkSMPlotMatrixViewProxy *proxy = vtkSMPlotMatrixViewProxy::SafeDownCast(
+  vtkSMPlotMatrixViewProxy *smproxy = vtkSMPlotMatrixViewProxy::SafeDownCast(
     this->getProxy());
-  if(!proxy)
+  if(!smproxy)
     {
     return;
     }
+  vtkScatterPlotMatrix* proxy = vtkScatterPlotMatrix::SafeDownCast(
+    smproxy->GetContextItem());
+  if(!proxy)
+    {
+    return;
+    } 
   // TODO: Update GUI from proxy
   this->blockSignals(true);
 
@@ -483,21 +489,21 @@ void pqPlotMatrixOptionsEditor::updateOptions()
     proxy->GetScatterPlotTitleFontItalic());
   this->updateDescription(this->Internal->Form->ChartTitleFont,
                           this->Internal->Form->TitleFont);
-  double rgba[4];
-  proxy->GetScatterPlotTitleColor(rgba);
+  vtkColor4f rgba;
+  rgba=proxy->GetScatterPlotTitleColor();
   this->Internal->Form->TitleColor = QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
   this->Internal->Form->TitleAlignment =
       proxy->GetScatterPlotTitleAlignment();
  
-  proxy->GetScatterPlotSelectedRowColumnColor(rgba);
+  rgba=proxy->GetScatterPlotSelectedRowColumnColor();
   this->Internal->Form->SelectedRowColumnScatterChartBGColor=
     QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-  proxy->GetScatterPlotSelectedActiveColor(rgba);
+  rgba=proxy->GetScatterPlotSelectedActiveColor();
   this->Internal->Form->SelectedActiveScatterChartBGColor=
     QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
   
-  float gutter[2];
-  proxy->GetGutter(gutter);
+  vtkVector2f gutter;
+  gutter = proxy->GetGutter();
   this->Internal->Form->Gutter.Set(gutter[0], gutter[1]);
   
   int borders[4];
@@ -510,16 +516,16 @@ void pqPlotMatrixOptionsEditor::updateOptions()
     {
     int plotType = dataIt.key();
     pqPlotMatrixOptionsChartSetting* settings = dataIt.value();
-    proxy->GetAxisColor(plotType, rgba);
+    rgba=proxy->GetAxisColor(plotType);
     settings->AxisColor =
       QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    proxy->GetBackgroundColor(plotType, rgba);
+    rgba=proxy->GetBackgroundColor(plotType);
     settings->BackGroundColor =
       QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    proxy->GetGridColor(plotType, rgba);
+    rgba = proxy->GetGridColor(plotType);
     settings->GridColor =
       QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    proxy->GetAxisLabelColor(plotType, rgba);
+    rgba=proxy->GetAxisLabelColor(plotType);
     settings->LabelColor =
       QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
     settings->Notation = proxy->GetAxisLabelNotation(plotType);
@@ -540,12 +546,18 @@ void pqPlotMatrixOptionsEditor::updateOptions()
 
 void pqPlotMatrixOptionsEditor::applyChartOptions()
 {
-  vtkSMPlotMatrixViewProxy *proxy = vtkSMPlotMatrixViewProxy::SafeDownCast(
+  vtkSMPlotMatrixViewProxy *smproxy = vtkSMPlotMatrixViewProxy::SafeDownCast(
     this->getProxy());
-  if(!proxy)
+  if(!smproxy)
     {
     return;
     }
+  vtkScatterPlotMatrix* proxy = vtkScatterPlotMatrix::SafeDownCast(
+    smproxy->GetContextItem());
+  if(!proxy)
+    {
+    return;
+    } 
 
   // title
   this->Internal->Form->Title = this->Internal->Form->ChartTitle->text();
@@ -573,9 +585,7 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
   this->Internal->Form->Gutter.Set(
     this->Internal->Form->GutterX->value(),
     this->Internal->Form->GutterX->value());
-  proxy->SetGutter(
-    this->Internal->Form->Gutter.X(),
-    this->Internal->Form->Gutter.Y());
+  proxy->SetGutter(this->Internal->Form->Gutter);
 
   // Margin size
   this->Internal->Form->Borders[0]= this->Internal->Form->LeftMargin->value();

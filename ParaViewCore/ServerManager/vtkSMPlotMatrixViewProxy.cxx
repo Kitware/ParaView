@@ -18,7 +18,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkPVPlotMatrixView.h"
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMPlotMatrixViewProxy);
@@ -488,4 +488,12 @@ const vtkClientServerStream& vtkSMPlotMatrixViewProxy::InvokeTypeServerMethod(
     << vtkClientServerStream::End;
   this->ExecuteStream(stream);
   return this->GetLastResult();
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractContextItem* vtkSMPlotMatrixViewProxy::GetContextItem()
+{
+  vtkPVPlotMatrixView* pvview = vtkPVPlotMatrixView::SafeDownCast(
+    this->GetClientSideObject());
+  return pvview? pvview->GetContextItem() : NULL;
 }

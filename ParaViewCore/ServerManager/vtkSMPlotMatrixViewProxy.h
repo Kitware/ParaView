@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMContextViewProxy.h"
 #include "vtkClientServerStream.h"
 
+class vtkAbstractContextItem;
+
 class VTK_EXPORT vtkSMPlotMatrixViewProxy : public vtkSMContextViewProxy
 {
 public:
@@ -141,6 +143,9 @@ public:
   // Update all the settings
   void UpdateSettings();
 
+  // Description:
+  // Provides access to the vtk plot matrix.
+  virtual vtkAbstractContextItem* GetContextItem();
 //BTX
 protected:
   vtkSMPlotMatrixViewProxy();

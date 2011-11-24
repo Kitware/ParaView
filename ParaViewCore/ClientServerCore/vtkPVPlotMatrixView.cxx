@@ -279,7 +279,7 @@ int vtkPVPlotMatrixView::GetScatterPlotTitleFontItalic()
 double* vtkPVPlotMatrixView::GetScatterPlotTitleColor()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleColor() : NULL;
+    this->PlotMatrix->GetScatterPlotTitleColor().Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -307,21 +307,21 @@ int vtkPVPlotMatrixView::GetGridVisibility(int plotType)
 double* vtkPVPlotMatrixView::GetBackgroundColor(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetBackgroundColor(plotType) : NULL;
+    this->PlotMatrix->GetBackgroundColor(plotType).Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetAxisColor(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisColor(plotType) : NULL;
+    this->PlotMatrix->GetAxisColor(plotType).Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetGridColor(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetGridColor(plotType) : NULL;
+    this->PlotMatrix->GetGridColor(plotType).Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -357,7 +357,7 @@ int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
 double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelColor(plotType) : NULL;
+    this->PlotMatrix->GetAxisLabelColor(plotType).Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -390,12 +390,12 @@ int vtkPVPlotMatrixView::GetTooltipPrecision(int plotType)
 double* vtkPVPlotMatrixView::GetScatterPlotSelectedRowColumnColor()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotSelectedRowColumnColor() : NULL;
+    this->PlotMatrix->GetScatterPlotSelectedRowColumnColor().Cast<double>().GetData() : NULL;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotSelectedActiveColor() : NULL;
+    this->PlotMatrix->GetScatterPlotSelectedActiveColor().Cast<double>().GetData() : NULL;
 }

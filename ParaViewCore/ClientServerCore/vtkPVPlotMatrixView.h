@@ -70,7 +70,6 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   virtual void SetGutter(float x, float y);
-  float* GetGutter();
 
   // Description:
   // Set/get the borders of the chart matrix (space in pixels around each chart).
@@ -78,7 +77,6 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   virtual void SetBorders(int left, int bottom, int right, int top);
-  int* GetBorders();
 
   // Description:
   // Sets whether or not the grid for the given axis is visible given a plot type, which refers to
