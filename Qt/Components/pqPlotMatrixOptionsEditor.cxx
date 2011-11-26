@@ -55,8 +55,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAxis.h"
 #include "vtkVector.h"
 #include "vtkScatterPlotMatrix.h"
+#include "vtkTextProperty.h"
 
-#include <math.h>
+#include <cmath>
 
 class pqPlotMatrixOptionsEditorForm;
 
@@ -481,26 +482,29 @@ void pqPlotMatrixOptionsEditor::updateOptions()
   this->blockSignals(true);
 
   // Use the server properties to update the options on the charts
-  this->Internal->Form->Title = proxy->GetScatterPlotTitle();
+  this->Internal->Form->Title = proxy->GetTitle();
+  vtkTextProperty *prop = proxy->GetTitleProperties();
   this->Internal->Form->TitleFont = 
-    QFont(proxy->GetScatterPlotTitleFontFamily(),
-    proxy->GetScatterPlotTitleFontSize(),
-    proxy->GetScatterPlotTitleFontBold() ? QFont::Bold : -1,
-    proxy->GetScatterPlotTitleFontItalic());
+    QFont(prop->GetFontFamilyAsString(),
+          prop->GetFontSize(),
+          prop->GetBold() ? QFont::Bold : -1,
+          prop->GetItalic());
   this->updateDescription(this->Internal->Form->ChartTitleFont,
                           this->Internal->Form->TitleFont);
-  vtkColor4f rgba;
-  rgba=proxy->GetScatterPlotTitleColor();
-  this->Internal->Form->TitleColor = QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-  this->Internal->Form->TitleAlignment =
-      proxy->GetScatterPlotTitleAlignment();
+  double rgba[4];
+  prop->GetColor(rgba);
+  rgba[3] = prop->GetOpacity();
+  this->Internal->Form->TitleColor = QColor::fromRgbF(rgba[0], rgba[1],
+                                                     rgba[2], rgba[2]);
+  this->Internal->Form->TitleAlignment = prop->GetJustification();
  
-  rgba=proxy->GetScatterPlotSelectedRowColumnColor();
-  this->Internal->Form->SelectedRowColumnScatterChartBGColor=
-    QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-  rgba=proxy->GetScatterPlotSelectedActiveColor();
-  this->Internal->Form->SelectedActiveScatterChartBGColor=
-    QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+  vtkColor4ub color;
+  color = proxy->GetScatterPlotSelectedRowColumnColor();
+  this->Internal->Form->SelectedRowColumnScatterChartBGColor =
+    QColor::fromRgb(color[0], color[1], color[2], color[3]);
+  color = proxy->GetScatterPlotSelectedActiveColor();
+  this->Internal->Form->SelectedActiveScatterChartBGColor =
+    QColor::fromRgb(color[0], color[1], color[2], color[3]);
   
   vtkVector2f gutter;
   gutter = proxy->GetGutter();
@@ -516,18 +520,20 @@ void pqPlotMatrixOptionsEditor::updateOptions()
     {
     int plotType = dataIt.key();
     pqPlotMatrixOptionsChartSetting* settings = dataIt.value();
-    rgba=proxy->GetAxisColor(plotType);
-    settings->AxisColor =
-      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    rgba=proxy->GetBackgroundColor(plotType);
-    settings->BackGroundColor =
-      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    rgba = proxy->GetGridColor(plotType);
-    settings->GridColor =
-      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
-    rgba=proxy->GetAxisLabelColor(plotType);
-    settings->LabelColor =
-      QColor::fromRgbF(rgba[0], rgba[1], rgba[2], rgba[3]);
+    color = proxy->GetAxisColor(plotType);
+    settings->AxisColor = QColor::fromRgb(color[0], color[1], color[2],
+                                          color[3]);
+    color = proxy->GetBackgroundColor(plotType);
+    settings->BackGroundColor = QColor::fromRgb(color[0], color[1], color[2],
+                                                color[3]);
+    color = proxy->GetGridColor(plotType);
+    settings->GridColor = QColor::fromRgb(color[0], color[1], color[2],
+                                          color[3]);
+    prop = proxy->GetAxisLabelProperties(plotType);
+    prop->GetColor(rgba);
+    rgba[3] = prop->GetOpacity();
+    settings->LabelColor = QColor::fromRgbF(rgba[0], rgba[1], rgba[2],
+                                            rgba[3]);
     settings->Notation = proxy->GetAxisLabelNotation(plotType);
     settings->Precision = proxy->GetAxisLabelPrecision(plotType);
     settings->ShowGrid = proxy->GetGridVisibility(plotType);
@@ -535,11 +541,11 @@ void pqPlotMatrixOptionsEditor::updateOptions()
     settings->ToolTipNotation = proxy->GetTooltipNotation(plotType);
     settings->ToolTipPrecision = proxy->GetTooltipPrecision(plotType);
 
-    settings->LabelFont = 
-      QFont(proxy->GetAxisLabelFontFamily(plotType),
-      proxy->GetAxisLabelFontSize(plotType),
-      proxy->GetAxisLabelFontBold(plotType) ? QFont::Bold : -1,
-      proxy->GetAxisLabelFontItalic(plotType));   
+    settings->LabelFont =
+      QFont(prop->GetFontFamilyAsString(),
+            prop->GetFontSize(),
+            prop->GetBold() ? QFont::Bold : -1,
+            prop->GetItalic());
     }
   this->blockSignals(false);
 }
@@ -561,25 +567,24 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
 
   // title
   this->Internal->Form->Title = this->Internal->Form->ChartTitle->text();
-  proxy->SetScatterPlotTitle(this->Internal->Form->Title.toAscii().constData());
+  proxy->SetTitle(this->Internal->Form->Title.toAscii().constData());
   this->Internal->Form->TitleAlignment = 
     this->Internal->Form->ChartTitleAlignment->currentIndex();
-  proxy->SetScatterPlotTitleAlignment(this->Internal->Form->TitleAlignment);
+  vtkTextProperty *prop = proxy->GetTitleProperties();
+  prop->SetJustification(this->Internal->Form->TitleAlignment);
   // Apply the Title font type info
   QString fontFamily = this->Internal->Form->TitleFont.family();
-  proxy->SetScatterPlotTitleFont(
-    fontFamily.toAscii().constData(),
-    this->Internal->Form->TitleFont.pointSize(),
-    this->Internal->Form->TitleFont.bold() ? 1 : 0,
-    this->Internal->Form->TitleFont.italic() ? 1 : 0);
+  prop->SetFontFamilyAsString(fontFamily.toAscii().constData());
+  prop->SetFontSize(this->Internal->Form->TitleFont.pointSize());
+  prop->SetBold(this->Internal->Form->TitleFont.bold() ? 1 : 0);
+  prop->SetItalic(this->Internal->Form->TitleFont.italic() ? 1 : 0);
 
   // The chart title color
   QColor color = this->Internal->Form->ChartTitleColor->chosenColor();
   this->Internal->Form->TitleColor = color;
-  proxy->SetScatterPlotTitleColor(
-    static_cast<double>(color.redF()),
-    static_cast<double>(color.greenF()),
-    static_cast<double>(color.blueF()));
+  prop->SetColor(static_cast<double>(color.redF()),
+                 static_cast<double>(color.greenF()),
+                 static_cast<double>(color.blueF()));
 
   // Gutter size
   this->Internal->Form->Gutter.Set(
@@ -601,63 +606,65 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
   // Scatter plot selection background color
   color = this->Internal->Form->selRowColBackgroundColor->chosenColor();
   this->Internal->Form->SelectedRowColumnScatterChartBGColor = color;
-  proxy->SetScatterPlotSelectedRowColumnColor(
-    static_cast<double>(color.redF()),
-    static_cast<double>(color.greenF()),
-    static_cast<double>(color.blueF()),
-    static_cast<double>(color.alphaF()));
+  vtkColor4ub vcolor(static_cast<unsigned char>(color.red()),
+                     static_cast<unsigned char>(color.green()),
+                     static_cast<unsigned char>(color.blue()),
+                     static_cast<unsigned char>(color.alpha()));
+  proxy->SetScatterPlotSelectedRowColumnColor(vcolor);
   color = this->Internal->Form->selActiveBackgroundColor->chosenColor();
   this->Internal->Form->SelectedActiveScatterChartBGColor = color;
-  proxy->SetScatterPlotSelectedActiveColor(
-    static_cast<double>(color.redF()),
-    static_cast<double>(color.greenF()),
-    static_cast<double>(color.blueF()),
-    static_cast<double>(color.alphaF()));
+  vcolor.Set(static_cast<unsigned char>(color.red()),
+             static_cast<unsigned char>(color.green()),
+             static_cast<unsigned char>(color.blue()),
+             static_cast<unsigned char>(color.alpha()));
+  proxy->SetScatterPlotSelectedActiveColor(vcolor);
 
   foreach(int plotType, this->Internal->Form->PlotData.keys())
     {
-  // Show axis grid lines
+    // Show axis grid lines
     proxy->SetGridVisibility(plotType,
       this->Internal->Form->PlotData[plotType]->ShowGrid);
     // Background color
     color = this->Internal->Form->PlotData[plotType]->BackGroundColor;
-    proxy->SetBackgroundColor(plotType,
-      static_cast<double>(color.redF()),
-      static_cast<double>(color.greenF()),
-      static_cast<double>(color.blueF()),
-      static_cast<double>(color.alphaF()));
-  // Axis color
+    vcolor.Set(static_cast<unsigned char>(color.red()),
+               static_cast<unsigned char>(color.green()),
+               static_cast<unsigned char>(color.blue()),
+               static_cast<unsigned char>(color.alpha()));
+    proxy->SetBackgroundColor(plotType, vcolor);
+    // Axis color
     color = this->Internal->Form->PlotData[plotType]->AxisColor;
-    proxy->SetAxisColor(plotType,
-      static_cast<double>(color.redF()),
-      static_cast<double>(color.greenF()),
-      static_cast<double>(color.blueF()));
-  // Axis grid color
+    vcolor.Set(static_cast<unsigned char>(color.red()),
+               static_cast<unsigned char>(color.green()),
+               static_cast<unsigned char>(color.blue()),
+               static_cast<unsigned char>(color.alpha()));
+    proxy->SetAxisColor(plotType, vcolor);
+    // Axis grid color
     color = this->Internal->Form->PlotData[plotType]->GridColor;
-    proxy->SetGridColor(plotType,
-      static_cast<double>(color.redF()),
-      static_cast<double>(color.greenF()),
-      static_cast<double>(color.blueF()));
-  // Axis label visibility
+    vcolor.Set(static_cast<unsigned char>(color.red()),
+               static_cast<unsigned char>(color.green()),
+               static_cast<unsigned char>(color.blue()),
+               static_cast<unsigned char>(color.alpha()));
+    proxy->SetGridColor(plotType, vcolor);
+    // Axis label visibility
     proxy->SetAxisLabelVisibility(plotType,
       this->Internal->Form->PlotData[plotType]->ShowLabels);
-  // Label color
+    // Label color
+    prop = proxy->GetAxisLabelProperties(plotType);
     color = this->Internal->Form->PlotData[plotType]->LabelColor;
-    proxy->SetAxisLabelColor(plotType,
-      static_cast<double>(color.redF()),
-      static_cast<double>(color.greenF()),
-      static_cast<double>(color.blueF()));
-  // Axis label font
+    prop->SetColor(static_cast<double>(color.redF()),
+                   static_cast<double>(color.greenF()),
+                   static_cast<double>(color.blueF()));
+    prop->SetOpacity(static_cast<double>(color.alphaF()));
+    // Axis label font
     QFont font = this->Internal->Form->PlotData[plotType]->LabelFont;
-    proxy->SetAxisLabelFont(plotType,
-      font.family().toAscii().constData(),
-      font.pointSize(),
-      font.bold() ? 1 : 0,
-      font.italic() ? 1 : 0);
-  // Axis label notation
+    prop->SetFontFamilyAsString(font.family().toAscii().constData());
+    prop->SetFontSize(font.pointSize());
+    prop->SetBold(font.bold() ? 1 : 0);
+    prop->SetItalic(font.italic() ? 1 : 0);
+    // Axis label notation
     proxy->SetAxisLabelNotation(plotType,
       this->Internal->Form->PlotData[plotType]->Notation);
-  // Axis label precision
+    // Axis label precision
     proxy->SetAxisLabelPrecision(plotType,
       this->Internal->Form->PlotData[plotType]->Precision);
     }

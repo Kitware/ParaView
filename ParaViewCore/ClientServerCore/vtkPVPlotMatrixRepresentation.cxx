@@ -52,6 +52,9 @@ vtkPVPlotMatrixRepresentation::vtkPVPlotMatrixRepresentation()
     this->ActivePlotColor[i] = 0;
     this->HistogramColor[i] = 0;
     }
+  this->ScatterPlotColor[3] = 255;
+  this->ActivePlotColor[3] = 255;
+  this->HistogramColor[3] = 255;
 
   this->ScatterPlotMarkerStyle = vtkPlotPoints::CIRCLE;
   this->ActivePlotMarkerStyle = vtkPlotPoints::CIRCLE;
@@ -78,15 +81,9 @@ bool vtkPVPlotMatrixRepresentation::AddToView(vtkView *view)
     plotMatrix->SetVisible(true);
 
     // set chart properties
-    plotMatrix->SetColor(this->ScatterPlotColor[0],
-                         this->ScatterPlotColor[1],
-                         this->ScatterPlotColor[2]);
-    plotMatrix->SetHistogramColor(this->HistogramColor[0],
-                                  this->HistogramColor[1],
-                                  this->HistogramColor[2]);
-    plotMatrix->SetActivePlotColor(this->ActivePlotColor[0],
-                                   this->ActivePlotColor[1],
-                                   this->ActivePlotColor[2]);
+    plotMatrix->SetColor(this->ScatterPlotColor);
+    plotMatrix->SetHistogramColor(this->HistogramColor);
+    plotMatrix->SetActivePlotColor(this->ActivePlotColor);
     plotMatrix->SetMarkerStyle(this->ScatterPlotMarkerStyle);
     plotMatrix->SetActivePlotMarkerStyle(this->ActivePlotMarkerStyle);
     plotMatrix->SetMarkerSize(this->ScatterPlotMarkerSize);
@@ -161,40 +158,37 @@ void vtkPVPlotMatrixRepresentation::SetSeriesLabel(const char *name, const char 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetColor(double r, double g, double b)
 {
+  this->ScatterPlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
+                                       static_cast<unsigned char>(g * 255),
+                                       static_cast<unsigned char>(b * 255));
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
-    plotMatrix->SetColor(r, g, b);
+    plotMatrix->SetColor(this->ScatterPlotColor);
     }
-
-  this->ScatterPlotColor[0] = r;
-  this->ScatterPlotColor[1] = g;
-  this->ScatterPlotColor[2] = b;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetActivePlotColor(double r, double g, double b)
 {
+  this->ActivePlotColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
+                                      static_cast<unsigned char>(g * 255),
+                                      static_cast<unsigned char>(b * 255));
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
-    plotMatrix->SetActivePlotColor(r, g, b);
+    plotMatrix->SetActivePlotColor(this->ActivePlotColor);
     }
-
-  this->ActivePlotColor[0] = r;
-  this->ActivePlotColor[1] = g;
-  this->ActivePlotColor[2] = b;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetHistogramColor(double r, double g, double b)
 {
+  this->HistogramColor = vtkColor4ub(static_cast<unsigned char>(r * 255),
+                                     static_cast<unsigned char>(g * 255),
+                                     static_cast<unsigned char>(b * 255));
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
-    plotMatrix->SetHistogramColor(r, g, b);
+    plotMatrix->SetHistogramColor(this->HistogramColor);
     }
-
-  this->HistogramColor[0] = r;
-  this->HistogramColor[1] = g;
-  this->HistogramColor[2] = b;
 }
 
 //----------------------------------------------------------------------------

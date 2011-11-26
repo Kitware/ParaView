@@ -19,6 +19,7 @@
 #include "vtkScatterPlotMatrix.h"
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
+#include "vtkTextProperty.h"
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixView);
@@ -59,7 +60,7 @@ void vtkPVPlotMatrixView::SetScatterPlotTitle(const char* title)
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotTitle(title);
+    this->PlotMatrix->SetTitle(title);
     }
 }
 
@@ -69,7 +70,11 @@ void vtkPVPlotMatrixView::SetScatterPlotTitleFont(const char* family,
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotTitleFont(family, pointSize, bold, italic);
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetFontFamilyAsString(family);
+    prop->SetFontSize(pointSize);
+    prop->SetBold(bold);
+    prop->SetItalic(italic);
     }
 }
 
@@ -79,7 +84,8 @@ void vtkPVPlotMatrixView::SetScatterPlotTitleColor(
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotTitleColor(red, green, blue);
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetColor(red, green, blue);
     }
 }
 
@@ -88,7 +94,8 @@ void vtkPVPlotMatrixView::SetScatterPlotTitleAlignment(int alignment)
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotTitleAlignment(alignment);
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetJustification(alignment);
     }
 }
 
@@ -124,27 +131,39 @@ void vtkPVPlotMatrixView::SetBackgroundColor(int plotType,
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetBackgroundColor(plotType, red, green, blue, alpha);
+    vtkColor4ub color(static_cast<unsigned char>(red * 255),
+                      static_cast<unsigned char>(green * 255),
+                      static_cast<unsigned char>(blue * 255),
+                      static_cast<unsigned char>(alpha * 255));
+    this->PlotMatrix->SetBackgroundColor(plotType, color);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetAxisColor(int plotType, double red, double green,
-                                         double blue)
+                                       double blue)
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetAxisColor(plotType, red, green, blue);
+    vtkColor4ub color(static_cast<unsigned char>(red * 255),
+                      static_cast<unsigned char>(green * 255),
+                      static_cast<unsigned char>(blue * 255),
+                      255);
+    this->PlotMatrix->SetAxisColor(plotType, color);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetGridColor(int plotType, double red, double green,
-                                         double blue)
+                                       double blue)
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetGridColor(plotType, red, green, blue);
+    vtkColor4ub color(static_cast<unsigned char>(red * 255),
+                      static_cast<unsigned char>(green * 255),
+                      static_cast<unsigned char>(blue * 255),
+                      255);
+    this->PlotMatrix->SetGridColor(plotType, color);
     }
 }
 
@@ -164,8 +183,11 @@ void vtkPVPlotMatrixView::SetAxisLabelFont(int plotType, const char* family,
 {
   if (this->PlotMatrix)
     {
-    this->PlotMatrix->SetAxisLabelFont(
-      plotType, family, pointSize, bold, italic);
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetFontFamilyAsString(family);
+    prop->SetFontSize(pointSize);
+    prop->SetBold(bold);
+    prop->SetItalic(italic);
     }
 }
 
@@ -175,7 +197,8 @@ void vtkPVPlotMatrixView::SetAxisLabelColor(
 {
   if(this->PlotMatrix)
     {
-    this->PlotMatrix->SetAxisLabelColor(plotType, red, green, blue);
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetColor(red, green, blue);
     }
 }
 
@@ -221,7 +244,11 @@ void vtkPVPlotMatrixView::SetScatterPlotSelectedRowColumnColor(
 {
   if(this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotSelectedRowColumnColor(red, green, blue, alpha);
+    vtkColor4ub color(static_cast<unsigned char>(red * 255),
+                      static_cast<unsigned char>(green * 255),
+                      static_cast<unsigned char>(blue * 255),
+                      static_cast<unsigned char>(alpha * 255));
+    this->PlotMatrix->SetScatterPlotSelectedRowColumnColor(color);
     }
 }
 
@@ -231,7 +258,11 @@ void vtkPVPlotMatrixView::SetScatterPlotSelectedActiveColor(
 {
   if(this->PlotMatrix)
     {
-    this->PlotMatrix->SetScatterPlotSelectedActiveColor(red, green, blue, alpha);
+    vtkColor4ub color(static_cast<unsigned char>(red * 255),
+                      static_cast<unsigned char>(green * 255),
+                      static_cast<unsigned char>(blue * 255),
+                      static_cast<unsigned char>(alpha * 255));
+    this->PlotMatrix->SetScatterPlotSelectedActiveColor(color);
     }
 }
 
@@ -257,43 +288,44 @@ void vtkPVPlotMatrixView::UpdateSettings()
 const char* vtkPVPlotMatrixView::GetScatterPlotTitleFontFamily()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleFontFamily() : NULL;
+    this->PlotMatrix->GetTitleProperties()->GetFontFamilyAsString() : NULL;
 }
 int vtkPVPlotMatrixView::GetScatterPlotTitleFontSize()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleFontSize() : -1;
+    this->PlotMatrix->GetTitleProperties()->GetFontSize() : -1;
 }
 int vtkPVPlotMatrixView::GetScatterPlotTitleFontBold()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleFontBold() : 0;
+    this->PlotMatrix->GetTitleProperties()->GetBold() : 0;
 }
 int vtkPVPlotMatrixView::GetScatterPlotTitleFontItalic()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleFontItalic() : 0;
+    this->PlotMatrix->GetTitleProperties()->GetItalic() : 0;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetScatterPlotTitleColor()
 {
+  // FIXME: Do we need this style of API? It means keeping around a double[3]
+  // in order to support it. I don't like it, and would rather avoid it.
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleColor().Cast<double>().GetData() : NULL;
+    this->PlotMatrix->GetTitleProperties()->GetColor() : NULL;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVPlotMatrixView::GetScatterPlotTitle()
 {
-  return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitle() : NULL;
+  return this->PlotMatrix ? this->PlotMatrix->GetTitle() : NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetScatterPlotTitleAlignment()
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetScatterPlotTitleAlignment() : 0;
+    this->PlotMatrix->GetTitleProperties()->GetJustification() : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -335,29 +367,30 @@ int vtkPVPlotMatrixView::GetAxisLabelVisibility(int plotType)
 const char* vtkPVPlotMatrixView::GetAxisLabelFontFamily(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelFontFamily(plotType) : NULL;
+    this->PlotMatrix->GetAxisLabelProperties(plotType)->GetFontFamilyAsString()
+      : NULL;
 }
 int vtkPVPlotMatrixView::GetAxisLabelFontSize(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelFontSize(plotType) : -1;
+    this->PlotMatrix->GetAxisLabelProperties(plotType)->GetFontSize() : -1;
 }
 int vtkPVPlotMatrixView::GetAxisLabelFontBold(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelFontBold(plotType) : 0;
+    this->PlotMatrix->GetAxisLabelProperties(plotType)->GetBold() : 0;
 }
 int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelFontItalic(plotType) : 0;
+    this->PlotMatrix->GetAxisLabelProperties(plotType)->GetItalic() : 0;
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
 {
   return this->PlotMatrix ? 
-    this->PlotMatrix->GetAxisLabelColor(plotType).Cast<double>().GetData() : NULL;
+    this->PlotMatrix->GetAxisLabelProperties(plotType)->GetColor() : NULL;
 }
 
 //----------------------------------------------------------------------------
