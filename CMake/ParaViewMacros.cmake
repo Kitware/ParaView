@@ -219,15 +219,15 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
 ENDFUNCTION (protobuf_generate)
 
 #------------------------------------------------------------------------------
-# GENERATE_HTMLS_FROM_XMLS can be used to generate HTML files for 
+# GENERATE_HTMLS_FROM_XMLS can be used to generate HTML files for
 # from a given list of xml files that correspond to server manager xmls.
 # ARGUMENTS:
+# output_files: OUT: variables set to the output files
 # xmlpatterns: IN : Qt xmlpatterns executable.
 # xmls: IN : full pathnames to xml files.
 # output_dir : IN : full path to output directory where to generate the htmls.
-# target : IN : name of the target to add the dependencies to.
 #------------------------------------------------------------------------------
-function (generate_htmls_from_xmls xmlpatterns xmls output_dir output_files)
+function (generate_htmls_from_xmls output_files xmlpatterns xmls output_dir )
   set (dependencies)
   foreach(xml ${xmls})
     get_filename_component(xml_name_we  ${xml} NAME_WE)

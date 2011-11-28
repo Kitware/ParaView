@@ -27,12 +27,11 @@ FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
 MARK_AS_ADVANCED(QT_HELP_GENERATOR QT_XMLPATTERNS_EXECUTABLE)
 
 # generate htmls from the server manager xmls.
-generate_htmls_from_xmls(
+generate_htmls_from_xmls(proxy_html_outputs
   "${QT_XMLPATTERNS_EXECUTABLE}"
   "${PARAVIEW_SERVERMANAGER_XMLS}"
-  "${CMAKE_CURRENT_BINARY_DIR}"
-  proxy_html_outputs)
-message("${proxy_html_outputs}")
+  "${CMAKE_CURRENT_BINARY_DIR}")
+
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
