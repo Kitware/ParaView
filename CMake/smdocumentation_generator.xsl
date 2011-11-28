@@ -2,54 +2,36 @@
 <!-- XSL used to generate HTMLs from server manager XML
   to run use : xmlpatterns <xsl> <xml> -output <html>
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output method="html"/>
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="xml"/>
 <xsl:template match="ServerManagerConfiguration/ProxyGroup">
   <xsl:variable name="group_name" select="@name" />
-  <xsl:for-each select="SourceProxy|Proxy">
-    <html>
-    <head>
-      <meta name="proxy_name"><xsl:value-of select="$group_name" />:<xsl:value-of select="@name" /></meta>
-    </head>
-    <body>
-    <h2><xsl:choose>
-      <xsl:when test="@label"> <xsl:value-of select="@label" /> </xsl:when>
-      <xsl:otherwise> <xsl:value-of select="@name" /> </xsl:otherwise>
-    </xsl:choose> (<xsl:value-of select="@name"/>) </h2>
-    <xsl:apply-templates select="Documentation" />
-    <table width="97%" border="2px" >
-      <tr bgcolor="#9acd32">
-        <th>Property</th>
-        <th width="60%">Description</th>
-        <th width="5%">Default(s)</th>
-        <th width="20%">Restrictions</th>
-      </tr>
-    <xsl:for-each select="DoubleVectorProperty|InputProperty|IntVectorProperty|StringVectorProperty|ProxyProperty|IdTypeVectorProperty">
-      <tr>
-        <th>
+  <xsl:for-each select="SourceProxy|Proxy|PWriterProxy|WriterProxy|PSWriterProxy">
+    <proxy>
+      <group><xsl:value-of select="$group_name" /></group>
+      <name><xsl:value-of select="@name" /></name>
+      <label>
+        <xsl:choose>
+          <xsl:when test="@label"> <xsl:value-of select="@label" /> </xsl:when>
+          <xsl:otherwise> <xsl:value-of select="@name" /> </xsl:otherwise>
+        </xsl:choose>
+      </label>
+      <xsl:apply-templates select="Documentation" />
+      <xsl:for-each select="DoubleVectorProperty|InputProperty|IntVectorProperty|StringVectorProperty|ProxyProperty|IdTypeVectorProperty">
+      <property>
+        <name><xsl:value-of select="@name" /></name>
+        <label>
           <xsl:choose>
             <xsl:when test="@label"><xsl:value-of select="@label"/></xsl:when>
             <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
           </xsl:choose>
-        </th>
-        <td>
-          <xsl:apply-templates select="Documentation" />
-        </td>
-        <td>
-          <div class="defaults">
-            <xsl:call-template name="WriteDefaults" />
-          </div>
-        </td>
-        <td>
-          <div class="domain">
-            <xsl:call-template name="WriteDomain" />
-          </div>
-        </td>
-      </tr>
+        </label>
+        <xsl:apply-templates select="Documentation" />
+        <defaults><xsl:call-template name="WriteDefaults" /> </defaults>
+        <domains><xsl:call-template name="WriteDomain" /></domains>
+      </property>
     </xsl:for-each>
-    </table>
-    </body>
-    </html>
+    </proxy>
   </xsl:for-each>
 </xsl:template>
 
@@ -82,23 +64,27 @@
 </xsl:template>
 
 <xsl:template match="StringListDomain">
-  The value(s) can be one of the following:
-  <ul>
-  <xsl:for-each select="String">
-    <li><xsl:value-of select="@value"/></li>
-  </xsl:for-each>
-  </ul>
+  <domain>
+    <text>The value(s) can be one of the following:</text>
+    <list>
+      <xsl:for-each select="String">
+        <item><xsl:value-of select="@value"/></item>
+      </xsl:for-each>
+    </list>
+  </domain>
 </xsl:template>
 
 <xsl:template match="ProxyListDomain">
-  The value can be one of the following:
-  <ul>
-  <xsl:for-each select="Proxy">
-    <li><xsl:value-of select="@name"/>
-        (<i><xsl:value-of select="@group"/></i>)
-    </li>
-  </xsl:for-each>
-  </ul>
+  <domain>
+    <text>The value can be one of the following:</text>
+    <list>
+      <xsl:for-each select="Proxy">
+        <item>
+          <xsl:value-of select="@name"/> (<xsl:value-of select="@group"/>)
+        </item>
+      </xsl:for-each>
+    </list>
+  </domain>
 </xsl:template>
 
 <xsl:template match="ProxyGroupDomain">
@@ -106,74 +92,92 @@
 </xsl:template>
 
 <xsl:template match="ExtentDomain">
-  The value(s) must lie within the structured-extents of the input dataset.
+  <domain>
+    <text>The value(s) must lie within the structured-extents of the input dataset.</text>
+  </domain>
 </xsl:template>
 
 <xsl:template match="FieldDataDomain">
-  The value must be field array name.
+  <domain>
+    <text>The value must be field array name.</text>
+  </domain>
 </xsl:template>
 
 <xsl:template match="FileListDomain">
-  The value(s) must be a filename (or filenames).
+  <domain>
+    <text> The value(s) must be a filename (or filenames).</text>
+  </domain>
 </xsl:template>
 
 <xsl:template match="FixedTypeDomain">
-  Once set, the input dataset cannot be changed.
+  <domain>
+    <text>Once set, the input dataset cannot be changed.</text>
+  </domain>
 </xsl:template>
 
 <xsl:template match="InputArrayDomain">
-  The dataset much contain a field array (
-    <xsl:value-of select="@attribute_type"/>)
-  <xsl:if test="@number_of_components">
-    with <xsl:value-of select="@number_of_components"/> component(s).
-  </xsl:if>
+  <domain>
+    <text>
+      The dataset much contain a field array (<xsl:value-of select="@attribute_type"/>)
+      <xsl:if test="@number_of_components">
+        with <xsl:value-of select="@number_of_components"/> component(s).
+      </xsl:if>
+    </text>
+  </domain>
 </xsl:template>
 
 <xsl:template match="EnumerationDomain">
-  The value(s) is an enumeration of the following:
-  <ul>
-    <xsl:for-each select="Entry">
-      <li><xsl:value-of select="@text"/> (
-          <xsl:value-of select="@value"/>)</li>
-    </xsl:for-each>
-  </ul>
+  <domain>
+    <text>The value(s) is an enumeration of the following:</text>
+    <list>
+      <xsl:for-each select="Entry">
+        <item><xsl:value-of select="@text"/> (<xsl:value-of select="@value"/>)</item>
+      </xsl:for-each>
+    </list>
+  </domain>
 </xsl:template>
 
 
 <xsl:template match="ArrayListDomain[@attribute_type='Scalars']">
   <!-- Handle ArrayListDomain -->
-  An array of scalars is required.
+  <domain><text>An array of scalars is required.</text></domain>
 </xsl:template>
 
 <xsl:template match="ArrayListDomain[@attribute_type='Vectors']">
   <!-- Handle ArrayListDomain -->
-  An array of vectors is required.
+  <domain><text>An array of vectors is required.</text></domain>
 </xsl:template>
 
 <xsl:template match="ArrayRangeDomain">
-  The value must lie within the range of the selected data array.
+  <domain><text>The value must lie within the range of the selected data array.</text></domain>
 </xsl:template>
 
 <xsl:template match="ArraySelectionDomain">
-  The list of array names is provided by the reader.
+  <domain><text>The list of array names is provided by the reader.</text></domain>
 </xsl:template>
 
 <xsl:template match="BoundsDomain[@mode='normal']">
-  The value must lie within the bounding box of the dataset.
-  <xsl:if test="@default_mode">
-    It will default to the <xsl:value-of select="@default_mode" /> in each dimension.
-  </xsl:if>
+  <domain><text>
+      The value must lie within the bounding box of the dataset.
+      <xsl:if test="@default_mode">
+        It will default to the <xsl:value-of select="@default_mode" /> in each dimension.
+      </xsl:if>
+  </text></domain>
 </xsl:template>
 
 <xsl:template match="BoundsDomain[@mode='magnitude']">
+  <domain><text>
   Determine the length of the dataset's diagonal.
   The value must lie within -diagonal length to +diagonal length.
+  </text></domain>
 </xsl:template>
 
 <xsl:template match="BoundsDomain[@mode='scaled_extent']">
+  <domain><text>
   The value must be less than the largest dimension of the
   dataset multiplied by a scale factor of
   <xsl:value-of select="@scale_factor" />.
+  </text></domain>
 </xsl:template>
 
 <xsl:template match="DoubleRangeDomain">
@@ -191,30 +195,74 @@
 </xsl:template>
 
 <xsl:template match="DataTypeDomain">
-  Accepts input of following types:
-  <ul>
-  <xsl:for-each select="DataType">
-    <li><xsl:value-of select="@value" /> </li>
-  </xsl:for-each>
-  </ul>
+  <domain>
+    <text>Accepts input of following types:</text>
+    <list>
+      <xsl:for-each select="DataType">
+        <item><xsl:value-of select="@value" /> </item>
+      </xsl:for-each>
+    </list>
+  </domain>
 </xsl:template>
 
 <xsl:template match="BooleanDomain">
-  Accepts boolean values (0 or 1).
+  <domain><text>Accepts boolean values (0 or 1).</text></domain>
 </xsl:template>
 
 <!-- Documentation Handler -->
 <xsl:template match="Documentation">
-  <xsl:choose>
-    <xsl:when test="@long_help">
-      <i><p>  <xsl:value-of select="@long_help" /></p></i>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:if test="@short_help">
-         <i><p>  <xsl:value-of select="@short_help" /></p></i>
-      </xsl:if>
-    </xsl:otherwise>
-  </xsl:choose>
-  <div class="description"><xsl:value-of select="." /></div>
+  <documentation>
+    <brief>
+      <xsl:choose>
+        <xsl:when test="@long_help">
+          <xsl:value-of select="@long_help" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="@short_help">
+             <xsl:value-of select="@short_help" />
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </brief>
+    <long><xsl:value-of select="." /></long>
+  </documentation>
 </xsl:template>
+
+<xsl:template match="ParaViewSources">
+  <categoryindex>
+    <label>Sources</label>
+    <xsl:call-template name="GenerateCategoryIndex" />
+  </categoryindex>
+</xsl:template>
+
+<xsl:template match="ParaViewFilters">
+  <categoryindex>
+    <label>Filters</label>
+    <xsl:call-template name="GenerateCategoryIndex" />
+  </categoryindex>
+</xsl:template>
+
+<xsl:template match="ParaViewReaders">
+  <categoryindex>
+    <label>Readers</label>
+    <xsl:call-template name="GenerateCategoryIndex" />
+  </categoryindex>
+</xsl:template>
+
+<xsl:template match="ParaViewWriters">
+  <categoryindex>
+    <label>Writers</label>
+    <xsl:call-template name="GenerateCategoryIndex" />
+  </categoryindex>
+</xsl:template>
+
+<xsl:template name="GenerateCategoryIndex" >
+  <xsl:for-each select="Proxy">
+    <item>
+      <group><xsl:value-of select="@group"/></group>
+      <name><xsl:value-of select="@name" /></name>
+    </item>
+  </xsl:for-each>
+</xsl:template>
+
 </xsl:stylesheet>

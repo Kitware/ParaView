@@ -26,19 +26,30 @@ FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
 
 MARK_AS_ADVANCED(QT_HELP_GENERATOR QT_XMLPATTERNS_EXECUTABLE)
 
+set (gui_xmls
+  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewSources.xml
+  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewFilters.xml
+  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewReaders.xml
+  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewWriters.xml)
+
 # generate htmls from the server manager xmls.
 generate_htmls_from_xmls(proxy_html_outputs
   "${QT_XMLPATTERNS_EXECUTABLE}"
   "${PARAVIEW_SERVERMANAGER_XMLS}"
+  "${gui_xmls}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/paraview.qhp
          ${proxy_html_outputs}
+  COMMAND ${CMAKE_COMMAND}
+          -E copy_if_different
+          "${CMAKE_CURRENT_SOURCE_DIR}/paraview.qhp"
+          "${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp"
   COMMAND ${QT_HELP_GENERATOR}
-  ARGS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
-      -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
+          ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
+          -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 

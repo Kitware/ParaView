@@ -227,39 +227,42 @@ ENDFUNCTION (protobuf_generate)
 # xmls: IN : full pathnames to xml files.
 # output_dir : IN : full path to output directory where to generate the htmls.
 #------------------------------------------------------------------------------
-function (generate_htmls_from_xmls output_files xmlpatterns xmls output_dir )
-  set (dependencies)
-  foreach(xml ${xmls})
-    get_filename_component(xml_name_we  ${xml} NAME_WE)
-    get_filename_component(xml_name  ${xml} NAME)
-
-    add_custom_command(
-      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final"
-
-      # process each XML using the XSL to generate the html.
-      COMMAND "${xmlpatterns}"
-              "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
-              "${xml}"
-              -output
-              "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.inter"
-
-      # process each html file to sperate it out into files for each proxy.
-      COMMAND "${CMAKE_COMMAND}"
-              -Dinput_file="${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.inter"
-              -Doutput_dir="${output_dir}"
-              -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final"
-              -P "${ParaView_CMAKE_DIR}/split_htmls.cmake"
-
-      DEPENDS "${xml}"
-              "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
-              "${ParaView_CMAKE_DIR}/split_htmls.cmake"
-
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-
-      COMMENT "Generating Documentation HTMLS for \"${xml_name}\"")
-
-      set (dependencies ${dependencies}
-            "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final")
+function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output_dir)
+  # create a string from the xmls list to pass
+  set (xmls_string)
+  foreach (xml ${xmls})
+    set (xmls_string "${xmls_string}${xml}+")
   endforeach()
+  
+  set (gui_xmls_string)
+  foreach (gui_xml ${gui_xmls})
+    set (gui_xmls_string "${gui_xmls_string}${gui_xml}+")
+  endforeach()
+
+  add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/temporary.xml"
+
+    # process each html file to sperate it out into files for each proxy.
+    COMMAND "${CMAKE_COMMAND}"
+            -Dxmlpatterns="${xmlpatterns}"
+            -Dxml_to_xml_xsl="${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+            -Dxml_to_html_xsl="${ParaView_CMAKE_DIR}/xml_to_html.xsl"
+            -Dinput_xmls:STRING="${xmls_string}"
+            -Dinput_gui_xmls:STRING="${gui_xmls_string}"
+            -Doutput_dir="${output_dir}"
+            -Dtemporary_dir="${CMAKE_CURRENT_BINARY_DIR}"
+            -P "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+
+    DEPENDS ${xmls}
+            "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+            "${ParaView_CMAKE_DIR}/xml_to_html.xsl"
+            "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+
+    COMMENT "Generating Documentation HTMLs from xmls")
+
+    set (dependencies ${dependencies}
+          "${CMAKE_CURRENT_BINARY_DIR}/temporary.xml")
   set (${output_files} ${dependencies} PARENT_SCOPE)
 endfunction()

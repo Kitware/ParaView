@@ -8,10 +8,10 @@
             <section title="Introduction" ref="Book/Book_Chapter1.html"/>
             <section title="Plugins" ref="Book/Book_Chapter16.html"/>
             <section title="Appendices" ref="Book/Book_Chapter17.html"/>
-            <section title="Sources" ref="ParaViewSources.html"/>
-            <section title="Filters" ref="ParaViewFilters.html"/>
-            <section title="Readers" ref="ParaViewReaders.html"/>
-            <section title="Writers" ref="ParaViewWriters.html"/>
+            <section title="Sources" ref="CategoryIndex.html"/>
+            <section title="Filters" ref="CategoryIndex.html"/>
+            <section title="Readers" ref="CategoryIndex.html"/>
+            <section title="Writers" ref="CategoryIndex.html"/>
           </section>
         </toc>
         <keywords>
