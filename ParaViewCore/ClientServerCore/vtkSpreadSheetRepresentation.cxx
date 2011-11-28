@@ -108,11 +108,6 @@ int vtkSpreadSheetRepresentation::RequestData(
       this->GetInternalOutputPort(1, 0));
     }
 
-  if (this->GetNumberOfInputConnections(2) == 1)
-    {
-    this->GetInternalOutputPort(2, 0);
-    }
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -133,7 +128,11 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetExtractedDataProducer()
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetSelectionProducer()
 {
-  return this->GetExtractedDataProducer();
+  if (this->GetNumberOfInputConnections(1) == 1)
+    {
+    return this->GetInternalOutputPort(1, 0);
+    }
+  return NULL;
 }
 
 

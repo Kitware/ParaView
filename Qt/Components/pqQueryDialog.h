@@ -83,6 +83,15 @@ protected slots:
   /// options in the selection type combo-box.
   void populateSelectionType();
 
+  /// reset the currently chosen clauses
+  void resetClauses();
+
+  /// adds a new clause.
+  void addClause();
+
+  /// remove a particular clause. The clause to be removed is the signal sender.
+  void removeClause();
+
   /// Called when user click the "Run Query" button.
   void runQuery();
 

@@ -4268,15 +4268,6 @@
         </Documentation>
       </InputProperty>
 
-      <InputProperty name="InternalInput2"
-        command="SetInputConnection"
-        port_index="2"
-        is_internal="1">
-        <Documentation>
-          Internal property. Please don't touch this.
-        </Documentation>
-      </InputProperty>
-
        <!-- end of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
 

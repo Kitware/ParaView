@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkQuerySelectionSource.h"
+#include "vtkPVCompositeDataInformation.h"
 
 #include <QList>
 
@@ -103,17 +104,17 @@ pqQueryDialog::pqQueryDialog(
     }
 
   // Ensure that there's only 1 clause
-//  this->resetClauses();
+  this->resetClauses();
 
-//  QObject::connect(this->Internals->selectionType,
-//    SIGNAL(currentIndexChanged(int)),
-//    this, SLOT(resetClauses()));
+  QObject::connect(this->Internals->selectionType,
+    SIGNAL(currentIndexChanged(int)),
+    this, SLOT(resetClauses()));
 
-//  QObject::connect(this->Internals->addRow,
-//    SIGNAL(clicked()), this, SLOT(addClause()));
+  QObject::connect(this->Internals->addRow,
+    SIGNAL(clicked()), this, SLOT(addClause()));
 
   /// Currently we don't support multiple clauses.
-//  this->Internals->addRow->hide();
+  this->Internals->addRow->hide();
 
   QObject::connect(this->Internals->runQuery,
     SIGNAL(clicked()), this, SLOT(runQuery()));
@@ -238,6 +239,60 @@ void pqQueryDialog::populateSelectionType()
     this->Internals->selectionType->addItem("Point", vtkDataObject::POINT);
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::resetClauses()
+{
+  foreach (pqQueryClauseWidget* clause, this->Internals->Clauses)
+    {
+    delete clause;
+    }
+  this->Internals->Clauses.clear();
+
+  delete this->Internals->queryClauseFrame->layout();
+  QVBoxLayout *vbox = new QVBoxLayout(this->Internals->queryClauseFrame);
+  vbox->setMargin(0);
+
+//  this->addClause();
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::addClause()
+{
+  if(this->Internals->source->currentPort() == NULL ||
+     this->Internals->source->currentPort()->getSource()->getProxy()->GetObjectsCreated() != 1)
+    {
+    return; // We can not create a Clause on nothing...
+    }
+
+  pqQueryClauseWidget* clause = new pqQueryClauseWidget(this);
+  QObject::connect(clause, SIGNAL(removeClause()), this, SLOT(removeClause()));
+
+  int attr_type = this->Internals->selectionType->itemData(
+    this->Internals->selectionType->currentIndex()).toInt();
+  clause->setProducer(this->Internals->source->currentPort());
+  clause->setAttributeType(attr_type);
+  clause->initialize();
+
+  this->Internals->Clauses.push_back(clause);
+
+  QVBoxLayout* vbox =
+    qobject_cast<QVBoxLayout*>(this->Internals->queryClauseFrame->layout());
+  vbox->addWidget(clause);
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::removeClause()
+{
+  pqQueryClauseWidget* clause =
+      qobject_cast<pqQueryClauseWidget*>(this->sender());
+  if (clause)
+    {
+    this->Internals->Clauses.removeAll(clause);
+    delete clause;
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 void pqQueryDialog::runQuery()
@@ -508,7 +563,7 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
       {
       this->Internals->extractSelectionOverTime->show();
       }
-    this->updateLabels();
+//    this->updateLabels();
     }
   else
     {

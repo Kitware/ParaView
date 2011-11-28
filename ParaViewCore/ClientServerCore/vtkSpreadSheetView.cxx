@@ -320,10 +320,10 @@ int vtkSpreadSheetView::StreamToClient()
   // From the active representation obtain the data/selection producers that
   // need to be streamed to the client.
   vtkAlgorithmOutput* dataPort = vtkGetDataProducer(this, cur);
-  vtkAlgorithmOutput* selectionPort = vtkGetSelectionProducer(this, cur);
+//  vtkAlgorithmOutput* selectionPort = vtkGetSelectionProducer(this, cur);
 
   this->TableSelectionMarker->SetInputConnection(0, dataPort);
-  this->TableSelectionMarker->SetInputConnection(1, selectionPort);
+  this->TableSelectionMarker->SetInputConnection(1, cur->GetExtractedDataProducer());
   this->TableStreamer->SetInputConnection(
       this->TableSelectionMarker->GetOutputPort());
   if (dataPort)

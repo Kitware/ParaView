@@ -50,10 +50,6 @@ public:
   enum CriteriaType
     {
     INVALID=0x0,
-    INDEX = 0x1,
-    GLOBALID =0x2,
-    THRESHOLD = 0x4,
-    LOCATION =0x8,
     BLOCK =0x10,
     AMR_LEVEL=0x20,
     AMR_BLOCK=0x40,

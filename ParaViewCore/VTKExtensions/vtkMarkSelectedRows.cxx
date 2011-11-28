@@ -22,10 +22,10 @@
 #include "vtkSelectionNode.h"
 #include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
-#include "vtkDataSet.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkUnsignedCharArray.h"
 
 vtkStandardNewMacro(vtkMarkSelectedRows);
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ int vtkMarkSelectedRows::FillInputPortInformation(int port, vtkInformation* info
 {
   if (port == 1)
     {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     return 1;
     }
@@ -59,7 +59,7 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
   vtkInformationVector* outputVector)
 {
   vtkTable* input = vtkTable::GetData(inputVector[0], 0);
-  vtkUnstructuredGrid *inputUG = vtkUnstructuredGrid::GetData(inputVector[1], 0);
+  vtkTable *extractedInput = vtkTable::GetData(inputVector[1], 0);
   vtkTable* output = vtkTable::GetData(outputVector, 0);
 
   output->ShallowCopy(input);
@@ -71,33 +71,35 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
   output->AddColumn(selected);
   selected->Delete();
 
-  if(!inputUG)
+  if(!extractedInput)
     {
     return 1;
     }
 
   vtkIdTypeArray *selectedIdsArray = 0;
 
-  if(vtkPointData *pointData = inputUG->GetPointData())
+  if(this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-    selectedIdsArray = vtkIdTypeArray::SafeDownCast(pointData->GetAbstractArray("vtkOriginalIds"));
+    selectedIdsArray = vtkIdTypeArray::SafeDownCast(extractedInput->GetColumnByName("vtkOriginalPointIds"));
     }
-  else if(vtkCellData *cellData = inputUG->GetCellData())
+  else if(this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-    selectedIdsArray = vtkIdTypeArray::SafeDownCast(cellData->GetAbstractArray("vtkOriginalIds"));
+    selectedIdsArray = vtkIdTypeArray::SafeDownCast(extractedInput->GetColumnByName("vtkOriginalCellIds"));
     }
 
   if(!selectedIdsArray)
     {
+    cout << "no selected ids array" << std::endl;
     return 1;
     }
 
   // Locate the selection node that may be applicable to the input.
   vtkIdTypeArray* originalIdsArray = vtkIdTypeArray::SafeDownCast(
     input->GetColumnByName("vtkOriginalIndices"));
-  for (unsigned int i = 0; i < output->GetNumberOfRows(); i++)
+
+  for (vtkIdType i = 0; i < output->GetNumberOfRows(); i++)
     {
-    vtkIdType originalId = originalIdsArray->GetValue(i);
+    vtkIdType originalId = originalIdsArray ? originalIdsArray->GetValue(i) : i;
     if (selectedIdsArray->LookupValue(originalId) != -1)
       {
       selected->SetValue(i, 1);
