@@ -75,6 +75,11 @@ public:
   // the vtkImageWriter subclass to use.
   int WriteImage(const char* filename, const char* writerName, int magnification);
 
+  // Description:
+  // Return true any internal representation is dirty. This can be usefull to
+  // know if the internal geometry has changed.
+  virtual bool HasDirtyRepresentation();
+
 //BTX
 protected:
   vtkSMViewProxy();

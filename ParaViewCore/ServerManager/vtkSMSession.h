@@ -23,6 +23,8 @@
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkProcessModuleAutoMPI;
+class vtkSMCollaborationManager;
+class vtkSMProxyLocator;
 class vtkSMSessionProxyManager;
 class vtkSMStateLocator;
 
@@ -32,6 +34,16 @@ public:
   static vtkSMSession* New();
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  //---------------------------------------------------------------------------
+  // API for collaboration management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Return the instance of vtkSMCollaborationManager that will be
+  // lazy created at the first call.
+  // By default we return NULL
+  virtual vtkSMCollaborationManager* GetCollaborationManager() { return NULL; }
 
   //---------------------------------------------------------------------------
   // API for client-side components of a session.
@@ -54,15 +66,11 @@ public:
   // Implementation provided simply returns the number of local processes.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
-  // Description:
-  // Provides a unique identifier across processes of that session. Default
-  // implementation simply uses a local variable to keep track of ids already
-  // assigned.
-  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier()
-    {
-    this->LastGUID++;
-    return this->LastGUID;
-    }
+  //---------------------------------------------------------------------------
+  // API for Proxy Finder/ReNew
+  //---------------------------------------------------------------------------
+
+  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
   enum RenderingMode
     {
@@ -112,6 +120,13 @@ public:
   // undo-redo state manager is updated.
   virtual void PushState(vtkSMMessage* msg);
 //ETX
+
+  //---------------------------------------------------------------------------
+  // API for Collaboration management
+  //---------------------------------------------------------------------------
+
+  // Called before application quit or session disconnection
+  virtual void PreDisconnection() {}
 
   //---------------------------------------------------------------------------
   // Static methods to create and register sessions easily.
@@ -192,9 +207,8 @@ protected:
 
   vtkSMSessionProxyManager* SessionProxyManager;
   vtkSMStateLocator* StateLocator;
+  vtkSMProxyLocator* ProxyLocator;
 
-  // GlobalID managed locally
-  vtkTypeUInt32 LastGUID;
   bool IsAutoMPI;
 
 private:

@@ -15,21 +15,104 @@
 #include "vtkSMProxySelectionModel.h"
 
 #include "vtkBoundingBox.h"
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVSession.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 
+#include <vtkstd/vector>
+#include <vtkstd/set>
+#include <vtkNew.h>
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
+
+//-----------------------------------------------------------------------------
+class vtkSMProxySelectionModel::vtkInternal
+{
+public:
+  unsigned int CollaborationManagerObserverID;
+  vtkSMProxySelectionModel* Owner;
+  bool FollowinMaster;
+  bool Initilized;
+  vtkstd::map<int, vtkSMMessage> ClientsCachedState;
+
+  vtkInternal(vtkSMProxySelectionModel* owner)
+    {
+    this->Owner = owner;
+    this->CollaborationManagerObserverID = 0;
+    this->FollowinMaster = true;
+    this->Initilized = false;
+    }
+
+  ~vtkInternal()
+    {
+    if(this->Owner->Session && this->CollaborationManagerObserverID)
+      {
+      this->Owner->Session->GetCollaborationManager()->RemoveObserver(
+          this->CollaborationManagerObserverID);
+      }
+    this->CollaborationManagerObserverID = 0;
+    }
+
+  void MasterChangedCallBack( vtkObject* vtkNotUsed(src),
+                              unsigned long vtkNotUsed(event),
+                              void* vtkNotUsed(data))
+    {
+    if(this->FollowinMaster && this->GetMasterId() != -1 &&
+       this->ClientsCachedState.find(
+           this->GetMasterId()) != this->ClientsCachedState.end())
+      {
+      this->Owner->LoadState( &this->ClientsCachedState[this->GetMasterId()],
+                              this->Owner->Session->GetProxyLocator());
+      this->Owner->PushStateToSession();
+      }
+    }
+
+  void ExportSelection(vtkCollection* src, vtkCollection* dst)
+    {
+    dst->RemoveAllItems();
+    src->InitTraversal();
+    while (vtkObject* obj = src->GetNextItemAsObject())
+      {
+      dst->AddItem(obj);
+      }
+    }
+
+  int GetMasterId()
+    {
+    if(!this->Owner->Session || !this->Owner->Session->GetCollaborationManager())
+      {
+      return -1;
+      }
+    return this->Owner->Session->GetCollaborationManager()->GetMasterId();
+    }
+};
+
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::vtkSMProxySelectionModel()
 {
+  this->Internal = new vtkSMProxySelectionModel::vtkInternal(this);
+
+  this->State = new vtkSMMessage();
+  this->SetLocation(vtkPVSession::CLIENT);
+  this->State->SetExtension(DefinitionHeader::server_class, "vtkSIObject"); // Dummy SIObject
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::~vtkSMProxySelectionModel()
 {
+  delete this->Internal;
+  delete this->State;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,6 +211,30 @@ void vtkSMProxySelectionModel::Select(
     this->Selection = new_selection;
     this->InvokeSelectionChanged();
     }
+
+  // Update the local state and push to the session
+  this->State->ClearExtension(ProxySelectionModelState::proxy);
+  this->State->ClearExtension(ProxySelectionModelState::port);
+
+  for (SelectionType::iterator iter = this->Selection.begin();
+    iter != this->Selection.end(); ++iter)
+    {
+    vtkSMProxy* obj = iter->GetPointer();
+    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
+      {
+      this->State->AddExtension( ProxySelectionModelState::proxy,
+        port->GetSourceProxy()->GetGlobalID());
+      this->State->AddExtension( ProxySelectionModelState::port,
+        port->GetPortIndex());
+      }
+    else
+      {
+      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
+      }
+    }
+
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
@@ -177,4 +284,129 @@ bool vtkSMProxySelectionModel::GetSelectionDataBounds(double bounds[6])
 void vtkSMProxySelectionModel::PrintSelf(ostream&  os,  vtkIndent  indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Selected Proxies: ";
+  this->Selection->InitTraversal();
+  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+    {
+    os << obj->GetGlobalID() << " ";
+    }
+  os << endl;
+}
+
+//-----------------------------------------------------------------------------
+const vtkSMMessage* vtkSMProxySelectionModel::GetFullState()
+{
+  return this->State;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator)
+{
+  // Store in cache the state
+  this->Internal->ClientsCachedState[msg->client_id()] = *msg;
+
+  if(!this->HasGlobalID())
+    {
+    this->SetGlobalID(msg->global_id());
+    }
+
+  // Make sure we are loading the master state and we want to follow it.
+  // Otherwise don't try to load that state
+  // If we did not get initialized yet, we don't filter
+  if( this->Internal->GetMasterId() != -1 &&
+      !( !this->Internal->Initilized ||
+         (this->IsFollowingMaster() &&
+          this->Internal->GetMasterId() == static_cast<int>(msg->client_id()))))
+    {
+    return;
+    }
+
+  // Has we are going to load a state, we can consider to be initialized
+  this->Internal->Initilized = true;
+
+  SelectionType new_selection;
+
+  // Load the proxy in the state
+  for(int i=0; i < msg->ExtensionSize(ProxySelectionModelState::proxy); i++)
+    {
+    vtkSMProxy* proxy =
+        locator->LocateProxy(msg->GetExtension(ProxySelectionModelState::proxy, i));
+    if(proxy)
+      {
+      if(msg->GetExtension(ProxySelectionModelState::port, i) != -1)
+        {
+        // We have to select an output port
+        vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+        assert("Try to select an output port of a non source proxy" && source);
+
+        proxy = source->GetOutputPort(msg->GetExtension(ProxySelectionModelState::port, i));
+        }
+
+      // Just add the proxy in the set
+      new_selection.insert(proxy);
+      }
+    else
+      {
+      vtkErrorMacro("Did not find the proxy for selection Model");
+      }
+    }
+
+  // Apply the state
+  bool tmp = this->IsLocalPushOnly();
+  this->EnableLocalPushOnly();
+  this->ClearAndSelect(new_selection);
+  if (new_selection.size() > 0)
+    {
+    // No need to do: this->Select(proxyToSelect.GetPointer(), SELECT);
+    // This is achieved in the SetCurrentProxy.
+    this->SetCurrentProxy(new_selection.first(), SELECT);
+    }
+
+  if(!tmp) this->DisableLocalPushOnly();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::PushStateToSession()
+{
+  if(!this->IsLocalPushOnly() && this->GetSession())
+    {
+    this->PushState(this->State);
+    }
+}
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::SetSession(vtkSMSession* session)
+{
+  // Unregister observer if meaningful
+  if(this->Session && this->Internal->CollaborationManagerObserverID)
+    {
+    this->Session->GetCollaborationManager()->RemoveObserver(
+        this->Internal->CollaborationManagerObserverID);
+    this->Internal->CollaborationManagerObserverID = 0;
+    }
+
+  this->Superclass::SetSession(session);
+
+  if(this->Session && this->Session->GetCollaborationManager())
+    {
+    this->Internal->CollaborationManagerObserverID =
+        this->Session->GetCollaborationManager()->AddObserver(
+            vtkSMCollaborationManager::UpdateMasterUser, this->Internal,
+            &vtkSMProxySelectionModel::vtkInternal::MasterChangedCallBack);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxySelectionModel::SetFollowingMaster(bool following)
+{
+  this->Internal->FollowinMaster = following;
+  if(following)
+    {
+    this->Internal->MasterChangedCallBack(0,0,0);
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMProxySelectionModel::IsFollowingMaster()
+{
+  return this->Internal->FollowinMaster;
 }

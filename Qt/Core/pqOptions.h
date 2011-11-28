@@ -88,6 +88,11 @@ public:
   vtkSetMacro(DisableLightKit, int);
 
   // Description:
+  // These flags are used for testing multi-clients configurations.
+  vtkGetMacro(TestMaster, int);
+  vtkGetMacro(TestSlave, int);
+
+  // Description:
   // Using --script option, user can specify a python script to be run on
   // startup. This have any effect only when ParaView is built with Python
   // support.
@@ -112,6 +117,8 @@ protected:
   int DisableRegistry;
   int DisableLightKit;
   int CurrentImageThreshold;
+  int TestMaster;
+  int TestSlave;
   char* PythonScript;
 
   vtkSetStringMacro(PythonScript);

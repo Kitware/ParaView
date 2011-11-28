@@ -127,7 +127,7 @@ vtkSMProxy::vtkSMProxy()
   this->Hints = 0;
   this->Deprecated = 0;
 
-  this->State = 0;
+  this->State = new vtkSMMessage();
 }
 
 //---------------------------------------------------------------------------
@@ -565,7 +565,7 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
   this->PullState(&message);
 
   // Update internal values
-  this->LoadState(&message, this->Session->GetStateLocator());
+  this->LoadState(&message, this->Session->GetProxyLocator());
 }
 
 //---------------------------------------------------------------------------
@@ -691,18 +691,11 @@ bool vtkSMProxy::ArePropertiesModified()
 //---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects()
 {
-  if (this->ObjectsCreated)
+  if (this->ObjectsCreated && this->State && this->Location == 0)
     {
     return;
     }
-  this->ObjectsCreated = 1;
   this->WarnIfDeprecated();
-
-  // If no location, it means no state...
-  if(this->Location == 0)
-    {
-    return;
-    }
 
   assert( "Test Proxy definition"
           && this->GetClassName() && this->GetSIClassName()
@@ -730,7 +723,6 @@ void vtkSMProxy::CreateVTKObjects()
     }
 
   // Save to state
-  this->State = new vtkSMMessage();
   this->State->CopyFrom(message);
 
   // Add Empty property into state to keep track of index later on
@@ -754,12 +746,26 @@ void vtkSMProxy::CreateVTKObjects()
       }
     }
 
+  // Even if the Proxy was marked as Created, we went so far to build correctly
+  // the state and this is the same case for prototype.
+  if(this->ObjectsCreated)
+    {
+    return;
+    }
+  this->ObjectsCreated = 1;
+  if(this->Location == 0)
+    {
+    return;
+    }
+
   // Push the state
   this->PushState(&message);
 
   // Update assigned id/location while the push
-  this->State->set_global_id(message.global_id());
-  this->State->set_location(message.location());
+  this->State->set_global_id(this->GetGlobalID());
+  // Using the real location and not the filtered one allow us to store
+  // the correct location in full state that is used in Undo/Redo.
+  this->State->set_location(this->Location);
 
   bool oldPushState = this->Internals->EnableAnnotationPush;
   this->Internals->EnableAnnotationPush = false;
@@ -1046,7 +1052,7 @@ void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy*)
 {
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
+  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Consumers.begin();
   for(; i != this->Internals->Consumers.end(); i++)
     {
@@ -1809,7 +1815,7 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root,
 }
 //---------------------------------------------------------------------------
 int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
-                           vtkSMProxyLocator* locator)
+                              vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -1859,73 +1865,134 @@ const vtkSMMessage* vtkSMProxy::GetFullState()
 }
 //---------------------------------------------------------------------------
 void vtkSMProxy::LoadState( const vtkSMMessage* message,
-                            vtkSMStateLocator* locator, bool definitionOnly)
+                            vtkSMProxyLocator* locator )
 {
   // Update globalId. This will fails if that one is already set with a different value
-  this->SetGlobalID(message->global_id());
+  if(this->HasGlobalID() && this->GetGlobalID() != message->global_id())
+    {
+    vtkErrorMacro("Try to load a state on a proxy which has a different ID" <<
+                  "(" << this->GetGlobalID() << " != " << message->global_id() << ")");
+    }
+  else
+    {
+    this->SetGlobalID(message->global_id());
+    }
+
+  // We try to extract some message informations that we might not get from
+  // proxy definition in the XML. This is specially true in collaboration.
+  if(message->HasExtension(DefinitionHeader::server_class))
+    {
+    this->SetSIClassName(message->GetExtension(DefinitionHeader::server_class).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_group))
+    {
+    this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_name))
+    {
+    this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
+    }
+  if(message->HasExtension(ProxyState::xml_sub_proxy_name))
+    {
+    this->SetXMLSubProxyName(message->GetExtension(ProxyState::xml_sub_proxy_name).c_str());
+    }
 
   // Manage its sub-proxy state
   int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);
+  vtkstd::vector<vtkSMMessage> subProxyStateToLoad;
   for(int idx=0; idx < nbSubProxy; idx++)
     {
     const ProxyState_SubProxy *subProxyMsg =
         &message->GetExtension(ProxyState::subproxy, idx);
     vtkSMProxy* subProxy = this->GetSubProxy(subProxyMsg->name().c_str());
 
-    // Make sure the subproxy is not still around with its GlobalId if that
-    // subproxy is not already alive with a valid GlobalId
-    if(!(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+    if(subProxy == NULL)
       {
-      vtkErrorMacro("SubProxy has no global ID but its old instance is still arround. "
-                    << subProxyMsg->global_id() << endl
+      vtkWarningMacro("State provide a sub-proxy information althoug the proxy"
+                      << "does not find that sub-proxy."
+                      << " - Proxy: "
+                      << this->XMLGroup << " - " << this->XMLName << endl
+                      << " - Sub-Proxy: " << subProxyMsg->name().c_str()
+                      << " " << subProxyMsg->global_id());
+      continue;
+      }
+
+    // Make sure we do not try to load a state to a proxy that has already
+    // sub-proxy with IDs that differ from the message state
+    if(subProxy->HasGlobalID() &&
+       (subProxy->GlobalID != subProxyMsg->global_id() ||
+       !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+      {
+      vtkErrorMacro("Invalid Proxy for message"
                     << "Parent Proxy - Group: " << this->XMLGroup
                     << " - Name: " << this->XMLName << endl
                     << "SubProxy - XMLName: " << subProxy->GetXMLName()
                     << " - SubProxyName: " << subProxyMsg->name().c_str()
-                    << endl);
+                    << " - Id: " << subProxy->GlobalID << endl
+                    << message->DebugString().c_str() << endl);
       }
-    assert(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id()));
 
-    vtkSMMessage subProxyState;
-    if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
+    // Update sub-proxy state if possible
+    if(!subProxy->HasGlobalID())
       {
-      subProxy->LoadState(&subProxyState, locator, definitionOnly);
-      subProxy->MarkDirty(NULL);
-      }
-    else if(!subProxy->HasGlobalID())
-      {
-      if(strcmp(subProxy->GetXMLName(),"Camera"))
-        {
-        vtkErrorMacro("### Warning !!! : set subproxy global ID without state. " << subProxyMsg->global_id());
-        }
+      vtkSMMessage subProxyState;
       subProxy->SetGlobalID(subProxyMsg->global_id());
+      if(this->GetSession()->GetStateLocator()->FindState(
+          subProxy->GetGlobalID(), &subProxyState))
+        {
+        subProxyStateToLoad.push_back(subProxyState);
+        }
       }
+    }
+  // Load deferred sub-proxy state
+  // Deferring sub-proxy loading IS VERY IMPORTANT, specialy for compound proxy
+  // that define pipeline connectivity.
+  // If not done while loading the pipeline connection, this will failed because
+  // the sub-proxy involved might not have a GlobalID yet !
+  for(size_t i = 0; i < subProxyStateToLoad.size(); i++)
+    {
+    vtkSMProxy* proxy =
+        vtkSMProxy::SafeDownCast(
+            this->Session->GetRemoteObject(subProxyStateToLoad[i].global_id()));
+    proxy->LoadState(&subProxyStateToLoad[i], locator);
     }
 
   // Manage properties
-  if(!definitionOnly)
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
+  for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
     {
-    vtkSMProxyInternals::PropertyInfoMap::iterator it;
-    vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
-    for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
+    const ProxyState_Property *prop_message =
+        &message->GetExtension(ProxyState::property, i);
+    const char* pname = prop_message->name().c_str();
+    it = this->Internals->Properties.find(pname);
+    if (it != this->Internals->Properties.end())
       {
-      const ProxyState_Property *prop_message =
-          &message->GetExtension(ProxyState::property, i);
-      const char* pname = prop_message->name().c_str();
-      it = this->Internals->Properties.find(pname);
-      if (it != this->Internals->Properties.end())
+      if (it->second.Property->GetIsInternal())
         {
-        it->second.Property->ReadFrom(message, i);
-        touchedProperties.push_back(it->second.Property.GetPointer());
+        // skip internal properties. Their state is never updated.
+        continue;
         }
-      }
 
-    // Make sure all dependent domains are updated. UpdateInformation()
-    // might have produced new information that invalidates the domains.
-    for (int i=0, nb=touchedProperties.size(); i < nb; i++)
-      {
-      touchedProperties[i]->UpdateDependentDomains();
+      // Some view properties need some special treatment and some
+      // of there properties MUST NOT be updated in case of collaborative
+      // notification.
+      if( this->Session->IsProcessingRemoteNotification() &&
+          it->second.Property->GetIgnoreSynchronization() )
+        {
+        continue;
+        }
+
+      it->second.Property->ReadFrom(message, i, locator);
+      touchedProperties.push_back(it->second.Property.GetPointer());
       }
+    }
+
+  // Make sure all dependent domains are updated. UpdateInformation()
+  // might have produced new information that invalidates the domains.
+  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+    {
+    touchedProperties[i]->UpdateDependentDomains();
     }
 
   // Manage annotation
@@ -2051,6 +2118,30 @@ void vtkSMProxy::UpdatePipelineInformation()
     }
 
   this->UpdatePropertyInformation();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::EnableLocalPushOnly()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->EnableLocalPushOnly();
+    }
+  this->Superclass::EnableLocalPushOnly();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::DisableLocalPushOnly()
+{
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->DisableLocalPushOnly();
+    }
+  this->Superclass::DisableLocalPushOnly();
 }
 
 //---------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import QtTestingImage
 
 object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'RTAnalyticSource')
-object2 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
 QtTesting.playCommand(object3, 'activate', '')

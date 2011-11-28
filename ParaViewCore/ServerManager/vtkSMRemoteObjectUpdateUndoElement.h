@@ -25,7 +25,7 @@
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" //  needed for vtkWeakPointer.
 
-class vtkSMStateLocator;
+class vtkSMProxyLocator;
 
 class VTK_EXPORT vtkSMRemoteObjectUpdateUndoElement : public vtkSMUndoElement
 {
@@ -45,10 +45,8 @@ public:
   virtual int Redo();
 
   // Description:
-  // A specific StateLoctor can be used when the state gets loaded by the
-  // remote object. Otherwise we use the one that is available in the session
-  // that was used to create that undo element.
-  virtual void SetStateLocator(vtkSMStateLocator* locator);
+  // Set ProxyLocator to use if any.
+  virtual void SetProxyLocator(vtkSMProxyLocator*);
 
 //BTX
 
@@ -70,7 +68,7 @@ protected:
   // Internal method used to update proxy state based on the state info
   int UpdateState(const vtkSMMessage* state);
 
-  vtkWeakPointer<vtkSMStateLocator> Locator;
+  vtkSMProxyLocator* ProxyLocator;
 
 private:
   vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.

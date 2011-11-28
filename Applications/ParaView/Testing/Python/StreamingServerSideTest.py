@@ -73,7 +73,7 @@ QtTesting.playCommand(object9_5, 'set_int', '32')
 QtTesting.playCommand(object1, 'activate', 'menuSources')
 object11 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object11, 'activate', 'StreamingSource')
-object12 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object12 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object12, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'menuFilters')
 object13 = 'pqClientMainWindow/menubar/menuFilters/Alphabetical'

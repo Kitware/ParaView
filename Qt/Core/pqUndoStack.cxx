@@ -40,14 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUndoElement.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
 
+
 #include <QtDebug>
 #include <QPointer>
+
 
 //-----------------------------------------------------------------------------
 class pqUndoStack::pqImplementation
@@ -276,7 +279,10 @@ bool pqUndoStack::ignoreAllChanges() const
 //-----------------------------------------------------------------------------
 void pqUndoStack::setActiveServer(pqServer* server)
 {
-  if (server)
+  // Clear stack
+  this->Implementation->IgnoreAllChangesStack.clear();
+
+  if (server && !server->session()->IsMultiClients())
     {
     this->endNonUndoableChanges();
     }

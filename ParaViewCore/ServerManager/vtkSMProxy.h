@@ -128,6 +128,7 @@ struct vtkSMProxyInternals;
 //ETX
 class vtkClientServerStream;
 class vtkPVInformation;
+class vtkSMLoadStateContext;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
@@ -423,6 +424,19 @@ public:
   // along the pipeline.
   void UpdateSelfAndAllInputs();
 
+  // Description:
+  // Allow to switch off any push of state change to the server for that
+  // particular object.
+  // This is used when we load a state based on a server notification. In that
+  // particular case, the server is already aware of that new state, so we keep
+  // those changes local.
+  virtual void EnableLocalPushOnly();
+
+  // Description:
+  // Enable the given remote object to communicate its state normaly to the
+  // server location.
+  virtual void DisableLocalPushOnly();
+
 //BTX
 
   // Description:
@@ -438,8 +452,7 @@ public:
   // properties values and just setup the new proxy hierarchy with all subproxy
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly = false);
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxy();
@@ -494,8 +507,8 @@ protected:
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMSourceProxy;
   friend class vtkSMUndoRedoStateLoader;
-  // -- PVEE only
-  friend class vtkWSMApplication;
+  friend class vtkSMDeserializerProtobuf;
+  friend class vtkSMStateLocator;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -674,7 +687,6 @@ protected:
   vtkSetStringMacro(SIClassName);
   vtkGetStringMacro(SIClassName);
   char* SIClassName;
-
 
   char* VTKClassName;
   char* XMLGroup;

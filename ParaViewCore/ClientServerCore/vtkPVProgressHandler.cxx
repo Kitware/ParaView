@@ -45,6 +45,9 @@
 // doing really large runs.
 // #define PV_DISABLE_PROGRESS_HANDLING
 
+#define SKIP_IF_DISABLED()\
+  if (this->Internals->DisableProgressHandling) { return; }
+
 inline const char* vtkGetProgressText(vtkObjectBase* o)
 {
   vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(o);
@@ -223,6 +226,8 @@ public:
   bool EnableProgress;
   bool ForceAsyncRequestReceived;
 
+  bool DisableProgressHandling;
+
   vtkTimerLog* ProgressTimer;
   vtkInternals()
     {
@@ -231,6 +236,11 @@ public:
     this->ForceAsyncRequestReceived = false;
     this->ProgressTimer = vtkTimerLog::New();
     this->ProgressTimer->StartTimer();
+#ifdef PV_DISABLE_PROGRESS_HANDLING
+    this->DisableProgressHandling = true;
+#else
+    this->DisableProgressHandling = false;
+#endif
     }
 
   ~vtkInternals()
@@ -292,14 +302,22 @@ void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
     this->Session = conn;
     this->Modified();
     }
+
+  // NOTE: SetSession is called in constructor of vtkPVSession and that's too
+  // early to be using any virtual methods on the session. So most
+  // initialization happens in PrepareProgress().
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::PrepareProgress()
 {
-#ifdef PV_DISABLE_PROGRESS_HANDLING
-  return;
+#ifndef PV_DISABLE_PROGRESS_HANDLING
+  this->Internals->DisableProgressHandling =
+    this->Session? this->Session->IsMultiClients() : true;
 #endif
+
+  SKIP_IF_DISABLED();
+
   this->InvokeEvent(vtkCommand::StartEvent, this);
   this->Internals->EnableProgress = true;
 
@@ -326,9 +344,7 @@ void vtkPVProgressHandler::PrepareProgress()
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::CleanupPendingProgress()
 {
-#ifdef PV_DISABLE_PROGRESS_HANDLING
-  return;
-#endif
+  SKIP_IF_DISABLED();
 
   if (!this->Internals->EnableProgress)
     {
@@ -425,9 +441,7 @@ void vtkPVProgressHandler::CleanupSatellites()
 void vtkPVProgressHandler::OnProgressEvent(vtkObject* obj,
   double progress)
 {
-#ifdef PV_DISABLE_PROGRESS_HANDLING
-  return;
-#endif
+  SKIP_IF_DISABLED();
 
   if (!this->Internals->EnableProgress)
     {
@@ -545,9 +559,7 @@ void vtkPVProgressHandler::ReceiveProgressFromServer(vtkMultiProcessController* 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::HandleServerProgress(int progress, const char* text)
 {
-#ifdef PV_DISABLE_PROGRESS_HANDLING
-  return;
-#endif
+  SKIP_IF_DISABLED();
 
   //cout << "Progress: " << (text? text : "(none)") << "==" << progress << endl;
   this->SetLastProgressText(text);

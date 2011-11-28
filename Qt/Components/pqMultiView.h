@@ -112,6 +112,9 @@ public:
   /// Overridden to handle full-screen mode.
   virtual void setCurrentWidget(QWidget* widget);
 
+  /// Allow to query if a given widget is already maximized or not
+  bool isMaximizedWidget(QWidget* maxWidget);
+
 signals:
   /// signal for new frame added
   void frameAdded(pqMultiViewFrame*);
@@ -145,10 +148,10 @@ public slots:
   /// Show the view as a fullscreen window.
   void toggleFullScreen();
 
-protected slots:
   virtual void maximizeWidget(QWidget*);
   virtual void restoreWidget(QWidget*);
 
+protected slots:
   /// As frames are added/removed/moved around, we may end up with duplicate
   /// frame names. We don't want to simply use a static int for uniquifying the
   /// names since then writing tests becomes really hard. So, whenever frames

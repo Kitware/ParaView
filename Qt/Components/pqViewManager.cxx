@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUtilities.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMCacheBasedProxyLocator.h"
 
 // Qt includes.
 #include <QAction>

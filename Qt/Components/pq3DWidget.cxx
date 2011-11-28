@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
+#include "pqServer.h"
 
 namespace
 {
@@ -139,9 +140,11 @@ public:
   pq3DWidgetInternal() :
     IgnorePropertyChange(false),
     WidgetVisible(true),
-    Selected(false)
+    Selected(false),
+    LastWidgetVisibilityGoal(true)
   {
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->IsMaster = pqApplicationCore::instance()->getActiveServer()->isMaster();
   }
     
   vtkSmartPointer<vtkSMProxy> ReferenceProxy;
@@ -162,6 +165,8 @@ public:
   pqPickHelper PickHelper;
   QKeySequence PickSequence;
   QPointer<QShortcut> PickShortcut;
+  bool IsMaster;
+  bool LastWidgetVisibilityGoal;
 };
 
 //-----------------------------------------------------------------------------
@@ -182,6 +187,10 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   QObject::connect(&this->Internal->PickHelper,
     SIGNAL(pickFinished(double, double, double)),
     this, SLOT(pick(double, double, double)));
+
+  QObject::connect( pqApplicationCore::instance(),
+                    SIGNAL(updateMasterEnableState(bool)),
+                    this, SLOT(updateMasterEnableState(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -560,7 +569,13 @@ void pq3DWidget::deselect()
 //-----------------------------------------------------------------------------
 void pq3DWidget::setWidgetVisible(bool visible)
 {
-  if(visible != this->Internal->WidgetVisible)
+  if(this->Internal->IsMaster)
+    {
+    this->Internal->LastWidgetVisibilityGoal = visible;
+    }
+
+  if( visible != this->Internal->WidgetVisible &&
+      ((!this->Internal->IsMaster && !visible) || this->Internal->IsMaster))
     {
     this->Internal->WidgetVisible = visible;
     this->updateWidgetVisibility();
@@ -700,4 +715,17 @@ void pq3DWidget::resetBounds()
   this->resetBounds(input_bounds);
   this->setModified();
   this->render();
+}
+//-----------------------------------------------------------------------------
+void pq3DWidget::updateMasterEnableState(bool I_am_the_Master)
+{
+  this->Internal->IsMaster = I_am_the_Master;
+  if(I_am_the_Master)
+    {
+    this->setWidgetVisible(this->Internal->LastWidgetVisibilityGoal);
+    }
+  else
+    {
+    this->hideWidget();
+    }
 }

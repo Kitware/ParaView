@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
+#include "pqCollaborationManager.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMDocumentation.h"
@@ -54,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-
 
 #include <QMap>
 #include <QDebug>
@@ -137,6 +138,11 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(forceFilterMenuRefresh()),
     &this->Timer, SLOT(start()));
+
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateEnableState()));
+
   this->updateEnableState();
 }
 
@@ -151,7 +157,9 @@ void pqFiltersMenuReaction::updateEnableState()
     }
 
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool enabled = activeObjects->activeServer() != NULL;
+  pqServer* server = activeObjects->activeServer();
+  bool enabled = (server != NULL);
+  enabled = enabled ? server->isMaster() : enabled;
 
   // selected ports.
   QList<pqOutputPort*> outputPorts;
@@ -183,6 +191,11 @@ void pqFiltersMenuReaction::updateEnableState()
         enabled = false;
         // we listen to state change so that we can update enable state when the
         // proxy gets initialized.
+        //
+        // It is better to expect a dataUpdated(pqPipelineSource*) signal than
+        // modifiedStateChanged(pqServerManagerModelItem*)
+        // as the rest of the GUI expect the dataUpdated(pqPipelineSource*))
+        // SIGNAL to happen after an apply even if the data did not changed.
         QObject::connect(source,
           SIGNAL(dataUpdated(pqPipelineSource*)),
           this, SLOT(onDataUpdated()));

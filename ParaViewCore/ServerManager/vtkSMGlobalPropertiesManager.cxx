@@ -60,6 +60,14 @@ vtkSMGlobalPropertiesManager::~vtkSMGlobalPropertiesManager()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMGlobalPropertiesManager::SetSession(vtkSMSession *)
+{
+  // It is a prototype, this should not get to the server
+  this->SetLocation(0);
+  // We also prevent the user from beeing able to set a session
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMGlobalPropertiesManager::InitializeProperties(
   const char* xmlgroup, const char* xmlname)
 {

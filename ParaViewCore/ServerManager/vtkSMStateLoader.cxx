@@ -70,12 +70,13 @@ vtkSMStateLoader::~vtkSMStateLoader()
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
-                                           const char* xml_name)
+                                           const char* xml_name,
+                                           const char* subProxyName)
 {
   // Check if the proxy requested is a view module.
   if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
     {
-    return this->Superclass::CreateProxy( xml_group, xml_name);
+    return this->Superclass::CreateProxy( xml_group, xml_name, subProxyName);
     }
 
   //**************************************************************************
@@ -124,11 +125,11 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
   //**************************************************************************
 
   // If all else fails, let the superclass handle it:
-  return this->Superclass::CreateProxy(xml_group, xml_name);
+  return this->Superclass::CreateProxy(xml_group, xml_name, subProxyName);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
+void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
   // Ensure that the proxy is created before it is registered, unless we are
   // reviving the server-side server manager, which needs special handling.
@@ -141,7 +142,7 @@ void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
+void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
 
   vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
@@ -173,7 +174,7 @@ void vtkSMStateLoader::RegisterProxyInternal(const char* group,
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(int id)
+vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(vtkTypeUInt32 id)
 {
   return this->LocateProxyElementInternal(
     this->ServerManagerStateElement, id);
@@ -181,14 +182,15 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(int id)
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
-  vtkPVXMLElement* root, int id)
+  vtkPVXMLElement* root, vtkTypeUInt32 id_)
 {
   if (!root)
     {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-      << id);
+      << id_);
     return 0;
     }
+  vtkIdType id = static_cast<vtkIdType>(id_);
 
   unsigned int numElems = root->GetNumberOfNestedElements();
   unsigned int i=0;
@@ -198,7 +200,7 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
     if (currentElement->GetName() &&
       strcmp(currentElement->GetName(), "Proxy") == 0)
       {
-      int currentId;
+      vtkIdType currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
         {
         continue;
@@ -406,7 +408,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
       if (link)
         {
-        if (!link->LoadState(currentElement, this->ProxyLocator))
+        if (!link->LoadXMLState(currentElement, this->ProxyLocator))
           {
           return 0;
           }

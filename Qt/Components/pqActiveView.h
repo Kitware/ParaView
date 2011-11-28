@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "pqComponentsExport.h"
+#include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 class pqView;
 

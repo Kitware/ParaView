@@ -256,6 +256,10 @@ void pqPlotSettingsModel::emitDataChanged()
 //-----------------------------------------------------------------------------
 void pqPlotSettingsModel::reload()
 {
+  if (this->Implementation->RepresentationProxy)
+    {
+    this->Implementation->RepresentationProxy->UpdatePropertyInformation();
+    }
   this->reset();
   this->updateCheckState(0, Qt::Horizontal);
 }

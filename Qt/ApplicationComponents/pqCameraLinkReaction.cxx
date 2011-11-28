@@ -50,7 +50,7 @@ void pqCameraLinkReaction::updateEnableState()
 {
   this->parentAction()->setEnabled(
     qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView()) !=
-    NULL);
+    NULL && this->IsMaster);
 }
 
 //-----------------------------------------------------------------------------

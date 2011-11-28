@@ -159,7 +159,17 @@ protected:
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,
   // after the object has been created. 
-  virtual void initialize() { };
+  virtual void initialize();
+
+  // Method used to update the internal structure whithout affecting
+  // the ProxyManager proxy registration
+  virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
+  virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
+
+protected slots:
+  // Used to monitor helper proxy registration when created on other clients
+  void onProxyRegistered(const QString&, const QString&, vtkSMProxy*);
+  void onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*);
 
 private:
   pqServer *Server;           ///< Stores the parent server.

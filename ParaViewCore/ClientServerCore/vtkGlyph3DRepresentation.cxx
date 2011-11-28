@@ -24,6 +24,7 @@
 #include "vtkPVArrowSource.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVUpdateSuppressor.h"
 #include "vtkQuadricClustering.h"
 #include "vtkRenderer.h"
 #include "vtkUnstructuredDataDeliveryFilter.h"
@@ -44,6 +45,9 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->LODDataCollector = vtkUnstructuredDataDeliveryFilter::New();
   this->LODDataCollector->SetOutputDataType(VTK_POLY_DATA);
 
+  this->GlyphUpdateSuppressor = vtkPVUpdateSuppressor::New();
+  this->LODGlyphUpdateSuppressor = vtkPVUpdateSuppressor::New();
+
   this->DummySource = vtkPVArrowSource::New();
 
   this->GlyphMapper->SetInputConnection(0,
@@ -51,8 +55,15 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->LODGlyphMapper->SetInputConnection(0,
     this->LODMapper->GetInputConnection(0, 0));
 
-  this->GlyphMapper->SetInputConnection(1, this->DataCollector->GetOutputPort());
-  this->LODGlyphMapper->SetInputConnection(1, this->LODDataCollector->GetOutputPort());
+  this->GlyphUpdateSuppressor->SetInputConnection(
+    this->DataCollector->GetOutputPort());
+  this->GlyphMapper->SetInputConnection(
+    1, this->GlyphUpdateSuppressor->GetOutputPort());
+
+  this->LODGlyphUpdateSuppressor->SetInputConnection(
+    this->LODDataCollector->GetOutputPort());
+  this->LODGlyphMapper->SetInputConnection(
+    1, this->LODGlyphUpdateSuppressor->GetOutputPort());
 
   this->GlyphActor->SetMapper(this->GlyphMapper);
   this->GlyphActor->SetLODMapper(this->LODGlyphMapper);
@@ -76,6 +87,8 @@ vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
   this->GlyphMapper->Delete();
   this->LODGlyphMapper->Delete();
   this->GlyphActor->Delete();
+  this->GlyphUpdateSuppressor->Delete();
+  this->LODGlyphUpdateSuppressor->Delete();
 
   this->DataCollector->Delete();
   this->LODDataCollector->Delete();
@@ -141,6 +154,9 @@ int vtkGlyph3DRepresentation::FillInputPortInformation(int port,
 int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  this->DataCollector->Modified();
+  this->LODDataCollector->Modified();
+
   if (inputVector[1]->GetNumberOfInformationObjects()==1)
     {
     this->DataCollector->SetInputConnection(this->GetInternalOutputPort(1));
@@ -154,12 +170,60 @@ int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
     this->LODDataCollector->SetInputConnection(this->DummySource->GetOutputPort());
     }
 
-  // Since data-deliver mode never changes for this representation, we simply do
-  // the data-delivery in RequestData itself to keep things simple.
-  this->DataCollector->Update();
-  this->LODDataCollector->Update();
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+int vtkGlyph3DRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request_type,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
+    {
+    return false;
+    }
+
+  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+    {
+    // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
+    // filters have their states updated as requested by the view.
+
+    // this is where we will look to see on what nodes are we going to render and
+    // render set that up.
+    if (this->Actor->GetEnableLOD())
+      {
+      this->LODDataCollector->ProcessViewRequest(inInfo);
+      if (this->LODGlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
+        this->LODDataCollector->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
+      }
+    else
+      {
+      this->DataCollector->ProcessViewRequest(inInfo);
+      if (this->GlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
+        this->DataCollector->GetMTime())
+        {
+        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+        }
+      }
+    }
+  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+    {
+    if (this->Actor->GetEnableLOD())
+      {
+      this->LODDataCollector->Modified();
+      this->LODGlyphUpdateSuppressor->ForceUpdate();
+      }
+    else
+      {
+      this->DataCollector->Modified();
+      this->GlyphUpdateSuppressor->ForceUpdate();
+      }
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

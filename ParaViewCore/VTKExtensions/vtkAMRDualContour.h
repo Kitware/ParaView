@@ -21,7 +21,7 @@
 
 // This will turn on validation and debug i/o of the filter.
 //#define vtkAMRDualContourDEBUG
-#define vtkAMRDualContourPROFILE
+//#define vtkAMRDualContourPROFILE
 
 #ifndef __vtkAMRDualContour_h
 #define __vtkAMRDualContour_h
@@ -102,7 +102,7 @@ public:
 
 protected:
   vtkAMRDualContour();
-  ~vtkAMRDualContour();
+  virtual ~vtkAMRDualContour();
 
   double IsoValue;
 

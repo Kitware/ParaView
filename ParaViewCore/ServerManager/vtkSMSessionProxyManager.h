@@ -187,6 +187,8 @@ public:
   // The collection is cleared before the proxies are added to it.
   void GetProxies(const char* groupname, const char* name,
     vtkCollection* collection);
+  void GetProxies(const char* groupname, vtkCollection* collection)
+    { this->GetProxies(groupname, NULL, collection); }
 
   // Description:
   // Returns the prototype proxy for the given type. This method may create
@@ -413,6 +415,23 @@ public:
   void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
   void UnRegisterSelectionModel(const char* name);
 
+
+  // Description:
+  // Method used to fetch the last state of the ProxyManager from the pvserver.
+  // This is used in the collaboration context when the user connect to a remote
+  // server and wants to update it state before doing anything.
+  void UpdateFromRemote();
+    
+  // Description:
+  // Those methods allow the user to make atomic change set in the notification
+  // collaboration in term of set of proxy registration.
+  // This allow us to prevent deletion on remote sites of proxies that
+  // will end up in the ProxyManager but have not been set into it yet.
+  bool IsStateUpdateNotificationEnabled();
+  void DisableStateUpdateNotification();
+  void EnableStateUpdateNotification();
+  void TriggerStateUpdate();
+
 //BTX
 
   // Description:
@@ -424,32 +443,7 @@ public:
 
   // Description:
   // This method is used to initialise the ProxyManager to the given state
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator);
-
-  // Description:
-  // This metod allow the creation of a proxy based on its full state.
-  // Used in Undo/Redo to bring back a proxy to life or in collaboration mode,
-  // where the message come from the server and the purpose is to create the SM
-  // side when the PM side has already been created.
-  // The User MUST delete the provided proxy otherwise it will live forever.
-  // If the definitionOnly Flag is set to True the proxy won't load the
-  // properties values and just setup the new proxy hierarchy with all subproxy
-  // globalID set. This allow to split the load process in 2 step to prevent
-  // invalid state when property refere to a sub-proxy that does not exist yet.
-
-  virtual vtkSMProxy* NewProxy( const vtkSMMessage* msg,
-                                vtkSMStateLocator* locator,
-                                bool definitionOnly = false);
-
-  // Description:
-  // Re-New a proxy based on its ID and its previous state.
-  // This means that it will create a new vtkSMProxy or will
-  // return NULL if that one already exist.
-  //
-  // WARNING:
-  // - It is at the responsability at the caller to delete the proxy.
-  virtual vtkSMProxy* ReNewProxy(vtkTypeUInt32 globalId,
-                                 vtkSMStateLocator* locator);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);

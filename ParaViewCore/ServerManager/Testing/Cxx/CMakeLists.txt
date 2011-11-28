@@ -25,6 +25,7 @@ SET(ServersServerManager_SRCS
   TestComparativeAnimationCueProxy 
   TestXMLSaveLoadState
   TestProxyAnnotation
+  TestSMIntVectorProperty
   )
 
 FOREACH(name ${ServersServerManager_SRCS})

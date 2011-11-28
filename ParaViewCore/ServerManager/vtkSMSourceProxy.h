@@ -126,7 +126,7 @@ public:
   // Description:
   // Creates extract selection proxies for each output port if not already
   // created.
-  void CreateSelectionProxies();
+  virtual void CreateSelectionProxies();
 
   // Description:
   // Set/Get the selection input. This is used to set the selection input to the
@@ -166,8 +166,12 @@ public:
   // This value is cached after the first call.
   virtual unsigned int GetNumberOfAlgorithmRequiredInputPorts();
 
+  // Description:
+  // Overridden to reserve additional IDs for use by "ExtractSelection" proxies.
+  virtual vtkTypeUInt32 GetGlobalID();
 
 //BTX
+
   enum ProcessSupportType
   {
     SINGLE_PROCESS,
@@ -217,11 +221,17 @@ protected:
   void SetOutputPort(unsigned int index, const char* name, 
     vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();
+  void SetExtractSelectionProxy(unsigned int index,
+    vtkSMSourceProxy* proxy);
+  void RemoveAllExtractSelectionProxies();
 
   // Description:
   // Overwritten from superclass to invoke 
   virtual void PostUpdateData();
 
+  // flag used to avoid creation of extract selection proxies for this source
+  // proxy.
+  bool DisableSelectionProxies;
   bool SelectionProxiesCreated;
 private:
   vtkSMSourceProxyInternals* PInternals;

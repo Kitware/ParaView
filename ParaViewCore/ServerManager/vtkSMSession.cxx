@@ -21,8 +21,10 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
 #include "vtkReservedRemoteObjectIds.h"
+#include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
@@ -32,6 +34,7 @@
 #include "vtkWeakPointer.h"
 
 #include <vtksys/ios/sstream>
+#include <vtkNew.h>
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -47,13 +50,21 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
   this->StateLocator = vtkSMStateLocator::New();
   this->IsAutoMPI = false;
 
-  // Start after the reserved one
-  this->LastGUID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
-
   if (initialize_during_constructor)
     {
     this->Initialize();
     }
+
+  // Create and setup deserializer for the local ProxyLocator
+  vtkNew<vtkSMDeserializerProtobuf> deserializer;
+  deserializer->SetStateLocator(this->StateLocator);
+  deserializer->SetSession(this);
+
+  // Create and setup proxy locator
+  this->ProxyLocator = vtkSMProxyLocator::New();
+  this->ProxyLocator->SetDeserializer(deserializer.GetPointer());
+  this->ProxyLocator->UseSessionToLocateProxy(true);
+  this->ProxyLocator->SetSession(this);
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +76,7 @@ vtkSMSession::~vtkSMSession()
     }
 
   this->StateLocator->Delete();
+  this->ProxyLocator->Delete();
   if (this->SessionProxyManager)
     {
     this->SessionProxyManager->Delete();
@@ -111,8 +123,7 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
   vtkSMRemoteObject *remoteObj =
     vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
 
-  //cout << "UpdateStateHistory: " << globalId << endl;
-  if (remoteObj && !remoteObj->IsPrototype())
+  if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
     {
     vtkSMMessage newState;
     newState.CopyFrom(*remoteObj->GetFullState());
@@ -123,7 +134,8 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 
     // Store state in cache
     vtkSMMessage oldState;
-    bool createAction = !this->StateLocator->FindState(globalId, &oldState);
+    bool createAction = !this->StateLocator->FindState( globalId, &oldState,
+      /* We want only a local lookup => false */          false );
 
     // This is a filtering Hack, I don't like it. :-(
     if (newState.GetExtension(ProxyState::xml_name) != "Camera")

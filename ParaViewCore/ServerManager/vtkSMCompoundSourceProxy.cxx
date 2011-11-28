@@ -13,15 +13,16 @@
 
 =========================================================================*/
 #include "vtkSMCompoundSourceProxy.h"
+#include "vtkSMProxyInternals.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMMessage.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyInternals.h"
 
 #include <vtkSmartPointer.h>
 
@@ -99,14 +100,15 @@ void vtkSMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::CreateOutputPorts()
 {
-  if (this->Location == 0 ||
-      (this->OutputPortsCreated && this->GetNumberOfOutputPorts() > 0))
+  if (this->Location == 0 || this->OutputPortsCreated)
     {
     return;
     }
+
   this->OutputPortsCreated = 1;
 
   this->RemoveAllOutputPorts();
+
   this->CreateVTKObjects();
 
   unsigned int index = 0;
@@ -126,16 +128,17 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
     source->CreateOutputPorts();
     vtkSMOutputPort* port = 0;
     vtkSMDocumentation* doc = 0;
+    unsigned int port_index = 0;
     if (iter->HasPortIndex())
       {
-      port = source->GetOutputPort(iter->PortIndex);
-      doc = source->GetOutputPortDocumentation(iter->PortIndex);
+      port_index = iter->PortIndex;
       }
     else
       {
-      port = source->GetOutputPort(iter->PortName.c_str());
-      doc = source->GetOutputPortDocumentation(iter->PortName.c_str());
+      port_index = source->GetOutputPortIndex(iter->PortName.c_str());
       }
+    port = source->GetOutputPort(port_index);
+    doc = source->GetOutputPortDocumentation(port_index);
     if (!port)
       {
       vtkErrorMacro( "Failed to locate requested output port of subproxy "
@@ -143,12 +146,40 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
       continue;
       }
     this->SetOutputPort(index, iter->ExposedName.c_str(), port, doc);
+
     index++;
 
     // Move forward
     iter++;
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundSourceProxy::CreateSelectionProxies()
+{
+  if (this->DisableSelectionProxies || this->SelectionProxiesCreated)
+    {
+    return;
+    }
+
+  this->SelectionProxiesCreated = true;
+  this->RemoveAllExtractSelectionProxies();
+
+  unsigned int numOutputs = this->GetNumberOfOutputPorts();
+
+  for (unsigned int cc=0; cc < numOutputs; cc++)
+    {
+    vtkSMOutputPort* port = this->GetOutputPort(cc);
+    vtkSMSourceProxy* source = port->GetSourceProxy();
+    if (source && source != this)
+      {
+      source->CreateSelectionProxies();
+      this->SetExtractSelectionProxy(cc,
+        source->GetSelectionOutput(port->GetPortIndex()));
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMCompoundSourceProxy::UpdateVTKObjects()
 {

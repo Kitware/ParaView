@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqManagePluginsReaction_h 
 #define __pqManagePluginsReaction_h
 
-#include "pqReaction.h"
+#include "pqMasterOnlyReaction.h"
 
 /// @ingroup Reactions
 /// pqManagePluginsReaction is the reaction to pop-up the plugins manager dialog.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManagePluginsReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManagePluginsReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 public:
   pqManagePluginsReaction(QAction* action): Superclass(action) { }
 

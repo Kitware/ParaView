@@ -22,6 +22,11 @@
 
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
+#include "vtkWeakPointer.h" // need for observer
+
+class vtkSMProxy;
+class vtkSMSession;
+class vtkUndoStack;
 
 class VTK_EXPORT vtkSMStateLocator : public vtkSMObject
 {
@@ -36,12 +41,20 @@ public:
   vtkSetObjectMacro(ParentLocator, vtkSMStateLocator);
   vtkGetObjectMacro(ParentLocator, vtkSMStateLocator);
 
+  // Description:
+  // By initializing the garabage collector the stored state get removed once
+  // their is no more chance for them to be reused inside the session.
+  void InitGarbageCollector(vtkSMSession*, vtkUndoStack*);
+
 //BTX
   // Description:
   // Fill the provided State message with the state found inside the current
   // locator or one of its parent. The method return true if the state was
   // successfully filled.
-  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill);
+  // The "useParent" flag allow to disable parent lookup but by default it
+  // is set to true.
+  virtual bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill,
+                         bool useParent = true );
 
   // Description:
   // Register the given state in the current locator. If a previous state was
@@ -54,6 +67,11 @@ public:
   virtual void UnRegisterState(vtkTypeUInt32 globalID, bool force);
 
   // Description:
+  // Remove all the registered states
+  // if force is true, it will also remove it from its hierarchical parents.
+  virtual void UnRegisterAllStates(bool force);
+
+  // Description:
   // Return true if the given state can be found locally whitout the help of
   // on the hierarchical parent
   virtual bool IsStateLocal(vtkTypeUInt32 globalID);
@@ -62,11 +80,19 @@ public:
   // Return true if the given state do exist in the locator hierachy
   virtual bool IsStateAvailable(vtkTypeUInt32 globalID);
 
+  // Description:
+  // Register the given proxy state as well as all its sub-proxy state so if
+  // that proxy need to be renew all its sub-proxy will be renew in the exact
+  // same state.
+  virtual void RegisterFullState(vtkSMProxy* proxy);
+
 protected:
   vtkSMStateLocator();
   ~vtkSMStateLocator();
 
   vtkSMStateLocator* ParentLocator;
+  vtkWeakPointer<vtkSMSession> Session;
+  vtkWeakPointer<vtkUndoStack> UndoStack;
 
 private:
   vtkSMStateLocator(const vtkSMStateLocator&); // Not implemented

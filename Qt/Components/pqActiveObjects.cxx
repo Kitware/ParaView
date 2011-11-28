@@ -223,9 +223,9 @@ void pqActiveObjects::viewSelectionChanged()
   if (view)
     {
     QObject::connect(view, SIGNAL(representationAdded(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
+      this, SLOT(updateRepresentation()), Qt::UniqueConnection);
     QObject::connect(view, SIGNAL(representationRemoved(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
+      this, SLOT(updateRepresentation()), Qt::UniqueConnection);
     }
 
   this->ActiveView = view;

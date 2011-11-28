@@ -1,7 +1,42 @@
 #include "vtkSpyPlotReaderMap.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
+#include "vtkMultiProcessStream.h"
 
+#include <vtksys/SystemTools.hxx>
+#include <assert.h>
+
+namespace
+{
+  // tests if the filename specified has a numerical extension.
+  // If so, returns the number specified in the extension as "number".
+  bool HasNumericalExtension(const char* filename, int &number)
+    {
+    number = 0;
+
+    vtkstd::string extension = 
+      vtksys::SystemTools::GetFilenameLastExtension(filename);
+    // NOTE: GetFilenameWithoutLastExtension() returns the extension with "."
+    // included.
+    if (extension.size() > 1 )
+      {
+      const char *a = extension.c_str();
+      a++; // to exclude the "."
+      if (isdigit(*a))
+        {
+        char *ep;
+        number = static_cast<int>(strtol(a, &ep, 10));
+        if (ep[0] == '\0')
+          {
+          return true;
+          }
+        }
+      }
+    return false;
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSpyPlotReaderMap::Clean(vtkSpyPlotUniReader* save)
 {
   MapOfStringToSPCTH::iterator it;
@@ -17,14 +52,72 @@ void vtkSpyPlotReaderMap::Clean(vtkSpyPlotUniReader* save)
   this->Files.erase(this->Files.begin(),end);
 }
 
-void vtkSpyPlotReaderMap::Initialize(const char *file)
+//-----------------------------------------------------------------------------
+bool vtkSpyPlotReaderMap::Save(vtkMultiProcessStream& stream)
 {
-  if ( !file || file != this->MasterFileName )
+  stream << 12345 << static_cast<int>(this->Files.size());
+  for (MapOfStringToSPCTH::iterator iter = this->Files.begin();
+    iter != this->Files.end(); ++iter)
     {
-    this->Clean(0);
+    stream << iter->first;
     }
+  return true;
 }
 
+//-----------------------------------------------------------------------------
+bool vtkSpyPlotReaderMap::Load(vtkMultiProcessStream& stream)
+{
+  this->Clean(NULL);
+  int size, magic_number;
+  stream >> magic_number >> size;
+  assert(magic_number == 12345);
+  for (int cc=0; cc < size; cc++)
+    {
+    vtkstd::string fname;
+    stream >> fname;
+    this->Files[fname] = NULL;
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSpyPlotReaderMap::Initialize(const char *filename)
+{
+  this->Clean(NULL);
+
+  ifstream ifs(filename);
+  if(!ifs)
+    {
+    vtkGenericWarningMacro("Error opening file " << filename);
+    return false;
+    }
+
+  char buffer[8];
+  if(!ifs.read(buffer,7))
+    {
+    vtkGenericWarningMacro("Problem reading header of file: " << filename);
+    return false;
+    }
+  buffer[7] = 0;
+  ifs.close();
+
+  // Build the file map by processing basic meta-data from the file i.e. if it's
+  // a case file, use the files specified. If it's a spcth data file, test to
+  // see if there are multiple files in the same location.
+  if(strcmp(buffer,"spydata")==0)
+    {
+    return this->InitializeFromSpyFile(filename);
+    }
+  else if(strcmp(buffer,"spycase")==0)
+    {
+    return this->InitializeFromCaseFile(filename);
+    }
+
+  vtkGenericWarningMacro("Not a SpyData file");
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 vtkSpyPlotUniReader* 
 vtkSpyPlotReaderMap::GetReader(MapOfStringToSPCTH::iterator& it, 
                                vtkSpyPlotReader* parent)
@@ -40,6 +133,7 @@ vtkSpyPlotReaderMap::GetReader(MapOfStringToSPCTH::iterator& it,
   return it->second;
 }
 
+//-----------------------------------------------------------------------------
 void vtkSpyPlotReaderMap::TellReadersToCheck(vtkSpyPlotReader *parent)
 {
   MapOfStringToSPCTH::iterator it;
@@ -48,4 +142,139 @@ void vtkSpyPlotReaderMap::TellReadersToCheck(vtkSpyPlotReader *parent)
     {
     this->GetReader(it, parent)->SetNeedToCheck(1);
     }
+}
+
+
+//-----------------------------------------------------------------------------
+bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
+{
+  // cerr << "spydatafile\n";
+  // See if this is part of a series
+  int currentNum=0;
+  bool isASeries = HasNumericalExtension(filename, currentNum);
+
+  if (!isASeries)
+    {
+    // Add an entry in the Map. The reader will be created on-demand when
+    // needed.
+    this->Files[filename]= NULL;
+    return true;
+    }
+
+  // There's a possibility that this is a spy file series. Try to detect the
+  // series.
+  vtkstd::string fileNoExt = 
+    vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
+  vtkstd::string filePath = 
+    vtksys::SystemTools::GetFilenamePath(filename);
+
+  // Now find all the files that make up the series that this file is part
+  // of
+  int idx = currentNum - 100;
+  int last = currentNum;
+  char buffer[1024];
+  int found = currentNum;
+  int minimum = currentNum;
+  int maximum = currentNum;
+  while ( 1 )
+    {
+    sprintf(buffer, "%s/%s.%d",filePath.c_str(), fileNoExt.c_str(), idx);
+    // cerr << "buffer1 == " << buffer << endl;
+    if ( !vtksys::SystemTools::FileExists(buffer) )
+      {
+      int next = idx;
+      for ( idx = last; idx > next; idx -- )
+        {
+        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        if ( !vtksys::SystemTools::FileExists(buffer) )
+          {
+          break;
+          }
+        else
+          {
+          found = idx;
+          }
+        }
+      break;
+      }
+    last = idx;
+    idx -= 100;
+    }
+  minimum = found;
+  idx = currentNum + 100;
+  last = currentNum;
+  found = currentNum;
+  while ( 1 )
+    {
+    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    // cerr << "buffer2 == " << buffer << endl;
+    if ( !vtksys::SystemTools::FileExists(buffer) )
+      {
+      int next = idx;
+      for ( idx = last; idx < next; idx ++ )
+        {
+        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+        if ( !vtksys::SystemTools::FileExists(buffer) )
+          {
+          break;
+          }
+        else
+          {
+          found = idx;
+          }
+        }
+      break;
+      }
+    last = idx;
+    idx += 100;
+    }
+  maximum = found;
+  for ( idx = minimum; idx <= maximum; ++ idx )
+    {
+    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
+    // cerr << "buffer3 == " << buffer << endl;
+    this->Files[buffer]=0;
+    }
+  // Okay now open just the first file to get meta data
+  // cerr << "updating meta... " << endl;
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
+{
+  // Setup the filemap and spcth structures
+  ifstream ifs(filename);
+  if (!ifs )
+    {
+    vtkGenericWarningMacro("Error opening file " << filename);
+    return false;
+    }
+  
+  vtkstd::string line;
+  if(!vtksys::SystemTools::GetLineFromStream(ifs,line)) // eat spycase line
+    {
+    vtkGenericWarningMacro("Syntax error in case file " << filename);
+    return 0;
+    }
+
+  while(vtksys::SystemTools::GetLineFromStream(ifs, line))
+    {
+    if(line.length()!=0)  // Skip blank lines
+      {
+      vtkstd::string::size_type stp = line.find_first_not_of(" \n\t\r");
+      vtkstd::string::size_type etp = line.find_last_not_of(" \n\t\r");
+      vtkstd::string f(line, stp, etp-stp+1);
+      if(f[0]!='#') // skip comment
+        {
+        if(!vtksys::SystemTools::FileIsFullPath(f.c_str()))
+          {
+          f = vtksys::SystemTools::GetFilenamePath(filename)+"/"+f;
+          }
+        this->Files[f.c_str()]=0;
+        }
+      }
+    }
+
+  return true;
 }

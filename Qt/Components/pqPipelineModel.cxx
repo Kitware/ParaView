@@ -1252,6 +1252,13 @@ void pqPipelineModel::updateData(pqServerManagerModelItem* source)
       this->itemDataChanged(link);
       }
     }
+  else // source is null, so update everything
+    {
+    foreach(pqPipelineModelDataItem* child, this->Internal->Root.Children)
+      {
+      this->itemDataChanged(child);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

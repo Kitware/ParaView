@@ -47,6 +47,9 @@
 #include "vtkStringList.h"
 #include "vtkVersion.h"
 
+#include "vtkSMSessionClient.h"
+#include "vtkSMCollaborationManager.h"
+
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
@@ -104,7 +107,6 @@ protected:
     }
   vtkSMSessionProxyManager* Target;
 };
-
 //*****************************************************************************
 //---------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMSessionProxyManager::New(vtkSMSession* session)
@@ -455,13 +457,34 @@ void vtkSMSessionProxyManager::GetProxies(const char* group,
     this->Internals->RegisteredProxyMap.find(group);
   if(it != this->Internals->RegisteredProxyMap.end())
     {
-    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
-    if (it2 != it->second.end())
+    if(name == NULL)
       {
-      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
-      for (; it3 != it2->second.end(); ++it3)
+      vtkSMProxyManagerProxyMapType::iterator it2 =
+        it->second.begin();
+      vtkstd::set<vtkTypeUInt32> ids;
+      for (; it2 != it->second.end(); it2++)
         {
-        collection->AddItem(it3->GetPointer()->Proxy);
+        vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
+          {
+          if(ids.find(it3->GetPointer()->Proxy->GetGlobalID()) != ids.end())
+            {
+            ids.insert(it3->GetPointer()->Proxy->GetGlobalID());
+            collection->AddItem(it3->GetPointer()->Proxy);
+            }
+          }
+        }
+      }
+    else
+      {
+      vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
+      if (it2 != it->second.end())
+        {
+        vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
+          {
+          collection->AddItem(it3->GetPointer()->Proxy);
+          }
         }
       }
     }
@@ -620,12 +643,12 @@ void vtkSMSessionProxyManager::UnRegisterProxies()
 
   this->Internals->ModifiedProxies.clear();
   this->Internals->RegisteredProxyTuple.clear();
-  this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
+  this->Internals->State.ClearExtension(PXMRegistrationState::registered_proxy);
 
   // Push state for undo/redo BUT only if it is not a clean up before deletion.
   if(this->PipelineState->GetSession())
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -651,7 +674,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy( const char* group, const char* n
     this->UnMarkProxyAsModified(info.Proxy);
 
     // Push state for undo/redo
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -682,7 +705,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
   // Push new state only if changed occured
   if(entriesToRemove.size() > 0)
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -704,7 +727,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
   // Push new state only if changed occured
   if(tuplesToRemove.size() > 0)
     {
-    this->PipelineState->ValidateState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -760,14 +783,19 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
     {
     proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
 
-    ProxyManagerState_ProxyRegistrationInfo *registration =
-        this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
-    registration->set_group(groupname);
-    registration->set_name(name);
-    registration->set_global_id(proxy->GetGlobalID());
+    // Do not put prototype groups in state
+    vtksys::RegularExpression prototypesRe("_prototypes$");
+    if (!prototypesRe.find(groupname))
+      {
+      PXMRegistrationState_Entry *entry =
+          this->Internals->State.AddExtension(PXMRegistrationState::registered_proxy);
+      entry->set_group(groupname);
+      entry->set_name(name);
+      entry->set_global_id(proxy->GetGlobalID());
 
-    // Push state for undo/redo
-    this->PipelineState->ValidateState();
+      // Push state for undo/redo
+      this->TriggerStateUpdate();
+      }
     }
 }
 
@@ -887,6 +915,12 @@ void vtkSMSessionProxyManager::RegisterLink(const char* name, vtkSMLink* link)
   info.ProxyName = name;
   info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+
+  // PXM state management
+  link->SetSession(this->GetSession());
+  link->PushStateToSession();
+  this->Internals->UpdateLinkState();
+  this->TriggerStateUpdate();
 }
 
 //---------------------------------------------------------------------------
@@ -915,6 +949,10 @@ void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
     info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
     this->Internals->RegisteredLinkMap.erase(it);
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+
+    // PXM state management
+    this->Internals->UpdateLinkState();
+    this->TriggerStateUpdate();
     }
 }
 
@@ -922,6 +960,10 @@ void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
 void vtkSMSessionProxyManager::UnRegisterAllLinks()
 {
   this->Internals->RegisteredLinkMap.clear();
+
+  // PXM state management
+  this->Internals->UpdateLinkState();
+  this->TriggerStateUpdate();
 }
 
 
@@ -1344,7 +1386,7 @@ void vtkSMSessionProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
     this->Internals->RegisteredLinkMap.begin();
   for (; it != this->Internals->RegisteredLinkMap.end(); ++it)
     {
-    it->second.GetPointer()->SaveState(it->first.c_str(), rootElement);
+    it->second.GetPointer()->SaveXMLState(it->first.c_str(), rootElement);
     }
 }
 
@@ -1448,6 +1490,10 @@ const vtkSMMessage* vtkSMSessionProxyManager::GetFullState()
     {
     this->Internals->State.set_global_id(vtkSMSessionProxyManager::GetReservedGlobalID());
     this->Internals->State.set_location(vtkProcessModule::PROCESS_DATA_SERVER);
+    this->Internals->State.SetExtension(DefinitionHeader::client_class, "");
+    this->Internals->State.SetExtension(DefinitionHeader::server_class, "vtkSIObject");
+    this->Internals->State.SetExtension(ProxyState::xml_group, "");
+    this->Internals->State.SetExtension(ProxyState::xml_name, "");
     }
 
   return &this->Internals->State;
@@ -1455,6 +1501,10 @@ const vtkSMMessage* vtkSMSessionProxyManager::GetFullState()
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
 {
+  // Disable state push
+  bool previous = this->StateUpdateNotification;
+  this->StateUpdateNotification = false;
+
   // Need to compute differences and just call Register/UnRegister for those items
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToRegister;
@@ -1478,64 +1528,101 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLoca
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
     iter++;
     }
-}
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMSessionProxyManager::NewProxy( const vtkSMMessage* msg,
-                                         vtkSMStateLocator* locator,
-                                         bool definitionOnly)
-{
-  if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
-      msg->HasExtension(ProxyState::xml_name))
-    {
-    vtkSMProxy *proxy =
-        this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
-                        msg->GetExtension(ProxyState::xml_name).c_str(), NULL);
 
-    // Then load the state for the current proxy
-    // (This do not include the exposed properties)
-    proxy->LoadState(msg, locator, definitionOnly);
+  // Manage ProxySelectionModel state
+  for(int i = 0,
+      size = msg->ExtensionSize(PXMRegistrationState::registered_selection_model);
+      i < size && this->Session;
+      i++)
+    {
+    vtkTypeUInt32 remoteObjectId =
+        msg->GetExtension(PXMRegistrationState::registered_selection_model, i).global_id();
+    const char* name =
+        msg->GetExtension(PXMRegistrationState::registered_selection_model, i).name().c_str();
 
-    // FIXME in collaboration mode we shouldn't push the state if it already come
-    // from the server side
-    proxy->Modified();
-    proxy->UpdateVTKObjects();
-    return proxy;
-    }
-  else if(msg)
-    {
-    vtkErrorMacro("Invalid msg while creating a new Proxy: \n" << msg->DebugString());
-    }
-  else
-    {
-    vtkErrorMacro("Invalid msg while creating a new Proxy: NULL");
-    }
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMSessionProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
-                                          vtkSMStateLocator* locator)
-{
-  if(this->Session->GetRemoteObject(globalId))
-    {
-    return NULL; // The given proxy already exist, DO NOT create a new one
-    }
-  vtkSMMessage proxyState;
-  if(locator && locator->FindState(globalId, &proxyState))
-    {
-    // Only create proxy and sub-proxies
-    vtkSMProxy* proxy = this->NewProxy( &proxyState, locator, true);
-    if(proxy)
+    vtkSMProxySelectionModel* model = this->GetSelectionModel(name);
+    if(!model->HasGlobalID())
       {
-      // Update properties now that SubProxy are properly set...
-      proxy->LoadState(&proxyState, locator, false);
-      proxy->MarkDirty(NULL);
-      proxy->UpdateVTKObjects();
+      vtkSMMessage msgTmp;
+      msgTmp.set_global_id(remoteObjectId);
+      msgTmp.set_location(vtkPVSession::DATA_SERVER_ROOT);
+      this->Session->PullState(&msgTmp);
+
+      model->LoadState(&msgTmp, locator);
       }
-    return proxy;
     }
-  return NULL;
+
+  // Manage Link state
+  vtkstd::set<vtkstd::string> linkNameToKeep;
+  for(int i = 0,
+      size = msg->ExtensionSize(PXMRegistrationState::registered_link);
+      i < size && this->Session;
+      i++)
+    {
+    vtkTypeUInt32 remoteObjectId =
+        msg->GetExtension(PXMRegistrationState::registered_link, i).global_id();
+    const char* name =
+        msg->GetExtension(PXMRegistrationState::registered_link, i).name().c_str();
+    linkNameToKeep.insert(name);
+
+    vtkSMLink* link = this->GetRegisteredLink(name);
+    if(link)
+      {
+      // Do nothing as we already know about it
+      }
+    else if ((link =
+              vtkSMLink::SafeDownCast(
+                  this->Session->GetRemoteObject(remoteObjectId))) != NULL)
+      {
+      // The link exist but is not registered
+      this->RegisterLink(name, link);
+      }
+    else
+      {
+      // We need to create that link, load its state and register it
+      vtkSMMessage msgTmp;
+      msgTmp.set_global_id(remoteObjectId);
+      msgTmp.set_location(vtkPVSession::DATA_SERVER_ROOT);
+      this->Session->PullState(&msgTmp);
+
+      // Create the concreate class
+      vtkObject* object;
+      const char* className = msgTmp.GetExtension(DefinitionHeader::client_class).c_str();
+      object = vtkInstantiator::CreateInstance(className);
+      if (!object)
+        {
+        vtkErrorMacro("Did not create Link concreate class of " << className);
+        abort();
+        }
+      link = vtkSMLink::SafeDownCast(object);
+      if(link)
+        {
+        link->LoadState(&msgTmp, locator);
+        this->RegisterLink(name, link);
+        }
+      object->Delete();
+      }
+    }
+  // Remove Link that have disapeared...
+  for(int i = 0; i < this->GetNumberOfLinks(); i++)
+    {
+    const char* currentLinkName = this->GetLinkName(i);
+    if(linkNameToKeep.find(currentLinkName) == linkNameToKeep.end())
+      {
+      this->UnRegisterLink(currentLinkName);
+      i--;
+      }
+    }
+
+  // Update state
+  this->Internals->UpdateProxySelectionModelState();
+  this->Internals->UpdateLinkState();
+
+  // Share it
+  this->StateUpdateNotification = previous;
+  this->TriggerStateUpdate();
 }
+
 //---------------------------------------------------------------------------
 bool vtkSMSessionProxyManager::HasDefinition( const char* groupName,
                                        const char* proxyName )
@@ -1591,4 +1678,72 @@ vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModel(
     }
 
   return iter->second;
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionProxyManager::UpdateFromRemote()
+{
+    if (this->Session)
+    {
+        // For collaboration purpose at connection time we synchronize our
+        // ProxyManager state with the server
+        if(this->Session->IsMultiClients())
+        {
+            vtkSMMessage msg;
+            msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
+            msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
+            this->Session->PullState(&msg);
+            if(msg.ExtensionSize(PXMRegistrationState::registered_proxy) > 0)
+            {
+                // We take the parent locator to always refer to the server while loading
+                // the state. This prevent us from getting a creation state instead of
+                // full update state when we split the creation/update action in 2
+                // separate call.
+                // Moreover, we don't want any existing states to be pushed again to
+                // the server.
+                bool previousValue = this->Session->StartProcessingRemoteNotification();
+                
+                // Setup server only state/proxy Locator
+                vtkNew<vtkSMDeserializerProtobuf> deserializer;
+                deserializer->SetStateLocator(this->Session->GetStateLocator()->GetParentLocator());
+                deserializer->SetSession(this->Session);
+                
+                vtkNew<vtkSMProxyLocator> serverLocator;
+                serverLocator->SetDeserializer(deserializer.GetPointer());
+                serverLocator->UseSessionToLocateProxy(true);
+                serverLocator->SetSession(this->Session);
+                
+                // Load and update
+                vtkSMProxyProperty::EnableProxyCreation();
+                this->LoadState( &msg, serverLocator.GetPointer());
+                this->UpdateRegisteredProxies(0);
+                vtkSMProxyProperty::DisableProxyCreation();
+                
+                this->Session->StopProcessingRemoteNotification(previousValue);
+            }
+        }
+    }
+}
+//---------------------------------------------------------------------------
+bool vtkSMSessionProxyManager::IsStateUpdateNotificationEnabled()
+{
+    return this->StateUpdateNotification;
+}
+//---------------------------------------------------------------------------
+void vtkSMSessionProxyManager::DisableStateUpdateNotification()
+{
+    this->StateUpdateNotification = false;
+}
+//---------------------------------------------------------------------------
+void vtkSMSessionProxyManager::EnableStateUpdateNotification()
+{
+    this->StateUpdateNotification = true;
+}
+//---------------------------------------------------------------------------
+void vtkSMSessionProxyManager::TriggerStateUpdate()
+{
+    if(this->PipelineState && this->StateUpdateNotification)
+    {
+        this->Internals->UpdateProxySelectionModelState();
+        this->PipelineState->ValidateState();
+    }
 }

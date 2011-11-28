@@ -27,12 +27,15 @@
 
 class vtkClientServerStream;
 class vtkSMSession;
-class vtkSMStateLocator;
+class vtkSMProxyLocator;
+class vtkSMLoadStateContext;
 
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
 {
 // My friends are...
-  friend class vtkSMStateHelper; // To pull state
+  friend class vtkSMStateHelper;          // To pull state
+  friend class vtkSMDeserializerProtobuf; // To set GlobalId
+  friend class vtkSMDeserializerXML;      // To set GlobalId
 
 public:
   vtkTypeMacro(vtkSMRemoteObject,vtkSMSessionObject);
@@ -52,7 +55,7 @@ public:
   // Description:
   // Get the global unique id for this object. If none is set and the session is
   // valid, a new global id will be assigned automatically.
-  vtkTypeUInt32 GetGlobalID();
+  virtual vtkTypeUInt32 GetGlobalID();
   const char* GetGlobalIDAsString();
 
   // Description:
@@ -83,14 +86,29 @@ public:
   // properties values and just setup the new proxy hierarchy with all subproxy
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly )
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator)
     {
     (void) msg;
     (void) locator;
-    (void) definitionOnly;
     }
 
+  // Description:
+  // Allow to switch off any push of state change to the server for that
+  // particular object.
+  // This is used when we load a state based on a server notification. In that
+  // particular case, the server is already aware of that new state, so we keep
+  // those changes local.
+  virtual void EnableLocalPushOnly();
+
+  // Description:
+  // Enable the given remote object to communicate its state normaly to the
+  // server location.
+  virtual void DisableLocalPushOnly();
+
+  // Description:
+  // Let the session be aware that even if the Location is client only,
+  // the message should not be send to the server for a general broadcast
+  virtual bool IsLocalPushOnly() { return this->ClientOnlyLocationFlag; }
 
 protected:
   // Description:
@@ -120,6 +138,7 @@ protected:
   // Assigned at :
   // - First push
   // - or when the RemoteObject is created by the ProcessModule remotely.
+  // - or when state is loaded from protobuf messages
   vtkTypeUInt32 GlobalID;
 
   // Location flag identify the processes on which the vtkSIObject
@@ -129,6 +148,13 @@ protected:
   // Allow remote object to be discard for any state management such as
   // Undo/Redo, Register/UnRegister (in ProxyManager) and so on...
   bool Prototype;
+
+  // Field that store the Disable/EnableLocalPushOnly() state information
+  bool ClientOnlyLocationFlag;
+
+  // Convenient method used to return either the local Location or a filtered
+  // version of it based on the ClientOnlyLocationFlag
+  vtkTypeUInt32 GetFilteredLocation();
 
 private:
   vtkSMRemoteObject(const vtkSMRemoteObject&); // Not implemented
