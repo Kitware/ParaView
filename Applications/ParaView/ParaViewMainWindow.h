@@ -44,7 +44,7 @@ public:
   ~ParaViewMainWindow();
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname);
+  void showHelpForProxy(const QString& proxyname, const QString& groupname);
 
 private:
   ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.

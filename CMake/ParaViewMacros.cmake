@@ -217,3 +217,49 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
     DEPENDS ${in_proto_file} protoc_compiler
   )
 ENDFUNCTION (protobuf_generate)
+
+#------------------------------------------------------------------------------
+# GENERATE_HTMLS_FROM_XMLS can be used to generate HTML files for 
+# from a given list of xml files that correspond to server manager xmls.
+# ARGUMENTS:
+# xmlpatterns: IN : Qt xmlpatterns executable.
+# xmls: IN : full pathnames to xml files.
+# output_dir : IN : full path to output directory where to generate the htmls.
+# target : IN : name of the target to add the dependencies to.
+#------------------------------------------------------------------------------
+function (generate_htmls_from_xmls xmlpatterns xmls output_dir output_files)
+  set (dependencies)
+  foreach(xml ${xmls})
+    get_filename_component(xml_name_we  ${xml} NAME_WE)
+    get_filename_component(xml_name  ${xml} NAME)
+
+    add_custom_command(
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final"
+
+      # process each XML using the XSL to generate the html.
+      COMMAND "${xmlpatterns}"
+              "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+              "${xml}"
+              -output
+              "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.inter"
+
+      # process each html file to sperate it out into files for each proxy.
+      COMMAND "${CMAKE_COMMAND}"
+              -Dinput_file="${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.inter"
+              -Doutput_dir="${output_dir}"
+              -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final"
+              -P "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+
+      DEPENDS "${xml}"
+              "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+              "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+
+      COMMENT "Generating Documentation HTMLS for \"${xml_name}\"")
+
+      set (dependencies ${dependencies}
+            "${CMAKE_CURRENT_BINARY_DIR}/${xml_name_we}.final")
+  endforeach()
+  set (${output_files} ${dependencies} PARENT_SCOPE)
+endfunction()
