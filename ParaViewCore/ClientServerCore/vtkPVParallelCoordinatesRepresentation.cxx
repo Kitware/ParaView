@@ -47,6 +47,10 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
     return false;
     }
 
+  std::cout << "pc table: ";
+  this->GetLocalOutput()->Print(std::cout);
+  std::cout << "num cols: " << this->GetLocalOutput()->GetNumberOfColumns() << std::endl;
+
   if (this->GetChart())
     {
     // Set the table, in case it has changed.
@@ -74,7 +78,7 @@ vtkChartParallelCoordinates* vtkPVParallelCoordinatesRepresentation::GetChart()
   if (this->ContextView)
     {
     return vtkChartParallelCoordinates::SafeDownCast(
-      this->ContextView->GetChart());
+      this->ContextView->GetContextItem());
     }
 
   return 0;

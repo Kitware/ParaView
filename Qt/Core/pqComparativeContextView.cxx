@@ -97,7 +97,7 @@ void pqComparativeContextView::initialize()
 vtkContextView* pqComparativeContextView::getVTKChartView() const
 {
   return vtkSMContextViewProxy::SafeDownCast(this->getViewProxy())
-      ->GetChartView();
+      ->GetContextView();
 }
 
 //-----------------------------------------------------------------------------
@@ -176,8 +176,8 @@ void pqComparativeContextView::onComparativeVisLayoutChanged()
     renView->UpdateVTKObjects();
 
     QVTKWidget* widget = new QVTKWidget();
-    renView->GetChartView()->SetInteractor(widget->GetInteractor());
-    widget->SetRenderWindow(renView->GetChartView()->GetRenderWindow());
+    renView->GetContextView()->SetInteractor(widget->GetInteractor());
+    widget->SetRenderWindow(renView->GetContextView()->GetRenderWindow());
     widget->installEventFilter(this);
     widget->setContextMenuPolicy(Qt::NoContextMenu);
     this->Internal->RenderWidgets[key] = widget;

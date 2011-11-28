@@ -41,9 +41,10 @@ public:
 
   ~Private()
     {
-    if(this->Proxy && this->Proxy->GetChart() && this->Forwarder.GetPointer() != NULL)
+    if (this->Proxy && this->Proxy->GetContextItem() &&
+        this->Forwarder.GetPointer() != NULL)
       {
-      this->Proxy->GetChart()->RemoveObserver(this->Forwarder.GetPointer());
+      this->Proxy->GetContextItem()->RemoveObserver(this->Forwarder.GetPointer());
       }
     }
 
@@ -51,20 +52,24 @@ public:
     {
     this->Forwarder->SetTarget(proxy);
     this->Proxy = proxy;
-    if(this->Proxy && this->Proxy->GetChart())
+    if(this->Proxy && this->Proxy->GetContextItem())
       {
-      this->Proxy->GetChart()->AddObserver(
+      this->Proxy->GetContextItem()->AddObserver(
           vtkChart::UpdateRange, this->Forwarder.GetPointer());
       }
     }
 
   void UpdateBounds()
     {
-    if(this->Proxy && this->Proxy->GetChart())
+    if(this->Proxy && this->Proxy->GetContextItem())
       {
       for(int i=0; i < 4; i++)
         {
-        this->Proxy->GetChart()->GetAxis(i)->GetRange(&this->ViewBounds[i*2]);
+        vtkChart *chart = vtkChart::SafeDownCast(this->Proxy->GetContextItem());
+        if (chart)
+          {
+          chart->GetAxis(i)->GetRange(&this->ViewBounds[i*2]);
+          }
         }
       }
     }
@@ -129,35 +134,39 @@ vtkRenderWindow* vtkSMContextViewProxy::GetRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-vtkContextView* vtkSMContextViewProxy::GetChartView()
+vtkContextView* vtkSMContextViewProxy::GetContextView()
 {
   return this->ChartView;
 }
 
 //----------------------------------------------------------------------------
-vtkChart* vtkSMContextViewProxy::GetChart()
+vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
-  return pvview? pvview->GetChart() : NULL;
+  return pvview? pvview->GetContextItem() : NULL;
 }
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
-  int previousBehaviour[4];
-  for(int i=0; i < 4; i++)
+  vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem());
+  if (chart)
     {
-    previousBehaviour[i] = this->GetChart()->GetAxis(i)->GetBehavior();
-    this->GetChart()->GetAxis(i)->SetBehavior(vtkAxis::AUTO);
-    }
+    int previousBehaviour[4];
+    for (int i = 0; i < 4; ++i)
+      {
+      previousBehaviour[i] = chart->GetAxis(i)->GetBehavior();
+      chart->GetAxis(i)->SetBehavior(vtkAxis::AUTO);
+      }
 
-  this->GetChart()->RecalculateBounds();
-  this->GetChartView()->Render();
+    chart->RecalculateBounds();
+    this->GetContextView()->Render();
 
-  // Revert behaviour as it use to be...
-  for(int i=0; i < 4; i++)
-    {
-    this->GetChart()->GetAxis(i)->SetBehavior(previousBehaviour[i]);
+    // Revert behaviour as it use to be...
+    for (int i = 0; i < 4; ++i)
+      {
+      chart->GetAxis(i)->SetBehavior(previousBehaviour[i]);
+      }
     }
 }
 
@@ -166,10 +175,10 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
 {
   this->StillRender();
 
-  this->GetChartView()->Render();
+  this->GetContextView()->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(this->GetChartView()->GetRenderWindow());
+  w2i->SetInput(this->GetContextView()->GetRenderWindow());
   w2i->SetMagnification(magnification);
 
   // Use front buffer on Windows for now until we can figure out
@@ -209,31 +218,28 @@ double* vtkSMContextViewProxy::GetViewBounds()
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::SetViewBounds(double* bounds)
 {
-  if(this->GetChart())
+  if(this->GetContextItem())
     {
     // Disable notification...
     this->Storage->Forwarder->SetTarget(NULL);
+    vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem());
 
-    for(int i=0; i < 4; i++)
+    if (chart)
       {
-      this->Storage->ViewBounds[i*2] = bounds[i*2];
-      this->Storage->ViewBounds[i*2+1] = bounds[i*2+1];
+      for (int i = 0; i < 4; i++)
+        {
+        this->Storage->ViewBounds[i*2] = bounds[i*2];
+        this->Storage->ViewBounds[i*2+1] = bounds[i*2+1];
 
-      this->GetChart()->GetAxis(i)->SetBehavior(vtkAxis::FIXED);
-      this->GetChart()->GetAxis(i)->SetRange(bounds[i*2], bounds[i*2+1]);
-      this->GetChart()->GetAxis(i)->RecalculateTickSpacing();
+        chart->GetAxis(i)->SetBehavior(vtkAxis::FIXED);
+        chart->GetAxis(i)->SetRange(bounds[i*2], bounds[i*2+1]);
+        chart->GetAxis(i)->RecalculateTickSpacing();
+        }
       }
-
-//    cout << "New bounds: ["
-//         << this->Storage->ViewBounds[0] << ", " << this->Storage->ViewBounds[1] << ", "
-//         << this->Storage->ViewBounds[2] << ", " << this->Storage->ViewBounds[3] << ", "
-//         << this->Storage->ViewBounds[4] << ", " << this->Storage->ViewBounds[5] << ", "
-//         << this->Storage->ViewBounds[6] << ", " << this->Storage->ViewBounds[7] << "]"
-//         << endl;
 
     // Do the rendering with the new range
     this->StillRender();
-    this->GetChartView()->Render();
+    this->GetContextView()->Render();
 
     // Bring the notification back
     this->Storage->Forwarder->SetTarget(this);

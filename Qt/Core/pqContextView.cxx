@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkScatterPlotMatrix.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -204,7 +205,7 @@ void pqContextView::initializeInteractors()
 
   if(proxy && qvtk)
     {
-    vtkContextView* view = proxy->GetChartView();
+    vtkContextView* view = proxy->GetContextView();
     view->SetInteractor(qvtk->GetInteractor());
     qvtk->SetRenderWindow(view->GetRenderWindow());
     }
@@ -232,7 +233,7 @@ QWidget* pqContextView::getWidget()
 /// the chart rendering.
 vtkContextView* pqContextView::getVTKContextView() const
 {
-  return vtkSMContextViewProxy::SafeDownCast(this->getProxy())->GetChartView();
+  return vtkSMContextViewProxy::SafeDownCast(this->getProxy())->GetContextView();
 }
 
 //-----------------------------------------------------------------------------
@@ -392,6 +393,23 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
 
 void pqContextView::selectionChanged()
 {
+  // Fill the selection source with the selection from the view
+  vtkSelection* sel = 0;
+
+  if(vtkChart *chart = vtkChart::SafeDownCast(this->getContextViewProxy()->GetContextItem()))
+    {
+    sel = chart->GetAnnotationLink()->GetCurrentSelection();
+    }
+
+  if(!sel)
+    {
+    return;
+    }
+  this->setSelection(sel);
+}
+
+void pqContextView::setSelection(vtkSelection* sel)
+{
   // Get the representation's source
   pqDataRepresentation* pqRepr = 0;
 
@@ -431,10 +449,6 @@ void pqContextView::selectionChanged()
     {
     selectionSource->Register(repSource);
     }
-
-  // Fill the selection source with the selection from the view
-  vtkSelection* sel = this->getContextViewProxy()->GetChart()
-                      ->GetAnnotationLink()->GetCurrentSelection();
 
   // Fill the selection source with the selection
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
