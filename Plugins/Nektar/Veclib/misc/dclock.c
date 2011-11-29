@@ -6,7 +6,7 @@
 
 #ifndef __LIBCATAMOUNT__ 
 
-#if !defined(i860) && !defined(dclock) && !defined(PARALLEL)
+#if !defined(i860) && !defined(dclock)
 
 double dclock(void)
 {
