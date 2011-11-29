@@ -1,9 +1,3 @@
-# Copy all online help files from current directory over to the binary directory.
-# These do not include any server manager documentation htmls.
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
-
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/index.html.in"
     "${CMAKE_CURRENT_BINARY_DIR}/index.html"
@@ -47,10 +41,10 @@ build_help_project(paraview
          <section title=\"Introduction\" ref=\"Book/Book_Chapter1.html\"/>
          <section title=\"Plugins\" ref=\"Book/Book_Chapter16.html\"/>
          <section title=\"Appendices\" ref=\"Book/Book_Chapter17.html\"/>
-         <section title=\"Sources\" ref=\"CategoryIndex.html#Sources\"/>
-         <section title=\"Filters\" ref=\"CategoryIndex.html#Filters\"/>
-         <section title=\"Readers\" ref=\"CategoryIndex.html#Readers\"/>
-         <section title=\"Writers\" ref=\"CategoryIndex.html#Writers\"/>
+         <section title=\"Sources\" ref=\"Sources.html\"/>
+         <section title=\"Filters\" ref=\"Filters.html\"/>
+         <section title=\"Readers\" ref=\"Readers.html\"/>
+         <section title=\"Writers\" ref=\"Writers.html\"/>
        </section>
      </toc>"
   FILES "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg"
@@ -60,9 +54,18 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
          ${proxy_html_outputs}
+
+  # copy all htmls from source to destination directory (same location where the
+  # qhp file is present.
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_CURRENT_SOURCE_DIR}
+          ${CMAKE_CURRENT_BINARY_DIR}
+
+  # Now, compile the qhp file to generate the qch.
   COMMAND ${QT_HELP_GENERATOR}
           ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
           -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
+
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 

@@ -270,6 +270,7 @@ function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output
   set (${output_files} ${dependencies} PARENT_SCOPE)
 endfunction()
 
+#------------------------------------------------------------------------------
 # Function used to build a qhp file.
 # build_help_project(NAME
 #                    WORKING_DIRECTORY directory
@@ -289,7 +290,9 @@ endfunction()
 #                      not specified.
 # TABLE_OF_CONTENTS_FILE :- file to read in to obtain the TABLE_OF_CONTENTS
 # FILES :- (optional: default="*.*") list of files (names or wildcards) to list
-#          in the qhp file.
+#          in the qhp file. Note that these files/paths are relative to the
+#          WORKING_DIRECTORY.
+#------------------------------------------------------------------------------
 function(build_help_project name)
   pv_parse_arguments(arg
     "WORKING_DIRECTORY;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;FILES"
@@ -297,7 +300,6 @@ function(build_help_project name)
     ${ARGN}
     )
 
-  message ("wd ${arg_WORKING_DIRECTORY}")
   if (NOT DEFINED arg_WORKING_DIRECTORY)
     message(FATAL_ERROR "No WORKING_DIRECTORY specified in build_help_project()")
   endif()

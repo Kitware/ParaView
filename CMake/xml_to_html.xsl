@@ -3,42 +3,44 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="html"/>
 <xsl:template match="/xml">
+  <xsl:apply-templates select="proxy" />
+  <xsl:apply-templates select="categoryindex" />
+</xsl:template>
+
+<xsl:template match="/xml/categoryindex">
   <html>
     <head>
-      <title>Catergory Index</title>
-      <meta name="filename" contents="CategoryIndex.html" />
+      <title><xsl:value-of select="label" />Index</title>
+      <xsl:element name="meta">
+        <xsl:attribute name="name">filename</xsl:attribute>
+        <xsl:attribute name="contents"><xsl:value-of select="label"/>.html</xsl:attribute></xsl:element>
     </head>
-
     <body>
-      <xsl:for-each select="categoryindex">
-        <h2><xsl:value-of select="label" /></h2>
-        <hr />
-        <table class="index_table">
-          <tr><th>Name</th><th>Description</th></tr>
-          <xsl:for-each select="item">
-            <tr>
-              <td>
-                <xsl:element name="a">
-                  <xsl:attribute name="href"><xsl:value-of select="group" />.<xsl:value-of select="name"/>.html</xsl:attribute>
-                  <xsl:variable name="group_name"><xsl:value-of select="group"/></xsl:variable>
-                  <xsl:variable name="proxy_name"><xsl:value-of select="name"/></xsl:variable>
-                  <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/label" />
-                  <span />
-                </xsl:element>
-              </td>
-              <td>
+      <h2><xsl:value-of select="label" /></h2>
+      <hr />
+      <table class="index_table">
+        <tr><th>Name</th><th>Description</th></tr>
+        <xsl:for-each select="item">
+          <tr>
+            <td>
+              <xsl:element name="a">
+                <xsl:attribute name="href"><xsl:value-of select="group" />.<xsl:value-of select="name"/>.html</xsl:attribute>
                 <xsl:variable name="group_name"><xsl:value-of select="group"/></xsl:variable>
                 <xsl:variable name="proxy_name"><xsl:value-of select="name"/></xsl:variable>
-                <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/documentation/brief" />
-              </td>
-            </tr>
-          </xsl:for-each>
-        </table>
-      </xsl:for-each>
+                <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/label" />
+                <span />
+              </xsl:element>
+            </td>
+            <td>
+              <xsl:variable name="group_name"><xsl:value-of select="group"/></xsl:variable>
+              <xsl:variable name="proxy_name"><xsl:value-of select="name"/></xsl:variable>
+              <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/documentation/brief" />
+            </td>
+          </tr>
+        </xsl:for-each>
+      </table>
     </body>
   </html>
-
-  <xsl:apply-templates select="proxy"/>
 </xsl:template>
 
 <xsl:template match="/xml/proxy">
