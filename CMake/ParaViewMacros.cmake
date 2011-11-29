@@ -229,6 +229,9 @@ ENDFUNCTION (protobuf_generate)
 #------------------------------------------------------------------------------
 function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output_dir)
   # create a string from the xmls list to pass
+  # since this list needs to be passed as an argument, we cannot escape the ";".
+  # generate_proxydocumentation.cmake has code to convert these strings back to
+  # lists.
   set (xmls_string)
   foreach (xml ${xmls})
     set (xmls_string "${xmls_string}${xml}+")
@@ -245,18 +248,18 @@ function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output
     # process each html file to sperate it out into files for each proxy.
     COMMAND "${CMAKE_COMMAND}"
             -Dxmlpatterns="${xmlpatterns}"
-            -Dxml_to_xml_xsl="${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+            -Dxml_to_xml_xsl="${ParaView_CMAKE_DIR}/smxml_to_xml.xsl"
             -Dxml_to_html_xsl="${ParaView_CMAKE_DIR}/xml_to_html.xsl"
             -Dinput_xmls:STRING="${xmls_string}"
             -Dinput_gui_xmls:STRING="${gui_xmls_string}"
             -Doutput_dir="${output_dir}"
-            -Dtemporary_dir="${CMAKE_CURRENT_BINARY_DIR}"
-            -P "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+            -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/temporary.xml"
+            -P "${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake"
 
     DEPENDS ${xmls}
-            "${ParaView_CMAKE_DIR}/smdocumentation_generator.xsl"
+            "${ParaView_CMAKE_DIR}/smxml_to_xml.xsl"
             "${ParaView_CMAKE_DIR}/xml_to_html.xsl"
-            "${ParaView_CMAKE_DIR}/split_htmls.cmake"
+            "${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake"
 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf8"?>
-<!-- XSL used to generate HTMLs from server manager XML
-  to run use : xmlpatterns <xsl> <xml> -output <html>
+<!-- XSL used to generate XML DOM from ServerManager xmls as well as GUI
+    configuration xmls for sources/filters/etc.
+    to run use : xmlpatterns <xsl> <xml> -output <html>
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml"/>
