@@ -269,3 +269,57 @@ function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output
           "${CMAKE_CURRENT_BINARY_DIR}/temporary.xml")
   set (${output_files} ${dependencies} PARENT_SCOPE)
 endfunction()
+
+# Function used to build a qhp file.
+# build_help_project(NAME
+#                    WORKING_DIRECTORY directory
+#                    [NAMESPACE namespacename (default:${NAME}.org)]
+#                    [FOLDER virtualfoldername (default:${NAME})]
+#                    [TABLE_OF_CONTENTS toc]
+#                    [TABLE_OF_CONTENTS_FILE toc_file_name]
+#                    [FILES relative filenames/wildcard-expressions]
+#                   )
+# NAME :- specifies the name for the qhp. The generated qhp file will be
+#         ${WORKING_DIRECTORY}/${name}.qhp
+# WORKING_DIRECTORY :- output-directory for the qhp file.
+# NAMESPACE :- (optional; default=${name}.org") Namespace to use in qhp file.
+# FOLDER :- (optional; default=${name}") virtual folder in qhp file.
+# TABLE_OF_CONTENTS :- (optional) XML string <toc>..</toc> (see qhp file
+#                      documentation). Used only when TABLE_OF_CONTENTS_FILE is
+#                      not specified.
+# TABLE_OF_CONTENTS_FILE :- file to read in to obtain the TABLE_OF_CONTENTS
+# FILES :- (optional: default="*.*") list of files (names or wildcards) to list
+#          in the qhp file.
+function(build_help_project name)
+  pv_parse_arguments(arg
+    "WORKING_DIRECTORY;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;FILES"
+    ""
+    ${ARGN}
+    )
+
+  message ("wd ${arg_WORKING_DIRECTORY}")
+  if (NOT DEFINED arg_WORKING_DIRECTORY)
+    message(FATAL_ERROR "No WORKING_DIRECTORY specified in build_help_project()")
+  endif()
+
+  pv_set_if_not_set(arg_FILES "*.*")
+  pv_set_if_not_set(arg_NAMESPACE "${name}.org")
+  pv_set_if_not_set(arg_FOLDER "${name}")
+
+  # if filename is specified, it takes precendence.
+  # setup toc variable to refer to the TOC xml dom.
+  if (DEFINED arg_TABLE_OF_CONTENTS_FILE)
+    file(READ ${arg_TABLE_OF_CONTENTS_FILE} arg_TABLE_OF_CONTENTS)
+  endif()
+
+  pv_set_if_not_set(arg_TABLE_OF_CONTENTS
+    "<toc><section title=\"${name}\" ref=\"index.html\"></section></toc>")
+
+  set (files)
+  foreach(filename ${arg_FILES})
+    set (files "${files}<file>${filename}</file>\n")
+  endforeach()
+
+  configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
+    ${arg_WORKING_DIRECTORY}/${name}.qhp)
+endfunction(build_help_project)

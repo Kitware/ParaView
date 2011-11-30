@@ -39,14 +39,27 @@ generate_htmls_from_xmls(proxy_html_outputs
   "${gui_xmls}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
+build_help_project(paraview
+  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  TABLE_OF_CONTENTS
+    "<toc>
+       <section title=\"ParaView User Manual\" ref=\"index.html\">
+         <section title=\"Introduction\" ref=\"Book/Book_Chapter1.html\"/>
+         <section title=\"Plugins\" ref=\"Book/Book_Chapter16.html\"/>
+         <section title=\"Appendices\" ref=\"Book/Book_Chapter17.html\"/>
+         <section title=\"Sources\" ref=\"CategoryIndex.html#Sources\"/>
+         <section title=\"Filters\" ref=\"CategoryIndex.html#Filters\"/>
+         <section title=\"Readers\" ref=\"CategoryIndex.html#Readers\"/>
+         <section title=\"Writers\" ref=\"CategoryIndex.html#Writers\"/>
+       </section>
+     </toc>"
+  FILES "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg"
+  )
+
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/paraview.qhp
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
          ${proxy_html_outputs}
-  COMMAND ${CMAKE_COMMAND}
-          -E copy_if_different
-          "${CMAKE_CURRENT_SOURCE_DIR}/paraview.qhp"
-          "${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp"
   COMMAND ${QT_HELP_GENERATOR}
           ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
           -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
