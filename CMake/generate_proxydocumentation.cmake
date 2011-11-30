@@ -13,9 +13,13 @@ cmake_minimum_required(VERSION 2.8)
 # output_file       :- File written out on successful completion.
 #                      This file is also used to save intermediate results.
 
+if (NOT EXISTS "${xmlpatterns}")
+  message(FATAL_ERROR "No xmlpatterns executable was defined!!!")
+endif()
+
 # input_xmls is a pseudo-list. Convert it to a real CMake list.
-string(REPLACE "+" ";" input_xmls ${input_xmls})
-string(REPLACE "+" ";" input_gui_xmls ${input_gui_xmls})
+string(REPLACE "+" ";" input_xmls "${input_xmls}")
+string(REPLACE "+" ";" input_gui_xmls "${input_gui_xmls}")
 
 set (xslt_xml)
 

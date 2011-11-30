@@ -8,18 +8,6 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/about.html"
     @ONLY)
 
-FIND_PROGRAM(QT_HELP_GENERATOR
-  qhelpgenerator
-  PATHS "${QT_BINARY_DIR}"
-  DOC "qhelpgenerator used to compile Qt help project files")
-
-FIND_PROGRAM(QT_XMLPATTERNS_EXECUTABLE
-  xmlpatterns
-  PATHS "${QT_BINARY_DIR}"
-  DOC "xmlpatterns used to generate html from Proxy documentation.")
-
-MARK_AS_ADVANCED(QT_HELP_GENERATOR QT_XMLPATTERNS_EXECUTABLE)
-
 set (gui_xmls
   ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewSources.xml
   ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewFilters.xml
@@ -28,7 +16,6 @@ set (gui_xmls
 
 # generate htmls from the server manager xmls.
 generate_htmls_from_xmls(proxy_html_outputs
-  "${QT_XMLPATTERNS_EXECUTABLE}"
   "${PARAVIEW_SERVERMANAGER_XMLS}"
   "${gui_xmls}"
   "${CMAKE_CURRENT_BINARY_DIR}")

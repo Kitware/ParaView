@@ -223,37 +223,54 @@ ENDFUNCTION (protobuf_generate)
 # from a given list of xml files that correspond to server manager xmls.
 # ARGUMENTS:
 # output_files: OUT: variables set to the output files
-# xmlpatterns: IN : Qt xmlpatterns executable.
 # xmls: IN : full pathnames to xml files.
 # output_dir : IN : full path to output directory where to generate the htmls.
 #------------------------------------------------------------------------------
-function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output_dir)
+function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   # create a string from the xmls list to pass
   # since this list needs to be passed as an argument, we cannot escape the ";".
   # generate_proxydocumentation.cmake has code to convert these strings back to
   # lists.
   set (xmls_string)
   foreach (xml ${xmls})
+    get_filename_component(xml "${xml}" ABSOLUTE)
     set (xmls_string "${xmls_string}${xml}+")
   endforeach()
   
   set (gui_xmls_string)
   foreach (gui_xml ${gui_xmls})
+    get_filename_component(gui_xml "${gui_xml}" ABSOLUTE)
     set (gui_xmls_string "${gui_xmls_string}${gui_xml}+")
   endforeach()
 
+  set (all_xmls ${xmls} ${gui_xmls})
+  list (GET all_xmls 0 first_xml)
+  if (NOT first_xml)
+    message(FATAL_ERROR "No xml specified!!!")
+  endif()
+
+  find_program(QT_XMLPATTERNS_EXECUTABLE
+    xmlpatterns
+    PATHS "${QT_BINARY_DIR}"
+    DOC "xmlpatterns used to generate html from Proxy documentation.")
+  mark_as_advanced(QT_XMLPATTERNS_EXECUTABLE)
+
+  if (NOT EXISTS ${QT_XMLPATTERNS_EXECUTABLE})
+    message(WARNING "Valid QT_XMLPATTERNS_EXECUTABLE not specified.")
+  endif()
+
   add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/temporary.xml"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
 
     # process each html file to sperate it out into files for each proxy.
     COMMAND "${CMAKE_COMMAND}"
-            -Dxmlpatterns="${xmlpatterns}"
+            -Dxmlpatterns="${QT_XMLPATTERNS_EXECUTABLE}"
             -Dxml_to_xml_xsl="${ParaView_CMAKE_DIR}/smxml_to_xml.xsl"
             -Dxml_to_html_xsl="${ParaView_CMAKE_DIR}/xml_to_html.xsl"
             -Dinput_xmls:STRING="${xmls_string}"
             -Dinput_gui_xmls:STRING="${gui_xmls_string}"
             -Doutput_dir="${output_dir}"
-            -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/temporary.xml"
+            -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
             -P "${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake"
 
     DEPENDS ${xmls}
@@ -266,23 +283,23 @@ function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output
     COMMENT "Generating Documentation HTMLs from xmls")
 
     set (dependencies ${dependencies}
-          "${CMAKE_CURRENT_BINARY_DIR}/temporary.xml")
+          "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml")
   set (${output_files} ${dependencies} PARENT_SCOPE)
 endfunction()
 
 #------------------------------------------------------------------------------
 # Function used to build a qhp (and qch) file. Adds a custom command to generate
 # a ${DESTINATION_DIRECTORY}/${name}.qch.
-# build_help_project(NAME
+# build_help_project(name 
 #                    DESTINATION_DIRECTORY directory
 #                    [DOCUMENTATION_SOURCE_DIR directory]
-#                    [NAMESPACE namespacename (default:${NAME}.org)]
-#                    [FOLDER virtualfoldername (default:${NAME})]
+#                    [NAMESPACE namespacename (default:${name}.org)]
+#                    [FOLDER virtualfoldername (default:${name})]
 #                    [TABLE_OF_CONTENTS toc]
 #                    [TABLE_OF_CONTENTS_FILE toc_file_name]
 #                    [FILES relative filenames/wildcard-expressions]
 #                   )
-# NAME :- specifies the name for the qhp. The generated qhp file will be
+# name :- specifies the name for the qhp. The generated qhp file will be
 #         ${DESTINATION_DIRECTORY}/${name}.qhp
 # DESTINATION_DIRECTORY :- output-directory for the qhp file.
 # DOCUMENTATION_SOURCE_DIR :- (optional) when specified, all files in this
@@ -308,6 +325,16 @@ function(build_help_project name)
 
   if (NOT DEFINED arg_DESTINATION_DIRECTORY)
     message(FATAL_ERROR "No DESTINATION_DIRECTORY specified in build_help_project()")
+  endif()
+
+  find_program(QT_HELP_GENERATOR
+    qhelpgenerator
+    PATHS "${QT_BINARY_DIR}"
+    DOC "qhelpgenerator used to compile Qt help project files")
+  mark_as_advanced(QT_HELP_GENERATOR)
+
+  if (NOT EXISTS ${QT_HELP_GENERATOR})
+    message(WARNING "Valid QT_HELP_GENERATOR not specified.")
   endif()
 
   # set default values for optional arguments.
@@ -353,8 +380,8 @@ function(build_help_project name)
   
     # Now, compile the qhp file to generate the qch.
     COMMAND ${QT_HELP_GENERATOR}
-            "${CMAKE_CURRENT_BINARY_DIR}/${name}.qhp"
-            -o "${CMAKE_CURRENT_BINARY_DIR}/${name}.qch"
+            "${arg_DESTINATION_DIRECTORY}/${name}.qhp"
+            -o "${arg_DESTINATION_DIRECTORY}/${name}.qch"
   
     COMMENT "Compiling Qt help project ${name}.qhp"
   )
