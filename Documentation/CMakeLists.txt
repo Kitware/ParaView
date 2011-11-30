@@ -33,8 +33,10 @@ generate_htmls_from_xmls(proxy_html_outputs
   "${gui_xmls}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
+# this function produces a ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch file.
 build_help_project(paraview
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  DOCUMENTATION_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
   TABLE_OF_CONTENTS
     "<toc>
        <section title=\"ParaView User Manual\" ref=\"index.html\">
@@ -47,27 +49,9 @@ build_help_project(paraview
          <section title=\"Writers\" ref=\"Writers.html\"/>
        </section>
      </toc>"
-  FILES "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg"
+  FILEPATTERNS "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg"
+  DEPENDS "${proxy_html_outputs}"
   )
-
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
-         ${proxy_html_outputs}
-
-  # copy all htmls from source to destination directory (same location where the
-  # qhp file is present.
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_CURRENT_SOURCE_DIR}
-          ${CMAKE_CURRENT_BINARY_DIR}
-
-  # Now, compile the qhp file to generate the qch.
-  COMMAND ${QT_HELP_GENERATOR}
-          ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
-          -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
-
-  COMMENT "Compiling Qt help project paraview.qhp"
-)
 
 ADD_CUSTOM_TARGET (ParaViewOnlineHelp
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)

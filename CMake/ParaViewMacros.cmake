@@ -271,9 +271,11 @@ function (generate_htmls_from_xmls output_files xmlpatterns xmls gui_xmls output
 endfunction()
 
 #------------------------------------------------------------------------------
-# Function used to build a qhp file.
+# Function used to build a qhp (and qch) file. Adds a custom command to generate
+# a ${DESTINATION_DIRECTORY}/${name}.qch.
 # build_help_project(NAME
-#                    WORKING_DIRECTORY directory
+#                    DESTINATION_DIRECTORY directory
+#                    [DOCUMENTATION_SOURCE_DIR directory]
 #                    [NAMESPACE namespacename (default:${NAME}.org)]
 #                    [FOLDER virtualfoldername (default:${NAME})]
 #                    [TABLE_OF_CONTENTS toc]
@@ -281,32 +283,38 @@ endfunction()
 #                    [FILES relative filenames/wildcard-expressions]
 #                   )
 # NAME :- specifies the name for the qhp. The generated qhp file will be
-#         ${WORKING_DIRECTORY}/${name}.qhp
-# WORKING_DIRECTORY :- output-directory for the qhp file.
+#         ${DESTINATION_DIRECTORY}/${name}.qhp
+# DESTINATION_DIRECTORY :- output-directory for the qhp file.
+# DOCUMENTATION_SOURCE_DIR :- (optional) when specified, all files in this
+#                             directory are copied over to the
+#                             DESTINATION_DIRECTORY.
 # NAMESPACE :- (optional; default=${name}.org") Namespace to use in qhp file.
 # FOLDER :- (optional; default=${name}") virtual folder in qhp file.
 # TABLE_OF_CONTENTS :- (optional) XML string <toc>..</toc> (see qhp file
 #                      documentation). Used only when TABLE_OF_CONTENTS_FILE is
 #                      not specified.
 # TABLE_OF_CONTENTS_FILE :- file to read in to obtain the TABLE_OF_CONTENTS
-# FILES :- (optional: default="*.*") list of files (names or wildcards) to list
+# FILEPATTERNS :- (optional: default="*.*") list of files (names or wildcards) to list
 #          in the qhp file. Note that these files/paths are relative to the
-#          WORKING_DIRECTORY.
+#          DESTINATION_DIRECTORY.
+# DEPENDS :- (optional) targets or files that the qch generation target depends on.
 #------------------------------------------------------------------------------
 function(build_help_project name)
   pv_parse_arguments(arg
-    "WORKING_DIRECTORY;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;FILES"
+    "DESTINATION_DIRECTORY;DOCUMENTATION_SOURCE_DIR;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;FILEPATTERNS;DEPENDS"
     ""
     ${ARGN}
     )
 
-  if (NOT DEFINED arg_WORKING_DIRECTORY)
-    message(FATAL_ERROR "No WORKING_DIRECTORY specified in build_help_project()")
+  if (NOT DEFINED arg_DESTINATION_DIRECTORY)
+    message(FATAL_ERROR "No DESTINATION_DIRECTORY specified in build_help_project()")
   endif()
 
-  pv_set_if_not_set(arg_FILES "*.*")
+  # set default values for optional arguments.
+  pv_set_if_not_set(arg_FILEPATTERNS "*.*")
   pv_set_if_not_set(arg_NAMESPACE "${name}.org")
   pv_set_if_not_set(arg_FOLDER "${name}")
+  pv_set_if_not_set(arg_DEPENDS "")
 
   # if filename is specified, it takes precendence.
   # setup toc variable to refer to the TOC xml dom.
@@ -318,10 +326,36 @@ function(build_help_project name)
     "<toc><section title=\"${name}\" ref=\"index.html\"></section></toc>")
 
   set (files)
-  foreach(filename ${arg_FILES})
+  foreach(filename ${arg_FILEPATTERNS})
     set (files "${files}<file>${filename}</file>\n")
   endforeach()
 
   configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
-    ${arg_WORKING_DIRECTORY}/${name}.qhp)
+    ${arg_DESTINATION_DIRECTORY}/${name}.qhp)
+
+  set (extra_args)
+  if (DEFINED arg_DOCUMENTATION_SOURCE_DIR)
+    set (extra_args
+      # copy all htmls from source to destination directory (same location where the
+      # qhp file is present.
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+              "${arg_DOCUMENTATION_SOURCE_DIR}"
+              "${arg_DESTINATION_DIRECTORY}"
+      )
+  endif()
+
+  ADD_CUSTOM_COMMAND(
+    OUTPUT "${arg_DESTINATION_DIRECTORY}/${name}.qch"
+    DEPENDS "${arg_DESTINATION_DIRECTORY}/${name}.qhp"
+            ${arg_DEPENDS}
+  
+    ${extra_args}
+  
+    # Now, compile the qhp file to generate the qch.
+    COMMAND ${QT_HELP_GENERATOR}
+            "${CMAKE_CURRENT_BINARY_DIR}/${name}.qhp"
+            -o "${CMAKE_CURRENT_BINARY_DIR}/${name}.qch"
+  
+    COMMENT "Compiling Qt help project ${name}.qhp"
+  )
 endfunction(build_help_project)
