@@ -1,4 +1,4 @@
-# The LAPACK external project for Titan
+# The LAPACK external project
 
 set(lapack_source "${CMAKE_CURRENT_BINARY_DIR}/LAPACK")
 set(lapack_binary "${CMAKE_CURRENT_BINARY_DIR}/LAPACK-build")
@@ -11,11 +11,10 @@ ExternalProject_Add(LAPACK
   URL ${LAPACK_URL}/${LAPACK_GZ}
   URL_MD5 ${LAPACK_MD5}
   CMAKE_ARGS
-    -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
-    -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
-    -DBUILD_SHARED_LIBS:BOOL=ON
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    ${LAPACK_EXTRA_ARGS}
-  INSTALL_COMMAND ""
+    -DBUILD_SHARED_LIBS:BOOL=OFF
+    -DBUILD_STATIC_LIBS:BOOL=ON
+    -DBUILD_TESTING:BOOL=OFF
+  CMAKE_ARGS
+      -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
-list(APPEND trilinos_depends LAPACK)
