@@ -56,11 +56,12 @@ ENDMACRO(PV_PLUGIN_PARSE_ARGUMENTS)
 
 # Macro to generate a header xml given an XML.
 MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)
+  set (tmp_xml_files)
   IF(PARAVIEW_PROCESS_XML_EXECUTABLE)
     FOREACH(TMPXML ${XMLFile})
       GET_FILENAME_COMPONENT(TMP_XML_FILE "${TMPXML}" ABSOLUTE)
       GET_FILENAME_COMPONENT(XML_NAME "${TMPXML}" NAME_WE)
-      SET(XML_FILES ${XML_FILES} ${TMP_XML_FILE})
+      SET(tmp_xml_files ${tmp_xml_files} ${TMP_XML_FILE})
       SET(HAVE_XML 1)
     ENDFOREACH(TMPXML)
 
@@ -69,9 +70,10 @@ MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)
 
       ADD_CUSTOM_COMMAND(
         OUTPUT "${XML_HEADER}"
-        DEPENDS ${XML_FILES} "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
+        DEPENDS ${tmp_xml_files} "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
         COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
-        ARGS "${XML_HEADER}" "vtkSM" "XML" "GetString" ${XML_FILES}
+          ${ARGN}
+          "${XML_HEADER}" "vtkSM" "XML" "GetString" ${tmp_xml_files}
         )
 
       SET (${OUT_XML_HEADER} ${XML_HEADER})
@@ -953,6 +955,34 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   ENDIF (ARG_PYTHON_MODULES)
 
   IF(PARAVIEW_BUILD_QT_GUI)
+
+    # if server-manager xmls are specified, we can generate documentation from
+    # them, if Qt is enabled.
+    if (ARG_SERVER_MANAGER_XML)
+      generate_htmls_from_xmls(proxy_documentation_files
+        "${ARG_SERVER_MANAGER_XML}"
+        "" # FIXME: not sure here. How to deal with this for plugins?
+        "${CMAKE_CURRENT_BINARY_DIR}/doc")
+    endif()
+
+    # generate the qch file for the plugin if any documentation is provided.
+    if (proxy_documentation_files)
+      build_help_project(${NAME}
+        DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc"
+        FILEPATTERNS "*.html; *.css;*.png;*.jpg"
+        DEPENDS "${proxy_documentation_files}")
+
+      # we don't compile the help project as a Qt resource. Instead it's
+      # packaged into as a SM resource. This makes it possible for
+      # server-only plugins to provide documentation to the client without
+      GENERATE_SERVER_MANAGER_XML_HEADER(resource_header
+        "${NAME}_doc"
+        "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch"
+        "-base64")
+
+      list(APPEND ARG_SERVER_MANAGER_SOURCES ${resource_header})
+    endif()
+
     IF(ARG_GUI_RESOURCE_FILES)
       # The generated qrc file has resource prefix "/name/ParaViewResources"
       # which helps is avoiding conflicts with resources from different
