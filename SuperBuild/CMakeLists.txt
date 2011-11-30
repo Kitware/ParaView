@@ -186,15 +186,17 @@ include(External_szip)
 #   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
 #   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
 
-# Build a common png used by several dependencies
-include(External_png)
-# can't get paraview to build SMExtractDocumentation with externally built png
-# until then ParaView will still use the system png.
-set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=ON
-  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-list(APPEND ParaView_dependencies png)
+if(WIN32 OR APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  # can't get paraview to build SMExtractDocumentation with externally built png
+  # until then ParaView will still use the system png.
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=ON
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
+endif()
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
@@ -227,7 +229,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER AND NOT WIN32 AND NOT UNIX)
+  if(CMAKE_Fortran_COMPILER)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
