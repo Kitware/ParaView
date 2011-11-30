@@ -4,6 +4,19 @@ set(lapack_source "${CMAKE_CURRENT_BINARY_DIR}/LAPACK")
 set(lapack_binary "${CMAKE_CURRENT_BINARY_DIR}/LAPACK-build")
 set(NUMPY_LAPACK_binary ${lapack_binary})
 
+if(WIN32)
+  set(LAPACK_EXTRA_ARGS 
+    -DBUILD_STATIC_LIBS:BOOL=ON
+    -DBUILD_SHARED_LIBS:BOOL=OFF
+    )
+else()
+  set(LAPACK_EXTRA_ARGS 
+    -DBUILD_STATIC_LIBS:BOOL=OFF
+    -DBUILD_SHARED_LIBS:BOOL=ON
+    )
+endif()
+
+
 ExternalProject_Add(LAPACK
   DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${lapack_source}
