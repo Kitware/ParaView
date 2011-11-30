@@ -284,11 +284,13 @@ bool vtkSMProxySelectionModel::GetSelectionDataBounds(double bounds[6])
 void vtkSMProxySelectionModel::PrintSelf(ostream&  os,  vtkIndent  indent)
 {
   this->Superclass::PrintSelf(os, indent);
+os << indent << "Current Proxy: "
+   << (this->Current ? this->Current->GetGlobalIDAsString() : "NULL") << endl;
   os << indent << "Selected Proxies: ";
-  this->Selection->InitTraversal();
-  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+  for( SelectionType::iterator iter = this->Selection.begin();
+       iter != this->Selection.end(); iter++)
     {
-    os << obj->GetGlobalID() << " ";
+    os << iter->GetPointer()->GetGlobalIDAsString() << " ";
     }
   os << endl;
 }
@@ -354,12 +356,12 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Apply the state
   bool tmp = this->IsLocalPushOnly();
   this->EnableLocalPushOnly();
-  this->ClearAndSelect(new_selection);
+  this->Select(new_selection, SELECT);
   if (new_selection.size() > 0)
     {
     // No need to do: this->Select(proxyToSelect.GetPointer(), SELECT);
     // This is achieved in the SetCurrentProxy.
-    this->SetCurrentProxy(new_selection.first(), SELECT);
+    this->SetCurrentProxy(new_selection.begin()->GetPointer(), SELECT);
     }
 
   if(!tmp) this->DisableLocalPushOnly();

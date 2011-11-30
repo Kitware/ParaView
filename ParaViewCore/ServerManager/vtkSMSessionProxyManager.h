@@ -409,6 +409,14 @@ public:
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
   // Description:
+  // Return the number of Selections models registered
+  vtkIdType GetNumberOfSelectionModel();
+
+  // Description:
+  // Return the selection model present at the index idx.
+  vtkSMProxySelectionModel* GetSelectionModelAt(int idx);
+
+  // Description:
   // Register/UnRegister a selection model. A selection model can be typically
   // used by applications to keep track of active sources, filters, views etc.
   // This will forward the call to the ProxyManager singleton
@@ -504,6 +512,7 @@ protected:
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkEventForwarderCommand* Forwarder;
   vtkSMPipelineState* PipelineState;
+  bool StateUpdateNotification;
 private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

@@ -332,7 +332,7 @@ vtkSMGlobalPropertiesManager* pqApplicationCore::getGlobalPropertiesManager()
     // Need to attach to a session
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSessionProxyManager* spxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-    this->Internal->GlobalPropertiesManager->SetSession(pxm->GetActiveSession());
+    this->Internal->GlobalPropertiesManager->SetSession(spxm->GetSession());
 
     this->Internal->GlobalPropertiesManager->InitializeProperties(
         "misc", "GlobalProperties");

@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVServerInformation.h"
 
@@ -227,7 +228,7 @@ void pqCollaborationPanel::followUserCamera(int userId)
     collabManager->setFollowUserView(userId);
     }
 
-  if(this->Internal->CameraToFollowOfUserId == userId)
+  if(this->Internal->CameraToFollowOfUserId == userId || this->getSMCollaborationManager() == NULL)
     {
     return;
     }
@@ -271,7 +272,7 @@ void pqCollaborationPanel::followUserCamera(int userId)
 
   // If we follow master lets selection model follow as well
   bool followMaster = (userId == this->getSMCollaborationManager()->GetMasterId());
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   for(vtkIdType idx=0; idx < pxm->GetNumberOfSelectionModel(); idx++)
     {
     vtkSMProxySelectionModel* selectionModel = pxm->GetSelectionModelAt(idx);
@@ -529,7 +530,7 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
       vtkTypeUInt32 cameraId = msg->global_id();
       pqApplicationCore* core = pqApplicationCore::instance();
       vtkSMProxyLocator* locator =
-          core->getActiveServer()->session()->GetProxyLocator();
+          vtkSMProxyManager::GetProxyManager()->GetActiveSession()->GetProxyLocator();
       vtkSMProxy* proxy = locator->LocateProxy(cameraId);
 
       // As camera do not synch its properties while IsProcessingRemoteNotification
@@ -544,7 +545,7 @@ void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
         proxy->DisableLocalPushOnly();
         core->render();
         }
-      else if(proxy->GetSession()->IsProcessingRemoteNotification())
+      else if(proxy && proxy->GetSession()->IsProcessingRemoteNotification())
         {
         emit delayUpdateCamera(&this->Internal->LocalCameraStateCache[currentUserId]);
         }

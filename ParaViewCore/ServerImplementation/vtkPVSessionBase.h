@@ -178,7 +178,7 @@ protected:
   virtual void CleanupPendingProgressInternal();
 
   friend class vtkSMRemoteObject;
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
 
   // Description:
   // Methods used to monitor if we are currently processing a server notification

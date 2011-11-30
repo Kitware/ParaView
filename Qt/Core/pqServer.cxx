@@ -228,7 +228,7 @@ pqTimeKeeper* pqServer::getTimeKeeper() const
 {
   if(!this->Internals->TimeKeeper)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
     pqServerManagerModel* smmodel =
         pqApplicationCore::instance()->getServerManagerModel();

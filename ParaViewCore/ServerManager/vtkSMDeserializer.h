@@ -31,7 +31,6 @@ class vtkSMSession;
 class VTK_EXPORT vtkSMDeserializer : public vtkSMSessionObject
 {
 public:
-  static vtkSMDeserializer* New();
   vtkTypeMacro(vtkSMDeserializer, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -52,12 +51,6 @@ protected:
   // simply asks the proxy manager to create a new proxy of the requested type.
   virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
                                   const char* subProxyName = NULL);
-
-  // Description:
-  // Called after a new proxy has been created. Gives the subclasses an
-  // opportunity to perform certain tasks such as registering proxies etc.
-  // Default implementation is empty.
-  virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
 
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented

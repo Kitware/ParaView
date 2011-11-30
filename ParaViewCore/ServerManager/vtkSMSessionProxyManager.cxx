@@ -28,6 +28,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMPipelineState.h"
@@ -122,6 +123,7 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
 {
   this->Superclass::SetSession(session);
 
+  this->StateUpdateNotification = true;
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMSessionProxyManagerInternals;
   this->Internals->ProxyManager = this;
@@ -1499,7 +1501,7 @@ const vtkSMMessage* vtkSMSessionProxyManager::GetFullState()
   return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
+void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
   // Disable state push
   bool previous = this->StateUpdateNotification;
@@ -1541,6 +1543,16 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLoca
         msg->GetExtension(PXMRegistrationState::registered_selection_model, i).name().c_str();
 
     vtkSMProxySelectionModel* model = this->GetSelectionModel(name);
+
+    // Make sure the expected selection model exist by creating a new empty one
+    // that will be filled by the LoadState
+    if(model == NULL)
+      {
+      model = vtkSMProxySelectionModel::New();
+      this->RegisterSelectionModel(name, model);
+      model->FastDelete();
+      }
+
     if(!model->HasGlobalID())
       {
       vtkSMMessage msgTmp;
@@ -1679,6 +1691,30 @@ vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModel(
 
   return iter->second;
 }
+//---------------------------------------------------------------------------
+vtkIdType vtkSMSessionProxyManager::GetNumberOfSelectionModel()
+{
+  return static_cast<vtkIdType>(this->Internals->SelectionModels.size());
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxySelectionModel* vtkSMSessionProxyManager::GetSelectionModelAt(int idx)
+{
+  vtkSMSessionProxyManagerInternals::SelectionModelsType::iterator iter =
+      this->Internals->SelectionModels.begin();
+  for(int i=0;i<idx;i++)
+    {
+    if(iter == this->Internals->SelectionModels.end())
+      {
+      // Out of range
+      return NULL;
+      }
+    iter++;
+    }
+
+  return iter->second;
+}
+
 //----------------------------------------------------------------------------
 void vtkSMSessionProxyManager::UpdateFromRemote()
 {
@@ -1689,7 +1725,7 @@ void vtkSMSessionProxyManager::UpdateFromRemote()
         if(this->Session->IsMultiClients())
         {
             vtkSMMessage msg;
-            msg.set_global_id(vtkSMProxyManager::GetReservedGlobalID());
+            msg.set_global_id(vtkSMSessionProxyManager::GetReservedGlobalID());
             msg.set_location(vtkPVSession::DATA_SERVER_ROOT);
             this->Session->PullState(&msg);
             if(msg.ExtensionSize(PXMRegistrationState::registered_proxy) > 0)

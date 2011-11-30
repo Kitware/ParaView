@@ -457,7 +457,7 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
     pqView* view = iter.value();
     if(view) // View can be NULL when it does not come from the same server
       {
-      elem->GetViewStateCache()->StoreProxyState(view->getProxy());
+      elem->StoreProxyState(view->getProxy());
       }
     }
 }

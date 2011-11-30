@@ -197,6 +197,13 @@ void pqActiveObjects::viewSelectionChanged()
     return;
     }
 
+  if(server->activeViewSelectionModel() == NULL)
+    {
+    // This mean that the servermanager is currently updating itself and no
+    // selection manager is set yet...
+    return;
+    }
+
   vtkSMProxy* selectedProxy = NULL;
   vtkSMProxySelectionModel* selection = server->activeViewSelectionModel();
   if (selection->GetNumberOfSelectedProxies() == 1)
@@ -243,6 +250,13 @@ void pqActiveObjects::sourceSelectionChanged()
     {
     this->resetActives();
     this->triggerSignals();
+    return;
+    }
+
+  if(server->activeSourcesSelectionModel() == NULL)
+    {
+    // This mean that the servermanager is currently updating itself and no
+    // selection manager is set yet...
     return;
     }
 
@@ -362,7 +376,7 @@ void pqActiveObjects::setActiveView(pqView* view)
     }
 
   pqServer* server = this->activeServer();
-  if (server)
+  if (server && server->activeViewSelectionModel())
     {
     server->activeViewSelectionModel()->SetCurrentProxy(
       view? view->getProxy(): NULL,
@@ -392,7 +406,7 @@ void pqActiveObjects::setActiveSource(pqPipelineSource* source)
     }
 
   pqServer* server = this->activeServer();
-  if (server)
+  if (server && server->activeSourcesSelectionModel())
     {
     server->activeSourcesSelectionModel()->SetCurrentProxy(
       source? source->getProxy(): NULL,

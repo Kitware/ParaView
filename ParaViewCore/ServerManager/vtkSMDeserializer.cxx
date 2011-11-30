@@ -25,7 +25,6 @@
 
 #include <assert.h>
 
-vtkStandardNewMacro(vtkSMDeserializer);
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {

@@ -632,7 +632,7 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
 //-----------------------------------------------------------------------------
 pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
 {
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->GetProxy("animation", "AnimationScene");
   if(proxy == NULL)
     {
