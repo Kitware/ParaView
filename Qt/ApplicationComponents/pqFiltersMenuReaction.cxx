@@ -201,9 +201,14 @@ void pqFiltersMenuReaction::updateEnableState()
           this, SLOT(onDataUpdated()));
         break;
         }
-      outputPorts.append(opPort);
+
+      // Make sure we still have a valid port, this issue came up with multi-server
+      if(opPort)
+        {
+        outputPorts.append(opPort);
+        }
       }
-    if (selModel->GetNumberOfSelectedProxies() ==0)
+    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.size() == 0)
       {
       enabled = false;
       }
