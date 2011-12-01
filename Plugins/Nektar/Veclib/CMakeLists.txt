@@ -1,9 +1,7 @@
 
-project(vec)
+project(vec C Fortran)
 
 include_directories(${Nektar_SOURCE_DIR}/include)
-
-add_definitions(-DPARALLEL)
 
 set(veclib_math_sources
   math/xfft.c
@@ -84,7 +82,6 @@ set(veclib_misc_sources
   misc/spline.c
   misc/veclib.c
   misc/dclock.c
-  #misc/zbesj.f
   misc/mach.c
   )
 
@@ -95,6 +92,8 @@ set(veclib_memory_sources
   memory/icopy.c
   )
 
+add_library(misc_F STATIC misc/zbesj.f misc/fftdf.f)
+
 add_library(vec STATIC 
   ${veclib_math_sources}
   ${veclib_triad_sources}
@@ -104,3 +103,5 @@ add_library(vec STATIC
   ${veclib_misc_sources}
   ${veclib_memory_sources}
   )
+
+target_link_libraries(vec misc_F)
