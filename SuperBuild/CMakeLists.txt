@@ -554,6 +554,7 @@ ExternalProject_Add(${proj}
     # zlib
     ${ZLIB_ARGS}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
+    -DPARAVIEW_BUILD_PLUGIN_AMR:BOOL=OFF
     ${AcuSolve_ARGS}
     # Documentation
     ${DOC_ARGS}
