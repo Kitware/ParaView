@@ -72,6 +72,12 @@ public:
   virtual const char* GetRequiredPlugins() = 0;
 
   // Description:
+  // Provides access to binary resources compiled into the plugin.
+  // This is primarily used to compile in icons and compressed help project
+  // (qch) files into plugins.
+  virtual void GetBinaryResources(vtkstd::vector<vtkstd::string>& resources);
+
+  // Description:
   // Used when import plugins programmatically.
   // This must only be called after the application has initialized, more
   // specifically, all plugin managers have been created and they have

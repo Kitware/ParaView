@@ -218,7 +218,77 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
   )
 ENDFUNCTION (protobuf_generate)
 
+#########################################################################
+# Function to generate header file from any file(s). Support ASCII as well as
+# binary files.
+# Usage:
+# generate_header(name
+#                 [PREFIX prefix_text]
+#                 [SUFFIX suffix_text]
+#                 [VARIABLE variablename]
+#                 [BINARY]
+#                 FILES <list-of-files>
+# name :- name of the header file e.g. ${CMAKE_CURRENT_BINARY_DIR}/FooBar.h
+# PREFIX :- (optional) when specified, used as the prefix for the generated
+#           function/variable names.
+# SUFFIX :- (optional) when specified, used as the suffix for the generated
+#           function/variable names.
+# BINARY :-(optional) when specified, all files are treated as binary and
+#           encoded using base64.
+# VARIABLE :- (optional) when specified, all the generate functions used to
+#             access the compiled files are listed.
+# FILES   :- list of files to compile in.
 #------------------------------------------------------------------------------
+function(generate_header name)
+  pv_parse_arguments(arg
+    "PREFIX;SUFFIX;VARIABLE;FILES"
+    "BINARY"
+    ${ARGN}
+    )
+
+  if (NOT PARAVIEW_PROCESS_XML_EXECUTABLE)
+    MESSAGE (FATAL_ERROR
+      "No PARAVIEW_PROCESS_XML_EXECUTABLE specified
+      Could not locate kwProcessXML executable")
+  endif ()
+
+  set (function_names)
+  set (input_files)
+  set (have_xmls)
+  foreach (input_file ${arg_FILES})
+    get_filename_component(absolute_file "${input_file}" ABSOLUTE)
+    get_filename_component(file_name "${absolute_file}" NAME_WE)
+    list (APPEND function_names "${arg_PREFIX}${file_name}${arg_SUFFIX}")
+    list (APPEND input_files "${absolute_file}")
+    set (have_xmls TRUE)
+  endforeach()
+
+  set (base_64)
+  if (arg_BINARY)
+    set (base_64 "-base64")
+  endif()
+
+  if (have_xmls)
+    add_custom_command(
+      OUTPUT "${name}"
+      COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
+              ${base_64}
+              ${name}
+              \"${arg_PREFIX}\" 
+              \"${arg_SUFFIX}\"
+              \"${arg_SUFFIX}\"
+              ${input_files}
+      DEPENDS ${arg_FILES}
+              ${PARAVIEW_PROCESS_XML_EXECUTABLE}
+     ) 
+  endif ()
+
+  if (DEFINED arg_VARIABLE)
+    set (${arg_VARIABLE} ${function_names} PARENT_SCOPE)
+  endif()
+endfunction()
+
+
 # GENERATE_HTMLS_FROM_XMLS can be used to generate HTML files for
 # from a given list of xml files that correspond to server manager xmls.
 # ARGUMENTS:
