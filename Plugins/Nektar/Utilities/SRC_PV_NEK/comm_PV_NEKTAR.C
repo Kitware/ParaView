@@ -79,8 +79,8 @@ void create_comm_BC(int Nout, int *face_counter){
   for (n_out = 0; n_out < Nout; n_out++){
     if (face_counter[n_out] != 0  || mynode() == 0  )
       my_color = 1;
-  }
-
+  }  
+     
   info = MPI_Comm_split(get_MPI_COMM(), my_color, mynode(), &MPI_COMM_BC[0]);
   if (info != MPI_SUCCESS) {
       fprintf (stderr, "scatter_topology_nektar: MPI split error\n");
@@ -88,7 +88,7 @@ void create_comm_BC(int Nout, int *face_counter){
   }
   if (my_color != 1)
     MPI_COMM_BC[n_out]=MPI_COMM_NULL;
-
+  
   for (n_out = 1; n_out < 10; n_out++)
      MPI_COMM_BC[n_out]=MPI_COMM_NULL;
 }
@@ -124,18 +124,18 @@ int mynode ()
   int myid;
   //printf("comm_PV_NEKTAR: mynode, try getting rank with MPI_COMM_WORLD\n");
 //  printf("comm_PV_NEKTAR: MPI_COMM_SPLIT: %d   MPI_COMM_WORLD: %d\n",
-//   MPI_COMM_SPLIT, MPI_COMM_WORLD);
+//	 MPI_COMM_SPLIT, MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);          /* my process id */
-
+  
   return myid;
 }
 
-
+ 
 void csend (int type, void *buf, int len, int node, int pid)
 {
 
   MPI_Send (buf, len, MPI_BYTE, node, type, MPI_COMM_WORLD);
-
+  
   return;
 }
 
@@ -144,7 +144,7 @@ void crecv (int typesel, void *buf, int len)
   MPI_Status status;
 
   MPI_Recv (buf, len, MPI_BYTE, MPI_ANY_SOURCE, typesel, MPI_COMM_WORLD, &status);
-
+  
   return;
 }
 
@@ -197,7 +197,7 @@ double dclock(void)
 #endif
 
 
-void gimax (int *x, int n, int *work) {
+void gimax (int *x, int n, int *work) { 
   register int i;
 
   MPI_Allreduce (x, work, n, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
@@ -256,10 +256,10 @@ void BCreduce(double *bc, Bsystem *Ubsys){
   int      nlk = Ubsys->nglobal - Ubsys->nsolve;
   double *n1,*n2;
   static MPI_Op MPI_Ifexists = NULL;
-
+  
   if(!MPI_Ifexists){
     MPI_Op_create((MPI_User_function *)ifexists, 1, &MPI_Ifexists);
-  }
+  } 
 
   n1 = dvector(0,ngk-1);
   n2 = dvector(0,ngk-1);
@@ -269,7 +269,7 @@ void BCreduce(double *bc, Bsystem *Ubsys){
 
   /* fill n1 with values from bc  */
   for(i = 0; i < nlk; ++i) n1[Ubsys->pll->knownmap[i]] = bc[i];
-
+  
   /* receive list from other processors and check against local */
   MPI_Allreduce (n1, n2, ngk, MPI_DOUBLE, MPI_Ifexists, MPI_COMM_WORLD);
   /* fill bc with values values from  n1 */
@@ -281,7 +281,7 @@ void BCreduce(double *bc, Bsystem *Ubsys){
 
 void GatherBlockMatrices(Element *U,Bsystem *B){
   double *edge, *face;
-
+  
   if(LGmax <=2) return;
 
   switch(B->Precon){
@@ -309,7 +309,7 @@ void GatherBlockMatrices(Element *U,Bsystem *B){
     sprintf(Fname,"Aface_VELOCITY_%d.dat",mynode());
   pFile = fopen(Fname,"w");
   int i,j,index = 0;
-
+  
   for (i = 0; i < B->Pmat->info.lenergy.nface; i++){
      for (j = 0; j < B->Pmat->info.lenergy.Lface[i]; j++){
           fprintf(pFile," %f ",face[index]);
@@ -516,7 +516,7 @@ void Set_Comm_GatherBlockMatrices(Element *U, Bsystem *B){
   Face   *f;
   Element *E;
   extern  Element_List *Mesh;
-  int active_handle = get_active_handle();
+  int active_handle = get_active_handle();  
 
 
   if(LGmax <=2) return;
@@ -536,14 +536,14 @@ void Set_Comm_GatherBlockMatrices(Element *U, Bsystem *B){
   }
 
   pos = ivector(0,max(nes,nfs));
-
+  
   /* make up numbering list based upon solvemap */
   /* assumed fixed L order */
-
-  pos[0] = 0;
+  
+  pos[0] = 0; 
   for(i = 1; i < nes+1; ++i)
     pos[i] = pos[i-1] + Ledge[i-1]*(Ledge[i-1]+1)/2;
-
+  
   map = ivector(0,pos[nes]);
 
   Lskip = LGmax-2;
@@ -552,40 +552,40 @@ void Set_Comm_GatherBlockMatrices(Element *U, Bsystem *B){
     for(j = 0; j < E->Nedges; ++j){
       e = E->edge + j;
       if(e->gid < nes){
-  /* allocate starting location based on global mesh */
-  start = Mesh->flist[pllinfo[active_handle].eloop[e->eid]]->edge[j].gid*Lskip;
-  l     = Ledge[e->gid];
-  l     = l*(l+1)/2;
-  iramp(l,&start,&one,map+pos[e->gid],1);
+	/* allocate starting location based on global mesh */
+	start = Mesh->flist[pllinfo[active_handle].eloop[e->eid]]->edge[j].gid*Lskip;
+	l     = Ledge[e->gid];
+	l     = l*(l+1)/2;
+	iramp(l,&start,&one,map+pos[e->gid],1);
       }
     }
-
+  
   B->egather = gs_init(map,pos[nes],option("GSLEVEL"));
   free(map);
+  
 
-
-#if 0
-  pos[0] = 0;
+#if 0 
+  pos[0] = 0; 
   for(i = 1; i < nfs+1; ++i)
-    pos[i] = pos[i-1] +  Lface[i-1]*(Lface[i-1]+1)/2;
-
+	  pos[i] = pos[i-1] +  Lface[i-1]*(Lface[i-1]+1)/2;
+  
   map = ivector(0,pos[nfs]);
-
+  
   Lskip = (LGmax-2)*(LGmax-2);
   Lskip = Lskip*(Lskip+1)/2;
   for(E=U;E; E = E->next)
     for(j = 0; j < E->Nfaces; ++j){
       f = E->face + j;
       if(f->gid < nfs){
-  /* allocate starting location based on global mesh */
-  start = Mesh->flist[pllinfo[active_handle].eloop[f->eid]]->face[j].gid*Lskip;
-  l     = Lface[f->gid];
-  l     = l*(l+1)/2;
-  iramp(l,&start,&one,map+pos[f->gid],1);
+	/* allocate starting location based on global mesh */
+	start = Mesh->flist[pllinfo[active_handle].eloop[f->eid]]->face[j].gid*Lskip;
+	l     = Lface[f->gid];
+	l     = l*(l+1)/2;
+	iramp(l,&start,&one,map+pos[f->gid],1);
       }
     }
   B->fgather = gs_init(map,pos[nfs],option("GSLEVEL"));
-
+ 
   free(map);
 #endif
 
@@ -610,9 +610,9 @@ void test_face_on_interface(Element_List *Mesh){
          solve_mask = E->vert[E->vnum(i_face,i_vert)].solve;
          if (solve_mask == 2) nv_solve2++;
        }
-       if  (nv_solve2 == E->Nfverts(i_face) )
+       if  (nv_solve2 == E->Nfverts(i_face) ) 
           nFaces_interface++;
-     }
+     } 
   }
 
   fprintf(stderr,"rank = %d: nFaces_total = %d  nFaces_interface = %d \n",
@@ -620,7 +620,7 @@ void test_face_on_interface(Element_List *Mesh){
 }
 
 void test_interface_mapping(Element *U, Element_List *Mesh){
-
+  
 /* MEMO */
 /*
 pllinfo.ncprocs is the number of connecting processors to this partition
@@ -658,15 +658,15 @@ pllinfo.cinfo[i].edgeid[j] is the local connecting face (it was originally writt
      for (i_face = 0; i_face < pllinfo[active_handle].cinfo[i_proc].nedges; ++i_face){
         f = Mesh->flist[pllinfo[active_handle].cinfo[i_proc].elmtid[i_face]]->face + pllinfo[active_handle].cinfo[i_proc].edgeid[i_face];
         ElementID_LOC =  Mesh->flist[pllinfo[active_handle].cinfo[i_proc].elmtid[i_face]]->id;
-        FaceID_LOC    = pllinfo[active_handle].cinfo[i_proc].edgeid[i_face];
+        FaceID_LOC    = pllinfo[active_handle].cinfo[i_proc].edgeid[i_face];     
 
         for(E = U; E; E= E->next){
-    if (E->id == ElementID_LOC){
-      fprintf(pFile," %d ( %d, %d )  ",f->eid, E->id,Mesh->flist[pllinfo[active_handle].eloop[f->eid]]->face[FaceID_LOC].gid);
-      break;
-    }
-  }
-
+	  if (E->id == ElementID_LOC){
+	    fprintf(pFile," %d ( %d, %d )  ",f->eid, E->id,Mesh->flist[pllinfo[active_handle].eloop[f->eid]]->face[FaceID_LOC].gid);
+	    break;
+	  }
+	}
+        
 
         //fprintf(pFile," %d (%d, %d)  ",f->gid, E->id,FaceID_LOC);
 
@@ -692,7 +692,7 @@ void unreduce (double *x, int n)
       csend (MSGTAG + k, x, n*sizeof(double), k, 0);
   else
     crecv (MSGTAG + pid, x, n*sizeof(double));
-
+  
   return;
 }
 
@@ -708,19 +708,19 @@ void reduce (double *x, int n, double *work)
       crecv (MSGTAG + k, x, n*sizeof(double));
       for (i = 0; i < n; i++) work[i] += x[i];
     }
-    for (i = 0; i < n; i++) x[i] = work[i];
+    for (i = 0; i < n; i++) x[i] = work[i];    
   } else
     csend (MSGTAG + pid, x, n*sizeof(double), 0, 0);
-
+  
   return;
 }
 
 void ifexists(double *in, double *inout, int *n, MPI_Datatype *size){
   int i;
-
+  
   for(i = 0; i < *n; ++i)
     inout[i] = (in[i] != 0.0)? in[i] : inout[i];
-
+  
 }
 
 void parallel_gather(double *w, Bsystem *B){
@@ -734,16 +734,16 @@ void parallel_gather(double *w, Bsystem *B){
 
 extern "C"
 {
-  void METIS_PartGraphRecursive(int &, int *, int *, int *, int *, int &,
-        int &, int &, int *, int *, int *);
+  void METIS_PartGraphRecursive(int &, int *, int *, int *, int *, int &, 
+				int &, int &, int *, int *, int *); 
 }
 
 static void pmetis(int &nel, int *xadj, int *adjncy, int *vwgt,
-       int *ewgt, int& wflag, int& nparts,int *option,
-       int &num, int* edgecut,int *partition){
+		   int *ewgt, int& wflag, int& nparts,int *option,
+		   int &num, int* edgecut,int *partition){
 
   METIS_PartGraphRecursive(nel,xadj,adjncy,vwgt,ewgt,wflag,
-         num, nparts,option,edgecut,partition);
+			   num, nparts,option,edgecut,partition);
 }
 
 void default_partitioner(Element_List *EL, int *partition){
@@ -754,28 +754,28 @@ void default_partitioner(Element_List *EL, int *partition){
   int *xadj, *adjncy;
   int opt[5];
   Element *E;
-
+ 
   //fprintf(stderr,"default_partitioner: ENTER\n");
 
   ROOTONLY
     fprintf(stdout,"Partitioner         : using pmetis \n");
-
+      
   /* count up number of local edges in patch */
   medg =0;
   if(eDIM == 2)
     for(E = EL->fhead; E; E= E->next){
-      for(j = 0; j < E->Nedges; ++j)
-  if(E->edge[j].base) ++medg;
+      for(j = 0; j < E->Nedges; ++j) 
+	if(E->edge[j].base) ++medg;
     }
   else
     for(E = EL->fhead; E; E= E->next){
-      for(j = 0; j < E->Nfaces; ++j)
-  if(E->face[j].link) ++medg;
+      for(j = 0; j < E->Nfaces; ++j) 
+	if(E->face[j].link) ++medg;
     }
-
+  
   xadj      = ivector(0,nel);
   adjncy    = ivector(0,medg-1);
-
+  
   izero(nel+1,xadj,1);
   cnt = 0;
   if(eDIM == 2)
@@ -783,45 +783,45 @@ void default_partitioner(Element_List *EL, int *partition){
       E = EL->flist[i];
       xadj[i+1] = xadj[i];
       for(j = 0; j < E->Nedges; ++j){
-  if(E[i].edge[j].base){
-    if(E[i].edge[j].link){
-      adjncy[cnt++] = E->edge[j].link->eid;
-      xadj[i+1]++;
-    }
-    else{
-      adjncy[cnt++] = E->edge[j].base->eid;
-      xadj[i+1]++;
-    }
-  }
+	if(E[i].edge[j].base){
+	  if(E[i].edge[j].link){
+	    adjncy[cnt++] = E->edge[j].link->eid;
+	    xadj[i+1]++;
+	  }
+	  else{
+	    adjncy[cnt++] = E->edge[j].base->eid;
+	    xadj[i+1]++;
+	  }
+	}
       }
     }
   else
     for(i = 0; i < nel; ++i){
       E = EL->flist[i];
       xadj[i+1] = xadj[i];
-      for(j = 0; j < E->Nfaces; ++j)
-  if(E->face[j].link){
-    adjncy[cnt++] = E->face[j].link->eid;
-    xadj[i+1]++;
-  }
+      for(j = 0; j < E->Nfaces; ++j) 
+	if(E->face[j].link){
+	  adjncy[cnt++] = E->face[j].link->eid;
+	  xadj[i+1]++;
+	}
     }
-
+  
   opt[0] = 0;
   int num, wflag;
   num = wflag = 0;
 
   //fprintf(stderr,"default_partitioner: call pmetis()\n");
   pmetis(nel,xadj,adjncy,0,0,wflag,pllinfo[get_active_handle()].nprocs,opt,num,
-   &edgecut,partition);
+	 &edgecut,partition);
   //fprintf(stderr,"default_partitioner: Done calling pmetis()\n");
-  free(xadj); free(adjncy);
+  free(xadj); free(adjncy); 
 
   //fprintf(stderr,"default_partitioner: EXIT\n");
 }
 #endif
 
 /* gather edges from other patches */
-void exchange_sides(int Nfields, Element_List **Us){
+void exchange_sides(int Nfields, Element_List **Us){ 
   register int   i,j,k,n;
   int            cnt, qface, qedg, *lid;
   int            ncprocs = pllinfo[get_active_handle()].ncprocs;
@@ -838,31 +838,31 @@ void exchange_sides(int Nfields, Element_List **Us){
       buf[i] = dvector(0,Nfields*cinfo[i].datlen-1);
     }
   }
-
+  
   if(Us[0]->fhead->dim() == 2){
     Edge           *e;
     /* fill up data buffer and send*/
     for(i = 0; i < pllinfo[active_handle].ncprocs; ++i){
       for(n = 0,cnt = 0; n < Nfields; ++n)
-  for(j = 0; j < cinfo[i].nedges; ++j){
-    e = Us[n]->flist[cinfo[i].elmtid[j]]->edge + cinfo[i].edgeid[j];
-    qedg = e->qedg;
-    dcopy(qedg,e->h,1,buf[i] + cnt,1);
-    cnt += qedg;
-  }
+	for(j = 0; j < cinfo[i].nedges; ++j){
+	  e = Us[n]->flist[cinfo[i].elmtid[j]]->edge + cinfo[i].edgeid[j];
+	  qedg = e->qedg;
+	  dcopy(qedg,e->h,1,buf[i] + cnt,1);
+	  cnt += qedg;
+	}
       SendRecvRep(buf[i],Nfields*cinfo[i].datlen*sizeof(double),
-      cinfo[i].cprocid);
+		  cinfo[i].cprocid);
     }
-
+    
     /* unpack*/
     for(i = 0; i < pllinfo[active_handle].ncprocs; ++i){
       for(n = 0,cnt = 0; n < Nfields; ++n)
-  for(j = 0; j < cinfo[i].nedges; ++j){
-    e = Us[n]->flist[cinfo[i].elmtid[j]]->edge[cinfo[i].edgeid[j]].link;
-    qedg = e->qedg;
-    dcopy(qedg,buf[i] + cnt,1,e->h,1);
-    cnt += qedg;
-  }
+	for(j = 0; j < cinfo[i].nedges; ++j){
+	  e = Us[n]->flist[cinfo[i].elmtid[j]]->edge[cinfo[i].edgeid[j]].link;
+	  qedg = e->qedg;
+	  dcopy(qedg,buf[i] + cnt,1,e->h,1);
+	  cnt += qedg;
+	}
     }
   }
   else{
@@ -870,36 +870,36 @@ void exchange_sides(int Nfields, Element_List **Us){
     /* fill up data buffer and send*/
     for(i = 0; i < pllinfo[active_handle].ncprocs; ++i){
       for(n = 0,cnt = 0; n < Nfields; ++n)
-  for(j = 0; j < cinfo[i].nedges; ++j){
-    f = Us[n]->flist[cinfo[i].elmtid[j]]->face + cinfo[i].edgeid[j];
+	for(j = 0; j < cinfo[i].nedges; ++j){
+	  f = Us[n]->flist[cinfo[i].elmtid[j]]->face + cinfo[i].edgeid[j];
 
-    if(Us[n]->flist[cinfo[i].elmtid[j]]->Nfverts(f->id) == 3)
-      lid =  Tri_nmap(f->qface,f->con);
-    else
-      lid = Quad_nmap(f->qface,f->con);
-
-    qface = f->qface*f->qface;
-    for(k=0;k<qface;++k)
-      buf[i][cnt+k] = f->h[lid[k]];
-    cnt += qface;
-  }
+	  if(Us[n]->flist[cinfo[i].elmtid[j]]->Nfverts(f->id) == 3)
+	    lid =  Tri_nmap(f->qface,f->con);
+	  else
+	    lid = Quad_nmap(f->qface,f->con);
+	  
+	  qface = f->qface*f->qface;
+	  for(k=0;k<qface;++k)
+	    buf[i][cnt+k] = f->h[lid[k]];
+	  cnt += qface;
+	}
 
       SendRecvRep(buf[i],Nfields*cinfo[i].datlen*sizeof(double),
-      cinfo[i].cprocid);
+		  cinfo[i].cprocid);
     }
-
+    
     /* unpack*/
     for(i = 0; i < pllinfo[active_handle].ncprocs; ++i){
       for(n = 0,cnt = 0; n < Nfields; ++n)
-  for(j = 0; j < cinfo[i].nedges; ++j){
-    f = Us[n]->flist[cinfo[i].elmtid[j]]->face[cinfo[i].edgeid[j]].link;
-    qface = f->qface*f->qface;
-    dcopy(qface,buf[i]+cnt,1,f->h,1);
-    cnt += qface;
-    if(f->con)
-      fprintf(stderr,"Face con not zero in elmt %id, face %id\n",
-        f->eid,f->id);
-  }
+	for(j = 0; j < cinfo[i].nedges; ++j){
+	  f = Us[n]->flist[cinfo[i].elmtid[j]]->face[cinfo[i].edgeid[j]].link;
+	  qface = f->qface*f->qface;
+	  dcopy(qface,buf[i]+cnt,1,f->h,1);
+	  cnt += qface;
+	  if(f->con)
+	    fprintf(stderr,"Face con not zero in elmt %id, face %id\n",
+		    f->eid,f->id);
+	}
     }
   }
 }
@@ -908,7 +908,7 @@ void SendRecvRep(void *buf, int len, int proc){
   MPI_Status status;
 
   MPI_Sendrecv_replace(buf, len, MPI_BYTE, proc, MSGTAG+pllinfo[get_active_handle()].procid, proc,
-           MSGTAG+proc, MPI_COMM_WORLD, &status);
+		       MSGTAG+proc, MPI_COMM_WORLD, &status);
 }
 
 
