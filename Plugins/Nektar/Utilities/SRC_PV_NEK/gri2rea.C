@@ -636,7 +636,7 @@ main (int argc, char *argv[])
   fprintf(reaout, "Dummy line from old nekton file\n");
   fprintf(reaout, "**MESH DATA** x,y,z, values of vertices 1,2,3,4.\n");
 
-  fprintf(reaout, "%d   3  1   NEL NDIM NLEVEL\n", nel);
+  fprintf(reaout, "%d 	3	1   NEL NDIM NLEVEL\n", nel);
 
   for(i=0;i<Npris;++i){
     fprintf(reaout, "Element %d Prism\n", i+1);

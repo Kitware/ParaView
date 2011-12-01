@@ -75,8 +75,6 @@ void exit_comm(void){
 
 }
 
-
-
 void default_partitioner(Element_List *EL, int *partition){
   register int i,j;
   int nel = EL->nel;
