@@ -2089,10 +2089,10 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Number Of Samples"
+      <IntVectorProperty name="NumberOfSamples"
         command="SetNumberOfSamples"
         number_of_elements="3"
-        default_values="20 20 20">
+        default_values="128 128 128">
         <Documentation>
           Set the number of samples used to create an uniform grid from the AMR.
         </Documentation>
