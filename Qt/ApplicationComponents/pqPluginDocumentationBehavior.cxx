@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqHelpReaction.cxx
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,66 +29,71 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqHelpReaction.h"
-
-#include <QApplication>
-#include <QDebug>
-#include <QHelpEngine>
-#include <QPointer>
-#include <QStringList>
-
-#include "pqCoreUtilities.h"
-#include "pqHelpWindow.h"
-#include "pqApplicationCore.h"
 #include "pqPluginDocumentationBehavior.h"
 
+#include "vtkPVPlugin.h"
+#include "vtkPVPluginTracker.h"
+#include <vtksys/Base64.h>
+
+#include <QHelpEngine>
+#include <QTemporaryFile>
+#include <QtDebug>
+
 //-----------------------------------------------------------------------------
-pqHelpReaction::pqHelpReaction(QAction* parentObject)
+pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(
+  QHelpEngine* parentObject)
   : Superclass(parentObject)
 {
-}
-
-//-----------------------------------------------------------------------------
-void pqHelpReaction::showHelp()
-{
-  pqHelpReaction::showHelp(QString());
-}
-
-//-----------------------------------------------------------------------------
-void pqHelpReaction::showHelp(const QString& url)
-{
-  static QPointer<pqHelpWindow> helpWindow;
-  if (helpWindow)
+  Q_ASSERT(parentObject != NULL);
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
     {
-    // raise assistant window;
-    helpWindow->show();
-    helpWindow->raise();
-    if (!url.isEmpty())
+    if (tracker->GetPluginLoaded(cc))
       {
-      helpWindow->showPage(url);
+      this->updatePlugin(tracker->GetPlugin(cc));
       }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqPluginDocumentationBehavior::~pqPluginDocumentationBehavior()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
+{
+  vtkstd::vector<vtkstd::string> resources;
+  if (!plugin)
+    {
     return;
     }
+  plugin->GetBinaryResources(resources);
 
-  QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
-  helpWindow = new pqHelpWindow(engine, pqCoreUtilities::mainWidget());
-  helpWindow->setWindowTitle(
-    QString("%1 Online Help").arg(QApplication::applicationName()));
+  QHelpEngine* engine = qobject_cast<QHelpEngine*>(this->parent());
+  Q_ASSERT(engine);
 
-  new pqPluginDocumentationBehavior(engine);
-
-  // show some home page. Pick the first registered documentation and show its
-  // home page.
-  QStringList registeredDocumentations = engine->registeredDocumentations();
-  if (registeredDocumentations.size() > 0)
+  for (size_t cc=0; cc < resources.size(); cc++)
     {
-    helpWindow->showHomePage(registeredDocumentations[0]);
-    }
-  helpWindow->show();
-  helpWindow->raise();
-  if (!url.isEmpty())
-    {
-    helpWindow->showPage(url);
+    const vtkstd::string& str = resources[cc];
+    unsigned char* decoded_stream = new unsigned char[str.size()];
+    unsigned long length = vtksysBase64_Decode(
+      reinterpret_cast<const unsigned char*>(str.c_str()),
+      static_cast<unsigned long>(str.size()),
+      decoded_stream,
+      0);
+
+    QTemporaryFile* file = new QTemporaryFile(this);
+    if (!file->open())
+      {
+      qCritical() << "Failed to create temporary files." << endl;
+      continue;
+      }
+    qint64 written = file->write(reinterpret_cast<char*>(decoded_stream), length);
+    Q_ASSERT(written == (qint64)length);
+    (void)written;
+    engine->registerDocumentation(file->fileName());
+
+    delete [] decoded_stream;
     }
 }
-
