@@ -131,7 +131,7 @@ public:
 
   // Description:
   // Return true, if multiple sessions can be used simultanuously.
-  // We set the default to be True.
+  // We set the default to be FALSE.
   vtkGetMacro(MultipleSessionsSupport, bool);
   vtkSetMacro(MultipleSessionsSupport, bool);
   vtkBooleanMacro(MultipleSessionsSupport, bool);

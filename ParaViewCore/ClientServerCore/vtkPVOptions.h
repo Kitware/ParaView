@@ -125,6 +125,10 @@ public:
   vtkGetMacro(MultiClientMode, int);
 
   // Description:
+  // Is this client allow multiple server connection in parallel
+  vtkGetMacro(MultiServerMode, int);
+
+  // Description:
   // Indicates if the application is in symmetric mpi mode.
   // This is applicable only to PVBATCH type of processes.
   // Typically, when set to true, the python script is run on satellites as
@@ -192,6 +196,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
   int MultiClientMode;
+  int MultiServerMode;
 
   int SymmetricMPIMode;
 

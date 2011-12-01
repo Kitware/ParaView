@@ -164,6 +164,10 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);
 
+  // Set multi-server flag to vtkProcessModule
+  vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(
+        options->GetMultiServerMode() != 0);
+
   // Make sure the ProxyManager get created...
   vtkSMProxyManager::GetProxyManager();
 }
