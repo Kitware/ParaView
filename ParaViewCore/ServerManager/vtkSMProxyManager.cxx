@@ -54,36 +54,49 @@ public:
   // GlobalPropertiesManagerObserver
   void GlobalPropertyEvent(vtkObject* src, unsigned long event, void* data)
     {
-    // FIXME: FIXME_MULTI_SERVER
-    //vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    //    vtkSMGlobalPropertiesManager::SafeDownCast(src);
+    vtkSMGlobalPropertiesManager* globalPropertiesManager =
+        vtkSMGlobalPropertiesManager::SafeDownCast(src);
 
-    //// We are only managing UndoElements on GlobalPropertyManager when only one
-    //// server is involved !!!
-    //if(globalPropertiesManager && this->SessionProxyManagerMap.size() == 1)
-    //  {
-    //  vtkSMSession* session = this->SessionProxyManagerMap.begin()->first;
-    //  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
-    //  const char* globalPropertiesManagerName =
-    //      pxm->GetGlobalPropertiesManagerName(globalPropertiesManager);
-    //  if( globalPropertiesManagerName &&
-    //      this->UndoStackBuilder &&
-    //      event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
-    //    {
-    //    vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
-    //    modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
+    vtkSMSession* session = NULL;
+    vtkSmartPointer<vtkSessionIterator> iter;
+    iter.TakeReference(
+          vtkProcessModule::GetProcessModule()->NewSessionIterator());
+    for ( iter->InitTraversal(); !iter->IsDoneWithTraversal();
+          iter->GoToNextItem())
+      {
+      vtkSMSession* temp = vtkSMSession::SafeDownCast(iter->GetCurrentSession());
+      if (temp && session)
+        {
+        // We are only managing UndoElements on GlobalPropertyManager when only one
+        // server is involved !!!
+        return;
+        }
+      session = temp;
+      }
 
-    //    vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
-    //    undoElem->SetSession(session);
-    //    undoElem->SetLinkState( globalPropertiesManagerName,
-    //                            modifiedInfo->GlobalPropertyName,
-    //                            modifiedInfo->Proxy,
-    //                            modifiedInfo->PropertyName,
-    //                            modifiedInfo->AddLink);
-    //    this->UndoStackBuilder->Add(undoElem);
-    //    undoElem->Delete();
-    //    }
-    //  }
+    if(globalPropertiesManager)
+      {
+      vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
+      const char* globalPropertiesManagerName =
+          pxm->GetGlobalPropertiesManagerName(globalPropertiesManager);
+      if( globalPropertiesManagerName &&
+          pxm->GetUndoStackBuilder() &&
+          event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
+        {
+        vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
+        modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
+
+        vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
+        undoElem->SetSession(session);
+        undoElem->SetLinkState( globalPropertiesManagerName,
+                                modifiedInfo->GlobalPropertyName,
+                                modifiedInfo->Proxy,
+                                modifiedInfo->PropertyName,
+                                modifiedInfo->AddLink);
+        pxm->GetUndoStackBuilder()->Add(undoElem);
+        undoElem->Delete();
+        }
+      }
     }
 };
 //***************************************************************************
