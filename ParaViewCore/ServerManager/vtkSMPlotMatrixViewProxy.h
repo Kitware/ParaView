@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define __vtkSMPlotMatrixViewProxy_h
 
 #include "vtkSMContextViewProxy.h"
-#include "vtkClientServerStream.h"
+#include "vtkClientServerStream.h" // For CS stream methods.
 
 class vtkAbstractContextItem;
 
