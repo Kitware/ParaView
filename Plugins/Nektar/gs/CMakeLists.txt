@@ -7,7 +7,7 @@ include_directories(
   )
 
 
-add_definitions(-Dr8 -DMPISRC -DSAFE -DPARALLEL)
+add_definitions(-Dr8 -DMPISRC -DSAFE)
 
 #GS = bit_mask bss_malloc ivec error comm gs queue stack # ex
 
@@ -18,7 +18,6 @@ set(gslib_sources
   src/error.c
   src/comm.c
   src/gs.c
-  #src/ex.c
   src/queue.c
   src/stack.c
   )
