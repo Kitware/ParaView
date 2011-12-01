@@ -232,3 +232,13 @@ void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, double dr)
   vtkSMOutputPort::DefaultNumPasses = dnp;
   vtkSMOutputPort::DefaultResolution = dr;
 }
+//----------------------------------------------------------------------------
+vtkSMSourceProxy* vtkSMOutputPort::GetSourceProxy()
+{
+  return this->SourceProxy.GetPointer();
+}
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetSourceProxy(vtkSMSourceProxy* src)
+{
+  this->SourceProxy = src;
+}
