@@ -3,7 +3,8 @@
   <ProxyGroup name="sources">
    <SourceProxy name="pvNektarReader"
                 class="vtkNektarReader"
-                label="nektar data reader">
+                label="nektar data reader"
+                multiprocess_support="multiple_processes">
      <Documentation
        short_help="Read a nektar file."
        long_help="Read a nektar file into an unstructured grid.">
