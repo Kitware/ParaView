@@ -951,10 +951,14 @@ class ActiveObjects(object):
             raise RuntimeError, "Try to set an active object with invalid active connection."
         pxm = servermanager.ProxyManager(session)
         model = pxm.GetSelectionModel(name)
+        if not model:
+            model = servermanager.vtkSMProxySelectionModel()
+            pxm.RegisterSelectionModel(name, model)
         return model
 
     def set_view(self, view):
         "Sets the active view."
+        active_view_model = self.__get_selection_model("ActiveView")
         if view:
             active_view_model = self.__get_selection_model("ActiveView", view.GetSession())
             active_view_model.SetCurrentProxy(view.SMProxy, 0)
@@ -969,6 +973,7 @@ class ActiveObjects(object):
 
     def set_source(self, source):
         "Sets the active source."
+        active_sources_model = self.__get_selection_model("ActiveSources")
         if source:
             # 3 == CLEAR_AND_SELECT
             active_sources_model = self.__get_selection_model("ActiveSources", source.GetSession())
