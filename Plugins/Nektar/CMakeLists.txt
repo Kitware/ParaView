@@ -13,30 +13,39 @@ endif()
 
 project(Nektar)
 
-find_package(MPI REQUIRED)
-find_package(BLAS)
-#find_PACKAGE(LAPACK REQUIRED)
+if(NOT MPI_LIBRARY)
+  find_package(MPI REQUIRED)
+endif()
 
-find_library(F2C_LIBRARY f2c)
-find_library(SCALAPACK_LIBRARY 
-  NAMES scalapack scalapackd
-  )
+message("BLAS_blas_LIBRARY ${BLAS_blas_LIBRARY}")
+if(NOT BLAS_blas_LIBRARY)
+  find_package(BLAS)
+endif()
+message("LAPACK_lapack_LIBRARY ${LAPACK_lapack_LIBRARY}")
+if(NOT LAPACK_lapack_LIBRARY)
+  find_PACKAGE(LAPACK)
+endif()
 
-find_library(SCALAPACK_LIBRARY 
-  NAMES scalapack scalapackd
-  )
+#find_library(F2C_LIBRARY f2c)
+#find_library(SCALAPACK_LIBRARY 
+#  NAMES scalapack scalapackd
+#  )
 
-find_library(BLACS_LIBRARY
-  NAMES blacs blacsd
-  )
+#find_library(SCALAPACK_LIBRARY 
+#  NAMES scalapack scalapackd
+#  )
+
+#find_library(BLACS_LIBRARY
+#  NAMES blacs blacsd
+#  )
   
-find_library(BLACS_C_init_LIBRARY 
-  NAMES BLACS_Cinit BLACS_Cinitd
-  )
+#find_library(BLACS_C_init_LIBRARY 
+#  NAMES BLACS_Cinit BLACS_Cinitd
+#  )
 
-find_library(BLACS_F_init_LIBRARY 
-  NAMES BLACS_Finit BLACS_Finitd
-  )
+#find_library(BLACS_F_init_LIBRARY 
+#  NAMES BLACS_Finit BLACS_Finitd
+#  )
 
 add_subdirectory(gs)
 add_subdirectory(Veclib)
@@ -70,10 +79,10 @@ target_link_libraries(pvNektarReader
   nektar
   ${BLAS_blas_LIBRARY}
   ${LAPACK_lapack_LIBRARY}
-  ${F2C_LIBRARY}
-  ${BLACS_C_init_LIBRARY}
-  ${BLACS_LIBRARY}
-  ${SCALAPACK_LIBRARY}
+#  ${F2C_LIBRARY}
+#  ${BLACS_C_init_LIBRARY}
+#  ${BLACS_LIBRARY}
+#  ${SCALAPACK_LIBRARY}
 #  nektarobj
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
   #/home/insley/TEST/PV_NEKTAR/Nektar-PARALLEL/Veclib/libvec.a
