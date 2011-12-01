@@ -53,20 +53,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MultiServerClientMainWindow::MultiServerClientMainWindow(
   QWidget* parentObject, Qt::WindowFlags wflags) : Superclass(parentObject, wflags)
 {
+  // tells the ParaView libraries to enable support for multiple simultaneous
+  // server connections.
+  vtkProcessModule::GetProcessModule()->MultipleSessionsSupportOn();
   Ui::MultiServerClientMainWindow ui;
   ui.setupUi(this);
 
   // create the representation when user hits "Apply";
-  ui.proxyTabWidget->setShowOnAccept(true);
+  //ui.proxyTabWidget->setShowOnAccept(true);
 
   new pqServerConnectReaction(ui.action_Connect);
 
   pqParaViewMenuBuilders::buildSourcesMenu(*ui.menu_Sources, this);
   new pqParaViewBehaviors(this, this);
-
-  // tells the ParaView libraries to enable support for multiple simultaneous
-  // server connections.
-  pqApplicationCore::instance()->getObjectBuilder()->setMultipleConnectionsSupport(true);
 
   // Keep arround GUI components
   this->pipelineBrowser = ui.pipelineBrowser;

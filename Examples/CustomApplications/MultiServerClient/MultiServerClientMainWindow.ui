@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>781</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -51,14 +51,92 @@
      <item>
       <widget class="pqPipelineBrowserWidget" name="pipelineBrowser" native="true"/>
      </item>
+     <item>
+      <widget class="QDockWidget" name="displayDock">
+       <property name="windowTitle">
+        <string>Display</string>
+       </property>
+       <widget class="QWidget" name="displayWidgetFrame_2">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QScrollArea" name="displayScrollArea_2">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="pqDisplayProxyEditorWidget" name="displayWidget_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>103</width>
+              <height>92</height>
+             </rect>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDockWidget" name="summaryDock">
+       <property name="windowTitle">
+        <string>Summary</string>
+       </property>
+       <widget class="pqSummaryPanel" name="summaryWidget_2"/>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDockWidget" name="objectInspectorDock">
+       <property name="windowTitle">
+        <string>Properties</string>
+       </property>
+       <widget class="pqObjectInspectorWidget" name="objectInspector_2"/>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDockWidget" name="informationDock">
+       <property name="windowTitle">
+        <string>Information</string>
+       </property>
+       <widget class="QWidget" name="informationWidgetFrame_2">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QScrollArea" name="informationScrollArea_2">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="pqProxyInformationWidget" name="informationWidget_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>103</width>
+              <height>92</height>
+             </rect>
+            </property>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="pqProxyTabWidget" name="proxyTabWidget"/>
   </widget>
   <action name="actionE_xit">
    <property name="text">
@@ -85,9 +163,27 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqProxyTabWidget</class>
+   <class>pqObjectInspectorWidget</class>
    <extends>QWidget</extends>
-   <header>pqProxyTabWidget.h</header>
+   <header>pqObjectInspectorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayProxyEditorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayProxyEditorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqProxyInformationWidget</class>
+   <extends>QWidget</extends>
+   <header>pqProxyInformationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSummaryPanel</class>
+   <extends>QWidget</extends>
+   <header>pqSummaryPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
