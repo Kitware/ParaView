@@ -1,5 +1,5 @@
 
-project(hybrid)
+project(hybrid C Fortran)
 
 include_directories(
   ${Nektar_SOURCE_DIR}/include
@@ -67,10 +67,9 @@ set(hybrid_sources
   src/Utilities.C
   src/SMatrix.C
   src/Felisa.C
-  src/FelisaF.F
   )
 
-
+add_library(Felisa STATIC src/FelisaF.F)
 
 add_library(hybrid STATIC ${hybrid_sources})
-target_link_libraries(hybrid vec metis gs)
+target_link_libraries(hybrid Felisa vec metis gs)
