@@ -39,6 +39,22 @@
 class vtkSMProxyManager::vtkPXMInternal
 {
 public:
+  // Properly detach observer of GlobalPropertiesManagers
+  ~vtkPXMInternal()
+  {
+  GlobalPropertiesManagersType::iterator globalPropMapIter;
+  GlobalPropertiesManagersCallBackIDType::iterator callbackMapIter;
+
+  for( globalPropMapIter = this->GlobalPropertiesManagers.begin();
+       globalPropMapIter != this->GlobalPropertiesManagers.end();
+       ++globalPropMapIter)
+    {
+    callbackMapIter =
+        this->GlobalPropertiesManagersCallBackID.find(globalPropMapIter->first);
+    globalPropMapIter->second->RemoveObserver(callbackMapIter->second);
+    }
+  }
+
   vtkWeakPointer<vtkSMSession> ActiveSession;
 
   // Data structure for storing GlobalPropertiesManagers.
