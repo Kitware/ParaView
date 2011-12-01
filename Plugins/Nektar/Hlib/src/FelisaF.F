@@ -32,7 +32,7 @@ c
       iu     = int(un)
       if(iu.eq.(nu-1)) iu = iu-1
       u      = iu
-      u      = un-u
+      u      = un-u 
       ip1    = iu+1
       ip2    = ip1+1
       do 100 id=1,2*NDIM
@@ -97,8 +97,8 @@ c *** out-of-bounds checking
 c
       UBOT = 0.
       VBOT = 0.
-      UTOP = nu-1
-      VTOP = nv-1
+      UTOP = nu-1 
+      VTOP = nv-1 
       ier = 0
       if(un.lt.UBOT.or.un.gt.UTOP.or.vn.lt.VBOT.or.vn.gt.VTOP) then
         ier = -1
@@ -126,7 +126,7 @@ c
   100 continue
 c
 c *** computes the values of the position, tangent and
-c     and twist vectors from the local coordinates 0<u,v<1
+c     and twist vectors from the local coordinates 0<u,v<1 
 c
       do 1000 id=1,ndim
       id1     = id +ndim
@@ -227,7 +227,7 @@ c
       dimension      r(12,*), xg(3,*), xl(2,*)
       dimension        xp(3),   uk(2),  uk1(2),  box(4)
       dimension      us(2,4), up(2,4), xd(2,4), bl(2,4)
-      dimension         w(4),  rp(12)
+      dimension         w(4),  rp(12) 
       integer   kp(2,4), verbose
       logical    feasib,   newdr,    flag,      ok
       common /GEOTOL/ tolg,spmin
@@ -245,10 +245,10 @@ c
 c     tolg := distance in 3D coordinates
 c     EPS3 := modulus of search direction
 c
-      EPS  = tolg
+      EPS  = tolg 
       EPS2 = EPS**2
 c
-c *** verbose = 1 turns on warnings
+c *** verbose = 1 turns on warnings 
       verbose = 0
 c
 c *** Stores values along the boundary
@@ -261,8 +261,8 @@ c
 c
 c *** Target point
 c
-c         if(verbose .eq. 1) then
-c            if( (ip/20)*20 .eq. ip ) then
+c         if(verbose .eq. 1) then 
+c            if( (ip/20)*20 .eq. ip ) then 
 c               write(*,'(i5)') ip
 c            else
 c               write(*,'(i5,$)') ip
@@ -282,44 +282,44 @@ c
 c
 c *** Finds the minimum along the boundary
 c
-        drm = SLARGE
+        drm = SLARGE 
         kb  = 0
         do j = 1,4
           dst = ( r(1,kp(1,j)) - r(1,kp(2,j)) )**2+
      &          ( r(2,kp(1,j)) - r(2,kp(2,j)) )**2+
      &          ( r(3,kp(1,j)) - r(3,kp(2,j)) )**2
-    if( dst .gt. EPS2 ) then
-      call localm(     nu,      nv,       r,      xp,
-     &                  up(1,j), xd(1,j), bl(1,j), bl(2,j),
+	  if( dst .gt. EPS2 ) then
+	    call localm(     nu,      nv,       r,      xp, 
+     &                  up(1,j), xd(1,j), bl(1,j), bl(2,j), 
      &                       al,      rp,     dr2)
             if( dr2 .lt. drm ) then
               drm   = dr2
               uk(1) = up(1,j)+al*xd(1,j)
               uk(2) = up(2,j)+al*xd(2,j)
-              kb    = j
+              kb    = j    
             endif
-            if( drm .lt. EPS ) then
+            if( drm .lt. EPS ) then 
               goto 100
             endif
           endif
         enddo
 c
-c *** If the minimum has not been found on the boundary, the point
-c     with minimum distance is used as the initial guess for a
-c     conjugate gradient minimization process.
+c *** If the minimum has not been found on the boundary, the point 
+c     with minimum distance is used as the initial guess for a 
+c     conjugate gradient minimization process. 
 c
-        call cgmin( nu, nv, r, xp, uk, kp, up, xd, bl, box,
+        call cgmin( nu, nv, r, xp, uk, kp, up, xd, bl, box, 
      &              rp, EPS, drm, ok )
         if( ok ) then
           goto 100
         else
-           if(verbose .eq. 1) then
+           if(verbose .eq. 1) then 
               write(*,'(/,a)') ' LOCUV > CG Iteration Failed'
               call info( ip, xp, rp, uk )
            endif
         endif
 c
-c *** Here tries a more robust but slower algorithm
+c *** Here tries a more robust but slower algorithm 
 c     when at a boundary point the line search has taken the
 c     iterative procedure out-of-bounds
 c
@@ -329,13 +329,13 @@ c
 c
         call locu2( nu, nv, r, xp, uk, rp, EPS, drm, ok )
         if( ok ) then
-           if(verbose .eq. 1) then
+           if(verbose .eq. 1) then 
               write(*,'(/,a)') ' LOCUV > Succesful 2nd Attempt'
               call info( ip, xp, rp, uk )
            endif
            goto 100
         else
-           if(verbose .eq. 1) then
+           if(verbose .eq. 1) then 
               write(*,'(/,a)') ' LOCUV > Brute Force Iteration Failed'
               call info( ip, xp, rp, uk )
            endif
@@ -350,10 +350,10 @@ c
         endif
 c
   100   continue
-        if( drm .gt. EPS ) then
-           if(verbose .eq. 1) then
-
-              write(*,'(/,a,//,2(a,/,a,1pe12.5,/),2(a,/))')
+        if( drm .gt. EPS ) then 
+           if(verbose .eq. 1) then 
+              
+              write(*,'(/,a,//,2(a,/,a,1pe12.5,/),2(a,/))') 
      &       ' LOCUV >        !!! *** WARNING *** !!!           ',
      &       '        The distance between the target point and ',
      &       '        and the last point in the iteration is:   ',drm,
@@ -377,7 +377,7 @@ c*                                                               *
 c*    [info] Displays a status message for the last iteration    *
 c*                                                               *
 c*---------------------------------------------------------------*
-      subroutine info( ip, xp, rp, uk )
+      subroutine info( ip, xp, rp, uk ) 
       implicit double precision (a-h,o-z)
       dimension xp(*), rp(*), uk(*)
       drm = dist3D( xp, rp )
@@ -418,14 +418,14 @@ c*---------------------------------------------------------------*
 c*                                                               *
 c*    [chsing] Checks the target coordinates "xp" against a set  *
 c*             of four candidate singular points whose local     *
-c*             coordinates are stored in us(2,4).                *
+c*             coordinates are stored in us(2,4).                * 
 c*                                                               *
 c*---------------------------------------------------------------*
       subroutine chsing( nu, nv, r, xp, us, uk, rp, EPS, drm, ok )
 c
       implicit double precision (a-h,o-z)
-      dimension  r(12,*), xp(*), us(2,*)
-      dimension  uk(*), rp(*)
+      dimension  r(12,*), xp(*), us(2,*) 
+      dimension  uk(*), rp(*) 
       logical ok
 c
       ok = .false.
@@ -437,7 +437,7 @@ c
           uk(1) = us(1,j)
           uk(2) = us(2,j)
           ok    = .true.
-          return
+          return 
         endif
       enddo
 c
@@ -450,7 +450,7 @@ c*            the target point "xp" via minimization using a     *
 c*            Conjugate Gradient algorithm.                      *
 c*                                                               *
 c*---------------------------------------------------------------*
-      subroutine cgmin( nu, nv, r, xp, uk, kp, up, xd, bl, box,
+      subroutine cgmin( nu, nv, r, xp, uk, kp, up, xd, bl, box, 
      &                  rp, EPS, drm, ok )
 c
       implicit double precision (a-h,o-z)
@@ -480,7 +480,7 @@ c *** Success flag
 c
       ok = .false.
 c
-c *** First we check that the first search direction does not
+c *** First we check that the first search direction does not 
 c     coincide with the current one on the
 c     boundary. If it does we select an alternative first guess.
 c
@@ -492,17 +492,17 @@ c
       drm = sqrt(drm)
       if( drm .lt. EPS ) then
         ok = .true.
-        return
+        return 
       endif
 c
-c *** Is the vector perpendicular to the surface ?
+c *** Is the vector perpendicular to the surface ?   
 c
       gk(1) = 2.*( drx*rp(4)+dry*rp(5)+drz*rp(6) )
       gk(2) = 2.*( drx*rp(7)+dry*rp(8)+drz*rp(9) )
       vmd   = sqrt(gk(1)**2+gk(2)**2)
       if(vmd .lt. EPS3) then
         ok = .true.
-        return
+        return 
       endif
       vmd   = 1./vmd
       dr(1) = -gk(1)*vmd
@@ -522,7 +522,7 @@ c
         drm = sqrt(drm)
         if( drm .lt. EPS ) then
           ok = .true.
-          return
+          return 
         endif
         gk(1) = 2.*( drx*rp(4)+dry*rp(5)+drz*rp(6) )
         gk(2) = 2.*( drx*rp(7)+dry*rp(8)+drz*rp(9) )
@@ -536,7 +536,7 @@ c
         dmd   = sqrt(dr(1)**2+dr(2)**2)
         if(dmd .lt. EPS3) then
           ok = .true.
-          return
+          return 
         endif
         dmd   = 1./dmd
         dr(1) = dr(1)*dmd
@@ -574,7 +574,7 @@ c
         uk(2) = uk(2)+al*dr(2)
         if( drm .lt. EPS ) then
           ok  = .true.
-          return
+          return 
         endif
         call fgsurf(1, nu, nv, r, uk(1), uk(2), rp, ier)
         drx   = rp(1)-xp(1)
@@ -599,7 +599,7 @@ c         bet   = (gk1(1)**2+gk1(2)**2)        ! Fletcher-Reeves
         if(vmd .lt. EPS3) then
           drm = sqrt(drm)
           ok  = .true.
-          return
+          return 
         endif
         vmd = 1./vmd
       enddo
@@ -642,7 +642,7 @@ c* Original Notes from the "Golden Oldies" NETLIB directory    *
 c*-------------------------------------------------------------*
 c*                                                             *
 c* SFMIN gives an approximation "x" to the point where the     *
-c*       function attains a minimum on the interval (x,b)      *
+c*       function attains a minimum on the interval (x,b)      * 
 c*                                                             *
 c* Input:                                                      *
 c* a     left endpoint of initial interval                     *
@@ -684,7 +684,7 @@ c
 c
 c *** GOLD is the squared inverse of the golden ratio
 c
-      GOLD = 0.5*(3.0-sqrt(5.0))
+      GOLD = 0.5*(3.0-sqrt(5.0)) 
 c
 c *** eps is approximately the square root of the relative machine
 c     precision.
@@ -732,10 +732,10 @@ c
       p    = -p
                                                     goto  30
    20 q    = -q
-   30 r    = e
+   30 r    = e 
       e    = d
-   40 if( abs(p) .ge. abs(0.5*q*r) .or.
-     &         p .le. q*(sa-x)     .or.
+   40 if( abs(p) .ge. abs(0.5*q*r) .or. 
+     &         p .le. q*(sa-x)     .or.  
      &         p .ge. q*(sb-x)         )            goto  60
 c
 c *** A parabolic-interpolation step
@@ -763,7 +763,7 @@ c
    90 if( abs(d) .lt. tol1 )                        goto 100
       u    = x+d
                                                     goto 120
-  100 if( d .le. 0.0 )                              goto 110
+  100 if( d .le. 0.0 )                              goto 110 
       u    = x+tol1
                                                     goto 120
   110 u    = x-tol1
@@ -780,11 +780,11 @@ c
       sa   = u
                                                     goto 140
   130 sb   = u
-  140 if( fu .gt. fx )                              goto 170
-      if( u .ge. x )                                goto 150
+  140 if( fu .gt. fx )                              goto 170 
+      if( u .ge. x )                                goto 150 
       sb   = x
                                                     goto 160
-  150 sa   = x
+  150 sa   = x 
   160 v    = w
       fv   = fw
       w    = x
@@ -800,7 +800,7 @@ c
   180 if( fu .gt. fv .and. v.ne.x .and. v.ne.w )    goto  10
       v    = u
       fv   = fu
-                                                    goto  10
+                                                    goto  10      
   190 return
 c
       end
@@ -820,7 +820,7 @@ c*---------------------------------------------------------------------*
 c
 c *** Bounds of the parameter plane
 c
-      UBOT = box(1)
+      UBOT = box(1) 
       VBOT = box(2)
       UTOP = box(3)
       VTOP = box(4)
@@ -833,16 +833,16 @@ c
 c
 c *** New position
 c
-      up(1) = uk(1)+tol*dn(1)
-      up(2) = uk(2)+tol*dn(2)
+      up(1) = uk(1)+tol*dn(1)      
+      up(2) = uk(2)+tol*dn(2)      
 c
-c *** Still in the parameter plane ?
+c *** Still in the parameter plane ? 
 c
-      if( up(1) .ge. UBOT .and. up(1) .le. UTOP .and.
+      if( up(1) .ge. UBOT .and. up(1) .le. UTOP .and. 
      &    up(2) .ge. VBOT .and. up(2) .le. VTOP       ) then
         feasib = .true.
       else
-        feasib = .false.
+        feasib = .false. 
       endif
 c
       return
@@ -858,14 +858,14 @@ c*--------------------------------------------------------*
       dimension       uk(*), dr(*), gk(*), box(*)
       logical    flag, feasib
 c
-      common /MACPAR/ SEPSIL, SLARGE, SSMALL
+      common /MACPAR/ SEPSIL, SLARGE, SSMALL      
 c
       newdr = .true.
       EPS   = SEPSIL
 c
 c *** Bounds of the parameter plane
 c
-      UBOT = box(1)
+      UBOT = box(1) 
       VBOT = box(2)
       UTOP = box(3)
       VTOP = box(4)
@@ -878,37 +878,37 @@ c
       dvt = abs(uk(2)-VTOP)
 c
 c *** Projects the descent direction ( opposite to the gradient )
-c     along the active boundary and verifies whether the new
+c     along the active boundary and verifies whether the new 
 c     direction is acceptable
 c
       if( dub .le. tol .or. dut .le. tol ) then
-        if( abs(gk(1)) .gt. EPS ) then
+        if( abs(gk(1)) .gt. EPS ) then 
           dr(1) = sign(1.D00,-gk(1))
           dr(2) = 0.
-          flag  = feasib( uk, dr, box, tol )
+          flag  = feasib( uk, dr, box, tol ) 
           if( flag ) return
         endif
       endif
 c
       if( dvb .le. tol .or. dvt .le. tol ) then
-        if( abs(gk(2)) .gt. EPS ) then
+        if( abs(gk(2)) .gt. EPS ) then 
           dr(1) = 0.
           dr(2) = sign(1.D00,-gk(2))
-          flag  = feasib( uk, dr, box, tol )
+          flag  = feasib( uk, dr, box, tol ) 
           if( flag ) return
         endif
       endif
 c
-c *** There is no feasible direction along the boundary
+c *** There is no feasible direction along the boundary 
 c
       newdr = .false.
 c
       return
       end
 c*--------------------------------------------------------*
-c*                                                        *
+c*                                                        * 
 c*    [bval] calculates some values along the boundaries  *
-c*                                                        *
+c*                                                        * 
 c*--------------------------------------------------------*
       subroutine bval( nu, nv, box, us, kp, up, xd, bl )
 c
@@ -942,13 +942,13 @@ c
 c *** v = VBOT
 c
       us(1,1) = 0.5*(UBOT+UTOP)
-      us(2,1) = VBOT
+      us(2,1) = VBOT 
       kp(1,1) = ipt1
       kp(2,1) = ipt2
-      up(1,1) = UBOT
-      up(2,1) = VBOT
-      xd(1,1) =  1.0
-      xd(2,1) =  0.0
+      up(1,1) = UBOT 
+      up(2,1) = VBOT 
+      xd(1,1) =  1.0 
+      xd(2,1) =  0.0 
       bl(1,1) =  0.
       bl(2,1) = UTOP
 c
@@ -958,10 +958,10 @@ c
       us(2,2) = 0.5*(VBOT+VTOP)
       kp(1,2) = ipt2
       kp(2,2) = ipt3
-      up(1,2) = UTOP
-      up(2,2) = VBOT
-      xd(1,2) =  0.0
-      xd(2,2) =  1.0
+      up(1,2) = UTOP 
+      up(2,2) = VBOT 
+      xd(1,2) =  0.0 
+      xd(2,2) =  1.0 
       bl(1,2) =  0.
       bl(2,2) = VTOP
 c
@@ -971,11 +971,11 @@ c
       us(2,3) = VTOP
       kp(1,3) = ipt3
       kp(2,3) = ipt4
-      up(1,3) = UTOP
-      up(2,3) = VTOP
-      xd(1,3) = -1.0
-      xd(2,3) =  0.0
-      bl(1,3) =  0.
+      up(1,3) = UTOP 
+      up(2,3) = VTOP 
+      xd(1,3) = -1.0 
+      xd(2,3) =  0.0 
+      bl(1,3) =  0. 
       bl(2,3) = UTOP
 c
 c *** u = UBOT
@@ -984,11 +984,11 @@ c
       us(2,4) = 0.5*(VBOT+VTOP)
       kp(1,4) = ipt4
       kp(2,4) = ipt1
-      up(1,4) = UBOT
-      up(2,4) = VTOP
-      xd(1,4) =  0.
-      xd(2,4) = -1.
-      bl(1,4) = 0.
+      up(1,4) = UBOT 
+      up(2,4) = VTOP 
+      xd(1,4) =  0. 
+      xd(2,4) = -1. 
+      bl(1,4) = 0. 
       bl(2,4) = VTOP
 c
       return
@@ -1008,10 +1008,10 @@ c
 c *** initial guess: parametric coordinates (u,v)
 c     of the closest support point
 c
-      drm = SLARGE
+      drm = SLARGE 
       do iu = 1,nu-1
         do iv = 1,nv-1
-          i1 = (iv-1)*nu+iu
+          i1 = (iv-1)*nu+iu 
           i2 = i1+1
           i3 = i1+nu
           i4 = i3+1
@@ -1058,20 +1058,20 @@ c
 c
 c *** Finds the closest support point
 c
-      dis = SLARGE
+      dis = SLARGE 
       au  = 0.0
-      do iu = 1,nu
+      do iu = 1,nu 
         av = 0.0
         do iv = 1,nv
           call fgsurf( 0, nu, nv, r, au, av, rp, ier)
           dis1 = dist3D(rp,xp)
-          if(dis1.lt.dis) then
+          if(dis1.lt.dis) then 
             aur = au
             avr = av
             dis = dis1
             if(dis.lt.EPS3D) then
               ok = .true.
-              goto 100
+              goto 100 
             endif
           endif
           av = av + 1.0
@@ -1089,11 +1089,11 @@ c
       du    = 0.5*du
       nbnd  = 3
       iter1 = 0
-  300 iter1 = iter1 + 1
+  300 iter1 = iter1 + 1 
       disk  = dis
       auk   = aur
       avk   = avr
-      ntr   = 0
+      ntr   = 0 
       uc    = aur - du*nbnd
       do iu = 1,2*nbnd+1
         vc = avr - du*nbnd
@@ -1104,7 +1104,7 @@ c
             xuvt(2,ntr) = vc
           endif
           vc = vc + du
-        enddo
+        enddo 
         uc = uc + du
       enddo
 c
@@ -1113,21 +1113,21 @@ c
       do it = 1,ntr
         call fgsurf( 0, nu, nv, r, xuvt(1,it), xuvt(2,it), rp, ier)
         dis1 = dist3D(rp,xp)
-        if(dis1.lt.dis) then
-          aur = xuvt(1,it)
-          avr = xuvt(2,it)
+        if(dis1.lt.dis) then 
+          aur = xuvt(1,it) 
+          avr = xuvt(2,it) 
           dis = dis1
           if(dis.lt.EPS3D) then
             ok = .true.
-            goto 100
+            goto 100 
           endif
         endif
       enddo
       if(aur .lt. auk-du*nbnd+EPS .or.
      &   aur .gt. auk+du*nbnd-EPS .or.
      &   avr .lt. avk-du*nbnd+EPS .or.
-     &   avr .gt. avk+du*nbnd-EPS )       goto 300
-      if(iter.gt.NIT) then
+     &   avr .gt. avk+du*nbnd-EPS )       goto 300 
+      if(iter.gt.NIT) then 
         ok = .false.
         return
       endif
@@ -1150,7 +1150,7 @@ c*    [sign] Routine needed for alpha's since not supported      *
 c*                                                               *
 c*---------------------------------------------------------------*
       double precision function sign( x1, x2 )
-      implicit double precision (a-h,o-z)
+      implicit double precision (a-h,o-z)  
       if(x2.lt.0.0) then
          sign  = -x1
       else
