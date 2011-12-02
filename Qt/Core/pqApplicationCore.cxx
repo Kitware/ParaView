@@ -733,6 +733,9 @@ QHelpEngine* pqApplicationCore::helpEngine()
     QTemporaryFile tFile;
     tFile.open();
     this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
+    QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
+      this->OutputWindow,
+      SLOT(onDisplayGenericWarningText(const QString&)));
     this->HelpEngine->setupData();
     // register the application's qch file. An application specific qch file can
     // be compiled into the executable in the build_paraview_client() cmake

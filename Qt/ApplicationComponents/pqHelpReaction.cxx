@@ -71,11 +71,13 @@ void pqHelpReaction::showHelp(const QString& url)
     }
 
   QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
+  new pqPluginDocumentationBehavior(engine);
+
+
   helpWindow = new pqHelpWindow(engine, pqCoreUtilities::mainWidget());
   helpWindow->setWindowTitle(
     QString("%1 Online Help").arg(QApplication::applicationName()));
 
-  new pqPluginDocumentationBehavior(engine);
 
   // show some home page. Pick the first registered documentation and show its
   // home page.
