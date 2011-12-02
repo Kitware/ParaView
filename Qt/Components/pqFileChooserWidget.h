@@ -48,6 +48,8 @@ class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true)
+  Q_PROPERTY(QString singleFilename READ singleFilename WRITE
+    setSingleFilename)
   Q_PROPERTY(QString extension READ extension WRITE setExtension)
   Q_PROPERTY(bool useDirectoryMode
              READ useDirectoryMode WRITE setUseDirectoryMode)
@@ -61,13 +63,13 @@ public:
   ~pqFileChooserWidget();
 
   /// get the filename
-  QStringList filenames();
+  QStringList filenames() const;
   /// set the filename
   void setFilenames(const QStringList&);
 
   /// convienince functions for when using only a single file (see
   /// forceSingleFile property).
-  QString singleFilename();
+  QString singleFilename() const;
   void setSingleFilename(const QString &);
   
   /// get the file extension for the file dialog

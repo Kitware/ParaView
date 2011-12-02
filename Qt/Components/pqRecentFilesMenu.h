@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqServer;
+class pqServerResource;
 class QAction;
 class QMenu;
 
@@ -52,10 +53,9 @@ public:
   /// Assigns the menu that will display the list of files
   pqRecentFilesMenu(QMenu& menu, QObject* p=0);
 
-signals:
-  /// Fired when the server connection for the resource
-  /// cannot be created.
-  void serverConnectFailed();
+  /// Open a resource on the given server
+  bool open(
+    pqServer* server, const pqServerResource& resource) const;
 
 private slots:
   void onResourcesChanged();

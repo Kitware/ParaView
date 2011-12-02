@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonShell.h"
 #include "pqPythonScriptEditor.h"
 #include "pqSettings.h"
-#include "pqServerStartups.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.

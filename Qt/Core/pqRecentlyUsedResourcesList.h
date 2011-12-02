@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerConnectReaction.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerConnectReaction_h 
-#define __pqServerConnectReaction_h
+#ifndef __pqRecentlyUsedResourcesList_h 
+#define __pqRecentlyUsedResourcesList_h
 
-#include "pqReaction.h"
+#include <QObject>
+#include <QList>
+#include "pqServerResource.h"
 
-class pqServerConfiguration;
-
-/// @ingroup Reactions
-/// Reaction for connecting to a server.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqServerConnectReaction : public pqReaction
+class pqSettings;
+/// pqRecentlyUsedResourcesList encapsulates a persistent collection of
+/// recently-used resources (data files or state files).
+///
+/// \sa pqServerResource
+class PQCORE_EXPORT pqRecentlyUsedResourcesList : public QObject
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef QObject Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
-  pqServerConnectReaction(QAction* parent);
+  pqRecentlyUsedResourcesList(QObject* parent=0);
+  virtual ~pqRecentlyUsedResourcesList();
 
-  /// Creates a server connection.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
-  static void connectToServerWithWarning();
-  static void connectToServer();
+  /// convenience typedef.
+  typedef QList<pqServerResource> ListT;
 
-  /// ParaView names server configurations (in pvsc files). To connect to a
-  /// server using the configuration specified, use this API.
-  static bool connectToServerUsingConfigurationName(const char* config_name);
+  /// Add a resource to the collection. Moves the resource to the beginning of
+  /// the list.
+  void add(const pqServerResource& resource);
 
-  /// To connect to a server given a configuration, use this API.
-  static bool connectToServerUsingConfiguration(
-    const pqServerConfiguration& config);
+  /// Returns the contents of the collection ordered from most-recently-used to
+  /// least-recently-used.
+  const QList<pqServerResource>& list() const
+    { return this->ResourceList; }
 
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqServerConnectReaction::connectToServerWithWarning(); }
+  /// Load the collection (from local user preferences)
+  void load(pqSettings&);
+
+  /// Save the collection (to local user preferences)
+  void save(pqSettings&) const;
+
+signals:
+  /// Signal emitted whenever the collection is changed
+  void changed();
 
 private:
-  Q_DISABLE_COPY(pqServerConnectReaction)
+  QList<pqServerResource> ResourceList;
+
+  Q_DISABLE_COPY(pqRecentlyUsedResourcesList)
 };
 
 #endif
-
-
