@@ -55,6 +55,7 @@ vtkSMProperty::vtkSMProperty()
   this->IsInternal = 0;
   this->Documentation = 0;
   this->Repeatable = 0;
+  this->IgnoreSynchronization = 0;
 
   this->Hints = 0;
   this->BlockModifiedEvents = false;
@@ -335,6 +336,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
   if(retVal) 
     { 
     this->SetInformationOnly(information_only); 
+    }
+  int ignore_synch;
+  retVal = element->GetScalarAttribute("ignore_synchronization", &ignore_synch);
+  if(retVal)
+    {
+    this->SetIgnoreSynchronization(ignore_synch);
     }
 
   int animateable;

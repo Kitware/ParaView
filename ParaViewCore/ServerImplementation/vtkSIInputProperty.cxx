@@ -117,6 +117,9 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
            << vtkClientServerStream::End;
     }
 
+  // Save to cache when pulled for collaboration
+  this->SaveValueToCache(message, offset);
+
   return this->ProcessMessage(stream);
 }
 

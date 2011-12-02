@@ -534,7 +534,7 @@ void vtkPVPythonInterpretor::ExecuteInitFromGUI()
     "servermanager.InitFromGUI()\n"
     "from paraview.simple import *\n"
     "active_objects.view = servermanager.GetRenderView()\n"
-    "paraview.simple._add_functions(globals())";
+    "";
   this->RunSimpleString(initStr);
   this->FlushMessages();
 }

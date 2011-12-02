@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPanelDecoratorInterface.h"
 #include "pqDisplayPanelInterface.h"
@@ -48,8 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqPlotMatrixDisplayPanel.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertyLinks.h"
+#include "pqServer.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
@@ -84,7 +87,8 @@ public:
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
        type == "ScatterPlotRepresentation" ||
-       type == "ParallelCoordinatesRepresentation")
+       type == "ParallelCoordinatesRepresentation" ||
+       type == "PlotMatrixRepresentation")
       {
       return true;
       }
@@ -128,6 +132,11 @@ public:
       {
       return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
       }
+    else if (type == "PlotMatrixRepresentation")
+      {
+      return new pqPlotMatrixDisplayPanel(proxy, p);
+      }
+
     return NULL;
     }
 };
@@ -192,6 +201,19 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
 
   this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
   l->addWidget(this->Internal->DisplayPanel);
+
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(portChanged(pqOutputPort*)),
+                this,
+                SLOT(setOutputPort(pqOutputPort*)));
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(viewChanged(pqView*)),
+                this,
+                SLOT(setView(pqView*)));
+  this->connect(&pqActiveObjects::instance(),
+                SIGNAL(representationChanged(pqRepresentation*)),
+                this,
+                SLOT(setRepresentation(pqRepresentation*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -326,6 +348,18 @@ void pqDisplayProxyEditorWidget::updatePanel()
     }
 
   this->layout()->addWidget(this->Internal->DisplayPanel);
+
+  // Add property PV_MUST_BE_MASTER to all its children
+  pqApplicationCore* core = pqApplicationCore::instance();
+  bool isMaster = core->getActiveServer()->isMaster();
+  foreach (QWidget* wdg, this->Internal->DisplayPanel->findChildren<QWidget*>())
+    {
+    wdg->setProperty("PV_MUST_BE_MASTER", QVariant(true));
+    if(!isMaster && wdg->isEnabled())
+      {
+      wdg->setEnabled(false);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

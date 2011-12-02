@@ -670,7 +670,10 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input,
 
   if (numProcs <= 1)
     {
-    output->ShallowCopy(input);
+    if (input)
+      {
+      output->ShallowCopy(input);
+      }
     return;
     }
 
@@ -731,7 +734,10 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input,
   int numProcs= this->Controller->GetNumberOfProcesses();
   if (numProcs == 1)
     {
-    output->ShallowCopy(input);
+    if (input)
+      {
+      output->ShallowCopy(input);
+      }
     return;
     }
 
@@ -925,6 +931,11 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataObject* da
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
 {
+  if (this->ClientDataServerSocketController == NULL)
+    {
+    return;
+    }
+
   int myId = this->Controller->GetLocalProcessId();
 
   if (myId == 0)

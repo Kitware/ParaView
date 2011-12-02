@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="camera">
     <CameraProxy name="Camera" class="vtkCamera"
-      processes="client|dataserver|renderserver" >
+      processes="client" > <!-- |dataserver|renderserver -->
       <DoubleVectorProperty
         name="CameraPositionInfo"
         command="GetPosition"
@@ -17,6 +17,7 @@
         number_of_elements="3"
         information_property="CameraPositionInfo"
         immediate_update="1"
+        ignore_synchronization="1"
         default_values="0 0 1">
       </DoubleVectorProperty>
 
@@ -35,6 +36,7 @@
         number_of_elements="3"
         information_property="CameraFocalPointInfo"
         immediate_update="1"
+        ignore_synchronization="1"
         default_values="0 0 0">
       </DoubleVectorProperty>
 
@@ -53,6 +55,7 @@
         number_of_elements="3"
         information_property="CameraViewUpInfo"
         immediate_update="1"
+        ignore_synchronization="1"
         default_values="0 1 0">
       </DoubleVectorProperty>
 
@@ -69,6 +72,7 @@
         information_property="CameraViewAngleInfo"
         number_of_elements="1"
         immediate_update="1"
+        ignore_synchronization="1"
         default_values="30">
       </DoubleVectorProperty>
 
@@ -87,6 +91,7 @@
         number_of_elements="2"
         information_property="CameraClippingRangeInfo"
         immediate_update="1"
+        ignore_synchronization="1"
         default_values="0.01 1000.01">
       </DoubleVectorProperty>
 
@@ -95,6 +100,7 @@
         command="SetParallelScale"
         information_property="CameraParallelScaleInfo"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="1.0">
       </DoubleVectorProperty>
 
@@ -111,6 +117,7 @@
         name="CameraParallelProjection"
         command="SetParallelProjection"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -119,6 +126,7 @@
         name="EyeAngle"
         command="SetEyeAngle"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="2.0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>

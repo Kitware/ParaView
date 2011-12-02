@@ -335,7 +335,7 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     {
     // Find characters after last "."
     size_t found = extension.find_last_of(".");
-    if(found != -1)
+    if(found != vtkstd::string::npos)
       {
       extension = extension.substr(found+1);
       }

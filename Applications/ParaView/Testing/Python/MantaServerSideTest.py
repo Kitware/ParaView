@@ -48,7 +48,7 @@ hack3 = 'pqClientMainWindow/menubar'
 QtTesting.playCommand(hack3, 'activate', 'menuSources')
 hack4 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(hack4, 'activate', 'SphereSource')
-object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object6 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object6, 'activate', '')
 
 #test sphere 'glyphs' while we are at it

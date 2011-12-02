@@ -34,9 +34,9 @@ SET (Kit_SRCS
   vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
+  vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkMPIMoveData.cxx
   vtkNetworkAccessManager.cxx
   vtkNetworkImageSource.cxx
   vtkOutlineRepresentation.cxx
@@ -71,11 +71,14 @@ SET (Kit_SRCS
   vtkPVInformation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMultiClientsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
+  vtkPVPlotMatrixView.cxx
+  vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginTracker.cxx

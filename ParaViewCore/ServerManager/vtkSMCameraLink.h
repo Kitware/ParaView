@@ -56,6 +56,15 @@ public:
   // \c interactive indicates if the render is interactive or not.
   virtual void UpdateViews(vtkSMProxy* caller, bool interactive);
 //BTX
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMCameraLink();
   ~vtkSMCameraLink();
@@ -79,7 +88,7 @@ protected:
 
   // Description:
   // Save the state of the link.
-  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
+  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
 
   // Description:
   // Internal method to copy vtkSMproperty values from caller to all linked
@@ -91,6 +100,11 @@ protected:
   void ResetCamera(vtkObject* caller);
 
   int SynchronizeInteractiveRenders;
+
+  // Description:
+  // Update the internal protobuf state
+  virtual void UpdateState();
+
 private:
 
   class vtkInternals;

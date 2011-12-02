@@ -4,6 +4,11 @@ SET (TESTS_WITHOUT_BASELINES
 
 SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
+#  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseLine.py
+#  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRContour.py
+#  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRDualClip.py
+#  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.py
+#  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.py
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
@@ -66,7 +71,7 @@ SET (StreamingServerSideTest_BREAK TRUE)
 SET(SaveLargeScreenshot_THRESHOLD 10000)
 SET(SLACTools_THRESHOLD 20)
 
-add_client_tests(
+add_client_tests("pypv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   PARALLEL)
 

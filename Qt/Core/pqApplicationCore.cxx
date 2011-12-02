@@ -90,6 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -185,6 +186,8 @@ void pqApplicationCore::constructor()
   QObject::connect(this->ServerManagerObserver,
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(onStateSaved(vtkPVXMLElement*)));
+  // CAUTION: We do not want to connect this slot to aboutToQuit()
+  //  => See prepareForQuit() for more details.
   QObject::connect(QCoreApplication::instance(),SIGNAL(lastWindowClosed()),
     this, SLOT(prepareForQuit()));
 
@@ -646,6 +649,11 @@ pqServer* pqApplicationCore::getActiveServer() const
 //-----------------------------------------------------------------------------
 void pqApplicationCore::prepareForQuit()
 {
+  foreach(pqServer* server, this->getServerManagerModel()->findChildren<pqServer*>())
+    {
+    server->session()->PreDisconnection();
+    }
+
   // As tempting as it is to connect this slot to
   // aboutToQuit() signal, it doesn't work since that signal is not
   // fired until the event loop exits, which doesn't happen until animation

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtTestingConfigure.h"
 
+#include "pqCollaborationEventPlayer.h"
 #include "pqApplicationCore.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorButtonEventTranslator.h"
@@ -128,6 +129,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFlatTreeViewEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqColorButtonEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+      new pqCollaborationEventPlayer(this));
 }
 
 //-----------------------------------------------------------------------------

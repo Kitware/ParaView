@@ -29,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -108,7 +108,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqProxyTabWidget" name="proxyTabWidget"/>
+   <widget class="pqObjectInspectorWidget" name="proxyTabWidget"/>
   </widget>
   <widget class="QDockWidget" name="statisticsDock">
    <property name="allowedAreas">
@@ -158,12 +158,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqProxyTabWidget</class>
-   <extends>QWidget</extends>
-   <header>pqProxyTabWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqViewManager</class>
    <extends>QWidget</extends>
    <header>pqViewManager.h</header>
@@ -196,6 +190,12 @@
    <class>pqComparativeVisPanel</class>
    <extends>QWidget</extends>
    <header>pqComparativeVisPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqObjectInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqObjectInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

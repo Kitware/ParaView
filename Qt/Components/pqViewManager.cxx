@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUtilities.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
-#include "vtkSMCacheBasedProxyLocator.h"
 
 // Qt includes.
 #include <QAction>
@@ -455,7 +454,7 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   for(; iter != this->Internal->Frames.end(); ++iter)
     {
     pqView* view = iter.value();
-    elem->GetViewStateCache()->StoreProxyState(view->getProxy());
+    elem->StoreProxyState(view->getProxy());
     }
 }
 

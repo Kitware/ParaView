@@ -17,26 +17,36 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
+#include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
+#include "vtkNew.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkSIProxy.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
+#include "vtkReservedRemoteObjectIds.h"
+#include "vtkSocketController.h"
+#include "vtkSIProxyDefinitionManager.h"
 
+#include <assert.h>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
+#include <vtkstd/string>
+#include <vtkstd/vector>
+#include <vtkstd/map>
 
-#include <assert.h>
-
-
+//****************************************************************************/
+//                    Internal Classes and typedefs
+//****************************************************************************/
 namespace
 {
   void RMICallback(void *localArg,
@@ -54,20 +64,181 @@ namespace
     self->OnCloseSessionRMI();
     }
 };
+//****************************************************************************/
+class vtkPVSessionServer::vtkInternals
+{
+public:
+  vtkInternals(vtkPVSessionServer* owner)
+    {
+    this->SatelliteServerSession =
+        (vtkProcessModule::GetProcessModule()->GetPartitionId() > 0);
+    this->Owner = owner;
 
+    // Attach callbacks
+    this->CompositeMultiProcessController->AddRMICallback(
+        &RMICallback, this->Owner,
+        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+
+    this->CompositeMultiProcessController->AddRMICallback(
+        &CloseSessionCallback, this->Owner,
+        vtkPVSessionServer::CLOSE_SESSION);
+
+    this->CompositeMultiProcessController->AddObserver(
+        vtkCompositeMultiProcessController::CompositeMultiProcessControllerChanged,
+        this, &vtkPVSessionServer::vtkInternals::ReleaseDeadClientSIObjects);
+
+    this->Owner->GetSessionCore()->GetProxyDefinitionManager()->AddObserver(
+        vtkCommand::RegisterEvent, this,
+        &vtkPVSessionServer::vtkInternals::CallBackProxyDefinitionManagerHasChanged);
+    this->Owner->GetSessionCore()->GetProxyDefinitionManager()->AddObserver(
+        vtkCommand::UnRegisterEvent, this,
+        &vtkPVSessionServer::vtkInternals::CallBackProxyDefinitionManagerHasChanged);
+    }
+  //-----------------------------------------------------------------
+  void CloseActiveController()
+    {
+    // FIXME: Maybe we want to keep listening even if no more client is
+    // connected.
+    if(this->CompositeMultiProcessController->UnRegisterActiveController() == 0)
+      {
+      vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()
+          ->AbortPendingConnection();
+      }
+    }
+  //-----------------------------------------------------------------
+  void CreateController(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+    {
+    vtkNetworkAccessManager* nam =
+        vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
+    vtkSocketController* ccontroller =
+        vtkSocketController::SafeDownCast(
+            nam->NewConnection(this->ClientURL.c_str()));
+    if (ccontroller)
+      {
+      ccontroller->GetCommunicator()->AddObserver(
+          vtkCommand::WrongTagEvent, this->Owner,
+          &vtkPVSessionServer::OnWrongTagEvent);
+
+      this->CompositeMultiProcessController->RegisterController(ccontroller);
+      ccontroller->FastDelete();
+      }
+    }
+  //-----------------------------------------------------------------
+  void SetClientURL(const char* client_url)
+    {
+    this->ClientURL = client_url;
+    }
+  //-----------------------------------------------------------------
+  void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
+    {
+    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    this->CompositeMultiProcessController->TriggerRMI2All(
+        1, (void*)data.c_str(), data.size(),
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, false);
+    }
+    //-----------------------------------------------------------------
+  void NotifyAllClients(vtkSMMessage* msgToBroadcast)
+    {
+    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    this->CompositeMultiProcessController->TriggerRMI2All(
+        1, (void*)data.c_str(), data.size(),
+        vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, true);
+    }
+  //-----------------------------------------------------------------
+  vtkCompositeMultiProcessController* GetActiveController()
+    {
+    if(this->SatelliteServerSession)
+      {
+      return NULL;
+      }
+    return this->CompositeMultiProcessController.GetPointer();
+    }
+  //-----------------------------------------------------------------
+  // Manage share_only message and return true if no processing should occurs
+  bool StoreShareOnly(vtkSMMessage* msg)
+    {
+    if(msg && msg->share_only())
+      {
+      vtkTypeUInt32 id = msg->global_id();
+      this->ShareOnlyCache[id].CopyFrom(*msg);
+      return true;
+      }
+    return false;
+    }
+  //-----------------------------------------------------------------
+  bool IsSatelliteSession()
+    {
+    return this->SatelliteServerSession;
+    }
+
+  //-----------------------------------------------------------------
+  // Return true if the message was updated by the ShareOnlyCache
+  bool RetreiveShareOnly(vtkSMMessage* msg)
+    {
+    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter =
+        this->ShareOnlyCache.find(msg->global_id());
+    if(iter != this->ShareOnlyCache.end())
+      {
+      msg->CopyFrom(iter->second);
+      return true;
+      }
+    return false;
+    }
+  //-----------------------------------------------------------------
+  void ReleaseDeadClientSIObjects(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+    {
+    int nbCtrls = this->CompositeMultiProcessController->GetNumberOfControllers();
+
+    vtkstd::vector<int> alivedClients(nbCtrls);
+    for(int i = 0; i < nbCtrls; i++)
+      {
+      alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
+      }
+    if(alivedClients.size() > 0)
+      {
+      this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
+      }
+    }
+  //-----------------------------------------------------------------
+  void CallBackProxyDefinitionManagerHasChanged(vtkObject* vtkNotUsed(src), unsigned long vtkNotUsed(event), void* vtkNotUsed(data))
+    {
+    vtkSMMessage proxyDefinitionManagerState;
+    this->Owner->GetSessionCore()->GetSIObject(
+        vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID)
+        ->Pull(&proxyDefinitionManagerState);
+    this->NotifyOtherClients(&proxyDefinitionManagerState);
+    }
+
+private:
+  vtkNew<vtkCompositeMultiProcessController> CompositeMultiProcessController;
+  vtkWeakPointer<vtkPVSessionServer> Owner;
+  vtkstd::string ClientURL;
+  vtkstd::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
+  bool SatelliteServerSession;
+};
+//****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
 vtkPVSessionServer::vtkPVSessionServer()
 {
-  this->ClientController = 0;
-  this->ActivateObserverId = 0;
-  this->DeActivateObserverId = 0;
+  this->Internal = new vtkInternals(this);
+
+  // By default we act as a server for a single client
+  this->MultipleConnection = false;
+
+  // On server side only one session is available so we just set it Active()
+  // forever
+  if(vtkProcessModule::GetProcessModule())
+    {
+    this->Activate();
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVSessionServer::~vtkPVSessionServer()
 {
-  this->SetClientController(0);
+  delete this->Internal;
+  this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -75,8 +246,8 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
 {
   switch (processType)
     {
-  case CLIENT:
-    return this->ClientController;
+    case CLIENT:
+    return this->Internal->GetActiveController();
 
   default:
     // we shouldn't warn.
@@ -87,54 +258,13 @@ vtkMultiProcessController* vtkPVSessionServer::GetController(ServerFlags process
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionServer::SetClientController(
-  vtkMultiProcessController* controller)
-{
-  if (this->ClientController == controller)
-    {
-    return;
-    }
-
-  if (this->ClientController)
-    {
-    this->ClientController->RemoveAllRMICallbacks(
-      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->ClientController->RemoveAllRMICallbacks(
-      vtkPVSessionServer::CLOSE_SESSION);
-    this->ClientController->RemoveObserver(this->ActivateObserverId);
-    this->ClientController->RemoveObserver(this->DeActivateObserverId);
-    this->ActivateObserverId = 0;
-    this->DeActivateObserverId = 0;
-    }
-
-  vtkSetObjectBodyMacro(
-    ClientController, vtkMultiProcessController, controller);
-
-  if (this->ClientController)
-    {
-    this->ClientController->AddRMICallback(
-      &RMICallback, this,
-      vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
-    this->ClientController->AddRMICallback(
-      &CloseSessionCallback, this,
-      vtkPVSessionServer::CLOSE_SESSION);
-    this->ActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::StartEvent, this, &vtkPVSessionServer::Activate);
-    this->DeActivateObserverId = this->ClientController->AddObserver(
-      vtkCommand::EndEvent, this, &vtkPVSessionServer::DeActivate);
-    this->ClientController->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this, &vtkPVSessionServer::OnWrongTagEvent);
-    }
-}
-
-//----------------------------------------------------------------------------
 bool vtkPVSessionServer::Connect()
 {
   vtksys_ios::ostringstream url;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (pm->GetPartitionId() > 0)
+  if (this->Internal->IsSatelliteSession())
     {
     return true;
     }
@@ -176,7 +306,6 @@ bool vtkPVSessionServer::Connect(const char* url)
     return true;
     }
 
-
   vtkNetworkAccessManager* nam =
     vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
 
@@ -200,6 +329,7 @@ bool vtkPVSessionServer::Connect(const char* url)
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
+    stream << (this->MultipleConnection ? "&multiple=true" : "");
     client_url = stream.str();
     }
   else if (pvserver_reverse.find(url))
@@ -231,6 +361,7 @@ bool vtkPVSessionServer::Connect(const char* url)
       {
       vtksys_ios::ostringstream stream;
       stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
+      stream << (this->MultipleConnection ? "&multiple=true" : "");
       client_url = stream.str();
       }
     }
@@ -262,14 +393,22 @@ bool vtkPVSessionServer::Connect(const char* url)
 
   vtkMultiProcessController* ccontroller =
     nam->NewConnection(client_url.c_str());
+  this->Internal->SetClientURL(client_url.c_str());
   if (ccontroller)
     {
-    this->SetClientController(ccontroller);
-    ccontroller->Delete();
+    this->Internal->GetActiveController()->RegisterController(ccontroller);
+    ccontroller->FastDelete();
     cout << "Client connected." << endl;
     }
 
-  return (this->ClientController != NULL);
+  if(this->MultipleConnection && this->Internal->GetActiveController())
+    {
+    // Listen for new client controller creation
+    nam->AddObserver( vtkCommand::ConnectionCreatedEvent, this->Internal,
+                      &vtkInternals::CreateController);
+    }
+
+  return (this->Internal->GetActiveController() != NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -282,7 +421,7 @@ bool vtkPVSessionServer::GetIsAlive()
     }
 
   // TODO: check for validity
-  return (this->ClientController != NULL);
+  return (this->Internal->GetActiveController() != NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -301,7 +440,20 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->PushState(&msg);
+
+//      cout << "=================================" << endl;
+//      msg.PrintDebugString();
+//      cout << "=================================" << endl;
+
+      // Do we skip the processing ?
+      if(!this->Internal->StoreShareOnly(&msg))
+        {
+        this->PushState(&msg);
+        }
+
+      // Notify when ProxyManager state has changed
+      // or any other state change
+      this->SendToNonActiveClients(&msg);
       }
     break;
 
@@ -311,22 +463,35 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->PullState(&msg);
+
+      // Use cache or process the call
+      if(!this->Internal->RetreiveShareOnly(&msg))
+        {
+        this->PullState(&msg);
+        }
 
       // Send the result back to client
       vtkMultiProcessStream css;
       css << msg.SerializeAsString();
-      this->ClientController->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
+      this->Internal->GetActiveController()->Send( css, 1, vtkPVSessionServer::REPLY_PULL);
       }
     break;
-
-  case vtkPVSessionServer::DELETE_SI:
+  case vtkPVSessionServer::REGISTER_SI:
       {
       vtkstd::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
-      this->DeleteSIObject(&msg);
+      this->RegisterSIObject(&msg);
+      }
+    break;
+  case vtkPVSessionServer::UNREGISTER_SI:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->UnRegisterSIObject(&msg);
       }
     break;
 
@@ -335,7 +500,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
       int ignore_errors, size;
       stream >> ignore_errors >> size;
       unsigned char* css_data = new unsigned char[size+1];
-      this->ClientController->Receive(css_data, size, 1,
+      this->Internal->GetActiveController()->Receive(css_data, size, 1,
         vtkPVSessionServer::EXECUTE_STREAM_TAG);
       vtkClientServerStream cssStream;
       cssStream.SetData(css_data, size);
@@ -376,9 +541,9 @@ void vtkPVSessionServer::SendLastResultToClient()
   reply.GetData(&data, &size_size_t);
   size = static_cast<int>(size_size_t);
 
-  this->ClientController->Send(&size, 1, 1,
+  this->Internal->GetActiveController()->Send(&size, 1, 1,
     vtkPVSessionServer::REPLY_LAST_RESULT);
-  this->ClientController->Send(data, size, 1,
+  this->Internal->GetActiveController()->Send(data, size, 1,
     vtkPVSessionServer::REPLY_LAST_RESULT);
 }
 
@@ -405,9 +570,9 @@ void vtkPVSessionServer::GatherInformationInternal(
     const unsigned char* data;
     css.GetData(&data, &length);
     int len = static_cast<int>(length);
-    this->ClientController->Send(&len, 1, 1,
+    this->Internal->GetActiveController()->Send(&len, 1, 1,
       vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
-    this->ClientController->Send(const_cast<unsigned char*>(data),
+    this->Internal->GetActiveController()->Send(const_cast<unsigned char*>(data),
       length, 1, vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
   else
@@ -415,7 +580,7 @@ void vtkPVSessionServer::GatherInformationInternal(
     vtkErrorMacro("Could not create information object.");
     // let client know that gather failed.
     int len = 0;
-    this->ClientController->Send(&len, 1, 1,
+    this->Internal->GetActiveController()->Send(&len, 1, 1,
       vtkPVSessionServer::REPLY_GATHER_INFORMATION_TAG);
     }
 }
@@ -425,9 +590,7 @@ void vtkPVSessionServer::OnCloseSessionRMI()
 {
   if (this->GetIsAlive())
     {
-    vtkSocketCommunicator::SafeDownCast(
-      this->ClientController->GetCommunicator())->CloseConnection();
-    this->SetClientController(0);
+    this->Internal->CloseActiveController();
     }
 }
 
@@ -435,4 +598,15 @@ void vtkPVSessionServer::OnCloseSessionRMI()
 void vtkPVSessionServer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::SendToNonActiveClients(vtkSMMessage* msg)
+{
+  this->Internal->NotifyOtherClients(msg);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSessionServer::BroadcastToClients(vtkSMMessage* msg)
+{
+  this->Internal->NotifyAllClients(msg);
 }

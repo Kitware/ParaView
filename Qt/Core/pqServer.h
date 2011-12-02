@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServer_h
 #define _pqServer_h
 
+class vtkObject;
 class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
@@ -47,8 +48,10 @@ class vtkSMSession;
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessageMinimal.h"
 #include "vtkWeakPointer.h"
 #include <QPointer>
+#include <QTimer>
 
 /// pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
 /// subclass that represents a vtkSMSession. Besides providing API to access
@@ -80,6 +83,15 @@ public:
   /// Returns is this connection is a connection to a remote
   /// server or a built-in server.
   bool isRemote() const;
+
+  /// Returns true if the client is currently master. For non-collaborative
+  /// session, it always return true.
+  bool isMaster() const;
+
+  /// Returns true if the client is currently processing remote messages
+  /// and still have more to process.
+  /// This method is used to deffered the tryRender.
+  bool isProcessingPending() const;
 
   /// Returns true is this connection has a separate render-server and
   /// data-server.
@@ -158,9 +170,43 @@ protected:
   // updates all servers with the current settings.
   static void updateGlobalMapperProperties();
 
+  // ---- Collaboration client-to-clients communication mechanisme ----
+
+signals:
+  /// Allow user to listen messages from other clients.
+  /// But if you plan to push some state by for example calling
+  /// the sendToOtherClients(vtkSMMessage*) slot, you MUST queued your slot.
+  /// Otherwise your communication will not be sent to the server.
+  /// Here is a code sample on how to connect to that signal:
+  ///
+  ///    QObject::connect( server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
+  ///                      this,   SLOT(onClientMessage(vtkSMMessage*)),
+  ///                      Qt::QueuedConnection);
+  void sentFromOtherClient(vtkSMMessage* msg);
+
+  /// Signal triggered when user information get updated
+  void triggeredMasterUser(int);
+  void triggeredUserName(int, QString&);
+  void triggeredUserListChanged();
+  void triggerFollowCamera(int);
+
+public slots:
+  /// Allow user to broadcast to other client a given message
+  void sendToOtherClients(vtkSMMessage* msg);
+
+  // ---- Collaboration client-to-clients communication mechanisme ----
+
 protected slots:
   /// Called to send a heartbeat to the server.
   void heartBeat();
+
+  /// Called when idle to look for server notification for collaboration purpose
+  void processServerNotification();
+
+  /// Called by vtkSMCollaborationManager when associated message happen.
+  /// This will convert the given parameter into vtkSMMessage and
+  /// emit sentFromOtherClient(vtkSMMessage*) signal.
+  void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
 
 private:
   pqServer(const pqServer&);  // Not implemented.
@@ -175,6 +221,8 @@ private:
   // Each connection will eventually have a PVOptions object. 
   // For now, this is same as the vtkProcessModule::Options.
   vtkSmartPointer<vtkPVOptions> Options;
+
+  QTimer IdleCollaborationTimer;
 
   class pqInternals;
   pqInternals* Internals;

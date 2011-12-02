@@ -1,10 +1,13 @@
 project(PhastaAdaptor)
 cmake_minimum_required(VERSION 2.6)
-#include_directories(${CoProcessor_SOURCE_DIR})
-include_directories(${FortranAdaptor_SOURCE_DIR})
-# pull in ParaView.
-#find_package(ParaView)
-#include(${PARAVIEW_USE_FILE})
+
+include(FortranCInterface)
+
+FortranCInterface_HEADER(PhastaAdaptorAPIMangling.h SYMBOLS
+  createpointsandallocatecells insertblockofcells addfields)
+
+include_directories(${FortranAdaptor_BINARY_DIR} ${FortranAdaptor_SOURCE_DIR}
+  ${PhastaAdaptor_BINARY_DIR})
 
 set(PhastaAdaptor_SRCS
   PhastaAdaptor.cxx

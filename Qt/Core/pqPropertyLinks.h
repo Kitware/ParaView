@@ -125,6 +125,8 @@ public:
   bool getOutOfSync() const;
   void clearOutOfSync() const;
 
+  void clearUncheckedProperties();
+
   bool isEqual(vtkSMProxy* proxy, vtkSMProperty* property, int idx,
     QObject* qObject, const char* qproperty) const;
 signals: 

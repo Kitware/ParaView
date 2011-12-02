@@ -79,6 +79,8 @@ pqOptions::pqOptions()
   this->DisableLightKit = 0;
   this->CurrentImageThreshold = 12;
   this->PythonScript = 0;
+  this->TestMaster = 0;
+  this->TestSlave = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,6 +135,14 @@ void pqOptions::Initialize()
   this->AddArgument("--script", NULL,
     &this->PythonScript,
     "Set a python script to be evaluated on startup.");
+
+  this->AddBooleanArgument("--test-master", 0,
+    &this->TestMaster,
+    "(For testing) When present, tests master configuration.");
+
+  this->AddBooleanArgument("--test-slave", 0,
+    &this->TestSlave,
+    "(For testing) When present, tests slave configuration.");
 }
 
 //-----------------------------------------------------------------------------

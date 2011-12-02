@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "pqComponentsExport.h"
+#include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 class pqView;
 class vtkSMProxySelectionModel;
@@ -75,15 +77,18 @@ private slots:
   //active view. If so, we set the active view to 0.
   void onViewRemoved(pqView*);
 
+  void onSessionCreated();
+  void onSessionClosed();
+
 private:
   pqActiveView();
   pqActiveView(const pqActiveView&); // Not implemented.
   void operator=(const pqActiveView&); // Not implemented.
   ~pqActiveView();
 
-  vtkEventQtSlotConnect* VTKConnect;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqView* ActiveView;
-  vtkSMProxySelectionModel* SMActiveView;
+  vtkWeakPointer<vtkSMProxySelectionModel> SMActiveView;
 };
 
 #endif

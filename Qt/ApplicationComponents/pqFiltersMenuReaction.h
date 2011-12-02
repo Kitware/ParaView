@@ -54,7 +54,7 @@ public:
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  virtual void updateEnableState();
 
   /// Creates a filter of the given type.
   static pqPipelineSource* createFilter(
@@ -66,6 +66,7 @@ protected slots:
     { pqFiltersMenuReaction::createFilter(group, name); } 
 
   void onDataUpdated();
+
 private:
   Q_DISABLE_COPY(pqFiltersMenuReaction)
 

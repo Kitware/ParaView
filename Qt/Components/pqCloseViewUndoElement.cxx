@@ -36,17 +36,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyLocator.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMCacheBasedProxyLocator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStateLocator.h"
+#include "vtkSMDeserializerProtobuf.h"
+#include "vtkSMProxyProperty.h"
 
 #include "pqApplicationCore.h"
 #include "pqViewManager.h"
+
+#include "vtkCollection.h"
 
 vtkStandardNewMacro(pqCloseViewUndoElement);
 //----------------------------------------------------------------------------
 pqCloseViewUndoElement::pqCloseViewUndoElement()
 {
   this->Index = NULL;
-  this->ViewStateCache = vtkSMCacheBasedProxyLocator::New();
+  this->StateCache = vtkSMStateLocator::New();
+
+  this->CacheDeserializer = vtkSMDeserializerProtobuf::New();
+  this->CacheDeserializer->SetStateLocator(this->StateCache);
+
+  this->ProxyLocator = vtkSMProxyLocator::New();
+  this->ProxyLocator->SetDeserializer(this->CacheDeserializer);
+  this->ProxyLocator->UseSessionToLocateProxy(true);
+
   this->SetSession(NULL); // Maybe keep the one use to create the Element for state loading...
 }
 
@@ -54,7 +67,15 @@ pqCloseViewUndoElement::pqCloseViewUndoElement()
 pqCloseViewUndoElement::~pqCloseViewUndoElement()
 {
   this->SetIndex(NULL);
-  this->ViewStateCache->Delete();
+
+  this->ProxyLocator->Delete();
+  this->ProxyLocator = NULL;
+
+  this->CacheDeserializer->Delete();
+  this->CacheDeserializer = NULL;
+
+  this->StateCache->Delete();
+  this->StateCache = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -68,17 +89,32 @@ void pqCloseViewUndoElement::CloseView(
 //----------------------------------------------------------------------------
 int pqCloseViewUndoElement::Undo()
 {
-    pqViewManager* manager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  // Make sure that the associated representation get created again
+  bool oldCanCreateProxy = vtkSMProxyProperty::CanCreateProxy();
+  vtkSMProxyProperty::EnableProxyCreation();
+
+  pqViewManager* manager = qobject_cast<pqViewManager*>(
+      pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
   if (!manager)
     {
+    if(!oldCanCreateProxy)
+      {
+      vtkSMProxyProperty::DisableProxyCreation();
+      }
     vtkErrorMacro("Failed to locate the multi view manager. "
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
-  manager->loadState(this->State, this->ViewStateCache);
-  this->ViewStateCache->GetLocatedProxies(this->UndoSetWorkingContext);
-  this->ViewStateCache->Clear();
+  manager->loadState(this->State, this->ProxyLocator);
+  this->ProxyLocator->GetLocatedProxies(this->UndoSetWorkingContext);
+
+  this->ProxyLocator->Clear();
+
+  // Bring back the old context
+  if(!oldCanCreateProxy)
+    {
+    vtkSMProxyProperty::DisableProxyCreation();
+    }
   return 1;
 }
 
@@ -104,6 +140,21 @@ int pqCloseViewUndoElement::Redo()
 void pqCloseViewUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Multi-view state:" << endl;
+  this->State->PrintXML(os, indent.GetNextIndent());
+  os << indent << "Saved frame state:" << endl;
+  this->CacheDeserializer->PrintSelf(os, indent.GetNextIndent());
+}
+
+//----------------------------------------------------------------------------
+void pqCloseViewUndoElement::StoreProxyState(vtkSMProxy* proxy)
+{
+  // Make sure we provide a valid session to the deserializer and locator
+  this->CacheDeserializer->SetSession(proxy->GetSession());
+  this->ProxyLocator->SetSession(proxy->GetSession());
+
+  // Register proxy state with all its sub-proxy
+  this->StateCache->RegisterFullState(proxy);
 }
 
 

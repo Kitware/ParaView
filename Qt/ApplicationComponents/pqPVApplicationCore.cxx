@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
+#include "pqApplyPropertiesManager.h"
 #include "pqAnimationManager.h"
 #include "pqComponentsInit.h"
 #include "pqComponentsTestUtility.h"
@@ -57,6 +58,7 @@ pqPVApplicationCore::pqPVApplicationCore(
   // Initialize pqComponents resources.
   pqComponentsInit();
 
+  this->ApplyPropertiesManger = new pqApplyPropertiesManager(this);
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
 
@@ -109,6 +111,12 @@ void pqPVApplicationCore::quickLaunch()
       }
     dialog.exec();
     }
+}
+
+//-----------------------------------------------------------------------------
+pqApplyPropertiesManager* pqPVApplicationCore::applyPropertiesManager() const
+{
+  return this->ApplyPropertiesManger;
 }
 
 //-----------------------------------------------------------------------------

@@ -40,6 +40,7 @@ import servermanager
 
 def _disconnect():
     if servermanager.ActiveConnection:
+        servermanager.ProxyManager().DisableStateUpdateNotification()
         servermanager.ProxyManager().UnRegisterProxies()
         active_objects.view = None
         active_objects.source = None
@@ -56,10 +57,21 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
 
-    tk =  servermanager.misc.TimeKeeper()
-    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
-    scene = AnimationScene()
-    scene.TimeKeeper = tk
+    servermanager.ProxyManager().DisableStateUpdateNotification()
+    servermanager.ProxyManager().UpdateFromRemote()
+    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    if not tk:
+       tk = servermanager.misc.TimeKeeper()
+       servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
+
+    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
+    if not scene:
+       scene = AnimationScene()
+       scene.TimeKeeper = tk
+
+    servermanager.ProxyManager().EnableStateUpdateNotification()
+    servermanager.ProxyManager().TriggerStateUpdate()
+
     return session
 
 def ReverseConnect(port=11111):
@@ -68,10 +80,22 @@ def ReverseConnect(port=11111):
     _disconnect()
     session = servermanager.ReverseConnect(port)
     _add_functions(globals())
-    tk =  servermanager.misc.TimeKeeper()
-    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
-    scene = AnimationScene()
-    scene.TimeKeeper = tk
+
+    servermanager.ProxyManager().DisableStateUpdateNotification()
+    servermanager.ProxyManager().UpdateFromRemote()
+    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    if not tk:
+       tk = servermanager.misc.TimeKeeper()
+       servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
+
+    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
+    if not scene:
+       scene = AnimationScene()
+       scene.TimeKeeper = tk
+
+    servermanager.ProxyManager().EnableStateUpdateNotification()
+    servermanager.ProxyManager().TriggerStateUpdate()
+
     return session
 
 def _create_view(view_xml_name):
@@ -891,9 +915,6 @@ class ActiveObjects(object):
         "Internal method."
         pxm = servermanager.ProxyManager()
         model = pxm.GetSelectionModel(name)
-        if not model:
-            model = servermanager.vtkSMProxySelectionModel()
-            pxm.RegisterSelectionModel(name, model)
         return model
 
     def set_view(self, view):
@@ -1025,5 +1046,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
 
 if not servermanager.ActiveConnection:
     Connect()
+else:
+    _add_functions(globals())
 
 active_objects = ActiveObjects()

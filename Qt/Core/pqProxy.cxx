@@ -42,9 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqUndoStack.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
 
 #include <QMap>
 #include <QList>
+#include <QString>
+#include <QStringList>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -77,6 +82,18 @@ pqProxy::pqProxy(const QString& group, const QString& name,
 //-----------------------------------------------------------------------------
 pqProxy::~pqProxy()
 {
+  // Attach listener for proxy registration to handle helper proxy
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerObserver* observer = core->getServerManagerObserver();
+  QObject::disconnect(observer,
+                      SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
+                      this,
+                      SLOT(onProxyRegistered(const QString&, const QString&, vtkSMProxy*)));
+  QObject::disconnect(observer,
+                      SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)),
+                      this,
+                      SLOT(onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
+
   this->clearHelperProxies();
   delete this->Internal;
 }
@@ -92,10 +109,11 @@ void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
 
   if (!already_added)
     {
+    // We call that method so sub-class can update domain or do what ever...
+    this->addInternalHelperProxy(key, proxy);
+
     QString groupname = QString("pq_helper_proxies.%1").arg(
       this->getProxy()->GetGlobalIDAsString());
-
-    this->Internal->ProxyLists[key].push_back(proxy);
     vtkSMProxyManager* pxm = proxy->GetProxyManager();
     pxm->RegisterProxy(groupname.toAscii().data(), 
       key.toAscii().data(), proxy);
@@ -111,11 +129,11 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
     return;
     }
 
+  // We call that method so sub-class can update domain or do what ever...
+  this->removeInternalHelperProxy(key, proxy);
+
   if (this->Internal->ProxyLists.contains(key))
     {
-    this->Internal->ProxyLists[key].removeAll(proxy);
-
-
     QString groupname = QString("pq_helper_proxies.%1").arg(
       this->getProxy()->GetGlobalIDAsString());
     vtkSMProxyManager* pxm = proxy->GetProxyManager();
@@ -136,12 +154,7 @@ void pqProxy::updateHelperProxies() const
   iter->SetModeToOneGroup();
   for (iter->Begin(groupname.toAscii().data()); !iter->IsAtEnd(); iter->Next())
     {
-    const char* key = iter->GetKey();
-    vtkSMProxy* proxy = iter->GetProxy();
-    if (proxy != NULL && !this->Internal->ProxyLists[key].contains(proxy))
-      {
-      this->Internal->ProxyLists[key].push_back(proxy);
-      }
+    this->addInternalHelperProxy(QString(iter->GetKey()), iter->GetProxy());
     }
   iter->Delete();
 }
@@ -352,4 +365,57 @@ vtkSMProxyManager* pqProxy::proxyManager() const
 {
   return this->Internal->Proxy ?
     this->Internal->Proxy->GetProxyManager() : NULL;
+}
+//-----------------------------------------------------------------------------
+void pqProxy::initialize()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerObserver* observer = core->getServerManagerObserver();
+
+  // Attach listener for proxy registration to handle helper proxy
+  QObject::connect(observer,
+                   SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
+                   this,
+                   SLOT(onProxyRegistered(const QString&, const QString&, vtkSMProxy*)));
+  QObject::connect(observer,
+                   SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)),
+                   this,
+                   SLOT(onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
+
+  // Update helper proxy if any of them are already registered in ProxyManager
+  this->updateHelperProxies();
+}
+//-----------------------------------------------------------------------------
+void pqProxy::addInternalHelperProxy(const QString& key, vtkSMProxy* proxy) const
+{
+  if(!proxy || this->Internal->ProxyLists[key].contains(proxy))
+    {
+    return; // No proxy to add
+    }
+
+  this->Internal->ProxyLists[key].push_back(proxy);
+}
+//-----------------------------------------------------------------------------
+void pqProxy::removeInternalHelperProxy(const QString& key, vtkSMProxy* proxy) const
+{
+  if (this->Internal->ProxyLists.contains(key))
+    {
+    this->Internal->ProxyLists[key].removeAll(proxy);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqProxy::onProxyRegistered(const QString& group, const QString& name, vtkSMProxy* proxy)
+{
+  if(group == QString("pq_helper_proxies.%1").arg(this->getProxy()->GetGlobalIDAsString()))
+    {
+    this->addInternalHelperProxy(name, proxy);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqProxy::onProxyUnRegistered(const QString& group, const QString& name, vtkSMProxy* proxy)
+{
+  if(group == QString("pq_helper_proxies.%1").arg(this->getProxy()->GetGlobalIDAsString()))
+    {
+    this->removeInternalHelperProxy(name, proxy);
+    }
 }

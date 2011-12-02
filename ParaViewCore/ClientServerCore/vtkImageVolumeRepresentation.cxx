@@ -16,7 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
-#include "vtkFixedPointVolumeRayCastMapper.h"
+#include "vtkSmartVolumeMapper.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -35,21 +35,13 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-class vtkImageVolumeRepresentation::vtkInternals
-{
-public:
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkVolumeMapper> >
-    MapOfMappers;
-  MapOfMappers Mappers;
-  vtkstd::string ActiveVolumeMapper;
-};
 
 vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 {
-  this->Internals = new vtkInternals();
-  this->DefaultMapper = vtkFixedPointVolumeRayCastMapper::New();
+  this->RequestedRenderMode = 0; // Use Smart Mode
+  this->VolumeMapper = vtkSmartVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
 
   this->Actor = vtkPVLODVolume::New();
@@ -79,8 +71,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
 {
-  delete this->Internals;
-  this->DefaultMapper->Delete();
+  this->VolumeMapper->Delete();
   this->Property->Delete();
   this->Actor->Delete();
   this->OutlineSource->Delete();
@@ -92,36 +83,6 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->SetColorArrayName(0);
 
   this->Cache->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::AddVolumeMapper(
-  const char* name, vtkVolumeMapper* mapper)
-{
-  this->Internals->Mappers[name] = mapper;
-}
-
-//----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetActiveVolumeMapper(const char* mapper)
-{
-  this->Internals->ActiveVolumeMapper = mapper? mapper : "";
-  this->MarkModified();
-}
-
-//----------------------------------------------------------------------------
-vtkVolumeMapper* vtkImageVolumeRepresentation::GetActiveVolumeMapper()
-{
-  if (this->Internals->ActiveVolumeMapper != "")
-    {
-    vtkInternals::MapOfMappers::iterator iter =
-      this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
-    if (iter != this->Internals->Mappers.end() && iter->second.GetPointer())
-      {
-      return iter->second.GetPointer();
-      }
-    }
-
-  return this->DefaultMapper;
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +158,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     this->CacheKeeper->Update();
 
     this->Actor->SetEnableLOD(0);
-    this->GetActiveVolumeMapper()->SetInputConnection(
+    this->VolumeMapper->SetInputConnection(
       this->CacheKeeper->GetOutputPort());
 
     this->OutlineSource->SetBounds(vtkImageData::SafeDownCast(
@@ -208,7 +169,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     // when no input is present, it implies that this processes is on a node
     // without the data input i.e. either client or render-server, in which case
     // we show only the outline.
-    this->GetActiveVolumeMapper()->RemoveAllInputs();
+    this->VolumeMapper->RemoveAllInputs();
     this->Actor->SetEnableLOD(1);
     }
 
@@ -260,20 +221,20 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::UpdateMapperParameters()
 {
-  vtkVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
-  activeMapper->SelectScalarArray(this->ColorArrayName);
+  this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
+  this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
   switch (this->ColorAttributeType)
     {
   case CELL_DATA:
-    activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
   case POINT_DATA:
   default:
-    activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
     break;
     }
-  this->Actor->SetMapper(activeMapper);
+  this->Actor->SetMapper(this->VolumeMapper);
 }
 
 //----------------------------------------------------------------------------

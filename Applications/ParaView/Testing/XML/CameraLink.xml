@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Cone" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Cylinder" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
   <pqevent object="pqClientMainWindow/pqLinksManager/addButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="currentChanged" arguments="/0/0|0" />

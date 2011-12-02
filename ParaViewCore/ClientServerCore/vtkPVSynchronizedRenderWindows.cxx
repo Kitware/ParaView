@@ -283,7 +283,11 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Enabled = true;
-  this->RenderEventPropagation = true;
+
+  // we no longer support render even propagation. This leads to unnecessary
+  // complications since it results in code have different paths on client and
+  // servers.
+  this->RenderEventPropagation = false;
   this->RenderOneViewAtATime = false;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -449,6 +453,11 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
   // triggers from the client.
   if (controller && this->Mode == RENDER_SERVER)
     {
+    // Only one RMICallback for PVSynchronizedRenderWindow can live at a time
+    controller->RemoveAllRMICallbacks(SYNC_MULTI_RENDER_WINDOW_TAG);
+    controller->RemoveAllRMICallbacks(GET_ZBUFFER_VALUE_TAG);
+
+    // Attach the one
     this->ClientServerRMITag =
       controller->AddRMICallback(::RenderRMI, this, SYNC_MULTI_RENDER_WINDOW_TAG);
     this->ClientServerGetZBufferValueRMITag =
@@ -639,6 +648,11 @@ void vtkPVSynchronizedRenderWindows::SetWindowSize(unsigned int id,
 {
   this->Internals->RenderWindows[id].Size[0] = width;
   this->Internals->RenderWindows[id].Size[1] = height;
+
+  // Make sure none of the dimension is 0
+  width = width ? width : 10;
+  height = height ? height : 10;
+
   if (this->Mode == BUILTIN || this->Mode == CLIENT)
     {
     vtkRenderWindow* window = this->GetRenderWindow(id);
@@ -814,7 +828,7 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
   // smart about it?
   this->SaveWindowAndLayout(renWin, stream);
 
-  this->ClientServerController->Broadcast(stream, 0);
+  this->ClientServerController->Send(stream, 1, 22222);
 
   this->UpdateWindowLayout();
 
@@ -834,7 +848,7 @@ void vtkPVSynchronizedRenderWindows::RootStartRender(vtkRenderWindow* renWin)
     {
     // * Get window layout from the server. $CODE_GET_LAYOUT_AND_UPDATE$
     vtkMultiProcessStream stream;
-    this->ClientServerController->Broadcast(stream, 1);
+    this->ClientServerController->Receive(stream, 1, 22222);
 
     // Load the layout for all the windows from the client.
     this->LoadWindowAndLayout(renWin, stream);

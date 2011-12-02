@@ -47,12 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
 // Qt Includes.
 #include <QPointer>
 #include <QList>
+#include <QString>
+#include <QStringList>
 #include <QMap>
 #include <QtDebug>
 

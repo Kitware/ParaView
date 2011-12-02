@@ -85,6 +85,12 @@ vtkPVXYChartView::~vtkPVXYChartView()
 }
 
 //----------------------------------------------------------------------------
+vtkAbstractContextItem* vtkPVXYChartView::GetContextItem()
+{
+  return this->GetChart();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetChartType(const char *type)
 {
   if (this->Chart)
