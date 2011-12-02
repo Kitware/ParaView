@@ -221,6 +221,14 @@ void pqServer::initialize()
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
     }
+
+  // Force a proper active SessionProxyManager once this one is fully initialized
+  // after a collaborative update
+  if(vtkSMProxyManager::GetProxyManager()->GetActiveSession() == this->Session)
+    {
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession((vtkSMSession*)NULL);
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
+    }
 }
 
 //-----------------------------------------------------------------------------

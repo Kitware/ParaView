@@ -311,7 +311,7 @@ void pqActiveObjects::onActiveServerChanged()
       pqApplicationCore::instance()->getServerManagerModel();
   pqServer* activeServer = smmodel->findServer(activeSession);
 
-  if(this->ActiveServer != activeServer)
+  if(activeServer)
     {
     this->setActiveServer(activeServer);
     }
@@ -320,7 +320,11 @@ void pqActiveObjects::onActiveServerChanged()
 
 void pqActiveObjects::setActiveServer(pqServer* server)
 {
-  if (this->ActiveServer == server)
+  // Make sure the active server has the proper listener setup
+  // in case of collaboration the object initialisation can cause a server to
+  // become active before any selection model get setup
+  if ( this->ActiveServer == server &&
+       this->VTKConnector->GetNumberOfConnections() > 1)
     {
     return;
     }
@@ -336,11 +340,11 @@ void pqActiveObjects::setActiveServer(pqServer* server)
 
   this->ActiveServer = server;
 
-  // FIXME: vtkSMProxyManager must fire an event when the active session is
-  // changed so that the active session can be changed from Python safely.
   vtkSMProxyManager::GetProxyManager()->SetActiveSession(
     server? server->session() : NULL);
-  if (server)
+  if ( server
+       && server->activeSourcesSelectionModel()
+       && server->activeViewSelectionModel())
     {
     this->VTKConnector->Connect(
       server->activeSourcesSelectionModel(), vtkCommand::CurrentChangedEvent,
