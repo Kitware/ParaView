@@ -94,3 +94,23 @@ void pqHelpReaction::showHelp(const QString& url)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqHelpReaction::showProxyHelp(const QString& group, const QString& name)
+{
+  // initializes the help engine.
+  pqHelpReaction::showHelp();
+
+  QHelpEngine* engine = pqApplicationCore::instance()->helpEngine();
+
+  // now determine the url for this proxy.
+  foreach (const QString& doc_namespace, engine->registeredDocumentations())
+    {
+    QString basename = QFileInfo(doc_namespace).baseName();
+    QString url = QString("qthelp://%1/%2/%3.%4.html").arg(doc_namespace).arg(basename).arg(
+      group).arg(name);
+    if (engine->findFile(url).isValid())
+      {
+      pqHelpReaction::showHelp(url);
+      }
+    }
+}

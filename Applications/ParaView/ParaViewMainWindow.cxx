@@ -127,12 +127,9 @@ ParaViewMainWindow::~ParaViewMainWindow()
   delete this->Internals;
 }
 
-
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
   QString& proxyname)
 {
-  pqHelpReaction::showHelp(
-    QString("qthelp://paraview.org/paraview/%1.%2.html").arg(
-      groupname).arg(proxyname));
+  pqHelpReaction::showProxyHelp(groupname, proxyname);
 }
