@@ -8,6 +8,18 @@
 # folder :-
 # name :-
 
+# extracts title from the html page to generate a user-friendly index.
+function (extract_title name filename)
+  file (READ ${filename} contents)
+  string (REGEX MATCH "<title>(.*)</title>" tmp "${contents}")
+  if (CMAKE_MATCH_1)
+    set (${name} "${CMAKE_MATCH_1}" PARENT_SCOPE)
+  else ()
+    get_filename_component(filename_name "${filename}" NAME)
+    set (${name} "${filename_name}" PARENT_SCOPE)
+  endif()
+endfunction()
+
 set (qhp_contents
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <QtHelpProject version=\"1.0\">
@@ -35,21 +47,32 @@ get_filename_component(working_dir "${output_file}" PATH)
 # We generate a toc using the files present.
 file (GLOB matching_files RELATIVE "${CMAKE_CURRENT_BINARY_DIR}" ${file_patterns} )
 set (toc)
+set (index_page)
 foreach (filename ${matching_files})
-  string (REGEX MATCH "^(.*)\\.html$" _tmp "${filename}")
+  string(REGEX MATCH "^(.*)\\.html$" _tmp "${filename}")
+
   set (name_we ${CMAKE_MATCH_1})
   if (name_we)
-    get_filename_component(filename_name "${filename}" NAME)
-    set (toc 
-    "${toc}    <section title=\"${filename_name}\" ref=\"${filename}\" />\n")
+    extract_title(title "${filename}")
+    set (toc "${toc}    <section title=\"${title}\" ref=\"${filename}\" />\n")
+    
+    string(TOLOWER "${filename}" lowercase_filename)
+    if (lowercase_filename MATCHES "index.html$")
+      set (index_page "${filename}")
+    endif ()
   endif()
 endforeach()
-set (toc
-"<toc>
-  <section title=\"${name}\" ref=\"index.html\" >\n
-${toc}
-  </section>
-</toc>")
+
+if (index_page)
+  set (toc
+  "<toc>
+    <section title=\"${name}\" ref=\"${index_page}\" >\n
+  ${toc}
+    </section>
+  </toc>")
+else ()
+  set (toc "<toc> <section title=\"${name}\"> ${toc} </section> </toc>")
+endif()
 
 set (files)
 foreach(filename ${file_patterns})
