@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPluginDocumentationBehavior.h"
 
+#include "pqCoreUtilities.h"
+#include "vtkCommand.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"
 #include <vtksys/Base64.h>
@@ -38,13 +40,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHelpEngine>
 #include <QTemporaryFile>
 #include <QtDebug>
+#include <QSet>
+
+//-----------------------------------------------------------------------------
+class pqPluginDocumentationBehavior::pqInternals
+{
+public:
+  QSet<QString> RegisteredPlugins;
+};
 
 //-----------------------------------------------------------------------------
 pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(
   QHelpEngine* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject),
+  Internals(new pqInternals())
 {
   Q_ASSERT(parentObject != NULL);
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  pqCoreUtilities::connect(tracker, vtkCommand::RegisterEvent,
+    this, SLOT(updatePlugins()));
+  this->updatePlugins();
+}
+
+//-----------------------------------------------------------------------------
+pqPluginDocumentationBehavior::~pqPluginDocumentationBehavior()
+{
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginDocumentationBehavior::updatePlugins()
+{
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
     {
@@ -56,18 +83,15 @@ pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(
 }
 
 //-----------------------------------------------------------------------------
-pqPluginDocumentationBehavior::~pqPluginDocumentationBehavior()
-{
-}
-
-//-----------------------------------------------------------------------------
 void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
 {
-  vtkstd::vector<vtkstd::string> resources;
-  if (!plugin)
+  if (!plugin ||
+    this->Internals->RegisteredPlugins.contains(plugin->GetPluginName()))
     {
     return;
     }
+
+  vtkstd::vector<vtkstd::string> resources;
   plugin->GetBinaryResources(resources);
 
   QHelpEngine* engine = qobject_cast<QHelpEngine*>(this->parent());
@@ -83,10 +107,13 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
       decoded_stream,
       0);
 
+    // the file gets deleted with the pqPluginDocumentationBehavior is deleted.
     QTemporaryFile* file = new QTemporaryFile(this);
     if (!file->open())
       {
       qCritical() << "Failed to create temporary files." << endl;
+      delete [] decoded_stream;
+      decoded_stream = NULL;
       continue;
       }
     qint64 written = file->write(reinterpret_cast<char*>(decoded_stream), length);
@@ -95,5 +122,6 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
     engine->registerDocumentation(file->fileName());
 
     delete [] decoded_stream;
+    decoded_stream = NULL;
     }
 }

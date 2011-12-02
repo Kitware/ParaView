@@ -50,7 +50,6 @@ set (toc)
 set (index_page)
 foreach (filename ${matching_files})
   string(REGEX MATCH "^(.*)\\.html$" _tmp "${filename}")
-
   set (name_we ${CMAKE_MATCH_1})
   if (name_we)
     extract_title(title "${filename}")
@@ -63,16 +62,13 @@ foreach (filename ${matching_files})
   endif()
 endforeach()
 
-if (index_page)
-  set (toc
-  "<toc>
-    <section title=\"${name}\" ref=\"${index_page}\" >\n
-  ${toc}
-    </section>
-  </toc>")
-else ()
-  set (toc "<toc> <section title=\"${name}\"> ${toc} </section> </toc>")
+if (NOT index_page AND matching_files)
+  # no index.html file located. Just point to the first html, if any.
+  list(GET matching_files 0 index_page)
 endif()
+
+set (toc
+  "<toc> <section title=\"${name}\" ref=\"${index_page}\" >\n ${toc} </section> </toc>")
 
 set (files)
 foreach(filename ${file_patterns})

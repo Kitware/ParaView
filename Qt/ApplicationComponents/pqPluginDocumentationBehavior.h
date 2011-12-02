@@ -51,9 +51,13 @@ public:
 
 protected slots:
   void updatePlugin(vtkPVPlugin*);
+  void updatePlugins();
 
 private:
   Q_DISABLE_COPY(pqPluginDocumentationBehavior)
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
