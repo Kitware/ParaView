@@ -80,9 +80,6 @@ pqHelpWindow::pqHelpWindow(
   Ui::pqHelpWindow ui;
   ui.setupUi(this);
 
-  QTemporaryFile tFile;
-  tFile.open();
-
   QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
     this, SIGNAL(helpWarnings(const QString&)));
 
