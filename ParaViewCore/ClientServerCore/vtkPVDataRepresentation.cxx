@@ -30,26 +30,9 @@
 #include <assert.h>
 #include <vtkstd/map>
 
-//---------------------------------------------------------------------------
-// vtkPVDataRepresentation::Internals
-//---------------------------------------------------------------------------
-
-class vtkPVDataRepresentation::Internals {
-public:
-  
-  // This is a cache of shallow copies of inputs provided for convenience.
-  // It is a map from (port index, connection index) to (original input data port, shallow copy port).
-  // NOTE: The original input data port pointer is not reference counted, so it should
-  // not be assumed to be a valid pointer. It is only used for pointer comparison.
-  vtkstd::map<vtkstd::pair<int, int>,
-  vtkstd::pair<vtkAlgorithmOutput*, vtkSmartPointer<vtkPVTrivialProducer> > >
-  InputInternal;
-};
-
 //----------------------------------------------------------------------------
 vtkPVDataRepresentation::vtkPVDataRepresentation()
 {
-  this->Implementation = new vtkPVDataRepresentation::Internals();
   this->Visibility = true;
   vtkExecutive* exec = this->CreateDefaultExecutive();
   this->SetExecutive(exec);
@@ -179,28 +162,26 @@ bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
 vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
                                                                    int conn)
 {
-  vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(
-    port, conn);
-  if (prevOutput->GetProducer()->IsA("vtkPVTrivialProducer"))
+  vtkTrivialProducer* prevProducer = this->GetInternalInput(port, conn);
+  if (prevProducer && prevProducer->IsA("vtkPVTrivialProducer"))
     {
-    return prevOutput;
+    return prevProducer->GetOutputPort();
     }
-  
-  vtkDataObject* dobj = prevOutput->GetProducer()->GetOutputDataObject(port);
+
+  vtkDataObject* dobj = this->GetInputDataObject(port, conn);
 
   vtkstd::pair<int, int> p(port, conn);
-  this->Implementation->InputInternal[p].first = prevOutput;
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
   vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
   tprod->SetExecutive(exec);
   tprod->SetOutput(dobj);
   vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
   portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
-  this->Implementation->InputInternal[p].second = tprod;
+  this->SetInternalInput(port, conn, tprod);
   tprod->Delete();
   exec->Delete();
 
-  return this->Implementation->InputInternal[p].second->GetOutputPort();
+  return tprod->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------
