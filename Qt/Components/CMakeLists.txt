@@ -118,6 +118,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -132,6 +133,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
+  pqPlotMatrixDisplayPanel.h
   pqPluginTreeWidget.h
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
@@ -245,12 +247,14 @@ SET(UI_FORMS
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
+  Resources/UI/pqMemoryInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
+  Resources/UI/pqPlotMatrixDisplayPanel.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -487,6 +491,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.cxx
+  pqMemoryInspector.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -529,6 +535,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.cxx
   pqPipelineTimeKeyFrameEditor.h
+  pqPlotMatrixDisplayPanel.cxx
+  pqPlotMatrixDisplayPanel.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPluginTreeWidget.h

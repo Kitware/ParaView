@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqPlotMatrixView.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -29,50 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#include "pqPlotMatrixView.h"
 
-#include "pqCoreUtilities.h"
-#include "pqCPWritersMenuManager.h"
-
-#include <QDebug>
-#include <QMainWindow>
-#include <QMenuBar>
-#include <QTimer>
+#include "vtkSMContextViewProxy.h"
+#include "vtkScatterPlotMatrix.h"
+#include "vtkAnnotationLink.h"
 
 //-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
+pqPlotMatrixView::pqPlotMatrixView(const QString &group, 
+                                   const QString &name,
+                                   vtkSMContextViewProxy *viewModule,
+                                   pqServer *server,
+                                   QObject *parent)
+  : pqContextView(viewType(), group, name, viewModule, server, parent)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
+pqPlotMatrixView::~pqPlotMatrixView()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCPPluginManager::startup()
+void pqPlotMatrixView::selectionChanged()
 {
-  pqCPWritersMenuManager *menuMgr = new pqCPWritersMenuManager(this);
-  if(pqCoreUtilities::mainWidget())
+  this->Superclass::selectionChanged();
+
+  // Fill the selection source with the selection from the view
+  vtkSelection* sel = 0;
+
+  if(vtkScatterPlotMatrix *chartMatrix = vtkScatterPlotMatrix::SafeDownCast(
+    this->getContextViewProxy()->GetContextItem()))
     {
-    // if we already have a main widget to add the menus to
-    // go ahead and do it.
-    menuMgr->createMenu();
+    sel = chartMatrix->GetActiveAnnotationLink() ?
+      chartMatrix->GetActiveAnnotationLink()->GetCurrentSelection() : NULL;
     }
-  else
+
+  if(!sel)
     {
-    // we don't have a main widget to add the menus to so
-    // we use a timer to do it a little bit later when we
-    // hope the main widget and everything else needed
-    // will be instantiated.
-    QTimer::singleShot(100, menuMgr, SLOT(createMenu()));
-   }
-
-  // don't delete menuMgr, it will be cleaned up by Qt.
-}
-
-//-----------------------------------------------------------------------------
-void pqCPPluginManager::shutdown()
-{
+    return;
+    }
+  this->setSelection(sel);
 }

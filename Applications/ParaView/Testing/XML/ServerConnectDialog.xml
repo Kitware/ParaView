@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Test fetching and importing a server configuration -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/fetchServers" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_fetch/editSources" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_editSources/editSourcesText/qt_scrollarea_viewport" command="mousePress" arguments="1,1,0,358,121" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_editSources/editSourcesText/qt_scrollarea_viewport" command="mouseRelease" arguments="1,0,0,358,121" />
+
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_editSources/editSourcesText" command="set_string" arguments="# Enter list of URLs to obtain server configurations from.&#xA;# Syntax:&#xA;#    pvsc &lt;url&gt; &lt;userfriendly-name&gt;&#xA;&#xA;# Official Kitware Server Configurations&#xA;pvsc http://www.paraview.org/files/pvsc Kitware Inc.&#xA;pvsc http://paraview.org/Wiki/images/e/e3/SampleServers.xml ParaView Wiki" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_editSources/editSourcesButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_fetch/importServersTable" command="mousePress" arguments="1,1,0,47,22,/0:1" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_fetch/importServersTable" command="mouseRelease" arguments="1,0,0,47,22,/0:1" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_fetch/importSelected" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,110,20,/0:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,110,20,/0:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,99,11,/4:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,99,11,/4:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/editServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="key" arguments="16777232" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="set_string" arguments="l" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/host" command="set_string" arguments="localhost" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_create/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_edit/editServer2ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- Try loading/saving server configurations that define UI interfaces -->
+    <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/load" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/servers-wiki.pvsc" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,71,15,/4:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,71,15,/4:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/connect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QDialog0/MPITYPE" command="set_string" arguments="MPICH Ver 2.0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/OFFSCREEN" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,77,14,/1:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,77,14,/1:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,77,14,/1:0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/PARALLELISM" command="set_string" arguments="Some Parallelism" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers/horz_header" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/save" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/SaveServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/save_servers" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/load" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/save_servers.pvsc" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,66,15,/1:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,66,15,/1:0" />
+  <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,66,15,/1:0" />
+  <pqevent object="pqClientMainWindow/1QDialog0/PARALLELISM" command="set_string" arguments="Some Parallelism" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton1" command="activate" arguments="" />
+</pqevents>

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QScrollArea>
 #include <QStyleFactory>
 
 // ParaView includes
@@ -344,10 +345,22 @@ QWidget* pqSummaryPanel::createPropertiesPanel()
   pqCollapsedGroup *frame = new pqCollapsedGroup(this);
   frame->setTitle("Properties");
 
+  QGridLayout *frameLayout = new QGridLayout;
+  frameLayout->setMargin(0);
+
+  QScrollArea *scrollArea = new QScrollArea(frame);
+  scrollArea->setFrameStyle(QFrame::NoFrame);
+  scrollArea->setWidgetResizable(true);
+
+  QWidget *scrollAreaWidget = new QWidget(scrollArea);
+
   this->PropertiesLayout = new QGridLayout;
   this->PropertiesLayout->setMargin(0);
 
-  frame->setLayout(this->PropertiesLayout);
+  scrollAreaWidget->setLayout(this->PropertiesLayout);
+  scrollArea->setWidget(scrollAreaWidget);
+  frameLayout->addWidget(scrollArea);
+  frame->setLayout(frameLayout);
 
   this->PropertiesPanelFrame = frame;
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,50 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef __pqMemoryInspector_h
+#define __pqMemoryInspector_h
 
-#include "pqCoreUtilities.h"
-#include "pqCPWritersMenuManager.h"
+#include <QWidget>
+#include "pqComponentsExport.h"
 
-#include <QDebug>
-#include <QMainWindow>
-#include <QMenuBar>
-#include <QTimer>
-
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
+class PQCOMPONENTS_EXPORT pqMemoryInspector : public QWidget
 {
-}
+  Q_OBJECT
+  typedef QWidget Superclass;
+public:
+  pqMemoryInspector(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqMemoryInspector();
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
-{
-}
+protected slots:
+  /// refreshes information.
+  void refresh();
+  void physicalMemoryToggled();
+  void exportToCSV();
+  void updateSummary();
 
-//-----------------------------------------------------------------------------
-void pqCPPluginManager::startup()
-{
-  pqCPWritersMenuManager *menuMgr = new pqCPWritersMenuManager(this);
-  if(pqCoreUtilities::mainWidget())
-    {
-    // if we already have a main widget to add the menus to
-    // go ahead and do it.
-    menuMgr->createMenu();
-    }
-  else
-    {
-    // we don't have a main widget to add the menus to so
-    // we use a timer to do it a little bit later when we
-    // hope the main widget and everything else needed
-    // will be instantiated.
-    QTimer::singleShot(100, menuMgr, SLOT(createMenu()));
-   }
+private:
+  Q_DISABLE_COPY(pqMemoryInspector)
+  class pqIntenals;
+  pqIntenals* Internals;
+};
 
-  // don't delete menuMgr, it will be cleaned up by Qt.
-}
-
-//-----------------------------------------------------------------------------
-void pqCPPluginManager::shutdown()
-{
-}
+#endif

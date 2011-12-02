@@ -722,6 +722,7 @@ bool vtkSMSessionClient::GatherInformation(
       }
     }
 
+  bool add_local_info = false;
   if ( (location & vtkPVSession::CLIENT) != 0)
     {
     bool ret_value = this->Superclass::GatherInformation(
@@ -731,6 +732,7 @@ bool vtkSMSessionClient::GatherInformation(
       this->EndBusyWork();
       return ret_value;
       }
+    add_local_info = true;
     }
 
   vtkMultiProcessStream stream;
@@ -782,7 +784,17 @@ bool vtkSMSessionClient::GatherInformation(
       }
     vtkClientServerStream csstream;
     csstream.SetData(data2, length2);
-    information->CopyFromStream(&csstream);
+    if (add_local_info)
+      {
+      vtkPVInformation* tempInfo = information->NewInstance();
+      tempInfo->CopyFromStream(&csstream);
+      information->AddInformation(tempInfo);
+      tempInfo->Delete();
+      }
+    else
+      {
+      information->CopyFromStream(&csstream);
+      }
     delete [] data2;
     }
   this->EndBusyWork();

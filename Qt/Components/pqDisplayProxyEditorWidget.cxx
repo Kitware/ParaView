@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqPlotMatrixDisplayPanel.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertyLinks.h"
 #include "pqServer.h"
@@ -86,7 +87,8 @@ public:
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
        type == "ScatterPlotRepresentation" ||
-       type == "ParallelCoordinatesRepresentation")
+       type == "ParallelCoordinatesRepresentation" ||
+       type == "PlotMatrixRepresentation")
       {
       return true;
       }
@@ -130,6 +132,11 @@ public:
       {
       return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
       }
+    else if (type == "PlotMatrixRepresentation")
+      {
+      return new pqPlotMatrixDisplayPanel(proxy, p);
+      }
+
     return NULL;
     }
 };

@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
   Q_OBJECT
   Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true)
   Q_PROPERTY(QString singleFilename READ singleFilename WRITE
-    setSingleFilename USER true)
+    setSingleFilename)
   Q_PROPERTY(QString extension READ extension WRITE setExtension)
   Q_PROPERTY(bool useDirectoryMode
              READ useDirectoryMode WRITE setUseDirectoryMode)

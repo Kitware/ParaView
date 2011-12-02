@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMContextViewProxy;
 class vtkContextView;
 class vtkObject;
+class vtkSelection;
 
 /// pqContextView is an abstract base class for all charting views based on the
 /// VTK context charting library.
@@ -126,7 +127,10 @@ protected:
   virtual void initialize();
 
   /// Listen for new selection events, and pass them back to ParaView
-  void selectionChanged();
+  virtual void selectionChanged();
+
+  /// Set selection to the view
+  virtual void setSelection(vtkSelection*);
   class command;
   command* Command;
 

@@ -77,6 +77,8 @@ SET (Kit_SRCS
   vtkPVOptionsXMLParser.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
+  vtkPVPlotMatrixView.cxx
+  vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginTracker.cxx
@@ -92,8 +94,9 @@ SET (Kit_SRCS
   vtkPVServerManagerPluginInterface.cxx
   vtkPVServerOptions.cxx
   vtkPVSession.cxx
-  vtkPVSynchronizedRenderWindows.cxx
   vtkPVSynchronizedRenderer.cxx
+  vtkPVSynchronizedRenderWindows.cxx
+  vtkPVSystemInformation.cxx
   vtkPVTemporalDataInformation.cxx
   vtkPVTimerInformation.cxx
   vtkPVView.cxx

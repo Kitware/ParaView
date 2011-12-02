@@ -150,6 +150,7 @@ pqServerConnectDialog::pqServerConnectDialog(
   this->Internals->setupUi(this);
   this->Internals->Selector = selector;
 
+  this->Internals->servers->horizontalHeader()->setObjectName("horz_header");
   //this->Internals->servers->horizontalHeader()->setResizeMode(0,
   //  QHeaderView::ResizeToContents);
 

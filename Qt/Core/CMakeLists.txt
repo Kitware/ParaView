@@ -83,6 +83,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
+  pqPlotMatrixView.h
   pqPlotSettingsModel.h
   pqPluginManager.h
   pqProgressManager.h
@@ -275,6 +276,8 @@ VTK_ADD_LIBRARY(pqCore
   pqPipelineRepresentation.h
   pqPipelineSource.cxx
   pqPipelineSource.h
+  pqPlotMatrixView.cxx
+  pqPlotMatrixView.h
   pqPlotSettingsModel.cxx
   pqPlotSettingsModel.h
   pqPluginManager.cxx

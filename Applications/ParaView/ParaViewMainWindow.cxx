@@ -69,6 +69,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->selectionInspectorDock->hide();
   this->Internals->comparativePanelDock->hide();
   this->Internals->collaborationPanelDock->hide();
+  this->Internals->memoryInspectorDock->hide();
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 

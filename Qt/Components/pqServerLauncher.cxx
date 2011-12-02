@@ -621,7 +621,8 @@ bool pqServerLauncher::launchAndConnectToServer()
   QEventLoop eventLoop;
   if (timeout > 0)
     {
-    QTimer::singleShot(timeout*1000, &eventLoop, SLOT(quit()));
+    QTimer::singleShot(
+      static_cast<int>(timeout*1000), &eventLoop, SLOT(quit()));
     }
   QObject::connect(process, SIGNAL(started()), &eventLoop, SLOT(quit()));
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), &eventLoop, SLOT(quit()));
@@ -637,7 +638,7 @@ bool pqServerLauncher::launchAndConnectToServer()
     }
 
   // wait for delay before attempting to connect to the server.
-  pqEventDispatcher::processEventsAndWait(delay * 1000);
+  pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
   if (process->state() != QProcess::Running)
     {
     qCritical() 

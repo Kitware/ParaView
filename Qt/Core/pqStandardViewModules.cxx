@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
 #include "pqParallelCoordinatesChartView.h"
+#include "pqPlotMatrixView.h"
 #include "pqRenderView.h"
 //#include "pqScatterPlotView.h"
 #include "pqServer.h"
@@ -74,7 +75,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeXYChartView::chartViewType() <<
     pqComparativeXYBarChartView::chartViewType() <<
-    pqParallelCoordinatesChartView::chartViewType();
+    pqParallelCoordinatesChartView::chartViewType() <<
+    pqPlotMatrixView::viewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -82,7 +84,8 @@ QStringList pqStandardViewModules::displayTypes() const
   return QStringList()
     << "XYChartRepresentation"
     << "XYBarChartRepresentation"
-    << "TextSourceRepresentation";
+    << "TextSourceRepresentation"
+    << "PlotMatrixRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
@@ -126,6 +129,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if (type == pqParallelCoordinatesChartView::chartViewType())
     {
     return pqParallelCoordinatesChartView::chartViewTypeName();
+    }
+  else if (type == pqPlotMatrixView::viewType())
+    {
+    return pqPlotMatrixView::viewTypeName();
     }
 
   return QString();
@@ -180,6 +187,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
   else if (viewtype == pqParallelCoordinatesChartView::chartViewType())
     {
     root_xmlname = "ParallelCoordinatesChartView";
+    }
+  else if (viewtype == pqPlotMatrixView::viewType())
+    {
+    root_xmlname = "PlotMatrixView";
     }
 
   if (root_xmlname)
@@ -259,6 +270,14 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                         vtkSMContextViewProxy::SafeDownCast(viewmodule),
                                         server, p);
     }
+  else if (viewtype == "PlotMatrixView")
+    {
+    return new pqPlotMatrixView(group,
+                                viewname,
+                                vtkSMContextViewProxy::SafeDownCast(viewmodule),
+                                server,
+                                p);
+    }
 
   qDebug() << "Failed to create a proxy" << viewmodule->GetClassName();
   return NULL;
@@ -272,7 +291,8 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   QObject* p)
 {
   if (display_type == "XYChartRepresentation" ||
-      display_type == "XYBarChartRepresentation")
+      display_type == "XYBarChartRepresentation" ||
+      display_type == "PlotMatrixRepresentation")
     {
     // new chart representations.
     return new pqChartRepresentation(group, n, proxy, server, p);
