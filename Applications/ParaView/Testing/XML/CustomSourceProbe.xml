@@ -24,4 +24,17 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="V" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+
+  <!-- TEST MEMORY INSPECTOR PANEL -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Memory Inspector" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/physicalMemory" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/filter" command="set_string" arguments="p" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/filter" command="set_string" arguments="para" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/buttonBox/Refresh" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/buttonBox/Export" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/test.csv" />
+  <pqevent object="pqClientMainWindow/memoryInspectorDock/dockWidgetContents/buttonBox/Refresh" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Memory Inspector" />
 </pqevents>
