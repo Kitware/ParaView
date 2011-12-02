@@ -933,7 +933,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     if (proxy_documentation_files)
       build_help_project(${NAME}
         DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc"
-        FILEPATTERNS "*.html; *.css;*.png;*.jpg"
+        FILEPATTERNS "*.html;*.css;*.png;*.jpg"
         DEPENDS "${proxy_documentation_files}")
 
       # we don't compile the help project as a Qt resource. Instead it's

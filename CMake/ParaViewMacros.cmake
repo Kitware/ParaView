@@ -385,6 +385,9 @@ endfunction()
 #          in the qhp file. Note that these files/paths are relative to the
 #          DESTINATION_DIRECTORY.
 # DEPENDS :- (optional) targets or files that the qch generation target depends on.
+#
+# If neither TABLE_OF_CONTENTS or TABLE_OF_CONTENTS_FILE is specified, then the
+# TOC is auto-generated.
 #------------------------------------------------------------------------------
 function(build_help_project name)
   pv_parse_arguments(arg
@@ -419,16 +422,7 @@ function(build_help_project name)
     file(READ ${arg_TABLE_OF_CONTENTS_FILE} arg_TABLE_OF_CONTENTS)
   endif()
 
-  pv_set_if_not_set(arg_TABLE_OF_CONTENTS
-    "<toc><section title=\"${name}\" ref=\"index.html\"></section></toc>")
-
-  set (files)
-  foreach(filename ${arg_FILEPATTERNS})
-    set (files "${files}<file>${filename}</file>\n")
-  endforeach()
-
-  configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
-    ${arg_DESTINATION_DIRECTORY}/${name}.qhp)
+  set (qhp_filename ${arg_DESTINATION_DIRECTORY}/${name}.qhp)
 
   set (extra_args)
   if (DEFINED arg_DOCUMENTATION_SOURCE_DIR)
@@ -441,18 +435,46 @@ function(build_help_project name)
       )
   endif()
 
+  if (NOT DEFINED arg_TABLE_OF_CONTENTS)
+    # sanitize arg_FILEPATTERNS since we pass it as a command line argument.
+    string (REPLACE ";" "+" arg_FILEPATTERNS "${arg_FILEPATTERNS}")
+    set (extra_args ${extra_args}
+
+    # generate the toc at run-time.
+    COMMAND ${CMAKE_COMMAND}
+            -Doutput_file="${qhp_filename}"
+            -Dfile_patterns="${arg_FILEPATTERNS}"
+            -Dnamespace="${arg_NAMESPACE}"
+            -Dfolder="${arg_FOLDER}"
+            -Dname="${name}"
+            -P "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
+    )
+  else ()
+    # toc is provided, we'll just configure the file.
+    set (files)
+    foreach(filename ${arg_FILEPATTERNS})
+      set (files "${files}<file>${filename}</file>\n")
+    endforeach()
+
+    configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
+      ${qhp_filename})
+    list (APPEND arg_DEPENDS ${qhp_filename})
+  endif()
+
   ADD_CUSTOM_COMMAND(
     OUTPUT "${arg_DESTINATION_DIRECTORY}/${name}.qch"
-    DEPENDS "${arg_DESTINATION_DIRECTORY}/${name}.qhp"
-            ${arg_DEPENDS}
+    DEPENDS ${arg_DEPENDS}
+            "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
   
     ${extra_args}
-  
+
     # Now, compile the qhp file to generate the qch.
     COMMAND ${QT_HELP_GENERATOR}
-            "${arg_DESTINATION_DIRECTORY}/${name}.qhp"
+            "${qhp_filename}"
             -o "${arg_DESTINATION_DIRECTORY}/${name}.qch"
   
     COMMENT "Compiling Qt help project ${name}.qhp"
+
+    WORKING_DIRECTORY "${arg_DESTINATION_DIRECTORY}"
   )
 endfunction(build_help_project)
