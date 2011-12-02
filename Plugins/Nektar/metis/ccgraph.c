@@ -14,7 +14,7 @@
 
 #include <metis.h>
 
-GraphType *SetUpCoarseGraph(GraphType *graph, int cnvtxs, int dovsiz);
+
 
 /*************************************************************************
 * This function creates the coarser graph

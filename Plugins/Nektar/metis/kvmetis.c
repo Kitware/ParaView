@@ -15,9 +15,6 @@
 
 #include <metis.h>
 
-int MlevelVolKWayPartitioning(CtrlType *ctrl, GraphType *graph, int nparts, idxtype *part,
-                              float *tpwgts, float ubfactor);
-
 
 /*************************************************************************
 * This function is the entry point for KMETIS

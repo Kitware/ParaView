@@ -13,7 +13,6 @@
 
 #include <metis.h>
 
-int IsBalanced(idxtype *pwgts, int nparts, float *tpwgts, float ubfactor);
 
 /*************************************************************************
 * This function is the entry point of refinement

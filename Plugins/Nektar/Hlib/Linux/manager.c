@@ -1216,7 +1216,7 @@ yyparse (void)
 #else
 int
 yyparse ()
-    //;
+    ;
 #endif
 #endif
 {
@@ -1577,7 +1577,7 @@ yyreduce:
 
 /* Line 1126 of yacc.c.  */
 #line 1580 "y.tab.c"
-
+
   yyvsp -= yylen;
   yyssp -= yylen;
 

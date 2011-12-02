@@ -13,9 +13,6 @@
 
 #include <metis.h>
 
-void *GKmalloc(int nbytes, char *msg);
-int *iset(int n, int val, int *x);
-idxtype *idxset(int n, idxtype val, idxtype *x);
 
 /*************************************************************************
 * This function prints an error message and exits

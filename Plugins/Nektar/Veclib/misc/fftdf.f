@@ -4,14 +4,14 @@
       integer          btrv(1), n, nskip, mtrn, mskip, isign
       integer          irev, ierr, ireal
 c
-c     fftdf performs multiple complex-complex or real-complex fast
-c     fourier transforms by decimation in frequency. initialization is
-c     performed by calling fftdf with isign = 0.  Note that the fortran
+c     fftdf performs multiple complex-complex or real-complex fast 
+c     fourier transforms by decimation in frequency. initialization is 
+c     performed by calling fftdf with isign = 0.  Note that the fortran 
 c     version does not actually use the btrv array.
 c
 c     a            double precision complex n + 1, real 2*(n+1)
 c                  the array of transforms.
-c
+c     
 c     nskip        skip between adjacent points of a transform (complex)
 c
 c     mtrn         number of transforms to do.
@@ -21,14 +21,14 @@ c
 c     isign        sign (+/-1) of exponent/direction of transform
 c                  forward = -1, back = +1
 c
-c     fac          array of exponential factors of length 6*n calculated
+c     fac          array of exponential factors of length 6*n calculated 
 c                  during the initialization call (isign=0)
 c
 c     irev         1 to do the bitreverse, 0 to skip it
 c
 c     btrv         index array for bitreverse on length n
 c
-c     ierr         return error condition
+c     ierr         return error condition  
 c
 c     ireal        0 = complex-complex, 1 = real-complex
 c
@@ -37,20 +37,20 @@ c
 c
 c     fourier-space representation
 c
-c     real-complex
+c     real-complex    
 c
-c     for a real array of length n, an array of length n+2 (n/2+1
+c     for a real array of length n, an array of length n+2 (n/2+1 
 c     complex numbers) is needed in fourier space
 c
 c         k:      0  1   2  ...   n/2-1  n/2
 c         index:  1  2   3  ...   n/2    n/2+1
 c
-c     complex-complex:
+c     complex-complex: 
 c
 c         k:      0   1   2  ...  n/2-1  +-n/2  -(n/2-1) ...  -2   -1
 c         index:  1   2   3  ...  n/2    n/2+1   n/2+2   ...  n-1   n
 c
-c     the index n/2+1 in the complex-complex fft corresponds to the
+c     the index n/2+1 in the complex-complex fft corresponds to the 
 c     aliased (+/-)n/2 mode and should be ignored (set to zero)
 c
 c
@@ -83,7 +83,7 @@ c
 c=====================================================================
 c
 c     real-complex decimation-in-frequency
-c
+c 
       subroutine fealft (data,n,nskip,mtrn,mskip,isign,
      >                   fac,irev,btrv,ierr)
       double precision  data(1)
@@ -109,9 +109,9 @@ c
          call ftsdf(data,n,nskip,mtrn,mskip,isign,fac,
      >        irev,btrv,ierr)
       endif
-c
+c     
 c     main loop over transforms
-c
+c     
       do itrn = 1, mtrn
          wpr  = dcos(theta)
          wpi  = dsin(theta)
@@ -149,7 +149,7 @@ c
             h1r      = data(i1)
             h1i      = data(i2)
             data(i1) = 2.d0 * (h1r + h1i)
-            data(i2) = 2.d0 * (h1r - h1i)
+            data(i2) = 2.d0 * (h1r - h1i) 
             data(i3) =  2.d0* data(i3)
             data(i4) = -2.d0* data(i4)
          else
@@ -171,12 +171,12 @@ c
          endif
       return
       end
-c
+c     
 c
 c=====================================================================
 c
 c     complex-complex decimation-in-frequency
-c
+c 
       subroutine ftsdf(data,n,nskip,mtrn,mskip,isign,
      >                 fac,irev,btrv,ierr)
       double precision  data(1)
@@ -197,10 +197,10 @@ c
      >           l2=1.442695040888963407359d0)
 
 c
-c     calculate log(n)
+c     calculate log(n) 
 c
       ilog = int(dlog(dble(n))*l2 + 0.01d0)
-c
+c 
 c     set starting point in exponential factor array
 c
       if (isign.eq.1) then
@@ -208,7 +208,7 @@ c
       else
          iss = 0
       endif
-c
+c     
 c     main loop over transforms
 c
       do itrn = 1, mtrn
@@ -230,7 +230,7 @@ c
                i2 = i1 + 1
                j1 = ishft(ib + (j - 1) * nskip,1) + 1
                j2 = j1 + 1
-c
+c     
                tmpr     = data(i1) - data(j1)
                tmpi     = data(i2) - data(j2)
                data(i1) = data(i1) + data(j1)
@@ -239,13 +239,13 @@ c
                data(j2) = exr * tmpi + exi * tmpr
 c
             enddo
-            idexj = idexj + 2
+            idexj = idexj + 2 
          enddo
 c
          if(mmax.gt.1) goto 101
 c
 c     do the bit reverse
-c
+c         
          if (irev.eq.0) goto 999
          j = 1
          do i = 1, n
@@ -321,8 +321,8 @@ c
          isign = 1
          goto 3
       endif
-c
-c     this section is to generate the additional factors needed for
+c     
+c     this section is to generate the additional factors needed for 
 c     real-complex
 c
       inf   = ishft(n,2)
@@ -345,7 +345,7 @@ c
          inf        = inf + 2
       enddo
       if (isign.lt.0) then
-         isign = 1
+         isign = 1 
          goto 33
       endif
       return

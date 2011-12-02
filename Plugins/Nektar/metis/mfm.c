@@ -13,7 +13,6 @@
 
 #include <metis.h>
 
-float Compute2WayHLoadImbalance(int ncon, float *npwgts, float *tpwgts);
 
 /*************************************************************************
 * This function performs an edge-based FM refinement

@@ -20,7 +20,7 @@ File Description:
 
 ************************************gs.c**************************************/
 #include <stdio.h>
-#include <string.h>
+#include <strings.h>
 #include <math.h>
 #include <float.h>
 #include <limits.h>
@@ -164,8 +164,6 @@ static void set_pairwise(gs_id *gs);
 static gs_id * gsi_new(void);
 static void set_tree(gs_id *gs);
 
-void gs_gop_vec(register gs_id *gs, register REAL *vals, register char *op, register int step);
-
 /* same for all but vector flavor */
 static void gs_gop_local_out(gs_id *gs, REAL *vals);
 /* vector flavor */
@@ -274,20 +272,7 @@ void flush_io_ (void)
 #endif
 }
 
-/******************************************************************************
-Function: gs_init_()
 
-Input :
-Output:
-Return:
-Description:
-******************************************************************************/
-void gs_init_vec_sz(int size)
-{
-  vec_ch = TRUE;
-
-  vec_sz = size;
-}
 
 /******************************************************************************
 Function: ()
@@ -306,6 +291,8 @@ void gs_init_vec_sz_(int *size)
   gs_init_vec_sz(*size);
 }
 
+
+
 /******************************************************************************
 Function: gs_init_()
 
@@ -314,12 +301,14 @@ Output:
 Return:
 Description:
 ******************************************************************************/
-void gs_init_msg_buf_sz(int buf_size)
+void gs_init_vec_sz(int size)
 {
-  msg_ch = TRUE;
+  vec_ch = TRUE;
 
-  msg_buf = buf_size;
+  vec_sz = size;
 }
+
+
 
 /******************************************************************************
 Function: ()
@@ -341,10 +330,27 @@ void  gs_init_msg_buf_sz_ (int *buf_size)
 /******************************************************************************
 Function: gs_init_()
 
-Input :
-Output:
-Return:
-Description:
+Input : 
+Output: 
+Return: 
+Description:  
+******************************************************************************/
+void gs_init_msg_buf_sz(int buf_size)
+{
+  msg_ch = TRUE;
+
+  msg_buf = buf_size;
+}
+
+
+
+/******************************************************************************
+Function: gs_init_()
+
+Input : 
+Output: 
+Return: 
+Description:  
 ******************************************************************************/
 #if defined UPCASE
 int
@@ -962,7 +968,6 @@ get_ngh_buf(gs_id *gs)
   int *ptr1, *ptr2, i_start, negl, nel, *elms;
   int oper=GL_B_OR;
   int *ptr3, *t_mask, *in_elm, level, ct1, ct2, *tp;
-  long int ii;
 
 
 #ifdef DEBUG
@@ -992,7 +997,7 @@ get_ngh_buf(gs_id *gs)
   per_load = negl  = gs->negl;
   gs->num_loads = num_loads = 1;
   i=p_mask_size*negl;
-
+  long int ii;
   ii = ((long int) p_mask_size) * ((long int) negl);
   if ( ((long int) msg_buf) < ii )
     buf_size = msg_buf;
@@ -1203,7 +1208,7 @@ set_pairwise(gs_id *gs)
 #endif
 
   len_pair_list=gs->len_pw_list;
-  gs->pw_elm_list=pairwise_elm_list=(int *)perm_malloc((len_pair_list+1)*INT_LEN);
+  gs->pw_elm_list=pairwise_elm_list=perm_malloc((len_pair_list+1)*INT_LEN);
 
   /* how many processors (nghs) do we have to exchange with? */
   nprs=gs->num_pairs=ct_bits((char *)sh_proc_mask,p_mask_size*INT_LEN);

@@ -15,8 +15,6 @@
 
 #include <metis.h>
 
-float BetterVBalance(int ncon, int norm, float *vwgt, float *u1wgt, float *u2wgt);
-int AreAllVwgtsBelowFast(int ncon, float *vwgt1, float *vwgt2, float limit);
 
 /*************************************************************************
 * This function finds a matching using the HEM heuristic
