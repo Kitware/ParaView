@@ -1669,6 +1669,7 @@ void vtkSMSessionProxyManager::RegisterSelectionModel(
     {
     vtkWarningMacro("Replacing existing selection model: " << name);
     }
+  model->SetSession(this->GetSession());
   this->Internals->SelectionModels[name] = model;
 }
 
