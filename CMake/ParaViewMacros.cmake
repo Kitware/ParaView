@@ -425,7 +425,7 @@ function(build_help_project name)
   set (qhp_filename ${arg_DESTINATION_DIRECTORY}/${name}.qhp)
 
   set (extra_args)
-  if (DEFINED arg_DOCUMENTATION_SOURCE_DIR)
+  if (arg_DOCUMENTATION_SOURCE_DIR)
     set (extra_args
       # copy all htmls from source to destination directory (same location where the
       # qhp file is present.

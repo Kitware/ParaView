@@ -830,7 +830,12 @@ ENDMACRO(PARAVIEW_QT4_ADD_RESOURCES)
 #  REQUIRED_PLUGINS is to specify the plugin names that this plugin depends on
 #  CS_KITS is experimental option to add wrapped kits. This may change in
 #  future.
+#  DOCUMENTATION_DIR (optional) :- used to specify a directory containing
+#  html/css/png/jpg files that comprise of the documentation for the plugin. In
+#  addition, CMake will automatically generate documentation for any proxies
+#  defined in XMLs for this plugin.
 # ADD_PARAVIEW_PLUGIN(Name Version
+#     [DOCUMENTATION_DIR dir]
 #     [SERVER_MANAGER_SOURCES source files]
 #     [SERVER_MANAGER_XML XMLFile]
 #     [SERVER_SOURCES source files]
@@ -862,6 +867,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   SET(ARG_REQUIRED_PLUGINS)
   SET(ARG_AUTOLOAD)
   SET(ARG_CS_KITS)
+  SET(ARG_DOCUMENTATION_DIR)
 
   SET(PLUGIN_NAME "${NAME}")
   SET(PLUGIN_VERSION "${VERSION}")
@@ -884,7 +890,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
   PV_PLUGIN_PARSE_ARGUMENTS(ARG 
-    "SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;AUTOLOAD;CS_KITS"
+    "DOCUMENTATION_DIR;SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;AUTOLOAD;CS_KITS"
     "" ${ARGN} )
 
   PV_PLUGIN_LIST_CONTAINS(reqired_server_arg "REQUIRED_ON_SERVER" ${ARGN})
@@ -930,11 +936,12 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     endif()
 
     # generate the qch file for the plugin if any documentation is provided.
-    if (proxy_documentation_files)
+    if (proxy_documentation_files OR ARG_DOCUMENTATION_DIR)
       build_help_project(${NAME}
         DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc"
+        DOCUMENTATION_SOURCE_DIR "${ARG_DOCUMENTATION_DIR}"
         FILEPATTERNS "*.html;*.css;*.png;*.jpg"
-        DEPENDS "${proxy_documentation_files}")
+        DEPENDS "${proxy_documentation_files}" )
 
       # we don't compile the help project as a Qt resource. Instead it's
       # packaged as a SM resource. This makes it possible for
