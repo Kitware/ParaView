@@ -52,6 +52,7 @@ public:
 protected slots:
   void updatePlugin(vtkPVPlugin*);
   void updatePlugins();
+  void refreshHelpEngine();
 
 private:
   Q_DISABLE_COPY(pqPluginDocumentationBehavior)

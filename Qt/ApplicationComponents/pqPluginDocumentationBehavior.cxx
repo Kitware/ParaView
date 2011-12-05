@@ -39,15 +39,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHelpContentWidget>
 #include <QHelpEngine>
+#include <QHelpSearchEngine>
 #include <QSet>
 #include <QtDebug>
 #include <QTemporaryFile>
+#include <QTimer>
 
 //-----------------------------------------------------------------------------
 class pqPluginDocumentationBehavior::pqInternals
 {
 public:
   QSet<QString> RegisteredPlugins;
+  QTimer Timer;
+
+  pqInternals()
+    {
+    this->Timer.setInterval(100);
+    this->Timer.setSingleShot(true);
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -57,6 +66,10 @@ pqPluginDocumentationBehavior::pqPluginDocumentationBehavior(
   Internals(new pqInternals())
 {
   Q_ASSERT(parentObject != NULL);
+
+  QObject::connect(&this->Internals->Timer,
+    SIGNAL(timeout()), this, SLOT(refreshHelpEngine()));
+
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   pqCoreUtilities::connect(tracker, vtkCommand::RegisterEvent,
     this, SLOT(updatePlugins()));
@@ -124,8 +137,18 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
 
     delete [] decoded_stream;
     decoded_stream = NULL;
+
+    this->Internals->Timer.start();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginDocumentationBehavior::refreshHelpEngine()
+{
+  QHelpEngine* engine = qobject_cast<QHelpEngine*>(this->parent());
+  Q_ASSERT(engine);
 
   engine->setupData();
   engine->contentWidget()->reset();
+  engine->searchEngine()->reindexDocumentation();
 }

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QHelpEngine;
 class QTextBrowser;
+class QUrl;
 
 /// pqHelpWindow provides a assistant-like window  for showing help provided by
 /// a QHelpEngine.
@@ -49,9 +50,11 @@ public:
     QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqHelpWindow();
 
+public slots:
   /// Requests showing of a particular page. The url must begin with "qthelp:"
   /// scheme when referring to pages from the help files.
   virtual void showPage(const QString& url);
+  virtual void showPage(const QUrl& url);
 
   /// Tires to locate a file name index.html in the given namespace and then
   /// shows that page.
@@ -60,6 +63,9 @@ public:
 signals:
   /// fired to relay warning messages from the help system.
   void helpWarnings(const QString&);
+
+protected slots:
+  void search();
 
 protected:
   QHelpEngine* HelpEngine;

@@ -33,17 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqHelpWindow.h"
 
 #include <QApplication>
-#include <QHelpEngine>
-#include <QHelpContentWidget>
-#include <QHelpContentModel>
-#include <QHelpContentItem>
-#include <QHelpIndexWidget>
 #include <QDir>
-#include <QTextBrowser>
-#include <QUrl>
-#include <QTemporaryFile>
+#include <QHelpContentItem>
+#include <QHelpContentModel>
+#include <QHelpContentWidget>
+#include <QHelpEngine>
+#include <QHelpIndexWidget>
+#include <QHelpSearchEngine>
+#include <QHelpSearchQueryWidget>
+#include <QHelpSearchResultWidget>
 #include <QLibraryInfo>
 #include <QtDebug>
+#include <QTemporaryFile>
+#include <QTextBrowser>
+#include <QUrl>
 
 class pqHelpWindow::pqTextBrowser : public QTextBrowser
 {
@@ -83,9 +86,26 @@ pqHelpWindow::pqHelpWindow(
   QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
     this, SIGNAL(helpWarnings(const QString&)));
 
+  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
+
+  this->tabifyDockWidget(ui.contentsDock, ui.indexDock);
+  this->tabifyDockWidget(ui.indexDock, ui.searchDock);
   ui.contentsDock->setWidget(this->HelpEngine->contentWidget());
   ui.indexDock->setWidget(this->HelpEngine->indexWidget());
-  ui.indexDock->hide();
+  ui.contentsDock->raise();
+
+  QWidget* searchPane = new QWidget(this);
+  QVBoxLayout* vbox = new QVBoxLayout();
+  searchPane->setLayout(vbox);
+  vbox->addWidget(engine->searchEngine()->queryWidget());
+  vbox->addWidget(engine->searchEngine()->resultWidget());
+  ui.searchDock->setWidget(searchPane);
+
+  QObject::connect(engine->searchEngine()->queryWidget(), SIGNAL(search()),
+    this, SLOT(search()));
+  QObject::connect(engine->searchEngine()->resultWidget(),
+    SIGNAL(requestShowLink(const QUrl&)),
+    this, SLOT(showPage(const QUrl&)));
 
   pqHelpWindow::pqTextBrowser* browser = 
     new pqHelpWindow::pqTextBrowser(this->HelpEngine, this);
@@ -105,6 +125,20 @@ pqHelpWindow::~pqHelpWindow()
 void pqHelpWindow::showPage(const QString& url)
 {
   this->Browser->setSource(url);
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::showPage(const QUrl& url)
+{
+  this->Browser->setSource(url);
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindow::search()
+{
+  QList<QHelpSearchQuery> query =
+    this->HelpEngine->searchEngine()->queryWidget()->query();
+  this->HelpEngine->searchEngine()->search(query);
 }
 
 //-----------------------------------------------------------------------------
