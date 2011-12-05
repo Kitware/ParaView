@@ -1,15 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
   CMAKE_POLICY(SET CMP0017 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
-
-if(NOT WIN32)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O3 -fpermissive -ffast-math -funroll-loops -fstrict-aliasing -w")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O3 -fpermissive -ffast-math -funroll-loops -fstrict-aliasing -w")
-endif()
-
 
 project(Nektar)
 
@@ -17,11 +11,10 @@ if(NOT MPI_LIBRARY)
   find_package(MPI REQUIRED)
 endif()
 
-message("BLAS_blas_LIBRARY ${BLAS_blas_LIBRARY}")
 if(NOT BLAS_blas_LIBRARY)
   find_package(BLAS)
 endif()
-message("LAPACK_lapack_LIBRARY ${LAPACK_lapack_LIBRARY}")
+
 if(NOT LAPACK_lapack_LIBRARY)
   find_PACKAGE(LAPACK)
 endif()
@@ -61,8 +54,8 @@ endif()
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${MPI_INCLUDE_PATH}
+#  ${CMAKE_CURRENT_SOURCE_DIR}
+#  ${MPI_INCLUDE_PATH}
   )
 
 add_library(nektarobj STATIC nektarObject.C)
@@ -73,7 +66,16 @@ add_paraview_plugin(pvNektarReader "1.0"
    GUI_RESOURCE_FILES pvNektarReaderGUI.xml)
 
 target_link_libraries(pvNektarReader
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Veclib/libvec.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Metis/metis-4.0/libmetis.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/gs/libgs.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libnektarmopt.a
+  #/home/partyd/Projects/Nektar/NEKTAR_OBJECT/libnektarobj.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libblas.a
+  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/liblapack.a
   hybrid
+  nektar
   vec
   metis
   gs
