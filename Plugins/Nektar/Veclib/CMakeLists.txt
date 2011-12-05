@@ -3,6 +3,11 @@ project(vec C Fortran)
 
 include_directories(${Nektar_SOURCE_DIR}/include)
 
+if(NOT WIN32)
+# need some try compiles
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+endif()
+
 set(veclib_math_sources
   math/xfft.c
   math/xvrand.c
@@ -83,6 +88,8 @@ set(veclib_misc_sources
   misc/veclib.c
   misc/dclock.c
   misc/mach.c
+  misc/zbesj.f
+  misc/fftdf.f
   )
 
 # MEMORY  = xvector xmatrix icopy
@@ -92,7 +99,6 @@ set(veclib_memory_sources
   memory/icopy.c
   )
 
-add_library(misc_F STATIC misc/zbesj.f misc/fftdf.f)
 
 add_library(vec STATIC 
   ${veclib_math_sources}
@@ -104,4 +110,4 @@ add_library(vec STATIC
   ${veclib_memory_sources}
   )
 
-target_link_libraries(vec misc_F)
+set_target_properties(vec PROPERTIES LINKER_LANGUAGE CXX)

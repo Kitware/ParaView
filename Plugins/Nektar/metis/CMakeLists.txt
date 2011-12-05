@@ -80,3 +80,4 @@ set(metis_sources
   )
 
 add_library(metis STATIC ${metis_sources})
+set_target_properties(metis PROPERTIES LINKER_LANGUAGE CXX)

@@ -7,12 +7,17 @@
 #        dgalerkin  ScaLapackNektar_new test_partition_connectivity \
 #        sgs
 
-project(nektar)
+project(nektar CXX)
 
 include_directories(
-  ${Nektar_SOURCE_DIR}/include
   ${MPI_INCLUDE_PATH}
+  ${Nektar_SOURCE_DIR}/include
   )
+
+if(NOT WIN32)
+# need some try compiles
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+endif()
 
 add_definitions(-DPARALLEL -DMETIS)
 
@@ -31,10 +36,9 @@ set(nektar_sources
   )
 
 add_library(nektar STATIC ${nektar_sources})
-target_link_libraries(nektar 
-  metis
-  gs
-  ${BLACS_C_init_LIBRARY}
-  ${BLACS_LIBRARY}
-  ${SCALAPACK_LIBRARY}
-  )
+
+#target_link_libraries(nektar
+#  ${MPI_LIBRARY}
+#  metis
+#  gs
+#  )

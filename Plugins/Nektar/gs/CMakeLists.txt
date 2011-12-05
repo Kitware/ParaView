@@ -6,6 +6,10 @@ include_directories(
   ${MPI_INCLUDE_PATH}
   )
 
+if(NOT WIN32)
+# need some try compiles
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+endif()
 
 add_definitions(-Dr8 -DMPISRC -DSAFE)
 
