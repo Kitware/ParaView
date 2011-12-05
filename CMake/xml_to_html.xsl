@@ -10,7 +10,7 @@
 <xsl:template match="/xml/categoryindex">
   <html>
     <head>
-      <title><xsl:value-of select="label" />Index</title>
+      <title><xsl:value-of select="label" /> Index</title>
       <xsl:element name="meta">
         <xsl:attribute name="name">filename</xsl:attribute>
         <xsl:attribute name="contents"><xsl:value-of select="label"/>.html</xsl:attribute></xsl:element>
