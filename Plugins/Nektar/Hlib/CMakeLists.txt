@@ -1,7 +1,12 @@
 
-project(hybrid CXX Fortran)
+project(hybrid C CXX Fortran)
+
+if(NOT MPI_INCLUDE_PATH)
+  find_package(MPI REQUIRED)
+endif()
 
 include_directories(
+  ${MPI_INCLUDE_PATH}
   ${Nektar_SOURCE_DIR}/include
   )
 
@@ -11,8 +16,9 @@ endif()
 
 if(NOT WIN32)
 # need some try compiles
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_C_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_CXX_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_Fortran_FLAGS "-fPIC -ffast-math -funroll-loops -w")
 endif()
 
 add_definitions(-DPARALLEL -DMETIS -DHOSURF -DZERONULLDIV -DSVVSYMM -DACCELERATOR -DCSGSLIB -DNDEBUG -DPBC_1D_LIN_ATREE)
@@ -75,11 +81,6 @@ set(hybrid_sources
   src/FelisaF.F
   )
 
-#add_library(Felisa STATIC src/FelisaF.F)
-
 add_library(hybrid STATIC ${hybrid_sources})
 
-#set_target_properties(Felisa PROPERTIES LINKER_LANGUAGE CXX)
-set_target_properties(hybrid PROPERTIES LINKER_LANGUAGE CXX)
-
-#target_link_libraries(hybrid Felisa vec metis gs)
+set_target_properties(hybrid PROPERTIES LINKER_LANGUAGE C)
