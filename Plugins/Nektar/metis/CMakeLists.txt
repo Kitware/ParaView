@@ -9,7 +9,7 @@ if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
 else()
 # need some try compiles
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -O2 -ansi -w")
+  set(CMAKE_C_FLAGS "-fPIC -O2 -ansi -w")
 endif()
 
 

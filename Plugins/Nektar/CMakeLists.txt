@@ -53,7 +53,6 @@ target_link_libraries(pvNektarReader
   #/home/partyd/Projects/Nektar/NEKTAR_OBJECT/libnektarobj.a
   #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libblas.a
   #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/liblapack.a
-  
   hybrid
   vec
   metis
