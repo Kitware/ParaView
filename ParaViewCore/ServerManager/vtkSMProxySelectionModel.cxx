@@ -44,10 +44,12 @@ public:
   vtkSMProxySelectionModel* Owner;
   bool FollowinMaster;
   bool Initilized;
+  bool DisableSessionStatePush;
   vtkstd::map<int, vtkSMMessage> ClientsCachedState;
 
   vtkInternal(vtkSMProxySelectionModel* owner)
     {
+    this->DisableSessionStatePush = false;
     this->Owner = owner;
     this->CollaborationManagerObserverID = 0;
     this->FollowinMaster = true;
@@ -126,8 +128,10 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command
 { 
   if (this->Current != proxy)
     {
+    this->Internal->DisableSessionStatePush = true;
     this->Current = proxy;
     this->Select(proxy, command);
+    this->Internal->DisableSessionStatePush = false;
     this->InvokeCurrentChanged(proxy);
     }
 }
@@ -211,42 +215,20 @@ void vtkSMProxySelectionModel::Select(
     this->Selection = new_selection;
     this->InvokeSelectionChanged();
     }
-
-  // Update the local state and push to the session
-  this->State->ClearExtension(ProxySelectionModelState::proxy);
-  this->State->ClearExtension(ProxySelectionModelState::port);
-
-  for (SelectionType::iterator iter = this->Selection.begin();
-    iter != this->Selection.end(); ++iter)
-    {
-    vtkSMProxy* obj = iter->GetPointer();
-    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
-      {
-      this->State->AddExtension( ProxySelectionModelState::proxy,
-        port->GetSourceProxy()->GetGlobalID());
-      this->State->AddExtension( ProxySelectionModelState::port,
-        port->GetPortIndex());
-      }
-    else
-      {
-      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
-      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
-      }
-    }
-
-  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::InvokeCurrentChanged(vtkSMProxy*  proxy)
 {
   this->InvokeEvent(vtkCommand::CurrentChangedEvent, proxy);
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::InvokeSelectionChanged()
 {
   this->InvokeEvent(vtkCommand::SelectionChangedEvent);
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
@@ -326,6 +308,32 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Has we are going to load a state, we can consider to be initialized
   this->Internal->Initilized = true;
 
+  // Load current proxy
+  vtkSMProxy* currentProxy = NULL;
+  if( msg->GetExtension(ProxySelectionModelState::current_proxy) != 0)
+    {
+    currentProxy =
+        locator->LocateProxy(
+          msg->GetExtension(ProxySelectionModelState::current_proxy));
+    if(currentProxy)
+      {
+      if(msg->GetExtension(ProxySelectionModelState::current_port) != -1)
+        {
+        // We have to select an output port
+        vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(currentProxy);
+        assert("Try to select an output port of a non source proxy" && source);
+
+        currentProxy =
+            source->GetOutputPort(
+              msg->GetExtension(ProxySelectionModelState::current_port));
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Did not find the CURRENT proxy for selection Model");
+      }
+    }
+
   SelectionType new_selection;
 
   // Load the proxy in the state
@@ -356,20 +364,62 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Apply the state
   bool tmp = this->IsLocalPushOnly();
   this->EnableLocalPushOnly();
+  this->SetCurrentProxy(currentProxy, NO_UPDATE);
   this->Select(new_selection, SELECT);
-  if (new_selection.size() > 0)
-    {
-    // No need to do: this->Select(proxyToSelect.GetPointer(), SELECT);
-    // This is achieved in the SetCurrentProxy.
-    this->SetCurrentProxy(new_selection.begin()->GetPointer(), SELECT);
-    }
-
   if(!tmp) this->DisableLocalPushOnly();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::PushStateToSession()
 {
+  if(this->Internal->DisableSessionStatePush)
+    {
+    return;
+    }
+
+  // Update the local state and push to the session
+  this->State->ClearExtension(ProxySelectionModelState::current_proxy);
+  this->State->ClearExtension(ProxySelectionModelState::current_port);
+  this->State->ClearExtension(ProxySelectionModelState::proxy);
+  this->State->ClearExtension(ProxySelectionModelState::port);
+
+  // - Selection
+  for ( SelectionType::iterator iter = this->Selection.begin();
+        iter != this->Selection.end(); ++iter)
+    {
+    vtkSMProxy* obj = iter->GetPointer();
+    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
+      {
+      this->State->AddExtension( ProxySelectionModelState::proxy,
+                                 port->GetSourceProxy()->GetGlobalID());
+      this->State->AddExtension( ProxySelectionModelState::port,
+                                 port->GetPortIndex());
+      }
+    else
+      {
+      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
+      }
+    }
+  // - Current
+  if ( this->Current )
+    {
+    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(this->Current.GetPointer()))
+      {
+      this->State->SetExtension( ProxySelectionModelState::current_proxy,
+                                 port->GetSourceProxy()->GetGlobalID());
+      this->State->SetExtension( ProxySelectionModelState::current_port,
+                                 port->GetPortIndex());
+      }
+    else
+      {
+      this->State->SetExtension( ProxySelectionModelState::current_proxy,
+                                 this->Current->GetGlobalID());
+      this->State->SetExtension( ProxySelectionModelState::current_port,
+                                 -1); // Not an outputport
+      }
+    }
+
   if(!this->IsLocalPushOnly() && this->GetSession())
     {
     this->PushState(this->State);

@@ -142,11 +142,14 @@ message PullRequest {
   }
 }
 
-// Extension ProxySelectionModel State ******************************** [50-51]
+// Extension ProxySelectionModel State ******************************** [50-53]
 
 message ProxySelectionModelState {
 
   extend Message {
+    optional uint32 current_proxy = 52 [default =  0];
+    optional int32  current_port  = 53 [default = -1];
+
     repeated uint32 proxy = 50;
     repeated int32  port  = 51;
   }
