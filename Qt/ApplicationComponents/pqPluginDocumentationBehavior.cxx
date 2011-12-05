@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPluginTracker.h"
 #include <vtksys/Base64.h>
 
+#include <QHelpContentWidget>
 #include <QHelpEngine>
-#include <QTemporaryFile>
-#include <QtDebug>
 #include <QSet>
+#include <QtDebug>
+#include <QTemporaryFile>
 
 //-----------------------------------------------------------------------------
 class pqPluginDocumentationBehavior::pqInternals
@@ -124,4 +125,7 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
     delete [] decoded_stream;
     decoded_stream = NULL;
     }
+
+  engine->setupData();
+  engine->contentWidget()->reset();
 }
