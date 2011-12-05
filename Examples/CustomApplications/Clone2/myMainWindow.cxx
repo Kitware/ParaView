@@ -76,7 +76,7 @@ myMainWindow::myMainWindow()
   this->Internals->proxyTabWidget->setShowOnAccept(true);
 
   // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget->getObjectInspector(),
+  QObject::connect(this->Internals->proxyTabWidget,
     SIGNAL(helpRequested(QString)),
     this, SLOT(showHelpForProxy(const QString&)));
 

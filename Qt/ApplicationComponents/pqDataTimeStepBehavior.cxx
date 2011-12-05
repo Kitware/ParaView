@@ -73,7 +73,7 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
     {
     vtkSMPropertyHelper helper(readerProxy, "TimestepValues");
     unsigned int num_timesteps = helper.GetNumberOfElements();
-    const double *timesteps = helper.GetAsDoublePtr();
+    std::vector<double> timesteps = helper.GetDoubleArray();
     if (num_timesteps > 1)
       {
       if (timeKeeper->getTime() < timesteps[num_timesteps-1])

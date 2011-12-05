@@ -256,15 +256,10 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
 
   this->Cache->UpdateRegisteredProxy();
 
-  return this->ProcessMessage(stream);
-}
+  // Save to cache when pulled for collaboration
+  this->SaveValueToCache(message, offset);
 
-//----------------------------------------------------------------------------
-bool vtkSIProxyProperty::Pull(vtkSMMessage*)
-{
-  // since proxy-properties cannot be InformationOnly, return false, so that the
-  // Proxy can simply return the cached property value, if any.
-  return false;
+  return this->ProcessMessage(stream);
 }
 
 //----------------------------------------------------------------------------

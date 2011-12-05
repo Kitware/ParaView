@@ -1,7 +1,6 @@
 project(CoProcessor)
 cmake_minimum_required(VERSION 2.6)
 include_directories(${CoProcessor_SOURCE_DIR})
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Needed for python scripting.")
 
 #--------------------------------------------------
 # Find and Use ParaView
@@ -68,52 +67,52 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 target_link_libraries(vtkCoProcessor ${CoProcessor_LIBS})
 
 IF (PARAVIEW_ENABLE_PYTHON)
-# Create Python bindings for the co-processing library
-INCLUDE(FindPythonLibs)
-SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
-INCLUDE(${VTK_CMAKE_DIR}/vtkWrapPython.cmake)
+  # Create Python bindings for the co-processing library
+  set(BUILD_SHARED_LIBS ON CACHE BOOL "Needed for python scripting.")
+  INCLUDE(FindPythonLibs)
+  SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
+  INCLUDE(${VTK_CMAKE_DIR}/vtkWrapPython.cmake)
 
-VTK_WRAP_PYTHON3(vtkCoProcessorPython CPPython_SRCS "${CoProcessor_SRCS}")
+  VTK_WRAP_PYTHON3(vtkCoProcessorPython CPPython_SRCS "${CoProcessor_SRCS}")
 
-# Create a shared library containing the python wrappers.  Executables
-# can link to this but it is not directly loaded dynamically as a
-# module.
-ADD_LIBRARY(vtkCoProcessorPythonD ${CPPython_SRCS})
-TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOPythonD)
+  # Create a shared library containing the python wrappers.  Executables
+  # can link to this but it is not directly loaded dynamically as a
+  # module.
+  ADD_LIBRARY(vtkCoProcessorPythonD ${CPPython_SRCS})
+  TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOPythonD)
 
-# On some UNIX platforms the python library is static and therefore
-# should not be linked into the shared library.  Instead the symbols
-# are exported from the python executable so that they can be used by
-# shared libraries that are linked or loaded.  On Windows and OSX we
-# want to link to the python libray to resolve its symbols
-# immediately.
-IF(WIN32 OR APPLE)
-  TARGET_LINK_LIBRARIES (vtkCoProcessorPythonD ${PYTHON_LIBRARIES})
-ENDIF(WIN32 OR APPLE)
+  # On some UNIX platforms the python library is static and therefore
+  # should not be linked into the shared library.  Instead the symbols
+  # are exported from the python executable so that they can be used by
+  # shared libraries that are linked or loaded.  On Windows and OSX we
+  # want to link to the python libray to resolve its symbols
+  # immediately.
+  IF(WIN32 OR APPLE)
+    TARGET_LINK_LIBRARIES (vtkCoProcessorPythonD ${PYTHON_LIBRARIES})
+  ENDIF(WIN32 OR APPLE)
 
-# Create a python module that can be loaded dynamically.  It links to
-# the shared library containing the wrappers for this kit.
-PYTHON_ADD_MODULE(vtkCoProcessorPython vtkCoProcessorPythonInit.cxx)
-TARGET_LINK_LIBRARIES(vtkCoProcessorPython vtkCoProcessorPythonD)
+  # Create a python module that can be loaded dynamically.  It links to
+  # the shared library containing the wrappers for this kit.
+  PYTHON_ADD_MODULE(vtkCoProcessorPython vtkCoProcessorPythonInit.cxx)
+  TARGET_LINK_LIBRARIES(vtkCoProcessorPython vtkCoProcessorPythonD)
 
-# Python extension modules on Windows must have the extension ".pyd"
-# instead of ".dll" as of Python 2.5.  Older python versions do support
-# this suffix.
-IF(WIN32 AND NOT CYGWIN)
-  SET_TARGET_PROPERTIES(vtkCoProcessorPython PROPERTIES SUFFIX ".pyd")
-ENDIF(WIN32 AND NOT CYGWIN)
+  # Python extension modules on Windows must have the extension ".pyd"
+  # instead of ".dll" as of Python 2.5.  Older python versions do support
+  # this suffix.
+  IF(WIN32 AND NOT CYGWIN)
+    SET_TARGET_PROPERTIES(vtkCoProcessorPython PROPERTIES SUFFIX ".pyd")
+  ENDIF(WIN32 AND NOT CYGWIN)
 
-IF(WIN32 OR APPLE)
-  TARGET_LINK_LIBRARIES (vtkCoProcessorPython ${PYTHON_LIBRARIES})
-ENDIF(WIN32 OR APPLE)
+  IF(WIN32 OR APPLE)
+    TARGET_LINK_LIBRARIES (vtkCoProcessorPython ${PYTHON_LIBRARIES})
+  ENDIF(WIN32 OR APPLE)
 
-
-SET(PYTHON_MODULE_PREFIX "")
-PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/cppythonmodules.h)
-GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
-IF(PY_STATIC_MODULES_LIST)
-  TARGET_LINK_LIBRARIES(vtkCoProcessor ${PY_STATIC_MODULES_LIST})
-ENDIF(PY_STATIC_MODULES_LIST)
+  SET(PYTHON_MODULE_PREFIX "")
+  PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/cppythonmodules.h)
+  GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
+  IF(PY_STATIC_MODULES_LIST)
+    TARGET_LINK_LIBRARIES(vtkCoProcessor ${PY_STATIC_MODULES_LIST})
+  ENDIF(PY_STATIC_MODULES_LIST)
 
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 

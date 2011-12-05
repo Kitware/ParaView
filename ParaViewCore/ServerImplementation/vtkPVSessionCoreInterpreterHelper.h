@@ -37,10 +37,26 @@ public:
   vtkTypeMacro(vtkPVSessionCoreInterpreterHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Returns the vtkSIObject for the global-id. This is used by SIOBJECT() and
+  // SIPROXY() stream (vtkClientServerStream) manipulator macros.
   vtkSIObject* GetSIObject(vtkTypeUInt32 gid);
+
+  // Description:
+  // Returns the vtkObject corresponding to the global id. This is used by the
+  // VTKOBJECT() stream (vtkClientServerStream) manipulator macros.
   vtkObjectBase* GetVTKObject(vtkTypeUInt32 gid);
 
+  // Description:
+  // Reserve a global id block.
+  vtkTypeUInt32 GetNextGlobalIdChunk(vtkTypeUInt32 chunkSize);
+
+  // Description:
+  // Provides access to the process module.
   vtkProcessModule* GetProcessModule();
+
+  // Description:
+  // Provides access to the progress handler.
   vtkPVProgressHandler* GetActiveProgressHandler();
 
   // Description:
@@ -48,6 +64,8 @@ public:
   // data-server and render-server.
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
 
+  // Description:
+  // Used by vtkPVSessionCore to pass the core. This is not reference counted.
   void SetCore(vtkPVSessionCore*);
 
 //BTX

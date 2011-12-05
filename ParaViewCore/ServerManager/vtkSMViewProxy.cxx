@@ -84,8 +84,8 @@ void vtkSMViewProxy::CreateVTKObjects()
   this->ExecuteStream(stream);
 
   vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
-    vtkPVView::ViewTimeChangedEvent,
-    this, &vtkSMViewProxy::ViewTimeChanged);
+      vtkPVView::ViewTimeChangedEvent,
+      this, &vtkSMViewProxy::ViewTimeChanged);
 }
 
 //----------------------------------------------------------------------------
@@ -173,10 +173,26 @@ void vtkSMViewProxy::Update()
   if (this->ObjectsCreated && this->NeedsUpdate)
     {
     vtkClientServerStream stream;
+
+    // To avoid race conditions in multi-client modes, we are taking a peculiar
+    // approach. Any ivar that affect parallel communication are overridden
+    // using the client-side values in the same ExecuteStream() call. That
+    // ensures that two clients cannot enter race condition. This results in minor
+    // increase in the size of the messages sent, but overall the benefits are
+    // greater.
+    vtkPVView* pvview = vtkPVView::SafeDownCast(this->GetClientSideObject());
+    if (pvview)
+      {
+      int use_cache =  pvview->GetUseCache()? 1 : 0;
+      stream << vtkClientServerStream::Invoke
+             << VTKOBJECT(this)
+             << "SetUseCache" << use_cache
+             << vtkClientServerStream::End;
+      }
     stream << vtkClientServerStream::Invoke
-      << VTKOBJECT(this)
-      << "Update"
-      << vtkClientServerStream::End;
+           << VTKOBJECT(this)
+           << "Update"
+           << vtkClientServerStream::End;
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
@@ -301,4 +317,9 @@ int vtkSMViewProxy::WriteImage(const char* filename,
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::HasDirtyRepresentation()
+{
+  return this->NeedsUpdate;
 }

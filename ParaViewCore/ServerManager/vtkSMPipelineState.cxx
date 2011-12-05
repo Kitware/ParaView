@@ -20,6 +20,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMProxyLocator.h"
 
 #include "vtkPVSession.h"
 
@@ -45,9 +46,20 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
   return vtkSMObject::GetProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
-void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator, bool vtkNotUsed(definitionOnly))
+void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
+                                    vtkSMProxyLocator* locator)
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if(this->ClientOnlyLocationFlag)
+    {
+    pxm->DisableStateUpdateNotification();
+    pxm->LoadState(msg, locator);
+    pxm->EnableStateUpdateNotification();
+    }
+  else
+    {
+    pxm->LoadState(msg, locator);
+    }
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()
@@ -56,6 +68,9 @@ void vtkSMPipelineState::ValidateState()
     {
     vtkSMMessage msg;
     msg.CopyFrom(*this->GetFullState());
+//    cout << "~~~~~~~~~~~~~ PUSH pxm state to server ~~~~~~~~~~~~~~~~" << endl;
+//    msg.PrintDebugString();
+//    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     this->PushState(&msg);
     }
 }

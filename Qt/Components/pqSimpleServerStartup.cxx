@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMath.h>
 #include <vtkTimerLog.h>
 #include <vtkPVXMLElement.h>
+#include <vtkSMProxyManager.h>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -798,9 +799,17 @@ void pqSimpleServerStartup::connectServer()
 {
   this->disconnectAllServers();
 
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  // Disable server notification for intermediate ProxyManager state
+  pxm->DisableStateUpdateNotification();
+
   pqServer* const server =
     pqApplicationCore::instance()->getObjectBuilder()->
     createServer(this->Implementation->Server);
+
+  // Enable server notification + Send the last state of the ProxyManager
+  pxm->EnableStateUpdateNotification();
+  pxm->TriggerStateUpdate();
 
   if(server)
     {

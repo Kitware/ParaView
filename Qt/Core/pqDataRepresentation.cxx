@@ -281,26 +281,37 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
 int pqDataRepresentation::getProxyScalarMode( )
 {
   vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast( this->getProxy() );
-   if (!repr)
+  if (!repr)
     {
     return 0;
+    }
+
+  // we check on if there is a color array name first since
+  // color attribute type may still be POINT_DATA or CELL_DATA even though
+  // the object isn't colored by field data
+  QVariant colorArrayName = pqSMAdaptor::getElementProperty(
+    repr->GetProperty("ColorArrayName"));
+
+  if(colorArrayName.isValid() == false || colorArrayName.isNull() == true ||
+     colorArrayName == "")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_NONE;
     }
 
   QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
     repr->GetProperty("ColorAttributeType"));
 
-   if(scalarMode == "CELL_DATA")
-      {
-      return vtkDataObject::FIELD_ASSOCIATION_CELLS;
-      }
-    else if(scalarMode == "POINT_DATA")
-      {
-      return vtkDataObject::FIELD_ASSOCIATION_POINTS;
-      }
+  if(scalarMode == "CELL_DATA")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_CELLS;
+    }
+  else if(scalarMode == "POINT_DATA")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    }
 
-   return vtkDataObject::FIELD_ASSOCIATION_NONE;
-  }
-
+  return vtkDataObject::FIELD_ASSOCIATION_NONE;
+}
 
 //-----------------------------------------------------------------------------
 vtkPVArrayInformation* pqDataRepresentation::getArrayInformation( const char* arrayname, const int &fieldType )

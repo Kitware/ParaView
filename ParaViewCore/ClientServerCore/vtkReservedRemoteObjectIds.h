@@ -17,6 +17,10 @@
 // .SECTION Description
 // Enum listing custom remote object with dedicated GlobalID. Those IDs are 
 // listed inside this enum to prevent any possible conflict.
+// ReservedId should be used if:
+//  - You have a vtkRemoteObject or a Proxy that is client only.
+//  - Only one instance in a session
+//  - It has to be shared across clients
 
 #ifndef __vtkReservedRemoteObjectIds_h
 #define __vtkReservedRemoteObjectIds_h
@@ -26,9 +30,10 @@ struct VTK_EXPORT vtkReservedRemoteObjectIds
   // This Enum allow the user to list a set of the reserved GlobalIds
   enum ReservedGlobalIds
     {
-    RESERVED_PROXY_MANAGER_ID = 1,
-    RESERVED_PROXY_DEFINITION_MANAGER_ID = 2,
-    RESERVED_MAX_IDS = 255
+    RESERVED_PROXY_MANAGER_ID              = 1,
+    RESERVED_PROXY_DEFINITION_MANAGER_ID   = 2,
+    RESERVED_COLLABORATION_COMMUNICATOR_ID = 3,
+    RESERVED_MAX_IDS                       = 255
     };
 };
 #endif

@@ -64,6 +64,12 @@ protected slots:
   /// Called when the action is triggered.
   virtual void onTriggered(){ }
 
+  virtual void updateEnableState(){ }
+  virtual void updateMasterEnableState(bool);
+
+protected:
+  bool IsMaster;
+
 private:
   Q_DISABLE_COPY(pqReaction)
 };

@@ -40,6 +40,7 @@ void vtkUndoStack::Clear()
 {
   this->Internal->UndoStack.clear();
   this->Internal->RedoStack.clear();
+  this->InvokeEvent(vtkUndoStack::UndoSetClearedEvent);
   this->Modified();
 }
 
@@ -51,7 +52,8 @@ void vtkUndoStack::Push(const char* label, vtkUndoSet* changeSet)
   while (this->Internal->UndoStack.size() >= 
     static_cast<unsigned int>(this->StackDepth) && this->StackDepth > 0)
     {
-    this->Internal->UndoStack.erase(this->Internal->UndoStack.begin()); 
+    this->Internal->UndoStack.erase(this->Internal->UndoStack.begin());
+    this->InvokeEvent(vtkUndoStack::UndoSetRemovedEvent);
     }
   this->Internal->UndoStack.push_back(
     vtkUndoStackInternal::Element(label, changeSet));

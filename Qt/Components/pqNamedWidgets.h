@@ -76,7 +76,7 @@ class PQCOMPONENTS_EXPORT pqNamedWidgets
 {
 public:
   /// populate a grid layout with widgets to represent the properties
-  static void createWidgets(QGridLayout* l, vtkSMProxy* pxy);
+  static void createWidgets(QGridLayout* l, vtkSMProxy* pxy, bool summaryOnly = false);
 
   /// Link a collection of Qt child widgets with server manager properties by name
   static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager,

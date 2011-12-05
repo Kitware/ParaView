@@ -45,7 +45,8 @@ vtkPVClientServerSynchronizedRenderers::~vtkPVClientServerSynchronizedRenderers(
 void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
 {
   // receive image from slave.
-  assert(this->ParallelController->IsA("vtkSocketController"));
+  assert(this->ParallelController->IsA("vtkSocketController") ||
+         this->ParallelController->IsA("vtkCompositeMultiProcessController") );
 
   vtkRawImage& rawImage = (this->ImageReductionFactor == 1)?
     this->FullImage : this->ReducedImage;
@@ -73,7 +74,8 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
 //----------------------------------------------------------------------------
 void vtkPVClientServerSynchronizedRenderers::SlaveEndRender()
 {
-  assert(this->ParallelController->IsA("vtkSocketController"));
+  assert(this->ParallelController->IsA("vtkSocketController") ||
+         this->ParallelController->IsA("vtkCompositeMultiProcessController") );
 
   vtkRawImage &rawImage = this->CaptureRenderedImage();
 

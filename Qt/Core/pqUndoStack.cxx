@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqServer.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 class pqUndoStack::pqImplementation
@@ -273,7 +274,10 @@ bool pqUndoStack::ignoreAllChanges() const
 //-----------------------------------------------------------------------------
 void pqUndoStack::setActiveServer(pqServer* server)
 {
-  if (server)
+  // Clear stack
+  this->Implementation->IgnoreAllChangesStack.clear();
+
+  if (server && !server->session()->IsMultiClients())
     {
     this->endNonUndoableChanges();
     }

@@ -23,18 +23,30 @@
 #ifndef __vtkSMProxySelectionModel_h
 #define __vtkSMProxySelectionModel_h
 
-#include "vtkSMObject.h"
+#include "vtkSMRemoteObject.h"
+#include "vtkSMMessageMinimal.h" // Needed for vtkSMMessage*
 
 class vtkSMProxySelectionModelInternal;
 class vtkCollection;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMObject
+class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxySelectionModel*  New();
-  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMObject);
+  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMRemoteObject);
   void PrintSelf(ostream&  os,  vtkIndent  indent);
+
+  // Description:
+  // Override the set session, so we can attach an observer to the Collaboration
+  // manager in order to monitor master/slave changes.
+  virtual void SetSession(vtkSMSession*);
+
+  // Description:
+  // Allow to synchronize the active object with master or just keep remote object
+  // out-of-synch. Only the state from the master will be loaded.
+  void SetFollowingMaster(bool following);
+  bool IsFollowingMaster();
  
 //BTX
   // vtkSMProxy selection flags
@@ -107,23 +119,49 @@ public:
   // vtkCommand::SelectionChangedEvent.
   vtkGetObjectMacro(NewlySelected, vtkCollection);
   vtkGetObjectMacro(NewlyDeselected, vtkCollection);
-//BTX 
+
+//BTX
+
+  // Description:
+  // This method return the full object state that can be used to create that
+  // object from scratch.
+  // This method will be used to fill the undo stack.
+  // If not overriden this will return NULL.
+  virtual const vtkSMMessage* GetFullState();
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMProxySelectionModel();
   ~vtkSMProxySelectionModel();
 
   void InvokeCurrentChanged(vtkSMProxy*  proxy);
-  void InvokeSelectionChanged();
+  void InvokeSelectionChanged(int selectionFlag);
+
+  // Description:
+  // When the state has changed we call that method so the state can be shared
+  // is any collaboration is involved
+  void PushStateToSession();
   
   vtkCollection* NewlySelected;
   vtkCollection* NewlyDeselected;
   vtkCollection* Selection;
+
+  // Cached version of State
+  vtkSMMessage* State;
 
 private:
   vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&); // Not implemented
   void operator = (const  vtkSMProxySelectionModel&); // Not implemented
 
   class vtkInternal;
+  friend class vtkInternal;
   vtkInternal* Internal;
 //ETX
 };

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonMacroSupervisor.h"
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "pqServer.h"
 
 #include "pqPythonManager.h"
 #include "pqCoreUtilities.h"
@@ -74,6 +75,10 @@ public:
 pqPythonMacroSupervisor::pqPythonMacroSupervisor(QObject* p) : QObject(p)
 {
   this->Internal = new pqInternal;
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this,
+                   SLOT(updateMacroList()));
 }
 
 //----------------------------------------------------------------------------
@@ -288,22 +293,30 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
     action->setText(macroName);
     return;
     }
+
+  // If we are master we allow macros
+  bool enable = pqApplicationCore::instance()->getActiveServer() ?
+                pqApplicationCore::instance()->getActiveServer()->isMaster() :
+                true;
   
   // Run action
   QAction* runAction = new QAction(macroName, this);
   runAction->setData(fileName);
+  runAction->setEnabled(enable);
   this->Internal->RunActionMap.insert(fileName, runAction);
   this->connect(runAction, SIGNAL(triggered()), SLOT(onMacroTriggered()));
 
   // Edit action
   QAction* editAction = new QAction(macroName, this);
   editAction->setData(fileName);
+  editAction->setEnabled(enable);
   this->Internal->EditActionMap.insert(fileName, editAction);
   this->connect(editAction, SIGNAL(triggered()), SLOT(onEditMacroTriggered()));
 
   // Delete action
   QAction* deleteAction = new QAction(macroName, this);
   deleteAction->setData(fileName);
+  deleteAction->setEnabled(enable);
   this->Internal->DeleteActionMap.insert(fileName, deleteAction);
   this->connect(deleteAction, SIGNAL(triggered()), SLOT(onDeleteMacroTriggered()));
 

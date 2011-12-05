@@ -2010,7 +2010,6 @@
         command="AddView"
         remove_command="RemoveView"
         argument_type="SMProxy"
-        state_ignored="1"
         repeatable="1">
         <Documentation>
           Views with their view time linked with this time keeper.
@@ -2204,7 +2203,7 @@
            class="vtkPolyDataMapper"
            processes="client|renderserver">
       <Documentation>
-        This proxy is useful for changing gloabal mapper settings such as
+        This proxy is useful for changing global mapper settings such as
         the coincident topology resolution setting on all rendering proceses.
       </Documentation>
       <IntVectorProperty name="Mode"
