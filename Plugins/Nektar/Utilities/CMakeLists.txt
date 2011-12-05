@@ -9,6 +9,10 @@
 
 project(nektar CXX)
 
+if(NOT MPI_INCLUDE_PATH)
+  find_package(MPI REQUIRED)
+endif()
+
 include_directories(
   ${MPI_INCLUDE_PATH}
   ${Nektar_SOURCE_DIR}/include
@@ -16,7 +20,7 @@ include_directories(
 
 if(NOT WIN32)
 # need some try compiles
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_CXX_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
 endif()
 
 add_definitions(-DPARALLEL -DMETIS)

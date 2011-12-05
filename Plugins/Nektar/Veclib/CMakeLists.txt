@@ -5,7 +5,8 @@ include_directories(${Nektar_SOURCE_DIR}/include)
 
 if(NOT WIN32)
 # need some try compiles
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_C_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_Fortran_FLAGS "-fPIC")
 endif()
 
 set(veclib_math_sources
@@ -110,4 +111,4 @@ add_library(vec STATIC
   ${veclib_memory_sources}
   )
 
-set_target_properties(vec PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(vec PROPERTIES LINKER_LANGUAGE C)
