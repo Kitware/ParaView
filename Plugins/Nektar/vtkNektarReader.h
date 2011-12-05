@@ -9,7 +9,7 @@
 #include <nektar.h>
 #include <gen_utils.h>
 
-
+#include <mpi.h>
 
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkPoints.h"
@@ -17,8 +17,8 @@
 
 
 class vtkDataArraySelection;
-class nektarList;
-class nektarObject;
+
+#include "nektarObject.h"
 
 
 class VTK_EXPORT vtkNektarReader : public vtkUnstructuredGridAlgorithm

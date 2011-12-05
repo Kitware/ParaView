@@ -65,6 +65,7 @@ include_directories(
   ${MPI_INCLUDE_PATH}
   )
 
+add_library(nektarobj STATIC nektarObject.C)
 
 add_paraview_plugin(pvNektarReader "1.0"
    SERVER_MANAGER_XML pvNektarReader.xml
@@ -77,6 +78,7 @@ target_link_libraries(pvNektarReader
   metis
   gs
   nektar
+  nektarobj
   ${BLAS_blas_LIBRARY}
   ${LAPACK_lapack_LIBRARY}
 #  ${F2C_LIBRARY}

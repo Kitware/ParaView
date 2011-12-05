@@ -23,166 +23,6 @@
 
 vtkStandardNewMacro(vtkNektarReader);
 
-class nektarObject
-{
-public:
-
-  vtkUnstructuredGrid* ugrid;
-  bool pressure;
-  bool velocity;
-  bool vorticity;
-  bool lambda_2;
-  int index;
-  int resolution;
-  nektarObject *prev;
-  nektarObject *next;
-
-  //nektarObject *find_obj(int id);
-  void reset()
-  {
-    this->pressure = false;
-    this->velocity = false;
-    this->vorticity = false;
-    this->lambda_2 = false;
-    this->index = 0;
-    this->resolution = 2;
-    if(this->ugrid)
-      {
-      this->ugrid->Delete();
-      this->ugrid = NULL;
-      }
-  }
-
-  nektarObject()
-  {
-    this->ugrid = NULL;
-    this->pressure = false;
-    this->velocity = false;
-    this->vorticity = false;
-    this->lambda_2 = false;
-    this->index = 0;
-    this->resolution = 2;
-    this->prev = NULL;
-    this->next = NULL;
-    }
-
-  ~nektarObject()
-  {
-    //fprintf(stdout, "nektarObject::~nektarObject() Called\n");
-    if(this->ugrid)
-      this->ugrid->Delete();
-  }
-};
-
-class nektarList
-{
-public:
-  nektarObject* head;
-  nektarObject* tail;
-  int max_count;
-  int cur_count;
-
-  nektarObject* getObject(int id)
-  {
-    nektarObject* curObj = this->head;
-    while (curObj)
-      {
-      if (curObj->index == id)  // if we found it
-        {
-        // move found obj to tail of the list
-        // if already tail, do nothing
-        if(curObj == this->tail)
-          break;
-
-        // if it's the head, update head to next
-        if(curObj == this->head)
-          {
-          this->head = this->head->next;
-          }
-        // now move curObj to tail
-        curObj->next->prev = curObj->prev;
-        if(curObj->prev) // i.e. if current was not the head
-          {
-          curObj->prev->next = curObj->next;
-          }
-        this->tail->next = curObj;
-        curObj->prev = this->tail;
-        curObj->next = NULL;
-        this->tail = curObj;
-        break;
-
-        }
-      else // otherwise, lok at the next one
-        {
-        curObj = curObj->next;
-        }
-      }
-
-    // if we didn't find it
-    if(curObj == NULL)
-      {
-      // if we are not over allocated,
-      // create a new object, and put it at the tail
-      if(this->cur_count < this->max_count)
-        {
-        this->cur_count++;
-        //curObj = nektarObject::New();
-        curObj = new nektarObject();
-        if (this->head == NULL)  // if list is empty
-          {
-          this->head = curObj;
-          this->tail = curObj;
-          }
-        else
-          {
-          this->tail->next = curObj;
-          curObj->prev = this->tail;
-          curObj->next = NULL;
-          this->tail = curObj;
-          }
-        // set the index to the one requested
-        curObj->index = id;
-        }
-      else  // otherwise reuse oldest obj (head), reset and move to tail
-        {
-        curObj = this->head;
-        this->head = this->head->next;
-        this->head->prev = NULL;
-
-        this->tail->next = curObj;
-        curObj->prev = this->tail;
-        curObj->next = NULL;
-        this->tail = curObj;
-        curObj->reset();
-        curObj->index = id;
-        }
-      }
-
-    return(curObj);
-  }
-
-  nektarList()
-  {
-    this->head = NULL;
-    this->tail = NULL;
-    this->max_count = 10;
-    this->cur_count = 0;
-  }
-
-  ~nektarList()
-  {
-    nektarObject* curObj = this->head;
-    while (curObj)
-      {
-      this->head = this->head->next;
-      //curObj->Delete();
-      curObj->~nektarObject();
-      curObj = this->head;
-
-      }
-  }
-};
-
 
 int  setup (FileList *f, Element_List **U, int *nftot, int Nsnapshots);
 void ReadCopyField (FileList *f, Element_List **U);
@@ -653,41 +493,41 @@ int vtkNektarReader::RequestInformation(
       p2=strchr(p, '\n');
        *p2= '\0';
 
-      if(vtksys::SystemTools::Strucmp(param, "REA_FILE") == 0)
+      if(strcasecmp(param, "REA_FILE") == 0)
       {
     while (*p == ' ')
         p++;
           strcpy(this->p_rea_file, p);
       }
-      else if(vtksys::SystemTools::Strucmp(param, "RST_DIR") == 0)
+      else if(strcasecmp(param, "RST_DIR") == 0)
       {
     while (*p == ' ')
         p++;
           strcpy(this->p_rst_dir, p);
       }
-      else if(vtksys::SystemTools::Strucmp(param, "RST_BASE") == 0)
+      else if(strcasecmp(param, "RST_BASE") == 0)
       {
     while (*p == ' ')
         p++;
     strcpy(this->p_rst_base, p);
       }
-      else if(vtksys::SystemTools::Strucmp(param, "RST_EXT") == 0)
+      else if(strcasecmp(param, "RST_EXT") == 0)
       {
     while (*p == ' ')
         p++;
     strcpy(this->p_rst_ext, p);
       }
-      else if(vtksys::SystemTools::Strucmp(param, "RST_START") == 0)
+      else if(strcasecmp(param, "RST_START") == 0)
           sscanf(p, "%d", &this->p_rst_start);
-      else if(vtksys::SystemTools::Strucmp(param, "RST_INC") == 0)
+      else if(strcasecmp(param, "RST_INC") == 0)
           sscanf(p, "%d", &this->p_rst_inc);
-      else if(vtksys::SystemTools::Strucmp(param, "RST_NUM") == 0)
+      else if(strcasecmp(param, "RST_NUM") == 0)
           sscanf(p, "%d", &this->p_rst_num);
-      else if(vtksys::SystemTools::Strucmp(param, "RST_DIGITS") == 0)
+      else if(strcasecmp(param, "RST_DIGITS") == 0)
           sscanf(p, "%d", &this->p_rst_digits);
-      else if(vtksys::SystemTools::Strucmp(param, "TIME_START") == 0)
+      else if(strcasecmp(param, "TIME_START") == 0)
           sscanf(p, "%f", &this->p_time_start);
-      else if(vtksys::SystemTools::Strucmp(param, "TIME_INC") == 0)
+      else if(strcasecmp(param, "TIME_INC") == 0)
           sscanf(p, "%f", &this->p_time_inc);
 
       scan_ret = fgets(paramLine, 256, inPtr);
@@ -1188,7 +1028,7 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid)
   if(this->master[0]->fhead->dim() == 3)
   {
     double ***num;
-    double ** temp_array = new double *[this->nfields];
+    double *temp_array[this->nfields];
 
     qa = iparam("VIS_RES");
     vtkDebugMacro(<<"vtkNektarReader::updateVtuData:: rank = "<<this->my_rank<<" QGmax = "<<QGmax<<", qa = "<< qa);
