@@ -1,14 +1,19 @@
 
 project(gs)
 
+if(NOT MPI_INCLUDE_PATH)
+  find_package(MPI REQUIRED)
+endif()
+
+
 include_directories(
-  ${gs_SOURCE_DIR}/include
   ${MPI_INCLUDE_PATH}
+  ${gs_SOURCE_DIR}/include
   )
 
 if(NOT WIN32)
 # need some try compiles
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
+  set(CMAKE_C_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
 endif()
 
 add_definitions(-Dr8 -DMPISRC -DSAFE)
@@ -40,3 +45,5 @@ set(gslib_headers
   )
 
 add_library(gs STATIC ${gslib_sources} ${gslib_headers})
+
+#set_target_properties(gs PROPERTIES COMPILE_DEFINITIONS -Dr8 -DMPISRC -DSAFE)
