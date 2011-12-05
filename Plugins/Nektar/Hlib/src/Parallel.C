@@ -22,14 +22,14 @@
 #include <string.h>
 #include "hotel.h"
 
-#ifndef PARALLEL
-#error NO PARALLEL!
+
 /* dummy functions */
 void init_comm (int *argc, char **argv[]){
   pllinfo[get_active_handle()].nprocs = 1;
   pllinfo[get_active_handle()].procid = 0;
 }
 
+#ifndef PARALLEL
 int numnodes (void){
   return 1;
 }
@@ -53,6 +53,7 @@ void gisum (int *x, int n, int *work){
   error_msg(No message passing routines linked);
 }
 
+#endif
 
 void BCreduce(double *bc, Bsystem *Ubsys){
   error_msg(No message passing routines linked);
@@ -100,5 +101,3 @@ void default_partitioner(Element_List *EL, int *partition){
       partition[j] = i;
 
 }
-
-#endif
