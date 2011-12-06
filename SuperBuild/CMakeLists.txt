@@ -328,7 +328,9 @@ endif()
 
 if(ENABLE_YT)
   set(MPL_dependencies NUMPY zlib)
-  list(APPEND MPL_dependencies freetype png)
+  if(WIN32 OR APPLE)
+    list(APPEND MPL_dependencies freetype png)
+  endif()
   include(External_MPL)
 
   set(Cython_dependencies NUMPY)
