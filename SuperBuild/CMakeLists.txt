@@ -105,13 +105,13 @@ set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 
 
-if(WIN32 OR APPLE)
+#if(WIN32 OR APPLE)
   set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
   set(pv_c_flags ${CMAKE_C_FLAGS})
-elseif()
-  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
-  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
-endif()
+#elseif()
+#  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
+#  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
+#endif()
 
 if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
