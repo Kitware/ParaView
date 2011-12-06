@@ -3793,6 +3793,9 @@
        <Documentation>
          This property lists which cell-centered arrays to read.
        </Documentation>
+       <Hints>
+         <ShowInSummaryPanel/>
+       </Hints>
      </StringVectorProperty>
 
      <Hints>
