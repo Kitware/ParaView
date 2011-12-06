@@ -102,7 +102,7 @@
  *                                                                       *
  *                                                                       *
  * Internal Symbol Table                                                 *
- * ---------------------                                                 *
+ * ---------------------                                                 * 
  * Symbol *install(char *name, int type, ...)                            *
  * Symbol *lookup (char *name)                                           *
  *                                                                       *
@@ -124,7 +124,7 @@
  * --------------------                                                  *
  * The parsers provide two types of function-string parsing based on the *
  * type of access involved: a vector parser for forcing functions and    *
- * boundary conditions and a scalar parser for miscellaneous applica-    *
+ * boundary conditions and a scalar parser for miscellaneous applica-    *   
  * tions.  The interfaces for these routines are:                        *
  *                                                                       *
  * void    vector_def (char *vlist, char *function)                      *
@@ -132,7 +132,7 @@
  *                                                                       *
  * double  scalar     (char *function)                                   *
  * --------------------------------------------------------------------- */
-
+ 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -154,12 +154,12 @@ typedef double (*PFD)(); /* Pointer to a function returning double */
 typedef struct Symbol {  /* Symbol table entry */
         char *name   ;   /* Symbol name        */
         short type   ;   /* VAR, BLTIN, UNDEF, DPARAM, IPARAM, OPTION */
-  short status ;   /* (see status definitions) */
+	short status ;   /* (see status definitions) */
         union {
-    int    num ;
+		int    num ;
                 double val ;
-    PFD    ptr ;
-        } u;
+		PFD    ptr ;
+	      } u;
       } Symbol;
 
 //extern double doUserdefA(double x, double y, double z);
@@ -173,29 +173,29 @@ typedef struct Symbol {  /* Symbol table entry */
 
 static Symbol  *install(char*, int, ...),    /* Table management (LOCAL) */
                *lookup (char*);
-static  double
+static  double 
   Sqrt(double),                         /* Operators (mathematical) */
-  Rand(double), Integer(double),
-  Mod(double),
-  Log(double), Log10(double),
-  Exp(double),
+  Rand(double), Integer(double), 
+  Mod(double), 
+  Log(double), Log10(double), 
+  Exp(double), 
   Radius(double,double),                /* ... binary operators ... */
   Jn(double,double),
   Yn(double,double),
   Angle(double,double),
   Step(double,double),                  /* Step function */
   Step2(double,double),                  /* Step function */
-  Pow(double,double),
+  Pow(double,double), 
   Shock(double,double,double),
   ReJn(double, double, double),
   ImJn(double, double, double),
   Jacobi(double,double,double,double),
-  Bump(double),
+  Bump(double), 
   Single(double, double),               /* NUWC new single tile: electrodes  */
   Womsin(double,double,double,double,double),
   Womcos(double,double,double,double,double);
 
-//static double
+//static double 
 //   UserdefA(double,double,double);
 
 
@@ -214,12 +214,12 @@ static struct {
   char   *name;
   int     oval;
 } O_default[] = {                 /* Options */
-   "binary",      1,
-   "direct",      1,
-   "core",        1,
-   "ReCalcPrecon",1,
-   "NPVIZ",       2,
-    0, 0
+	 "binary",      1,
+	 "direct",      1,
+	 "core",        1,
+	 "ReCalcPrecon",1,
+	 "NPVIZ",       2,
+	  0, 0
 };
 
 static struct {                /* Parameters (integer) */
@@ -237,28 +237,28 @@ static struct {                /* Parameters (integer) */
          "P_RK_scheme_id",        7,
          "P_RK_IOsteps",          0,
          "HISSTEP",               0,
-   "CFLSTEP",               0,
+	 "CFLSTEP",               0,
          "DIM",                   2,
-   "NSTEPS",                1,
-   "NRCSTEP",               0, /* needed for steering of computation. resets RC B.C. values */
-   "IOSTEP",                0,
+	 "NSTEPS",                1,
+	 "NRCSTEP",               0, /* needed for steering of computation. resets RC B.C. values */
+	 "IOSTEP",                0,
          "ELEMENTS",              0,
-   "NORDER",                5,
-   "MODES",                 0,
-   "EQTYPE",                0,
-   "INTYPE",                2,
+	 "NORDER",                5,
+	 "MODES",                 0,
+	 "EQTYPE",                0,
+	 "INTYPE",                2,
          "VTKSTEPS",              0,
          "RMTHST",                0, /* 1 if remote host is spesified 0 if not */
-   "NPODORDER",      0, /* number of fields for accelerator */
-         "NPPODORDER",            0, /* number of fields for accelerator */
+	 "NPODORDER",		  0, /* number of fields for accelerator */
+         "NPPODORDER",            0, /* number of fields for accelerator */	
          "NPORT",              5001, /* default port number */
-   "LQUAD",                 0, /* quadrature points in 'a' direction  */
+	 "LQUAD",                 0, /* quadrature points in 'a' direction  */
          "MQUAD",                 0, /* quadrature points in 'b' direction  */
 #if DIM == 3
-   "NQUAD",                 0, /* quadrature points in 'c' direction  */
+	 "NQUAD",                 0, /* quadrature points in 'c' direction  */
 #endif
-   "IDpatch",      0, /* handle, index of domain currently being processed*/
-    0,                      0
+	 "IDpatch",		  0, /* handle, index of domain currently being processed*/
+	  0,                      0
 };
 
 static struct {                  /* Parameters (double) */
@@ -272,31 +272,31 @@ static struct {                  /* Parameters (double) */
          "P_RK_Kfixed",     0.,
          "P_DUMP_TIME",     0.,
          "DT",              0.001,    /* Time step (also below)    */
-   "DELT",            0.,
-   "STARTIME",        0.,
-   "XSCALE",          1.,
-   "YSCALE",          1.,
-   "TOL",             1.e-8,    /* Last-resort tolerance       */
-   "TOLCG",           1.e-8,    /* Conjugate Gradient Solver   */
-   "TOLCGP",          1.e-8,    /* Pressure Conjugate Gradient */
-   "TOLABS",          1.e-8,    /* Default PCG tolerance       */
-   "TOLREL",          1.e-6,    /* Default for ?               */
-   "IOTIME",          0.,
-   "FLOWRATE",        0.,
-   "PGRADX",          0.,
-   "FFZ",             0.,       /* Applied force for N-S       */
-   "FFY",             0.,
-   "FFX",             0.,
-   "LAMBDA",          1.e30,    /* Helmholtz Constant          */
-   "KINVIS",          1.,       /* 1/Re for N-S                */
-   "THETA",           0.0,      /* theta scheme variable       */
-   "BNDTIMEFCE",      1.0,      /* time dependent boundary fce */
-   "LZ",              1.0,      /* default Z direction length  */
-   "Re_Uinf",         1.0,      /* default velocity in Re      */
-   "Re_Len",          1.0,      /* default length in Re        */
-   "PSfactor",        1.0,      /* default scaling width of prism */
-         "DMAXANGLESUR",    0.95,     /* maximum angle for Recon surfaces */
-    0,                0.
+	 "DELT",            0.,
+	 "STARTIME",        0.,
+	 "XSCALE",          1.,
+	 "YSCALE",          1.,
+	 "TOL",             1.e-8,    /* Last-resort tolerance       */
+	 "TOLCG",           1.e-8,    /* Conjugate Gradient Solver   */
+	 "TOLCGP",          1.e-8,    /* Pressure Conjugate Gradient */
+	 "TOLABS",          1.e-8,    /* Default PCG tolerance       */
+	 "TOLREL",          1.e-6,    /* Default for ?               */
+	 "IOTIME",          0.,
+	 "FLOWRATE",        0.,
+	 "PGRADX",          0.,
+	 "FFZ",             0.,       /* Applied force for N-S       */
+	 "FFY",             0.,
+	 "FFX",             0.,
+	 "LAMBDA",          1.e30,    /* Helmholtz Constant          */
+	 "KINVIS",          1.,       /* 1/Re for N-S                */
+	 "THETA",           0.0,      /* theta scheme variable       */
+	 "BNDTIMEFCE",      1.0,      /* time dependent boundary fce */
+	 "LZ",              1.0,      /* default Z direction length  */
+	 "Re_Uinf",         1.0,      /* default velocity in Re      */
+	 "Re_Len",          1.0,      /* default length in Re        */
+	 "PSfactor",        1.0,      /* default scaling width of prism */
+         "DMAXANGLESUR",    0.95,     /* maximum angle for Recon surfaces */ 
+	  0,                0.
 };
 
 
@@ -305,11 +305,11 @@ static struct {                  /* Constants */
   double   cval;
 } consts[] = {
         "PI",     3.14159265358979323846,   /* Pi */
-  "E",      2.71828182845904523536,   /* Natural logarithm */
-  "GAMMA",  0.57721566490153286060,   /* Euler */
-  "DEG",   57.29577951308232087680,   /* deg/radian */
-  "PHI",    1.61803398874989484820,   /* golden ratio */
-   0,       0
+	"E",      2.71828182845904523536,   /* Natural logarithm */
+	"GAMMA",  0.57721566490153286060,   /* Euler */
+	"DEG",   57.29577951308232087680,   /* deg/radian */
+	"PHI",    1.61803398874989484820,   /* golden ratio */
+	 0,       0
 };
 
 static struct {                /* Built-ins */
@@ -318,35 +318,35 @@ static struct {                /* Built-ins */
   PFD      func;               /* Pointer to the function */
 } builtins[] = {
          "sin",   1,  sin,
-   "cos",   1,  cos,
-   "cosh",  1,  cosh,
-   "sinh",  1,  sinh,
+	 "cos",   1,  cos,
+	 "cosh",  1,  cosh,
+	 "sinh",  1,  sinh,
          "tanh",  1,  tanh,
-   "atan",  1,  atan,
-   "abs",   1,  fabs,
-   "int",   1,  Integer,     /* .... Argument Checking .... */
-   "log",   1,  Log,
-   "log10", 1,  Log10,
-   "exp",   1,  Exp,
-   "sqrt",  1,  Sqrt,
-   "rand",  1,  Rand,        /* random number (input the magnitude) */
-   "mod",   1,  Mod,   /* remainder */
-   "bump",  1,  Bump,
-   "single", 2, Single,
-   "jn",    2,  Jn,      /* Bessel function J */
-   "yn",    2,  Yn,      /* Bessel function Y */
-   "rad",   2,  Radius,  /* rad = sqrt(x^2 + y^2) */
-   "ang",   2,  Angle,   /* ang = atan2(x,y)      */
-   "step",  2,  Step,    /* step(x,a) = 0  (if x < a) else 1 */
-   "step2", 2,  Step2,   /* step(x,a) = 0 (if x <= a) else 1 */
-   "rejn",  3,  ReJn,    /* Real part of complex Bessel function Jn(z) */
-   "imjn",  3,  ImJn,    /* Imag part of complex Bessel function Jn(z) */
+	 "atan",  1,  atan,
+	 "abs",   1,  fabs,
+	 "int",   1,  Integer,     /* .... Argument Checking .... */
+	 "log",   1,  Log,         
+	 "log10", 1,  Log10,       
+	 "exp",   1,  Exp,         
+	 "sqrt",  1,  Sqrt,        
+	 "rand",  1,  Rand,        /* random number (input the magnitude) */
+	 "mod",   1,  Mod,   /* remainder */
+	 "bump",  1,  Bump, 
+	 "single", 2, Single,
+	 "jn",    2,  Jn,      /* Bessel function J */
+	 "yn",    2,  Yn,      /* Bessel function Y */
+	 "rad",   2,  Radius,  /* rad = sqrt(x^2 + y^2) */
+	 "ang",   2,  Angle,   /* ang = atan2(x,y)      */
+	 "step",  2,  Step,    /* step(x,a) = 0  (if x < a) else 1 */
+	 "step2", 2,  Step2,   /* step(x,a) = 0 (if x <= a) else 1 */
+	 "rejn",  3,  ReJn,    /* Real part of complex Bessel function Jn(z) */
+	 "imjn",  3,  ImJn,    /* Imag part of complex Bessel function Jn(z) */
          "shock", 3,  Shock,   /* shock(x,a,b) = a (if x < 0), (a+b)/2 (if x==0) or b (if x > 0) */
          "jacobi", 4,  Jacobi,
-   "womsin", 5,  Womsin,     /* Womersley solution due to sin component of u_avg  */
-   "womcos", 5,  Womcos,     /* Womersley solution due to cos component of u_avg  */
+	 "womsin", 5,  Womsin,     /* Womersley solution due to sin component of u_avg  */
+	 "womcos", 5,  Womcos,     /* Womersley solution due to cos component of u_avg  */
    /*      "userdefA", 3, UserdefA, */
-   0,       0
+	 0,       0
 };
 
 /* External variables */
@@ -354,9 +354,9 @@ static struct {                /* Built-ins */
 Tree*    Symbols  = 0;     /* Symbol table     */
 Tree*    Options  = 0;     /* Option table     */
 Tree*    Params   = 0;     /* Parameters table */
-jmp_buf  begin;
+jmp_buf  begin;            
 
-static char     func_string[SIZE],
+static char     func_string[SIZE], 
                 *cur_string;
 static double   stack_value;
 
@@ -385,8 +385,8 @@ extern int errno;
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
 #line 275 "../src/manager.y"
 typedef union YYSTYPE {                /* stack type */
-  double  val;    /* actual value */
-  Symbol *sym;    /* symbol table pointer */
+	double  val;    /* actual value */
+	Symbol *sym;    /* symbol table pointer */
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
 #line 393 "y.tab.c"
@@ -465,21 +465,21 @@ typedef union YYSTYPE {                /* stack type */
 #  endif
 #  if (defined __cplusplus && ! defined _STDLIB_H \
        && ! ((defined YYMALLOC || defined malloc) \
-       && (defined YYFREE || defined free)))
+	     && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   define YYINCLUDED_STDLIB_H
 #  endif
 #  ifndef YYMALLOC
 #   define YYMALLOC malloc
 #   if (! defined (malloc) && ! defined (YYINCLUDED_STDLIB_H) \
-  && (defined (__STDC__) || defined (__cplusplus)))
+	&& (defined (__STDC__) || defined (__cplusplus)))
 void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
 #   if (! defined (free) && ! defined (YYINCLUDED_STDLIB_H) \
-  && (defined (__STDC__) || defined (__cplusplus)))
+	&& (defined (__STDC__) || defined (__cplusplus)))
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
@@ -489,7 +489,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined (yyoverflow) \
      && (! defined (__cplusplus) \
-   || (defined (YYSTYPE_IS_TRIVIAL) && YYSTYPE_IS_TRIVIAL)))
+	 || (defined (YYSTYPE_IS_TRIVIAL) && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -504,7 +504,7 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (short int) + sizeof (YYSTYPE))      \
+     ((N) * (sizeof (short int) + sizeof (YYSTYPE))			\
       + YYSTACK_GAP_MAXIMUM)
 
 /* Copy COUNT objects from FROM to TO.  The source and destination do
@@ -514,13 +514,13 @@ union yyalloc
 #   define YYCOPY(To, From, Count) \
       __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
 #  else
-#   define YYCOPY(To, From, Count)    \
-      do          \
-  {          \
-    YYSIZE_T yyi;        \
-    for (yyi = 0; yyi < (Count); yyi++)  \
-      (To)[yyi] = (From)[yyi];    \
-  }          \
+#   define YYCOPY(To, From, Count)		\
+      do					\
+	{					\
+	  YYSIZE_T yyi;				\
+	  for (yyi = 0; yyi < (Count); yyi++)	\
+	    (To)[yyi] = (From)[yyi];		\
+	}					\
       while (0)
 #  endif
 # endif
@@ -530,15 +530,15 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)          \
-    do                  \
-      {                  \
-  YYSIZE_T yynewbytes;            \
-  YYCOPY (&yyptr->Stack, Stack, yysize);        \
-  Stack = &yyptr->Stack;            \
-  yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-  yyptr += yynewbytes / sizeof (*yyptr);        \
-      }                  \
+# define YYSTACK_RELOCATE(Stack)					\
+    do									\
+      {									\
+	YYSIZE_T yynewbytes;						\
+	YYCOPY (&yyptr->Stack, Stack, yysize);				\
+	Stack = &yyptr->Stack;						\
+	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+	yyptr += yynewbytes / sizeof (*yyptr);				\
+      }									\
     while (0)
 
 #endif
@@ -567,7 +567,7 @@ union yyalloc
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   269
 
-#define YYTRANSLATE(YYX)            \
+#define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
@@ -796,44 +796,44 @@ static const unsigned char yystos[] =
       28,    23
 };
 
-#define yyerrok    (yyerrstatus = 0)
-#define yyclearin  (yychar = YYEMPTY)
-#define YYEMPTY    (-2)
-#define YYEOF    0
+#define yyerrok		(yyerrstatus = 0)
+#define yyclearin	(yychar = YYEMPTY)
+#define YYEMPTY		(-2)
+#define YYEOF		0
 
-#define YYACCEPT  goto yyacceptlab
-#define YYABORT    goto yyabortlab
-#define YYERROR    goto yyerrorlab
+#define YYACCEPT	goto yyacceptlab
+#define YYABORT		goto yyabortlab
+#define YYERROR		goto yyerrorlab
 
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
    Once GCC version 2 has supplanted version 1, this can go.  */
 
-#define YYFAIL    goto yyerrlab
+#define YYFAIL		goto yyerrlab
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)          \
-do                \
-  if (yychar == YYEMPTY && yylen == 1)        \
-    {                \
-      yychar = (Token);            \
-      yylval = (Value);            \
-      yytoken = YYTRANSLATE (yychar);        \
-      YYPOPSTACK;            \
-      goto yybackup;            \
-    }                \
-  else                \
-    {                \
+#define YYBACKUP(Token, Value)					\
+do								\
+  if (yychar == YYEMPTY && yylen == 1)				\
+    {								\
+      yychar = (Token);						\
+      yylval = (Value);						\
+      yytoken = YYTRANSLATE (yychar);				\
+      YYPOPSTACK;						\
+      goto yybackup;						\
+    }								\
+  else								\
+    {								\
       yyerror (YY_("syntax error: cannot back up")); \
-      YYERROR;              \
-    }                \
+      YYERROR;							\
+    }								\
 while (0)
 
 
-#define YYTERROR  1
-#define YYERRCODE  256
+#define YYTERROR	1
+#define YYERRCODE	256
 
 
 /* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
@@ -842,22 +842,22 @@ while (0)
 
 #define YYRHSLOC(Rhs, K) ((Rhs)[K])
 #ifndef YYLLOC_DEFAULT
-# define YYLLOC_DEFAULT(Current, Rhs, N)        \
-    do                  \
-      if (N)                \
-  {                \
-    (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;  \
-    (Current).first_column = YYRHSLOC (Rhs, 1).first_column;  \
-    (Current).last_line    = YYRHSLOC (Rhs, N).last_line;    \
-    (Current).last_column  = YYRHSLOC (Rhs, N).last_column;  \
-  }                \
-      else                \
-  {                \
-    (Current).first_line   = (Current).last_line   =    \
-      YYRHSLOC (Rhs, 0).last_line;        \
-    (Current).first_column = (Current).last_column =    \
-      YYRHSLOC (Rhs, 0).last_column;        \
-  }                \
+# define YYLLOC_DEFAULT(Current, Rhs, N)				\
+    do									\
+      if (N)								\
+	{								\
+	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+	}								\
+      else								\
+	{								\
+	  (Current).first_line   = (Current).last_line   =		\
+	    YYRHSLOC (Rhs, 0).last_line;				\
+	  (Current).first_column = (Current).last_column =		\
+	    YYRHSLOC (Rhs, 0).last_column;				\
+	}								\
     while (0)
 #endif
 
@@ -868,9 +868,9 @@ while (0)
 
 #ifndef YY_LOCATION_PRINT
 # if YYLTYPE_IS_TRIVIAL
-#  define YY_LOCATION_PRINT(File, Loc)      \
-     fprintf (File, "%d.%d-%d.%d",      \
-              (Loc).first_line, (Loc).first_column,  \
+#  define YY_LOCATION_PRINT(File, Loc)			\
+     fprintf (File, "%d.%d-%d.%d",			\
+              (Loc).first_line, (Loc).first_column,	\
               (Loc).last_line,  (Loc).last_column)
 # else
 #  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
@@ -894,21 +894,21 @@ while (0)
 #  define YYFPRINTF fprintf
 # endif
 
-# define YYDPRINTF(Args)      \
-do {            \
-  if (yydebug)          \
-    YYFPRINTF Args;        \
+# define YYDPRINTF(Args)			\
+do {						\
+  if (yydebug)					\
+    YYFPRINTF Args;				\
 } while (0)
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)    \
-do {                \
-  if (yydebug)              \
-    {                \
-      YYFPRINTF (stderr, "%s ", Title);        \
-      yysymprint (stderr,          \
-                  Type, Value);  \
-      YYFPRINTF (stderr, "\n");          \
-    }                \
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)		\
+do {								\
+  if (yydebug)							\
+    {								\
+      YYFPRINTF (stderr, "%s ", Title);				\
+      yysymprint (stderr,					\
+                  Type, Value);	\
+      YYFPRINTF (stderr, "\n");					\
+    }								\
 } while (0)
 
 /*------------------------------------------------------------------.
@@ -932,10 +932,10 @@ yy_stack_print (bottom, top)
   YYFPRINTF (stderr, "\n");
 }
 
-# define YY_STACK_PRINT(Bottom, Top)        \
-do {                \
-  if (yydebug)              \
-    yy_stack_print ((Bottom), (Top));        \
+# define YY_STACK_PRINT(Bottom, Top)				\
+do {								\
+  if (yydebug)							\
+    yy_stack_print ((Bottom), (Top));				\
 } while (0)
 
 
@@ -962,10 +962,10 @@ yy_reduce_print (yyrule)
   YYFPRINTF (stderr, "-> %s\n", yytname[yyr1[yyrule]]);
 }
 
-# define YY_REDUCE_PRINT(Rule)    \
-do {          \
-  if (yydebug)        \
-    yy_reduce_print (Rule);    \
+# define YY_REDUCE_PRINT(Rule)		\
+do {					\
+  if (yydebug)				\
+    yy_reduce_print (Rule);		\
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -980,7 +980,7 @@ int yydebug;
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef  YYINITDEPTH
+#ifndef	YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
@@ -1065,27 +1065,27 @@ yytnamerr (char *yyres, const char *yystr)
       char const *yyp = yystr;
 
       for (;;)
-  switch (*++yyp)
-    {
-    case '\'':
-    case ',':
-      goto do_not_strip_quotes;
+	switch (*++yyp)
+	  {
+	  case '\'':
+	  case ',':
+	    goto do_not_strip_quotes;
 
-    case '\\':
-      if (*++yyp != '\\')
-        goto do_not_strip_quotes;
-      /* Fall through.  */
-    default:
-      if (yyres)
-        yyres[yyn] = *yyp;
-      yyn++;
-      break;
+	  case '\\':
+	    if (*++yyp != '\\')
+	      goto do_not_strip_quotes;
+	    /* Fall through.  */
+	  default:
+	    if (yyres)
+	      yyres[yyn] = *yyp;
+	    yyn++;
+	    break;
 
-    case '"':
-      if (yyres)
-        yyres[yyn] = '\0';
-      return yyn;
-    }
+	  case '"':
+	    if (yyres)
+	      yyres[yyn] = '\0';
+	    return yyn;
+	  }
     do_not_strip_quotes: ;
     }
 
@@ -1220,7 +1220,7 @@ yyparse ()
 #endif
 #endif
 {
-
+  
   int yystate;
   int yyn;
   int yyresult;
@@ -1267,7 +1267,7 @@ yyparse ()
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;    /* Cause a token to be read.  */
+  yychar = YYEMPTY;		/* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
@@ -1298,25 +1298,25 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-  /* Give user a chance to reallocate the stack. Use copies of
-     these so that the &'s don't force the real ones into
-     memory.  */
-  YYSTYPE *yyvs1 = yyvs;
-  short int *yyss1 = yyss;
+	/* Give user a chance to reallocate the stack. Use copies of
+	   these so that the &'s don't force the real ones into
+	   memory.  */
+	YYSTYPE *yyvs1 = yyvs;
+	short int *yyss1 = yyss;
 
 
-  /* Each stack pointer address is followed by the size of the
-     data in use in that stack, in bytes.  This used to be a
-     conditional around just the two extra args, but that might
-     be undefined if yyoverflow is a macro.  */
-  yyoverflow (YY_("memory exhausted"),
-        &yyss1, yysize * sizeof (*yyssp),
-        &yyvs1, yysize * sizeof (*yyvsp),
+	/* Each stack pointer address is followed by the size of the
+	   data in use in that stack, in bytes.  This used to be a
+	   conditional around just the two extra args, but that might
+	   be undefined if yyoverflow is a macro.  */
+	yyoverflow (YY_("memory exhausted"),
+		    &yyss1, yysize * sizeof (*yyssp),
+		    &yyvs1, yysize * sizeof (*yyvsp),
 
-        &yystacksize);
+		    &yystacksize);
 
-  yyss = yyss1;
-  yyvs = yyvs1;
+	yyss = yyss1;
+	yyvs = yyvs1;
       }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
@@ -1324,23 +1324,23 @@ yyparse ()
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-  goto yyexhaustedlab;
+	goto yyexhaustedlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-  yystacksize = YYMAXDEPTH;
+	yystacksize = YYMAXDEPTH;
 
       {
-  short int *yyss1 = yyss;
-  union yyalloc *yyptr =
-    (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
-  if (! yyptr)
-    goto yyexhaustedlab;
-  YYSTACK_RELOCATE (yyss);
-  YYSTACK_RELOCATE (yyvs);
+	short int *yyss1 = yyss;
+	union yyalloc *yyptr =
+	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+	if (! yyptr)
+	  goto yyexhaustedlab;
+	YYSTACK_RELOCATE (yyss);
+	YYSTACK_RELOCATE (yyvs);
 
 #  undef YYSTACK_RELOCATE
-  if (yyss1 != yyssa)
-    YYSTACK_FREE (yyss1);
+	if (yyss1 != yyssa)
+	  YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -1350,10 +1350,10 @@ yyparse ()
 
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-      (unsigned long int) yystacksize));
+		  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
-  YYABORT;
+	YYABORT;
     }
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
@@ -1404,7 +1404,7 @@ yybackup:
   if (yyn <= 0)
     {
       if (yyn == 0 || yyn == YYTABLE_NINF)
-  goto yyerrlab;
+	goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -1485,8 +1485,8 @@ yyreduce:
   case 9:
 #line 297 "../src/manager.y"
     { if ((yyvsp[0].sym)->type == UNDEF)
-          execerrnr("undefined variable",(yyvsp[0].sym)->name);
-        (yyval.val) = (yyvsp[0].sym)->u.val; }
+		      execerrnr("undefined variable",(yyvsp[0].sym)->name);
+		    (yyval.val) = (yyvsp[0].sym)->u.val; }
     break;
 
   case 10:
@@ -1542,18 +1542,18 @@ yyreduce:
   case 21:
 #line 316 "../src/manager.y"
     {
-    if ((yyvsp[0].val) == 0.0){
+	  if ((yyvsp[0].val) == 0.0){
 #if ZERONULLDIV
-      (yyval.val) = 0.0;
+	    (yyval.val) = 0.0;
 #else
-      execerror("division by zero","");
-      (yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val);
+	    execerror("division by zero","");
+	    (yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val); 
 #endif
-    }
-    else{
-      (yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val);
-    }
-  }
+	  }
+	  else{
+	    (yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val); 
+	  }
+	}
     break;
 
   case 22:
@@ -1614,106 +1614,106 @@ yyerrlab:
       yyn = yypact[yystate];
 
       if (YYPACT_NINF < yyn && yyn < YYLAST)
-  {
-    int yytype = YYTRANSLATE (yychar);
-    YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
-    YYSIZE_T yysize = yysize0;
-    YYSIZE_T yysize1;
-    int yysize_overflow = 0;
-    char *yymsg = 0;
-#    define YYERROR_VERBOSE_ARGS_MAXIMUM 5
-    char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-    int yyx;
+	{
+	  int yytype = YYTRANSLATE (yychar);
+	  YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
+	  YYSIZE_T yysize = yysize0;
+	  YYSIZE_T yysize1;
+	  int yysize_overflow = 0;
+	  char *yymsg = 0;
+#	  define YYERROR_VERBOSE_ARGS_MAXIMUM 5
+	  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+	  int yyx;
 
 #if 0
-    /* This is so xgettext sees the translatable formats that are
-       constructed on the fly.  */
-    YY_("syntax error, unexpected %s");
-    YY_("syntax error, unexpected %s, expecting %s");
-    YY_("syntax error, unexpected %s, expecting %s or %s");
-    YY_("syntax error, unexpected %s, expecting %s or %s or %s");
-    YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
+	  /* This is so xgettext sees the translatable formats that are
+	     constructed on the fly.  */
+	  YY_("syntax error, unexpected %s");
+	  YY_("syntax error, unexpected %s, expecting %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
 #endif
-    char *yyfmt;
-    char const *yyf;
-    static char const yyunexpected[] = "syntax error, unexpected %s";
-    static char const yyexpecting[] = ", expecting %s";
-    static char const yyor[] = " or %s";
-    char yyformat[sizeof yyunexpected
-      + sizeof yyexpecting - 1
-      + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
-         * (sizeof yyor - 1))];
-    char const *yyprefix = yyexpecting;
+	  char *yyfmt;
+	  char const *yyf;
+	  static char const yyunexpected[] = "syntax error, unexpected %s";
+	  static char const yyexpecting[] = ", expecting %s";
+	  static char const yyor[] = " or %s";
+	  char yyformat[sizeof yyunexpected
+			+ sizeof yyexpecting - 1
+			+ ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
+			   * (sizeof yyor - 1))];
+	  char const *yyprefix = yyexpecting;
 
-    /* Start YYX at -YYN if negative to avoid negative indexes in
-       YYCHECK.  */
-    int yyxbegin = yyn < 0 ? -yyn : 0;
+	  /* Start YYX at -YYN if negative to avoid negative indexes in
+	     YYCHECK.  */
+	  int yyxbegin = yyn < 0 ? -yyn : 0;
 
-    /* Stay within bounds of both yycheck and yytname.  */
-    int yychecklim = YYLAST - yyn;
-    int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-    int yycount = 1;
+	  /* Stay within bounds of both yycheck and yytname.  */
+	  int yychecklim = YYLAST - yyn;
+	  int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+	  int yycount = 1;
 
-    yyarg[0] = yytname[yytype];
-    yyfmt = yystpcpy (yyformat, yyunexpected);
+	  yyarg[0] = yytname[yytype];
+	  yyfmt = yystpcpy (yyformat, yyunexpected);
 
-    for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-      if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-        {
-    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-      {
-        yycount = 1;
-        yysize = yysize0;
-        yyformat[sizeof yyunexpected - 1] = '\0';
-        break;
-      }
-    yyarg[yycount++] = yytname[yyx];
-    yysize1 = yysize + yytnamerr (0, yytname[yyx]);
-    yysize_overflow |= yysize1 < yysize;
-    yysize = yysize1;
-    yyfmt = yystpcpy (yyfmt, yyprefix);
-    yyprefix = yyor;
-        }
+	  for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+	    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+	      {
+		if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+		  {
+		    yycount = 1;
+		    yysize = yysize0;
+		    yyformat[sizeof yyunexpected - 1] = '\0';
+		    break;
+		  }
+		yyarg[yycount++] = yytname[yyx];
+		yysize1 = yysize + yytnamerr (0, yytname[yyx]);
+		yysize_overflow |= yysize1 < yysize;
+		yysize = yysize1;
+		yyfmt = yystpcpy (yyfmt, yyprefix);
+		yyprefix = yyor;
+	      }
 
-    yyf = YY_(yyformat);
-    yysize1 = yysize + yystrlen (yyf);
-    yysize_overflow |= yysize1 < yysize;
-    yysize = yysize1;
+	  yyf = YY_(yyformat);
+	  yysize1 = yysize + yystrlen (yyf);
+	  yysize_overflow |= yysize1 < yysize;
+	  yysize = yysize1;
 
-    if (!yysize_overflow && yysize <= YYSTACK_ALLOC_MAXIMUM)
-      yymsg = (char *) YYSTACK_ALLOC (yysize);
-    if (yymsg)
-      {
-        /* Avoid sprintf, as that infringes on the user's name space.
-     Don't have undefined behavior even if the translation
-     produced a string with the wrong number of "%s"s.  */
-        char *yyp = yymsg;
-        int yyi = 0;
-        while ((*yyp = *yyf))
-    {
-      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
-        {
-          yyp += yytnamerr (yyp, yyarg[yyi++]);
-          yyf += 2;
-        }
-      else
-        {
-          yyp++;
-          yyf++;
-        }
-    }
-        yyerror (yymsg);
-        YYSTACK_FREE (yymsg);
-      }
-    else
-      {
-        yyerror (YY_("syntax error"));
-        goto yyexhaustedlab;
-      }
-  }
+	  if (!yysize_overflow && yysize <= YYSTACK_ALLOC_MAXIMUM)
+	    yymsg = (char *) YYSTACK_ALLOC (yysize);
+	  if (yymsg)
+	    {
+	      /* Avoid sprintf, as that infringes on the user's name space.
+		 Don't have undefined behavior even if the translation
+		 produced a string with the wrong number of "%s"s.  */
+	      char *yyp = yymsg;
+	      int yyi = 0;
+	      while ((*yyp = *yyf))
+		{
+		  if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
+		    {
+		      yyp += yytnamerr (yyp, yyarg[yyi++]);
+		      yyf += 2;
+		    }
+		  else
+		    {
+		      yyp++;
+		      yyf++;
+		    }
+		}
+	      yyerror (yymsg);
+	      YYSTACK_FREE (yymsg);
+	    }
+	  else
+	    {
+	      yyerror (YY_("syntax error"));
+	      goto yyexhaustedlab;
+	    }
+	}
       else
 #endif /* YYERROR_VERBOSE */
-  yyerror (YY_("syntax error"));
+	yyerror (YY_("syntax error"));
     }
 
 
@@ -1721,19 +1721,19 @@ yyerrlab:
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse look-ahead token after an
-   error, discard it.  */
+	 error, discard it.  */
 
       if (yychar <= YYEOF)
         {
-    /* Return failure if at end of input.  */
-    if (yychar == YYEOF)
-      YYABORT;
+	  /* Return failure if at end of input.  */
+	  if (yychar == YYEOF)
+	    YYABORT;
         }
       else
-  {
-    yydestruct ("Error: discarding", yytoken, &yylval);
-    yychar = YYEMPTY;
-  }
+	{
+	  yydestruct ("Error: discarding", yytoken, &yylval);
+	  yychar = YYEMPTY;
+	}
     }
 
   /* Else will try to reuse look-ahead token after shifting the error
@@ -1762,25 +1762,25 @@ yyvsp -= yylen;
 | yyerrlab1 -- common code for both syntax error and YYERROR.  |
 `-------------------------------------------------------------*/
 yyerrlab1:
-  yyerrstatus = 3;  /* Each real token shifted decrements this.  */
+  yyerrstatus = 3;	/* Each real token shifted decrements this.  */
 
   for (;;)
     {
       yyn = yypact[yystate];
       if (yyn != YYPACT_NINF)
-  {
-    yyn += YYTERROR;
-    if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-      {
-        yyn = yytable[yyn];
-        if (0 < yyn)
-    break;
-      }
-  }
+	{
+	  yyn += YYTERROR;
+	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+	    {
+	      yyn = yytable[yyn];
+	      if (0 < yyn)
+		break;
+	    }
+	}
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-  YYABORT;
+	YYABORT;
 
 
       yydestruct ("Error: popping", yystos[yystate], yyvsp);
@@ -1829,11 +1829,11 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-     yytoken, &yylval);
+		 yytoken, &yylval);
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-      yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp);
       YYPOPSTACK;
     }
 #ifndef yyoverflow
@@ -1846,7 +1846,7 @@ yyreturn:
 
 #line 333 "../src/manager.y"
 
-  /* end of grammer */
+	/* end of grammer */
 
 /* --------------------------------------------------------------------- *
  *                                                                       *
@@ -1856,36 +1856,36 @@ yyreturn:
 
 yylex()
 {
-  int c;
+	int c;
 
-  while((c = *cur_string++) == ' ' || c == '\t');
+	while((c = *cur_string++) == ' ' || c == '\t');
 
-  if(c == EOF)
-    return 0;
-  if(c == '.' || isdigit(c)) {                      /* number */
-          char *p;
-          yylval.val = strtod(--cur_string, &p);
-    cur_string = p;
-    return NUMBER;
-  }
-  if(isalpha(c)) {                                  /* symbol */
-    Symbol *s;
-    char sbuf[100], *p = sbuf;
+	if(c == EOF)
+		return 0;
+	if(c == '.' || isdigit(c)) {                      /* number */
+	        char *p;
+	        yylval.val = strtod(--cur_string, &p);
+		cur_string = p;
+		return NUMBER;
+	}
+	if(isalpha(c)) {                                  /* symbol */
+		Symbol *s;
+		char sbuf[100], *p = sbuf;
 
-    do
-      *p++ = c;
-    while
-      ((c = *cur_string++) != EOF && (isalnum(c) || c == '_'));
+		do
+		  *p++ = c;
+		while
+		  ((c = *cur_string++) != EOF && (isalnum(c) || c == '_')); 
 
-    cur_string--;
-    *p = '\0';
-    if(!(s=lookup(sbuf)))
-      s = install(sbuf, UNDEF, 0.);
-    yylval.sym = s;
-    return (s->type == UNDEF) ? VAR : s->type;
-  }
+		cur_string--;
+		*p = '\0';
+		if(!(s=lookup(sbuf))) 
+		  s = install(sbuf, UNDEF, 0.);
+		yylval.sym = s;
+		return (s->type == UNDEF) ? VAR : s->type;
+	}
 
-  return c;
+	return c;
 }
 
 warning(char *s, char *t)    /* print warning message */
@@ -1915,10 +1915,10 @@ execerrnr(char *s, char *t)   /* run-time error, no recovery */
   exit(-1);
 }
 
-fpecatch()   /* catch floating point exceptions */
+fpecatch()	 /* catch floating point exceptions */
 {
   fputs ("speclib: floating point exception\n"
-   "exiting to system...\n", stderr);
+	 "exiting to system...\n", stderr);
   exit  (-1);
 }
 
@@ -1952,10 +1952,10 @@ double scalar (char *function)
 {
   if (strlen(function) > SIZE-1)
     execerrnr ("Too many characters in function:\n", function);
-
+  
   sprintf (cur_string = func_string, "%s\n", function);
   yyparse ();
-
+  
   return stack_value;
 }
 
@@ -1995,7 +1995,7 @@ void vector_def (char *vlist, char *function)
   name = strtok(buf, " ");
   nvec = 0;
   while (name && nvec < VMAX) {
-    if (!(s=lookup(name)))
+    if (!(s=lookup(name))) 
       s = install (name, VAR, 0.);
     vs[nvec++] = s;
     name  = strtok((char*) NULL, " ");
@@ -2025,8 +2025,8 @@ void vector_set (int n, ...)
   /* evaluate the function */
 
   while (n--) {
-    for (i = 0; i < nvec; i++) vs[i]->u.val = *(vv[i]++);
-    cur_string = func_string;
+    for (i = 0; i < nvec; i++) vs[i]->u.val = *(vv[i]++);    
+    cur_string = func_string; 
     yyparse();
     *(fv++)    = stack_value;
   }
@@ -2106,7 +2106,7 @@ int option (char *name)
 {
   Node *np;
   int   status = 0;
-
+  
   if (np = tree_search (Options->root, name))
     status = ((Symbol*) np->other)->u.num;
 
@@ -2121,7 +2121,7 @@ int option_set (char *name, int status)
     ((Symbol*) np->other)->u.num = status;
   else
     install (name, OPTION, status);
-
+  
   return status;
 }
 
@@ -2151,7 +2151,7 @@ void manager_init (void)
 
   for(i = 0; O_default[i].name; i++)
      install(O_default[i].name,OPTION,O_default[i].oval);
-  for(i = 0; I_default[i].name; i++)
+  for(i = 0; I_default[i].name; i++) 
      install(I_default[i].name,IPARAM,I_default[i].pval);
   for(i = 0; D_default[i].name; i++)
      install(D_default[i].name,DPARAM,D_default[i].pval);
@@ -2182,7 +2182,7 @@ void manager_init (void)
       break;
     }
   }
-
+  
   return;
 }
 
@@ -2229,13 +2229,13 @@ static Symbol *lookup (char *key)
     return (Symbol*) np->other;
 
   return (Symbol*) NULL;     /* not found */
-}
+}                  
 
-/*
- * install "key" in a symbol table
+/* 
+ * install "key" in a symbol table 
  */
 
-static Symbol *install (char *key, int type, ...)
+static Symbol *install (char *key, int type, ...)     
 {
   Node   *np;
   Symbol *sp;
@@ -2243,7 +2243,7 @@ static Symbol *install (char *key, int type, ...)
   va_list ap;
 
   va_start (ap, type);
-
+  
   /* Get a node for this key and create a new symbol */
 
   np       = create_node (key);
@@ -2263,8 +2263,8 @@ static Symbol *install (char *key, int type, ...)
     tp        = Params;
     sp->u.val = va_arg(ap, double);
     break;
-  case VAR:
-  case UNDEF:
+  case VAR: 
+  case UNDEF:  
     tp        = Symbols;
     sp->u.val = va_arg(ap, double);
     break;
@@ -2313,7 +2313,7 @@ static double Log (double x)
   return errcheck(log(x), "log") ;
 }
 
-static double Log10 (double x)
+static double Log10 (double x) 
 {
   return errcheck(log10(x), "log10") ;
 }
@@ -2322,7 +2322,7 @@ static double Exp (double x)
 {
   if(x<-28.)
     return 0.;
-
+  
   return errcheck(exp(x), "exp") ;
 }
 
@@ -2339,9 +2339,9 @@ static double Pow (double x, double y)
 
   if (yn >= 0 && yn == y) {     /* Do it inline if y is an integer power */
       register int n = yn;
-      while (n--)
+      while (n--) 
          px *= x;
-  } else
+  } else  
       px = errcheck (pow(x,y), "exponentiation");
 
   return px;
@@ -2350,13 +2350,13 @@ static double Pow (double x, double y)
 static double Integer (double x)
 {
   return (double) (long) x;
-}
+} 
 
 static double Mod (double x)
 {
   double tmp;
   return (double) modf(x,&tmp);
-}
+} 
 
 static double Rand (double x)
 {
@@ -2403,7 +2403,7 @@ static double ReJn (double n, double x,  double y)
 {
   double rej, imj;
   int nz,ierr;
-
+  
   zbesj(&x,&y,n,1,1,&rej,&imj,&nz,&ierr);
   return rej;
 }
@@ -2412,7 +2412,7 @@ static double ImJn (double n, double x, double y)
 {
   double rej, imj;
   int nz,ierr;
-
+  
   zbesj(&x,&y,n,1,1,&rej,&imj,&nz,&ierr);
   return imj;
 }
@@ -2420,12 +2420,12 @@ static double ImJn (double n, double x, double y)
 /* Calcualte the Womersley solution at r for a pipe of radius R and
    wave number wnum.  The solution is assumed to be set so that the
    spatail mean fo the flow satisfies u_avg(r) = A cos (wnum t) + B
-   sin(wnum t)
+   sin(wnum t) 
 */
 
-static double Womersley(double A,double B,double r,double R,double mu,
-      double wnum,double t){
-
+static double Womersley(double A,double B,double r,double R,double mu, 
+			double wnum,double t){
+  
   double x,y;
 
   if(r > R) fprintf(stderr,"Error in manager.y: Womersley - r > R\n");
@@ -2438,9 +2438,9 @@ static double Womersley(double A,double B,double r,double R,double mu,
     double isqrt2 = 1.0/sqrt(2.0);
     static double R_str, wnum_str,mu_str;
     static double Jr,Ji,alpha,j0r,j0i, isqrt;
+    
 
-
-    /* for case of repeated calls to with same parameters look to store
+    /* for case of repeated calls to with same parameters look to store 
        parameters independent of r. */
     if((R != R_str)||(wnum != wnum_str)||(mu != mu_str)){
       double retmp[2],imtmp[2];
@@ -2463,14 +2463,14 @@ static double Womersley(double A,double B,double r,double R,double mu,
     fac = 1/(Jr*Jr + Ji*Ji);
     cr  =  (A*Jr - B*Ji)*fac;
     ci  = -(A*Ji + B*Jr)*fac;
-
+    
     /* setup J0r, J0i */
     re  = -alpha*isqrt2*r/R;
     im  =  alpha*isqrt2*r/R;
     zbesj(&re,&im,0,1,1,&rej,&imj,&nz,&ierr);
     fac = 1/(j0r*j0r+j0i*j0i);
     J0r = 1-fac*(rej*j0r+imj*j0i);
-    J0i = -fac*(imj*j0r-rej*j0i);
+    J0i = -fac*(imj*j0r-rej*j0i); 
 
     /* return solution */
     return (cr*J0r - ci*J0i)*cos(wnum*t) - (ci*J0r + cr*J0i)*sin(wnum*t);
@@ -2513,7 +2513,7 @@ static double Step (double x, double a)
   return H;
 }
 
-/* Heaviside step function H(x-a) =1 if x > a else =0 */
+/* Heaviside step function H(x-a) =1 if x > a else =0 */ 
 static double Step2 (double x, double a)
 {
   double H = 1.0;
@@ -2521,7 +2521,7 @@ static double Step2 (double x, double a)
     H = 0.0;
 
   return H;
-}
+} 
 
 static double Shock(double x, double a, double b)
 {
@@ -2536,8 +2536,8 @@ static double Shock(double x, double a, double b)
 
 
 /* -----------------------------------------------------------------
-   jacobi() - jacobi polynomials
-
+   jacobi() - jacobi polynomials 
+   
    Get a vector 'poly' of values of the n_th order Jacobi polynomial
    P^(alpha,beta)_n(z) alpha > -1, beta > -1 at the z
    ----------------------------------------------------------------- */
@@ -2549,20 +2549,20 @@ static double Jacobi(double z, double n, double alpha, double beta){
   double   a1,a2,a3,a4;
   double   two = 2.0, apb = alpha + beta;
   double   poly, polyn1,polyn2;
-
+  
   polyn2 = one;
   polyn1 = 0.5*(alpha - beta + (alpha + beta + 2)*z);
-
+  
   for(k = 2; k <= n; ++k){
     a1 =  two*k*(k + apb)*(two*k + apb - two);
     a2 = (two*k + apb - one)*(alpha*alpha - beta*beta);
     a3 = (two*k + apb - two)*(two*k + apb - one)*(two*k + apb);
     a4 =  two*(k + alpha - one)*(k + beta - one)*(two*k + apb);
-
+    
     a2 /= a1;
     a3 /= a1;
     a4 /= a1;
-
+    
     poly   = (a2 + a3*z)*polyn1 - a4*polyn2;
     polyn2 = polyn1;
     polyn1 = poly  ;
@@ -2583,11 +2583,11 @@ static double Single(double x, double y)
     {
       tmp = (y-3.)*(y-4.)*(y-3.)*(y-4.);
       if (x>=1.0 && x<=2.)
-  return gamma*(x-1.0)*(x-2.)*(x-1.0)*(x-2.);
+	return gamma*(x-1.0)*(x-2.)*(x-1.0)*(x-2.);
       if(x>=3.0 && x<=4.0)
-  return gamma*(x-3.0)*(x-4.0)*(x-3.0)*(x-4.0);
-      if(x>=5. && x<=6.)
-  return gamma*(x-5.0)*(x-6.)*(x-5.0)*(x-6.);
+	return gamma*(x-3.0)*(x-4.0)*(x-3.0)*(x-4.0);
+      if(x>=5. && x<=6.) 
+	return gamma*(x-5.0)*(x-6.)*(x-5.0)*(x-6.);
     }
 #else
   double gamma = 64.0*64.0;
@@ -2605,7 +2605,7 @@ static double Single(double x, double y)
     xa = 5.;    xb = 6.;
     ya = 5.;    yb = 6.;
   }
-  else
+  else 
     return 0.;
 
   return gamma*(x-xa)*(x-xa)*(x-xb)*(x-xb)*(y-ya)*(y-ya)*(y-yb)*(y-yb);
@@ -2618,5 +2618,11 @@ static double UserdefA(double x, double y, double z){
   return doUserdefA(x,y,z);
 }
 */
-
+  
 #undef M_PI
+
+
+
+
+
+
