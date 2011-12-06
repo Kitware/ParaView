@@ -429,6 +429,19 @@ if(NOT APPLE)
   endif()
 endif()
 
+if(NOT APPLE AND CMAKE_Fortran_COMPILER)
+  option(PARAVIEW_BUILD_PLUGIN_Nektar "Build Nektar Plugin" FALSE)
+  if(PARAVIEW_BUILD_PLUGIN_Nektar)
+    set(Nektar_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_Nektar:BOOL=ON
+    )
+  else()
+    set(Nektar_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_Nektar:BOOL=OFF
+    )
+  endif()
+endif()
+
 # Build VisTrailsPlugin
 option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
 set(VisTrails_ARGS)
@@ -560,6 +573,7 @@ ExternalProject_Add(${proj}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
     -DPARAVIEW_BUILD_PLUGIN_AMR:BOOL=OFF
     ${AcuSolve_ARGS}
+    ${Nektar_ARGS}
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ParaViewSuperBuild_SOURCE_DIR}/.plugins <BINARY_DIR>/bin/
