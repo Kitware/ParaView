@@ -44,23 +44,12 @@ add_paraview_plugin(pvNektarReader "1.0"
 
 target_link_libraries(pvNektarReader
   nektar
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libnektarmopt.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Hlib/Linux/libhybridmopt.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Veclib/libvec.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Metis/metis-4.0/libmetis.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/gs/libgs.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libnektarmopt.a
-  #/home/partyd/Projects/Nektar/NEKTAR_OBJECT/libnektarobj.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libblas.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/liblapack.a
   hybrid
   vec
   metis
   gs
   nektar
   nektarobj
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/libblas.a
-  #/home/partyd/Projects/Nektar/Nektar-PARALLEL/Utilities/Linux/liblapack.a
   ${BLAS_blas_LIBRARY}
   ${LAPACK_lapack_LIBRARY}
   )
