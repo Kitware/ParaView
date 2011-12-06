@@ -33,9 +33,9 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
@@ -160,9 +160,9 @@ SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.
 
-set (ColorEditor1_BREAK TRUE)
+set (NewColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
-set (ColorEditor3_BREAK TRUE)
+set (NewColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
@@ -311,7 +311,7 @@ set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (ColorEditor1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (NewColorEditor1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor4_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
