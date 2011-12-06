@@ -105,10 +105,10 @@ set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 
 
-if(WIN32)
+if(WIN32 OR APPLE)
   set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
   set(pv_c_flags ${CMAKE_C_FLAGS})
-else()
+elseif()
   set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
   set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
 endif()
@@ -309,21 +309,23 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
 endif()
 
-set(freetype_dependencies zlib)
-list(APPEND ParaView_dependencies freetype)
-include(External_freetype)
-set(freetype_ARGS
-  -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
-  -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
-  -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
-  -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
-  )
+if(WIN32 OR APPLE)
+  set(freetype_dependencies zlib)
+  list(APPEND ParaView_dependencies freetype)
+  include(External_freetype)
+  set(freetype_ARGS
+    -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
+    -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
+    -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
+    -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
+    )
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
-else()
-  get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
+  else()
+    get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+  endif()
 endif()
 
 if(ENABLE_YT)
