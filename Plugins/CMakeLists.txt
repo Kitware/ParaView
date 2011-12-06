@@ -55,7 +55,7 @@ paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analy
 paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
 paraview_build_optional_plugin(SQToolkit "SciberQuest SciViz Toolkit" SQToolkit OFF)
 paraview_build_optional_plugin(AMR "AMR Toolkit" AMR ON)
-if(PARAVIEW_USE_MPI)
+if(PARAVIEW_USE_MPI AND NOT WIN32)
   paraview_build_optional_plugin(Nektar "Nektar Reader Plugin" Nektar OFF)
 endif()
 
