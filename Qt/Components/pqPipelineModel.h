@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QAbstractItemModel>
+#include <QPointer>
+#include "pqView.h"
 
 class pqDataRepresentation;
 class pqPipelineModelFilter;
@@ -355,7 +357,7 @@ private:
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
   QPixmap *PixmapList;               ///< Stores the item icons.
-  pqView* View;
+  QPointer<pqView> View;
   bool Editable;
   QString FilterRoleAnnotationKey;
   vtkSession* FilterRoleSession;

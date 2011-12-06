@@ -385,7 +385,12 @@ void pqActiveObjects::setActiveView(pqView* view)
     server->activeViewSelectionModel()->SetCurrentProxy(
       view? view->getProxy(): NULL,
       vtkSMProxySelectionModel::CLEAR_AND_SELECT);
-    // this triggers a call to viewSelectionChanged();
+
+    // this triggers a call to viewSelectionChanged(); but in collaboration mode
+    // the ProxySelectionModel has been changed underneath therefore this
+    // current proxy call do not trigger anything as it is already set with
+    // the given value so we force our current class to update itself.
+    this->viewSelectionChanged();
     }
   else
     {
