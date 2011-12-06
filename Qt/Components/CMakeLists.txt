@@ -82,7 +82,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComparativeVisPanel.h
   pqContourPanel.h
   pqContourWidget.h
-  pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionWizard.h
@@ -101,7 +100,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
-  pqEditServerStartupDialog.h
   pqExodusIIPanel.h
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
@@ -122,6 +120,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -168,9 +167,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectThroughPanel.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
-  pqServerBrowser.h
-  pqServerStartupBrowser.h
-  pqServerStartupDialog.h
+  pqServerConfigurationImporter.h
+  pqServerConnectDialog.h
+  pqServerLauncher.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
@@ -180,7 +179,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSummaryPanel.h
   pqProxySILModel.h
   pqSelectionInputWidget.h
-  pqSimpleServerStartup.h
   pqSourceComboBox.h
   pqSphereWidget.h
   pqSplineWidget.h
@@ -232,7 +230,6 @@ SET(UI_FORMS
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqContourWidget.ui
-  Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewButtonDialog.ui
@@ -240,7 +237,6 @@ SET(UI_FORMS
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
-  Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
@@ -256,6 +252,7 @@ SET(UI_FORMS
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
+  Resources/UI/pqMemoryInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
@@ -280,8 +277,8 @@ SET(UI_FORMS
   Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
-  Resources/UI/pqServerBrowser.ui
-  Resources/UI/pqServerStartupDialog.ui
+  Resources/UI/pqServerConnectDialog.ui
+  Resources/UI/pqServerLauncherDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
@@ -426,8 +423,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqContourPanel.h
   pqContourWidget.cxx
   pqContourWidget.h
-  pqCreateServerStartupDialog.cxx
-  pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.cxx
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.cxx
@@ -466,8 +461,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
   pqDistanceWidget.h
-  pqEditServerStartupDialog.cxx
-  pqEditServerStartupDialog.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
   pqExtractCTHPartsPanel.cxx
@@ -508,6 +501,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.cxx
+  pqMemoryInspector.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -603,12 +598,12 @@ VTK_ADD_LIBRARY(pqComponents
   pqSelectionInputWidget.h
   pqSelectionManager.cxx
   pqSelectionManager.h
-  pqServerBrowser.cxx
-  pqServerBrowser.h
-  pqServerStartupBrowser.cxx
-  pqServerStartupBrowser.h
-  pqServerStartupDialog.cxx
-  pqServerStartupDialog.h
+  pqServerConfigurationImporter.cxx
+  pqServerConfigurationImporter.h
+  pqServerConnectDialog.cxx
+  pqServerConnectDialog.h
+  pqServerLauncher.cxx
+  pqServerLauncher.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
@@ -627,8 +622,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqSummaryPanel.h
   pqProxySILModel.cxx
   pqProxySILModel.h
-  pqSimpleServerStartup.cxx
-  pqSimpleServerStartup.h
   pqSourceComboBox.cxx
   pqSourceComboBox.h
   pqSphereWidget.cxx

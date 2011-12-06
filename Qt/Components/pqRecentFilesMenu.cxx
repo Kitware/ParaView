@@ -29,17 +29,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqRecentFilesMenu.h"
-#include "pqSimpleServerStartup.h"
 
-#include <pqApplicationCore.h>
-#include <pqServerResource.h>
-#include <pqServerResources.h>
+#include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqObjectBuilder.h"
+#include "pqRecentlyUsedResourcesList.h"
+#include "pqServerConfiguration.h"
+#include "pqServerConnectDialog.h"
+#include "pqServerLauncher.h"
+#include "pqServerManagerModel.h"
+#include "pqServerResource.h"
+#include "pqUndoStack.h"
+#include "vtkPVXMLParser.h"
+#include "vtkSmartPointer.h"
 
 #include <QMenu>
 #include <QTimer>
 #include <QtDebug>
+#include <QMessageBox>
 
 #include <vtkstd/algorithm>
 
@@ -60,7 +68,6 @@ public:
 
   QMenu& Menu;
   pqServerResource RecentResource;
-  pqSimpleServerStartup ServerStartup;
   
   /// Functor that returns true if two resources have the same URI scheme and host(s)
   class SameSchemeAndHost
@@ -88,7 +95,7 @@ pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p) :
   QObject(p), Implementation(new pqImplementation(menu))
 {
   connect(
-    &pqApplicationCore::instance()->serverResources(),
+    &pqApplicationCore::instance()->recentlyUsedResources(),
     SIGNAL(changed()),
     this,
     SLOT(onResourcesChanged()));
@@ -99,34 +106,26 @@ pqRecentFilesMenu::pqRecentFilesMenu(QMenu& menu, QObject* p) :
     this,
     SLOT(onOpenResource(QAction*)));
     
-  connect(
-    &this->Implementation->ServerStartup,
-    SIGNAL(serverStarted(pqServer*)),
-    this,
-    SLOT(onServerStarted(pqServer*)));
-
-  QObject::connect(
-    &this->Implementation->ServerStartup, SIGNAL(serverFailed()),
-    this, SIGNAL(serverConnectFailed()));
-  
   this->onResourcesChanged();
 }
 
+//-----------------------------------------------------------------------------
 pqRecentFilesMenu::~pqRecentFilesMenu()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onResourcesChanged()
 {
   this->Implementation->Menu.clear();
   
   // Get the set of all resources in most-recently-used order ...
-  pqServerResources::ListT resources = 
-    pqApplicationCore::instance()->serverResources().list();
+  const pqRecentlyUsedResourcesList::ListT &resources = 
+    pqApplicationCore::instance()->recentlyUsedResources().list();
 
   // Get the set of servers with unique scheme/host in most-recently-used order ...
-  pqServerResources::ListT servers;
+  pqRecentlyUsedResourcesList::ListT servers;
   for(int i = 0; i != resources.size(); ++i)
     {
     pqServerResource resource = resources[i];
@@ -200,6 +199,7 @@ void pqRecentFilesMenu::onResourcesChanged()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource(QAction* action)
 {
   // Note: we can't update the resources here because it would destroy the
@@ -210,6 +210,7 @@ void pqRecentFilesMenu::onOpenResource(QAction* action)
   QTimer::singleShot(0, this, SLOT(onOpenResource()));
 }
 
+//-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onOpenResource()
 {
   const pqServerResource resource = this->Implementation->RecentResource;
@@ -219,13 +220,125 @@ void pqRecentFilesMenu::onOpenResource()
       ? resource.sessionServer().schemeHostsPorts()
       : resource.schemeHostsPorts();
 
-  this->Implementation->ServerStartup.startServer(server);
+  pqServerManagerModel *smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqServer *pq_server = smModel->findServer(server);
+  if (!pq_server)
+    {
+    int ret = QMessageBox::warning(
+      pqCoreUtilities::mainWidget(),
+      tr("Disconnect from current server?"),
+      tr("The file you opened requires connecting to a new server. \n"
+        "The current connection will be closed.\n\n"
+        "Are you sure you want to continue?"),
+      QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::No)
+      {
+      return;
+      }
+    pqServerConfiguration config_to_connect;
+    if (pqServerConnectDialog::selectServer(config_to_connect,
+        pqCoreUtilities::mainWidget(), server))
+      {
+      pqServerLauncher launcher(config_to_connect);
+      if (launcher.connectToServer())
+        {
+        pq_server = launcher.connectedServer();
+        }
+      }
+    }
+  if (pq_server)
+    {
+    this->onServerStarted(pq_server);
+    }
 }
 
+//-----------------------------------------------------------------------------
 void pqRecentFilesMenu::onServerStarted(pqServer* server)
 {
-  pqServerResources& resources = pqApplicationCore::instance()->serverResources();
-  resources.open(server, this->Implementation->RecentResource);
-  resources.add(this->Implementation->RecentResource);
-  resources.save(*pqApplicationCore::instance()->settings());
+  if (this->open(server, this->Implementation->RecentResource))
+    {
+    pqRecentlyUsedResourcesList& mruList =
+      pqApplicationCore::instance()->recentlyUsedResources();
+    mruList.add(this->Implementation->RecentResource);
+    mruList.save(*pqApplicationCore::instance()->settings());
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqRecentFilesMenu::open(
+  pqServer* server, const pqServerResource& resource) const
+{
+  if(!server)
+    {
+    qCritical() << "Cannot open a resource with NULL server";
+    return false;
+    }
+    
+  if(resource.scheme() == "session")
+    {
+    if(!resource.path().isEmpty())
+      {
+      // Read in the xml file to restore.
+      vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
+      xmlParser->SetFileName(resource.path().toAscii().data());
+      xmlParser->Parse();
+
+      // Get the root element from the parser.
+      if(vtkPVXMLElement* const root = xmlParser->GetRootElement())
+        {
+        pqApplicationCore::instance()->loadState(root, server);
+        return true;
+        }
+      else
+        {
+        qCritical() << "Root does not exist. Either state file could not be opened "
+                  "or it does not contain valid xml";
+        }
+      }
+    }
+  else
+    {
+    if (!resource.path().isEmpty())
+      {
+      QString readerGroup = resource.data("readergroup");
+      QString readerName = resource.data("reader");
+      pqPipelineSource* reader = 0;
+
+      if (!readerName.isEmpty() && !readerGroup.isEmpty())
+        {
+        pqApplicationCore* core = pqApplicationCore::instance();
+        pqObjectBuilder* builder = core->getObjectBuilder();
+        BEGIN_UNDO_SET("Create Reader");
+        QStringList files;
+        files.push_back(resource.path());
+        QString extrafilesCount = resource.data("extrafilesCount");
+        if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
+          {
+          for (int cc=0; cc < extrafilesCount.toInt(); cc++)
+            {
+            QString extrafile = resource.data(QString("file.%1").arg(cc));
+            if (!extrafile.isEmpty())
+              {
+              files.push_back(extrafile);
+              }
+            }
+          }
+        reader = builder->createReader(
+          readerGroup, readerName, files, server);
+        END_UNDO_SET();
+        return true;
+        }
+      else
+        {
+        qDebug() << "Recent changes to the settings code have "
+          << "made these old entries unusable.";
+        }
+  
+      if (!reader)
+        {
+        qCritical() << "Error opening file " << resource.path() << "\n";
+        }
+      }
+    }
+  return false;
 }

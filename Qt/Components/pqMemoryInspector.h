@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCreateServerStartupDialog.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,47 +28,32 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqCreateServerStartupDialog_h
-#define __pqCreateServerStartupDialog_h
+========================================================================*/
+#ifndef __pqMemoryInspector_h
+#define __pqMemoryInspector_h
 
+#include <QWidget>
 #include "pqComponentsExport.h"
-#include <pqServerResource.h>
-#include <QDialog>
 
-class PQCOMPONENTS_EXPORT pqCreateServerStartupDialog :
-  public QDialog
+class PQCOMPONENTS_EXPORT pqMemoryInspector : public QWidget
 {
-  typedef QDialog Superclass;
-  
   Q_OBJECT
-  
+  typedef QWidget Superclass;
 public:
-  pqCreateServerStartupDialog(
-    const pqServerResource& server = pqServerResource("cs://localhost"),
-    QWidget* parent = 0);
-  ~pqCreateServerStartupDialog();
+  pqMemoryInspector(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqMemoryInspector();
 
-  const QString getName();
-  const pqServerResource getServer();
-
-private slots:
-  void updateServerType();
-  void updateConnectButton();
+protected slots:
+  /// refreshes information.
+  void refresh();
+  void physicalMemoryToggled();
+  void exportToCSV();
+  void updateSummary();
 
 private:
-  void accept();
-
-  enum
-    {
-    CLIENT_SERVER=0,
-    CLIENT_SERVER_REVERSE_CONNECT=1,
-    CLIENT_DATA_SERVER_RENDER_SERVER=2,
-    CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT=3
-    };
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  Q_DISABLE_COPY(pqMemoryInspector)
+  class pqIntenals;
+  pqIntenals* Internals;
 };
 
 #endif
-
