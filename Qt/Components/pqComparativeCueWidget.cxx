@@ -128,7 +128,8 @@ vtkSMComparativeAnimationCueProxy* pqComparativeCueWidget::cue() const
 //-----------------------------------------------------------------------------
 bool pqComparativeCueWidget::acceptsMultipleValues() const
 {
-  return (this->Cue && this->Cue->GetCue()->GetAnimatedElement() == -1);
+  return (this->Cue &&
+    vtkSMPropertyHelper(this->Cue, "AnimatedElement").GetAsInt() == -1);
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +165,6 @@ void pqComparativeCueWidget::updateGUI()
     {
     return;
     }
-  vtkPVComparativeAnimationCue* acue = acueProxy->GetCue();
 
   for (int colno=0; colno < cols; colno++)
     {
@@ -173,7 +173,7 @@ void pqComparativeCueWidget::updateGUI()
       QTableWidgetItem* tableitem = new QTableWidgetItem();
 
       unsigned int numvalues = 0;
-      double* values = acue->GetValues(colno, rowno, cols, rows, numvalues);
+      double* values = acueProxy->GetValues(colno, rowno, cols, rows, numvalues);
       if (numvalues >= 1)
         {
         QStringList val_list;
@@ -213,14 +213,14 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
         *ptr = QVariant(part).toDouble();
         ptr++;
         }
-      this->cue()->GetCue()->UpdateValue(colno, rowno, newvalues,
+      this->cue()->UpdateValue(colno, rowno, newvalues,
         static_cast<unsigned int>(parts.size()));
       }
     }
   else
     {
     double item_data = QVariant(text).toDouble();
-    this->cue()->GetCue()->UpdateValue(colno, rowno, item_data);
+    this->cue()->UpdateValue(colno, rowno, item_data);
     }
   END_UNDO_SET();
 
@@ -285,20 +285,20 @@ void pqComparativeCueWidget::editRange()
 
   BEGIN_UNDO_SET("Update Parameter Values");
 
-  vtkPVComparativeAnimationCue* acue = this->cue()->GetCue();
+  vtkSMComparativeAnimationCueProxy* acueProxy = this->cue();
 
   if (range.rowCount() == 1 &&
     range.columnCount() == this->size().width())
     {
     // user set an x-range.
-    acue->UpdateXRange(range.topRow(), &minvalues[0], &maxvalues[0],
+    acueProxy->UpdateXRange(range.topRow(), &minvalues[0], &maxvalues[0],
       numvalues);
     }
   else if (range.columnCount() == 1 &&
     range.rowCount() == this->size().height())
     {
     // user set a y-range.
-    acue->UpdateYRange(range.leftColumn(),
+    acueProxy->UpdateYRange(range.leftColumn(),
       &minvalues[0], &maxvalues[0], numvalues);
     }
   else if (range.columnCount() == this->size().width() &&
@@ -309,20 +309,20 @@ void pqComparativeCueWidget::editRange()
       {
     case HORZ_FIRST:
       // user set a t-range.
-      acue->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
+      acueProxy->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
       break;
 
     case VERT_FIRST:
-      acue->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues,
+      acueProxy->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues,
         true);
       break;
 
     case HORZ_ONLY:
-      acue->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      acueProxy->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
       break;
 
     case VERT_ONLY:
-      acue->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      acueProxy->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
       break;
 
     default:
@@ -366,7 +366,7 @@ void pqComparativeCueWidget::editRange()
             }
           newvalues[cc] = minvalues[cc] + scale_factor * (maxvalues[cc] - minvalues[cc]);
           }
-        acue->UpdateValue(xx, yy, &newvalues[0], numvalues);
+        acueProxy->UpdateValue(xx, yy, &newvalues[0], numvalues);
         }
       }
     }
