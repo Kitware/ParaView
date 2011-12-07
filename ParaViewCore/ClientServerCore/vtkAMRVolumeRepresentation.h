@@ -35,6 +35,7 @@ class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
+class vtkPVRenderView;
 class vtkPVUpdateSuppressor;
 class vtkUnstructuredDataDeliveryFilter;
 class vtkVolumeProperty;
@@ -116,6 +117,19 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
 
+  // Description:
+  // Gets the metadata from upstream module and determines which blocks
+  // should be loaded by this instance.
+  virtual int RequestInformation(
+                                 vtkInformation *rqst,
+                                 vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector );
+
+  // Description:
+  // Performs upstream requests to the reader
+  virtual int RequestUpdateExtent(
+                                  vtkInformation*, vtkInformationVector**, 
+                                  vtkInformationVector* );
 //BTX
 protected:
   vtkAMRVolumeRepresentation();
@@ -158,6 +172,7 @@ protected:
   vtkAMRVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
+  vtkPVRenderView *RenderView;
 
   vtkOutlineSource* OutlineSource;
   vtkUnstructuredDataDeliveryFilter* OutlineDeliveryFilter;

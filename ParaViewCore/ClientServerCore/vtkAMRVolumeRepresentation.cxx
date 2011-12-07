@@ -41,6 +41,7 @@ vtkStandardNewMacro(vtkAMRVolumeRepresentation);
 vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 {
   this->RequestedRenderMode = 0; // Use Smart Mode
+  this->RenderView = NULL;
   this->VolumeMapper = vtkAMRVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
 
@@ -94,6 +95,28 @@ int vtkAMRVolumeRepresentation::FillInputPortInformation(
   return 1;
 }
 
+//----------------------------------------------------------------------------
+int
+vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
+                                                vtkInformationVector** inputVector,
+                                                vtkInformationVector* outputVector)
+{
+  this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
+  this->VolumeMapper->ProcessUpdateExtentRequest(this->RenderView->GetRenderer(),
+                                                  request, inputVector,
+                                                  outputVector);
+}
+//----------------------------------------------------------------------------
+int
+vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
+                                               vtkInformationVector** inputVector,
+                                               vtkInformationVector* outputVector)
+{
+  this->Superclass::RequestInformation(request, inputVector, outputVector);
+  this->VolumeMapper->ProcessInformationRequest(this->RenderView->GetRenderer(),
+                                                request, inputVector,
+                                                outputVector);
+}
 //----------------------------------------------------------------------------
 int vtkAMRVolumeRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
@@ -202,6 +225,12 @@ bool vtkAMRVolumeRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
+    if (this->RenderView)
+      {
+      this->RenderView->UnRegister(0);
+      }
+    this->RenderView = rview;
+    this->RenderView->Register(0);
     return true;
     }
   return false;
@@ -214,6 +243,11 @@ bool vtkAMRVolumeRepresentation::RemoveFromView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
+    if (this->RenderView)
+      {
+      this->RenderView->UnRegister(0);
+      this->RenderView = NULL;
+      }
     return true;
     }
   return false;
