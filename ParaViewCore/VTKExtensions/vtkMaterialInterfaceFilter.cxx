@@ -6328,6 +6328,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
       vtkAppendPolyData *apf=vtkAppendPolyData::New();
       apf->AddInputData(destMesh);
       apf->AddInputData(srcMesh);
+      apf->Update();
       vtkPolyData *mergedMesh=apf->GetOutput();
       
       //mergedMesh->Register(0); // Do I have to? no because multi piece does it
@@ -6431,6 +6432,7 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
     #endif
     // clean duplicate points
     cpd->SetInputData(fragmentMesh);
+    cpd->Update();
     vtkPolyData *cleanedFragmentMesh=cpd->GetOutput();
     
     #ifdef vtkMaterialInterfaceFilterDEBUG
