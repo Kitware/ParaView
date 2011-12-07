@@ -67,11 +67,10 @@ int Source(int argc, char *argv[])
   sms->SetOriginCX(-1.75,-1.25,0,0);
 
   vtkDataObject *input = sms->GetOutput();
-  vtkInformation* info;
-  info->Set(vtkDataObject::DATA_OBJECT(), input);
+  vtkInformation* info = sms->GetOutputInformation(0);
   vtkStreamingDemandDrivenPipeline* sddp =
-    vtkStreamingDemandDrivenPipeline::SafeDownCast
-    (vtkExecutive::PRODUCER()->GetExecutive(info));
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(
+      sms->GetExecutive());
 
   //test source by asking it to produce different pieces...
   const int numers[5] = {0, 0, 1, 1, 3};

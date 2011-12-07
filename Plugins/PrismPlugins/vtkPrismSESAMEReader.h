@@ -99,8 +99,13 @@ protected:
 
   int OpenFile();
   void CloseFile();
-  void Execute();
-  void ExecuteInformation();
+  int RequestData(vtkInformation*,
+                  vtkInformationVector**,
+                  vtkInformationVector* outputVector);
+  int RequestInformation(
+    vtkInformation* request,
+    vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
   int ReadTableValueLine ( float *v1, float *v2, float *v3,
       float *v4, float *v5);
