@@ -35,9 +35,22 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns the client-side vtkPVComparativeAnimationCue instance. Same as
-  // vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
-  vtkPVComparativeAnimationCue* GetCue();
+  // Methods simply forwarded to vtkPVComparativeAnimationCue.
+  // Any of these methods changing the state of the proxy, also call
+  // this->MarkModified(this).
+  void UpdateXRange(int y, double minx, double maxx);
+  void UpdateYRange(int x, double miny, double maxy);
+  void UpdateWholeRange(double mint, double maxt);
+  void UpdateValue(int x, int y, double value);
+  void UpdateXRange(int y, double *minx, double* maxx, unsigned int numvalues);
+  void UpdateYRange(int x, double *minx, double* maxx, unsigned int numvalues);
+  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues);
+  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues,
+    bool vertical_first);
+  void UpdateValue(int x, int y, double *value, unsigned int numValues);
+  double* GetValues(int x, int y, int dx, int dy, unsigned int &numValues);
+  double GetValue(int x, int y, int dx, int dy);
+  void UpdateAnimatedValue(int x, int y, int dx, int dy);
 
   // Description:
   // Saves the state of the proxy. This state can be reloaded
@@ -48,6 +61,7 @@ public:
   // and sub-proxies. More control is provided by the following overload.
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
     { return this->Superclass::SaveXMLState(root); }
+
   // Description:
   // The iterator is use to filter the property available on the given proxy
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
