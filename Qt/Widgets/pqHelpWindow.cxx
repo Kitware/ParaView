@@ -32,8 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpWindow.h"
 #include "ui_pqHelpWindow.h"
 
-#include <QApplication>
-#include <QDir>
+#include <QByteArray>
 #include <QHelpContentItem>
 #include <QHelpContentModel>
 #include <QHelpContentWidget>
@@ -42,36 +41,93 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHelpSearchEngine>
 #include <QHelpSearchQueryWidget>
 #include <QHelpSearchResultWidget>
-#include <QLibraryInfo>
+#include <QNetworkAccessManager>
+#include <QNetworkProxy>
+#include <QPointer>
 #include <QtDebug>
-#include <QTemporaryFile>
-#include <QTextBrowser>
+#include <QTimer>
 #include <QUrl>
+#include <QWebPage>
+#include <QWebView>
 
-class pqHelpWindow::pqTextBrowser : public QTextBrowser
+// ****************************************************************************
+//    CLASS pqHelpWindow::pqNetworkAccessManager
+// ****************************************************************************
+//-----------------------------------------------------------------------------
+class pqHelpWindow::pqNetworkAccessManager : public QNetworkAccessManager
 {
+  typedef QNetworkAccessManager Superclass;
+  QPointer<QHelpEngineCore> Engine;
 public:
-  pqTextBrowser(QHelpEngine* engine, QWidget * parentObject = 0)
-    : QTextBrowser(parentObject)
-    {
-    Q_ASSERT(engine != 0);
-    this->Engine = engine;
-    }
+  pqNetworkAccessManager(
+    QHelpEngineCore* helpEngine, QNetworkAccessManager *manager, QObject *parent) :
+    Superclass(parent),
+    Engine(helpEngine)
+  {
+  Q_ASSERT(manager != NULL && helpEngine != NULL);
 
-  virtual QVariant loadResource(int type, const QUrl &url)
+  this->setCache(manager->cache());
+  this->setCookieJar(manager->cookieJar());
+  this->setProxy(manager->proxy());
+  this->setProxyFactory(manager->proxyFactory());
+  }
+
+protected:    
+  virtual QNetworkReply *createRequest(
+    Operation operation, const QNetworkRequest &request, QIODevice *device)
     {
-    if (url.scheme() == "qthelp")
+    if (request.url().scheme() == "qthelp" && operation == GetOperation)
       {
-      return QVariant(this->Engine->fileData(url));
+      return new pqHelpWindowNetworkReply(request.url(), this->Engine);
       }
     else
       {
-      return QTextBrowser::loadResource(type, url);
+      return this->Superclass::createRequest(operation, request, device);
       }
     }
+
 private:
-  QHelpEngine* Engine;
+  Q_DISABLE_COPY(pqNetworkAccessManager);
 };
+
+// ****************************************************************************
+//            CLASS pqHelpWindowNetworkReply
+// ****************************************************************************
+
+//-----------------------------------------------------------------------------
+pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
+  const QUrl& url, QHelpEngineCore* engine) : Superclass(engine)
+{
+  Q_ASSERT(engine);
+
+  this->HelpEngine = engine;
+  this->setUrl(url);
+
+  // timer is essential since all the signals that are fired when data is
+  // available need to happen after the constructor.
+  QTimer::singleShot(0, this, SLOT(process()));
+}
+
+//-----------------------------------------------------------------------------
+void pqHelpWindowNetworkReply::process()
+{
+  if (this->HelpEngine)
+    {
+    QByteArray rawData = this->HelpEngine->fileData(this->url());
+    this->Buffer.setData(rawData);
+    this->Buffer.open(QIODevice::ReadOnly);
+
+    this->open(QIODevice::ReadOnly|QIODevice::Unbuffered);
+    this->setHeader(QNetworkRequest::ContentLengthHeader, QVariant(rawData.size()));
+    this->setHeader(QNetworkRequest::ContentTypeHeader, "text/html");
+    emit this->readyRead();
+    emit this->finished();
+    }
+}
+
+// ****************************************************************************
+//            CLASS pqHelpWindow
+// ****************************************************************************
 
 //-----------------------------------------------------------------------------
 pqHelpWindow::pqHelpWindow(
@@ -107,13 +163,18 @@ pqHelpWindow::pqHelpWindow(
     SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
-  pqHelpWindow::pqTextBrowser* browser = 
-    new pqHelpWindow::pqTextBrowser(this->HelpEngine, this);
-  this->Browser = browser;
-  this->setCentralWidget(browser);
+  this->Browser = new QWebView(this);
+  this->setCentralWidget(this->Browser);
+
+  QNetworkAccessManager *oldManager = this->Browser->page()->networkAccessManager();
+  pqNetworkAccessManager* newManager = new pqNetworkAccessManager(
+    this->HelpEngine, oldManager, this);
+  this->Browser->page()->setNetworkAccessManager(newManager);
+  this->Browser->page()->setForwardUnsupportedContent(false);
+    
   QObject::connect(
     this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)),
-    browser, SLOT(setSource(const QUrl&)));
+    this, SLOT(showPage(const QUrl&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -124,13 +185,13 @@ pqHelpWindow::~pqHelpWindow()
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QString& url)
 {
-  this->Browser->setSource(url);
+  this->Browser->setUrl(url);
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QUrl& url)
 {
-  this->Browser->setSource(url);
+  this->Browser->setUrl(url);
 }
 
 //-----------------------------------------------------------------------------

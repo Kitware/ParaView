@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqHelpWindow_h
 
 #include <QMainWindow>
+#include <QPointer>
 #include "QtWidgetsExport.h"
 
 class QHelpEngine;
-class QTextBrowser;
+class QHelpEngineCore;
 class QUrl;
+class QWebView;
 
 /// pqHelpWindow provides a assistant-like window  for showing help provided by
 /// a QHelpEngine.
@@ -69,14 +71,48 @@ protected slots:
 
 protected:
   QHelpEngine* HelpEngine;
-  QTextBrowser* Browser;
+  QWebView* Browser;
 
 private:
   Q_DISABLE_COPY(pqHelpWindow)
 
-  class pqTextBrowser;
+  class pqNetworkAccessManager;
+  friend class pqNetworkAccessManager;
+};
+
+
+#include <QNetworkReply>
+#include <QBuffer>
+/// Internal class used to add support to QWebView to load files from
+/// QHelpEngine.
+class QTWIDGETS_EXPORT pqHelpWindowNetworkReply : public QNetworkReply
+{
+  Q_OBJECT;
+  typedef QNetworkReply Superclass;
+public:
+  pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
+
+  virtual void abort() {}
+  virtual qint64 bytesAvailable() const
+    { return this->Buffer.bytesAvailable(); }
+  virtual bool isSequential() const
+    { return this->Buffer.isSequential(); }
+
+private slots:
+  /// reads the raw data fires signals to notify data is available.
+  void process();
+
+protected:
+  virtual qint64 readData(char *data, qint64 maxSize)
+    {
+    return this->Buffer.read(data, maxSize);
+    }
+
+  QPointer<QHelpEngineCore> HelpEngine;
+  QBuffer Buffer;
+
+private:
+  Q_DISABLE_COPY(pqHelpWindowNetworkReply)
 };
 
 #endif
-
-

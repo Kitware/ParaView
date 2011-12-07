@@ -15,8 +15,10 @@ IF(QT4_FOUND)
 # ENDIF (NOT qt_version_tmp)
 
 SET (QT_USE_QTHELP TRUE)
+SET (QT_USE_QTWEBKIT TRUE)
 SET (QT_USE_QTUITOOLS TRUE)
 SET (QT_USE_QTXML TRUE)  # uitools depends on xml
+SET (QT_USE_QTNETWORK TRUE)
 SET (QT_USE_QTNETWORK TRUE)
 # This ensures that the Qt includes dir etc are set properly.
 # We don't need to find the Qt4 package or include the use file
