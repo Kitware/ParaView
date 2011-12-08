@@ -36,7 +36,7 @@ build_help_project(paraview
          <section title=\"Writers\" ref=\"Writers.html\"/>
        </section>
      </toc>"
-  FILEPATTERNS "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg"
+  FILEPATTERNS "*.html;*.css;*.png;*.jpg;Book/*.html;Book/*.css;Book/*.png;Book/*.jpg;images/*.jpg"
   DEPENDS "${proxy_html_outputs}"
   )
 
