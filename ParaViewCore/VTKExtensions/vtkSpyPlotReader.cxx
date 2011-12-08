@@ -759,8 +759,11 @@ int vtkSpyPlotReader::RequestData(
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
-        }
-      this->ComputeDerivedVars(cd, block, uniReader, blockID);
+        }      
+      if(!this->IsAMR)
+      {
+        this->ComputeDerivedVars(cd, block, uniReader, blockID);
+      }
 
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
@@ -2241,7 +2244,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
   vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID)
 {
-  if ( this->ComputeDerivedVariables != 1 )
+  if ( this->ComputeDerivedVariables != 1 || this->IsAMR)
     {
     return 0;
     }
