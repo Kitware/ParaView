@@ -192,6 +192,10 @@ SET (XYChart_THRESHOLD 150)
 
 SET (XYHistogram_THRESHOLD 60)
 
+# The color and opacity are often different on different machines.
+SET (NewColorEditor1_THRESHOLD 60)
+SET (NewColorEditor3_THRESHOLD 60)
+
 # Histogram filter produces different results when running in parallel, so
 # disable it.
 IF (PARAVIEW_USE_MPI)
