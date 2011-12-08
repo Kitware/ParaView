@@ -162,19 +162,30 @@ bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
 vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
                                                                    int conn)
 {
-  vtkTrivialProducer* prevProducer = this->GetInternalInput(port, conn);
-  if (prevProducer && prevProducer->IsA("vtkPVTrivialProducer"))
+  vtkAlgorithmOutput* prevOutput =
+    this->Superclass::GetInternalOutputPort(port, conn);
+  if (!prevOutput)
     {
-    return prevProducer->GetOutputPort();
+    return 0;
     }
 
-  vtkDataObject* dobj = this->GetInputDataObject(port, conn);
+  vtkTrivialProducer* prevProducer = static_cast<vtkTrivialProducer*>(
+    prevOutput->GetProducer());
+  if (prevProducer->IsA("vtkPVTrivialProducer"))
+    {
+    return prevOutput;
+    }
+
+  vtkDataObject* dobj = prevProducer->GetOutputDataObject(0);
+  vtkDataObject* copy = dobj->NewInstance();
+  copy->ShallowCopy(dobj);
 
   vtkstd::pair<int, int> p(port, conn);
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
   vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
   tprod->SetExecutive(exec);
-  tprod->SetOutput(dobj);
+  tprod->SetOutput(copy);
+  copy->Delete();
   vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
   portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
   this->SetInternalInput(port, conn, tprod);
