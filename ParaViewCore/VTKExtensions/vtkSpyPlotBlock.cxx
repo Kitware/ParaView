@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
 Program:   Visualization Toolkit
@@ -626,9 +627,12 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
         }
 
       data->AddArray(materialDensity);
-      materialDensity->Delete();
+      materialDensity->FastDelete();
       }
     }
+
+  data->AddArray(volumeArray);
+  volumeArray->FastDelete();
 }
 //-----------------------------------------------------------------------------
 double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
