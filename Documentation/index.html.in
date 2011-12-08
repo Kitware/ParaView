@@ -23,7 +23,7 @@ Released   : 20111010
 	<div id="header-wrapper">
 		<div id="header">
 			<div id="logo">
-				<h1><a href="www.paraview.org">ParaView </a></h1>
+				<h1><a href="http://www.paraview.org">ParaView </a></h1>
         <p>User's Manual for v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@</p>
 			</div>
 		</div>
