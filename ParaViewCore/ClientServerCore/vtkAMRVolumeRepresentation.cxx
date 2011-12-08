@@ -105,6 +105,7 @@ vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
   this->VolumeMapper->ProcessUpdateExtentRequest(this->RenderView->GetRenderer(),
                                                   request, inputVector,
                                                   outputVector);
+  return 1;
 }
 //----------------------------------------------------------------------------
 int
@@ -116,6 +117,7 @@ vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
   this->VolumeMapper->ProcessInformationRequest(this->RenderView->GetRenderer(),
                                                 request, inputVector,
                                                 outputVector);
+  return 1;
 }
 //----------------------------------------------------------------------------
 int vtkAMRVolumeRepresentation::ProcessViewRequest(
@@ -164,6 +166,7 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
 int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+    cerr << "vtkAMRVolumeRepresentation::RequestData" << endl;
   // mark delivery filters modified.
   this->OutlineDeliveryFilter->Modified();
 

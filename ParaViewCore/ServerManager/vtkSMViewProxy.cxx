@@ -120,6 +120,22 @@ void vtkSMViewProxy::StillRender()
   int interactive = 0;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
 
+  unsigned int numProducers = this->GetNumberOfProducers();
+  for (unsigned int i=0; i<numProducers; i++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      this->GetProducerProxy(i));
+    if (repr && repr->GetProperty("Shade"))
+      {
+        repr->InvokeCommand("Shade");
+      }
+    else
+      {
+      //this->GetProducerProxy(i)->PostUpdateData();
+      }
+    }
+
+
   // We call update separately from the render. This is done so that we don't
   // get any synchronization issues with GUI responding to the data-updated
   // event by making some data information requests(for example). If those
