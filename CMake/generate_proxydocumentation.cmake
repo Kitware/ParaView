@@ -33,6 +33,12 @@ foreach(xml ${input_xmls} ${input_gui_xmls})
   set (temp)
   # process each XML using the XSL to generate the html.
   execute_process(
+    # create directory first. This is not needed, but if no output htmls are
+    # generated because of missing proxy definitions, the the build may die with
+    # an error due to missing directory.
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${output_dir}"
+
+    # do the XSL translations.
     COMMAND "${xmlpatterns}" "${xml_to_xml_xsl}" "${xml}"
     OUTPUT_VARIABLE  temp
     )
