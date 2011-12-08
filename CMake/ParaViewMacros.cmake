@@ -318,6 +318,10 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   if (NOT first_xml)
     message(FATAL_ERROR "No xml specified!!!")
   endif()
+  
+  # extract the name from the first xml file. This is the name for temporary
+  # file we use.
+  get_filename_component(first_xml "${first_xml}" NAME)
 
   find_program(QT_XMLPATTERNS_EXECUTABLE
     xmlpatterns
