@@ -237,10 +237,10 @@ SET (SaveCSV_THRESHOLD 40)
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
 
-# ColorEditor3 does volume rendering of structrued data which required remote
+# NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
-SET (ColorEditor3_DISABLE_CS TRUE)
-SET (ColorEditor3_DISABLE_CRS TRUE)
+SET (NewColorEditor3_DISABLE_CS TRUE)
+SET (NewColorEditor3_DISABLE_CRS TRUE)
 
 # ViewSettingsDialog uses texture background which is currently supported only
 # in local render mode.
@@ -283,7 +283,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
-#     - ViewSettingsDialog, ColorEditor3, RectilinearFractal
+#     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
 #
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
