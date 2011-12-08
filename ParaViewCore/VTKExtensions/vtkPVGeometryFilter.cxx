@@ -739,6 +739,27 @@ int vtkPVGeometryFilter::RequestAMRData(
       return 0;
     }
 
+
+  // If we are in outline view, just get the bounds from the hierarchicalbox
+  // dataset.
+  if( this->UseOutline )
+    {
+    vtkOutlineSource *outline = vtkOutlineSource::New();
+    outline->SetBounds( input->GetBounds() );
+    outline->Update();
+
+    vtkPolyData *AMRDataOutline = vtkPolyData::New();
+    AMRDataOutline->SetPoints(outline->GetOutput()->GetPoints() );
+    AMRDataOutline->SetLines(outline->GetOutput()->GetLines() );
+    AMRDataOutline->SetPolys(outline->GetOutput()->GetPolys() );
+    outline->Delete();
+
+    output->SetNumberOfBlocks( 1 );
+    output->SetBlock( 0, AMRDataOutline );
+    AMRDataOutline->Delete();
+    return 0;
+    }
+
   // STEP 1: Construct output object, i.e., a multiblock of multiple pieces
   // that mirrors the vtkHierarchicalBoxDataSet
   output->SetNumberOfBlocks( input->GetNumberOfLevels() );
