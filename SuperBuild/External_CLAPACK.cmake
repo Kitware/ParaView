@@ -13,6 +13,12 @@ if(UNIX AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
   set(pv_tpl_c_flags_LAPACK "-fPIC ${pv_tpl_c_flags}")
 endif()
 
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/CLAPACK_install_step.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CLAPACK_install_step.cmake
+    @ONLY)
+
+set(CLAPACK_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/CLAPACK_install_step.cmake)
+
 ExternalProject_Add(CLAPACK
   DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${CLAPACK_source}
@@ -25,8 +31,15 @@ ExternalProject_Add(CLAPACK
     -DBUILD_SHARED_LIBS:BOOL=OFF
     ${pv_tpl_compiler_args}
     ${CLAPACK_EXTRA_ARGS}
-  INSTALL_COMMAND ""
+  INSTALL_COMMAND ${CLAPACK_INSTALL_COMMAND}
   )
 
-set(CLAPACK_DIR "${CLAPACK_binary}" CACHE PATH "CLAPACK binary directory" FORCE)
-mark_as_advanced(CLAPACK_DIR)
+if(WIN32)
+  set(BLAS_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/blas${_LINK_LIBRARY_SUFFIX}")
+  set(LAPACK_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/lapack${_LINK_LIBRARY_SUFFIX}")
+  set(F2C_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libf2c${_LINK_LIBRARY_SUFFIX}")
+else()
+  set(BLAS_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libblas.a")
+  set(LAPACK_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/liblapack.a")
+  set(F2C_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libf2c.a")
+endif()

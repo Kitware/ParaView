@@ -2,7 +2,26 @@
 # The OpenMPI external project for ParaView
 set(OpenMPI_source "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI")
 set(OpenMPI_build "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-build")
-set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-install")
+set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}")
+message("CMAKE_Fortran_COMPILER ${CMAKE_Fortran_COMPILER}")
+if(CMAKE_Fortran_COMPILER)
+  message("Fortran Compiler!")
+  if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel" AND WIN32)
+    include(DetectIntelFortranEnvironment)
+    set(OpenMPI_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILE_PATH=${intel_ifort_path}/ifort.exe
+    )
+  message("setting ifort.")
+  else()
+    set(OpenMPI_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILE_PATH=${CMAKE_Fortran_COMPILER}
+    )
+  list(APPEND OpenMPI_EXTRA_ARGS
+    -DOMPI_WANT_F77_BINDINGS:BOOL=ON
+    -DOMPI_WANT_F90_BINDINGS:BOOL=ON
+  )
+  endif()
+endif()
 
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
@@ -14,10 +33,7 @@ if(WIN32)
     URL ${OPENMPI_URL}/${OPENMPI_GZ}
     URL_MD5 ${OPENMPI_MD5}
     CMAKE_CACHE_ARGS
-#      -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
-#      -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
-#      ${pv_tpl_compiler_args}
       ${OpenMPI_EXTRA_ARGS}
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>

@@ -1,0 +1,38 @@
+
+if(WIN32)
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/SRC/Release/lapack@_LINK_LIBRARY_SUFFIX@" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/BLAS/SRC/Release/blas@_LINK_LIBRARY_SUFFIX@" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/F2CLIBS/libf2c/Release/libf2c@_LINK_LIBRARY_SUFFIX@" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "@CLAPACK_source@/include" "@CMAKE_CURRENT_BINARY_DIR@/include"
+    )
+
+else()
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/SRC/liblapack.a" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/BLAS/SRC/libblas.a" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "@CLAPACK_binary@/F2CLIBS/libf2c/libf2c.a" "@CMAKE_CURRENT_BINARY_DIR@/lib/"
+    )
+
+  EXECUTE_PROCESS(
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "@CLAPACK_source@/include" "@CMAKE_CURRENT_BINARY_DIR@/include"
+    )
+
+endif()

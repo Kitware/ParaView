@@ -1,0 +1,146 @@
+
+ <ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+   <SourceProxy name="pvNektarReader"
+                class="vtkNektarReader"
+                label="nektar data reader"
+                multiprocess_support="multiple_processes">
+     <Documentation
+       short_help="Read a nektar file."
+       long_help="Read a nektar file into an unstructured grid.">
+       The NekTar reader reads NekTar files, and convert the data from modal to physical space, generating the output in an unstructured grid dataset.
+     </Documentation>
+
+     <StringVectorProperty
+        name="DataFileName"
+        animateable="0"
+  information_only="1"
+        command="GetDataFileName"
+        number_of_elements="1">
+  <SimpleStringInformationHelper/>
+        <Documentation>
+          This property specifies the file name for the NekTar reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+  information_property="DataFileName">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the NekTar reader.
+        </Documentation>
+     </StringVectorProperty>
+
+ <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+<!--
+     <StringVectorProperty
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+-->
+<!--  not sure about this, can probably delete
+     <StringVectorProperty
+        name="DataFileInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name=""/>
+     </StringVectorProperty>
+-->
+
+
+      <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Variables">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="DerivedVariableArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="DerivedVariable"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="DerivedVariableArrayStatus"
+        command="SetDerivedVariableArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="DerivedVariableArrayInfo"
+        label="Derived Quantities">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="DerivedVariableArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which derived quantities to generate.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+      name="Resolution"
+      command="SetElementResolution"
+      number_of_elements="1"
+      default_values="2">
+       <IntRangeDomain name="range" min="2" max="10"/>
+       <Documentation>
+         This property sets the number of subdivisions along each edge of the elements.
+       </Documentation>
+     </IntVectorProperty>
+
+   <!-- End NekTar Reader -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
