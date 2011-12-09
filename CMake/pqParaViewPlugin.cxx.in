@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <class T, class F>
 void PushBack(T& vector, F& fun)
 {
-  char* text = fun(NULL);
+  char* text = fun();
   vector.push_back(text);
   delete []text;
 }
@@ -68,8 +68,8 @@ extern "C" void VTK_EXPORT @PLUGIN_NAME@_CombinedInitialize(
 void @PLUGIN_NAME@_Plugin::GetBinaryResources(
   vtkstd::vector<vtkstd::string>& resources)
 {
-  (void)resources;
 @BINARY_RESOURCES_INIT@
+  (void)resources;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,8 +92,8 @@ vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 //-----------------------------------------------------------------------------
 void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
 {
-  (void)xmls;
 @XML_INTERFACES_INIT@
+  (void)xmls;
 }
 #endif
 

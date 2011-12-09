@@ -286,10 +286,8 @@ int main(int argc, char* argv[])
     ot.Stream
       << "// Get single string" << endl
       << "char* " << ot.Prefix.c_str() << moduleName.c_str() << argv[argv_offset + 4] 
-      << "(bool *base64_encoded=NULL)" << endl
+      << "()" << endl
       << "{" << endl
-      << "  if (base64_encoded) {*base64_encoded = " 
-      << (ot.UseBase64Encoding?  "true" : "false") << ";}" << endl
       << "  size_t len = ( 0"
       << lenstr.str()
       << " );" << endl
