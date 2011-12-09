@@ -131,6 +131,13 @@
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+	  name = "EnableTracking"
+	  command ="SetUseOffAxisProjection"
+	  number_of_elements="1"
+	  default_values="0">
+      </IntVectorProperty>
+
       <DoubleVectorProperty
          name="HeadPose"
          command="SetEyeTransformMatrix"
