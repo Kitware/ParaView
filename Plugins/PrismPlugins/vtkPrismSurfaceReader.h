@@ -178,6 +178,9 @@ protected:
 
  
   bool GetVariableRange (const char *name,vtkDoubleArray*);
+
+  void SetupViewKeys(double geomBounds[6], vtkPointSet* surfaceOutput,
+                      vtkPointSet* curveOutput, vtkPointSet* contourOutput);
   //BTX 
   class MyInternal;
   MyInternal* Internal;
