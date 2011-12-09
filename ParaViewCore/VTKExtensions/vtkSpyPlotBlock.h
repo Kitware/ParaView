@@ -28,10 +28,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSystemIncludes.h"
 
 class vtkCellData;
+class vtkDoubleArray;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkSpyPlotIStream;
 class vtkBoundingBox;
+class vtkUnsignedCharArray;
 
 class VTK_EXPORT vtkSpyPlotBlock
 {
@@ -89,17 +91,24 @@ public:
     
   void SetCoordinateSystem(const int &coordinateSystem);
 
-  void ComputeDerivedVariables( vtkCellData *data, const int &numberOfMaterials, 
+  void ComputeDerivedVariables(vtkCellData *data, const int &numberOfMaterials,
     vtkDataArray** materialMasses, vtkDataArray** materialVolumeFractions,
-    int dims[3], const int &downConvertVolumeFraction) const;
-
-  //Parameter i is the x dimension index not coordinate location
-  //will return a negative volume if you requst a the volume of a cell
-  //that is outside the demensions of the block
-  double GetCellVolume(double spacing[3], const int &i) const;
+    const int &downConvertVolumeFraction) const;
 
 protected:
   
+  //will return a negative volume if you requst a the volume of a cell
+  //that is outside the demensions of the block
+  double GetCellVolume(int i, int j, int k) const;
+  void ComputeMaterialDensity(vtkDataArray*  materialMasses,
+                              vtkUnsignedCharArray* materialFraction,
+                              vtkDoubleArray* volumes,
+                              vtkDoubleArray* materialdensity) const;
+  void ComputeMaterialDensity(vtkDataArray*  materialMasses,
+                              vtkFloatArray* materialFraction,
+                              vtkDoubleArray* volumes,
+                              vtkDoubleArray* materialdensity) const;
+
   int Dimensions[3];
   struct BlockStatusType
   {
