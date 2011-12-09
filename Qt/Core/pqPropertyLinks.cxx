@@ -80,6 +80,10 @@ public:
 
   // This flag indicates if the QObject and the vtkSMProperty are out of synch. 
   bool OutOfSync;
+
+  // This flag indicates that we are creating a new connection
+  // and modifed signals should not be emitted.
+  bool CreatingConnection;
 };
 
 class pqPropertyLinks::pqInternal
@@ -119,6 +123,7 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(
   this->Internal->QtObject = qobject;
   this->Internal->QtProperty = qproperty;
   this->Internal->OutOfSync = false;
+  this->Internal->CreatingConnection = false;
 }
 
 pqPropertyLinksConnection::~pqPropertyLinksConnection()
@@ -146,6 +151,16 @@ void pqPropertyLinksConnection::clearOutOfSync() const
   this->Internal->OutOfSync = false;
 }
 
+void pqPropertyLinksConnection::setCreatingConnection(bool creatingConnection)
+{
+  this->Internal->CreatingConnection = creatingConnection;
+}
+
+bool pqPropertyLinksConnection::creatingConnection() const
+{
+  return this->Internal->CreatingConnection;
+}
+
 void pqPropertyLinksConnection::clearUncheckedProperties()
 {
   pqSMAdaptor::clearUncheckedProperties(this->Internal->Property);
@@ -170,6 +185,13 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
 
   if(this->Internal->QtObject)
     {
+    // do not emit modifed signals from the QtObject if we are
+    // in the process of creating the connection
+    if(this->Internal->CreatingConnection)
+      {
+      this->Internal->QtObject->blockSignals(true);
+      }
+
     // get the property of the object
     QVariant old;
     old = this->Internal->QtObject->property(this->Internal->QtProperty);
@@ -301,8 +323,21 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
     case pqSMAdaptor::PROXYLIST:
       break;
       }
+
+    // re-enable signals from the QtObject if we blocked
+    // them because we were creating the connection
+    if(this->Internal->CreatingConnection)
+      {
+      this->Internal->QtObject->blockSignals(false);
+      }
     }
-  emit this->smPropertyChanged();
+
+  // emit property changed signal if we are not in the
+  // process of creating the connection
+  if(!this->Internal->CreatingConnection)
+    {
+    emit this->smPropertyChanged();
+    }
 }
 
 void pqPropertyLinksConnection::qtLinkedPropertyChanged() 
@@ -545,12 +580,16 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   QObject::connect(conn, SIGNAL(smPropertyChanged()),
     this, SIGNAL(smPropertyChanged()));
   
+  conn->setCreatingConnection(true);
+
   conn->setUseUncheckedProperties(this->Internal->UseUncheckedProperties);
   conn->setAutoUpdateVTKObjects(this->Internal->AutoUpdate);
   // set the object property to the current server manager property value
   conn->smLinkedPropertyChanged();
   // We let the connection be marked dirty on creation.
   // conn->clearOutOfSync();
+
+  conn->setCreatingConnection(false);
 }
 
 //-----------------------------------------------------------------------------
