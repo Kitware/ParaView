@@ -49,11 +49,14 @@ public:
 protected slots:
   void addServerInFiltering(pqServer*);
   void applyPipelineFiltering(int);
+  void applyPipelineFiltering2(int);
 
 private:
   Q_DISABLE_COPY(MultiServerClientMainWindow);
 
   pqPipelineBrowserWidget* pipelineBrowser;
   QComboBox* comboBox;
+  pqPipelineBrowserWidget* pipelineBrowser2;
+  QComboBox* comboBox2;
 };
 #endif
