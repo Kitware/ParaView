@@ -163,14 +163,14 @@ public:
     {
     return this->Information.GetPointer();
     }
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const
+  virtual int rowCount(const QModelIndex &idx=QModelIndex()) const
     {
-    (void)parent;
+    (void)idx;
     return this->Information->GetSystemInformations().size();
     }
-  virtual int columnCount(const QModelIndex& parent=QModelIndex()) const
+  virtual int columnCount(const QModelIndex& idx=QModelIndex()) const
     {
-    (void)parent;
+    (void)idx;
     // Process #, Memory Used, Memory Free, Hostname, Total Memory
     return 5;
     }
