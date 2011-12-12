@@ -300,23 +300,13 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::FIELD_SELECTION:
         {
-        if(this->Internal->Index == 0)
+        prop = pqSMAdaptor::getFieldSelection(this->Internal->Property,
+                                              propertyValueType);
+
+        if(prop != old)
           {
-          prop = pqSMAdaptor::getFieldSelectionMode(this->Internal->Property, propertyValueType);
-          if(prop != old)
-            {
-            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-              prop);
-            }
-          }
-        else
-          {
-          prop = pqSMAdaptor::getFieldSelectionScalar(this->Internal->Property, propertyValueType);
-          if(prop != old)
-            {
-            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-              prop);
-            }
+          this->Internal->QtObject->setProperty(this->Internal->QtProperty,
+                                                prop);
           }
         }
     case pqSMAdaptor::UNKNOWN:
@@ -476,28 +466,14 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
 
       break;
     case pqSMAdaptor::FIELD_SELECTION:
-        if(this->Internal->Index == 0)
-          {
-          pqSMAdaptor::setFieldSelectionMode(this->Internal->Property,
-                                             prop.toString(),
-                                             propertyValueType);
+        pqSMAdaptor::setFieldSelection(this->Internal->Property,
+                                       prop.toStringList(),
+                                       propertyValueType);
 
           if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
             {
             this->Internal->Proxy->UpdateVTKObjects();
             }
-          }
-        else
-          {
-          pqSMAdaptor::setFieldSelectionScalar(this->Internal->Property,
-                                               prop.toString(),
-                                               propertyValueType);
-
-          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
-            {
-            this->Internal->Proxy->UpdateVTKObjects();
-            }
-          }
 
         break;
     case pqSMAdaptor::UNKNOWN:

@@ -1704,6 +1704,94 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
     }
 }
 
+QStringList pqSMAdaptor::getFieldSelection(vtkSMProperty *Property,
+                                           PropertyValueType Type)
+{
+  vtkSMStringVectorProperty *StringVectorProperty =
+    vtkSMStringVectorProperty::SafeDownCast(Property);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(StringVectorProperty->GetDomain("field_list"));
+
+  QString mode;
+  QString scalars;
+
+  if(StringVectorProperty && domain)
+    {
+    int which;
+
+    if(Type == CHECKED)
+      {
+      which = QString(StringVectorProperty->GetElement(3)).toInt();
+      }
+    else if(Type == UNCHECKED)
+      {
+      which = QString(StringVectorProperty->GetUncheckedElement(3)).toInt();
+      }
+
+    for(int i = 0; i < domain->GetNumberOfEntries(); i++)
+      {
+      if(domain->GetEntryValue(i) == which)
+        {
+        mode = domain->GetEntryText(i);
+        break;
+        }
+      }
+
+    if(Type == CHECKED)
+      {
+      scalars = StringVectorProperty->GetElement(4);
+      }
+    else if(Type == UNCHECKED)
+      {
+      scalars = StringVectorProperty->GetUncheckedElement(4);
+      }
+    }
+
+  QStringList selection;
+  selection.append(mode);
+  selection.append(scalars);
+  return selection;
+}
+
+void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
+                                    const QStringList &Value,
+                                    PropertyValueType Type)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+
+  if(Value.size() != 2)
+    {
+    return;
+    }
+
+  if(Property && domain)
+    {
+    for(int i = 0; i < domain->GetNumberOfEntries(); i++)
+      {
+      if(Value[0] == domain->GetEntryText(i))
+        {
+        const char *text = QString("%1").arg(domain->GetEntryValue(i)).toAscii().data();
+
+        if(Type == CHECKED)
+          {
+          Property->SetElement(3, text);
+          Property->SetElement(4, Value[1].toAscii().data());
+          }
+        else if(Type == UNCHECKED)
+          {
+          Property->SetUncheckedElement(3, text);
+          Property->SetUncheckedElement(4, Value[1].toAscii().data());
+          Property->UpdateDependentDomains();
+          }
+        break;
+        }
+      }
+    }
+}
+
 QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop,
                                            PropertyValueType Type)
 {
