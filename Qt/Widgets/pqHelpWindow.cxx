@@ -60,8 +60,9 @@ class pqHelpWindow::pqNetworkAccessManager : public QNetworkAccessManager
   QPointer<QHelpEngineCore> Engine;
 public:
   pqNetworkAccessManager(
-    QHelpEngineCore* helpEngine, QNetworkAccessManager *manager, QObject *parent) :
-    Superclass(parent),
+    QHelpEngineCore* helpEngine, QNetworkAccessManager *manager,
+    QObject *parentObject) :
+    Superclass(parentObject),
     Engine(helpEngine)
   {
   Q_ASSERT(manager != NULL && helpEngine != NULL);
@@ -96,12 +97,12 @@ private:
 
 //-----------------------------------------------------------------------------
 pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
-  const QUrl& url, QHelpEngineCore* engine) : Superclass(engine)
+  const QUrl& my_url, QHelpEngineCore* engine) : Superclass(engine)
 {
   Q_ASSERT(engine);
 
   this->HelpEngine = engine;
-  this->setUrl(url);
+  this->setUrl(my_url);
 
   // timer is essential since all the signals that are fired when data is
   // available need to happen after the constructor.
