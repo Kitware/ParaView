@@ -301,13 +301,13 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   # since this list needs to be passed as an argument, we cannot escape the ";".
   # generate_proxydocumentation.cmake has code to convert these strings back to
   # lists.
-  set (xmls_string)
+  set (xmls_string "")
   foreach (xml ${xmls})
     get_filename_component(xml "${xml}" ABSOLUTE)
     set (xmls_string "${xmls_string}${xml}+")
   endforeach()
   
-  set (gui_xmls_string)
+  set (gui_xmls_string "")
   foreach (gui_xml ${gui_xmls})
     get_filename_component(gui_xml "${gui_xml}" ABSOLUTE)
     set (gui_xmls_string "${gui_xmls_string}${gui_xml}+")
@@ -337,20 +337,20 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
 
     # process each html file to sperate it out into files for each proxy.
-    COMMAND "${CMAKE_COMMAND}"
-            -Dxmlpatterns="${QT_XMLPATTERNS_EXECUTABLE}"
-            -Dxml_to_xml_xsl="${ParaView_CMAKE_DIR}/smxml_to_xml.xsl"
-            -Dxml_to_html_xsl="${ParaView_CMAKE_DIR}/xml_to_html.xsl"
-            -Dinput_xmls:STRING="${xmls_string}"
-            -Dinput_gui_xmls:STRING="${gui_xmls_string}"
-            -Doutput_dir="${output_dir}"
-            -Doutput_file="${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
-            -P "${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake"
+    COMMAND ${CMAKE_COMMAND}
+            -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
+            -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+            -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
+            -Dinput_xmls:STRING=${xmls_string}
+            -Dinput_gui_xmls:STRING=${gui_xmls_string}
+            -Doutput_dir:PATH=${output_dir}
+            -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml
+            -P ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
     DEPENDS ${xmls}
-            "${ParaView_CMAKE_DIR}/smxml_to_xml.xsl"
-            "${ParaView_CMAKE_DIR}/xml_to_html.xsl"
-            "${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake"
+            ${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+            ${ParaView_CMAKE_DIR}/xml_to_html.xsl
+            ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 
@@ -446,11 +446,11 @@ function(build_help_project name)
 
     # generate the toc at run-time.
     COMMAND ${CMAKE_COMMAND}
-            -Doutput_file="${qhp_filename}"
-            -Dfile_patterns="${arg_FILEPATTERNS}"
-            -Dnamespace="${arg_NAMESPACE}"
-            -Dfolder="${arg_FOLDER}"
-            -Dname="${name}"
+            -Doutput_file:FILEPATH=${qhp_filename}
+            -Dfile_patterns:STRING="${arg_FILEPATTERNS}"
+            -Dnamespace:STRING="${arg_NAMESPACE}"
+            -Dfolder:PATH=${arg_FOLDER}
+            -Dname:STRING="${name}"
             -P "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
     )
   else ()
@@ -466,16 +466,16 @@ function(build_help_project name)
   endif()
 
   ADD_CUSTOM_COMMAND(
-    OUTPUT "${arg_DESTINATION_DIRECTORY}/${name}.qch"
+    OUTPUT ${arg_DESTINATION_DIRECTORY}/${name}.qch
     DEPENDS ${arg_DEPENDS}
-            "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
+            ${ParaView_CMAKE_DIR}/generate_qhp.cmake
   
     ${extra_args}
 
     # Now, compile the qhp file to generate the qch.
     COMMAND ${QT_HELP_GENERATOR}
-            "${qhp_filename}"
-            -o "${arg_DESTINATION_DIRECTORY}/${name}.qch"
+            ${qhp_filename}
+            -o ${arg_DESTINATION_DIRECTORY}/${name}.qch
   
     COMMENT "Compiling Qt help project ${name}.qhp"
 
