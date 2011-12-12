@@ -23,6 +23,9 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkPVMultiClientsInformation.h"
 
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxy.h"
+
 #include <vtkstd/map>
 #include <vtkstd/vector>
 #include <vtkstd/string>
@@ -36,6 +39,7 @@ public:
   vtkInternal()
     {
     this->Me = 0;
+    this->UserToFollow = 0;
     this->Clear();
     }
 
@@ -59,7 +63,10 @@ public:
     if(this->Master != newMaster)
       {
       this->Master = newMaster;
-      this->UpdateState(-1);
+
+      // If no user to follow yet, then we follow master...
+      this->UpdateState( (this->UserToFollow == 0) ?
+                           newMaster : this->UserToFollow);
       this->Manager->InvokeEvent(
           (unsigned long)vtkSMCollaborationManager::UpdateMasterUser,
           (void*) &newMaster);
@@ -96,10 +103,12 @@ public:
     this->Users.clear();
     this->Master = 0;
     this->State.Clear();
+    this->LocalCameraStateCache.clear();
     }
 
   void UpdateState(int followCamUserId)
     {
+    this->UserToFollow = followCamUserId;
     this->State.ClearExtension(ClientsInformation::user);
     int size = this->Users.size();
     for(int i=0; i < size; ++i)
@@ -134,6 +143,7 @@ public:
       }
 
     // Update user name/master info
+    int newFollow = 0;
     for(int i=0; i < size; ++i)
       {
       const ClientsInformation_ClientInfo* user =
@@ -148,21 +158,67 @@ public:
       if(user->follow_cam())
         {
         // Invoke event...
+        newFollow = id;
         this->Manager->InvokeEvent(
             (unsigned long)vtkSMCollaborationManager::FollowUserCamera,
             (void*) &id);
         }
       }
+    if(newFollow)
+      {
+      this->UserToFollow = newFollow;
+      }
 
     return foundChanges;
     }
 
+  // Return the camera update message user origin otherwise
+  // if not a camera update message we return -1;
+  int StoreCameraByUser(const vtkSMMessage* msg)
+  {
+  if(msg->HasExtension(DefinitionHeader::client_class) &&
+     msg->GetExtension(DefinitionHeader::client_class) == "vtkSMCameraProxy")
+    {
+    int currentUserId = static_cast<int>(msg->client_id());
+    this->LocalCameraStateCache[currentUserId].CopyFrom(*msg);
+    return currentUserId;
+    }
+  return -1;
+  }
+
+  void UpdateCamera(const vtkSMMessage* msg)
+  {
+  vtkTypeUInt32 cameraId = msg->global_id();
+  vtkSMProxyLocator* locator = this->Manager->GetSession()->GetProxyLocator();
+  vtkSMProxy* proxy = locator->LocateProxy(cameraId);
+
+  // As camera do not synch its properties while IsProcessingRemoteNotification
+  // there is no point of updating it when we are in that case.
+  // So we just push back that request to later...
+  if(proxy && !proxy->GetSession()->IsProcessingRemoteNotification())
+    {
+    // Update Proxy
+    proxy->EnableLocalPushOnly();
+    proxy->LoadState(msg, locator);
+    proxy->UpdateVTKObjects();
+    proxy->DisableLocalPushOnly();
+
+    // Fire event so the Qt layer could trigger a render
+    this->Manager->InvokeEvent(vtkSMCollaborationManager::CameraChanged);
+    }
+  else if(proxy->GetSession()->IsProcessingRemoteNotification())
+    {
+    cout << "Impossible to update camera..." << endl;
+    }
+  }
   vtkWeakPointer<vtkSMCollaborationManager> Manager;
   vtkstd::map<int, vtkstd::string>          UserNames;
   vtkstd::vector<int>                       Users;
   int                                       Me;
+  int                                       UserToFollow;
   int                                       Master;
   vtkSMMessage                              State;
+  vtkstd::map<int, vtkSMMessage>            LocalCameraStateCache;
 };
 //****************************************************************************
 vtkStandardNewMacro(vtkSMCollaborationManager);
@@ -208,12 +264,19 @@ void vtkSMCollaborationManager::LoadState( const vtkSMMessage* msg,
     }
   else
     {
+    // Handle camera synchro
+    if(this->Internal->UserToFollow == this->Internal->StoreCameraByUser(msg) && this->Internal->UserToFollow != -1)
+      {
+      this->Internal->UpdateCamera(msg);
+      }
+
     // For Observers
     vtkSMMessage* msgCopy = new vtkSMMessage();
     msgCopy->CopyFrom(*msg);
     this->InvokeEvent(CollaborationNotification, msgCopy);
     }
 }
+
 //----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMCollaborationManager::GetGlobalID()
 {
@@ -242,6 +305,12 @@ void vtkSMCollaborationManager::FollowUser(int clientId)
     {
     this->Internal->UpdateState(clientId);
     this->UpdateUserInformations();
+
+    // Update the camera
+    if( clientId != -1 &&
+        this->Internal->LocalCameraStateCache.find(clientId) !=
+          this->Internal->LocalCameraStateCache.end() )
+    this->Internal->UpdateCamera(&this->Internal->LocalCameraStateCache[clientId]);
     }
 }
 

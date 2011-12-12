@@ -120,7 +120,8 @@ public:
     UpdateUserName = 12346,
     UpdateUserList = 12347,
     UpdateMasterUser = 12348,
-    FollowUserCamera = 12349
+    FollowUserCamera = 12349,
+    CameraChanged = 12350
     };
 
   // Description:

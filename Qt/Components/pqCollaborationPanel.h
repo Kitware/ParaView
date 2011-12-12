@@ -79,9 +79,6 @@ protected slots:
   /// Called when user hit enter in the input line of chat message
   void onUserMessage();
 
-  /// Called when client receive message state that are tagged "share_only"
-  void onShareOnlyMessage(vtkSMMessage* msg);
-
   /// Called when we change pqServer so we can connect to the
   /// right pqCollaborationManager
   void connectLocalSlots();
