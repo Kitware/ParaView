@@ -945,7 +945,7 @@
     </ContextViewProxy>
 
     <!-- ================================================================== -->
-    <ContextViewProxy name="PlotMatrixView"
+    <PlotMatrixViewProxy name="PlotMatrixView"
       base_proxygroup="views"
       base_proxyname="ViewBase"
       class="vtkPVPlotMatrixView"
@@ -954,7 +954,7 @@
       <Documentation>
         This is the proxy for the plot matrix view.
       </Documentation>
-    </ContextViewProxy>
+    </PlotMatrixViewProxy>
 
     <!-- ================================================================== -->
     <ViewProxy name="SpreadSheetView"

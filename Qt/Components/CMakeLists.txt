@@ -45,8 +45,9 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidget.h
   pqAboutDialog.h
-  pqActiveRenderViewOptions.h
   pqActiveObjects.h
+  pqActivePlotMatrixViewOptions.h
+  pqActiveRenderViewOptions.h
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.h
   pqActiveView.h
@@ -135,6 +136,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
   pqPlotMatrixDisplayPanel.h
+  pqPlotMatrixOptionsEditor.h
   pqPluginTreeWidget.h
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
@@ -257,6 +259,7 @@ SET(UI_FORMS
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPlotMatrixDisplayPanel.ui
+  Resources/UI/pqPlotMatrixOptionsWidget.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -334,10 +337,12 @@ VTK_ADD_LIBRARY(pqComponents
   pqAboutDialog.h
   pqActionGroupInterface.cxx
   pqActionGroupInterface.h
-  pqActiveRenderViewOptions.cxx
-  pqActiveRenderViewOptions.h
   pqActiveObjects.cxx
   pqActiveObjects.h
+  pqActivePlotMatrixViewOptions.cxx
+  pqActivePlotMatrixViewOptions.h
+  pqActiveRenderViewOptions.cxx
+  pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.cxx
@@ -541,6 +546,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqPipelineTimeKeyFrameEditor.h
   pqPlotMatrixDisplayPanel.cxx
   pqPlotMatrixDisplayPanel.h
+  pqPlotMatrixOptionsEditor.cxx
+  pqPlotMatrixOptionsEditor.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPluginTreeWidget.h
