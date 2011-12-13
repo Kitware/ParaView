@@ -85,7 +85,6 @@ a:hover {
 	margin-left: 30px;
 	padding: 20px 0px 0px 0px;
 	letter-spacing: -1px;
-	text-transform: lowercase;
 	font-size: 3.8em;
 	color: #FF3000;
 }
@@ -93,7 +92,6 @@ a:hover {
 #logo p {
 	margin: -5px 0px 0px 0px;
 	padding: 0px 0 0 32px;
-	text-transform: lowercase;
 	font: normal 14px Georgia, "Times New Roman", Times, serif;
 	font-style: italic;
 	color: #45302C;
@@ -233,7 +231,6 @@ a:hover {
 .post .title a {
 	letter-spacing: -2px;
 	text-decoration: none;
-	text-transform: lowercase;
 	color: #202020;
 	border: none;
 }
