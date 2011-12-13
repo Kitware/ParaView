@@ -1728,7 +1728,7 @@ QStringList pqSMAdaptor::getFieldSelection(vtkSMProperty *Property,
       which = QString(StringVectorProperty->GetUncheckedElement(3)).toInt();
       }
 
-    for(int i = 0; i < domain->GetNumberOfEntries(); i++)
+    for(unsigned int i = 0; i < domain->GetNumberOfEntries(); i++)
       {
       if(domain->GetEntryValue(i) == which)
         {
@@ -1769,7 +1769,7 @@ void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
 
   if(Property && domain)
     {
-    for(int i = 0; i < domain->GetNumberOfEntries(); i++)
+    for(unsigned int i = 0; i < domain->GetNumberOfEntries(); i++)
       {
       if(Value[0] == domain->GetEntryText(i))
         {
