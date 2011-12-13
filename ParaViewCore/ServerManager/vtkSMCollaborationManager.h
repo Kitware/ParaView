@@ -71,8 +71,8 @@ public:
   virtual void PromoteToMaster(int clientId);
 
   // Description:
-  // Share the decision that user should follow that given user.
-  // Only master can change the user to follow.
+  // Share the decision that user should follow that given user if master or
+  // follow someone else on your own
   virtual void FollowUser(int clientId);
 
   // Description:

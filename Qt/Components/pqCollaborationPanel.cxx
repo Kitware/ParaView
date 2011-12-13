@@ -236,11 +236,8 @@ void pqCollaborationPanel::followUserCamera(int userId)
     this->Internal->CameraToFollowOfUserId = userId;
     }
 
-  // If we are the master we want the slaves to follow the same camera as us
-  if(this->getSMCollaborationManager()->IsMaster())
-    {
-    this->getSMCollaborationManager()->FollowUser(userId);
-    }
+  // Update the collaboration manager
+  this->getSMCollaborationManager()->FollowUser(userId);
 
   // Update the UI
   int nbRows = this->Internal->members->rowCount();
