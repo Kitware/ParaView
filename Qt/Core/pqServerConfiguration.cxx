@@ -69,9 +69,9 @@ pqServerConfiguration::~pqServerConfiguration()
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfiguration::setName(const QString& name)
+void pqServerConfiguration::setName(const QString& arg_name)
 {
-  this->XML->SetAttribute("name", name.toAscii().data());
+  this->XML->SetAttribute("name", arg_name.toAscii().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -87,9 +87,9 @@ pqServerResource pqServerConfiguration::resource() const
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfiguration::setResource(const pqServerResource& resource)
+void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 {
-  this->setResource(resource.schemeHostsPorts().toURI());
+  this->setResource(arg_resource.schemeHostsPorts().toURI());
 }
 
 //-----------------------------------------------------------------------------
@@ -137,23 +137,23 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
 
   vtkPVXMLElement* commandStartup =
     this->XML->FindNestedElementByName("CommandStartup");
-  vtkPVXMLElement* command = commandStartup->FindNestedElementByName("Command");
+  vtkPVXMLElement* commandXML = commandStartup->FindNestedElementByName("Command");
 
-  if (command == NULL)
+  if (commandXML == NULL)
     {
     // CommandStartup is missing the  <Command/> element. That's peculiar, but
     // not a critical error. So we return empty string.
     return QString();
     }
 
-  command->GetScalarAttribute("timeout", &timeout);
-  command->GetScalarAttribute("delay", &delay);
+  commandXML->GetScalarAttribute("timeout", &timeout);
+  commandXML->GetScalarAttribute("delay", &delay);
 
   QString reply;
   QTextStream stream(&reply);
-  stream << command->GetAttributeOrDefault("exec", "");
-  vtkPVXMLElement* arguments = command->GetNumberOfNestedElements()==1?
-    command->GetNestedElement(0) : NULL;
+  stream << commandXML->GetAttributeOrDefault("exec", "");
+  vtkPVXMLElement* arguments = commandXML->GetNumberOfNestedElements()==1?
+    commandXML->GetNestedElement(0) : NULL;
   if (arguments)
     {
     for (unsigned int cc=0; cc < arguments->GetNumberOfNestedElements(); cc++)
