@@ -5,9 +5,7 @@ export_rendering = %1
 # simulation input name.
 simulation_input_map = { %2 };
 
-image_file_name = '%3'
-
-image_write_frequency = %4
+screenshot_info = { %3 }
 
 # This is map of lists of write frequencies. This is used to populate the
 # RequestDataDescription() method so that grids are requested only when needed.
@@ -58,7 +56,23 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     # handle writers.
     proxy = info.Proxy
     if proxy.GetXMLGroup() == 'views' and export_rendering:
+        proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
+        ctorArgs = [ ctorMethod, "\"%s\"" % screenshot_info[proxyName][0], screenshot_info[proxyName][1], \
+                     screenshot_info[proxyName][2], "cp_views" ]
         view_proxies.append(proxy)
+        return ("CreateView", ctorArgs, extraCtorCommands)
+
+
+        ctorArgs = [ ctorMethod ]
+        ctorArgs += \
+            screenshot_info[ servermanager.ProxyManager().GetProxyName("views", proxy) ]
+        ctorArgs.append("cp_views")
+        xmlgroup = xmlElement.GetAttribute("group")
+        xmlname = xmlElement.GetAttribute("name")
+        pxm = smtrace.servermanager.ProxyManager()
+        writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
+        ctorMethod = "CreateView"
+        return (ctorMethod, ctorArgs, extraCtorCommands)
 
     if not proxy.GetHints() or \
       not proxy.GetHints().FindNestedElementByName("CoProcessing"):
@@ -67,7 +81,6 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     xmlElement = proxy.GetHints().FindNestedElementByName("CoProcessing")
     xmlgroup = xmlElement.GetAttribute("group")
     xmlname = xmlElement.GetAttribute("name")
-
     pxm = smtrace.servermanager.ProxyManager()
     ctorMethod = None
     writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
@@ -75,7 +88,7 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
         # we have a valid prototype based on the writer stub
         ctorMethod =  \
             smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
-    elif not writer_proxy:
+    else:
         # a bit of a hack but we assume that there's a stub of some
         # writer that's not available in this build but is available
         # with the build used by the simulation code (probably through a plugin)
@@ -127,15 +140,15 @@ smtrace.append_trace()
 # Stop trace and print it to the console
 smtrace.stop_trace()
 
-
 for view_proxy in view_proxies:
     # Locate which simulation input this write is connected to, if any. If so,
     # we update the write_frequencies datastructure accordingly.
     sim_inputs = cp_locate_simulation_inputs_for_view(view_proxy)
+    proxyName = servermanager.ProxyManager().GetProxyName("views", view_proxy)
+    image_write_frequency = screenshot_info[proxyName][1]
     for sim_input_name in sim_inputs:
         if not image_write_frequency in write_frequencies[sim_input_name]:
             write_frequencies[sim_input_name].append(image_write_frequency)
-    #write_frequencies['input'].append(image_write_frequency)
 
 output_contents = """
 try: paraview.simple
@@ -155,6 +168,7 @@ def RequestDataDescription(datadescription):
 def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     cp_writers = []
+    cp_views = []
     timestep = datadescription.GetTimeStep()
 
 %s
@@ -163,14 +177,61 @@ def DoCoProcessing(datadescription):
             writer.FileName = writer.cpFileName.replace("%%t", str(timestep))
             writer.UpdatePipeline()
 
-    if timestep %% %s == 0 or datadescription.GetForceOutput() == True:
-        views = servermanager.GetRenderViews()
-        views += servermanager.GetContextViews()
-        imagefilename = "%s"
-        for view in range(len(views)):
-            fname = imagefilename.replace("%%v", str(view))
+    if %s : # rescale data range
+        import math
+        for view in cp_views:
+            if timestep %% view.cpFrequency == 0 or datadescription.GetForceOutput() == True:
+                reps = view.Representations
+                for rep in reps:
+                    if hasattr(rep, 'Visibility') and rep.Visibility == 1 and hasattr(rep, 'MapScalars') and rep.MapScalars != '':
+                        input = rep.Input
+                        input.UpdatePipeline() #make sure range is up-to-date
+                        lut = rep.LookupTable
+                        if rep.ColorAttributeType == 'POINT_DATA':
+                            datainformation = input.GetPointDataInformation()
+                        elif rep.ColorAttributeType == 'CELL_DATA':
+                            datainformation = input.GetCellDataInformation()
+                        else:
+                            print 'something strange with color attribute type', rep.ColorAttributeType
+
+                        if lut.VectorMode != 'Magnitude' or \
+                           datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents() == 1:
+                            datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(lut.VectorComponent)
+                        else:
+                            datarange = [0,0]
+                            for i in range(datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents()):
+                                for j in range(2):
+                                    datarange[j] += datainformation.GetArray(rep.ColorArrayName).GetRange(i)[j]*datainformation.GetArray(rep.ColorArrayName).GetRange(i)[j]
+                            datarange[0] = math.sqrt(datarange[0])
+                            datarange[1] = math.sqrt(datarange[1])
+
+                        rgbpoints = lut.RGBPoints.GetData()
+                        numpts = len(rgbpoints)/4
+                        minvalue = min(datarange[0], rgbpoints[0])
+                        maxvalue = max(datarange[1], rgbpoints[(numpts-1)*4])
+                        if minvalue != rgbpoints[0] or maxvalue != rgbpoints[(numpts-1)*4]:
+                            # rescale all of the points
+                            oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]
+                            newrange = maxvalue - minvalue
+                            for v in range(numpts):
+                                rgbpoints[v*4] = minvalue+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
+
+                            lut.RGBPoints.SetData(rgbpoints)
+
+    for view in cp_views:
+        if timestep %% view.cpFrequency == 0 or datadescription.GetForceOutput() == True:
+            fname = view.cpFileName
             fname = fname.replace("%%t", str(timestep))
-            WriteImage(fname, views[view])
+            if view.cpFitToScreen != 0:
+                if view.IsA("vtkSMRenderViewProxy") == True:
+                    view.ResetCamera()
+                elif view.IsA("vtkSMContextViewProxy") == True:
+                    view.ResetDisplay()
+                else:
+                    print ' do not know what to do with a ', view.GetClassName()
+
+            WriteImage(fname, view)
+
 
     # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
     tobedeleted = GetNextProxyToDelete()
@@ -210,6 +271,16 @@ def CreateWriter(proxy_ctor, filename, freq, cp_writers):
     writer.add_attribute("cpFileName", filename)
     cp_writers.append(writer)
     return writer
+
+def CreateView(proxy_ctor, filename, freq, fittoscreen, cp_views):
+    view = proxy_ctor()
+    view.add_attribute("cpFileName", filename)
+    view.add_attribute("cpFrequency", freq)
+    view.add_attribute("cpFileName", filename)
+    view.add_attribute("cpFitToScreen", fittoscreen)
+    cp_views.append(view)
+    return view
+
 """
 
 timestep_expression = """
@@ -238,11 +309,11 @@ for sim_input in write_frequencies:
     request_data_description += timestep_expression % (sim_input, condition_str)
 
 
+rescale_data_range = %4
+
 fileName = "%5"
 outFile = open(fileName, 'w')
-if image_write_frequency < 1:
-    image_write_frequency = 1
 
-outFile.write(output_contents % (request_data_description, do_coprocessing, image_write_frequency, image_file_name))
+outFile.write(output_contents % (request_data_description, do_coprocessing, rescale_data_range))
 outFile.close()
 
