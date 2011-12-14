@@ -83,11 +83,6 @@ public:
 
   void setupScreenshotInfo();
 
-  /* void enableRescaleDataRange(bool on) */
-  /* { */
-  /*   this->Info.rescaleDataRange->setEnabled(on); */
-  /* } */
-
   pqView* getView()
   {
     return this->View;
@@ -108,10 +103,10 @@ public:
     return this->Info.fitToScreen->isChecked();
   }
 
-  /* bool rescaleDataRange() */
-  /* { */
-  /*   return this->Info.rescaleDataRange->isChecked(); */
-  /* } */
+  int getMagnification()
+  {
+    return this->Info.imageMagnification->value();
+  }
 
 public slots:
   void updateImageFileName();

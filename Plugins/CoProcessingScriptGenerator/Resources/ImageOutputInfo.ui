@@ -66,7 +66,7 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="2" rowspan="4" colspan="2">
+   <item row="0" column="2">
     <widget class="QLabel" name="thumbnailLabel">
      <property name="text">
       <string>TextLabel</string>
@@ -136,6 +136,29 @@
     </widget>
    </item>
    <item row="3" column="0">
+    <widget class="QLabel" name="imageMagnificationLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Magnification</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="imageMagnification">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
     <widget class="QCheckBox" name="fitToScreen">
      <property name="toolTip">
       <string>Check to reset the view to fit the objects to the view every outputted time step.</string>

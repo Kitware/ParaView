@@ -486,10 +486,11 @@ bool pqCPExportStateWizard::validateCurrentPage()
         this->Internals->viewsContainer->widget(i));
       pqView* view = viewInfo->getView();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', '%3', '%4'],").
+      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5'],").
         arg(proxyManager->GetProxyName("views", viewProxy)).
         arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
-        arg(static_cast<int>(viewInfo->fitToScreen()));
+        arg(static_cast<int>(viewInfo->fitToScreen())).
+        arg(viewInfo->getMagnification());
       rendering_info+= info;
       }
     // remove the last comma -- assume that there's at least one view
