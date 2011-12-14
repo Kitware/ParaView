@@ -61,13 +61,25 @@ public slots:
   /// explicitly, it is called automatically when the layoutManager is modified.
   void reload();
 
+protected slots:
+  /// slots called on different signals fired by the nested frames or splitters.
+  /// Note that these slots use this->sender(), hence these should not be called
+  /// directly. These result in updating the layoutManager.
+  void splitVertical();
+  void splitHorizontal();
+  void close();
+  void splitterMoved();
+
 protected:
   /// called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
   /// takes over the ownership of the created frame and will delete/re-parent it
   /// as and when appropriate.
   virtual QWidget* newFrame(vtkSMProxy* view);
-  
+ 
+private:
+  QWidget* createWidget(unsigned int, vtkSMViewLayout* layout, QWidget* parentWdg);
+
 private:
   Q_DISABLE_COPY(pqMultiViewWidget);
 

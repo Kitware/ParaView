@@ -45,14 +45,24 @@ public:
       return false;
       }
 
-    // now verify that every parent node for location is a split cell.
-    int parent = (static_cast<int>(location) - 1) / 2;
-    while (parent >= 0 && this->KDTree[parent].Direction != vtkSMViewLayout::NONE)
+    if (location == 0)
       {
-      parent = (static_cast<int>(location) - 1) / 2;
+      return true;
       }
 
-    return (parent < 0);
+    // now verify that every parent node for location is a split cell.
+    int parent = (static_cast<int>(location) - 1) / 2;
+    while (this->KDTree[parent].Direction != vtkSMViewLayout::NONE)
+      {
+      if (parent == 0)
+        {
+        return true;
+        }
+
+      parent = (static_cast<int>(parent) - 1) / 2;
+      }
+
+    return false;
     }
 
   void MoveSubtree(unsigned int destination, unsigned int source)
@@ -273,6 +283,18 @@ vtkSMViewLayout::Direction vtkSMViewLayout::GetSplitDirection(unsigned int locat
 }
 
 //----------------------------------------------------------------------------
+double vtkSMViewLayout::GetSplitFraction(unsigned int location)
+{
+  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+    {
+    vtkErrorMacro("Invalid location '" << location << "' specified.");
+    return NONE;
+    }
+
+  return this->Internals->KDTree[location].SplitFraction;
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMViewLayout::GetView(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
@@ -282,6 +304,25 @@ vtkSMProxy* vtkSMViewLayout::GetView(unsigned int location)
     }
 
   return this->Internals->KDTree[location].ViewProxy;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayout::SetSplitFraction(unsigned int location, double val)
+{
+  if (val < 0.0 || val > 1.0)
+    {
+    vtkErrorMacro("Invalid fraction : " << val 
+      << ". Must be in the range [0, 1]");
+    return 0;
+    }
+
+  if (!this->IsSplitCell(location))
+    {
+    return false;
+    }
+
+  this->Internals->KDTree[location].SplitFraction = val;
+  return true;
 }
 
 //----------------------------------------------------------------------------

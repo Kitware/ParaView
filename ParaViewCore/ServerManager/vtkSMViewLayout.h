@@ -68,12 +68,37 @@ public:
   // else false.
   bool Collape(unsigned int location);
 
+  // Description:
+  // Update the split fraction for a split cell. If IsSplitCell(location)
+  // returns false, this method does not update the fraction.
+  bool SetSplitFraction(unsigned int location, double fraction);
+
+  // Description:
+  // Returns true if the cell identified by the location is a split cell.
   bool IsSplitCell(unsigned int location);
+
+  // Description:
+  // Returns the split direction for a split cell at the given location.
   Direction GetSplitDirection(unsigned int location);
+
+  // Description:
+  // Returns the split-fraction for a split cell at the given location.
+  double GetSplitFraction(unsigned int location);
+
+  // Description:
+  // Returns the index for the first child of the given location. This does not
+  // do any validity checks for the location, nor that of the child.
   unsigned int GetFirstChild(unsigned int location)
     { return 2*location + 1; }
+
+  // Description:
+  // Returns the index for the second child of the given location. This does not
+  // do any validity checks for the location, nor that of the child.
   unsigned int GetSecondChild(unsigned int location)
     { return 2*location + 2; }
+
+  // Description:
+  // Returns the view, if any, assigned to the given cell location.
   vtkSMProxy* GetView(unsigned int location);
 
 //BTX

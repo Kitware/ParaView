@@ -43,13 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqMultiViewWidget::pqInternals
 {
 public:
+  QMap<void*, QPointer<QWidget> > ViewFrames;
   vtkWeakPointer<vtkSMViewLayout> LayoutManager;
   QPointer<QWidget> Container;
 };
 
 //-----------------------------------------------------------------------------
-pqMultiViewWidget::pqMultiViewWidget(
-  QWidget * parentObject, Qt::WindowFlags f)
+pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
   Internals( new pqInternals())
 {
@@ -79,39 +79,86 @@ vtkSMViewLayout* pqMultiViewWidget::layoutManager() const
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 {
-  return new pqMultiViewFrame();
+  pqMultiViewFrame* frame = new pqMultiViewFrame(this);
+  frame->showDecorations();
+  frame->MaximizeButton->show();
+  frame->CloseButton->show();
+  frame->SplitVerticalButton->show();
+  frame->SplitHorizontalButton->show();
+
+  QObject::connect(frame, SIGNAL(splitVerticalPressed()),
+    this, SLOT(splitVertical()));
+  QObject::connect(frame, SIGNAL(splitHorizontalPressed()),
+    this, SLOT(splitHorizontal()));
+  QObject::connect(frame, SIGNAL(closePressed()),
+    this, SLOT(close()));
+  return frame;
 }
 
-namespace
+//-----------------------------------------------------------------------------
+QWidget* pqMultiViewWidget::createWidget(
+  unsigned int index, vtkSMViewLayout* vlayout, QWidget* parentWdg)
 {
-  QWidget* GetWidget(unsigned int index, vtkSMViewLayout* vlayout)
+  vtkSMViewLayout::Direction direction = vlayout->GetSplitDirection(index);
+  switch (direction)
     {
-    vtkSMViewLayout::Direction direction = vlayout->GetSplitDirection(index);
-    switch (direction)
+  case vtkSMViewLayout::NONE:
       {
-    case vtkSMViewLayout::NONE:
+      vtkSMProxy* view = vlayout->GetView(index);
+      QWidget* frame = NULL;
+      if (view == NULL || !this->Internals->ViewFrames.contains(view))
         {
-        pqMultiViewFrame* frame = new pqMultiViewFrame();
-        frame->setObjectName(QString("Frame.%1").arg(index));
-        return frame;
+        frame = this->newFrame(view);
+        if (view != NULL)
+          {
+          this->Internals->ViewFrames[view] = frame;
+          frame->setParent(this);
+          }
+        else
+          {
+          frame->setParent(parentWdg);
+          }
         }
-
-    case vtkSMViewLayout::VERTICAL:
-    case vtkSMViewLayout::HORIZONTAL:
+      else
         {
-        QSplitter* splitter = new QSplitter();
-        splitter->setOpaqueResize(false);
-        splitter->setOrientation(
-          direction == vtkSMViewLayout::VERTICAL?
-          Qt::Vertical : Qt::Horizontal);
-        splitter->addWidget(GetWidget(vlayout->GetFirstChild(index), vlayout));
-        splitter->addWidget(GetWidget(vlayout->GetSecondChild(index), vlayout));
-        splitter->setObjectName(QString("Splitter.%1").arg(index));
-        return splitter;
+        frame = this->Internals->ViewFrames[view];
         }
-      break;
+      frame->setObjectName(QString("Frame.%1").arg(index));
+      frame->setProperty("FRAME_INDEX", QVariant(index));
+      return frame;
       }
+
+  case vtkSMViewLayout::VERTICAL:
+  case vtkSMViewLayout::HORIZONTAL:
+      {
+      QSplitter* splitter = new QSplitter(parentWdg);
+      splitter->setObjectName(QString("Splitter.%1").arg(index));
+      splitter->setProperty("FRAME_INDEX", QVariant(index));
+      splitter->setOpaqueResize(false);
+      splitter->setOrientation(
+        direction == vtkSMViewLayout::VERTICAL?
+        Qt::Vertical : Qt::Horizontal);
+      splitter->addWidget(
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, parentWdg));
+      splitter->addWidget(
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, parentWdg));
+
+      // set the sizes are percentage. QSplitter uses the initially specified
+      // sizes as reference.
+      QList<int> sizes;
+      sizes << vlayout->GetSplitFraction(index) * 10000;
+      sizes << (1.0 - vlayout->GetSplitFraction(index))  * 10000;
+      splitter->setSizes(sizes);
+
+      // FIXME: Don't like this as this QueuedConnection may cause multiple
+      // renders.
+      QObject::connect(splitter, SIGNAL(splitterMoved(int, int)),
+        this, SLOT(splitterMoved()), Qt::QueuedConnection);
+      return splitter;
+      }
+    break;
     }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +171,66 @@ void pqMultiViewWidget::reload()
     return;
     }
 
-  this->Internals->Container = GetWidget(0, vlayout);
-  this->layout()->addWidget(this->Internals->Container);
+  QWidget* container = new QWidget(this);
+  QVBoxLayout* vbox = new QVBoxLayout(container);
+  container->setLayout(vbox);
+
+  QWidget* child = this->createWidget(0, vlayout, container);
+  vbox->addWidget(child);
+
+  this->layout()->addWidget(container);
+  this->Internals->Container = container;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::splitVertical()
+{
+  QWidget* frame = qobject_cast<QWidget*>(this->sender());
+  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
+  if (index.isValid() && this->layoutManager())
+    {
+    this->layoutManager()->SplitVertical(index.toUInt(), 0.5);
+    }
+  this->reload();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::splitHorizontal()
+{
+  QWidget* frame = qobject_cast<QWidget*>(this->sender());
+  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
+  if (index.isValid() && this->layoutManager())
+    {
+    this->layoutManager()->SplitHorizontal(index.toUInt(), 0.5);
+    }
+  this->reload();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::close()
+{
+  QWidget* frame = qobject_cast<QWidget*>(this->sender());
+  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
+  if (index.isValid() && this->layoutManager())
+    {
+    this->layoutManager()->Collape(index.toUInt());
+    }
+  this->reload();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::splitterMoved()
+{
+  QSplitter* splitter = qobject_cast<QSplitter*>(this->sender());
+  QVariant index = splitter? splitter->property("FRAME_INDEX") : QVariant();
+  if (index.isValid() && this->layoutManager())
+    {
+    QList<int> sizes = splitter->sizes();
+    if (sizes.size() == 2)
+      {
+      double fraction = sizes[0] * 1.0 / (sizes[0] + sizes[1]);
+      this->layoutManager()->SetSplitFraction(index.toUInt(), fraction);
+      }
+    }
+  this->reload();
 }
