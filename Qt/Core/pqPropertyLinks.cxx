@@ -152,9 +152,9 @@ void pqPropertyLinksConnection::clearOutOfSync() const
   this->Internal->OutOfSync = false;
 }
 
-void pqPropertyLinksConnection::setCreatingConnection(bool creatingConnection)
+void pqPropertyLinksConnection::setCreatingConnection(bool b)
 {
-  this->Internal->CreatingConnection = creatingConnection;
+  this->Internal->CreatingConnection = b;
 }
 
 bool pqPropertyLinksConnection::creatingConnection() const
