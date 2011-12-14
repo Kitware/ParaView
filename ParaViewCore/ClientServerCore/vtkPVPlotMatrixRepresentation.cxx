@@ -155,10 +155,12 @@ void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char *name, bool v
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::SetSeriesLabel(const char *name, const char *label)
+void vtkPVPlotMatrixRepresentation::SetSeriesLabel(
+  const char *vtkNotUsed(name), const char *vtkNotUsed(label))
 {
-  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
+  if(this->GetPlotMatrix())
     {
+    // TODO
     }
 }
 

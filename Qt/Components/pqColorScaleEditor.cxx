@@ -839,7 +839,6 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
   if (this->ColorMap)
     {
     this->Form->InSetColors = true;
-    vtkColorTransferFunction* tf = this->currentColorFunction();
     vtkColorTransferFunction* clientTF=vtkColorTransferFunction::SafeDownCast(
       this->ColorMap->getProxy()->GetClientSideObject());
     if(!clientTF)

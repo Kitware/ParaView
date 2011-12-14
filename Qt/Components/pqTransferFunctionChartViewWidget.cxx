@@ -230,7 +230,7 @@ QList<T*> pqTransferFunctionChartViewWidget::plots()const
 }
 //-----------------------------------------------------------------------------
 pqTransferFunctionChartViewWidget::pqTransferFunctionChartViewWidget(
-                             QWidget* parent/*=NULL*/):Superclass(parent)
+                             QWidget* parentWidget/*=NULL*/):Superclass(parentWidget)
 {
   this->Internal = new pqTransferFunctionChartViewWidget::pqInternal(*this);
   this->Internal->init();
@@ -593,11 +593,6 @@ void pqTransferFunctionChartViewWidget
 void pqTransferFunctionChartViewWidget
 ::setOpacityFunctionToPlots(vtkPiecewiseFunction* opacityTF)
 {
-  int numPts = 0;
-  if(opacityTF)
-    {
-    numPts = opacityTF->GetSize();
-    }
   this->setPiecewiseFunctionToPlots(opacityTF);
   foreach(vtkCompositeTransferFunctionItem* plot,
           this->plots<vtkCompositeTransferFunctionItem>())
@@ -638,9 +633,9 @@ bool pqTransferFunctionChartViewWidget
 
 // ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget
-::setBordersVisible(bool show)
+::setBordersVisible(bool visible)
 {
-  this->Internal->showBorders(show);
+  this->Internal->showBorders(visible);
 }
 
 // ----------------------------------------------------------------------------
@@ -724,15 +719,15 @@ void pqTransferFunctionChartViewWidget::editPoint()
 // ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::boundAxesToChartBounds()
 {
-  vtkChartXY* chart = this->chart();
+  vtkChartXY* currentchart = this->chart();
   double bounds[8];
   this->chartBounds(bounds);
-  for (int i = 0; i < chart->GetNumberOfAxes(); ++i)
+  for (int i = 0; i < currentchart->GetNumberOfAxes(); ++i)
     {
     if (bounds[2*i] != VTK_DOUBLE_MAX)
       {
-      chart->GetAxis(i)->SetMinimumLimit(bounds[2*i]);
-      chart->GetAxis(i)->SetMaximumLimit(bounds[2*i + 1]);
+      currentchart->GetAxis(i)->SetMinimumLimit(bounds[2*i]);
+      currentchart->GetAxis(i)->SetMaximumLimit(bounds[2*i + 1]);
       }
     }
   /// We only set the plot user bounds if the chart is using User bounds.
@@ -873,10 +868,10 @@ void pqTransferFunctionChartViewWidget::chartUserBounds(double* bounds)const
 // ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::setAxesToChartBounds()
 {
-  vtkChartXY* chart = this->chart();
+  vtkChartXY* currentchart = this->chart();
   double bounds[8];
   this->chartBounds(bounds);
-  for (int i = 0; i < chart->GetNumberOfAxes(); ++i)
+  for (int i = 0; i < currentchart->GetNumberOfAxes(); ++i)
     {
     if (bounds[2*i] != VTK_DOUBLE_MAX)
       {
@@ -884,19 +879,15 @@ void pqTransferFunctionChartViewWidget::setAxesToChartBounds()
       if(deltarange==0)
         {
         double range= 1.0;
-        chart->GetAxis(i)->SetRange(0,range);
-        //if(bounds[2*i+1]==0)
-        //  {
-        //  this->moveAllPoints(range/2);
-        //  }
-        chart->GetAxis(i)->SetBehavior(2);
+        currentchart->GetAxis(i)->SetRange(0,range);
+        currentchart->GetAxis(i)->SetBehavior(2);
         }
       else
         {
         deltarange *= (deltarange <=1) ? 0.05 : 0.02;
-        chart->GetAxis(i)->SetRange(bounds[2*i]-deltarange,
+        currentchart->GetAxis(i)->SetRange(bounds[2*i]-deltarange,
           bounds[2*i+1]+deltarange);
-        chart->GetAxis(i)->SetBehavior(2);
+        currentchart->GetAxis(i)->SetBehavior(2);
         }
       }
     }

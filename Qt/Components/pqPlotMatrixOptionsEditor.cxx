@@ -75,10 +75,10 @@ public:
   pqPlotMatrixOptionsChartSetting();
   ~pqPlotMatrixOptionsChartSetting() {}
 
+  QColor BackGroundColor;
   QColor AxisColor;
   QColor GridColor;
   QColor LabelColor;
-  QColor BackGroundColor;
   QFont LabelFont;
   int Notation;
   int Precision;
@@ -98,6 +98,7 @@ public:
   int getIndexForLocation(int location) const;
 
   QString CurrentPage;
+  vtkVector2f Gutter;
   
   //Title properties
   QFont TitleFont;
@@ -110,7 +111,6 @@ public:
   QMap<int, pqPlotMatrixOptionsChartSetting*> PlotData;
   int CurrentPlot;
   int Borders[4];
-  vtkVector2f Gutter;
 };
 
 //----------------------------------------------------------------------------
@@ -656,11 +656,11 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
                    static_cast<double>(color.blueF()));
     prop->SetOpacity(static_cast<double>(color.alphaF()));
     // Axis label font
-    QFont font = this->Internal->Form->PlotData[plotType]->LabelFont;
-    prop->SetFontFamilyAsString(font.family().toAscii().constData());
-    prop->SetFontSize(font.pointSize());
-    prop->SetBold(font.bold() ? 1 : 0);
-    prop->SetItalic(font.italic() ? 1 : 0);
+    QFont plotfont = this->Internal->Form->PlotData[plotType]->LabelFont;
+    prop->SetFontFamilyAsString(plotfont.family().toAscii().constData());
+    prop->SetFontSize(plotfont.pointSize());
+    prop->SetBold(plotfont.bold() ? 1 : 0);
+    prop->SetItalic(plotfont.italic() ? 1 : 0);
     // Axis label notation
     proxy->SetAxisLabelNotation(plotType,
       this->Internal->Form->PlotData[plotType]->Notation);
