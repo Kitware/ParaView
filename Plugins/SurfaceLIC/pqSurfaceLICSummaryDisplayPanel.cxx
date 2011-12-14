@@ -51,9 +51,10 @@ pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentatio
   vtkSMProxy *proxy = representation->getProxy();
 
   pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(this->ui->VectorFieldSelector);
-  pqComboBoxDomain *domain = new pqComboBoxDomain(this->ui->VectorFieldSelector,
-                                                  proxy->GetProperty("SelectLICVectors"),
-                                                  "array_list");
+  new pqComboBoxDomain(this->ui->VectorFieldSelector,
+                       proxy->GetProperty("SelectLICVectors"),
+                       "array_list");
+
   this->Links.addPropertyLink(adaptor,
                               "currentText",
                               SIGNAL(currentTextChanged(const QString&)),
