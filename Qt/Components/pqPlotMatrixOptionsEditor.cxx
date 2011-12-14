@@ -721,13 +721,13 @@ void pqPlotMatrixOptionsEditor::loadChartPage()
     }
 }
 
-bool pqPlotMatrixOptionsEditor::pickFont(QLabel *label, QFont &font)
+bool pqPlotMatrixOptionsEditor::pickFont(QLabel *label, QFont &pfont)
 {
   bool ok = false;
-  font = QFontDialog::getFont(&ok, font, this);
+  pfont = QFontDialog::getFont(&ok, pfont, this);
   if(ok)
     {
-    this->updateDescription(label, font);
+    this->updateDescription(label, pfont);
     this->changesAvailable();
     return true;
     }
