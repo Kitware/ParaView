@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqApplyPropertiesManager::pqApplyPropertiesManager(QObject *parent)
-  : QObject(parent)
+pqApplyPropertiesManager::pqApplyPropertiesManager(QObject *p)
+  : QObject(p)
 {
   pqApplicationCore::instance()->registerManager("APPLY_PROPERTIES", this);
 }
