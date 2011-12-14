@@ -196,7 +196,7 @@ void pqServerConfiguration::setStartupToManual()
 
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::setStartupToCommand(
-  double timeout, double delay, const QString& command)
+  double timeout, double delay, const QString& command_str)
 {
   // we try to preserve any existing options.
   vtkPVXMLElement* startupElement = this->XML->GetNestedElement(0);
@@ -225,7 +225,7 @@ void pqServerConfiguration::setStartupToCommand(
   xml_command->SetName("Command");
   startupElement->AddNestedElement(xml_command.GetPointer());
 
-  QStringList commandList = command.split(" ", QString::SkipEmptyParts);
+  QStringList commandList = command_str.split(" ", QString::SkipEmptyParts);
   Q_ASSERT(commandList.size() >= 1);
 
   xml_command->AddAttribute("exec", commandList[0].toAscii().data());
