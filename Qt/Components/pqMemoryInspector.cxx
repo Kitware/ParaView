@@ -174,7 +174,7 @@ public:
     // Process #, Memory Used, Memory Free, Hostname, Total Memory
     return 5;
     }
-  virtual QVariant data(const QModelIndex& index, int role=Qt::DisplayRole) const
+  virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
     if (role != Qt::DisplayRole && role != Qt::ToolTipRole &&
       role != Qt::UserRole)
@@ -183,10 +183,10 @@ public:
       }
 
     const vtkPVSystemInformation::SystemInformationType& info
-      = this->Information->GetSystemInformations()[index.row()];
+      = this->Information->GetSystemInformations()[idx.row()];
     if (role == Qt::ToolTipRole)
       {
-      int row = index.row();
+      int row = idx.row();
       // show a summary.
       return tooltipTemplate().arg(
         processTypeToText(info.ProcessType)).arg(
@@ -199,7 +199,7 @@ public:
         info.NumberOfPhyicalCPUs).arg(info.NumberOfLogicalCPUs);
       }
 
-    switch (index.column())
+    switch (idx.column())
       {
     case PROCESS_NAME:
         {
