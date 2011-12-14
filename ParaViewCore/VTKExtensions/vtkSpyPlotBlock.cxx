@@ -579,7 +579,6 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   volumeArray->SetNumberOfValues(arraySize);
 
   //first compute the volume array and hold onto it
-  double volume = -1;
   vtkIdType pos = 0;
   for ( int k=0; k < this->SavedRealDims[2]; k++)
     {
