@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
-pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent)
-  : QSortFilterProxyModel(parent)
+pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *p)
+  : QSortFilterProxyModel(p)
 {
 }
 //-----------------------------------------------------------------------------
@@ -51,14 +51,16 @@ pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent
 bool pqPipelineAnnotationFilterModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 1, sourceParent);
-    return sourceModel()->data(index, pqPipelineModel::AnnotationFilterRole).toBool();
+    QModelIndex sourceIndex = sourceModel()->index(sourceRow, 1, sourceParent);
+    return sourceModel()->data(sourceIndex, pqPipelineModel::AnnotationFilterRole).toBool();
 }
 //-----------------------------------------------------------------------------
 
 bool pqPipelineAnnotationFilterModel::lessThan(const QModelIndex &left,
                                       const QModelIndex &right) const
 {
+  Q_UNUSED(left);
+  Q_UNUSED(right);
   return true; // We do not sort, we only filter
 }
 //-----------------------------------------------------------------------------
