@@ -2136,3 +2136,4 @@ void pqColorScaleEditor::updateDisplay()
     this->Display->renderViewEventually();
     }
 }
+
