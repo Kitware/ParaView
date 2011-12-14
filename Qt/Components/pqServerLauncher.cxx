@@ -85,6 +85,7 @@ namespace
     pqWidget() : Widget(NULL), ToSave(false) { }
     pqWidget(QWidget* wdg, const QString& pname) :
       PropertyName(pname), Widget(wdg), ToSave(false) { }
+    virtual ~pqWidget() { }
 
     virtual QVariant get() const
       {
