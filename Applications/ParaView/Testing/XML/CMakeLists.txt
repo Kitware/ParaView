@@ -245,6 +245,9 @@ SET (FFTOverTime_DISABLE_CRS TRUE)
 # rendering in client-serve mode.
 SET (NewColorEditor3_DISABLE_CS TRUE)
 SET (NewColorEditor3_DISABLE_CRS TRUE)
+# NewColorEditor1 has a clip widget that can not be handled properly by
+# the collaboration render window yet, so disable for now.
+SET (NewColorEditor1_DISABLE_CRS TRUE)
 
 # ViewSettingsDialog uses texture background which is currently supported only
 # in local render mode.
@@ -316,7 +319,6 @@ set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (NewColorEditor1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor4_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
