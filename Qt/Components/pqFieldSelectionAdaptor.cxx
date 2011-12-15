@@ -99,16 +99,16 @@ pqFieldSelectionAdaptor::~pqFieldSelectionAdaptor()
   this->Connection->Delete();
 }
 
-void pqFieldSelectionAdaptor::setSelection(const QStringList &selection)
+void pqFieldSelectionAdaptor::setSelection(const QStringList &sel)
 {
-  if(selection.size() != 2)
+  if(sel.size() != 2)
     {
     return;
     }
 
-  if(selection != this->Selection)
+  if(sel != this->Selection)
     {
-    this->Selection = selection;
+    this->Selection = sel;
     this->updateGUI();
     emit this->selectionChanged();
     }
@@ -140,9 +140,9 @@ void pqFieldSelectionAdaptor::setScalar(const QString& sc)
 }
 
 void pqFieldSelectionAdaptor::setAttributeModeAndScalar(
-         const QString& mode, const QString& scalar)
+         const QString& m, const QString& s)
 {
-  this->setSelection(QStringList() << mode << scalar);
+  this->setSelection(QStringList() << m << s);
 }
 
 void pqFieldSelectionAdaptor::updateGUI()
