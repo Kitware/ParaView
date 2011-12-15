@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include "pqComponentsExport.h"
 
-class vtkSMViewLayoutProxy;
+class pqMultiViewFrame;
 class vtkSMProxy;
+class vtkSMViewLayoutProxy;
 
 /// pqMultiViewWidget is a widget that manages layout of multiple views. It
 /// works together with a vtkSMViewLayoutProxy instance to keep track of the layout
@@ -70,13 +71,20 @@ protected slots:
   void close();
   void splitterMoved();
 
+  /// make a frame active.
+  void makeActive(pqMultiViewFrame* frame);
+
 protected:
   /// called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
   /// takes over the ownership of the created frame and will delete/re-parent it
   /// as and when appropriate.
-  virtual QWidget* newFrame(vtkSMProxy* view);
- 
+  virtual pqMultiViewFrame* newFrame(vtkSMProxy* view);
+
+  /// event filter callback to detect when a sub-frame becomes active, so that
+  /// we can mark it as such.
+  virtual bool eventFilter(QObject* caller, QEvent* evt);
+
 private:
   QWidget* createWidget(unsigned int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
 

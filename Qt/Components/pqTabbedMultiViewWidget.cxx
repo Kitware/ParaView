@@ -41,13 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
+#include "pqProxy.h"
 
 #include <QMultiMap>
 
 class pqTabbedMultiViewWidget::pqInternals
 {
 public:
-  QMultiMap<vtkIdType, pqMultiViewWidget*> TabWidgets;
+  QMultiMap<vtkIdType, QPointer<pqMultiViewWidget> > TabWidgets;
 };
 
 //-----------------------------------------------------------------------------
@@ -55,24 +56,15 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   : Superclass(parentObject),
   Internals(new pqInternals())
 {
-  pqServerManagerObserver* smobserver =
-    pqApplicationCore::instance()->getServerManagerObserver();
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
 
-  QObject::connect(smobserver,
-    SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
-    this,
-    SLOT(proxyRegistered(const QString&, const QString&, vtkSMProxy*)));
-
-  QObject::connect(smobserver,
-    SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)),
-    this,
-    SLOT(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
-
-  QObject::connect(smobserver, SIGNAL(connectionCreated(vtkIdType)),
-    this, SLOT(connectionCreated(vtkIdType)));
-
-  QObject::connect(smobserver, SIGNAL(connectionClosed(vtkIdType)),
-    this, SLOT(connectionClosed(vtkIdType)));
+  QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
+    this, SLOT(proxyAdded(pqProxy*)));
+  QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
+    this, SLOT(proxyRemoved(pqProxy*)));
+  QObject::connect(smmodel, SIGNAL(preServerRemoved(pqServer*)),
+    this, SLOT(serverRemoved(pqServer*)));
 
   this->addTab(new QWidget(this), "+");
   QObject::connect(this, SIGNAL(currentChanged(int)),
@@ -86,43 +78,44 @@ pqTabbedMultiViewWidget::~pqTabbedMultiViewWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::proxyRegistered(
-  const QString& group, const QString& name, vtkSMProxy* proxy)
+void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
 {
-  if (group == "layouts" && proxy && proxy->IsA("vtkSMViewLayoutProxy"))
+  if (proxy->getSMGroup() == "layouts" &&
+    proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
     {
-    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy)); 
+    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy())); 
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::proxyUnRegistered(
-  const QString& group, const QString& name, vtkSMProxy* proxy)
+void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
 {
-  if (group == "layouts" && proxy && proxy->IsA("vtkSMViewLayoutProxy"))
+  if (proxy->getSMGroup() == "layouts" &&
+    proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
     {
-    QList<pqMultiViewWidget*> widgets = this->Internals->TabWidgets.values();
-    foreach (pqMultiViewWidget* widget, widgets)
+    vtkSMProxy* smproxy = proxy->getProxy();
+
+    QList<QPointer<pqMultiViewWidget> > widgets =
+      this->Internals->TabWidgets.values();
+    foreach (QPointer<pqMultiViewWidget> widget, widgets)
       {
-      if (widget && widget->layoutManager() == proxy)
+      if (widget && widget->layoutManager() == smproxy)
         {
-        this->closeTab(this->indexOf(widget));
+        this->Internals->TabWidgets.remove(
+          proxy->getServer()->GetConnectionID(), widget);
+        this->removeTab(this->indexOf(widget));
+        delete widget;
         }
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::connectionCreated(vtkIdType connectionId)
-{
-}
-
-//-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::connectionClosed(vtkIdType connectionId)
+void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 {
   // remove all tabs corresponding to the closed session.
-  QList<pqMultiViewWidget*> widgets =
-    this->Internals->TabWidgets.values(connectionId);
+  QList<QPointer<pqMultiViewWidget> > widgets =
+    this->Internals->TabWidgets.values(server->GetConnectionID());
   foreach (pqMultiViewWidget* widget, widgets)
     {
     int cur_index = this->indexOf(widget);
@@ -133,14 +126,16 @@ void pqTabbedMultiViewWidget::connectionClosed(vtkIdType connectionId)
     delete widget;
     }
 
-  this->Internals->TabWidgets.remove(connectionId);
+  this->Internals->TabWidgets.remove(server->GetConnectionID());
 }
 
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::checkToAddTab(int index)
 {
-  if (index == (this->count()-1))
+  if (index == (this->count()-1) && index != 0)
     {
+    // index !=0 check keeps this widget from creating new tabs as the tabs are
+    // being removed.
     this->createTab();
     }
 }
@@ -148,21 +143,20 @@ void pqTabbedMultiViewWidget::checkToAddTab(int index)
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::closeTab(int index)
 {
-  BEGIN_UNDO_SET("Remove View Tab");
-
   pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
     this->widget(index));
-  this->removeTab(index);
-
   vtkSMProxy* vlayout = widget? widget->layoutManager() : NULL;
-  delete widget;
-
   if (vlayout)
     {
-    vtkSMProxyManager* pxm = vlayout->GetProxyManager();
-    pxm->UnRegisterProxy(vlayout);
+    pqServerManagerModel* smmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+    pqObjectBuilder* builder =
+      pqApplicationCore::instance()->getObjectBuilder();
+
+    BEGIN_UNDO_SET("Remove View Tab");
+    builder->destroy(smmodel->findItem<pqProxy*>(vlayout));
+    END_UNDO_SET();
     }
-  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

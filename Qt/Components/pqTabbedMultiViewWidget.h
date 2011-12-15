@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "vtkType.h" // needed for vtkIdType
 
-class vtkSMProxy;
+class pqProxy;
+class pqServer;
 class vtkSMViewLayoutProxy;
 
 /// pqTabbedMultiViewWidget is used to to enable adding of multiple
@@ -58,13 +59,12 @@ public slots:
 
 protected slots:
   /// slots connects to corresponding signals on pqServerManagerObserver.
-  void proxyRegistered(const QString& group, const QString& name, 
-    vtkSMProxy* proxy);
-  void proxyUnRegistered(const QString& group, const QString& name, 
-    vtkSMProxy* proxy);
-  void connectionCreated(vtkIdType connectionId);
-  void connectionClosed(vtkIdType connectionId);
-  
+  void proxyAdded(pqProxy*);
+  void proxyRemoved(pqProxy*);
+  void serverRemoved(pqServer*);
+ 
+  /// called when the active tab changes. If the active tab is the "+" tab, then
+  /// add a new tab to the widget.
   void checkToAddTab(int);
 
 private:

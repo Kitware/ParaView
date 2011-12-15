@@ -39,13 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QApplication>
 
 class pqMultiViewWidget::pqInternals
 {
 public:
-  QMap<void*, QPointer<QWidget> > ViewFrames;
+  QMap<void*, QPointer<pqMultiViewFrame> > ViewFrames;
+  QList<QPointer<pqMultiViewFrame> > EmptyFrames;
+
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
   QPointer<QWidget> Container;
+
+  QPointer<pqMultiViewFrame> ActiveFrame;
 };
 
 //-----------------------------------------------------------------------------
@@ -53,7 +58,11 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
   Internals( new pqInternals())
 {
-  this->setLayout(new QVBoxLayout(this));
+  QVBoxLayout* vbox = new QVBoxLayout(this);
+  vbox->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(vbox);
+
+  qApp->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -77,7 +86,48 @@ vtkSMViewLayoutProxy* pqMultiViewWidget::layoutManager() const
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqMultiViewWidget::newFrame(vtkSMProxy* view)
+bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
+{
+  if (evt->type() == QEvent::MouseButtonPress)
+    {
+    QWidget* wdg = qobject_cast<QWidget*>(caller);
+    if (wdg && this->isAncestorOf(wdg))
+      {
+      // If the new widget that is getting the focus is a child widget of any of the
+      // frames, then the frame should be made active.
+      foreach (pqMultiViewFrame* frame,
+        (this->Internals->ViewFrames.values() + this->Internals->EmptyFrames))
+        {
+        if (frame && frame->isAncestorOf(wdg))
+          {
+          this->makeActive(frame);
+          }
+        }
+      }
+    }
+
+  return this->Superclass::eventFilter(caller, evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
+{
+  if (this->Internals->ActiveFrame != frame)
+    {
+    if (this->Internals->ActiveFrame)
+      {
+      this->Internals->ActiveFrame->setActive(false);
+      }
+    this->Internals->ActiveFrame = frame;
+    if (frame)
+      {
+      frame->setActive(true);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 {
   pqMultiViewFrame* frame = new pqMultiViewFrame(this);
   frame->showDecorations();
@@ -105,7 +155,7 @@ QWidget* pqMultiViewWidget::createWidget(
   case vtkSMViewLayoutProxy::NONE:
       {
       vtkSMProxy* view = vlayout->GetView(index);
-      QWidget* frame = NULL;
+      pqMultiViewFrame* frame = NULL;
       if (view == NULL || !this->Internals->ViewFrames.contains(view))
         {
         frame = this->newFrame(view);
@@ -117,6 +167,7 @@ QWidget* pqMultiViewWidget::createWidget(
         else
           {
           frame->setParent(parentWdg);
+          this->Internals->EmptyFrames.push_back(frame);
           }
         }
       else
@@ -125,6 +176,10 @@ QWidget* pqMultiViewWidget::createWidget(
         }
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
+      if (!this->Internals->ActiveFrame)
+        {
+        this->makeActive(frame);
+        }
       return frame;
       }
 
@@ -164,7 +219,13 @@ QWidget* pqMultiViewWidget::createWidget(
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::reload()
 {
+  foreach (pqMultiViewFrame* frame, this->Internals->EmptyFrames)
+    {
+    delete frame;
+    }
+  this->Internals->EmptyFrames.clear();
   delete this->Internals->Container;
+
   vtkSMViewLayoutProxy* vlayout = this->layoutManager();
   if (!vlayout)
     {
@@ -173,6 +234,7 @@ void pqMultiViewWidget::reload()
 
   QWidget* container = new QWidget(this);
   QVBoxLayout* vbox = new QVBoxLayout(container);
+  vbox->setContentsMargins(0, 0, 0, 0);
   container->setLayout(vbox);
 
   QWidget* child = this->createWidget(0, vlayout, container);
