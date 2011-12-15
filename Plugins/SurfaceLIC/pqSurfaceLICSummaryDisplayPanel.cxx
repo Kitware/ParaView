@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSignalAdaptors.h"
 
-pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent)
-  : QWidget(parent),
+pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *p)
+  : QWidget(p),
     ui(new Ui::pqSurfaceLICSummaryDisplayPanel)
 {
   ui->setupUi(this);
