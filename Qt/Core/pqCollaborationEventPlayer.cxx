@@ -55,7 +55,8 @@ void pqCollaborationEventPlayer::waitForMaster()
   pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
     pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
   // this process should just wait patiently until it becomes the master.
-  while (mgr && !mgr->collaborationManager()->IsMaster())
+  while ( mgr && mgr->activeCollaborationManager() &&
+          !mgr->activeCollaborationManager()->IsMaster())
     {
     pqEventDispatcher::processEventsAndWait(500); 
     }
@@ -67,8 +68,8 @@ void pqCollaborationEventPlayer::waitForConnections(int num_connections)
   pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
     pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
   // this process should just wait patiently until it becomes the master.
-  while (mgr && mgr->collaborationManager()->GetNumberOfConnectedClients() <
-    num_connections)
+  while ( mgr && mgr->activeCollaborationManager() &&
+          mgr->activeCollaborationManager()->GetNumberOfConnectedClients() < num_connections)
     {
     pqEventDispatcher::processEventsAndWait(500); 
     }

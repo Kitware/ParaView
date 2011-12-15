@@ -43,70 +43,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqCollaborationBehavior::pqCollaborationBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  this->CollaborationManager = NULL;
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+  this->CollaborationManager = new pqCollaborationManager(this);
+  pqApplicationCore* core = pqApplicationCore::instance();
+  core->registerManager("COLLABORATION_MANAGER", this->CollaborationManager);
+
+  QObject::connect( core->getServerManagerModel(),
                     SIGNAL(preServerAdded(pqServer*)),
-                    this, SLOT(onServerAdded(pqServer*)));
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
+                    this->CollaborationManager, SLOT(onServerAdded(pqServer*)));
+
+  QObject::connect( core->getServerManagerModel(),
                     SIGNAL(aboutToRemoveServer(pqServer*)),
-                    this, SLOT(onServerRemoved(pqServer*)));
-}
+                    this->CollaborationManager, SLOT(onServerRemoved(pqServer*)));
 
-//-----------------------------------------------------------------------------
-void pqCollaborationBehavior::onServerAdded(pqServer* server)
-{
-  // Clean-up previous instance if needed
-  this->onServerRemoved(NULL);
+  QObject::connect( this->CollaborationManager,
+                    SIGNAL(triggeredMasterChanged(bool)),
+                    core,
+                    SIGNAL(updateMasterEnableState(bool)));
 
-  if(server->session()->IsMultiClients())
-    {
-    this->CollaborationManager = new pqCollaborationManager(this);
-    this->CollaborationManager->setServer(server);
-    QObject::connect(this->CollaborationManager,
-                     SIGNAL(triggeredMasterChanged(bool)),
-                     pqApplicationCore::instance(),
-                     SIGNAL(updateMasterEnableState(bool)));
+  // We attach mouse listener on active change time otherwise when the view
+  // is just added, the widget is not yet correctly initialized...
+  QObject::connect( &pqActiveObjects::instance(),
+                    SIGNAL(viewChanged(pqView*)),
+                    this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
+                    Qt::UniqueConnection);
 
-    QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                      SIGNAL(serverAdded(pqServer*)),
-                      this->CollaborationManager, SLOT(updateEnabledState()),
-                      Qt::QueuedConnection);
-
-    // We attach mouse listener on active change time otherwise when the view
-    // is just added, the widget is not yet correctly initialized...
-    QObject::connect( &pqActiveObjects::instance(),
-                      SIGNAL(viewChanged(pqView*)),
-                      this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
-                      Qt::UniqueConnection);
-
-    QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                      SIGNAL(viewAdded(pqView*)),
-                      this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)),
-                      Qt::UniqueConnection);
-
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationBehavior::onServerRemoved(pqServer* vtkNotUsed(server))
-{
-  if(this->CollaborationManager)
-    {
-    QObject::disconnect( this->CollaborationManager,
-                         SIGNAL(triggeredMasterChanged(bool)),
-                         pqApplicationCore::instance(),
-                         SIGNAL(updateMasterEnableState(bool)));
-    QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
-                         SIGNAL(serverAdded(pqServer*)),
-                         this->CollaborationManager, SLOT(updateEnabledState()));
-    QObject::disconnect( &pqActiveObjects::instance(),
-                         SIGNAL(viewChanged(pqView*)),
-                         this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()));
-    QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
-                         SIGNAL(viewAdded(pqView*)),
-                         this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)));
-
-    this->CollaborationManager->deleteLater();
-    this->CollaborationManager = NULL;
-    }
+  QObject::connect( core->getServerManagerModel(),
+                    SIGNAL(viewAdded(pqView*)),
+                    this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)),
+                    Qt::UniqueConnection);
 }

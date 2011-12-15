@@ -661,7 +661,7 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
       break;
     case vtkSMCollaborationManager::CollaborationNotification:
       vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
-      emit sentFromOtherClient(msg);
+      emit sentFromOtherClient(this, msg);
       break;
     }
 }

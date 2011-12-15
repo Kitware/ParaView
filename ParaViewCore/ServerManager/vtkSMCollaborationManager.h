@@ -76,6 +76,10 @@ public:
   virtual void FollowUser(int clientId);
 
   // Description:
+  // Return the local followed user
+  int GetFollowedUser();
+
+  // Description:
   // Return true if the current client is the master
   virtual bool IsMaster();
 

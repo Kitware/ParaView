@@ -190,7 +190,7 @@ signals:
   ///    QObject::connect( server, SIGNAL(sentFromOtherClient(vtkSMMessage*)),
   ///                      this,   SLOT(onClientMessage(vtkSMMessage*)),
   ///                      Qt::QueuedConnection);
-  void sentFromOtherClient(vtkSMMessage* msg);
+  void sentFromOtherClient(pqServer*,vtkSMMessage* msg);
 
   /// Signal triggered when user information get updated
   void triggeredMasterUser(int);
@@ -213,7 +213,7 @@ protected slots:
 
   /// Called by vtkSMCollaborationManager when associated message happen.
   /// This will convert the given parameter into vtkSMMessage and
-  /// emit sentFromOtherClient(vtkSMMessage*) signal.
+  /// emit sentFromOtherClient(pqServer*,vtkSMMessage*) signal.
   void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
 
 private:
