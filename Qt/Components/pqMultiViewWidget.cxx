@@ -31,9 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqMultiViewWidget.h"
 
-#include "vtkWeakPointer.h"
-#include "vtkSMViewLayoutProxy.h"
+#include "pqApplicationCore.h"
 #include "pqMultiViewFrame.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
+#include "vtkSMViewLayoutProxy.h"
+#include "vtkWeakPointer.h"
 
 #include <QFrame>
 #include <QPointer>
@@ -44,11 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqMultiViewWidget::pqInternals
 {
 public:
-  QMap<void*, QPointer<pqMultiViewFrame> > ViewFrames;
+  QVector<QPointer<QWidget> > Widgets;
   QList<QPointer<pqMultiViewFrame> > EmptyFrames;
 
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
-  QPointer<QWidget> Container;
+  QPointer<QWidget> Cleaner;
 
   QPointer<pqMultiViewFrame> ActiveFrame;
 };
@@ -95,9 +98,9 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
       {
       // If the new widget that is getting the focus is a child widget of any of the
       // frames, then the frame should be made active.
-      foreach (pqMultiViewFrame* frame,
-        (this->Internals->ViewFrames.values() + this->Internals->EmptyFrames))
+      foreach (QWidget* wdg, this->Internals->Widgets)
         {
+        pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
         if (frame && frame->isAncestorOf(wdg))
           {
           this->makeActive(frame);
@@ -107,6 +110,22 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
     }
 
   return this->Superclass::eventFilter(caller, evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::assignToFrame(pqView* view)
+{
+  // FIXME:
+  if (this->Internals->EmptyFrames.size() > 0)
+    {
+    QWidget* frame = this->Internals->EmptyFrames[0];
+    QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
+    if (index.isValid())
+      {
+      this->layoutManager()->AssignView(index.toUInt(), view->getProxy());
+      this->reload();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -142,37 +161,76 @@ pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
     this, SLOT(splitHorizontal()));
   QObject::connect(frame, SIGNAL(closePressed()),
     this, SLOT(close()));
+
+  if (view)
+    {
+    pqServerManagerModel* smmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+    pqView* pqview = smmodel->findItem<pqView*>(view);
+    Q_ASSERT(pqview != NULL);
+    QWidget* viewWidget = pqview->getWidget();
+    frame->setMainWidget(viewWidget);
+    viewWidget->setParent(frame);
+    }
   return frame;
+}
+
+namespace
+{
+  pqView* getPQView(vtkSMProxy* view)
+    {
+    if (view)
+      {
+      pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+      return smmodel->findItem<pqView*>(view);
+      }
+    return NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::createWidget(
   unsigned int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
 {
+  if (this->Internals->Widgets.size() <= static_cast<int>(index))
+    {
+    this->Internals->Widgets.resize(index+1);
+    }
+
   vtkSMViewLayoutProxy::Direction direction = vlayout->GetSplitDirection(index);
   switch (direction)
     {
   case vtkSMViewLayoutProxy::NONE:
       {
       vtkSMProxy* view = vlayout->GetView(index);
-      pqMultiViewFrame* frame = NULL;
-      if (view == NULL || !this->Internals->ViewFrames.contains(view))
+      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+        this->Internals->Widgets[index]);
+      if (!frame)
         {
         frame = this->newFrame(view);
-        if (view != NULL)
-          {
-          this->Internals->ViewFrames[view] = frame;
-          frame->setParent(this);
-          }
-        else
-          {
-          frame->setParent(parentWdg);
-          this->Internals->EmptyFrames.push_back(frame);
-          }
+        }
+      Q_ASSERT(frame != NULL);
+
+      frame->setParent(parentWdg);
+      this->Internals->Widgets[index] = frame;
+
+      if (frame->mainWidget())
+        {
+        frame->setMainWidget(NULL);
+        }
+
+      if (view != NULL)
+        {
+        pqView* pqview = getPQView(view);
+        Q_ASSERT(pqview != NULL);
+        QWidget* viewWidget = pqview->getWidget();
+        frame->setMainWidget(viewWidget);
+        viewWidget->setParent(frame);
         }
       else
         {
-        frame = this->Internals->ViewFrames[view];
+        this->Internals->EmptyFrames.push_back(frame);
         }
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
@@ -186,7 +244,15 @@ QWidget* pqMultiViewWidget::createWidget(
   case vtkSMViewLayoutProxy::VERTICAL:
   case vtkSMViewLayoutProxy::HORIZONTAL:
       {
-      QSplitter* splitter = new QSplitter(parentWdg);
+      QSplitter* splitter = qobject_cast<QSplitter*>(
+        this->Internals->Widgets[index]);
+      if (!splitter)
+        {
+        splitter = new QSplitter(parentWdg);
+        }
+      Q_ASSERT(splitter);
+      splitter->setParent(parentWdg);
+      this->Internals->Widgets[index] = splitter;
       splitter->setObjectName(QString("Splitter.%1").arg(index));
       splitter->setProperty("FRAME_INDEX", QVariant(index));
       splitter->setOpaqueResize(false);
@@ -207,6 +273,8 @@ QWidget* pqMultiViewWidget::createWidget(
 
       // FIXME: Don't like this as this QueuedConnection may cause multiple
       // renders.
+      QObject::disconnect(splitter, SIGNAL(splitterMoved(int, int)),
+        this, SLOT(splitterMoved()));
       QObject::connect(splitter, SIGNAL(splitterMoved(int, int)),
         this, SLOT(splitterMoved()), Qt::QueuedConnection);
       return splitter;
@@ -219,29 +287,30 @@ QWidget* pqMultiViewWidget::createWidget(
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::reload()
 {
-  foreach (pqMultiViewFrame* frame, this->Internals->EmptyFrames)
-    {
-    delete frame;
-    }
   this->Internals->EmptyFrames.clear();
-  delete this->Internals->Container;
-
   vtkSMViewLayoutProxy* vlayout = this->layoutManager();
   if (!vlayout)
     {
     return;
     }
 
-  QWidget* container = new QWidget(this);
-  QVBoxLayout* vbox = new QVBoxLayout(container);
+  this->Internals->Cleaner = new QWidget(this);
+
+  foreach (QWidget* widget, this->Internals->Widgets)
+    {
+    if (widget)
+      {
+      widget->setParent(this->Internals->Cleaner);
+      }
+    }
+  QWidget* child = this->createWidget(0, vlayout, this);
+  delete this->Internals->Cleaner;
+
+  delete this->layout();
+  QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setContentsMargins(0, 0, 0, 0);
-  container->setLayout(vbox);
-
-  QWidget* child = this->createWidget(0, vlayout, container);
   vbox->addWidget(child);
-
-  this->layout()->addWidget(container);
-  this->Internals->Container = container;
+  this->setLayout(vbox);
 }
 
 //-----------------------------------------------------------------------------

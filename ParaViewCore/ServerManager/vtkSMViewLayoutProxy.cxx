@@ -134,7 +134,8 @@ unsigned int vtkSMViewLayoutProxy::Split(
     return 0;
     }
 
-  vtkInternals::Cell &cell = this->Internals->KDTree[location];
+  // we don't get by value, since we resize the vector.
+  vtkInternals::Cell cell = this->Internals->KDTree[location];
   if (cell.Direction != NONE)
     {
     vtkErrorMacro("Cell identified by location '" << location
@@ -164,15 +165,17 @@ unsigned int vtkSMViewLayoutProxy::Split(
     this->Internals->KDTree.resize(2*location + 2 + 1);
     }
 
+
+  unsigned int child_location = (2*location + 1);
   if (cell.ViewProxy)
     {
     vtkInternals::Cell &child = this->Internals->KDTree[2*location + 1];
     child.ViewProxy = cell.ViewProxy;
     cell.ViewProxy = NULL;
-    return (2*location + 2);
     }
+  this->Internals->KDTree[location] = cell;
 
-  return (2*location + 1);
+  return child_location;
 }
 
 //----------------------------------------------------------------------------

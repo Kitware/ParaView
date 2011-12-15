@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
-#include "pqProxy.h"
 
 #include <QMultiMap>
 
@@ -84,6 +84,19 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
     {
     this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy())); 
+    }
+  else if (qobject_cast<pqView*>(proxy))
+    {
+    // FIXME: we may want to give server-manager the opportunity to place the
+    // view after creation, if it wants. The GUI should try to find a place for
+    // it, only if the server-manager (through undo-redo, or loading state or
+    // Python or collaborative-client).
+    pqMultiViewWidget* currentWidget = qobject_cast<pqMultiViewWidget*>(
+      this->currentWidget());
+    if (currentWidget)
+      {
+      currentWidget->assignToFrame(qobject_cast<pqView*>(proxy));
+      }
     }
 }
 

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqMultiViewFrame;
+class pqView;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
 
@@ -61,6 +62,12 @@ public slots:
   /// vtkSMViewLayoutProxy instance. One does not need to call this method
   /// explicitly, it is called automatically when the layoutManager is modified.
   void reload();
+
+  /// assigns a frame to the view. This assumes that the view not already been
+  /// placed in a frame. This will try to locate an empty frame, if possible. If
+  /// no empty frames are available, it will split the active frame along its
+  /// longest dimension and place the view in the newly created child-frame.
+  void assignToFrame(pqView*);
 
 protected slots:
   /// slots called on different signals fired by the nested frames or splitters.
