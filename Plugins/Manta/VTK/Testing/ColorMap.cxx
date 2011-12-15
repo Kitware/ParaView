@@ -54,7 +54,7 @@ void ConfigureMapper( vtkPolyDataMapper * mapper,
                       int                 colorMode, 
                       int                 useLookupTableScalarRange, 
                       int                 interpolateScalarsBeforeMapping,
-                      char *              colorByArrayName, 
+                      const char *        colorByArrayName, 
                       int                 colorByArrayVectorComponentIndex,
                       int                 vectorByVTKmapper );
 void ConfigureColorLUT( vtkLookupTable  * clrLUT,
@@ -497,7 +497,7 @@ void ConfigureMapper( vtkPolyDataMapper * mapper,
                       int                 colorMode, 
                       int                 useLookupTableScalarRange, 
                       int                 interpolateScalarsBeforeMapping,
-                      char *              colorByArrayName, 
+                      const char *        colorByArrayName, 
                       int                 colorByArrayVectorComponentIndex,
                       int                 vectorByVTKmapper )
 {
