@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include "pqComponentsExport.h"
 
-class vtkSMViewLayout;
+class vtkSMViewLayoutProxy;
 class vtkSMProxy;
 
 /// pqMultiViewWidget is a widget that manages layout of multiple views. It
-/// works together with a vtkSMViewLayout instance to keep track of the layout
+/// works together with a vtkSMViewLayoutProxy instance to keep track of the layout
 /// for the views. It's acceptable to create multiple instances of
 /// pqMultiViewWidget in the same application.
 class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
@@ -50,14 +50,14 @@ public:
   pqMultiViewWidget(QWidget * parent=0, Qt::WindowFlags f=0);
   virtual ~pqMultiViewWidget();
 
-  /// Get/Set the vtkSMViewLayout instance this widget is using as the layout
+  /// Get/Set the vtkSMViewLayoutProxy instance this widget is using as the layout
   /// manager.
-  void setLayoutManager(vtkSMViewLayout*);
-  vtkSMViewLayout* layoutManager() const;
+  void setLayoutManager(vtkSMViewLayoutProxy*);
+  vtkSMViewLayoutProxy* layoutManager() const;
 
 public slots:
   /// this forces the pqMultiViewWidget to reload its layout from the
-  /// vtkSMViewLayout instance. One does not need to call this method
+  /// vtkSMViewLayoutProxy instance. One does not need to call this method
   /// explicitly, it is called automatically when the layoutManager is modified.
   void reload();
 
@@ -78,7 +78,7 @@ protected:
   virtual QWidget* newFrame(vtkSMProxy* view);
  
 private:
-  QWidget* createWidget(unsigned int, vtkSMViewLayout* layout, QWidget* parentWdg);
+  QWidget* createWidget(unsigned int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget);

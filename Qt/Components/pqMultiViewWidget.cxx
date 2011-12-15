@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewWidget.h"
 
 #include "vtkWeakPointer.h"
-#include "vtkSMViewLayout.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "pqMultiViewFrame.h"
 
 #include <QFrame>
@@ -44,7 +44,7 @@ class pqMultiViewWidget::pqInternals
 {
 public:
   QMap<void*, QPointer<QWidget> > ViewFrames;
-  vtkWeakPointer<vtkSMViewLayout> LayoutManager;
+  vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
   QPointer<QWidget> Container;
 };
 
@@ -64,14 +64,14 @@ pqMultiViewWidget::~pqMultiViewWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiViewWidget::setLayoutManager(vtkSMViewLayout* vlayout)
+void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
 {
   this->Internals->LayoutManager = vlayout;
   this->reload();
 }
 
 //-----------------------------------------------------------------------------
-vtkSMViewLayout* pqMultiViewWidget::layoutManager() const
+vtkSMViewLayoutProxy* pqMultiViewWidget::layoutManager() const
 {
   return this->Internals->LayoutManager;
 }
@@ -97,12 +97,12 @@ QWidget* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::createWidget(
-  unsigned int index, vtkSMViewLayout* vlayout, QWidget* parentWdg)
+  unsigned int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
 {
-  vtkSMViewLayout::Direction direction = vlayout->GetSplitDirection(index);
+  vtkSMViewLayoutProxy::Direction direction = vlayout->GetSplitDirection(index);
   switch (direction)
     {
-  case vtkSMViewLayout::NONE:
+  case vtkSMViewLayoutProxy::NONE:
       {
       vtkSMProxy* view = vlayout->GetView(index);
       QWidget* frame = NULL;
@@ -128,15 +128,15 @@ QWidget* pqMultiViewWidget::createWidget(
       return frame;
       }
 
-  case vtkSMViewLayout::VERTICAL:
-  case vtkSMViewLayout::HORIZONTAL:
+  case vtkSMViewLayoutProxy::VERTICAL:
+  case vtkSMViewLayoutProxy::HORIZONTAL:
       {
       QSplitter* splitter = new QSplitter(parentWdg);
       splitter->setObjectName(QString("Splitter.%1").arg(index));
       splitter->setProperty("FRAME_INDEX", QVariant(index));
       splitter->setOpaqueResize(false);
       splitter->setOrientation(
-        direction == vtkSMViewLayout::VERTICAL?
+        direction == vtkSMViewLayoutProxy::VERTICAL?
         Qt::Vertical : Qt::Horizontal);
       splitter->addWidget(
         this->createWidget(vlayout->GetFirstChild(index), vlayout, parentWdg));
@@ -165,7 +165,7 @@ QWidget* pqMultiViewWidget::createWidget(
 void pqMultiViewWidget::reload()
 {
   delete this->Internals->Container;
-  vtkSMViewLayout* vlayout = this->layoutManager();
+  vtkSMViewLayoutProxy* vlayout = this->layoutManager();
   if (!vlayout)
     {
     return;

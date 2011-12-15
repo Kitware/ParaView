@@ -12,23 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMViewLayout - vtkSMViewLayout is used by ParaView to layout
+// .NAME vtkSMViewLayoutProxy - vtkSMViewLayoutProxy is used by ParaView to layout
 // multiple views in a 2D KD-Tree layout.
 // .SECTION Description
 // 
 
-#ifndef __vtkSMViewLayout_h
-#define __vtkSMViewLayout_h
+#ifndef __vtkSMViewLayoutProxy_h
+#define __vtkSMViewLayoutProxy_h
 
-#include "vtkSMRemoteObject.h"
+#include "vtkSMProxy.h"
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMViewLayout : public vtkSMRemoteObject
+class VTK_EXPORT vtkSMViewLayoutProxy : public vtkSMProxy
 {
 public:
-  static vtkSMViewLayout* New();
-  vtkTypeMacro(vtkSMViewLayout, vtkSMRemoteObject);
+  static vtkSMViewLayoutProxy* New();
+  vtkTypeMacro(vtkSMViewLayoutProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   enum Direction
@@ -103,12 +103,12 @@ public:
 
 //BTX
 protected:
-  vtkSMViewLayout();
-  ~vtkSMViewLayout();
+  vtkSMViewLayoutProxy();
+  ~vtkSMViewLayoutProxy();
 
 private:
-  vtkSMViewLayout(const vtkSMViewLayout&); // Not implemented
-  void operator=(const vtkSMViewLayout&); // Not implemented
+  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&); // Not implemented
+  void operator=(const vtkSMViewLayoutProxy&); // Not implemented
 
   class vtkInternals;
   vtkInternals* Internals;

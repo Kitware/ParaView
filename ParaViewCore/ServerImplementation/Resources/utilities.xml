@@ -2308,6 +2308,12 @@
       <!-- End of TimerLog -->
     </Proxy>
 
+    <ViewLayoutProxy name="ViewLayout">
+      <Documentation>
+        Proxy used to manage layout for mutliple views.
+      </Documentation>
+    </ViewLayoutProxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

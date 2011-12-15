@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMViewLayout.h"
+#include "vtkSMViewLayoutProxy.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkSMProxy.h"
@@ -21,17 +21,17 @@
 #include <vector>
 #include <assert.h>
 
-class vtkSMViewLayout::vtkInternals
+class vtkSMViewLayoutProxy::vtkInternals
 {
 public:
   struct Cell
     {
-    vtkSMViewLayout::Direction Direction;
+    vtkSMViewLayoutProxy::Direction Direction;
     double SplitFraction;
     vtkWeakPointer<vtkSMProxy> ViewProxy;
 
     Cell() :
-      Direction(vtkSMViewLayout::NONE),
+      Direction(vtkSMViewLayoutProxy::NONE),
       SplitFraction(0.5)
     {
     }
@@ -52,7 +52,7 @@ public:
 
     // now verify that every parent node for location is a split cell.
     int parent = (static_cast<int>(location) - 1) / 2;
-    while (this->KDTree[parent].Direction != vtkSMViewLayout::NONE)
+    while (this->KDTree[parent].Direction != vtkSMViewLayoutProxy::NONE)
       {
       if (parent == 0)
         {
@@ -108,9 +108,9 @@ private:
     }
 };
 
-vtkStandardNewMacro(vtkSMViewLayout);
+vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
-vtkSMViewLayout::vtkSMViewLayout() :
+vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
   Internals(new vtkInternals())
 {
   // Push the root element.
@@ -118,14 +118,14 @@ vtkSMViewLayout::vtkSMViewLayout() :
 }
 
 //----------------------------------------------------------------------------
-vtkSMViewLayout::~vtkSMViewLayout()
+vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
 {
   delete this->Internals;
   this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMViewLayout::Split(
+unsigned int vtkSMViewLayoutProxy::Split(
   unsigned int location, int direction, double fraction)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
@@ -176,7 +176,7 @@ unsigned int vtkSMViewLayout::Split(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayout::AssignView(unsigned int location, vtkSMProxy* view)
+bool vtkSMViewLayoutProxy::AssignView(unsigned int location, vtkSMProxy* view)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -203,7 +203,7 @@ bool vtkSMViewLayout::AssignView(unsigned int location, vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMViewLayout::RemoveView(vtkSMProxy* view)
+unsigned int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
 {
   unsigned int index = 0;
   for (vtkInternals::KDTreeType::iterator iter =
@@ -221,7 +221,7 @@ unsigned int vtkSMViewLayout::RemoveView(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayout::Collape(unsigned int location)
+bool vtkSMViewLayoutProxy::Collape(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -258,7 +258,7 @@ bool vtkSMViewLayout::Collape(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayout::IsSplitCell(unsigned int location)
+bool vtkSMViewLayoutProxy::IsSplitCell(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -271,7 +271,7 @@ bool vtkSMViewLayout::IsSplitCell(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-vtkSMViewLayout::Direction vtkSMViewLayout::GetSplitDirection(unsigned int location)
+vtkSMViewLayoutProxy::Direction vtkSMViewLayoutProxy::GetSplitDirection(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -283,7 +283,7 @@ vtkSMViewLayout::Direction vtkSMViewLayout::GetSplitDirection(unsigned int locat
 }
 
 //----------------------------------------------------------------------------
-double vtkSMViewLayout::GetSplitFraction(unsigned int location)
+double vtkSMViewLayoutProxy::GetSplitFraction(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -295,7 +295,7 @@ double vtkSMViewLayout::GetSplitFraction(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMViewLayout::GetView(unsigned int location)
+vtkSMProxy* vtkSMViewLayoutProxy::GetView(unsigned int location)
 {
   if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
     {
@@ -307,7 +307,7 @@ vtkSMProxy* vtkSMViewLayout::GetView(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayout::SetSplitFraction(unsigned int location, double val)
+bool vtkSMViewLayoutProxy::SetSplitFraction(unsigned int location, double val)
 {
   if (val < 0.0 || val > 1.0)
     {
@@ -326,7 +326,7 @@ bool vtkSMViewLayout::SetSplitFraction(unsigned int location, double val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMViewLayout::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMViewLayoutProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

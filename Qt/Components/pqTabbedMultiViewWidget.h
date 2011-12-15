@@ -1,0 +1,77 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    $RCSfile$
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2. 
+   
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#ifndef __pqTabbedMultiViewWidget_h 
+#define __pqTabbedMultiViewWidget_h
+
+#include <QTabWidget>
+#include "pqComponentsExport.h"
+#include "vtkType.h" // needed for vtkIdType
+
+class vtkSMProxy;
+class vtkSMViewLayoutProxy;
+
+/// pqTabbedMultiViewWidget is used to to enable adding of multiple
+/// pqMultiViewWidget instances in tabs. This class directly listens to the
+/// server-manager to automatically create pqMultiViewWidget instances for every
+/// vtkSMViewLayoutProxy registered.
+class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QTabWidget
+{
+  Q_OBJECT
+  typedef QTabWidget Superclass;
+public:
+  pqTabbedMultiViewWidget(QWidget* parent=0);
+  virtual ~pqTabbedMultiViewWidget();
+
+public slots:
+  void createTab();
+  void createTab(vtkSMViewLayoutProxy*);
+  void closeTab(int);
+
+protected slots:
+  /// slots connects to corresponding signals on pqServerManagerObserver.
+  void proxyRegistered(const QString& group, const QString& name, 
+    vtkSMProxy* proxy);
+  void proxyUnRegistered(const QString& group, const QString& name, 
+    vtkSMProxy* proxy);
+  void connectionCreated(vtkIdType connectionId);
+  void connectionClosed(vtkIdType connectionId);
+  
+  void checkToAddTab(int);
+
+private:
+  Q_DISABLE_COPY(pqTabbedMultiViewWidget);
+
+  class pqInternals;
+  pqInternals* Internals;
+};
+
+#endif
