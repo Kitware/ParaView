@@ -338,28 +338,17 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
 
   // Setup the UI shown when no view is present in the frame.
   QWidget* emptyFrame = frame->emptyMainWidget();
-
-  QScrollArea* scrollArea = new QScrollArea(emptyFrame);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidgetResizable(true);
-  QFrame* frame2 = new QFrame(scrollArea);
-  scrollArea->setWidget(frame2);
   Ui::EmptyView ui;
-  ui.setupUi(frame2);
-
-  QVBoxLayout* vlayout = new QVBoxLayout(emptyFrame);
-  vlayout->addWidget(scrollArea);
+  ui.setupUi(emptyFrame);
 
   this->buildConvertMenu();
-
-  ui.ConvertActionsFrame->layout()->setSpacing(0);
 
   // Add buttons for all conversion actions.
   QList<QAction*> convertActions =
     this->Internal->ConvertMenu.actions();
   foreach (QAction* action, convertActions)
     {
-    QPushButton* button = new QPushButton(action->text(), frame);
+    QPushButton* button = new QPushButton(action->text(), emptyFrame);
     button->setObjectName(action->text());
     ui.ConvertActionsFrame->layout()->addWidget(button);
     button->addAction(action);
