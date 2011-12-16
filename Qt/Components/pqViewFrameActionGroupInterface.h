@@ -48,6 +48,8 @@ public:
 
   /// Add/remove plugin's actions to/from the frame 
   /// depending on the view type. Returns true if it did.
+  /// Note that pqView* may be NULL, implying that the frame is not being
+  /// assigned to any view.
   virtual bool connect(pqMultiViewFrame*, pqView*) = 0;
   virtual bool disconnect(pqMultiViewFrame*, pqView*) = 0;
 

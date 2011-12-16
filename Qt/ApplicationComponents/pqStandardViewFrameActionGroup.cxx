@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqStandardViewFrameActionGroup.h"
+#include "ui_pqEmptyView.h"
 
 #include "pqRenderView.h"
 #include "pqEditCameraReaction.h"
@@ -46,6 +47,15 @@ pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentOb
 //-----------------------------------------------------------------------------
 bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *view)
 {
+  if (view == NULL)
+    {
+    // Setup the UI shown when no view is present in the frame.
+    QWidget* emptyFrame = frame->emptyMainWidget();
+    Ui::EmptyView ui;
+    ui.setupUi(emptyFrame);
+    return true;
+    }
+
   pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
   if (render_module)
     {
