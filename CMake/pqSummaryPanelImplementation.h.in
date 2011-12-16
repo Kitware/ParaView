@@ -44,7 +44,7 @@ class @PANEL_NAME@Implementation : public QObject, public pqSummaryPanelInterfac
   Q_INTERFACES(pqSummaryPanelInterface)
 
 public:
-  @PANEL_NAME@Implementation(QObject *parent = 0);
+  @PANEL_NAME@Implementation(QObject *p = 0);
 
   virtual QWidget* createDisplayPanel(pqRepresentation *representation) const;
 };

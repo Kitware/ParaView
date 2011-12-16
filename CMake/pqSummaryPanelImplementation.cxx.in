@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 
-@PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject *parent)
-  : QObject(parent)
+@PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject *p)
+  : QObject(p)
 {
 }
 
