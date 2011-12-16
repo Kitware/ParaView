@@ -11408,44 +11408,6 @@ This property controls how the filter works to generate tensor cell data. You ca
          <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
 
-     <StringVectorProperty
-        name="VolumeFractionArrays"
-        command="SetMaterialVolumeFractionArray"
-        label="List of array names holding volume fractions for each material"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1" >
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="NormalArrays"
-        command="SetMaterialNormalArray"
-        label="List of array names holding separation normal for each material"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1" >
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="OrderArrays"
-        command="SetMaterialOrderingArray"
-        label="List of array names holding material order for each material"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1" >
-     </StringVectorProperty>
-
-     <IntVectorProperty
-        name="MaterialBlockMapping"
-        command="AddMaterialBlockMapping"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        clean_command="RemoveAllMaterialBlockMappings" >
-     </IntVectorProperty>
 
      <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
