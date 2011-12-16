@@ -35,18 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrameActionGroup.h"
 #include "pqApplicationComponentsExport.h"
 
+class QWidget;
+
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionGroup : public pqViewFrameActionGroup
 {
   Q_OBJECT
   typedef pqViewFrameActionGroup Superclass;
 public:
   pqStandardViewFrameActionGroup(QObject* parent=0);
+  virtual ~pqStandardViewFrameActionGroup();
 
   // Description:
   // Tries to add/remove this group's actions to/from the frame if the
   // view type is supported. Returns whether or not they were.
   virtual bool connect(pqMultiViewFrame *frame, pqView *view);
   virtual bool disconnect(pqMultiViewFrame *frame, pqView *view);
+
+protected slots:
+  void aboutToShowConvertMenu();
+
+protected:
+  void setupEmptyFrame(QWidget* frame);
 
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionGroup)

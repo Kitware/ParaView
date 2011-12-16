@@ -32,11 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewFrameActionGroup.h"
 #include "ui_pqEmptyView.h"
 
-#include "pqRenderView.h"
-#include "pqEditCameraReaction.h"
-#include "pqViewSettingsReaction.h"
+#include "pqApplicationCore.h"
 #include "pqCameraUndoRedoReaction.h"
+#include "pqEditCameraReaction.h"
+#include "pqInterfaceTracker.h"
 #include "pqMultiViewFrame.h"
+#include "pqRenderView.h"
+#include "pqViewModuleInterface.h"
+#include "pqViewSettingsReaction.h"
+
+#include <QMenu>
+#include <QPushButton>
+#include <QSet>
 
 //-----------------------------------------------------------------------------
 pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentObject)
@@ -45,14 +52,24 @@ pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentOb
 }
 
 //-----------------------------------------------------------------------------
+pqStandardViewFrameActionGroup::~pqStandardViewFrameActionGroup()
+{
+}
+
+//-----------------------------------------------------------------------------
 bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *view)
 {
+  Q_ASSERT(frame != NULL);
+
+  frame->getContextMenu()->addSeparator();
+  QMenu* convertMenu = frame->getContextMenu()->addMenu("Convert To ...");
+  QObject::connect(convertMenu, SIGNAL(aboutToShow()),
+    this, SLOT(aboutToShowConvertMenu()));
+
   if (view == NULL)
     {
     // Setup the UI shown when no view is present in the frame.
-    QWidget* emptyFrame = frame->emptyMainWidget();
-    Ui::EmptyView ui;
-    ui.setupUi(emptyFrame);
+    this->setupEmptyFrame(frame->emptyMainWidget());
     return true;
     }
 
@@ -94,6 +111,7 @@ bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *vi
   return true;
 }
 
+//-----------------------------------------------------------------------------
 inline void REMOVE_ACTION(const char* name, pqMultiViewFrame* frame)
 {
   QAction* action = frame->getAction(name);
@@ -113,3 +131,58 @@ bool pqStandardViewFrameActionGroup::disconnect(pqMultiViewFrame *frame, pqView 
   return true;
 }
 
+//-----------------------------------------------------------------------------
+namespace
+{
+  static QMap<QString, QString> availableViewTypes()
+    {
+    QMap<QString, QString> views;
+    pqInterfaceTracker* tracker =
+      pqApplicationCore::instance()->interfaceTracker();
+    foreach (pqViewModuleInterface* vi,
+      tracker->interfaces<pqViewModuleInterface*>())
+      {
+      QStringList viewTypes = vi->viewTypes();
+      for (int cc=0; cc < viewTypes.size(); cc++)
+        {
+        views[viewTypes[cc]] = vi->viewTypeName(viewTypes[cc]);
+        }
+      }
+    return views;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::aboutToShowConvertMenu()
+{
+  QMenu* menu = qobject_cast<QMenu*>(this->sender());
+  if (menu)
+    {
+    menu->clear();
+    QMap<QString, QString> views = availableViewTypes();
+    for (QMap<QString, QString>::iterator iter = views.begin();
+      iter != views.end(); ++iter)
+      {
+      QAction* view_action = new QAction(iter.value(), menu);
+      view_action->setData(iter.key());
+      menu->addAction(view_action);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::setupEmptyFrame(QWidget* frame)
+{
+  Ui::EmptyView ui;
+  ui.setupUi(frame);
+
+  QMap<QString, QString> views = availableViewTypes();
+  for (QMap<QString, QString>::iterator iter = views.begin();
+    iter != views.end(); ++iter)
+    {
+    QPushButton* button = new QPushButton(iter.value(), ui.ConvertActionsFrame);
+    button->setObjectName(iter.value());
+    button->setProperty("pqStandardViewFrameActionGroup_VIEW_TYPE", iter.key());
+    ui.ConvertActionsFrame->layout()->addWidget(button);
+    }
+}
