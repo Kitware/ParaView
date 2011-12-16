@@ -57,9 +57,6 @@ public:
   void setLayoutManager(vtkSMViewLayoutProxy*);
   vtkSMViewLayoutProxy* layoutManager() const;
 
-signals:
-  void activeChanged(pqView*);
-
 public slots:
   /// this forces the pqMultiViewWidget to reload its layout from the
   /// vtkSMViewLayoutProxy instance. One does not need to call this method
@@ -81,8 +78,14 @@ protected slots:
   void close();
   void splitterMoved();
 
-  /// make a frame active.
+  /// makes a frame active. This also call pqActiveObjects::setActiveView() to
+  /// make the corresponding view active.
   void makeActive(pqMultiViewFrame* frame);
+
+  /// marks the frame corresponding to the view, if present in the widget, as
+  /// active. Note that this method does not fire the activeChanged() signal.
+  void markActive(pqView* view);
+  void markActive(pqMultiViewFrame* frame);
 
 protected:
   /// called whenever a new frame needs to be created for a view. Note that view

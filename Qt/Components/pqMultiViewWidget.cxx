@@ -56,7 +56,7 @@ public:
 
   // This map is used to avoid reassigning frames. Once a view is assigned a
   // frame, we preserve that frame as long as possible.
-  QMap<void*, QPointer<pqMultiViewFrame> > ViewFrames;
+  QMap<vtkSMProxy*, QPointer<pqMultiViewFrame> > ViewFrames;
 
   QList<QPointer<pqMultiViewFrame> > EmptyFrames;
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
@@ -89,8 +89,8 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 
   qApp->installEventFilter(this);
 
-  QObject::connect(this, SIGNAL(activeChanged(pqView*)),
-    &pqActiveObjects::instance(), SLOT(setActiveView(pqView*)));
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(viewChanged(pqView*)), this, SLOT(markActive(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -155,6 +155,38 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
       this->reload();
       }
     }
+  pqActiveObjects::instance().setActiveView(view);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::markActive(pqView* view)
+{
+  bool prev = this->blockSignals(true);
+   if (view &&
+    this->Internals->ViewFrames.contains(view->getProxy()))
+     {
+     this->markActive(this->Internals->ViewFrames[view->getProxy()]);
+     }
+   else
+     {
+     this->markActive(static_cast<pqMultiViewFrame*>(NULL));
+     }
+ 
+  this->blockSignals(prev);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::markActive(pqMultiViewFrame* frame)
+{
+  if (this->Internals->ActiveFrame)
+    {
+    this->Internals->ActiveFrame->setActive(false);
+    }
+  this->Internals->ActiveFrame = frame;
+  if (frame)
+    {
+    frame->setActive(true);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -162,24 +194,17 @@ void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
 {
   if (this->Internals->ActiveFrame != frame)
     {
-    if (this->Internals->ActiveFrame)
-      {
-      this->Internals->ActiveFrame->setActive(false);
-      }
-    this->Internals->ActiveFrame = frame;
-    if (frame)
-      {
-      frame->setActive(true);
-      }
-
-    /// trigger signal that some view became active.
     pqView* view = NULL;
     if (frame)
       {
       unsigned int index = frame->property("FRAME_INDEX").toUInt();
       view = getPQView(this->layoutManager()->GetView(index));
       }
-    emit this->activeChanged(view);
+    pqActiveObjects::instance().setActiveView(view);
+    // this needs to called only when view == null since in that case when
+    // markActive(pqView*) slot is called, we have no idea what frame is really
+    // to be made active.
+    this->markActive(frame);
     }
 }
 
@@ -335,25 +360,15 @@ void pqMultiViewWidget::reload()
   vbox->addWidget(child);
   this->setLayout(vbox);
 
-  bool prev = this->blockSignals(true);
-  pqView* activeView = pqActiveObjects::instance().activeView();
-  if (activeView &&
-    this->Internals->ViewFrames.contains(activeView->getProxy()))
-    {
-    this->makeActive(this->Internals->ViewFrames[activeView->getProxy()]);
-    }
-  else
-    {
-    this->makeActive(NULL);
-    }
-  this->blockSignals(prev);
+  // ensure the active view is marked appropriately.
+  this->markActive(pqActiveObjects::instance().activeView());
 
   // Cleanup deleted objects. "cleaner" helps us avoid any dangling widgets and
   // deletes them whwn delete cleaner is called. Now we prune internal
   // datastructures to get rid of these NULL ptrs.
 
   // remove any deleted view frames.
-  QMutableMapIterator<void*, QPointer<pqMultiViewFrame> > iter(
+  QMutableMapIterator<vtkSMProxy*, QPointer<pqMultiViewFrame> > iter(
       this->Internals->ViewFrames);
   while (iter.hasNext())
     {
