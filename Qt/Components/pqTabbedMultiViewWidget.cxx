@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 
 #include <QMultiMap>
+#include <QtDebug>
 
 class pqTabbedMultiViewWidget::pqInternals
 {
@@ -91,11 +92,25 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     // view after creation, if it wants. The GUI should try to find a place for
     // it, only if the server-manager (through undo-redo, or loading state or
     // Python or collaborative-client).
-    pqMultiViewWidget* currentWidget = qobject_cast<pqMultiViewWidget*>(
-      this->currentWidget());
-    if (currentWidget)
+    pqMultiViewWidget* frame =
+      qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+
+    if (!frame)
       {
-      currentWidget->assignToFrame(qobject_cast<pqView*>(proxy));
+      // implies no vtkSMViewLayoutProxy was registered for this session.
+      this->createTab();
+      frame = qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+      }
+
+    if (frame)
+      {
+      frame->assignToFrame(qobject_cast<pqView*>(proxy));
+      }
+    else
+      {
+      qCritical() <<
+        "A new view was added, but pqTabbedMultiViewWidget has no "
+        "idea where to put this view.";
       }
     }
 }
