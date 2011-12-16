@@ -38,9 +38,10 @@ public:
     };
 
 
-  bool IsCellValid(size_t location)
+  bool IsCellValid(int location)
     {
-    if (location >= this->KDTree.size())
+    if (location < 0 ||
+      location >= static_cast<int>(this->KDTree.size()))
       {
       return false;
       }
@@ -65,12 +66,15 @@ public:
     return false;
     }
 
-  void MoveSubtree(unsigned int destination, unsigned int source)
+  void MoveSubtree(int destination, int source)
     {
+    assert(destination >= 0 && source >= 0);
+
     // we only support moving a subtree "up".
     assert(destination < source);
 
-    if (source >= this->KDTree.size() || destination >= this->KDTree.size())
+    if (source >= static_cast<int>(this->KDTree.size()) ||
+      destination >= static_cast<int>(this->KDTree.size()))
       {
       return;
       }
@@ -125,10 +129,9 @@ vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMViewLayoutProxy::Split(
-  unsigned int location, int direction, double fraction)
+int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return 0;
@@ -160,28 +163,26 @@ unsigned int vtkSMViewLayoutProxy::Split(
   cell.SplitFraction = fraction;
 
   // ensure that both the children (2i+1), (2i+2) can fit in the KDTree.
-  if ( (2*location + 2) >= this->Internals->KDTree.size())
+  if ( (2*location + 2) >= static_cast<int>(this->Internals->KDTree.size()))
     {
     this->Internals->KDTree.resize(2*location + 2 + 1);
     }
 
-
-  unsigned int child_location = (2*location + 1);
+  int child_location = (2*location + 1);
   if (cell.ViewProxy)
     {
-    vtkInternals::Cell &child = this->Internals->KDTree[2*location + 1];
+    vtkInternals::Cell &child = this->Internals->KDTree[child_location];
     child.ViewProxy = cell.ViewProxy;
     cell.ViewProxy = NULL;
     }
   this->Internals->KDTree[location] = cell;
-
   return child_location;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::AssignView(unsigned int location, vtkSMProxy* view)
+bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return false;
@@ -206,9 +207,114 @@ bool vtkSMViewLayoutProxy::AssignView(unsigned int location, vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
+int vtkSMViewLayoutProxy::AssignViewToAnyCell(
+  vtkSMProxy* view, int location_hint)
 {
-  unsigned int index = 0;
+  if (!view)
+    {
+    vtkErrorMacro("View cannot be NULL.");
+    return 0;
+    }
+
+  if (location_hint < 0)
+    {
+    location_hint = 0;
+    }
+
+  // If location_hint refers to an empty cell, use it.
+  if (this->Internals->IsCellValid(location_hint))
+    {
+    int empty_cell = this->GetEmptyCell(location_hint);
+    if (empty_cell >= 0)
+      {
+      return this->AssignView(empty_cell, view);
+      }
+    }
+  else
+    {
+    // make location_hint a valid location.
+    location_hint = 0;
+    }
+
+  // Find any empty cell.
+  int empty_cell = this->GetEmptyCell(0);
+  if (empty_cell >= 0)
+    {
+    return this->AssignView(empty_cell, view);
+    }
+
+  // No empty cell found, split a view, starting with the location_hint.
+  Direction direction = HORIZONTAL;
+
+  int parent = this->GetParent(location_hint);
+  if (parent >= 0)
+    {
+    direction = this->GetSplitDirection(parent) == HORIZONTAL?
+      VERTICAL: HORIZONTAL;
+    }
+  int split_cell = this->GetSplittableCell(location_hint, direction);
+  assert(split_cell >= 0);
+
+  int new_cell = this->Split(split_cell, direction, 0.5);
+  if (this->GetView(new_cell) == NULL)
+    {
+    return this->AssignView(new_cell, view);
+    }
+
+  return this->AssignView(new_cell + 1, view);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::GetEmptyCell(int root)
+{
+  vtkInternals::Cell &cell = this->Internals->KDTree[root];
+  if (cell.Direction == NONE && cell.ViewProxy == NULL)
+    {
+    return root;
+    }
+  else if (cell.Direction == HORIZONTAL ||
+    cell.Direction == VERTICAL)
+    {
+    int child0 = 2*root + 1;
+    int empty_cell = this->GetEmptyCell(child0);
+    if (empty_cell >= 0)
+      {
+      return empty_cell;
+      }
+    int child1 = 2*root + 2;
+    empty_cell = this->GetEmptyCell(child1);
+    if (empty_cell >= 0)
+      {
+      return empty_cell;
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::GetSplittableCell(int root,
+  vtkSMViewLayoutProxy::Direction& suggested_direction)
+{
+  vtkInternals::Cell &cell = this->Internals->KDTree[root];
+  if (cell.Direction == NONE)
+    {
+    return root;
+    }
+  else if (cell.Direction == HORIZONTAL ||
+    cell.Direction == VERTICAL)
+    {
+    suggested_direction = cell.Direction == HORIZONTAL?
+      VERTICAL : HORIZONTAL;
+    int child0 = 2*root + 1;
+    return this->GetSplittableCell(child0, suggested_direction);
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
+{
+  int index = 0;
   for (vtkInternals::KDTreeType::iterator iter =
     this->Internals->KDTree.begin();
     iter != this->Internals->KDTree.end(); ++iter, ++index)
@@ -220,13 +326,13 @@ unsigned int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
       }
     }
 
-  return static_cast<unsigned int>(-1);
+  return -1;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::Collape(unsigned int location)
+bool vtkSMViewLayoutProxy::Collape(int location)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return false;
@@ -251,9 +357,8 @@ bool vtkSMViewLayoutProxy::Collape(unsigned int location)
     return true;
     }
 
-  unsigned int parent = (location -1) / 2;
-  unsigned int sibling = ((location % 2) == 0)?
-    (2*parent + 1) : (2*parent + 2);
+  int parent = (location - 1) / 2;
+  int sibling = ((location % 2) == 0)? (2*parent + 1) : (2*parent + 2);
 
   this->Internals->MoveSubtree(parent, sibling);
   this->Internals->Shrink();
@@ -261,9 +366,9 @@ bool vtkSMViewLayoutProxy::Collape(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::IsSplitCell(unsigned int location)
+bool vtkSMViewLayoutProxy::IsSplitCell(int location)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return false;
@@ -274,9 +379,10 @@ bool vtkSMViewLayoutProxy::IsSplitCell(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-vtkSMViewLayoutProxy::Direction vtkSMViewLayoutProxy::GetSplitDirection(unsigned int location)
+vtkSMViewLayoutProxy::Direction vtkSMViewLayoutProxy::GetSplitDirection(
+  int location)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return NONE;
@@ -286,9 +392,9 @@ vtkSMViewLayoutProxy::Direction vtkSMViewLayoutProxy::GetSplitDirection(unsigned
 }
 
 //----------------------------------------------------------------------------
-double vtkSMViewLayoutProxy::GetSplitFraction(unsigned int location)
+double vtkSMViewLayoutProxy::GetSplitFraction(int location)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return NONE;
@@ -298,9 +404,9 @@ double vtkSMViewLayoutProxy::GetSplitFraction(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMViewLayoutProxy::GetView(unsigned int location)
+vtkSMProxy* vtkSMViewLayoutProxy::GetView(int location)
 {
-  if (!this->Internals->IsCellValid(static_cast<size_t>(location)))
+  if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
     return false;
@@ -310,7 +416,7 @@ vtkSMProxy* vtkSMViewLayoutProxy::GetView(unsigned int location)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::SetSplitFraction(unsigned int location, double val)
+bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 {
   if (val < 0.0 || val > 1.0)
     {

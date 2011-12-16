@@ -99,7 +99,7 @@ protected:
   virtual bool eventFilter(QObject* caller, QEvent* evt);
 
 private:
-  QWidget* createWidget(unsigned int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
+  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget);

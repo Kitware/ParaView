@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqMultiViewFrame.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
 #include "pqView.h"
 #include "vtkSMViewLayoutProxy.h"
@@ -141,19 +142,16 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::assignToFrame(pqView* view)
 {
-  // FIXME: This should somehow let the ServerManager do the assignment.
-  if (this->Internals->EmptyFrames.size() > 0)
+  if (this->layoutManager() && view)
     {
-    QWidget* frame = (
-      this->Internals->EmptyFrames.contains(this->Internals->ActiveFrame))?
-      this->Internals->ActiveFrame :
-      this->Internals->EmptyFrames[0];
-    QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
-    if (index.isValid())
+    int active_index = 0;
+    if (this->Internals->ActiveFrame)
       {
-      this->layoutManager()->AssignView(index.toUInt(), view->getProxy());
-      this->reload();
+      active_index =
+        this->Internals->ActiveFrame->property("FRAME_INDEX").toInt();
       }
+    this->layoutManager()->AssignViewToAnyCell(view->getProxy(), active_index);
+    this->reload();
     }
   pqActiveObjects::instance().setActiveView(view);
 }
@@ -197,7 +195,7 @@ void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
     pqView* view = NULL;
     if (frame)
       {
-      unsigned int index = frame->property("FRAME_INDEX").toUInt();
+      int index = frame->property("FRAME_INDEX").toInt();
       view = getPQView(this->layoutManager()->GetView(index));
       }
     pqActiveObjects::instance().setActiveView(view);
@@ -252,7 +250,7 @@ pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::createWidget(
-  unsigned int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
+  int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
 {
   if (this->Internals->Widgets.size() <= static_cast<int>(index))
     {
@@ -387,11 +385,12 @@ void pqMultiViewWidget::splitVertical()
   QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
   if (index.isValid() && this->layoutManager())
     {
-    unsigned int new_index =
-      this->layoutManager()->SplitVertical(index.toUInt(), 0.5);
+    BEGIN_UNDO_SET("Split View");
+    int new_index = this->layoutManager()->SplitVertical(index.toInt(), 0.5);
     this->reload();
     this->makeActive(qobject_cast<pqMultiViewFrame*>(
         this->Internals->Widgets[new_index + 1]));
+    END_UNDO_SET();
     }
 }
 
@@ -402,11 +401,12 @@ void pqMultiViewWidget::splitHorizontal()
   QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
   if (index.isValid() && this->layoutManager())
     {
-    unsigned int new_index =
-      this->layoutManager()->SplitHorizontal(index.toUInt(), 0.5);
+    BEGIN_UNDO_SET("Split View");
+    int new_index = this->layoutManager()->SplitHorizontal(index.toInt(), 0.5);
     this->reload();
     this->makeActive(qobject_cast<pqMultiViewFrame*>(
         this->Internals->Widgets[new_index + 1]));
+    END_UNDO_SET();
     }
 }
 
@@ -417,7 +417,9 @@ void pqMultiViewWidget::close()
   QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
   if (index.isValid() && this->layoutManager())
     {
-    this->layoutManager()->Collape(index.toUInt());
+    BEGIN_UNDO_SET("Close View");
+    this->layoutManager()->Collape(index.toInt());
+    END_UNDO_SET();
     }
   this->reload();
 }
@@ -432,9 +434,11 @@ void pqMultiViewWidget::splitterMoved()
     QList<int> sizes = splitter->sizes();
     if (sizes.size() == 2)
       {
+      BEGIN_UNDO_SET("Resize Frame");
       double fraction = sizes[0] * 1.0 / (sizes[0] + sizes[1]);
-      this->layoutManager()->SetSplitFraction(index.toUInt(), fraction);
+      this->layoutManager()->SetSplitFraction(index.toInt(), fraction);
       this->reload();
+      END_UNDO_SET();
       }
     }
 }
