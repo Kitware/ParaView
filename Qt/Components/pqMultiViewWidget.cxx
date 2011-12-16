@@ -185,9 +185,25 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
+void pqMultiViewWidget::makeFrameActive()
+{
+  if (!this->Internals->ActiveFrame)
+    {
+    foreach (QWidget* wdg, this->Internals->Widgets)
+      {
+      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
+      if (frame)
+        {
+        this->makeActive(frame);
+        break;
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiViewWidget::markActive(pqView* view)
 {
-  bool prev = this->blockSignals(true);
    if (view &&
     this->Internals->ViewFrames.contains(view->getProxy()))
      {
@@ -197,8 +213,6 @@ void pqMultiViewWidget::markActive(pqView* view)
      {
      this->markActive(static_cast<pqMultiViewFrame*>(NULL));
      }
- 
-  this->blockSignals(prev);
 }
 
 //-----------------------------------------------------------------------------

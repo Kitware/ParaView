@@ -69,7 +69,7 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
 
   this->addTab(new QWidget(this), "+");
   QObject::connect(this, SIGNAL(currentChanged(int)),
-    this, SLOT(checkToAddTab(int)));
+    this, SLOT(currentTabChanged(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -158,9 +158,16 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::checkToAddTab(int index)
+void pqTabbedMultiViewWidget::currentTabChanged(int index)
 {
-  if (index == (this->count()-1) && index != 0)
+  if (index < (this->count()-1))
+    {
+    // make the first frame active.
+    pqMultiViewWidget* frame =
+      qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+    frame->makeFrameActive();
+    }
+  else if (index == (this->count()-1) && index != 0)
     {
     // index !=0 check keeps this widget from creating new tabs as the tabs are
     // being removed.

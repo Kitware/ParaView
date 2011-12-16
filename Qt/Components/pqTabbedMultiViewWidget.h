@@ -65,7 +65,7 @@ protected slots:
  
   /// called when the active tab changes. If the active tab is the "+" tab, then
   /// add a new tab to the widget.
-  void checkToAddTab(int);
+  void currentTabChanged(int);
 
 private:
   Q_DISABLE_COPY(pqTabbedMultiViewWidget);

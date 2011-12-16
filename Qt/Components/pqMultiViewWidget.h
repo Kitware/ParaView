@@ -69,6 +69,11 @@ public slots:
   /// longest dimension and place the view in the newly created child-frame.
   void assignToFrame(pqView*);
 
+  /// In a tabbed setup, when pqMultiViewWidget becomes active, this method
+  /// should be called to ensure that the first view/frame in this widget is
+  /// indeed made active, as the user would expect.
+  void makeFrameActive();
+
 protected slots:
   /// slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called
