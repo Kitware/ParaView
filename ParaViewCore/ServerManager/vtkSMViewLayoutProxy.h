@@ -15,8 +15,8 @@
 // .NAME vtkSMViewLayoutProxy - vtkSMViewLayoutProxy is used by ParaView to layout
 // multiple views in a 2D KD-Tree layout.
 // .SECTION Description
-// 
-
+// Every time the vtkSMViewLayoutProxy changes so that it would affect the UI,
+// this class fires vtkCommand::ConfigureEvent.
 #ifndef __vtkSMViewLayoutProxy_h
 #define __vtkSMViewLayoutProxy_h
 
@@ -77,7 +77,7 @@ public:
   // If the cell has a sibling, then that sibling is assigned to the parent
   // node and the sibling cell is destroyed as well. Returns true on success,
   // else false.
-  bool Collape(int location);
+  bool Collapse(int location);
 
   // Description:
   // Update the split fraction for a split cell. If IsSplitCell(location)
@@ -123,6 +123,17 @@ protected:
   ~vtkSMViewLayoutProxy();
 
   // Description:
+  // Called to load state from protobuf message.
+  virtual void LoadState(
+    const vtkSMMessage* message, vtkSMProxyLocator* locator);
+
+  // Description:
+  // Although this class is a proxy, it's not really a proxy in the traditional
+  // sense. So instead of using UpdateVTKObjects() to push state changes to the
+  // server (or undo-redo stack), this new method is provided.
+  virtual void UpdateState();
+
+  // Description:
   // Starting with the cell-index, tries to find an empty cell in the sub-tree.
   // Returns -1 if none found. May return \c root, if root is indeed an empty
   // cell. Note this assumes that root is valid.
@@ -138,6 +149,15 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  bool SetBlockUpdate(bool new_value)
+    {
+    bool temp = this->BlockUpdate;
+    this->BlockUpdate = new_value;
+    return temp;
+    }
+
+  bool BlockUpdate;
 //ETX
 };
 

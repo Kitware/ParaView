@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
 #include "pqView.h"
+#include "vtkCommand.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -59,9 +60,22 @@ public:
   // frame, we preserve that frame as long as possible.
   QMap<vtkSMProxy*, QPointer<pqMultiViewFrame> > ViewFrames;
 
-  QList<QPointer<pqMultiViewFrame> > EmptyFrames;
+  unsigned long ObserverId;
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
   QPointer<pqMultiViewFrame> ActiveFrame;
+
+  pqInternals() : ObserverId(0)
+    {
+
+    }
+
+  ~pqInternals()
+    {
+    if (this->LayoutManager && this->ObserverId)
+      {
+      this->LayoutManager->RemoveObserver(this->ObserverId);
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -104,8 +118,23 @@ pqMultiViewWidget::~pqMultiViewWidget()
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
 {
-  this->Internals->LayoutManager = vlayout;
-  this->reload();
+  if (this->Internals->LayoutManager != vlayout)
+    {
+    if (this->Internals->LayoutManager)
+      {
+      this->Internals->LayoutManager->RemoveObserver(
+        this->Internals->ObserverId);
+      }
+    this->Internals->ObserverId = 0;
+    this->Internals->LayoutManager = vlayout;
+    if (vlayout)
+      {
+      this->Internals->ObserverId =
+        vlayout->AddObserver(vtkCommand::ConfigureEvent,
+          this, &pqMultiViewWidget::reload);
+      }
+    this->reload();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +180,6 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
         this->Internals->ActiveFrame->property("FRAME_INDEX").toInt();
       }
     this->layoutManager()->AssignViewToAnyCell(view->getProxy(), active_index);
-    this->reload();
     }
   pqActiveObjects::instance().setActiveView(view);
 }
@@ -277,11 +305,6 @@ QWidget* pqMultiViewWidget::createWidget(
 
       frame->setParent(parentWdg);
       this->Internals->Widgets[index] = frame;
-      if (view == NULL)
-        {
-        this->Internals->EmptyFrames.push_back(frame);
-        }
-
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
       return frame;
@@ -333,7 +356,6 @@ QWidget* pqMultiViewWidget::createWidget(
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::reload()
 {
-  this->Internals->EmptyFrames.clear();
   vtkSMViewLayoutProxy* vlayout = this->layoutManager();
   if (!vlayout)
     {
@@ -387,7 +409,6 @@ void pqMultiViewWidget::splitVertical()
     {
     BEGIN_UNDO_SET("Split View");
     int new_index = this->layoutManager()->SplitVertical(index.toInt(), 0.5);
-    this->reload();
     this->makeActive(qobject_cast<pqMultiViewFrame*>(
         this->Internals->Widgets[new_index + 1]));
     END_UNDO_SET();
@@ -403,7 +424,6 @@ void pqMultiViewWidget::splitHorizontal()
     {
     BEGIN_UNDO_SET("Split View");
     int new_index = this->layoutManager()->SplitHorizontal(index.toInt(), 0.5);
-    this->reload();
     this->makeActive(qobject_cast<pqMultiViewFrame*>(
         this->Internals->Widgets[new_index + 1]));
     END_UNDO_SET();
@@ -418,10 +438,9 @@ void pqMultiViewWidget::close()
   if (index.isValid() && this->layoutManager())
     {
     BEGIN_UNDO_SET("Close View");
-    this->layoutManager()->Collape(index.toInt());
+    this->layoutManager()->Collapse(index.toInt());
     END_UNDO_SET();
     }
-  this->reload();
 }
 
 //-----------------------------------------------------------------------------
@@ -437,7 +456,6 @@ void pqMultiViewWidget::splitterMoved()
       BEGIN_UNDO_SET("Resize Frame");
       double fraction = sizes[0] * 1.0 / (sizes[0] + sizes[1]);
       this->layoutManager()->SetSplitFraction(index.toInt(), fraction);
-      this->reload();
       END_UNDO_SET();
       }
     }

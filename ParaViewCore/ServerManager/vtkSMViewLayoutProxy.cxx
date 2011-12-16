@@ -14,8 +14,13 @@
 =========================================================================*/
 #include "vtkSMViewLayoutProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 
 #include <vector>
@@ -115,7 +120,8 @@ private:
 vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
-  Internals(new vtkInternals())
+  Internals(new vtkInternals()),
+  BlockUpdate(false)
 {
   // Push the root element.
   this->Internals->KDTree.resize(1);
@@ -126,6 +132,99 @@ vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::LoadState(
+  const vtkSMMessage* message, vtkSMProxyLocator* locator)
+{
+  this->Superclass::LoadState(message, locator);
+
+  if (message->ExtensionSize(ProxyState::user_data) != 1)
+    {
+    // vtkWarningMacro("Missing ViewLayoutState");
+    return;
+    }
+
+  const ProxyState_UserData& user_data =
+    message->GetExtension(ProxyState::user_data, 0);
+  if (user_data.key() != "ViewLayoutState")
+    {
+    //vtkWarningMacro("Unexpected user_data. Expecting ViewLayoutState.");
+    return;
+    }
+
+  this->Internals->KDTree.clear();
+  this->Internals->KDTree.resize(user_data.variant_size());
+
+  for (int cc=0; cc < user_data.variant_size(); cc++)
+    {
+    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+    const Variant& value = user_data.variant(cc);
+
+    cell.SplitFraction = value.float64(0);
+
+    switch (value.integer(0))
+      {
+    case HORIZONTAL:
+      cell.Direction = HORIZONTAL;
+      break;
+
+    case VERTICAL:
+      cell.Direction = VERTICAL;
+      break;
+
+    case NONE:
+    default:
+      cell.Direction = NONE;
+      }
+
+    if (locator && vtkSMProxyProperty::CanCreateProxy())
+      {
+      cell.ViewProxy = locator->LocateProxy(value.proxy_global_id(0));
+      }
+    else
+      {
+      cell.ViewProxy = vtkSMProxy::SafeDownCast(
+        this->GetSession()->GetRemoteObject(value.proxy_global_id(0)));
+      }
+    }
+
+  // let the world know that the layout has been reconfigured.
+  this->InvokeEvent(vtkCommand::ConfigureEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::UpdateState()
+{
+  if (this->BlockUpdate)
+    {
+    return;
+    }
+
+  // ensure that the state is created correctly.
+  this->CreateVTKObjects();
+
+  // push current state.
+  this->State->ClearExtension(ProxyState::user_data);
+
+  ProxyState_UserData* user_data =
+    this->State->AddExtension(ProxyState::user_data);
+  user_data->set_key("ViewLayoutState");
+
+  for (size_t cc=0; cc < this->Internals->KDTree.size(); cc++)
+    {
+    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+
+    Variant* variant = user_data->add_variant();
+    variant->set_type(Variant::INT); // type is just arbitrary here.
+    variant->add_integer(cell.Direction);
+    variant->add_float64(cell.SplitFraction);
+    variant->add_proxy_global_id(
+      cell.ViewProxy? cell.ViewProxy->GetGlobalID() : 0);
+    }
+  this->PushState(this->State);
+  this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -176,6 +275,7 @@ int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
     cell.ViewProxy = NULL;
     }
   this->Internals->KDTree[location] = cell;
+  this->UpdateState();
   return child_location;
 }
 
@@ -202,7 +302,12 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
     return false;
     }
 
-  cell.ViewProxy = view;
+  if (cell.ViewProxy != view)
+    {
+    cell.ViewProxy = view;
+    this->UpdateState();
+    }
+
   return true;
 }
 
@@ -255,13 +360,85 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
   int split_cell = this->GetSplittableCell(location_hint, direction);
   assert(split_cell >= 0);
 
+  bool prev = this->SetBlockUpdate(true);
   int new_cell = this->Split(split_cell, direction, 0.5);
+  this->SetBlockUpdate(prev);
+
   if (this->GetView(new_cell) == NULL)
     {
     return this->AssignView(new_cell, view);
     }
 
   return this->AssignView(new_cell + 1, view);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
+{
+  int index = 0;
+  for (vtkInternals::KDTreeType::iterator iter =
+    this->Internals->KDTree.begin();
+    iter != this->Internals->KDTree.end(); ++iter, ++index)
+    {
+    if (iter->ViewProxy == view)
+      {
+      iter->ViewProxy = NULL;
+      this->UpdateState();
+      return index;
+      }
+    }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::Collapse(int location)
+{
+  if (!this->Internals->IsCellValid(location))
+    {
+    vtkErrorMacro("Invalid location '" << location << "' specified.");
+    return false;
+    }
+
+  vtkInternals::Cell &cell = this->Internals->KDTree[location];
+  if (cell.Direction != NONE)
+    {
+    vtkErrorMacro("Only leaf cells can be collapsed.");
+    return false;
+    }
+  
+  if (cell.ViewProxy != NULL)
+    {
+    vtkErrorMacro("Only empty cells can be collapsed.");
+    return false;
+    }
+
+  if (location == 0)
+    {
+    // sure, trying to collapse the root node...whatever!!!
+    return true;
+    }
+
+  int parent = (location - 1) / 2;
+  int sibling = ((location % 2) == 0)? (2*parent + 1) : (2*parent + 2);
+
+  this->Internals->MoveSubtree(parent, sibling);
+  this->Internals->Shrink();
+  this->UpdateState();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::IsSplitCell(int location)
+{
+  if (!this->Internals->IsCellValid(location))
+    {
+    vtkErrorMacro("Invalid location '" << location << "' specified.");
+    return false;
+    }
+
+  const vtkInternals::Cell &cell = this->Internals->KDTree[location];
+  return (cell.Direction != NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -309,73 +486,6 @@ int vtkSMViewLayoutProxy::GetSplittableCell(int root,
     return this->GetSplittableCell(child0, suggested_direction);
     }
   return -1;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
-{
-  int index = 0;
-  for (vtkInternals::KDTreeType::iterator iter =
-    this->Internals->KDTree.begin();
-    iter != this->Internals->KDTree.end(); ++iter, ++index)
-    {
-    if (iter->ViewProxy == view)
-      {
-      iter->ViewProxy = NULL;
-      return index;
-      }
-    }
-
-  return -1;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::Collape(int location)
-{
-  if (!this->Internals->IsCellValid(location))
-    {
-    vtkErrorMacro("Invalid location '" << location << "' specified.");
-    return false;
-    }
-
-  vtkInternals::Cell &cell = this->Internals->KDTree[location];
-  if (cell.Direction != NONE)
-    {
-    vtkErrorMacro("Only leaf cells can be collapsed.");
-    return false;
-    }
-  
-  if (cell.ViewProxy != NULL)
-    {
-    vtkErrorMacro("Only empty cells can be collapsed.");
-    return false;
-    }
-
-  if (location == 0)
-    {
-    // sure, trying to collapse the root node...whatever!!!
-    return true;
-    }
-
-  int parent = (location - 1) / 2;
-  int sibling = ((location % 2) == 0)? (2*parent + 1) : (2*parent + 2);
-
-  this->Internals->MoveSubtree(parent, sibling);
-  this->Internals->Shrink();
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::IsSplitCell(int location)
-{
-  if (!this->Internals->IsCellValid(location))
-    {
-    vtkErrorMacro("Invalid location '" << location << "' specified.");
-    return false;
-    }
-
-  const vtkInternals::Cell &cell = this->Internals->KDTree[location];
-  return (cell.Direction != NONE);
 }
 
 //----------------------------------------------------------------------------
@@ -430,7 +540,12 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
     return false;
     }
 
-  this->Internals->KDTree[location].SplitFraction = val;
+  if (this->Internals->KDTree[location].SplitFraction != val)
+    {
+    this->Internals->KDTree[location].SplitFraction = val;
+    this->UpdateState();
+    }
+
   return true;
 }
 
