@@ -32,12 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewFrameActionGroup.h"
 #include "ui_pqEmptyView.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCameraUndoRedoReaction.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqMultiViewFrame.h"
+#include "pqObjectBuilder.h"
 #include "pqRenderView.h"
+#include "pqUndoStack.h"
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
 
@@ -164,8 +167,12 @@ void pqStandardViewFrameActionGroup::aboutToShowConvertMenu()
       iter != views.end(); ++iter)
       {
       QAction* view_action = new QAction(iter.value(), menu);
-      view_action->setData(iter.key());
+      view_action->setProperty("PV_VIEW_TYPE", iter.key());
+      view_action->setProperty("PV_VIEW_LABEL", iter.value());
+      view_action->setProperty("PV_COMMAND", "Convert To");
       menu->addAction(view_action);
+      QObject::connect(view_action, SIGNAL(triggered()),
+        this, SLOT(invoked()), Qt::QueuedConnection);
       }
     }
 }
@@ -182,7 +189,47 @@ void pqStandardViewFrameActionGroup::setupEmptyFrame(QWidget* frame)
     {
     QPushButton* button = new QPushButton(iter.value(), ui.ConvertActionsFrame);
     button->setObjectName(iter.value());
-    button->setProperty("pqStandardViewFrameActionGroup_VIEW_TYPE", iter.key());
+    button->setProperty("PV_VIEW_TYPE", iter.key());
+    button->setProperty("PV_VIEW_LABEL", iter.value());
+    button->setProperty("PV_COMMAND", "Create");
+
+    QObject::connect(button, SIGNAL(clicked()),
+      this, SLOT(invoked()), Qt::QueuedConnection);
     ui.ConvertActionsFrame->layout()->addWidget(button);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::invoked()
+{
+  QObject* osender = this->sender();
+  if (!osender)
+    {
+    return;
+    }
+
+  // either create a new view, or convert the existing one.
+  // This slot is called either from an action in the "Convert To" menu, or from
+  // the buttons on an empty frame.
+  QString type = osender->property("PV_VIEW_TYPE").toString();
+  QString label = osender->property("PV_VIEW_LABEL").toString();
+  QString command = osender->property("PV_COMMAND").toString();
+
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()-> getObjectBuilder();
+
+  BEGIN_UNDO_SET(QString("%1 %2").arg(command).arg(label));
+
+  // destroy active-view, if present (implying convert was called).
+  if (pqActiveObjects::instance().activeView())
+    {
+    builder->destroy(pqActiveObjects::instance().activeView());
+    }
+
+  if (type != "None")
+    {
+    builder->createView(type, pqActiveObjects::instance().activeServer());
+    }
+
+  END_UNDO_SET();
 }
