@@ -57,6 +57,9 @@ public:
   void setLayoutManager(vtkSMViewLayoutProxy*);
   vtkSMViewLayoutProxy* layoutManager() const;
 
+signals:
+  void activeChanged(pqView*);
+
 public slots:
   /// this forces the pqMultiViewWidget to reload its layout from the
   /// vtkSMViewLayoutProxy instance. One does not need to call this method

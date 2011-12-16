@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqMultiViewWidget.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqInterfaceTracker.h"
 #include "pqMultiViewFrame.h"
@@ -63,6 +64,21 @@ public:
 };
 
 //-----------------------------------------------------------------------------
+namespace
+{
+  pqView* getPQView(vtkSMProxy* view)
+    {
+    if (view)
+      {
+      pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+      return smmodel->findItem<pqView*>(view);
+      }
+    return NULL;
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
   Internals( new pqInternals())
@@ -72,6 +88,9 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
   this->setLayout(vbox);
 
   qApp->installEventFilter(this);
+
+  QObject::connect(this, SIGNAL(activeChanged(pqView*)),
+    &pqActiveObjects::instance(), SLOT(setActiveView(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +171,15 @@ void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
       {
       frame->setActive(true);
       }
+
+    /// trigger signal that some view became active.
+    pqView* view = NULL;
+    if (frame)
+      {
+      unsigned int index = frame->property("FRAME_INDEX").toUInt();
+      view = getPQView(this->layoutManager()->GetView(index));
+      }
+    emit this->activeChanged(view);
     }
 }
 
@@ -195,21 +223,6 @@ pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
     }
 
   return frame;
-}
-
-//-----------------------------------------------------------------------------
-namespace
-{
-  pqView* getPQView(vtkSMProxy* view)
-    {
-    if (view)
-      {
-      pqServerManagerModel* smmodel =
-        pqApplicationCore::instance()->getServerManagerModel();
-      return smmodel->findItem<pqView*>(view);
-      }
-    return NULL;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -304,7 +317,6 @@ void pqMultiViewWidget::reload()
     return;
     }
 
-
   QWidget *cleaner = new QWidget();
   foreach (QWidget* widget, this->Internals->Widgets)
     {
@@ -313,9 +325,7 @@ void pqMultiViewWidget::reload()
       widget->setParent(cleaner);
       }
     }
-
   QWidget* child = this->createWidget(0, vlayout, this);
-
   delete cleaner;
   cleaner = NULL;
 
@@ -325,17 +335,18 @@ void pqMultiViewWidget::reload()
   vbox->addWidget(child);
   this->setLayout(vbox);
 
-  if (!this->Internals->ActiveFrame)
+  bool prev = this->blockSignals(true);
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  if (activeView &&
+    this->Internals->ViewFrames.contains(activeView->getProxy()))
     {
-    foreach (QWidget* wdg, this->Internals->Widgets)
-      {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
-      if (frame)
-        {
-        this->makeActive(frame);
-        }
-      }
+    this->makeActive(this->Internals->ViewFrames[activeView->getProxy()]);
     }
+  else
+    {
+    this->makeActive(NULL);
+    }
+  this->blockSignals(prev);
 
   // Cleanup deleted objects. "cleaner" helps us avoid any dangling widgets and
   // deletes them whwn delete cleaner is called. Now we prune internal
@@ -352,7 +363,6 @@ void pqMultiViewWidget::reload()
       iter.remove();
       }
     }
-
 }
 
 //-----------------------------------------------------------------------------
