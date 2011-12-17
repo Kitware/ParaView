@@ -139,6 +139,18 @@ public:
   // Updates positions for all views using the layout and current sizes.
   void UpdateViewPositions();
 
+  // Description:
+  // Overridden to save custom XML state.
+  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
+    { return this->Superclass::SaveXMLState(root); }
+  virtual vtkPVXMLElement* SaveXMLState(
+    vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
+
+  // Description:
+  // Overridden to load custom XML state.
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
+
 //BTX
 protected:
   vtkSMViewLayoutProxy();

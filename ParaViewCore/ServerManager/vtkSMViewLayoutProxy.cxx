@@ -16,6 +16,7 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -84,7 +85,7 @@ public:
       {
       return;
       }
-      
+
     Cell source_cell = this->KDTree[source];
     this->MoveSubtree(2*destination+1, 2*source+1);
     this->MoveSubtree(2*destination+2, 2*source+2);
@@ -305,6 +306,105 @@ void vtkSMViewLayoutProxy::UpdateState()
   this->InvokeEvent(vtkCommand::ConfigureEvent);
 
   this->UpdateViewPositions();
+}
+
+//----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMViewLayoutProxy::SaveXMLState(
+  vtkPVXMLElement* root, vtkSMPropertyIterator* iter)
+{
+  vtkPVXMLElement* element = this->Superclass::SaveXMLState(root, iter);
+  if (!element)
+    {
+    return NULL;
+    }
+
+  vtkPVXMLElement* layout = vtkPVXMLElement::New();
+  layout->SetName("Layout");
+  layout->AddAttribute("number_of_elements",
+    static_cast<int>(this->Internals->KDTree.size()));
+  element->AddNestedElement(layout);
+  layout->Delete();
+
+  for (size_t cc=0; cc < this->Internals->KDTree.size(); cc++)
+    {
+    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+
+    vtkPVXMLElement* item = vtkPVXMLElement::New();
+    item->SetName("Item");
+    item->AddAttribute("direction", static_cast<int>(cell.Direction));
+    item->AddAttribute("fraction", cell.SplitFraction);
+    item->AddAttribute("view", (cell.ViewProxy?
+      static_cast<unsigned int>(cell.ViewProxy->GetGlobalID()) : 0));
+    layout->AddNestedElement(item);
+    item->Delete();
+    }
+
+  return element;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::LoadXMLState(
+  vtkPVXMLElement* element, vtkSMProxyLocator* locator)
+{
+  if (!this->Superclass::LoadXMLState(element, locator))
+    {
+    return 0;
+    }
+
+  if (!locator)
+    {
+    return 1;
+    }
+
+  vtkPVXMLElement* layout = element->FindNestedElementByName("Layout");
+  int number_of_elements = 0;
+  if (!layout->GetScalarAttribute("number_of_elements", &number_of_elements) ||
+    (number_of_elements <= 0))
+    {
+    vtkErrorMacro("Missing (or invalid) 'number_of_elements' attribute.");
+    return 0;
+    }
+
+  if (static_cast<int>(layout->GetNumberOfNestedElements()) != number_of_elements)
+    {
+    vtkErrorMacro("Mismatch in number_of_elements and nested elements.");
+    return 0;
+    }
+
+  this->Internals->KDTree.clear();
+  this->Internals->KDTree.resize(number_of_elements);
+  for (unsigned int cc = 0; cc < layout->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* item = layout->GetNestedElement(cc);
+    if (item == NULL || item->GetName() == NULL ||
+      strcmp(item->GetName(), "Item") != 0)
+      {
+      vtkErrorMacro("Invalid nested element at index : " << cc);
+      return 0;
+      }
+    int direction, viewid;
+    double fraction;
+    if (!item->GetScalarAttribute("direction", &direction) ||
+      !item->GetScalarAttribute("fraction", &fraction) ||
+      !item->GetScalarAttribute("view", &viewid))
+      {
+      vtkErrorMacro("Invalid nested element at index : " << cc);
+      return 0;
+      }
+    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+    cell.Direction = ((direction == NONE)? NONE : (
+        (direction == HORIZONTAL)? HORIZONTAL : VERTICAL));
+    cell.SplitFraction = fraction;
+    if (viewid)
+      {
+      cell.ViewProxy = locator->LocateProxy(viewid);
+      }
+    else
+      {
+      cell.ViewProxy = NULL;
+      }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -610,7 +710,7 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 {
   if (val < 0.0 || val > 1.0)
     {
-    vtkErrorMacro("Invalid fraction : " << val 
+    vtkErrorMacro("Invalid fraction : " << val
       << ". Must be in the range [0, 1]");
     return 0;
     }
