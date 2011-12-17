@@ -14,9 +14,27 @@
 =========================================================================*/
 // .NAME vtkSMViewLayoutProxy - vtkSMViewLayoutProxy is used by ParaView to layout
 // multiple views in a 2D KD-Tree layout.
+//
 // .SECTION Description
+// vtkSMViewLayoutProxy is used by ParaView to layout multiple views in a 2D
+// KD-Tree layout. This is proxy, hence can be registered with the proxy manager
+// just like other regular proxies; participates in xml state saving/restoring,
+// undo-redo, etc. Users can affects the GUI layout using this proxy instance
+// from Python as well.
+//
 // Every time the vtkSMViewLayoutProxy changes so that it would affect the UI,
 // this class fires vtkCommand::ConfigureEvent.
+//
+// View proxies that are to laid out in an layout should be "assigned" to a
+// particular cell in a vtkSMViewLayoutProxy instance. vtkSMViewLayoutProxy
+// takes over the responsibility of updating the view's \c Position property
+// correctly. Application must call UpdateViewPositions() method every time the
+// positions may have changed i.e. the view sizes could have changed.
+//
+// Although, currently, there are no safe guards against assigning a view to
+// more than one layout, this is strictly prohibited and can cause unexpected
+// problems at run-time.
+
 #ifndef __vtkSMViewLayoutProxy_h
 #define __vtkSMViewLayoutProxy_h
 
@@ -116,6 +134,10 @@ public:
   // Description:
   // Returns the view, if any, assigned to the given cell location.
   vtkSMProxy* GetView(int location);
+
+  // Description:
+  // Updates positions for all views using the layout and current sizes.
+  void UpdateViewPositions();
 
 //BTX
 protected:

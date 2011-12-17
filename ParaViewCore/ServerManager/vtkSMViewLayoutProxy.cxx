@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
@@ -97,6 +98,44 @@ public:
     this->KDTree.resize(max_index + 1);
     }
 
+  void UpdateViewPositions(int root=0, int posx=0, int posy=0)
+    {
+    if (root == 0)
+      {
+      this->Sizes.resize(this->KDTree.size() * 2);
+      this->ComputeSizes();
+      }
+
+    const Cell& cell = this->KDTree[root];
+    if (cell.Direction == vtkSMViewLayoutProxy::NONE)
+      {
+      if (cell.ViewProxy)
+        {
+        int pos[2] = { posx, posy };
+        vtkSMPropertyHelper(cell.ViewProxy, "ViewPosition").Set(pos, 2);
+        cell.ViewProxy->UpdateProperty("ViewPosition");
+        }
+      //cout << "View Position: " << cell.ViewProxy  << " = "
+      //  << posx << "," << posy << endl;
+      }
+    else
+      {
+      // root is a split-cell. Determine sizes for the two children.
+      const int *size = &this->Sizes[2* (2*root+1)];
+
+      if (cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL)
+        {
+        this->UpdateViewPositions(2*root+1, posx, posy);
+        this->UpdateViewPositions(2*root+2, posx + size[0], posy);
+        }
+      else // cell.Direction == VERTICAL
+        {
+        this->UpdateViewPositions(2*root+1, posx, posy);
+        this->UpdateViewPositions(2*root+2, posx, posy + size[1]);
+        }
+      }
+    }
+
   typedef std::vector<Cell> KDTreeType;
   KDTreeType KDTree;
 
@@ -114,6 +153,44 @@ private:
       return this->GetMaxChildIndex(child0);
       }
     return parent;
+    }
+
+  // temporary vector uses by ComputeSizes() and allocated by
+  // UpdateViewPositions().
+  std::vector<int> Sizes;
+
+  const int *ComputeSizes(int root=0)
+    {
+    assert(2*root+1 < static_cast<int>(this->Sizes.size()));
+
+    const Cell& cell = this->KDTree[root];
+    if (cell.Direction == vtkSMViewLayoutProxy::NONE)
+      {
+      int size[2] = {0, 0};
+      if (cell.ViewProxy)
+        {
+        vtkSMPropertyHelper(cell.ViewProxy, "ViewSize").Get(size, 2);
+        }
+      this->Sizes[2*root] = size[0];
+      this->Sizes[2*root + 1] = size[1];
+      return &this->Sizes[2*root];
+      }
+
+    const int *size0 = this->ComputeSizes(2*root+1);
+    const int *size1 = this->ComputeSizes(2*root+2);
+
+    // now double the width (or height) based on the split direction.
+    if (cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL)
+      {
+      this->Sizes[2*root] = size0[0] + size1[0];
+      this->Sizes[2*root + 1] = std::max(size0[1], size1[1]);
+      }
+    else
+      {
+      this->Sizes[2*root] = std::max(size0[0], size1[0]);
+      this->Sizes[2*root + 1] = size0[1] + size1[1];
+      }
+    return &this->Sizes[2*root];
     }
 };
 
@@ -223,8 +300,11 @@ void vtkSMViewLayoutProxy::UpdateState()
     variant->add_proxy_global_id(
       cell.ViewProxy? cell.ViewProxy->GetGlobalID() : 0);
     }
+
   this->PushState(this->State);
   this->InvokeEvent(vtkCommand::ConfigureEvent);
+
+  this->UpdateViewPositions();
 }
 
 //----------------------------------------------------------------------------
@@ -547,6 +627,12 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
     }
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::UpdateViewPositions()
+{
+  this->Internals->UpdateViewPositions();
 }
 
 //----------------------------------------------------------------------------

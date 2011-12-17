@@ -92,6 +92,8 @@ protected slots:
   void markActive(pqView* view);
   void markActive(pqMultiViewFrame* frame);
 
+  void updateViewPositions();
+
 protected:
   /// called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
@@ -102,7 +104,7 @@ protected:
   /// event filter callback to detect when a sub-frame becomes active, so that
   /// we can mark it as such.
   virtual bool eventFilter(QObject* caller, QEvent* evt);
-
+  
 private:
   QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
 
