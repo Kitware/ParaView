@@ -92,8 +92,6 @@ protected slots:
   void markActive(pqView* view);
   void markActive(pqMultiViewFrame* frame);
 
-  void updateViewPositions();
-
 protected:
   /// called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller

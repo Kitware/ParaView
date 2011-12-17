@@ -15,6 +15,7 @@
 #include "vtkSMViewLayoutProxy.h"
 
 #include "vtkCommand.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
@@ -139,6 +140,7 @@ public:
 
   typedef std::vector<Cell> KDTreeType;
   KDTreeType KDTree;
+  vtkCommand* Observer;
 
 private:
   size_t GetMaxChildIndex(size_t parent)
@@ -201,6 +203,9 @@ vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
   Internals(new vtkInternals()),
   BlockUpdate(false)
 {
+  this->Internals->Observer = vtkMakeMemberFunctionCommand(
+    *this, &vtkSMViewLayoutProxy::UpdateViewPositions);
+
   // Push the root element.
   this->Internals->KDTree.resize(1);
 }
@@ -208,6 +213,10 @@ vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
 {
+  vtkMemberFunctionCommand<vtkSMViewLayoutProxy>::SafeDownCast(
+    this->Internals->Observer)->Reset();
+  this->Internals->Observer->Delete();
+  this->Internals->Observer = NULL;
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -292,7 +301,7 @@ void vtkSMViewLayoutProxy::UpdateState()
 
   for (size_t cc=0; cc < this->Internals->KDTree.size(); cc++)
     {
-    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+    const vtkInternals::Cell &cell = this->Internals->KDTree[cc];
 
     Variant* variant = user_data->add_variant();
     variant->set_type(Variant::INT); // type is just arbitrary here.
@@ -327,7 +336,7 @@ vtkPVXMLElement* vtkSMViewLayoutProxy::SaveXMLState(
 
   for (size_t cc=0; cc < this->Internals->KDTree.size(); cc++)
     {
-    vtkInternals::Cell &cell = this->Internals->KDTree[cc];
+    const vtkInternals::Cell &cell = this->Internals->KDTree[cc];
 
     vtkPVXMLElement* item = vtkPVXMLElement::New();
     item->SetName("Item");
@@ -462,6 +471,12 @@ int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
 //----------------------------------------------------------------------------
 bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
 {
+  if (view == NULL)
+    {
+    vtkErrorMacro("View cannot be NULL.");
+    return false;
+    }
+
   if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
@@ -482,12 +497,22 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
     return false;
     }
 
-  if (cell.ViewProxy != view)
+  if (cell.ViewProxy == view)
     {
-    cell.ViewProxy = view;
-    this->UpdateState();
+    // nothing to do.
+    return true;
     }
 
+  cell.ViewProxy = view;
+
+  if (view->GetProperty("ViewSize"))
+    {
+    // every time view-size changes, we update the view positions for all views.
+    view->GetProperty("ViewSize")->AddObserver(
+      vtkCommand::ModifiedEvent, this->Internals->Observer);
+    }
+
+  this->UpdateState();
   return true;
 }
 
@@ -562,6 +587,11 @@ int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
     {
     if (iter->ViewProxy == view)
       {
+      if (iter->ViewProxy->GetProperty("ViewSize"))
+        {
+        iter->ViewProxy->GetProperty("ViewSize")->RemoveObserver(
+          this->Internals->Observer);
+        }
       iter->ViewProxy = NULL;
       this->UpdateState();
       return index;

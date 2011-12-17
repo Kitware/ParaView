@@ -28,8 +28,7 @@
 // View proxies that are to laid out in an layout should be "assigned" to a
 // particular cell in a vtkSMViewLayoutProxy instance. vtkSMViewLayoutProxy
 // takes over the responsibility of updating the view's \c Position property
-// correctly. Application must call UpdateViewPositions() method every time the
-// positions may have changed i.e. the view sizes could have changed.
+// correctly. 
 //
 // Although, currently, there are no safe guards against assigning a view to
 // more than one layout, this is strictly prohibited and can cause unexpected
@@ -137,6 +136,8 @@ public:
 
   // Description:
   // Updates positions for all views using the layout and current sizes.
+  // This method is called automatically when the layout changes or the
+  // "ViewSize" property on the assigned views changes.
   void UpdateViewPositions();
 
   // Description:
@@ -149,7 +150,6 @@ public:
   // Description:
   // Overridden to load custom XML state.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
 
 //BTX
 protected:

@@ -181,15 +181,6 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
         this->Internals->ActiveFrame->property("FRAME_INDEX").toInt();
       }
     this->layoutManager()->AssignViewToAnyCell(view->getProxy(), active_index);
-
-    if (view)
-      {
-      // FIXME: need to remove observer when pqMultiViewWidget is deleted.
-      view->getProxy()->GetProperty("ViewSize")->AddObserver(
-        vtkCommand::ModifiedEvent,
-        this, &pqMultiViewWidget::updateViewPositions);
-      }
-
     }
   pqActiveObjects::instance().setActiveView(view);
 }
@@ -482,14 +473,5 @@ void pqMultiViewWidget::splitterMoved()
       this->layoutManager()->SetSplitFraction(index.toInt(), fraction);
       END_UNDO_SET();
       }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::updateViewPositions()
-{
-  if (this->layoutManager())
-    {
-    this->layoutManager()->UpdateViewPositions();
     }
 }
