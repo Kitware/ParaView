@@ -775,7 +775,12 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
     this->UnMarkProxyAsModified(info.Proxy);
 
     // Push state for undo/redo
-    this->TriggerStateUpdate();
+    if(!proxy->IsPrototype())
+      {
+      // Prototypes are not part of the state, so we only push the state when
+      // it is worth...
+      this->TriggerStateUpdate();
+      }
     }
 }
 
@@ -826,7 +831,7 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     }
 
   // Push new state only if changed occured
-  if(tuplesToRemove.size() > 0)
+  if(tuplesToRemove.size() > 0 && !proxy->IsPrototype())
     {
     this->TriggerStateUpdate();
     }

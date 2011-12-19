@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqQVTKWidget.h"
 #include "pqContextView.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -151,6 +152,11 @@ public:
         // Update the client id for mouse pointer
         this->LastMousePointerPosition.set_client_id(
             this->CollaborationManager->GetUserId());
+
+        this->VTKConnect->Connect( this->CollaborationManager.GetPointer(),
+                                   vtkSMCollaborationManager::CameraChanged,
+                                   pqApplicationCore::instance(),
+                                   SLOT(render()));
         }
       }
     }
@@ -177,6 +183,7 @@ public:
   bool MousePointerLocationUpdated;
   bool BroadcastMouseLocation;
   vtkstd::map<vtkTypeUInt32, ChartBounds> ContextViewBoundsToShare;
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
 
 protected:
   QPointer<pqServer> Server;
