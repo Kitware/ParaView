@@ -542,6 +542,21 @@ void vtkSMSourceProxy::CreateSelectionProxies()
   for (int j=0; j<numOutputs; j++)
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;
+    // If the selection proxy has been created previously on the server,
+    // lets register it...
+    // This happen in collaboration mode when the SelectionProxy
+    // became alive because of the SelectionRepresentation before the
+    // CreateSelectionProxies() get called on the original source proxy...
+    if( esProxy =
+        vtkSMSourceProxy::SafeDownCast(
+          this->Session->GetRemoteObject(this->GetGlobalID()+j+1)))
+      {
+      esProxy->DisableSelectionProxies = true;
+      this->PInternals->SelectionProxies[j] = esProxy;
+      continue;
+      }
+
+    // Otherwise create it properly
     esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
         pxm->NewProxy("filters", "PVExtractSelection")));
     if (esProxy)
