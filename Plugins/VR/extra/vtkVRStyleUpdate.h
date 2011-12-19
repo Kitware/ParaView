@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRActiveObjectManipulationStyle.h
+   Module:    vtkVRStyleUpdate.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRActiveObjectManipulationStyle_h_
-#define __vtkVRActiveObjectManipulationStyle_h_
+#ifndef __vtkVRStyleUpdate_h_
+#define __vtkVRStyleUpdate_h_
 
-#include "vtkVRInteractorStyle.h"
+#include "vtkVRStyleTracking.h"
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
+class vtkTransform;
 struct vtkVREventData;
 
-class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
+class vtkVRStyleUpdate : public vtkVRStyleTracking
 {
   Q_OBJECT
-  typedef vtkVRInteractorStyle Superclass;
+  typedef vtkVRStyleTracking Superclass;
 public:
-  vtkVRActiveObjectManipulationStyle(QObject* parent);
-  ~vtkVRActiveObjectManipulationStyle();
-  virtual bool handleEvent(const vtkVREventData& data);
-  virtual bool update();
+  vtkVRStyleUpdate(QObject* parent);
+  ~vtkVRStyleUpdate();
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* saveConfiguration() const;
 
 protected:
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
-
+  virtual void HandleButton( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
+  virtual bool GetProxyNProperty();
+  virtual void GetProperty() {}
 protected:
+  vtkSMProxy *Proxy;
+  vtkSMDoubleVectorProperty *Property;
+  std::string ProxyName;
+  std::string PropertyName;
+  bool IsFoundProxyProperty;
+  std::string Button;
+  bool Enabled;
+  bool IsInitialRecorded;
+  vtkTransform *InitialInvertedPose;
 };
 
-#endif //__vtkVRActiveObjectManipulationStyle.h_
+#endif //__vtkVRStyleUpdate.h_

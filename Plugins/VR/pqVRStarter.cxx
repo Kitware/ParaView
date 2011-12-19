@@ -30,26 +30,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqVRStarter.h"
-
-// Server Manager Includes.
-
-// Qt Includes.
 #include <QtDebug>
 #include <QTimer>
-// ParaView Includes.
 #include "vtkVRPNConnection.h"
 #include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
-#include "vtkVRGenericStyle.h"
-#include "vtkVRHeadTrackingStyle.h"
-#include "vtkVRActiveObjectManipulationStyle.h"
 #include "vtkVRQueue.h"
 #include "vtkVRQueueHandler.h"
-#include "vtkVRVectorPropertyStyle.h"
 #include "pqApplicationCore.h"
 #include "vtkVRConnectionManager.h"
 
+//-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
 {
 public:
@@ -80,12 +71,9 @@ void pqVRStarter::onStartup()
   this->Internals->EventQueue = new vtkVRQueue(this);
   this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
   this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
-
-  //qWarning() << "Message from pqVRStarter: Application Started";
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions *options = (vtkPVOptions*)pm->GetOptions();
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
+  //qWarning() << "Message from pqVRStarter: Application Started";
 }
 
 //-----------------------------------------------------------------------------

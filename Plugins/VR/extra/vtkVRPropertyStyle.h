@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRWandTrackingStyle.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,24 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRWandTrackingStyle_h_
-#define __vtkVRWandTrackingStyle_h_
+#ifndef __vtkVRPropertyStyle_h
+#define __vtkVRPropertyStyle_h
 
 #include "vtkVRInteractorStyle.h"
+#include "vtkSmartPointer.h"
+#include <vector>
+#include <map>
 
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-struct vtkVREventData;
+class vtkSMProperty;
+class vtkSMProxy;
 
-/// This is demonstration of how subclasses for vtkVRInteractorStyle can be
-/// implemented.
-class vtkVRWandTrackingStyle : public vtkVRInteractorStyle
+/// vtkVRPropertyStyle is superclass for interactor styles that change any
+/// property on some proxy. Which property/proxy is being controlled can be
+/// setup (in future) by means, reading configuration values from the state file
+/// or via some user-interface panel.
+class vtkVRPropertyStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRWandTrackingStyle(QObject* parent);
-  ~vtkVRWandTrackingStyle();
+  vtkVRPropertyStyle(QObject* parent=0);
+  virtual ~vtkVRPropertyStyle();
 
   /// called to handle an event. If the style does not handle this event or
   /// handles it but does not want to stop any other handlers from handling it
@@ -60,16 +64,37 @@ public:
   /// external interaction style manager.
   virtual bool update();
 
+  /// configure the style using the xml configuration.
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// save the xml configuration.
+  virtual vtkPVXMLElement* saveConfiguration() const;
+
+  /// Get/set the property being controlled by this style.
+  virtual vtkSMProperty* getSMProperty() const;
+  virtual vtkSMProxy* getSMProxy() const;
+  virtual const QString& getSMPropertyName() const
+    {return this->PropertyName; }
+  void setSMProperty(vtkSMProxy*, const QString& property_name);
+
 protected:
   void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
   void HandleTracker( const vtkVREventData& data );
-  bool GetWandPoseProxyNProperty( vtkSMRenderViewProxy** proxy,
-                                  vtkSMDoubleVectorProperty** prop);
-  bool SetWandPoseProperty(const vtkVREventData &data );
-  bool UpdateNRenderWithWandPose();
+  void SetButtonValue( std::string dest, int value );
+  void SetAnalogValue( std::string dest, double value );
+  void SetAnalogVectorValue( std::string dest,
+                             const double* value,
+                             unsigned int total);
+  void SetTrackerValue( std::string dest, double value );
+  void SetTrackerVectorValue( std::string dest, const double value[16] );
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  QString PropertyName;
+  std::vector<std::string> tokenize( std::string input);
+  std::map<std::string,std::string> Map;
 
-protected:
+private:
+  Q_DISABLE_COPY(vtkVRPropertyStyle)
 };
 
-#endif //__vtkVRWandTrackingStyle.h_
+#endif

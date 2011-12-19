@@ -39,16 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
 #include "vtkVRQueue.h"
-#include "vtkTransform.h"
-#include "vtkMatrix4x4.h"
 #include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
-
 #include <map>
 #include <vector>
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
+class vtkTransform;
+class vtkMatrix4x4;
 
 /// Callback to listen to VRPN events
 class vtkVRUIConnection : public QThread
@@ -59,50 +58,37 @@ public:
   vtkVRUIConnection(QObject *parent=0);
   ~vtkVRUIConnection();
 
-  // Description:
-  // Name of the device. For example, "Tracker0@localhost"
-  // Initial value is a NULL pointer.
+  /// Name of the device. For example, "Tracker0@localhost". Initial value is a
+  /// NULL pointer.
   void SetAddress(std::string name);
 
-  // Description:
-  // Port number of the VRUI server.
-  // Initial value is 8555.
+  /// Port number of the VRUI server. Initial value is 8555.
   void SetPort(std::string port);
 
-  // Description:
-  // Set the device name.
+  /// Set the device name.
   void SetName(std::string name);
 
-  // Description:
-  // Add button device
+  /// Add button device
   void AddButton(std::string id, std::string name);
 
-  // Description:
-  // Add Analog device
+  /// Add Analog device
   void AddAnalog(std::string id,  std::string name );
 
-  // Description:
-  // Add tracking device
+  /// Add tracking device
   void AddTracking( std::string id,  std::string name);
 
-  // Description:
-  // Adding a transformation matrix
+  /// Adding a transformation matrix
   void SetTransformation( vtkMatrix4x4* matix );
 
-  // Description:
-  // Initialize the device with the name.
+  /// Initialize the device with the name.
   bool Init();
 
-  // Description:
-  // Tell if Init() was called succesfully
-  // bool GetInitialized() const;
+  /// Tell if Init() was called succesfully bool GetInitialized() const;
 
-  // Description:
-  // Terminate the thread
+  /// Terminate the thread
   void Stop();
 
-  // Description:
-  // Sets the Event Queue into which the vrpn data needs to be written
+  /// Sets the Event Queue into which the vrpn data needs to be written
   void SetQueue( vtkVRQueue* queue );
 
   /// configure the style using the xml configuration.
@@ -116,19 +102,8 @@ public:
   void callback();
 
 protected:
-    // Description:
-  void Activate();
 
-  // Description:
-  void Deactivate();
-
-  // Description:
-  void StartStream();
-
-  // Description:
-  void StopStream();
-
-  void PrintPositionOrientation();
+  // void PrintPositionOrientation();
   void GetNextPacket();
 
   std::string GetName( int eventType, int id=0 );
@@ -169,6 +144,8 @@ protected:
   bool _Stop;
 
   vtkVRQueue* EventQueue;
+  vtkMatrix4x4 *ZUpToYUpMatrix;
+  vtkMatrix4x4 *Matrix;
 
   class pqInternals;
   pqInternals* Internals;

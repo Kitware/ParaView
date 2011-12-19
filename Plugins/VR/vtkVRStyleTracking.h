@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRActiveObjectManipulationStyle.h
+   Module:    vtkVRStyleTracking.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRActiveObjectManipulationStyle_h_
-#define __vtkVRActiveObjectManipulationStyle_h_
+#ifndef __vtkVRStyleTracking_h_
+#define __vtkVRStyleTracking_h_
 
 #include "vtkVRInteractorStyle.h"
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
+class vtkTransform;
 struct vtkVREventData;
 
-class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
+class vtkVRStyleTracking : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRActiveObjectManipulationStyle(QObject* parent);
-  ~vtkVRActiveObjectManipulationStyle();
-  virtual bool handleEvent(const vtkVREventData& data);
+  vtkVRStyleTracking(QObject* parent);
+  ~vtkVRStyleTracking();
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* saveConfiguration() const;
+  virtual void HandleTracker( const vtkVREventData& data );
   virtual bool update();
+protected:
+  virtual void SetProperty( );
 
 protected:
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
-
-protected:
+  std::string Tracker;
+  vtkTransform* OutPose;
 };
 
-#endif //__vtkVRActiveObjectManipulationStyle.h_
+#endif //__vtkVRStyleTracking.h_

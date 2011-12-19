@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRActiveObjectManipulationStyle.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRActiveObjectManipulationStyle_h_
-#define __vtkVRActiveObjectManipulationStyle_h_
+#ifndef __vtkVRStyleGrabNRotateSliceNormal_h
+#define __vtkVRStyleGrabNRotateSliceNormal_h
 
-#include "vtkVRInteractorStyle.h"
+#include "vtkVRStyleGrabNUpdateMatrix.h"
+#include "vtkSmartPointer.h"
+#include <vector>
+#include <map>
 
+class vtkSMProperty;
+class vtkSMProxy;
 class vtkSMRenderViewProxy;
+class vtkMatrix4x4;
 class vtkSMDoubleVectorProperty;
-struct vtkVREventData;
 
-class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
+class vtkVRStyleGrabNRotateSliceNormal : public vtkVRStyleGrabNUpdateMatrix
 {
   Q_OBJECT
-  typedef vtkVRInteractorStyle Superclass;
+  typedef vtkVRStyleGrabNUpdateMatrix Superclass;
 public:
-  vtkVRActiveObjectManipulationStyle(QObject* parent);
-  ~vtkVRActiveObjectManipulationStyle();
-  virtual bool handleEvent(const vtkVREventData& data);
+  vtkVRStyleGrabNRotateSliceNormal(QObject* parent=0);
+  virtual ~vtkVRStyleGrabNRotateSliceNormal();
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* saveConfiguration() const;
+  virtual void HandleButton( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
+   virtual void GetPropertyData();
+  virtual void SetProperty();
   virtual bool update();
+  bool GetNormalProxyNProperty();
 
 protected:
-  void HandleAnalog ( const vtkVREventData& data );
-  void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
+  std::string NormalProxyName;
+  std::string NormalPropertyName;
+  bool IsFoundNormalProxyProperty;
 
-protected:
+  vtkSMProxy* NormalProxy;
+  vtkSMDoubleVectorProperty* NormalProperty;
+  double Normal[4];
+private:
+  Q_DISABLE_COPY(vtkVRStyleGrabNRotateSliceNormal)
 };
 
-#endif //__vtkVRActiveObjectManipulationStyle.h_
+#endif
