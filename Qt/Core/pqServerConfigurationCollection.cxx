@@ -206,9 +206,9 @@ QString pqServerConfigurationCollection::saveContents(bool only_mutable) const
 
 //-----------------------------------------------------------------------------
 void pqServerConfigurationCollection::addConfiguration(
-  vtkPVXMLElement* configuration, bool mutable_config)
+  vtkPVXMLElement* arg_configuration, bool mutable_config)
 {
-  pqServerConfiguration config(configuration);
+  pqServerConfiguration config(arg_configuration);
   config.setMutable(mutable_config);
   this->addConfiguration(config);
 }
