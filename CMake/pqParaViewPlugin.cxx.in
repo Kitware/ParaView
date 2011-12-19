@@ -33,6 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
+@EXTRA_INCLUDES@
+
+//-----------------------------------------------------------------------------
+// Used to push a string returns from a function to a vector.
+template <class T, class F>
+void PushBack(T& vector, F& fun)
+{
+  char* text = fun();
+  vector.push_back(text);
+  delete []text;
+}
+
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
 # ifdef INITIALIZE_WRAPPING
@@ -53,10 +65,12 @@ extern "C" void VTK_EXPORT @PLUGIN_NAME@_CombinedInitialize(
 #endif
 
 //-----------------------------------------------------------------------------
-#ifdef plugin_type_servermanager
-@SM_PLUGIN_INCLUDES@
-@PUSH_BACK_XML_INTERFACES@
-#endif
+void @PLUGIN_NAME@_Plugin::GetBinaryResources(
+  vtkstd::vector<vtkstd::string>& resources)
+{
+@BINARY_RESOURCES_INIT@
+  (void)resources;
+}
 
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_gui
@@ -76,12 +90,9 @@ vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 }
 
 //-----------------------------------------------------------------------------
-void @PLUGIN_NAME@_Plugin::GetXMLs
-  (vtkstd::vector<vtkstd::string> &xmls)
+void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
 {
-# ifdef PUSH_BACK_XML_INTERFACES
-  PUSH_BACK_XML_INTERFACES(xmls);
-# endif
+@XML_INTERFACES_INIT@
   (void)xmls;
 }
 #endif
@@ -142,5 +153,3 @@ PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
 #endif
 #endif
-
-

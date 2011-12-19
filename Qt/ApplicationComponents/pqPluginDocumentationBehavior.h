@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,31 +29,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewMainWindow_h
-#define __ParaViewMainWindow_h
+#ifndef __pqPluginDocumentationBehavior_h 
+#define __pqPluginDocumentationBehavior_h
 
-#include <QMainWindow>
+#include <QObject>
+#include "pqApplicationComponentsExport.h"
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+class QHelpEngine;
+class vtkPVPlugin;
+
+/// @ingroup Behaviors
+/// pqPluginDocumentationBehavior is a helper class that ensures that
+/// documentation from plugins is registered with the QHelpEngine.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDocumentationBehavior : public QObject
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
+  typedef QObject Superclass;
 public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  pqPluginDocumentationBehavior(QHelpEngine* engine);
+  virtual ~pqPluginDocumentationBehavior();
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname, const QString& groupname);
+  void updatePlugin(vtkPVPlugin*);
+  void updatePlugins();
+  void refreshHelpEngine();
 
 private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+  Q_DISABLE_COPY(pqPluginDocumentationBehavior)
 
   class pqInternals;
   pqInternals* Internals;
 };
 
 #endif
-
-

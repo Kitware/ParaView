@@ -84,8 +84,8 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // Enable help for from the object inspector.
   QObject::connect(this->Internals->objectInspector,
-    SIGNAL(helpRequested(QString)),
-    this, SLOT(showHelpForProxy(const QString&)));
+    SIGNAL(helpRequested(const QString&, const QString&)),
+    this, SLOT(showHelpForProxy(const QString&, const QString&)));
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
@@ -127,10 +127,9 @@ ParaViewMainWindow::~ParaViewMainWindow()
   delete this->Internals;
 }
 
-
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::showHelpForProxy(const QString& proxyname)
+void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
+  QString& proxyname)
 {
-  pqHelpReaction::showHelp(
-    QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
+  pqHelpReaction::showProxyHelp(groupname, proxyname);
 }

@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QFileInfo>
 
+#include "vtkObject.h"
+#include "vtkWeakPointer.h"
+
 QPointer<QWidget> pqCoreUtilities::MainWidget = 0;
 
 //-----------------------------------------------------------------------------
@@ -154,4 +157,74 @@ QString pqCoreUtilities::getNoneExistingFileName(QString expectedFilePath)
 
   return dir.absolutePath() + QDir::separator() + fileName;
   }
+
 //-----------------------------------------------------------------------------
+class pqCoreUtilitiesEventHelper::pqInternal
+{
+public:
+  vtkWeakPointer<vtkObject> EventInvoker;
+  unsigned long EventID;
+  pqInternal() : EventID(0)
+    {
+    }
+
+  ~pqInternal()
+    {
+    if (this->EventInvoker && this->EventID > 0 &&
+      this->EventInvoker->HasObserver(this->EventID))
+      {
+      this->EventInvoker->RemoveObserver(this->EventID);
+      }
+    }
+};
+
+//-----------------------------------------------------------------------------
+pqCoreUtilitiesEventHelper::pqCoreUtilitiesEventHelper(QObject* object)
+  : Superclass(object), Interal(new pqCoreUtilitiesEventHelper::pqInternal())
+{
+}
+
+//-----------------------------------------------------------------------------
+pqCoreUtilitiesEventHelper::~pqCoreUtilitiesEventHelper()
+{
+  delete this->Interal;
+}
+
+//-----------------------------------------------------------------------------
+void pqCoreUtilitiesEventHelper::executeEvent(
+  vtkObject* obj, unsigned long eventid, void* calldata)
+{
+  emit this->eventInvoked(obj, eventid, calldata);
+}
+
+//-----------------------------------------------------------------------------
+unsigned long pqCoreUtilities::connect(
+  vtkObject* vtk_object, int vtk_event_id,
+  QObject* qobject, const char* signal_or_slot,
+  Qt::ConnectionType type/* = Qt::AutoConnection*/)
+{
+  if (vtk_object == NULL || qobject == NULL || signal_or_slot == NULL)
+    {
+    return 0;
+    }
+
+  pqCoreUtilitiesEventHelper *helper = new pqCoreUtilitiesEventHelper(qobject);
+  unsigned long eventid = vtk_object->AddObserver(
+    vtk_event_id, helper, &pqCoreUtilitiesEventHelper::executeEvent);
+  helper->Interal->EventID = eventid;
+  helper->Interal->EventInvoker = vtk_object;
+
+  QObject::connect(
+    helper, SIGNAL(eventInvoked(vtkObject*, unsigned long, void*)),
+    qobject, signal_or_slot, type);
+
+  // * When qobject is deleted, helper is deleted. pqCoreUtilitiesEventHelper in
+  // its destructor ensures that the observer is removed from the vtk_object if
+  // it exists.
+  // * When VTK-object is deleted, it removes the observer, but cannot delete
+  // helper. Since pqCoreUtilitiesEventHelper::Interal keeps a weak-pointer to
+  // the vtk_object, that gets cleared. So eventually when qobject is destroyed,
+  // the pqCoreUtilitiesEventHelper is deleted, but since the vtk_object is
+  // already deleted, it doesnt' do anything special.
+  return eventid;
+}
