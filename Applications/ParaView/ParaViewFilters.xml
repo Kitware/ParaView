@@ -175,6 +175,7 @@
   <Proxy group="filters" name="UnstructuredGradient" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" />
+  <Proxy group="filters" name="YoungsMaterialInterface"/>
   <Proxy group="filters" name="NormalGlyphs" />
   <Proxy group="filters" name="TableToPolyData" />
   <Proxy group="filters" name="TableToStructuredGrid" />
