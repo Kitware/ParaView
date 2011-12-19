@@ -447,12 +447,12 @@ int vtkSMPlotMatrixViewProxy::GetTooltipPrecision(int plotType)
   return this->ReceiveIntValue("GetTooltipPrecision", plotType);
 }
 //----------------------------------------------------------------------------
-void vtkSMPlotMatrixViewProxy::GetGutter(float* xy)
+void vtkSMPlotMatrixViewProxy::GetGutter(float* vtkNotUsed(xy))
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPlotMatrixViewProxy::GetBorders(int* borders)
+void vtkSMPlotMatrixViewProxy::GetBorders(int* vtkNotUsed(borders))
 {
 }
 //----------------------------------------------------------------------------
