@@ -82,8 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 
 //-----------------------------------------------------------------------------
-pqSummaryPanel::pqSummaryPanel(QWidget *parent)
-  : QWidget(parent)
+pqSummaryPanel::pqSummaryPanel(QWidget *p)
+  : QWidget(p)
 {
   this->CurrentPanel = 0;
   this->Representation = 0;
@@ -95,19 +95,19 @@ pqSummaryPanel::pqSummaryPanel(QWidget *parent)
   this->DisplayWidget = 0;
   this->Links = new pqPropertyLinks;
 
-  QVBoxLayout* layout = new QVBoxLayout;
+  QVBoxLayout* l = new QVBoxLayout;
 
-  layout->addWidget(this->createPropertiesPanel());
-  layout->addWidget(this->createButtonBox());
-  layout->addWidget(this->createRepresentationFrame());
-  layout->addWidget(this->createDisplayPanel());
-  layout->addStretch();
+  l->addWidget(this->createPropertiesPanel());
+  l->addWidget(this->createButtonBox());
+  l->addWidget(this->createRepresentationFrame());
+  l->addWidget(this->createDisplayPanel());
+  l->addStretch();
 
   this->PropertiesPanelFrame->hide();
   this->RepresentationFrame->hide();
   this->DisplayPanelFrame->hide();
 
-  this->setLayout(layout);
+  this->setLayout(l);
 
   this->connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqDataRepresentation*)),
                 this, SLOT(setRepresentation(pqDataRepresentation*)));
@@ -165,25 +165,25 @@ pqSummaryPanel::~pqSummaryPanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqSummaryPanel::setProxy(pqProxy *proxy)
+void pqSummaryPanel::setProxy(pqProxy *p)
 {
   if(this->Proxy)
     {
     // remove old property links
-    if(vtkSMProperty *property = this->Proxy->getProxy()->GetProperty("Representation"))
+    if(vtkSMProperty *prop = this->Proxy->getProxy()->GetProperty("Representation"))
       {
       this->Links->removePropertyLink(this->RepresentationSignalAdaptor,
                                       "currentText",
                                       SIGNAL(currentIndexChanged(int)),
                                       this->Proxy->getProxy(),
-                                      property);
+                                      prop);
       }
     }
 
-  this->Proxy = proxy;
+  this->Proxy = p;
 
   // do nothing if this proxy is already current
-  if(this->CurrentPanel && this->CurrentPanel->referenceProxy() == proxy)
+  if(this->CurrentPanel && this->CurrentPanel->referenceProxy() == p)
     {
     return;
     }
@@ -202,7 +202,7 @@ void pqSummaryPanel::setProxy(pqProxy *proxy)
   this->CurrentPanel = NULL;
   bool reusedPanel = false;
 
-  if(!proxy)
+  if(!p)
     {
     this->DeleteButton->setEnabled(false);
     this->PropertiesPanelFrame->hide();
@@ -212,7 +212,7 @@ void pqSummaryPanel::setProxy(pqProxy *proxy)
 
   if(this->CurrentPanel == NULL)
     {
-    this->CurrentPanel = this->createSummaryPropertiesPanel(proxy);
+    this->CurrentPanel = this->createSummaryPropertiesPanel(p);
     }
 
   // the current auto panel always has the name "Editor"
@@ -242,7 +242,7 @@ void pqSummaryPanel::setProxy(pqProxy *proxy)
   this->CurrentPanel->show();
   this->updateDeleteButtonState();
 
-  this->PanelStore[proxy] = this->CurrentPanel;
+  this->PanelStore[p] = this->CurrentPanel;
   this->PropertiesPanelFrame->show();
 
   this->updateAcceptState();
@@ -255,9 +255,9 @@ pqProxy* pqSummaryPanel::proxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqSummaryPanel::setRepresentation(pqDataRepresentation *representation)
+void pqSummaryPanel::setRepresentation(pqDataRepresentation *repr)
 {
-  this->Representation = representation;
+  this->Representation = repr;
 
   if(!this->Representation)
     {
@@ -267,12 +267,12 @@ void pqSummaryPanel::setRepresentation(pqDataRepresentation *representation)
     return;
     }
 
-  vtkSMProxy *proxy = representation->getProxy();
-  vtkSMProperty *representationProperty = proxy->GetProperty("Representation");
+  vtkSMProxy *p = repr->getProxy();
+  vtkSMProperty *representationProperty = p->GetProperty("Representation");
 
   if(representationProperty)
     {
-    this->RepresentationSelector->setRepresentation(representation);
+    this->RepresentationSelector->setRepresentation(repr);
 
     this->RepresentationFrame->show();
     }
@@ -281,7 +281,7 @@ void pqSummaryPanel::setRepresentation(pqDataRepresentation *representation)
     this->RepresentationFrame->hide();
     }
 
-  this->representationChanged(representation);
+  this->representationChanged(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -291,10 +291,10 @@ pqRepresentation* pqSummaryPanel::representation() const
 }
 
 //-----------------------------------------------------------------------------
-void pqSummaryPanel::setView(pqView* view)
+void pqSummaryPanel::setView(pqView* v)
 {
-  this->View = view;
-  emit this->viewChanged(view);
+  this->View = v;
+  emit this->viewChanged(v);
 }
 
 //-----------------------------------------------------------------------------
@@ -372,7 +372,7 @@ QWidget* pqSummaryPanel::createButtonBox()
 {
   QFrame *frame = new QFrame(this);
 
-  QBoxLayout* layout = new QHBoxLayout();
+  QBoxLayout* l = new QHBoxLayout();
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("&Apply"));
@@ -421,15 +421,15 @@ QWidget* pqSummaryPanel::createButtonBox()
   this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
   this->connect(this->DeleteButton, SIGNAL(clicked()), SLOT(deleteProxy()));
 
-  layout->addWidget(this->AcceptButton);
-  layout->addWidget(this->ResetButton);
-  layout->addWidget(this->DeleteButton);
+  l->addWidget(this->AcceptButton);
+  l->addWidget(this->ResetButton);
+  l->addWidget(this->DeleteButton);
 
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
   this->DeleteButton->setEnabled(false);
 
-  frame->setLayout(layout);
+  frame->setLayout(l);
 
   return frame;
 }
@@ -439,7 +439,7 @@ QWidget* pqSummaryPanel::createRepresentationFrame()
 {
   QFrame *frame = new QFrame(this);
 
-  QHBoxLayout *layout = new QHBoxLayout;
+  QHBoxLayout *l = new QHBoxLayout;
 
   this->RepresentationSelector = new pqDisplayRepresentationWidget(frame);
   this->RepresentationSignalAdaptor = 0;
@@ -450,10 +450,10 @@ QWidget* pqSummaryPanel::createRepresentationFrame()
           SLOT(representionComboBoxChanged(const QString&)),
           Qt::QueuedConnection);
 
-  layout->addWidget(new QLabel("Representation:", frame));
-  layout->addWidget(this->RepresentationSelector);
+  l->addWidget(new QLabel("Representation:", frame));
+  l->addWidget(this->RepresentationSelector);
 
-  frame->setLayout(layout);
+  frame->setLayout(l);
 
   this->RepresentationFrame = frame;
 
@@ -476,9 +476,9 @@ QWidget* pqSummaryPanel::createDisplayPanel()
 }
 
 //-----------------------------------------------------------------------------
-pqObjectPanel* pqSummaryPanel::createSummaryPropertiesPanel(pqProxy *proxy)
+pqObjectPanel* pqSummaryPanel::createSummaryPropertiesPanel(pqProxy *p)
 {
-  if(!proxy)
+  if(!p)
     {
     return 0;
     }
@@ -491,7 +491,7 @@ pqObjectPanel* pqSummaryPanel::createSummaryPropertiesPanel(pqProxy *proxy)
 
   foreach(pqSummaryPanelInterface *interface, interfaceTracker->interfaces<pqSummaryPanelInterface *>())
     {
-    customPropertiesPanel = interface->createPropertiesPanel(proxy);
+    customPropertiesPanel = interface->createPropertiesPanel(p);
 
     if(customPropertiesPanel)
       {
@@ -507,21 +507,21 @@ pqObjectPanel* pqSummaryPanel::createSummaryPropertiesPanel(pqProxy *proxy)
   else
     {
     // use an auto-generated panel
-    return new pqAutoGeneratedObjectPanel(proxy, true);
+    return new pqAutoGeneratedObjectPanel(p, true);
     }
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqSummaryPanel::createSummaryDisplayPanel(pqDataRepresentation *representation)
+QWidget* pqSummaryPanel::createSummaryDisplayPanel(pqDataRepresentation *repr)
 {
-  if(!representation)
+  if(!repr)
     {
     return 0;
     }
 
   QWidget *widget = new QWidget(this);
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(0);
+  QVBoxLayout *l = new QVBoxLayout;
+  l->setMargin(0);
 
   pqInterfaceTracker *interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
 
@@ -531,7 +531,7 @@ QWidget* pqSummaryPanel::createSummaryDisplayPanel(pqDataRepresentation *represe
 
   foreach(pqSummaryPanelInterface *interface, interfaceTracker->interfaces<pqSummaryPanelInterface *>())
     {
-    customDisplayPanel = interface->createDisplayPanel(representation);
+    customDisplayPanel = interface->createDisplayPanel(repr);
 
     if(customDisplayPanel)
       {
@@ -542,10 +542,10 @@ QWidget* pqSummaryPanel::createSummaryDisplayPanel(pqDataRepresentation *represe
 
   if(customDisplayPanel)
     {
-    layout->addWidget(customDisplayPanel);
+    l->addWidget(customDisplayPanel);
     }
 
-  widget->setLayout(layout);
+  widget->setLayout(l);
 
   return widget;
 }
@@ -621,17 +621,17 @@ void pqSummaryPanel::updateDeleteButtonState()
 }
 
 //-----------------------------------------------------------------------------
-void pqSummaryPanel::removeProxy(pqPipelineSource* proxy)
+void pqSummaryPanel::removeProxy(pqPipelineSource* p)
 {
-  this->disconnect(proxy, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+  this->disconnect(p, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
                    this, SLOT(updateAcceptState()));
 
-  if (this->CurrentPanel && this->CurrentPanel->referenceProxy() == proxy)
+  if (this->CurrentPanel && this->CurrentPanel->referenceProxy() == p)
     {
     this->CurrentPanel = NULL;
     }
 
-  QMap<pqProxy*, QPointer<pqObjectPanel> >::iterator iter = this->PanelStore.find(proxy);
+  QMap<pqProxy*, QPointer<pqObjectPanel> >::iterator iter = this->PanelStore.find(p);
   if (iter != this->PanelStore.end())
     {
     this->disconnect(iter.value(), SIGNAL(modified()),
@@ -665,6 +665,8 @@ void pqSummaryPanel::deleteProxy()
 //-----------------------------------------------------------------------------
 void pqSummaryPanel::handleConnectionChanged(pqPipelineSource* in, pqPipelineSource* out)
 {
+  Q_UNUSED(out);
+
   if(this->CurrentPanel && this->CurrentPanel->referenceProxy() == in)
     {
     this->updateDeleteButtonState();
@@ -720,7 +722,7 @@ void pqSummaryPanel::show(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqSummaryPanel::representationChanged(pqDataRepresentation *representation)
+void pqSummaryPanel::representationChanged(pqDataRepresentation *repr)
 {
   if(this->DisplayWidget)
     {
@@ -730,7 +732,7 @@ void pqSummaryPanel::representationChanged(pqDataRepresentation *representation)
     this->DisplayPanelFrame->hide();
     }
 
-  this->DisplayWidget = this->createSummaryDisplayPanel(representation);
+  this->DisplayWidget = this->createSummaryDisplayPanel(repr);
 
   if(this->DisplayWidget)
     {
