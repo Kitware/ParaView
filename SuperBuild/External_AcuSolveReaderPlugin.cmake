@@ -5,7 +5,7 @@ set(AcuSolveReaderPlugin_source "${CMAKE_CURRENT_BINARY_DIR}/AcuSolveReaderPlugi
 # and configure and build it
 ExternalProject_Add(AcuSolveReaderPlugin
   GIT_REPOSITORY "git://kwsource.kitwarein.com/paraview/acusolvereaderplugin.git"
-  GIT_TAG 9ff302e15e72aa735708d09d76968998c96acb1e
+  GIT_TAG 3338d1e44b97353b298ed9be87b69aef56153538
   SOURCE_DIR ${AcuSolveReaderPlugin_source}
   BINARY_DIR ""
   CONFIGURE_COMMAND ""
