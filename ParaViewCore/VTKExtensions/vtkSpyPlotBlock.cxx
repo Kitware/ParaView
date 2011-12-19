@@ -579,7 +579,6 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   volumeArray->SetNumberOfValues(arraySize);
 
   //first compute the volume array and hold onto it
-  double volume = -1;
   vtkIdType pos = 0;
   for ( int k=0; k < this->SavedRealDims[2]; k++)
     {
@@ -667,7 +666,7 @@ double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
         volume = vtkMath::DoublePi() *(y[j+1]-y[j])*(x[i+1]*x[i+1]-x[i]*x[i]);
         break;
       case vtkSpyPlotBlock::Cartesian3D:
-        (z[k+1]-z[k])*(y[j+1]-y[j])*(x[i+1]-x[i]);
+        volume = (z[k+1]-z[k])*(y[j+1]-y[j])*(x[i+1]-x[i]);
         break;
       }
   return volume;
