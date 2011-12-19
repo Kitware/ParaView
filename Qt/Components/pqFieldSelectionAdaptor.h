@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 class QComboBox;
 #include "vtkSmartPointer.h"
 class vtkSMProperty;
@@ -52,6 +53,7 @@ class PQCOMPONENTS_EXPORT pqFieldSelectionAdaptor : public QObject
   Q_OBJECT
   Q_PROPERTY(QString attributeMode READ attributeMode WRITE setAttributeMode)
   Q_PROPERTY(QString scalar READ scalar WRITE setScalar)
+  Q_PROPERTY(QStringList selection READ selection WRITE setSelection)
 
 public:
   /// constructor requires a QComboBox, 
@@ -62,6 +64,9 @@ public:
   QString attributeMode() const;
   /// get the scalar
   QString scalar() const;
+
+  void setSelection(const QStringList &selection);
+  QStringList selection() const;
 
 signals:
   /// signal the attributeMode and/or scalar changed
@@ -87,9 +92,7 @@ private slots:
                            void*, void*, vtkCommand*);
 
 protected:
-
-  QString AttributeMode;
-  QString Scalar;
+  QStringList Selection;
   vtkSmartPointer<vtkSMProperty> Property;
   vtkSmartPointer<vtkSMDomain> AttributeModeDomain;
   vtkSmartPointer<vtkSMDomain> ScalarDomain;

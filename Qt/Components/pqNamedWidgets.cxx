@@ -380,12 +380,11 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         pqFieldSelectionAdaptor* adaptor = new
           pqFieldSelectionAdaptor(comboBox, SMProperty);
         adaptor->setObjectName("FieldSelectionAdaptor");
-        property_manager->registerLink(
-          adaptor, "attributeMode", SIGNAL(selectionChanged()),
-          proxy, SMProperty, 0);
-        property_manager->registerLink(
-          adaptor, "scalar", SIGNAL(selectionChanged()),
-          proxy, SMProperty, 1);
+        property_manager->registerLink(adaptor,
+                                       "selection",
+                                       SIGNAL(selectionChanged()),
+                                       proxy,
+                                       SMProperty);
         }
       }
     }
