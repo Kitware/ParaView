@@ -131,8 +131,14 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
         {
         this->Internals->TabWidgets.remove(
           proxy->getServer()->GetConnectionID(), widget);
-        this->removeTab(this->indexOf(widget));
+        int index = this->indexOf(widget);
+        if (this->currentWidget() == widget)
+          {
+          this->setCurrentIndex(((index-1) > 0)? (index-1) : 0);
+          }
+        this->removeTab(index);
         delete widget;
+        break;
         }
       }
     }
