@@ -549,3 +549,17 @@ ExternalProject_Add(${proj}
     ${DOC_ARGS}
   INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ParaViewSuperBuild_SOURCE_DIR}/.plugins <BINARY_DIR>/bin/
   )
+
+#-----------------------------------------------------------------------------
+# Configure testing support.
+include(CTest)
+if(BUILD_TESTING)
+  enable_testing()
+endif(BUILD_TESTING)
+
+# Testing.
+if(BUILD_TESTING)
+  set(Testing_Temporary_dir ${ParaViewSuperBuild_BINARY_DIR}/Testing/Temporary)
+  make_directory(${Testing_Temporary_dir})
+  add_subdirectory(Testing)
+endif()
