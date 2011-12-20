@@ -490,13 +490,12 @@ void pqCollaborationManager::enableMousePointerSharing(bool enable)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds)
 {
-//  cout << "set bounds: ["
-//       << bounds[0] << ", " << bounds[1] << ", "
-//       << bounds[2] << ", " << bounds[3] << ", "
-//       << bounds[4] << ", " << bounds[5] << ", "
-//       << bounds[6] << ", " << bounds[7] << "]"
-//       << endl;
-  this->Internals->ContextViewBoundsToShare[gid].SetRange(bounds);
+  pqContextView* chartView = qobject_cast<pqContextView*>(QObject::sender());
+  if( chartView && activeCollaborationManager() &&
+      activeCollaborationManager()->GetSession() == chartView->getServer()->session())
+    {
+    this->Internals->ContextViewBoundsToShare[gid].SetRange(bounds);
+    }
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::sendChartViewBoundsToOtherClients()
