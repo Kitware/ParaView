@@ -326,6 +326,10 @@ bool vtkPVSessionBase::StartProcessingRemoteNotification()
 void vtkPVSessionBase::StopProcessingRemoteNotification(bool previousValue)
 {
   this->ProcessingRemoteNotification = previousValue;
+  if(!previousValue)
+    {
+    this->InvokeEvent(vtkPVSessionBase::ProcessingRemoteEnd);
+    }
 }
 //----------------------------------------------------------------------------
 bool vtkPVSessionBase::IsProcessingRemoteNotification()

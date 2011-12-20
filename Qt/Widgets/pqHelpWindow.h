@@ -33,56 +33,86 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqHelpWindow_h
 
 #include <QMainWindow>
+#include <QPointer>
 #include "QtWidgetsExport.h"
 
 class QHelpEngine;
-class QTextBrowser;
+class QHelpEngineCore;
+class QUrl;
+class QWebView;
 
-/// pqHelpWindow provides a assistant-like window  for showing embedded
-/// documentation in any application. It supports showing of Qt compressed help 
-/// files (*.qch files generated from *.qhp files). The qch file can be
-/// either on disk or an embedded qt-resource.
+/// pqHelpWindow provides a assistant-like window  for showing help provided by
+/// a QHelpEngine.
 class QTWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
 public:
-  pqHelpWindow(
-    const QString& window_title, QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqHelpWindow(QHelpEngine* engine,
+    QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqHelpWindow();
 
-  /// Register a *.qch documentation file.
-  /// This can be a file in the qt-resource space as well.
-  /// Note these are Qt compressed help files i.e. *.qch files generated
-  /// from *.qhp and not the help collection files (*.qhc generated from *.qhcp)
-  /// which have the assistant configuration details.
-  /// Unlike registering the documentation with the Qt assistant, this is not
-  /// remembered across sessions and must be done each time.
-  /// On successful loading, returns the namespace name provided by the help
-  /// file.
-  virtual QString registerDocumentation(const QString& qchfilename);
-
+public slots:
   /// Requests showing of a particular page. The url must begin with "qthelp:"
   /// scheme when referring to pages from the help files.
   virtual void showPage(const QString& url);
+  virtual void showPage(const QUrl& url);
 
-  /// Experimental. I am not sure how to reliably determine the home page.
+  /// Tires to locate a file name index.html in the given namespace and then
+  /// shows that page.
   virtual void showHomePage(const QString& namespace_name);
 
 signals:
   /// fired to relay warning messages from the help system.
   void helpWarnings(const QString&);
 
+protected slots:
+  void search();
+
 protected:
   QHelpEngine* HelpEngine;
-  QTextBrowser* Browser;
+  QWebView* Browser;
 
 private:
   Q_DISABLE_COPY(pqHelpWindow)
 
-  class pqTextBrowser;
+  class pqNetworkAccessManager;
+  friend class pqNetworkAccessManager;
+};
+
+
+#include <QNetworkReply>
+#include <QBuffer>
+/// Internal class used to add support to QWebView to load files from
+/// QHelpEngine.
+class QTWIDGETS_EXPORT pqHelpWindowNetworkReply : public QNetworkReply
+{
+  Q_OBJECT;
+  typedef QNetworkReply Superclass;
+public:
+  pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
+
+  virtual void abort() {}
+  virtual qint64 bytesAvailable() const
+    { return this->Buffer.bytesAvailable(); }
+  virtual bool isSequential() const
+    { return this->Buffer.isSequential(); }
+
+private slots:
+  /// reads the raw data fires signals to notify data is available.
+  void process();
+
+protected:
+  virtual qint64 readData(char *data, qint64 maxSize)
+    {
+    return this->Buffer.read(data, maxSize);
+    }
+
+  QPointer<QHelpEngineCore> HelpEngine;
+  QBuffer Buffer;
+
+private:
+  Q_DISABLE_COPY(pqHelpWindowNetworkReply)
 };
 
 #endif
-
-

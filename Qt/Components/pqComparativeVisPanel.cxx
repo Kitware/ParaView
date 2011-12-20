@@ -175,7 +175,7 @@ namespace pqComparativeVisPanelNS
         maxValue = domain[1].toDouble();
         }
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->GetCue()->UpdateWholeRange(minValue, maxValue);
+        cueProxy)->UpdateWholeRange(minValue, maxValue);
       }
     if (!proxy)
       {
@@ -184,7 +184,7 @@ namespace pqComparativeVisPanelNS
       // this is a "Time" animation cue. Use the range provided by the time
       // keeper.
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->GetCue()->UpdateWholeRange(range.first, range.second);
+        cueProxy)->UpdateWholeRange(range.first, range.second);
       }
     cueProxy->UpdateVTKObjects();
     pxm->RegisterProxy("comparative_cues",

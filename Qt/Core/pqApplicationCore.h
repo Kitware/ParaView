@@ -58,6 +58,7 @@ class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
 class QApplication;
+class QHelpEngine;
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMGlobalPropertiesManager;
@@ -123,6 +124,14 @@ public:
 
   /// Unregisters a manager for a particular function, if any.
   void unRegisterManager(const QString& function);
+
+  /// provides access to the help engine. The engine is created the first time
+  /// this method is called.
+  QHelpEngine* helpEngine();
+
+  /// QHelpEngine doesn't like filenames in resource space. This method creates
+  /// a temporary file for the resource and registers that with the QHelpEngine.
+  void registerDocumentation(const QString& filename);
 
   /// ServerManagerObserver observer the vtkSMProxyManager
   /// for changes to the server manager and fires signals on
@@ -314,6 +323,7 @@ protected:
   pqRecentlyUsedResourcesList *RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
+  QHelpEngine* HelpEngine;
   QPointer<pqTestUtility> TestUtility;
 
 private:
@@ -324,7 +334,6 @@ private:
   static pqApplicationCore* Instance;
   void constructor();
   void createOutputWindow();
-  bool FinalizeOnExit;
 };
 
 #endif

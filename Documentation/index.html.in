@@ -1,43 +1,72 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
 
-<html>
+Name       : Paperlike     
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20111010
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>ParaView</title>
-  <link rel="stylesheet" type="text/css" href="ParaViewDoc.css"/>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>ParaView Users Manual</title>
+<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 <body>
-
-<div class="ProxyDocumentation">
-  <div class="ProxyHeading">
-    ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@
-  </div>
+<div id="wrapper">
+	<div id="header-wrapper">
+		<div id="header">
+			<div id="logo">
+				<h1><a href="http://www.paraview.org">ParaView </a></h1>
+        <p>User's Manual for v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@</p>
+			</div>
+		</div>
+	</div>
+	<!-- end #header -->
+	<div id="page">
+		<div id="content">
+			<div class="post">
+        <div class="entry">
+          <p>
+            ParaView is an open-source, multi-platform data analysis and
+            visualization application. ParaView users can quickly build
+            visualizations to analyze their data using qualitative and
+            quantitative techniques. The data exploration can be done
+            interactively in 3D or programmatically using ParaView's batch
+            processing capabilities.
+          </p>
+          <p>
+            ParaView was developed to analyze extremely large datasets using
+            distributed memory computing resources. It can be run on
+            supercomputers to analyze datasets of terascale as well as on laptops
+            for smaller data.
+          </p>
+        </div>
+      </div>
+			<div id="about">
+        <p>This is an abridged version of the ParaView User's Manual. For a
+        regularly updated version of the manual, refer to the
+        <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">ParaView Wiki (Manual)</a>.
+        A pdf version of the Users Manual is also included in the official ParaView
+        Binary binaries and can be downloaded from the
+        <a href="http://www.paraview.org/paraview/resources/software.html">download page</a>
+        </p>
+			</div>
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+	<!-- end #page -->
 </div>
-
-<p align="center"><a href="http://www.paraview.org"><img src="ParaViewLogo.png"/></a></p>
-
-<p>
-An application and architecture for display and analysis of massive
-scientific datasets.
-
-<p>
-This is an abridged version of the ParaView user's guide. The complete
-document is a file included with Kitware's binaries that is called "ParaView User's Guide
-v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.pdf".
-You can also obtain, print and even edit the most current version of the document here:
-<a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents.</a>
-
-<div class="toc">
-  <p><strong>Table of Contents</strong></p>
-  <ul>
-    <li><a href="Book/Book_Chapter1.html">Introduction</a><li>
-    <li><a href="Book/Book_Chapter16.html">Plugins</a><li>
-    <li><a href="Book/Book_Chapter17.html">Appendices</a><li>
-    <li><a href="ParaViewSources.html">Sources</a></li>
-    <li><a href="ParaViewFilters.html">Filters</a></li>
-    <li><a href="ParaViewReaders.html">Readers</a></li>
-    <li><a href="ParaViewWriters.html">Writers</a></li>
-  </ul>
+<div id="footer">
+	<p>Design by <a href="http://www.freecsstemplates.org/"> CSS Templates</a>
+  under Creative Commons Attribution 2.5 License.</p>
 </div>
-
+<!-- end #footer -->
 </body>
 </html>

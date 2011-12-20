@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
-pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent)
-  : QSortFilterProxyModel(parent)
+pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *p)
+  : QSortFilterProxyModel(p)
 {
   this->FilterAnnotation = this->FilterSession = false;
 }
@@ -52,12 +52,12 @@ pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent
 bool pqPipelineAnnotationFilterModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 1, sourceParent);
+    QModelIndex sourceIndex = sourceModel()->index(sourceRow, 1, sourceParent);
     return (this->FilterAnnotation ?
-              sourceModel()->data(index, pqPipelineModel::AnnotationFilterRole).toBool() :
+              sourceModel()->data(sourceIndex, pqPipelineModel::AnnotationFilterRole).toBool() :
               true)
         && (this->FilterSession ?
-              sourceModel()->data(index, pqPipelineModel::SessionFilterRole).toBool() :
+              sourceModel()->data(sourceIndex, pqPipelineModel::SessionFilterRole).toBool() :
               true);
 }
 //-----------------------------------------------------------------------------
@@ -65,6 +65,8 @@ bool pqPipelineAnnotationFilterModel::filterAcceptsRow(int sourceRow,
 bool pqPipelineAnnotationFilterModel::lessThan(const QModelIndex &left,
                                       const QModelIndex &right) const
 {
+  Q_UNUSED(left);
+  Q_UNUSED(right);
   return true; // We do not sort, we only filter
 }
 //-----------------------------------------------------------------------------

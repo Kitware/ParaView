@@ -114,12 +114,6 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(preViewRemoved(pqView*)),
                     this, SLOT(disconnectViewLocalSlots(pqView*)));
-
-  QObject::connect( this,
-                    SIGNAL(delayUpdateCamera(vtkSMMessage*)),
-                    this, SLOT(onShareOnlyMessage(vtkSMMessage*)),
-                    Qt::QueuedConnection);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -243,11 +237,8 @@ void pqCollaborationPanel::followUserCamera(int userId)
     this->Internal->CameraToFollowOfUserId = userId;
     }
 
-  // If we are the master we want the slaves to follow the same camera as us
-  if(this->getSMCollaborationManager()->IsMaster())
-    {
-    this->getSMCollaborationManager()->FollowUser(userId);
-    }
+  // Update the collaboration manager
+  this->getSMCollaborationManager()->FollowUser(userId);
 
   // Update the UI
   int nbRows = this->Internal->members->rowCount();
@@ -261,13 +252,6 @@ void pqCollaborationPanel::followUserCamera(int userId)
       {
       this->Internal->members->item(i, 1)->setIcon(QIcon());
       }
-    }
-
-  vtkstd::map<int, vtkSMMessage>::iterator camCache;
-  camCache = this->Internal->LocalCameraStateCache.find(userId);
-  if(camCache != this->Internal->LocalCameraStateCache.end())
-    {
-    this->onShareOnlyMessage(&camCache->second);
     }
 
   // If we follow master lets selection model follow as well
@@ -402,9 +386,6 @@ void pqCollaborationPanel::connectLocalSlots()
     QObject::connect( collab,
                       SIGNAL(triggeredUserListChanged()),
                       this,   SLOT(onUserUpdate()));
-    QObject::connect( collab,
-                      SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
-                      this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
 
     QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
                       collab, SLOT(onChatMessage(int,QString&)));
@@ -510,45 +491,4 @@ void pqCollaborationPanel::disconnectViewLocalSlots(pqView* view)
 void pqCollaborationPanel::stopFollowingCamera()
 {
   this->followUserCamera(-1);
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationPanel::onShareOnlyMessage(vtkSMMessage *msg)
-{
-  // Check if its camera update
-  if(msg->HasExtension(DefinitionHeader::client_class) &&
-     msg->GetExtension(DefinitionHeader::client_class) == "vtkSMCameraProxy")
-    {
-    int currentUserId = static_cast<int>(msg->client_id());
-
-    // Keep in cache the latest camera position of each participants
-    this->Internal->LocalCameraStateCache[currentUserId].CopyFrom(*msg);
-
-    // If I'm following that one just update my camera
-    if(this->Internal->CameraToFollowOfUserId == currentUserId)
-      {
-      vtkTypeUInt32 cameraId = msg->global_id();
-      pqApplicationCore* core = pqApplicationCore::instance();
-      vtkSMProxyLocator* locator =
-          vtkSMProxyManager::GetProxyManager()->GetActiveSession()->GetProxyLocator();
-      vtkSMProxy* proxy = locator->LocateProxy(cameraId);
-
-      // As camera do not synch its properties while IsProcessingRemoteNotification
-      // there is no point of updating it when we are in that case.
-      // So we just push back that request to later...
-      if(proxy && !proxy->GetSession()->IsProcessingRemoteNotification())
-        {
-        // Update Proxy
-        proxy->EnableLocalPushOnly();
-        proxy->LoadState(msg, locator);
-        proxy->UpdateVTKObjects();
-        proxy->DisableLocalPushOnly();
-        core->render();
-        }
-      else if(proxy && proxy->GetSession()->IsProcessingRemoteNotification())
-        {
-        emit delayUpdateCamera(&this->Internal->LocalCameraStateCache[currentUserId]);
-        }
-      }
-    }
 }

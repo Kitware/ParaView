@@ -301,6 +301,11 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
     item->setData(0, Qt::DecorationRole, pixmaps[pix]);
     }
   item->setData(0, Qt::UserRole, QString("%1 %2").arg((int)pix).arg(realName));
+
+  // initialize check state to unchecked. this also ensures
+  // that the item has a checkbox displayed in the view
+  item->setData(0, Qt::CheckStateRole, false);
+
   this->propertyManager()->registerLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),

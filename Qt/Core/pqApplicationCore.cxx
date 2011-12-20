@@ -37,11 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QHelpEngine>
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
 #include <QSize>
 #include <QtDebug>
+#include <QTemporaryFile>
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
@@ -128,7 +130,6 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();
-  this->FinalizeOnExit = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -143,6 +144,7 @@ void pqApplicationCore::constructor()
   this->RecentlyUsedResourcesList = NULL;
   this->ServerConfigurations = NULL;
   this->Settings = NULL;
+  this->HelpEngine = NULL;
 
   // initialize statics in case we're a static library
   pqCoreInit();
@@ -234,6 +236,14 @@ pqApplicationCore::~pqApplicationCore()
   delete this->Settings;
   this->Settings = 0;
 
+  if (this->HelpEngine)
+    {
+    QString collectionFile = this->HelpEngine->collectionFile();
+    delete this->HelpEngine;
+    QFile::remove(collectionFile);
+    }
+  this->HelpEngine = NULL;
+
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
   // on these explicitly in which case we end up with segfaults.
@@ -252,10 +262,7 @@ pqApplicationCore::~pqApplicationCore()
     pqApplicationCore::Instance = 0;
     }
 
-  if (this->FinalizeOnExit)
-    {
-    vtkInitializationHelper::Finalize();
-    }
+  vtkInitializationHelper::Finalize();
   vtkOutputWindow::SetInstance(NULL);
   delete this->OutputWindow;
   this->OutputWindow = NULL;
@@ -719,6 +726,65 @@ pqTestUtility* pqApplicationCore::testUtility()
     this->TestUtility = new pqCoreTestUtility(this);
     }
   return this->TestUtility;
+}
+
+//-----------------------------------------------------------------------------
+QHelpEngine* pqApplicationCore::helpEngine()
+{
+  if (!this->HelpEngine)
+    {
+    QTemporaryFile tFile;
+    tFile.open();
+    this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
+    QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
+      this->OutputWindow,
+      SLOT(onDisplayGenericWarningText(const QString&)));
+    this->HelpEngine->setupData();
+    // register the application's qch file. An application specific qch file can
+    // be compiled into the executable in the build_paraview_client() cmake
+    // function. If this file is provided, then that gets registered as
+    // :/${application_name}/Documentation/${qch-filename}.
+    // Locate all such registered resources and register them with the help
+    // engine.
+    QDir dir(QString(":/%1/Documentation").arg(QApplication::applicationName()));
+    QStringList help_files;
+    if (dir.exists())
+      {
+      QStringList filters;
+      filters << "*.qch";
+      help_files = dir.entryList(filters, QDir::Files);
+      }
+    foreach (const QString& filename, help_files)
+      {
+      QString qch_file = QString(":/%1/Documentation/%2").arg(
+        QApplication::applicationName()).arg(filename);
+      this->registerDocumentation(qch_file);
+      }
+    this->HelpEngine->setupData();
+    }
+
+  return this->HelpEngine;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::registerDocumentation(const QString& filename)
+{
+  QHelpEngine* engine = this->helpEngine();
+
+  // QHelpEngine doesn't like files from resource space. So we create a local
+  // file and use that.
+  QTemporaryFile* localFile = QTemporaryFile::createLocalFile(filename);
+  if (localFile)
+    {
+    // localFile has autoRemove ON by default, so the file will be deleted with
+    // the application quits.
+    localFile->setParent(engine);
+    engine->registerDocumentation(localFile->fileName());
+    }
+  else
+    {
+    engine->registerDocumentation(filename);
+    }
 }
 
 //-----------------------------------------------------------------------------

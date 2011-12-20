@@ -42,7 +42,8 @@ public:
   enum EventIds
     {
     RegisterRemoteObjectEvent   = 1234,
-    UnRegisterRemoteObjectEvent = 4321
+    UnRegisterRemoteObjectEvent = 4321,
+    ProcessingRemoteEnd         = 2143
     };
 
   //---------------------------------------------------------------------------

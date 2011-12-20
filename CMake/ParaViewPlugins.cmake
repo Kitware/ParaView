@@ -54,34 +54,6 @@ MACRO(PV_PLUGIN_PARSE_ARGUMENTS prefix arg_names option_names)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PV_PLUGIN_PARSE_ARGUMENTS)
 
-# Macro to generate a header xml given an XML.
-MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)
-  IF(PARAVIEW_PROCESS_XML_EXECUTABLE)
-    FOREACH(TMPXML ${XMLFile})
-      GET_FILENAME_COMPONENT(TMP_XML_FILE "${TMPXML}" ABSOLUTE)
-      GET_FILENAME_COMPONENT(XML_NAME "${TMPXML}" NAME_WE)
-      SET(XML_FILES ${XML_FILES} ${TMP_XML_FILE})
-      SET(HAVE_XML 1)
-    ENDFOREACH(TMPXML)
-
-    IF(HAVE_XML)
-      SET(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML_${Name}.h")
-
-      ADD_CUSTOM_COMMAND(
-        OUTPUT "${XML_HEADER}"
-        DEPENDS ${XML_FILES} "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
-        COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
-        ARGS "${XML_HEADER}" "vtkSM" "XML" "GetString" ${XML_FILES}
-        )
-
-      SET (${OUT_XML_HEADER} ${XML_HEADER})
-    ENDIF(HAVE_XML)
-
-  ELSE(PARAVIEW_PROCESS_XML_EXECUTABLE)
-    MESSAGE("kwProcessXML not found.  Plugin may not build correctly")
-  ENDIF(PARAVIEW_PROCESS_XML_EXECUTABLE)
-ENDMACRO(GENERATE_SERVER_MANAGER_XML_HEADER)
-
 # Macro to encode any file(s) as a string. This creates a new cxx file with a
 # declaration of a "const char*" string with the same name as the file.
 # Example:
@@ -112,46 +84,30 @@ ENDMACRO(ENCODE_FILES_AS_STRINGS)
 # sets OUTSRCS with the generated code
 MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
   SET (plugin_type_servermanager TRUE)
-  SET(SM_PLUGIN_INCLUDES)
-  SET(XML_FILES)
-  SET(HAVE_XML 0)
-  SET(PUSH_BACK_XML_INTERFACES 
-    "#define PUSH_BACK_XML_INTERFACES(xmls)\\\n"
-    )
+  SET (SM_PLUGIN_INCLUDES)
+  SET (XML_INTERFACES_INIT)
+
+  # if (XMLFile) doesn't work correctly in a macro. We need to 
+  # set a local variable.
+  set (xmlfiles ${XMLFile})
+  if (xmlfiles)
+    # generate a header from all the xmls specified.
+    set(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML_${Name}.h")
+
+    generate_header(${XML_HEADER}
+      PREFIX "${Name}"
+      SUFFIX "Interfaces"
+      VARIABLE function_names
+      FILES ${xmlfiles})
+
+    foreach (func_name ${function_names})
+      set (XML_INTERFACES_INIT
+        "${XML_INTERFACES_INIT}  PushBack(xmls, ${func_name});\n")
+    endforeach()
+
+    set (SM_PLUGIN_INCLUDES "${SM_PLUGIN_INCLUDES}#include \"${XML_HEADER}\"\n")
+  endif()
   
-  SET(XML_IFACE_PREFIX ${Name})
-  SET(XML_IFACE_GET_METHOD GetInterfaces)
-  SET(XML_IFACE_SUFFIX Interface)
-  
-  IF(PARAVIEW_PROCESS_XML_EXECUTABLE)
-    FOREACH(TMPXML ${XMLFile})
-      GET_FILENAME_COMPONENT(TMP_XML_FILE "${TMPXML}" ABSOLUTE)
-      GET_FILENAME_COMPONENT(XML_NAME "${TMPXML}" NAME_WE)
-      SET(XML_FILES ${XML_FILES} ${TMP_XML_FILE})
-      SET(PUSH_BACK_XML_INTERFACES 
-        "${PUSH_BACK_XML_INTERFACES}{ char* temp = ${XML_IFACE_PREFIX}${XML_NAME}${XML_IFACE_GET_METHOD}(); xmls.push_back(temp); delete []temp;} \\\n")
-      SET(HAVE_XML 1)
-    ENDFOREACH(TMPXML)
-    SET (PUSH_BACK_XML_INTERFACES "${PUSH_BACK_XML_INTERFACES}\n")
-
-    IF(HAVE_XML)
-      SET(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML_${Name}.h")
-      SET (SM_PLUGIN_INCLUDES "#include \"${XML_HEADER}\"")
-
-      ADD_CUSTOM_COMMAND(
-        OUTPUT "${XML_HEADER}"
-        DEPENDS ${XML_FILES} "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
-        COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
-        ARGS "${XML_HEADER}"
-        ${XML_IFACE_PREFIX} ${XML_IFACE_SUFFIX} ${XML_IFACE_GET_METHOD}
-        ${XML_FILES}
-        )
-    ENDIF(HAVE_XML)
-
-  ELSE(PARAVIEW_PROCESS_XML_EXECUTABLE)
-    MESSAGE("kwProcessXML not found.  Plugin may not build correctly")
-  ENDIF(PARAVIEW_PROCESS_XML_EXECUTABLE)
-
   SET(HDRS)
   SET(REALSRCS)
   SET(INST_SRCS)
@@ -181,7 +137,7 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
       VTK_MAKE_INSTANTIATOR3(vtkSM${Name}Instantiator INST_SRCS "${REALSRCS}"
         VTK_EXPORT "${CMAKE_CURRENT_BINARY_DIR}" "")
       SET (SM_PLUGIN_INCLUDES
-        "${SM_PLUGIN_INCLUDES}\n#include \"vtkSM${Name}Instantiator.h\"")
+        "${SM_PLUGIN_INCLUDES}#include \"vtkSM${Name}Instantiator.h\"\n")
     ENDIF(REALSRCS)
     SET(INITIALIZE_WRAPPING 1)
   ELSE(HDRS)
@@ -874,7 +830,12 @@ ENDMACRO(PARAVIEW_QT4_ADD_RESOURCES)
 #  REQUIRED_PLUGINS is to specify the plugin names that this plugin depends on
 #  CS_KITS is experimental option to add wrapped kits. This may change in
 #  future.
+#  DOCUMENTATION_DIR (optional) :- used to specify a directory containing
+#  html/css/png/jpg files that comprise of the documentation for the plugin. In
+#  addition, CMake will automatically generate documentation for any proxies
+#  defined in XMLs for this plugin.
 # ADD_PARAVIEW_PLUGIN(Name Version
+#     [DOCUMENTATION_DIR dir]
 #     [SERVER_MANAGER_SOURCES source files]
 #     [SERVER_MANAGER_XML XMLFile]
 #     [SERVER_SOURCES source files]
@@ -906,6 +867,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   SET(ARG_REQUIRED_PLUGINS)
   SET(ARG_AUTOLOAD)
   SET(ARG_CS_KITS)
+  SET(ARG_DOCUMENTATION_DIR)
 
   SET(PLUGIN_NAME "${NAME}")
   SET(PLUGIN_VERSION "${VERSION}")
@@ -913,13 +875,22 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   SET(PLUGIN_REQUIRED_ON_CLIENT 1)
   SET(PLUGIN_REQUIRED_PLUGINS)
   SET(HAVE_REQUIRED_PLUGINS 0)
+  SET(BINARY_RESOURCES_INIT)
+  SET(EXTRA_INCLUDES)
+
+  # binary_resources are used to compile in icons and documentation for the
+  # plugin. Note that this is not used to compile Qt resources, these are
+  # directly compiled into the Qt plugin.
+  # (since we don't support icons right now, this is used only for
+  # documentation.
+  set (binary_resources)
 
   
   INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
   INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
   PV_PLUGIN_PARSE_ARGUMENTS(ARG 
-    "SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;AUTOLOAD;CS_KITS"
+    "DOCUMENTATION_DIR;SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;AUTOLOAD;CS_KITS"
     "" ${ARGN} )
 
   PV_PLUGIN_LIST_CONTAINS(reqired_server_arg "REQUIRED_ON_SERVER" ${ARGN})
@@ -942,6 +913,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   IF(ARG_SERVER_MANAGER_SOURCES OR ARG_SERVER_MANAGER_XML)
     ADD_SERVER_MANAGER_EXTENSION(SM_SRCS ${NAME} ${VERSION} "${ARG_SERVER_MANAGER_XML}"
                                  ${ARG_SERVER_MANAGER_SOURCES})
+    set (EXTRA_INCLUDES "${EXTRA_INCLUDES}${SM_PLUGIN_INCLUDES}\n")
   ENDIF(ARG_SERVER_MANAGER_SOURCES OR ARG_SERVER_MANAGER_XML)
 
   IF (ARG_PYTHON_MODULES)
@@ -953,6 +925,40 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   ENDIF (ARG_PYTHON_MODULES)
 
   IF(PARAVIEW_BUILD_QT_GUI)
+
+    # if server-manager xmls are specified, we can generate documentation from
+    # them, if Qt is enabled.
+    if (ARG_SERVER_MANAGER_XML)
+      generate_htmls_from_xmls(proxy_documentation_files
+        "${ARG_SERVER_MANAGER_XML}"
+        "" # FIXME: not sure here. How to deal with this for plugins?
+        "${CMAKE_CURRENT_BINARY_DIR}/doc")
+    endif()
+
+    # generate the qch file for the plugin if any documentation is provided.
+    if (proxy_documentation_files OR ARG_DOCUMENTATION_DIR)
+      build_help_project(${NAME}
+        DESTINATION_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc"
+        DOCUMENTATION_SOURCE_DIR "${ARG_DOCUMENTATION_DIR}"
+        FILEPATTERNS "*.html;*.css;*.png;*.jpg"
+        DEPENDS "${proxy_documentation_files}" )
+
+      # we don't compile the help project as a Qt resource. Instead it's
+      # packaged as a SM resource. This makes it possible for
+      # server-only plugins to provide documentation to the client without
+      generate_header("${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h"
+        SUFFIX "_doc"
+        VARIABLE function_names
+        BINARY
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/doc/${NAME}.qch")
+      list(APPEND binary_resources ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h)
+      set (EXTRA_INCLUDES "${EXTRA_INCLUDES}#include \"${CMAKE_CURRENT_BINARY_DIR}/${NAME}_doc.h\"")
+      foreach (func_name ${function_names})
+        set (BINARY_RESOURCES_INIT 
+          "${BINARY_RESOURCES_INIT}  PushBack(resources, ${func_name});\n")
+      endforeach()
+    endif()
+
     IF(ARG_GUI_RESOURCE_FILES)
       # The generated qrc file has resource prefix "/name/ParaViewResources"
       # which helps is avoiding conflicts with resources from different
@@ -985,6 +991,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   ENDIF(PARAVIEW_BUILD_QT_GUI)
 
   SET(SM_SRCS
+    ${binary_resources}
     ${ARG_SERVER_MANAGER_SOURCES}
     ${SM_SRCS}
     ${ARG_SERVER_SOURCES}

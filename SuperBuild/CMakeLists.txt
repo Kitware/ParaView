@@ -105,13 +105,13 @@ set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 
 
-if(WIN32)
+#if(WIN32 OR APPLE)
   set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
   set(pv_c_flags ${CMAKE_C_FLAGS})
-else()
-  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
-  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_CMAKE_BINARY_DIR}/lib -I${ParaViewSuperBuild_CMAKE_BINARY_DIR}/include")
-endif()
+#elseif()
+#  set(pv_cxx_flags "${CMAKE_CXX_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
+#  set(pv_c_flags "${CMAKE_C_FLAGS} -L${ParaViewSuperBuild_BINARY_DIR}/lib -I${ParaViewSuperBuild_BINARY_DIR}/include")
+#endif()
 
 if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
@@ -140,6 +140,10 @@ endif()
 
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
+
+if(CMAKE_Fortran_COMPILER)
+  enable_language(Fortran)
+endif()
 
 #------------------------------------------------------------------------------
 configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
@@ -182,15 +186,17 @@ include(External_szip)
 #   -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
 #   -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY})
 
-# Build a common png used by several dependencies
-include(External_png)
-# can't get paraview to build SMExtractDocumentation with externally built png
-# until then ParaView will still use the system png.
-set(PNG_ARGS
-  -DVTK_USE_SYSTEM_PNG:BOOL=ON
-  -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
-  -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
-list(APPEND ParaView_dependencies png)
+if(WIN32 OR APPLE)
+  # Build a common png used by several dependencies
+  include(External_png)
+  # can't get paraview to build SMExtractDocumentation with externally built png
+  # until then ParaView will still use the system png.
+  set(PNG_ARGS
+    -DVTK_USE_SYSTEM_PNG:BOOL=ON
+    -DPNG_PNG_INCLUDE_DIR:PATH=${PNG_INCLUDE_DIR}
+    -DPNG_LIBRARY:FILEPATH=${PNG_LIBRARY})
+  list(APPEND ParaView_dependencies png)
+endif()
 
 if(WIN32)
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${png_install}/bin)
@@ -223,7 +229,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER AND NOT WIN32 AND NOT UNIX)
+  if(CMAKE_Fortran_COMPILER)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
@@ -303,26 +309,30 @@ else()
   list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${HDF5_DIR})
 endif()
 
-set(freetype_dependencies zlib)
-list(APPEND ParaView_dependencies freetype)
-include(External_freetype)
-set(freetype_ARGS
-  -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
-  -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
-  -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
-  -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
-  )
+if(WIN32 OR APPLE)
+  set(freetype_dependencies zlib)
+  list(APPEND ParaView_dependencies freetype)
+  include(External_freetype)
+  set(freetype_ARGS
+    -DVKT_USE_SYSTEM_FREETYPE:BOOL=ON
+    -DFREETYPE_INCLUDE_DIR_freetype2:PATH=${FT_INCLUDE_DIR}/freetype
+    -DFREETYPE_INCLUDE_DIR_ft2build:PATH=${FT_INCLUDE_DIR}
+    -DFREETYPE_LIBRARY:FILEPATH=${FT_LIBRARY}
+    )
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
-else()
-  get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${freetype_install}/bin)
+  else()
+    get_filename_component(FT_DIR "${FT_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${FT_DIR})
+  endif()
 endif()
 
 if(ENABLE_YT)
   set(MPL_dependencies NUMPY zlib)
-  list(APPEND MPL_dependencies freetype png)
+  if(WIN32 OR APPLE)
+    list(APPEND MPL_dependencies freetype png)
+  endif()
   include(External_MPL)
 
   set(Cython_dependencies NUMPY)
@@ -419,6 +429,19 @@ if(NOT APPLE)
   endif()
 endif()
 
+if(NOT APPLE AND CMAKE_Fortran_COMPILER)
+  option(PARAVIEW_BUILD_PLUGIN_Nektar "Build Nektar Plugin" FALSE)
+  if(PARAVIEW_BUILD_PLUGIN_Nektar)
+    set(Nektar_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_Nektar:BOOL=ON
+    )
+  else()
+    set(Nektar_ARGS
+      -DPARAVIEW_BUILD_PLUGIN_Nektar:BOOL=OFF
+    )
+  endif()
+endif()
+
 # Build VisTrailsPlugin
 option(PARAVIEW_BUILD_PLUGIN_VisTrails "Build VisTrails Plugin" FALSE)
 set(VisTrails_ARGS)
@@ -505,6 +528,10 @@ ExternalProject_Add(${proj}
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
     -DPARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES:BOOL=ON
     -DPARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS:STRING=${PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS}
+    # BLAS/LAPACK
+    -DBLAS_blas_LIBRARY:FILEPATH=${BLAS_LIBRARY}
+    -DLAPACK_lapack_LIBRARY:FILEPATH=${LAPACK_LIBRARY}
+    -DF2C_LIBRARY:FILEPATH=${F2C_LIBRARY}
     -DPARAVIEW_EXTERNAL_PLUGIN_DIRS:STRING=${PARAVIEW_EXTERNAL_PLUGIN_DIRS}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
@@ -544,7 +571,9 @@ ExternalProject_Add(${proj}
     # zlib
     ${ZLIB_ARGS}
     -DPARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
+    -DPARAVIEW_BUILD_PLUGIN_AMR:BOOL=OFF
     ${AcuSolve_ARGS}
+    ${Nektar_ARGS}
     # Documentation
     ${DOC_ARGS}
   INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ParaViewSuperBuild_SOURCE_DIR}/.plugins <BINARY_DIR>/bin/

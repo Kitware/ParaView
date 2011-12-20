@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #ifndef __pqVRStarter_h
 #define __pqVRStarter_h
-
 #include <QObject>
 
 class QTimer;
@@ -41,19 +40,29 @@ class vtkVRQueueHandler;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 
+/// pqVRStarter creates and establishes the framework for VR device. There are
+/// three primary objects that make up the framework, vtkVRConnectionManager,
+/// vtkVRQueue and VRQueueHandler. vtkVRConnectionManager and the
+/// vtkVRQueueHandler are threads one acting as a source and other as the
+/// destination for coming in from various VR connection servers (VRPN and
+/// VRUI). vtkVRQueue is a asynchronous queue established between the
+/// VRConnectionManager and the vtkVRQueueHandler.
 class pqVRStarter : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
   pqVRStarter(QObject* p=0);
   ~pqVRStarter();
 
-  // Callback for shutdown.
-  void onShutdown();
-
-  // Callback for startup.
+  /// Creates and initiates the vtkVRConnectionManager thread the vtkVRQueue and
+  /// vtkVRQueueHandler thread.
   void onStartup();
+
+  /// Stops the vtkVRConnectioManager and vtkVRQueueHandler threads. Also
+  /// deletes the corresponding objects including vtkVRQueue.
+  void onShutdown();
 
 private:
   Q_DISABLE_COPY(pqVRStarter);

@@ -18,19 +18,18 @@ find_library(VRPN_LIBRARY vrpn)
 find_library(VRPN_QUAT_LIBRARY quat)
 
 QT4_WRAP_CPP(MOC_SRCS
+  pqVRStarter.h
+  vtkVRConnectionManager.h
   vtkVRPNConnection.h
   vtkVRUIConnection.h
-  vtkVRConnectionManager.h
-  pqVRStarter.h
-  vtkVRGenericStyle.h
-  vtkVRHeadTrackingStyle.h
-  vtkVRWandTrackingStyle.h
-  vtkVRActiveObjectManipulationStyle.h
-  vtkVRInteractorStyle.h
-  vtkVRPropertyStyle.h
   vtkVRQueue.h
   vtkVRQueueHandler.h
-  vtkVRVectorPropertyStyle.h
+  vtkVRInteractorStyle.h
+  vtkVRStyleTracking.h
+  vtkVRStyleGrabNUpdateMatrix.h
+  vtkVRStyleGrabNRotateSliceNormal.h
+  vtkVRStyleGrabNTranslateSliceOrigin.h
+  vtkVRActiveObjectManipulationStyle.h
   )
 
 SET (QT_USE_QTNETWORK TRUE)
@@ -52,22 +51,21 @@ INCLUDE_DIRECTORIES(
   ${VRPN_INCLUDE_DIR})
 
 SET( VR_SOURCE_FILES
-  vtkVRPNConnection.cxx
-  vtkVRUIConnection.cxx
   vtkVRConnectionManager.cxx
-  vtkVRGenericStyle.cxx
-  vtkVRHeadTrackingStyle.cxx
-  vtkVRWandTrackingStyle.cxx
-  vtkVRActiveObjectManipulationStyle.cxx
-  vtkVRInteractorStyle.cxx
+  vtkVRPNConnection.cxx
   vtkVRPNCallBackHandlers.cxx
-  vtkVRQueue.cxx
-  vtkVRQueueHandler.cxx
-  vtkVRPropertyStyle.cxx
-  vtkVRVectorPropertyStyle.cxx
+  vtkVRUIConnection.cxx
   vtkVRUIPipe.cxx
   vtkVRUIServerState.cxx
   vtkVRUITrackerState.cxx
+  vtkVRQueue.cxx
+  vtkVRQueueHandler.cxx
+  vtkVRInteractorStyle.cxx
+  vtkVRStyleTracking.cxx
+  vtkVRStyleGrabNUpdateMatrix.cxx
+  vtkVRStyleGrabNRotateSliceNormal.cxx
+  vtkVRStyleGrabNTranslateSliceOrigin.cxx
+  vtkVRActiveObjectManipulationStyle.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRStarter

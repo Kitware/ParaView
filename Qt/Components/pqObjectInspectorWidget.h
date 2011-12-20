@@ -128,6 +128,7 @@ signals:
   void viewChanged(pqView*);
 
   void helpRequested(const QString& proxyType);
+  void helpRequested(const QString& groupname, const QString& proxyType);
 
   void canAccept();
 

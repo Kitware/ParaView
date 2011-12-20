@@ -42,35 +42,52 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <QDateTime>
-#include <QDebug>
-#include <vtkstd/vector>
-#include <QTcpSocket>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkMath.h"
+#include "vtkMatrix4x4.h"
+#include "vtkTransform.h"
 #include "vtkVRUIPipe.h"
 #include "vtkVRUIServerState.h"
 #include "vtkVRUITrackerState.h"
+#include <QDateTime>
+#include <QDebug>
+#include <vtkstd/vector>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#ifdef QTSOCK
+#include <QTcpSocket>
+#else
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#endif
 
-
+// ----------------------------------------------------------------------------
 class vtkVRUIConnection::pqInternals
 {
-    public:
+public:
+  // --------------------------------------------------------------------------
   pqInternals()
   {
+#ifdef QTSOCK
+    this->Socket = false;
+#else
+    this->Socket = -1;
+#endif
     this->Active=false;
     this->Pipe=0;
     this->State=0;
     this->StateMutex=0;
     this->Streaming=false;           // streaming
-    this->PacketSignalCond=0;        // for streaming
-    this->PacketSignalCondMutex=0; // for streaming
+    //  this->PacketSignalCond=0;        // for streaming
+    //   this->PacketSignalCondMutex=0; // for streaming
   }
 
+  // --------------------------------------------------------------------------
   ~pqInternals()
   {
     if(this->Pipe!=0)
@@ -83,47 +100,173 @@ class vtkVRUIConnection::pqInternals
       }
   }
 
+#ifdef QTSOCK
+  QTcpSocket *Socket;
+#else
+  int   Socket;
+#endif
   bool Active;
   vtkVRUIPipe *Pipe;
   vtkVRUIServerState *State;
   QMutex *StateMutex;
   bool Streaming;                   // streaming
-  QWaitCondition *PacketSignalCond; // for streaming
-  QMutex *PacketSignalCondMutex;    // for streaming
+  // QWaitCondition *PacketSignalCond; // for streaming
+  // QMutex *PacketSignalCondMutex;    // for streaming
 
-
-  // Streaming routine called when streaming is used
-  void stream()
+  // --------------------------------------------------------------------------
+  void initSocket(std::string address,  std::string port)
   {
-    bool done=false;
-    QMutex *stateLock;
-    while(!done)
+#ifdef QTSOCK
+    this->Socket=new QTcpSocket;
+#ifdef VRUI_ENABLE_DEBUG
+    qDebug() << QString( address.c_str() ) << "::"
+             << QString( port.c_str() ).toInt();
+#endif
+
+    this->Socket->connectToHost(QString(address.c_str()),
+                                QString( port.c_str() ).toInt() ); // ReadWrite?
+#else
+    struct sockaddr_in      client_addr;
+    struct  hostent         *hp;
+
+    this->Socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->Socket < 0) {
+#ifdef VRUI_ENABLE_DEBUG
+    qDebug() << "Error opening stream socket";
+    abort();
+#endif
+    }
+
+    /* Name socket using file system name */
+    hp = gethostbyname(address.c_str());
+    if (hp == 0) {
+    fprintf(stderr, "%s: unknown host\n", address.c_str());
+    return;
+    }
+    bcopy(hp->h_addr, &client_addr.sin_addr, hp->h_length);
+
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_port = htons(( uint16_t )atoi(port.c_str()));
+
+    if (::connect(this->Socket, (struct sockaddr *)&client_addr, sizeof(struct sockaddr_in)) < 0) { /* TODO: why is this "sockaddr", when the type is "sockaddr_in" ?? */
+    close(this->Socket);
+    perror("connecting stream socket");
+    return;
+    }
+#endif
+  }
+
+  // --------------------------------------------------------------------------
+  void initPipe()
+  {
+    this->Pipe=new vtkVRUIPipe(this->Socket);
+  }
+
+  // --------------------------------------------------------------------------
+  bool connect()
+  {
+#ifdef VRUI_ENABLE_DEBUG
+    std::cout<< "Trying to connect" <<std::endl;
+#endif
+    this->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
+    if(!this->Pipe->WaitForServerReply(30000)) // 30s
       {
-      vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
-      switch(m)
-        {
-        case vtkVRUIPipe::PACKET_REPLY:
-          cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
-          this->StateMutex->lock();
-          this->Pipe->ReadState(this->State);
-          this->StateMutex->unlock();
-          break;
-        case vtkVRUIPipe::STOPSTREAM_REPLY:
-          cout << "thread:STOPSTREAM_REPLY ok : tag=" << m << endl;
-          done=true;
-          break;
-        default:
-          cerr << "thread: Mismatching message while waiting for PACKET_REPLY: tag=" << m << endl;
-          done=true;
-          break;
-        }
+      cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
+      delete this->Pipe;
+      this->Pipe=0;
+      return false;
+      }
+    if(this->Pipe->Receive()!=vtkVRUIPipe::CONNECT_REPLY)
+      {
+      cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
+      delete this->Pipe;
+      this->Pipe=0;
+      return false;
+      }
+    this->State=new vtkVRUIServerState;
+    this->StateMutex=new QMutex;
+    this->Pipe->ReadLayout(this->State);
+    return true;
+  }
+
+  // --------------------------------------------------------------------------
+  void activate()
+  {
+    if(!this->Active)
+      {
+      this->Pipe->Send(vtkVRUIPipe::ACTIVATE_REQUEST);
+      this->Active=true;
       }
   }
 
+  // --------------------------------------------------------------------------
+  void deactivate()
+  {
+    if(this->Active)
+      {
+      this->Active=false;
+      this->Pipe->Send(vtkVRUIPipe::DEACTIVATE_REQUEST);
+      }
+  }
+
+  // --------------------------------------------------------------------------
+  void startStream()
+  {
+    if(this->Active)
+      {
+#ifdef VRUI_ENABLE_DEBUG
+      std::cout<<"start streaming" <<std::endl;
+#endif
+      this->Streaming=true;
+      this->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
+      }
+  }
+
+  // --------------------------------------------------------------------------
+  void stopStream()
+  {
+    if(this->Streaming)
+      {
+      this->Streaming=false;
+      this->Pipe->Send(vtkVRUIPipe::STOPSTREAM_REQUEST);
+      }
+  }
+
+  // --------------------------------------------------------------------------
+  // Streaming routine called when streaming is used
+  void readStream()
+  {
+    this->StateMutex->lock();
+    this->Pipe->ReadState(this->State);
+    this->StateMutex->unlock();
+    bool done=false;
+    vtkVRUIPipe::MessageTag m=this->Pipe->Receive();
+    switch(m)
+      {
+      case vtkVRUIPipe::PACKET_REPLY:
+#ifdef VRUI_ENABLE_DEBUG
+        cout << "thread:PACKET_REPLY ok : tag=" << m << endl;
+#endif
+        this->StateMutex->lock();
+        this->Pipe->ReadState(this->State);
+        this->StateMutex->unlock();
+
+        break;
+      case vtkVRUIPipe::STOPSTREAM_REPLY:
+        cout << "thread:STOPSTREAM_REPLY ok : tag=" << m << endl;
+        done=true;
+        break;
+      default:
+        cerr << "thread: Mismatching message while waiting for PACKET_REPLY: tag="
+             << this->Pipe->GetString( m ) << "::"
+             << m << endl;
+        done=true;
+        break;
+      }
+  }
 };
 
-
-// -----------------------------------------------------------------------cnstr
+// ----------------------------------------------------------------------------
 vtkVRUIConnection::vtkVRUIConnection(QObject* parentObject)
   :Superclass( parentObject )
 {
@@ -139,20 +282,22 @@ vtkVRUIConnection::vtkVRUIConnection(QObject* parentObject)
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
+  this->Matrix= vtkMatrix4x4::New();
+  this->ZUpToYUpMatrix = vtkMatrix4x4::New();
 }
 
-// -----------------------------------------------------------------------destr
+// ----------------------------------------------------------------------------
 vtkVRUIConnection::~vtkVRUIConnection()
 {
-  this->StopStream();
-
-  this->Deactivate();
-
-  delete this->Internals;
+  this->ZUpToYUpMatrix->Delete();
+  this->Matrix->Delete();
   this->Transformation->Delete();
+  this->Internals->stopStream();
+  this->Internals->deactivate();
+  delete this->Internals;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::AddButton(std::string id, std::string name)
 {
   std::stringstream returnStr;
@@ -161,7 +306,7 @@ void vtkVRUIConnection::AddButton(std::string id, std::string name)
   this->ButtonPresent = true;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::AddAnalog(std::string id, std::string name )
 {
   std::stringstream returnStr;
@@ -170,7 +315,7 @@ void vtkVRUIConnection::AddAnalog(std::string id, std::string name )
   this->AnalogPresent = true;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::AddTracking( std::string id, std::string name)
 {
   std::stringstream returnStr;
@@ -179,19 +324,19 @@ void vtkVRUIConnection::AddTracking( std::string id, std::string name)
   this->TrackerPresent = true;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::SetName(std::string name)
 {
   this->Name = name;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::SetAddress(std::string name)
 {
   this->Address = name;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::SetQueue( vtkVRQueue* queue )
 {
   this->EventQueue = queue;
@@ -200,39 +345,17 @@ void vtkVRUIConnection::SetQueue( vtkVRQueue* queue )
 // ----------------------------------------------------------------------------
 bool vtkVRUIConnection::Init()
 {
-  QTcpSocket *socket=new QTcpSocket;
-  socket->connectToHost(QString(this->Address.c_str()),atoi( this->Port.c_str() )); // ReadWrite?
-  this->Internals->Pipe=new vtkVRUIPipe(socket);
-  this->Internals->Pipe->Send(vtkVRUIPipe::CONNECT_REQUEST);
-  if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
-    {
-    cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
-    delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
-    return false;
-    }
-  if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::CONNECT_REPLY)
-    {
-    cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
-    delete this->Internals->Pipe;
-    this->Internals->Pipe=0;
-    return false;
-    }
-
-  this->Internals->State=new vtkVRUIServerState;
-  this->Internals->StateMutex=new QMutex;
-
-  this->Internals->Pipe->ReadLayout(this->Internals->State);
-
-  this->Activate();
-
-  //this->StartStream();
-
+  // Initialize the socket connetion;
+  this->Internals->initSocket(this->Address, this->Port);
+  this->Internals->initPipe();
+  if ( !this->Internals->connect() ) return false;
+  this->Internals->activate();
+  //this->Internals->startStream();
   this->Initialized=true;
   return true;
 }
 
-// ----------------------------------------------------------------private-slot
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::run()
 {
   while ( !this->_Stop )
@@ -241,7 +364,7 @@ void vtkVRUIConnection::run()
       {
       if ( this->Internals->Streaming )
         {
-        this->Internals->stream();
+        this->Internals->readStream();
         }
       else
         {
@@ -251,20 +374,20 @@ void vtkVRUIConnection::run()
     }
 }
 
-// ---------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::Stop()
 {
   this->_Stop = true;
-  this->StopStream();
-  this->Deactivate();
+  this->Internals->stopStream();
+  this->Internals->deactivate();
   QThread::terminate();
 }
 
 
-// ---------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 std::string vtkVRUIConnection::GetName( int eventType, int id )
 {
-  std::stringstream returnStr,connection,event;
+  std::stringstream returnStr,connection,e;
   if(this->Name.size())
     returnStr << this->Name << ".";
   else
@@ -272,31 +395,31 @@ std::string vtkVRUIConnection::GetName( int eventType, int id )
   switch (eventType )
     {
     case ANALOG_EVENT:
-      event << "analog." << id;
-      if( this->AnalogMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->AnalogMapping[event.str()];
+      e << "analog." << id;
+      if( this->AnalogMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->AnalogMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case BUTTON_EVENT:
-      event << "button." << id;
-      if( this->ButtonMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->ButtonMapping[event.str()];
+      e << "button." << id;
+      if( this->ButtonMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->ButtonMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case TRACKER_EVENT:
-      event << "tracker."<< id;
-      if( this->TrackerMapping.find( event.str())!=this->TrackerMapping.end())
-        returnStr << this->TrackerMapping[event.str()];
+      e << "tracker."<< id;
+      if( this->TrackerMapping.find( e.str())!=this->TrackerMapping.end())
+        returnStr << this->TrackerMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     }
   return returnStr.str();
 }
 
-// ---------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::verifyConfig( const char* id,
                                       const char* name )
 {
@@ -310,7 +433,7 @@ void vtkVRUIConnection::verifyConfig( const char* id,
     }
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 bool vtkVRUIConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 {
   bool returnVal = false;
@@ -318,33 +441,33 @@ bool vtkVRUIConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     {
     for ( unsigned cc=0; cc < child->GetNumberOfNestedElements();++cc )
       {
-      vtkPVXMLElement* event = child->GetNestedElement(cc);
-      if ( event && event->GetName() )
+      vtkPVXMLElement* e = child->GetNestedElement(cc);
+      if ( e && e->GetName() )
         {
-        const char* id = event->GetAttributeOrEmpty( "id" );
-        const char* name = event->GetAttributeOrEmpty( "name" );
+        const char* id = e->GetAttributeOrEmpty( "id" );
+        const char* name = e->GetAttributeOrEmpty( "name" );
         this->verifyConfig(id, name);
 
-        if ( strcmp( event->GetName(), "Button" )==0 )
+        if ( strcmp( e->GetName(), "Button" )==0 )
           {
           this->AddButton( id, name );
           }
-        else if ( strcmp( event->GetName(), "Analog" )==0 )
+        else if ( strcmp( e->GetName(), "Analog" )==0 )
           {
           this->AddAnalog( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "Tracker" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "Tracker" ) ==0 )
           {
           this->AddTracking( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "TrackerTransform" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "TrackerTransform" ) ==0 )
           {
-          this->configureTransform( event );
+          this->configureTransform( e );
           }
 
         else
           {
-          qWarning() << "Unknown Device type: \"" << event->GetName() <<"\"";
+          qWarning() << "Unknown Device type: \"" << e->GetName() <<"\"";
           }
         returnVal = true;
         }
@@ -353,7 +476,7 @@ bool vtkVRUIConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
   return returnVal;
 }
 
-// ---------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::configureTransform( vtkPVXMLElement* child )
 {
   if (child->GetName() && strcmp( child->GetName(), "TrackerTransform" )==0 )
@@ -365,7 +488,7 @@ void vtkVRUIConnection::configureTransform( vtkPVXMLElement* child )
     }
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRUIConnection::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
@@ -380,7 +503,7 @@ vtkPVXMLElement* vtkVRUIConnection::saveConfiguration() const
   return child;
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
 {
   if(!this->ButtonPresent) return;
@@ -399,19 +522,19 @@ void vtkVRUIConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "button" )==0 )
       {
-      event->SetName("Button");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Button");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
 {
   if(!this->AnalogPresent) return;
@@ -430,19 +553,19 @@ void vtkVRUIConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "analog" )==0 )
       {
-      event->SetName("Analog");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Analog");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
 {
   if(!this->TrackerPresent) return;
@@ -461,19 +584,19 @@ void vtkVRUIConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "tracker" )==0 )
       {
-      event->SetName("Tracker");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Tracker");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
-// ---------------------------------------------------------------------private
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child ) const
 {
   if(!this->TrackerTransformPresent) return;
@@ -489,7 +612,7 @@ void vtkVRUIConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child 
   transformationMatrix->FastDelete();
 }
 
-// ----------------------------------------------------------------------public
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::SetTransformation( vtkMatrix4x4* matrix )
 {
   for (int i = 0; i < 4; ++i)
@@ -502,62 +625,26 @@ void vtkVRUIConnection::SetTransformation( vtkMatrix4x4* matrix )
   this->TrackerTransformPresent = true;
 }
 
-void vtkVRUIConnection::Activate()
-{
-  if(!this->Internals->Active)
-    {
-    this->Internals->Pipe->Send(vtkVRUIPipe::ACTIVATE_REQUEST);
-    this->Internals->Active=true;
-    }
-}
-
-void vtkVRUIConnection::Deactivate()
-{
-  if(this->Internals->Active)
-    {
-    this->Internals->Active=false;
-    this->Internals->Pipe->Send(vtkVRUIPipe::DEACTIVATE_REQUEST);
-    }
-}
-
-void vtkVRUIConnection::StartStream()
-{
-  if(this->Internals->Active)
-    {
-    this->Internals->Streaming=true;
-    this->Internals->PacketSignalCond=new QWaitCondition;
-    QMutex m;
-    m.lock();
-    this->Internals->Pipe->Send(vtkVRUIPipe::STARTSTREAM_REQUEST);
-    this->Internals->PacketSignalCond->wait(&m);
-    m.unlock();
-    }
-}
-
-void vtkVRUIConnection::StopStream()
-{
-  if(this->Internals->Streaming)
-    {
-    this->Internals->Streaming=false;
-    this->Internals->Pipe->Send(vtkVRUIPipe::STOPSTREAM_REQUEST);
-    }
-}
-
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::callback()
 {
   if(this->Initialized)
     {
-    // std::cout << "callback()" << std::endl;
 
+#ifdef VRUI_ENABLE_DEBUG
+    std::cout << "callback()" << std::endl;
+#endif
     this->Internals->StateMutex->lock();
     this->GetAndEnqueueButtonData();
     this->GetAndEnqueueAnalogData();
     this->GetAndEnqueueTrackerData();
     this->Internals->StateMutex->unlock();
+
     this->GetNextPacket(); // for the next step
     }
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetNextPacket()
 {
   if(this->Internals->Active)
@@ -565,19 +652,20 @@ void vtkVRUIConnection::GetNextPacket()
     if(this->Internals->Streaming)
       {
       // With a thread
-      this->Internals->PacketSignalCondMutex->lock();
-      this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
-      this->Internals->PacketSignalCondMutex->unlock();
+      // this->Internals->PacketSignalCondMutex->lock();
+      // this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
+      // this->Internals->PacketSignalCondMutex->unlock();
       }
     else
       {
       // With a loop
       this->Internals->Pipe->Send(vtkVRUIPipe::PACKET_REQUEST);
-      if(this->Internals->Pipe->WaitForServerReply(10000))
+      if(this->Internals->Pipe->WaitForServerReply(30000))
         {
         if(this->Internals->Pipe->Receive()!=vtkVRUIPipe::PACKET_REPLY)
           {
-          cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << endl;
+          cout << "VRUI Mismatching message while waiting for PACKET_REPLY" << std::endl;
+          abort();
           }
         else
           {
@@ -597,67 +685,7 @@ void vtkVRUIConnection::GetNextPacket()
     }
 }
 
-void vtkVRUIConnection::PrintPositionOrientation()
-{
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
-    this->Internals->State->GetTrackerStates();
-
-  float pos[3];
-  float q[4];
-  (*trackers)[0]->GetPosition(pos);
-  (*trackers)[0]->GetUnitQuaternion(q);
-
-  // cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
-  // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
-  //      << endl;
-
-  vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
-  // cout << "button0=" << (*buttons)[0] << endl;
-  pqView *view = 0;
-  view = pqActiveObjects::instance().activeView();
-  if ( view )
-    {
-    vtkSMRenderViewProxy *proxy = 0;
-    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-    if ( proxy )
-      {
-      double rotMat[3][3];
-      vtkMath::QuaternionToMatrix3x3((double*)q,rotMat);
-      vtkSMDoubleVectorProperty *prop = 0;
-      prop = vtkSMDoubleVectorProperty::SafeDownCast( proxy->GetProperty( "HeadPose" ) );
-      if ( prop )
-        {
-        prop->SetElement( 0,  rotMat[0][0] );
-        prop->SetElement( 1,  rotMat[0][1] );
-        prop->SetElement( 2,  rotMat[0][2] );
-        prop->SetElement( 3,  pos [0]*1  );
-
-        prop->SetElement( 4,  rotMat[1][0] );
-        prop->SetElement( 5,  rotMat[1][1] );
-        prop->SetElement( 6,  rotMat[1][2] );
-        prop->SetElement( 7,  pos [1]*1  );
-
-        prop->SetElement( 8,  rotMat[2][0] );
-        prop->SetElement( 9,  rotMat[2][1] );
-        prop->SetElement( 10, rotMat[2][2] );
-        prop->SetElement( 11, pos [2]*1  );
-
-        prop->SetElement( 12, 0.0 );
-        prop->SetElement( 13, 0.0 );
-        prop->SetElement( 14, 0.0 );
-        prop->SetElement( 15, 1.0 );
-
-        // proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], pos[0]*1,
-        //                  rotMat[1][0], rotMat[1][1],rotMat[1][2], pos[1]*1,
-        //                  rotMat[2][0], rotMat[2][1],rotMat[2][2], pos[2]*1,
-        //                  0.0, 0.0, 0.0, 1.0 );
-        proxy->UpdateVTKObjects();
-        proxy->StillRender();
-        }
-      }
-    }
-}
-
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::NewAnalogValue(vtkstd::vector<float> *data)
 {
   vtkVREventData temp;
@@ -665,14 +693,15 @@ void vtkVRUIConnection::NewAnalogValue(vtkstd::vector<float> *data)
   temp.name = GetName( ANALOG_EVENT);
   temp.eventType = ANALOG_EVENT;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
-  temp.data.analog.num_channel = ( *data ).size();
-  for ( int i=0 ; i<( *data ).size() ;++i )
+  temp.data.analog.num_channel = ( int )( *data ).size();
+  for ( unsigned int i=0 ; i<( *data ).size() ;++i )
     {
     temp.data.analog.channel[i] = ( *data )[i];
     }
   this->EventQueue->enqueue( temp );
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::NewButtonValue(int state,  int button)
 {
   vtkVREventData temp;
@@ -685,9 +714,9 @@ void vtkVRUIConnection::NewButtonValue(int state,  int button)
   this->EventQueue->enqueue( temp );
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor)
 {
-
   vtkVREventData temp;
   temp.connId = this->Address;
   temp.name = GetName( TRACKER_EVENT, sensor );
@@ -699,81 +728,142 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
   float q[4];
   data->GetPosition(pos);
   data->GetUnitQuaternion(q);
-  vtkMath::QuaternionToMatrix3x3(&q[0], rotMatrix );
-  vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
 
-  matrix->Element[0][0] = rotMatrix[0][0];
-  matrix->Element[0][1] = rotMatrix[0][1];
-  matrix->Element[0][2] = rotMatrix[0][2];
-  matrix->Element[0][3] = pos[0];
+#if defined( VRUI_ENABLE_DEBUG ) || 0
+  cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")" << endl;
+#endif
 
-  matrix->Element[1][0] = rotMatrix[1][0];
-  matrix->Element[1][1] = 1*rotMatrix[1][1];
-  matrix->Element[1][2] = rotMatrix[1][2];
-  matrix->Element[1][3] = pos[1];
+  // VTK expects quaternion in the format of (real, i, j, k), where as
+  // FreeVR VRUI Daemon is giving us (i,j,k, real)
+  float vtkQuat[4] = {q[3], q[0], q[1], q[2]};
 
-  matrix->Element[2][0] = rotMatrix[2][0];
-  matrix->Element[2][1] = rotMatrix[2][1];
-  matrix->Element[2][2] = rotMatrix[2][2];
-  matrix->Element[2][3] = pos[2];
+  vtkMath::QuaternionToMatrix3x3(&vtkQuat[0], rotMatrix );
 
-  matrix->Element[3][0] = 0.0f;
-  matrix->Element[3][1] = 0.0f;
-  matrix->Element[3][2] = 0.0f;
-  matrix->Element[3][3] = 1.0f;
 
-  vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
+  this->Matrix->Element[0][0] = rotMatrix[0][0];
+  this->Matrix->Element[1][0] = rotMatrix[1][0];
+  this->Matrix->Element[2][0] = rotMatrix[2][0];
+  this->Matrix->Element[3][0] = 0.0;
 
-  temp.data.tracker.matrix[0] = matrix->Element[0][0];
-  temp.data.tracker.matrix[1] = matrix->Element[0][1];
-  temp.data.tracker.matrix[2] = matrix->Element[0][2];
-  temp.data.tracker.matrix[3] = matrix->Element[0][3];
+  this->Matrix->Element[0][1] = rotMatrix[0][1];
+  this->Matrix->Element[1][1] = rotMatrix[1][1];
+  this->Matrix->Element[2][1] = rotMatrix[2][1];
+  //this->Matrix->Element[1][3] = pos[2]*1/12;
+  this->Matrix->Element[3][1] = 0.0;
 
-  temp.data.tracker.matrix[4] = matrix->Element[1][0];
-  temp.data.tracker.matrix[5] = matrix->Element[1][1];
-  temp.data.tracker.matrix[6] = matrix->Element[1][2];
-  temp.data.tracker.matrix[7] = matrix->Element[1][3];
+  this->Matrix->Element[0][2] = rotMatrix[0][2];
+  this->Matrix->Element[1][2] = rotMatrix[1][2];
+  this->Matrix->Element[2][2] = rotMatrix[2][2];
+  //this->Matrix->Element[2][3] = pos[1]*-1/12;
+  this->Matrix->Element[3][2] = 0.0;
 
-  temp.data.tracker.matrix[8] = matrix->Element[2][0];
-  temp.data.tracker.matrix[9] = matrix->Element[2][1];
-  temp.data.tracker.matrix[10] = matrix->Element[2][2];
-  temp.data.tracker.matrix[11] = matrix->Element[2][3];
+  this->Matrix->Element[0][3] = pos[0] / 12.0;
+  this->Matrix->Element[1][3] = pos[1] / 12.0;
+  this->Matrix->Element[2][3] = pos[2] / 12.0;
+  this->Matrix->Element[3][3] = 1.0f;
 
-  temp.data.tracker.matrix[12] = matrix->Element[3][0];
-  temp.data.tracker.matrix[13] = matrix->Element[3][1];
-  temp.data.tracker.matrix[14] = matrix->Element[3][2];
-  temp.data.tracker.matrix[15] = matrix->Element[3][3];
+#if defined( VRUI_ENABLE_DEBUG ) || 0
+  if(sensor)
+  {
+    std::cout << "Pre multiplication matrix: " << std::endl;
+    this->Matrix->PrintSelf( cout, vtkIndent(0) );
+  }
+#endif
 
-  matrix->Delete();
+
+  this->ZUpToYUpMatrix->Element[0][0] = 1.0;
+  this->ZUpToYUpMatrix->Element[1][0] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][0] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][0] = 0.0;
+
+  this->ZUpToYUpMatrix->Element[0][1] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][1] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][1] = -1.0;
+  this->ZUpToYUpMatrix->Element[3][1] = 0.0;
+
+  this->ZUpToYUpMatrix->Element[0][2] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][2] = 1.0;
+  this->ZUpToYUpMatrix->Element[2][2] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][2] = 0.0;
+
+  this->ZUpToYUpMatrix->Element[0][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[1][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[2][3] = 0.0;
+  this->ZUpToYUpMatrix->Element[3][3] = 1.0;
+
+  vtkMatrix4x4::Multiply4x4( this->ZUpToYUpMatrix, this->Matrix, this->Matrix );
+
+#if defined( VRUI_ENABLE_DEBUG ) || 0
+  if(sensor)
+    {
+    std::cout << "Post multiplication matrix: " << std::endl;
+    this->Matrix->PrintSelf( cout, vtkIndent(0) );
+    }
+#endif
+
+
+#if defined( VRUI_ENABLE_DEBUG ) || 0
+  if(sensor)
+    cout << "post pos=("
+         << this->Matrix->Element[0][3] << ","
+         << this->Matrix->Element[1][3] << ","
+         << this->Matrix->Element[2][3] << ")" << endl;
+#endif
+
+  temp.data.tracker.matrix[0] = this->Matrix->Element[0][0];
+  temp.data.tracker.matrix[1] = this->Matrix->Element[0][1];
+  temp.data.tracker.matrix[2] = this->Matrix->Element[0][2];
+  temp.data.tracker.matrix[3] = this->Matrix->Element[0][3];
+
+  temp.data.tracker.matrix[4] = this->Matrix->Element[1][0];
+  temp.data.tracker.matrix[5] = this->Matrix->Element[1][1];
+  temp.data.tracker.matrix[6] = this->Matrix->Element[1][2];
+  temp.data.tracker.matrix[7] = this->Matrix->Element[1][3];
+
+  temp.data.tracker.matrix[8] = this->Matrix->Element[2][0];
+  temp.data.tracker.matrix[9] = this->Matrix->Element[2][1];
+  temp.data.tracker.matrix[10] = this->Matrix->Element[2][2];
+  temp.data.tracker.matrix[11] = this->Matrix->Element[2][3];
+
+  temp.data.tracker.matrix[12] = this->Matrix->Element[3][0];
+  temp.data.tracker.matrix[13] = this->Matrix->Element[3][1];
+  temp.data.tracker.matrix[14] = this->Matrix->Element[3][2];
+  temp.data.tracker.matrix[15] = this->Matrix->Element[3][3];
+
   this->EventQueue->enqueue( temp );
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueButtonData()
 {
   vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
-  for (int i = 0; i < ( *buttons ).size(); ++i)
+  for (unsigned int i = 0; i < ( *buttons ).size(); ++i)
     {
     NewButtonValue( ( *buttons )[i], i );
     }
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueAnalogData()
 {
   vtkstd::vector<float> *analog=this->Internals->State->GetValuatorStates();
   NewAnalogValue( analog );
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueTrackerData()
 {
   vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
-  for (int i = 0; i < ( *trackers ).size(); ++i)
+  for (unsigned int i = 0; i < ( *trackers ).size(); ++i)
     {
     NewTrackerValue( (*trackers )[i] , i);
     }
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRUIConnection::SetPort(std::string port)
 {
   this->Port = port;

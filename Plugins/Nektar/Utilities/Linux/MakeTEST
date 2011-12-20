@@ -1,0 +1,58 @@
+
+ifeq ($(PARALLEL),1)
+
+override CPPFLAGS :=  -DPARALLEL -DMETIS  $(CPPFLAGS) $(MPIINC)
+override LIBS     := $(LIBS) -lgs -lmetis
+override ALL    := $(ALL)
+
+
+ifeq ($(LTYPE),g)  # turn on debug flag
+CPPFLAGS := -DDEBUG $(CPPFLAGS)
+CXXFLAGS := $(DEBUG) $(CCWOFF)
+CFLAGS := $(DEBUG) $(CWOFF)
+FFLAGS := $(FFLAGS) $(DEBUGF) $(FWOFF)
+LDFLAGS  := $(DEBUGLD)
+else      # Maximal optimization flags
+ifeq ($(LTYPE),mopt)
+CXXFLAGS := $(MOPTXX)
+CFLAGS := $(MOPT)
+FFLAGS := $(FFLAGS) $(MOPTF)
+LDFLAGS  := $(MOPTLD)
+else      # Regular optimization flags
+ifeq ($(LTYPE),opt)
+CXXFLAGS := $(OPTXX)
+CFLAGS := $(OPT)
+FFLAGS := $(FFLAGS) $(OPTF)
+LDFLAGS  := $(OPTLD)
+endif
+endif
+endif
+
+endif
+
+override LIB    := $(LIB)$(LTYPE).a
+
+# ---------------------------------------------------------------- #
+# The following expand to give the names of all sections (ALL),    #
+# all library member dependencies (LMOD), all associated           #
+# object files (OBJS), and all source code files (SRC).            #
+# ---------------------------------------------------------------- #
+
+LMOD  = $(foreach routine, $(ALL), $(LIB)($(routine).o))
+OBJS  = $(foreach routine, $(ALL), $(routine).o)
+
+# -----------------------------------------------------------
+
+$(LIB): $(LMOD)
+  ranlib $(LIB)
+
+# ------------------------------------------------------------------
+#                 Special rules for certain files
+# ------------------------------------------------------------------
+
+.C.o:
+  $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+.c.o:
+  $(CC)  $(CFLAGS) $(CPPFLAGS) -c $<
+.F.o:
+  $(FC) $(FFLAGS)  -c $<

@@ -188,6 +188,13 @@ public:
                                   QStringList Value,
                                   PropertyValueType Type = CHECKED);
 
+  // get/set the field selection
+  static QStringList getFieldSelection(vtkSMProperty *Property,
+                                       PropertyValueType Type = CHECKED);
+  static void setFieldSelection(vtkSMProperty *Property,
+                                const QStringList &Value,
+                                PropertyValueType Type = CHECKED);
+
   /// get/set the field selection mode (point, cell, ...)
   static QString getFieldSelectionMode(vtkSMProperty* prop,
                                        PropertyValueType Type = CHECKED);
