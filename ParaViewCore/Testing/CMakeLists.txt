@@ -50,6 +50,8 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSpyPlotUniReader.h
       vtkUndoStackInternal.h
       vtkReservedRemoteObjectIds.h
+      vtkSMSessionProxyManager.h
+      vtkPVSynchronizedRenderWindows.h
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
