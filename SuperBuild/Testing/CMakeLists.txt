@@ -1,6 +1,4 @@
 
-message("Building tests!!")
-
 ExternalProject_Get_Property(ParaView binary_dir)
 set(ParaView_BINARY_DIR "${binary_dir}")
 
@@ -15,7 +13,8 @@ if(WIN32)
   execute_process(
     COMMAND cscript /NoLogo ${ParaViewSuperBuild_SOURCE_DIR}/shortpath.vbs ${Testing_Temporary_Native_dir}
     OUTPUT_VARIABLE Testing_Temporary_short_dir
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
 
   add_test(
     NAME InstallParaView
@@ -28,5 +27,25 @@ elseif(UNIX AND NOT APPLE)
     WORKING_DIRECTORY ${Testing_Temporary_dir}
   )
 else()
-  add_test(InstallParaView ${ParaView_Package})
+
+#hdiutil attach DarwinPorts-1.2-10.4.dmg
+#cd /Volumes/DarwinPorts-1.2/
+#sudo installer -pkg DarwinPorts-1.2.pkg -target "/"
+#hdiutil detach /Volumes/DarwinPorts-1.2/
+
+  add_test(
+    NAME MountDMG
+    COMMAND hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg
+  )
+
+  add_test(
+    NAME InstallParaView 
+    COMMAND installer ${CPACK_PACKAGE_FILE_NAME}.dmg -target ${Testing_Temporary_Native_dir}
+    WORKING_DIRECTORY /Volumes/${CPACK_PACKAGE_FILE_NAME}
+  )
+
+  add_test(
+    NAME UnMountDMG 
+    COMMAND hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}.dmg
+  )
 endif()
