@@ -43,6 +43,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Enable/Disable a view.
+  vtkSetMacro(Enable, bool);
+  vtkGetMacro(Enable, bool);
+  vtkBooleanMacro(Enable, bool);
+
+  // Description:
   // Renders the view using full resolution.
   virtual void StillRender();
 
@@ -103,6 +109,7 @@ protected:
   vtkSetStringMacro(DefaultRepresentationName);
   char* DefaultRepresentationName;
 
+  bool Enable;
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented

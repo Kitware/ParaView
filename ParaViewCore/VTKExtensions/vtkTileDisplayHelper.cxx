@@ -39,7 +39,7 @@ public:
     double PhysicalViewport[4];
     };
 
-  typedef vtkstd::map<void*, vtkTile> TilesMapType;
+  typedef vtkstd::map<unsigned int, vtkTile> TilesMapType;
   TilesMapType LeftEyeTilesMap;
   TilesMapType RightEyeTilesMap;  
 
@@ -62,7 +62,7 @@ public:
 
   // Iterates over all valid tiles in the TilesMap and flush the images to the
   // screen.
-  void FlushTiles(void* current, const int &leftEye)
+  void FlushTiles(unsigned int current, const int &leftEye)
     {    
     TilesMapType *TileMap = NULL;
     if ( leftEye )
@@ -125,7 +125,7 @@ vtkTileDisplayHelper* vtkTileDisplayHelper::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::SetTile(void* key,
+void vtkTileDisplayHelper::SetTile(unsigned int key,
   double viewport[4], vtkRenderer* renderer,
   vtkSynchronizedRenderers::vtkRawImage& image)
 {
@@ -145,14 +145,14 @@ void vtkTileDisplayHelper::SetTile(void* key,
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::EraseTile(void* key)
+void vtkTileDisplayHelper::EraseTile(unsigned int key)
 {
   this->Internals->LeftEyeTilesMap.erase(key);
   this->Internals->RightEyeTilesMap.erase(key);
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::FlushTiles(void* key, int leftEye)
+void vtkTileDisplayHelper::FlushTiles(unsigned int key, int leftEye)
 {
   this->Internals->FlushTiles(key,leftEye);
 }

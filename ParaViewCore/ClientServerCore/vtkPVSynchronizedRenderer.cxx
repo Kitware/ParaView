@@ -53,7 +53,8 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
+void vtkPVSynchronizedRenderer::Initialize(
+  vtkPVSession* session, unsigned int id)
 {
   if(this->Mode != INVALID)
     {
@@ -68,6 +69,10 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
       "vtkPVSynchronizedRenderWindows cannot be used in the current\n"
       "setup. Aborting for debugging purposes.");
     abort();
+    }
+  if (id == 0)
+    {
+    vtkWarningMacro("Id should not be 0.");
     }
 
   // active session must be a paraview-session.
@@ -186,11 +191,11 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
         }
       else
         {
-        this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
-        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
-          tile_dims[0], tile_dims[1]);
-        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
-          tile_mullions[0], tile_mullions[1]);
+        vtkIceTSynchronizedRenderers* isr = vtkIceTSynchronizedRenderers::New();
+        isr->SetIdentifier(id);
+        isr->SetTileDimensions(tile_dims[0], tile_dims[1]);
+        isr->SetTileMullions(tile_mullions[0], tile_mullions[1]);
+        this->ParallelSynchronizer = isr;
         }
 #else
       // FIXME: need to add support for compositing when not using IceT
