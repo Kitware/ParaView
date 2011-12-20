@@ -20,7 +20,8 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-#include <vtkstd/map>
+#include <map>
+#include <set>
 
 class vtkTileDisplayHelper::vtkInternals
 {
@@ -39,13 +40,18 @@ public:
     double PhysicalViewport[4];
     };
 
-  typedef vtkstd::map<unsigned int, vtkTile> TilesMapType;
+  typedef std::set<unsigned int> KeySet;
+  KeySet EnabledKeys;
+
+  typedef std::map<unsigned int, vtkTile> TilesMapType;
   TilesMapType LeftEyeTilesMap;
   TilesMapType RightEyeTilesMap;  
 
   void FlushTile(const TilesMapType::iterator& iter, const TilesMapType& TileMap, const int &vtkNotUsed(leftEye))
     {
-    if (iter != TileMap.end())
+    if (iter != TileMap.end() &&
+      (this->EnabledKeys.size() == 0 || 
+      this->EnabledKeys.find(iter->first) != this->EnabledKeys.end()))
       {
       vtkTile& tile = iter->second;
       vtkRenderer* renderer = tile.Renderer;
@@ -155,6 +161,18 @@ void vtkTileDisplayHelper::EraseTile(unsigned int key)
 void vtkTileDisplayHelper::FlushTiles(unsigned int key, int leftEye)
 {
   this->Internals->FlushTiles(key,leftEye);
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::ResetEnabledKeys()
+{
+  this->Internals->EnabledKeys.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::EnableKey(unsigned int key)
+{
+  this->Internals->EnabledKeys.insert(key);
 }
 
 //----------------------------------------------------------------------------

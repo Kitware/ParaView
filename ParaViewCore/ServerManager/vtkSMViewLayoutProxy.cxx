@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMViewLayoutProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
@@ -763,6 +764,34 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 void vtkSMViewLayoutProxy::UpdateViewPositions()
 {
   this->Internals->UpdateViewPositions();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
+{
+  this->CreateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "ResetTileDisplay"
+         << vtkClientServerStream::End;
+  for (vtkInternals::KDTreeType::iterator iter =
+    this->Internals->KDTree.begin();
+    iter != this->Internals->KDTree.end();
+    ++iter)
+    {
+    if (iter->ViewProxy.GetPointer() != NULL)
+      {
+      stream << vtkClientServerStream::Invoke
+        << VTKOBJECT(this)
+        << "ShowOnTileDisplay"
+        << static_cast<unsigned int>(iter->ViewProxy->GetGlobalID())
+        << vtkClientServerStream::End;
+      }
+    }
+
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------

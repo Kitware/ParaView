@@ -200,6 +200,12 @@ void pqMultiViewWidget::makeFrameActive()
         }
       }
     }
+
+  if (this->layoutManager())
+    {
+    this->layoutManager()->ShowViewsOnTileDisplay();
+    }
+
 }
 
 //-----------------------------------------------------------------------------

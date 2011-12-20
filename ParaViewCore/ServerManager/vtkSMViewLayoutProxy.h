@@ -141,6 +141,12 @@ public:
   void UpdateViewPositions();
 
   // Description:
+  // When in tile-display configuration, only 1 view-layout is shown on the
+  // tile-display (for obvious reasons). To show any particular layout on the
+  // tile display, simply call this method.
+  void ShowViewsOnTileDisplay();
+
+  // Description:
   // Overridden to save custom XML state.
   virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root)
     { return this->Superclass::SaveXMLState(root); }

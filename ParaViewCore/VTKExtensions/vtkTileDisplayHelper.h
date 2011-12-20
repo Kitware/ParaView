@@ -55,6 +55,11 @@ public:
   // Flush the tiles.
   void FlushTiles(unsigned int key, int leftEye);
 
+  // Description:
+  // Set the enabled tiles-set. Only enabled keys are "flushed".
+  void ResetEnabledKeys();
+  void EnableKey(unsigned int);
+
 //BTX
 protected:
   vtkTileDisplayHelper();
