@@ -63,6 +63,13 @@ public:
   void SetMasking(bool val);
   double* GetBounds();
 
+  //***************************************************************************
+  // Overridden to forward to the vtkGlyph3DMapper.
+  virtual void SetInterpolateScalarsBeforeMapping(int val);
+  virtual void SetLookupTable(vtkScalarsToColors* val);
+  virtual void SetMapScalars(int val);
+  virtual void SetStatic(int val);
+
 //BTX
 protected:
   vtkGlyph3DRepresentation();
@@ -91,6 +98,11 @@ protected:
   // Used in ConvertSelection to locate the prop used for actual rendering.
   virtual vtkPVLODActor* GetRenderedProp()
     { return this->GlyphActor; }
+
+  // Description:
+  // Overridden to ensure that the coloring decisions are passed over to the
+  // glyph mapper.
+  virtual void UpdateColoringParameters();
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
