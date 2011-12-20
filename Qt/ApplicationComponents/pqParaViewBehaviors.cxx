@@ -106,5 +106,9 @@ pqParaViewBehaviors::pqParaViewBehaviors(
     mainWindow);
   QObject::connect(altSpace, SIGNAL(activated()),
     pqApplicationCore::instance(), SLOT(quickLaunch()));
+  QShortcut *ctrlF = new QShortcut(Qt::CTRL + Qt::Key_F,
+    mainWindow);
+  QObject::connect(ctrlF, SIGNAL(activated()),
+    pqApplicationCore::instance(), SLOT(startSearch()));
 }
 

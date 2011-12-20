@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsInit.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
+#include "pqItemViewSearchWidget.h"
 #include "pqPQLookupTableManager.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
 #include "pqSetName.h"
+#include "pqSpreadSheetViewModel.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonManager.h"
@@ -49,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAction>
 #include <QShortcut>
+#include <QApplication>
+#include <QAbstractItemView>
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(
@@ -113,6 +117,27 @@ void pqPVApplicationCore::quickLaunch()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqPVApplicationCore::startSearch()
+{
+  if(!QApplication::focusWidget())
+    {
+    return;
+    }
+  QAbstractItemView* focusItemView =
+    qobject_cast<QAbstractItemView*>(QApplication::focusWidget());
+  if(!focusItemView)
+    {
+    return;
+    }
+  // currently we don't support search on pqSpreadSheetViewModel
+  if(qobject_cast<pqSpreadSheetViewModel*>(focusItemView->model()))
+    {
+    return;
+    }
+  pqItemViewSearchWidget searchDialog(focusItemView);
+  searchDialog.showSearchWidget();
+}
 //-----------------------------------------------------------------------------
 pqApplyPropertiesManager* pqPVApplicationCore::applyPropertiesManager() const
 {
