@@ -333,13 +333,13 @@ void vtkSMProxyProperty::SetNumberOfProxies(unsigned int num)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfProxies()
 {
-  return this->PPInternals->Proxies.size();
+  return static_cast<unsigned int>(this->PPInternals->Proxies.size());
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 {
-  return this->PPInternals->UncheckedProxies.size();
+  return static_cast<unsigned int>(this->PPInternals->UncheckedProxies.size());
 }
 
 //---------------------------------------------------------------------------
