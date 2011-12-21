@@ -7,6 +7,10 @@ if(NOT ParaView_BINARY_DIR)
   find_path(ParaView_BINARY_DIR CPackParaViewConfig.cmake)
 endif()
 
+if(NOT Testing_Temporary_dir)
+  set(Testing_Temporary_dir ${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary)
+endif()
+
 #include cpack file to get package variables
 include(${ParaView_BINARY_DIR}/Applications/ParaView/CPackParaViewConfig.cmake)
 file(TO_NATIVE_PATH ${Testing_Temporary_dir} Testing_Temporary_Native_dir)

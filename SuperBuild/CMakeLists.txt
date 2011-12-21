@@ -568,6 +568,7 @@ if(BUILD_TESTING)
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaViewBinaryTesting-build
     CMAKE_CACHE_ARGS
       -DParaView_BINARY_DIR:PATH=${ParaView_BINARY_DIR}
+      -DTesting_Temporary_dir:PATH=${Testing_Temporary_dir}
     INSTALL_COMMAND ""
   )
   #add_subdirectory(Testing)
