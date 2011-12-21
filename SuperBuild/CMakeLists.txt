@@ -488,8 +488,7 @@ list(REMOVE_DUPLICATES PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS)
 # Configure and build ParaView
 #------------------------------------------------------------------------------
 
-set(proj ParaView)
-ExternalProject_Add(${proj}
+ExternalProject_Add(ParaView
   DEPENDS ${ParaView_dependencies}
   DOWNLOAD_COMMAND ""
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -555,11 +554,21 @@ ExternalProject_Add(${proj}
 include(CTest)
 if(BUILD_TESTING)
   enable_testing()
-endif(BUILD_TESTING)
 
-# Testing.
-if(BUILD_TESTING)
   set(Testing_Temporary_dir ${ParaViewSuperBuild_BINARY_DIR}/Testing/Temporary)
   make_directory(${Testing_Temporary_dir})
-  add_subdirectory(Testing)
+  
+  ExternalProject_Get_Property(ParaView binary_dir)
+  set(ParaView_BINARY_DIR "${binary_dir}")
+  
+  ExternalProject_Add(ParaViewBinaryTesting
+    DEPENDS ParaView
+    DOWNLOAD_COMMAND ""
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Testing
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaViewBinaryTesting-build
+    CMAKE_CACHE_ARGS
+      -DParaView_BINARY_DIR:PATH=${ParaView_BINARY_DIR}
+    INSTALL_COMMAND ""
+  )
+  #add_subdirectory(Testing)
 endif()
