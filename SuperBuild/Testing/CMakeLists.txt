@@ -7,6 +7,10 @@ include(${ParaView_BINARY_DIR}/Applications/ParaView/CPackParaViewConfig.cmake)
 
 file(TO_NATIVE_PATH ${Testing_Temporary_dir} Testing_Temporary_Native_dir)
 
+set(PV_INSTALL_LOCATION ${Testing_Temporary_dir}/install)
+set(PV_INSTALL_BINARY ${PV_INSTALL_LOCATION}/bin/paraview${CMAKE_EXECUTABLE_SUFFIX})
+set(PV_INSTALL_TEST_XML_DIR ${ParaViewSuperBuild_SOURCE_DIR}/Testing/XML)
+
 # First order of business. Install ParaView!
 if(WIN32)
   # we need the short path to the temp dir
@@ -27,12 +31,6 @@ elseif(UNIX AND NOT APPLE)
     WORKING_DIRECTORY ${Testing_Temporary_dir}
   )
 else()
-
-#hdiutil attach DarwinPorts-1.2-10.4.dmg
-#cd /Volumes/DarwinPorts-1.2/
-#sudo installer -pkg DarwinPorts-1.2.pkg -target "/"
-#hdiutil detach /Volumes/DarwinPorts-1.2/
-
   add_test(
     NAME MountDMG
     COMMAND hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg
@@ -47,5 +45,26 @@ else()
   add_test(
     NAME UnMountDMG 
     COMMAND hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}.dmg
+  )
+endif()
+
+if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
+  add_test(
+    NAME LoadAcuSolveReaderPlugin
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadAcuSolveReaderPlugin.xml --exit
+  )
+endif()
+
+if(PARAVIEW_BUILD_PLUGIN_VisTrails)
+  add_test(
+    NAME LoadVisTrailsPlugin
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadAcuSolveReaderPlugin.xml --exit
+  )
+endif()
+
+if(PARAVIEW_BUILD_PLUGIN_Nektar)
+  add_test(
+    NAME LoadNektarReaderPlugin
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadNektarReaderPlugin.xml --exit
   )
 endif()
