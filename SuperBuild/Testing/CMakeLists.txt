@@ -1,14 +1,15 @@
 
-ExternalProject_Get_Property(ParaView binary_dir)
-set(ParaView_BINARY_DIR "${binary_dir}")
+cmake_minimum_required(VERSION 2.8.3)
 
-#include cpack file to get package variables
-include(${ParaView_BINARY_DIR}/Applications/ParaView/CPackParaViewConfig.cmake)
+project(ParaViewBinaryTesting)
+
+if(NOT Testing_Temporary_dir)
+  set(Testing_Temporary_dir ${CMAKE_CURRENT_BINARY_DIR}/Testing/Temporary)
+endif()
 
 file(TO_NATIVE_PATH ${Testing_Temporary_dir} Testing_Temporary_Native_dir)
-
 set(PV_INSTALL_LOCATION ${Testing_Temporary_dir}/install)
-set(PV_INSTALL_TEST_XML_DIR ${ParaViewSuperBuild_SOURCE_DIR}/Testing/XML)
+set(PV_INSTALL_TEST_XML_DIR ${ParaViewBinaryTesting_SOURCE_DIR}/XML)
 
 # First order of business. Install ParaView!
 if(WIN32)
@@ -62,7 +63,7 @@ endif()
 if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   add_test(
     NAME LoadVisTrailsPlugin
-    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadAcuSolveReaderPlugin.xml --exit
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadVisTrailsReaderPlugin.xml --exit
   )
 endif()
 
