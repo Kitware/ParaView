@@ -1463,7 +1463,9 @@
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
           <Property name="VolumeRenderingMode" />
+          <Property name="ResamplingMethod" />
           <Property name="NumberOfSamples" />
+          <Property name="FreezeFocalPoint" />
           <Property name="Shade"/>
         </ExposedProperties>
       </SubProxy>
@@ -2089,6 +2091,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="FreezeFocalPoint"
+        command="SetFreezeFocalPoint"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Focal Point is not moved when Dollying the Camera.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="NumberOfSamples"
         command="SetNumberOfSamples"
         number_of_elements="3"
@@ -2104,6 +2116,16 @@
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <IntVectorProperty name="ResamplingMethod"
+        command="SetRequestedResamplingMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="Frustrum Based" />
+          <Entry value="1" text="Focal Point Based" />
+        </EnumerationDomain>
+      </IntVectorProperty>
 
       <IntVectorProperty name="VolumeRenderingMode"
         command="SetRequestedRenderMode"

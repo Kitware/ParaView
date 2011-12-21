@@ -72,6 +72,11 @@ public:
   vtkGetMacro(RequestedRenderMode, int);
 
   // Description:
+  //Select the type of resampling techinque approach to use.
+  vtkSetMacro(RequestedResamplingMode, int);
+  vtkGetMacro(RequestedResamplingMode, int);
+
+  // Description:
   // Set/Get the number of samples/cells along the i/j/k directions.
   // The default is 128x128x128
   vtkSetVector3Macro(NumberOfSamples,int);
@@ -130,6 +135,8 @@ public:
   virtual int RequestUpdateExtent(
                                   vtkInformation*, vtkInformationVector**, 
                                   vtkInformationVector* );
+  vtkSetMacro(FreezeFocalPoint,bool);
+  vtkGetMacro(FreezeFocalPoint,bool);
 //BTX
 protected:
   vtkAMRVolumeRepresentation();
@@ -182,7 +189,9 @@ protected:
   int ColorAttributeType;
   char* ColorArrayName;
   int RequestedRenderMode;
+  int RequestedResamplingMode;
   int NumberOfSamples[3];
+  bool FreezeFocalPoint;
 
 private:
   vtkAMRVolumeRepresentation(const vtkAMRVolumeRepresentation&); // Not implemented

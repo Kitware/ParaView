@@ -41,6 +41,7 @@ vtkStandardNewMacro(vtkAMRVolumeRepresentation);
 vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 {
   this->RequestedRenderMode = 0; // Use Smart Mode
+  this->RequestedResamplingMode = 0; // Frustrum Mode
   this->RenderView = NULL;
   this->VolumeMapper = vtkAMRVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
@@ -67,6 +68,7 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
   this->OutlineMapper->SetInputConnection(
     this->OutlineUpdateSuppressor->GetOutputPort());
   this->Actor->SetLODMapper(this->OutlineMapper);
+  this->FreezeFocalPoint = false;
 }
 
 //----------------------------------------------------------------------------
@@ -262,6 +264,8 @@ void vtkAMRVolumeRepresentation::UpdateMapperParameters()
   this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
   this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
   this->VolumeMapper->SetNumberOfSamples(this->NumberOfSamples);
+  this->VolumeMapper->SetRequestedResamplingMode(this->RequestedResamplingMode);
+  this->VolumeMapper->SetFreezeFocalPoint(this->FreezeFocalPoint);
   switch (this->ColorAttributeType)
     {
   case CELL_DATA:

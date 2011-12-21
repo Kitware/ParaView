@@ -98,6 +98,7 @@ public:
     this->BackfaceRepresentationAdaptor = 0;
     this->SliceDomain = 0;
     this->SelectedMapperAdaptor = 0;
+    this->SelectedResamplerAdaptor = 0;
     this->CompositeTreeAdaptor = 0;
     }
 
@@ -121,6 +122,7 @@ public:
   pqSignalAdaptorColor*    AmbientColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
   pqSignalAdaptorComboBox* SelectedMapperAdaptor;
+  pqSignalAdaptorComboBox* SelectedResamplerAdaptor;
   pqSignalAdaptorComboBox* BackfaceRepresentationAdaptor;
   pqWidgetRangeDomain* SliceDomain;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
@@ -493,6 +495,20 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
         pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, false, true);
     }
 
+  if (reprProxy->GetProperty("ResamplingMethod"))
+    {
+    QList<QVariant> methodNames =
+      pqSMAdaptor::getEnumerationPropertyDomain(
+        reprProxy->GetProperty("ResamplingMethod"));
+    foreach(QVariant item, methodNames)
+      {
+      this->Internal->SelectResamplerMethod->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+      this->Internal->SelectedResamplerAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, reprProxy->GetProperty("ResamplingMethod"));
+    }
   if (reprProxy->GetProperty("SelectMapper"))
     {
     QList<QVariant> mapperNames =
@@ -624,6 +640,18 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->Internal->Shading->setEnabled(false);
     }
 
+  if (reprProxy->GetProperty("FreezeFocalPoint"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->FreezeFocalPoint,
+      "checked", SIGNAL(toggled(bool)),
+      reprProxy, reprProxy->GetProperty("FreezeFocalPoint"));
+    this->Internal->Shading->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->FreezeFocalPoint->setEnabled(false);
+    }
+
   this->updateEnableState();
 
 }
@@ -696,6 +724,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
+
+  this->Internal->SelectedResamplerAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->SelectResamplerMethod);
 
   this->Internal->BackfaceRepresentationAdaptor = new pqSignalAdaptorComboBox(
                                    this->Internal->BackfaceStyleRepresentation);
