@@ -61,7 +61,11 @@ if(WIN32)
   #set(MPI_LIBRARY optimized "${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpid${_LINK_LIBRARY_SUFFIX}")
   set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX})
   #set(MPI_EXTRA_LIBRARY optimized "${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX} debug ${OpenMPI_install}/lib/libmpi_cxxd${_LINK_LIBRARY_SUFFIX}")
-  set(MPI_EXTRA_LIBRARY "${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX}")
+  list(APPEND MPI_EXTRA_LIBRARY 
+    ${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX}
+    ${OpenMPI_install}/lib/libopen-pal${_LINK_LIBRARY_SUFFIX}
+    ${OpenMPI_install}/lib/libopen-rte${_LINK_LIBRARY_SUFFIX}
+  )
 else()
   set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi.a)
   set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx.a)
