@@ -62,7 +62,7 @@ endif()
 if(PARAVIEW_BUILD_PLUGIN_VisTrails)
   add_test(
     NAME LoadVisTrailsPlugin
-    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadAcuSolveReaderPlugin.xml --exit
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadVisTrailsReaderPlugin.xml --exit
   )
 endif()
 
