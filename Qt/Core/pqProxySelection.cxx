@@ -47,7 +47,7 @@ bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
     pqApplicationCore::instance()->getServerManagerModel();
 
   pqProxySelection new_selection;
-  vtkSMProxySelectionModel::SelectionType::iterator iter;
+  vtkSMProxySelectionModel::SelectionType::const_iterator iter;
   const vtkSMProxySelectionModel::SelectionType &selection =
     other->GetSelection();
   for (iter = selection.begin(); iter != selection.end(); ++iter)
