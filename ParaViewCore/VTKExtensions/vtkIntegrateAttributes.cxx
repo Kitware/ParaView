@@ -528,6 +528,23 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
       tmp->Delete();
       tmp = 0;
       }
+
+    // now that we have all of the sums from each process
+    // set the point location with the global value
+    if (this->Sum != 0.0)
+      {
+      pt[0] = this->SumCenter[0] / this->Sum;
+      pt[1] = this->SumCenter[1] / this->Sum;
+      pt[2] = this->SumCenter[2] / this->Sum;
+      }
+    else
+      {
+      pt[0] = this->SumCenter[0];
+      pt[1] = this->SumCenter[1];
+      pt[2] = this->SumCenter[2];
+      }
+    output->GetPoints()->SetPoint(0, pt);
+
     if (output->GetPointData()->GetArray("vtkGhostLevels"))
       {
       output->GetPointData()->RemoveArray("vtkGhostLevels");
