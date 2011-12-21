@@ -165,8 +165,12 @@ void vtkSMSession::Initialize()
   // in batch mode, vtkSMSession is created on all nodes.
 
   // All these initializations need to be done on all nodes in symmetric-batch
-  // mode. In non-symmetric-batch mode, I don't think there would be any harm in
-  // doing these anyways.
+  // mode. In non-symmetric-batch mode. Which means we are a CLIENT,
+  // so if we are not then we stop the initialisation here !
+  if( !(this->GetProcessRoles() & vtkPVSession::CLIENT) )
+    {
+    return;
+    }
 
   // Initialize the proxy manager.
   // this updates proxy definitions if we are connected to a remote server.
