@@ -1,14 +1,17 @@
 
-ExternalProject_Get_Property(ParaView binary_dir)
-set(ParaView_BINARY_DIR "${binary_dir}")
+cmake_minimum_required(VERSION 2.8.3)
+
+project(ParaViewBinaryTesting)
+
+if(NOT ParaView_BINARY_DIR)
+  find_path(ParaView_BINARY_DIR CPackParaViewConfig.cmake)
+endif()
 
 #include cpack file to get package variables
 include(${ParaView_BINARY_DIR}/Applications/ParaView/CPackParaViewConfig.cmake)
-
 file(TO_NATIVE_PATH ${Testing_Temporary_dir} Testing_Temporary_Native_dir)
-
 set(PV_INSTALL_LOCATION ${Testing_Temporary_dir}/install)
-set(PV_INSTALL_TEST_XML_DIR ${ParaViewSuperBuild_SOURCE_DIR}/Testing/XML)
+set(PV_INSTALL_TEST_XML_DIR ${ParaViewBinaryTesting_SOURCE_DIR}/XML)
 
 # First order of business. Install ParaView!
 if(WIN32)
