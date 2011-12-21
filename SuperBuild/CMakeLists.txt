@@ -561,15 +561,55 @@ if(BUILD_TESTING)
   ExternalProject_Get_Property(ParaView binary_dir)
   set(ParaView_BINARY_DIR "${binary_dir}")
   
-  ExternalProject_Add(ParaViewBinaryTesting
-    DEPENDS ParaView
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Testing
-    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaViewBinaryTesting-build
-    CMAKE_CACHE_ARGS
-      -DParaView_BINARY_DIR:PATH=${ParaView_BINARY_DIR}
-      -DTesting_Temporary_dir:PATH=${Testing_Temporary_dir}
-    INSTALL_COMMAND ""
+  include(${ParaViewSuperBuild_SOURCE_DIR}/../CMake/ParaViewDetermineVersion.cmake)
+  
+  find_package(Git)
+  
+  determine_version(
+    ${ParaViewSuperBuild_SOURCE_DIR}/..
+    ${GIT_EXECUTABLE}
+    ${ParaViewSuperBuild_SOURCE_DIR}/../CMake/.paraview.version
+    "PARAVIEW")
+
+  # Copied from Applications\ParaView\CMakeLists.txt
+  set(_paraview_version_patch_full "${PARAVIEW_VERSION_PATCH}")
+  if(NOT "${PARAVIEW_VERSION_PATCH_EXTRA}" STREQUAL "")
+    set(_paraview_version_patch_full 
+      "${PARAVIEW_VERSION_PATCH}-${PARAVIEW_VERSION_PATCH_EXTRA}"
+    )
+  endif(NOT "${PARAVIEW_VERSION_PATCH_EXTRA}" STREQUAL "")
+
+  set(PARAVIEW_CPACK_VERSION
+    ${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${_paraview_version_patch_full}
   )
-  #add_subdirectory(Testing)
+
+  # Copied from ParaViewBrandingCPack.cmake - Should put in own file/function
+  IF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
+    SET (CMAKE_SYSTEM_PROCESSOR "x86")
+  ENDIF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
+  IF(NOT DEFINED CPACK_SYSTEM_NAME)
+    SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
+  ENDIF(NOT DEFINED CPACK_SYSTEM_NAME)
+  IF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+    IF(CMAKE_CL_64)
+      SET(CPACK_SYSTEM_NAME Win64-${CMAKE_SYSTEM_PROCESSOR})
+    ELSE(CMAKE_CL_64)
+      SET(CPACK_SYSTEM_NAME Win32-${CMAKE_SYSTEM_PROCESSOR})
+    ENDIF(CMAKE_CL_64)
+  ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+
+  IF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
+    list(LENGTH CMAKE_OSX_ARCHITECTURES _length)
+    IF(_length GREATER 1)
+      SET(CPACK_SYSTEM_NAME Darwin-Universal)
+    ELSE(_length GREATER 1)
+      SET(CPACK_SYSTEM_NAME Darwin-${CMAKE_OSX_ARCHITECTURES})
+    ENDIF(_length GREATER 1)
+  ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
+
+  set(CPACK_PACKAGE_FILE_NAME ParaView-${PARAVIEW_CPACK_VERSION}-${CPACK_SYSTEM_NAME})
+  
+  message("CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}")
+
+  add_subdirectory(Testing)
 endif()
