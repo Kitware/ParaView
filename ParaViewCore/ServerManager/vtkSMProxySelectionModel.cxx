@@ -195,7 +195,7 @@ void vtkSMProxySelectionModel::Select(
     new_selection = this->Selection;
     }
 
-  for (SelectionType::iterator iter = proxies.begin();
+  for (SelectionType::const_iterator iter = proxies.begin();
     iter != proxies.end(); ++iter)
     {
     vtkSMProxy* proxy = iter->GetPointer();
