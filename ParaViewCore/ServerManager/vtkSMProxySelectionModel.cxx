@@ -364,8 +364,8 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Apply the state
   bool tmp = this->IsLocalPushOnly();
   this->EnableLocalPushOnly();
-  this->SetCurrentProxy(currentProxy, NO_UPDATE);
   this->Select(new_selection, CLEAR_AND_SELECT);
+  this->SetCurrentProxy(currentProxy, new_selection.size() == 0 ? SELECT : NO_UPDATE);
   if(!tmp) this->DisableLocalPushOnly();
 }
 
@@ -419,6 +419,9 @@ void vtkSMProxySelectionModel::PushStateToSession()
                                  -1); // Not an outputport
       }
     }
+
+  // If we push our state we are correctly initialized
+  this->Internal->Initilized = true;
 
   if(!this->IsLocalPushOnly() && this->GetSession())
     {

@@ -279,12 +279,6 @@ void pq3DWidget::setView(pqView* pqview)
     return;
     }
 
-  cout << "pq3DWidget::setView()" << endl;
-  if(pqview) cout << " - pqview->getProxy()->GetSession(): " << pqview->getProxy()->GetSession() << endl;
-  if(rview) cout << " - rview->getProxy()->GetSession(): " << rview->getProxy()->GetSession() << endl;
-  if(widget) cout << " - widget->GetSession(): " << widget->GetSession() << endl;
-
-
   // get rid of old shortcut.
   delete this->Internal->PickShortcut;
 
