@@ -124,12 +124,12 @@ set(MANTA_GZ manta-r${MANTA_REVISION}.tar.gz)
 
 #http://www.open-mpi.org/software/ompi/v1.5/downloads/openmpi-1.5.4.tar.gz
 set(OPENMPI_MAJOR 1)
-set(OPENMPI_MINOR 5)
+set(OPENMPI_MINOR 4)
 set(OPENMPI_PATCH 4)
 set(OPENMPI_VERSION ${OPENMPI_MAJOR}.${OPENMPI_MINOR}.${OPENMPI_PATCH})
 set(OPENMPI_URL http://www.open-mpi.org/software/ompi/v${OPENMPI_MAJOR}.${OPENMPI_MINOR}/downloads)
 set(OPENMPI_GZ openmpi-${OPENMPI_VERSION}.tar.gz)
-set(OPENMPI_MD5 cb11927986419374c54aa4c878209913)
+set(OPENMPI_MD5 7253c2a43445fbce2bf4f1dfbac113ad)
 
 set(MPICH2_MAJOR 1)
 set(MPICH2_MINOR 4)
