@@ -109,6 +109,26 @@ protected:
   vtkSMSessionProxyManager* Target;
 };
 //*****************************************************************************
+class vtkSMProxyManagerForwarder : public vtkCommand
+{
+public:
+  static vtkSMProxyManagerForwarder* New()
+    { return new vtkSMProxyManagerForwarder(); }
+
+  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+    {
+    if (vtkSMProxyManager::IsInitialized())
+      {
+      vtkSMProxyManager::GetProxyManager()->InvokeEvent(event, data);
+      }
+    }
+
+protected:
+  vtkSMProxyManagerForwarder()
+    {
+    }
+};
+//*****************************************************************************
 //---------------------------------------------------------------------------
 vtkSMSessionProxyManager* vtkSMSessionProxyManager::New(vtkSMSession* session)
 {
@@ -152,9 +172,7 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
 
   // setup event forwarder so that it forwards all events fired by this class via
   // the global proxy manager.
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkNew<vtkEventForwarderCommand> forwarder;
-  forwarder->SetTarget(pxm);
+  vtkNew<vtkSMProxyManagerForwarder> forwarder;
   this->AddObserver(vtkCommand::AnyEvent, forwarder.GetPointer());
 }
 
