@@ -204,20 +204,21 @@ void pqMultiViewFrame::setTitle(const QString& title)
 
 void pqMultiViewFrame::hideMenu(bool vis)
 {
+  QBoxLayout* boxlayout = qobject_cast<QBoxLayout*>(this->layout());
+  Q_ASSERT(boxlayout);
+
   if(vis && !this->MenuHidden)
-  {
+    {
     this->MenuHidden=true;
-    QLayout* l=this->layout();
     this->Menu->hide();
-    l->removeWidget(this->Menu);
-  }
+    boxlayout->removeWidget(this->Menu);
+    }
   else if(!vis && this->MenuHidden)
-  {
+    {
     this->MenuHidden=false;
-    QLayout* l=this->layout();
-    l->addWidget(this->Menu);
+    boxlayout->insertWidget(0, this->Menu);
     this->Menu->show();
-  }
+    }
 }
 bool pqMultiViewFrame::menuAutoHide() const
 {
@@ -447,14 +448,18 @@ bool pqMultiViewFrame::eventFilter(QObject* caller, QEvent* e)
 //-----------------------------------------------------------------------------
 void pqMultiViewFrame::hideDecorations()
 {
-//  this->hideMenu(true);
-  this->Menu->hide();
+  this->hideMenu(true);
+  this->layout()->setMargin(0);
+  this->layout()->setSpacing(0);
+  //this->Menu->hide();
 }
 
 //-----------------------------------------------------------------------------
 void pqMultiViewFrame::showDecorations()
 {
-//  this->hideMenu(false);
-  this->Menu->show();
+  this->hideMenu(false);
+  this->layout()->setMargin(gPenWidth);
+  this->layout()->setSpacing(gPenWidth);
+  //this->Menu->show();
 }
 

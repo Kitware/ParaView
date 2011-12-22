@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqMultiViewFrame.h"
 #include "pqServerManagerModel.h"
@@ -42,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
 #include "vtkSMViewLayoutProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
 #include <QApplication>
@@ -60,7 +62,7 @@ public:
 
   // This map is used to avoid reassigning frames. Once a view is assigned a
   // frame, we preserve that frame as long as possible.
-  QMap<vtkSMProxy*, QPointer<pqMultiViewFrame> > ViewFrames;
+  QMap<vtkSMViewProxy*, QPointer<pqMultiViewFrame> > ViewFrames;
 
   unsigned long ObserverId;
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
@@ -118,6 +120,56 @@ namespace
       }
     return NULL;
     }
+
+
+  /// A simple subclass of QBoxLayout mimicking the layout style of a QSplitter
+  /// with just 2 widgets.
+  class pqSplitterLayout : public QBoxLayout
+  {
+  double SplitFraction;
+public:
+
+  pqSplitterLayout(QBoxLayout::Direction dir, QWidget* parentWdg)
+    : QBoxLayout(dir, parentWdg), SplitFraction(0.5)
+    {
+    this->setContentsMargins(0, 0, 0,0);
+    this->setSpacing(0);
+    };
+
+  virtual ~pqSplitterLayout()
+    {
+    }
+
+  void setSplitFraction(double val) { this->SplitFraction = val; }
+
+  virtual void setGeometry(const QRect& rect)
+    {
+    this->QLayout::setGeometry(rect);
+
+    Q_ASSERT(this->count() <= 2);
+
+    int offset = 0;
+    double fractions[2] = { this->SplitFraction, 1.0 - this->SplitFraction };
+    for (int cc=0; cc < this->count(); cc++)
+      {
+      QLayoutItem* item = this->itemAt(cc);
+      if (this->direction() == LeftToRight)
+        {
+        item->setGeometry(
+          QRect(offset + rect.x(), rect.y(),
+            fractions[cc] * rect.width(), rect.height()));
+        offset += fractions[cc] * rect.width();
+        }
+      else if (this->direction() == TopToBottom)
+        {
+        item->setGeometry(
+          QRect(rect.x(), offset + rect.y(),
+            rect.width(), fractions[cc] * rect.height()));
+        offset += fractions[cc] * rect.height();
+        }
+      }
+    }
+  };
 }
 
 //-----------------------------------------------------------------------------
@@ -203,7 +255,7 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
       active_index =
         this->Internals->ActiveFrame->property("FRAME_INDEX").toInt();
       }
-    this->layoutManager()->AssignViewToAnyCell(view->getProxy(), active_index);
+    this->layoutManager()->AssignViewToAnyCell(view->getViewProxy(), active_index);
     }
   pqActiveObjects::instance().setActiveView(view);
 }
@@ -235,9 +287,9 @@ void pqMultiViewWidget::makeFrameActive()
 void pqMultiViewWidget::markActive(pqView* view)
 {
    if (view &&
-    this->Internals->ViewFrames.contains(view->getProxy()))
+    this->Internals->ViewFrames.contains(view->getViewProxy()))
      {
-     this->markActive(this->Internals->ViewFrames[view->getProxy()]);
+     this->markActive(this->Internals->ViewFrames[view->getViewProxy()]);
      }
    else
      {
@@ -338,7 +390,7 @@ QWidget* pqMultiViewWidget::createWidget(
     {
   case vtkSMViewLayoutProxy::NONE:
       {
-      vtkSMProxy* view = vlayout->GetView(index);
+      vtkSMViewProxy* view = vlayout->GetView(index);
       pqMultiViewFrame* frame = view?
         this->Internals->ViewFrames[view] : NULL;
       if (!frame)
@@ -378,6 +430,7 @@ QWidget* pqMultiViewWidget::createWidget(
         }
       Q_ASSERT(splitter);
       splitter->setParent(parentWdg);
+      splitter->setHandleWidth(this->DecorationsVisible? 3 : 1);
       this->Internals->Widgets[index] = splitter;
       splitter->setObjectName(QString("Splitter.%1").arg(index));
       splitter->setProperty("FRAME_INDEX", QVariant(index));
@@ -407,25 +460,20 @@ QWidget* pqMultiViewWidget::createWidget(
       }
     else
       {
-      QWidget* box = new QWidget(parentWdg);
-      QBoxLayout* blayout = NULL;
-      if (direction == vtkSMViewLayoutProxy::VERTICAL)
-        {
-        blayout = new QVBoxLayout(box);
-        }
-      else
-        {
-        blayout = new QHBoxLayout(box);
-        }
-      // FIXME how to respect SplitFraction in this layout?
-      blayout->setContentsMargins(0, 0, 0, 0);
-      blayout->setSpacing(0);
-      blayout->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, box));
-      blayout->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, box));
-      box->setLayout(blayout);
-      return box;
+      QWidget* container = new QWidget(parentWdg);
+      pqSplitterLayout* slayout = new pqSplitterLayout(
+        direction == vtkSMViewLayoutProxy::VERTICAL?
+        pqSplitterLayout::TopToBottom :
+        pqSplitterLayout::LeftToRight,
+        container);
+      slayout->setSplitFraction(vlayout->GetSplitFraction(index));
+      container->setLayout(slayout);
+      container->setObjectName(QString("Container.%1").arg(index));
+      slayout->addWidget(
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, container));
+      slayout->addWidget(
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, container));
+      return container;
       }
     break;
     }
@@ -489,7 +537,7 @@ void pqMultiViewWidget::reload()
   // datastructures to get rid of these NULL ptrs.
 
   // remove any deleted view frames.
-  QMutableMapIterator<vtkSMProxy*, QPointer<pqMultiViewFrame> > iter(
+  QMutableMapIterator<vtkSMViewProxy*, QPointer<pqMultiViewFrame> > iter(
       this->Internals->ViewFrames);
   while (iter.hasNext())
     {
@@ -592,4 +640,28 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 
   this->DecorationsVisible = val;
   this->reload();
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
+{
+  QSize requestedSize(dx, dy);
+  QSize originalSize = this->size();
+  QSize mySize = this->size();
+  QSize myMaximumSize = this->maximumSize();
+
+  int magnification =  pqView::computeMagnification(requestedSize, mySize);
+  bool decorationsVisibility = this->DecorationsVisible;
+
+  this->setDecorationsVisible(false);
+  this->setMaximumSize(mySize);
+  this->resize(mySize);
+  pqEventDispatcher::processEventsAndWait(1);
+
+  vtkImageData* image = this->layoutManager()->CaptureWindow(magnification);
+  this->setDecorationsVisible(decorationsVisibility);
+  this->setMaximumSize(myMaximumSize);
+  this->resize(originalSize);
+
+  return image;
 }

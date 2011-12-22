@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMultiViewFrame;
 class pqView;
+class vtkImageData;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
 
@@ -60,6 +61,10 @@ public:
   /// Returns whether window decorations and splitter handles are visible.
   bool isDecorationsVisible() const
      { return this->DecorationsVisible; }
+
+  /// Captures an image for the views in the layout. Note that there must be
+  /// at least one valid view in the widget, otherwise returns NULL.
+  vtkImageData* captureImage(int width, int height);
 
 public slots:
   /// This forces the pqMultiViewWidget to reload its layout from the

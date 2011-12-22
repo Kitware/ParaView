@@ -57,6 +57,9 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   : Superclass(parentObject),
   Internals(new pqInternals())
 {
+  pqApplicationCore::instance()->registerManager(
+    "MULTIVIEW_WIDGET", this);
+
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
 
@@ -229,4 +232,28 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
       vlayout->GetSession())->GetConnectionID();
   this->Internals->TabWidgets.insert(cid, widget);
+}
+
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->currentWidget());
+  if (widget)
+    {
+    return widget->captureImage(dx, dy);
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+QSize pqTabbedMultiViewWidget::clientSize() const
+{
+  if (this->currentWidget())
+    {
+    return this->currentWidget()->size();
+    }
+
+  return this->size();
 }

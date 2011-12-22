@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxy;
 class pqServer;
 class vtkSMViewLayoutProxy;
+class vtkImageData;
 
 /// pqTabbedMultiViewWidget is used to to enable adding of multiple
 /// pqMultiViewWidget instances in tabs. This class directly listens to the
@@ -51,6 +52,13 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QTabWidget
 public:
   pqTabbedMultiViewWidget(QWidget* parent=0);
   virtual ~pqTabbedMultiViewWidget();
+
+  /// Returns the size for the tabs in the widget.
+  QSize clientSize() const;
+
+  /// Captures an image for the views in the layout. Note that there must be
+  /// at least one valid view in the widget, otherwise returns NULL.
+  vtkImageData* captureImage(int width, int height);
 
 public slots:
   void createTab();

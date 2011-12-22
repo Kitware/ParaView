@@ -16,19 +16,23 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkImageData.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMAnimationSceneImageWriter.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
+#include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
-#include <vector>
 #include <assert.h>
+#include <algorithm>
+#include <vector>
 
 class vtkSMViewLayoutProxy::vtkInternals
 {
@@ -37,7 +41,7 @@ public:
     {
     vtkSMViewLayoutProxy::Direction Direction;
     double SplitFraction;
-    vtkWeakPointer<vtkSMProxy> ViewProxy;
+    vtkWeakPointer<vtkSMViewProxy> ViewProxy;
 
     Cell() :
       Direction(vtkSMViewLayoutProxy::NONE),
@@ -274,7 +278,7 @@ void vtkSMViewLayoutProxy::LoadState(
       }
     else
       {
-      cell.ViewProxy = vtkSMProxy::SafeDownCast(
+      cell.ViewProxy = vtkSMViewProxy::SafeDownCast(
         this->GetSession()->GetRemoteObject(value.proxy_global_id(0)));
       }
     }
@@ -472,7 +476,7 @@ int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
+bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
 {
   if (view == NULL)
     {
@@ -521,7 +525,7 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMProxy* view)
 
 //----------------------------------------------------------------------------
 int vtkSMViewLayoutProxy::AssignViewToAnyCell(
-  vtkSMProxy* view, int location_hint)
+  vtkSMViewProxy* view, int location_hint)
 {
   if (!view)
     {
@@ -581,7 +585,7 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
 }
 
 //----------------------------------------------------------------------------
-int vtkSMViewLayoutProxy::RemoveView(vtkSMProxy* view)
+int vtkSMViewLayoutProxy::RemoveView(vtkSMViewProxy* view)
 {
   int index = 0;
   for (vtkInternals::KDTreeType::iterator iter =
@@ -728,7 +732,7 @@ double vtkSMViewLayoutProxy::GetSplitFraction(int location)
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMViewLayoutProxy::GetView(int location)
+vtkSMViewProxy* vtkSMViewLayoutProxy::GetView(int location)
 {
   if (!this->Internals->IsCellValid(location))
     {
@@ -839,6 +843,72 @@ void vtkSMViewLayoutProxy::RestoreMaximizedState()
     this->MaximizedCell = -1;
     this->UpdateState();
     }
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
+{
+  if (this->MaximizedCell != -1)
+    {
+    vtkSMViewProxy* view = this->GetView(this->MaximizedCell);
+    if (view)
+      {
+      return view->CaptureWindow(magnification);
+      }
+    vtkErrorMacro("No view present in the layout.");
+    return NULL;
+    }
+
+  int extent[6] = {VTK_INT_MAX, VTK_INT_MIN,
+    VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN};
+
+  std::vector<vtkSmartPointer<vtkImageData> > images;
+  for (vtkInternals::KDTreeType::iterator iter =
+    this->Internals->KDTree.begin();
+    iter != this->Internals->KDTree.end(); ++iter)
+    {
+    if (iter->ViewProxy.GetPointer())
+      {
+      vtkImageData* image = iter->ViewProxy->CaptureWindow(magnification);
+      if (image)
+        {
+        const int* image_extent = image->GetExtent();
+        extent[0] = std::min(extent[0], image_extent[0]);
+        extent[2] = std::min(extent[2], image_extent[2]);
+        extent[4] = std::min(extent[4], image_extent[4]);
+        extent[1] = std::max(extent[1], image_extent[1]);
+        extent[3] = std::max(extent[3], image_extent[3]);
+        extent[5] = std::max(extent[5], image_extent[5]);
+
+        images.push_back(image);
+        image->FastDelete();
+        }
+      }
+    }
+
+  if (images.size() == 0)
+    {
+    vtkErrorMacro("No view present in the layout.");
+    return NULL;
+    }
+
+  vtkImageData* image = vtkImageData::New();
+  image->SetExtent(extent);
+  image->SetScalarTypeToUnsignedChar();
+  image->SetNumberOfScalarComponents(3);
+  image->AllocateScalars();
+
+  unsigned char* image_data = 
+    reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+  std::fill(
+    image_data, image_data + image->GetNumberOfPoints() * 3,
+    static_cast<unsigned char>(0));
+  
+  for (size_t cc=0; cc < images.size(); cc++)
+    {
+    vtkSMAnimationSceneImageWriter::Merge(image, images[cc]);
+    }
+  return image;
 }
 
 //----------------------------------------------------------------------------

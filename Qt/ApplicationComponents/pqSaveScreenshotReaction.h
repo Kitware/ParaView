@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /// @ingroup Reactions
-/// Reaction to save a screen shot.
+/// Reaction to save a screen shot. This reaction can only be used when
+/// pqTabbedMultiViewWidget is used as the widget containing the views.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveScreenshotReaction : public pqReaction
 {
   Q_OBJECT

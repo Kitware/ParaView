@@ -39,7 +39,8 @@
 
 #include "vtkSMProxy.h"
 
-class vtkSMProxy;
+class vtkSMViewProxy;
+class vtkImageData;
 
 class VTK_EXPORT vtkSMViewLayoutProxy : public vtkSMProxy
 {
@@ -72,7 +73,7 @@ public:
   // Description:
   // Assign a view at a particular location. Note that the view's position may
   // be changed by Split() calls. Returns true on success.
-  bool AssignView(int location, vtkSMProxy* view);
+  bool AssignView(int location, vtkSMViewProxy* view);
 
   // Description:
   // Similar to AssignView() except that is location specified is not available,
@@ -82,12 +83,12 @@ public:
   // we either split the cell or traverse down the sub-tree from the cell and
   // split a cell to make room for the view. Thus, this method will always
   // assign the view to a frame. Returns the assigned location.
-  int AssignViewToAnyCell(vtkSMProxy* view, int location_hint);
+  int AssignViewToAnyCell(vtkSMViewProxy* view, int location_hint);
 
   // Description:
   // Removes a view. Returns the location of the cell emptied by the view, if
   // any, otherwise -1.
-  int RemoveView(vtkSMProxy* view);
+  int RemoveView(vtkSMViewProxy* view);
 
   // Description:
   // Collapses a cell. Only leaf cells without any assigned views can be collapsed.
@@ -148,7 +149,7 @@ public:
 
   // Description:
   // Returns the view, if any, assigned to the given cell location.
-  vtkSMProxy* GetView(int location);
+  vtkSMViewProxy* GetView(int location);
 
   // Description:
   // Updates positions for all views using the layout and current sizes.
@@ -161,6 +162,10 @@ public:
   // tile-display (for obvious reasons). To show any particular layout on the
   // tile display, simply call this method.
   void ShowViewsOnTileDisplay();
+
+  // Description:
+  // Captures an image from the layout (including all the views in the layout.
+  vtkImageData* CaptureWindow(int magnification);
 
   // Description:
   // Overridden to save custom XML state.
