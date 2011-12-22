@@ -102,6 +102,22 @@ public:
   bool SetSplitFraction(int location, double fraction);
 
   // Description:
+  // One can maximize a particular (non-split) cell. Note the maximized state is
+  // restored as soon as the layout is changed or when RestoreMaximizedState()
+  // is called. Returns false if the cell at the location cannot be maximized
+  // since it's a split cell or invalid cell, true otherwise.
+  bool MaximizeCell(int location);
+
+  // Description:
+  // Restores the maximized state.
+  void RestoreMaximizedState();
+
+  // Description:
+  // Returns the maximized cell, if any. Returns -1 if no cell is currently
+  // maximized.
+  vtkGetMacro(MaximizedCell, int);
+
+  // Description:
   // Returns true if the cell identified by the location is a split cell.
   bool IsSplitCell(int location);
 
@@ -183,6 +199,7 @@ protected:
   // Starting with the root, finds a splittable cell. Assumes \c root is valid.
   int GetSplittableCell(int root, Direction& suggested_direction);
 
+  int MaximizedCell;
 private:
   vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&); // Not implemented
   void operator=(const vtkSMViewLayoutProxy&); // Not implemented

@@ -44,13 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkWeakPointer.h"
 
+#include <QApplication>
 #include <QFrame>
+#include <QMap>
 #include <QPointer>
 #include <QSplitter>
-#include <QVBoxLayout>
-#include <QApplication>
+#include <QStackedLayout>
 #include <QVector>
-#include <QMap>
+#include <QVBoxLayout>
 
 class pqMultiViewWidget::pqInternals
 {
@@ -77,6 +78,31 @@ public:
       this->LayoutManager->RemoveObserver(this->ObserverId);
       }
     }
+
+  void setMaximizedWidget(QWidget* wdg)
+    {
+    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
+    if (frame)
+      {
+      frame->MaximizeButton->hide();
+      frame->CloseButton->hide();
+      frame->SplitHorizontalButton->hide();
+      frame->SplitVerticalButton->hide();
+      frame->RestoreButton->show();
+      }
+    if (this->MaximizedWidget)
+      {
+      this->MaximizedWidget->MaximizeButton->show();
+      this->MaximizedWidget->CloseButton->show();
+      this->MaximizedWidget->SplitHorizontalButton->show();
+      this->MaximizedWidget->SplitVerticalButton->show();
+      this->MaximizedWidget->RestoreButton->hide();
+      }
+    this->MaximizedWidget = frame;
+    }
+
+private:
+  QPointer<pqMultiViewFrame> MaximizedWidget;
 };
 
 //-----------------------------------------------------------------------------
@@ -99,10 +125,6 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
   Internals( new pqInternals())
 {
-  QVBoxLayout* vbox = new QVBoxLayout(this);
-  vbox->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(vbox);
-
   qApp->installEventFilter(this);
 
   QObject::connect(&pqActiveObjects::instance(),
@@ -271,6 +293,10 @@ pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
     this, SLOT(splitHorizontal()));
   QObject::connect(frame, SIGNAL(closePressed()),
     this, SLOT(close()));
+  QObject::connect(frame, SIGNAL(maximizePressed()),
+    this, SLOT(maximize()));
+  QObject::connect(frame, SIGNAL(restorePressed()),
+    this, SLOT(restore()));
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -396,10 +422,32 @@ void pqMultiViewWidget::reload()
   cleaner = NULL;
 
   delete this->layout();
+
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setContentsMargins(0, 0, 0, 0);
   vbox->addWidget(child);
   this->setLayout(vbox);
+
+  int maximized_cell = vlayout->GetMaximizedCell();
+  this->Internals->setMaximizedWidget(NULL);
+  for (int cc = 0; cc < this->Internals->Widgets.size(); cc++)
+    {
+    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+      this->Internals->Widgets[cc]);
+    if (frame)
+      {
+      bool visibility = true;
+      if (cc == maximized_cell)
+        {
+        this->Internals->setMaximizedWidget(frame);
+        }
+      else if (maximized_cell != -1)
+        {
+        visibility = false;
+        }
+      frame->setVisible(visibility);
+      }
+    }
 
   // ensure the active view is marked appropriately.
   this->markActive(pqActiveObjects::instance().activeView());
@@ -479,5 +527,25 @@ void pqMultiViewWidget::splitterMoved()
       this->layoutManager()->SetSplitFraction(index.toInt(), fraction);
       END_UNDO_SET();
       }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::maximize()
+{
+  QWidget* frame = qobject_cast<QWidget*>(this->sender());
+  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
+  if (index.isValid() && this->layoutManager())
+    {
+    this->layoutManager()->MaximizeCell(index.toInt());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::restore()
+{
+  if (this->layoutManager())
+    {
+    this->layoutManager()->RestoreMaximizedState();
     }
 }

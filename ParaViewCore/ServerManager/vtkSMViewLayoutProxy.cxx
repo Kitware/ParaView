@@ -201,6 +201,7 @@ private:
 vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
+  MaximizedCell(-1),
   Internals(new vtkInternals()),
   BlockUpdate(false)
 {
@@ -465,6 +466,7 @@ int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
     cell.ViewProxy = NULL;
     }
   this->Internals->KDTree[location] = cell;
+  this->MaximizedCell = -1;
   this->UpdateState();
   return child_location;
 }
@@ -635,6 +637,7 @@ bool vtkSMViewLayoutProxy::Collapse(int location)
 
   this->Internals->MoveSubtree(parent, sibling);
   this->Internals->Shrink();
+  this->MaximizedCell = -1;
   this->UpdateState();
   return true;
 }
@@ -754,6 +757,7 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
   if (this->Internals->KDTree[location].SplitFraction != val)
     {
     this->Internals->KDTree[location].SplitFraction = val;
+    this->MaximizedCell = -1;
     this->UpdateState();
     }
 
@@ -763,7 +767,26 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 //----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::UpdateViewPositions()
 {
-  this->Internals->UpdateViewPositions();
+  if (this->MaximizedCell == -1)
+    {
+    this->Internals->UpdateViewPositions();
+    }
+  else
+    {
+    // simply set all ViewPositions to 0.
+    for (vtkInternals::KDTreeType::iterator iter =
+      this->Internals->KDTree.begin();
+      iter != this->Internals->KDTree.end();
+      ++iter)
+      {
+      if (iter->ViewProxy.GetPointer() != NULL)
+        {
+        int pos[2] = {0, 0};
+        vtkSMPropertyHelper(iter->ViewProxy, "ViewPosition").Set(pos, 2);
+        iter->ViewProxy->UpdateProperty("ViewPosition");
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -792,6 +815,30 @@ void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
     }
 
   this->ExecuteStream(stream);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::MaximizeCell(int location)
+{
+  if (this->Internals->IsCellValid(location) == false ||
+    this->IsSplitCell(location))
+    {
+    return false;
+    }
+
+  this->MaximizedCell = location;
+  this->UpdateState();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::RestoreMaximizedState()
+{
+  if (this->MaximizedCell != -1)
+    {
+    this->MaximizedCell = -1;
+    this->UpdateState();
+    }
 }
 
 //----------------------------------------------------------------------------

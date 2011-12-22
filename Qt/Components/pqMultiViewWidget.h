@@ -80,8 +80,10 @@ protected slots:
   /// directly. These result in updating the layoutManager.
   void splitVertical();
   void splitHorizontal();
-  void close();
   void splitterMoved();
+  void close();
+  void maximize();
+  void restore();
 
   /// makes a frame active. This also call pqActiveObjects::setActiveView() to
   /// make the corresponding view active.
