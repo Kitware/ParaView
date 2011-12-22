@@ -1270,22 +1270,12 @@
       <DoubleVectorProperty
         name="Points"
         command="AddPoint"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        clean_command="RemoveAllPoints"
-        animateable="0"
-        number_of_elements="4"
-        default_values="0.0 0.0 1.0 1.0">
-      </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="CurvedPoints"
-        command="AddPoint"
         number_of_elements_per_command="4"
         repeat_command="1"
         clean_command="RemoveAllPoints"
         animateable="0"
         number_of_elements="4"
-        default_values="0.0 0.0 0.5 0.2">
+        default_values="0.0 0.0 0.5 0.0">
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
