@@ -57,13 +57,17 @@ public:
   void setLayoutManager(vtkSMViewLayoutProxy*);
   vtkSMViewLayoutProxy* layoutManager() const;
 
+  /// Returns whether window decorations and splitter handles are visible.
+  bool isDecorationsVisible() const
+     { return this->DecorationsVisible; }
+
 public slots:
-  /// this forces the pqMultiViewWidget to reload its layout from the
+  /// This forces the pqMultiViewWidget to reload its layout from the
   /// vtkSMViewLayoutProxy instance. One does not need to call this method
   /// explicitly, it is called automatically when the layoutManager is modified.
   void reload();
 
-  /// assigns a frame to the view. This assumes that the view not already been
+  /// Assigns a frame to the view. This assumes that the view not already been
   /// placed in a frame. This will try to locate an empty frame, if possible. If
   /// no empty frames are available, it will split the active frame along its
   /// longest dimension and place the view in the newly created child-frame.
@@ -74,8 +78,13 @@ public slots:
   /// indeed made active, as the user would expect.
   void makeFrameActive();
 
+  /// Set the visibility for frame decorations and splitter handles.
+  void setDecorationsVisible(bool);
+  void showDecorations() { this->setDecorationsVisible(true); }
+  void hideDecorations() { this->setDecorationsVisible(false); }
+
 protected slots:
-  /// slots called on different signals fired by the nested frames or splitters.
+  /// Slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called
   /// directly. These result in updating the layoutManager.
   void splitVertical();
@@ -85,23 +94,23 @@ protected slots:
   void maximize();
   void restore();
 
-  /// makes a frame active. This also call pqActiveObjects::setActiveView() to
+  /// Makes a frame active. This also call pqActiveObjects::setActiveView() to
   /// make the corresponding view active.
   void makeActive(pqMultiViewFrame* frame);
 
-  /// marks the frame corresponding to the view, if present in the widget, as
+  /// Marks the frame corresponding to the view, if present in the widget, as
   /// active. Note that this method does not fire the activeChanged() signal.
   void markActive(pqView* view);
   void markActive(pqMultiViewFrame* frame);
 
 protected:
-  /// called whenever a new frame needs to be created for a view. Note that view
+  /// Called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
   /// takes over the ownership of the created frame and will delete/re-parent it
   /// as and when appropriate.
   virtual pqMultiViewFrame* newFrame(vtkSMProxy* view);
 
-  /// event filter callback to detect when a sub-frame becomes active, so that
+  /// Event filter callback to detect when a sub-frame becomes active, so that
   /// we can mark it as such.
   virtual bool eventFilter(QObject* caller, QEvent* evt);
   
@@ -113,6 +122,8 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+
+  bool DecorationsVisible;
 };
 
 #endif

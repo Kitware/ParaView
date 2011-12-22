@@ -46,12 +46,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QMap>
 #include <QPointer>
 #include <QSplitter>
-#include <QStackedLayout>
-#include <QVector>
 #include <QVBoxLayout>
+#include <QVector>
 
 class pqMultiViewWidget::pqInternals
 {
@@ -123,7 +123,8 @@ namespace
 //-----------------------------------------------------------------------------
 pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
-  Internals( new pqInternals())
+  Internals( new pqInternals()),
+  DecorationsVisible(true)
 {
   qApp->installEventFilter(this);
 
@@ -354,11 +355,20 @@ QWidget* pqMultiViewWidget::createWidget(
       this->Internals->Widgets[index] = frame;
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
+      if (this->DecorationsVisible)
+        {
+        frame->showDecorations();
+        }
+      else
+        {
+        frame->hideDecorations();
+        }
       return frame;
       }
 
   case vtkSMViewLayoutProxy::VERTICAL:
   case vtkSMViewLayoutProxy::HORIZONTAL:
+    if (this->DecorationsVisible)
       {
       QSplitter* splitter = qobject_cast<QSplitter*>(
         this->Internals->Widgets[index]);
@@ -376,9 +386,9 @@ QWidget* pqMultiViewWidget::createWidget(
         direction == vtkSMViewLayoutProxy::VERTICAL?
         Qt::Vertical : Qt::Horizontal);
       splitter->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, parentWdg));
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter));
       splitter->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, parentWdg));
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter));
 
       // set the sizes are percentage. QSplitter uses the initially specified
       // sizes as reference.
@@ -394,6 +404,28 @@ QWidget* pqMultiViewWidget::createWidget(
       QObject::connect(splitter, SIGNAL(splitterMoved(int, int)),
         this, SLOT(splitterMoved()), Qt::QueuedConnection);
       return splitter;
+      }
+    else
+      {
+      QWidget* box = new QWidget(parentWdg);
+      QBoxLayout* blayout = NULL;
+      if (direction == vtkSMViewLayoutProxy::VERTICAL)
+        {
+        blayout = new QVBoxLayout(box);
+        }
+      else
+        {
+        blayout = new QHBoxLayout(box);
+        }
+      // FIXME how to respect SplitFraction in this layout?
+      blayout->setContentsMargins(0, 0, 0, 0);
+      blayout->setSpacing(0);
+      blayout->addWidget(
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, box));
+      blayout->addWidget(
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, box));
+      box->setLayout(blayout);
+      return box;
       }
     break;
     }
@@ -548,4 +580,16 @@ void pqMultiViewWidget::restore()
     {
     this->layoutManager()->RestoreMaximizedState();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::setDecorationsVisible(bool val)
+{
+  if (this->DecorationsVisible == val)
+    {
+    return;
+    }
+
+  this->DecorationsVisible = val;
+  this->reload();
 }
