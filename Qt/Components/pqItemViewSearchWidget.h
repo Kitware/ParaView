@@ -45,11 +45,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCOMPONENTS_EXPORT pqItemViewSearchWidget : public QDialog
 {
   Q_OBJECT
+  Q_ENUMS(ItemSearchType)
   typedef QDialog Superclass;
 
 public:
   pqItemViewSearchWidget(QWidget* parent = 0);
   virtual ~pqItemViewSearchWidget();
+  enum ItemSearchType
+    {
+    Current,
+    Next,
+    Previous
+    };
 
 public slots:
   virtual void showSearchWidget();
@@ -70,12 +77,12 @@ protected:
   virtual bool eventFilter(QObject* obj, QEvent* event);
   virtual void keyPressEvent(QKeyEvent *e);
   /// Recursive to search all QModelIndices in the model.
-  bool searchModel( const QAbstractItemModel * M,
-    const QModelIndex & Top, const QString & S ) const;
+
+  virtual bool searchModel( const QAbstractItemModel * M,
+    const QModelIndex & Top, const QString & S,
+    ItemSearchType searchType = Current ) const;
   /// Overwrite to focus the lineEdit box
   void showEvent(QShowEvent *);
-  virtual bool matchSearchString(const QAbstractItemModel * M,
-    const QModelIndex &start, const QString &searchString) const;
 
 private:
   pqItemViewSearchWidget(const pqItemViewSearchWidget&); // Not implemented.

@@ -207,7 +207,8 @@ void pqItemViewSearchWidget::updateSearch(QString searchText)
 }
 //-----------------------------------------------------------------------------
 bool pqItemViewSearchWidget::searchModel( const QAbstractItemModel * M,
-  const QModelIndex & curIdx, const QString & searchString ) const
+  const QModelIndex & curIdx, const QString & searchString,
+  ItemSearchType searchType ) const
 {
   bool found=false;
   if( !curIdx.isValid() )
@@ -216,19 +217,40 @@ bool pqItemViewSearchWidget::searchModel( const QAbstractItemModel * M,
     }
   pqWaitCursor wCursor;
 
-  // Try to match the curIdx index itself
-  if (this->matchSearchString(M, curIdx, searchString))
+  if(searchType == Previous && M->hasChildren(curIdx))
     {
+    QModelIndex current;
+    // Search curIdx index's children
+    for( int r = M->rowCount( curIdx )-1; r >=0&& !found;r-- )
+      {
+      for( int c = M->columnCount( curIdx )-1; c>=0 && !found;c-- )
+        {
+        current = M->index( r, c, curIdx );
+        found = this->searchModel( M, current, searchString, searchType );
+        }
+      }
+    }
+
+  if(found)
+    {
+    return found;
+    }
+  // Try to match the curIdx index itself
+  QString strText = M->data(curIdx, Qt::DisplayRole).toString();
+  Qt::CaseSensitivity cs = this->Private->checkBoxMattchCase->isChecked() ?
+    Qt::CaseSensitive : Qt::CaseInsensitive;
+  if(strText.contains(searchString, cs))
+    {
+    this->Private->CurrentFound = curIdx;
     found = true;
     this->Private->BaseWidget->model()->setData(
-      curIdx, Qt::green, Qt::BackgroundColorRole);
-    this->Private->BaseWidget->scrollTo(curIdx);
-    this->Private->CurrentFound = curIdx;
+      this->Private->CurrentFound, Qt::green, Qt::BackgroundColorRole);
+    this->Private->BaseWidget->scrollTo(this->Private->CurrentFound);
     this->Private->lineEditSearch->setPalette(this->Private->WhitePal);
     return found;
     }
 
-  if(M->hasChildren(curIdx))
+  if(searchType != Previous && M->hasChildren(curIdx))
     {
     QModelIndex current;
     // Search curIdx index's children
@@ -237,7 +259,7 @@ bool pqItemViewSearchWidget::searchModel( const QAbstractItemModel * M,
       for( int c = 0; c < M->columnCount( curIdx )&& !found;c ++ )
         {
         current = M->index( r, c, curIdx );
-        found = this->searchModel( M, current, searchString );
+        found = this->searchModel( M, current, searchString, searchType );
         }
       }
     }
@@ -255,17 +277,16 @@ void pqItemViewSearchWidget::findNext()
   const QString searchString =this->Private->SearchString;
 
   // Loop through all the model indices in the model
-  QModelIndexList match;
   QAbstractItemModel* viewModel = theView->model();
   QModelIndex current, firstmactch, start=this->Private->CurrentFound;
   if(start.isValid())
     {
     this->Private->BaseWidget->model()->setData(
       start, Qt::white, Qt::BackgroundColorRole);
-
-    // search the rest of this index
+    // search the rest of this index -- horizontally
     int r = start.row();
-    for( int c = start.column()+1; c < viewModel->columnCount( ); c++ )
+    int numCols = viewModel->columnCount(start.parent());
+    for( int c = start.column()+1; c < numCols; c++ )
       {
       current = start.sibling(r, c);
       if (this->searchModel( viewModel, current, searchString ))
@@ -273,8 +294,47 @@ void pqItemViewSearchWidget::findNext()
         return;
         }
       }
+
+   // Search all the children
+   if(viewModel->hasChildren(start))
+     {
+     for( r = 0; r < viewModel->rowCount(start); r++ )
+       {
+       for( int c = 0; c < viewModel->columnCount(start); c++ )
+         {
+         current = viewModel->index( r, c, start );
+         if (this->searchModel( viewModel, current, searchString ))
+           {
+           return;
+           }
+         }
+       }
+     }
+
+    // search the siblings of this index and
+    // need to recursive up parents until root
+    QModelIndex pidx = start.parent();
+    QModelIndex tmpIdx = start;
+    while(pidx.isValid())
+      {
+      for( r = tmpIdx.row()+1; r < viewModel->rowCount(pidx); r++ )
+        {
+        for( int c = 0; c < viewModel->columnCount(pidx); c++ )
+          {
+          current = viewModel->index( r, c, pidx );
+          if (this->searchModel( viewModel, current, searchString ))
+            {
+            return;
+            }
+          }
+        }
+      tmpIdx = pidx;
+      pidx = pidx.parent();
+      }
+
     // If not found, start from next row
-    for( r = start.row()+1; r < viewModel->rowCount(); r++ )
+    int numRows = viewModel->rowCount();
+    for( r = start.row()+1; r < numRows; r++ )
       {
       for( int c = 0; c < viewModel->columnCount( ); c++ )
         {
@@ -285,10 +345,11 @@ void pqItemViewSearchWidget::findNext()
           }
         }
       }
+    
     // If still not found, start from (0,0)
     for( r = 0; r <= start.row(); r++ )
       {
-      for( int c = 0; c < viewModel->columnCount( ); c++ )
+      for( int c = 0; c <= start.column(); c++ )
         {
         current = viewModel->index( r, c );
         if (this->searchModel( viewModel, current, searchString ))
@@ -297,6 +358,7 @@ void pqItemViewSearchWidget::findNext()
           }
         }
       }
+
     this->Private->lineEditSearch->setPalette(this->Private->RedPal);
     }
   else
@@ -320,7 +382,6 @@ void pqItemViewSearchWidget::findPrevious()
   const QString searchString =this->Private->SearchString;
 
   // Loop through all the model indices in the model
-  QModelIndexList match;
   QAbstractItemModel* viewModel = theView->model();
   QModelIndex current, firstmactch, start=this->Private->CurrentFound;
   if(start.isValid())
@@ -332,18 +393,40 @@ void pqItemViewSearchWidget::findPrevious()
     for( int c = start.column()-1; c >=0; c-- )
       {
       current = start.sibling(r, c);
-      if (this->searchModel( viewModel, current, searchString ))
+      if (this->searchModel( viewModel, current, searchString, Previous ))
         {
         return;
         }
       }
+      
+    // search the siblings of this index
+    // need to recursive up parents until root
+    QModelIndex pidx = start.parent();
+    QModelIndex tmpIdx = start;
+    while(pidx.isValid())
+      {
+      for( r = tmpIdx.row()-1; r >=0; r--)
+        {
+        for( int c = viewModel->columnCount(pidx)-1; c >=0; c-- )
+          {
+          current = viewModel->index( r, c, pidx );
+          if (this->searchModel( viewModel, current, searchString, Previous ))
+            {
+            return;
+            }
+          }
+        }
+      tmpIdx = pidx;
+      pidx = pidx.parent();
+      }
+
     // If not found, start from previous row
     for( r = start.row()-1; r >=0; r-- )
       {
       for( int c = viewModel->columnCount()-1; c >=0; c-- )
         {
         current = viewModel->index( r, c );
-        if (this->searchModel( viewModel, current, searchString ))
+        if (this->searchModel( viewModel, current, searchString, Previous ))
           {
           return;
           }
@@ -355,32 +438,17 @@ void pqItemViewSearchWidget::findPrevious()
       for( int c =viewModel->columnCount( )-1; c>=0 ; c-- )
         {
         current = viewModel->index( r, c );
-        if (this->searchModel( viewModel, current, searchString ))
+        if (this->searchModel( viewModel, current, searchString, Previous ))
           {
           return;
           }
         }
       }
+
     this->Private->lineEditSearch->setPalette(this->Private->RedPal);
     }
   else
     {
     this->updateSearch();
     }
-}
-
-//-----------------------------------------------------------------------------
-bool pqItemViewSearchWidget::matchSearchString(
-  const QAbstractItemModel * M,
-  const QModelIndex &idx, const QString &searchString) const
-{
-  Qt::CaseSensitivity cs = this->Private->checkBoxMattchCase->isChecked() ?
-    Qt::CaseSensitive : Qt::CaseInsensitive;
-  QVariant v = M->data(idx, Qt::DisplayRole);
-  QString t = v.toString();
-  if (t.contains(searchString, cs))
-    {
-    return true;
-    }
-  return false;
 }
