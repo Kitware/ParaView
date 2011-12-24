@@ -75,6 +75,17 @@ void vtkSMPluginManager::RegisterSession(vtkSMSession* session)
     this->Internals->RemoteInformations[session].TakeReference(remoteInfo);
     session->GatherInformation(vtkPVSession::DATA_SERVER_ROOT, remoteInfo, 0);
     }
+
+  // Also update the local information. This is generally unnecessary, but for
+  // statically linked in plugins, this provides a cleaner opportunity to bring
+  // in what's linked in.
+
+  // we use Update so that any auto-load state changes done in
+  // this->LocalInformation are preserved.
+  vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+  temp->CopyFromObject(NULL);
+  this->LocalInformation->Update(temp);
+  temp->Delete();
 }
 
 //----------------------------------------------------------------------------
