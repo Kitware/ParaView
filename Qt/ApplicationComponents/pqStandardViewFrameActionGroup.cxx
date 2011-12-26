@@ -121,9 +121,20 @@ bool pqStandardViewFrameActionGroup::disconnect(pqViewFrame *frame, pqView *)
 //-----------------------------------------------------------------------------
 namespace
 {
-  static QMap<QString, QString> availableViewTypes()
+  struct ViewType
     {
-    QMap<QString, QString> views;
+    QString Label;
+    QString Name;
+    };
+
+  bool ViewTypeComparator(const ViewType& one, const ViewType& two)
+    {
+    return one.Label.toLower() < two.Label.toLower();
+    }
+
+  static QList<ViewType> availableViewTypes()
+    {
+    QList<ViewType> views;
     pqInterfaceTracker* tracker =
       pqApplicationCore::instance()->interfaceTracker();
     foreach (pqViewModuleInterface* vi,
@@ -132,9 +143,13 @@ namespace
       QStringList viewTypes = vi->viewTypes();
       for (int cc=0; cc < viewTypes.size(); cc++)
         {
-        views[viewTypes[cc]] = vi->viewTypeName(viewTypes[cc]);
+        ViewType info;
+        info.Label = vi->viewTypeName(viewTypes[cc]);
+        info.Name = viewTypes[cc];
+        views.push_back(info);
         }
       }
+    qSort(views.begin(), views.end(), ViewTypeComparator);
     return views;
     }
 }
@@ -146,13 +161,12 @@ void pqStandardViewFrameActionGroup::aboutToShowConvertMenu()
   if (menu)
     {
     menu->clear();
-    QMap<QString, QString> views = availableViewTypes();
-    for (QMap<QString, QString>::iterator iter = views.begin();
-      iter != views.end(); ++iter)
+    QList<ViewType> views = availableViewTypes();
+    foreach (const ViewType& type, views)
       {
-      QAction* view_action = new QAction(iter.value(), menu);
-      view_action->setProperty("PV_VIEW_TYPE", iter.key());
-      view_action->setProperty("PV_VIEW_LABEL", iter.value());
+      QAction* view_action = new QAction(type.Label, menu);
+      view_action->setProperty("PV_VIEW_TYPE", type.Name);
+      view_action->setProperty("PV_VIEW_LABEL", type.Label);
       view_action->setProperty("PV_COMMAND", "Convert To");
       menu->addAction(view_action);
       QObject::connect(view_action, SIGNAL(triggered()),
@@ -167,14 +181,13 @@ void pqStandardViewFrameActionGroup::setupEmptyFrame(QWidget* frame)
   Ui::EmptyView ui;
   ui.setupUi(frame);
 
-  QMap<QString, QString> views = availableViewTypes();
-  for (QMap<QString, QString>::iterator iter = views.begin();
-    iter != views.end(); ++iter)
+  QList<ViewType> views = availableViewTypes();
+  foreach (const ViewType& type, views)
     {
-    QPushButton* button = new QPushButton(iter.value(), ui.ConvertActionsFrame);
-    button->setObjectName(iter.value());
-    button->setProperty("PV_VIEW_TYPE", iter.key());
-    button->setProperty("PV_VIEW_LABEL", iter.value());
+    QPushButton* button = new QPushButton(type.Label, ui.ConvertActionsFrame);
+    button->setObjectName(type.Name);
+    button->setProperty("PV_VIEW_TYPE", type.Name);
+    button->setProperty("PV_VIEW_LABEL", type.Label);
     button->setProperty("PV_COMMAND", "Create");
 
     QObject::connect(button, SIGNAL(clicked()),
