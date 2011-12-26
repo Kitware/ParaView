@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
-#include "pqViewFrame.h"
+#include "pqObjectBuilder.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
+#include "pqViewFrame.h"
 #include "pqView.h"
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
@@ -567,7 +568,17 @@ void pqMultiViewWidget::standardButtonPressed(int button)
 
   case pqViewFrame::Close:
     BEGIN_UNDO_SET("Close View");
-    this->layoutManager()->Collapse(index.toInt());
+    this->layoutManager()->RemoveView(index.toInt());
+    if (pqActiveObjects::instance().activeView())
+      {
+      pqObjectBuilder* builder =
+        pqApplicationCore::instance()-> getObjectBuilder();
+      builder->destroy(pqActiveObjects::instance().activeView());
+      }
+    if (index.toInt() != 0)
+      {
+      this->layoutManager()->Collapse(index.toInt());
+      }
     END_UNDO_SET();
     break;
     }

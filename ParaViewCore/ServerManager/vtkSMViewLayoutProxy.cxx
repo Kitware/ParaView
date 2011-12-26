@@ -583,6 +583,12 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::RemoveView(int index)
+{
+  return this->RemoveView(this->GetView(index)) != -1;
+}
+
+//----------------------------------------------------------------------------
 int vtkSMViewLayoutProxy::RemoveView(vtkSMViewProxy* view)
 {
   if (!view)

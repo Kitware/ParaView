@@ -89,6 +89,7 @@ public:
   // Removes a view. Returns the location of the cell emptied by the view, if
   // any, otherwise -1.
   int RemoveView(vtkSMViewProxy* view);
+  bool RemoveView(int index);
 
   // Description:
   // Collapses a cell. Only leaf cells without any assigned views can be collapsed.
