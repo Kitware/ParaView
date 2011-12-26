@@ -88,11 +88,7 @@ public:
     pqViewFrame* frame = qobject_cast<pqViewFrame*>(wdg);
     if (frame)
       {
-      frame->setStandardButtons(
-        pqViewFrame::SplitVertical |
-        pqViewFrame::SplitHorizontal |
-        pqViewFrame::Maximize |
-        pqViewFrame::Restore);
+      frame->setStandardButtons(pqViewFrame::Restore);
       }
     if (this->MaximizedWidget)
       {
