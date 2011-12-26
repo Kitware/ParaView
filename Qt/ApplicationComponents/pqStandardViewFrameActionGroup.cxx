@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraUndoRedoReaction.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
-#include "pqMultiViewFrame.h"
+#include "pqViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqRenderView.h"
 #include "pqUndoStack.h"
@@ -60,77 +60,61 @@ pqStandardViewFrameActionGroup::~pqStandardViewFrameActionGroup()
 }
 
 //-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *view)
+bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
 {
   Q_ASSERT(frame != NULL);
 
-  frame->getContextMenu()->addSeparator();
-  QMenu* convertMenu = frame->getContextMenu()->addMenu("Convert To ...");
+  frame->contextMenu()->addSeparator();
+  QMenu* convertMenu = frame->contextMenu()->addMenu("Convert To ...");
   QObject::connect(convertMenu, SIGNAL(aboutToShow()),
     this, SLOT(aboutToShowConvertMenu()));
 
   if (view == NULL)
     {
     // Setup the UI shown when no view is present in the frame.
-    this->setupEmptyFrame(frame->emptyMainWidget());
+    QWidget* empty_frame = new QWidget(frame);
+    this->setupEmptyFrame(empty_frame);
+    frame->setCentralWidget(empty_frame);
     return true;
     }
 
   pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
   if (render_module)
     {
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"),
-      "Adjust Camera",
-      this);
+    QAction* cameraAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");
     cameraAction->setObjectName("CameraButton");
-    frame->addTitlebarAction(cameraAction);
     new pqEditCameraReaction(cameraAction, view);
     }
 
-  QAction* optionsAction = new QAction(
-    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options", this);
+  QAction* optionsAction = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options");
   optionsAction->setObjectName("OptionsButton");
-  frame->addTitlebarAction(optionsAction);
   new pqViewSettingsReaction(optionsAction, view);
 
   if (view->supportsUndo())
     {
     // Setup undo/redo connections if the view module
     // supports interaction undo.
-    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
-      "Camera Redo",
-      this);
+    QAction* forwardAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
+      "Camera Redo");
     forwardAction->setObjectName("ForwardButton");
-    frame->addTitlebarAction(forwardAction);
     new pqCameraUndoRedoReaction(forwardAction, false, view);
 
-    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
-      "Camera Undo",
-      this);
+    QAction* backAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
+      "Camera Undo");
     backAction->setObjectName("BackButton");
-    frame->addTitlebarAction(backAction);
     new pqCameraUndoRedoReaction(backAction, true, view);
     }
   return true;
 }
 
 //-----------------------------------------------------------------------------
-inline void REMOVE_ACTION(const char* name, pqMultiViewFrame* frame)
+bool pqStandardViewFrameActionGroup::disconnect(pqViewFrame *frame, pqView *)
 {
-  QAction* action = frame->getAction(name);
-  if (action)
-    {
-    frame->removeTitlebarAction(action);
-    delete action;
-    }
-}
-//-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionGroup::disconnect(pqMultiViewFrame *frame, pqView *)
-{
-  REMOVE_ACTION("CameraButton", frame);
-  REMOVE_ACTION("OptionsButton", frame);
-  REMOVE_ACTION("ForwardButton", frame);
-  REMOVE_ACTION("BackButton", frame);
+  frame->removeTitleBarActions(); 
   return true;
 }
 

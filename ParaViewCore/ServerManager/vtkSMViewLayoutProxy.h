@@ -98,6 +98,11 @@ public:
   bool Collapse(int location);
 
   // Description:
+  // Swaps the cells at the two locations. Both locations must be leaf locations
+  // i.e. cannot be split-cells.
+  bool SwapCells(int location1, int location2);
+
+  // Description:
   // Update the split fraction for a split cell. If IsSplitCell(location)
   // returns false, this method does not update the fraction.
   bool SetSplitFraction(int location, double fraction);

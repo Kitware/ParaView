@@ -480,7 +480,6 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
 {
   if (view == NULL)
     {
-    vtkErrorMacro("View cannot be NULL.");
     return false;
     }
 
@@ -529,7 +528,6 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
 {
   if (!view)
     {
-    vtkErrorMacro("View cannot be NULL.");
     return 0;
     }
 
@@ -587,6 +585,11 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
 //----------------------------------------------------------------------------
 int vtkSMViewLayoutProxy::RemoveView(vtkSMViewProxy* view)
 {
+  if (!view)
+    {
+    return -1;
+    }
+
   int index = 0;
   for (vtkInternals::KDTreeType::iterator iter =
     this->Internals->KDTree.begin();
@@ -606,6 +609,30 @@ int vtkSMViewLayoutProxy::RemoveView(vtkSMViewProxy* view)
     }
 
   return -1;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewLayoutProxy::SwapCells(int location1, int location2)
+{
+  if (!this->Internals->IsCellValid(location1) ||
+    !this->Internals->IsCellValid(location2))
+    {
+    vtkErrorMacro("Invalid locations specified.");
+    return false;
+    }
+
+  vtkInternals::Cell &cell1 = this->Internals->KDTree[location1];
+  vtkInternals::Cell &cell2 = this->Internals->KDTree[location2];
+  if (cell1.Direction == NONE && cell2.Direction == NONE)
+    {
+    vtkSMViewProxy* temp1 = cell1.ViewProxy;
+    cell1.ViewProxy = cell2.ViewProxy;
+    cell2.ViewProxy = temp1;
+    this->UpdateState();
+    return true;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

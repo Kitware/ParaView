@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
-#include "pqViewManager.h"
 
 //=============================================================================
 class pqLockViewSizeCustomDialog::pqUI : public Ui::pqLockViewSizeCustomDialog
@@ -100,16 +99,17 @@ inline QSize pqLockViewSizeCustomDialog::customResolution() const
 //-----------------------------------------------------------------------------
 void pqLockViewSizeCustomDialog::apply()
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  if (viewManager)
-    {
-    viewManager->setMaxViewWindowSize(this->customResolution());
-    }
-  else
-    {
-    qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
-    }
+  // FIXME_VIEW_LAYOUT
+  //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  //if (viewManager)
+  //  {
+  //  viewManager->setMaxViewWindowSize(this->customResolution());
+  //  }
+  //else
+  //  {
+  //  qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
+  //  }
   pqSettings *settings = pqApplicationCore::instance()->settings();
   settings->setValue("LockViewSize/CustomResolution", this->customResolution());
 }
@@ -124,15 +124,16 @@ void pqLockViewSizeCustomDialog::accept()
 //-----------------------------------------------------------------------------
 void pqLockViewSizeCustomDialog::unlock()
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  if (viewManager)
-    {
-    viewManager->setMaxViewWindowSize(QSize(-1, -1));
-    }
-  else
-    {
-    qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
-    }
+  // FIXME_VIEW_LAYOUT
+  //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  //if (viewManager)
+  //  {
+  //  viewManager->setMaxViewWindowSize(QSize(-1, -1));
+  //  }
+  //else
+  //  {
+  //  qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
+  //  }
   this->reject();
 }

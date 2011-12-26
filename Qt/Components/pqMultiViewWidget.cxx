@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
-#include "pqMultiViewFrame.h"
+#include "pqViewFrame.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
+#include <QVariant>
 #include <QApplication>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -62,11 +63,11 @@ public:
 
   // This map is used to avoid reassigning frames. Once a view is assigned a
   // frame, we preserve that frame as long as possible.
-  QMap<vtkSMViewProxy*, QPointer<pqMultiViewFrame> > ViewFrames;
+  QMap<vtkSMViewProxy*, QPointer<pqViewFrame> > ViewFrames;
 
   unsigned long ObserverId;
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
-  QPointer<pqMultiViewFrame> ActiveFrame;
+  QPointer<pqViewFrame> ActiveFrame;
 
   pqInternals() : ObserverId(0)
     {
@@ -83,28 +84,28 @@ public:
 
   void setMaximizedWidget(QWidget* wdg)
     {
-    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
+    pqViewFrame* frame = qobject_cast<pqViewFrame*>(wdg);
     if (frame)
       {
-      frame->MaximizeButton->hide();
-      frame->CloseButton->hide();
-      frame->SplitHorizontalButton->hide();
-      frame->SplitVerticalButton->hide();
-      frame->RestoreButton->show();
+      frame->setStandardButtons(
+        pqViewFrame::SplitVertical |
+        pqViewFrame::SplitHorizontal |
+        pqViewFrame::Maximize |
+        pqViewFrame::Restore);
       }
     if (this->MaximizedWidget)
       {
-      this->MaximizedWidget->MaximizeButton->show();
-      this->MaximizedWidget->CloseButton->show();
-      this->MaximizedWidget->SplitHorizontalButton->show();
-      this->MaximizedWidget->SplitVerticalButton->show();
-      this->MaximizedWidget->RestoreButton->hide();
+      this->MaximizedWidget->setStandardButtons(
+        pqViewFrame::SplitVertical |
+        pqViewFrame::SplitHorizontal |
+        pqViewFrame::Maximize |
+        pqViewFrame::Close);
       }
     this->MaximizedWidget = frame;
     }
 
 private:
-  QPointer<pqMultiViewFrame> MaximizedWidget;
+  QPointer<pqViewFrame> MaximizedWidget;
 };
 
 //-----------------------------------------------------------------------------
@@ -231,8 +232,8 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
       // frames, then the frame should be made active.
       foreach (QWidget* frame_or_splitter, this->Internals->Widgets)
         {
-        pqMultiViewFrame* frame =
-          qobject_cast<pqMultiViewFrame*>(frame_or_splitter);
+        pqViewFrame* frame =
+          qobject_cast<pqViewFrame*>(frame_or_splitter);
         if (frame && frame->isAncestorOf(wdg))
           {
           this->makeActive(frame);
@@ -267,7 +268,7 @@ void pqMultiViewWidget::makeFrameActive()
     {
     foreach (QWidget* wdg, this->Internals->Widgets)
       {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(wdg);
+      pqViewFrame* frame = qobject_cast<pqViewFrame*>(wdg);
       if (frame)
         {
         this->makeActive(frame);
@@ -293,26 +294,26 @@ void pqMultiViewWidget::markActive(pqView* view)
      }
    else
      {
-     this->markActive(static_cast<pqMultiViewFrame*>(NULL));
+     this->markActive(static_cast<pqViewFrame*>(NULL));
      }
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiViewWidget::markActive(pqMultiViewFrame* frame)
+void pqMultiViewWidget::markActive(pqViewFrame* frame)
 {
   if (this->Internals->ActiveFrame)
     {
-    this->Internals->ActiveFrame->setActive(false);
+    this->Internals->ActiveFrame->setBorderVisibility(false);
     }
   this->Internals->ActiveFrame = frame;
   if (frame)
     {
-    frame->setActive(true);
+    frame->setBorderVisibility(true);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
+void pqMultiViewWidget::makeActive(pqViewFrame* frame)
 {
   if (this->Internals->ActiveFrame != frame)
     {
@@ -331,25 +332,13 @@ void pqMultiViewWidget::makeActive(pqMultiViewFrame* frame)
 }
 
 //-----------------------------------------------------------------------------
-pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
+pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 {
-  pqMultiViewFrame* frame = new pqMultiViewFrame(this);
-  frame->showDecorations();
-  frame->MaximizeButton->show();
-  frame->CloseButton->show();
-  frame->SplitVerticalButton->show();
-  frame->SplitHorizontalButton->show();
-
-  QObject::connect(frame, SIGNAL(splitVerticalPressed()),
-    this, SLOT(splitVertical()));
-  QObject::connect(frame, SIGNAL(splitHorizontalPressed()),
-    this, SLOT(splitHorizontal()));
-  QObject::connect(frame, SIGNAL(closePressed()),
-    this, SLOT(close()));
-  QObject::connect(frame, SIGNAL(maximizePressed()),
-    this, SLOT(maximize()));
-  QObject::connect(frame, SIGNAL(restorePressed()),
-    this, SLOT(restore()));
+  pqViewFrame* frame = new pqViewFrame(this);
+  QObject::connect(frame, SIGNAL(buttonPressed(int)),
+    this, SLOT(standardButtonPressed(int)));
+  QObject::connect(frame, SIGNAL(swapPositions(const QString&)),
+    this, SLOT(swapPositions(const QString&)), Qt::QueuedConnection);
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -359,7 +348,7 @@ pqMultiViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
     Q_ASSERT(pqview != NULL);
 
     QWidget* viewWidget = pqview->getWidget();
-    frame->setMainWidget(viewWidget);
+    frame->setCentralWidget(viewWidget);
     viewWidget->setParent(frame);
     }
 
@@ -391,7 +380,7 @@ QWidget* pqMultiViewWidget::createWidget(
   case vtkSMViewLayoutProxy::NONE:
       {
       vtkSMViewProxy* view = vlayout->GetView(index);
-      pqMultiViewFrame* frame = view?
+      pqViewFrame* frame = view?
         this->Internals->ViewFrames[view] : NULL;
       if (!frame)
         {
@@ -407,14 +396,7 @@ QWidget* pqMultiViewWidget::createWidget(
       this->Internals->Widgets[index] = frame;
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
-      if (this->DecorationsVisible)
-        {
-        frame->showDecorations();
-        }
-      else
-        {
-        frame->hideDecorations();
-        }
+      frame->setDecorationsVisibility(this->DecorationsVisible);
       return frame;
       }
 
@@ -512,7 +494,7 @@ void pqMultiViewWidget::reload()
   this->Internals->setMaximizedWidget(NULL);
   for (int cc = 0; cc < this->Internals->Widgets.size(); cc++)
     {
-    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+    pqViewFrame* frame = qobject_cast<pqViewFrame*>(
       this->Internals->Widgets[cc]);
     if (frame)
       {
@@ -537,7 +519,7 @@ void pqMultiViewWidget::reload()
   // datastructures to get rid of these NULL ptrs.
 
   // remove any deleted view frames.
-  QMutableMapIterator<vtkSMViewProxy*, QPointer<pqMultiViewFrame> > iter(
+  QMutableMapIterator<vtkSMViewProxy*, QPointer<pqViewFrame> > iter(
       this->Internals->ViewFrames);
   while (iter.hasNext())
     {
@@ -550,45 +532,44 @@ void pqMultiViewWidget::reload()
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiViewWidget::splitVertical()
+void pqMultiViewWidget::standardButtonPressed(int button)
 {
   QWidget* frame = qobject_cast<QWidget*>(this->sender());
   QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
-  if (index.isValid() && this->layoutManager())
+  if (!index.isValid() || this->layoutManager() == NULL)
     {
-    BEGIN_UNDO_SET("Split View");
-    int new_index = this->layoutManager()->SplitVertical(index.toInt(), 0.5);
-    this->makeActive(qobject_cast<pqMultiViewFrame*>(
-        this->Internals->Widgets[new_index + 1]));
-    END_UNDO_SET();
+    return;
     }
-}
 
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::splitHorizontal()
-{
-  QWidget* frame = qobject_cast<QWidget*>(this->sender());
-  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
-  if (index.isValid() && this->layoutManager())
+  switch (button)
     {
-    BEGIN_UNDO_SET("Split View");
-    int new_index = this->layoutManager()->SplitHorizontal(index.toInt(), 0.5);
-    this->makeActive(qobject_cast<pqMultiViewFrame*>(
-        this->Internals->Widgets[new_index + 1]));
-    END_UNDO_SET();
-    }
-}
+  case pqViewFrame::SplitVertical:
+  case pqViewFrame::SplitHorizontal:
+      {
+      BEGIN_UNDO_SET("Split View");
+      int new_index = this->layoutManager()->Split(index.toInt(),
+        (button == pqViewFrame::SplitVertical?
+         vtkSMViewLayoutProxy::VERTICAL : vtkSMViewLayoutProxy::HORIZONTAL),
+        0.5);
+      this->makeActive(qobject_cast<pqViewFrame*>(
+          this->Internals->Widgets[new_index + 1]));
+      END_UNDO_SET();
+      }
+    break;
 
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::close()
-{
-  QWidget* frame = qobject_cast<QWidget*>(this->sender());
-  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
-  if (index.isValid() && this->layoutManager())
-    {
+  case pqViewFrame::Maximize:
+    this->layoutManager()->MaximizeCell(index.toInt());
+    break;
+
+  case pqViewFrame::Restore:
+    this->layoutManager()->RestoreMaximizedState();
+    break;
+
+  case pqViewFrame::Close:
     BEGIN_UNDO_SET("Close View");
     this->layoutManager()->Collapse(index.toInt());
     END_UNDO_SET();
+    break;
     }
 }
 
@@ -607,26 +588,6 @@ void pqMultiViewWidget::splitterMoved()
       this->layoutManager()->SetSplitFraction(index.toInt(), fraction);
       END_UNDO_SET();
       }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::maximize()
-{
-  QWidget* frame = qobject_cast<QWidget*>(this->sender());
-  QVariant index = frame? frame->property("FRAME_INDEX") : QVariant();
-  if (index.isValid() && this->layoutManager())
-    {
-    this->layoutManager()->MaximizeCell(index.toInt());
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiViewWidget::restore()
-{
-  if (this->layoutManager())
-    {
-    this->layoutManager()->RestoreMaximizedState();
     }
 }
 
@@ -664,4 +625,48 @@ vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
   this->resize(originalSize);
 
   return image;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::swapPositions(const QString& uid_str)
+{
+  QUuid other (uid_str);
+
+  vtkSMViewLayoutProxy* vlayout = this->layoutManager();
+  pqViewFrame* sender = qobject_cast<pqViewFrame*>(this->sender());
+  if (!sender || !vlayout)
+    {
+    return;
+    }
+
+  pqViewFrame* swapWith = NULL;
+  foreach (QWidget* wdg, this->Internals->Widgets)
+    {
+    pqViewFrame* frame = qobject_cast<pqViewFrame*>(wdg);
+    if (frame && frame->uniqueID() == other)
+      {
+      swapWith = frame;
+      break;
+      }
+    }
+
+  if (!swapWith)
+    {
+    return;
+    }
+
+  int id1 = sender->property("FRAME_INDEX").toInt();
+  int id2 = swapWith->property("FRAME_INDEX").toInt();
+  vtkSMViewProxy* view1 = vlayout->GetView(id1);
+  vtkSMViewProxy* view2 = vlayout->GetView(id2);
+
+  if (view1 == NULL && view2 == NULL)
+    {
+    return;
+    }
+  
+  BEGIN_UNDO_SET("Swap Views");
+  vlayout->SwapCells(id1, id2);
+  END_UNDO_SET();
+  this->reload();
 }

@@ -68,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqViewManager.h"
+#include "pqTabbedMultiViewWidget.h"
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -378,8 +378,8 @@ bool pqAnimationManager::saveAnimation()
     this->Internals->ActiveServer->isRemote());
 
   // Use viewManager is available.
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   
   // Set current size of the window.
   QSize viewSize = viewManager? viewManager->clientSize() : QSize(800, 600);
@@ -604,7 +604,9 @@ bool pqAnimationManager::saveAnimation()
 
   // Enforce any view size conditions (such a multiple of 4). 
   ::enforceMultiple4(newSize); 
-  int magnification = viewManager? viewManager->prepareForCapture(newSize): 1;
+  int magnification = 1; // viewManager? viewManager->prepareForCapture(newSize): 1;
+  // FIXME_VIEW_LAYOUT
+  abort();
  
   if (disconnect_and_save)
     {
@@ -688,7 +690,8 @@ bool pqAnimationManager::saveAnimation()
   sceneProxy->UpdateVTKObjects();
   if (viewManager)
     {
-    viewManager->finishedCapture();
+    // viewManager->finishedCapture();
+    // FIXME_VIEW_LAYOUT
     }
 
   if (stereo)

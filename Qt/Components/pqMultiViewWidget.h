@@ -33,10 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqMultiViewWidget_h
 
 #include <QWidget>
+#include <QUuid>
 #include "pqComponentsExport.h"
 
-class pqMultiViewFrame;
 class pqView;
+class pqViewFrame;
 class vtkImageData;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
@@ -92,28 +93,27 @@ protected slots:
   /// Slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called
   /// directly. These result in updating the layoutManager.
-  void splitVertical();
-  void splitHorizontal();
+  void standardButtonPressed(int);
   void splitterMoved();
-  void close();
-  void maximize();
-  void restore();
 
   /// Makes a frame active. This also call pqActiveObjects::setActiveView() to
   /// make the corresponding view active.
-  void makeActive(pqMultiViewFrame* frame);
+  void makeActive(pqViewFrame* frame);
 
   /// Marks the frame corresponding to the view, if present in the widget, as
   /// active. Note that this method does not fire the activeChanged() signal.
   void markActive(pqView* view);
-  void markActive(pqMultiViewFrame* frame);
+  void markActive(pqViewFrame* frame);
+
+  /// swap frame positions.
+  void swapPositions(const QString&);
 
 protected:
   /// Called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
   /// takes over the ownership of the created frame and will delete/re-parent it
   /// as and when appropriate.
-  virtual pqMultiViewFrame* newFrame(vtkSMProxy* view);
+  virtual pqViewFrame* newFrame(vtkSMProxy* view);
 
   /// Event filter callback to detect when a sub-frame becomes active, so that
   /// we can mark it as such.

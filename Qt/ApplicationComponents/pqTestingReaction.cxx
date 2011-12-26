@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqLockViewSizeCustomDialog.h"
 #include "pqTestUtility.h"
-#include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
 pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type)
@@ -46,10 +45,11 @@ pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::Connec
   if (mode == LOCK_VIEW_SIZE)
     {
     parentObject->setCheckable(true);
-    pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-                   pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-    QObject::connect(viewManager, SIGNAL(maxViewWindowSizeSet(bool)),
-                     parentObject, SLOT(setChecked(bool)));
+    // FIXME_VIEW_LAYOUT
+    //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+    //               pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+    //QObject::connect(viewManager, SIGNAL(maxViewWindowSizeSet(bool)),
+    //                 parentObject, SLOT(setChecked(bool)));
     }
 }
 
@@ -114,16 +114,17 @@ void pqTestingReaction::playTest(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqTestingReaction::lockViewSize(bool lock)
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  if (viewManager)
-    {
-    viewManager->setMaxViewWindowSize(lock? QSize(300, 300) : QSize(-1, -1));
-    }
-  else
-    {
-    qCritical("pqTestingReaction requires pqViewManager.");
-    }
+  // FIXME_VIEW_LAYOUT
+  //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  //if (viewManager)
+  //  {
+  //  viewManager->setMaxViewWindowSize(lock? QSize(300, 300) : QSize(-1, -1));
+  //  }
+  //else
+  //  {
+  //  qCritical("pqTestingReaction requires pqViewManager.");
+  //  }
 }
  
 //-----------------------------------------------------------------------------
