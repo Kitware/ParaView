@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSize>
 #include <QtDebug>
 
-
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqAnimationSceneImageWriter.h"
@@ -604,9 +603,8 @@ bool pqAnimationManager::saveAnimation()
 
   // Enforce any view size conditions (such a multiple of 4). 
   ::enforceMultiple4(newSize); 
-  int magnification = 1; // viewManager? viewManager->prepareForCapture(newSize): 1;
-  // FIXME_VIEW_LAYOUT
-  abort();
+  int magnification = viewManager?
+    viewManager->prepareForCapture(newSize.width(), newSize.height()): 1;
  
   if (disconnect_and_save)
     {
@@ -690,8 +688,7 @@ bool pqAnimationManager::saveAnimation()
   sceneProxy->UpdateVTKObjects();
   if (viewManager)
     {
-    // viewManager->finishedCapture();
-    // FIXME_VIEW_LAYOUT
+    viewManager->cleanupAfterCapture();
     }
 
   if (stereo)

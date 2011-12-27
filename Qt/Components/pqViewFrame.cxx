@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewFrame.h"
 
+#include "pqSetName.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QDrag>
@@ -76,22 +78,24 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   // Create standard buttons.
   this->StandardToolButtons[SplitVertical] =
     this->createButton(new QAction(
-        QIcon(":/pqWidgets/Icons/pqSplitViewV12.png"), "Split Vertical", this));
+        QIcon(":/pqWidgets/Icons/pqSplitViewV12.png"), "Split Vertical", this)
+      << pqSetName("SplitVertical"));
   this->StandardToolButtons[SplitHorizontal] =
     this->createButton(new QAction(
-        QIcon(":/pqWidgets/Icons/pqSplitViewH12.png"), "Split Horizontal", this));
+        QIcon(":/pqWidgets/Icons/pqSplitViewH12.png"), "Split Horizontal", this)
+      << pqSetName("SplitHorizontal"));
   this->StandardToolButtons[Maximize] =
     this->createButton(new QAction(
         QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)),
-        "Maximize", this));
+        "Maximize", this) << pqSetName("Maximize"));
   this->StandardToolButtons[Restore] =
     this->createButton(new QAction(
         QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarNormalButton)),
-        "Restore", this));
+        "Restore", this) << pqSetName("Minimize"));
   this->StandardToolButtons[Close] =
     this->createButton(new QAction(
         QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)),
-        "Close", this));
+        "Close", this) << pqSetName("Close"));
 
   this->updateTitleBar();
   this->updateLayout();
@@ -257,7 +261,7 @@ QToolButton* pqViewFrame::createButton(QAction* action)
   toolButton->setObjectName(action->objectName());
   toolButton->setIcon(action->icon());
 
-  QObject::connect(toolButton, SIGNAL(clicked()),
+  QObject::connect(toolButton, SIGNAL(triggered(QAction*)),
     this, SLOT(buttonClicked()));
   return toolButton;
 }

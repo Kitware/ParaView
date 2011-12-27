@@ -184,6 +184,10 @@ public:
   // Overridden to load custom XML state.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Resets the layout.
+  void Reset();
+
 //BTX
 protected:
   vtkSMViewLayoutProxy();

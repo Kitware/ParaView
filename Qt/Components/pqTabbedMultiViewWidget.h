@@ -60,6 +60,13 @@ public:
   /// at least one valid view in the widget, otherwise returns NULL.
   vtkImageData* captureImage(int width, int height);
 
+  /// setups up the environment for capture. Returns the magnification that can
+  /// be used to capture the image for required size.
+  int prepareForCapture(int width, int height);
+
+  /// cleans up the environment after image capture.
+  void cleanupAfterCapture();
+
 signals:
   /// fired when lockViewSize() is called.
   void viewSizeLocked(bool);
@@ -75,6 +82,9 @@ public slots:
   /// Locks the maximum size for each view-frame to the given size.
   /// Use empty QSize() instance to indicate no limits.
   void lockViewSize(const QSize&);
+
+  /// cleans up the layout.
+  void reset();
 
 protected slots:
   /// slots connects to corresponding signals on pqServerManagerObserver.

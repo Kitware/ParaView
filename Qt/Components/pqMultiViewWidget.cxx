@@ -630,26 +630,33 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
+int pqMultiViewWidget::prepareForCapture(int dx, int dy)
 {
   QSize requestedSize(dx, dy);
   QSize originalSize = this->size();
   QSize mySize = this->size();
-  QSize myMaximumSize = this->maximumSize();
 
   int magnification =  pqView::computeMagnification(requestedSize, mySize);
-  bool decorationsVisibility = this->DecorationsVisible;
-
-  this->setDecorationsVisible(false);
   this->setMaximumSize(mySize);
   this->resize(mySize);
+  this->setDecorationsVisible(false);
   pqEventDispatcher::processEventsAndWait(1);
+  return magnification;
+}
 
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::cleanupAfterCapture()
+{
+  this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+  this->setDecorationsVisible(true);
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
+{
+  int magnification = this->prepareForCapture(dx, dy);
   vtkImageData* image = this->layoutManager()->CaptureWindow(magnification);
-  this->setDecorationsVisible(decorationsVisibility);
-  this->setMaximumSize(myMaximumSize);
-  this->resize(originalSize);
-
+  this->cleanupAfterCapture();
   return image;
 }
 
@@ -695,4 +702,10 @@ void pqMultiViewWidget::swapPositions(const QString& uid_str)
   vlayout->SwapCells(id1, id2);
   END_UNDO_SET();
   this->reload();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::reset()
+{
+  this->layoutManager()->Reset();
 }

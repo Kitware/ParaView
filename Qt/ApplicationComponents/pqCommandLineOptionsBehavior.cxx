@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConnectReaction.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "vtkProcessModule.h"
@@ -236,13 +237,13 @@ void pqCommandLineOptionsBehavior::resetApplication()
     }
 
   // reset view layout.
-  // FIXME_VIEW_LAYOUT
-  //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  //if (viewManager)
-  //  {
-  //  viewManager->reset();
-  //  }
+  pqTabbedMultiViewWidget* viewWidget = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  if (viewWidget)
+    {
+    viewWidget->reset();
+    }
+
   // create default render view.
   pqApplicationCore::instance()->getObjectBuilder()->createView(
     pqRenderView::renderViewType(),

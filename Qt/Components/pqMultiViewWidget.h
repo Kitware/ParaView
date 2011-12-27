@@ -66,6 +66,13 @@ public:
   /// Captures an image for the views in the layout. Note that there must be
   /// at least one valid view in the widget, otherwise returns NULL.
   vtkImageData* captureImage(int width, int height);
+ 
+  /// setups up the environment for capture. Returns the magnification that can
+  /// be used to capture the image for required size.
+  int prepareForCapture(int width, int height);
+
+  /// cleans up the environment after image capture.
+  void cleanupAfterCapture();
 
 public slots:
   /// This forces the pqMultiViewWidget to reload its layout from the
@@ -92,6 +99,9 @@ public slots:
   /// Locks the maximum size for each view-frame to the given size.
   /// Use empty QSize() instance to indicate no limits.
   void lockViewSize(const QSize&);
+
+  /// cleans up the layout.
+  void reset();
 
 protected slots:
   /// Slots called on different signals fired by the nested frames or splitters.

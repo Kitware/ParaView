@@ -271,11 +271,14 @@ void pqTabbedMultiViewWidget::createTab()
 void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
 {
   pqMultiViewWidget* widget = new pqMultiViewWidget(this);
+
+  int count = this->Internals->TabWidget->count();
+
+  widget->setObjectName(QString("MultiViewWidget%1").arg(count));
   widget->setLayoutManager(vlayout);
 
-  int tab_index = this->Internals->TabWidget->insertTab(
-    this->Internals->TabWidget->count()-1, widget,
-    QString("Layout #%1").arg(this->Internals->TabWidget->count()));
+  int tab_index = this->Internals->TabWidget->insertTab(count-1, widget,
+    QString("Layout #%1").arg(count));
   this->Internals->TabWidget->setCurrentIndex(tab_index);
 
   vtkIdType cid =
@@ -283,7 +286,6 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
       vlayout->GetSession())->GetConnectionID();
   this->Internals->TabWidgets.insert(cid, widget);
 }
-
 
 //-----------------------------------------------------------------------------
 vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
@@ -295,6 +297,30 @@ vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
     return widget->captureImage(dx, dy);
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+int pqTabbedMultiViewWidget::prepareForCapture(int dx, int dy)
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->currentWidget());
+  if (widget)
+    {
+    return widget->prepareForCapture(dx, dy);
+    }
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::cleanupAfterCapture()
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->currentWidget());
+  if (widget)
+    {
+    widget->cleanupAfterCapture();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -322,4 +348,20 @@ void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
     }
 
   emit this->viewSizeLocked(!viewSize.isEmpty());
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::reset()
+{
+  for (int cc=this->Internals->TabWidget->count()-1; cc > 1; --cc)
+    {
+    this->closeTab(cc-1);
+    }
+
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->currentWidget());
+  if (widget)
+    {
+    widget->reset();
+    }
 }

@@ -228,6 +228,14 @@ vtkSMViewLayoutProxy::~vtkSMViewLayoutProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::Reset()
+{
+  this->Internals->KDTree.clear();
+  this->Internals->KDTree.resize(1);
+  this->UpdateState();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::LoadState(
   const vtkSMMessage* message, vtkSMProxyLocator* locator)
 {
