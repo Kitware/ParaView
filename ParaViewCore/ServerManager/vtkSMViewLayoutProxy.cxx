@@ -93,6 +93,7 @@ public:
       }
 
     Cell source_cell = this->KDTree[source];
+    this->KDTree[source] = Cell();
     this->MoveSubtree(2*destination+1, 2*source+1);
     this->MoveSubtree(2*destination+2, 2*source+2);
     this->KDTree[destination] = source_cell;
@@ -150,17 +151,14 @@ public:
 private:
   size_t GetMaxChildIndex(size_t parent)
     {
-    size_t child0 = 2*parent + 1;
-    size_t child1 = 2*parent + 2;
-    if (child1 < this->KDTree.size())
+    if (this->KDTree[parent].Direction == vtkSMViewLayoutProxy::NONE)
       {
-      return this->GetMaxChildIndex(child1);
+      return parent;
       }
-    else if (child0 < this->KDTree.size())
-      {
-      return this->GetMaxChildIndex(child0);
-      }
-    return parent;
+
+    size_t child1 = this->GetMaxChildIndex(2*parent + 1);
+    size_t child2 = this->GetMaxChildIndex(2*parent + 2);
+    return std::max(child1, child2);
     }
 
   // temporary vector uses by ComputeSizes() and allocated by
