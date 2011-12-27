@@ -61,8 +61,6 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
 //-----------------------------------------------------------------------------
 pqVRStarter::~pqVRStarter()
 {
-  delete this->Internals->EventQueue;
-  delete this->Internals->Handler;
 }
 
 //-----------------------------------------------------------------------------
