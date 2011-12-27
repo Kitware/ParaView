@@ -24,9 +24,6 @@
     </property>
     <item row="0" column="0">
      <widget class="pqTabbedMultiViewWidget" name="MultiViewManager">
-      <property name="tabsClosable">
-       <bool>false</bool>
-      </property>
      </widget>
     </item>
    </layout>
@@ -261,7 +258,7 @@
   </customwidget>
   <customwidget>
    <class>pqTabbedMultiViewWidget</class>
-   <extends>QTabWidget</extends>
+   <extends>QWidget</extends>
    <header>pqTabbedMultiViewWidget.h</header>
    <container>1</container>
   </customwidget>

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTabbedMultiViewWidget_h 
 #define __pqTabbedMultiViewWidget_h
 
-#include <QTabWidget>
+#include <QWidget>
 #include "pqComponentsExport.h"
 #include "vtkType.h" // needed for vtkIdType
 
@@ -45,10 +45,10 @@ class vtkImageData;
 /// pqMultiViewWidget instances in tabs. This class directly listens to the
 /// server-manager to automatically create pqMultiViewWidget instances for every
 /// vtkSMViewLayoutProxy registered.
-class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QTabWidget
+class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
 {
   Q_OBJECT
-  typedef QTabWidget Superclass;
+  typedef QWidget Superclass;
 public:
   pqTabbedMultiViewWidget(QWidget* parent=0);
   virtual ~pqTabbedMultiViewWidget();
@@ -64,6 +64,9 @@ public slots:
   void createTab();
   void createTab(vtkSMViewLayoutProxy*);
   void closeTab(int);
+
+  /// toggles fullscreen state.
+  void toggleFullScreen();
 
 protected slots:
   /// slots connects to corresponding signals on pqServerManagerObserver.

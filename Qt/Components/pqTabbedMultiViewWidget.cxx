@@ -44,12 +44,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 
 #include <QMultiMap>
+#include <QPointer>
+#include <QShortcut>
+#include <QTabWidget>
 #include <QtDebug>
+#include <QVBoxLayout>
 
 class pqTabbedMultiViewWidget::pqInternals
 {
 public:
+  QPointer<QTabWidget> TabWidget;
   QMultiMap<vtkIdType, QPointer<pqMultiViewWidget> > TabWidgets;
+  QPointer<QWidget> FullScreenWindow;
 };
 
 //-----------------------------------------------------------------------------
@@ -57,6 +63,15 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   : Superclass(parentObject),
   Internals(new pqInternals())
 {
+  this->Internals->TabWidget = new QTabWidget(this);
+  this->Internals->TabWidget->setObjectName("CoreWidget");
+
+  QVBoxLayout* vbox = new QVBoxLayout();
+  this->setLayout(vbox);
+  vbox->setMargin(0);
+  vbox->setSpacing(0);
+  vbox->addWidget(this->Internals->TabWidget);
+
   pqApplicationCore::instance()->registerManager(
     "MULTIVIEW_WIDGET", this);
 
@@ -70,8 +85,8 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   QObject::connect(smmodel, SIGNAL(preServerRemoved(pqServer*)),
     this, SLOT(serverRemoved(pqServer*)));
 
-  this->addTab(new QWidget(this), "+");
-  QObject::connect(this, SIGNAL(currentChanged(int)),
+  this->Internals->TabWidget->addTab(new QWidget(this), "+");
+  QObject::connect(this->Internals->TabWidget, SIGNAL(currentChanged(int)),
     this, SLOT(currentTabChanged(int)));
 }
 
@@ -79,6 +94,37 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
 pqTabbedMultiViewWidget::~pqTabbedMultiViewWidget()
 {
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::toggleFullScreen()
+{
+  if (this->Internals->FullScreenWindow)
+    {
+    this->Internals->FullScreenWindow->layout()->removeWidget(
+      this->Internals->TabWidget);
+    this->layout()->addWidget(this->Internals->TabWidget);
+    delete this->Internals->FullScreenWindow;
+    }
+  else
+    {
+    QWidget* fullScreenWindow = new QWidget(this, Qt::Window);
+    this->Internals->FullScreenWindow = fullScreenWindow;
+    fullScreenWindow->setObjectName("FullScreenWindow");
+    this->layout()->removeWidget(this->Internals->TabWidget);
+
+    QVBoxLayout* vbox = new QVBoxLayout(fullScreenWindow);
+    vbox->setSpacing(0); vbox->setMargin(0);
+
+    vbox->addWidget(this->Internals->TabWidget);
+    fullScreenWindow->showFullScreen();
+    fullScreenWindow->show();
+
+    QShortcut *esc= new QShortcut(Qt::Key_Escape, fullScreenWindow);
+    QObject::connect(esc, SIGNAL(activated()), this, SLOT(toggleFullScreen()));
+    QShortcut *f11= new QShortcut(Qt::Key_F11, fullScreenWindow);
+    QObject::connect(f11, SIGNAL(activated()), this, SLOT(toggleFullScreen()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -96,13 +142,15 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     // it, only if the server-manager (through undo-redo, or loading state or
     // Python or collaborative-client).
     pqMultiViewWidget* frame =
-      qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+      qobject_cast<pqMultiViewWidget*>(
+        this->Internals->TabWidget->currentWidget());
 
     if (!frame)
       {
       // implies no vtkSMViewLayoutProxy was registered for this session.
       this->createTab();
-      frame = qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+      frame = qobject_cast<pqMultiViewWidget*>(
+        this->Internals->TabWidget->currentWidget());
       }
 
     if (frame)
@@ -134,12 +182,13 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
         {
         this->Internals->TabWidgets.remove(
           proxy->getServer()->GetConnectionID(), widget);
-        int index = this->indexOf(widget);
-        if (this->currentWidget() == widget)
+        int index = this->Internals->TabWidget->indexOf(widget);
+        if (this->Internals->TabWidget->currentWidget() == widget)
           {
-          this->setCurrentIndex(((index-1) > 0)? (index-1) : 0);
+          this->Internals->TabWidget->setCurrentIndex(
+            ((index-1) > 0)? (index-1) : 0);
           }
-        this->removeTab(index);
+        this->Internals->TabWidget->removeTab(index);
         delete widget;
         break;
         }
@@ -155,10 +204,10 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
     this->Internals->TabWidgets.values(server->GetConnectionID());
   foreach (pqMultiViewWidget* widget, widgets)
     {
-    int cur_index = this->indexOf(widget);
+    int cur_index = this->Internals->TabWidget->indexOf(widget);
     if (cur_index != -1)
       {
-      this->removeTab(cur_index);
+      this->Internals->TabWidget->removeTab(cur_index);
       }
     delete widget;
     }
@@ -169,14 +218,14 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::currentTabChanged(int index)
 {
-  if (index < (this->count()-1))
+  if (index < (this->Internals->TabWidget->count()-1))
     {
     // make the first frame active.
-    pqMultiViewWidget* frame =
-      qobject_cast<pqMultiViewWidget*>(this->currentWidget());
+    pqMultiViewWidget* frame = qobject_cast<pqMultiViewWidget*>(
+      this->Internals->TabWidget->currentWidget());
     frame->makeFrameActive();
     }
-  else if (index == (this->count()-1) && index != 0)
+  else if (index == (this->Internals->TabWidget->count()-1) && index != 0)
     {
     // index !=0 check keeps this widget from creating new tabs as the tabs are
     // being removed.
@@ -188,7 +237,7 @@ void pqTabbedMultiViewWidget::currentTabChanged(int index)
 void pqTabbedMultiViewWidget::closeTab(int index)
 {
   pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
-    this->widget(index));
+    this->Internals->TabWidget->widget(index));
   vtkSMProxy* vlayout = widget? widget->layoutManager() : NULL;
   if (vlayout)
     {
@@ -224,9 +273,10 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
   pqMultiViewWidget* widget = new pqMultiViewWidget(this);
   widget->setLayoutManager(vlayout);
 
-  int tab_index = this->insertTab(
-    this->count()-1, widget, QString("Layout #%1").arg(this->count()));
-  this->setCurrentIndex(tab_index);
+  int tab_index = this->Internals->TabWidget->insertTab(
+    this->Internals->TabWidget->count()-1, widget,
+    QString("Layout #%1").arg(this->Internals->TabWidget->count()));
+  this->Internals->TabWidget->setCurrentIndex(tab_index);
 
   vtkIdType cid =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
@@ -239,7 +289,7 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
 vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
 {
   pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
-    this->currentWidget());
+    this->Internals->TabWidget->currentWidget());
   if (widget)
     {
     return widget->captureImage(dx, dy);
@@ -250,9 +300,9 @@ vtkImageData* pqTabbedMultiViewWidget::captureImage(int dx, int dy)
 //-----------------------------------------------------------------------------
 QSize pqTabbedMultiViewWidget::clientSize() const
 {
-  if (this->currentWidget())
+  if (this->Internals->TabWidget->currentWidget())
     {
-    return this->currentWidget()->size();
+    return this->Internals->TabWidget->currentWidget()->size();
     }
 
   return this->size();
