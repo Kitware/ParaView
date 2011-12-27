@@ -117,11 +117,6 @@ vtkVRPNConnection::vtkVRPNConnection(QObject* parentObject)
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
-
-  // this->Mapping["Tracker0@192.168.1.126"]="kinect";
-  // this->Mapping["device0@localhost"]="space-navigator";
-  // this->Mapping["TRACKER.0"] = "head";
-  // this->Mapping["TRACKER.13"] = "right-hand";
 }
 
 // -----------------------------------------------------------------------destr
