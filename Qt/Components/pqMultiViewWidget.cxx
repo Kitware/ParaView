@@ -582,19 +582,27 @@ void pqMultiViewWidget::standardButtonPressed(int button)
     break;
 
   case pqViewFrame::Close:
-    BEGIN_UNDO_SET("Close View");
-    this->layoutManager()->RemoveView(index.toInt());
-    if (pqActiveObjects::instance().activeView())
       {
-      pqObjectBuilder* builder =
-        pqApplicationCore::instance()-> getObjectBuilder();
-      builder->destroy(pqActiveObjects::instance().activeView());
+      BEGIN_UNDO_SET("Close View");
+      vtkSMViewProxy* viewProxy =
+        this->layoutManager()->GetView(index.toInt());
+      if (viewProxy)
+        {
+        this->layoutManager()->RemoveView(viewProxy);
+        pqObjectBuilder* builder =
+          pqApplicationCore::instance()->getObjectBuilder();
+        builder->destroy(getPQView(viewProxy));
+        }
+      if (index.toInt() != 0)
+        {
+        int location = index.toInt();
+        int parent = vtkSMViewLayoutProxy::GetParent(location);
+        this->layoutManager()->Collapse(location);
+        this->makeActive(qobject_cast<pqViewFrame*>(
+            this->Internals->Widgets[parent]));
+        }
+      END_UNDO_SET();
       }
-    if (index.toInt() != 0)
-      {
-      this->layoutManager()->Collapse(index.toInt());
-      }
-    END_UNDO_SET();
     break;
     }
 }
