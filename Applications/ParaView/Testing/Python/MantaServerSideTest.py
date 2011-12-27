@@ -38,9 +38,9 @@ object3 = 'pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object3, 'activate', '')
 
 #close the 3D view and make a manta view
-object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
+object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close'
 QtTesting.playCommand(object4, 'activate', '')
-object5 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Manta'
+object5 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/MantaView'
 QtTesting.playCommand(object5, 'activate', '')
 
 #show something
