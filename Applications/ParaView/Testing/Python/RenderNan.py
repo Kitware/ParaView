@@ -25,7 +25,7 @@ object9 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object9, 'set_string', 'efield')
 
 # Image compare for default colors.
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'RenderNanDefaultColor.png', 300, 300);
 
 #############################################################################
@@ -43,7 +43,7 @@ object5 = 'pqClientMainWindow/pqColorScaleDialog/CloseButton'
 QtTesting.playCommand(object5, 'activate', '')
 
 # Image compare for preset color.
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'RenderNanPresetColor.png', 300, 300);
 
 
@@ -58,5 +58,5 @@ object3 = 'pqClientMainWindow/pqColorScaleDialog/CloseButton'
 QtTesting.playCommand(object3, 'activate', '')
 
 # Image compare for color selected via GUI.
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'RenderNanGUIColor.png', 300, 300);

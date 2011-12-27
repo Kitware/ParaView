@@ -46,7 +46,7 @@ object11 = 'pqClientMainWindow/pqSLACDataLoadManager/buttonBox/1QPushButton0'
 QtTesting.playCommand(object11, 'activate', '')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 # For some reason, the snapshot is being grabbed before the image is updated
 # when the dialog closes.  To get around this issue, simulate a mouse click
 # in the view.  I'm not really happy with this hack because it won't catch if
@@ -66,7 +66,7 @@ object2 = 'pqSLACActionHolder/actionWireframeSolidMesh'
 QtTesting.playCommand(object2, 'activate', '')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsBFieldWireSolid.png', 300, 300);
 
 #############################################################################
@@ -79,7 +79,7 @@ QtTesting.playCommand(object1, 'activate', 'menuTools')
 object2 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object2, 'activate', 'actionTesting_Window_Size')
 
-object3 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object3, 'mousePress', '(0.863333,0.543333,1,1,0)')
 QtTesting.playCommand(object3, 'mouseMove', '(0.743333,0.633333,1,0,0)')
 QtTesting.playCommand(object3, 'mouseRelease', '(0.743333,0.633333,1,0,0)')
@@ -101,7 +101,7 @@ object7 = 'pqSLACActionHolder/actionShowParticles'
 QtTesting.playCommand(object7, 'set_boolean', 'false')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsWireEFieldTempResetHideP.png', 300, 300);
 
 #############################################################################
@@ -120,7 +120,7 @@ object5 = 'pqSLACActionHolder/actionShowStandardViewpoint'
 QtTesting.playCommand(object5, 'activate', '')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsBlackBackReset.png', 300, 300);
 
 #############################################################################
@@ -136,5 +136,5 @@ object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/Multi
 QtTesting.playCommand(object8, 'activate', '')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsPlotOverZ.png', 300, 300);

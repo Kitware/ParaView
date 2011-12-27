@@ -23,7 +23,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="pqTabbedMultiViewWidget" name="MultiViewManager">
+     <widget class="pqTabbedMultiViewWidget" name="MultiViewWidget">
      </widget>
     </item>
    </layout>

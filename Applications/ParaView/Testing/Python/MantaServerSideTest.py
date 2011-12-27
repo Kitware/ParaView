@@ -55,11 +55,11 @@ QtTesting.playCommand(object6, 'activate', '')
 objectfoo = 'pqClientMainWindow/representationToolbar/displayRepresentation/comboBox'
 QtTesting.playCommand(objectfoo, 'set_string', 'Points')
 
-object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object7 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object7, 'mousePress', '(0.719373,0.369784,1,1,0)')
 QtTesting.playCommand(object7, 'mouseMove', '(0.605413,0.271942,1,0,0)')
 QtTesting.playCommand(object7, 'mouseRelease', '(0.605413,0.271942,1,0,0)')
 
 # Image comparison
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'MantaSSImage.png', 300, 300);

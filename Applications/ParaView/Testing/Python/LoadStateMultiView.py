@@ -37,6 +37,6 @@ QtTesting.playCommand(object1, 'activate', 'actionFileLoadServerState')
 #QtTesting.playCommand(object2, 'activate', '')
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
 
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'LoadStateMultiView.png', 200, 200);
 

@@ -66,7 +66,7 @@ QtTesting.playCommand(object13, 'activate', 'DataSetSurfaceFilter')
 QtTesting.playCommand(object12, 'activate', '')
 object20 = 'pqClientMainWindow/cameraToolbar/actionPositiveZ'
 QtTesting.playCommand(object20, 'activate', '')
-object21 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object21 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object21, 'mousePress', '(0.529061,0.519763,1,1,0)')
 QtTesting.playCommand(object21, 'mouseMove', '(0.71237,0.632411,1,0,0)')
 QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
@@ -90,7 +90,7 @@ object19 = 'pqClientMainWindow/cameraToolbar/actionNegativeY'
 QtTesting.playCommand(object19, 'activate', '')
 object20 = 'pqClientMainWindow/cameraToolbar/actionPositiveZ'
 QtTesting.playCommand(object20, 'activate', '')
-object21 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object21 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object21, 'mousePress', '(0.529061,0.519763,1,1,0)')
 QtTesting.playCommand(object21, 'mouseMove', '(0.71237,0.632411,1,0,0)')
 QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
@@ -113,7 +113,7 @@ QtTesting.playCommand(object16, 'mousePress', '1,1,0,12,13,/0:0/0:0/0:1')
 QtTesting.playCommand(object16, 'mouseRelease', '1,0,0,12,13,/0:0/0:0/0:1')
 object34 = 'pqClientMainWindow/cameraToolbar/actionPositiveZ'
 QtTesting.playCommand(object34, 'activate', '')
-object35 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object35 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object35, 'mousePress', '(0.529061,0.519763,1,1,0)')
 QtTesting.playCommand(object35, 'mouseMove', '(0.71237,0.632411,1,0,0)')
 QtTesting.playCommand(object35, 'mouseRelease', '(0.71237,0.632411,1,0,0)')

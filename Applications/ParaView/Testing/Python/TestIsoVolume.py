@@ -23,7 +23,7 @@ time.sleep(0.1) # Slow down to make sure the UI has been updated correctly on Ma
 QtTesting.playCommand(object5, 'set_string', '140')
 QtTesting.playCommand(object3, 'activate', '')
 # DO_IMAGE_COMPARE
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'TestIsoVolume1.png', 300, 300);
 
 #----------------- NEXT TEST -----------
