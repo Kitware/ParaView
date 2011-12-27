@@ -132,7 +132,7 @@ QtTesting.playCommand(object6, 'activate', '')
 object7 = 'pqClientMainWindow/VCRToolbar/actionVCRNextFrame'
 QtTesting.playCommand(object7, 'activate', '')
 
-object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
+object8 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Close'
 QtTesting.playCommand(object8, 'activate', '')
 
 #Image compare
