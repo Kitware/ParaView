@@ -77,13 +77,15 @@ protected:
   virtual bool eventFilter(QObject* obj, QEvent* event);
   virtual void keyPressEvent(QKeyEvent *e);
   /// Recursive to search all QModelIndices in the model.
-
   virtual bool searchModel( const QAbstractItemModel * M,
     const QModelIndex & Top, const QString & S,
     ItemSearchType searchType = Current ) const;
   /// Overwrite to focus the lineEdit box
   void showEvent(QShowEvent *);
-
+  /// match the input string with the index's text
+  virtual bool matchString( const QAbstractItemModel * M,
+    const QModelIndex & curIdx, 
+    const QString & searchString) const;
 private:
   pqItemViewSearchWidget(const pqItemViewSearchWidget&); // Not implemented.
   void operator=(const pqItemViewSearchWidget&); // Not implemented.

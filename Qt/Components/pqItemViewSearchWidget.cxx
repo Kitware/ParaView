@@ -236,18 +236,9 @@ bool pqItemViewSearchWidget::searchModel( const QAbstractItemModel * M,
     return found;
     }
   // Try to match the curIdx index itself
-  QString strText = M->data(curIdx, Qt::DisplayRole).toString();
-  Qt::CaseSensitivity cs = this->Private->checkBoxMattchCase->isChecked() ?
-    Qt::CaseSensitive : Qt::CaseInsensitive;
-  if(strText.contains(searchString, cs))
+  if(this->matchString(M, curIdx, searchString))
     {
-    this->Private->CurrentFound = curIdx;
-    found = true;
-    this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, Qt::green, Qt::BackgroundColorRole);
-    this->Private->BaseWidget->scrollTo(this->Private->CurrentFound);
-    this->Private->lineEditSearch->setPalette(this->Private->WhitePal);
-    return found;
+    return true;
     }
 
   if(searchType != Previous && M->hasChildren(curIdx))
@@ -416,6 +407,11 @@ void pqItemViewSearchWidget::findPrevious()
             }
           }
         }
+      // Try to match the parent index itself
+      if(this->matchString(viewModel, pidx, searchString))
+        {
+        return;
+        }
       tmpIdx = pidx;
       pidx = pidx.parent();
       }
@@ -451,4 +447,24 @@ void pqItemViewSearchWidget::findPrevious()
     {
     this->updateSearch();
     }
+}
+
+//-----------------------------------------------------------------------------
+bool pqItemViewSearchWidget::matchString( const QAbstractItemModel * M,
+                                         const QModelIndex & curIdx, 
+                                         const QString & searchString) const
+{// Try to match the curIdx index itself
+  QString strText = M->data(curIdx, Qt::DisplayRole).toString();
+  Qt::CaseSensitivity cs = this->Private->checkBoxMattchCase->isChecked() ?
+  Qt::CaseSensitive : Qt::CaseInsensitive;
+  if(strText.contains(searchString, cs))
+    {
+    this->Private->CurrentFound = curIdx;
+    this->Private->BaseWidget->model()->setData(
+      this->Private->CurrentFound, Qt::green, Qt::BackgroundColorRole);
+    this->Private->BaseWidget->scrollTo(this->Private->CurrentFound);
+    this->Private->lineEditSearch->setPalette(this->Private->WhitePal);
+    return true;
+    }
+  return false;
 }
