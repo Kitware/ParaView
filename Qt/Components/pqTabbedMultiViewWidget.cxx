@@ -137,6 +137,10 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     }
   else if (qobject_cast<pqView*>(proxy))
     {
+    if (pqApplicationCore::instance()->isLoadingState())
+      {
+      return;
+      }
     // FIXME: we may want to give server-manager the opportunity to place the
     // view after creation, if it wants. The GUI should try to find a place for
     // it, only if the server-manager (through undo-redo, or loading state or
