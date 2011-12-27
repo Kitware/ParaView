@@ -143,6 +143,8 @@ static const char * white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
 #include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
 
+#include "pqUndoStack.h"
+
 class pqTransferFunctionEditor::pqInternals: public Ui::pqTransferFunctionEditor
 {
 public:
@@ -689,8 +691,10 @@ void pqTransferFunctionEditor::SetProxyValue(const char *name,
   pqSMAdaptor::setMultipleElementProperty(Property, val);
   if (updateFlag && !this->Internals->BlockSignals)
     {
+    BEGIN_UNDO_EXCLUDE();
     reprProxy->UpdateVTKObjects();
     this->updateAllViews();
+    END_UNDO_EXCLUDE();
     }
 }
 //----------------------------------------------------------------------------
