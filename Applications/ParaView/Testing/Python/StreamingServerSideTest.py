@@ -62,9 +62,9 @@ QtTesting.playCommand(objectb4, 'activate', '')
 
 # Test the iterating view
 print "opening iterating view"
-object7 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
+object7 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close'
 QtTesting.playCommand(object7, 'activate', '')
-object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Iterating View'
+object8 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/IteratingView'
 QtTesting.playCommand(object8, 'activate', '')
 object9 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/streaming_controls/cache_size'
 QtTesting.playCommand(object9, 'set_string', 'no')
@@ -90,7 +90,7 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
 # Test the prioritizing view
 print "opening prioritizing view"
 QtTesting.playCommand(object7, 'activate', '')
-object15 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Prioritizing View'
+object15 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/PrioritizingView'
 QtTesting.playCommand(object15, 'activate', '')
 QtTesting.playCommand(object9, 'set_string', 'no')
 QtTesting.playCommand(object9_5, 'set_int', '32')
@@ -114,7 +114,7 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.71237,0.632411,1,0,0)')
 # Test the refining view by refining and coarsening
 print "opening refining view"
 QtTesting.playCommand(object7, 'activate', '')
-object27 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/Refining View'
+object27 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RefiningView'
 QtTesting.playCommand(object27, 'activate', '')
 object28 = 'pqClientMainWindow/pqStreamingControls/dockWidgetContents/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/streaming_controls/cache_size'
 QtTesting.playCommand(object28, 'set_string', 'no')
