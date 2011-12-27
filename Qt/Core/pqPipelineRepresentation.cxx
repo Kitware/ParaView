@@ -264,7 +264,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 {
   // We deliberately don;t call superclass. For somereason,
   // its messing up with the scalar coloring.
-  // this->Superclass::setDefaultPropertyValues();
+  this->Superclass::setDefaultPropertyValues();
 
   if (!this->isVisible() &&
       !pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault()
