@@ -473,8 +473,9 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
+int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
 {
+  vtkPVXMLElement* rootElement = parent;
   if (rootElement->GetName() && 
     strcmp(rootElement->GetName(),"ServerManagerState") != 0)
     {
@@ -488,7 +489,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
     }
   
   vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
-  if (!convertor->Process(rootElement))
+  if (!convertor->Process(parent))
     {
     vtkWarningMacro("State convertor was not able to convert the state to current "
       "version successfully");
