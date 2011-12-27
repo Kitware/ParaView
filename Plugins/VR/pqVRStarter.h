@@ -68,6 +68,7 @@ private:
   Q_DISABLE_COPY(pqVRStarter);
   class pqInternals;
   pqInternals* Internals;
+  bool IsShutdown;
 };
 
 #endif

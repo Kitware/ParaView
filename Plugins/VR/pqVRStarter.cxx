@@ -56,11 +56,16 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals = new pqInternals;
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
+  this->IsShutdown = false;
 }
 
 //-----------------------------------------------------------------------------
 pqVRStarter::~pqVRStarter()
 {
+  if(!this->IsShutdown)
+    {
+      this->onShutdown();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -82,5 +87,6 @@ void pqVRStarter::onShutdown()
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
   delete this->Internals->EventQueue;
+  this->IsShutdown = true;
   // qWarning() << "Message from pqVRStarter: Application Shutting down";
 }
