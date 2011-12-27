@@ -220,7 +220,7 @@ void vtkVRPNConnection::Stop()
 {
   this->Initialized = false;
   this->_Stop = true;
-  QThread::quit();
+  QThread::wait();
 }
 
 // ---------------------------------------------------------------------private

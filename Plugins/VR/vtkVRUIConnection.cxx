@@ -380,7 +380,7 @@ void vtkVRUIConnection::Stop()
   this->_Stop = true;
   this->Internals->stopStream();
   this->Internals->deactivate();
-  QThread::quit();
+  QThread::wait();
 }
 
 
