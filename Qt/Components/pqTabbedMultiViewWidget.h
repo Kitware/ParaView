@@ -60,6 +60,10 @@ public:
   /// at least one valid view in the widget, otherwise returns NULL.
   vtkImageData* captureImage(int width, int height);
 
+signals:
+  /// fired when lockViewSize() is called.
+  void viewSizeLocked(bool);
+
 public slots:
   void createTab();
   void createTab(vtkSMViewLayoutProxy*);
@@ -67,6 +71,10 @@ public slots:
 
   /// toggles fullscreen state.
   void toggleFullScreen();
+
+  /// Locks the maximum size for each view-frame to the given size.
+  /// Use empty QSize() instance to indicate no limits.
+  void lockViewSize(const QSize&);
 
 protected slots:
   /// slots connects to corresponding signals on pqServerManagerObserver.

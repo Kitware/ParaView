@@ -82,7 +82,6 @@ void pqViewMenuManager::buildMenu()
 
   this->Menu->addSeparator();
 
-  // FIXME_VIEW_LAYOUT
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)

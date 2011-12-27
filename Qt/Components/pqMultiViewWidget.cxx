@@ -329,6 +329,16 @@ void pqMultiViewWidget::makeActive(pqViewFrame* frame)
 }
 
 //-----------------------------------------------------------------------------
+void pqMultiViewWidget::lockViewSize(const QSize& viewSize)
+{
+  if (this->LockViewSize != viewSize)
+    {
+    this->LockViewSize = viewSize;
+    this->reload();
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 {
   pqViewFrame* frame = new pqViewFrame(this);
@@ -394,6 +404,15 @@ QWidget* pqMultiViewWidget::createWidget(
       frame->setObjectName(QString("Frame.%1").arg(index));
       frame->setProperty("FRAME_INDEX", QVariant(index));
       frame->setDecorationsVisibility(this->DecorationsVisible);
+      if (this->LockViewSize.isEmpty())
+        {
+        frame->centralWidget()->setMaximumSize(
+          QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        }
+      else
+        {
+        frame->centralWidget()->setMaximumSize(this->LockViewSize);
+        }
       return frame;
       }
 

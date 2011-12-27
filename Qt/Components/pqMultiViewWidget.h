@@ -89,6 +89,10 @@ public slots:
   void showDecorations() { this->setDecorationsVisible(true); }
   void hideDecorations() { this->setDecorationsVisible(false); }
 
+  /// Locks the maximum size for each view-frame to the given size.
+  /// Use empty QSize() instance to indicate no limits.
+  void lockViewSize(const QSize&);
+
 protected slots:
   /// Slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called
@@ -129,6 +133,8 @@ private:
   pqInternals* Internals;
 
   bool DecorationsVisible;
+
+  QSize LockViewSize;
 };
 
 #endif

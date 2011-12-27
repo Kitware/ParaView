@@ -31,10 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTestingReaction.h"
 
-#include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqLockViewSizeCustomDialog.h"
+#include "pqPVApplicationCore.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqTestUtility.h"
 
 //-----------------------------------------------------------------------------
@@ -45,11 +46,10 @@ pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::Connec
   if (mode == LOCK_VIEW_SIZE)
     {
     parentObject->setCheckable(true);
-    // FIXME_VIEW_LAYOUT
-    //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    //               pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-    //QObject::connect(viewManager, SIGNAL(maxViewWindowSizeSet(bool)),
-    //                 parentObject, SLOT(setChecked(bool)));
+    pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+      pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+    QObject::connect(viewManager, SIGNAL(viewSizeLocked(bool)),
+      parentObject, SLOT(setChecked(bool)));
     }
 }
 
@@ -114,17 +114,16 @@ void pqTestingReaction::playTest(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqTestingReaction::lockViewSize(bool lock)
 {
-  // FIXME_VIEW_LAYOUT
-  //pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  //if (viewManager)
-  //  {
-  //  viewManager->setMaxViewWindowSize(lock? QSize(300, 300) : QSize(-1, -1));
-  //  }
-  //else
-  //  {
-  //  qCritical("pqTestingReaction requires pqViewManager.");
-  //  }
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  if (viewManager)
+    {
+    viewManager->lockViewSize(lock? QSize(300, 300) : QSize(-1, -1));
+    }
+  else
+    {
+    qCritical("pqTestingReaction requires pqTabbedMultiViewWidget.");
+    }
 }
  
 //-----------------------------------------------------------------------------

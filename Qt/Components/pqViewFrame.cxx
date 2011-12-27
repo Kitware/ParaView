@@ -119,6 +119,12 @@ void pqViewFrame::setCentralWidget(QWidget* widget)
 }
 
 //-----------------------------------------------------------------------------
+QWidget* pqViewFrame::centralWidget() const
+{
+  return this->CentralWidget;
+}
+
+//-----------------------------------------------------------------------------
 void pqViewFrame::updateLayout()
 {
   QVBoxLayout* vbox = new QVBoxLayout();

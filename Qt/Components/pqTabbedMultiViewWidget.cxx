@@ -307,3 +307,19 @@ QSize pqTabbedMultiViewWidget::clientSize() const
 
   return this->size();
 }
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
+{
+  QList<QPointer<pqMultiViewWidget> > widgets =
+    this->Internals->TabWidgets.values();
+  foreach (QPointer<pqMultiViewWidget> widget, widgets)
+    {
+    if (widget)
+      {
+      widget->lockViewSize(viewSize);
+      }
+    }
+
+  emit this->viewSizeLocked(!viewSize.isEmpty());
+}
