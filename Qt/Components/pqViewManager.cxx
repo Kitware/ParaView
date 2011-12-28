@@ -1260,8 +1260,6 @@ void pqViewManager::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqViewManager::onServerDisconnect()
 {
-  pqObjectBuilder* builder = pqApplicationCore::instance()-> getObjectBuilder();
-
   // We only cleanup views if only one server at a time is supported,
   // otherwise we keep the layout and just remove content that depend on the
   // deleted server.

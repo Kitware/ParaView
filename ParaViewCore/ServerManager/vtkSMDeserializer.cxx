@@ -43,7 +43,7 @@ vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
   assert("Expect a valid session" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   assert("Expect a valid SessionProxyManager" && pxm);
-  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname);
+  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subname);
   return proxy;
 }
 

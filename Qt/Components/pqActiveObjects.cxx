@@ -205,15 +205,15 @@ void pqActiveObjects::viewSelectionChanged()
     }
 
   vtkSMProxy* selectedProxy = NULL;
-  vtkSMProxySelectionModel* selection = server->activeViewSelectionModel();
-  if (selection->GetNumberOfSelectedProxies() == 1)
+  vtkSMProxySelectionModel* viewSelection = server->activeViewSelectionModel();
+  if (viewSelection->GetNumberOfSelectedProxies() == 1)
     {
-    selectedProxy = selection->GetSelectedProxy(0);
+    selectedProxy = viewSelection->GetSelectedProxy(0);
     }
-  else if (selection->GetNumberOfSelectedProxies() > 1)
+  else if (viewSelection->GetNumberOfSelectedProxies() > 1)
     {
-    selectedProxy = selection->GetCurrentProxy();
-    if (selectedProxy && !selection->IsSelected(selectedProxy))
+    selectedProxy = viewSelection->GetCurrentProxy();
+    if (selectedProxy && !viewSelection->IsSelected(selectedProxy))
       {
       selectedProxy = NULL;
       }
@@ -309,11 +309,11 @@ void pqActiveObjects::onActiveServerChanged()
 
   pqServerManagerModel* smmodel =
       pqApplicationCore::instance()->getServerManagerModel();
-  pqServer* activeServer = smmodel->findServer(activeSession);
+  pqServer* newActiveServer = smmodel->findServer(activeSession);
 
-  if(activeServer)
+  if(newActiveServer)
     {
-    this->setActiveServer(activeServer);
+    this->setActiveServer(newActiveServer);
     }
 }
 //-----------------------------------------------------------------------------
@@ -465,7 +465,7 @@ void pqActiveObjects::setActivePort(pqOutputPort* port)
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::setSelection(
-  const pqProxySelection& selection, pqServerManagerModelItem* current)
+  const pqProxySelection& selection_, pqServerManagerModelItem* current)
 {
   pqProxy* current_proxy = qobject_cast<pqProxy*>(current);
   pqOutputPort* current_port = qobject_cast<pqOutputPort*>(current);
@@ -473,7 +473,7 @@ void pqActiveObjects::setSelection(
     (current_port? current_port->getServer() : NULL);
 
   // ascertain that all items in the selection have the same server.
-  foreach (pqServerManagerModelItem* item, selection)
+  foreach (pqServerManagerModelItem* item, selection_)
     {
     pqProxy* proxy = qobject_cast<pqProxy*>(item);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
@@ -501,7 +501,7 @@ void pqActiveObjects::setSelection(
     {
     this->setActiveServer(server);
 
-    selection.copyTo(server->activeSourcesSelectionModel());
+    selection_.copyTo(server->activeSourcesSelectionModel());
     // this triggers a call to selectionChanged() if selection actually changed.
 
     vtkSMProxy* proxy = current_proxy? current_proxy->getProxy() :

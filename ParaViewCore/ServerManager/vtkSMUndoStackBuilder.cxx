@@ -145,7 +145,7 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
 
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::OnCreateObject(
-  vtkSMSession* session, vtkSMMessage* newState)
+  vtkSMSession* vtkNotUsed(session), vtkSMMessage* newState)
 {
   if (this->UndoStack)
     {

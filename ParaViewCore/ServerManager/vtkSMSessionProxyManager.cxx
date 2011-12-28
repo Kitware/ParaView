@@ -115,7 +115,7 @@ public:
   static vtkSMProxyManagerForwarder* New()
     { return new vtkSMProxyManagerForwarder(); }
 
-  virtual void Execute(vtkObject *obj, unsigned long event, void* data)
+  virtual void Execute(vtkObject*, unsigned long event, void* data)
     {
     if (vtkSMProxyManager::IsInitialized())
       {
