@@ -60,7 +60,6 @@ public:
 
 public slots:
   virtual void showSearchWidget();
-  virtual void closeSearchWidget();
 
 protected slots:
 

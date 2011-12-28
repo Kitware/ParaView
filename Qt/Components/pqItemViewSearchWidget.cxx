@@ -83,6 +83,8 @@ pqItemViewSearchWidget::pqItemViewSearchWidget(QWidget* parentW):
     this, SLOT(findPrevious()));
   this->installEventFilter(this);
   this->Private->lineEditSearch->installEventFilter(this);
+  this->setAttribute(Qt::WA_DeleteOnClose, true);
+  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 // -------------------------------------------------------------------------
@@ -117,13 +119,10 @@ void pqItemViewSearchWidget::showSearchWidget()
   mappedPoint = this->Private->BaseWidget->mapToGlobal(mappedPoint);
   mappedPoint = this->mapFromGlobal(mappedPoint);
   this->move(mappedPoint.x(), mappedPoint.y()-2*this->height());
-  this->exec();
-}
-
-// --------------------------------------------------------------------------
-void pqItemViewSearchWidget::closeSearchWidget()
-{
-  this->close();
+  this->setModal(false);
+  this->show();
+  this->raise();
+  this->activateWindow();
 }
 
 //-----------------------------------------------------------------------------
@@ -138,6 +137,15 @@ bool pqItemViewSearchWidget::eventFilter(QObject* obj, QEvent* event)
      return true;
      }
    }
+ else if(event->type()== QEvent::WindowDeactivate)
+   {
+   if(obj == this && !this->isActiveWindow())
+     {
+     event->accept();
+     this->close();
+     return true;
+     }
+   }
   return this->Superclass::eventFilter(obj, event);
 }
 
@@ -147,7 +155,7 @@ void pqItemViewSearchWidget::keyPressEvent(QKeyEvent *e)
   if ((e->key()==Qt::Key_Escape))
     {
     e->accept();
-    this->close();
+    this->accept();
     }
   else if((e->modifiers()==Qt::AltModifier))
     {

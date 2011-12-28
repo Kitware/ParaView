@@ -135,8 +135,11 @@ void pqPVApplicationCore::startSearch()
     {
     return;
     }
-  pqItemViewSearchWidget searchDialog(focusItemView);
-  searchDialog.showSearchWidget();
+
+  pqItemViewSearchWidget* searchDialog =
+    new pqItemViewSearchWidget(focusItemView);
+  searchDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  searchDialog->showSearchWidget();
 }
 //-----------------------------------------------------------------------------
 pqApplyPropertiesManager* pqPVApplicationCore::applyPropertiesManager() const
