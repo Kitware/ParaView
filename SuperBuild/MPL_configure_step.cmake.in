@@ -1,5 +1,5 @@
 message("Configuring MPL:\n@MPL_binary@")
-set(ENV{LD_LIBRARY_PATH} "@freetype_install@/lib")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
 include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
