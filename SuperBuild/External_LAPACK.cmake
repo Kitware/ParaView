@@ -14,7 +14,7 @@ if(WIN32)
   if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     include(DetectIntelFortranEnvironment)
     list(APPEND LAPACK_EXTRA_ARGS 
-      -DCMAKE_Fortran_COMPILER:FILE_PATH=${intel_ifort_path}/ifort.exe
+      -DCMAKE_Fortran_COMPILER:FILEPATH=${intel_ifort_path}/ifort.exe
     )
   endif()
 else()
