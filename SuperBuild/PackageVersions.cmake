@@ -43,10 +43,10 @@ set(NUMPY_MD5 2bce18c08fc4fce461656f0f4dd9103e)
 
 set(distribute_MAJOR 0)
 set(distribute_MINOR 6)
-set(distribute_PATCH 19)
+set(distribute_PATCH 24)
 set(distribute_URL http://pypi.python.org/packages/source/d/distribute/)
 set(distribute_GZ distribute-${distribute_MAJOR}.${distribute_MINOR}.${distribute_PATCH}.tar.gz)
-set(distribute_MD5 21e7a442c4d8f0cb0223f2ed5e4569ad)
+set(distribute_MD5 17722b22141aba8235787f79800cc452)
 
 set(yt_MAJOR 2)
 set(yt_MINOR 2)
