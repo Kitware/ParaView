@@ -10,6 +10,13 @@ if(WIN32)
     -DBUILD_STATIC_LIBS:BOOL=ON
     -DBUILD_SHARED_LIBS:BOOL=OFF
     )
+
+  if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+    include(DetectIntelFortranEnvironment)
+    list(APPEND LAPACK_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILE_PATH=${intel_ifort_path}/ifort.exe
+    )
+  endif()
 else()
   set(LAPACK_EXTRA_ARGS 
     -DBUILD_STATIC_LIBS:BOOL=OFF
