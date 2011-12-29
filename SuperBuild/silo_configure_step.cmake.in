@@ -17,6 +17,10 @@ else()
     set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
     set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
     set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  else()
+    set(ENV{CPPFLAGS} "@pv_tpl_cxx_flags@")
+    set(ENV{CXXFLAGS} "@pv_tpl_cxx_flags@")
+    set(ENV{CFLAGS} "@pv_tpl_c_flags@")
   endif()
 
   EXECUTE_PROCESS(
