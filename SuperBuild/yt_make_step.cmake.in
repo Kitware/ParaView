@@ -3,7 +3,11 @@ set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
 if(APPLE)
-  set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  set(ENV{CFLAGS} "@pv_tpl_c_flags@ -arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+elseif(UNIX)
+  set(ENV{CFLAGS} "@pv_tpl_c_flags@")
+else()
+  set(ENV{CL} "@pv_tpl_c_flags@")
 endif()
 
 execute_process(
