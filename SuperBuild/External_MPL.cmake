@@ -1,4 +1,3 @@
-# The Numpy external project
 
 set(MPL_binary "${CMAKE_CURRENT_BINARY_DIR}/MPL/")
 
@@ -14,9 +13,6 @@ if(APPLE)
   set(MPL_PREFIX_ARGS "${MPL_PERFIX} ${MPL_INSTALL_PURELIB} ${MPL_INSTALL_PLATLIB} ${MPL_INSTALL_SCRIPTS}")
 endif()
 
-# to configure matplotlib we run a cmake -P script
-# the script will create a site.cfg file
-# then run python setup.py config to verify setup
 configure_file(
   MPL_configure_step.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/MPL_configure_step.cmake @ONLY)

@@ -6,10 +6,12 @@ set(lapack_install "${CMAKE_CURRENT_BINARY_DIR}")
 set(NUMPY_LAPACK_binary ${lapack_binary})
 
 if(WIN32)
-  set(LAPACK_EXTRA_ARGS 
-    -DBUILD_STATIC_LIBS:BOOL=ON
-    -DBUILD_SHARED_LIBS:BOOL=OFF
+  if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+    include(DetectIntelFortranEnvironment)
+    list(APPEND LAPACK_EXTRA_ARGS 
+      -DCMAKE_Fortran_COMPILER:FILEPATH=${intel_ifort_path}/ifort.exe
     )
+  endif()
 else()
   set(LAPACK_EXTRA_ARGS 
     -DBUILD_STATIC_LIBS:BOOL=OFF
@@ -28,8 +30,8 @@ ExternalProject_Add(LAPACK
   INSTALL_DIR ${lapack_install}
   URL ${LAPACK_URL}/${LAPACK_GZ}
   URL_MD5 ${LAPACK_MD5}
-  CMAKE_ARGS
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+  CMAKE_CACHE_ARGS
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
     -DBUILD_TESTING:BOOL=OFF
     ${LAPACK_EXTRA_ARGS}
   CMAKE_ARGS

@@ -231,7 +231,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER)
+  if(CMAKE_Fortran_COMPILER AND NOT WIN32)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
@@ -343,9 +343,9 @@ if(ENABLE_YT)
   set(h5py_dependencies NUMPY HDF5 Cython)
   include(External_h5py)
 
-  set(yt_dependencies NUMPY HDF5 MPL h5py)
+  set(yt_dependencies NUMPY HDF5 MPL h5py Cython)
   if(NOT APPLE)
-    set(distribute_dependencies PYTHON)
+    set(distribute_dependencies python)
     include(External_distribute)
     list(APPEND yt_dependencies distribute)
   endif()
@@ -403,7 +403,7 @@ list(APPEND ParaView_dependencies VRPN)
 include(External_VRPN)
 set(VRPN_ARGS
   -DPARAVIEW_BUILD_PLUGIN_VRPNPlugin:BOOL=ON
-  -DVRPN_LIBRARY:FILE_PATH=${VRPN_LIBRARY}
+  -DVRPN_LIBRARY:FILEPATH=${VRPN_LIBRARY}
   -DVRPN_INCLUDE_DIR:PATH=${VRPN_INCLUDE_DIR})
 
 if(WIN32)
