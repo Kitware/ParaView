@@ -58,5 +58,9 @@ pqQtMessageHandlerBehavior::pqQtMessageHandlerBehavior(QObject* parentObject)
 {
   qInstallMsgHandler(::QtMessageOutput);
 }
+pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
+{
+  qInstallMsgHandler(0);
+}
 
 
