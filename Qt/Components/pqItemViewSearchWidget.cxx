@@ -54,6 +54,8 @@ class pqItemViewSearchWidget::PIMPL : public Ui::pqItemViewSearchWidget
 public:
   PIMPL(QWidget* parentW) 
   {
+  this->BaseWidget = parentW ? 
+    qobject_cast<QAbstractItemView*>(parentW) : NULL;;
   this->RedPal.setColor(QPalette::Base, Qt::red);
   this->WhitePal.setColor(QPalette::Base, Qt::white);
   this->DlgBackPal.setColor(QPalette::Background, Qt::darkYellow);
@@ -72,7 +74,6 @@ pqItemViewSearchWidget::pqItemViewSearchWidget(QWidget* parentW):
 {
   this->Private = new pqItemViewSearchWidget::PIMPL(parentW);
   this->Private->setupUi(this);
-  this->setBaseWidget(parentW); 
   QObject::connect(this->Private->lineEditSearch, SIGNAL(textEdited(QString)),
     this, SLOT(updateSearch(QString)));
   QObject::connect(this->Private->checkBoxMattchCase, SIGNAL(toggled(bool)),
@@ -126,27 +127,27 @@ void pqItemViewSearchWidget::showSearchWidget()
 }
 
 //-----------------------------------------------------------------------------
-bool pqItemViewSearchWidget::eventFilter(QObject* obj, QEvent* event)
+bool pqItemViewSearchWidget::eventFilter(QObject* obj, QEvent* anyevent)
 { 
- if(event->type()== QEvent::KeyPress)
+ if(anyevent->type()== QEvent::KeyPress)
    {
-   QKeyEvent *e = dynamic_cast<QKeyEvent*>(event);
+   QKeyEvent *e = dynamic_cast<QKeyEvent*>(anyevent);
    if(e && e->modifiers()==Qt::AltModifier)
      {
      this->keyPressEvent(e);
      return true;
      }
    }
- else if(event->type()== QEvent::WindowDeactivate)
+ else if(anyevent->type()== QEvent::WindowDeactivate)
    {
    if(obj == this && !this->isActiveWindow())
      {
-     event->accept();
+     anyevent->accept();
      this->close();
      return true;
      }
    }
-  return this->Superclass::eventFilter(obj, event);
+  return this->Superclass::eventFilter(obj, anyevent);
 }
 
 //-----------------------------------------------------------------------------
