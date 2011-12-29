@@ -231,7 +231,7 @@ if(NOT APPLE)
 
   set(NUMPY_dependencies python)
 
-  if(CMAKE_Fortran_COMPILER)
+  if(CMAKE_Fortran_COMPILER AND NOT WIN32)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
     list(APPEND ParaView_dependencies LAPACK)
