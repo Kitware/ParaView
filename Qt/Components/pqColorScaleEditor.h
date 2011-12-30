@@ -70,13 +70,8 @@ protected:
   virtual void hideEvent(QHideEvent *e);
 
 private slots:
-  /// \name Color Scale Methods
-  //@{
-  void handleEditorPointMoved();
-  void handleEditorPointMoveFinished();
-  void handleEditorAddOrDelete();
-  void setColors();
-  void setOpacity();
+  void updateColors();
+  void updateOpacity();
 
   void handleOpacityPointsChanged();
   void handleColorPointsChanged();
@@ -164,8 +159,11 @@ private:
   vtkPiecewiseFunction* currentOpacityFunction();
   void addRepClientColorFunction();
   void addRepClientOpacityFunction();
-  bool internalComputeRange(double* range);
+  bool internalScalarRange(double* range);
   void renderTransferFunctionViews();
+  void unsetCurrentPoints();
+  void pushColors();
+  void pushOpacity();
 
 private:
   pqColorScaleEditorForm *Form;

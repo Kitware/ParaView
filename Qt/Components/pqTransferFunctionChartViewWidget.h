@@ -100,11 +100,7 @@ public:
 
   void validBounds(double bounds[4])const;
   void setValidBounds(double bounds[4]);
-
   void setPlotsUserBounds(double* bounds);
-
-  /// Reimplemented to set the bounds to the plots as well
-  virtual void boundAxesToChartBounds();
 
   /// Return the chart bounds for the 4 chart axes.
   /// bounds must be an array of 8 doubles.
@@ -114,7 +110,7 @@ public:
   void setChartUserBounds(double* bounds);
   void chartUserBounds(double* bounds)const;
 
-  /// 
+  /// Set the chart axes to chart bounds
   virtual void setAxesToChartBounds();
 
   /// Title that appears inside the view
@@ -128,36 +124,18 @@ public:
   /// Utility function that returns the view chart. It can be used for customizing
   /// the chart display options (axes, legend...)
   vtkChartXY* chart()const;
-  //void setCurrentControlPointsItem(vtkControlPointsItem* item);
 
 signals:
     void plotAdded(vtkPlot* plot);
-    void boundsChanged();
     void currentPointEdited();
 
 public slots:
     void editPoint();
-
-    /// Move all the control points by a given offset.
-    /// \sa vtkControlPoints::movePoints()
-    void moveAllPoints(double xOffset, double yOffset = 0.);
-
-    /// Spread all the control points by a given offset.
-    /// A value >0 will space the control points, a value <0. will contract
-    /// them.
-    /// \sa vtkControlPoints::spreadPoints()
-    void spreadAllPoints(double factor = 1.);
-
     void resetView();
     void renderView();
 
-protected slots:
-    void onBoundsChanged();
-
-
 protected:
 
-  virtual void onChartUpdated();
   void chartBoundsToPlotBounds(double bounds[8], double plotBounds[4])const;
 
   vtkContextScene* scene()const;

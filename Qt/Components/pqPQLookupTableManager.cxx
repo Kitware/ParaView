@@ -452,8 +452,10 @@ void pqPQLookupTableManager::setOpacityFunctionDefaultState(
  vtkSMProxy* opFuncProxy)
 {
   // Setup default opacity function to go from (0.0,0.0) to (1.0,1.0).
+  // We are new setting defaults for midPoint (0.5) and sharpness(0.0) 
   QList<QVariant> values;
-  values << 0.0 << 0.0 << 1.0 << 1.0 ;
+  values << 0.0 << 0.0 << 0.5 << 0.0 ;
+  values << 1.0 << 1.0 << 0.5 << 0.0 ;
   pqSMAdaptor::setMultipleElementProperty(
     opFuncProxy->GetProperty("Points"), values);
 
