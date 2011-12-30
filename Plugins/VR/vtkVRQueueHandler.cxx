@@ -62,7 +62,7 @@ vtkVRQueueHandler::vtkVRQueueHandler(
 {
   this->Internals = new pqInternals();
   this->Internals->Queue = queue;
-  this->Internals->Timer.setInterval(100);
+  this->Internals->Timer.setInterval(1);
   this->Internals->Timer.setSingleShot(true);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(processEvents()));
