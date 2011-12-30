@@ -18,6 +18,7 @@
 #include "vtkDataObject.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
+#include "vtkIntArray.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkMath.h"
@@ -79,6 +80,21 @@ bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInforma
     {
     outInfo->Set(vtkPrismView::PRISM_THRESHOLD_BOUNDS(), bounds, 6);
     }
+
+  vtkIntArray *logScaling = vtkIntArray::SafeDownCast(
+                              input->GetFieldData()->GetArray("PRISM_USE_LOG_SCALING"));
+  if(logScaling)
+    {
+    outInfo->Set(vtkPrismView::PRISM_USE_LOG_SCALING(),logScaling->GetPointer(0),3);
+    }
+
+  vtkIntArray *tableId = vtkIntArray::SafeDownCast(
+                           input->GetFieldData()->GetArray("PRISM_TABLE_ID"));
+  if(tableId)
+   {
+   outInfo->Set(vtkPrismView::PRISM_TABLE_ID(),*tableId->GetPointer(0));
+   }
+
   return true;
 }
 
