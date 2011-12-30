@@ -93,7 +93,7 @@
       <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
         command="SetUseOffscreenRenderingForScreenshots"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           Set whether offscreen rendering should be used during
