@@ -130,7 +130,7 @@ else()
   set(pv_tpl_c_flags "${pv_tpl_c_flags} -w")
   set(pv_tpl_cxx_flags "${pv_tpl_cxx_flags} -w")
 endif()
-message("pv_tpl_c_flags ${pv_tpl_c_flags}")
+
 if(WIN32)
   set(_LINK_LIBRARY_SUFFIX .lib)
 elseif(APPLE)
