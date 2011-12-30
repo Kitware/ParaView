@@ -56,17 +56,6 @@ if(WIN32)
 
 else()
 
-  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_patch_step.cmake.in
-  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake
-  #  @ONLY)
-  
-  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_configure_step.cmake.in
-  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake
-  #  @ONLY)
-
-  #set(freetype_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake)
-  #set(freetype_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake)
-
   ExternalProject_Add(freetype
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${freetype_source}
@@ -74,10 +63,8 @@ else()
     URL ${FT_URL}/${FT_GZ}
     URL_MD5 ${FT_MD5}
     BUILD_IN_SOURCE 1
-    BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
-    BUILD_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FCFLAGS=-fPIC make
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DADDITIONAL_CFLAGS=-fPIC -DADDITIONAL_CXXFLAGS=-fPIC -DINSTALL_DIR=<INSTALL_DIR> -DWORKING_DIR=<SOURCE_DIR> -P ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake
     DEPENDS ${freetype_dependencies}
   )
 

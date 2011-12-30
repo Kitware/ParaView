@@ -157,6 +157,15 @@ configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
 configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
   ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_common_environment.cmake @ONLY)
 
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_configure_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake @ONLY)
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_make_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_make_step.cmake @ONLY)
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_install_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_install_step.cmake @ONLY)
+
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
 #------------------------------------------------------------------------------
@@ -494,7 +503,7 @@ endif()
 
 set(PARAVIEW_EXTRA_INSTALL_RULES)
 
-# Install libz2 until we start building it ourselves.
+# Install libbz2 until we start building it ourselves.
 if(UNIX AND NOT APPLE)
   list(APPEND PARAVIEW_EXTRA_INSTALL_RULES ${CMAKE_CURRENT_SOURCE_DIR}/install_bz2.cmake)
 endif()
