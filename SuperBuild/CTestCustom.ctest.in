@@ -152,6 +152,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "CLAPACK.BLAS.SRC"
   "CLAPACK.F2CLIBS.libf2c"
 
+  # configure
+  "configure: WARNING:*"
+
   # Make
   "warning: jobserver unavailable"
 
