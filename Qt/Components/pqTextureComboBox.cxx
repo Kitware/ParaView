@@ -415,11 +415,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
     return false;
     }
 
-  assert("Render view should be set before any texture loading" &&
-         this->Internal->RenderView.data());
-  vtkSMSessionProxyManager* pxm =
-      this->Internal->RenderView->getProxy()->GetSessionProxyManager();
-
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
   //texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename);
