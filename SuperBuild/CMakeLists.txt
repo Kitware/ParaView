@@ -44,13 +44,6 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
   )
 
-#------------------------------------------------------------------------------
-# Configure Common environment file
-#------------------------------------------------------------------------------
-
-configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
-  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_common_environment.cmake @ONLY)
-
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
 #-----------------------------------------------------------------------------
@@ -137,7 +130,7 @@ else()
   set(pv_tpl_c_flags "${pv_tpl_c_flags} -w")
   set(pv_tpl_cxx_flags "${pv_tpl_cxx_flags} -w")
 endif()
-
+message("pv_tpl_c_flags ${pv_tpl_c_flags}")
 if(WIN32)
   set(_LINK_LIBRARY_SUFFIX .lib)
 elseif(APPLE)
@@ -156,6 +149,13 @@ endif()
 #------------------------------------------------------------------------------
 configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
   ${ParaViewSuperBuild_BINARY_DIR}/CTestCustom.ctest @ONLY)
+
+#------------------------------------------------------------------------------
+# Configure Common environment file
+#------------------------------------------------------------------------------
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_common_environment.cmake @ONLY)
 
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
