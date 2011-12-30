@@ -56,7 +56,10 @@ if(WIN32)
 
 else()
 
+  set(freetype_flags "-w^^-fPIC")
+
   ExternalProject_Add(freetype
+    LIST_SEPARATOR ^^
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${freetype_source}
     INSTALL_DIR ${freetype_install}
@@ -65,7 +68,7 @@ else()
     BUILD_IN_SOURCE 1
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DADDITIONAL_CFLAGS=-w -DADDITIONAL_CPPFPAGS=-w -DINSTALL_DIR=<INSTALL_DIR> -DWORKING_DIR=<SOURCE_DIR> -P ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DADDITIONAL_CFLAGS=${freetype_flags} -DADDITIONAL_CPPFPAGS=${freetype_flags} -DINSTALL_DIR=<INSTALL_DIR> -DWORKING_DIR=<SOURCE_DIR> -P ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake
     DEPENDS ${freetype_dependencies}
   )
 
