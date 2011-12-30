@@ -40,10 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStateLocator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QList>
 #include <QString>
 #include <vtkstd/vector>
+#include <assert.h>
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"

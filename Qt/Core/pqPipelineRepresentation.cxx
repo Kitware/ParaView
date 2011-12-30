@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
@@ -221,7 +221,7 @@ void pqPipelineRepresentation::createHelperProxies()
 
   if (proxy->GetProperty("ScalarOpacityFunction"))
     {
-    vtkSMProxyManager* pxm = this->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* opacityFunction = 
       pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
     opacityFunction->UpdateVTKObjects();

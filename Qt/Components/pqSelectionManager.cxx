@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
 #include "vtkAlgorithm.h"
@@ -56,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -209,20 +209,17 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
 
     // update the servermanagermodel selection so that the pipeline browser
     // knows which source was selected.
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqServerManagerSelectionModel* selModel = core->getSelectionModel();
-    selModel->setCurrentItem(selectedPort,
-      pqServerManagerSelectionModel::ClearAndSelect);
+    pqActiveObjects::instance().setActivePort(selectedPort);
     }
 
   emit this->selectionChanged(selectedPort);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkIdType vtkNotUsed(connId))
+vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkSMSession* session)
 {
   // Create a selection source proxy
-  vtkSMProxyManager* pm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
     pm->NewProxy("sources", "PedigreeIDSelectionSource"));
 

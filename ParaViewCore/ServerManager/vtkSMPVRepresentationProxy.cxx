@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -130,7 +131,7 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
 
 //----------------------------------------------------------------------------
 int vtkSMPVRepresentationProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
 {
   this->InReadXMLAttributes = true;
   for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)

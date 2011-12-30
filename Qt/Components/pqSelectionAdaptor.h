@@ -36,87 +36,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QItemSelectionModel> //need for qtSelectionFlags
 
-class pqSelectionAdaptorInternal;
 class pqServerManagerModelItem;
-class pqServerManagerSelection;
-class pqServerManagerSelectionModel;
-
 class QAbstractItemModel;
-class QItemSelection;
-class QItemSelectionModel;
 class QModelIndex;
 
-// pqSelectionAdaptor is the abstract base class for an adaptor that connects a
-// QItemSelectionModel for any QAbstractItemModel to a 
-// pqServerManagerSelectionModel. When the selection in the QItemSelectionModel
-// changes, the pqServerManagerSelectionModel will be updated and vice versa.
-// Every model implemented on top of pqServerManagerModel that should
-// participate in synchronized selections would typically subclass and implement 
-// an adaptor. Subclass typically only need to implement
-// mapToSMModel() and mapFromSMModel().
+/// pqSelectionAdaptor is the abstract base class for an adaptor that connects a
+/// QItemSelectionModel to pqActiveObjects making it possible to update the
+/// pqActiveObjects source selection when the QItemSelectionModel changes and
+/// vice-versa.
+/// Subclass typically only need to implement mapToItem() and mapFromItem().
 class PQCOMPONENTS_EXPORT pqSelectionAdaptor : public QObject
 {
   Q_OBJECT
-
 public:
   virtual ~pqSelectionAdaptor();
 
-  // Returns a pointer to the QItemSelectionModel.
-  QItemSelectionModel* getQSelectionModel() const;
-
-  // Reurns a pointer to the pqServerManagerSelectionModel.
-  pqServerManagerSelectionModel* getSMSelectionModel() const;
+  /// Returns a pointer to the QItemSelectionModel.
+  QItemSelectionModel* getQSelectionModel() const
+    { return this->QSelectionModel; }
 
 protected:
-  pqSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* parent=0);
+  pqSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel);
 
-  // Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
-  // Subclass must implement this method.
-  virtual QModelIndex mapFromSMModel(pqServerManagerModelItem* item) const = 0;
+  /// Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
+  virtual QModelIndex mapFromItem(pqServerManagerModelItem* item) const = 0;
 
-  // Maps a QModelIndex to a pqServerManagerModelItem.
-  // Subclass must implement this method.
-  virtual pqServerManagerModelItem* mapToSMModel(
-    const QModelIndex& index) const =0;
+  /// Maps a QModelIndex to a pqServerManagerModelItem.
+  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const =0;
 
-  // Returns the QAbstractItemModel used by the QSelectionModel.
-  // If QSelectionModel uses a QAbstractProxyModel, this method skips
-  // over all such proxy models and returns the first non-proxy model 
-  // encountered.
+  /// Returns the QAbstractItemModel used by the QSelectionModel.
+  /// If QSelectionModel uses a QAbstractProxyModel, this method skips
+  /// over all such proxy models and returns the first non-proxy model 
+  /// encountered.
   const QAbstractItemModel* getQModel() const;
 
 protected slots:
-  virtual void currentChanged(const QModelIndex& current, 
-    const QModelIndex& previous);
-  virtual void selectionChanged(const QItemSelection& selected,
-    const QItemSelection& deselected);
+  /// called when the selection in the Qt-model changes.
+  virtual void selectionChanged();
 
-  virtual void currentChanged(pqServerManagerModelItem* item);
-  virtual void selectionChanged(const pqServerManagerSelection& selected,
-    const pqServerManagerSelection& deselected);
+  /// called when the ServerManager level selection (or current) changes.
+  virtual void currentProxyChanged();
+  virtual void proxySelectionChanged();
 
-
-  // subclasses can override this method to provide model specific selection 
-  // overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
+  /// subclasses can override this method to provide model specific selection 
+  /// overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
   virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const 
     { return QItemSelectionModel::NoUpdate; }
 
 private:
-  pqSelectionAdaptorInternal* Internal;
-
-
-  // Given a QModelIndex for the QAbstractItemModel under the QItemSelectionModel,
-  // this returns the QModelIndex for the inner most non-proxy 
-  // QAbstractItemModel.
+  /// Given a QModelIndex for the QAbstractItemModel under the QItemSelectionModel,
+  /// this returns the QModelIndex for the inner most non-proxy 
+  /// QAbstractItemModel.
   QModelIndex mapToSource(const QModelIndex& inIndex) const;
 
-
-  // Given a QModelIndex for the innermost non-proxy QAbstractItemModel,
-  // this returns the QModelIndex for the QAbstractItemModel under the 
-  // QItemSelectionModel.
+  /// Given a QModelIndex for the innermost non-proxy QAbstractItemModel,
+  /// this returns the QModelIndex for the QAbstractItemModel under the 
+  /// QItemSelectionModel.
   QModelIndex mapFromSource(const QModelIndex& inIndex, 
     const QAbstractItemModel* model) const;
+
+  QItemSelectionModel* QSelectionModel;
+  bool IgnoreSignals;
 };
 
 

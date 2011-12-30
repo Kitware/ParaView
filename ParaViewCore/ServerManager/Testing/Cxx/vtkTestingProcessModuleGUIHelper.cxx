@@ -24,6 +24,8 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMTesting.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkTesting.h"
 #include "vtkTestingOptions.h"
 
@@ -105,7 +107,7 @@ void vtkTestingProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkTestingProcessModuleGUIHelper::Run()
+int vtkTestingProcessModuleGUIHelper::Run(vtkSMSession* session)
 {
   int res = 0;
   // Load the state and process it.
@@ -143,10 +145,10 @@ int vtkTestingProcessModuleGUIHelper::Run()
     }
   parser->Parse(str_buffer.c_str(), str_buffer.length());
 
-  vtkSMProxyManager::GetProxyManager()->LoadXMLState(parser->GetRootElement());
+  vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+  pxm->LoadXMLState(parser->GetRootElement());
   parser->Delete();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   pxm->UpdateRegisteredProxiesInOrder(0);
 
   vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(

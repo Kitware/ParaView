@@ -90,7 +90,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCustomViewButtonDialog.h
   pqCutPanel.h
   pqDataInformationModel.h
-  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.h
   pqDialog.h
   pqDisplayArrayWidget.h
@@ -180,7 +179,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSummaryPanel.h
   pqProxySILModel.h
   pqSelectionInputWidget.h
-  pqSourceComboBox.h
   pqSphereWidget.h
   pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
@@ -443,8 +441,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqCutPanel.h
   pqDataInformationModel.cxx
   pqDataInformationModel.h
-  pqDataInformationModelSelectionAdaptor.cxx
-  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.cxx
   pqDataInformationWidget.h
   pqDialog.cxx
@@ -626,8 +622,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqSummaryPanel.h
   pqProxySILModel.cxx
   pqProxySILModel.h
-  pqSourceComboBox.cxx
-  pqSourceComboBox.h
   pqSphereWidget.cxx
   pqSphereWidget.h
   pqSplineWidget.cxx

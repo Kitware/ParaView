@@ -349,6 +349,7 @@ public:
 //-----------------------------------------------------------------------------
 void pqPipelineModel::constructor()
 {
+  this->FilterRoleSession = NULL;
   this->Internal = new pqPipelineModelInternal(this);
   this->Editable = true;
   this->View = NULL;
@@ -694,6 +695,15 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         return QVariant(
             source->getProxy()->HasAnnotation(
                 this->FilterRoleAnnotationKey.toAscii().data()));
+        }
+      return QVariant(true);
+      }
+  case pqPipelineModel::SessionFilterRole:
+      {
+      if(this->FilterRoleSession && server)
+        {
+        // We just want to make sure we are pointing to the same session
+        return ((void*)server->session() == (void*)this->FilterRoleSession);
         }
       return QVariant(true);
       }
@@ -1267,4 +1277,16 @@ void pqPipelineModel::enableFilterAnnotationKey(const QString &expectedAnnotatio
 void pqPipelineModel::disableFilterAnnotationKey()
 {
   this->FilterRoleAnnotationKey.clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::enableFilterSession(vtkSession* session)
+{
+this->FilterRoleSession = session;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::disableFilterSession()
+{
+this->FilterRoleSession = NULL;
 }

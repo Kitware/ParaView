@@ -37,8 +37,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get the interpreter for this process.
-  static vtkClientServerInterpreter* GetInterpreter();
+  // Creates (and registers) a new interpreter.
+  vtkClientServerInterpreter* NewInterpreter();
+
+  // Description:
+  // Get the interpreter for this process. Initializing a new interpreter is
+  // expensive. So filters that need to use interpreter temporarily to call
+  // methods on a vtkObject can simply use the global interpreter. As a rule,
+  // if you need to assign ID's to objects, then you're probably better off
+  // creating a new interpreter using NewInterpreter() and using it rather than
+  // the global interpreter.
+  static vtkClientServerInterpreter* GetGlobalInterpreter();
 
   // Description
   // Provides access to the singleton. This will instantiate
@@ -62,10 +71,6 @@ protected:
   static vtkClientServerInterpreterInitializer* New();
   vtkClientServerInterpreterInitializer();
   ~vtkClientServerInterpreterInitializer();
-
-  // Description:
-  // Creates (and registers) a new interpreter.
-  vtkClientServerInterpreter* NewInterpreter();
 
   // Description:
   // Registers an interpreter. This DOES NOT affect the reference count of the

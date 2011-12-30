@@ -36,6 +36,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMServerStateLocator.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -326,8 +327,9 @@ void vtkSMSessionClient::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::SetupDataServerRenderServerConnection()
 {
-  vtkSMProxy* mpiMToN = vtkSMObject::GetProxyManager()->NewProxy(
-    "internals", "MPIMToNSocketConnection");
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this);
+  vtkSMProxy* mpiMToN = pxm->NewProxy("internals", "MPIMToNSocketConnection");
   vtkSMPropertyHelper(mpiMToN, "WaitingProcess").Set(
     vtkProcessModule::PROCESS_RENDER_SERVER);
   mpiMToN->UpdateVTKObjects();

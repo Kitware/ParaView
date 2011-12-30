@@ -262,6 +262,7 @@ vtkStandardNewMacro(vtkPVPythonInterpretor);
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
+  this->ActiveSessionObserverAttached = false;
   this->Internal = new vtkPVPythonInterpretorInternal();
   this->ExecutablePath = 0;
   this->CaptureStreams = false;
@@ -270,6 +271,7 @@ vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::~vtkPVPythonInterpretor()
 {
+  this->DetachActiveSessionObserver();
   delete this->Internal;
   this->SetExecutablePath(0);
 }
@@ -535,8 +537,19 @@ void vtkPVPythonInterpretor::ExecuteInitFromGUI()
     "from paraview.simple import *\n"
     "active_objects.view = servermanager.GetRenderView()\n"
     "";
+  this->ActiveSessionObserverAttached = true;
   this->RunSimpleString(initStr);
   this->FlushMessages();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::DetachActiveSessionObserver()
+{
+if(this->ActiveSessionObserverAttached)
+  {
+  this->RunSimpleString("paraview.simple.active_session_observer = None\n");
+  this->FlushMessages();
+  }
 }
 
 //-----------------------------------------------------------------------------

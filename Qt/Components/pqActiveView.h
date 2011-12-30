@@ -38,19 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 class pqView;
-class vtkSMProxySelectionModel;
-class vtkEventQtSlotConnect;
 
 /// Provides a central location for managing an "active" view
 /// (note that a "view" could be a 3D render view, a plot, or
 /// any other type of view).
-///
-/// A slot is provided to set the currently-active view, and
-/// a signal notifies observers when the active view changes
-/// 
-/// To make it possible to synchronize the active view with the python shell,
-/// this class now internal uses vtkSMProxySelectionModel (registered as
-/// "ActiveView" with the proxy manager.
+/// This class is deprecated for all intents and purposes. One should directly
+/// use pqActiveObjects. For backwards compatibility, this simply forwards the
+/// calls to pqActiveObjects instance.
 class PQCOMPONENTS_EXPORT pqActiveView : public QObject
 {
   Q_OBJECT
@@ -59,7 +53,7 @@ public:
   static pqActiveView& instance();
   
   /// Returns the currently-active view (could return NULL)
-  pqView* current();
+  pqView* current() const;
   
 signals:
   /// Signal emitted whenever the currently-active view changes
@@ -69,26 +63,11 @@ public slots:
   /// Called to set the currently-active view
   void setCurrent(pqView* view);
 
-private slots:
-  /// called when vtkSMProxySelectionModel's current changes.
-  void smCurrentChanged();
-
-  /// called when a view is destroyed. We ensure that it's not same as the
-  //active view. If so, we set the active view to 0.
-  void onViewRemoved(pqView*);
-
-  void onSessionCreated();
-  void onSessionClosed();
-
 private:
   pqActiveView();
-  pqActiveView(const pqActiveView&); // Not implemented.
-  void operator=(const pqActiveView&); // Not implemented.
   ~pqActiveView();
 
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  pqView* ActiveView;
-  vtkWeakPointer<vtkSMProxySelectionModel> SMActiveView;
+  Q_DISABLE_COPY(pqActiveView);
 };
 
 #endif

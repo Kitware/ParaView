@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   session->Delete();
 
   vtkTestingProcessModuleGUIHelper* helper = vtkTestingProcessModuleGUIHelper::New();
-  int ret = helper->Run();
+  int ret = helper->Run(session);
 
   helper->Delete();
   vtkInitializationHelper::Finalize();

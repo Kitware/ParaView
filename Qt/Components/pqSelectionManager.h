@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSelectionManager_h
 
 #include "pqComponentsExport.h"
-#include "pqServerManagerSelectionModel.h"
 
 #include <QObject>
 #include <QPair>
@@ -43,11 +42,13 @@ class pqOutputPort;
 class pqPipelineSource;
 class pqRenderView;
 class pqSelectionManagerImplementation;
+class pqServerManagerModelItem;
 class pqView;
 class vtkDataObject;
 class vtkSelection;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
+class vtkSMSession;
 class vtkSMSourceProxy;
 
 /// pqSelectionManager is the nexus for introspective surface selection in 
@@ -75,7 +76,7 @@ public:
 
   /// Make a selection source proxy for a client-side selection.
   /// Only supports pedigree id selections.
-  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkIdType connId);
+  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkSMSession* session);
 
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)

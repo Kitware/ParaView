@@ -39,9 +39,8 @@ class pqOutputPort;
 class pqPipelineSource;
 class pqServerManagerModelItem;
 
-/// pqOutputPortComboBox is equivalent to pqSourceComboBox except that instead
-/// of shows all the source/filter proxies, it shows the output ports of all the
-/// sourcs/filters.
+/// pqOutputPortComboBox is a combo-box that shows all outputports for all
+/// sources/filters.
 class PQCOMPONENTS_EXPORT pqOutputPortComboBox : public QComboBox
 {
   Q_OBJECT
@@ -81,7 +80,7 @@ private slots:
   void nameChanged(pqServerManagerModelItem* item);
 
   /// Called when current in the server manager selection changes.
-  void onCurrentChanged(pqServerManagerModelItem* item);
+  void portChanged(pqOutputPort* item);
 
   /// Called when currentIndexChanged(int) is fired.
   /// We fire currentIndexChanged(pqPipelineSource*) and

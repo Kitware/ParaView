@@ -20,11 +20,14 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 
 #include <vtkstd/map>
 #include <vtkstd/list>
 #include <vtkstd/string>
+#include <assert.h>
 
 class vtkSMGlobalPropertiesManager::vtkInternals
 {
@@ -57,14 +60,6 @@ vtkSMGlobalPropertiesManager::~vtkSMGlobalPropertiesManager()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMGlobalPropertiesManager::SetSession(vtkSMSession *)
-{
-  // It is a prototype, this should not get to the server
-  this->SetLocation(0);
-  // We also prevent the user from beeing able to set a session
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMGlobalPropertiesManager::InitializeProperties(
   const char* xmlgroup, const char* xmlname)
 {
@@ -79,13 +74,17 @@ bool vtkSMGlobalPropertiesManager::InitializeProperties(
     {
     return false;
     }
-  vtkPVXMLElement* elem = this->GetProxyManager()->GetProxyElement(xmlgroup, xmlname);
+
+  assert("Session should be set at this point" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
+  vtkPVXMLElement* elem = pxm->GetProxyElement(xmlgroup, xmlname);
   if (!elem)
     {
     return false;
     }
 
-  this->ReadXMLAttributes(this->GetProxyManager(), elem);
+  this->ReadXMLAttributes(pxm, elem);
   this->SetXMLName(xmlname);
   this->SetXMLGroup(xmlgroup);
   return true;

@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <assert.h>
 
 // Qt Includes.
 #include <QFileInfo>
@@ -60,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
+#include "pqServer.h"
 
 
 class pqTextureComboBox::pqInternal
@@ -262,6 +265,9 @@ void pqTextureComboBox::reload()
   vtkSMProxyIterator* proxyIter = vtkSMProxyIterator::New();
   proxyIter->SetModeToOneGroup();
 
+  // Look for proxy that in the current active server/session
+  proxyIter->SetSession(pqApplicationCore::instance()->getActiveServer()->session());
+
   QMap<QString, int> countMap;
   for (proxyIter->Begin(TEXTURESGROUP); !proxyIter->IsAtEnd(); proxyIter->Next())
     {
@@ -409,7 +415,11 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
     return false;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  assert("Render view should be set before any texture loading" &&
+         this->Internal->RenderView.data());
+  vtkSMSessionProxyManager* pxm =
+      this->Internal->RenderView->getProxy()->GetSessionProxyManager();
+
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
   //texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename);

@@ -125,6 +125,8 @@ SET (Kit_SRCS
   vtkSMServerStateLocator.cxx
   vtkSMSession.cxx
   vtkSMSessionClient.cxx
+  vtkSMSessionObject.cxx
+  vtkSMSessionProxyManager.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
@@ -169,8 +171,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx
   vtkSMLink.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyManager.cxx # since New() is protected.
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
+  vtkSMSessionProxyManager.cxx # since New() is non-standard.
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx

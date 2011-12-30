@@ -26,6 +26,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
 #include "vtkCommand.h"
 
@@ -332,13 +333,13 @@ void vtkSMProxyProperty::SetNumberOfProxies(unsigned int num)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfProxies()
 {
-  return this->PPInternals->Proxies.size();
+  return static_cast<unsigned int>(this->PPInternals->Proxies.size());
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 {
-  return this->PPInternals->UncheckedProxies.size();
+  return static_cast<unsigned int>(this->PPInternals->UncheckedProxies.size());
 }
 
 //---------------------------------------------------------------------------
@@ -420,7 +421,6 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
          proxyIdIter++ )
       {
       // Get the proxy from proxy manager
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
       vtkSMProxy* proxy;
       if(locator && vtkSMProxyProperty::CanCreateProxy())
@@ -431,7 +431,7 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
         {
         proxy =
             vtkSMProxy::SafeDownCast(
-                pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+              this->GetParent()->GetSession()->GetRemoteObject(*proxyIdIter));
         }
 
       if(proxy)
@@ -468,7 +468,9 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src, 
   const char* exceptionClass, int proxyPropertyCopyFlag)
 {
-  vtkSMProxyManager* pxm = this->GetParent()->GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
+          this->GetParent()->GetSession());
   vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(src);
 
   this->RemoveAllProxies();

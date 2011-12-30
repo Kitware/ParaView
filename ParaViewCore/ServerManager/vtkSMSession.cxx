@@ -20,17 +20,17 @@
 #include "vtkProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
+#include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
-#include "vtkSMUndoStack.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/ios/sstream>
@@ -46,11 +46,8 @@ vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 {
+  this->SessionProxyManager = NULL;
   this->StateLocator = vtkSMStateLocator::New();
-  this->StateManagement = true; // Allow to store state in local cache for Uno/Redo
-  this->PluginManager = vtkSMPluginManager::New();
-  this->PluginManager->SetSession(this);
-  this->UndoStackBuilder = NULL;
   this->IsAutoMPI = false;
 
   if (initialize_during_constructor)
@@ -73,26 +70,18 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
-  if (vtkSMObject::GetProxyManager())
+  if (vtkSMProxyManager::IsInitialized())
     {
-    vtkSMObject::GetProxyManager()->SetSession(NULL);
-    }
-  this->PluginManager->Delete();
-  this->PluginManager = NULL;
-  this->SetUndoStackBuilder(0);
-  this->StateLocator->Delete();
-  this->ProxyLocator->Delete();
-}
-//----------------------------------------------------------------------------
-void vtkSMSession::SetUndoStackBuilder(vtkSMUndoStackBuilder *undostackBuilder)
-{
-  // Init garbage collection for StateLocator
-  if(undostackBuilder)
-    {
-    this->StateLocator->InitGarbageCollector(this, undostackBuilder->GetUndoStack());
+    vtkSMProxyManager::GetProxyManager()->GetPluginManager()->UnRegisterSession(this);
     }
 
-  vtkSetObjectBodyMacro(UndoStackBuilder, vtkSMUndoStackBuilder, undostackBuilder);
+  this->StateLocator->Delete();
+  this->ProxyLocator->Delete();
+  if (this->SessionProxyManager)
+    {
+    this->SessionProxyManager->Delete();
+    this->SessionProxyManager = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -120,53 +109,49 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 {
-  if( this->StateManagement &&
-      ((this->GetProcessRoles() & vtkPVSession::CLIENT) != 0) )
+  // check is global-undo-stack builder is set.
+  vtkSMUndoStackBuilder* usb =
+    vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+
+  if (usb == NULL ||
+    (this->GetProcessRoles() & vtkPVSession::CLIENT) == 0)
     {
-    vtkTypeUInt32 globalId = msg->global_id();
-    vtkSMRemoteObject *remoteObj =
-      vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
+    return;
+    }
 
-    //cout << "UpdateStateHistory: " << globalId << endl;
+  vtkTypeUInt32 globalId = msg->global_id();
+  vtkSMRemoteObject *remoteObj =
+    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(globalId));
 
-    if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
-      {
-      vtkSMMessage newState;
-      newState.CopyFrom(*remoteObj->GetFullState());
+  if(remoteObj && !remoteObj->IsPrototype() && remoteObj->GetFullState())
+    {
+    vtkSMMessage newState;
+    newState.CopyFrom(*remoteObj->GetFullState());
 
-      // Need to provide id/location as the full state may not have them yet
-      newState.set_global_id(globalId);
-      newState.set_location(msg->location());
+    // Need to provide id/location as the full state may not have them yet
+    newState.set_global_id(globalId);
+    newState.set_location(msg->location());
 
-      // Store state in cache
-      vtkSMMessage oldState;
-      bool createAction = !this->StateLocator->FindState( globalId, &oldState,
+    // Store state in cache
+    vtkSMMessage oldState;
+    bool createAction = !this->StateLocator->FindState( globalId, &oldState,
       /* We want only a local lookup => false */          false );
 
-      // This is a filtering Hack, I don't like it. :-(
-      if(newState.GetExtension(ProxyState::xml_name) != "Camera")
-        {
-        this->StateLocator->RegisterState(&newState);
-        }
+    // This is a filtering Hack, I don't like it. :-(
+    if (newState.GetExtension(ProxyState::xml_name) != "Camera")
+      {
+      this->StateLocator->RegisterState(&newState);
+      }
 
-      // Propagate to undo stack builder if possible
-      if(this->UndoStackBuilder)
-        {
-        if(createAction)
-          {
-          // Do we want to manage object creation ?
-          this->UndoStackBuilder->GetUndoStack()->InvokeEvent(vtkSMUndoStack::ObjectCreationEvent, &newState);
-          }
-        else
-          {
-          // Update
-          if(oldState.SerializeAsString() != newState.SerializeAsString())
-            {
-            this->UndoStackBuilder->OnStateChange( this, globalId,
-                                                   &oldState, &newState);
-            }
-          }
-        }
+    // Propagate to undo stack builder if possible
+    if (createAction)
+      {
+      usb->OnCreateObject(this, &newState);
+      }
+    else if (oldState.SerializeAsString() != newState.SerializeAsString())
+      {
+      // Update
+      usb->OnStateChange( this, globalId, &oldState, &newState);
       }
     }
 }
@@ -174,15 +159,25 @@ void vtkSMSession::UpdateStateHistory(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 void vtkSMSession::Initialize()
 {
-  // initialization should never happens on the satellites.
-  if (this->GetProcessRoles() & vtkPVSession::CLIENT)
-    {
-    // Make sure that the client as the server XML definition
-    vtkSMObject::GetProxyManager()->SetSession(this);
+  assert(this->SessionProxyManager == NULL);
 
-    this->PluginManager->SetSession(this);
-    this->PluginManager->Initialize();
+  // Remember, although vtkSMSession is always only created on the client side,
+  // in batch mode, vtkSMSession is created on all nodes.
+
+  // All these initializations need to be done on all nodes in symmetric-batch
+  // mode. In non-symmetric-batch mode. Which means we are a CLIENT,
+  // so if we are not then we stop the initialisation here !
+  if( !(this->GetProcessRoles() & vtkPVSession::CLIENT) )
+    {
+    return;
     }
+
+  // Initialize the proxy manager.
+  // this updates proxy definitions if we are connected to a remote server.
+  this->SessionProxyManager = vtkSMSessionProxyManager::New(this);
+
+  // Initialize the plugin manager.
+  vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
 }
 
 //----------------------------------------------------------------------------

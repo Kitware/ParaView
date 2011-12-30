@@ -53,7 +53,6 @@ class pqServer;
 class pqServerConfigurationCollection;
 class pqServerManagerModel;
 class pqServerManagerObserver;
-class pqServerManagerSelectionModel;
 class pqServerResource;
 class pqSettings;
 class pqTestUtility;
@@ -183,11 +182,6 @@ public:
   /// the application. Used to change the active display
   /// policy. The pqApplicationCore takes over the ownership of the display policy.
   void setDisplayPolicy(pqDisplayPolicy* dp);
-
-  /// Returns the server manager selection model which keeps track of the active
-  /// sources/filters.
-  pqServerManagerSelectionModel* getSelectionModel()
-    { return this->SelectionModel; }
 
   /// Provides access to the test utility.
   virtual pqTestUtility* testUtility();
@@ -325,7 +319,6 @@ protected:
   pqProgressManager* ProgressManager;
   pqServerManagerModel* ServerManagerModel;
   pqServerManagerObserver* ServerManagerObserver;
-  pqServerManagerSelectionModel* SelectionModel;
   pqUndoStack* UndoStack;
   pqRecentlyUsedResourcesList *RecentlyUsedResourcesList;
   pqServerConfigurationCollection* ServerConfigurations;

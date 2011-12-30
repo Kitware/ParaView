@@ -31,11 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCreateCustomFilterReaction.h"
 
-#include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
-#include "pqServerManagerSelectionModel.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -44,10 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::connect(core->getSelectionModel(),
-    SIGNAL(selectionChanged(const pqServerManagerSelection&,
-        const pqServerManagerSelection&)),
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(portChanged(pqOutputPort*)),
+    this, SLOT(updateEnableState()));
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(selectionChanged(const pqProxySelection&)),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
@@ -55,10 +55,8 @@ pqCreateCustomFilterReaction::pqCreateCustomFilterReaction(QAction* parentObject
 //-----------------------------------------------------------------------------
 void pqCreateCustomFilterReaction::updateEnableState()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
-  this->parentAction()->setEnabled(selection.size() > 0 && this->IsMaster);
+  this->parentAction()->setEnabled(
+    pqActiveObjects::instance().selection().size() > 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -67,9 +65,8 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   // Get the selected sources from the application core. Notify the user
   // if the selection is empty.
   QWidget *mainWin = pqCoreUtilities::mainWidget();
-  const pqServerManagerSelection *selections =
-    pqApplicationCore::instance()->getSelectionModel()->selectedItems();
-  if (selections->size() == 0)
+
+  if (pqActiveObjects::instance().selection().size() == 0)
     {
     qCritical() <<
       "No pipeline objects are selected."
@@ -82,7 +79,7 @@ void pqCreateCustomFilterReaction::createCustomFilter()
   // selection. The model only accepts pipeline sources. Notify the
   // user if the model is empty.
   pqCustomFilterDefinitionModel custom;
-  custom.setContents(selections);
+  custom.setContents(pqActiveObjects::instance().selection());
   if (!custom.hasChildren(QModelIndex()))
     {
     QMessageBox::warning(mainWin, "Create Custom Filter Error",

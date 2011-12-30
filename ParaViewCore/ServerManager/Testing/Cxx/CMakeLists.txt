@@ -13,6 +13,12 @@ ADD_EXECUTABLE(TestSubProxy
 TARGET_LINK_LIBRARIES(TestSubProxy
   vtkPVServerManager)
 
+ADD_EXECUTABLE(TestMultipleSessions
+  TestMultipleSessions.cxx)
+
+TARGET_LINK_LIBRARIES(TestMultipleSessions
+  vtkPVServerManager)
+
 ################################################################################
 SET(ServersServerManager_SRCS
   ParaViewCoreServerManagerPrintSelf

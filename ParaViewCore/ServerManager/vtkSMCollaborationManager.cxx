@@ -100,7 +100,7 @@ public:
       if(this->UserNames[userId] != userName)
         {
         this->UserNames[userId] = userName;
-        this->UpdateState(-1);
+        this->UpdateState(this->UserToFollow);
         this->Manager->InvokeEvent(
             (unsigned long)vtkSMCollaborationManager::UpdateUserName,
             (void*) &userId);
@@ -110,7 +110,7 @@ public:
     else
       {
       this->UserNames.erase(userId);
-      this->UpdateState(-1);
+      this->UpdateState(this->UserToFollow);
       }
     return false;
     }
@@ -188,7 +188,7 @@ public:
       this->UserToFollow = newFollow;
       }
 
-    return foundChanges;
+    return foundChanges || newFollow;
     }
 
   // Return the camera update message user origin otherwise
@@ -329,8 +329,18 @@ void vtkSMCollaborationManager::PromoteToMaster(int clientId)
   this->UpdateUserInformations();
 }
 //----------------------------------------------------------------------------
+int vtkSMCollaborationManager::GetFollowedUser()
+{
+  return this->Internal->UserToFollow;
+}
+//----------------------------------------------------------------------------
 void vtkSMCollaborationManager::FollowUser(int clientId)
 {
+  if( this->Internal->UserToFollow == clientId)
+    {
+    return;
+    }
+
   if(this->IsMaster())
     {
     this->Internal->UpdateState(clientId);

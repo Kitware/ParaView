@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 
 #include <QList>
@@ -117,7 +117,7 @@ void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
 //-----------------------------------------------------------------------------
 void pqAnimationCue::removeKeyFrameInternal(vtkSMProxy* keyframe)
 {
-  vtkSMProxyManager* pxm = this->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   pxm->UnRegisterProxy("animation",
     pxm->GetProxyName("animation", keyframe), keyframe);
 }
@@ -168,7 +168,7 @@ void pqAnimationCue::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   if (!this->Internal->Manipulator && proxy->GetProperty("Manipulator"))
     {
-    vtkSMProxyManager* pxm = this->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* manip = 
       pxm->NewProxy("animation_manipulators", 
         this->ManipulatorType.toAscii().data());
@@ -328,7 +328,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
     return 0;
     }
 
-  vtkSMProxyManager* pxm = this->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
 
   // Get the current keyframes.
   QList<vtkSMProxy*> keyframes = this->getKeyFrames();

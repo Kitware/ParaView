@@ -74,7 +74,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   QString filters = readerFactory->GetSupportedFileTypes(
     server->session());
   if (!filters.isEmpty())
@@ -123,7 +123,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
     }
 
   vtkSMReaderFactory* readerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   pqPipelineSource* reader = NULL;
 
   //Extension to ReaderType,ReaderGroup Hash table

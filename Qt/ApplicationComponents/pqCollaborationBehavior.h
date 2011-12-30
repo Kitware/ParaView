@@ -48,11 +48,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCollaborationBehavior : public QObject
 public:
   pqCollaborationBehavior(QObject* parent=0);
 
-protected slots:
-  /// called when a reader is created.
-  void onServerAdded(pqServer* server);
-  void onServerRemoved(pqServer* server);
-
 private:
   Q_DISABLE_COPY(pqCollaborationBehavior)
 

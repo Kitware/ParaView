@@ -19,10 +19,10 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDomain.h"
-#include "vtkSMSession.h"
-#include "vtkSMUndoStackBuilder.h"
 #include "vtkSMComparativeAnimationCueUndoElement.h"
+#include "vtkSMDomain.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMUndoStackBuilder.h"
 
 //****************************************************************************
 //                         Internal classes
@@ -33,13 +33,11 @@ public:
   vtkInternal(vtkSMComparativeAnimationCueProxy* parent)
     {
     this->Parent = parent;
-    this->UndoStackBuilder = NULL;
     }
 
   ~vtkInternal()
     {
     this->Parent = NULL;
-    this->UndoStackBuilder = NULL;
     if(this->Observable)
       {
       this->Observable->RemoveObserver(this->CallbackID);
@@ -51,13 +49,11 @@ public:
                          void *vtkNotUsed(callData))
     {
     // Make sure an UndoStackBuilder is available
-    if(this->UndoStackBuilder == NULL)
+    vtkSMUndoStackBuilder* usb =
+      vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+    if (usb == NULL)
       {
-      this->UndoStackBuilder = this->Parent->GetSession()->GetUndoStackBuilder();
-      if(this->UndoStackBuilder == NULL)
-        {
-        return;
-        }
+      return;
       }
 
     if(!this->Parent || !this->Parent->GetComparativeAnimationCue())
@@ -71,11 +67,11 @@ public:
     this->Parent->SaveXMLState(newState);
     elem->SetXMLStates(this->Parent->GetGlobalID(), this->LastKnownState, newState);
     elem->SetSession(this->Parent->GetSession());
-    if(this->UndoStackBuilder->Add(elem))
+    if (usb->Add(elem))
       {
       this->LastKnownState = vtkSmartPointer<vtkPVXMLElement>::New();
       newState->CopyTo(this->LastKnownState);
-      this->UndoStackBuilder->PushToStack();
+      usb->PushToStack();
       }
     elem->Delete();
     }
@@ -83,11 +79,11 @@ public:
   void AttachObserver(vtkObject* obj)
     {
     this->Observable = obj;
-    this->CallbackID = obj->AddObserver( vtkCommand::StateChangedEvent, this,
-                                         &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
+    this->CallbackID = obj->AddObserver(
+      vtkCommand::StateChangedEvent, this,
+      &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
     }
 
-  vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMComparativeAnimationCueProxy* Parent;
   vtkWeakPointer<vtkObject> Observable;
   vtkSmartPointer<vtkPVXMLElement> LastKnownState;

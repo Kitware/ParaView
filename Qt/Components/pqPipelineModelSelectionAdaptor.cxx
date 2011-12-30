@@ -36,14 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqServerManagerSelectionModel.h"
 #include "pqPipelineModel.h"
 
 //-----------------------------------------------------------------------------
 pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
-  QItemSelectionModel* pipelineSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* _parent/*=0*/)
-: pqSelectionAdaptor(pipelineSelectionModel, smSelectionModel, _parent)
+  QItemSelectionModel* pipelineSelectionModel)
+: pqSelectionAdaptor(pipelineSelectionModel)
 {
   if (!qobject_cast<const pqPipelineModel*>(this->getQModel()))
     {
@@ -59,8 +57,8 @@ pqPipelineModelSelectionAdaptor::~pqPipelineModelSelectionAdaptor()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqPipelineModelSelectionAdaptor::mapFromSMModel(
-    pqServerManagerModelItem* item) const
+QModelIndex pqPipelineModelSelectionAdaptor::mapFromItem(
+  pqServerManagerModelItem* item) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
@@ -68,11 +66,10 @@ QModelIndex pqPipelineModelSelectionAdaptor::mapFromSMModel(
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModelItem* pqPipelineModelSelectionAdaptor::mapToSMModel(
-    const QModelIndex& index) const
+pqServerManagerModelItem*
+pqPipelineModelSelectionAdaptor::mapToItem(const QModelIndex& index) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
     this->getQModel());
-  return pM->getItemFor(index); 
+  return pM->getItemFor(index);
 }
-

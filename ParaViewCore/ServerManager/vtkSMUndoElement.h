@@ -26,6 +26,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkSMSession;
+class vtkSMSessionProxyManager;
 
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
@@ -36,6 +37,10 @@ public:
   // Get/Set the Session that has been used to generate that undoElement.
   virtual vtkSMSession* GetSession();
   virtual void SetSession(vtkSMSession*);
+
+  // Description:
+  // Return the corresponding ProxyManager if any.
+  virtual vtkSMSessionProxyManager* GetSessionProxyManager();
 
 protected:
   vtkSMUndoElement();

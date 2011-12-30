@@ -34,13 +34,14 @@
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
 #define MAX_NUMBER_OF_PORTS 10
@@ -221,7 +222,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   // this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
                                         vtkPVXMLElement* element)
 {
   const char* executiveName = element->GetAttribute("executive");
@@ -537,8 +538,9 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     }
   this->PInternals->SelectionProxies.resize(numOutputs);
 
-  vtkSMProxyManager* pxm = this->GetProxyManager();
   vtkClientServerStream stream;
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   for (int j=0; j<numOutputs; j++)
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;

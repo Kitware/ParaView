@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMVectorProperty.h"
 
@@ -277,7 +277,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     }
   else
     {
-    vtkSMProxyManager* pxm = repr->getProxy()->GetProxyManager();
+    vtkSMSessionProxyManager* pxm = repr->proxyManager();
     selsource = 
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", proxyname));
     pqSMAdaptor::setElementProperty(

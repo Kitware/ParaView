@@ -40,6 +40,7 @@ struct vtkSMSourceProxyInternals;
 //ETX
 class vtkSMOutputPort;
 class vtkSMProperty;
+class vtkSMSessionProxyManager;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
 {
@@ -207,7 +208,7 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
   // Description:
   // Internal method which creates the output port proxies using the proxy specified.

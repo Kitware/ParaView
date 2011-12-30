@@ -31,6 +31,7 @@
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/map>
@@ -43,6 +44,8 @@
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
 public:
+  vtkTypeMacro(vtkSMProxyManagerProxyInfo, vtkObjectBase);
+
   vtkSmartPointer<vtkSMProxy> Proxy;
   unsigned long ModifiedObserverTag;
   unsigned long StateChangedObserverTag;
@@ -51,26 +54,13 @@ public:
 
   static vtkSMProxyManagerProxyInfo* New()
     {
+    // This is required everytime we're implementing our own New() to avoid
+    // "Deleting unknown object" warning from vtkDebugLeaks.
+#ifdef VTK_DEBUG_LEAKS
+    vtkDebugLeaks::ConstructClass("vtkSMProxyManagerProxyInfo");
+#endif
     return new vtkSMProxyManagerProxyInfo();
     }
-
-  // Description:
-  // this needs to be overridden otherwise vtkDebugLeaks warnings are objects
-  // are destroyed.
-  void UnRegister()
-    {
-    int refcount = this->GetReferenceCount()-1;
-    this->SetReferenceCount(refcount);
-    if (refcount <= 0)
-      {
-#ifdef VTK_DEBUG_LEAKS
-      vtkDebugLeaks::DestructClass("vtkSMProxyManagerProxyInfo");
-#endif
-      delete this;
-      }
-    }
-  virtual void UnRegister(vtkObjectBase *)
-    { this->UnRegister(); }
 
 private:
   vtkSMProxyManagerProxyInfo()
@@ -198,8 +188,7 @@ struct vtkSMProxyManagerEntry
   }
 };
 //-----------------------------------------------------------------------------
-
-struct vtkSMProxyManagerInternals
+struct vtkSMSessionProxyManagerInternals
 {
   // This data structure stores actual proxy instances grouped in
   // collections.
@@ -227,21 +216,11 @@ struct vtkSMProxyManagerInternals
     SelectionModelsType;
   SelectionModelsType SelectionModels;
 
-  // Data structure for storing GlobalPropertiesManagers.
-  typedef vtkstd::map<vtkstd::string,
-          vtkSmartPointer<vtkSMGlobalPropertiesManager> >
-            GlobalPropertiesManagersType;
-  typedef vtkstd::map<vtkstd::string,
-          unsigned long >
-            GlobalPropertiesManagersCallBackIDType;
-  GlobalPropertiesManagersType GlobalPropertiesManagers;
-  GlobalPropertiesManagersCallBackIDType GlobalPropertiesManagersCallBackID;
-
   // Data structure for storing the fullState
   vtkSMMessage State;
 
   // Keep ref to the proxyManager to access the session
-  vtkSMProxyManager *ProxyManager;
+  vtkSMSessionProxyManager *ProxyManager;
 
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,
@@ -331,7 +310,7 @@ struct vtkSMProxyManagerInternals
     this->RegisteredProxyTuple = resultSet;
 
     // Deal with map only (true)
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.begin();
     for (; it != this->RegisteredProxyMap.end(); it++)
       {
@@ -387,7 +366,7 @@ struct vtkSMProxyManagerInternals
       }
 
     // Deal with map
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.find(group);
     if ( it != this->RegisteredProxyMap.end() )
       {
@@ -442,7 +421,7 @@ struct vtkSMProxyManagerInternals
     this->RegisteredProxyTuple.erase(vtkSMProxyManagerEntry(group,name,proxy));
 
     // Deal with map
-    vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
         this->RegisteredProxyMap.find(group);
     if ( it != this->RegisteredProxyMap.end() )
       {
@@ -529,4 +508,3 @@ struct vtkSMProxyManagerInternals
 };
 
 #endif
-

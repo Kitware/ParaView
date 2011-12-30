@@ -179,18 +179,13 @@ def DoCoProcessing(datadescription):
         tobedeleted = GetNextProxyToDelete()
 
 def GetNextProxyToDelete():
-    iter = servermanager.vtkSMProxyIterator()
-    iter.Begin()
-    while not iter.IsAtEnd():
+    for iter in servermanager.ProxyIterator():
         if iter.GetGroup().find("prototypes") != -1:
-            iter.Next()
-            continue
+           continue
         proxy = servermanager._getPyProxy(iter.GetProxy())
         proxygroup = iter.GetGroup()
         if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
             return proxy
-        iter.Next()
-
     return None
 
 def CreateProducer(datadescription, gridname):
