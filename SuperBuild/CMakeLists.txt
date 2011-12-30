@@ -157,6 +157,15 @@ configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
 configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
   ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_common_environment.cmake @ONLY)
 
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_configure_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake @ONLY)
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_make_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_make_step.cmake @ONLY)
+
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_install_step.cmake.in
+  ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_install_step.cmake @ONLY)
+
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
 #------------------------------------------------------------------------------
