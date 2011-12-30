@@ -168,15 +168,11 @@ void pqDataRepresentation::setDefaultPropertyValues()
     return;
     }
 
-  // Set default arrays and lookup table.
+  // this used to call proxy->UpdatePipeline(), however that's totally
+  // unnecessary. It gets called already e.g. by pqDisplayPolicy or by
+  // vtkSMRenderViewProxy::CreateDefaultRepresentation etc.
   vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
-  
-  // setDefaultPropertyValues() can always call Update on the display. 
-  // This is safe since setDefaultPropertyValues is called only after having
-  // added the display to the render module, which ensures that the
-  // update time has been set correctly on the display.
-  proxy->UpdatePipeline();
   proxy->GetProperty("Input")->UpdateDependentDomains();
   
   this->Superclass::setDefaultPropertyValues();
