@@ -43,17 +43,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
 
+#include <QEvent>
+#include <QLabel>
 #include <QMultiMap>
 #include <QPointer>
 #include <QShortcut>
+#include <QStyle>
+#include <QTabBar>
 #include <QTabWidget>
-#include <QtDebug>
 #include <QVBoxLayout>
+#include <QtDebug>
+
+namespace
+{
+  class pqTabWidget : public QTabWidget
+  {
+public:
+  pqTabWidget(QWidget* parentObject): QTabWidget(parentObject)
+  {
+  }
+
+  int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const
+    {
+    for (int cc=0; cc < this->count(); cc++)
+      {
+      if (this->tabBar()->tabButton(cc, position) == wdg)
+        {
+        return cc;
+        }
+      }
+    return -1;
+    }
+
+  void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg)
+    {
+    this->tabBar()->setTabButton(index, position, wdg);
+    }
+  };
+}
 
 class pqTabbedMultiViewWidget::pqInternals
 {
 public:
-  QPointer<QTabWidget> TabWidget;
+  QPointer<pqTabWidget> TabWidget;
   QMultiMap<vtkIdType, QPointer<pqMultiViewWidget> > TabWidgets;
   QPointer<QWidget> FullScreenWindow;
 };
@@ -63,7 +95,7 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   : Superclass(parentObject),
   Internals(new pqInternals())
 {
-  this->Internals->TabWidget = new QTabWidget(this);
+  this->Internals->TabWidget = new pqTabWidget(this);
   this->Internals->TabWidget->setObjectName("CoreWidget");
 
   QVBoxLayout* vbox = new QVBoxLayout();
@@ -133,7 +165,7 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
   if (proxy->getSMGroup() == "layouts" &&
     proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
     {
-    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy())); 
+    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy()));
     }
   else if (qobject_cast<pqView*>(proxy))
     {
@@ -275,6 +307,8 @@ void pqTabbedMultiViewWidget::createTab()
 void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
 {
   pqMultiViewWidget* widget = new pqMultiViewWidget(this);
+  QObject::connect(widget, SIGNAL(frameActivated()), this,
+    SLOT(frameActivated()));
 
   int count = this->Internals->TabWidget->count();
 
@@ -285,10 +319,42 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
     QString("Layout #%1").arg(count));
   this->Internals->TabWidget->setCurrentIndex(tab_index);
 
+  //set the close button for all tabs that are closeable.
+  if (tab_index != 0)
+    {
+    QLabel* label = new QLabel(this);
+    label->setObjectName("close");
+    label->setPixmap(
+      this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
+    this->Internals->TabWidget->setTabButton(tab_index,
+      QTabBar::RightSide, label);
+    label->installEventFilter(this);
+    }
+
+
   vtkIdType cid =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
       vlayout->GetSession())->GetConnectionID();
   this->Internals->TabWidgets.insert(cid, widget);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::eventFilter(QObject *obj, QEvent *evt)
+{
+  // filtering events on the QLabel added as the tabButton to the tabbar to
+  // close the tabs. If clicked, we close the tab.
+  if (evt->type() == QEvent::MouseButtonRelease)
+    {
+    int index = this->Internals->TabWidget->tabButtonIndex(
+      qobject_cast<QWidget*>(obj), QTabBar::RightSide);
+    if (index != -1)
+      {
+      this->closeTab(index);
+      return true;
+      }
+    }
+
+  return this->Superclass::eventFilter(obj, evt);
 }
 
 //-----------------------------------------------------------------------------
@@ -368,4 +434,15 @@ void pqTabbedMultiViewWidget::reset()
     {
     widget->reset();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::frameActivated()
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->sender());
+  if (widget)
+    {
+    this->Internals->TabWidget->setCurrentWidget(widget);
+    }
+
 }

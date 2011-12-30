@@ -91,10 +91,17 @@ protected slots:
   void proxyAdded(pqProxy*);
   void proxyRemoved(pqProxy*);
   void serverRemoved(pqServer*);
- 
+
   /// called when the active tab changes. If the active tab is the "+" tab, then
   /// add a new tab to the widget.
   void currentTabChanged(int);
+
+  /// called when a frame in pqMultiViewWidget is activated. Ensures that that
+  /// widget is visible.
+  void frameActivated();
+
+protected:
+  bool eventFilter(QObject *obj, QEvent *event);
 
 private:
   Q_DISABLE_COPY(pqTabbedMultiViewWidget);

@@ -261,6 +261,9 @@ void pqMultiViewWidget::assignToFrame(pqView* view)
 //-----------------------------------------------------------------------------
 void pqMultiViewWidget::makeFrameActive()
 {
+  /// note pqMultiViewWidget::markActive(pqViewFrame*) fires a signal that
+  /// results in this method being called. So we need to ensure that we don't
+  /// do anything silly here that could cause infinite recursion.
   if (!this->Internals->ActiveFrame)
     {
     foreach (QWidget* wdg, this->Internals->Widgets)
@@ -306,6 +309,10 @@ void pqMultiViewWidget::markActive(pqViewFrame* frame)
   if (frame)
     {
     frame->setBorderVisibility(true);
+    // indicate to the world that a frame on this widget has been activated.
+    // pqTabbedMultiViewWidget listens to this signal to raise that tab.
+    emit this->frameActivated();
+    // NOTE: this signal will result in call to makeFrameActive().
     }
 }
 

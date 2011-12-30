@@ -364,7 +364,7 @@ bool pqViewFrame::eventFilter(QObject* caller, QEvent* evt)
     this->drop(de);
     }
 
-  return caller->event(evt);
+  return this->Superclass::eventFilter(caller, evt);
 }
 
 //-----------------------------------------------------------------------------

@@ -74,6 +74,10 @@ public:
   /// cleans up the environment after image capture.
   void cleanupAfterCapture();
 
+signals:
+  /// fired when a frame in this widget becomes active.
+  void frameActivated();
+
 public slots:
   /// This forces the pqMultiViewWidget to reload its layout from the
   /// vtkSMViewLayoutProxy instance. One does not need to call this method
