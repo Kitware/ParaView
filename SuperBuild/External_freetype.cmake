@@ -56,17 +56,6 @@ if(WIN32)
 
 else()
 
-  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_patch_step.cmake.in
-  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake
-  #  @ONLY)
-  
-  #configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/freetype_configure_step.cmake.in
-  #  ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake
-  #  @ONLY)
-
-  #set(freetype_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_patch_step.cmake)
-  #set(freetype_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/freetype_configure_step.cmake)
-
   ExternalProject_Add(freetype
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${freetype_source}
