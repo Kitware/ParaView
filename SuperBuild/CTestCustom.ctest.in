@@ -154,6 +154,8 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # configure
   "configure: WARNING:*"
+  "configure: warning:*"
+  "config.status: WARNING:*"
 
   # Make
   "warning: jobserver unavailable"
