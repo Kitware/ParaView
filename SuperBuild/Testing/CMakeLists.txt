@@ -53,6 +53,8 @@ endif()
 
 set(PV_INSTALL_BINARY ${PV_INSTALL_LOCATION}/bin/paraview${CMAKE_EXECUTABLE_SUFFIX})
 
+
+
 if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
   add_test(
     NAME LoadAcuSolveReaderPlugin
@@ -72,4 +74,25 @@ if(PARAVIEW_BUILD_PLUGIN_Nektar)
     NAME LoadNektarReaderPlugin
     COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadNektarReaderPlugin.xml --exit
   )
+endif()
+
+if(PARAVIEW_DATA_ROOT)
+  add_test(
+    NAME LoadXDMFZlibData.xml
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+  )
+
+  if(PARAVIEW_BUILD_Silo)
+    add_test(
+      NAME LoadSiloData.xml
+      COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+    )
+  endif()
+
+  if(PARAVIEW_BUILD_CGNS)
+    add_test(
+      NAME LoadCGNSData.xml
+      COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+    )
+  endif()
 endif()
