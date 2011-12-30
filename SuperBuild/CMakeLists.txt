@@ -151,7 +151,7 @@ configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
   ${ParaViewSuperBuild_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
 #------------------------------------------------------------------------------
-# Configure Common environment file
+# Configure Common environment files
 #------------------------------------------------------------------------------
 
 configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
