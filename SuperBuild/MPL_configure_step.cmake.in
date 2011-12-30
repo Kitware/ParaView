@@ -13,10 +13,6 @@ if(WIN32)
   set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
   set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
   set(ENV{CL} "@pv_tpl_c_flags@")
-else()
-  set(ENV{CPPFLAGS} "@pv_tpl_cxx_flags@")
-  set(ENV{CXXFLAGS} "@pv_tpl_cxx_flags@")
-  set(ENV{CFLAGS} "@pv_tpl_c_flags@")
 endif()
 
 execute_process(

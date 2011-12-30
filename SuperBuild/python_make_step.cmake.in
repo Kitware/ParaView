@@ -1,6 +1,8 @@
 
 if(UNIX)
 
+  include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
+
   set(cmd "make")
   if (APPLE)
     set(ENV{LDFLAGS} "-undefined dynamic_lookup")
