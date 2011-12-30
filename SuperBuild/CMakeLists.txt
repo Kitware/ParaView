@@ -494,7 +494,7 @@ endif()
 
 set(PARAVIEW_EXTRA_INSTALL_RULES)
 
-# Install libz2 until we start building it ourselves.
+# Install libbz2 until we start building it ourselves.
 if(UNIX AND NOT APPLE)
   list(APPEND PARAVIEW_EXTRA_INSTALL_RULES ${CMAKE_CURRENT_SOURCE_DIR}/install_bz2.cmake)
 endif()
