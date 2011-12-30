@@ -111,6 +111,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqImageTip.h
   pqImplicitPlaneWidget.h
   pqIsoVolumePanel.h
+  pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
@@ -244,6 +245,7 @@ SET(UI_FORMS
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqIsoVolumePanel.ui
+  Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
   Resources/UI/pqLineSourceControls.ui
@@ -483,6 +485,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqImplicitPlaneWidget.h
   pqIsoVolumePanel.h
   pqIsoVolumePanel.cxx
+  pqItemViewSearchWidget.cxx
+  pqItemViewSearchWidget.h
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
