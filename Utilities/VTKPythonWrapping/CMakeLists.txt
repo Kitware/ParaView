@@ -101,6 +101,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     smstate
     pvfilters
     pvvtkextensions
+    extract_selection
     )
 
   # Now copy these files if necessary.

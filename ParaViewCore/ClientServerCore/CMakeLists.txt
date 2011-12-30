@@ -139,6 +139,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
   SET(Kit_SRCS ${Kit_SRCS}
     vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
+    vtkPythonExtractSelection.cxx
     vtkPythonProgrammableFilter.cxx
     )
   SET (KIT_LIBS ${KIT_LIBS} ${PYTHON_LIBRARIES} vtkPVPythonInterpretor)

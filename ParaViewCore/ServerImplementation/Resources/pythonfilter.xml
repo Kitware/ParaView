@@ -1,5 +1,51 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
+    <SourceProxy name="PythonExtractSelection"
+                 class="vtkPythonExtractSelection"
+                 label="Extract Selection (Python)">
+      <InputProperty
+         name="Input"
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+        Set the input of the filter.
+           </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+         name="Expression"
+         command="SetExpression"
+         number_of_elements="1">
+        <Documentation>
+        The Python expression evaluated during execution.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+         name="ArrayAssociation"
+         command="SetArrayAssociation"
+         number_of_elements="1"
+         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Point Data"/>
+          <Entry value="1" text="Cell Data"/>
+        </EnumerationDomain>
+        <Documentation>
+        This property controls the association of the output array as well as
+        which arrays are defined as variables.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+
 
     <SourceProxy name="PythonCalculator" 
                  class="vtkPythonCalculator"
