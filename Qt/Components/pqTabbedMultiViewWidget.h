@@ -73,6 +73,7 @@ signals:
 
 public slots:
   void createTab();
+  void createTab(pqServer*);
   void createTab(vtkSMViewLayoutProxy*);
   void closeTab(int);
 

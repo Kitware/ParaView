@@ -86,8 +86,25 @@ class pqTabbedMultiViewWidget::pqInternals
 {
 public:
   QPointer<pqTabWidget> TabWidget;
-  QMultiMap<vtkIdType, QPointer<pqMultiViewWidget> > TabWidgets;
+  QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
   QPointer<QWidget> FullScreenWindow;
+
+  /// returns a frame that can be used to assign the view proxy. May return NULL
+  /// if no suitable frame is found.
+  pqMultiViewWidget* assignableFrame(pqProxy* view)
+    {
+    pqMultiViewWidget* current = qobject_cast<pqMultiViewWidget*>(
+      this->TabWidget->currentWidget());
+    if (current && this->TabWidgets.contains(view->getServer(), current))
+      {
+      return current;
+      }
+    if (this->TabWidgets.count(view->getServer()) > 0)
+      {
+      return this->TabWidgets.value(view->getServer());
+      }
+    return NULL;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -177,14 +194,12 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     // view after creation, if it wants. The GUI should try to find a place for
     // it, only if the server-manager (through undo-redo, or loading state or
     // Python or collaborative-client).
-    pqMultiViewWidget* frame =
-      qobject_cast<pqMultiViewWidget*>(
-        this->Internals->TabWidget->currentWidget());
+    pqMultiViewWidget* frame = this->Internals->assignableFrame(proxy);
 
     if (!frame)
       {
       // implies no vtkSMViewLayoutProxy was registered for this session.
-      this->createTab();
+      this->createTab(proxy->getServer());
       frame = qobject_cast<pqMultiViewWidget*>(
         this->Internals->TabWidget->currentWidget());
       }
@@ -216,8 +231,7 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
       {
       if (widget && widget->layoutManager() == smproxy)
         {
-        this->Internals->TabWidgets.remove(
-          proxy->getServer()->GetConnectionID(), widget);
+        this->Internals->TabWidgets.remove(proxy->getServer(), widget);
         int index = this->Internals->TabWidget->indexOf(widget);
         if (this->Internals->TabWidget->currentWidget() == widget)
           {
@@ -237,7 +251,7 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 {
   // remove all tabs corresponding to the closed session.
   QList<QPointer<pqMultiViewWidget> > widgets =
-    this->Internals->TabWidgets.values(server->GetConnectionID());
+    this->Internals->TabWidgets.values(server);
   foreach (pqMultiViewWidget* widget, widgets)
     {
     int cur_index = this->Internals->TabWidget->indexOf(widget);
@@ -248,7 +262,7 @@ void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
     delete widget;
     }
 
-  this->Internals->TabWidgets.remove(server->GetConnectionID());
+  this->Internals->TabWidgets.remove(server);
 }
 
 //-----------------------------------------------------------------------------
@@ -294,6 +308,15 @@ void pqTabbedMultiViewWidget::createTab()
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server)
     {
+    this->createTab(server);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::createTab(pqServer* server)
+{
+  if (server)
+    {
     BEGIN_UNDO_SET("Add View Tab");
     vtkSMProxy* vlayout = pqApplicationCore::instance()->getObjectBuilder()->
       createProxy("misc", "ViewLayout", server, "layouts");
@@ -332,10 +355,10 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
     }
 
 
-  vtkIdType cid =
+  pqServer* server =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
-      vlayout->GetSession())->GetConnectionID();
-  this->Internals->TabWidgets.insert(cid, widget);
+      vlayout->GetSession());
+  this->Internals->TabWidgets.insert(server, widget);
 }
 
 //-----------------------------------------------------------------------------
