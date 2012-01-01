@@ -343,7 +343,10 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
   this->Internals->TabWidget->setCurrentIndex(tab_index);
 
   //set the close button for all tabs that are closeable.
-  if (tab_index != 0)
+  //if (tab_index != 0 || true)
+  //   initially, we wanted to not allow closing the first tab. However, that
+  //   becomes cumbersome with mutliple servers. So let's experiment with all
+  //   tabs closeable.
     {
     QLabel* label = new QLabel(this);
     label->setObjectName("close");
@@ -353,7 +356,6 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
       QTabBar::RightSide, label);
     label->installEventFilter(this);
     }
-
 
   pqServer* server =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
@@ -372,7 +374,13 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject *obj, QEvent *evt)
       qobject_cast<QWidget*>(obj), QTabBar::RightSide);
     if (index != -1)
       {
+      BEGIN_UNDO_SET("Close Tab");
       this->closeTab(index);
+      if (this->Internals->TabWidget->count() == 1)
+        {
+        this->createTab();
+        }
+      END_UNDO_SET();
       return true;
       }
     }
