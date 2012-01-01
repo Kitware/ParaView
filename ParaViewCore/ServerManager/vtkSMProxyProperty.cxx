@@ -128,6 +128,7 @@ bool vtkSMProxyProperty::CreateProxyAllowed = false; // static init
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
   this->PPInternals = new vtkSMProxyPropertyInternals;
+  this->SkipDependency = false;
 }
 
 //---------------------------------------------------------------------------
@@ -461,6 +462,11 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
 int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
                                           vtkPVXMLElement* element)
 {
+  int skip_dependency;
+  if (element->GetScalarAttribute("skip_dependency", &skip_dependency))
+    {
+    this->SkipDependency = (skip_dependency == 1);
+    }
   return this->Superclass::ReadXMLAttributes(parent, element);
 }
 
@@ -549,7 +555,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::AddProducer(vtkSMProxy* producer)
 {
-  if (producer && this->GetParent())
+  if (producer && this->GetParent() && !this->SkipDependency)
     {
     this->PPInternals->ProducerCounts[producer]++;
     if (this->PPInternals->ProducerCounts[producer] == 1)
@@ -563,7 +569,7 @@ void vtkSMProxyProperty::AddProducer(vtkSMProxy* producer)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveProducer(vtkSMProxy* producer)
 {
-  if (producer && this->GetParent())
+  if (producer && this->GetParent() && !this->SkipDependency)
     {
     this->PPInternals->ProducerCounts[producer]--;
     assert(this->PPInternals->ProducerCounts[producer] >= 0);
@@ -579,7 +585,7 @@ void vtkSMProxyProperty::RemoveProducer(vtkSMProxy* producer)
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  os << indent << "SkipDependency: "<< this->SkipDependency << endl;
   os << indent << "Values: ";
   for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
     {
