@@ -198,6 +198,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqViewContextMenuManager.h
   pqViewFrame.h
   pqViewFrameActionGroup.h
+  pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXYChartDisplayPanel.h
@@ -658,6 +659,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqViewContextMenuManager.h
   pqViewFrame.cxx
   pqViewFrame.h
+  pqViewManager.cxx
+  pqViewManager.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
