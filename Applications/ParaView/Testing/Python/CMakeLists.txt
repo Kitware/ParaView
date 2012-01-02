@@ -11,7 +11,6 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
   )
@@ -40,7 +39,6 @@ set (NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
-set (RenderNan_BREAK TRUE)
 set (MantaServerSideTest_DISABLE_C TRUE)
 set (MantaServerSideTest_DISABLE_CRS TRUE)
 SET (MantaTest_BREAK TRUE)
