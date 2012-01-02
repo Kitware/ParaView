@@ -427,10 +427,18 @@ IF (PARAVIEW_DATA_ROOT)
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
   )
 
+  add_client_server_tests("pvcs"
+    TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+  )
+
   IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     add_client_render_server_tests("pvcrs"
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    )
+
+    add_client_render_server_tests("pvcrs"
+      TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
     )
   ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
