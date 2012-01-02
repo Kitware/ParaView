@@ -1571,6 +1571,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1790,6 +1793,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2244,6 +2250,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2484,6 +2493,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
