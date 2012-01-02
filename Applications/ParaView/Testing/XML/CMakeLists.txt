@@ -4,6 +4,10 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
 )
 
+SET (TESTS_WITH_INLINE_COMPARES
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+)
+
 SET (TESTS_WITH_BASELINES)
 IF(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
@@ -143,6 +147,7 @@ set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
+set (TestIsoVolume_BREAK TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
@@ -383,6 +388,12 @@ set (XdmfReadStructuredGridCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TES
 set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+
+IF (PARAVIEW_DATA_ROOT)
+  set (TESTS_WITHOUT_BASELINES
+    ${TESTS_WITHOUT_BASELINES}
+    ${TESTS_WITH_INLINE_COMPARES})
+ENDIF (PARAVIEW_DATA_ROOT)
 
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}

@@ -15,7 +15,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.py
   )
 
 IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
@@ -40,7 +39,6 @@ set (FileSeries_BREAK TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
 set (LoadStateMultiView_BREAK TRUE)
 set (NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
-set (TestIsoVolume_BREAK TRUE)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
