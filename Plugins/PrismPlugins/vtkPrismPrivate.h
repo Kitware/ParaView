@@ -99,6 +99,7 @@ inline void scalePoint(double point[3], bool scalingEnabled[3], const int &table
  inline bool scaleBounds(int scalingEnabled[3], const int &tableId,
    double bounds[6])
 {
+  (void)tableId;
   bool scaling[3] = {(scalingEnabled[0]>0),
                      (scalingEnabled[1]>0),
                      (scalingEnabled[2]>0)};
