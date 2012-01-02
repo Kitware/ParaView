@@ -6,6 +6,7 @@ SET (TESTS_WITHOUT_BASELINES
 
 SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -246,6 +247,8 @@ SET (SaveCSV_THRESHOLD 40)
 ## selection is not supported in render server mode esp. when number of render
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
+
+set (LoadStateMultiView_BREAK TRUE)
 
 # NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
