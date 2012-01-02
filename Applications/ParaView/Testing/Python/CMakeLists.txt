@@ -11,7 +11,6 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
   )
 
@@ -62,7 +61,6 @@ set (StreamingServerSideTest_DISABLE_CRS TRUE)
 SET (StreamingServerSideTest_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
-SET(SaveLargeScreenshot_THRESHOLD 10000)
 SET(SLACTools_THRESHOLD 20)
 
 add_client_tests("pypv"

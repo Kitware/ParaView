@@ -8,6 +8,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -283,6 +284,9 @@ SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+
+# Set image threshold overrides for the tests.
+SET(SaveLargeScreenshot_THRESHOLD 10000)
 
 IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
   SET(EyeDomeLighting_DISABLE_C TRUE)
