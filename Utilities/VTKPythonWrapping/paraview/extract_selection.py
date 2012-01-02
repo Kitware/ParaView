@@ -23,6 +23,19 @@ from paraview import servermanager
 if servermanager.progressObserverTag:
     servermanager.ToggleProgressPrinting()
 
+contains = in1d
+
+#class _array(object):
+#    """used to wrap numpy array to add support for == operator
+#       that compares two array to generate a mask using numpy.in1d() method"""
+#    def __init__(self, array):
+#        self.array = array
+#
+#    def __eq__(self, other):
+#        if type(other) == ndarray or type(other) == list:
+#          return in1d(self.array, other)
+#        return self.array == other
+
 def PassBlock(self, iterCD):
     """Test if the block passes the block-criteria, if any"""
     return True
@@ -69,7 +82,7 @@ def ExecData(self, inputDS):
     # is either an array or a boolean value.
     mask = eval(self.GetExpression(), globals(), new_locals)
 
-    print mask
+    # print mask
 
     # extract the elements from the input dataset using the mask.
     extracted_ds = ExtractElements(self, inputDS, mask)
