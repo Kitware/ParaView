@@ -179,12 +179,12 @@ def DoCoProcessing(datadescription):
         tobedeleted = GetNextProxyToDelete()
 
 def GetNextProxyToDelete():
-    for iter in servermanager.ProxyIterator():
-        if iter.GetGroup().find("prototypes") != -1:
-           continue
-        proxy = servermanager._getPyProxy(iter.GetProxy())
-        proxygroup = iter.GetGroup()
-        if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
+    proxyiterator = servermanager.ProxyIterator()
+    for proxy in proxyiterator:
+        group = proxyiterator.GetGroup()
+        if group.find("prototypes") != -1:
+            continue
+        if group != 'timekeeper' and group.find("pq_helper_proxies") == -1 :
             return proxy
     return None
 
