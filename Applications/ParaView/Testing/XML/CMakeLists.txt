@@ -9,6 +9,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -204,6 +205,11 @@ SET (XYHistogram_THRESHOLD 60)
 # The color and opacity are often different on different machines.
 SET (NewColorEditor1_THRESHOLD 60)
 SET (NewColorEditor3_THRESHOLD 60)
+
+SET (SLACTools_DISABLE_CS TRUE)
+SET (SLACTools_DISABLE_CRS TRUE)
+SET (SLACTools_BREAK TRUE)
+SET(SLACTools_THRESHOLD 20)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.
