@@ -56,7 +56,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release/"
 				ObjectFile=".\..\..\..\objs\release/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -131,7 +131,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release_mt/"
 				ObjectFile=".\..\..\..\objs\release_mt/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release_mt/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -210,7 +210,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release_st/"
 				ObjectFile=".\..\..\..\objs\release_st/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release_st/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -282,7 +282,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug/"
 				ObjectFile=".\..\..\..\objs\debug/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -355,7 +355,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug_st/"
 				ObjectFile=".\..\..\..\objs\debug_st/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug_st/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -429,7 +429,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug_mt/"
 				ObjectFile=".\..\..\..\objs\debug_mt/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug_mt/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -505,7 +505,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release/"
 				ObjectFile=".\..\..\..\objs\release/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -581,7 +581,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release_mt/"
 				ObjectFile=".\..\..\..\objs\release_mt/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release_mt/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -663,7 +663,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\release_st/"
 				ObjectFile=".\..\..\..\objs\release_st/"
 				ProgramDataBaseFileName=".\..\..\..\objs\release_st/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="0"
 				CompileAs="0"
 			/>
@@ -736,7 +736,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug/"
 				ObjectFile=".\..\..\..\objs\debug/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -810,7 +810,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug_st/"
 				ObjectFile=".\..\..\..\objs\debug_st/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug_st/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -885,7 +885,7 @@
 				AssemblerListingLocation=".\..\..\..\objs\debug_mt/"
 				ObjectFile=".\..\..\..\objs\debug_mt/"
 				ProgramDataBaseFileName=".\..\..\..\objs\debug_mt/"
-				WarningLevel="4"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>

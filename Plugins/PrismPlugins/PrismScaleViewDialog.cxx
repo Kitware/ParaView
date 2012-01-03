@@ -65,19 +65,19 @@ PrismScaleViewDialog::PrismScaleViewDialog(
   this->Internals->ZAxesBG.addButton(this->Internals->UseZCustomScale);
 
   //setup the custom bounds editing signals
-  QObject::connect(this->Internals->XCustomMin, SIGNAL(editingFinished()),
+  QObject::connect(this->Internals->XCustomMin, SIGNAL(textChanged(QString)),
     this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->XCustomMax, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));
-
-  QObject::connect(this->Internals->YCustomMin, SIGNAL(editingFinished()),
-    this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->YCustomMax, SIGNAL(editingFinished()),
+  QObject::connect(this->Internals->XCustomMax, SIGNAL(textChanged(QString)),
     this, SLOT(onCustomBoundsChanged()));
 
-  QObject::connect(this->Internals->ZCustomMin, SIGNAL(editingFinished()),
+  QObject::connect(this->Internals->YCustomMin, SIGNAL(textChanged(QString)),
     this, SLOT(onCustomBoundsChanged()));
-  QObject::connect(this->Internals->ZCustomMax, SIGNAL(editingFinished()),
+  QObject::connect(this->Internals->YCustomMax, SIGNAL(textChanged(QString)),
+    this, SLOT(onCustomBoundsChanged()));
+
+  QObject::connect(this->Internals->ZCustomMin, SIGNAL(textChanged(QString)),
+    this, SLOT(onCustomBoundsChanged()));
+  QObject::connect(this->Internals->ZCustomMax, SIGNAL(textChanged(QString)),
     this, SLOT(onCustomBoundsChanged()));
 
   //connect all the radio buttons to the signal mapper

@@ -31,13 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqActiveView.h"
 
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxySelectionModel.h"
-#include "vtkEventQtSlotConnect.h"
-
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
 #include "pqView.h"
+#include "pqActiveObjects.h"
 
 //-----------------------------------------------------------------------------
 pqActiveView& pqActiveView::instance()
@@ -47,17 +42,12 @@ pqActiveView& pqActiveView::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqActiveView::pqActiveView() : ActiveView(0)
+pqActiveView::pqActiveView()
 {
-  pqServerManagerModel* model = NULL;
-  model = pqApplicationCore::instance()->getServerManagerModel();
+  pqActiveObjects* ao = &pqActiveObjects::instance();
 
-  QObject::connect( model, SIGNAL(viewRemoved(pqView*)),
-                    this,    SLOT(onViewRemoved(pqView*)));
-  QObject::connect( model, SIGNAL(serverAdded(pqServer*)),
-                    this,    SLOT(onSessionCreated()));
-  QObject::connect( model, SIGNAL(preServerRemoved(pqServer*)),
-                    this,    SLOT(onSessionClosed()));
+  QObject::connect(ao, SIGNAL(viewChanged(pqView*)),
+    this, SIGNAL(changed(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -66,67 +56,13 @@ pqActiveView::~pqActiveView()
 }
 
 //-----------------------------------------------------------------------------
-pqView* pqActiveView::current()
+pqView* pqActiveView::current() const
 {
-  return this->ActiveView;
-}
-
-//-----------------------------------------------------------------------------
-void pqActiveView::smCurrentChanged()
-{
-  // Make sure we can do something
-  if(!this->SMActiveView) return;
-
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqView* view = smmodel->findItem<pqView*>(this->SMActiveView->GetCurrentProxy());
-  if (this->ActiveView != view)
-    {
-    this->ActiveView = view;
-    emit this->changed(view);
-    }
+  return pqActiveObjects::instance().activeView();
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveView::setCurrent(pqView* view)
 {
-  // Make sure we can do something
-  if(!this->SMActiveView) return;
-
-  vtkSMProxy* viewProxy = view? view->getProxy() : 0;
-  this->SMActiveView->SetCurrentProxy( viewProxy,
-      vtkSMProxySelectionModel::CLEAR_AND_SELECT); // FIXME: Used to be NO_UPDATE
-}
-
-//-----------------------------------------------------------------------------
-void pqActiveView::onViewRemoved(pqView* view)
-{
-  if (this->ActiveView == view)
-    {
-    this->setCurrent(0);
-    }
-}
-//-----------------------------------------------------------------------------
-void pqActiveView::onSessionCreated()
-{
-  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  this->SMActiveView = pxm->GetSelectionModel("ActiveView");
-
-  if(this->SMActiveView)
-    {
-    this->VTKConnect->Connect(this->SMActiveView, vtkCommand::CurrentChangedEvent,
-                              this, SLOT(smCurrentChanged()));
-
-    // Make sure we at least execute it once specially
-    // if the active view has already been set.
-    smCurrentChanged();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqActiveView::onSessionClosed()
-{
-  this->VTKConnect->Disconnect();
+  pqActiveObjects::instance().setActiveView(view);
 }

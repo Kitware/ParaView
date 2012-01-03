@@ -131,26 +131,37 @@
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+	  name = "EnableTracking"
+	  command ="SetUseOffAxisProjection"
+	  number_of_elements="1"
+	  default_values="0">
+      </IntVectorProperty>
+
       <DoubleVectorProperty
          name="HeadPose"
          command="SetEyeTransformMatrix"
+         is_internal="1"
+         immediate_update="1"
          number_of_elements="16"
-	 argument_is_array="1"
+         argument_is_array="1"
          default_values="1.0 0.0 0.0 0.0
-			 0.0 1.0 0.0 0.0
-			 0.0 0.0 1.0 0.0
-			 0.0 0.0 0.0 1.0" >
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0" >
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
          name="WandPose"
          command="SetModelTransformMatrix"
+         is_internal="1"
+         immediate_update="1"
          number_of_elements="16"
-	 argument_is_array="1"
+         argument_is_array="1"
          default_values="1.0 0.0 0.0 0.0
-			 0.0 1.0 0.0 0.0
-			 0.0 0.0 1.0 0.0
-			 0.0 0.0 0.0 1.0" >
+                         0.0 1.0 0.0 0.0
+                         0.0 0.0 1.0 0.0
+                         0.0 0.0 0.0 1.0" >
       </DoubleVectorProperty>
 
     </CameraProxy> <!-- end of Camera Proxy -->
@@ -536,7 +547,7 @@
         number_of_elements="1"
         default_values="2"
         animateable="0">
-        <EnumerationDomain>
+        <EnumerationDomain name="enum">
           <Entry value="0" text="None" />
           <Entry value="1" text="Prop" />
           <Entry value="2" text="Viewport" />

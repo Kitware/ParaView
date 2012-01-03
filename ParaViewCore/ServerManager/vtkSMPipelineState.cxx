@@ -19,6 +19,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMProxyLocator.h"
 
@@ -26,12 +27,13 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMPipelineState);
 //----------------------------------------------------------------------------
 vtkSMPipelineState::vtkSMPipelineState()
 {
-  this->SetGlobalID(vtkSMProxyManager::GetReservedGlobalID());
+  this->SetGlobalID(vtkSMSessionProxyManager::GetReservedGlobalID());
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
 }
 
@@ -43,13 +45,15 @@ vtkSMPipelineState::~vtkSMPipelineState()
 //----------------------------------------------------------------------------
 const vtkSMMessage* vtkSMPipelineState::GetFullState()
 {
-  return vtkSMObject::GetProxyManager()->GetFullState();
+  assert("Session should be valid" && this->Session);
+  return this->GetSessionProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::LoadState( const vtkSMMessage* msg,
                                     vtkSMProxyLocator* locator)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   if(this->ClientOnlyLocationFlag)
     {
     pxm->DisableStateUpdateNotification();

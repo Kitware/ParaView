@@ -42,7 +42,7 @@ class pqProxyInternal;
 class pqServer;
 class vtkPVXMLElement;
 class vtkSMProxy;
-class vtkSMProxyManager;
+class vtkSMSessionProxyManager;
 
 /// This class represents any registered Server Manager proxy.
 /// It keeps essential information to locate the proxy as well as
@@ -134,6 +134,9 @@ public:
   /// possible to locate helper proxies created from Python.
   void updateHelperProxies() const;
 
+  /// Returns the proxy manager by calling this->getProxy()->GetProxyManager();
+  vtkSMSessionProxyManager* proxyManager() const;
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
@@ -162,9 +165,6 @@ protected:
   // the ProxyManager proxy registration
   virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
   virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
-
-  /// Returns the proxy manager by calling this->getProxy()->GetProxyManager();
-  vtkSMProxyManager* proxyManager() const;
 
 protected slots:
   // Used to monitor helper proxy registration when created on other clients

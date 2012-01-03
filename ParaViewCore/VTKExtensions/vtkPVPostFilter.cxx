@@ -23,8 +23,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkInformationStringVectorKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointDataToCellData.h"
@@ -33,6 +35,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 #include <assert.h>
+#include <set>
 #include <sstream>
 
 namespace
@@ -175,13 +178,37 @@ int vtkPVPostFilter::FillInputPortInformation(
 {
   // We want to exclude vtkTemporalDataSet from being accepted as an input,
   // everything else is acceptable.
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGraph");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+
+  std::string currentDataObject;
+
+  const std::string invalid("UnknownClass");
+
+  std::set<std::string> exemptClasses;
+
+  //too properly exclude datasets you need to exclude all abstract
+  //classes so that only thing left in the valid input list
+  //is concrete implementations. This listing is of all abstract data objects
+  exemptClasses.insert("vtkDataObject");
+  exemptClasses.insert("vtkCompositeDataSet");
+  exemptClasses.insert("vtkDataSet");
+  exemptClasses.insert("vtkGraph");
+
+  //now exclude concrete classes, that we don't want the post
+  //filter to work on
+  exemptClasses.insert("vtkTemporalDataSet");
+
+  int i=0;
+  while(currentDataObject != invalid)
+    {
+    currentDataObject = vtkDataObjectTypes::GetClassNameFromTypeId(i++);
+    if (exemptClasses.count(currentDataObject)==0)
+      {
+      //if the set doesn't contain this dataobject
+      //it is a failed input type
+      vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()->Append(
+            info,currentDataObject.c_str());
+      }
+    }
   return 1;
 }
 

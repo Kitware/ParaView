@@ -135,6 +135,9 @@ IF(PARAVIEW_ENABLE_PYTHON)
   ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+SET (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
+    CACHE INTERNAL "Server Manager XMLs")
+
 #needs to depend on vtkParaViewIncludeModulesToSMApplication so
 #we can regenerate when python filters or VisItBridge are toggled on/off
 SET(CMD_DEP kwProcessXML)

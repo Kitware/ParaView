@@ -38,30 +38,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 #include "pqView.h"
 #include "vtkClientServerStream.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkMapper.h"                 // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
 #include "vtkNetworkAccessManager.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkToolkits.h"
-#include "vtkEventQtSlotConnect.h"
-#include "vtkNew.h"
-#include "vtkSMMessage.h"
 
 // Qt includes.
 #include <QColor>
+#include <QDir>
 #include <QCoreApplication>
 #include <QtDebug>
+#include <QStringList>
 #include <QTimer>
 
 class pqServer::pqInternals
@@ -143,9 +147,29 @@ pqServer::~pqServer()
 //-----------------------------------------------------------------------------
 void pqServer::initialize()
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   // Update ProxyManager based on its remote state
   pxm->UpdateFromRemote();
+
+  // setup the active-view and active-sources selection models.
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveSources", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveSources = selmodel;
+
+  selmodel = pxm->GetSelectionModel("ActiveView");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveView", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveView = selmodel;
+
 
   // Setup the Connection TimeKeeper.
   // Currently, we are keeping seperate times per connection. Once we start
@@ -197,6 +221,14 @@ void pqServer::initialize()
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
     }
+
+  // Force a proper active SessionProxyManager once this one is fully initialized
+  // after a collaborative update
+  if(vtkSMProxyManager::GetProxyManager()->GetActiveSession() == this->Session)
+    {
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession((vtkSMSession*)NULL);
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +236,7 @@ pqTimeKeeper* pqServer::getTimeKeeper() const
 {
   if(!this->Internals->TimeKeeper)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
     pqServerManagerModel* smmodel =
         pqApplicationCore::instance()->getServerManagerModel();
@@ -219,13 +251,26 @@ vtkSMSession* pqServer::session() const
 {
   return this->Session.GetPointer();
 }
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeSourcesSelectionModel() const
+{
+  return this->ActiveSources;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeViewSelectionModel() const
+{
+  return this->ActiveView;
+}
+
 //-----------------------------------------------------------------------------
 void pqServer::createTimeKeeper()
 {
   // Set Global Time keeper if needed.
   if(this->getTimeKeeper() == NULL)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
     proxy->UpdateVTKObjects();
     pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
@@ -561,9 +606,9 @@ void pqServer::updateGlobalMapperProperties()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxyManager* pqServer::proxyManager() const
+vtkSMSessionProxyManager* pqServer::proxyManager() const
 {
-  return vtkSMObject::GetProxyManager();
+  return this->Session->GetSessionProxyManager();
 }
 
 //-----------------------------------------------------------------------------
@@ -616,7 +661,7 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
       break;
     case vtkSMCollaborationManager::CollaborationNotification:
       vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
-      emit sentFromOtherClient(msg);
+      emit sentFromOtherClient(this, msg);
       break;
     }
 }

@@ -14,16 +14,14 @@
 =========================================================================*/
 // .NAME vtkSMObject - superclass for most server manager classes
 // .SECTION Description
-// vtkSMObject provides several methods common to most server manager
-// classes. These are mostly for setting and getting singletons including
-// the communication and process modules and the proxy manager.
+// vtkSMObject is mostly to tag a class hierarchy that it belong to the
+// servermanager.
 
 #ifndef __vtkSMObject_h
 #define __vtkSMObject_h
 
 #include "vtkObject.h"
 
-class vtkSMProxyManager;
 class vtkSMApplication;
 
 class VTK_EXPORT vtkSMObject : public vtkObject
@@ -33,16 +31,9 @@ public:
   vtkTypeMacro(vtkSMObject, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Proxy manager singleton stores all proxy groups and instances.
-  static vtkSMProxyManager* GetProxyManager();
-  static void SetProxyManager(vtkSMProxyManager* pm);
-
 protected:
   vtkSMObject();
   ~vtkSMObject();
-
-  static vtkSMProxyManager* ProxyManager;
 
 private:
   vtkSMObject(const vtkSMObject&); // Not implemented

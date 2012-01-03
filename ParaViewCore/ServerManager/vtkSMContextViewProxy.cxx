@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkSMContextViewProxy.h"
 
-#include "vtkChart.h"
+#include "vtkChartXY.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkObjectFactory.h"
@@ -65,7 +65,8 @@ public:
       {
       for(int i=0; i < 4; i++)
         {
-        vtkChart *chart = vtkChart::SafeDownCast(this->Proxy->GetContextItem());
+        // FIXME: Generalize to support charts with zero to many axes.
+        vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Proxy->GetContextItem());
         if (chart)
           {
           chart->GetAxis(i)->GetRange(&this->ViewBounds[i*2]);
@@ -149,7 +150,8 @@ vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
-  vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem());
+  // FIXME: We should generalize this to support all charts (zero to many axes).
+  vtkChartXY *chart = vtkChartXY::SafeDownCast(this->GetContextItem());
   if (chart)
     {
     int previousBehaviour[4];
@@ -222,7 +224,8 @@ void vtkSMContextViewProxy::SetViewBounds(double* bounds)
     {
     // Disable notification...
     this->Storage->Forwarder->SetTarget(NULL);
-    vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem());
+    // FIXME: This also needs generalizing to support all chart types.
+    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->GetContextItem());
 
     if (chart)
       {

@@ -23,9 +23,11 @@ ExternalProject_Add(Boost
   UPDATE_COMMAND ""
   SOURCE_DIR ${boost_source}
   BINARY_DIR ${boost_binary}
-  CMAKE_ARGS
+  CMAKE_CACHE_ARGS
      ${boost_lib_args}
      ${pv_tpl_compiler_args}
+    -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
+    -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG:PATH=${boost_binary}/lib
@@ -53,5 +55,5 @@ ExternalProject_Add(Boost
   )
 
 # These variables are used to find Boost by other projects
-set(Boost_INCLUDE_DIR "${boost_install}/include/boost-${BOOST_MAJOR}_${BOOST_MINOR}" CACHE PATH "" FORCE)
-set(BOOST_LIBRARYDIR "${boost_install}/lib" CACHE PATH "" FORCE)
+set(Boost_INCLUDE_DIR "${boost_install}/include/boost-${BOOST_MAJOR}_${BOOST_MINOR}")
+set(BOOST_LIBRARYDIR "${boost_install}/lib")

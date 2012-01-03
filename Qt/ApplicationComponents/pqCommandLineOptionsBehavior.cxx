@@ -80,12 +80,9 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   const char* serverresource_name = options->GetServerResourceName();
   if (serverresource_name)
     {
-    pqServerConnectReaction::connectToServer(serverresource_name); 
-    if (!pqActiveObjects::instance().activeServer())
+    if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
+        serverresource_name))
       {
-      // FIXME: This warning is not showing up since pqAlwaysConnectedBehavior
-      // connects to a server. We need to check if active server is not same as
-      // requested server, then warn.
       qCritical() << "Could not connect to requested server \"" 
         << serverresource_name 
         << "\". Creating default builtin connection.";

@@ -1,0 +1,679 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    $RCSfile$
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2. 
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "pqServerLauncher.h"
+#include "ui_pqServerLauncherDialog.h"
+
+#include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqFileChooserWidget.h"
+#include "pqObjectBuilder.h"
+#include "pqServerConfiguration.h"
+#include "pqServer.h"
+#include "pqServerResource.h"
+#include "pqSettings.h"
+#include "vtkMath.h"
+#include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+#include "vtkPVOptions.h"
+#include "vtkPVXMLElement.h"
+#include "vtkTimerLog.h"
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QEventLoop>
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPointer>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QtDebug>
+#include <QTimer>
+
+class pqServerLauncher::pqInternals
+{
+public:
+  pqServerConfiguration Configuration;
+  QProcessEnvironment Options;
+  QPointer<pqServer> Server;
+};
+
+namespace
+{
+  /// pqWidget is used to make it easier to get and set values from different
+  /// types of widgets.
+  class pqWidget
+    {
+    QString PropertyName;
+  public:
+    QWidget* Widget;
+    bool ToSave;
+    pqWidget() : Widget(NULL), ToSave(false) { }
+    pqWidget(QWidget* wdg, const QString& pname) :
+      PropertyName(pname), Widget(wdg), ToSave(false) { }
+    virtual ~pqWidget() { }
+
+    virtual QVariant get() const
+      {
+      return this->Widget->property(this->PropertyName.toAscii().data());
+      }
+    virtual void set(const QVariant& value)
+      {
+      this->Widget->setProperty(this->PropertyName.toAscii().data(), value);
+      }
+    };
+
+  class pqWidgetForComboBox : public pqWidget
+    {
+  public:
+    pqWidgetForComboBox(QComboBox* widget):
+      pqWidget(widget, QString()) { }
+
+    virtual QVariant get() const
+      {
+      QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
+      return combobox->itemData(combobox->currentIndex());
+      }
+    
+    virtual void set(const QVariant& value)
+      {
+      QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
+      combobox->setCurrentIndex(combobox->findData(value));
+      }
+    };
+
+  class pqWidgetForCheckbox : public pqWidget
+    {
+    QString TrueValue;
+    QString FalseValue;
+  public:
+    pqWidgetForCheckbox(QCheckBox* widget, const char* tval, const char* fval):
+      pqWidget(widget, QString()), TrueValue(tval), FalseValue(fval) { }
+
+    virtual QVariant get() const
+      {
+      QCheckBox* checkbox= qobject_cast<QCheckBox*>(this->Widget);
+      return checkbox->isChecked()? this->TrueValue : this->FalseValue;
+      }
+    
+    virtual void set(const QVariant& value)
+      {
+      QCheckBox* checkbox= qobject_cast<QCheckBox*>(this->Widget);
+      checkbox->setChecked(value.toString() == this->TrueValue);
+      }
+    };
+
+  /// Returns pre-defined run-time environment. This includes the environement
+  /// of this application itself as well as some predefined values.
+  QProcessEnvironment getDefaultEnvironment(
+    const pqServerConfiguration& configuration)
+    {
+    pqServerResource resource = configuration.resource();
+
+    // Get the process environment.
+    QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
+
+    // Now append the pre-defined runtime environment to this.
+    options.insert("PV_CONNECTION_URI", resource.toURI());
+    options.insert("PV_CONNECTION_SCHEME", resource.scheme());
+    options.insert("PV_VERSION_MAJOR", QString::number(PARAVIEW_VERSION_MAJOR));
+    options.insert("PV_VERSION_MINOR", QString::number(PARAVIEW_VERSION_MINOR));
+    options.insert("PV_VERSION_PATCH", QString::number(PARAVIEW_VERSION_PATCH));
+    options.insert("PV_VERSION",PARAVIEW_VERSION);
+    options.insert("PV_VERSION_FULL", PARAVIEW_VERSION_FULL);
+    options.insert("PV_SERVER_HOST", resource.host());
+    options.insert("PV_SERVER_PORT", QString::number(resource.port(11111)));
+    options.insert("PV_DATA_SERVER_HOST", resource.dataServerHost());
+    options.insert("PV_DATA_SERVER_PORT",
+      QString::number(resource.dataServerPort(11111)));
+    options.insert("PV_RENDER_SERVER_HOST", resource.renderServerHost());
+    options.insert("PV_RENDER_SERVER_PORT",
+      QString::number(resource.renderServerPort(22221)));
+    return options;
+    }
+
+  /// Processes the <Options /> XML defined in the server configuration to
+  /// update the dialog with widgets of right type with correct default values.
+  /// It uses application settings to obtain the default values, whenever
+  /// possible.
+  bool createWidgets(QMap<QString, pqWidget>& widgets,
+    QDialog& dialog, const pqServerConfiguration& configuration,
+    QProcessEnvironment& options)
+    {
+    vtkPVXMLElement* optionsXML = configuration.optionsXML();
+    Q_ASSERT(optionsXML != NULL);
+
+    QFormLayout *formLayout = new QFormLayout();
+    dialog.setLayout(formLayout);
+    dialog.setWindowTitle(
+      QString("Connection Options for \"%1\"").arg(configuration.name()));
+
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+
+    // Process the <Options/> to create dialog with widgets.
+    for (unsigned int cc=0; cc < optionsXML->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* node = optionsXML->GetNestedElement(cc);
+      if (node->GetName() == NULL)
+        {
+        continue;
+        }
+
+      if (strcmp(node->GetName(), "Set") == 0)
+        {
+        options.insert(node->GetAttribute("name"), node->GetAttribute("value"));
+        }
+      else if (strcmp(node->GetName(), "Option") == 0)
+        {
+        vtkPVXMLElement* typeNode = node->GetNestedElement(0);
+        if (typeNode == NULL || typeNode->GetName() == NULL)
+          {
+          continue;
+          }
+
+        const char* name = node->GetAttribute("name");
+        const char* label = node->GetAttributeOrDefault("label", name);
+        bool readonly = strcmp(node->GetAttributeOrDefault("readonly", "false"), "true") == 0;
+        bool save = strcmp(node->GetAttributeOrDefault("save", "true"), "true") == 0;
+
+        QString settingsKey =
+          QString("SERVER_STARTUP/%1.%2").arg(configuration.name()).arg(name);
+
+        bool default_is_random = false;
+        QVariant default_value;
+        if (typeNode->GetAttribute("default"))
+          {
+          default_is_random = 
+            (strcmp(typeNode->GetAttribute("default"), "random") == 0);
+          default_value = QString(typeNode->GetAttribute("default"));
+
+          // if default_is_random, save cannot be true.
+          if (default_is_random)
+            {
+            save = false;
+            }
+          }
+
+        // noise is a in the range [0, 1].
+        double noise = 0.0;
+        if (default_is_random)
+          {
+          // We need a seed that changes every execution. Get the
+          // universal time as double and then add all the bytes
+          // together to get a nice seed without causing any overflow.
+          long rseed = 0;
+          double atime = vtkTimerLog::GetUniversalTime()*1000;
+          char* tc = (char*)&atime;
+          for (unsigned int ic=0; ic<sizeof(double); ic++)
+            {
+            rseed += tc[ic];
+            }
+          vtkMath::RandomSeed(rseed);
+          noise = vtkMath::Random();
+          }
+
+        // obtain default value from settings if available.
+        if (save && settings->contains(settingsKey))
+          {
+          default_value = settings->value(settingsKey);
+          }
+
+        if (strcmp(typeNode->GetName(), "Range") == 0) 
+          {
+          QString min = typeNode->GetAttributeOrDefault("min","0");
+          QString max = typeNode->GetAttributeOrDefault("max", "99999999999");
+          QString step = typeNode->GetAttributeOrDefault("step", "1");
+          QWidget* widget = NULL;
+          if (strcmp(typeNode->GetAttributeOrDefault("type", "int"), "int") == 0)
+            {
+            widget = new QSpinBox(&dialog);
+            if (default_is_random)
+              {
+              default_value = min.toInt() + (max.toInt() - min.toInt()) * noise;
+              }
+            }
+          else // assume double.
+            {
+            widget = new QDoubleSpinBox(&dialog);
+            if (default_is_random)
+              {
+              default_value = min.toDouble() + (max.toDouble() - min.toDouble()) * noise;
+              }
+            }
+          widgets[name] = pqWidget(widget, "value");
+          widget->setProperty("minimum", QVariant(min));
+          widget->setProperty("maximum", QVariant(max));
+          widget->setProperty("step", QVariant(step));
+          }
+        else if (strcmp(typeNode->GetName(), "String") == 0)
+          {
+          QLineEdit* widget = new QLineEdit(QString(), &dialog);
+          widgets[name] = pqWidget(widget, "text");
+          }
+        else if (strcmp(typeNode->GetName(), "File") == 0)
+          {
+          pqFileChooserWidget* widget = new pqFileChooserWidget(&dialog);
+          widget->setForceSingleFile(true);
+          widgets[name] = pqWidget(widget, "singleFilename");
+          }
+        else if (strcmp(typeNode->GetName(), "Boolean") == 0)
+          {
+          QCheckBox * checkbox = new QCheckBox(&dialog);
+          const char* true_value = typeNode->GetAttributeOrDefault("true", "1");
+          const char* false_value = typeNode->GetAttributeOrDefault("false", "0");
+          widgets[name] = pqWidgetForCheckbox(checkbox, true_value, false_value);
+          }
+        else if (strcmp(typeNode->GetName(), "Enumeration") == 0)
+          {
+          QComboBox* widget = new QComboBox(&dialog);
+          for (unsigned int kk=0; kk < typeNode->GetNumberOfNestedElements();
+            kk++)
+            {
+            vtkPVXMLElement* child = typeNode->GetNestedElement(kk);
+            if (QString(child->GetName()) == "Entry") 
+              {
+              QString xml_value = child->GetAttribute("value");
+              QString xml_label = child->GetAttributeOrDefault(
+                "label", xml_value.toAscii().data());
+              widget->addItem(xml_label, xml_value);
+              }
+            }
+          widgets[name] = pqWidgetForComboBox(widget);
+          }
+        else
+          {
+          qWarning() << "Ignoring unknown element '<" << typeNode->GetName()
+            << "/>' discovered under <Option/> element.";
+          continue;
+          }
+
+        widgets[name].ToSave = save;
+        widgets[name].set(default_value);
+        widgets[name].Widget->setEnabled(!readonly);
+        widgets[name].Widget->setObjectName(name);
+        formLayout->addRow(label, widgets[name].Widget);
+        }// end of <Option />
+      else if (strcmp(node->GetName(), "Switch") == 0)
+        {
+        continue; // Switch's are handled afterwords
+        }
+      else
+        {
+        qWarning() << "Ignoring unknown element '<" << node->GetName()
+          << "/>' discovered under <Options/> element."; 
+        }
+      }
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(
+      QDialogButtonBox::Ok|QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    QObject::connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    QObject::connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    formLayout->addRow(buttonBox);
+    return true;
+    }
+
+  /// Update the QProcessEnvironment based on the values picked by the user on
+  /// the widgets. This function may change the resource uri for the \c
+  /// configuration itself if any of the GUI widgets changed the server-port
+  /// numbers.
+  void updateEnvironment(const QMap<QString, pqWidget> &widgets,
+    pqServerConfiguration& configuration,
+    QProcessEnvironment& options)
+    {
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    pqServerResource resource = configuration.resource();
+    foreach (const pqWidget& item, widgets)
+      {
+      QString name = item.Widget->objectName();
+      QVariant chosen_value = item.get();
+      cout << name.toAscii().data() << "=" << chosen_value.toString().toAscii().data() <<
+        endl;
+      if (item.ToSave)
+        {
+        // save the chosen value in settings if requested.
+        QString settingsKey = QString("SERVER_STARTUP/%1.%2").arg(
+          configuration.name()).arg(name);
+        settings->setValue(settingsKey, chosen_value);
+        }
+      options.insert(name, chosen_value.toString());
+      //cout << name.toAscii().data() << " = " <<
+      //  chosen_value.toString().toAscii().data() << endl;
+
+      // Some options can affect the server resource itself e.g. PV_SERVER_PORT etc.
+      // So if those were changed using the config XML, we need to update the
+      // resource.
+      if (name == "PV_SERVER_PORT")
+        {
+        resource.setPort(chosen_value.toInt());
+        configuration.setResource(resource);
+        }
+      else if (name == "PV_DATA_SERVER_PORT")
+        {
+        resource.setDataServerPort(chosen_value.toInt());
+        configuration.setResource(resource);
+        }
+      else if (name == "PV_RENDER_SERVER_PORT")
+        {
+        resource.setRenderServerPort(chosen_value.toInt());
+        configuration.setResource(resource);
+        }
+      }
+    }
+
+  /// Process <Switch />
+  void handleSwitchCases(const pqServerConfiguration& configuration,
+    QProcessEnvironment& options)
+    {
+    vtkPVXMLElement* optionsXML = configuration.optionsXML();
+    for (unsigned int cc=0; cc < optionsXML->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* switchXML = optionsXML->GetNestedElement(cc);
+      if (!switchXML->GetName() || strcmp(switchXML->GetName(), "Switch") != 0)
+        {
+        continue;
+        }
+      const char* variable = switchXML->GetAttribute("name");
+      if (!variable)
+        {
+        qWarning("Missing attribute 'name' in 'Switch' statement");
+        continue;
+        }
+      if (!options.contains(variable))
+        {
+        qWarning() << "'Switch' statement has no effect since no variable named " 
+          << variable << " is defined. ";
+        continue;
+        }
+      QString value = options.value(variable);
+      bool handled = false;
+      for (unsigned int kk=0; !handled && kk < switchXML->GetNumberOfNestedElements(); kk++)
+        {
+        vtkPVXMLElement* caseXML = switchXML->GetNestedElement(kk);
+        if (!caseXML->GetName() || strcmp(caseXML->GetName(), "Case") != 0)
+          {
+          qWarning() << "'<Switch/> element can only contain <Case/> elements";
+          continue;
+          }
+        const char* case_value = caseXML->GetAttribute("value");
+        if (!case_value || value != case_value)
+          {
+          continue;
+          }
+        handled = true;
+        for (unsigned int i=0; i < caseXML->GetNumberOfNestedElements(); i++)
+          {
+          vtkPVXMLElement* setXML= caseXML->GetNestedElement(i);
+          if (QString(setXML->GetName()) == "Set")
+            {
+            const char* option_name = setXML->GetAttributeOrDefault("name", "");
+            const char* option_value = setXML->GetAttributeOrDefault("value", "");
+            options.insert(option_name, option_value);
+            }
+          else
+            {
+            qWarning()
+              << "'Case' element can only contain 'Set' elements as children and not '"
+              << setXML->GetName() << "'";
+            }
+          }
+        }
+      if (!handled)
+        {
+        qWarning() << "Case '"<< value << "' not handled in 'Switch' for variable "
+          "'" << variable << "'";
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqServerLauncher::pqServerLauncher(
+  const pqServerConfiguration& configuration,
+  QObject* parentObject)
+  : Superclass(parentObject)
+{
+  this->Internals = new pqInternals();
+
+  // we create a clone so that we can change the values in place.
+  this->Internals->Configuration = configuration.clone();
+}
+
+//-----------------------------------------------------------------------------
+pqServerLauncher::~pqServerLauncher()
+{
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::connectToServer()
+{
+  switch (this->Internals->Configuration.startupType())
+    {
+  case pqServerConfiguration::MANUAL:
+    return this->promptOptions()? this->connectToPrelaunchedServer() : false;
+
+  case pqServerConfiguration::COMMAND:
+    return this->promptOptions()? this->launchAndConnectToServer() : false;
+
+  default:
+    return false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::connectToPrelaunchedServer()
+{
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+  const pqServerResource& resource = this->Internals->Configuration.resource();
+
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  QObject::connect(&dialog, SIGNAL(rejected()),
+    builder, SLOT(abortPendingConnections()));
+
+  Ui::pqServerLauncherDialog ui;
+  ui.setupUi(&dialog);
+  ui.message->setText(QString("Connecting to '%1'").arg(
+      this->Internals->Configuration.name()));
+  if (resource.scheme() == "csrc" || resource.scheme() == "cdsrsrc")
+    {
+    // using reverse connect, popup the dialog.
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+    }
+
+  this->Internals->Server = builder->createServer(resource);
+  return this->Internals->Server != NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::promptOptions()
+{
+  vtkPVXMLElement* optionsXML = this->Internals->Configuration.optionsXML();
+  if (optionsXML == NULL)
+    {
+    return true;
+    }
+
+  // Get the process environment.
+  QProcessEnvironment& options = this->Internals->Options;
+  options = getDefaultEnvironment(this->Internals->Configuration);
+  
+  QDialog dialog(pqCoreUtilities::mainWidget());
+
+  // setup the dialog using the configuration's XML.
+  QMap<QString, pqWidget> widgets; // map to save the widgets.
+  createWidgets(widgets, dialog, this->Internals->Configuration, options);
+  if (dialog.exec() != QDialog::Accepted)
+    {
+    return false;
+    }
+
+  /// now based on user-chosen values, update the options.
+  updateEnvironment(widgets, this->Internals->Configuration, options);
+
+  // Now that user entered options have been processes, handle the <Switch />
+  // elements.  This has to happen after the Options have been updated with
+  // user-selected values so that we can pick the right case.
+  handleSwitchCases(this->Internals->Configuration, options);
+
+  // if options contains PV_CONNECTION_ID. We need to update the pqOptions to
+  // give it the correct connection-id.
+  if (options.contains("PV_CONNECTION_ID"))
+    {
+    vtkPVOptions* pvoptions =
+      vtkProcessModule::GetProcessModule()->GetOptions();
+    if (pvoptions)
+      {
+      pvoptions->SetConnectID(options.value("PV_CONNECTION_ID").toInt());
+      }
+    }
+
+  // Now we have the environment filled up correctly.
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::launchAndConnectToServer()
+{
+  // We need launch the server.
+  double timeout, delay;
+  QString command = this->Internals->Configuration.command(timeout, delay);
+  if (command.isEmpty())
+    {
+    qCritical() << "Could not determine command to launch the server.";
+    return false;
+    }
+
+  // popup a dialog to tell the user that teh server is being lanuched.
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  Ui::pqServerLauncherDialog ui;
+  ui.setupUi(&dialog);
+  ui.cancel->hide();
+  ui.message->setText(QString("Launching server '%1'").arg(
+      this->Internals->Configuration.name()));
+  dialog.show();
+  dialog.raise();
+  dialog.activateWindow();
+
+  // replace all $FOO$ with values for QProcessEnvironment.
+  QRegExp regex("\\$([^$]*)\\$");
+
+  // Do string-substitution for the command line.
+  while (regex.indexIn(command) > -1)
+    {
+    QString before = regex.cap(0);
+    QString variable = regex.cap(1);
+    QString after = this->Internals->Options.value(variable, variable);
+    command.replace(before, after);
+    }
+
+  cout << "Server launch command is : " << command.toAscii().data() << endl;
+  QProcess* process = new QProcess(pqApplicationCore::instance());
+  // QObject::connect(process, SIGNAL(started()), this, SLOT(processStarted()));
+  QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
+    this, SLOT(processFailed(QProcess::ProcessError)));
+
+  process->setProcessEnvironment(this->Internals->Options);
+  process->setProcessChannelMode(QProcess::ForwardedChannels);
+  process->start(command);
+  process->closeWriteChannel();
+
+  // wait for process to start.
+  // We don't use QProcess::waitForStarted() since that can freeze the
+  // application.
+  // We don't use pqEventDispatcher::processEventsAndWait() since we want to
+  // abort the wait if the process launches correctly.
+  QEventLoop eventLoop;
+  if (timeout > 0)
+    {
+    QTimer::singleShot(
+      static_cast<int>(timeout*1000), &eventLoop, SLOT(quit()));
+    }
+  QObject::connect(process, SIGNAL(started()), &eventLoop, SLOT(quit()));
+  QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), &eventLoop, SLOT(quit()));
+  eventLoop.exec();
+
+  if (process->state() != QProcess::Running)
+    {
+    process->kill();
+    qCritical() << "Server launch timed out.";
+    process->waitForFinished();
+    delete process;
+    return false;
+    }
+
+  // wait for delay before attempting to connect to the server.
+  pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
+  if (process->state() != QProcess::Running)
+    {
+    qCritical() 
+      << "Server launched aborted before attempting to connect to it.";
+    process->waitForFinished();
+    delete process;
+    return false;
+    }
+
+  return this->connectToPrelaunchedServer();
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::processFailed(QProcess::ProcessError error_code)
+{
+  switch (error_code)
+    {
+  case QProcess::FailedToStart:
+    qCritical() <<
+      "The process failed to start. Either the invoked program is missing, "
+      "or you may have insufficient permissions to invoke the program.";
+    break;
+
+  case QProcess::Crashed: 
+    qCritical() << "The process crashed some time after starting successfully.";
+    break;
+
+  default:
+    qCritical() << "Process failed with error";
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerLauncher::connectedServer() const
+{
+  return this->Internals->Server;
+}

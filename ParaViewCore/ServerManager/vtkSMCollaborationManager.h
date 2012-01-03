@@ -71,9 +71,13 @@ public:
   virtual void PromoteToMaster(int clientId);
 
   // Description:
-  // Share the decision that user should follow that given user.
-  // Only master can change the user to follow.
+  // Share the decision that user should follow that given user if master or
+  // follow someone else on your own
   virtual void FollowUser(int clientId);
+
+  // Description:
+  // Return the local followed user
+  int GetFollowedUser();
 
   // Description:
   // Return true if the current client is the master
@@ -120,7 +124,8 @@ public:
     UpdateUserName = 12346,
     UpdateUserList = 12347,
     UpdateMasterUser = 12348,
-    FollowUserCamera = 12349
+    FollowUserCamera = 12349,
+    CameraChanged = 12350
     };
 
   // Description:

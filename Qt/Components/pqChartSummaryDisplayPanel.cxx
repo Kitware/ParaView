@@ -43,15 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 
 //-----------------------------------------------------------------------------
-pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent)
-  : QWidget(parent)
+pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *repr, QWidget *p)
+  : QWidget(p)
 {
-  this->Representation = representation;
+  this->Representation = repr;
 
-  vtkSMProxy *proxy = representation->getProxy();
+  vtkSMProxy *proxy = repr->getProxy();
   const char *name = proxy->GetXMLName();
 
-  QFormLayout *layout = new QFormLayout;
+  QFormLayout *l = new QFormLayout;
 
   // setup the attribute mode selector
   this->AttributeSelector = new QComboBox(this);
@@ -66,7 +66,7 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
                               SIGNAL(currentTextChanged(const QString&)),
                               proxy,
                               proxy->GetProperty("AttributeType"));
-  layout->addRow("Attribute Mode:", this->AttributeSelector);
+  l->addRow("Attribute Mode:", this->AttributeSelector);
 
   if(strcmp(name, "ParallelCoordinatesRepresentation") != 0)
     {
@@ -74,7 +74,7 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
     this->UseArrayIndex = new QCheckBox(this);
     this->UseArrayIndex->setChecked(true);
 
-    layout->addRow("Use Indicies for X-Axis:", this->UseArrayIndex);
+    l->addRow("Use Indicies for X-Axis:", this->UseArrayIndex);
 
     this->XSeriesSelector = new QComboBox(this);
     this->XSeriesSelector->setEnabled(false);
@@ -86,7 +86,7 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
                                 SIGNAL(currentTextChanged(const QString&)),
                                 proxy,
                                 proxy->GetProperty("XArrayName"));
-    layout->addRow("X Axis Series:", this->XSeriesSelector);
+    l->addRow("X Axis Series:", this->XSeriesSelector);
 
     this->Links.addPropertyLink(this->UseArrayIndex,
                                 "checked",
@@ -102,15 +102,15 @@ pqChartSummaryDisplayPanel::pqChartSummaryDisplayPanel(pqRepresentation *represe
 
   // setup the y-series selector
   this->PlotSettingsModel = new pqPlotSettingsModel(this);
-  this->PlotSettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(representation));
+  this->PlotSettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(repr));
 
   this->YSeriesSelector = new QComboBox(this);
   connect(this->YSeriesSelector, SIGNAL(activated(int)), this, SLOT(ySeriesChanged(int)));
   this->YSeriesSelector->setModel(this->PlotSettingsModel);
 
-  layout->addRow("Y Axis Series:", this->YSeriesSelector);
+  l->addRow("Y Axis Series:", this->YSeriesSelector);
 
-  this->setLayout(layout);
+  this->setLayout(l);
 }
 
 //-----------------------------------------------------------------------------

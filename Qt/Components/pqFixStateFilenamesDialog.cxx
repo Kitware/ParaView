@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QDebug>
 #include <QGridLayout>
@@ -104,8 +105,9 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
       qWarning("Possibly invalid state file.");
       return;
       }
-    vtkSMProxy* prototype = vtkSMProxyManager::GetProxyManager()->
-      GetPrototypeProxy(group, type);
+    vtkSMProxy* prototype =
+        vtkSMProxyManager::GetProxyManager()->
+        GetActiveSessionProxyManager()->GetPrototypeProxy(group, type);
     if (!prototype)
       {
       return;
@@ -117,8 +119,10 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
       return;
       }
 
-    vtkSMProxy* tempClone = vtkSMProxyManager::GetProxyManager()->NewProxy(
-      group, type);
+    vtkSMSessionProxyManager* pxm =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+    vtkSMProxy* tempClone = pxm->NewProxy(group, type);
     tempClone->SetLocation(0);
     tempClone->SetSession(NULL);
 

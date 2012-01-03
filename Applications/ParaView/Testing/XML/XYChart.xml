@@ -11,4 +11,6 @@
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCurrent" arguments="6.0" />
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCheckState" arguments="6.0,2" />
+  <!-- Make sure the chart is showing everything (Only needed in slow computers) -->
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 </pqevents>

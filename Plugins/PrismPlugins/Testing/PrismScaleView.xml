@@ -42,8 +42,14 @@
   <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseYThresholdBounds" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseXCustomScale" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/PrismViewScalingWidget/UseZCustomScale" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/XCustomMax" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="50"/>
+  <pqevent object="pqClientMainWindow/PrismViewScalingWidget/ZCustomMax" command="set_string" arguments="2.718281828" />
+  <pqevent object="pqClientMainWindow" command="pause" arguments="50"/>
   <pqevent object="pqClientMainWindow/PrismViewScalingWidget/buttonBox/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/PrismViewScalingWidget/buttonBox/1QPushButton0" command="activate" arguments="" />
+
+
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,85,7,/0:0/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,85,7,/0:0/0:0/0:0/0:0" />

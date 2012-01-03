@@ -438,43 +438,7 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
     }
 
   // Here is the trick:  The satellites need a point and vertex to
-  // marshal the attributes.  Node zero needs to receive first...
-  int localProcId = 0;
-  // Send results to process 0.
-  if (this->Controller)
-    {
-    localProcId = this->Controller->GetLocalProcessId();
-    if (localProcId == 0)
-      {
-      int numProcs = this->Controller->GetNumberOfProcesses();
-      int id;
-      for (id = 1; id < numProcs; ++id)
-        {
-        double msg[5];
-        this->Controller->Receive(msg,
-                                  5,
-                                  id,
-                                  vtkIntegrateAttributes::IntegrateAttrInfo);
-        vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
-        this->Controller->Receive(tmp,
-                                  id,
-                                  vtkIntegrateAttributes::IntegrateAttrData);
-        if (this->CompareIntegrationDimension(output, (int)(msg[0])))
-          {
-          this->Sum += msg[1];
-          this->SumCenter[0] += msg[2];
-          this->SumCenter[1] += msg[3];
-          this->SumCenter[2] += msg[4];
-          this->IntegrateSatelliteData(tmp->GetPointData(),
-                                       output->GetPointData());
-          this->IntegrateSatelliteData(tmp->GetCellData(),
-                                       output->GetCellData());
-          }
-        tmp->Delete();
-        tmp = 0;
-        }
-      }
-    }
+  // marshal the attributes.
 
   // Generate point and vertex.  Add extra attributes for area too.
   // Satellites do not need the area attribute, but it does not hurt.
@@ -523,7 +487,7 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
   output->GetCellData()->AddArray(sumArray);
   sumArray->Delete();
 
-  if (localProcId > 0)
+  if (this->Controller->GetLocalProcessId() > 0)
     {
     double msg[5];
     msg[0] = (double)(this->IntegrationDimension);
@@ -538,6 +502,49 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
     }
   else
     {
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    for (int id = 1; id < numProcs; ++id)
+      {
+      double msg[5];
+      this->Controller->Receive(msg,
+                                5,
+                                id,
+                                vtkIntegrateAttributes::IntegrateAttrInfo);
+      vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+      this->Controller->Receive(tmp,
+                                id,
+                                vtkIntegrateAttributes::IntegrateAttrData);
+      if (this->CompareIntegrationDimension(output, (int)(msg[0])))
+        {
+        this->Sum += msg[1];
+        this->SumCenter[0] += msg[2];
+        this->SumCenter[1] += msg[3];
+        this->SumCenter[2] += msg[4];
+        this->IntegrateSatelliteData(tmp->GetPointData(),
+                                     output->GetPointData());
+        this->IntegrateSatelliteData(tmp->GetCellData(),
+                                     output->GetCellData());
+        }
+      tmp->Delete();
+      tmp = 0;
+      }
+
+    // now that we have all of the sums from each process
+    // set the point location with the global value
+    if (this->Sum != 0.0)
+      {
+      pt[0] = this->SumCenter[0] / this->Sum;
+      pt[1] = this->SumCenter[1] / this->Sum;
+      pt[2] = this->SumCenter[2] / this->Sum;
+      }
+    else
+      {
+      pt[0] = this->SumCenter[0];
+      pt[1] = this->SumCenter[1];
+      pt[2] = this->SumCenter[2];
+      }
+    output->GetPoints()->SetPoint(0, pt);
+
     if (output->GetPointData()->GetArray("vtkGhostLevels"))
       {
       output->GetPointData()->RemoveArray("vtkGhostLevels");

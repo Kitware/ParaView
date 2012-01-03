@@ -26,7 +26,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
@@ -188,7 +188,7 @@ public:
 
     vtkInternal::RepresentationData& data = iter->second;
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = repr->GetSessionProxyManager();
 
     // Create a new representation
     vtkSMProxy* newRepr =
@@ -381,8 +381,8 @@ void vtkPVComparativeView::Build(int dx, int dy)
     // ensure that there are enough representation clones in the root view to
     // match the dimensions.
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMViewProxy* root_view = this->GetRootView();
+    vtkSMSessionProxyManager* pxm = root_view->GetSessionProxyManager();
     size_t numReprs = dx * dy;
     vtkInternal::MapOfReprClones::iterator reprIter;
     for (reprIter = this->Internal->RepresentationClones.begin();
@@ -467,7 +467,7 @@ void vtkPVComparativeView::AddNewView()
   ENSURE_INIT();
 
   vtkSMViewProxy* rootView = this->GetRootView();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = rootView->GetSessionProxyManager();
   vtkSMViewProxy* newView = vtkSMViewProxy::SafeDownCast(
     pxm->NewProxy(rootView->GetXMLGroup(), rootView->GetXMLName()));
   if (!newView)

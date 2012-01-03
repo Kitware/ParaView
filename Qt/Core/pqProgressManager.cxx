@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "vtkEventQtSlotConnect.h"
+#include "vtkCommand.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
@@ -57,8 +57,6 @@ pqProgressManager::pqProgressManager(QObject* _parent)
   this->ReadyEnableProgress = false;
   this->LastProgressTime = 0;
 
-  this->VTKConnect = vtkEventQtSlotConnect::New();
-
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this, SLOT(onServerAdded(pqServer*)));
@@ -67,19 +65,20 @@ pqProgressManager::pqProgressManager(QObject* _parent)
 //-----------------------------------------------------------------------------
 pqProgressManager::~pqProgressManager()
 {
-  this->VTKConnect->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressManager::onServerAdded(pqServer* server)
 {
-  this->VTKConnect->Disconnect();
-  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
-    vtkCommand::StartEvent, this, SLOT(onStartProgress()));
-  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
-  vtkCommand::EndEvent, this, SLOT(onEndProgress()));
-  this->VTKConnect->Connect(server->session()->GetProgressHandler(),
-    vtkCommand::ProgressEvent, this, SLOT(onProgress(vtkObject*)));
+  vtkPVProgressHandler* progressHandler =
+    server->session()->GetProgressHandler();
+
+  pqCoreUtilities::connect(
+    progressHandler, vtkCommand::StartEvent, this, SLOT(onStartProgress()));
+  pqCoreUtilities::connect(
+    progressHandler, vtkCommand::EndEvent, this, SLOT(onEndProgress()));
+  pqCoreUtilities::connect(
+    progressHandler, vtkCommand::ProgressEvent, this, SLOT(onProgress(vtkObject*)));
 }
 
 //-----------------------------------------------------------------------------

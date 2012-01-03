@@ -54,10 +54,10 @@ MainPipelineWindow::MainPipelineWindow()
 
   // Init and layout the UI
   QWidget *container = new QWidget(this);
-  QVBoxLayout *layout = new QVBoxLayout();
-  layout->addWidget(this->FilterSelector);
-  layout->addWidget(this->PipelineWidget);
-  container->setLayout(layout);
+  QVBoxLayout *internalLayout = new QVBoxLayout();
+  internalLayout->addWidget(this->FilterSelector);
+  internalLayout->addWidget(this->PipelineWidget);
+  container->setLayout(internalLayout);
   this->setCentralWidget(container);
 
   // Create a complex pipeline with different annotations

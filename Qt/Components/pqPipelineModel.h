@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QAbstractItemModel>
+#include <QPointer>
+#include "pqView.h"
 
 class pqDataRepresentation;
 class pqPipelineModelFilter;
@@ -79,6 +81,7 @@ class pqServer;
 class QPixmap;
 class QString;
 class pqPipelineModelDataItem;
+class vtkSession;
 
 /// This class is the model for the PipelineLine browser tree view.
 /// pqServerManagerModel models the vtkSMProxyManager for the GUI. The 
@@ -101,7 +104,8 @@ public:
   };
 
   enum ItemRole {
-    AnnotationFilterRole = 33
+    AnnotationFilterRole = 33,
+    SessionFilterRole = 34
     };
 
 public:
@@ -265,8 +269,20 @@ public:
   ///   Disable annotation key, so
   ///   "this->data( ... , pqPipelineMode::AnnotationFilterRole)"
   ///   will always return a QVariant("true")
-  /// \param font The font to use for modified items.
   void disableFilterAnnotationKey();
+
+  /// \brief
+  ///   Store the session key that will be used when
+  ///   "this->data( ... , pqPipelineMode::SessionFilterRole)"
+  ///   get called.
+  /// \param session that will be lookup inside the above code.
+  void enableFilterSession(vtkSession* session);
+
+  /// \brief
+  ///   Disable annotation key, so
+  ///   "this->data( ... , pqPipelineMode::SessionFilterRole)"
+  ///   will always return a QVariant("true")
+  void disableFilterSession();
 
 public slots:
   /// Called when a new server connection is detected. Adds the connection to the
@@ -341,9 +357,10 @@ private:
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
   QPixmap *PixmapList;               ///< Stores the item icons.
-  pqView* View;
+  QPointer<pqView> View;
   bool Editable;
   QString FilterRoleAnnotationKey;
+  vtkSession* FilterRoleSession;
   void constructor();
 };
 

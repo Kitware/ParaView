@@ -18,9 +18,11 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
 //----------------------------------------------------------------------------
@@ -42,7 +44,8 @@ vtkSMRepresentationProxy* vtkSMTwoDRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("Session should be valid" && this->GetSession());
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);

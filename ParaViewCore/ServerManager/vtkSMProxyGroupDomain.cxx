@@ -18,10 +18,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 #include <vtkstd/vector>
+#include <assert.h>
 
 #include "vtkStdString.h"
 
@@ -81,14 +84,14 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
     return 0;
     }
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
-  if (pm)
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  if (pxm)
     {
     vtkstd::vector<vtkStdString>::iterator it = 
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {
-      if (pm->IsProxyInGroup(proxy, it->c_str()))
+      if (pxm->IsProxyInGroup(proxy, it->c_str()))
         {
         return 1;
         }
@@ -120,7 +123,7 @@ unsigned int vtkSMProxyGroupDomain::GetNumberOfProxies()
 {
   unsigned int numProxies = 0;
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
+  vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
     vtkstd::vector<vtkStdString>::iterator it = 
@@ -140,7 +143,8 @@ const char* vtkSMProxyGroupDomain::GetProxyName(unsigned int idx)
   unsigned int proxyCount = 0;
   unsigned int prevProxyCount = 0;
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
+  assert("Session should be set by now" && this->Session);
+  vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
     vtkstd::vector<vtkStdString>::iterator it = 
@@ -164,7 +168,8 @@ const char* vtkSMProxyGroupDomain::GetProxyName(vtkSMProxy* proxy)
 {
   const char* proxyName = 0;
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
+  assert("Session should be set by now" && this->Session);
+  vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
     vtkstd::vector<vtkStdString>::iterator it = 
@@ -184,7 +189,8 @@ const char* vtkSMProxyGroupDomain::GetProxyName(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(const char* name)
 {
-  vtkSMProxyManager* pm = this->GetProxyManager();
+  assert("Session should be set by now" && this->Session);
+  vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
     vtkstd::vector<vtkStdString>::iterator it = 

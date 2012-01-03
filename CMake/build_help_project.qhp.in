@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QtHelpProject version="1.0">
+    <namespace>${arg_NAMESPACE}</namespace>
+    <virtualFolder>${arg_FOLDER}</virtualFolder>
+    <filterSection>
+        ${arg_TABLE_OF_CONTENTS}
+        <keywords>
+          <!-- how to handle keywords? -->
+        </keywords>
+        <files>
+          ${files}
+        </files>
+    </filterSection>
+</QtHelpProject>

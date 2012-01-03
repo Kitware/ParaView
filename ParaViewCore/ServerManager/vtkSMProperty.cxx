@@ -270,7 +270,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
+int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                      vtkPVXMLElement* element)
 {
   // TODO: some of the attributes are no longer necessary on the proxy-side,
@@ -413,6 +413,8 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
       if (domain)
         {
+        assert("Session should be valid" && proxy->GetSession());
+        domain->SetSession(proxy->GetSession());
         if (domain->ReadXMLAttributes(this, domainEl))
           {
           const char* dname = domainEl->GetAttribute("name");

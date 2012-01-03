@@ -144,6 +144,17 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnCreateObject(
+  vtkSMSession* vtkNotUsed(session), vtkSMMessage* newState)
+{
+  if (this->UndoStack)
+    {
+    this->UndoStack->InvokeEvent(
+      vtkSMUndoStack::ObjectCreationEvent, newState);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

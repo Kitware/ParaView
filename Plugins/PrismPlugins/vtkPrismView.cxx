@@ -17,10 +17,12 @@
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCubeAxesRepresentation.h"
-#include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
-#include "vtkInformationObjectBaseKey.h"
+#include "vtkInformationIntegerKey.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkInformationVector.h"
+#include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformationIntegerVectorKey.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPrismRepresentation.h"
@@ -29,9 +31,14 @@
 #include "vtkSelectionRepresentation.h"
 #include "vtkTransform.h"
 
+#include "vtkPrismPrivate.h"
+
 vtkStandardNewMacro(vtkPrismView);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_THRESHOLD_BOUNDS, DoubleVector,6);
+vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_USE_LOG_SCALING, IntegerVector,3);
+vtkInformationKeyMacro(vtkPrismView, PRISM_TABLE_ID, Integer);
+
 //----------------------------------------------------------------------------
 vtkPrismView::vtkPrismView()
 {
@@ -46,6 +53,9 @@ vtkPrismView::vtkPrismView()
   this->FullWorldBounds[3] =  this->FullWorldBounds[4] = this->FullWorldBounds[5] = 0;
   this->ThresholdWorldBounds[0] =  this->ThresholdWorldBounds[1] = this->ThresholdWorldBounds[2] = 0;
   this->ThresholdWorldBounds[3] =  this->ThresholdWorldBounds[4] = this->ThresholdWorldBounds[5] = 0;
+
+  this->LogScalingEnabled[0] = this->LogScalingEnabled[1] = this->LogScalingEnabled[2] = 0;
+  this->PrismTableId = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -110,6 +120,15 @@ bool vtkPrismView::UpdateWorldScale()
       }
     }
 
+
+  //now scale the bounds
+  bool valid =
+      vtkPrismCommon::scaleBounds(this->LogScalingEnabled,this->PrismTableId,bounds);
+  if(!valid)
+    {
+    return false;
+    }
+
   matrix[0] = 100.0 / (bounds[1] - bounds[0]);
   matrix[5] = 100.0 / (bounds[3] - bounds[2]);
   matrix[10] = 100.0 / (bounds[5] - bounds[4]);
@@ -136,6 +155,7 @@ void vtkPrismView::GatherRepresentationInformation()
   //This is what we want to do:
   //go through all the reps with the prism bounds key and determine what the world space
   //apply this scaling to everything in the view. Handle the cube axis as a special case
+
   for (int cc=0; cc < num_reprs; cc++)
     {
     vtkInformation* info =
@@ -144,16 +164,28 @@ void vtkPrismView::GatherRepresentationInformation()
       {
       //collect all the bounds of the world
       vtkBoundingBox repBounds;
-      repBounds.AddBounds(info->Get(vtkPrismView::PRISM_GEOMETRY_BOUNDS()));
+      repBounds.AddBounds(vtkPrismView::PRISM_GEOMETRY_BOUNDS()->Get(info));
       worldBounds.AddBox(repBounds);
 
       //collect all the bounds of the thresholded world
       vtkBoundingBox tBounds;
-      tBounds.AddBounds(info->Get(vtkPrismView::PRISM_THRESHOLD_BOUNDS()));
+      tBounds.AddBounds(vtkPrismView::PRISM_THRESHOLD_BOUNDS()->Get(info));
       thresholdBounds.AddBox(tBounds);
+
+      //we are going to presume that all the objects have the same scaling
+      //modes and table ids as that is the only way sane way to determine
+      //how to scale the bounds
+      if(has_reps==false)
+        {
+        //do this only once
+        vtkPrismView::PRISM_USE_LOG_SCALING()->Get(info,this->LogScalingEnabled);
+        this->PrismTableId = vtkPrismView::PRISM_TABLE_ID()->Get(info);
+        }
       has_reps = true;
       }
     }
+
+  //update the world and threshold ivars
   if (has_reps)
     {
     worldBounds.GetBounds(this->FullWorldBounds);
@@ -164,9 +196,6 @@ void vtkPrismView::GatherRepresentationInformation()
     vtkMath::UninitializeBounds(this->FullWorldBounds);
     vtkMath::UninitializeBounds(this->ThresholdWorldBounds);
     }
-  //update the world and threshold ivars
-  worldBounds.GetBounds(this->FullWorldBounds);
-  thresholdBounds.GetBounds(this->ThresholdWorldBounds);
 
   this->SynchronizedWindows->SynchronizeBounds(this->FullWorldBounds);
   this->SynchronizedWindows->SynchronizeBounds(this->ThresholdWorldBounds);

@@ -42,23 +42,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
-pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *parent)
-  : QSortFilterProxyModel(parent)
+pqPipelineAnnotationFilterModel::pqPipelineAnnotationFilterModel(QObject *p)
+  : QSortFilterProxyModel(p)
 {
+  this->FilterAnnotation = this->FilterSession = false;
 }
 //-----------------------------------------------------------------------------
 
 bool pqPipelineAnnotationFilterModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 1, sourceParent);
-    return sourceModel()->data(index, pqPipelineModel::AnnotationFilterRole).toBool();
+    QModelIndex sourceIndex = sourceModel()->index(sourceRow, 1, sourceParent);
+    return (this->FilterAnnotation ?
+              sourceModel()->data(sourceIndex, pqPipelineModel::AnnotationFilterRole).toBool() :
+              true)
+        && (this->FilterSession ?
+              sourceModel()->data(sourceIndex, pqPipelineModel::SessionFilterRole).toBool() :
+              true);
 }
 //-----------------------------------------------------------------------------
 
 bool pqPipelineAnnotationFilterModel::lessThan(const QModelIndex &left,
                                       const QModelIndex &right) const
 {
+  Q_UNUSED(left);
+  Q_UNUSED(right);
   return true; // We do not sort, we only filter
 }
 //-----------------------------------------------------------------------------
@@ -68,18 +76,52 @@ void pqPipelineAnnotationFilterModel::enableAnnotationFilter(const QString &anno
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->FilterAnnotation = true;
     model->enableFilterAnnotationKey(annotationKey);
     reset();
+    }
+  else
+    {
+    this->FilterAnnotation = false;
     }
 }
 //-----------------------------------------------------------------------------
 
 void pqPipelineAnnotationFilterModel::disableAnnotationFilter()
 {
+  this->FilterAnnotation = false;
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
     model->disableFilterAnnotationKey();
+    reset();
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqPipelineAnnotationFilterModel::enableSessionFilter(vtkSession *session)
+{
+  pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
+  if(model)
+    {
+    this->FilterSession = true;
+    model->enableFilterSession(session);
+    reset();
+    }
+  else
+    {
+    this->FilterSession = false;
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqPipelineAnnotationFilterModel::disableSessionFilter()
+{
+  this->FilterSession = false;
+  pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
+  if(model)
+    {
+    model->disableFilterSession();
     reset();
     }
 }

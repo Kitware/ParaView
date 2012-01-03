@@ -1,0 +1,61 @@
+ParaView NekTar Reader Plugin
+
+Building the components:
+
+----------------
+
+NEKTAR_OBJECT:
+cd to NEKTAR_OBJECT
+Edit: Makefile and set VTK_DIR appropriately
+build command: make
+
+This is a small class used for caching data. It may be possible
+to move this into the NEKTAR_READER_MPI dir, but it was not clear
+to me how to get CMake to build this correctly there.
+
+----------------
+
+Nektar-PARALLEL:
+You currently need to cd to each of the following directories
+to build the given individual components:
+
+First, edit:
+Flags/Linux.inc and set MPI_DIR appropriately
+
+gs:
+build command: make ARCH=Linux mopt PARALLEL=1
+
+Hlib/Linux:
+build command: make ARCH=Linux mopt PARALLEL=1
+
+Metis/metis-4.0/Lib:
+build command: make
+
+Utilities/Linux:
+build command: make ARCH=Linux mopt PARALLEL=1
+Currently, there is a version of BLAS and LAPACK that live in this directory
+(built on Linux x86_64)  Not sure of the best way to resolve these
+dependencies. Should the source be distributed?  Should they be
+external dependencies?
+
+Veclib:
+build command: make ARCH=Linux OPTM=1
+
+----------------
+
+NEKTAR_READER_MPI:
+
+Edit: CMakeLists.txt
+Replace all instances of "/home/insley/TEST" with the
+correct path to the PV_NEKTAR directory.
+
+The last 3 libraries in TARGET_LINK_LIBRARIES are external dependancies:
+libblas.a
+liblapack.a
+libgfortran.a
+
+I'm not sure of the best way of including these in the distribution, or even
+if they should be included.
+
+
+Generate a Makefile using CMake.

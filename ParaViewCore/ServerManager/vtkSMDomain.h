@@ -26,7 +26,7 @@
 #ifndef __vtkSMDomain_h
 #define __vtkSMDomain_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 #include "vtkClientServerID.h" // needed for saving animation in batch script
 
 class vtkSMProperty;
@@ -36,10 +36,10 @@ class vtkPVXMLElement;
 struct vtkSMDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMDomain : public vtkSMObject
+class VTK_EXPORT vtkSMDomain : public vtkSMSessionObject
 {
 public:
-  vtkTypeMacro(vtkSMDomain, vtkSMObject);
+  vtkTypeMacro(vtkSMDomain, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

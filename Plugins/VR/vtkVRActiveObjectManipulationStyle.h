@@ -38,8 +38,6 @@ class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 struct vtkVREventData;
 
-/// This is demonstration of how subclasses for vtkVRInteractorStyle can be
-/// implemented.
 class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
@@ -47,23 +45,11 @@ class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
 public:
   vtkVRActiveObjectManipulationStyle(QObject* parent);
   ~vtkVRActiveObjectManipulationStyle();
-
-  /// called to handle an event. If the style does not handle this event or
-  /// handles it but does not want to stop any other handlers from handling it
-  /// as well, they should return false. Other return true. Returning true
-  /// indicates that vtkVRQueueHandler the event has been "consumed".
   virtual bool handleEvent(const vtkVREventData& data);
-
-  /// called to update all the remote vtkObjects and perhaps even to render.
-  /// Typically processing intensive operations go here. The method should not
-  /// be called from within the handler and is reserved to be called from an
-  /// external interaction style manager.
   virtual bool update();
 
 protected:
-  void HandleButton ( const vtkVREventData& data );
   void HandleAnalog ( const vtkVREventData& data );
-  void HandleTracker( const vtkVREventData& data );
   void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
 
 protected:

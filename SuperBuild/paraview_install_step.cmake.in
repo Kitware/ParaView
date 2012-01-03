@@ -1,0 +1,13 @@
+
+include(@ParaViewSuperBuild_CMAKE_BINARY_DIR@/cdat_common_environment.cmake)
+
+execute_process(
+  COMMAND make install ${INSTALL_ARGS}
+  WORKING_DIRECTORY "${WORKING_DIR}"
+  RESULT_VARIABLE res)
+
+if(NOT ${res} EQUAL 0)
+  message("Install Errors detected: \n${CDAT_OUT}\n${CDAT_ERR}")
+  message(FATAL_ERROR "Error in install")
+endif()
+message("Install succeeded.")

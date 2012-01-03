@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QMenu>
 #include <QDoubleValidator>
@@ -212,7 +213,8 @@ pqApplicationOptions::~pqApplicationOptions()
 //-----------------------------------------------------------------------------
 void pqApplicationOptions::updatePalettes()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (pxm->GetSession() == NULL)
     {
     // cannot update the definitions since no valid session is present.
@@ -459,7 +461,8 @@ inline QColor getQColor(vtkSMProxy* proxy, const char* pname)
 //-----------------------------------------------------------------------------
 void pqApplicationOptions::loadPalette(const QString& paletteName)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
     paletteName.toAscii().data());
   if (!prototype)

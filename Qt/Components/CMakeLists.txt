@@ -45,8 +45,9 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidget.h
   pqAboutDialog.h
-  pqActiveRenderViewOptions.h
   pqActiveObjects.h
+  pqActivePlotMatrixViewOptions.h
+  pqActiveRenderViewOptions.h
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.h
   pqActiveView.h
@@ -81,7 +82,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComparativeVisPanel.h
   pqContourPanel.h
   pqContourWidget.h
-  pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionWizard.h
@@ -90,7 +90,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCustomViewButtonDialog.h
   pqCutPanel.h
   pqDataInformationModel.h
-  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.h
   pqDialog.h
   pqDisplayArrayWidget.h
@@ -100,7 +99,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
-  pqEditServerStartupDialog.h
   pqExodusIIPanel.h
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
@@ -112,6 +110,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqImageTip.h
   pqImplicitPlaneWidget.h
   pqIsoVolumePanel.h
+  pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
@@ -121,6 +120,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -136,6 +136,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
   pqPlotMatrixDisplayPanel.h
+  pqPlotMatrixOptionsEditor.h
   pqPluginTreeWidget.h
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
@@ -166,9 +167,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectThroughPanel.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
-  pqServerBrowser.h
-  pqServerStartupBrowser.h
-  pqServerStartupDialog.h
+  pqServerConfigurationImporter.h
+  pqServerConnectDialog.h
+  pqServerLauncher.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
@@ -178,8 +179,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSummaryPanel.h
   pqProxySILModel.h
   pqSelectionInputWidget.h
-  pqSimpleServerStartup.h
-  pqSourceComboBox.h
   pqSphereWidget.h
   pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
@@ -204,6 +203,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.h
   pqComponentsTestUtility.h
+  pqTransferFunctionChartViewWidget.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
 )
 
@@ -229,7 +229,6 @@ SET(UI_FORMS
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqContourWidget.ui
-  Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewButtonDialog.ui
@@ -237,7 +236,6 @@ SET(UI_FORMS
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
-  Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
@@ -245,6 +243,7 @@ SET(UI_FORMS
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqIsoVolumePanel.ui
+  Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
   Resources/UI/pqLineSourceControls.ui
@@ -253,6 +252,7 @@ SET(UI_FORMS
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
+  Resources/UI/pqMemoryInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
@@ -260,6 +260,7 @@ SET(UI_FORMS
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPlotMatrixDisplayPanel.ui
+  Resources/UI/pqPlotMatrixOptionsWidget.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -276,8 +277,8 @@ SET(UI_FORMS
   Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
-  Resources/UI/pqServerBrowser.ui
-  Resources/UI/pqServerStartupDialog.ui
+  Resources/UI/pqServerConnectDialog.ui
+  Resources/UI/pqServerLauncherDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
@@ -337,10 +338,12 @@ VTK_ADD_LIBRARY(pqComponents
   pqAboutDialog.h
   pqActionGroupInterface.cxx
   pqActionGroupInterface.h
-  pqActiveRenderViewOptions.cxx
-  pqActiveRenderViewOptions.h
   pqActiveObjects.cxx
   pqActiveObjects.h
+  pqActivePlotMatrixViewOptions.cxx
+  pqActivePlotMatrixViewOptions.h
+  pqActiveRenderViewOptions.cxx
+  pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.cxx
@@ -420,8 +423,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqContourPanel.h
   pqContourWidget.cxx
   pqContourWidget.h
-  pqCreateServerStartupDialog.cxx
-  pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.cxx
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.cxx
@@ -440,8 +441,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqCutPanel.h
   pqDataInformationModel.cxx
   pqDataInformationModel.h
-  pqDataInformationModelSelectionAdaptor.cxx
-  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.cxx
   pqDataInformationWidget.h
   pqDialog.cxx
@@ -460,8 +459,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
   pqDistanceWidget.h
-  pqEditServerStartupDialog.cxx
-  pqEditServerStartupDialog.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
   pqExtractCTHPartsPanel.cxx
@@ -484,6 +481,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqImplicitPlaneWidget.h
   pqIsoVolumePanel.h
   pqIsoVolumePanel.cxx
+  pqItemViewSearchWidget.cxx
+  pqItemViewSearchWidget.h
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
@@ -502,6 +501,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
   pqLockViewSizeCustomDialog.h
+  pqMemoryInspector.cxx
+  pqMemoryInspector.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -546,6 +547,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqPipelineTimeKeyFrameEditor.h
   pqPlotMatrixDisplayPanel.cxx
   pqPlotMatrixDisplayPanel.h
+  pqPlotMatrixOptionsEditor.cxx
+  pqPlotMatrixOptionsEditor.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPluginTreeWidget.h
@@ -595,12 +598,12 @@ VTK_ADD_LIBRARY(pqComponents
   pqSelectionInputWidget.h
   pqSelectionManager.cxx
   pqSelectionManager.h
-  pqServerBrowser.cxx
-  pqServerBrowser.h
-  pqServerStartupBrowser.cxx
-  pqServerStartupBrowser.h
-  pqServerStartupDialog.cxx
-  pqServerStartupDialog.h
+  pqServerConfigurationImporter.cxx
+  pqServerConfigurationImporter.h
+  pqServerConnectDialog.cxx
+  pqServerConnectDialog.h
+  pqServerLauncher.cxx
+  pqServerLauncher.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
@@ -619,10 +622,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqSummaryPanel.h
   pqProxySILModel.cxx
   pqProxySILModel.h
-  pqSimpleServerStartup.cxx
-  pqSimpleServerStartup.h
-  pqSourceComboBox.cxx
-  pqSourceComboBox.h
   pqSphereWidget.cxx
   pqSphereWidget.h
   pqSplineWidget.cxx
@@ -672,6 +671,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.cxx
   pqXYChartOptionsEditor.h
+  pqTransferFunctionChartViewWidget.cxx
+  pqTransferFunctionChartViewWidget.h 
   ${EXTRA_PQ_COMPONENT_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

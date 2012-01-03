@@ -50,6 +50,16 @@ namespace
       {
       }
 
+    bool RefersToSamePlugin(const vtkItem& item)
+      {
+      if (!item.Name.empty() && (item.Name == this->Name))
+        {
+        return true;
+        }
+      return (!item.FileName.empty() && item.FileName != "linked-in"
+        && item.FileName == this->FileName);
+      }
+
     bool Load(const vtkClientServerStream& stream, int &offset)
       {
       const char* temp_ptr;
@@ -251,9 +261,14 @@ void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
     for (self_iter = this->Internals->begin();
       self_iter != this->Internals->end(); ++self_iter)
       {
-      if (other_iter->Name == self_iter->Name ||
-        other_iter->FileName == self_iter->FileName)
+      if (self_iter->RefersToSamePlugin(*other_iter))
         {
+        // cout << "Other: " << endl
+        //      << "  Name: " << other_iter->Name.c_str() << endl
+        //      << "  Filename: " << other_iter->FileName.c_str() <<endl
+        //      << "Self: " << endl
+        //      << "  Name: " << self_iter->Name.c_str() << endl
+        //      << "  Filename: " << self_iter->FileName.c_str() << endl;
         bool prev_autoload = self_iter->AutoLoad;
         bool auto_load_force = self_iter->AutoLoadForce;
         (*self_iter) = (*other_iter);

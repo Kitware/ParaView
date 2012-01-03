@@ -318,8 +318,8 @@ protected:
                    vtkDataArray *a3);
 
   int ComputeDerivedVariables;
-  int ComputeDerivedVars(vtkCellData* data, 
-    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
+  int ComputeDerivedVars(vtkCellData* data,
+    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID);
 
   // Description:
   // Get the data array selection tables used to configure which data

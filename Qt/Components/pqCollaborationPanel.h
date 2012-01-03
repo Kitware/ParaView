@@ -56,7 +56,7 @@ signals:
   /// Emitting this signal will result by adding the message into the UI and
   /// if the user is the local one, the message will be broadcasted to the
   /// other clients.
-  void triggerChatMessage(int userId, QString& msgContent);
+  void triggerChatMessage(pqServer* server,int userId, QString& msgContent);
 
   /// Emmitting this signal when user has allowed its mouse position to be
   /// shared and send to the other clients
@@ -68,7 +68,7 @@ signals:
 
 public slots:
   /// Called by pqCollaborationManager when a message is received
-  void writeChatMessage(int userId, QString& txt);
+  void writeChatMessage(pqServer* server, int userId, QString& txt);
   /// Called by pqCollaborationManager when a user name update occurs
   /// (this invalidate the table model)
   void onUserUpdate();
@@ -78,14 +78,6 @@ public slots:
 protected slots:
   /// Called when user hit enter in the input line of chat message
   void onUserMessage();
-
-  /// Called when client receive message state that are tagged "share_only"
-  void onShareOnlyMessage(vtkSMMessage* msg);
-
-  /// Called when we change pqServer so we can connect to the
-  /// right pqCollaborationManager
-  void connectLocalSlots();
-  void disconnectLocalSlots();
 
   /// Called when pqView are added/removed so we can listen user interaction
   void connectViewLocalSlots(pqView*);
@@ -101,6 +93,8 @@ protected slots:
 
   /// Called when to follow a given user camera
   void followUserCamera(int userId);
+
+  void onServerChanged();
 
 protected:
 

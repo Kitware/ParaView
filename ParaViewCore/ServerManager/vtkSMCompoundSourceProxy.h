@@ -132,7 +132,7 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
   // Description:
   // Call superclass' and then assigns a new executive

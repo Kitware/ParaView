@@ -48,17 +48,17 @@ class pqOutputWindowAdapter;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
+class pqRecentlyUsedResourcesList;
 class pqServer;
+class pqServerConfigurationCollection;
 class pqServerManagerModel;
 class pqServerManagerObserver;
-class pqServerManagerSelectionModel;
 class pqServerResource;
-class pqServerResources;
-class pqServerStartups;
 class pqSettings;
 class pqTestUtility;
 class pqUndoStack;
 class QApplication;
+class QHelpEngine;
 class QStringList;
 class vtkPVXMLElement;
 class vtkSMGlobalPropertiesManager;
@@ -125,6 +125,14 @@ public:
   /// Unregisters a manager for a particular function, if any.
   void unRegisterManager(const QString& function);
 
+  /// provides access to the help engine. The engine is created the first time
+  /// this method is called.
+  QHelpEngine* helpEngine();
+
+  /// QHelpEngine doesn't like filenames in resource space. This method creates
+  /// a temporary file for the resource and registers that with the QHelpEngine.
+  void registerDocumentation(const QString& filename);
+
   /// ServerManagerObserver observer the vtkSMProxyManager
   /// for changes to the server manager and fires signals on
   /// certain actions such as registeration/unregistration of proxies
@@ -175,11 +183,6 @@ public:
   /// policy. The pqApplicationCore takes over the ownership of the display policy.
   void setDisplayPolicy(pqDisplayPolicy* dp);
 
-  /// Returns the server manager selection model which keeps track of the active
-  /// sources/filters.
-  pqServerManagerSelectionModel* getSelectionModel()
-    { return this->SelectionModel; }
-
   /// Provides access to the test utility.
   virtual pqTestUtility* testUtility();
 
@@ -193,12 +196,13 @@ public:
   /// Returns the manager for the global properties such as ForegroundColor etc.
   vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
 
-  /// Returns the set of available server resources
-  pqServerResources& serverResources();
-  /// Set server resources
-  void setServerResources(pqServerResources* serverResources);
-  /// Returns an object that can start remote servers
-  pqServerStartups& serverStartups();
+  /// Returns the set of recently-used resources i.e. data files and state
+  /// files.
+  pqRecentlyUsedResourcesList& recentlyUsedResources();
+
+  /// Returns the collection of server configurations known. Server
+  /// configurations have information about connecting to different servers.
+  pqServerConfigurationCollection& serverConfigurations();
 
   /// Get the application settings.
   pqSettings* settings();
@@ -315,11 +319,11 @@ protected:
   pqProgressManager* ProgressManager;
   pqServerManagerModel* ServerManagerModel;
   pqServerManagerObserver* ServerManagerObserver;
-  pqServerManagerSelectionModel* SelectionModel;
   pqUndoStack* UndoStack;
-  pqServerResources* ServerResources;
-  pqServerStartups* ServerStartups;
+  pqRecentlyUsedResourcesList *RecentlyUsedResourcesList;
+  pqServerConfigurationCollection* ServerConfigurations;
   pqSettings* Settings;
+  QHelpEngine* HelpEngine;
   QPointer<pqTestUtility> TestUtility;
 
 private:
@@ -330,7 +334,6 @@ private:
   static pqApplicationCore* Instance;
   void constructor();
   void createOutputWindow();
-  bool FinalizeOnExit;
 };
 
 #endif

@@ -71,7 +71,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSignalAdaptors.h"
 
 #include "IteratingView.h"

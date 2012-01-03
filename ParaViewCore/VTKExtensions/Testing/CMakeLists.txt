@@ -9,7 +9,6 @@ SET(ServersFilters_SRCS
   TestExtractScatterPlot
   TestTilesHelper
   TestSortingTable
-  TestPVAMRDualContour
   )
 
 IF (VTK_DATA_ROOT)
@@ -18,6 +17,7 @@ IF (VTK_DATA_ROOT)
     TestContinuousClose3D
     TestPVFilters
     TestSpyPlotTracers
+    TestPVAMRDualContour
     )
 ENDIF (VTK_DATA_ROOT)
 

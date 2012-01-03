@@ -31,10 +31,12 @@
 
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
+#include "vtkWeakPointer.h" // for vtkWeakPointer.
 
 class vtkDataObject;
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
+class vtkPVSession;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
@@ -42,7 +44,11 @@ class vtkSelection;
 class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
 {
 public:
-  static vtkPVSynchronizedRenderWindows* New();
+  // Description:
+  // if session==NULL, then active session is used. If no active session is
+  // present, then it's a critical error and this method will return NULL.
+  static vtkPVSynchronizedRenderWindows* New(vtkPVSession* session=NULL);
+
   vtkTypeMacro(vtkPVSynchronizedRenderWindows, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -158,7 +164,7 @@ public:
   // This method should only be called on RENDER_SERVER or BATCH processes.
   // Returns true if in tile display mode and fills up tile_dims with the tile
   // dimensions.
-  static bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
+  bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
 
   // Description:
   // Returns the z-buffer value at the given location. \c id is the view id
@@ -181,8 +187,12 @@ public:
   // Need mode to use it correctly.
   ModeEnum GetMode() { return this->Mode; };
 
+  // Description:
+  // Provides access to the session.
+  vtkPVSession* GetSession();
+
 protected:
-  vtkPVSynchronizedRenderWindows();
+  vtkPVSynchronizedRenderWindows(vtkPVSession*);
   ~vtkPVSynchronizedRenderWindows();
 
   // Description:
@@ -244,6 +254,8 @@ protected:
   bool Enabled;
   bool RenderEventPropagation;
   bool RenderOneViewAtATime;
+
+  vtkWeakPointer<vtkPVSession> Session;
 
 private:
   vtkPVSynchronizedRenderWindows(const vtkPVSynchronizedRenderWindows&); // Not implemented

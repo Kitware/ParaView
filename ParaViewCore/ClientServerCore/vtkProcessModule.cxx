@@ -182,6 +182,10 @@ bool vtkProcessModule::Finalize()
 {
   if(vtkProcessModule::Singleton)
     {
+    // Make sure no session are kept inside ProcessModule so SessionProxyManager
+    // could cleanup their Proxies before the ProcessModule get deleted.
+    vtkProcessModule::Singleton->Internals->Sessions.clear();
+
     vtkProcessModule::Singleton->InvokeEvent(vtkCommand::ExitEvent);
     }
 
@@ -232,6 +236,7 @@ vtkProcessModule::vtkProcessModule()
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
+  this->MultipleSessionsSupport = false; // Set MULTI-SERVER to false as DEFAULT
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);

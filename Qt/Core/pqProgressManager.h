@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QList>
 
-class vtkEventQtSlotConnect;
 class vtkObject;
 class pqServer;
 /// pqProgressManager is progress manager. It centralizes progress raising/
@@ -124,7 +123,6 @@ protected:
   double LastProgressTime;
   bool EnableProgress;
   bool ReadyEnableProgress;
-  vtkEventQtSlotConnect* VTKConnect;
 private:
   pqProgressManager(const pqProgressManager&); // Not implemented.
   void operator=(const pqProgressManager&); // Not implemented.

@@ -51,6 +51,9 @@ public:
   /// Show a particular help page.
   static void showHelp(const QString& url);
 
+  /// Show the documentation for a particular proxy.
+  static void showProxyHelp(const QString& group, const QString& name);
+
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()

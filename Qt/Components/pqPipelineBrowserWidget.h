@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeView.h"
 #include "pqComponentsExport.h"
 
-class pqView;
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;
 class pqPipelineSource;
+class pqView;
+class vtkSession;
 
 /// pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
 /// replacement for pqPipelineBrowser.
@@ -62,6 +63,12 @@ public:
 
   /// Disable any Annotation filter
   void disableAnnotationFilter();
+
+  /// Set Session filter to use
+  void enableSessionFilter(vtkSession* session);
+
+  /// Disable any Session filter
+  void disableSessionFilter();
 
 signals:
   /// Fired when the delete key is pressed.

@@ -31,9 +31,4 @@ void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b);
 void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b);
 void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t);
 
-// void VRPN_CALLBACK handleTrackerPosQuat(void *userdata, const vrpn_TRACKERCB t);
-// void VRPN_CALLBACK handleAnalogPos(void *userdata,
-//                                    const vrpn_ANALOGCB t);
-
-
 #endif // __vtkVRPNCallBackHandlers_h

@@ -17,7 +17,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
-
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyManager.h"
 
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
@@ -50,4 +51,10 @@ void vtkSMUndoElement::SetSession(vtkSMSession* session)
 vtkSMSession* vtkSMUndoElement::GetSession()
 {
   return this->Session.GetPointer();
+}
+//----------------------------------------------------------------------------
+vtkSMSessionProxyManager* vtkSMUndoElement::GetSessionProxyManager()
+{
+  return
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->Session);
 }

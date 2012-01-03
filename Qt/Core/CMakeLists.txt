@@ -51,12 +51,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCollaborationManager.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
-  pqCommandServerStartup.h
   pqComparativeContextView.h
   pqComparativeRenderView.h
   pqComparativeXYBarChartView.h
   pqComparativeXYChartView.h
   pqCoreTestUtility.h
+  pqCoreUtilities.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
   pqFileDialog.h
@@ -73,7 +73,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
-  pqManualServerStartup.h
   pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -93,6 +92,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxy.h
   pqQVTKWidget.h
   pqQVTKWidgetEventTranslator.h
+  pqRecentlyUsedResourcesList.h
   pqRenderView.h
   pqRenderViewBase.h
   pqRepresentation.h
@@ -103,13 +103,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqScalarsToColors.h
 #  pqScatterPlotRepresentation.h
   pqServer.h
+  pqServerConfigurationCollection.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.h
-  pqServerResources.h
-  pqServerStartup.h
-  pqServerStartups.h
   pqSettings.h
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.h
@@ -198,8 +195,6 @@ VTK_ADD_LIBRARY(pqCore
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
   pqColorButtonEventTranslator.h
-  pqCommandServerStartup.cxx
-  pqCommandServerStartup.h
   pqComparativeContextView.cxx
   pqComparativeContextView.h
   pqComparativeRenderView.cxx
@@ -257,8 +252,6 @@ VTK_ADD_LIBRARY(pqCore
   pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
-  pqManualServerStartup.cxx
-  pqManualServerStartup.h
   pqNameCount.cxx
   pqNameCount.h
   pqObjectBuilder.cxx
@@ -299,12 +292,16 @@ VTK_ADD_LIBRARY(pqCore
   pqProxy.h
   pqProxyModifiedStateUndoElement.cxx
   pqProxyModifiedStateUndoElement.h
+  pqProxySelection.cxx
+  pqProxySelection.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidget.h
+  pqRecentlyUsedResourcesList.cxx
+  pqRecentlyUsedResourcesList.h
   pqRenderViewBase.cxx
   pqRenderViewBase.h
   pqRenderView.cxx
@@ -323,6 +320,10 @@ VTK_ADD_LIBRARY(pqCore
   pqScalarsToColors.h
   pqServer.cxx
   pqServer.h
+  pqServerConfiguration.cxx
+  pqServerConfiguration.h
+  pqServerConfigurationCollection.cxx
+  pqServerConfigurationCollection.h
   pqServerManagerModel.cxx
   pqServerManagerModel.h
   pqServerManagerModelInterface.cxx
@@ -331,15 +332,8 @@ VTK_ADD_LIBRARY(pqCore
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.cxx
-  pqServerManagerSelectionModel.h
   pqServerResource.cxx
   pqServerResource.h
-  pqServerResources.cxx
-  pqServerResources.h
-  pqServerStartup.h
-  pqServerStartups.cxx
-  pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
   pqSMAdaptor.cxx

@@ -1,0 +1,121 @@
+ARCH    = $(shell uname)
+MACH    := $(shell uname -m)
+VPATH   = ../src
+LIBDIR  = ../../Hlib/$(ARCH)
+HDRDIR  = ../../include
+TARFILE = Utils.tar
+
+CPPFLAGS = -I$(HDRDIR) #-DONEELMT
+
+ifeq ($(ARCH),Linux)
+  ifeq ($(MACH),ia64)
+        ARCH =  Linux-ia64
+  endif
+endif
+
+ifdef PARALLEL
+MPIPRG  = yes
+endif
+
+include ../../Flags/$(ARCH).inc
+
+ifeq ($(ARCH),cray-pvp)      # Cray PVP
+include ../../Flags/CRAYPVP.inc
+endif
+
+ifeq ($(ARCH),cray-t3d)      # Cray T3D
+include ../../Flags/T3D.inc
+endif
+
+ifeq ($(ARCH),unicosmk)      # Cray T3E
+include ../../Flags/T3E.inc
+endif
+
+ifeq ($(ARCH),alpha)      # DEC Alpha AXP
+include ../../Flags/DECAXP.inc
+endif
+
+ifeq ($(ARCH),OSF1)                     # DEC Alpha AXP
+include ../../Flags/DECAXP.inc
+endif
+
+ifeq ($(ARCH),HP-UX)      # HP-UX
+include ../../Flags/HP-UX.inc
+endif
+
+ifeq ($(ARCH),XT3)                     # CRAY XT3
+include ../../Flags/XT3.inc
+endif
+
+
+
+ifeq ($(LTYPE),g)  # turn on debug flag
+CPPFLAGS := -DDEBUG $(DEBUG) $(CPPFLAGS)
+CXXFLAGS := $(DEBUG) $(CCWOFF)
+CFLAGS := $(DEBUG) $(CWOFF)
+FFLAGS := $(DEBUGF) $(FWOFF)
+LDFLAGS  := $(DEBUGLD)
+else      # Maximal optimization flags
+ifeq ($(LTYPE),mopt)
+CXXFLAGS := $(MOPTXX)
+CFLAGS := $(MOPT)
+FFLAGS := $(MOPTF)
+LDFLAGS  := $(MOPTLD)
+else      # Regular optimization flags
+ifeq ($(LTYPE),opt)
+CXXFLAGS := $(OPTXX)
+CFLAGS := $(OPT)
+FFLAGS := $(OPTF)
+LDFLAGS  := $(OPTLD)
+endif
+endif
+endif
+
+ifdef PARALLEL
+override CPPFLAGS :=  -DPARALLEL -DMETIS $(CPPFLAGS) $(MPIINC)
+overrider ALL    := $(ALL)
+
+ifeq ($(ARCH),ap3000)
+override LIBS     := $(LIBS) -L/opt/FSUNaprun/lib -lmpl -lemi -lthread
+endif
+
+ifeq ($(ARCH),Linux)      # Linux using GCC
+override LIBS     := $(LIBS) -lmetis -lgs $(MPILIB) -lmpich
+endif
+
+ifeq ($(ARCH),unicosmk)      # T3E
+override LIBS     := $(LIBS) -lmetis -lgs -lmpi
+endif
+
+ifeq ($(ARCH),OSF1) # Atlas cluster
+override LIBS     := $(LIBS) -lmetis -lgs -lmpi -lelan -lelan3
+else
+override LIBS     := $(LIBS)
+endif
+
+endif
+
+override LIBS   := -L$(LIBDIR) -lhybrid$(LTYPE) $(LIBS) #-lefence
+
+
+$(PROG) :$(PROG).o gen_utils.o io.o prepost.o mlevel.o bwoptim.o comm.o
+  $(LD) $(CPPFLAGS) -o $(PROG) $< gen_utils.o io.o prepost.o mlevel.o\
+   bwoptim.o comm.o -I -L$(LIBDIR) $(LIBS)
+
+
+particle :particle.o gen_utils.o io.o prepost.o mlevel.o bwoptim.o comm.o
+  $(LD) $(CPPFLAGS) -o $(PROG) $< gen_utils.o io.o prepost.o mlevel.o\
+   bwoptim.o comm.o -I -L$(LIBDIR) $(LIBS)
+
+
+isocon  :isocon.o isoutils.o gen_utils.o io.o prepost.o mlevel.o bwoptim.o comm.o
+  $(LD) $(CPPFLAGS) -o $(PROG) $< gen_utils.o io.o isoutils.o prepost.o mlevel.o\
+   bwoptim.o comm.o -I -L$(LIBDIR) $(LIBS)
+
+isofilter :isofilter.o isoutils.o gen_utils.o io.o prepost.o mlevel.o bwoptim.o comm.o
+  $(LD) $(CPPFLAGS) -o $(PROG) $< gen_utils.o io.o isoutils.o prepost.o mlevel.o\
+   bwoptim.o comm.o -I -L$(LIBDIR) $(LIBS)
+
+#LINUX is reading in curved data incorrectly in optimised mode so compile debug
+io.o:io.C
+  $(CXX) -g $(CPPFLAGS) -c -o io.o $<

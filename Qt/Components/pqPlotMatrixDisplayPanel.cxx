@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqPlotMatrixDisplayPanel.h"
 
-pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representation, QWidget *parent)
-  : pqDisplayPanel(representation, parent)
+pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representation, QWidget *pWidget)
+  : pqDisplayPanel(representation, pWidget)
 {
   Ui::pqPlotMatrixDisplayPanel ui;
   ui.setupUi(this);
@@ -128,5 +128,7 @@ void pqPlotMatrixDisplayPanel::headerCheckStateChanged()
 
 void pqPlotMatrixDisplayPanel::dataChanged(QModelIndex topLeft, QModelIndex bottomRight)
 {
+  Q_UNUSED(topLeft);
+  Q_UNUSED(bottomRight);
   this->Representation->renderViewEventually();
 }

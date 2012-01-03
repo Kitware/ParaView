@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _vtkPVPlotMatrixRepresentation_h
 
 #include "vtkChartRepresentation.h"
+#include "vtkColor.h" // for ivars
 
 class vtkScatterPlotMatrix;
 
@@ -107,10 +108,9 @@ private:
   vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&); // Not implemented
   void operator=(const vtkPVPlotMatrixRepresentation&); // Not implemented
 
-private:
-  double ActivePlotColor[3];
-  double ScatterPlotColor[3];
-  double HistogramColor[3];
+  vtkColor4ub ActivePlotColor;
+  vtkColor4ub ScatterPlotColor;
+  vtkColor4ub HistogramColor;
   int ScatterPlotMarkerStyle;
   int ActivePlotMarkerStyle;
   double ScatterPlotMarkerSize;

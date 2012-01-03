@@ -3,12 +3,14 @@ if(WIN32)
 
   #EXECUTE_PROCESS(
   #  COMMAND @CMAKE_BUILD_TOOL@ "@freetype_source@/builds/win32/vc2008/freetype.sln" /Upgrade
-  #  WORKING_DIRECTORY "@Silo_source@"
+  #  WORKING_DIRECTORY "@freetype_source@"
   #  )
+
+  set(ENV{CL} "@pv_tpl_c_flags@")
 
   EXECUTE_PROCESS(
     COMMAND @CMAKE_BUILD_TOOL@ "@freetype_source@/builds/win32/vc2008/freetype.sln" /build "@freetype_configuration@" /project freetype
-    WORKING_DIRECTORY "@Silo_source@"
+    WORKING_DIRECTORY "@freetype_source@"
     )
 
 endif()

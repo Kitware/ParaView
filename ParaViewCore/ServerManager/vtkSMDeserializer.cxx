@@ -21,17 +21,18 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {
-  this->Session = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMDeserializer::~vtkSMDeserializer()
 {
-  this->SetSession(0);
 }
 
 //----------------------------------------------------------------------------
@@ -39,7 +40,9 @@ vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
                                            const char* xmlname,
                                            const char* subname)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  assert("Expect a valid session" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert("Expect a valid SessionProxyManager" && pxm);
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subname);
   return proxy;
 }
@@ -48,15 +51,4 @@ vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
 void vtkSMDeserializer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-vtkSMSession* vtkSMDeserializer::GetSession()
-{
-  return this->Session.GetPointer();
-}
-//----------------------------------------------------------------------------
-void vtkSMDeserializer::SetSession(vtkSMSession* s)
-{
-  this->Session = s;
 }

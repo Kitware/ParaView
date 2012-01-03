@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqSMAdaptor.h"
 
-pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *parent)
-  : pqObjectPanel(proxy, parent)
+pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *pxy, QWidget *p)
+  : pqObjectPanel(pxy, p)
 {
-  QFormLayout *layout = new QFormLayout;
+  QFormLayout *l = new QFormLayout;
 
   this->Expression = new QLineEdit(this);
   this->ResultArrayName = new QLineEdit(this);
@@ -48,10 +48,10 @@ pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *pare
   // set default array name to 'Result'
   this->ResultArrayName->setText("Result");
 
-  layout->addRow("Expression:", this->Expression);
-  layout->addRow("Result Array Name:", this->ResultArrayName);
+  l->addRow("Expression:", this->Expression);
+  l->addRow("Result Array Name:", this->ResultArrayName);
 
-  vtkSMProxy *smProxy = proxy->getProxy();
+  vtkSMProxy *smProxy = pxy->getProxy();
 
   this->Links.setUseUncheckedProperties(true);
   this->Links.addPropertyLink(this->Expression,
@@ -66,7 +66,7 @@ pqCalculatorSummaryPanel::pqCalculatorSummaryPanel(pqProxy *proxy, QWidget *pare
                               smProxy,
                               smProxy->GetProperty("ResultArrayName"));
 
-  setLayout(layout);
+  setLayout(l);
 }
 
 pqCalculatorSummaryPanel::~pqCalculatorSummaryPanel()
