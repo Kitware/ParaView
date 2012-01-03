@@ -151,7 +151,7 @@ configure_file(${ParaViewSuperBuild_SOURCE_DIR}/CTestCustom.ctest.in
   ${ParaViewSuperBuild_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
 #------------------------------------------------------------------------------
-# Configure Common environment file
+# Configure Common environment files
 #------------------------------------------------------------------------------
 
 configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/paraview_common_environment.cmake.in
@@ -372,35 +372,41 @@ if(ENABLE_YT)
 endif()
 
 # Build Silo
-list(APPEND Silo_dependencies zlib HDF5)
-list(APPEND ParaView_dependencies Silo)
-include(External_Silo)
-set(Silo_ARGS
-  -DVISIT_BUILD_READER_Silo:BOOL=ON
-  -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
-  -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
+option(PARAVIEW_BUILD_Silo "Build Silo library" ON)
+if(PARAVIEW_BUILD_Silo)
+  list(APPEND Silo_dependencies zlib HDF5)
+  list(APPEND ParaView_dependencies Silo)
+  include(External_Silo)
+  set(Silo_ARGS
+    -DVISIT_BUILD_READER_Silo:BOOL=ON
+    -DSILO_INCLUDE_DIR:PATH=${SILO_INCLUDE_DIR}
+    -DSILO_LIBRARY:FILEPATH=${SILO_LIBRARY})
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${Silo_install}/bin)
-else()
-  get_filename_component(SILO_DIR "${SILO_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${SILO_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${Silo_install}/bin)
+  else()
+    get_filename_component(SILO_DIR "${SILO_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${SILO_DIR})
+  endif()
 endif()
 
 # Build CGNS
-list(APPEND CGNS_dependencies zlib HDF5)
-list(APPEND ParaView_dependencies CGNS)
-include(External_CGNS)
-set(CGNS_ARGS
-  -DVISIT_BUILD_READER_CGNS:BOOL=ON
-  -DCGNS_INCLUDE_DIR:PATH=${CGNS_INCLUDE_DIR}
-  -DCGNS_LIBRARY:FILEPATH=${CGNS_LIBRARY})
+option(PARAVIEW_BUILD_CGNS "Build CGNS library" ON)
+if(PARAVIEW_BUILD_CGNS)
+  list(APPEND CGNS_dependencies zlib HDF5)
+  list(APPEND ParaView_dependencies CGNS)
+  include(External_CGNS)
+  set(CGNS_ARGS
+    -DVISIT_BUILD_READER_CGNS:BOOL=ON
+    -DCGNS_INCLUDE_DIR:PATH=${CGNS_INCLUDE_DIR}
+    -DCGNS_LIBRARY:FILEPATH=${CGNS_LIBRARY})
 
-if(WIN32)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_install}/lib)
-else()
-  get_filename_component(CGNS_DIR "${CGNS_LIBRARY}" PATH)
-  list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
+  if(WIN32)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_install}/lib)
+  else()
+    get_filename_component(CGNS_DIR "${CGNS_LIBRARY}" PATH)
+    list(APPEND PARAVIEW_FIXUP_BUNDLE_SEARCH_PATHS ${CGNS_DIR})
+  endif()
 endif()
 
 if(NOT WIN32)
@@ -646,18 +652,22 @@ if(BUILD_TESTING)
     ENDIF(CMAKE_CL_64)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
 
-  IF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
+  if(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
     list(LENGTH CMAKE_OSX_ARCHITECTURES _length)
     IF(_length GREATER 1)
       SET(CPACK_SYSTEM_NAME Darwin-Universal)
     ELSE(_length GREATER 1)
       SET(CPACK_SYSTEM_NAME Darwin-${CMAKE_OSX_ARCHITECTURES})
     ENDIF(_length GREATER 1)
-  ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
+  endif(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
 
   set(CPACK_PACKAGE_FILE_NAME ParaView-${PARAVIEW_CPACK_VERSION}-${CPACK_SYSTEM_NAME})
   
-  message("CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}")
+  find_path(PARAVIEW_DATA_ROOT ParaViewData.readme
+    ${ParaView_SOURCE_DIR}/ParaViewData
+    ${ParaView_SOURCE_DIR}/../ParaViewData
+    $ENV{PARAVIEW_DATA_ROOT}
+  )
 
   add_subdirectory(Testing)
 endif()

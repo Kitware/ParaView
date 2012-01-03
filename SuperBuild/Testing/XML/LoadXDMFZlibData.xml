@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Scenario1_p1.xmf" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Pressure_Head" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/summaryDock/summaryWidget/1pqCollapsedGroup1/1QWidget0/1pqGenericSummaryDisplayPanel0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/PresetButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/OkButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pushButtonApply" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqColorScaleDialog/CloseButton" command="activate" arguments="" />
+</pqevents>
