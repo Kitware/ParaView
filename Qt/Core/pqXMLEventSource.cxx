@@ -147,14 +147,18 @@ int pqXMLEventSource::getNextEvent(
       {
       return FAILURE;
       }
+    cout << width << ", " << height << endl;
+    QSize old_size = widget->maximumSize();
+    widget->setMaximumSize(width, height);
     widget->resize(width, height);
 
     pqOptions* const options = pqOptions::SafeDownCast(
       vtkProcessModule::GetProcessModule()->GetOptions());
-    if (!pqCoreTestUtility::CompareImage(widget, baseline,
-       options->GetCurrentImageThreshold(),
-       std::cerr,
-       pqCoreTestUtility::TestDirectory()))
+    bool retVal = pqCoreTestUtility::CompareImage(widget, baseline,
+      options->GetCurrentImageThreshold(), std::cerr,
+      pqCoreTestUtility::TestDirectory());
+    widget->setMaximumSize(old_size);
+    if (!retVal)
       {
       return FAILURE;
       }
