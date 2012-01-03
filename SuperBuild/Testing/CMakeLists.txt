@@ -36,7 +36,7 @@ elseif(UNIX AND NOT APPLE)
 else()
   add_test(
     NAME MountDMG
-    COMMAND hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg
+    COMMAND yes Y | /usr/bin/hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg > /dev/null
   )
 
   add_test(
@@ -47,7 +47,7 @@ else()
 
   add_test(
     NAME UnMountDMG 
-    COMMAND hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}.dmg
+    COMMAND /usr/bin/hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}
   )
 endif()
 
