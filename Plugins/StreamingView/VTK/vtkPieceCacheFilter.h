@@ -33,7 +33,7 @@
 
 #include "vtkDataSetAlgorithm.h"
 
-#include <vtkstd/map> // used for the cache
+#include <map> // used for the cache
 
 class vtkAppendPolyData;
 class vtkPolyData;
@@ -130,9 +130,9 @@ protected:
 //BTX
   //The cache is a map of slots to datasets. The datasets are stored with their
   //pipeline time so that they do not become stale.
-  typedef vtkstd::map<
+  typedef std::map<
     int, //slot
-    vtkstd::pair<
+    std::pair<
     unsigned long, //pipeline modified time
     vtkDataSet *> //data
     > CacheType;
@@ -140,7 +140,7 @@ protected:
 
   //The filter keeps track of what contents are part of the append table, along
   //with the resolution they were stored at
-  typedef vtkstd::map<
+  typedef std::map<
     int, //slot
     double //resolution
     > AppendIndex;

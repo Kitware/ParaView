@@ -34,7 +34,7 @@
 #include <time.h>
 #include <sstream>
 #include <string>
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkRawStridedReader1);
 
