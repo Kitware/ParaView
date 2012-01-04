@@ -623,15 +623,15 @@
      <property name="title">
       <string>Volume</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+     <layout class="QGridLayout">
+     <item row="5" column="0">
        <widget class="QLabel" name="label_18">
         <property name="text">
          <string>Resampler Method</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
+      <item row="5" column="1" colspan="2">
        <widget class="QComboBox" name="SelectResamplerMethod"/>
       </item>
       <item row="1" column="0">
@@ -699,7 +699,13 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item row="4" column="0">
        <widget class="QCheckBox" name="FreezeFocalPoint">
