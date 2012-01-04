@@ -56,13 +56,13 @@
 #include "vtkAllToNRedistributeCompositePolyData.h"
 #endif
 
-#include <vtkstd/vector>
+#include <vector>
 
 bool vtkMPIMoveData::UseZLibCompression = false;
 
 namespace
 {
-  static bool vtkMPIMoveDataMerge(vtkstd::vector<vtkSmartPointer<vtkDataObject> >& pieces,
+  static bool vtkMPIMoveDataMerge(std::vector<vtkSmartPointer<vtkDataObject> >& pieces,
     vtkDataObject* result)
     {
     if (pieces.size() == 0)
@@ -104,7 +104,7 @@ namespace
       // append-filter API.
       vtkMergeGraphs* mergegraphs = vtkMergeGraphs::New();
       mergegraphs->SetInput(0, pieces[0]);
-      vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter =
+      std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter =
         pieces.begin();
       iter++;
       for ( ; iter != pieces.end(); ++iter)
@@ -136,7 +136,7 @@ namespace
       return false;
       }
 
-    vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
+    std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
     for (iter = pieces.begin(); iter != pieces.end(); ++iter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
@@ -1181,7 +1181,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
     }
 
   bool is_image_data = data->IsA("vtkImageData") != 0;
-  vtkstd::vector<vtkSmartPointer<vtkDataObject> > pieces;
+  std::vector<vtkSmartPointer<vtkDataObject> > pieces;
 
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
     {

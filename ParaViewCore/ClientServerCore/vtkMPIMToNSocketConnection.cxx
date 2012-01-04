@@ -23,8 +23,8 @@
 #include "vtkServerSocket.h"
 #include "vtkSocketCommunicator.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
@@ -37,10 +37,10 @@ public:
   struct NodeInformation
   {
     int PortNumber;
-    vtkstd::string HostName;
+    std::string HostName;
   };
-  vtkstd::vector<NodeInformation> ServerInformation;
-  vtkstd::vector<vtkstd::string> MachineNames;
+  std::vector<NodeInformation> ServerInformation;
+  std::vector<std::string> MachineNames;
 };
 
 

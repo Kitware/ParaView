@@ -22,7 +22,7 @@
 #ifndef __vtkMaterialInterfaceToProcMap_h
 #define __vtkMaterialInterfaceToProcMap_h
 
-#include "vtkstd/vector"
+#include "vector"
 
 class vtkMaterialInterfaceToProcMap
 {
@@ -44,15 +44,15 @@ public:
   void SetProcOwnsPiece(int fragmentId);
   void UnSetProcOwnsPiece(int procId, int fragmentId);
   void UnSetProcOwnsPiece(int fragmentId);
-  vtkstd::vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
-  vtkstd::vector<int> WhoHasAPiece(int fragmentId) const;
+  std::vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
+  std::vector<int> WhoHasAPiece(int fragmentId) const;
   int GetProcCount(int fragmentId){ return this->ProcCount[fragmentId]; }
 private:
   // proc -> fragment -> bit mask, bit is 1 if
   // the fragment is on proc
-  vtkstd::vector<vtkstd::vector<int> > PieceToProcMap;
+  std::vector<std::vector<int> > PieceToProcMap;
   // fragment id -> count num procs
-  vtkstd::vector<int> ProcCount;
+  std::vector<int> ProcCount;
 
   int NProcs;     // number of procs
   int NFragments; // number of fragments to map

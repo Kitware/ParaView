@@ -19,16 +19,16 @@
 #include "vtkSmartPointer.h"
 #include "vtkSession.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
+#include <map>
+#include <vector>
 
 class vtkProcessModule::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkIdType, vtkSmartPointer<vtkSession> > MapOfSessions;
+  typedef std::map<vtkIdType, vtkSmartPointer<vtkSession> > MapOfSessions;
   MapOfSessions Sessions;
 
-  typedef vtkstd::vector<vtkWeakPointer<vtkSession> > ActiveSessionStackType;
+  typedef std::vector<vtkWeakPointer<vtkSession> > ActiveSessionStackType;
   ActiveSessionStackType ActiveSessionStack;
 };
 

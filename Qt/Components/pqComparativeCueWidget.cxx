@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMPropertyHelper.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 namespace
 {
@@ -61,9 +61,9 @@ namespace
       }
     };
 
-  vtkstd::vector<double> getValues(const QString& str)
+  std::vector<double> getValues(const QString& str)
     {
-    vtkstd::vector<double> values;
+    std::vector<double> values;
     QStringList parts = str.split(',', QString::SkipEmptyParts);
     foreach (QString part, parts)
       {
@@ -272,8 +272,8 @@ void pqComparativeCueWidget::editRange()
   int parameter_change_mode = ui.mode->currentIndex();
   enum { HORZ_FIRST, VERT_FIRST, HORZ_ONLY, VERT_ONLY };
 
-  vtkstd::vector<double> minvalues = ::getValues(ui.minValue->text());
-  vtkstd::vector<double> maxvalues = ::getValues(ui.maxValue->text());
+  std::vector<double> minvalues = ::getValues(ui.minValue->text());
+  std::vector<double> maxvalues = ::getValues(ui.maxValue->text());
 
   unsigned int numvalues = static_cast<unsigned int>(qMin(minvalues.size(),
       maxvalues.size()));
@@ -333,7 +333,7 @@ void pqComparativeCueWidget::editRange()
     {
     // cannot formulate user chose as a range. Set individual values.
     int count = range.rowCount() * range.columnCount() -1;
-    vtkstd::vector<double> newvalues;
+    std::vector<double> newvalues;
     newvalues.resize(minvalues.size(), 0.0);
     for (int xx=range.leftColumn(); xx <= range.rightColumn(); xx++)
       {

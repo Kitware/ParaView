@@ -21,17 +21,17 @@
 #define __vtkPVPythonPluginInterface_h
 
 #include "vtkObject.h"
-#include <vtkstd/vector> // STL Header
-#include <vtkstd/string> // STL Header
+#include <vector> // STL Header
+#include <string> // STL Header
 
 class VTK_EXPORT vtkPVPythonPluginInterface
 {
 public:
   virtual ~vtkPVPythonPluginInterface();
 
-  virtual void GetPythonSourceList(vtkstd::vector<vtkstd::string>& modules,
-    vtkstd::vector<vtkstd::string>& sources,
-    vtkstd::vector<int> &package_flags) = 0;
+  virtual void GetPythonSourceList(std::vector<std::string>& modules,
+    std::vector<std::string>& sources,
+    std::vector<int> &package_flags) = 0;
 };
 
 #endif

@@ -26,7 +26,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkPVTemporalDataInformation);
 //----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void vtkPVTemporalDataInformation::CopyFromObject(vtkObject* object)
   // last time value as the 2 timesteps.
 
   vtkInformation* pipelineInfo = dobj->GetPipelineInformation();
-  vtkstd::vector<double> timesteps;
+  std::vector<double> timesteps;
   if (pipelineInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
     {
     double* ptimesteps =
@@ -183,7 +183,7 @@ void vtkPVTemporalDataInformation::CopyFromObject(vtkObject* object)
     this->NumberOfTimeSteps = 0;
     }
 
-  vtkstd::vector<double>::iterator iter;
+  std::vector<double>::iterator iter;
   vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       port->GetProducer()->GetExecutive());
@@ -311,7 +311,7 @@ void vtkPVTemporalDataInformation::CopyFromStream(
     }
 
   vtkTypeUInt32 length;
-  vtkstd::vector<unsigned char> data;
+  std::vector<unsigned char> data;
   vtkClientServerStream dcss;
 
   // Point array information.

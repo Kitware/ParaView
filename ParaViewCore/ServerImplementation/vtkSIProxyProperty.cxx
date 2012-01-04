@@ -22,7 +22,7 @@
 #include "vtkSMMessage.h"
 
 #include <assert.h>
-#include <vtkstd/set>
+#include <set>
 #include <vtkSmartPointer.h>
 
 //****************************************************************************/
@@ -58,10 +58,10 @@ public:
     this->RegisteredProxy.clear();
     }
   //--------------------------------------------------------------------------
-  void GetProxyToRemove( vtkstd::vector<vtkTypeUInt32> &proxyToRemove )
+  void GetProxyToRemove( std::vector<vtkTypeUInt32> &proxyToRemove )
     {
     proxyToRemove.clear();
-    vtkstd::set<vtkTypeUInt32>::iterator iter = this->RegisteredProxy.begin();
+    std::set<vtkTypeUInt32>::iterator iter = this->RegisteredProxy.begin();
     while(iter != this->RegisteredProxy.end())
       {
       if(this->VariantSet.find(*iter) == this->VariantSet.end())
@@ -73,10 +73,10 @@ public:
       }
     }
   //--------------------------------------------------------------------------
-  void GetProxyToAdd( vtkstd::vector<vtkTypeUInt32> &proxyToAdd )
+  void GetProxyToAdd( std::vector<vtkTypeUInt32> &proxyToAdd )
     {
     proxyToAdd.clear();
-    vtkstd::set<vtkTypeUInt32>::iterator iter = this->VariantSet.begin();
+    std::set<vtkTypeUInt32>::iterator iter = this->VariantSet.begin();
     while(iter != this->VariantSet.end())
       {
       if(this->RegisteredProxy.find(*iter) == this->RegisteredProxy.end())
@@ -90,7 +90,7 @@ public:
   //--------------------------------------------------------------------------
   void UpdateRegisteredProxy()
     {
-    vtkstd::vector<vtkSmartPointer<vtkSIObject> >::iterator iterEnd = this->Dependancy.begin();
+    std::vector<vtkSmartPointer<vtkSIObject> >::iterator iterEnd = this->Dependancy.begin();
     iterEnd += this->NumberOfDependancyToDelete;
     this->Dependancy.erase(this->Dependancy.begin(), iterEnd);
     this->NumberOfDependancyToDelete = 0;
@@ -99,9 +99,9 @@ public:
     }
   //--------------------------------------------------------------------------
 private:
-  vtkstd::set<vtkTypeUInt32> RegisteredProxy;
-  vtkstd::set<vtkTypeUInt32> VariantSet;
-  vtkstd::vector<vtkSmartPointer<vtkSIObject> > Dependancy;
+  std::set<vtkTypeUInt32> RegisteredProxy;
+  std::set<vtkTypeUInt32> VariantSet;
+  std::vector<vtkSmartPointer<vtkSIObject> > Dependancy;
   vtkSIProxyProperty* Parent;
   size_t NumberOfDependancyToDelete;
 };
@@ -186,7 +186,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
   this->Cache->SetVariant(&prop->value());
-  vtkstd::vector<vtkTypeUInt32> proxy_ids;
+  std::vector<vtkTypeUInt32> proxy_ids;
 
   vtkClientServerStream stream;
   vtkObjectBase* object = this->GetVTKObject();

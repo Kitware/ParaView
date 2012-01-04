@@ -36,12 +36,12 @@
 #include "vtkPGenericEnSightReader.h"
 
 #include "vtkIdTypeArray.h" // For ivars
-#include <vtkstd/map> // For ivars
-#include <vtkstd/string> // For ivars
-#include <vtkstd/algorithm> // For ivars
-#include <vtkstd/string> // For ivars
-#include <vtkstd/vector> // For ivars
-#include <vtkstd/map> // For ivars
+#include <map> // For ivars
+#include <string> // For ivars
+#include <algorithm> // For ivars
+#include <string> // For ivars
+#include <vector> // For ivars
+#include <map> // For ivars
 
 class vtkDataSet;
 class vtkIdList;
@@ -65,15 +65,15 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
 
   //----------------------------------------------------------------------------
   // PointIds and CellIds must be stored in a different way:
-  // vtkstd::vector in non distributed mode
-  // vtkstd::map in distributed mode
+  // std::vector in non distributed mode
+  // std::map in distributed mode
   // note: Ensight Ids are INTEGERS, not longs
   class vtkPEnSightReaderCellIds
   {
 
   public:
-    typedef vtkstd::map< int , int > IntIntMap;
-    typedef vtkstd::vector< int > IntVector;
+    typedef std::map< int , int > IntIntMap;
+    typedef std::vector< int > IntVector;
 
     vtkPEnSightReaderCellIds()
       {
@@ -210,7 +210,7 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
           }
         case SPARSE_MODE:
           {
-          vtkstd::map<int,int>::iterator it = this->cellMap->find(id);
+          std::map<int,int>::iterator it = this->cellMap->find(id);
           if( it == this->cellMap->end() )
             return -1;
           else
@@ -242,7 +242,7 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
           }
         case SPARSE_MODE:
           {
-          vtkstd::map<int,int>::iterator it = this->cellMap->find(id);
+          std::map<int,int>::iterator it = this->cellMap->find(id);
           if( it == this->cellMap->end() )
             this->cellNumberOfIds++;
 
@@ -851,7 +851,7 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
   int GhostLevels;
 
 //BTX
-  vtkstd::map<vtkstd::string, vtkstd::map<int, long> > FileOffsets;
+  std::map<std::string, std::map<int, long> > FileOffsets;
 //ETX
 
  private:

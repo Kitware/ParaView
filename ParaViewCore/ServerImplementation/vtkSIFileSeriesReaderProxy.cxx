@@ -24,7 +24,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include <assert.h>

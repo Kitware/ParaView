@@ -20,7 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-#include <vtkstd/map>
+#include <map>
 
 class vtkTileDisplayHelper::vtkInternals
 {
@@ -39,7 +39,7 @@ public:
     double PhysicalViewport[4];
     };
 
-  typedef vtkstd::map<void*, vtkTile> TilesMapType;
+  typedef std::map<void*, vtkTile> TilesMapType;
   TilesMapType LeftEyeTilesMap;
   TilesMapType RightEyeTilesMap;  
 

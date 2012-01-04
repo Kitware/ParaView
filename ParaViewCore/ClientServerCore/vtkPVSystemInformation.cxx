@@ -18,7 +18,7 @@
 #include "vtkClientServerStream.h"
 
 #include <vtksys/SystemInformation.hxx>
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 vtkStandardNewMacro(vtkPVSystemInformation);
 //----------------------------------------------------------------------------
@@ -206,7 +206,7 @@ void vtkPVSystemInformation::CopyToStream(vtkClientServerStream* stream)
   stream->Reset();
   *stream << vtkClientServerStream::Reply
           << static_cast<unsigned int>(this->SystemInformations.size());
-  vtkstd::for_each(this->SystemInformations.begin(),
+  std::for_each(this->SystemInformations.begin(),
     this->SystemInformations.end(),
     vtkPVSystemInformationSave(*stream));
   *stream << vtkClientServerStream::End;
@@ -224,7 +224,7 @@ void vtkPVSystemInformation::CopyFromStream(const vtkClientServerStream* stream)
     }
   this->SystemInformations.clear();
   this->SystemInformations.resize(count);
-  if (vtkstd::for_each(this->SystemInformations.begin(),
+  if (std::for_each(this->SystemInformations.begin(),
     this->SystemInformations.end(),
     vtkPVSystemInformationLoad(*stream, offset))==false)
     {

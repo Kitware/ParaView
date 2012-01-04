@@ -197,7 +197,7 @@ GaussianControlPoint::operator != (const GaussianControlPoint &obj) const
 //   
 // ****************************************************************************
 
-const vtkstd::string
+const std::string
 GaussianControlPoint::TypeName() const
 {
     return "GaussianControlPoint";
@@ -247,7 +247,7 @@ GaussianControlPoint::CopyAttributes(const AttributeGroup *atts)
 // ****************************************************************************
 
 AttributeSubject *
-GaussianControlPoint::CreateCompatible(const vtkstd::string &tname) const
+GaussianControlPoint::CreateCompatible(const std::string &tname) const
 {
     AttributeSubject *retval = 0;
     if(TypeName() == tname)
@@ -510,7 +510,7 @@ GaussianControlPoint::GetYBias() const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 GaussianControlPoint::GetFieldName(int index) const
 {
     switch (index)
@@ -568,7 +568,7 @@ GaussianControlPoint::GetFieldType(int index) const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 GaussianControlPoint::GetFieldTypeName(int index) const
 {
     switch (index)

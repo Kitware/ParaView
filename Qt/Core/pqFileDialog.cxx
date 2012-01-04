@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QShowEvent>
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 class pqFileComboBox : public QComboBox
@@ -1153,12 +1153,12 @@ bool pqFileDialog::selectFile(const QString& f)
 {
   // We don't use QFileInfo here since it messes the paths up if the client and
   // the server are heterogeneous systems.
-  vtkstd::string unix_path = f.toAscii().data();
+  std::string unix_path = f.toAscii().data();
   vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
 
-  vtkstd::string filename, dirname;
-  vtkstd::string::size_type slashPos = unix_path.rfind("/");
-  if (slashPos != vtkstd::string::npos)
+  std::string filename, dirname;
+  std::string::size_type slashPos = unix_path.rfind("/");
+  if (slashPos != std::string::npos)
     {
     filename = unix_path.substr(slashPos+1);
     dirname = unix_path.substr(0, slashPos);

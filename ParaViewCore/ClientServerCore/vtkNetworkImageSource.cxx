@@ -115,7 +115,7 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
 
   vtkSmartPointer<vtkImageReader2> reader;
   // determine type of reader to create.
-  vtkstd::string ext =
+  std::string ext =
     vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename));
   if (ext == ".bmp")
     {

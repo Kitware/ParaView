@@ -25,7 +25,7 @@
 #include "vtkTable.h"
 #include "vtkDataArray.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
 //-----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ void vtkAttributeDataReductionFilterReduce(vtkAttributeDataReductionFilter*,
 //-----------------------------------------------------------------------------
 static void vtkAttributeDataReductionFilterReduce(
   vtkDataSetAttributes* output,
-  vtkstd::vector<vtkDataSetAttributes*> inputs,
+  std::vector<vtkDataSetAttributes*> inputs,
   vtkAttributeDataReductionFilter* self)
 {
   int numInputs = static_cast<int>(inputs.size());
@@ -241,9 +241,9 @@ int vtkAttributeDataReductionFilter::RequestData(
   vtkTable* table0 = vtkTable::SafeDownCast(input0);
   vtkTable* tableOutput = vtkTable::SafeDownCast(output);
 
-  vtkstd::vector<vtkDataSetAttributes*> inputPDs;
-  vtkstd::vector<vtkDataSetAttributes*> inputCDs;
-  vtkstd::vector<vtkDataSetAttributes*> inputRDs;
+  std::vector<vtkDataSetAttributes*> inputPDs;
+  std::vector<vtkDataSetAttributes*> inputCDs;
+  std::vector<vtkDataSetAttributes*> inputRDs;
   vtkSmartPointer<vtkDataSetAttributes> outputPD, outputCD, outputRD;
 
   if (dsOutput && ds0)

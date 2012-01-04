@@ -18,8 +18,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTypeTraits.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
@@ -85,16 +85,16 @@ public:
     StartIndex(r.StartIndex), Invalid(r.Invalid), String(r.String) {}
 
   // Actual binary data in the stream.
-  typedef vtkstd::vector<unsigned char> DataType;
+  typedef std::vector<unsigned char> DataType;
   DataType Data;
 
   // Offset to each value stored in the stream.
-  typedef vtkstd::vector<DataType::difference_type> ValueOffsetsType;
+  typedef std::vector<DataType::difference_type> ValueOffsetsType;
   ValueOffsetsType ValueOffsets;
 
   // Index into ValueOffsets of the first value corresponding to each
   // message.
-  typedef vtkstd::vector<ValueOffsetsType::size_type> MessageIndexesType;
+  typedef std::vector<ValueOffsetsType::size_type> MessageIndexesType;
   MessageIndexesType MessageIndexes;
 
   // Hold references to vtkObjectBase instances stored in the stream.
@@ -102,9 +102,9 @@ public:
   // Register/UnRegister for objects stored in the stream because the
   // owner of this stream effectively owns those objects.  If no owner
   // is given, then the objects are not referenced.
-  struct ObjectsType: vtkstd::vector<vtkObjectBase*>
+  struct ObjectsType: std::vector<vtkObjectBase*>
   {
-    typedef vtkstd::vector<vtkObjectBase*> Superclass;
+    typedef std::vector<vtkObjectBase*> Superclass;
     ObjectsType(vtkObjectBase* owner): Owner(owner) {}
     ObjectsType(const ObjectsType& r, vtkObjectBase* owner): Superclass(r),
                                                              Owner(owner)
@@ -167,7 +167,7 @@ public:
   int Invalid;
 
   // Buffer for return value from StreamToString.
-  vtkstd::string String;
+  std::string String;
 
   // Access to protected members of vtkClientServerStream.
   static vtkClientServerStream& Write(vtkClientServerStream& css,

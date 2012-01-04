@@ -21,11 +21,11 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <set>
+#include <string>
 
 class vtkSMPVRepresentationProxy::vtkStringSet :
-  public vtkstd::set<vtkstd::string> {};
+  public std::set<std::string> {};
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
 //----------------------------------------------------------------------------

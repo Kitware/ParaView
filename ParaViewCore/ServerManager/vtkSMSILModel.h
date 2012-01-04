@@ -34,7 +34,7 @@
 #define __vtkSMSILModel_h
 
 #include "vtkSMObject.h"
-#include <vtkstd/set> // required for vtkset
+#include <set> // required for vtkset
 
 class vtkGraph;
 class vtkSMStringVectorProperty;
@@ -146,7 +146,7 @@ public:
   vtkIdType FindVertex(const char* name);
 
 //BTX 
-  void GetLeaves(vtkstd::set<vtkIdType>& leaves,
+  void GetLeaves(std::set<vtkIdType>& leaves,
     vtkIdType root, bool traverse_cross_edges);
 protected:
   vtkSMSILModel();

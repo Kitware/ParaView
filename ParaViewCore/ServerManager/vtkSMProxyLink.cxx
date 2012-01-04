@@ -23,9 +23,9 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMMessage.h"
 
-#include <vtkstd/list>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <list>
+#include <set>
+#include <string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
 
@@ -51,10 +51,10 @@ struct vtkSMProxyLinkInternals
     vtkCommand* Observer;
   };
 
-  typedef vtkstd::list<LinkedProxy> LinkedProxiesType;
+  typedef std::list<LinkedProxy> LinkedProxiesType;
   LinkedProxiesType LinkedProxies;
 
-  typedef vtkstd::set<vtkstd::string> ExceptionPropertiesType;
+  typedef std::set<std::string> ExceptionPropertiesType;
   ExceptionPropertiesType ExceptionProperties;
 };
 

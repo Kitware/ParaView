@@ -20,7 +20,7 @@
 #include <iostream>
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include <vtkstd/string>
+#include <string>
 using namespace std;
 
 int main( int argc, char *argv[] )
@@ -48,9 +48,9 @@ int main( int argc, char *argv[] )
   int ts = -1;
   for(; iter != adiosFile->Variables.end() ; iter++)
     {
-    vtkstd::string name = iter->second.Name;
+    std::string name = iter->second.Name;
     cout << name.c_str() << endl;
-    if(name.find("_50/") != vtkstd::string::npos)
+    if(name.find("_50/") != std::string::npos)
       {
       if(ts != 50)
         {
@@ -58,7 +58,7 @@ int main( int argc, char *argv[] )
         }
       ts = 50;
       }
-    else if(name.find("_100/") != vtkstd::string::npos)
+    else if(name.find("_100/") != std::string::npos)
       {
       if(ts != 100)
         {

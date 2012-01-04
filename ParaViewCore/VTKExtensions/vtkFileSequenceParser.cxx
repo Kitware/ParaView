@@ -18,8 +18,8 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <set>
+#include <string>
 
 vtkStandardNewMacro(vtkFileSequenceParser);
 //-----------------------------------------------------------------------------

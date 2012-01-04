@@ -40,7 +40,7 @@
 
 // Static members. These are returned from the As functions when there
 // is no data. It ensures that the references that are returned are safe.
-vtkstd::string         DataNode::bogusString;
+std::string         DataNode::bogusString;
 charVector          DataNode::bogusCharVector;
 unsignedCharVector  DataNode::bogusUnsignedCharVector;
 intVector           DataNode::bogusIntVector;
@@ -65,70 +65,70 @@ stringVector        DataNode::bogusStringVector;
 //   
 // ****************************************************************************
 
-DataNode::DataNode(const vtkstd::string &name) : Key(name)
+DataNode::DataNode(const std::string &name) : Key(name)
 {
     NodeType = INTERNAL_NODE;
     Length = 0;
     Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, char val) : Key(name)
+DataNode::DataNode(const std::string &name, char val) : Key(name)
 {
     NodeType = CHAR_NODE;
     Length = 0;
     Data = (void *)(new char(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, unsigned char val) : Key(name)
+DataNode::DataNode(const std::string &name, unsigned char val) : Key(name)
 {
     NodeType = UNSIGNED_CHAR_NODE;
     Length = 0;
     Data = (void *)(new unsigned char(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, int val) : Key(name)
+DataNode::DataNode(const std::string &name, int val) : Key(name)
 {
     NodeType = INT_NODE;
     Length = 0;
     Data = (void *)(new int(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, long val) : Key(name)
+DataNode::DataNode(const std::string &name, long val) : Key(name)
 {
     NodeType = LONG_NODE;
     Length = 0;
     Data = (void *)(new long(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, float val) : Key(name)
+DataNode::DataNode(const std::string &name, float val) : Key(name)
 {
     NodeType = FLOAT_NODE;
     Length = 0;
     Data = (void *)(new float(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, double val) : Key(name)
+DataNode::DataNode(const std::string &name, double val) : Key(name)
 {
     NodeType = DOUBLE_NODE;
     Length = 0;
     Data = (void *)(new double(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const vtkstd::string &val) : Key(name)
+DataNode::DataNode(const std::string &name, const std::string &val) : Key(name)
 {
     NodeType = STRING_NODE;
     Length = 0;
-    Data = (void *)(new vtkstd::string(val));
+    Data = (void *)(new std::string(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, bool val) : Key(name)
+DataNode::DataNode(const std::string &name, bool val) : Key(name)
 {
     NodeType = BOOL_NODE;
     Length = 0;
     Data = (void *)(new bool(val));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const char *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const char *vals, int len) : Key(name)
 {
     NodeType = CHAR_ARRAY_NODE;
     Length = len;
@@ -141,7 +141,7 @@ DataNode::DataNode(const vtkstd::string &name, const char *vals, int len) : Key(
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const unsigned char *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const unsigned char *vals, int len) : Key(name)
 {
     NodeType = UNSIGNED_CHAR_ARRAY_NODE;
     Length = len;
@@ -154,7 +154,7 @@ DataNode::DataNode(const vtkstd::string &name, const unsigned char *vals, int le
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const int *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const int *vals, int len) : Key(name)
 {
     NodeType = INT_ARRAY_NODE;
     Length = len;
@@ -167,7 +167,7 @@ DataNode::DataNode(const vtkstd::string &name, const int *vals, int len) : Key(n
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const long *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const long *vals, int len) : Key(name)
 {
     NodeType = LONG_ARRAY_NODE;
     Length = len;
@@ -180,7 +180,7 @@ DataNode::DataNode(const vtkstd::string &name, const long *vals, int len) : Key(
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const float *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const float *vals, int len) : Key(name)
 {
     NodeType = FLOAT_ARRAY_NODE;
     Length = len;
@@ -193,7 +193,7 @@ DataNode::DataNode(const vtkstd::string &name, const float *vals, int len) : Key
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const double *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const double *vals, int len) : Key(name)
 {
     NodeType = DOUBLE_ARRAY_NODE;
     Length = len;
@@ -206,13 +206,13 @@ DataNode::DataNode(const vtkstd::string &name, const double *vals, int len) : Ke
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const vtkstd::string *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const std::string *vals, int len) : Key(name)
 {
     NodeType = STRING_ARRAY_NODE;
     Length = len;
     if(len > 0)
     {
-        vtkstd::string *sptr = new vtkstd::string[len];
+        std::string *sptr = new std::string[len];
         Data = (void *)sptr;   
         for(int i = 0; i < len; ++i)
             sptr[i] = vals[i];
@@ -221,7 +221,7 @@ DataNode::DataNode(const vtkstd::string &name, const vtkstd::string *vals, int l
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const bool *vals, int len) : Key(name)
+DataNode::DataNode(const std::string &name, const bool *vals, int len) : Key(name)
 {
     NodeType = BOOL_ARRAY_NODE;
     Length = len;
@@ -234,49 +234,49 @@ DataNode::DataNode(const vtkstd::string &name, const bool *vals, int len) : Key(
         Data = 0;
 }
 
-DataNode::DataNode(const vtkstd::string &name, const charVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const charVector &vec) : Key(name)
 {
     NodeType = CHAR_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new charVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const unsignedCharVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const unsignedCharVector &vec) : Key(name)
 {
     NodeType = UNSIGNED_CHAR_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new unsignedCharVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const intVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const intVector &vec) : Key(name)
 {
     NodeType = INT_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new intVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const longVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const longVector &vec) : Key(name)
 {
     NodeType = LONG_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new longVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const floatVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const floatVector &vec) : Key(name)
 {
     NodeType = FLOAT_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new floatVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const doubleVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const doubleVector &vec) : Key(name)
 {
     NodeType = DOUBLE_VECTOR_NODE;
     Length = 0;
     Data = (void *)(new doubleVector(vec));
 }
 
-DataNode::DataNode(const vtkstd::string &name, const stringVector &vec) : Key(name)
+DataNode::DataNode(const std::string &name, const stringVector &vec) : Key(name)
 {
     NodeType = STRING_VECTOR_NODE;
     Length = 0;
@@ -389,7 +389,7 @@ DataNode::FreeData()
         break;
     case STRING_NODE:
         { // new scope
-            vtkstd::string *sptr = (vtkstd::string *)Data;
+            std::string *sptr = (std::string *)Data;
             delete sptr;
         }
         break;
@@ -437,7 +437,7 @@ DataNode::FreeData()
         break;
     case STRING_ARRAY_NODE:
         { // new scope
-            vtkstd::string *sptr = (vtkstd::string *)Data;
+            std::string *sptr = (std::string *)Data;
             delete [] sptr;
         }
         break;
@@ -548,11 +548,11 @@ DataNode::AsDouble() const
     return rv;
 }
 
-const vtkstd::string &
+const std::string &
 DataNode::AsString() const
 {
     if(NodeType == STRING_NODE && Data != 0)
-        return *((vtkstd::string *)Data);
+        return *((std::string *)Data);
     else
         return bogusString;
 }
@@ -599,10 +599,10 @@ DataNode::AsDoubleArray() const
     return (const double *)Data;
 }
 
-const vtkstd::string *
+const std::string *
 DataNode::AsStringArray() const
 {
-    return (const vtkstd::string *)Data;
+    return (const std::string *)Data;
 }
 
 const bool *
@@ -727,11 +727,11 @@ DataNode::SetDouble(double val)
 }
 
 void
-DataNode::SetString(const vtkstd::string &val)
+DataNode::SetString(const std::string &val)
 {
     FreeData();
     NodeType = STRING_NODE;
-    Data = (void *)(new vtkstd::string(val));
+    Data = (void *)(new std::string(val));
 }
 
 void
@@ -833,14 +833,14 @@ DataNode::SetDoubleArray(const double *vals, int len)
 }
 
 void
-DataNode::SetStringArray(const vtkstd::string *vals, int len)
+DataNode::SetStringArray(const std::string *vals, int len)
 {
     FreeData();
     NodeType = STRING_ARRAY_NODE;
     Length = len;
     if(len > 0)
     {
-        vtkstd::string *sptr = new vtkstd::string[len];
+        std::string *sptr = new std::string[len];
         Data = (void *)sptr;   
         for(int i = 0; i < len; ++i)
             sptr[i] = vals[i];
@@ -944,7 +944,7 @@ DataNode::SetStringVector(const stringVector &vec)
 // ****************************************************************************
 
 DataNode *
-DataNode::GetNode(const vtkstd::string &key, DataNode *parentNode)
+DataNode::GetNode(const std::string &key, DataNode *parentNode)
 {
     DataNode *searchNode, *intermediate, *retval = 0;
 
@@ -1124,7 +1124,7 @@ DataNode::RemoveNode(DataNode *node, bool deleteNode)
 // ****************************************************************************
 
 void
-DataNode::RemoveNode(const vtkstd::string &key, bool deleteNode)
+DataNode::RemoveNode(const std::string &key, bool deleteNode)
 {
     if(NodeType != INTERNAL_NODE)
         return;
@@ -1178,14 +1178,14 @@ DataNode::RemoveNode(const vtkstd::string &key, bool deleteNode)
 // Methods to get/set some of the private fields.
 //
 
-const vtkstd::string &
+const std::string &
 DataNode::GetKey() const
 {
     return Key;
 }
 
 void
-DataNode::SetKey(const vtkstd::string &k)
+DataNode::SetKey(const std::string &k)
 {
     Key = k;
 }

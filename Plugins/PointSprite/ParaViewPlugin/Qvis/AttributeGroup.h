@@ -37,9 +37,9 @@
 
 #ifndef ATTRIBUTEGROUP_H
 #define ATTRIBUTEGROUP_H
-#include <vtkstd/vector>
-#include <vtkstd/string>
-#include <vtkstd/exception>
+#include <vector>
+#include <string>
+#include <exception>
 #include <visitstream.h>
 #include <VisItException.h>
 
@@ -156,7 +156,7 @@ public:
     // Selects all of the attributes in the AttributeGroup
     virtual void SelectAll() = 0;
     void SelectField(int);
-    void SelectFields(const vtkstd::vector<int> &);
+    void SelectFields(const std::vector<int> &);
     void UnSelectAll();
 
     virtual bool CreateNode(DataNode *node, bool, bool);
@@ -171,11 +171,11 @@ public:
     virtual void InterpolateLinear(const AttributeGroup *atts1,
                                    const AttributeGroup *atts2, double f);
     virtual bool EqualTo(const AttributeGroup *atts) const;
-    virtual const vtkstd::string TypeName() const;
+    virtual const std::string TypeName() const;
 
-    virtual vtkstd::string GetFieldName(int index) const;
+    virtual std::string GetFieldName(int index) const;
     virtual FieldType   GetFieldType(int index) const;
-    virtual vtkstd::string GetFieldTypeName(int index) const;
+    virtual std::string GetFieldTypeName(int index) const;
     virtual bool        FieldsEqual(int index, const AttributeGroup*) const;
 
     static bool VersionLessThan(const char *configVersion, const char *version);
@@ -231,7 +231,7 @@ private:
         int  length;
     };
 
-    typedef vtkstd::vector<typeInfo> typeInfoVector;
+    typedef std::vector<typeInfo> typeInfoVector;
 
     // Support methods
     void CreateTypeMap(const char *formatString);
@@ -246,7 +246,7 @@ ostream& operator<<(ostream& os, const AttributeGroup&);
 
 // Some vector typedefs.
 #include <vectortypes.h>
-typedef vtkstd::vector<AttributeGroup *> AttributeGroupVector;
+typedef std::vector<AttributeGroup *> AttributeGroupVector;
 
 // An exception class
 class BadDeclareFormatString : public VisItException { };

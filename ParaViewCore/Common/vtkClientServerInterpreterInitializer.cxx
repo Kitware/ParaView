@@ -19,15 +19,15 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkClientServerInterpreterInitializer::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkWeakPointer<vtkClientServerInterpreter> >
+  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter> >
     VectorOfInterpreters;
   VectorOfInterpreters Interpreters;
-  typedef vtkstd::vector<
+  typedef std::vector<
     vtkClientServerInterpreterInitializer::InterpreterInitializationCallback>
     VectorOfCallbacks;
   VectorOfCallbacks Callbacks;

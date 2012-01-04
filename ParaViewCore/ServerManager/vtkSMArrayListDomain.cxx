@@ -28,9 +28,9 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <vector>
+#include <string>
 #include "vtksys/ios/sstream"
 #include "vtkStdString.h"
 
@@ -45,11 +45,11 @@ struct vtkSMArrayListDomainInformationKey
 
 struct vtkSMArrayListDomainInternals
 {
-  vtkstd::map<vtkStdString, int> PartialMap;
-  vtkstd::vector<int> DataTypes;
-  vtkstd::vector<int> FieldAssociation;
-  vtkstd::map<int,int> DomainAssociation;
-  vtkstd::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
+  std::map<vtkStdString, int> PartialMap;
+  std::vector<int> DataTypes;
+  std::vector<int> FieldAssociation;
+  std::map<int,int> DomainAssociation;
+  std::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
 
   void SetAssociations(int index, int field, int domain)
     {
@@ -130,7 +130,7 @@ int vtkSMArrayListDomain::RemoveString(const char* string)
   if (index != -1)
     {
     int cc=0;
-    vtkstd::vector<int>::iterator iter;
+    std::vector<int>::iterator iter;
     for (iter=this->ALDInternals->FieldAssociation.begin();
       iter != this->ALDInternals->FieldAssociation.end();
       iter++, cc++)
@@ -456,10 +456,10 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
     }
   else
     {
-    vtkstd::stringstream locations(key_locations);
-    vtkstd::stringstream names(key_names);
-    vtkstd::stringstream strategies(key_strategies);
-    vtkstd::string location, name, strategy, last_strategy;
+    std::stringstream locations(key_locations);
+    std::stringstream names(key_names);
+    std::stringstream strategies(key_strategies);
+    std::string location, name, strategy, last_strategy;
     int strat;
     // default value for the strategy
     last_strategy = "need_key";
@@ -524,7 +524,7 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
 
     while (dataTypeStream.good())
       {
-      vtkstd::string thisType;
+      std::string thisType;
       dataTypeStream >> thisType;
 
       if ( thisType=="VTK_VOID" )
@@ -708,7 +708,7 @@ unsigned int vtkSMArrayListDomain::AddInformationKey(const char* location, const
 //---------------------------------------------------------------------------
 unsigned int vtkSMArrayListDomain::RemoveInformationKey(const char* location, const char *name)
 {
-  vtkstd::vector<vtkSMArrayListDomainInformationKey>::iterator it
+  std::vector<vtkSMArrayListDomainInformationKey>::iterator it
     = this->ALDInternals->InformationKeys.begin();
   int index = 0;
   while(it != this->ALDInternals->InformationKeys.end())

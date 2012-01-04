@@ -62,9 +62,9 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiPieceDataSet.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <vector>
+#include <string>
 #include <assert.h>
 
 #define VTK_CREATE(type, name) \
@@ -477,8 +477,8 @@ namespace
       return;
       }
 
-    vtkstd::vector<vtkPolyData*> inputs;
-    vtkstd::vector<int> points_counts, cell_counts, verts_counts, polys_counts,
+    std::vector<vtkPolyData*> inputs;
+    std::vector<int> points_counts, cell_counts, verts_counts, polys_counts,
       lines_counts, strips_counts;
 
     polys_counts.resize(num_pieces); verts_counts.resize(num_pieces);
@@ -512,7 +512,7 @@ namespace
     appender->Delete();
     inputs.clear();
 
-    vtkstd::vector<int> points_offsets, verts_offsets, lines_offsets,
+    std::vector<int> points_offsets, verts_offsets, lines_offsets,
       polys_offsets, strips_offsets;
     polys_offsets.resize(num_pieces); verts_offsets.resize(num_pieces);
     lines_offsets.resize(num_pieces); strips_offsets.resize(num_pieces);
@@ -625,7 +625,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     totNumBlocks++;
     }
 
-  vtkstd::vector<unsigned char> non_null_leaves;
+  std::vector<unsigned char> non_null_leaves;
   non_null_leaves.reserve(totNumBlocks); //just an estimate.
 
   int numInputs = 0;
@@ -680,7 +680,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   iter.TakeReference(output->NewIterator());
   iter->VisitOnlyLeavesOff();
 
-  vtkstd::vector<vtkMultiPieceDataSet*> pieces_to_merge;
+  std::vector<vtkMultiPieceDataSet*> pieces_to_merge;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem())
     {
@@ -712,7 +712,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     // nothing special to do here.
     if (reduced_size != 0)
       {
-      vtkstd::vector<unsigned char>reduced_non_null_leaves;
+      std::vector<unsigned char>reduced_non_null_leaves;
       reduced_non_null_leaves.resize(reduced_size, 0);
       this->Controller->AllReduce(
         &non_null_leaves[0], &reduced_non_null_leaves[0],

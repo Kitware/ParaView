@@ -19,14 +19,14 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <assert.h>
 
 namespace
 {
   // ********* INT *************
-  vtkstd::vector<int>&
-    operator<< (vtkstd::vector<int>& values, const Variant& variant)
+  std::vector<int>&
+    operator<< (std::vector<int>& values, const Variant& variant)
       {
       int num_elems = variant.integer_size();
       values.resize(values.size() + num_elems);
@@ -37,10 +37,10 @@ namespace
       return values;
       }
 
-  Variant& operator << (Variant& variant, const vtkstd::vector<int> &values)
+  Variant& operator << (Variant& variant, const std::vector<int> &values)
     {
     variant.set_type(Variant::INT);
-    vtkstd::vector<int>::const_iterator iter;
+    std::vector<int>::const_iterator iter;
     for (iter = values.begin(); iter!= values.end(); ++iter)
       {
       variant.add_integer(*iter);
@@ -48,7 +48,7 @@ namespace
     return variant;
     }
 
-  bool operator << (vtkstd::vector<int>& values, const vtkClientServerStream& stream)
+  bool operator << (std::vector<int>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
     int argType = stream.GetArgumentType(0, 0);
@@ -95,8 +95,8 @@ namespace
     }
 
   // ********* DOUBLE *************
-  vtkstd::vector<double>&
-    operator<< (vtkstd::vector<double>& values, const Variant& variant)
+  std::vector<double>&
+    operator<< (std::vector<double>& values, const Variant& variant)
       {
       int num_elems = variant.float64_size();
       values.resize(values.size() + num_elems);
@@ -107,10 +107,10 @@ namespace
       return values;
       }
 
-  Variant& operator << (Variant& variant, const vtkstd::vector<double> &values)
+  Variant& operator << (Variant& variant, const std::vector<double> &values)
     {
     variant.set_type(Variant::FLOAT64);
-    vtkstd::vector<double>::const_iterator iter;
+    std::vector<double>::const_iterator iter;
     for (iter = values.begin(); iter!= values.end(); ++iter)
       {
       variant.add_float64(*iter);
@@ -118,7 +118,7 @@ namespace
     return variant;
     }
 
-  bool operator << (vtkstd::vector<double>& values, const vtkClientServerStream& stream)
+  bool operator << (std::vector<double>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
     int argType = stream.GetArgumentType(0, 0);
@@ -162,13 +162,13 @@ namespace
 
       values.resize(cur_size + length);
       delete [] fvalues;
-      vtkstd::copy(fvalues, fvalues + length, &values[cur_size]);
+      std::copy(fvalues, fvalues + length, &values[cur_size]);
       }
     return false;
     }
 
   // ********* vtkIdType *************
-  void OperatorIdType(vtkstd::vector<vtkIdType>& values, const Variant& variant)
+  void OperatorIdType(std::vector<vtkIdType>& values, const Variant& variant)
     {
     int num_elems = variant.idtype_size();
     values.resize(values.size() + num_elems);
@@ -177,17 +177,17 @@ namespace
       values[cc] = variant.idtype(cc);
       }
     }
-  void OperatorIdType(Variant& variant, const vtkstd::vector<vtkIdType> &values)
+  void OperatorIdType(Variant& variant, const std::vector<vtkIdType> &values)
     {
     variant.set_type(Variant::IDTYPE);
-    vtkstd::vector<vtkIdType>::const_iterator iter;
+    std::vector<vtkIdType>::const_iterator iter;
     for (iter = values.begin(); iter!= values.end(); ++iter)
       {
       variant.add_idtype(*iter);
       }
     }
 
-  bool OperatorIdType(vtkstd::vector<vtkIdType>& values, const vtkClientServerStream& stream)
+  bool OperatorIdType(std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
     int argType = stream.GetArgumentType(0, 0);
@@ -225,20 +225,20 @@ namespace
     }
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
-  vtkstd::vector<vtkIdType>&
-    operator<< (vtkstd::vector<vtkIdType>& values, const Variant& variant)
+  std::vector<vtkIdType>&
+    operator<< (std::vector<vtkIdType>& values, const Variant& variant)
       {
       OperatorIdType(values, variant);
       return values;
       }
 
-  Variant& operator << (Variant& variant, const vtkstd::vector<vtkIdType> &values)
+  Variant& operator << (Variant& variant, const std::vector<vtkIdType> &values)
     {
     OperatorIdType(variant, values);
     return variant;
     }
 
-  bool operator << (vtkstd::vector<vtkIdType>& values, const vtkClientServerStream& stream)
+  bool operator << (std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
     {
     return OperatorIdType(values, stream);
     }
@@ -285,7 +285,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
   this->SaveValueToCache(message, offset);
 
   const Variant *variant = &prop->value();
-  vtkstd::vector<T> values;
+  std::vector<T> values;
 
   AppendValues(values, *variant, force_idtype());
 
@@ -336,7 +336,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Pull(vtkSMMessage* message)
     return true;
     }
 
-  vtkstd::vector<T> values;
+  std::vector<T> values;
   AppendValues(values, res, force_idtype());
 
   // now add 'values' to the message.
@@ -441,7 +441,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::ReadXMLAttributes(
 
   if (number_of_elements > 0)
     {
-    vtkstd::vector<T> values;
+    std::vector<T> values;
     values.resize(number_of_elements);
     if (element->GetAttribute("default_values") &&
       strcmp("none", element->GetAttribute("default_values")) == 0 )

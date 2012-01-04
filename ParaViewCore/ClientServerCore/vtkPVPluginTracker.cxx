@@ -29,8 +29,8 @@
 #include "vtkPVXMLParser.h"
 
 #include <assert.h>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/String.hxx>
@@ -56,8 +56,8 @@ namespace
   class vtkItem
     {
   public:
-    vtkstd::string FileName;
-    vtkstd::string PluginName;
+    std::string FileName;
+    std::string PluginName;
     vtkPVPlugin* Plugin;
     bool AutoLoad;
     vtkItem()
@@ -67,20 +67,20 @@ namespace
       }
     };
 
-  vtkstd::string vtkLocatePlugin(const char* plugin, bool add_extensions)
+  std::string vtkLocatePlugin(const char* plugin, bool add_extensions)
     {
     // Make sure we can get the options before going further
     if(vtkProcessModule::GetProcessModule() == NULL)
       {
-      return vtkstd::string();
+      return std::string();
       }
 
     bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    vtkstd::string app_dir = options->GetApplicationPath();
+    std::string app_dir = options->GetApplicationPath();
     app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
 
-    vtkstd::vector<vtkstd::string> paths_to_search;
+    std::vector<std::string> paths_to_search;
     paths_to_search.push_back(app_dir);
     paths_to_search.push_back(app_dir + "/plugins/" + plugin);
 #if defined(__APPLE__)
@@ -90,8 +90,8 @@ namespace
     // On windows configuration files are in the parent directory
     paths_to_search.push_back(app_dir + "/../");
 
-    vtkstd::string name = plugin;
-    vtkstd::string filename = name;
+    std::string name = plugin;
+    std::string filename = name;
     if (add_extensions)
       {
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -104,7 +104,7 @@ namespace
       }
     for (size_t cc=0; cc < paths_to_search.size(); cc++)
       {
-      vtkstd::string path = paths_to_search[cc];
+      std::string path = paths_to_search[cc];
       if (vtksys::SystemTools::FileExists(
           (path + "/" + filename).c_str(), true))
         {
@@ -113,12 +113,12 @@ namespace
       vtkPVPluginTrackerDebugMacro(
         (path + "/" + filename).c_str() << "-- not found");
       }
-    return vtkstd::string();
+    return std::string();
     }
 
-  vtkstd::string vtkGetPluginNameFromFileName(const vtkstd::string& filename)
+  std::string vtkGetPluginNameFromFileName(const std::string& filename)
     {
-    vtkstd::string defaultname =
+    std::string defaultname =
       vtksys::SystemTools::GetFilenameWithoutExtension(filename);
     if (defaultname.size() > 3 &&
       VTKSTRNCASECMP(defaultname.c_str(), "lib", 3) == 0)
@@ -130,7 +130,7 @@ namespace
 }
 
 class vtkPVPluginTracker::vtkPluginsList :
-  public vtkstd::vector<vtkItem>
+  public std::vector<vtkItem>
 {
 public:
   iterator LocateUsingPluginName(const char* pluginname)
@@ -188,7 +188,7 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     // Locate ".plugins" file and process it.
     // This will setup the distributed-list of plugins. Also it will load any
     // auto-load plugins.
-    vtkstd::string _plugins = vtkLocatePlugin(".plugins", false);
+    std::string _plugins = vtkLocatePlugin(".plugins", false);
     if (!_plugins.empty())
       {
       mgr->LoadPluginConfigurationXML(_plugins.c_str());
@@ -275,7 +275,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
     vtkPVXMLElement* child = root->GetNestedElement(cc);
     if (child && child->GetName() && strcmp(child->GetName(), "Plugin") == 0)
       {
-      vtkstd::string name = child->GetAttributeOrEmpty("name");
+      std::string name = child->GetAttributeOrEmpty("name");
       int auto_load;
       if (name.empty() || !child->GetScalarAttribute("auto_load", &auto_load))
         {
@@ -285,7 +285,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         }
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: "
         << name.c_str());
-      vtkstd::string plugin_filename;
+      std::string plugin_filename;
       if (child->GetAttribute("filename") &&
         vtksys::SystemTools::FileExists(child->GetAttribute("filename"), true))
         {
@@ -332,7 +332,7 @@ unsigned int vtkPVPluginTracker::GetNumberOfPlugins()
 //----------------------------------------------------------------------------
 unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
 {
-  vtkstd::string defaultname = vtkGetPluginNameFromFileName(filename);
+  std::string defaultname = vtkGetPluginNameFromFileName(filename);
   vtkPluginsList::iterator iter =
     this->PluginsList->LocateUsingFileName(filename);
   if (iter == this->PluginsList->end())
@@ -408,8 +408,8 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
     dynamic_cast<vtkPVPythonPluginInterface*>(plugin);
   if (pythonplugin)
     {
-    vtkstd::vector<vtkstd::string> modules, sources;
-    vtkstd::vector<int> package_flags;
+    std::vector<std::string> modules, sources;
+    std::vector<int> package_flags;
     pythonplugin->GetPythonSourceList(modules, sources, package_flags);
     assert(modules.size() == sources.size() &&
       sources.size() == package_flags.size());

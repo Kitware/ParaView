@@ -114,8 +114,8 @@ EqualVal<T>::EqualVector(void *a1_, void *a2_)
 {
     if (a1_ == a2_)
        return true;
-    vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
-    vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
+    std::vector<T> &a1  = *(std::vector<T>*)a1_;
+    std::vector<T> &a2  = *(std::vector<T>*)a2_;
     int l1 = static_cast<int>(a1.size());
     int l2 = static_cast<int>(a2.size());
     if (l1 != l2)

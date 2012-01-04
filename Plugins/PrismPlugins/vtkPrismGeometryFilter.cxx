@@ -31,7 +31,7 @@ class vtkPrismGeometryFilter::MyInternal
 public:
   vtkGlyph3D *Glyph;
   vtkIdType TableId;
-  vtkstd::string AxisVarName[3];
+  std::string AxisVarName[3];
 
   MyInternal()
     {

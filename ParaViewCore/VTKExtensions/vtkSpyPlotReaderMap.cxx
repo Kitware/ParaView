@@ -14,7 +14,7 @@ namespace
     {
     number = 0;
 
-    vtkstd::string extension = 
+    std::string extension =
       vtksys::SystemTools::GetFilenameLastExtension(filename);
     // NOTE: GetFilenameWithoutLastExtension() returns the extension with "."
     // included.
@@ -73,7 +73,7 @@ bool vtkSpyPlotReaderMap::Load(vtkMultiProcessStream& stream)
   assert(magic_number == 12345);
   for (int cc=0; cc < size; cc++)
     {
-    vtkstd::string fname;
+    std::string fname;
     stream >> fname;
     this->Files[fname] = NULL;
     }
@@ -163,9 +163,9 @@ bool vtkSpyPlotReaderMap::InitializeFromSpyFile(const char* filename)
 
   // There's a possibility that this is a spy file series. Try to detect the
   // series.
-  vtkstd::string fileNoExt = 
+  std::string fileNoExt =
     vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
-  vtkstd::string filePath = 
+  std::string filePath =
     vtksys::SystemTools::GetFilenamePath(filename);
 
   // Now find all the files that make up the series that this file is part
@@ -251,7 +251,7 @@ bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
     return false;
     }
   
-  vtkstd::string line;
+  std::string line;
   if(!vtksys::SystemTools::GetLineFromStream(ifs,line)) // eat spycase line
     {
     vtkGenericWarningMacro("Syntax error in case file " << filename);
@@ -262,9 +262,9 @@ bool vtkSpyPlotReaderMap::InitializeFromCaseFile(const char* filename)
     {
     if(line.length()!=0)  // Skip blank lines
       {
-      vtkstd::string::size_type stp = line.find_first_not_of(" \n\t\r");
-      vtkstd::string::size_type etp = line.find_last_not_of(" \n\t\r");
-      vtkstd::string f(line, stp, etp-stp+1);
+      std::string::size_type stp = line.find_first_not_of(" \n\t\r");
+      std::string::size_type etp = line.find_last_not_of(" \n\t\r");
+      std::string f(line, stp, etp-stp+1);
       if(f[0]!='#') // skip comment
         {
         if(!vtksys::SystemTools::FileIsFullPath(f.c_str()))

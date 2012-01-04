@@ -119,7 +119,7 @@ int vtk1DTransferFunctionFilter::RequestData(vtkInformation* vtkNotUsed(request)
     }
 
   // set the name of the mapped array
-  vtkstd::ostringstream sstr;
+  std::ostringstream sstr;
   if(this->ConcatenateOutputNameWithInput)
     {
     sstr << inArray->GetName() << this->OutputArrayName;

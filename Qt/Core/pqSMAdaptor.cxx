@@ -1313,7 +1313,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
   else if(svp)
     {
     const char** cvalues = new const char*[num];
-    vtkstd::string *str_values= new vtkstd::string[num];
+    std::string *str_values= new std::string[num];
     for (int cc=0; cc < num; cc++)
       {
       str_values[cc] = Value[cc].toString().toAscii().data();

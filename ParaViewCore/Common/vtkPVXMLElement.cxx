@@ -20,8 +20,8 @@
 
 vtkStandardNewMacro(vtkPVXMLElement);
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -32,11 +32,11 @@ vtkStandardNewMacro(vtkPVXMLElement);
 
 struct vtkPVXMLElementInternals
 {
-  vtkstd::vector<vtkstd::string> AttributeNames;
-  vtkstd::vector<vtkstd::string> AttributeValues;
-  typedef vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> > VectorOfElements;
+  std::vector<std::string> AttributeNames;
+  std::vector<std::string> AttributeValues;
+  typedef std::vector<vtkSmartPointer<vtkPVXMLElement> > VectorOfElements;
   VectorOfElements NestedElements;
-  vtkstd::string CharacterData;
+  std::string CharacterData;
 };
 
 //----------------------------------------------------------------------------
@@ -192,7 +192,7 @@ void vtkPVXMLElement::RemoveAllNestedElements()
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::RemoveNestedElement(vtkPVXMLElement* element)
 {
-  vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> >::iterator iter
+  std::vector<vtkSmartPointer<vtkPVXMLElement> >::iterator iter
     = this->Internal->NestedElements.begin();
   for ( ; iter != this->Internal->NestedElements.end(); ++iter)
     {
@@ -733,8 +733,8 @@ bool vtkPVXMLElement::Equals(vtkPVXMLElement* other)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::RemoveAttribute(const char* name)
 {
-  vtkstd::vector<vtkstd::string>::iterator nameIterator = this->Internal->AttributeNames.begin();
-  vtkstd::vector<vtkstd::string>::iterator valueIterator = this->Internal->AttributeValues.begin();
+  std::vector<std::string>::iterator nameIterator = this->Internal->AttributeNames.begin();
+  std::vector<std::string>::iterator valueIterator = this->Internal->AttributeValues.begin();
   while(nameIterator != this->Internal->AttributeNames.end())
     {
     if(strcmp(nameIterator->c_str(), name) == 0)

@@ -34,7 +34,7 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/RegularExpression.hxx>
 
 static const int ExodusArrayTypeIndices[] = {
@@ -82,7 +82,7 @@ protected:
     vtkStdString name;
     int status;
   };
-  typedef vtkstd::vector<ObjectStatus> ObjectStatusList;
+  typedef std::vector<ObjectStatus> ObjectStatusList;
   ObjectStatusList ArrayStatuses[NumExodusArrayTypeIndices];
   ObjectStatusList ObjectStatuses[NumExodusObjectTypeIndices];
 };

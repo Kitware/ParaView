@@ -282,7 +282,7 @@ void pqCPExportStateWizard::updateImageFileNameExtension(
   const QString& fileExtension)
 {
   QString displayText = this->Internals->imageFileName->text();
-  vtkstd::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
+  std::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
     displayText.toLocal8Bit().constData());
 
   newFileName.append(".");

@@ -26,13 +26,13 @@
 #include "vtkTimerLog.h"
 
 #include <assert.h>
-#include <vtkstd/map>
+#include <map>
 
 
 class vtkPVView::vtkInternals
 {
 private:
-  typedef vtkstd::map<vtkPVSession*,
+  typedef std::map<vtkPVSession*,
     vtkWeakPointer<vtkPVSynchronizedRenderWindows> > MapOfSynchronizedWindows;
   static MapOfSynchronizedWindows SynchronizedWindows;
 public:

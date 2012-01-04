@@ -22,7 +22,7 @@
 #include "vtkVariantArray.h"
 #include "vtkDataArray.h"
 
-#include <vtkstd/set>
+#include <set>
 #include <vtksys/ios/sstream>
 
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
@@ -509,7 +509,7 @@ int vtkSciVizStatistics::RequestData(
 
 int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* inTable, vtkFieldData* dataAttrIn )
 {
-  vtkstd::set<vtkStdString>::iterator colIt;
+  std::set<vtkStdString>::iterator colIt;
   for ( colIt = this->P->Buffer.begin(); colIt != this->P->Buffer.end(); ++ colIt )
     {
     vtkAbstractArray* arr = dataAttrIn->GetAbstractArray( colIt->c_str() );
@@ -521,7 +521,7 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* inTable, vtkFieldData* 
         {
         // Create a column in the table for each component of non-scalar arrays requested.
         // FIXME: Should we add a "norm" column when arr is a vtkDataArray? It would make sense.
-        vtkstd::vector<vtkAbstractArray*> comps;
+        std::vector<vtkAbstractArray*> comps;
         int i;
         const char* compName;
         for ( i = 0; i < ncomp; ++ i )
@@ -551,7 +551,7 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* inTable, vtkFieldData* 
           }
         else if ( sarr )
           {
-          vtkstd::vector<vtkStringArray*> scomps;
+          std::vector<vtkStringArray*> scomps;
           for ( i = 0; i < ncomp; ++ i, ++vidx )
             {
             scomps[i] = vtkStringArray::SafeDownCast( comps[i] );
@@ -597,7 +597,7 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
 {
   // FIXME: this should eventually eliminate duplicate points as well as subsample...
   //        but will require the original ugrid/polydata/graph.
-  vtkstd::set<vtkIdType> trainRows;
+  std::set<vtkIdType> trainRows;
   vtkIdType N = fullDataTable->GetNumberOfRows();
   double frac = static_cast<double>( M ) / static_cast<double>( N );
   for ( vtkIdType i = 0; i < N; ++ i )
@@ -632,7 +632,7 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
   trainingTable->SetNumberOfRows( M );
   vtkVariantArray* row = vtkVariantArray::New();
   vtkIdType dstRow = 0;
-  for ( vtkstd::set<vtkIdType>::iterator it = trainRows.begin(); it != trainRows.end(); ++ it, ++ dstRow )
+  for ( std::set<vtkIdType>::iterator it = trainRows.begin(); it != trainRows.end(); ++ it, ++ dstRow )
     {
     fullDataTable->GetRow( *it, row );
     trainingTable->SetRow( dstRow, row );

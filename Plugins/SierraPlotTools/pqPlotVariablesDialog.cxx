@@ -166,7 +166,7 @@ public:
       }
   }
 
-  vtkstd::vector<RangeWidgetGroup *> rangeWidgetGroups;
+  std::vector<RangeWidgetGroup *> rangeWidgetGroups;
   QFrame * horizLine;
   QString varName;
 

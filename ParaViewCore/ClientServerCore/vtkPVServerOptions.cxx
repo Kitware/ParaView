@@ -47,8 +47,8 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
   int caveBounds = 0;
   for (int i = 0; atts[i] && atts[i + 1]; i += 2)
     {
-    vtkstd::string key = atts[i];
-    vtkstd::string value = atts[i + 1];
+    std::string key = atts[i];
+    std::string value = atts[i + 1];
     if(key == "Name")
       {
       info.Name = value;

@@ -30,8 +30,8 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 
-#include <vtkstd/string>
-using vtkstd::string;
+#include <string>
+using std::string;
 
 #include <mpi.h>
 

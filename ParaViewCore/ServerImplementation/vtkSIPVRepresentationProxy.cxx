@@ -25,8 +25,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkSISourceProxy.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 #include <assert.h>
 
@@ -36,10 +36,10 @@ public:
   struct vtkValue
     {
     vtkSmartPointer<vtkSIProxy> SubProxy;
-    vtkstd::string SubText;
+    std::string SubText;
     };
 
-  typedef vtkstd::map<vtkstd::string, vtkValue> RepresentationProxiesType;
+  typedef std::map<std::string, vtkValue> RepresentationProxiesType;
   RepresentationProxiesType RepresentationProxies;
 };
 

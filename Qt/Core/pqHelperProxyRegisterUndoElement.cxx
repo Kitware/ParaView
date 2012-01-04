@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QList>
 #include <QString>
-#include <vtkstd/vector>
+#include <vector>
 #include <assert.h>
 
 #include "pqApplicationCore.h"
@@ -70,7 +70,7 @@ struct HelperProxy
 struct pqHelperProxyRegisterUndoElement::vtkInternals
 {
   vtkTypeUInt32 ProxyGlobalID;
-  vtkstd::vector<HelperProxy> HelperList;
+  std::vector<HelperProxy> HelperList;
 };
 //*****************************************************************************
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
