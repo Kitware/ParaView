@@ -25,7 +25,7 @@ if(WIN32)
     URL_MD5 ${PYTHON_MD5}
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${python_build}
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/PythonPatches/pyproject.vsprops ${PythonPCBuildDir}
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/PythonPatches/pyproject.vsprops ${python_base}
     CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE ${python_BUILD_IN_SOURCE}
     BUILD_COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build ${python_configuration} /project select
