@@ -160,6 +160,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # Make
   "warning: jobserver unavailable"
 
+  # libtool
+  libtool: install: warning:
+
   # MPL
   "WARNING: Could not find .freetype2. headers in any"
 
