@@ -31,15 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqActiveObjects.h"
 
-#include "pqActiveView.h"
 #include "pqApplicationCore.h"
-#include "pqDataRepresentation.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
-#include "pqView.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
 
 #include <QDebug>
 
@@ -51,95 +48,228 @@ pqActiveObjects& pqActiveObjects::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqActiveObjects::pqActiveObjects()
+pqActiveObjects::pqActiveObjects() :
+  CachedServer(NULL),
+  CachedSource(NULL),
+  CachedPort(NULL),
+  CachedView(NULL),
+  CachedRepresentation(NULL),
+  VTKConnector(vtkEventQtSlotConnect::New())
 {
-  this->CachedSource = 0;
-  this->CachedView = 0;
-  this->CachedPort = 0;
-  this->CachedServer = 0;
-
-  pqActiveView* actView = &pqActiveView::instance();
-  QObject::connect(actView, SIGNAL(changed(pqView*)),
-    this, SLOT(activeViewChanged(pqView*)));
-
-  pqServerManagerSelectionModel *selection =
-      pqApplicationCore::instance()->getSelectionModel();
-  QObject::connect(selection, SIGNAL(currentChanged(pqServerManagerModelItem*)),
-    this, SLOT(onSelectionChanged()));
-  QObject::connect(selection,
-    SIGNAL(selectionChanged(
-        const pqServerManagerSelection&, const pqServerManagerSelection&)),
-    this, SLOT(onSelectionChanged()));
-
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
-    this, SLOT(onServerChanged()));
+    this, SLOT(serverAdded(pqServer*)));
   QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
-    this, SLOT(onServerChanged()));
+    this, SLOT(serverRemoved(pqServer*)));
+  QObject::connect(smmodel, SIGNAL(preItemRemoved(pqServerManagerModelItem*)),
+    this, SLOT(proxyRemoved(pqServerManagerModelItem*)));
 
   QObject::connect(this, SIGNAL(viewChanged(pqView*)),
     this, SLOT(updateRepresentation()));
   QObject::connect(this, SIGNAL(portChanged(pqOutputPort*)),
     this, SLOT(updateRepresentation()));
+
+  this->VTKConnector->Connect(vtkSMProxyManager::GetProxyManager(),
+                              vtkSMProxyManager::ActiveSessionChanged,
+                              this, SLOT(onActiveServerChanged()));
+
+  QList<pqServer*> servers = smmodel->findItems<pqServer*>();
+  if (servers.size() ==1)
+    {
+    this->setActiveServer(servers[0]);
+    }
 }
 
 //-----------------------------------------------------------------------------
 pqActiveObjects::~pqActiveObjects()
 {
-
+  this->VTKConnector->Delete();
+  this->VTKConnector = NULL;
 }
 
 //-----------------------------------------------------------------------------
-void pqActiveObjects::activeViewChanged(pqView* newView)
+void pqActiveObjects::resetActives()
 {
-  if (newView)
+  this->ActiveSource = NULL;
+  this->ActivePort = NULL;
+  this->ActiveView = NULL;
+  this->ActiveRepresentation = NULL;
+  this->Selection.clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::triggerSignals()
+{
+  if (this->signalsBlocked())
     {
-    QObject::connect(newView, SIGNAL(representationAdded(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
-    QObject::connect(newView, SIGNAL(representationRemoved(pqRepresentation*)),
-      this, SLOT(updateRepresentation()));
+    // don't update cached variables when signals are blocked.
+    return;
     }
-  if (this->CachedView != newView)
+
+  if (this->ActiveServer.data() != this->CachedServer)
     {
-    this->CachedView = newView;
-    emit this->viewChanged(newView);
+    this->CachedServer = this->ActiveServer.data();
+    emit this->serverChanged(this->ActiveServer);
+    }
+
+  if (this->ActivePort.data() != this->CachedPort)
+    {
+    this->CachedPort = this->ActivePort.data();
+    emit this->portChanged(this->ActivePort);
+    }
+
+  if (this->ActiveSource.data() != this->CachedSource)
+    {
+    this->CachedSource = this->ActiveSource.data();
+    emit this->sourceChanged(this->ActiveSource);
+    }
+
+  if (this->ActiveRepresentation.data() != this->CachedRepresentation)
+    {
+    this->CachedRepresentation = this->ActiveRepresentation.data();
+    emit this->representationChanged(this->ActiveRepresentation);
+    emit this->representationChanged(static_cast<pqRepresentation*>(
+        this->ActiveRepresentation.data()));
+    }
+
+  if (this->ActiveView.data() != this->CachedView)
+    {
+    this->CachedView = this->ActiveView.data();
+    emit this->viewChanged(this->ActiveView);
+    }
+
+  if (this->CachedSelection != this->Selection)
+    {
+    this->CachedSelection = this->Selection;
+    emit this->selectionChanged(this->Selection);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqActiveObjects::onServerChanged()
+void pqActiveObjects::serverAdded(pqServer* server)
 {
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqServer* server = smmodel->getNumberOfItems<pqServer*>() == 1?
-    smmodel->getItemAtIndex<pqServer*>(0) : NULL;
-  if (this->CachedServer != server)
+  if (this->activeServer() == NULL && server)
     {
-    this->CachedServer = server;
-    emit this->serverChanged(server);
+    this->setActiveServer(server);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqActiveObjects::onSelectionChanged()
+void pqActiveObjects::serverRemoved(pqServer* server)
 {
-  pqServerManagerModelItem *item = 0;
-  pqServerManagerSelectionModel *selection =
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection *selected = selection->selectedItems();
-  if(selected->size() == 1)
+  if (this->activeServer() == server)
     {
-    item = selected->first();
+    this->setActiveServer(NULL);
     }
-  else if(selected->size() > 1)
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::proxyRemoved(pqServerManagerModelItem* proxy)
+{
+  bool prev = this->blockSignals(true);
+
+  if (this->ActiveSource == proxy)
     {
-    item = selection->currentItem();
-    if(item && !selection->isSelected(item))
+    this->setActiveSource(NULL);
+    }
+  else if (this->ActivePort == proxy)
+    {
+    this->setActivePort(NULL);
+    }
+  else if (this->ActiveView == proxy)
+    {
+    this->setActiveView(NULL);
+    }
+
+  this->blockSignals(prev);
+  this->triggerSignals();
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::viewSelectionChanged()
+{
+  pqServer* server = this->activeServer();
+  if (!this->ActiveServer)
+    {
+    this->resetActives();
+    this->triggerSignals();
+    return;
+    }
+
+  if(server->activeViewSelectionModel() == NULL)
+    {
+    // This mean that the servermanager is currently updating itself and no
+    // selection manager is set yet...
+    return;
+    }
+
+  vtkSMProxy* selectedProxy = NULL;
+  vtkSMProxySelectionModel* viewSelection = server->activeViewSelectionModel();
+  if (viewSelection->GetNumberOfSelectedProxies() == 1)
+    {
+    selectedProxy = viewSelection->GetSelectedProxy(0);
+    }
+  else if (viewSelection->GetNumberOfSelectedProxies() > 1)
+    {
+    selectedProxy = viewSelection->GetCurrentProxy();
+    if (selectedProxy && !viewSelection->IsSelected(selectedProxy))
       {
-      item = 0;
+      selectedProxy = NULL;
       }
     }
+
+  pqView* view =
+    pqApplicationCore::instance()->getServerManagerModel()->findItem<pqView*>(
+      selectedProxy);
+
+  if (this->ActiveView)
+    {
+    QObject::disconnect(this->ActiveView, 0, this, 0);
+    }
+  if (view)
+    {
+    QObject::connect(view, SIGNAL(representationAdded(pqRepresentation*)),
+      this, SLOT(updateRepresentation()), Qt::UniqueConnection);
+    QObject::connect(view, SIGNAL(representationRemoved(pqRepresentation*)),
+      this, SLOT(updateRepresentation()), Qt::UniqueConnection);
+    }
+
+  this->ActiveView = view;
+
+  // if view changed, then the active representation may have changed as well.
+  this->updateRepresentation();
+  // updateRepresentation calls triggerSignals().
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::sourceSelectionChanged()
+{
+  pqServer* server = this->activeServer();
+  if (!this->ActiveServer)
+    {
+    this->resetActives();
+    this->triggerSignals();
+    return;
+    }
+
+  if(server->activeSourcesSelectionModel() == NULL)
+    {
+    // This mean that the servermanager is currently updating itself and no
+    // selection manager is set yet...
+    return;
+    }
+
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxySelectionModel* selModel = server->activeSourcesSelectionModel();
+
+  // setup the "ActiveSource" and "ActivePort" which depends on the
+  // "CurrentProxy".
+  vtkSMProxy* currentProxy = selModel->GetCurrentProxy();
+
+  pqServerManagerModelItem* item =
+    smmodel->findItem<pqServerManagerModelItem*>(currentProxy);
   pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
   pqPipelineSource *source = opPort? opPort->getSource() : 
     qobject_cast<pqPipelineSource*>(item);
@@ -148,74 +278,258 @@ void pqActiveObjects::onSelectionChanged()
     opPort = source->getOutputPort(0);
     }
 
-  bool port_changed =  (this->CachedPort != opPort);
-  bool source_changed = (this->CachedSource != source);
-
-  if (port_changed && this->CachedPort)
+  if (this->ActivePort)
     {
-    QObject::disconnect(this->CachedPort, 0, this, 0);
+    QObject::disconnect(this->ActivePort, 0, this, 0);
+    }
+  if (opPort)
+    {
+    QObject::connect(
+      opPort, SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation*)),
+      this, SLOT(updateRepresentation()));
+    }
+  this->ActiveSource = source;
+  this->ActivePort = opPort;
+
+  // Update the Selection.
+  this->Selection.copyFrom(selModel);
+
+  this->updateRepresentation();
+  // updateRepresentation calls triggerSignals().
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::onActiveServerChanged()
+{
+  vtkSMSession* activeSession = vtkSMProxyManager::GetProxyManager()->GetActiveSession();
+  if(activeSession == NULL)
+    {
+    return;
     }
 
-  this->CachedPort = opPort;
-  this->CachedSource = source;
+  pqServerManagerModel* smmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+  pqServer* newActiveServer = smmodel->findServer(activeSession);
 
-  if (port_changed)
+  if(newActiveServer)
     {
-    if (opPort)
-      {
-      QObject::connect(opPort,
-        SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation*)),
-        this, SLOT(updateRepresentation()));
-      }
-    emit this->portChanged(opPort);
+    this->setActiveServer(newActiveServer);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqActiveObjects::setActiveServer(pqServer* server)
+{
+  // Make sure the active server has the proper listener setup
+  // in case of collaboration the object initialisation can cause a server to
+  // become active before any selection model get setup
+  if ( this->ActiveServer == server &&
+       this->VTKConnector->GetNumberOfConnections() > 1)
+    {
+    return;
     }
 
-  if (source_changed)
+  bool prev = this->blockSignals(true);
+
+  this->VTKConnector->Disconnect();
+
+  // Need to connect it back to know if python is changing the active one
+  this->VTKConnector->Connect(vtkSMProxyManager::GetProxyManager(),
+                              vtkSMProxyManager::ActiveSessionChanged,
+                              this, SLOT(onActiveServerChanged()));
+
+  this->ActiveServer = server;
+
+  vtkSMProxyManager::GetProxyManager()->SetActiveSession(
+    server? server->session() : NULL);
+  if ( server
+       && server->activeSourcesSelectionModel()
+       && server->activeViewSelectionModel())
     {
-    emit this->sourceChanged(source);
+    this->VTKConnector->Connect(
+      server->activeSourcesSelectionModel(), vtkCommand::CurrentChangedEvent,
+      this, SLOT(sourceSelectionChanged()));
+    this->VTKConnector->Connect(
+      server->activeSourcesSelectionModel(), vtkCommand::SelectionChangedEvent,
+      this, SLOT(sourceSelectionChanged()));
+
+    this->VTKConnector->Connect(
+      server->activeViewSelectionModel(), vtkCommand::CurrentChangedEvent,
+      this, SLOT(viewSelectionChanged()));
+    this->VTKConnector->Connect(
+      server->activeViewSelectionModel(), vtkCommand::SelectionChangedEvent,
+      this, SLOT(viewSelectionChanged()));
     }
+
+  this->sourceSelectionChanged();
+  this->viewSelectionChanged();
+
+  this->blockSignals(prev);
+  this->triggerSignals();
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::setActiveView(pqView* view)
 {
-  pqActiveView::instance().setCurrent(view);
+  bool prev = this->blockSignals(true);
+
+  // ensure that the appropriate server is active.
+  if (view)
+    {
+    this->setActiveServer(view->getServer());
+    }
+
+  pqServer* server = this->activeServer();
+  if (server && server->activeViewSelectionModel())
+    {
+    server->activeViewSelectionModel()->SetCurrentProxy(
+      view? view->getProxy(): NULL,
+      vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+
+    // this triggers a call to viewSelectionChanged(); but in collaboration mode
+    // the ProxySelectionModel has been changed underneath therefore this
+    // current proxy call do not trigger anything as it is already set with
+    // the given value so we force our current class to update itself.
+    this->viewSelectionChanged();
+    }
+  else
+    {
+    // if there's no-active server, it implies that setActiveView() must be
+    // called with NULL. In that case, we cannot really clear the selection
+    // since we have no clue what's the active server. So nothing to do here.
+    }
+
+  this->blockSignals(prev);
+  this->triggerSignals();
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::setActiveSource(pqPipelineSource* source)
 {
-  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(source,
-    pqServerManagerSelectionModel::ClearAndSelect);
+  bool prev = this->blockSignals(true);
+
+  // ensure that the appropriate server is active.
+  if (source)
+    {
+    this->setActiveServer(source->getServer());
+    }
+
+  pqServer* server = this->activeServer();
+  if (server && server->activeSourcesSelectionModel())
+    {
+    server->activeSourcesSelectionModel()->SetCurrentProxy(
+      source? source->getProxy(): NULL,
+      vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+    // this triggers a call to sourceSelectionChanged();
+    }
+  else
+    {
+    // if there's no-active server, it implies that setActiveSource() must be
+    // called with NULL. In that case, we cannot really clear the selection
+    // since we have no clue what's the active server. So nothing to do here.
+    }
+
+  this->blockSignals(prev);
+  this->triggerSignals();
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::setActivePort(pqOutputPort* port)
 {
-  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(port,
-    pqServerManagerSelectionModel::ClearAndSelect);
+  bool prev = this->blockSignals(true);
+
+  // ensure that the appropriate server is active.
+  if (port)
+    {
+    this->setActiveServer(port->getServer());
+    }
+
+  pqServer* server = this->activeServer();
+  if (server)
+    {
+    server->activeSourcesSelectionModel()->SetCurrentProxy(
+      port? port->getOutputPortProxy(): NULL,
+      vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+    // this triggers a call to selectionChanged();
+    }
+  else
+    {
+    // if there's no-active server, it implies that setActivePort() must be
+    // called with NULL. In that case, we cannot really clear the selection
+    // since we have no clue what's the active server. So nothing to do here.
+    }
+
+  this->blockSignals(prev);
+  this->triggerSignals();
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveObjects::setSelection(
+  const pqProxySelection& selection_, pqServerManagerModelItem* current)
+{
+  pqProxy* current_proxy = qobject_cast<pqProxy*>(current);
+  pqOutputPort* current_port = qobject_cast<pqOutputPort*>(current);
+  pqServer* server = current_proxy? current_proxy->getServer() :
+    (current_port? current_port->getServer() : NULL);
+
+  // ascertain that all items in the selection have the same server.
+  foreach (pqServerManagerModelItem* item, selection_)
+    {
+    pqProxy* proxy = qobject_cast<pqProxy*>(item);
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+    pqServer* cur_server = proxy? proxy->getServer() :
+      (port? port->getServer() : qobject_cast<pqServer*>(item));
+    if (cur_server != NULL && cur_server != server)
+      {
+      if (server == NULL)
+        {
+        server = cur_server;
+        }
+      else
+        {
+        qCritical() <<
+          "Selections with heterogeneous servers are not supported.";
+        return;
+        }
+      }
+    }
+
+  bool prev = this->blockSignals(true);
+
+  // ensure that the appropriate server is active.
+  if (server)
+    {
+    this->setActiveServer(server);
+
+    selection_.copyTo(server->activeSourcesSelectionModel());
+    // this triggers a call to selectionChanged() if selection actually changed.
+
+    vtkSMProxy* proxy = current_proxy? current_proxy->getProxy() :
+      (current_port? current_port->getOutputPortProxy() : NULL);
+    server->activeSourcesSelectionModel()->SetCurrentProxy(proxy,
+      vtkSMProxySelectionModel::SELECT);
+    }
+  else
+    {
+    // if there's no-active server, it implies that setSelection() must be
+    // called with NULL. In that case, we cannot really clear the selection
+    // since we have no clue what's the active server. So nothing to do here.
+    }
+  this->blockSignals(prev);
+  this->triggerSignals();
 }
 
 //-----------------------------------------------------------------------------
 void pqActiveObjects::updateRepresentation()
 {
-  pqDataRepresentation* repr = 0;
-  if (this->activePort())
+  pqOutputPort* port = this->activePort();
+  if (port)
     {
-    repr = this->activePort()->getRepresentation(this->activeView());
+    this->ActiveRepresentation = port->getRepresentation(this->activeView());
     }
-  if (this->CachedRepresentation != repr)
+  else
     {
-    this->CachedRepresentation = repr;
-    emit this->representationChanged(repr);
-    emit this->representationChanged(static_cast<pqRepresentation*>(repr));
+    this->ActiveRepresentation = NULL;
     }
+  this->triggerSignals();
 }
-
-//-----------------------------------------------------------------------------
-void pqActiveObjects::setActiveServer(pqServer*)
-{
-  qDebug() << "pqActiveObjects::setActiveServer is not supported yet since "
-    " ParaView only support 1 server connection at a time.";
-}
-

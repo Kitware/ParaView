@@ -19,10 +19,10 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDomain.h"
-#include "vtkSMSession.h"
-#include "vtkSMUndoStackBuilder.h"
 #include "vtkSMComparativeAnimationCueUndoElement.h"
+#include "vtkSMDomain.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMUndoStackBuilder.h"
 
 //****************************************************************************
 //                         Internal classes
@@ -33,13 +33,11 @@ public:
   vtkInternal(vtkSMComparativeAnimationCueProxy* parent)
     {
     this->Parent = parent;
-    this->UndoStackBuilder = NULL;
     }
 
   ~vtkInternal()
     {
     this->Parent = NULL;
-    this->UndoStackBuilder = NULL;
     if(this->Observable)
       {
       this->Observable->RemoveObserver(this->CallbackID);
@@ -51,13 +49,11 @@ public:
                          void *vtkNotUsed(callData))
     {
     // Make sure an UndoStackBuilder is available
-    if(this->UndoStackBuilder == NULL)
+    vtkSMUndoStackBuilder* usb =
+      vtkSMProxyManager::GetProxyManager()->GetUndoStackBuilder();
+    if (usb == NULL)
       {
-      this->UndoStackBuilder = this->Parent->GetSession()->GetUndoStackBuilder();
-      if(this->UndoStackBuilder == NULL)
-        {
-        return;
-        }
+      return;
       }
 
     if(!this->Parent || !this->Parent->GetComparativeAnimationCue())
@@ -71,11 +67,11 @@ public:
     this->Parent->SaveXMLState(newState);
     elem->SetXMLStates(this->Parent->GetGlobalID(), this->LastKnownState, newState);
     elem->SetSession(this->Parent->GetSession());
-    if(this->UndoStackBuilder->Add(elem))
+    if (usb->Add(elem))
       {
       this->LastKnownState = vtkSmartPointer<vtkPVXMLElement>::New();
       newState->CopyTo(this->LastKnownState);
-      this->UndoStackBuilder->PushToStack();
+      usb->PushToStack();
       }
     elem->Delete();
     }
@@ -83,11 +79,11 @@ public:
   void AttachObserver(vtkObject* obj)
     {
     this->Observable = obj;
-    this->CallbackID = obj->AddObserver( vtkCommand::StateChangedEvent, this,
-                                         &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
+    this->CallbackID = obj->AddObserver(
+      vtkCommand::StateChangedEvent, this,
+      &vtkSMComparativeAnimationCueProxy::vtkInternal::CreateUndoElement);
     }
 
-  vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMComparativeAnimationCueProxy* Parent;
   vtkWeakPointer<vtkObject> Observable;
   vtkSmartPointer<vtkPVXMLElement> LastKnownState;
@@ -122,14 +118,6 @@ void vtkSMComparativeAnimationCueProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetCue()
-{
-  this->CreateVTKObjects();
-  return vtkPVComparativeAnimationCue::SafeDownCast(
-    this->GetClientSideObject());
-}
-
-//----------------------------------------------------------------------------
 vtkPVComparativeAnimationCue* vtkSMComparativeAnimationCueProxy::GetComparativeAnimationCue()
 {
   return vtkPVComparativeAnimationCue::SafeDownCast(this->GetClientSideObject());
@@ -156,44 +144,107 @@ int vtkSMComparativeAnimationCueProxy::LoadXMLState(
   return 1;
 }
 
+#define SAFE_FORWARD(method)\
+  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();\
+  if (cue == NULL) \
+    { vtkWarningMacro("Please call CreateVTKObjects() first."); return; }\
+  cue->method
+
+#define SAFE_FORWARD_AND_RETURN(method, retval)\
+  vtkPVComparativeAnimationCue* cue = this->GetComparativeAnimationCue();\
+  if (cue == NULL) \
+    { vtkWarningMacro("Please call CreateVTKObjects() first."); return retval; }\
+  return cue->method
+
 //----------------------------------------------------------------------------
-#ifdef FIXME_COLLABORATION
-
-int vtkSMComparativeAnimationCueProxy::RevertState(
-  vtkPVXMLElement* proxyElement, vtkSMProxyLocator* vtkNotUsed(locator))
+void vtkSMComparativeAnimationCueProxy::UpdateXRange(int y, double minx, double maxx)
 {
-  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
-    const char* name =  currentElement->GetName();
-    if (name && strcmp(name, "CueCommand") == 0)
-      {
-      vtkInternals::vtkCueCommand cmd;
-      if (cmd.FromXML(currentElement) == false)
-        {
-        vtkErrorMacro("Error when loading CueCommand.");
-        return 0;
-        }
-
-      int remove = 0;
-      int position = -1;
-      currentElement->GetScalarAttribute("remove", &remove);
-      currentElement->GetScalarAttribute("position", &position);
-      if (remove)
-        {
-        this->Internals->InsertCommand(cmd, position);
-        }
-      else
-        {
-        this->Internals->RemoveCommand(cmd);
-        }
-      }
-    }
-  this->Modified();
-  return 1;
+  SAFE_FORWARD(UpdateXRange)(y, minx, maxx);
+  this->MarkModified(this);
 }
-#endif
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateYRange(int x, double miny, double maxy)
+{
+  SAFE_FORWARD(UpdateYRange)(x, miny, maxy);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(double mint, double maxt)
+{
+  SAFE_FORWARD(UpdateWholeRange)(mint, maxt);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateValue(int x, int y, double value)
+{
+  SAFE_FORWARD(UpdateValue)(x, y, value);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateXRange(
+  int y, double *minx, double* maxx, unsigned int numvalues)
+{
+  SAFE_FORWARD(UpdateXRange)(y, minx, maxx, numvalues);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateYRange(
+  int x, double *minx, double* maxx, unsigned int numvalues)
+{
+  SAFE_FORWARD(UpdateYRange)(x, minx, maxx, numvalues);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
+  double *mint, double *maxt, unsigned int numValues)
+{
+  SAFE_FORWARD(UpdateWholeRange)(mint, maxt, numValues);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
+  double *mint, double *maxt, unsigned int numValues, bool vertical_first)
+{
+  SAFE_FORWARD(UpdateWholeRange)(mint, maxt, numValues, vertical_first);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateValue(
+  int x, int y, double *value, unsigned int numValues)
+{
+  SAFE_FORWARD(UpdateValue)(x, y, value, numValues);
+  this->MarkModified(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeAnimationCueProxy::UpdateAnimatedValue(
+  int x, int y, int dx, int dy)
+{
+  SAFE_FORWARD(UpdateAnimatedValue)(x, y, dx, dy);
+  // NOTE: this should not call MarkModified().
+}
+
+//----------------------------------------------------------------------------
+double* vtkSMComparativeAnimationCueProxy::GetValues(
+  int x, int y, int dx, int dy, unsigned int &numValues)
+{
+  SAFE_FORWARD_AND_RETURN(GetValues, NULL)(x, y, dx, dy, numValues);
+}
+
+//----------------------------------------------------------------------------
+double vtkSMComparativeAnimationCueProxy::GetValue(
+  int x, int y, int dx, int dy)
+{
+  SAFE_FORWARD_AND_RETURN(GetValue, 0)(x, y, dx, dy);
+}
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::PrintSelf(ostream& os, vtkIndent indent)

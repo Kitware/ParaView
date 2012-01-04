@@ -452,8 +452,9 @@ void vtkSMSILModel::UpdatePropertyValue(vtkSMStringVectorProperty* svp)
     values[2*cc] = this->GetName(*iter);
     values[2*cc+1] = check_states[this->GetCheckStatus(*iter)];
     }
-  svp->SetElements(
-    static_cast<unsigned int>(leaf_ids.size())*2, values);
+  svp->SetElements(values,
+                   static_cast<unsigned int>(leaf_ids.size())*2);
+
   delete[] values;
   this->BlockUpdate = false;
 }

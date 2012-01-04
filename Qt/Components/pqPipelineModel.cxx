@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelDataItem : public QObject
@@ -348,6 +349,7 @@ public:
 //-----------------------------------------------------------------------------
 void pqPipelineModel::constructor()
 {
+  this->FilterRoleSession = NULL;
   this->Internal = new pqPipelineModelInternal(this);
   this->Editable = true;
   this->View = NULL;
@@ -635,14 +637,17 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
   pqOutputPort* port = qobject_cast<pqOutputPort*>(item->Object);
   switch (role)
     {
+  case Qt::ToolTipRole:
+    if (source && source->getProxy()->HasAnnotation("tooltip"))
+      {
+      return QVariant(source->getProxy()->GetAnnotation("tooltip"));
+      }
   case Qt::DisplayRole:
     if (idx.column() == 1)
       {
       return QIcon(this->PixmapList[item->VisibilityIcon]);
       }
     // *** don't break.
-
-  case Qt::ToolTipRole:
   case Qt::EditRole:
     if (idx.column() == 0)
       {
@@ -682,6 +687,25 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         return qVariantFromValue<QFont>(this->Internal->ModifiedFont);
         }
       break;
+      }
+  case pqPipelineModel::AnnotationFilterRole:
+      {
+      if(!this->FilterRoleAnnotationKey.isEmpty() && source)
+        {
+        return QVariant(
+            source->getProxy()->HasAnnotation(
+                this->FilterRoleAnnotationKey.toAscii().data()));
+        }
+      return QVariant(true);
+      }
+  case pqPipelineModel::SessionFilterRole:
+      {
+      if(this->FilterRoleSession && server)
+        {
+        // We just want to make sure we are pointing to the same session
+        return ((void*)server->session() == (void*)this->FilterRoleSession);
+        }
+      return QVariant(true);
       }
 
     }
@@ -1228,6 +1252,13 @@ void pqPipelineModel::updateData(pqServerManagerModelItem* source)
       this->itemDataChanged(link);
       }
     }
+  else // source is null, so update everything
+    {
+    foreach(pqPipelineModelDataItem* child, this->Internal->Root.Children)
+      {
+      this->itemDataChanged(child);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1236,3 +1267,26 @@ void pqPipelineModel::setModifiedFont(const QFont& font)
   this->Internal->ModifiedFont = font;
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineModel::enableFilterAnnotationKey(const QString &expectedAnnotation)
+{
+  this->FilterRoleAnnotationKey = expectedAnnotation;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::disableFilterAnnotationKey()
+{
+  this->FilterRoleAnnotationKey.clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::enableFilterSession(vtkSession* session)
+{
+this->FilterRoleSession = session;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::disableFilterSession()
+{
+this->FilterRoleSession = NULL;
+}

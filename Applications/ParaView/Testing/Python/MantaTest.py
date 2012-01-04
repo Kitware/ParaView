@@ -43,25 +43,25 @@ QtTesting.playCommand(object12, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'menuSources')
 object13 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object13, 'activate', 'SphereSource')
-object14 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThetaResolution'
+object14 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ThetaResolution'
 QtTesting.playCommand(object14, 'key', '16777219')
 QtTesting.playCommand(object14, 'set_string', '20')
 QtTesting.playCommand(object14, 'set_string', '20')
-object15 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/StartTheta/LineEdit'
+object15 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/StartTheta/LineEdit'
 QtTesting.playCommand(object15, 'key', '16777217')
-object16 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/EndTheta/LineEdit'
+object16 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/EndTheta/LineEdit'
 QtTesting.playCommand(object16, 'key', '16777217')
-object17 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/PhiResolution'
+object17 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/PhiResolution'
 QtTesting.playCommand(object17, 'key', '16777217')
 QtTesting.playCommand(object17, 'set_string', '20')
 QtTesting.playCommand(object17, 'set_string', '20')
-object18 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object18 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object18, 'activate', '')
 
 #ascribe some data values to test color mapping
 object19 = 'pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Calculator'
 QtTesting.playCommand(object19, 'activate', '')
-object20 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Function'
+object20 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Function'
 QtTesting.playCommand(object20, 'set_string', 'coordsX')
 QtTesting.playCommand(object18, 'activate', '')
 
@@ -95,17 +95,17 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.419355,0.304348,1,0,0)')
 #test manta material in the middle view
 object37 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object37, 'set_string', 'Solid Color')
-object38 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar'
+object38 = 'pqClientMainWindow/1QTabBar1'
 QtTesting.playCommand(object38, 'set_tab', '1')
-object39 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_vcontainer/1QScrollBar0'
+object39 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_vcontainer/1QScrollBar0'
 QtTesting.playCommand(object39, 'mousePress', '1,1,0,8,40')
 QtTesting.playCommand(object39, 'mouseMove', '1,0,0,10,241')
 QtTesting.playCommand(object39, 'mouseRelease', '1,0,0,10,241')
-object40 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/MantaDisplay/material'
+object40 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/MantaDisplay/material'
 QtTesting.playCommand(object40, 'set_string', 'phong')
-object41 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/MantaDisplay/reflectance'
+object41 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/MantaDisplay/reflectance'
 QtTesting.playCommand(object41, 'set_double', '0.5')
-object42 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/MantaDisplay/eta'
+object42 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/MantaDisplay/eta'
 
 #make refresh all three views
 object1 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'

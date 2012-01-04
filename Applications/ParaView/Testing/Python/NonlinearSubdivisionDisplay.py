@@ -21,7 +21,7 @@ object6 = 'pqClientMainWindow/MainControlsToolbar/actionOpenData'
 QtTesting.playCommand(object6, 'activate', '')
 object7 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object7, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/quadraticTetra01.vtu')
-object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object8 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object8, 'activate', '')
 
 # Edit the color map to capture negative values that occur in the nonlinear interpolation.
@@ -41,15 +41,15 @@ QtTesting.playCommand(object8, 'activate', '')
 # Change to surface with edges rendering mode
 object15 = 'pqClientMainWindow/representationToolbar/displayRepresentation/comboBox'
 QtTesting.playCommand(object15, 'set_string', 'Surface With Edges')
-object16 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar'
+object16 = 'pqClientMainWindow/1QTabBar1'
 QtTesting.playCommand(object16, 'set_tab', '1')
 
 # Change subdivision and capture images.
-# object17 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_vcontainer/1QScrollBar0'
+# object17 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_vcontainer/1QScrollBar0'
 # QtTesting.playCommand(object17, 'mousePress', '1,1,0,9,64')
 # QtTesting.playCommand(object17, 'mouseMove', '1,0,0,7,175')
 # QtTesting.playCommand(object17, 'mouseRelease', '1,0,0,7,175')
-subdivisionWidget = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/NonlinearSubdivisionLevel'
+subdivisionWidget = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/NonlinearSubdivisionLevel'
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
 
 QtTesting.playCommand(subdivisionWidget, 'set_int', '0')

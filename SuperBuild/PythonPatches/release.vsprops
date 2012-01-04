@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+  ProjectType="Visual C++"
+  Version="8.00"
+  Name="release"
+  >
+  <Tool
+    Name="VCCLCompilerTool"
+    PreprocessorDefinitions="NDEBUG"
+    WarningLevel="0"
+  />
+  <UserMacro
+    Name="KillPythonExe"
+    Value="$(OutDir)\kill_python.exe"
+  /
+</VisualStudioPropertySheet>

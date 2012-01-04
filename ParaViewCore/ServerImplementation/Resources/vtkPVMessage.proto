@@ -40,12 +40,15 @@ message MessageCollection
   repeated Message item = 1;
 }
 
-// Generic message type ******************************************* [1-2 :> 10]
+// Generic message type ******************************************* [1-5 :> 10]
 
 message Message
 {
-  required uint64 global_id = 1;
-  required uint32 location  = 2;
+  required uint64 global_id  = 1;
+  required uint32 location   = 2;
+  optional bool   share_only = 3 [default = false];
+  optional bool   req_def    = 4 [default = false];
+  optional uint32 client_id  = 5 [default = 0];
 
   extensions 10 to max;
 }
@@ -63,7 +66,7 @@ message DefinitionHeader
   }
 }
 
-// Extension ProxyState *********************************************** [20-24]
+// Extension ProxyState *********************************************** [20-26]
 
 message ProxyState
 {
@@ -75,8 +78,14 @@ message ProxyState
 
   message SubProxy
     {
-    required string name = 1;
+    required string name      = 1;
     required uint32 global_id = 2;
+    }
+
+  message Annotation
+    {
+    required string key   = 1;
+    required string value = 2;
     }
 
   extend Message {
@@ -85,26 +94,30 @@ message ProxyState
     optional string   xml_sub_proxy_name  = 22;
     repeated Property property            = 23;
     repeated SubProxy subproxy            = 24;
+    repeated Annotation annotation        = 25;
+    optional bool       has_annotation    = 26 [default = false];
   }
 }
 
-// Extension ProxyManagerState ******************************************* [30]
+// Extension PXMState ************************************************* [30-32]
 
-message ProxyManagerState
+message PXMRegistrationState
 {
-  message ProxyRegistrationInfo
+  message Entry
     {
-    required string group     = 1;
+    optional string group     = 1;
     required string name      = 2;
     required uint64 global_id = 3;
     }
 
   extend Message {
-    repeated ProxyRegistrationInfo registered_proxy = 30;
+    repeated Entry registered_proxy           = 30;
+    repeated Entry registered_selection_model = 31;
+    repeated Entry registered_link            = 32;
   }
 }
 
-// Extension ProxyDefinitionState ************************************* [31-32]
+// Extension ProxyDefinitionState ************************************* [35-36]
 
 message ProxyDefinitionState
 {
@@ -116,8 +129,8 @@ message ProxyDefinitionState
     }
 
   extend Message {
-    repeated ProxyXMLDefinition xml_definition_proxy        = 31;
-    repeated ProxyXMLDefinition xml_custom_definition_proxy = 32;
+    repeated ProxyXMLDefinition xml_definition_proxy        = 35;
+    repeated ProxyXMLDefinition xml_custom_definition_proxy = 36;
   }
 }
 
@@ -129,6 +142,111 @@ message PullRequest {
   }
 }
 
+// Extension ProxySelectionModel State ******************************** [50-53]
 
+message ProxySelectionModelState {
+
+  extend Message {
+    optional uint32 current_proxy = 52 [default =  0];
+    optional int32  current_port  = 53 [default = -1];
+
+    repeated uint32 proxy = 50;
+    repeated int32  port  = 51;
+  }
+}
+
+// Extension Link State *********************************************** [60-64]
+
+message LinkState {
+
+  message LinkDescription
+    {
+    // Need to be in sync with the enum in vtkSMLink.h
+    enum Direction
+      {
+      NONE   = 0;
+      INPUT  = 1;
+      OUTPUT = 2;
+      }
+
+    required uint32 proxy         = 1;
+    optional string property_name = 2;
+    required Direction direction  = 3;
+    }
+
+  extend Message {
+    optional bool propagate_update         = 60 [default = true];
+    optional bool enabled                  = 61 [default = true];
+    optional bool sync_interactive_renders = 62 [default = true];
+    repeated LinkDescription link          = 63;
+    repeated string exception_property     = 64;
+  }
+}
+
+// Extension MousePointer Event *************************************** [70-73]
+
+message MousePointer {
+
+  enum Ratio {
+    BOTH   = 0;
+    HEIGHT = 1;
+    WIDTH  = 2;
+  }
+
+  extend Message {
+    required uint32 view      = 70;
+    optional double x         = 71 [default = 0];
+    optional double y         = 72 [default = 0];
+    optional bool   forceShow = 73 [default = false];
+    optional Ratio  ratioType = 74 [default = HEIGHT];
+  }
+}
+
+// Extension ChartViewBounds Event ************************************ [75-76]
+
+message ChartViewBounds {
+
+  extend Message {
+    required uint32 view  = 75;
+    repeated double range = 76;
+  }
+}
+
+// Extension ClientsInformation State ********************************* [80-85]
+
+message ClientsInformation {
+
+  message ClientInfo {
+    required uint32 user       = 1;
+    optional string name       = 2;
+    optional bool   is_master  = 3 [default = false];
+    optional bool   follow_cam = 4 [default = false];
+  }
+
+  extend Message {
+    repeated ClientInfo user = 80;
+  }
+}
+
+message ChatMessage {
+  extend Message {
+    required uint32 author = 84;
+    required string txt    = 85;
+  }
+}
+
+// Extension Qt Events ************************************************ [98-99]
+
+message QtEvent {
+  enum QtEventType {
+    CHAT                = 1;
+    CHART_BOUNDS        = 2;
+    OTHER               = 3;
+  }
+
+  extend Message {
+    required QtEventType type  = 98;
+  }
+}
 
 // End of Messages definitions ************************************************

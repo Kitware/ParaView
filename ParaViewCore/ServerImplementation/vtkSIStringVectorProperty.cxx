@@ -50,6 +50,9 @@ bool vtkSIStringVectorProperty::Push(vtkSMMessage* message, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
+  // Save to cache when pulled for collaboration
+  this->SaveValueToCache(message, offset);
+
   const Variant *variant = &prop->value();
   int num_elems = variant->txt_size();
   vtkVectorOfStrings values;
@@ -66,7 +69,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
 {
   if (!this->InformationOnly)
     {
-    return false;
+    return this->Superclass::Pull(message);
     }
 
   if (!this->GetCommand())

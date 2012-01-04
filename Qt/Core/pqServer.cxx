@@ -36,24 +36,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTimeKeeper.h"
+#include "pqView.h"
 #include "vtkClientServerStream.h"
-#include "vtkMapper.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkMapper.h"                 // Needed for VTK_RESOLVE_SHIFT_ZBUFFER
+#include "vtkNetworkAccessManager.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMViewProxy.h"
 #include "vtkToolkits.h"
 
 // Qt includes.
 #include <QColor>
+#include <QDir>
 #include <QCoreApplication>
 #include <QtDebug>
+#include <QStringList>
 #include <QTimer>
 
 class pqServer::pqInternals
@@ -64,6 +76,10 @@ public:
   // inactivity timeouts.
   QTimer HeartbeatTimer;
 
+  int IdleServerMessageCounter;
+
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
+  vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
@@ -99,6 +115,12 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
     this, SLOT(heartBeat()));
 
   this->setHeartBeatTimeout(pqServer::getHeartBeatTimeoutSetting());
+
+  // Setup idle Timer for collaboration in order to get server notification
+  this->IdleCollaborationTimer.setInterval(100);
+  this->IdleCollaborationTimer.setSingleShot(true);
+  QObject::connect(&this->IdleCollaborationTimer, SIGNAL(timeout()),
+                   this, SLOT(processServerNotification()));
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +147,30 @@ pqServer::~pqServer()
 //-----------------------------------------------------------------------------
 void pqServer::initialize()
 {
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
+  // Update ProxyManager based on its remote state
+  pxm->UpdateFromRemote();
+
+  // setup the active-view and active-sources selection models.
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveSources", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveSources = selmodel;
+
+  selmodel = pxm->GetSelectionModel("ActiveView");
+  if (selmodel == NULL)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveView", selmodel);
+    selmodel->FastDelete();
+    }
+  this->ActiveView = selmodel;
+
+
   // Setup the Connection TimeKeeper.
   // Currently, we are keeping seperate times per connection. Once we start
   // supporting multiple connections, we may want to the link the
@@ -132,27 +178,71 @@ void pqServer::initialize()
   this->createTimeKeeper();
 
   // Create the GlobalMapperPropertiesProxy.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
-  proxy->UpdateVTKObjects();
-  pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
+  vtkSMProxy* proxy = pxm->GetProxy("temp_prototypes", "GlobalMapperProperties");
+  if(proxy == NULL)
+    {
+    proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
+    proxy->UpdateVTKObjects();
+    pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
+    proxy->FastDelete();
+    }
   this->GlobalMapperPropertiesProxy = proxy;
-  proxy->Delete();
+  this->updateGlobalMapperProperties();
 
   // Create Strict Load Balancing Proxy
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  proxy = pxm->NewProxy("misc", "StrictLoadBalancing");
-  vtkSMPropertyHelper(proxy, "DisableExtentsTranslator").Set(
-    settings->value("strictLoadBalancing", false).toBool());
-  proxy->UpdateVTKObjects();
-  proxy->Delete();
+  proxy = pxm->GetProxy("temp_prototypes", "StrictLoadBalancing");
+  if (proxy == NULL)
+    {
+    proxy = pxm->NewProxy("misc", "StrictLoadBalancing");
+    vtkSMPropertyHelper(proxy, "DisableExtentsTranslator").Set(
+      settings->value("strictLoadBalancing", false).toBool());
+    proxy->UpdateVTKObjects();
 
-  this->updateGlobalMapperProperties();
+    pxm->RegisterProxy("temp_prototypes", "StrictLoadBalancing", proxy);
+    proxy->FastDelete();
+    }
+
+
+  // In case of Multi-clients connection, the client has to listen
+  // server notification so collaboration could happen
+  if(this->session()->IsMultiClients())
+    {
+    this->IdleCollaborationTimer.start();
+    vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
+    if(currentSession)
+      {
+      // Initialise the CollaborationManager to listen server notification
+      this->Internals->CollaborationCommunicator = currentSession->GetCollaborationManager();
+      this->Internals->VTKConnect->Connect(
+          currentSession->GetCollaborationManager(),
+          vtkCommand::AnyEvent,
+          this,
+          SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
+      }
+    }
+
+  // Force a proper active SessionProxyManager once this one is fully initialized
+  // after a collaborative update
+  if(vtkSMProxyManager::GetProxyManager()->GetActiveSession() == this->Session)
+    {
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession((vtkSMSession*)NULL);
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
+    }
 }
 
 //-----------------------------------------------------------------------------
 pqTimeKeeper* pqServer::getTimeKeeper() const
 {
+  if(!this->Internals->TimeKeeper)
+    {
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
+    vtkSMProxy* proxy = pxm->GetProxy("timekeeper", "TimeKeeper");
+    pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+    this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
+    }
+
   return this->Internals->TimeKeeper;
 }
 
@@ -161,19 +251,34 @@ vtkSMSession* pqServer::session() const
 {
   return this->Session.GetPointer();
 }
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeSourcesSelectionModel() const
+{
+  return this->ActiveSources;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxySelectionModel* pqServer::activeViewSelectionModel() const
+{
+  return this->ActiveView;
+}
+
 //-----------------------------------------------------------------------------
 void pqServer::createTimeKeeper()
 {
-  // Set Global Time keeper.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
-  proxy->UpdateVTKObjects();
-  pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
-  proxy->Delete();
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
+  // Set Global Time keeper if needed.
+  if(this->getTimeKeeper() == NULL)
+    {
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
+    vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
+    proxy->UpdateVTKObjects();
+    pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
+    proxy->FastDelete();
+    pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+    this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -199,6 +304,20 @@ int pqServer::getNumberOfPartitions()
 bool pqServer::isRemote() const
 {
   return this->Session->IsA("vtkSMSessionClient");
+}
+
+//-----------------------------------------------------------------------------
+bool pqServer::isMaster() const
+{
+  if(this->session()->IsMultiClients())
+    {
+    vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
+    if(currentSession)
+      {
+      return currentSession->GetCollaborationManager()->IsMaster();
+      }
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -487,7 +606,79 @@ void pqServer::updateGlobalMapperProperties()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxyManager* pqServer::proxyManager() const
+vtkSMSessionProxyManager* pqServer::proxyManager() const
 {
-  return vtkSMObject::GetProxyManager();
+  return this->Session->GetSessionProxyManager();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::processServerNotification()
+{
+  vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
+  if (sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
+    {
+    // process all server-notification events.
+    while (vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(1) == 1)
+      {
+      }
+    foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+      {
+      vtkSMViewProxy* viewProxy = view->getViewProxy();
+      if(viewProxy && viewProxy->HasDirtyRepresentation())
+        {
+        view->render();
+        }
+      }
+    }
+  this->IdleCollaborationTimer.start();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
+                                            unsigned long event_,
+                                            void* vtkNotUsed(method),
+                                            void* data)
+{
+  int userId;
+  QString userName;
+  switch(event_)
+    {
+    case vtkSMCollaborationManager::UpdateUserName:
+      userId = *reinterpret_cast<int*>(data);
+      userName = this->Internals->CollaborationCommunicator->GetUserLabel(userId);
+      emit triggeredUserName(userId, userName);
+      break;
+    case vtkSMCollaborationManager::UpdateUserList:
+      emit triggeredUserListChanged();
+      break;
+    case vtkSMCollaborationManager::UpdateMasterUser:
+      userId = *reinterpret_cast<int*>(data);
+      emit triggeredMasterUser(userId);
+      break;
+    case vtkSMCollaborationManager::FollowUserCamera:
+      userId = *reinterpret_cast<int*>(data);
+      emit triggerFollowCamera(userId);
+      break;
+    case vtkSMCollaborationManager::CollaborationNotification:
+      vtkSMMessage* msg = reinterpret_cast<vtkSMMessage*>(data);
+      emit sentFromOtherClient(this, msg);
+      break;
+    }
+}
+//-----------------------------------------------------------------------------
+void pqServer::sendToOtherClients(vtkSMMessage* msg)
+{
+  if(this->Internals->CollaborationCommunicator)
+    {
+    this->Internals->CollaborationCommunicator->SendToOtherClients(msg);
+    }
+}
+//-----------------------------------------------------------------------------
+bool pqServer::isProcessingPending() const
+{
+  // check with the network access manager if there are any messages to receive
+  // from the server.
+  bool retVal = vtkProcessModule::GetProcessModule()->
+    GetNetworkAccessManager()->GetNetworkEventsAvailable();
+  return retVal;
 }

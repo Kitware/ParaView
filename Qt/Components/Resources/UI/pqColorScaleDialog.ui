@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>604</width>
-    <height>477</height>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,178 +24,20 @@
        <string>Color Scale</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0" colspan="4">
-        <widget class="QVTKWidget" name="ColorScale" native="true">
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="whatsThis">
-          <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="ValueLabel">
-         <property name="text">
-          <string>Scalar Value</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="ScalarValue">
-         <property name="whatsThis">
-          <string>This displays the value for the current control point. It can also be used to change the value of the point.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="OpacityLabel">
-         <property name="text">
-          <string>Opacity</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLineEdit" name="Opacity">
-         <property name="whatsThis">
-          <string>This displays the opacity for the current control point. It can also be used to change the opacity of the point.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>168</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="pqColorChooserButton" name="NanColor">
-           <property name="toolTip">
-            <string>The color to use for not-a-number values.</string>
-           </property>
-           <property name="text">
-            <string>NaN Color</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="2">
-        <widget class="QLabel" name="ScaleLabel">
-         <property name="text">
-          <string>Scale</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3">
-        <widget class="QLineEdit" name="ScalarOpacityUnitDistance"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Color Space</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="ColorSpace">
-         <property name="whatsThis">
-          <string>Select the color space used for the color interpolation.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2" colspan="2">
-        <layout class="QHBoxLayout">
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="SaveButton">
-           <property name="whatsThis">
-            <string>Click this button to save the current color map as a preset.</string>
-           </property>
-           <property name="text">
-            <string>&amp;Save</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PresetButton">
-           <property name="whatsThis">
-            <string>Click this button to change the color map to a preset.</string>
-           </property>
-           <property name="text">
-            <string>Choose &amp;Preset</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QCheckBox" name="UseLogScale">
-         <property name="whatsThis">
-          <string>Check this option to use a logarithmic scale on the color map.</string>
-         </property>
-         <property name="text">
-          <string>Use Logarithmic Scale</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QCheckBox" name="UseAutoRescale">
-         <property name="whatsThis">
-          <string>Check this option to automatically rescale the color map to the current data range.</string>
-         </property>
-         <property name="text">
-          <string>Automatically Rescale to Fit Data Range</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Minimum:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="8" column="1">
         <widget class="QLabel" name="MinimumLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -211,14 +53,20 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="8" column="2">
         <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Maximum:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="3">
+       <item row="8" column="3">
         <widget class="QLabel" name="MaximumLabel">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -234,7 +82,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0" colspan="4">
+       <item row="9" column="0" colspan="4">
         <layout class="QHBoxLayout">
          <item>
           <spacer>
@@ -299,7 +147,7 @@
          </item>
         </layout>
        </item>
-       <item row="8" column="0" colspan="2">
+       <item row="11" column="0" colspan="2">
         <widget class="QCheckBox" name="UseDiscreteColors">
          <property name="whatsThis">
           <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
@@ -312,7 +160,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="3">
+       <item row="12" column="0" colspan="3">
         <layout class="QHBoxLayout">
          <item>
           <widget class="QLabel" name="TableSizeLabel">
@@ -358,18 +206,206 @@
          </item>
         </layout>
        </item>
-       <item row="10" column="0" colspan="4">
-        <spacer>
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="3" column="0" colspan="4">
+        <widget class="QFrame" name="frameOpacity">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeHint" stdset="0">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4">
+        <widget class="QFrame" name="frameColorTF">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
           <size>
-           <width>361</width>
-           <height>26</height>
+           <width>0</width>
+           <height>50</height>
           </size>
          </property>
-        </spacer>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="4">
+        <layout class="QHBoxLayout" name="colorTFLayout">
+         <item>
+          <widget class="QLabel" name="ValueLabel">
+           <property name="text">
+            <string>Color Scalar Value</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="ScalarValue">
+           <property name="whatsThis">
+            <string>This displays the value for the current control point. It can also be used to change the value of the point.</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="pqColorChooserButton" name="ScalarColor">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
+           </property>
+           <property name="text">
+            <string>Scalar Color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="pqColorChooserButton" name="NanColor">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
+           </property>
+           <property name="text">
+            <string>NaN Color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Color Space</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="ColorSpace">
+           <property name="whatsThis">
+            <string>Select the color space used for the color interpolation.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0" colspan="4">
+        <layout class="QHBoxLayout" name="opacityLayout">
+         <item>
+          <widget class="QLabel" name="labelOpacityScalar">
+           <property name="text">
+            <string>Opacity Scalar Value</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="opacityScalar"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="OpacityLabel">
+           <property name="text">
+            <string>Opacity</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Opacity">
+           <property name="whatsThis">
+            <string>This displays the opacity for the current control point. It can also be used to change the opacity of the point.</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="ScaleLabel">
+           <property name="text">
+            <string>Scale</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="ScalarOpacityUnitDistance"/>
+         </item>
+        </layout>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QCheckBox" name="UseAutoRescale">
+         <property name="whatsThis">
+          <string>Check this option to automatically rescale the color map to the current data range.</string>
+         </property>
+         <property name="text">
+          <string>Automatically Rescale to Fit Data Range</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="UseLogScale">
+         <property name="whatsThis">
+          <string>Check this option to use a logarithmic scale on the color map.</string>
+         </property>
+         <property name="text">
+          <string>Use Logarithmic Scale</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBoxImmediateRender">
+         <property name="text">
+          <string>Render View Immediately</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <layout class="QHBoxLayout">
+         <item>
+          <spacer>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="SaveButton">
+           <property name="whatsThis">
+            <string>Click this button to save the current color map as a preset.</string>
+           </property>
+           <property name="text">
+            <string>&amp;Save</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="PresetButton">
+           <property name="whatsThis">
+            <string>Click this button to change the color map to a preset.</string>
+           </property>
+           <property name="text">
+            <string>Choose &amp;Preset</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -864,7 +900,30 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <layout class="QHBoxLayout">
+     <item>
+      <widget class="QPushButton" name="pushButtonApply">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer>
        <property name="orientation">
@@ -901,24 +960,18 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>pqStandardColorButton</class>
    <extends>QToolButton</extends>
    <header>pqStandardColorButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>QVTKWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QToolButton</extends>
-   <header>pqColorChooserButton.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>PresetButton</tabstop>
-  <tabstop>UseLogScale</tabstop>
   <tabstop>UseAutoRescale</tabstop>
   <tabstop>RescaleButton</tabstop>
   <tabstop>RescaleToDataButton</tabstop>
@@ -927,10 +980,6 @@
   <tabstop>TableSizeText</tabstop>
   <tabstop>CloseButton</tabstop>
   <tabstop>ColorTabs</tabstop>
-  <tabstop>ScalarValue</tabstop>
-  <tabstop>Opacity</tabstop>
-  <tabstop>ScalarOpacityUnitDistance</tabstop>
-  <tabstop>ColorSpace</tabstop>
   <tabstop>SaveButton</tabstop>
   <tabstop>ShowColorLegend</tabstop>
   <tabstop>TitleName</tabstop>

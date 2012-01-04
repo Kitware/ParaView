@@ -112,20 +112,31 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(standard_lib=1)"
                         OUTPUT_VARIABLE PYTHON_LIBS_DIR
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
+        set(PYTHON_LIBS_DEST ${pv_runtime_dest})
       else(WIN32)
         get_filename_component(PYTHON_LIBS_DIR "${PYTHON_LIBRARY}" PATH)
         file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
 
         # install pyconfig.h
-        string(REGEX MATCH "python[0-9].[0-9]" py_inc_dir ${PYTHON_INCLUDE_DIR})
+        string(REGEX MATCH "python[0-9].[0-9]" py_ver_dir ${PYTHON_INCLUDE_DIR})
         install(FILES ${PYTHON_INCLUDE_DIR}/pyconfig.h
-                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_inc_dir}
+                DESTINATION ${PV_INSTALL_LIB_DIR}/include/${py_ver_dir}
+                PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
                 COMPONENT Runtime)
+        set(PYTHON_LIBS_DIR ${PYTHON_LIBS_DIR}/${py_ver_dir})
+        set(PYTHON_LIBS_DEST ${pv_runtime_dest}/lib)
+        
+        file(GLOB python_modules "${ParaView_BINARY_DIR}/bin/*Python.so")
+
+        install(FILES ${python_modules}
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)
+
       endif(WIN32)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
       install(DIRECTORY ${PYTHON_LIBS_DIR}
-              DESTINATION ${pv_runtime_dest}
+              DESTINATION ${PYTHON_LIBS_DEST}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime
               REGEX "lib2to3/" EXCLUDE
@@ -176,7 +187,8 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
         COMPONENT Runtime
         PATTERN "mpicc*" EXCLUDE
         PATTERN "mpicxx*" EXCLUDE
-        PATTERN "mpic++*" EXCLUDE)
+        PATTERN "mpic++*" EXCLUDE
+        PATTERN "python*" EXCLUDE)
     endif(PARAVIEW_INSTALL_MPIEXEC AND MPIEXEC)
   endif(PARAVIEW_USE_MPI)
 

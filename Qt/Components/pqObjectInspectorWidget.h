@@ -52,6 +52,7 @@ class QPushButton;
 class pqPipelineSource;
 class pqObjectPanel;
 class pqView;
+class pqOutputPort;
 class pqObjectPanelInterface;
 
 
@@ -108,6 +109,8 @@ public slots:
   /// sets the enabled state of the delete button.
   void updateDeleteButtonState();
 
+  void setOutputPort(pqOutputPort *port);
+
 signals:
   /// emitted before accept.
   void preaccept();
@@ -125,6 +128,7 @@ signals:
   void viewChanged(pqView*);
 
   void helpRequested(const QString& proxyType);
+  void helpRequested(const QString& groupname, const QString& proxyType);
 
   void canAccept();
 
@@ -157,11 +161,12 @@ private:
   QTimer AutoAcceptTimer;
   static bool AutoAccept;
   bool ShowOnAccept;
+  pqOutputPort *OutputPort;
   
   pqObjectPanel* CurrentPanel;
 
   // This keeps all the panels created. 
-  QMap<pqProxy*, pqObjectPanel*> PanelStore;
+  QMap<pqProxy*, QPointer<pqObjectPanel> > PanelStore;
 };
 
 #endif

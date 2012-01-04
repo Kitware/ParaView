@@ -11,10 +11,10 @@ mode = 'main/FileMode'
 connection = 'main/ConnectionMode'
 
 #objects in file dialog
-fdName = 'main/pqFileDialog/FileName'
-fdCancel = 'main/pqFileDialog/Cancel'
-fdOk = 'main/pqFileDialog/OK'
-fdFiles = 'main/pqFileDialog/Files'
+fdName = 'main/pqFileDialog/mainSplitter/widget/FileName'
+fdCancel = 'main/pqFileDialog/mainSplitter/widget/Cancel'
+fdOk = 'main/pqFileDialog/mainSplitter/widget/OK'
+fdFiles = 'main/pqFileDialog/mainSplitter/widget/Files'
 fdUp = 'main/pqFileDialog/NavigateUp'
 fdMsgOk = 'main/pqFileDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0'
 

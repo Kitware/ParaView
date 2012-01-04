@@ -224,6 +224,11 @@ protected:
   virtual void wheelEvent(QWheelEvent *e);
   //@}
 
+  /// \name Event Handlers
+  //@{
+  virtual bool event(QEvent *e);
+  //@}
+
   int horizontalOffset() const;
   int verticalOffset() const;
 

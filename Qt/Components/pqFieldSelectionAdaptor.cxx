@@ -50,10 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
                                  vtkSMProperty* prop)
-  : QObject(p), Property(prop), 
+  : QObject(p), Property(prop),
     MarkedForUpdate(false), IsGettingAllDomains(false)
 {
   this->Connection = vtkEventQtSlotConnect::New();
+
+  // resize selection to two strings
+  this->Selection.append("");
+  this->Selection.append("");
 
   if(p && pqSMAdaptor::getPropertyType(prop) == pqSMAdaptor::FIELD_SELECTION)
     {
@@ -95,37 +99,50 @@ pqFieldSelectionAdaptor::~pqFieldSelectionAdaptor()
   this->Connection->Delete();
 }
 
+void pqFieldSelectionAdaptor::setSelection(const QStringList &sel)
+{
+  if(sel.size() != 2)
+    {
+    return;
+    }
+
+  if(sel != this->Selection)
+    {
+    this->Selection = sel;
+    this->updateGUI();
+    emit this->selectionChanged();
+    }
+}
+
+QStringList pqFieldSelectionAdaptor::selection() const
+{
+  return this->Selection;
+}
 
 QString pqFieldSelectionAdaptor::attributeMode() const
 {
-  return this->AttributeMode;
+  return this->Selection[0];
 }
 
 QString pqFieldSelectionAdaptor::scalar() const
 {
-  return this->Scalar;
+  return this->Selection[1];
 }
 
 void pqFieldSelectionAdaptor::setAttributeMode(const QString& mode)
 {
-  this->setAttributeModeAndScalar(mode, this->Scalar);
+  this->setAttributeModeAndScalar(mode, this->scalar());
 }
 
 void pqFieldSelectionAdaptor::setScalar(const QString& sc)
 {
-  this->setAttributeModeAndScalar(this->AttributeMode, sc);
+  this->setAttributeModeAndScalar(this->attributeMode(), sc);
 }
 
 void pqFieldSelectionAdaptor::setAttributeModeAndScalar(
-         const QString& mode, const QString& sc)
+         const QString& m, const QString& s)
 {
-  if(mode != this->AttributeMode || sc != this->Scalar)
-    {
-    this->AttributeMode = mode;
-    this->Scalar = sc;
-    this->updateGUI();
-    emit this->selectionChanged();
-    }
+  this->setSelection(QStringList() << m << s);
 }
 
 void pqFieldSelectionAdaptor::updateGUI()
@@ -137,7 +154,7 @@ void pqFieldSelectionAdaptor::updateGUI()
     for (int i=0; i<num; i++)
       {
       QStringList array = combo->itemData(i).toStringList();
-      if (array[0] == this->AttributeMode && array[1] == this->Scalar)
+      if (array == this->Selection)
         {
         if(combo->currentIndex() != i)
           {
@@ -154,15 +171,7 @@ void pqFieldSelectionAdaptor::indexChanged(int index)
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
   if(combo)
     {
-    QStringList array = combo->itemData(index).toStringList();
-
-    // get attribute mode type
-    QString mode = array[0];
-    
-    // get scalar
-    QString sc = array[1];
-
-    this->setAttributeModeAndScalar(mode, sc);
+    this->setSelection(combo->itemData(index).toStringList());
     }
 }
 
@@ -196,16 +205,9 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     {
     return;
     }
-  
+
   QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
   QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
-
-
-  QVariant originalData;
-  if(combo->currentIndex() >= 0)
-    {
-    originalData = combo->itemData(combo->currentIndex());
-    }
 
   vtkSMArrayListDomain* ald = vtkSMArrayListDomain::SafeDownCast(
     this->Property->GetDomain("array_list"));
@@ -246,8 +248,7 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     QString arrayName = array.first;
     QStringList data;
     data << fld->GetEntryTextForValue(domain_association)
-         << arrayName
-         << (array.second? "1" : "0");
+         << arrayName;
     if (array.second)
       {
       arrayName += " (partial)";
@@ -261,7 +262,7 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
       {
       combo->addItem(arrayName, QVariant(data));
       }
-    if (QVariant(data) == originalData)
+    if (data == this->selection())
       {
       newIndex = array_idx;
       }

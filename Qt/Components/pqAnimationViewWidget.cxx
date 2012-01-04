@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QVBoxLayout>
 
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqAnimatablePropertiesComboBox.h"
 #include "pqAnimatableProxyComboBox.h"
 #include "pqAnimationCue.h"
@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSetName.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -200,7 +199,7 @@ public:
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)
     {
-    if(QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
+    if(cue && QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
       {
       return true;
       }
@@ -351,14 +350,17 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
                    SIGNAL(keyFrameTimeChanged(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)),
                    this, SLOT(setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)));
   
-  QObject::connect(&pqActiveView::instance(),
-    SIGNAL(changed(pqView*)),
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
   
-  QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
-    SIGNAL(currentChanged(pqServerManagerModelItem*)),
-    this, SLOT(setCurrentSelection(pqServerManagerModelItem*)));
-  
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
+    this, SLOT(setCurrentSelection(pqPipelineSource*)));
+
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
+    this, SLOT(onSceneCuesChanged()));
+
   QObject::connect(this->Internal->CreateSource,
     SIGNAL(currentProxyChanged(vtkSMProxy*)),
     this, SLOT(setCurrentProxy(vtkSMProxy*)));
@@ -452,6 +454,12 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::onSceneCuesChanged()
 {
+  if(!this->Internal->Scene)
+    {
+    // No scene, so do nothing
+    return;
+    }
+
   QSet<pqAnimationCue*> cues = this->Internal->Scene->getCues();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
@@ -462,6 +470,10 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   // add new tracks
   foreach(pqAnimationCue* cue, cues)
     {
+    if(cue == NULL)
+      {
+      continue;
+      }
     QString completeName = this->Internal->cueName(cue);
 
     iter = this->Internal->TrackMap.find(cue);
@@ -806,10 +818,9 @@ void pqAnimationViewWidget::setActiveView(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationViewWidget::setCurrentSelection(pqServerManagerModelItem* item)
+void pqAnimationViewWidget::setCurrentSelection(pqPipelineSource* pxy)
 {
-  pqProxy* pxy = qobject_cast<pqProxy*>(item);
-  if(pxy)
+  if (pxy)
     {
     int idx = this->Internal->CreateSource->findProxy(pxy->getProxy());
     if(idx != -1)

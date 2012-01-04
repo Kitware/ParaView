@@ -21,6 +21,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMMessage.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>
@@ -102,13 +103,22 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     }
 
   this->Modified();
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxyLink::RemoveAllLinks()
 {
   this->Internals->LinkedProxies.clear();
+  this->State->ClearExtension(LinkState::link);
   this->Modified();
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
 }
 
 //---------------------------------------------------------------------------
@@ -125,6 +135,10 @@ void vtkSMProxyLink::RemoveLinkedProxy(vtkSMProxy* proxy)
       break;
       }
     }
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
 }
 
 //---------------------------------------------------------------------------
@@ -173,6 +187,10 @@ int vtkSMProxyLink::GetLinkedProxyDirection(int index)
 void vtkSMProxyLink::AddException(const char* propertyname)
 {
   this->Internals->ExceptionProperties.insert(propertyname);
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
 }
 
 //---------------------------------------------------------------------------
@@ -184,6 +202,10 @@ void vtkSMProxyLink::RemoveException(const char* propertyname)
     {
     this->Internals->ExceptionProperties.erase(iter);
     }
+
+  // Update state and push it to share
+  this->UpdateState();
+  this->PushStateToSession();
 }
 
 //---------------------------------------------------------------------------
@@ -261,7 +283,7 @@ void vtkSMProxyLink::UpdateVTKObjects(vtkSMProxy* caller)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
+void vtkSMProxyLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
   root->SetName("ProxyLink");
@@ -283,7 +305,7 @@ void vtkSMProxyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyLink::LoadState(
+int vtkSMProxyLink::LoadXMLState(
   vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = linkElement->GetNumberOfNestedElements();
@@ -337,5 +359,87 @@ void vtkSMProxyLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//-----------------------------------------------------------------------------
+void vtkSMProxyLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *locator)
+{
+  this->Superclass::LoadState(msg, locator);
 
+  // Reset old state
+  this->Internals->LinkedProxies.clear();
+  this->Internals->ExceptionProperties.clear();
 
+  // Manage ProxyLinks
+  int numberOfLinks = msg->ExtensionSize(LinkState::link);
+  for(int i=0; i < numberOfLinks; i++)
+    {
+    const LinkState_LinkDescription* link = &msg->GetExtension(LinkState::link, i);
+    vtkSMProxy* proxy = locator->LocateProxy(link->proxy());
+
+    if(proxy)
+      {
+      switch(link->direction())
+        {
+        case LinkState_LinkDescription::NONE:
+          this->AddLinkedProxy(proxy, vtkSMLink::NONE);
+          break;
+        case LinkState_LinkDescription::INPUT:
+          this->AddLinkedProxy(proxy, vtkSMLink::INPUT);
+          break;
+        case LinkState_LinkDescription::OUTPUT:
+          this->AddLinkedProxy(proxy, vtkSMLink::OUTPUT);
+          break;
+        }
+      }
+    else
+      {
+      vtkDebugMacro("Proxy not found with ID: " << link->proxy());
+      }
+    }
+
+  // Manage property exclusion
+  int numberOfPropExclusion = msg->ExtensionSize(LinkState::exception_property);
+  for(int i=0; i < numberOfPropExclusion; i++)
+    {
+    this->AddException(msg->GetExtension(LinkState::exception_property, i).c_str());
+    }
+}
+//-----------------------------------------------------------------------------
+void vtkSMProxyLink::UpdateState()
+{
+  if(this->Session == NULL)
+    {
+    return;
+    }
+
+  this->State->ClearExtension(LinkState::link);
+  this->State->ClearExtension(LinkState::exception_property);
+
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(; iter != this->Internals->LinkedProxies.end(); ++iter)
+    {
+    LinkState_LinkDescription* link = this->State->AddExtension(LinkState::link);
+    link->set_proxy(iter->Proxy.GetPointer()->GetGlobalID());
+    switch(iter->UpdateDirection)
+      {
+      case vtkSMLink::NONE:
+        link->set_direction(LinkState_LinkDescription::NONE);
+        break;
+      case vtkSMLink::INPUT:
+        link->set_direction(LinkState_LinkDescription::INPUT);
+        break;
+      case vtkSMLink::OUTPUT:
+        link->set_direction(LinkState_LinkDescription::OUTPUT);
+        break;
+      default:
+        vtkErrorMacro("Invalid Link direction");
+        break;
+      }
+    }
+  vtkSMProxyLinkInternals::ExceptionPropertiesType::iterator exceptIter =
+      this->Internals->ExceptionProperties.begin();
+  for(; exceptIter != this->Internals->ExceptionProperties.end(); ++exceptIter)
+    {
+    this->State->AddExtension(LinkState::exception_property, exceptIter->c_str());
+    }
+}

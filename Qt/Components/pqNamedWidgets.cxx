@@ -380,12 +380,11 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         pqFieldSelectionAdaptor* adaptor = new
           pqFieldSelectionAdaptor(comboBox, SMProperty);
         adaptor->setObjectName("FieldSelectionAdaptor");
-        property_manager->registerLink(
-          adaptor, "attributeMode", SIGNAL(selectionChanged()),
-          proxy, SMProperty, 0);
-        property_manager->registerLink(
-          adaptor, "scalar", SIGNAL(selectionChanged()),
-          proxy, SMProperty, 1);
+        property_manager->registerLink(adaptor,
+                                       "selection",
+                                       SIGNAL(selectionChanged()),
+                                       proxy,
+                                       SMProperty);
         }
       }
     }
@@ -689,7 +688,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
 static void processHints(QGridLayout* panelLayout,
                          vtkSMProxy* smProxy,
                          QStringList& propertiesToHide,
-                         QStringList& propertiesToShow)
+                         QStringList& propertiesToShow,
+                         bool summaryOnly)
 {
   // Obtain the list of input ports, we don't show any widgets for input ports.
   QList<const char*> inputPortNames = 
@@ -704,6 +704,12 @@ static void processHints(QGridLayout* panelLayout,
   // etc etc.
   vtkPVXMLElement* hints = smProxy->GetHints();
   if (!hints)
+    {
+    return;
+    }
+
+  // check if we are only showing summary properties
+  if(summaryOnly && hints->FindNestedElementByName("ShowInSummaryPanel") == 0)
     {
     return;
     }
@@ -811,7 +817,7 @@ static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 }
 
 //-----------------------------------------------------------------------------
-void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
+void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bool summaryOnly)
 {
   bool row_streched = false; // when set, the extra setRowStretch() at the end
                              // is skipped
@@ -847,7 +853,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 
   QStringList propertiesToHide;
   QStringList propertiesToShow;
-  processHints(panelLayout, pxy, propertiesToHide, propertiesToShow);
+  processHints(panelLayout, pxy, propertiesToHide, propertiesToShow, summaryOnly);
 
   // Skip the filename property, unless the user has indicated that the filename
   // should be shown on the property panel.
@@ -890,13 +896,19 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       continue;
       }
 
+    vtkPVXMLElement *hints = SMProperty->GetHints();
+
+    // skip non-summary properties if summaryOnly is true
+    if(summaryOnly && (!hints || hints->FindNestedElementByName("ShowInSummaryPanel") == 0))
+      {
+      continue;
+      }
+
     // update domains we might ask for
     SMProperty->UpdateDependentDomains();
 
     pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
     QList<QString> domainsTypes = pqSMAdaptor::getDomainTypes(SMProperty);
-
-    vtkPVXMLElement *hints = SMProperty->GetHints();
 
     // skip input properties
     if(pt == pqSMAdaptor::PROXY || pt == pqSMAdaptor::PROXYLIST)
@@ -1403,7 +1415,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       }
     }
   iter->Delete();
-  if (!row_streched)
+  if (!row_streched && !summaryOnly)
     {
     panelLayout->setRowStretch(rowCount, 1);
     }

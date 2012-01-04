@@ -3,10 +3,10 @@
  <widget class="QDialog" name="pqColorPresetDialog" >
   <property name="geometry" >
    <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>394</width>
-    <height>243</height>
+     <x>0</x>
+     <y>0</y>
+     <width>463</width>
+     <height>373</height>
    </rect>
   </property>
   <property name="windowTitle" >

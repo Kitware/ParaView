@@ -23,13 +23,20 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 #include <vtkstd/map>
 
+// set this to 1 if you want to generate a log file with all the raw socket
+// communication.
+#define GENERATE_DEBUG_LOG 0
+
+#define MAX_SOCKETS 256
 
 class vtkTCPNetworkAccessManager::vtkInternals
 {
@@ -134,13 +141,26 @@ bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
   return false;
 }
 
-#define MAX_SOCKETS 256
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetNetworkEventsAvailable()
+{
+  return (this->ProcessEventsInternal(1, false) == 1);
+}
+
 //----------------------------------------------------------------------------
 int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
+{
+  return this->ProcessEventsInternal(timeout_msecs, true);
+}
+
+//----------------------------------------------------------------------------
+int vtkTCPNetworkAccessManager::ProcessEventsInternal(
+  unsigned long timeout_msecs, bool do_processing)
 {
   int sockets_to_select[MAX_SOCKETS];
   vtkObject* controller_or_server_socket[MAX_SOCKETS];
 
+  vtkSocketController* ctrlWithBufferToEmpty = NULL;
   int size=0;
   vtkInternals::VectorOfControllers::iterator iter1;
   for (iter1 = this->Internals->Controllers.begin();
@@ -159,9 +179,22 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       {
       sockets_to_select[size] = socket->GetSocketDescriptor();
       controller_or_server_socket[size] = controller;
+      if(comm->HasBufferredMessages())
+        {
+        ctrlWithBufferToEmpty = controller;
+        if (!do_processing)
+          {
+          // we do have events to process, but we were told not to process them,
+          // so just return and say we have something to process here.
+          return 1;
+          }
+        }
       size++;
       }
     }
+
+  // Only one client connected, so if it fails, just quit...
+  bool can_quit_if_error = (size == 1);
 
   // Now add server sockets.
   vtkInternals::MapToServerSockets::iterator iter2;
@@ -178,17 +211,30 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       }
     }
 
-  if (size == 0)
+  if (size == 0 || this->AbortPendingConnectionFlag)
     {
     return -1;
     }
 
+  // Try to empty RMI buffered messages if any
+  if(ctrlWithBufferToEmpty && (ctrlWithBufferToEmpty->ProcessRMIs(0,1) ==
+                               vtkMultiProcessController::RMI_NO_ERROR))
+    {
+    return 1;
+    }
+
   int selected_index = -1;
   int result = vtkSocket::SelectSockets(sockets_to_select, size,
-    timeout_msecs, &selected_index);
+                                        timeout_msecs, &selected_index);
   if (result <= 0)
     {
     return result;
+    }
+  if (result > 0 && !do_processing)
+    {
+    // we were told not to do any processing, so just let the caller know that
+    // we have events to process.
+    return 1;
     }
 
   if (controller_or_server_socket[selected_index]->IsA("vtkServerSocket"))
@@ -201,7 +247,10 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
     }
   else
     {
-    vtkMultiProcessController* controller =
+    // We use smart pointer here to make sure the controller will live
+    // during the whole ProcessRMIs call. As that call can release
+    // the controller while executing.
+    vtkSmartPointer<vtkMultiProcessController> controller =
       vtkMultiProcessController::SafeDownCast(
         controller_or_server_socket[selected_index]);
     result = controller->ProcessRMIs(0, 1);
@@ -211,12 +260,13 @@ int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)
       return 1;
       }
 
+    // Close cleanly the socket in error
     vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
-      controller->GetCommunicator());
-    cout << "GetIsConnected " << comm->GetIsConnected() << endl;
-    // Processing error or connection was closed.
-    // TODO: handle this.
-    return -1;
+        controller->GetCommunicator());
+    comm->CloseConnection();
+
+    return can_quit_if_error ? -1 /* Quit */ :
+                                1 /* Pretend it's OK */;
     }
 
   return 0;
@@ -254,6 +304,11 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   vtkSocketController* controller = vtkSocketController::New();
   vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
     controller->GetCommunicator());
+#if GENERATE_DEBUG_LOG
+  vtksys_ios::ostringstream mystr;
+  mystr << "/tmp/client."<< getpid() << ".log";
+  comm->LogToFile(mystr.str().c_str());
+#endif
   comm->SetSocket(cs);
   if (!comm->Handshake() ||
     !this->ParaViewHandshake(controller, false, handshake))

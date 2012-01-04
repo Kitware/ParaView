@@ -22,8 +22,8 @@
 
 #include "vtkSMViewProxy.h"
 
+class vtkAbstractContextItem;
 class vtkContextView;
-class vtkChart;
 class vtkImageData;
 class vtkRenderWindow;
 
@@ -34,14 +34,23 @@ public:
   vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Return the bounds of the chart
+  double* GetViewBounds();
+
+  // Description:
+  // Change the bounds of the current chart and change its behavior to be FIXED
+  // FIXME: We shouldn't have to change the behavior.
+  void SetViewBounds(double*);
+
 //BTX
   // Description:
   // Provides access to the vtk chart view.
-  vtkContextView* GetChartView();
+  vtkContextView* GetContextView();
 
   // Description:
   // Provides access to the vtk chart.
-  virtual vtkChart* GetChart();
+  virtual vtkAbstractContextItem* GetContextItem();
 //ETX
 
   // Description:

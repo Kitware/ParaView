@@ -91,6 +91,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     vtk/dataset_adapter
     servermanager
     __init__
+    collaboration
     numeric
     util
     variant

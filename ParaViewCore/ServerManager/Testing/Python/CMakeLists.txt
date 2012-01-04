@@ -91,12 +91,16 @@ SET(PY_TESTS_NO_BASELINE
   CellIntegrator
   CSVWriterReader
   IntegrateAttributes
-  Plugins
   ProgrammableFilter
   ProxyManager
   SMPropertyAdaptor
   VRMLSource
+  MultiServer
 )
+
+if(PARAVIEW_BUILD_PLUGIN_SurfaceLIC AND PARAVIEW_BUILD_PLUGIN_SLACTools)
+  list(APPEND PY_TESTS_NO_BASELINE Plugins)
+endif()
 
 include("TestNumPy.cmake")
 

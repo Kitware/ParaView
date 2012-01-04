@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
 
+#include "pqActiveObjects.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
@@ -67,16 +68,24 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->statisticsDock->hide();
   this->Internals->selectionInspectorDock->hide();
   this->Internals->comparativePanelDock->hide();
+  this->Internals->collaborationPanelDock->hide();
+  this->Internals->memoryInspectorDock->hide();
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 
+  this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->objectInspectorDock);
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->displayDock);
+  this->tabifyDockWidget(this->Internals->summaryDock, this->Internals->informationDock);
+  this->Internals->summaryDock->raise();
+
   // Enable automatic creation of representation on accept.
-  this->Internals->proxyTabWidget->setShowOnAccept(true);
+  this->Internals->objectInspector->setShowOnAccept(true);
 
   // Enable help for from the object inspector.
-  QObject::connect(this->Internals->proxyTabWidget->getObjectInspector(),
-    SIGNAL(helpRequested(QString)),
-    this, SLOT(showHelpForProxy(const QString&)));
+  QObject::connect(this->Internals->objectInspector,
+    SIGNAL(helpRequested(const QString&, const QString&)),
+    this, SLOT(showHelpForProxy(const QString&, const QString&)));
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
@@ -118,10 +127,9 @@ ParaViewMainWindow::~ParaViewMainWindow()
   delete this->Internals;
 }
 
-
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::showHelpForProxy(const QString& proxyname)
+void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
+  QString& proxyname)
 {
-  pqHelpReaction::showHelp(
-    QString("qthelp://paraview.org/paraview/%1.html").arg(proxyname));
+  pqHelpReaction::showProxyHelp(groupname, proxyname);
 }

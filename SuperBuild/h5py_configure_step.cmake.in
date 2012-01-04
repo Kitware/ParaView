@@ -8,6 +8,11 @@ include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake
 if(WIN32)
   file(TO_NATIVE_PATH "@HDF5_install@" hdf5_install)
   set(ENV{HDF5_DIR} "${hdf5_install}")
+  set(ENV{CL} "@pv_tpl_c_flags@")
+else()
+  set(ENV{CPPFLAGS} "@pv_tpl_cxx_flags@ @paraview_osx_flags@")
+  set(ENV{CXXFLAGS} "@pv_tpl_cxx_flags@ @paraview_osx_flags@")
+  set(ENV{CFLAGS} "@pv_tpl_c_flags@ @paraview_osx_flags@")
 endif()
 
 if(WIN32)

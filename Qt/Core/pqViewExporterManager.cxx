@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDocumentation.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkProcessModule.h"
 
@@ -88,7 +88,7 @@ void pqViewExporterManager::setView(pqView* view)
   // ensure the proxy-manager has instantiated the prototypes.
   if (this->View)
     {
-    this->View->getProxy()->GetProxyManager()->InstantiateGroupPrototypes("exporters");
+    this->View->proxyManager()->InstantiateGroupPrototypes("exporters");
     }
 
   bool can_export = false;
@@ -97,6 +97,7 @@ void pqViewExporterManager::setView(pqView* view)
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   iter->SetSkipPrototypes(false);
+  iter->SetSession(proxy->GetSession());
   for (iter->Begin("exporters_prototypes");
     !can_export && !iter->IsAtEnd(); iter->Next())
     {
@@ -126,6 +127,7 @@ QString pqViewExporterManager::getSupportedFileTypes() const
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   iter->SetSkipPrototypes(false);
+  iter->SetSession(proxy->GetSession());
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(
@@ -168,11 +170,13 @@ bool pqViewExporterManager::write(const QString& filename)
 
   vtkSMExporterProxy* exporter = 0;
   vtkSMViewProxy* proxy = vtkSMViewProxy::SafeDownCast(this->View->getProxy());
-  vtkSMProxyManager* pxm = proxy->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
 
   iter->SetModeToOneGroup();
   iter->SetSkipPrototypes(false);
+  iter->SetSession(proxy->GetSession());
+
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(

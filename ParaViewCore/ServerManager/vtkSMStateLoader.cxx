@@ -25,6 +25,7 @@
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 #include "vtkSMSession.h"
@@ -32,6 +33,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMStateLoader);
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
@@ -54,7 +56,6 @@ vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
   this->ServerManagerStateElement = 0;
-  this->Session = 0;
   this->ProxyLocator = vtkSMProxyLocator::New();
 }
 
@@ -64,22 +65,18 @@ vtkSMStateLoader::~vtkSMStateLoader()
   this->SetProxyLocator(0);
   this->ServerManagerStateElement = 0;
   this->ProxyLocator = 0;
-  if(this->Session)
-    {
-    this->Session->Delete();
-    this->Session = 0;
-    }
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
-                                           const char* xml_name)
+                                           const char* xml_name,
+                                           const char* subProxyName)
 {
   // Check if the proxy requested is a view module.
   if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
     {
-    return this->Superclass::CreateProxy( xml_group, xml_name);
+    return this->Superclass::CreateProxy( xml_group, xml_name, subProxyName);
     }
 
   //**************************************************************************
@@ -93,6 +90,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     {
     // If an animation scene already exists, we use that.
     vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+    iter->SetSession(this->Session);
     vtkSMProxy* scene = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
@@ -113,7 +111,8 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
     && strcmp(xml_name, "TimeKeeper") == 0)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    assert("Session should be valid" && this->Session);
+    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
     vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
@@ -126,11 +125,11 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
   //**************************************************************************
 
   // If all else fails, let the superclass handle it:
-  return this->Superclass::CreateProxy(xml_group, xml_name);
+  return this->Superclass::CreateProxy(xml_group, xml_name, subProxyName);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
+void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
   // Ensure that the proxy is created before it is registered, unless we are
   // reviving the server-side server manager, which needs special handling.
@@ -143,7 +142,7 @@ void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
+void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
 
   vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
@@ -164,7 +163,8 @@ void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
 void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   if (pxm->GetProxyName(group, proxy))
     {
     // Don't re-register a proxy in the same group.
@@ -174,7 +174,7 @@ void vtkSMStateLoader::RegisterProxyInternal(const char* group,
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(int id)
+vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(vtkTypeUInt32 id)
 {
   return this->LocateProxyElementInternal(
     this->ServerManagerStateElement, id);
@@ -182,14 +182,15 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(int id)
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
-  vtkPVXMLElement* root, int id)
+  vtkPVXMLElement* root, vtkTypeUInt32 id_)
 {
   if (!root)
     {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-      << id);
+      << id_);
     return 0;
     }
+  vtkIdType id = static_cast<vtkIdType>(id_);
 
   unsigned int numElems = root->GetNumberOfNestedElements();
   unsigned int i=0;
@@ -199,7 +200,7 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
     if (currentElement->GetName() &&
       strcmp(currentElement->GetName(), "Proxy") == 0)
       {
-      int currentId;
+      vtkIdType currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
         {
         continue;
@@ -314,14 +315,16 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 void vtkSMStateLoader::HandleCustomProxyDefinitions(
   vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   pm->LoadCustomProxyDefinitions(element);
 }
 
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -345,6 +348,7 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
     if (!mgr)
       {
       mgr = vtkSMGlobalPropertiesManager::New();
+      mgr->SetSession(this->GetSession());
       mgr->InitializeProperties(group.c_str(), type.c_str());
       pxm->SetGlobalPropertiesManager(mgrname, mgr);
       mgr->Delete();
@@ -360,7 +364,8 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -403,7 +408,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
       if (link)
         {
-        if (!link->LoadState(currentElement, this->ProxyLocator))
+        if (!link->LoadXMLState(currentElement, this->ProxyLocator))
           {
           return 0;
           }
@@ -456,7 +461,8 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
   // often override those that the timekeeper painstakingly computed. Here we
   // explicitly trigger the timekeeper so that the scene re-determines the
   // ranges, unless they are locked of course.
-  vtkSMProxy* timekeeper = vtkSMObject::GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
   if (timekeeper)
     {
     timekeeper->GetProperty("TimeRange")->Modified();

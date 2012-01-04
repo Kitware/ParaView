@@ -133,9 +133,15 @@ FUNCTION(build_paraview_client BPC_NAME)
         MACOSX_PACKAGE_LOCATION Resources
       )
       IF(QT_MAC_USE_COCOA)
-        GET_FILENAME_COMPONENT(qt_menu_nib
-          "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
-          REALPATH)
+        IF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+              GET_FILENAME_COMPONENT(qt_menu_nib
+                "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
+                REALPATH)
+        ELSE (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+          GET_FILENAME_COMPONENT(qt_menu_nib
+            "@QT_LIBRARY_DIR@/Resources/qt_menu.nib"
+            REALPATH)
+        ENDIF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
 
         set(qt_menu_nib_sources
           "${qt_menu_nib}/classes.nib"

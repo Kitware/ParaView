@@ -44,7 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt includes.
@@ -66,10 +69,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
+#include "pqServer.h"
+
+namespace
+{
+  vtkSMProxySelectionModel* getSelectionModel(vtkSMProxy* proxy)
+    {
+    vtkSMSessionProxyManager* pxm =
+      proxy->GetSession()->GetSessionProxyManager();
+    return pxm->GetSelectionModel("ActiveSources");
+    }
+}
 
 //-----------------------------------------------------------------------------
 class pq3DWidget::pqStandardWidgets : public pq3DWidgetInterface
@@ -127,9 +140,11 @@ public:
   pq3DWidgetInternal() :
     IgnorePropertyChange(false),
     WidgetVisible(true),
-    Selected(false)
+    Selected(false),
+    LastWidgetVisibilityGoal(true)
   {
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->IsMaster = pqApplicationCore::instance()->getActiveServer()->isMaster();
   }
     
   vtkSmartPointer<vtkSMProxy> ReferenceProxy;
@@ -150,6 +165,8 @@ public:
   pqPickHelper PickHelper;
   QKeySequence PickSequence;
   QPointer<QShortcut> PickShortcut;
+  bool IsMaster;
+  bool LastWidgetVisibilityGoal;
 };
 
 //-----------------------------------------------------------------------------
@@ -170,6 +187,10 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   QObject::connect(&this->Internal->PickHelper,
     SIGNAL(pickFinished(double, double, double)),
     this, SLOT(pick(double, double, double)));
+
+  QObject::connect( pqApplicationCore::instance(),
+                    SIGNAL(updateMasterEnableState(bool)),
+                    this, SLOT(updateMasterEnableState(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -245,13 +266,25 @@ void pq3DWidget::setView(pqView* pqview)
     return;
     }
 
+  // This test has been added to support proxy that have been created on
+  // different servers. We return if we switch from a view from a server
+  // to another view from another server.
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if ((widget && pqview &&
+       pqview->getProxy()->GetSession() != widget->GetSession())
+      ||
+      (rview && pqview &&
+       rview->getProxy()->GetSession() != pqview->getProxy()->GetSession()))
+    {
+    return;
+    }
+
   // get rid of old shortcut.
   delete this->Internal->PickShortcut;
 
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
-  vtkSMProxy* widget = this->getWidgetProxy();
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
@@ -530,7 +563,13 @@ void pq3DWidget::deselect()
 //-----------------------------------------------------------------------------
 void pq3DWidget::setWidgetVisible(bool visible)
 {
-  if(visible != this->Internal->WidgetVisible)
+  if(this->Internal->IsMaster)
+    {
+    this->Internal->LastWidgetVisibilityGoal = visible;
+    }
+
+  if( visible != this->Internal->WidgetVisible &&
+      ((!this->Internal->IsMaster && !visible) || this->Internal->IsMaster))
     {
     this->Internal->WidgetVisible = visible;
     this->updateWidgetVisibility();
@@ -656,8 +695,9 @@ void pq3DWidget::resetBounds()
   double input_bounds[6];
   if (this->UseSelectionDataBounds)
     {
-    if (!pqApplicationCore::instance()->getSelectionModel()->
-      getSelectionDataBounds(input_bounds))
+    vtkSMProxySelectionModel* selModel = getSelectionModel(widget);
+
+    if (!selModel->GetSelectionDataBounds(input_bounds))
       {
       return;
       }
@@ -669,4 +709,17 @@ void pq3DWidget::resetBounds()
   this->resetBounds(input_bounds);
   this->setModified();
   this->render();
+}
+//-----------------------------------------------------------------------------
+void pq3DWidget::updateMasterEnableState(bool I_am_the_Master)
+{
+  this->Internal->IsMaster = I_am_the_Master;
+  if(I_am_the_Master)
+    {
+    this->setWidgetVisible(this->Internal->LastWidgetVisibilityGoal);
+    }
+  else
+    {
+    this->hideWidget();
+    }
 }

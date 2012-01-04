@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QList>
 
+class pqApplyPropertiesManager;
 class pqAnimationManager;
 class pqPythonManager;
 class pqSelectionManager;
@@ -60,6 +61,9 @@ public:
   /// created then return NULL.
   static pqPVApplicationCore* instance()
     { return qobject_cast<pqPVApplicationCore*>(Superclass::instance()); }
+
+  /// Provides access to the apply properties manager.
+  pqApplyPropertiesManager* applyPropertiesManager() const;
 
   /// Provides access to the selection manager. Selection manager provides
   /// access to the ParaView wide data selection mechanism. This must not be
@@ -86,10 +90,14 @@ public:
 public slots:
   /// Pops-up the quick launch dialog.
   void quickLaunch();
+  /// Pops-up the search dialog if the focused widget is
+  /// QAsbstractItemView type.
+  void startSearch();
 
 protected:
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
+  QPointer<pqApplyPropertiesManager> ApplyPropertiesManger;
 
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget> > QuickLaunchMenus;

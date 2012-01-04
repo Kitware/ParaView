@@ -48,14 +48,6 @@ public:
   vtkGetStringMacro(Command);
 
   // Description:
-  // Advanced. If UpdateSelf is true, the property will be pushed
-  // by calling the method (Command) on the proxy instead of the
-  // VTK object. This is commonly used to implement more complicated
-  // functionality than can be obtained by calling a method on all
-  // server objects.
-  vtkGetMacro(UpdateSelf, bool);
-
-  // Description:
   // Is InformationOnly is set to true, this property is used to
   // get information from server instead of setting values.
   vtkGetMacro(InformationOnly, bool);
@@ -90,7 +82,7 @@ protected:
 
   // Description:
   // Pull the current state of the underneath implementation
-  virtual bool Pull(vtkSMMessage*) {return true; }
+  virtual bool Pull(vtkSMMessage*);
 
   // Description:
   // Parse the xml for the property.
@@ -107,16 +99,21 @@ protected:
 
   char* XMLName;
   char* Command;
-  bool UpdateSelf;
   bool InformationOnly;
   bool Repeatable;
   bool IsInternal;
 
   vtkWeakPointer<vtkSIProxy> SIProxyObject;
 
+  // Allow subclass to save the property value as a state part
+  void SaveValueToCache(vtkSMMessage* proxyStateUpdate, int offset);
+
 private:
   vtkSIProperty(const vtkSIProperty&); // Not implemented
   void operator=(const vtkSIProperty&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

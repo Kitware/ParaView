@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqReaction.h"
 
+#include "pqApplicationCore.h"
+#include "pqServer.h"
 //-----------------------------------------------------------------------------
 pqReaction::pqReaction(QAction* parentObject,Qt::ConnectionType type) : Superclass(parentObject)
 {
@@ -38,6 +40,13 @@ pqReaction::pqReaction(QAction* parentObject,Qt::ConnectionType type) : Supercla
 
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(onTriggered()),type);
+
+  // Deal with master/slave enable/disable
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateMasterEnableState(bool)));
+
+  this->IsMaster = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -45,4 +54,9 @@ pqReaction::~pqReaction()
 {
 }
 
-
+//-----------------------------------------------------------------------------
+void pqReaction::updateMasterEnableState(bool isMaster)
+{
+  this->IsMaster = isMaster;
+  updateEnableState();
+}

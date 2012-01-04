@@ -75,6 +75,12 @@ public:
   virtual int ProcessEvents(unsigned long timeout_msecs);
 
   // Description:
+  // Peeks to check if any activity is available. When this call returns true,
+  // ProcessEvents() will always result in some activity processing if called
+  // afterword.
+  virtual bool GetNetworkEventsAvailable();
+
+  // Description:
   // Returns true is the manager is currently waiting for any connections.
   virtual bool GetPendingConnectionsPresent();
 
@@ -82,6 +88,9 @@ public:
 protected:
   vtkTCPNetworkAccessManager();
   ~vtkTCPNetworkAccessManager();
+
+  // used by GetPendingConnectionsPresent and ProcessEvents
+  int ProcessEventsInternal(unsigned long timeout_msecs, bool do_processing);
 
   // Description:
   // Connects to remote processes.

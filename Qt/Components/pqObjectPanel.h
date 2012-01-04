@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqProxyPanel.h"
 
+#include <QPointer>
+
 class pqPropertyManager;
 
 /// Base class for Widget which provides an editor for editing properties
@@ -66,9 +68,7 @@ public slots:
   virtual void reset();
 
 protected:
-
-  pqProxy* ReferenceProxy;
-
+  QPointer<pqProxy> ReferenceProxy;
 };
 
 #endif

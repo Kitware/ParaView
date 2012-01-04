@@ -35,6 +35,13 @@ public:
   vtkTypeMacro(vtkSIProxy, vtkSIObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // This method is called before the deletion of the SIObject.
+  // Basically this is used to remove all dependency with other SIObject so after
+  // a first pass on all SIObject with a AboutToDelete() we can simply delete the
+  // remaining SIObjects.
+  virtual void AboutToDelete();
+
 //BTX
   // Description:
   // Push a new state to the underneath implementation
@@ -125,12 +132,14 @@ protected:
   vtkSetStringMacro(VTKClassName);
   vtkSetStringMacro(XMLGroup);
   vtkSetStringMacro(XMLName);
+  vtkSetStringMacro(XMLSubProxyName);
   vtkSetStringMacro(PostPush);
   vtkSetStringMacro(PostCreation);
 
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
+  char* XMLSubProxyName;
   char* PostPush;
   char* PostCreation;
 

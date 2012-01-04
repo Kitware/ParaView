@@ -33,6 +33,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
+  // Description:
   // Toggle the visibility of the original mesh.
   // If this->GetVisibility() is false, then this has no effect.
   void SetMeshVisibility(bool visible);
@@ -54,6 +62,13 @@ public:
   void SetOrientationMode(int val);
   void SetMasking(bool val);
   double* GetBounds();
+
+  //***************************************************************************
+  // Overridden to forward to the vtkGlyph3DMapper.
+  virtual void SetInterpolateScalarsBeforeMapping(int val);
+  virtual void SetLookupTable(vtkScalarsToColors* val);
+  virtual void SetMapScalars(int val);
+  virtual void SetStatic(int val);
 
 //BTX
 protected:
@@ -84,8 +99,16 @@ protected:
   virtual vtkPVLODActor* GetRenderedProp()
     { return this->GlyphActor; }
 
+  // Description:
+  // Overridden to ensure that the coloring decisions are passed over to the
+  // glyph mapper.
+  virtual void UpdateColoringParameters();
+
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
+  vtkPVUpdateSuppressor* GlyphUpdateSuppressor;
+  vtkPVUpdateSuppressor* LODGlyphUpdateSuppressor;
+
   vtkPVLODActor* GlyphActor;
   vtkQuadricClustering* GlyphDecimator;
   vtkUnstructuredDataDeliveryFilter* DataCollector;

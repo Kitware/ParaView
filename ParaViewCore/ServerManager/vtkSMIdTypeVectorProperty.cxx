@@ -62,7 +62,8 @@ void vtkSMIdTypeVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                         vtkSMProxyLocator*)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
@@ -170,6 +171,18 @@ int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values,
 }
 
 //---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values)
+{
+  return this->Internals->SetUncheckedElements(values);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIdTypeVectorProperty::SetUncheckedElements(const vtkIdType* values, unsigned int numValues)
+{
+  return this->Internals->SetUncheckedElements(values, numValues);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
                                                  vtkPVXMLElement* element)
 {
@@ -242,6 +255,12 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
     {
     this->Internals->Copy(dsrc->Internals);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIdTypeVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
 }
 
 //---------------------------------------------------------------------------

@@ -101,7 +101,7 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
   this->ContextView = chartView;
   if (this->Options)
     {
-    this->Options->SetChart(chartView->GetChart());
+    this->Options->SetChart(vtkChart::SafeDownCast(chartView->GetContextItem()));
     this->Options->SetTableVisibility(this->GetVisibility());
     }
   return true;
@@ -204,12 +204,15 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     this->Options->SetTable(this->GetLocalOutput());
     }
 
-  if (this->ContextView && this->ContextView->GetChart())
+  if (this->ContextView)
     {
-    vtkSelection* sel = vtkSelection::SafeDownCast(
-      this->SelectionDeliveryFilter->GetOutputDataObject(0));
-    this->AnnLink->SetCurrentSelection(sel);
-    this->ContextView->GetChart()->SetAnnotationLink(this->AnnLink);
+    if(vtkChart *chart = vtkChart::SafeDownCast(this->ContextView->GetContextItem()))
+      {
+      vtkSelection* sel = vtkSelection::SafeDownCast(
+        this->SelectionDeliveryFilter->GetOutputDataObject(0));
+      this->AnnLink->SetCurrentSelection(sel);
+      chart->SetAnnotationLink(this->AnnLink);
+      }
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);

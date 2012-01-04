@@ -848,6 +848,9 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
 {
   // For sending degenerate array values we need to know the type.
   // This assumes all images are the same type (of course).
+  if( !volume->GetCellData()->HasArray(this->ArrayName) )
+    return;
+
   vtkDataArray* da = volume->GetCellData()->GetArray(this->ArrayName);
   if (da)
     {

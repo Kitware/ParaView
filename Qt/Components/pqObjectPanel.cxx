@@ -57,14 +57,18 @@ pqProxy* pqObjectPanel::referenceProxy() const
 void pqObjectPanel::accept()
 {
   pqProxyPanel::accept();
-  this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+
+  if(this->ReferenceProxy)
+    {
+    this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqObjectPanel::reset()
 {
   pqProxyPanel::reset();
-  if (this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
+  if (this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
     {
     this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
     }
@@ -74,10 +78,9 @@ void pqObjectPanel::reset()
 void pqObjectPanel::setModified()
 {
   // don't change from UNINITIALIZED to MODIFIED
-  pqProxy* refProxy = this->referenceProxy();
-  if(refProxy->modifiedState() != pqProxy::UNINITIALIZED)
+  if(this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
     {
-    refProxy->setModifiedState(pqProxy::MODIFIED);
+    this->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
     pqProxyPanel::setModified();
     }
 }

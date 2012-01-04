@@ -48,8 +48,11 @@ class pqScalarsToColors;
 class QHideEvent;
 class QShowEvent;
 class QString;
-class vtkTransferFunctionViewer;
-
+class pqTransferFunctionChartViewWidget;
+class vtkPlot;
+class vtkObject;
+class vtkColorTransferFunction;
+class vtkPiecewiseFunction;
 
 class PQCOMPONENTS_EXPORT pqColorScaleEditor : public QDialog
 {
@@ -67,24 +70,25 @@ protected:
   virtual void hideEvent(QHideEvent *e);
 
 private slots:
-  /// \name Color Scale Methods
-  //@{
-  void handleEditorPointMoved();
-  void handleEditorPointMoveFinished();
-  void handleEditorAddOrDelete();
-  void setColors();
-  void changeCurrentColor();
+  void updateColors();
+  void updateOpacity();
 
-  void handlePointsChanged();
+  void handleOpacityPointsChanged();
+  void handleColorPointsChanged();
 
-  void handleEditorCurrentChanged();
-  void setCurrentPoint(int index);
-  void setValueFromText();
+  void setScalarFromText();
   void setOpacityFromText();
+  void setSingleOpacityFromText();
+  void setOpacityScalarFromText();
+  void setOpacityControlsVisibility(bool visible);
+  void updateDisplay();
 
   void setColorSpace(int index);
+  void internalSetColorSpace(int index,
+    vtkColorTransferFunction*);
 
   void setNanColor(const QColor &color);
+  void setScalarColor(const QColor &color);
 
   void savePreset();
   void loadPreset();
@@ -125,9 +129,21 @@ private slots:
   /// MakeDefaultButton callback.
   void makeDefault();
 
+  // Transfer function chart view slots
+  void onColorPlotAdded(vtkPlot*);
+  void onOpacityPlotAdded(vtkPlot*);
+  void updateCurrentColorPoint();
+  void updateCurrentOpacityPoint();
+  void enableColorPointControls();
+  void enableOpacityPointControls();
+  void renderViewOptionally();
+  void saveOptionalUserSettings();
+  void restoreOptionalUserSettings();
+
 private:
   void loadBuiltinColorPresets();
   void loadColorPoints();
+  void loadOpacityPoints();
   void initColorScale();
   void enablePointControls();
   void updatePointValues();
@@ -137,9 +153,22 @@ private:
   void setLegend(pqScalarBarRepresentation *legend);
   void enableLegendControls(bool enable);
 
+  // Initialize the transfer function view widgets
+  void initTransferFunctionView();
+  vtkColorTransferFunction* currentColorFunction();
+  vtkPiecewiseFunction* currentOpacityFunction();
+  void addRepClientColorFunction();
+  void addRepClientOpacityFunction();
+  bool internalScalarRange(double* range);
+  void renderTransferFunctionViews();
+  void unsetCurrentPoints();
+  void pushColors();
+  void pushOpacity();
+
 private:
   pqColorScaleEditorForm *Form;
-  vtkTransferFunctionViewer *Viewer;
+  pqTransferFunctionChartViewWidget* ColorMapViewer;
+  pqTransferFunctionChartViewWidget* OpacityFunctionViewer;
   pqDataRepresentation *Display;
   pqScalarsToColors *ColorMap;
   pqScalarOpacityFunction *OpacityFunction;

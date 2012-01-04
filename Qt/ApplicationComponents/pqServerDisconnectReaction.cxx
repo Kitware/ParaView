@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
+#include "vtkSMSession.h"
+
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
@@ -78,6 +80,7 @@ void pqServerDisconnectReaction::disconnectFromServer()
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server)
     {
+    server->session()->PreDisconnection();
     core->getObjectBuilder()->removeServer(server);
     }
 }

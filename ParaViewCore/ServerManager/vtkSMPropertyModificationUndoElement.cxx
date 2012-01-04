@@ -69,7 +69,7 @@ int vtkSMPropertyModificationUndoElement::RevertToState()
                               proxy->GetProperty(this->PropertyName) : NULL );
   if (property)
     {
-    property->ReadFrom(this->PropertyState, 0); // 0 because only one
+    property->ReadFrom(this->PropertyState, 0, NULL); // 0 because only one
     proxy->UpdateProperty(this->PropertyName);
     }
   return 1;

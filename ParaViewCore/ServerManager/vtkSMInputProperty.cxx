@@ -81,7 +81,8 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
+void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
+                                  vtkSMProxyLocator* locator)
 {
   // --------------------------------------------------------------------------
   // WARNING: this method is REALLY close to its superclass: Please keep them
@@ -129,9 +130,18 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset)
         proxyIdIter++)
       {
       // Get the proxy from proxy manager
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+      vtkSMProxy* proxy;
+      if(locator && vtkSMProxyProperty::CanCreateProxy())
+        {
+        proxy = locator->LocateProxy(*proxyIdIter);
+        }
+      else
+        {
+        proxy =
+            vtkSMProxy::SafeDownCast(
+              this->GetParent()->GetSession()->GetRemoteObject(*proxyIdIter));
+        }
+
       if(proxy)
         {
         this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);

@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkVRGenericStyle.h"
-#include "vtkVRHeadTrackingStyle.h"
-#include "vtkVRWandTrackingStyle.h"
 #include "vtkVRActiveObjectManipulationStyle.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
-#include "vtkVRVectorPropertyStyle.h"
+#include "vtkVRStyleTracking.h"
+#include "vtkVRStyleGrabNUpdateMatrix.h"
+#include "vtkVRStyleGrabNRotateSliceNormal.h"
+#include "vtkVRStyleGrabNTranslateSliceOrigin.h"
 #include "pqApplicationCore.h"
 
 #include <QList>
@@ -62,7 +62,7 @@ vtkVRQueueHandler::vtkVRQueueHandler(
 {
   this->Internals = new pqInternals();
   this->Internals->Queue = queue;
-  this->Internals->Timer.setInterval(100);
+  this->Internals->Timer.setInterval(1);
   this->Internals->Timer.setSingleShot(true);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(processEvents()));
@@ -143,24 +143,18 @@ void vtkVRQueueHandler::processEvents()
 
 //----------------------------------------------------------------------------
 /* Sample configuration:
-  <VRInteractorStyles>
-    <Style class="vtkVRVectorPropertyStyle"
-           proxy="12"
-           property="Normal"
-           mode="direction">
-      <Event device="wand" button="1" />
+ <VRInteractorStyles>
+    <Style class="vtkVRStyleGrabNRotateWorld">
+      <Button name="wiimote.A"/>
+      <Tracker name="wiimote.tracker"/>
     </Style>
-
-    <Style class="vtkVRVectorPropertyStyle"
-           proxy="12"
-           property="Origin"
-           mode="displacement">
-      <Event device="wand" button="2" />
+    <Style class="vtkVRWandTrackingStyle">
+      <Event name="wiitracker.hand" type = "tracker"/>
     </Style>
-  </VRInteractorStyles>
-*/
+ </VRInteractorStyles>
+ */
 void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
-  vtkSMProxyLocator* locator)
+                                        vtkSMProxyLocator* locator)
 {
   if (!xml)
     {
@@ -176,27 +170,27 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        if (strcmp(class_name, "vtkVRVectorPropertyStyle")==0)
+        if (strcmp(class_name, "vtkVRStyleTracking")==0)
           {
-          vtkVRVectorPropertyStyle* style = new vtkVRVectorPropertyStyle(this);
+          vtkVRStyleTracking* style = new vtkVRStyleTracking(this);
           style->configure(child, locator);
           this->add(style);
           }
-        else if (strcmp(class_name, "vtkVRGenericStyle")==0)
+        else if (strcmp(class_name, "vtkVRStyleGrabNUpdateMatrix")==0)
           {
-          vtkVRGenericStyle* style = new vtkVRGenericStyle(this);
+          vtkVRStyleGrabNUpdateMatrix* style = new vtkVRStyleGrabNUpdateMatrix(this);
           style->configure(child, locator);
           this->add(style);
           }
-        else if (strcmp(class_name, "vtkVRHeadTrackingStyle")==0)
+        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
           {
-          vtkVRHeadTrackingStyle* style = new vtkVRHeadTrackingStyle(this);
+          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
           style->configure(child, locator);
           this->add(style);
           }
-        else if (strcmp(class_name, "vtkVRWandTrackingStyle")==0)
+        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
           {
-          vtkVRWandTrackingStyle* style = new vtkVRWandTrackingStyle(this);
+          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
           style->configure(child, locator);
           this->add(style);
           }
@@ -216,7 +210,7 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
   else
     {
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
-      locator);
+                          locator);
     }
 }
 
@@ -225,17 +219,17 @@ void vtkVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
 {
   Q_ASSERT(root != NULL);
 
-  vtkPVXMLElement* parent = vtkPVXMLElement::New();
-  parent->SetName("VRInteractorStyles");
+  vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
+  tempParent->SetName("VRInteractorStyles");
   foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
     {
     vtkPVXMLElement* child = style->saveConfiguration();
     if (child)
       {
-      parent->AddNestedElement(child);
+      tempParent->AddNestedElement(child);
       child->Delete();
       }
     }
-  root->AddNestedElement(parent);
-  parent->Delete();
+  root->AddNestedElement(tempParent);
+  tempParent->Delete();
 }

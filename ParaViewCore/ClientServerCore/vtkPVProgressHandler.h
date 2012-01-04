@@ -18,6 +18,8 @@
 // all configurations single process, client-server, mpi-batch. One progress
 // handler is created per Session.
 //
+// Progress events are currently not supported in multi-clients mode.
+//
 // .SECTION Events
 // vtkCommand::StartEvent
 // \li fired to indicate beginning of progress handling

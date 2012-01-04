@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTestingReaction_h 
 #define __pqTestingReaction_h
 
-#include "pqReaction.h"
+#include "pqMasterOnlyReaction.h"
 
 /// @ingroup Reactions
 /// pqTestingReaction can be used to recording or playing back tests.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTestingReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTestingReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 public:
   enum Mode
     {

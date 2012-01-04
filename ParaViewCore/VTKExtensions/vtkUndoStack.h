@@ -43,6 +43,13 @@ class vtkUndoSet;
 class VTK_EXPORT vtkUndoStack : public vtkObject
 {
 public:
+
+  enum EventIds
+    {
+    UndoSetRemovedEvent = 1989,
+    UndoSetClearedEvent = 1990
+    };
+
   static vtkUndoStack* New();
   vtkTypeMacro(vtkUndoStack, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);

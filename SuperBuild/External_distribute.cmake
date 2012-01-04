@@ -34,5 +34,5 @@ ExternalProject_Add(distribute
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ${distribute_BUILD_COMMAND}
   INSTALL_COMMAND ${distribute_INSTALL_COMMAND}
-  DEPENDS ${distribute_DEPENDENCIES}
+  DEPENDS ${distribute_dependencies}
   )

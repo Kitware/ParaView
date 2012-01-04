@@ -9,16 +9,25 @@ if(WIN32)
   EXECUTE_PROCESS(
     COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /Upgrade
     WORKING_DIRECTORY "@Silo_source@"
+    RESULT_VARIABLE res0
     )
 
   EXECUTE_PROCESS(
     COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project pdb_detect
     WORKING_DIRECTORY "@Silo_source@"
+    RESULT_VARIABLE res1
     )
 
   EXECUTE_PROCESS(
     COMMAND @CMAKE_BUILD_TOOL@ "@Silo_source@/SiloWindows/MSVC8/SiloWindows.sln" /build @silo_configuration@ /project Silo
     WORKING_DIRECTORY "@Silo_source@"
+    RESULT_VARIABLE res2
     )
+
+  if(NOT ${res0} EQUAL 0 OR NOT ${res1} EQUAL 0 OR NOT ${res2} EQUAL 0)
+    message("Silo Errors detected: \n${Silo_OUT}\n${Silo_ERR}")
+    message(FATAL_ERROR "Error in build of Silo")
+  endif()
+endif()
 
 endif()

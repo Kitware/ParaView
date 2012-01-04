@@ -1,0 +1,52 @@
+message  = Extra build flags:\n\n
+#COMPATH  = /opt/xt-pe/1.3.10/bin/snos64/
+CXX  = mpicxx
+CC  = mpicc
+FC  = mpif90
+ifdef MPIPRG
+# CFM default rule
+message  += CFM default uses LAM,\n to use MPICH define MPICH.\n\n
+ifdef MPICH
+MPICXX  = CC
+MPICC  = cc
+MPILIB  =
+else
+MPICXX  = CC
+MPICC  = cc
+MPILIB  =
+endif
+endif
+# LLAPACK  = #-llapack -lsci
+#LLAPACK = -L$(TACC_ACML_LIB) -lacml
+LBLAS  = #-lblas
+
+BLACSdir  = /share/home/00422/cazes/lib/BLACS/LIB/
+SLALAPACKdir  = /share/home/00422/cazes/lib/scalapack-1.8.0/
+SCALAPACK  = $(SLALAPACKdir)libscalapack.a $(BLACSdir)blacsF77init_MPI-LINUX-0.a $(BLACSdir)blacsCinit_MPI-LINUX-0.a $(BLACSdir)blacs_MPI-LINUX-0.a
+LLAPACK  = $(SCALAPACK) $(TACC_ACML_LIB)/libacml.a $(SCALAPACK)
+
+
+message  += You can specify MCPU=-mcpu=pentiumpro,ev5 etc.\n or MCPU=-march=pentium. See the gcc info pages for more information.
+OPTXX  = -O2 #$(MCPU)  -fastsse   -malign-double -ffast-math
+MOPTXX  = -O3  -fastsse -Munroll #$(MCPU)  -malign-double -ffast-math -funroll-loops -fstrict-aliasing
+OPT = $(OPTXX)
+MOPT = $(MOPTXX)
+OPTF  =
+MOPTF  =
+OPTF  = -O2 #$(MCPU) -malign-double -ffast-math # -fno-globals
+MOPTF  = -O3 -fastsse   #$(MCPU) -malign-double -ffast-math -funroll-loops # -fno-globals
+DEBUG  = -g #-Mprof=func
+DEBUGF  = -g #-Mprof=func
+LD  = $(CXX)
+DEBUGLD  = $(DEBUG)
+MOPTLD  = $(MOPTXX)
+OPTLD  = $(OPTXX)
+ifdef FFTPRG
+FFTLIB  = -lfftw
+endif
+LPDIO   = #-L/usr/local/packages/pdio/nektar/lib -lpdio
+# LIBS    = $(FFTLIB) $(MPILIB) $(LLAPACK) $(LBLAS) -lpgf90 -lpghpf2 -lpghpf_mpi -lpgftnrtl -lvec $(LPDIO)
+LIBS  = $(FFTLIB) $(MPILIB) $(LLAPACK) $(LBLAS) -L/share/apps/pgi/7.1/linux86-64/7.1-2/lib -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc -lrt -lpthread  -lvec -lm
+# LIBS  = $(FFTLIB) $(MPILIB) $(LLAPACK) $(LBLAS) -lvec
+XLIBDIRS = -L/usr/X11/lib
+XINCDIRS = -I/usr/include/X11

@@ -36,6 +36,9 @@
    <property name="text" >
     <string>Pre&amp;vious Frame</string>
    </property>
+   <property name="PV_MUST_BE_MASTER" stdset="0">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionVCRFirstFrame" >
    <property name="enabled" >
@@ -101,6 +104,9 @@
   <addaction name="actionVCRNextFrame" />
   <addaction name="actionVCRLastFrame" />
   <addaction name="actionVCRLoop" />
+  <property name="PV_MUST_BE_MASTER" stdset="0">
+    <bool>true</bool>
+  </property>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

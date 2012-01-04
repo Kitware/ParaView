@@ -29,6 +29,7 @@
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVLastSelectionInformation.h"
 #include "vtkPVOptions.h"
@@ -46,7 +47,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
@@ -275,22 +276,10 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
 
-#if 0
   vtkCamera* camera = vtkCamera::SafeDownCast(this
                                               ->GetSubProxy( "ActiveCamera" )
                                               ->GetClientSideObject() );
   rv->SetActiveCamera( camera );
-#else
-  vtkSMProxy* cameraProxy = this->GetSubProxy("ActiveCamera");
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "SetActiveCamera"
-         << VTKOBJECT(cameraProxy)
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-#endif
 
   if (rv->GetInteractor())
     {
@@ -323,6 +312,22 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
         domain->GetEntryValueForText(pvoptions->GetStereoType()));
       }
     }
+
+  // Update whether render servers can open display i.e. remote rendering is
+  // possible on all processes.
+  vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
+  this->GetSession()->GatherInformation(
+    vtkPVSession::RENDER_SERVER, info, 0);
+  if (info->GetCanOpenDisplay() == 0)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << VTKOBJECT(this)
+      << "RemoteRenderingAvailableOff"
+      << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+    }
+  info->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -334,7 +339,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = source->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = source->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
@@ -769,7 +774,7 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(&frustum[index*4]);
 
-  vtkSMProxy* selectionSource = this->GetProxyManager()->NewProxy("sources",
+  vtkSMProxy* selectionSource = this->GetSessionProxyManager()->NewProxy("sources",
     "FrustumSelectionSource");
   vtkSMPropertyHelper(selectionSource, "FieldType").Set(fieldAssociation);
   vtkSMPropertyHelper(selectionSource, "Frustum").Set(frustum, 32);

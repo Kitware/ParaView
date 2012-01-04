@@ -1,8 +1,9 @@
 # This is where the logic resides for verifying the source tree layout.
 
-function(CheckGitDirectory path)
+function(CheckGitDirectory path submodule)
   # Emit a fatal error and inform the user to init their submodules.
-  if(NOT EXISTS "${path}/.git/config")
+  # supports new git (1.7.7?) locations of submodule .git directories
+  if(NOT EXISTS "${path}/${submodule}/.git/config" AND NOT EXISTS ${ParaView_SOURCE_DIR}/.git/modules/${submodule}/config)
     message(FATAL_ERROR "
  Please initialize the git submodules.
  ${path} is not a valid git submodule.
@@ -19,7 +20,7 @@ set(ParaView_Submodules VTK Utilities/IceT Utilities/Xdmf2 Qt/Testing)
 foreach(submodule ${ParaView_Submodules})
   # If this is a git checkout, then check the submodules were initialized.
   if(EXISTS "${ParaView_SOURCE_DIR}/.git/config")
-    CheckGitDirectory("${ParaView_SOURCE_DIR}/${submodule}")
+    CheckGitDirectory("${ParaView_SOURCE_DIR}" "${submodule}")
   endif()
 endforeach()
 

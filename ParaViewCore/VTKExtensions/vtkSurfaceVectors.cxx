@@ -82,6 +82,13 @@ int vtkSurfaceVectors::RequestData(vtkInformation *vtkNotUsed(request),
   vtkIdType numPoints, pointId, i, cellId;
   numPoints = input->GetNumberOfPoints();
   vtkDataArray *inVectors = this->GetInputArrayToProcess(0,inputVector);
+
+  if(!inVectors)
+    {
+    output->ShallowCopy(input);
+    return 1;
+    }
+
   vtkDataArray* newVectors = 0;
   vtkDoubleArray* newScalars = 0;
   vtkIdList* cellIds = vtkIdList::New();
@@ -125,7 +132,7 @@ int vtkSurfaceVectors::RequestData(vtkInformation *vtkNotUsed(request),
       cellId = cellIds->GetId(i);
       cellType = input->GetCellType(cellId);  
       if (cellType == VTK_VOXEL || cellType == VTK_POLYGON ||
-          cellType == VTK_TRIANGLE || VTK_QUAD)
+          cellType == VTK_TRIANGLE || cellType == VTK_QUAD)
         {
         input->GetCellPoints(cellId, ptIds);
         input->GetPoint(ptIds->GetId(0), p1);

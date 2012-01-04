@@ -31,11 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPPluginManager.h"
 
+#include "pqCoreUtilities.h"
 #include "pqCPWritersMenuManager.h"
 
 #include <QDebug>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QTimer>
 
 //-----------------------------------------------------------------------------
 pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
@@ -52,7 +54,20 @@ pqCPPluginManager::~pqCPPluginManager()
 void pqCPPluginManager::startup()
 {
   pqCPWritersMenuManager *menuMgr = new pqCPWritersMenuManager(this);
-  menuMgr->createMenu();
+  if(pqCoreUtilities::mainWidget())
+    {
+    // if we already have a main widget to add the menus to
+    // go ahead and do it.
+    menuMgr->createMenu();
+    }
+  else
+    {
+    // we don't have a main widget to add the menus to so
+    // we use a timer to do it a little bit later when we
+    // hope the main widget and everything else needed
+    // will be instantiated.
+    QTimer::singleShot(100, menuMgr, SLOT(createMenu()));
+   }
 
   // don't delete menuMgr, it will be cleaned up by Qt.
 }

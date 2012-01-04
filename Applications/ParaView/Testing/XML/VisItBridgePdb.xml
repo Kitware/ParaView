@@ -4,5 +4,5 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/VisItBridge/compoundtest.pdb" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="Protein Data Bank Files (VisIt)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

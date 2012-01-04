@@ -23,6 +23,7 @@
 #include "vtkPVView.h"
 
 class vtkContextView;
+class vtkAbstractContextItem;
 class vtkRenderWindow;
 class vtkChart;
 
@@ -48,8 +49,8 @@ public:
   vtkGetObjectMacro(ContextView, vtkContextView);
 
   // Description:
-  // Get the chart.
-  virtual vtkChart* GetChart()=0;
+  // Get the context item.
+  virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   // Description:
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
@@ -59,6 +60,11 @@ public:
   // must be called before calling any other methods on this class.
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
+
+  // Description:
+  // Overridden to ensure that in multi-client configurations, same set of
+  // representations are "dirty" on all processes to avoid race conditions.
+  virtual void Update();
 
 //BTX
 protected:

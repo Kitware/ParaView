@@ -122,6 +122,7 @@
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
+  <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <Proxy group="filters" name="LevelIdScalars" />
@@ -155,6 +156,7 @@
   <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
   <Proxy group="filters" name="QuadricClustering" />
   <Proxy group="filters" name="RectilinearGridConnectivity" />
+  <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="ReflectionFilter" />
   <Proxy group="filters" name="RibbonFilter" />
   <Proxy group="filters" name="RotationalExtrusionFilter" />
@@ -183,6 +185,7 @@
   <Proxy group="filters" name="UnstructuredGradient" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" />
+  <Proxy group="filters" name="YoungsMaterialInterface"/>
   <Proxy group="filters" name="NormalGlyphs" />
   <Proxy group="filters" name="TableToPolyData" />
   <Proxy group="filters" name="TableToStructuredGrid" />

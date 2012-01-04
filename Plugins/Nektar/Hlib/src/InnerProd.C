@@ -1,0 +1,1951 @@
+
+/**************************************************************************/
+//                                                                        //
+//   Author:    T.Warburton                                               //
+//   Design:    T.Warburton && S.Sherwin                                  //
+//   Date  :    12/4/96                                                   //
+//                                                                        //
+//   Copyright notice:  This code shall not be replicated or used without //
+//                      the permission of the author.                     //
+//                                                                        //
+/**************************************************************************/
+
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+#include <polylib.h>
+#include "veclib.h"
+#include "hotel.h"
+
+#include <stdio.h>
+
+static void Hex_map_to_hj(Element *E, double *d);
+
+/*
+
+Function name: Element::Iprod
+
+Function Purpose:
+
+Argument 1: Element *T
+Purpose:
+
+Function Notes:
+
+*/
+
+void Tri::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Iprod_d(T, ba,bb);
+}
+
+
+
+
+void Quad::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Iprod_d(T, ba,bb);
+}
+
+
+
+
+void Tet::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Basis    *bc = ba;
+  Tet::Iprod_3d(T, ba,bb,bc);
+}
+
+
+
+
+void Pyr::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Basis    *bc = ba;
+  Pyr::Iprod_3d(T, ba,bb,bc);
+}
+
+
+
+
+void Prism::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Basis    *bc = ba;
+  Prism::Iprod_3d(T, ba,bb,bc);
+}
+
+
+
+
+void Hex::Iprod(Element *T){
+  Basis    *ba = T->getbasis();
+  Basis    *bb = ba;
+  Basis    *bc = ba;
+  Hex::Iprod_3d(T, ba,bb,bc);
+}
+
+
+
+
+void Element::Iprod(Element *){ERR;}                // Inner product to Elmt
+
+
+
+void Tri::Iprod_d(Element *T, Basis *ba, Basis *bb){
+  register int i,L=0;
+  double  *wa,*wb,*H, *wk_a;
+  Edge    *e = T->edge;
+  Face    *f = T->face;
+  size_t  d = sizeof(double);
+
+  double *wk = Tri_wk.get();
+
+  T->state = 't';
+
+  getzw(T->qa,&wa,&wa,'a');
+  getzw(T->qb,&wb,&wb,'b');
+
+  /* multiply physical solution by jacobean and weights*/
+  if(T->curvX)
+    dvmul(qa*qb,T->geom->jac.p,1,*h,1,*T->h,1);
+  else
+    dsmul(qa*qb,T->geom->jac.d,*h,1,*T->h,1);
+
+  for(i = 0; i < qb; ++i) dvmul(qa,wa,1, T->h[i],1, T->h[i],1);
+  for(i = 0; i < qb; ++i) dscal(qa,wb[i],T->h[i],1);
+
+  dgemm('T','N',qb,lmax,qa,1.0,T->h[0],qa,ba->vert[1].a,qa,0.0,wk,qb);
+
+#if 0
+  H = *T->h;
+  dgemv('T',qb,lmax,1.0,bb->vert[2].b,qb,wk   ,1,0.0,H     ,1);
+  dgemv('T',qb,lmax,1.0,bb->vert[2].b,qb,wk+qb,1,0.0,H+lmax,1);
+  H  += 2*lmax;
+  wk_a = wk+2*qb;
+  for(i = 0; i < lmax-2; wk_a+=qb,H+=lmax-2-i, ++i)
+    dgemv('T',qb,lmax-2-i,1.0,bb->edge[0][i].b,qb,1,wk_a,1,0.0,H,1);
+#else
+  H = *T->h;
+  mxva(bb->vert[2].b,qb,1,wk   ,1,H     ,1,lmax,qb);
+  mxva(bb->vert[2].b,qb,1,wk+qb,1,H+lmax,1,lmax,qb);
+  H  += 2*lmax;
+  wk_a = wk+2*qb;
+  for(i = 0; i < lmax-2; wk_a+=qb,H+=lmax-2-i, ++i)
+    mxva(bb->edge[0][i].b,qb,1,wk_a,1,H,1,lmax-2-i,qb);
+#endif
+
+  /* unpack h */
+  /* copy field into h for moment */
+  H = *T->h;
+  T->vert[2].hj[0] = *H; H++;
+  T->vert[1].hj[0] = *H; H++;
+  memcpy(e[1].hj,H,e[1].l*d); H += lmax-2;
+  T->vert[2].hj[0] += *H; H++;
+  T->vert[0].hj[0] = *H; H++ ;
+  memcpy(e[2].hj,H,e[2].l*d); H += lmax-2;
+
+  for(i = 0, L = 0; i < e[0].l; L += lmax-2-i, ++i)
+    e[0].hj[i] = H[L];
+  ++H;
+  for(i = 0; i < f[0].l; H += lmax-2-i, ++i)
+    memcpy(f[0].hj[i],H,(f[0].l-i)*d);
+
+}
+
+void Quad::Iprod_d(Element *T, Basis *ba, Basis *bb){
+  register int i;
+  double  *wa,*wb,*H, *wk;
+  Edge    *e = T->edge;
+  Face    *f = T->face;
+  size_t  d = sizeof(double);
+
+  T->state = 't';
+
+  getzw(T->qa,&wa,&wa,'a');
+  getzw(T->qb,&wb,&wb,'a');
+
+  /* multiply physical solution by jacobean and weights */
+
+  H  = Quad_Iprod_wk;
+  wk = Quad_wk;
+
+  dvmul(qa*qb,T->geom->jac.p,1,h[0],1,H,1);
+
+  for(i = 0; i < qb; ++i) dvmul(qa,wa,1, H+i*qa,1, H+i*qa,1);
+  for(i = 0; i < qa; ++i) dvmul(qb,wb,1, H+i,  qa, H+i,  qa);
+
+  dgemm('T','N',lmax,  qb,qa,1.0, ba->vert[1].a, qa,    H, qa, 0.0, wk, lmax);
+  dgemm('N','N',lmax,lmax,qb,1.0, wk, lmax, bb->vert[2].b, qb, 0.0,  H, lmax);
+
+  /* unpack h */
+  /* copy field into T->h for moment */
+  T->vert[2].hj[0] = *H; ++H;
+  T->vert[3].hj[0] = *H; ++H;
+  memcpy(e[2].hj,H,e[2].l*d); H += lmax-2;
+  T->vert[1].hj[0] = *H; ++H;
+  T->vert[0].hj[0] = *H; ++H;
+  memcpy(e[0].hj,H,e[0].l*d); H += lmax-2;
+
+  dcopy(e[1].l, H, lmax, e[1].hj, 1);++H;
+  dcopy(e[3].l, H, lmax, e[3].hj, 1);++H;
+
+  for(i = 0; i < f[0].l; ++H, ++i)
+    dcopy(f[0].l, H, lmax, f[0].hj[i], 1);
+
+}
+
+void Tet::Iprod_d(Element *, Basis *, Basis *){
+  fprintf(stderr,"Tet::Iprod_d not implemented\n");
+}
+
+void Pyr::Iprod_d(Element *, Basis *, Basis *){
+  fprintf(stderr,"Pyr::Iprod_d not implemented\n");
+}
+
+void Prism::Iprod_d(Element *, Basis *, Basis *){
+  fprintf(stderr,"Prism::Iprod_d not implemented\n");
+}
+
+void Hex::Iprod_d(Element *, Basis *, Basis *){
+  fprintf(stderr,"Hex::Iprod_d not implemented\n");
+}
+
+void Tet::Iprod_3d(Element *E, Basis *ba, Basis *bb, Basis *bc){
+  register int i,j,k;
+  const    int qbc = qb*qc;
+  int     ll;
+  double  *wa,*wb,*wc,*H,*fh,*fha,*fa, *wk = Tet_Iprod_wk;
+  Edge    *e = E->edge;
+  Face    *f = E->face;
+  Mode    *m,**m1;
+
+  E->state = 't';
+
+  /* multiply physical solution by jacobean */
+  if(E->curvX)
+    dvmul(qtot,E->geom->jac.p,1,h_3d[0][0],1,E->h_3d[0][0],1);
+  else
+    dsmul(qtot,E->geom->jac.d,h_3d[0][0],1,E->h_3d[0][0],1);
+
+  /* assuming at present that quadrature order if fixed */
+  getzw(E->qa,&wa,&wa,'a');
+  getzw(E->qb,&wb,&wb,'b');
+  getzw(E->qc,&wc,&wc,'c');
+
+  for(i = 0; i < qb*qc; ++i)
+    dvmul(qa,  wa,  1,  E->h_3d[0][i], 1, E->h_3d[0][i], 1);
+  for(i = 0; i < qc; ++i)
+    for(j = 0; j < qb; ++j)
+      dsmul(qa,    wb[j], E->h_3d[i][j], 1, E->h_3d[i][j], 1);
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb, wc[i], E->h_3d[i][0], 1, E->h_3d[i][0], 1);
+
+  fh = wk;
+  fha = fh + (LGmax+1)*QGmax*QGmax;
+
+  /* calculate fh[l][j][k] */
+  /* edge 6, vertex C and D */
+  for(k = 0, H = E->h_3d[0][0]; k < qc; ++k)
+    for(j = 0; j < qb; ++j, H+=qa)
+      fh[j*qc + k] = ddot(qa,ba->vert[2].a,1,H,1);
+
+  /* face 3, edges 2 and 5, vertex B */
+  fh += qbc;
+  for(k = 0, H = E->h_3d[0][0]; k < qc; ++k)
+    for(j = 0; j < qb; ++j, H+=qa)
+      fh[j*qc+k] = ddot(qa,ba->vert[1].a,1,H,1);
+
+  /* face 4, edges 3 and 4, vertex A */
+  fh += qbc;
+  for(k = 0, H = E->h_3d[0][0]; k < qc; ++k)
+    for(j = 0; j < qb; ++j, H += qa)
+      fh[j*qc+k] = ddot(qa,ba->vert[0].a,1,H,1);
+
+  /* interior, faces 1 and 2, edge 1 */
+  ll= max(E->interior_l,max(f[0].l,max(f[1].l,e[0].l)));
+  fh += qbc;
+  m = ba->edge[0];
+  for(i = 0; i < ll; ++i,fh+=qbc)
+    for(k = 0,H = E->h_3d[0][0]; k < qc; ++k)
+      for(j = 0; j < qb; ++j,H+=qa)
+  fh[j*qc+k] = ddot(qa,m[i].a,1,H,1);
+
+  /* calculate fhat[l][m][k] needs to be done mulitply for each *
+   * different type of g^2(b) since l may vary                */
+
+  /* interior and face 1   */
+  ll = max(f[0].l,E->interior_l);
+  m1 = bb->face[0];
+  fh = wk+3*qbc;
+  for(i = 0,fa = fha; i < ll; fa += (ll-i)*qc, ++i)
+    for(j = 0; j < ll-i; ++j)
+      for(k = 0; k < qc; ++k)
+  fa[j*qc+k] = ddot(qb,m1[i][j].b,1,fh+i*qbc+k,qc);
+
+  /* inner product of interior */
+  for(i = 0,fa = fha; i < E->interior_l; fa += (ll-i)*qc, ++i)
+    for(j = 0; j < E->interior_l-i; ++j)
+      for(k = 0; k < E->interior_l-i-j; ++k)
+  E->hj_3d[i][j][k] = ddot(qc,fa+j*qc,1,bc->intr[i][j][k].c,1);
+
+  /* inner product of face 1 */
+  for(i = 0,fa = fha; i < f[0].l; fa += (ll-i)*qc, ++i)
+    for(j = 0; j < f[0].l-i; ++j)
+      f[0].hj[i][j] = ddot(qc,fa+j*qc,1,bc->face[0][i][j].c,1);
+
+  /* face 2 and edge 1*/
+  ll = max(f[1].l,e[0].l);
+  m = bb->edge[0];
+  for(i = 0; i < ll; ++i,fh+=qbc)
+    for(k = 0; k < qc; ++k)
+      fha[i*qc+k] = ddot(qb,m[i].b,1,fh+k,qc);
+
+  /* inner product of face 2  */
+  for(i = 0; i < f[1].l; ++i)
+    for(k = 0; k < f[1].l-i; ++k)
+      f[1].hj[i][k] = ddot(qc,fha+i*qc,1,bc->face[1][i][k].c,1);
+
+  /* inner product of edge 1  */
+  for(i = 0; i < e[0].l; ++i)
+    e[0].hj[i] = ddot(qc,fha+i*qc,1,bc->edge[0][i].c,1);
+
+  /*  faces 3, edge 2*/
+  ll = max(f[2].l,e[1].l);
+  m = bb->edge[1];
+  fh = wk + qbc;
+  for(i = 0; i < ll; ++i)
+    for(k = 0; k < qc; ++k)
+      fha[i*qc+k] = ddot(qb,m[i].b,1,fh+k,qc);
+
+  /* inner product of face 3  */
+  for(i = 0; i < f[2].l; ++i)
+    for(k = 0; k < f[2].l-i; ++k)
+      f[2].hj[i][k] = ddot(qc,fha+i*qc,1,bc->face[2][i][k].c,1);
+
+  /* inner product of edge 2  */
+  for(i = 0; i < e[1].l; ++i)
+    e[1].hj[i] = ddot(qc,fha+i*qc,1,bc->edge[1][i].c,1);
+
+  /* f1 for faces 4, edges 3*/
+  ll= max(f[3].l,e[2].l);
+  m = bb->edge[2];
+  fh += qbc;
+  for(i = 0; i < ll; ++i)
+    for(k = 0; k < qc; ++k)
+      fha[i*qc+k] = ddot(qb,m[i].b,1,fh+k,qc);
+
+  /* inner product of face 4  */
+  for(i = 0; i < f[3].l; ++i)
+    for(k = 0; k < f[3].l-i; ++k)
+      f[3].hj[i][k] = ddot(qc,fha+i*qc,1,bc->face[3][i][k].c,1);
+
+  /* inner product of edge 3  */
+  for(i = 0; i < e[2].l; ++i)
+    e[2].hj[i] = ddot(qc,fha+i*qc,1,bc->edge[2][i].c,1);
+
+  /* f1 for edge 4, vertex A*/
+  for(k = 0; k < qc; ++k)
+    fha[k] = ddot(qb,bb->vert[0].b,1,fh+k,qc);
+
+  /*  inner product of edge 4  */
+  for(i = 0; i < e[3].l; ++i)
+    e[3].hj[i] = ddot(qc,fha,1,bc->edge[3][i].c,1);
+
+  /* inner product of vertex A */
+  E->vert[0].hj[0] = ddot(qc,fha,1,bc->vert[0].c,1);
+
+  /* f1 for edge 5, vertex B*/
+  fh = wk + qbc;
+  for(k = 0; k < qc; ++k)
+    fha[k] = ddot(qb,bb->vert[0].b,1,fh+k,qc);
+
+  /*  inner product of edge 5  */
+  for(i = 0; i < e[4].l; ++i)
+    e[4].hj[i] = ddot(qc,fha,1,bc->edge[4][i].c,1);
+
+  /* inner product of vertex B */
+  E->vert[1].hj[0] = ddot(qc,fha,1,bc->vert[1].c,1);
+
+  /* f1 for edge 6 and vertex C */
+  for(k = 0; k < qc; ++k)
+    fha[k] = ddot(qb,bb->vert[2].b,1,wk+k,qc);
+
+  /* calculate interior product of edge 6  */
+  for(i = 0; i < e[5].l; ++i)
+    e[5].hj[i] = ddot(qc,fha,1,bc->edge[5][i].c,1);
+
+  /* inner product of vertex C */
+  E->vert[2].hj[0] = ddot(qc,fha,1,bc->vert[2].c,1);
+
+  /* f1 for vertex D */
+  for(k = 0; k < qc; ++k)
+    fha[k] = ddot(qb,bb->vert[3].b,1,wk+k,qc);
+
+  /* inner product of vertex D */
+  E->vert[3].hj[0] = ddot(qc,fha,1,bc->vert[3].c,1);
+}
+
+void Pyr::Iprod_3d(Element *E, Basis *ba, Basis *bb, Basis *bc){
+
+  register int i,j,k;
+  double   *wa,*wb,*wc;
+
+  E->state = 't';
+
+  dvmul(qtot,geom->jac.p,1,h_3d[0][0],1,E->h_3d[0][0],1);
+
+  getzw(E->qa,&wa,&wa,'a');
+  getzw(E->qb,&wb,&wb,'a');
+  getzw(E->qc,&wc,&wc,'c');  // changed
+
+  for(i = 0; i < qb*qc; ++i)
+   dvmul(qa,  wa,  1,  E->h_3d[0][i], 1, E->h_3d[0][i], 1);
+  for(i = 0; i < qc; ++i)
+    for(j = 0; j < qb; ++j)
+      dsmul(qa,    wb[j], E->h_3d[i][j], 1, E->h_3d[i][j], 1);
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb, wc[i], E->h_3d[i][0], 1, E->h_3d[i][0], 1);
+
+  Mode   *bv = bc->vert;
+  Mode  **be = bc->edge;
+  Mode ***bf = bc->face;
+  Mode ***bi = bc->intr;
+
+  Vert *v = E->vert;
+  Edge *e = E->edge;
+  Face *f = E->face;
+
+  double *H = Pyr_Iprod_wk;
+
+  dgemm('T','N',lmax,qb*qc,qa,1.0,ba->vert[0].a,qa,**E->h_3d,qa,0.0,H,lmax);
+
+  for(i=0;i<qc;++i)
+    dgemm('N','N',lmax,lmax,qb,1.,H+i*lmax*qb,lmax, bb->vert[0].b, qb,0.0, (**E->h_3d)+i*lmax*lmax,lmax);
+
+  H = (**E->h_3d);
+
+  v[0].hj[0] = ddot(qc, bv[0].c, 1, H, lmax*lmax);
+  v[4].hj[0] = ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[4].l;++i)
+    e[4].hj[i] = ddot(qc, be[4][i].c, 1, H, lmax*lmax);
+
+  H += 1;
+
+  for(i=0;i<e[0].l;++i)
+    e[0].hj[i] = ddot(qc, be[0][i].c, 1, H+i, lmax*lmax);
+
+  for(i=0;i<f[1].l;++i)
+    for(j=0;j<f[1].l-i;++j)
+      f[1].hj[i][j] = ddot(qc, bf[1][i][j].c, 1, H+i, lmax*lmax);
+
+  H += lmax-2;
+
+  v[1].hj[0] =  ddot(qc, bv[1].c, 1, H, lmax*lmax);
+  v[4].hj[0] += ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[5].l;++i)
+    e[5].hj[i] = ddot(qc, be[5][i].c, 1, H, lmax*lmax);
+
+  H = (**E->h_3d) + lmax;
+
+  for(i=0;i<e[3].l;++i)
+    e[3].hj[i] = ddot(qc, be[3][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<f[4].l;++i)
+    for(j=0;j<f[4].l-i;++j)
+      f[4].hj[i][j] = ddot(qc, bf[4][i][j].c, 1, H+i*lmax, lmax*lmax);
+
+  H += 1;
+
+  int il = interior_l;
+
+  for(i=0;i<il;++i)
+    for(j=0;j<il-i;++j)
+      for(k=0;k<il-i-j;++k)
+  hj_3d[i][j][k] = ddot(qc, bi[i][j][k].c, 1, H+i+j*lmax, lmax*lmax);
+
+  for(i=0;i<f[0].l;++i)
+    for(j=0;j<f[0].l;++j)
+      f[0].hj[i][j] = ddot(qc, bf[0][i][j].c, 1, H+j+i*lmax, lmax*lmax);
+
+  H += (lmax-2);
+
+  for(i=0;i<e[1].l;++i)
+    e[1].hj[i] = ddot(qc, be[1][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<f[2].l;++i)
+    for(j=0;j<f[2].l-i;++j)
+      f[2].hj[i][j] = ddot(qc, bf[2][i][j].c, 1, H+i*lmax, lmax*lmax);
+
+  H = (**E->h_3d) + lmax*(lmax-1);  // fill in top layer
+
+  v[3].hj[0] = ddot(qc, bv[3].c, 1, H, lmax*lmax);
+  v[4].hj[0] += ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[7].l;++i)
+    e[7].hj[i] = ddot(qc, be[7][i].c, 1, H, lmax*lmax);
+
+  H += 1;
+
+  for(i=0;i<e[2].l;++i)
+    e[2].hj[i] = ddot(qc, be[2][i].c, 1, H+i, lmax*lmax);
+
+  for(i=0;i<f[3].l;++i)
+    for(j=0;j<f[3].l-i;++j)
+      f[3].hj[i][j] = ddot(qc, bf[3][i][j].c, 1, H+i, lmax*lmax);
+
+  H += (lmax-2);
+
+  v[2].hj[0] = ddot(qc, bv[2].c, 1, H, lmax*lmax);
+  v[4].hj[0] += ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[6].l;++i)
+    e[6].hj[i] = ddot(qc, be[6][i].c, 1, H, lmax*lmax);
+}
+
+
+void Prism::Iprod_3d(Element *E, Basis *ba, Basis *bb, Basis *bc){
+
+  register int i,j,k;
+
+  double   *wa,*wb,*wc;
+
+  E->state = 't';
+
+  dvmul(qtot,geom->jac.p,1,h_3d[0][0],1,E->h_3d[0][0],1);
+
+  getzw(E->qa,&wa,&wa,'a');
+  getzw(E->qb,&wb,&wb,'a');
+  getzw(E->qc,&wc,&wc,'b');  // changed
+
+  for(i = 0; i < qb*qc; ++i)
+   dvmul(qa,  wa,  1,  E->h_3d[0][i], 1, E->h_3d[0][i], 1);
+  for(i = 0; i < qc; ++i)
+    for(j = 0; j < qb; ++j)
+      dsmul(qa,    wb[j], E->h_3d[i][j], 1, E->h_3d[i][j], 1);
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb, wc[i], E->h_3d[i][0], 1, E->h_3d[i][0], 1);
+
+  Mode   *bv = bc->vert;
+  Mode  **be = bc->edge;
+  Mode ***bf = bc->face;
+  Mode ***bi = bc->intr;
+
+  Vert *v = E->vert;
+  Edge *e = E->edge;
+  Face *f = E->face;
+
+  double *H = Prism_Iprod_wk;
+
+  dgemm('T','N',lmax,qb*qc,qa,1.0,ba->vert[0].a,qa,**E->h_3d,qa,0.0,H,lmax);
+
+  for(i=0;i<qc;++i)
+    dgemm('N','N',lmax,lmax,qb,1.,H+i*lmax*qb,lmax, bb->vert[0].b, qb,0.0, (**E->h_3d)+i*lmax*lmax,lmax);
+
+  H = (**E->h_3d);
+
+  v[0].hj[0] = ddot(qc, bv[0].c, 1, H, lmax*lmax);
+  v[4].hj[0] = ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[4].l;++i)
+    e[4].hj[i] = ddot(qc, be[4][i].c, 1, H, lmax*lmax);
+
+  H += 1;
+
+  for(i=0;i<e[0].l;++i)
+    e[0].hj[i] = ddot(qc, be[0][i].c, 1, H+i, lmax*lmax);
+
+  for(i=0;i<f[1].l;++i)
+    for(j=0;j<f[1].l-i;++j)
+      f[1].hj[i][j] = ddot(qc, bf[1][i][j].c, 1, H+i, lmax*lmax);
+
+  H += lmax-2;
+
+  v[1].hj[0] =  ddot(qc, bv[1].c, 1, H, lmax*lmax);
+  v[4].hj[0] += ddot(qc, bv[4].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[5].l;++i)
+    e[5].hj[i] = ddot(qc, be[5][i].c, 1, H, lmax*lmax);
+
+
+
+  H = (**E->h_3d) + lmax;
+
+  for(i=0;i<e[3].l;++i)
+    e[3].hj[i] = ddot(qc, be[3][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<e[8].l;++i)
+    e[8].hj[i] = ddot(qc, be[8][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<f[4].l;++i)
+    for(j=0;j<f[4].l;++j)
+      f[4].hj[i][j] = ddot(qc, bf[4][i][j].c, 1, H+j*lmax, lmax*lmax);
+
+  H += 1;
+
+  int il = interior_l;
+
+  for(i=0;i<il-1;++i)
+    for(j=0;j<il;++j)
+      for(k=0;k<il-1-i;++k)
+  hj_3d[i][j][k] = ddot(qc, bi[i][j][k].c, 1, H+i+j*lmax, lmax*lmax);
+
+  for(i=0;i<f[0].l;++i)
+    for(j=0;j<f[0].l;++j)
+      f[0].hj[i][j] = ddot(qc, bf[0][i][j].c, 1, H+j+i*lmax, lmax*lmax);
+
+  H += (lmax-2);
+
+  for(i=0;i<e[1].l;++i)
+    e[1].hj[i] = ddot(qc, be[1][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<e[8].l;++i)
+    e[8].hj[i] += ddot(qc, be[8][i].c, 1, H+i*lmax, lmax*lmax);
+
+  for(i=0;i<f[2].l;++i)
+    for(j=0;j<f[2].l;++j)
+      f[2].hj[i][j] = ddot(qc, bf[2][i][j].c, 1, H+j*lmax, lmax*lmax);
+
+  H = (**E->h_3d) + lmax*(lmax-1);  // fill in top layer
+
+  v[3].hj[0] = ddot(qc, bv[3].c, 1, H, lmax*lmax);
+  v[5].hj[0] = ddot(qc, bv[5].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[7].l;++i)
+    e[7].hj[i] = ddot(qc, be[7][i].c, 1, H, lmax*lmax);
+
+  H += 1;
+
+  for(i=0;i<e[2].l;++i)
+    e[2].hj[i] = ddot(qc, be[2][i].c, 1, H+i, lmax*lmax);
+
+  for(i=0;i<f[3].l;++i)
+    for(j=0;j<f[3].l-i;++j)
+      f[3].hj[i][j] = ddot(qc, bf[3][i][j].c, 1, H+i, lmax*lmax);
+
+  H += (lmax-2);
+
+  v[2].hj[0] = ddot(qc, bv[2].c, 1, H, lmax*lmax);
+  v[5].hj[0] += ddot(qc, bv[5].c, 1, H, lmax*lmax);
+
+  for(i=0;i<e[6].l;++i)
+    e[6].hj[i] = ddot(qc, be[6][i].c, 1, H, lmax*lmax);
+
+}
+
+
+
+void Hex::Iprod_3d(Element *E, Basis *ba, Basis *bb, Basis *bc){
+
+  register int i,j;
+  double   *wa,*wb,*wc;
+
+  E->state = 't';
+
+  dvmul(qtot,geom->jac.p,1,h_3d[0][0],1,E->h_3d[0][0],1);
+
+  getzw(E->qa,&wa,&wa,'a');
+  getzw(E->qb,&wb,&wb,'a');
+  getzw(E->qb,&wc,&wc,'a');
+
+  for(i = 0; i < qb*qc; ++i)
+   dvmul(qa,  wa,  1,  E->h_3d[0][i], 1, E->h_3d[0][i], 1);
+  for(i = 0; i < qc; ++i)
+    for(j = 0; j < qb; ++j)
+      dsmul(qa,    wb[j], E->h_3d[i][j], 1, E->h_3d[i][j], 1);
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb, wc[i], E->h_3d[i][0], 1, E->h_3d[i][0], 1);
+
+
+  double *H = Hex_Iprod_wk;
+
+  dgemm('T','N',lmax,qb*qc,qa,1.0,ba->vert[0].a,qa,**E->h_3d,qa,0.0,H,lmax);
+
+  for(i=0;i<qc;++i)
+    dgemm('N','N',lmax,lmax,qb,1.,H+i*lmax*qb,lmax, bb->vert[0].b, qb,0.0, (**E->h_3d)+i*lmax*lmax,lmax);
+
+  dgemm('N','N',lmax*lmax,lmax,qc,1.0, **E->h_3d, lmax*lmax, bc->vert[0].c, qc, 0.0, H, lmax*lmax);
+
+  Hex_map_to_hj(this, H);
+
+}
+
+
+
+static void Hex_map_to_hj(Element *E, double *d){
+  int lm = E->lmax;
+  int i,j,k;
+
+  E->vert[0].hj[0] = d[0];
+  E->vert[1].hj[0] = d[lm-1];
+  E->vert[2].hj[0] = d[lm*lm-1];
+  E->vert[3].hj[0] = d[lm*(lm-1)];
+
+  E->vert[4].hj[0] = d[lm*lm*(lm-1)+0];
+  E->vert[5].hj[0] = d[lm*lm*(lm-1)+lm-1];
+  E->vert[6].hj[0] = d[lm*lm*(lm-1)+lm*lm-1];
+  E->vert[7].hj[0] = d[lm*lm*(lm-1)+lm*(lm-1)];
+
+  dcopy(E->edge[0].l, d+1, 1,           E->edge[0].hj, 1);
+  dcopy(E->edge[1].l, d+lm+lm-1, lm,    E->edge[1].hj, 1);
+  dcopy(E->edge[2].l, d+lm*(lm-1)+1, 1, E->edge[2].hj, 1);
+  dcopy(E->edge[3].l, d+lm, lm,         E->edge[3].hj, 1);
+
+  dcopy(E->edge[4].l, d+lm*lm, lm*lm,           E->edge[4].hj, 1);
+  dcopy(E->edge[5].l, d+lm*lm+lm-1, lm*lm,      E->edge[5].hj, 1);
+  dcopy(E->edge[6].l, d+lm*lm+lm*lm-1, lm*lm,   E->edge[6].hj, 1);
+  dcopy(E->edge[7].l, d+lm*lm+lm*(lm-1), lm*lm, E->edge[7].hj, 1);
+
+  dcopy(E->edge[8].l,  d+lm*lm*(lm-1)+1, 1,           E->edge[8].hj, 1);
+  dcopy(E->edge[9].l,  d+lm*lm*(lm-1)+lm+lm-1, lm,    E->edge[9].hj, 1);
+  dcopy(E->edge[10].l, d+lm*lm*(lm-1)+lm*(lm-1)+1, 1, E->edge[10].hj, 1);
+  dcopy(E->edge[11].l, d+lm*lm*(lm-1)+lm, lm,         E->edge[11].hj, 1);
+
+   // faces
+  for(i=0;i<E->face[0].l;++i)
+    dcopy(E->face[0].l, d+lm+1+i*lm, 1, E->face[0].hj[i], 1);
+
+  for(i=0;i<E->face[1].l;++i)
+    dcopy(E->face[1].l,  d+lm*lm+1+i*lm*lm, 1, E->face[1].hj[i], 1);
+
+  for(i=0;i<E->face[2].l;++i)
+    dcopy(E->face[2].l, d+lm*lm+lm+lm-1+i*lm*lm, lm,E->face[2].hj[i], 1 );
+
+  for(i=0;i<E->face[3].l;++i)
+    dcopy(E->face[3].l, d+lm*lm+lm*(lm-1)+1+i*lm*lm, 1, E->face[3].hj[i], 1);
+
+  for(i=0;i<E->face[4].l;++i)
+    dcopy(E->face[4].l,  d+lm*lm+lm+i*lm*lm, lm, E->face[4].hj[i], 1);
+
+  for(i=0;i<E->face[5].l;++i)
+    dcopy(E->face[5].l, d+lm*lm*(lm-1)+lm+1+i*lm, 1, E->face[5].hj[i], 1);
+
+  // interior
+
+  for(i=0;i<E->interior_l;++i)
+    for(j=0;j<E->interior_l;++j)
+      for(k=0;k<E->interior_l;++k)
+  E->hj_3d[i][j][k] = d[lm*lm+lm+1+k+j*lm+i*lm*lm];
+}
+
+
+
+/*
+
+Function name: Element::iprod
+
+Function Purpose:
+
+Argument 1: Mode *x
+Purpose:
+
+Argument 2: Mode *y
+Purpose:
+
+Function Notes:
+
+*/
+
+double Tri::iprod(Mode *x, Mode *y){
+  double d;
+  d  = ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+  return d;
+}
+
+
+
+
+double Quad::iprod(Mode *x, Mode *y){
+  double d  = geom->jac.d;
+  d *= ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+    return d;
+}
+
+
+
+
+double Tet::iprod(Mode *x, Mode *y){
+  double d;
+  d  = ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+  d *= ddot(qc,x->c,1,y->c,1);
+  return d;
+}
+
+
+
+
+double Pyr::iprod(Mode *x, Mode *y){
+  double d;
+  d  = ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+  d *= ddot(qc,x->c,1,y->c,1);
+  return d;
+}
+
+
+
+
+double Prism::iprod(Mode *x, Mode *y){
+  double d;
+  d  = ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+  d *= ddot(qc,x->c,1,y->c,1);
+  return d;
+}
+
+
+
+
+double Hex::iprod(Mode *x, Mode *y){
+  double d;
+  d  = ddot(qa,x->a,1,y->a,1);
+  d *= ddot(qb,x->b,1,y->b,1);
+  d *= ddot(qc,x->c,1,y->c,1);
+  return d;
+}
+
+
+
+
+double Element::iprod(Mode *, Mode *){return 0.0;}
+
+
+
+
+/*
+
+Function name: Element::iprodlap
+
+Function Purpose:
+
+Argument 1: Mode *x
+Purpose:
+
+Argument 2: Mode *y
+Purpose:
+
+Argument 3: Mode *fac
+Purpose:
+
+Function Notes:
+
+*/
+
+double Tri::iprodlap(Mode *x, Mode *y, Mode *fac){
+  double prod,s1,s2,s3,s4,s5;
+  double g1 = geom->rx.d*geom->rx.d + geom->ry.d*geom->ry.d;
+  double g2 = geom->sx.d*geom->sx.d + geom->sy.d*geom->sy.d;
+  double g4 = geom->rx.d*geom->sx.d + geom->ry.d*geom->sy.d;
+  double g3 = 0,g5 = 0,g6=0;
+
+  double *tmp = dvector(0,QGmax-1);
+
+  prod  = g1*ddot(qa,x[0].a,1,y[0].a,1);
+  dvmul(qa,fac[0].a,1,x[0].a,1,tmp,1);
+  prod += 2*(g4+g5)*ddot(qa,tmp,1,y[0].a,1);
+  dvmul(qa,fac[0].a,1,tmp,1,tmp,1);
+  prod += (g2+2*g6+g3)*ddot(qa,tmp,1,y[0].a,1);
+  prod *= ddot(qb,x[0].b,1,y[0].b,1);
+
+  s1 = ddot(qa,x[0].a,1,y[1].a,1);
+  dvmul(qa,fac[0].a,1,x[0].a,1,tmp,1);
+  s2 = ddot(qa,tmp,1,y[1].a,1);
+  s3 = ddot(qa,y[0].a,1,x[1].a,1);
+  dvmul(qa,fac[0].a,1,y[0].a,1,tmp,1);
+  s4 = ddot(qa,tmp,1,x[1].a,1);
+  s5 = ddot(qa,x[1].a,1,y[1].a,1);
+
+  prod += (g4*s1 + (g2+g6)*s2)*ddot(qb,x[0].b,1,y[1].b,1);
+  prod += (g4*s3 + (g2+g6)*s4)*ddot(qb,y[0].b,1,x[1].b,1);
+
+  prod += g2*ddot(qb,x[1].b,1,y[1].b,1)*s5;
+
+  free(tmp);
+  return prod;
+}
+
+
+
+
+double Quad::iprodlap(Mode *x, Mode *y, Mode *fac){
+  double prod,s1,s2,s3,s4,s5;
+  double g1 = geom->rx.d*geom->rx.d + geom->ry.d*geom->ry.d;
+  double g2 = geom->sx.d*geom->sx.d + geom->sy.d*geom->sy.d;
+  double g4 = geom->rx.d*geom->sx.d + geom->ry.d*geom->sy.d;
+  double g3 = 0,g5 = 0,g6=0;
+
+  double *tmp =dvector(0,QGmax-1);
+
+  prod  = g1*ddot(qa,x[0].a,1,y[0].a,1);
+  dvmul(qa,fac[0].a,1,x[0].a,1,tmp,1);
+  prod += 2*(g4+g5)*ddot(qa,tmp,1,y[0].a,1);
+  dvmul(qa,fac[0].a,1,tmp,1,tmp,1);
+  prod += (g2+2*g6+g3)*ddot(qa,tmp,1,y[0].a,1);
+  prod *= ddot(qb,x[0].b,1,y[0].b,1);
+
+  s1 = ddot(qa,x[0].a,1,y[1].a,1);
+  dvmul(qa,fac[0].a,1,x[0].a,1,tmp,1);
+  s2 = ddot(qa,tmp,1,y[1].a,1);
+  s3 = ddot(qa,y[0].a,1,x[1].a,1);
+  dvmul(qa,fac[0].a,1,y[0].a,1,tmp,1);
+  s4 = ddot(qa,tmp,1,x[1].a,1);
+  s5 = ddot(qa,x[1].a,1,y[1].a,1);
+
+  prod += (g4*s1 + (g2+g6)*s2)*ddot(qb,x[0].b,1,y[1].b,1);
+  prod += (g4*s3 + (g2+g6)*s4)*ddot(qb,y[0].b,1,x[1].b,1);
+
+  prod += g2*ddot(qb,x[1].b,1,y[1].b,1)*s5;
+
+  free(tmp);
+  return prod;
+}
+
+
+
+
+double Tet::iprodlap(Mode *, Mode *, Mode *){
+  fprintf(stderr,"Tet::iprodlap not implemented\n");
+  return 0.0;
+}
+
+
+
+
+double Pyr::iprodlap(Mode *, Mode *, Mode *){
+  fprintf(stderr,"Pyr::iprodlap not implemented\n");
+  return 0.0;
+}
+
+
+
+
+double Prism::iprodlap(Mode *, Mode *, Mode *){
+  fprintf(stderr,"Prism::iprodlap not implemented\n");
+  return 0.0;
+}
+
+
+
+
+double Hex::iprodlap(Mode *, Mode *, Mode *){
+  fprintf(stderr,"Hex::iprodlap not implemented\n");
+  return 0.0;
+}
+
+
+
+
+double Element::iprodlap(Mode *, Mode *, Mode *){return 0.0;}
+
+
+/*
+
+Function name: Element::HelmHoltz
+
+Function Purpose:
+
+Argument 1: Metric *lambda
+Purpose:
+
+Function Notes:
+
+*/
+
+
+static double setQfactor(int ind, int limit, int low, int high){ //SVV
+ double num   = ind - (limit - high),
+        denom = ind - low + 1 ,
+        Q;
+
+ if(ind>limit)
+   num = 0.0;
+
+ Q = num*num/(denom*denom);
+ return Q;
+}
+
+
+void Tri::HelmHoltz(Metric *lambda){
+  int   Nm,qt;
+  Basis *b,*db;
+  double *store,*u1,*u2;
+  static int SVV = dparam("SVVfactor") ? 1:0;
+
+  double *wk = Tri_wk.get();
+
+  store = wk+QGmax*QGmax;
+  u1    = wk+2*QGmax*QGmax;
+  u2    = wk+3*QGmax*QGmax;
+
+  Nm = Nmodes;
+  b  = getbasis();
+  db = derbasis();
+  qt = qa*qb;
+
+  Grad_d(u1, u2, 0, 'a');
+
+  if(lambda){
+    if(lambda->wave){
+      dsmul(qt,lambda->d, *h,1,*h,1);
+      dvvtvp(qt,lambda->wave[0],1,u1,1,*h,1,*h,1);
+      dvvtvp(qt,lambda->wave[1],1,u2,1,*h,1,*h,1);
+      Iprod_d(this,b,b);
+      dcopy(Nm,vert->hj,1,store,1);
+    }
+    else{
+      Iprod_d(this,b,b);
+      dsmul(Nm, lambda->d, vert->hj, 1, store, 1);
+    }
+  }
+  else
+    dzero(Nm,store,1);
+
+#ifndef SVVSYMM
+  form_diprod(u1,u2,NULL,b->vert+1);
+#endif
+
+  if (SVV && type != 'p') {
+    register int i,j,k,cnt;
+    int    fl = face[0].l, el;
+    double Qa,Qb,*filter = dvector(0,Nm-1);
+    static double  Epsilon;
+    static int NCutMT, NCutM, init=1;
+
+
+    if(init){
+      double SVVfactor = dparam("SVVfactor");
+
+#ifdef SVVSYMM
+      init_ortho_basis();
+#endif
+      Epsilon = dparam("EPSILON");
+      if (iparam("MNT"))
+  NCutMT = iparam("MNT");
+      else
+  NCutMT = 0;
+
+      if(SVVfactor > 1.0){
+  fprintf(stdout,"SVVfactor greater than 1 reseting to 1\n");
+  SVVfactor = 1.0;
+      }
+      NCutM = (int)((lmax-2)*(1.0-SVVfactor));
+
+#ifdef SVVSYMM
+      NCutM += 2; // add 2 so that zero and linear mode are not affected
+#endif
+
+      fprintf(stdout,"\nUsing Spectrally Varying Viscosity:\n"
+        "\t filtering from %d mode\n",NCutM);
+
+
+      init = 0;
+
+    }
+
+    // set up filter vector to scale weak Laplacian
+    dzero(Nm,filter,1);
+
+
+#ifndef SVVSYMM
+    cnt = Nverts;
+    for (k = 0; k < Nedges; k++) {
+      el = edge[k].l;
+
+      for (i= NCutM; i < (el - NCutMT); ++i) {
+  Qa = setQfactor (i, el, NCutM, NCutMT);
+  filter[cnt+i]= exp(-Qa);
+      }
+      cnt += el;
+    }
+
+    for (i = 0; i < fl; i++){
+      for (j = 0; j <fl-i; j++,++cnt){
+  Qa = Qb = 0.0;
+
+  if (i >= NCutM && i < (fl-NCutMT))
+    Qa = setQfactor (i, fl, NCutM, NCutMT);
+  if (j >= NCutM && j < (fl-i-NCutMT))
+    Qa = setQfactor (j, fl, NCutM, NCutMT); // emulation of gsk
+  //Qb = setQfactor (j, fl-i, NCutM, NCutMT);
+
+  if (i<NCutM && j<NCutM)
+    filter[cnt] = 0.0;
+  else{
+    if (i>=(fl-NCutMT) && j>=(fl-i-NCutMT))
+      filter[cnt] = 1.0;
+    else
+      filter[cnt] = exp(-(Qa+Qb));
+  }
+      }
+    }
+#else
+    // This only needs to be used if the othogonal projections is used.
+    cnt = 0;
+    for (i = 0; i < lmax; i++){
+      for (j = 0; j < lmax-i; j++,++cnt){
+  if(i+j >= NCutM){
+    Qb = setQfactor (i+j, lmax, NCutM, NCutMT);
+    filter[cnt] = exp(-Qb);
+  }
+      }
+    }
+#endif
+
+#ifdef SVVSYMM
+    double *str = dvector(0,2*qt-1);
+
+    dcopy(qt,u1,1,*h,1);
+    Ofwd(*h,vert->hj,lmax);
+    dvmul(Nm,filter,1,vert->hj,1,vert->hj,1);
+    Obwd(vert->hj,*h,lmax);
+    dcopy(qt,*h,1,str,1);
+
+    dcopy(qt,u2,1,*h,1);
+    Ofwd(*h,vert->hj,lmax);
+    dvmul(Nm,filter,1,vert->hj,1,vert->hj,1);
+    Obwd(vert->hj,*h,lmax);
+    dcopy(qt,*h,1,str+qt,1);
+
+    form_diprod(str,str+qt,NULL,b->vert+1);
+
+    dsmul(qt,Epsilon,str,1,*h,1);
+    Iprod_d(this,db,b);
+    dvadd(Nm,vert->hj,1,store,1,store,1);
+#if 0
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+#endif
+
+    dsmul(qt,Epsilon,str+qt,1,*h,1);
+    Iprod_d(this,b,db);
+    dvadd(Nm,vert->hj,1,store,1,store,1);
+#if 0
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+#endif
+
+    free(str);
+#else
+    dsmul(qt,Epsilon,u1,1,*h,1);
+    Iprod_d(this,db,b);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+
+    dsmul(qt,Epsilon,u2,1,*h,1);
+    Iprod_d(this,b,db);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+#endif
+
+    free(filter);
+  }
+
+#ifdef SVVSYMM
+  form_diprod(u1,u2,NULL,b->vert+1);
+#endif
+
+  // add contribution of original Laplacian
+  if(option("AXISYM")){
+    // assume lambda->p holds r
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+    dvmul(qtot, lambda->p, 1, u2, 1, u2, 1);
+  }
+  else if(lambda && lambda->p){
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+    dvmul(qtot, lambda->p, 1, u2, 1, u2, 1);
+  }
+
+  dcopy(qt, u1, 1, *h, 1);
+  Iprod_d(this,db,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt, u2,1,*h,1);
+  Iprod_d((Element*)this,b,db);
+  dvadd(Nm,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+}
+
+
+void Quad::HelmHoltz(Metric *lambda){
+  int   Nm,qt;
+  Basis *b,*db;
+  double *store,*u1,*u2;
+  static int SVV = dparam("SVVfactor") ? 1:0;
+
+  store = dvector(0,Nmodes-1);
+  u1    = dvector(0,2*QGmax*QGmax-1);
+  u2    = u1 + QGmax*QGmax;
+
+  Nm = Nmodes;
+  b  = getbasis();
+  db = derbasis();
+  qt = qa*qb;
+
+  Grad_d(u1, u2, 0, 'a');
+
+  if(lambda){
+    if(lambda->wave){
+      dsmul   (qt,lambda->d, *h,1,*h,1);
+      dvvtvp  (qt,lambda->wave[0],1,u1,1,*h,1,*h,1);
+      dvvtvp  (qt,lambda->wave[1],1,u2,1,*h,1,*h,1);
+      Iprod_d (this,b,b);
+      dcopy   (Nm,vert->hj,1,store,1);
+    }
+    else{
+      Iprod_d (this,b,b);
+      dsmul   (Nm, lambda->d, vert->hj, 1, store, 1);
+    }
+  }
+   else if(lambda->wave){ /* zero lambda case */
+    dvmul   (qt,lambda->wave[0],1,u1,1,*h,1);
+    dvvtvp  (qt,lambda->wave[1],1,u2,1,*h,1,*h,1);
+    Iprod_d (this,b,b);
+    dcopy   (Nm,vert->hj,1,store,1);
+  }
+  else
+    dzero(Nm,store,1);
+
+#ifndef SVVSYMM
+  form_diprod(u1,u2,NULL,(Mode*)NULL);
+#endif
+
+  if (SVV && type != 'p') {
+    register int i,j,k,cnt;
+    int    fl = face[0].l, el;
+    double Qa,Qb,*filter = dvector(0,Nm-1);
+    static double  Epsilon;
+    static int NCutMT, NCutM, init=1;
+
+
+    if(init){
+      double SVVfactor = dparam("SVVfactor");
+
+#ifdef SVVSYMM
+      init_ortho_basis();
+#endif
+
+      Epsilon = dparam("EPSILON");
+
+      if (iparam("MNT"))
+  NCutMT = iparam("MNT");
+      else
+  NCutMT = 0;
+
+      if(SVVfactor > 1.0){
+  fprintf(stdout,"SVVfactor greater than 1 reseting to 1\n");
+  SVVfactor = 1.0;
+      }
+
+      NCutM = (int)((lmax-2)*(1.0-SVVfactor));
+
+#ifdef SVVSYMM
+      NCutM += 2; // add 2 so that zero and linear mode are not affected
+#endif
+
+      fprintf(stdout,"\nUsing Spectrally Varying Viscosity:\n"
+        "\t filtering from %d mode\n",NCutM);
+
+      init = 0;
+    }
+
+
+    // set up filter vector to scale weak Laplacian
+    dzero(Nm,filter,1);
+
+#ifndef SVVSYMM
+    cnt = Nverts;
+    for (k = 0; k < Nedges; k++) {
+      el = edge[k].l;
+      // modify edge modes higher than NcutM
+      for (i = NCutM; i < (el - NCutMT); ++i) {
+  Qa = setQfactor (i, el, NCutM, NCutMT);
+  filter[cnt+i] = exp(-Qa);
+      }
+      cnt += el;
+    }
+
+    for (i = 0; i < NCutM; i++){
+      for (j = NCutM; j < (fl - NCutMT); j++) {
+  Qb = setQfactor (j, fl, NCutM, NCutMT);
+  filter[cnt+j] = exp(-Qb);
+      }
+      cnt += fl;
+    }
+
+    for (i = NCutM; i < (fl - NCutMT); i++){
+      Qa = setQfactor (i, fl, NCutM, NCutMT);
+      for (j = 0; j < NCutM; j++)
+  filter[cnt+j] = exp(-Qa);
+
+      for (j = NCutM; j < (fl - NCutMT); j++){
+  Qb = setQfactor (j, fl, NCutM, NCutMT);
+  filter[cnt+j] = exp(-(Qa+Qb));
+      }
+      cnt += fl;
+    }
+#else
+
+    // This only needs to be used if the othogonal projections is used.
+
+    cnt = 0;
+    for (i = 0; i < NCutM; i++){
+      for (j = NCutM; j < lmax; j++){
+  Qb = setQfactor (j, lmax, NCutM, NCutMT);
+  filter[cnt+j] = exp(-Qb);
+      }
+      cnt += lmax;
+    }
+
+    for (i = NCutM; i < lmax; i++){
+      Qa = setQfactor (i, lmax, NCutM, NCutMT);
+
+      for (j = 0; j < NCutM; j++)
+  filter[cnt+j] = exp(-Qa);
+
+      for (j = NCutM; j < lmax; j++){
+  Qb = setQfactor (j, lmax, NCutM, NCutMT);
+  filter[cnt+j] = exp(-(Qa+Qb));
+      }
+      cnt += lmax;
+    }
+
+#endif
+
+
+#ifdef SVVSYMM
+    double *str = dvector(0,2*qt-1);
+
+    dcopy(qt,u1,1,*h,1);
+    //Jfwd(this);
+    Ofwd(*h,vert->hj,lmax);
+    dvmul(Nm,filter,1,vert->hj,1,vert->hj,1);
+    //Jbwd(this,getbasis());
+    Obwd(vert->hj,*h,lmax);
+    dcopy(qt,*h,1,str,1);
+
+    dcopy(qt,u2,1,*h,1);
+    //Jfwd(this);
+    Ofwd(*h,vert->hj,lmax);
+    dvmul(Nm,filter,1,vert->hj,1,vert->hj,1);
+    //Jbwd(this,getbasis());
+    Obwd(vert->hj,*h,lmax);
+    dcopy(qt,*h,1,str+qt,1);
+
+    form_diprod(str,str+qt,NULL,(Mode*)NULL);
+
+    dsmul(qt,Epsilon,str,1,*h,1);
+    Iprod_d(this,db,b);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+
+    dsmul(qt,Epsilon,str+qt,1,*h,1);
+    Iprod_d(this,b,db);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+
+    free(str);
+#else
+    dsmul(qt,Epsilon,u1,1,*h,1);
+    Iprod_d(this,db,b);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+
+    dsmul(qt,Epsilon,u2,1,*h,1);
+    Iprod_d(this,b,db);
+    dvvtvp(Nm,filter,1,vert->hj,1,store,1,store,1);
+#endif
+
+    free(filter);
+  }
+
+#ifdef SVVSYMM
+  form_diprod(u1,u2,NULL,(Mode*)NULL);
+#endif
+
+  // put in variable viscosity for derivate operator
+  if(option("AXISYM")){
+    // assume lambda->p holds r
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+    dvmul(qtot, lambda->p, 1, u2, 1, u2, 1);
+  }
+  else if(lambda&&lambda->p){
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+    dvmul(qtot, lambda->p, 1, u2, 1, u2, 1);
+  }
+
+  dcopy(qt,u1,1,*h,1);
+  Iprod_d(this,db,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u2,1,*h,1);
+  Iprod_d(this,b,db);
+  dvadd(Nm,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+
+  free(store); free(u1);
+}
+
+
+
+
+void Tet::HelmHoltz(Metric *lambda){
+  int   Nm,qt;
+  Basis *b,*db;
+  double *store,*u1,*u2,*u3;
+  int SVV = dparam("SVVfactor") ? 1:0;
+
+  store = Tet_HelmHoltz_wk;
+  u1    = store+QGmax*QGmax*QGmax;
+  u2    = store+2*QGmax*QGmax*QGmax;
+  u3    = store+3*QGmax*QGmax*QGmax;
+
+  dzero(3*QGmax*QGmax*QGmax, u1, 1);
+
+  Nm = Nmodes;
+
+  b  = getbasis();
+  db = derbasis();
+  qt = qtot;
+
+  Grad_d(u1, u2, u3, 'a');
+  // add sponge
+  if(lambda->p)
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+
+  if(lambda){
+    Tet::Iprod_3d(this,b,b,b);
+    dsmul(Nm, lambda->d, vert->hj, 1, store, 1);
+  }
+  else
+    dzero(Nm,store,1);
+
+
+  if (SVV && type != 'p') {
+    register int i,j,k,cnt;
+    int    fl = face[0].l, el;
+    double Qb,*filter = dvector(0,Nm-1);
+    static double  Epsilon;
+    static int NCutMT, NCutM, init=1;
+
+
+    if(init){
+     // if(!is_init_ortho_basis())
+      init_ortho_basis();
+
+      Epsilon = dparam("EPSILON");
+      double SVVfactor = dparam("SVVfactor");
+      if (SVVfactor > 1.0) SVVfactor = 1.0;
+
+      if (iparam("MNT"))
+        NCutMT = iparam("MNT");
+      else
+        NCutMT = 0;
+
+      NCutM = (int) ((lmax-2)*(1.0-SVVfactor));
+
+      ROOTONLY
+        fprintf(stdout,"\nUsing Spectrally Varying Viscosity:\n"
+                "\t filtering from %d mode\n",NCutM);
+
+      init = 0;
+    }
+
+    // set up filter vector to scale weak Laplacian
+    dzero(Nm,filter,1);
+
+    cnt = 0;
+    for (i = 0; i < lmax; i++){
+      for (j = 0; j < lmax-i; j++){
+        for (k=0; k<lmax-i-j;k++,++cnt){
+          if(i+j+k >= NCutM){
+            Qb = setQfactor (i+j+k, lmax, NCutM, NCutMT);
+            filter[cnt] = exp(-Qb);
+          }
+        }
+      }
+    }
+    double *str = dvector(0,3*qt-1);
+    double *ftmp1 = dvector(0,QGmax*QGmax*QGmax-1);
+    double *ftmp2 = dvector(0,QGmax*QGmax*QGmax-1);
+
+    dcopy(qt,u1,1,ftmp1,1);
+    Ofwd(ftmp1,ftmp2,lmax);
+    dvmul(Nm,filter,1,ftmp2,1,ftmp2,1);
+    Obwd(ftmp2,ftmp1,lmax);
+    dcopy(qt,ftmp1,1,str,1);
+
+    dcopy(qt,u2,1,ftmp1,1);
+    Ofwd(ftmp1,ftmp2,lmax);
+    dvmul(Nm,filter,1,ftmp2,1,ftmp2,1);
+    Obwd(ftmp2,ftmp1,lmax);
+    dcopy(qt,ftmp1,1,str+qt,1);
+
+    dcopy(qt,u3,1,ftmp1,1);
+    Ofwd(ftmp1,ftmp2,lmax);
+    dvmul(Nm,filter,1,ftmp2,1,ftmp2,1);
+    Obwd(ftmp2,ftmp1,lmax);
+    dcopy(qt,ftmp1,1,str+2*qt,1);
+
+    form_diprod(str,str+qt,str+2*qt,b->vert+1);
+
+    dsmul(qt,Epsilon,str,1,*h_3d[0],1);
+    Iprod_3d(this,db,b,b);
+    dvadd(Nm,vert->hj,1,store,1,store,1);
+
+    dsmul(qt,Epsilon,str+qt,1,*h_3d[0],1);
+    Iprod_3d(this,b,db,b);
+    dvadd(Nm,vert->hj,1,store,1,store,1);
+
+    dsmul(qt,Epsilon,str+2*qt,1,*h_3d[0],1);
+    Iprod_3d(this,b,b,db);
+    dvadd(Nm,vert->hj,1,store,1,store,1);
+
+    free(ftmp1); free(ftmp2);
+    free(str);
+    free(filter);
+  }
+
+  form_diprod(u1,u2,u3,b->vert+1);
+
+  dcopy(qt,u1,1,*h_3d[0],1);
+  Tet::Iprod_3d(this,db,b,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u2,1,*h_3d[0],1);
+  Tet::Iprod_3d(this,b,db,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u3,1,*h_3d[0],1);
+  Tet::Iprod_3d(this,b,b,db);
+  dvadd(Nm,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+}
+
+
+
+
+void Pyr::HelmHoltz(Metric *lambda){
+  int   Nm,qt;
+  Basis *b,*db;
+  double *store,*u1,*u2,*u3;
+
+  store = Pyr_HelmHoltz_wk;
+  u1    = Pyr_HelmHoltz_wk+QGmax*QGmax*QGmax;
+  u2    = Pyr_HelmHoltz_wk+2*QGmax*QGmax*QGmax;
+  u3    = Pyr_HelmHoltz_wk+3*QGmax*QGmax*QGmax;
+
+  dzero(3*QGmax*QGmax*QGmax, u1, 1);
+
+  Nm = Nmodes;
+
+  b  = getbasis();
+  db = derbasis();
+  qt = qtot;
+
+  Grad_d(u1, u2, u3, 'a');
+  // add sponge
+  if(lambda->p)
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+
+  form_diprod(u1,u2,u3,NULL);
+
+  if(lambda){
+    Pyr::Iprod_3d(this,b,b,b);
+    dsmul(Nm, lambda->d, vert->hj, 1, store, 1);
+  }
+  else
+    dzero(Nm,store,1);
+
+  dcopy(qt,u1,1,*h_3d[0],1);
+  Pyr::Iprod_3d(this,db,b,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u2,1,*h_3d[0],1);
+  Pyr::Iprod_3d(this,b,db,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u3,1,*h_3d[0],1);
+  Pyr::Iprod_3d(this,b,b,db);
+  dvadd(Nm,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+
+}
+
+
+
+
+void Prism::HelmHoltz(Metric *lambda){
+  Basis *b,*db;
+  double *store,*u1,*u2,*u3;
+
+  store = Prism_HelmHoltz_wk;
+  u1    = Prism_HelmHoltz_wk+QGmax*QGmax*QGmax;
+  u2    = Prism_HelmHoltz_wk+2*QGmax*QGmax*QGmax;
+  u3    = Prism_HelmHoltz_wk+3*QGmax*QGmax*QGmax;
+
+  dzero(3*QGmax*QGmax*QGmax, u1, 1);
+
+  b  = getbasis();
+  db = derbasis();
+
+  Grad_d(u1, u2, u3, 'a');
+  // add sponge
+  if(lambda->p)
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+
+  form_diprod(u1,u2,u3,NULL);
+
+  if(lambda){
+    Prism::Iprod_3d(this,b,b,b);
+    dsmul(Nmodes, lambda->d, vert->hj, 1, store, 1);
+  }
+  else
+    dzero(Nmodes,store,1);
+
+  dcopy(qtot,u1,1,*h_3d[0],1);
+  Prism::Iprod_3d(this,db,b,b);
+  dvadd(Nmodes,vert->hj,1,store,1,store,1);
+
+  dcopy(qtot,u2,1,*h_3d[0],1);
+  Prism::Iprod_3d(this,b,db,b);
+  dvadd(Nmodes,vert->hj,1,store,1,store,1);
+
+  dcopy(qtot,u3,1,*h_3d[0],1);
+  Prism::Iprod_3d(this,b,b,db);
+  dvadd(Nmodes,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+
+}
+
+
+
+
+void Hex::HelmHoltz(Metric *lambda){
+  int   Nm,qt;
+  Basis *b,*db;
+  double *store,*u1,*u2,*u3;
+
+  store = Hex_HelmHoltz_wk;
+  u1    = store+QGmax*QGmax*QGmax;
+  u2    = store+2*QGmax*QGmax*QGmax;
+  u3    = store+3*QGmax*QGmax*QGmax;
+
+  dzero(3*QGmax*QGmax*QGmax, u1, 1);
+
+  Nm = Nmodes;
+
+  b  = getbasis();
+  db = derbasis();
+  qt = qtot;
+
+  Grad_d(u1, u2, u3, 'a');
+  // add sponge
+  if(lambda->p)
+    dvmul(qtot, lambda->p, 1, u1, 1, u1, 1);
+
+  form_diprod(u1,u2,u3,NULL);
+
+  if(lambda){
+    Hex::Iprod_3d(this,b,b,b);
+    dsmul(Nm, lambda->d, vert->hj, 1, store, 1);
+  }
+  else
+    dzero(Nm,store,1);
+
+  dcopy(qt,u1,1,*h_3d[0],1);
+  Hex::Iprod_3d(this,db,b,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u2,1,*h_3d[0],1);
+  Hex::Iprod_3d(this,b,db,b);
+  dvadd(Nm,vert->hj,1,store,1,store,1);
+
+  dcopy(qt,u3,1,*h_3d[0],1);
+  Hex::Iprod_3d(this,b,b,db);
+  dvadd(Nm,vert->hj,1,store,1,vert->hj,1);
+
+  state = 't';
+
+}
+
+
+
+
+void Element::HelmHoltz(Metric *){ERR;}
+
+
+
+
+/*
+
+Function name: Element::form_diprod
+
+Function Purpose:
+
+Argument 1: double *u1
+Purpose:
+
+Argument 2: double *u2
+Purpose:
+
+Argument 3: double *
+Purpose:
+
+Argument 4: Mode *m
+Purpose:
+
+Function Notes:
+
+*/
+
+void Tri::form_diprod(double *u1, double *u2, double *, Mode *m)
+{
+  register int i;
+  const    int qt = qa*qb;
+  Geom     *G = geom;
+  double *tmp = Tri_wk.get()+4*QGmax*QGmax; // sort out later
+  double *Ur = tmp;
+
+  //  Grad_d(u1,u2,(double*)NULL,'a');
+
+  if(curvX){
+    dvmul (qt,G->rx.p,1,u1,1,Ur,1);
+    dvvtvp(qt,G->ry.p,1,u2,1,Ur,1,Ur,1);
+
+    dvmul (qt,G->sy.p,1,u2,1,u2,1);
+    dvvtvp(qt,G->sx.p,1,u1,1,u2,1,u2,1);
+  }
+  else{
+    if(G->rx.d) dsmul(qt,G->rx.d,u1,1,Ur,1);
+    else        dzero(qt,Ur,1);
+    if(G->ry.d) daxpy(qt,G->ry.d,u2,1,Ur,1);
+
+    if(G->sy.d) dscal(qt,G->sy.d,u2,1);
+    else        dzero(qt,u2,1);
+    if(G->sx.d) daxpy(qt,G->sx.d,u1,1,u2,1);
+  }
+
+  for(i = 0; i < qa; ++i)
+    dsmul(qb,m[0].a[i],u2+i,qa,u1+i,qa);
+  dvadd(qt,Ur,1,u1,1,u1,1);
+
+  for(i = 0; i < qb; ++i)
+    dscal(qa,1.0/m[0].b[i],u1+i*qa,1);
+//  free(tmp);
+}
+
+
+
+
+void Quad::form_diprod(double *u1, double *u2, double *, Mode *)
+{
+  const    int qt = qa*qb;
+  Geom     *G = geom;
+  double *Ur = dvector(0,qt-1);
+
+  //  Grad_d(u1,u2,(double*)NULL,'a');
+
+  dvmul (qt,G->rx.p,1,u1,1,Ur,1);
+  dvvtvp(qt,G->ry.p,1,u2,1,Ur,1,Ur,1);
+
+  dvmul (qt,G->sy.p,1,u2,1,u2,1);
+  dvvtvp(qt,G->sx.p,1,u1,1,u2,1,u2,1);
+
+  dcopy (qt,Ur,1,u1,1);
+  free(Ur);
+}
+
+
+
+
+void Tet::form_diprod(double *u1, double *u2, double *u3, Mode *m)
+{
+  register int i,j;
+  Geom     *G  = geom;
+  double   *Ur = Tet_form_diprod_wk;
+  double   *Us = Ur+QGmax*QGmax*QGmax;
+  double   *us;
+
+  //  Grad_d(u1,u2,u3,'a');
+
+  if(curvX){
+    dvmul (qtot,G->rx.p,1,u1,1,Ur,1);
+    dvvtvp(qtot,G->ry.p,1,u2,1,Ur,1,Ur,1);
+    dvvtvp(qtot,G->rz.p,1,u3,1,Ur,1,Ur,1);
+
+    dvmul (qtot,G->sx.p,1,u1,1,Us,1);
+    dvvtvp(qtot,G->sy.p,1,u2,1,Us,1,Us,1);
+    dvvtvp(qtot,G->sz.p,1,u3,1,Us,1,Us,1);
+
+    dvmul (qtot,G->tz.p,1,u3,1,u3,1);
+    dvvtvp(qtot,G->ty.p,1,u2,1,u3,1,u3,1);
+    dvvtvp(qtot,G->tx.p,1,u1,1,u3,1,u3,1);
+  }
+  else{
+    if(G->rx.d) dsmul(qtot,G->rx.d,u1,1,Ur,1);
+    else        dzero(qtot,Ur,1);
+    if(G->ry.d) daxpy(qtot,G->ry.d,u2,1,Ur,1);
+    if(G->rz.d) daxpy(qtot,G->rz.d,u3,1,Ur,1);
+
+    if(G->sx.d) dsmul(qtot,G->sx.d,u1,1,Us,1);
+    else        dzero(qtot,Us,1);
+    if(G->sy.d) daxpy(qtot,G->sy.d,u2,1,Us,1);
+    if(G->sz.d) daxpy(qtot,G->sz.d,u3,1,Us,1);
+
+    if(G->tz.d) dsmul(qtot,G->tz.d,u3,1,u3,1);
+    else        dzero(qtot,u3,1);
+    if(G->ty.d) daxpy(qtot,G->ty.d,u2,1,u3,1);
+    if(G->tx.d) daxpy(qtot,G->tx.d,u1,1,u3,1);
+  }
+
+  dvadd(qtot,Us,1,u3,1,u1,1);
+  for(i = 0; i < qa; ++i)
+    dsmul(qb*qc,m[0].a[i],u1+i,qa,u1+i,qa);
+  dvadd(qtot,Ur,1,u1,1,u1,1);
+
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb,1.0/m[0].c[i],u1+i*qa*qb,1,u1+i*qa*qb,1);
+
+  dvrecp(qb,m[0].b,1,Ur,1);
+  for(i = 0,us=Us; i < qc; ++i)
+    for(j = 0; j < qb; ++j,u1+=qa,u3+=qa,us+=qa){
+      dsmul(qa,Ur[j],u1,1,u1,1);
+      daxpy(qa,m[1].b[j],u3,1,us,1);
+    }
+
+  for(i = 0; i < qc; ++i)
+    dsmul(qa*qb,1.0/m[0].c[i],Us+i*qa*qb,1,u2+i*qa*qb,1);
+}
+
+
+
+
+void Pyr::form_diprod(double *u1, double *u2, double *u3, Mode *)
+{
+#if 1
+
+  register int i,j;
+  Geom     *G  = geom;
+  double   *Ur = Pyr_form_diprod_wk;
+  double   *Us = Pyr_form_diprod_wk+QGmax*QGmax*QGmax;
+  double   *Ut = Pyr_form_diprod_wk+2*QGmax*QGmax*QGmax;
+
+  Basis    *B = getbasis();
+
+  //  Grad_d(u1,u2,u3,'a');
+
+  dvmul (qtot,G->rx.p,1,u1,1,Ur,1);
+  dvvtvp(qtot,G->ry.p,1,u2,1,Ur,1,Ur,1);
+  dvvtvp(qtot,G->rz.p,1,u3,1,Ur,1,Ur,1);
+
+  dvmul (qtot,G->sx.p,1,u1,1,Us,1);
+  dvvtvp(qtot,G->sy.p,1,u2,1,Us,1,Us,1);
+  dvvtvp(qtot,G->sz.p,1,u3,1,Us,1,Us,1);
+
+  dvmul (qtot,G->tx.p,1,u1,1,Ut,1);
+  dvvtvp(qtot,G->ty.p,1,u2,1,Ut,1,Ut,1);
+  dvvtvp(qtot,G->tz.p,1,u3,1,Ut,1,Ut,1);
+
+  // u1
+  for(i=0;i<qb*qc;++i)
+    dvvtvp(qa, B->vert[1].a, 1, Ut+i*qa, 1, Ur+i*qa, 1, Ur+i*qa, 1);
+
+  for(i=0;i<qc;++i)
+    dscal(qa*qb, 1./B->vert[0].c[i], Ur+i*qa*qb, 1);
+
+  // u2
+  for(i=0;i<qc;++i)
+    for(j=0;j<qb;++j)
+      daxpy(qa, B->vert[1].a[j], Ut+j*qa+i*qa*qb, 1, Us+j*qa+i*qa*qb, 1);
+
+  for(i=0;i<qc;++i)
+    dscal(qa*qb, 1./B->vert[0].c[i], Us+i*qa*qb, 1);
+
+  dcopy(qtot, Ur, 1, u1, 1);
+  dcopy(qtot, Us, 1, u2, 1);
+  dcopy(qtot, Ut, 1, u3, 1);
+#endif
+}
+
+
+
+
+void Prism::form_diprod(double *u1, double *u2, double *u3, Mode *)
+{
+#if 1
+
+  register int i;
+  Geom     *G  = geom;
+  double   *Ur = Prism_form_diprod_wk;
+  double   *Us = Prism_form_diprod_wk+QGmax*QGmax*QGmax;
+  double   *Ut = Prism_form_diprod_wk+2*QGmax*QGmax*QGmax;
+
+  Basis    *B = getbasis();
+
+  //  Grad_d(u1,u2,u3,'a');
+
+  dvmul (qtot,G->rx.p,1,u1,1,Ur,1);
+  dvvtvp(qtot,G->ry.p,1,u2,1,Ur,1,Ur,1);
+  dvvtvp(qtot,G->rz.p,1,u3,1,Ur,1,Ur,1);
+
+  dvmul (qtot,G->sx.p,1,u1,1,Us,1);
+  dvvtvp(qtot,G->sy.p,1,u2,1,Us,1,Us,1);
+  dvvtvp(qtot,G->sz.p,1,u3,1,Us,1,Us,1);
+
+  dvmul (qtot,G->tx.p,1,u1,1,Ut,1);
+  dvvtvp(qtot,G->ty.p,1,u2,1,Ut,1,Ut,1);
+  dvvtvp(qtot,G->tz.p,1,u3,1,Ut,1,Ut,1);
+
+  for(i=0;i<qb*qc;++i)
+    dvvtvp(qa, B->vert[1].a, 1, Ut+i*qa, 1, Ur+i*qa, 1, Ur+i*qa, 1);
+
+  for(i=0;i<qc;++i)
+    dscal(qa*qb, 1./B->vert[0].c[i], Ur+i*qa*qb, 1);
+
+  dcopy(qtot, Ur, 1, u1, 1);
+  dcopy(qtot, Us, 1, u2, 1);
+  dcopy(qtot, Ut, 1, u3, 1);
+
+
+#endif
+}
+
+
+
+
+void Hex::form_diprod(double *u1, double *u2, double *u3, Mode *)
+{
+  Geom     *G  = geom;
+  double   *Ur = Hex_form_diprod_wk;
+  double   *Us = Hex_form_diprod_wk+QGmax*QGmax*QGmax;
+  double   *Ut = Hex_form_diprod_wk+2*QGmax*QGmax*QGmax;
+
+  //  Grad_d(u1,u2,u3,'a');
+
+  dvmul (qtot,G->rx.p,1,u1,1,Ur,1);
+  dvvtvp(qtot,G->ry.p,1,u2,1,Ur,1,Ur,1);
+  dvvtvp(qtot,G->rz.p,1,u3,1,Ur,1,Ur,1);
+
+  dvmul (qtot,G->sx.p,1,u1,1,Us,1);
+  dvvtvp(qtot,G->sy.p,1,u2,1,Us,1,Us,1);
+  dvvtvp(qtot,G->sz.p,1,u3,1,Us,1,Us,1);
+
+  dvmul (qtot,G->tx.p,1,u1,1,Ut,1);
+  dvvtvp(qtot,G->ty.p,1,u2,1,Ut,1,Ut,1);
+  dvvtvp(qtot,G->tz.p,1,u3,1,Ut,1,Ut,1);
+
+  dcopy(qtot, Ur, 1, u1, 1);
+  dcopy(qtot, Us, 1, u2, 1);
+  dcopy(qtot, Ut, 1, u3, 1);
+
+}
+
+void Element::form_diprod(double *, double *, double *, Mode *){ERR;}

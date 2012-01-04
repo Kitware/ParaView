@@ -230,6 +230,9 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
         <Documentation>
           This property specifies the length of the box in the X direction.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -242,6 +245,9 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
         <Documentation>
           This property specifies the length of the box in the Y direction.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -254,6 +260,9 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
         <Documentation>
           This property specifies the length of the box in the Z direction.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -266,6 +275,9 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
         <Documentation>
           This property specifies the center of the box.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
    <!-- End Box -->
    </SourceProxy>
@@ -299,6 +311,9 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
         <Documentation>
           This property specifies the radius of the base of the cone.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -311,6 +326,9 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
         <Documentation>
           This property specifies the height of the cone.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -323,6 +341,9 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          <Documentation>
            This property specifies the center of the cone.
          </Documentation>
+         <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -335,6 +356,9 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
         <Documentation>
           Set the orientation vector of the cone.  The vector does not have to be normalized.  The cone will point in the direction specified.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -934,6 +958,9 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
         <Documentation>
           This property specifies the 3D coordinates for the center of the sphere.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -946,6 +973,9 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
         <Documentation>
           This property specifies the radius of the sphere.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -1040,6 +1070,9 @@ The Disk source can be used to add a polygonal disk to the 3D scene. The output 
         <Documentation>
           Specify inner radius of hole in disc.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -1052,6 +1085,9 @@ The Disk source can be used to add a polygonal disk to the 3D scene. The output 
         <Documentation>
           Specify outer radius of disc. 
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty

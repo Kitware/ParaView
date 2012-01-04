@@ -35,9 +35,9 @@ SET (Kit_SRCS
   vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
+  vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkMPIMoveData.cxx
   vtkNetworkAccessManager.cxx
   vtkNetworkImageSource.cxx
   vtkOutlineRepresentation.cxx
@@ -72,11 +72,14 @@ SET (Kit_SRCS
   vtkPVInformation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMultiClientsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
+  vtkPVPlotMatrixView.cxx
+  vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginTracker.cxx
@@ -92,8 +95,9 @@ SET (Kit_SRCS
   vtkPVServerManagerPluginInterface.cxx
   vtkPVServerOptions.cxx
   vtkPVSession.cxx
-  vtkPVSynchronizedRenderWindows.cxx
   vtkPVSynchronizedRenderer.cxx
+  vtkPVSynchronizedRenderWindows.cxx
+  vtkPVSystemInformation.cxx
   vtkPVTemporalDataInformation.cxx
   vtkPVTimerInformation.cxx
   vtkPVView.cxx
@@ -118,9 +122,18 @@ IF (PARAVIEW_USE_ICE_T AND VTK_USE_MPI)
   SET (Kit_SRCS
     ${Kit_SRCS}
     vtkIceTSynchronizedRenderers.cxx)
-
   INCLUDE_DIRECTORIES(${ICET_INCLUDE_DIR})
   SET(KIT_LIBS ${KIT_LIBS} IceTCore IceTMPI IceTGL)
+
+  # The following was copy/paste from vtkIncludeDirectories.cmake
+  # OpenGL include directories.
+  IF(APPLE)
+    IF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
+      INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+    ENDIF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
+  ELSE(APPLE)
+    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+  ENDIF(APPLE)
 ENDIF (PARAVIEW_USE_ICE_T AND VTK_USE_MPI)
 
 IF(PARAVIEW_ENABLE_PYTHON)
@@ -157,6 +170,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVPythonPluginInterface.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVSession.cxx
+  vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkSession.cxx
   vtkTileDisplayHelper.cxx

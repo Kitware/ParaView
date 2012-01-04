@@ -24,7 +24,7 @@ QtTesting.playCommand(object9, 'activate', '')
 object10 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
 QtTesting.playCommand(object10, 'currentChanged', '/0/2|0')
 #QtTesting.playCommand(object10, 'currentChanged', '/0/2|1')
-object11 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar'
+object11 = 'pqClientMainWindow/1QTabBar1'
 QtTesting.playCommand(object11, 'set_tab', '1')
 QtTesting.playCommand(object1, 'activate', 'actionFileSaveServerState')
 object13 = 'pqClientMainWindow/FileSaveServerStateDialog'

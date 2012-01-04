@@ -65,7 +65,8 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMDoubleVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                         vtkSMProxyLocator*)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
@@ -189,6 +190,18 @@ int vtkSMDoubleVectorProperty::SetElements(const double* values)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::SetUncheckedElements(const double* values)
+{
+  return this->Internals->SetUncheckedElements(values);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::SetUncheckedElements(const double* values, unsigned int numValues)
+{
+  return this->Internals->SetUncheckedElements(values, numValues);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                                  vtkPVXMLElement* element)
 {
@@ -264,6 +277,12 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
     {
     this->Internals->Copy(dsrc->Internals);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::ClearUncheckedElements()
+{
+  this->Internals->ClearUncheckedElements();
 }
 
 //---------------------------------------------------------------------------

@@ -32,8 +32,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkIntArray.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
-#include "vtkProcessGroup.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessGroup.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
@@ -67,6 +68,8 @@ vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level);
 
+class vtkSpyPlotReader::VectorOfDoubles : public vtkstd::vector<double> {};
+
 //-----------------------------------------------------------------------------
 vtkSpyPlotReader::vtkSpyPlotReader()
 {
@@ -78,16 +81,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->BoxSize[1] = -1;
   this->BoxSize[2] = -1;
   this->FileName = 0;
-  this->CurrentFileName = 0;
   this->CellDataArraySelection = vtkDataArraySelection::New();
-  // Setup the selection callback to modify this object when an array
-  // selection is changed.
-  this->SelectionObserver = vtkCallbackCommand::New();
-  this->SelectionObserver->SetCallback(
-    &vtkSpyPlotReader::SelectionModifiedCallback);
-  this->SelectionObserver->SetClientData(this);
-  this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
-                                            this->SelectionObserver);
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
@@ -105,8 +99,8 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
-  this->UpdateFileCallCount = 0;
-
+  this->FileNameChanged = true;
+  this->TimeSteps = new vtkSpyPlotReader::VectorOfDoubles();
   this->TimeRequestedFromPipeline = false;
 }
 
@@ -114,17 +108,22 @@ vtkSpyPlotReader::vtkSpyPlotReader()
 vtkSpyPlotReader::~vtkSpyPlotReader()
 {
   this->SetFileName(0);
-  this->SetCurrentFileName(0);
-  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
-  this->SelectionObserver->Delete();
   this->CellDataArraySelection->Delete();
   this->Map->Clean(0);
   delete this->Map;
   delete this->Bounds;
   this->Map = 0;
   this->SetGlobalController(0);
+  delete this->TimeSteps;
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotReader::SetTimeStepsInternal(const vtkSpyPlotReader::VectorOfDoubles& doubles)
+{
+  *this->TimeSteps = doubles;
+  this->TimeStepRange[1] = static_cast<int>(doubles.size()-1);
+}
 
 //-----------------------------------------------------------------------------
 // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
@@ -133,23 +132,13 @@ void vtkSpyPlotReader::SetFileName(const char* filename)
 {  
   if ( this->FileName == NULL && filename == NULL) { return;}
   if ( this->FileName && filename && (!strcmp(this->FileName,filename))) { return;}
-  if (this->FileName) { delete [] this->FileName; }
-  if (filename)
-    {
-    size_t n = strlen(filename) + 1;
-    char *cp1 =  new char[n];
-    const char *cp2 = (filename);
-    this->FileName = cp1;
-    do { *cp1++ = *cp2++; } while ( --n );
-    }
-   else
-    {
-    this->FileName = NULL;
-    }
-  this->UpdateFileCallCount = 0;
+
+  // Filename is going to change.
+  delete [] this->FileName;
+  this->FileName = vtksys::SystemTools::DuplicateString(filename);
+  this->FileNameChanged = true;
   this->Modified();
 }
-
 
 //-----------------------------------------------------------------------------
 // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
@@ -165,9 +154,6 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *req,
   // before RequestDataObject
   this->UpdateFile (req, outV);
   
-  // We only need IsAMR set from UpdateFile, reset the CurrentFile
-  this->SetCurrentFileName (0);
-
   if (this->IsAMR)
     {
     outData = vtkHierarchicalBoxDataSet::New();
@@ -211,366 +197,146 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
 
-  return this->UpdateFile (request, outputVector);
+  // I don't think UpdateFile is needed here since RequestDataObject() would have
+  // got UpdateFile to do the necessary work.
+  if (!this->UpdateFile (request, outputVector))
+    {
+    return 0;
+    }
+
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  if (this->TimeSteps->size() > 0)
+    {
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+      &(*this->TimeSteps)[0],
+      static_cast<int>(this->TimeSteps->size()));
+
+    double timeRange[2];
+    timeRange[0] = this->TimeSteps->front();
+    timeRange[1] = this->TimeSteps->back();
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
+      timeRange, 2);
+    }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
                                   vtkInformationVector* outputVector)
 {
-  if (this->UpdateFileCallCount >= 2)
+  if (!this->FileNameChanged)
     {
-    //We need to call UpdateFile twice once in RequestDataObject to set isAmr
-    //and a second time in RequestInformation so that the time information is properly set
-    //because of this design issue, these method should be refactored. But currently
-    //I don't know enough about spy plot to cleanly see a way to do this.
+    // If filename hasn't changed since the last time we read the core
+    // meta-data, we don't need to re-read it. If the file was processed
+    // successfully, then this->Map->Files won't be empty.
+    return (this->Map->Files.size() != 0)? 1 : 0;
+    }
 
-    //so whenever a file name is set we will reset UpdateFileCallCount to zero.
-    //than the calls to updateFile in request data object and request information will
-    //increment the counter and make sure the method doesn't execute more than twice
+  this->FileNameChanged = false;
 
-    //When the file count is greater than two the only thing we have to do is handle
-    //changes to the temporal step, so we always call UpdateMetaData
-    
-    this->UpdateMetaData(request,outputVector);
-    return 1;
-    }
-  this->UpdateFileCallCount++;
+  const int procId = this->GlobalController?
+    this->GlobalController->GetLocalProcessId() : 0;
+  const int numProcs = this->GlobalController?
+    this->GlobalController->GetNumberOfProcesses() : 1;
+  //cout << procId << " : " << __LINE__ << endl;
 
-  ifstream ifs(this->FileName);
-  if(!ifs)
+  // When running in parallel, we need to ensure that all testing and meta-data
+  // loading only happens on the root node. (BUG #12720).
+  // We fill up the "Map" on root node, and then share the filename with all
+  // nodes.
+  if (procId == 0)
     {
-    vtkErrorMacro("Error opening file " << this->FileName);
-    return 0;
+    // Clean Map and initialize it with the given file.
+    this->Map->Initialize(this->FileName);
     }
-  char buffer[8];
-  if(!ifs.read(buffer,7))
+  if (numProcs > 1)
     {
-    vtkErrorMacro("Problem reading header of file: " << this->FileName);
-    return 0;
+    vtkMultiProcessStream stream;
+    this->Map->Save(stream);
+    this->GlobalController->Broadcast(stream, 0);
+    if (procId > 0)
+      {
+      this->Map->Load(stream);
+      }
     }
-  buffer[7] = 0;
-  ifs.close();
-  if(strcmp(buffer,"spydata")==0)
-    {
-    return this->UpdateSpyDataFile(request, outputVector);
-    }
-  else if(strcmp(buffer,"spycase")==0)
-    {
-    return this->UpdateCaseFile(this->FileName, request, outputVector);
-    }
-  else
-    {
-    vtkErrorMacro("Not a SpyData file");
-    return 0;
-    }
+
+  return this->Map->Files.size() > 0?
+    this->UpdateMetaData(request, outputVector) : 0;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request, 
-                                        vtkInformationVector* outputVector)
+int vtkSpyPlotReader::UpdateMetaData(
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector* vtkNotUsed(outputVector))
 {
-  // cerr << "spydatafile\n";
-  // See if this is part of a series
-  vtkstd::string extension = 
-    vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-  int currentNum=0, isASeries=0;
-  size_t esize;
-  esize = extension.size();
-  if (esize > 0 )
-    {
-    // See if this is a pure numerical extension - hence it's part 
-    // of a series - if the first char is a . we need to exclude it
-    // from the check
-    const char *a = extension.c_str();
-    char *ep;
-    size_t b = 0;
-    if (a[0] == '.')
-      {
-      b = 1;
-      }
-
-    if ((esize > b) && isdigit(a[b]))
-      {
-      currentNum = static_cast<int>(strtol(&(a[b]), &ep, 10));
-      if (ep[0] == '\0')
-        {
-        isASeries = 1;
-        }
-      }
-    }
-
-  if (!isASeries)
-    {
-    this->SetCurrentFileName(this->FileName);
-
-    vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt = 
-      this->Map->Files.find(this->FileName);
-
-    vtkSpyPlotUniReader* oldReader = 0;
-    if ( mapIt != this->Map->Files.end() )
-      {
-      oldReader = this->Map->GetReader(mapIt, this);
-      oldReader->Register(this);
-      oldReader->Print(cout);
-      }
-    this->Map->Clean(oldReader);
-    if ( oldReader )
-      {
-      this->Map->Files[this->FileName]=oldReader;
-      oldReader->UnRegister(this);
-      }
-    else
-      {
-      this->Map->Files[this->FileName]= 0;
-      vtkDebugMacro( << __LINE__ << " Create new uni reader: " 
-                     << this->Map->Files[this->FileName] );
-      }
-    return this->UpdateMetaData(request, outputVector);
-    }
-
-  // Check to see if this is the same filename as before
-  // if so then I already have the meta info, so just return
-  if(this->GetCurrentFileName()!=0 &&
-     strcmp(this->FileName,this->GetCurrentFileName())==0)
-    {
-    //cerr << "Not setting much else\n";
-    return 1;
-    }
-  // cerr << "setting Current file name " << this->FileName << endl;
-  this->SetCurrentFileName(this->FileName);
-  this->Map->Clean(0);
-  vtkstd::string fileNoExt = 
-    vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-  vtkstd::string filePath = 
-    vtksys::SystemTools::GetFilenamePath(this->FileName);
-
-  // Now find all the files that make up the series that this file is part
-  // of
-  int idx = currentNum - 100;
-  int last = currentNum;
-  char buffer[1024];
-  int found = currentNum;
-  int minimum = currentNum;
-  int maximum = currentNum;
-  while ( 1 )
-    {
-    sprintf(buffer, "%s/%s.%d",filePath.c_str(), fileNoExt.c_str(), idx);
-    // cerr << "buffer1 == " << buffer << endl;
-    if ( !vtksys::SystemTools::FileExists(buffer) )
-      {
-      int next = idx;
-      for ( idx = last; idx > next; idx -- )
-        {
-        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-        if ( !vtksys::SystemTools::FileExists(buffer) )
-          {
-          break;
-          }
-        else
-          {
-          found = idx;
-          }
-        }
-      break;
-      }
-    last = idx;
-    idx -= 100;
-    }
-  minimum = found;
-  idx = currentNum + 100;
-  last = currentNum;
-  found = currentNum;
-  while ( 1 )
-    {
-    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    // cerr << "buffer2 == " << buffer << endl;
-    if ( !vtksys::SystemTools::FileExists(buffer) )
-      {
-      int next = idx;
-      for ( idx = last; idx < next; idx ++ )
-        {
-        sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-        if ( !vtksys::SystemTools::FileExists(buffer) )
-          {
-          break;
-          }
-        else
-          {
-          found = idx;
-          }
-        }
-      break;
-      }
-    last = idx;
-    idx += 100;
-    }
-  maximum = found;
-  for ( idx = minimum; idx <= maximum; ++ idx )
-    {
-    sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-    // cerr << "buffer3 == " << buffer << endl;
-    this->Map->Files[buffer]=0;
-    vtkDebugMacro( << __LINE__ << " Create new uni reader: " 
-                   << this->Map->Files[buffer] );
-    }
-  // Okay now open just the first file to get meta data
-  vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << this->Map->Files.begin()->first.c_str());
-  // cerr << "updating meta... " << endl;
-  return this->UpdateMetaData(request, outputVector);
-}
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateCaseFile(const char *fname,
-                                     vtkInformation* request, 
-                                     vtkInformationVector* outputVector)
-{
-  // Check to see if this is the same filename as before
-  // if so then I already have the meta info, so just return
-  if(this->GetCurrentFileName()!=0 &&
-     strcmp(fname,this->GetCurrentFileName())==0)
-    {
-    return 1;
-    }
-
-  // Set case file name and clean/initialize file map
-  this->SetCurrentFileName(fname);
-  this->Map->Clean(0);
-
-  // Setup the filemap and spcth structures
-  ifstream ifs(this->FileName);
-  if (!ifs )
-    {
-    vtkErrorMacro("Error opening file " << fname);
-    return 0;
-    }
-  
-  vtkstd::string line;
-  if(!vtksys::SystemTools::GetLineFromStream(ifs,line)) // eat spycase line
-    {
-    vtkErrorMacro("Syntax error in case file " << fname);
-    return 0;
-    }
-
-  while(vtksys::SystemTools::GetLineFromStream(ifs, line))
-    {
-    if(line.length()!=0)  // Skip blank lines
-      {
-      vtkstd::string::size_type stp = line.find_first_not_of(" \n\t\r");
-      vtkstd::string::size_type etp = line.find_last_not_of(" \n\t\r");
-      vtkstd::string f(line, stp, etp-stp+1);
-      if(f[0]!='#') // skip comment
-        {
-        if(!vtksys::SystemTools::FileIsFullPath(f.c_str()))
-          {
-          f = vtksys::SystemTools::GetFilenamePath(this->FileName)+"/"+f;
-          }
-        this->Map->Files[f.c_str()]=0;
-        vtkDebugMacro( << __LINE__ << " Create new uni reader: " << this->Map->Files[f.c_str()] );
-        }
-      }
-    }
-
-  // Okay now open just the first file to get meta data
-  vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << this->Map->Files.begin()->first.c_str());
-  return this->UpdateMetaData(request, outputVector);
-}
-
-//-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
-                                     vtkInformationVector* outputVector)
-{
-  vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator it;
-  it=this->Map->Files.begin();
-  
-  const char *fname=0;
-  vtkSpyPlotUniReader *uniReader=0;
-  
-  if(it==this->Map->Files.end())
+  if (this->Map->Files.size() == 0)
     {
     vtkErrorMacro("The internal file map is empty!");
     return 0;
     }
 
-  fname=it->first.c_str();
-  uniReader=this->Map->GetReader(it, this);
+  // This method needs to collect meta-data i.e.
+  // number of timesteps and names for the cell-arrays.
+  // For that we use the first file specified. To avoid IO issues in parallel,
+  // this meta-data is collected on root node alone and then broadcast to all
+  // processes (BUG #12720).
+  const int procId = this->GlobalController?
+    this->GlobalController->GetLocalProcessId() : 0;
+  const int numProcs = this->GlobalController?
+    this->GlobalController->GetNumberOfProcesses() : 1;
+  //cout << procId << " : " << __LINE__ << endl;
 
-  int i;
-  int num_time_steps;
-  
-  // Open the file and get the number time steps
-  uniReader->SetFileName(fname);
-  uniReader->ReadInformation();
-  int* timeStepRange = uniReader->GetTimeStepRange();
-  num_time_steps=timeStepRange[1] + 1;
-  this->TimeStepRange[1]=timeStepRange[1];
-  
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+  vtkSpyPlotReader::VectorOfDoubles timesteps;
+
+  if (procId == 0)
     {
-    vtkInformation* outInfo = outputVector->GetInformationObject(0);
-    double* timeArray = uniReader->GetTimeArray();
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-                 timeArray,
-                 num_time_steps);
-    double timeRange[2];
-    timeRange[0] = timeArray[0];
-    timeRange[1] = timeArray[num_time_steps-1];
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
-                 timeRange, 2);
+    vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator iter =
+      this->Map->Files.begin();
+    assert(iter!=this->Map->Files.end());
+
+    vtkSpyPlotUniReader *uniReader = this->Map->GetReader(iter, this);
+    // Open the file and get the number time steps and arrays.
+    uniReader->ReadInformation();
+    uniReader->GetTimeStepRange(this->TimeStepRange);
+    int num_timesteps  = this->TimeStepRange[1] + 1;
+    timesteps.insert(timesteps.end(),
+      uniReader->GetTimeArray(), uniReader->GetTimeArray() + num_timesteps);
+    this->IsAMR = uniReader->IsAMR();
     }
 
-  if (!this->TimeRequestedFromPipeline)
+  if (numProcs > 1)
     {
-    this->CurrentTimeStep=this->TimeStep;
-    }
-  if(this->CurrentTimeStep<0||this->CurrentTimeStep>=num_time_steps)
-    {
-    vtkErrorMacro("TimeStep set to " << this->CurrentTimeStep << " outside of the range 0 - " << (num_time_steps-1) << ". Use 0.");
-    this->CurrentTimeStep=0;
-    }
-
-  // Set the reader to read the first time step.
-  uniReader->SetCurrentTimeStep(this->CurrentTimeStep);
-
-  // Print info
-  vtkDebugMacro("File has " << num_time_steps << " timesteps");
-  vtkDebugMacro("Timestep values:");
-  for(i=0; i< num_time_steps; ++i)
-    {
-    vtkDebugMacro(<< i << ": " << uniReader->GetTimeFromTimeStep(i));
-    }
-
-  // AMR (hierarchy of uniform grids) or flat mesh (set of rectilinear grids)
-  this->IsAMR=uniReader->IsAMR();
-
-  // Fields
-  int fieldsCount = uniReader->GetNumberOfCellFields();
-  vtkDebugMacro("Number of fields: " << fieldsCount);
-  
-  
-  vtkstd::set<vtkstd::string> fileFields;
-  
-  int field;
-  for(field=0; field<fieldsCount; ++field)
-    {
-    const char*fieldName=this->CellDataArraySelection->GetArrayName(field);
-    vtkDebugMacro("Field #" << field << ": " << fieldName);
-    fileFields.insert(fieldName);
-    }
-  // Now remove the existing array that were not found in the file.
-  field=0;
-  // the trick is that GetNumberOfArrays() may change at each step.
-  while(field<this->CellDataArraySelection->GetNumberOfArrays())
-    {
-    if(fileFields.find(this->CellDataArraySelection->GetArrayName(field))==fileFields.end())
+    vtkMultiProcessStream stream;
+    stream << this->IsAMR << static_cast<int>(timesteps.size());
+    for (size_t cc = 0; cc < timesteps.size(); cc++)
       {
-      this->CellDataArraySelection->RemoveArrayByIndex(field);
+      stream << timesteps[cc];
       }
-    else
+    this->GlobalController->Broadcast(stream, 0);
+
+    if (procId > 0)
       {
-      ++field;
+      int size;
+      stream  >> this->IsAMR >> size;
+      timesteps.resize(size);
+      for (int cc=0; cc < size; cc++)
+        {
+        double val; stream >> val;
+        timesteps[cc] = val;
+        }
       }
     }
+  this->SetTimeStepsInternal(timesteps);
+
+  // I am not bothering syncing array names between processes since all enabled
+  // arrays will be marked explicitly on all processes any ways.
+
+  // To minimize the need for interprocess communication when timesteps change,
+  // I am removing the code that updated the cell-arrays available per timestep.
+  // The code seemed to assume that the arrays available could change over time.
+  // That's sounds highly improbable.
   return 1;
 }
 
@@ -647,7 +413,7 @@ int vtkSpyPlotRemoveBadGhostCells(
   return 1;
 }
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
+int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *vtkNotUsed(requestInfo),
                                      vtkInformationVector *outputInfoVec,
                                      vtkCompositeDataSet *outputData)
 {
@@ -691,19 +457,14 @@ int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
         }
       }
     this->CurrentTimeStep=closestStep;
-
-    this->TimeRequestedFromPipeline = true;
-    this->UpdateMetaData(requestInfo, outputInfoVec);
-    this->TimeRequestedFromPipeline = false;
     }
   else
     {
-    this->UpdateMetaData(requestInfo, outputInfoVec);
+    this->CurrentTimeStep = this->TimeStep;
     }
 
   outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
                             steps+this->CurrentTimeStep, 1);
-
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -979,6 +740,8 @@ int vtkSpyPlotReader::RequestData(
         hasBadGhostCells = this->PrepareData(
           vtkMultiBlockDataSet::SafeDownCast(cds), block, &rg, extents, realExtents,
           realDims, &cd);
+
+        //currently only for rectilinear grids do we computed derived variables
         grids.push_back(rg);
         }
 
@@ -989,16 +752,18 @@ int vtkSpyPlotReader::RequestData(
       if(!hasBadGhostCells)
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
-                              uniReader, cd);
-        this->ComputeDerivedVars(cd, block, uniReader, blockID,dims);
+                              uniReader, cd);        
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
-        this->ComputeDerivedVars(cd, block, uniReader, blockID,realDims);
-        }
+        }      
+      if(!this->IsAMR)
+      {
+        this->ComputeDerivedVars(cd, block, uniReader, blockID);
+      }
 
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
@@ -1101,12 +866,6 @@ void vtkSpyPlotReader::AddGhostLevelArray(int numLevels)
   */
 }
 
-//----------------------------------------------------------------------------
-void vtkSpyPlotReader::SelectionModifiedCallback(vtkObject*, unsigned long,
-                                                 void* clientdata, void*)
-{
-  static_cast<vtkSpyPlotReader*>(clientdata)->Modified();
-}
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::GetNumberOfCellArrays()
 {
@@ -1129,6 +888,11 @@ int vtkSpyPlotReader::GetCellArrayStatus(const char* name)
 void vtkSpyPlotReader::SetCellArrayStatus(const char* name, int status)
 {
   vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if (this->CellDataArraySelection->ArrayIsEnabled(name) == (status? 1 : 0))
+    {
+    return;
+    }
+
   if(status)
     {
     this->CellDataArraySelection->EnableArray(name);
@@ -1137,6 +901,8 @@ void vtkSpyPlotReader::SetCellArrayStatus(const char* name, int status)
     {
     this->CellDataArraySelection->DisableArray(name);
     }
+
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
@@ -2476,10 +2242,9 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 //-----------------------------------------------------------------------------
 // synch data set structure
 int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
-  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
-  int dims[3])
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID)
 {
-  if ( this->ComputeDerivedVariables != 1 )
+  if ( this->ComputeDerivedVariables != 1 || this->IsAMR)
     {
     return 0;
     }
@@ -2499,7 +2264,7 @@ int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
 
   block->SetCoordinateSystem(reader->GetCoordinateSystem());
   block->ComputeDerivedVariables(data, numberOfMaterials,
-    materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
+    materialMasses, materialVolumeFractions, this->DownConvertVolumeFraction);
     
   //cleanup memory and leave  
   delete[] materialMasses;

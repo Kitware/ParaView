@@ -39,6 +39,12 @@ public:
   vtkTypeMacro(vtkPVSessionBase, vtkPVSession);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  enum EventIds
+    {
+    RegisterRemoteObjectEvent   = 1234,
+    UnRegisterRemoteObjectEvent = 4321,
+    ProcessingRemoteEnd         = 2143
+    };
 
   //---------------------------------------------------------------------------
   // Superclass Implementations
@@ -118,8 +124,12 @@ public:
 
 //BTX
   // Description:
-  // Delete server side object. (SIObject)
-  virtual void DeleteSIObject(vtkSMMessage* msg);
+  // Unregister server side object. (SIObject)
+  virtual void UnRegisterSIObject(vtkSMMessage* msg);
+
+  // Description:
+  // Register server side object. (SIObject)
+  virtual void RegisterSIObject(vtkSMMessage* msg);
 //ETX
 
   // Description:
@@ -132,6 +142,30 @@ public:
   // prevent any deletion across several method call.
   virtual void GetAllRemoteObjects(vtkCollection* collection);
 
+  //---------------------------------------------------------------------------
+  // API for GlobalId management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Provides the next available identifier. This implementation works locally.
+  // without any code distribution. To support the distributed architecture
+  // the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+  // vtkPVSessionBase instance.
+  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
+
+  // Description:
+  // Return the first Id of the requested chunk.
+  // 1 = ReverveNextIdChunk(10); | Reserved ids [1,2,3,4,5,6,7,8,9,10]
+  // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
+  // b = a + 10;
+  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
+
+  // Description:
+  // This propertie is used to discard ignore_synchronization proxy property
+  // when we load protobuf states.
+  // Therefore, if we load any camera state while that property is true, this
+  // won't affect the proxy/property state at all. It will simply remain the same.
+  virtual bool IsProcessingRemoteNotification();
 
 //BTX
 protected:
@@ -145,10 +179,20 @@ protected:
   virtual void CleanupPendingProgressInternal();
 
   friend class vtkSMRemoteObject;
+  friend class vtkSMSessionProxyManager;
+
+  // Description:
+  // Methods used to monitor if we are currently processing a server notification
+  // Only vtkSMSessionClient use the flag to disable ignore_synchronization
+  // properties from beeing updated.
+  virtual bool StartProcessingRemoteNotification();
+  virtual void StopProcessingRemoteNotification(bool previousValue);
+  bool ProcessingRemoteNotification;
 
   // Description:
   // Register a remote object
-  void RegisterRemoteObject(vtkTypeUInt32 globalid,vtkObject* obj);
+  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkTypeUInt32 location,
+                            vtkObject* obj);
 
   // Description:
   // Unregister a remote object
@@ -161,6 +205,8 @@ private:
   void operator=(const vtkPVSessionBase&); // Not implemented
 
   vtkPVServerInformation* LocalServerInformation;
+  unsigned long ActivateObserverTag;
+  unsigned long DesactivateObserverTag;
 //ETX
 };
 

@@ -12,7 +12,7 @@
 extern "C" void createstructuredgrid_(
   int *myid, int *xdim, int *ystart, int *ystop, double *xspc, double *yspc)
 {
-  if(!GetCoProcessorData())
+  if(!ParaViewCoProcessing::GetCoProcessorData())
     {
     vtkGenericWarningMacro("Unable to access CoProcessorData.");
     return;
@@ -33,7 +33,7 @@ extern "C" void createstructuredgrid_(
   img->SetExtent (-1, *xdim, ystart[*myid] - 2, ystop[*myid], 0, 0);
   img->SetOrigin (0.0, 0.0, 0.0);
 
-  GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(grid);
+  ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(grid);
   grid->Delete ();
 }
 
@@ -47,7 +47,7 @@ extern "C" void add_scalar_(char *fname, int *len, double *data, int *size)
   arr->SetArray (data, *size, 1);
   vtkMultiBlockDataSet *grid = 
           vtkMultiBlockDataSet::SafeDownCast (
-            GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
+            ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
   vtkDataSet *dataset = vtkDataSet::SafeDownCast(grid->GetBlock (0));
   dataset->GetPointData ()->AddArray (arr);
   arr->Delete ();
@@ -68,7 +68,7 @@ extern "C" void add_vector_(char *fname, int *len, double *data0, double *data1,
     }
   vtkMultiBlockDataSet *grid = 
           vtkMultiBlockDataSet::SafeDownCast (
-            GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
+            ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
   vtkDataSet *dataset = vtkDataSet::SafeDownCast(grid->GetBlock (0));
   dataset->GetPointData ()->AddArray (arr);
   arr->Delete ();
@@ -81,7 +81,7 @@ extern "C" void add_pressure_ (int *index, double *data, int *size)
   static int componentMap[6] = { 0, 3, 5, 1, 4, 2 };
   vtkMultiBlockDataSet *grid = 
           vtkMultiBlockDataSet::SafeDownCast (
-            GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
+            ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName ("input")->GetGrid ());
 
   int real_index = *index - 24;
   char *name;

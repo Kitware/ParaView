@@ -21,7 +21,7 @@
       <DoubleVectorProperty name="CacheKey"
         command="SetCacheKey"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -33,7 +33,7 @@
       <IntVectorProperty name="UseCache"
         command="SetUseCache"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -54,6 +54,7 @@
         command="SetSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.
@@ -81,6 +82,7 @@
       <IntVectorProperty name="UseOffscreenRendering"
         command="SetUseOffscreenRendering"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -91,7 +93,7 @@
       <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
         command="SetUseOffscreenRenderingForScreenshots"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           Set whether offscreen rendering should be used during
@@ -165,6 +167,7 @@
       <DoubleVectorProperty name="RemoteRenderThreshold"
         command="SetRemoteRenderingThreshold"
         number_of_elements="1"
+        ignore_synchronization="1"
         default_values="20.0">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
@@ -940,6 +943,18 @@
       </Documentation>
 
     </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <PlotMatrixViewProxy name="PlotMatrixView"
+      base_proxygroup="views"
+      base_proxyname="ViewBase"
+      class="vtkPVPlotMatrixView"
+      processes="client|renderserver|dataserver"
+      representation_name="PlotMatrixRepresentation">
+      <Documentation>
+        This is the proxy for the plot matrix view.
+      </Documentation>
+    </PlotMatrixViewProxy>
 
     <!-- ================================================================== -->
     <ViewProxy name="SpreadSheetView"
@@ -2130,6 +2145,7 @@
       <IntVectorProperty name="VolumeRenderingMode"
         command="SetRequestedRenderMode"
         number_of_elements="1"
+
         default_values="0">
         <EnumerationDomain name="enum" >
           <Entry value="0" text="Smart" />
@@ -4106,6 +4122,247 @@
     </ParallelCoordinatesRepresentationProxy>
 
     <!-- =================================================================== -->
+    <ChartRepresentationProxy name="PlotMatrixRepresentation"
+      base_proxygroup="representations"
+      class="vtkPVPlotMatrixRepresentation"
+      processes="client|dataserver|renderserver" >
+      <Documentation>
+        Representation used by PlotMatrixView.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+        command="SetFieldAssociation"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <FieldDataDomain name="enum"
+           enable_field_data="1"
+           disable_update_domain_entries="1" >
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompositeDataSetIndex"
+        command="SetCompositeDataSetIndex"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to
+          pass. The flat index must point to a non-empty, non-composite dataset
+          for anything to be passed through. If the input is not a composite
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SeriesVisibilityInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of visibility for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesVisibility"
+        command="SetSeriesVisibility"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="SeriesVisibilityInfo" >
+        <Documentation>
+          Set the series visibility.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabelInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of labels for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabel"
+        command="SetSeriesLabel"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1"
+        information_property="LabelInfo">
+        <Documentation>
+          Set the series labels.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        information_only="1"
+        si_class="vtkSIContextArraysProperty" >
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        default_values="0 0 0">
+        <Documentation>
+          Sets the color.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ActivePlotColor"
+        command="SetActivePlotColor"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        default_values="0 0 0">
+        <Documentation>
+          Sets the color for the active plot.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HistogramColor"
+        command="SetHistogramColor"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        default_values="0 0 0">
+        <Documentation>
+          Sets the color for the histograms.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ScatterPlotMarkerStyle"
+        command="SetMarkerStyle"
+        default_values="4"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker style for the scatter plots.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ActivePlotMarkerStyle"
+        command="SetActivePlotMarkerStyle"
+        default_values="4"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker style for the active plot.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ScatterPlotMarkerSize"
+        command="SetMarkerSize"
+        default_values="5"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker size for the scatter plots.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ActivePlotMarkerSize"
+        command="SetActivePlotMarkerSize"
+        default_values="8"
+        number_of_elements="1">
+        <Documentation>
+          Property which sets the marker size for the active plots.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <InputProperty name="InternalInput1"
+        command="SetInputConnection"
+        port_index="1"
+        is_internal="1">
+        <Documentation>
+          Internal property. Please don't touch this.
+        </Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="PlotOptions"
+          proxygroup="options"
+          proxyname="PlotOptionsBase">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="Color" exposed_name="SeriesColor" />
+          <Property name="Label" exposed_name="SeriesLabel" />
+          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
+          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
+
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
+          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
+          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
     <!-- New representation for ContextView based charts. -->
     <ChartRepresentationProxy name="XYChartRepresentation"
       base_proxygroup="representations"
@@ -4408,7 +4665,7 @@
 
       <DoubleVectorProperty name="CacheKey"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -4419,7 +4676,7 @@
 
       <IntVectorProperty name="UseCache"
         number_of_elements="1"
-        is_internal="1"
+        state_ignored="1"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -4440,6 +4697,7 @@
         command="SetViewSize"
         number_of_elements="2"
         state_ignored="1"
+        ignore_synchronization="1"
         default_values="400 400" >
         <Documentation>
           Set the size of this view in the multiview configuration.

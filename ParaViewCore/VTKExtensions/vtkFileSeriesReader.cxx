@@ -326,6 +326,55 @@ vtkstd::vector<double> vtkFileSeriesReaderTimeRanges::GetTimesForInput(
   return times;
 }
 
+namespace
+{
+  // Helper class used to ensure that ProcessRequest() never results in change
+  // in MTime as that can have disastrous effects.
+  class vtkEnsureMTime
+    {
+    vtkObject* Object;
+    unsigned long MTime;
+  public:
+    vtkEnsureMTime(vtkObject* object):
+      Object(object),
+      MTime(object? object->GetMTime() : 0)
+    {
+    }
+    ~vtkEnsureMTime()
+      {
+      if (this->Object &&
+        this->Object->GetMTime() != this->MTime)
+        {
+        cerr << this->Object->GetClassName() <<
+          "'s MTime was changed unexpectedly.\n"
+          "This can imply serious problem in the reader logic and cause\n"
+          "unexpected issues when running in parallel. \n"
+          "Please address the issues." << endl;
+        abort();
+        }
+      }
+    };
+
+  class vtkRecordMTime
+    {
+    vtkObject* Object;
+    unsigned long &MTime;
+  public:
+    vtkRecordMTime(vtkObject* obj, unsigned long &mtime):
+      Object(obj), MTime(mtime)
+    {
+    this->MTime = 0;
+    }
+    ~vtkRecordMTime()
+      {
+      if (this->Object)
+        {
+        this->MTime = this->Object->GetMTime();
+        }
+      }
+    };
+}
+
 //=============================================================================
 struct vtkFileSeriesReaderInternals
 {
@@ -406,15 +455,27 @@ unsigned long vtkFileSeriesReader::GetMTime()
 //----------------------------------------------------------------------------
 void vtkFileSeriesReader::AddFileName(const char* name)
 {
-  this->Internal->FileNames.push_back(name);
+  this->AddFileNameInternal(name);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkFileSeriesReader::RemoveAllFileNames()
 {
-  this->Internal->FileNames.clear();
+  this->RemoveAllFileNamesInternal();
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkFileSeriesReader::AddFileNameInternal(const char* name)
+{
+  this->Internal->FileNames.push_back(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkFileSeriesReader::RemoveAllFileNamesInternal()
+{
+  this->Internal->FileNames.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -468,7 +529,7 @@ int vtkFileSeriesReader::CanReadFile(vtkAlgorithm *reader, const char *filename)
     {
     int canRead = 1;
     vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetInterpreter();
+        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
 
     // Build stream request
     vtkClientServerStream stream;
@@ -491,10 +552,17 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
                                         vtkInformationVector** inputVector,
                                         vtkInformationVector* outputVector)
 {
+  vtkEnsureMTime check(this);
+
   this->UpdateMetaData();
 
   if (this->Reader)
     {
+    // We want to suppress the modification time change in the Reader.  See
+    // vtkFileSeriesReader::GetMTime() for details on how this works.
+    this->SavedReaderModification = this->GetMTime();
+    vtkRecordMTime record_time(this->Reader, this->HiddenReaderModification);
+
     // Make sure that there is a file to get information from.
     if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
       {
@@ -724,11 +792,7 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
   if (this->Reader && this->FileNameMethod)
     {
     vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetInterpreter();
-
-    // We want to suppress the modification time change in the Reader.  See
-    // vtkFileSeriesReader::GetMTime() for details on how this works.
-    this->SavedReaderModification = this->GetMTime();
+        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
 
     // Build stream request
     vtkClientServerStream stream;
@@ -740,8 +804,6 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
 
     // Process stream and delete interpreter
     interpreter->ProcessStream(stream);
-
-    this->HiddenReaderModification = this->Reader->GetMTime();
     }
   this->SetCurrentFileName(fname);
 }
@@ -836,10 +898,13 @@ void vtkFileSeriesReader::UpdateMetaData()
       return;
       }
 
-    this->RemoveAllFileNames();
+    // essential that we don't use the public methods AddFileName(),
+    // RemoveAllFileNames() since those change the MTime of this class in
+    // ProcessRequest() method.
+    this->Internal->FileNames.clear();
     for (int i = 0; i < dataFiles->GetNumberOfValues(); i++)
       {
-      this->AddFileName(dataFiles->GetValue(i).c_str());
+      this->Internal->FileNames.push_back(dataFiles->GetValue(i));
       }
 
     this->MetaFileReadTime.Modified();

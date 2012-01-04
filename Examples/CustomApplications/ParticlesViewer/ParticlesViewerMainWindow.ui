@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>580</width>
     <height>480</height>
    </rect>
   </property>
@@ -28,8 +28,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
-     <height>27</height>
+     <width>580</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -57,15 +57,6 @@
    </attribute>
    <widget class="pqPipelineBrowserWidget" name="pipelineBrowser"/>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
-   <property name="windowTitle">
-    <string>Object Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="pqProxyTabWidget" name="objectInspector"/>
-  </widget>
   <widget class="pqAxesToolbar" name="axesToolbar">
    <property name="windowTitle">
     <string>Axes Controls</string>
@@ -76,6 +67,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_3">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqObjectInspectorWidget" name="objectInspector"/>
   </widget>
   <action name="action_Open_Dataset">
    <property name="text">
@@ -99,12 +96,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqProxyTabWidget</class>
-   <extends>QWidget</extends>
-   <header>pqProxyTabWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqAxesToolbar</class>
    <extends>QToolBar</extends>
    <header>pqAxesToolbar.h</header>
@@ -113,6 +104,12 @@
    <class>pqViewManager</class>
    <extends>QWidget</extends>
    <header>pqViewManager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqObjectInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqObjectInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

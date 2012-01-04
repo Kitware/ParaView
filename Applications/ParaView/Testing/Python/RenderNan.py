@@ -14,11 +14,11 @@ object4 = 'pqClientMainWindow/pqSelectReaderDialog/listWidget'
 QtTesting.playCommand(object4, 'currentChangedbyItemName', 'SLAC Mesh Files')
 object5 = 'pqClientMainWindow/pqSelectReaderDialog/okButton'
 QtTesting.playCommand(object5, 'activate', '')
-object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ModeFileName/FileButton'
+object6 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ModeFileName/FileButton'
 QtTesting.playCommand(object6, 'activate', '')
-object7 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ModeFileName/pqFileDialog'
+object7 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ModeFileName/pqFileDialog'
 QtTesting.playCommand(object7, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/fields_..mod')
-object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object8 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object8, 'activate', '')
 QtTesting.playCommand(object8, 'activate', '')
 object9 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'

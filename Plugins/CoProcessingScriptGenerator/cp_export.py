@@ -67,10 +67,25 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     xmlElement = proxy.GetHints().FindNestedElementByName("CoProcessing")
     xmlgroup = xmlElement.GetAttribute("group")
     xmlname = xmlElement.GetAttribute("name")
+
     pxm = smtrace.servermanager.ProxyManager()
+    ctorMethod = None
     writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
-    ctorMethod =  \
-      smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
+    if writer_proxy:
+        # we have a valid prototype based on the writer stub
+        ctorMethod =  \
+            smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
+    elif not writer_proxy:
+        # a bit of a hack but we assume that there's a stub of some
+        # writer that's not available in this build but is available
+        # with the build used by the simulation code (probably through a plugin)
+        # this stub must have the proper name in the coprocessing hints
+        print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+            "XML group. This is not a problem as long as the writer is available with " \
+            "the ParaView build used by the simulation code."
+        ctorMethod =  \
+            smtrace.servermanager._make_name_valid(xmlname)
+
     write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
     ctorArgs = [ctorMethod, \
                 "\"%s\"" % proxy.GetProperty("FileName").GetElement(0),\
@@ -164,18 +179,13 @@ def DoCoProcessing(datadescription):
         tobedeleted = GetNextProxyToDelete()
 
 def GetNextProxyToDelete():
-    iter = servermanager.vtkSMProxyIterator()
-    iter.Begin()
-    while not iter.IsAtEnd():
+    for iter in servermanager.ProxyIterator():
         if iter.GetGroup().find("prototypes") != -1:
-            iter.Next()
-            continue
+           continue
         proxy = servermanager._getPyProxy(iter.GetProxy())
         proxygroup = iter.GetGroup()
         if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
             return proxy
-        iter.Next()
-
     return None
 
 def CreateProducer(datadescription, gridname):

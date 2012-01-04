@@ -22,10 +22,11 @@
 #include "vtkPVSessionBase.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
-class vtkSMPluginManager;
-class vtkSMUndoStackBuilder;
-class vtkSMStateLocator;
 class vtkProcessModuleAutoMPI;
+class vtkSMCollaborationManager;
+class vtkSMProxyLocator;
+class vtkSMSessionProxyManager;
+class vtkSMStateLocator;
 
 class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
 {
@@ -33,6 +34,16 @@ public:
   static vtkSMSession* New();
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  //---------------------------------------------------------------------------
+  // API for collaboration management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Return the instance of vtkSMCollaborationManager that will be
+  // lazy created at the first call.
+  // By default we return NULL
+  virtual vtkSMCollaborationManager* GetCollaborationManager() { return NULL; }
 
   //---------------------------------------------------------------------------
   // API for client-side components of a session.
@@ -44,8 +55,8 @@ public:
   virtual const char* GetURI() { return "builtin:"; }
 
   // Description:
-  // Returns the vtkSMPluginManager attached to this session.
-  vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
+  // Returns the vtkSMSessionProxyManager associated with this session.
+  vtkGetObjectMacro(SessionProxyManager, vtkSMSessionProxyManager);
 
   // Description:
   // Returns the number of processes on the given server/s. If more than 1
@@ -55,15 +66,11 @@ public:
   // Implementation provided simply returns the number of local processes.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
-  // Description:
-  // Provides a unique identifier across processes of that session. Default
-  // implementation simply uses a local variable to keep track of ids already
-  // assigned.
-  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier()
-    {
-    this->LastGUID++;
-    return this->LastGUID;
-    }
+  //---------------------------------------------------------------------------
+  // API for Proxy Finder/ReNew
+  //---------------------------------------------------------------------------
+
+  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
   enum RenderingMode
     {
@@ -85,24 +92,10 @@ public:
   //---------------------------------------------------------------------------
 
   // Description:
-  // Allow the user to bind an UndoStackBuilder with the given session
-  virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
-  vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
-
-
-  // Description:
-  // Flag used to disable state caching needed for undo/redo. This overcome the
-  // presence of undo stack builder in the session.
-  vtkBooleanMacro(StateManagement, bool);
-  vtkSetMacro(StateManagement, bool);
-  vtkGetMacro(StateManagement, bool);
-
-
-  // Description:
   // Provide an access to the session state locator that can provide the last
   // state of a given remote object that have been pushed.
   // That locator will be filled by RemoteObject state only if
-  // StateManagement is set to true.
+  // the UndoStackBuilder in vtkSMProxyManager is non-null.
   vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
 
   //---------------------------------------------------------------------------
@@ -128,6 +121,12 @@ public:
   virtual void PushState(vtkSMMessage* msg);
 //ETX
 
+  //---------------------------------------------------------------------------
+  // API for Collaboration management
+  //---------------------------------------------------------------------------
+
+  // Called before application quit or session disconnection
+  virtual void PreDisconnection() {}
 
   //---------------------------------------------------------------------------
   // Static methods to create and register sessions easily.
@@ -206,13 +205,10 @@ protected:
   // maintain the UndoRedo mecanisme.
   void UpdateStateHistory(vtkSMMessage* msg);
 
-  vtkSMUndoStackBuilder* UndoStackBuilder;
-  vtkSMPluginManager* PluginManager;
+  vtkSMSessionProxyManager* SessionProxyManager;
   vtkSMStateLocator* StateLocator;
-  bool StateManagement;
+  vtkSMProxyLocator* ProxyLocator;
 
-  // GlobalID managed locally
-  vtkTypeUInt32 LastGUID;
   bool IsAutoMPI;
 
 private:

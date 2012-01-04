@@ -32,21 +32,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCPWritersMenuManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
+#include "pqPluginManager.h"
 #include "pqServer.h"
-#include "pqServerManagerSelectionModel.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "vtkProcessModule.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProxySelectionModel.h"
 
 #include <QAction>
 #include <QDebug>
@@ -55,21 +60,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 
-static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
+#include <assert.h>
+
+namespace
 {
-  // if "Input" is present, we return that, otherwise the "first"
-  // vtkSMInputProperty encountered is returned.
+  static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
+  {
+    // if "Input" is present, we return that, otherwise the "first"
+    // vtkSMInputProperty encountered is returned.
 
-  vtkSMInputProperty *prop = vtkSMInputProperty::SafeDownCast(
-    proxy->GetProperty("Input"));
-  vtkSMPropertyIterator* propIter = proxy->NewPropertyIterator();
-  for (propIter->Begin(); !prop && !propIter->IsAtEnd(); propIter->Next())
-    {
-    prop = vtkSMInputProperty::SafeDownCast(propIter->GetProperty());
-    }
+    vtkSMInputProperty *prop = vtkSMInputProperty::SafeDownCast(
+      proxy->GetProperty("Input"));
+    vtkSMPropertyIterator* propIter = proxy->NewPropertyIterator();
+    for (propIter->Begin(); !prop && !propIter->IsAtEnd(); propIter->Next())
+      {
+      prop = vtkSMInputProperty::SafeDownCast(propIter->GetProperty());
+      }
 
-  propIter->Delete();
-  return prop;
+    propIter->Delete();
+    return prop;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -77,11 +87,33 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
   Superclass(parentObject)
 {
   this->Menu = 0;
+
+  // this updates the available writers whenever the active
+  // source changes
   QObject::connect(
-    pqApplicationCore::instance()->getSelectionModel(),
-    SIGNAL(selectionChanged(const pqServerManagerSelection&,
-    const pqServerManagerSelection&)),
-    this, SLOT(updateEnableState()));
+        &pqActiveObjects::instance(),
+        SIGNAL(sourceChanged(pqPipelineSource*)),
+        this, SLOT(updateEnableState()));
+
+  // this updates the available writers whenever a filter
+  // is updated (i.e. the user hits the Apply button)
+  QObject::connect(&this->Timer, SIGNAL(timeout()),
+                   this, SLOT(updateEnableState()));
+  this->Timer.setInterval(11);
+  this->Timer.setSingleShot(true);
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+                   SIGNAL(dataUpdated(pqPipelineSource*)),
+                   &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(forceFilterMenuRefresh()),
+                   &this->Timer, SLOT(start()));
+
+  // this updates the available writers whenever a plugin is
+  // loaded.
+  QObject::connect(
+    pqApplicationCore::instance()->getPluginManager(),
+    SIGNAL(pluginsUpdated()),
+    this, SLOT(createMenu()));
 }
 
 //-----------------------------------------------------------------------------
@@ -110,65 +142,58 @@ namespace
 //-----------------------------------------------------------------------------
 void pqCPWritersMenuManager::createMenu()
 {
-  // Load the resource file and parse the XML to add items to the menu.
-  QFile xmlFile(":/CoProcessingPlugin/ParaViewResources/Writers.xml");
-  if (!xmlFile.open(QIODevice::ReadOnly))
-    {
-    qCritical() << "Failed to load the Writers.xml resource file."
-      << " Plugin has not been built correctly.";
-    return;
-    }
-
-  QByteArray dat = xmlFile.readAll();
-  xmlFile.close();
-  vtkSmartPointer<vtkPVXMLParser> parser =
-    vtkSmartPointer<vtkPVXMLParser>::New();
-  if (!parser->Parse(dat.data()))
-    {
-    qCritical() << "Failed to parse resource xml."
-      << " Plugin has not been built correctly.";
-    return;
-    }
-
   QMainWindow *mainWindow = qobject_cast<QMainWindow*>(
     pqCoreUtilities::mainWidget());
 
-  this->Menu = new QMenu("&Writers", mainWindow);
-  this->Menu->setObjectName("CoProcessingWritersMenu");
-  mainWindow->menuBar()->insertMenu(
-    ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
-
-  QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
-    this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
-  vtkPVXMLElement* elem = parser->GetRootElement();
-  unsigned int num_elems = elem->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < num_elems; cc++)
+  if(this->Menu == NULL)
     {
-    vtkPVXMLElement* curElem = elem->GetNestedElement(cc);
-    if (curElem->GetName() && strcmp(curElem->GetName(),"Writer") == 0)
+    this->Menu = new QMenu("&Writers", mainWindow);
+    this->Menu->setObjectName("CoProcessingWritersMenu");
+    mainWindow->menuBar()->insertMenu(
+      ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
+
+    QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
+                     this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+    }
+  this->Menu->clear();
+
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  vtkSMProxyDefinitionManager* proxyDefinitions =
+    pxm->GetProxyDefinitionManager();
+
+  // For now we only worry about proxies in the filter group and
+  // we search specifically for proxies with a coprocessing hint
+  // since we've marked them as special
+  const char proxyGroup[] = "filters";
+  vtkPVProxyDefinitionIterator* iter =
+    proxyDefinitions->NewSingleGroupIterator(proxyGroup);
+  for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
+    {
+    if(vtkPVXMLElement* hints = iter->GetProxyHints())
       {
-      const char* proxyname = curElem->GetAttribute("proxyname");
-      const char* proxygroup = curElem->GetAttribute("proxygroup");
-      if (proxygroup && proxyname)
+      if(vtkPVXMLElement* coprocessingHint =
+         hints->FindNestedElementByName("CoProcessing"))
         {
-        vtkSMProxy* prototype = pxm->GetPrototypeProxy(proxygroup, proxyname);
+        const char* proxyName = iter->GetProxyName();
+        vtkSMProxy* prototype = pxm->GetPrototypeProxy(proxyGroup, proxyName);
         if (!prototype)
           {
           qWarning() << "Failed to locate proxy for writer: " <<
-            proxygroup <<" , " << proxyname;
+            proxyGroup <<" , " << proxyName;
           continue;
           }
-        QAction* action = this->Menu->addAction(prototype->GetXMLLabel()?
+        QAction* action = this->Menu->addAction(
+          prototype->GetXMLLabel() ?
           prototype->GetXMLLabel() : prototype->GetXMLName());
         QStringList list;
-        list << proxygroup << proxyname;
+        list << proxyGroup << proxyName;
         action->setData(list);
         }
       }
     }
+  iter->Delete();
 
   this->updateEnableState();
 }
@@ -176,35 +201,36 @@ void pqCPWritersMenuManager::createMenu()
 //-----------------------------------------------------------------------------
 void pqCPWritersMenuManager::updateEnableState()
 {
-  if (!this->Menu)
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  if (!this->Menu || !pxm)
     {
     return;
     }
 
   // Get the list of selected sources. Make sure the list contains
   // only valid sources.
-  const pqServerManagerSelection *selItems =
-    pqApplicationCore::instance()->getSelectionModel()->selectedItems();
+  pqServerManagerModel* pqModel = pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxySelectionModel* selection = pxm->GetSelectionModel("ActiveSources");
 
   QList<pqOutputPort*> outputPorts;
-  pqServerManagerModelItem* item = NULL;
-  pqServerManagerSelection::ConstIterator iter = selItems->begin();
-  for( ; iter != selItems->end(); ++iter)
+  for(int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
-    item = *iter;
-    pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
-    pqOutputPort* port = source? source->getOutputPort(0) :
-      qobject_cast<pqOutputPort*>(item);
+    vtkSMProxy* smProxy = selection->GetSelectedProxy(index);
+    pqPipelineSource* source = pqModel->findItem<pqPipelineSource*>(smProxy);
+    pqOutputPort* port = source ? source->getOutputPort(0) :
+                                  pqModel->findItem<pqOutputPort*>(smProxy);
     if (port)
       {
       outputPorts.append(port);
       }
     }
 
+  assert("A proxy manager should have been found by now" && pxm);
+
   // Iterate over all filters in the menu and see if they can be
   // applied to the current source(s).
   bool some_enabled = false;
-  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
   QList<QAction *> menu_actions = this->Menu->findChildren<QAction *>();
   foreach( QAction* action, menu_actions)
     {
@@ -243,7 +269,7 @@ void pqCPWritersMenuManager::updateEnableState()
     vtkSMInputProperty *input = ::getInputProperty(output);
     if (input)
       {
-      if (!input->GetMultipleInput() && selItems->size() > 1)
+      if (!input->GetMultipleInput() && selection->GetNumberOfSelectedProxies() > 1)
         {
         action->setEnabled(false);
         continue;
@@ -290,7 +316,8 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)
@@ -300,21 +327,20 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
     }
 
   // Get the list of selected sources.
-  pqServerManagerSelection selected =
-    *core->getSelectionModel()->selectedItems();
+  vtkSMProxySelectionModel* selection = pxm->GetSelectionModel("ActiveSources");
+  pqServerManagerModel* pqModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqOutputPort*> selectedOutputPorts;
   QMap<QString, QList<pqOutputPort*> > namedInputs;
-
+  pqPipelineSource* source;
+  pqOutputPort* opPort;
   // Determine the list of selected output ports.
-  foreach (pqServerManagerModelItem* item, selected)
+  for (unsigned int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
-    pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
-    if (opPort)
+    if (opPort = pqModel->findItem<pqOutputPort*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(opPort);
       }
-    else if (source)
+    else if (source = pqModel->findItem<pqPipelineSource*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(source->getOutputPort(0));
       }

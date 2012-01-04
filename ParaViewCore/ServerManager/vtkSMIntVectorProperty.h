@@ -59,6 +59,11 @@ public:
   int *GetElements();
 
   // Description:
+  // Sets the values of all the unchecked elements.
+  int SetUncheckedElements(const int* values);
+  int SetUncheckedElements(const int* values, unsigned int numValues);
+
+  // Description:
   // Set the value of 1st element. The vector is resized as necessary.
   // Returns 0 if Set fails either because the property is read only
   // or one or more of the values is not in all domains.
@@ -125,6 +130,8 @@ public:
   // Returns the default value, if any, specified in the XML.
   int GetDefaultValue(int idx);
 
+  virtual void ClearUncheckedElements();
+
 //BTX
 protected:
   vtkSMIntVectorProperty();
@@ -136,12 +143,11 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*);
 
 
   // Handle XML with int type for default values.
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   class vtkInternals;
   vtkInternals* Internals;

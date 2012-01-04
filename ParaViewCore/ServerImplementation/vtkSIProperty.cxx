@@ -18,8 +18,49 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkSIProxy.h"
+#include "vtkSMMessage.h"
 #include "vtkPVXMLElement.h"
 
+//****************************************************************************/
+//                    Internal Classes and typedefs
+//****************************************************************************/
+class vtkSIProperty::vtkInternals
+{
+public:
+  vtkInternals()
+    {
+    this->CacheValue = NULL;
+    }
+  ~vtkInternals()
+    {
+    this->ClearCache();
+    }
+
+  void ClearCache()
+    {
+    if(this->CacheValue)
+      {
+      delete this->CacheValue;
+      this->CacheValue = NULL;
+      }
+    }
+
+  bool HasCache()
+    {
+    return this->CacheValue != NULL;
+    }
+
+  void SaveToCache(const ProxyState_Property *newValue)
+    {
+    this->ClearCache();
+    this->CacheValue = new ProxyState_Property();
+    this->CacheValue->CopyFrom(*newValue);
+    }
+
+  ProxyState_Property *CacheValue;
+};
+
+//****************************************************************************/
 vtkStandardNewMacro(vtkSIProperty);
 //----------------------------------------------------------------------------
 vtkSIProperty::vtkSIProperty()
@@ -27,10 +68,10 @@ vtkSIProperty::vtkSIProperty()
   this->Command = NULL;
   this->XMLName = NULL;
   this->IsInternal = false;
-  this->UpdateSelf = false;
   this->InformationOnly = false;
   this->Repeatable = false;
   this->SIProxyObject = NULL;
+  this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
@@ -38,6 +79,7 @@ vtkSIProperty::~vtkSIProperty()
 {
   this->SetCommand(NULL);
   this->SetXMLName(NULL);
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -69,13 +111,6 @@ bool vtkSIProperty::ReadXMLAttributes(
   if (element->GetScalarAttribute("repeat_command", &repeat_command))
     {
     this->Repeatable = (repeat_command != 0);
-    }
-
-
-  int update_self;
-  if (element->GetScalarAttribute("update_self", &update_self))
-    {
-    this->UpdateSelf = (update_self != 0);
     }
 
   int information_only;
@@ -145,8 +180,7 @@ void vtkSIProperty::PrintSelf(ostream& os, vtkIndent indent)
 //          and not for value property.
 bool vtkSIProperty::Push(vtkSMMessage*, int)
 {
-  if ( this->InformationOnly || !this->Command || this->UpdateSelf ||
-       this->GetVTKObject() == NULL)
+  if (this->InformationOnly || !this->Command || this->GetVTKObject() == NULL)
     {
     return true;
     }
@@ -156,4 +190,24 @@ bool vtkSIProperty::Push(vtkSMMessage*, int)
   stream << this->GetVTKObject() << this->Command;
   stream << vtkClientServerStream::End;
   return this->ProcessMessage(stream);
+}
+//----------------------------------------------------------------------------
+// CAUTION: This method should only be called to retreive the cache value of the
+//          property.
+bool vtkSIProperty::Pull(vtkSMMessage* msg)
+{
+  if(!this->InformationOnly && this->Internals->HasCache())
+    {
+    ProxyState_Property *newProp = msg->AddExtension(ProxyState::property);
+    newProp->CopyFrom(*this->Internals->CacheValue);
+    }
+
+  return true;
+}
+//----------------------------------------------------------------------------
+void vtkSIProperty::SaveValueToCache(vtkSMMessage* message, int offset)
+{
+  const ProxyState_Property *prop =
+      &message->GetExtension(ProxyState::property, offset);
+  this->Internals->SaveToCache(prop);
 }

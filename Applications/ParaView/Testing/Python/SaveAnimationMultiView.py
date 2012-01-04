@@ -6,13 +6,13 @@ import time
 
 object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'Wavelet')
-object2 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
-object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar'
+object6 = 'pqClientMainWindow/1QTabBar1'
 QtTesting.playCommand(object6, 'set_tab', '1')
-object24 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox'
+object24 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox'
 QtTesting.playCommand(object24, 'set_string', 'Surface')
-object25 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables'
+object25 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables'
 QtTesting.playCommand(object25, 'set_string', 'RTData')
 QtTesting.playCommand(object6, 'set_tab', '0')
 object3 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
@@ -20,7 +20,7 @@ QtTesting.playCommand(object3, 'activate', '')
 
 QtTesting.playCommand(object1, 'activate', 'Arrow')
 QtTesting.playCommand(object2, 'activate', '')
-object4 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Delete'
+object4 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Delete'
 QtTesting.playCommand(object4, 'activate', '')
 
 object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
@@ -32,7 +32,7 @@ QtTesting.playCommand(object5, 'mousePress', '(0.533784,0.680147,1,1,0)')
 QtTesting.playCommand(object5, 'mouseMove', '(0.533784,0.680147,1,0,0)')
 QtTesting.playCommand(object5, 'mouseRelease', '(0.533784,0.680147,1,0,0)')
 QtTesting.playCommand(object6, 'set_tab', '1')
-object8 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
+object8 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')

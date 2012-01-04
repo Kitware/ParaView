@@ -13,6 +13,8 @@
 
 =========================================================================*/
 
+#include "PhastaAdaptorAPIMangling.h"
+
 #include "FortranAdaptorAPI.h"
 #include "vtkCellData.h"
 #include "vtkCellType.h"
@@ -25,10 +27,10 @@
 #include "vtkPoints.h"
 #include "vtkUnstructuredGrid.h"
 
-extern "C" void createpointsandallocatecells_(
+extern "C" void createpointsandallocatecells(
   int* numPoints, double* coordsArray, int* numCells)
 {
-  if(!GetCoProcessorData())
+  if(!ParaViewCoProcessing::GetCoProcessorData())
     {
     vtkGenericWarningMacro("Unable to access CoProcessorData.");
     return;
@@ -50,18 +52,18 @@ extern "C" void createpointsandallocatecells_(
   Grid->SetPoints(nodePoints);
   nodePoints->Delete();
   Grid->Allocate(*numCells);
-  GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(Grid);
+  ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(Grid);
   Grid->Delete();
 }
 
-extern "C" void insertblockofcells_(
+extern "C" void insertblockofcells(
   int* numCellsInBlock, int* numPointsPerCell, int* cellConnectivity)
 {
   vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast(
-    GetCoProcessorData()->GetInputDescriptionByName("input")->GetGrid());
+    ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName("input")->GetGrid());
   if(!grid)
     {
-    cout << "CoProcessing: Could not access grid for cell insertion.\n";
+    vtkGenericWarningMacro("CoProcessing: Could not access grid for cell insertion.");
     }
   int type = -1;
   switch(*numPointsPerCell)
@@ -88,8 +90,8 @@ extern "C" void insertblockofcells_(
     }
     default:
     {
-    cout << "CoProcessing: Incorrect amount of vertices per element: " 
-         << *numPointsPerCell << endl;
+    vtkGenericWarningMacro("CoProcessing: Incorrect amount of vertices per element: "
+                           << *numPointsPerCell);
     return;
     }
     }
@@ -103,7 +105,7 @@ extern "C" void insertblockofcells_(
       
       if(pts[i] < 0 || pts[i] >= numPoints)
         {
-        cout << pts[i] << " is not a valid node id\n";
+        vtkGenericWarningMacro(<<pts[i] << " is not a valid node id.");
         }
       }
     if(type == VTK_TETRA)
@@ -116,16 +118,16 @@ extern "C" void insertblockofcells_(
     }
 }
 
-extern "C" void addfields_(
+extern "C" void addfields(
   int* nshg, int* vtkNotUsed(ndof), double* dofArray, int *compressibleFlow)
 {
   vtkCPInputDataDescription* idd =
-    GetCoProcessorData()->GetInputDescriptionByName("input");
+    ParaViewCoProcessing::GetCoProcessorData()->GetInputDescriptionByName("input");
   vtkUnstructuredGrid* UnstructuredGrid = 
     vtkUnstructuredGrid::SafeDownCast(idd->GetGrid());
   if(!UnstructuredGrid)
     {
-    cout << "PhastaAdaptor.cxx: No unstructured grid to attach field data to.\n";
+    vtkGenericWarningMacro("No unstructured grid to attach field data to.");
     return;
     }
   vtkIdType NumberOfNodes = UnstructuredGrid->GetNumberOfPoints();

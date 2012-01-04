@@ -24,15 +24,15 @@
 #ifndef __vtkSMCompoundProxyDefinitionLoader_h
 #define __vtkSMCompoundProxyDefinitionLoader_h
 
-#include "vtkSMDeserializer.h"
+#include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializer
+class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializerXML
 {
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();
-  vtkTypeMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializerXML);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void SetRootElement(vtkPVXMLElement*);
@@ -43,7 +43,7 @@ protected:
 
   // Description:
   // Locate the XML for the proxy with the given id.
-  virtual vtkPVXMLElement* LocateProxyElement(int id);
+  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id);
 
   vtkPVXMLElement* RootElement;
 private:

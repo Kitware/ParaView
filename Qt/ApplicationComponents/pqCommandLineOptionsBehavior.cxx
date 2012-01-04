@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCommandLineOptionsBehavior.h"
 
 #include "pqActiveObjects.h"
+#include "pqCollaborationEventPlayer.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
@@ -79,12 +80,9 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   const char* serverresource_name = options->GetServerResourceName();
   if (serverresource_name)
     {
-    pqServerConnectReaction::connectToServer(serverresource_name); 
-    if (!pqActiveObjects::instance().activeServer())
+    if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
+        serverresource_name))
       {
-      // FIXME: This warning is not showing up since pqAlwaysConnectedBehavior
-      // connects to a server. We need to check if active server is not same as
-      // requested server, then warn.
       qCritical() << "Could not connect to requested server \"" 
         << serverresource_name 
         << "\". Creating default builtin connection.";
@@ -144,6 +142,12 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
 #endif
     }
 
+  if (options->GetDisableRegistry())
+    {
+    // a cout for test playback.
+    cout << "Process started" << endl;
+    }
+
   if (options->GetNumberOfTestScripts() > 0)
     {
     QTimer::singleShot(1000, this, SLOT(playTests()));
@@ -166,6 +170,18 @@ void pqCommandLineOptionsBehavior::playTests()
       {
       this->resetApplication();
       }
+    else if (cc==0)
+      {
+      if (options->GetTestMaster())
+        {
+        pqCollaborationEventPlayer::waitForConnections(2);
+        }
+      else if (options->GetTestSlave())
+        {
+        pqCollaborationEventPlayer::waitForMaster();
+        }
+      }
+
 
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
@@ -183,6 +199,15 @@ void pqCommandLineOptionsBehavior::playTests()
 
   if (options->GetExitAppWhenTestsDone())
     {
+    if (options->GetTestMaster())
+      {
+      pqCollaborationEventPlayer::wait(1000);
+      }
+
+    // Make sure that the pqApplicationCore::prepareForQuit() method
+    // get called
+    QApplication::closeAllWindows();
+
     QApplication::instance()->exit(success? 0 : 1);
     }
 }
@@ -225,10 +250,6 @@ void pqCommandLineOptionsBehavior::resetApplication()
 
   // reset animation time.
   pqActiveObjects::instance().activeServer()->getTimeKeeper()->setTime(0.0);
-
-  // restore panels etc.
-  pqPersistentMainWindowStateBehavior::restoreState(
-    qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()));
 
   pqEventDispatcher::processEventsAndWait(10);
 

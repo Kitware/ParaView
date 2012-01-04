@@ -31,6 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnimationScene.h"
 
+#include "pqAnimationCue.h"
+#include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
+#include "pqSettings.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqTimeKeeper.h"
 #include "vtkAnimationCue.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
@@ -41,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 
@@ -49,16 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QSize>
 
-#include "pqAnimationCue.h"
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
-#include "pqSettings.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
-#include "pqTimeKeeper.h"
 
 template<class T>
 static uint qHash(QPointer<T> p)
@@ -447,14 +448,14 @@ void pqAnimationScene::initializeCue(
     kf1->UpdateVTKObjects();
 
     double bounds[6] = {-1, 1, -1, 1, -1, 1};
-    pqApplicationCore::instance()->getSelectionModel()->getSelectionDataBounds(
+    cue->getServer()->activeSourcesSelectionModel()->GetSelectionDataBounds(
       bounds);
 
     vtkBoundingBox bbox(bounds);
     double center[3];
     bbox.GetCenter(center);
     vtkPoints* pts = vtkSMUtilities::CreateOrbit(center,
-      vtkSMPropertyHelper(kf0, "ViewUp").GetAsDoublePtr(),
+      &vtkSMPropertyHelper(kf0, "ViewUp").GetDoubleArray()[0],
       5*bbox.GetMaxLength()/2.0, 10);
     vtkSMPropertyHelper(kf0, "PositionPathPoints").Set(
       reinterpret_cast<double*>(pts->GetVoidPointer(0)),
@@ -622,7 +623,7 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 //-----------------------------------------------------------------------------
 void pqAnimationScene::updateApplicationSettings()
 {
-  vtkSMProxyManager* pxm = this->getServer()->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->getServer()->proxyManager();
   vtkSMProxy* globalAnimationProperties =
     pxm->NewProxy("misc", "GlobalAnimationProperties");
   pqSMAdaptor::setElementProperty(globalAnimationProperties->GetProperty("CacheLimit"),

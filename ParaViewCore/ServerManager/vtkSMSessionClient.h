@@ -25,6 +25,9 @@
 
 class vtkMultiProcessController;
 class vtkPVServerInformation;
+class vtkSMCollaborationManager;
+class vtkSMProxyLocator;
+class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
 {
@@ -120,7 +123,54 @@ public:
   // and 2 render-server nodes, then this method will return 3.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
+  //---------------------------------------------------------------------------
+  // API for Collaboration management
+  //---------------------------------------------------------------------------
+
+  // Called before application quit or session disconnection
+  // Used to prevent quiting client to delete proxy of a running session.
+  virtual void PreDisconnection();
+
+  // Description:
+  // Flag used to know if it is a good time to handle server notification.
+  virtual bool IsNotBusy();
+  // Description:
+  // BusyWork should be declared inside method that will request several
+  // network call that we don't want to interupt such as GatherInformation
+  // and Pull.
+  virtual void StartBusyWork();
+  // Description:
+  // BusyWork should be declared inside method that will request several
+  // network call that we don't want to interupt such as GatherInformation
+  // and Pull.
+  virtual void EndBusyWork();
+
+  // Description:
+  // Return the instance of vtkSMCollaborationManager that will be
+  // lazy created at the first call.
+  virtual vtkSMCollaborationManager* GetCollaborationManager();
+
+  //---------------------------------------------------------------------------
+  // API for GlobalId management
+  //---------------------------------------------------------------------------
+
+  // Description:
+  // Provides the next available identifier. This implementation works locally.
+  // without any code distribution. To support the distributed architecture
+  // the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+  // vtkPVSessionBase instance.
+  virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
+
+  // Description:
+  // Return the first Id of the requested chunk.
+  // 1 = ReverveNextIdChunk(10); | Reserved ids [1,2,3,4,5,6,7,8,9,10]
+  // 11 = ReverveNextIdChunk(10);| Reserved ids [11,12,13,14,15,16,17,18,19,20]
+  // b = a + 10;
+  virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
+
 //BTX
+  void OnServerNotificationMessageRMI(void* message, int message_length);
+
 protected:
   vtkSMSessionClient();
   ~vtkSMSessionClient();
@@ -132,7 +182,11 @@ protected:
 
   // Description:
   // Delete server side object. (SIObject)
-  virtual void DeleteSIObject(vtkSMMessage* msg);
+  virtual void UnRegisterSIObject(vtkSMMessage* msg);
+
+  // Description:
+  // Notify server side object that it is used by one more client. (SIObject)
+  virtual void RegisterSIObject(vtkSMMessage* msg);
 
   // Description:
   // Translates the location to a real location based on whether a separate
@@ -152,9 +206,29 @@ protected:
 
   bool AbortConnect;
   char* URI;
+
+  // This flag allow us to disable remote Object deletion in a collaboration
+  // context when a client is leaving a visalization session.
+  // Typically we don't want this client to broadcast to the other to delete all
+  // the proxy because it does not need them anymore as it is leaving...
+  bool NoMoreDelete;
+
+  // Field used to communicate with other clients
+  vtkSMCollaborationManager* CollaborationCommunicator;
+
+  // Description:
+  // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
+  // Return true if the event was handle locally.
+  virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
+                                void* calldata);
+
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented
+
+  int NotBusy;
+  vtkTypeUInt32 LastGlobalID;
+  vtkTypeUInt32 LastGlobalIDAvailable;
 //ETX
 };
 

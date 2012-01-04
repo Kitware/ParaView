@@ -129,6 +129,13 @@ public:
   // provided for some old api.
   vtkSession* GetSession();
 
+  // Description:
+  // Return true, if multiple sessions can be used simultanuously.
+  // We set the default to be FALSE.
+  vtkGetMacro(MultipleSessionsSupport, bool);
+  vtkSetMacro(MultipleSessionsSupport, bool);
+  vtkBooleanMacro(MultipleSessionsSupport, bool);
+
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
 
   // Description:
@@ -227,6 +234,8 @@ private:
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
 
   bool SymmetricMPIMode;
+
+  bool MultipleSessionsSupport;
 //ETX
 };
 

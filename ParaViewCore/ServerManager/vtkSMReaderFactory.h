@@ -61,7 +61,7 @@ public:
   // Description:
   // Registers all prototypes from a particular group that have the
   // "ReaderFactory" hint.
-  void RegisterPrototypes(const char* xmlgroup);
+  void RegisterPrototypes(vtkSMSession* session, const char* xmlgroup);
 
   // Description:
   // Load configuration XML. This adds the prototypes specified in the

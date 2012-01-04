@@ -74,11 +74,17 @@ public:
   pqObjectBuilder(QObject* parent=0);
   virtual ~pqObjectBuilder();
   
-  /// Create a server connection give a server resource
+  /// Create a server connection give a server resource.
+  /// By default, this method does not create a new connection if one already
+  /// exists. Also it disconnects from any existing server connection before
+  /// connecting to a new one. This behavior can be changed by setting
+  /// MultipleConnectionsSupport to true. In that case
+  /// this will always try to connect the server using the details specified in
+  /// the resource irrespective if the server is already connected or any other
+  /// server connections exists. 
+  /// Calling this method while waiting for a previous server connection to be
+  /// established raises errors.
   pqServer* createServer(const pqServerResource& resource);
-
-  /// Closes any open connections for reverse-connection.
-  void abortPendingConnections();
  
   /// Destroy a server connection 
   void removeServer(pqServer *server);
@@ -192,23 +198,21 @@ public:
   /// otherwise simply returns the first one encountered.
   static QString getFileNamePropertyName(vtkSMProxy*);
 
-  // HACK: pqSimpleServerStartup needs to fire the
-  // finishedAddingServer() signal on successful
-  // reverse connection. Server creation and correspoinding
-  // signals need a bit reorganizing.
-  void fireFinishedAddingServer(pqServer* server)
-    {
-    emit this->finishedAddingServer(server);
-    }
-
   /// Returns true while pqObjectBuilder is in createServer() call.
   bool waitingForConnection() const
     { return this->WaitingForConnection; }
+
+public slots:
+  /// Closes any open connections for reverse-connection.
+  void abortPendingConnections();
 
 signals:
   
   /// Emitted after a new server connection is created
   void finishedAddingServer(pqServer *server);
+
+  /// Emitted when another server is avilable after a server remove
+  void activeServerChanged(pqServer *server);
 
   /// Fired on successful completion of createSource().
   /// Remember that this signal is fired only when the creation of the object

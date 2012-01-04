@@ -31,17 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqServerConnectReaction.h"
 
+#include "vtkProcessModule.h"
+
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqServerConfigurationCollection.h"
+#include "pqServerConfiguration.h"
+#include "pqServerConnectDialog.h"
 #include "pqServer.h"
+#include "pqServerLauncher.h"
 #include "pqServerManagerModel.h"
-#include "pqServerStartupBrowser.h"
-#include "pqServerStartups.h"
-#include "pqSimpleServerStartup.h"
 
 #include <QMessageBox>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 pqServerConnectReaction::pqServerConnectReaction(QAction* parentObject)
@@ -57,7 +62,8 @@ void pqServerConnectReaction::connectToServerWithWarning()
 
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  if (smmodel->findItems<pqPipelineSource*>(server).size() > 0)
+  if ( !vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport() &&
+       (smmodel->findItems<pqPipelineSource*>(server).size() > 0) )
     {
     int ret = QMessageBox::warning(
       pqCoreUtilities::mainWidget(),
@@ -79,28 +85,31 @@ void pqServerConnectReaction::connectToServerWithWarning()
 //-----------------------------------------------------------------------------
 void pqServerConnectReaction::connectToServer()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerStartupBrowser server_browser (core->serverStartups(),
-    pqCoreUtilities::mainWidget());
-  QStringList ignoreList;
-  ignoreList << "builtin";
-  server_browser.setIgnoreList(ignoreList);
-  server_browser.exec();
-}
-
-//-----------------------------------------------------------------------------
-void pqServerConnectReaction::connectToServer(
-  const char* serverresource_name)
-{
-  if (serverresource_name)
+  pqServerConnectDialog dialog(pqCoreUtilities::mainWidget());
+  if (dialog.exec() == QDialog::Accepted)
     {
-    pqServerStartup* startUp = 
-      pqApplicationCore::instance()->serverStartups().getStartup(serverresource_name);
-    if (startUp)
-      {
-      pqSimpleServerStartup starter;
-      starter.startServerBlocking(*startUp);
-      }
+    pqServerConnectReaction::connectToServerUsingConfiguration(
+      dialog.configurationToConnect());
     }
 }
 
+//-----------------------------------------------------------------------------
+bool pqServerConnectReaction::connectToServerUsingConfigurationName(
+  const char* config_name)
+{
+  const pqServerConfiguration* config =
+    pqApplicationCore::instance()->serverConfigurations().configuration(config_name);
+  if (config)
+    {
+    return pqServerConnectReaction::connectToServerUsingConfiguration(*config);
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerConnectReaction::connectToServerUsingConfiguration(
+  const pqServerConfiguration& config)
+{
+  pqServerLauncher launcher(config);
+  return launcher.connectToServer();
+}

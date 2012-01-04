@@ -75,6 +75,11 @@ public:
   virtual vtkPVServerInformation* GetServerInformation()=0;
 
   // Description:
+  // Allow anyone to know easily if the current session is involved in
+  // collaboration or not. This is mostly true for the Client side.
+  virtual bool IsMultiClients();
+
+  // Description:
   // Provides access to the progress handler.
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 
@@ -100,7 +105,8 @@ protected:
 
   // Description:
   // Callback when any vtkMultiProcessController subclass fires a WrongTagEvent.
-  virtual void OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
+  // Return true if the event was handle localy.
+  virtual bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid,
     void* calldata);
 
   // Description:

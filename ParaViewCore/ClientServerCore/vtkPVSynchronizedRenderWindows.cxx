@@ -16,6 +16,7 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
+#include "vtkDebugLeaks.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -263,11 +264,42 @@ namespace
     }
 };
 
-vtkStandardNewMacro(vtkPVSynchronizedRenderWindows);
 vtkCxxSetObjectMacro(vtkPVSynchronizedRenderWindows, ClientDataServerController,
   vtkMultiProcessController);
+
 //----------------------------------------------------------------------------
-vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
+vtkPVSynchronizedRenderWindows* vtkPVSynchronizedRenderWindows::New(
+  vtkPVSession* session/*=NULL*/)
+{
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkPVSynchronizedRenderWindows");
+#endif
+
+  // Ensure vtkProcessModule is setup correctly.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm)
+    {
+    vtkGenericWarningMacro(
+      "vtkPVSynchronizedRenderWindows cannot be used in the current\n"
+      "setup.");
+    return NULL;
+    }
+
+  vtkPVSession* activeSession = session? session :
+    vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (!activeSession)
+    {
+    vtkGenericWarningMacro(
+      "vtkPVSynchronizedRenderWindows cannot be created with a valid session");
+    return NULL;
+    }
+
+  return new vtkPVSynchronizedRenderWindows(activeSession);
+}
+
+//----------------------------------------------------------------------------
+vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows(
+  vtkPVSession* activeSession /*NULL*/) : Session(activeSession)
 {
   this->Mode = INVALID;
   this->ClientServerController = 0;
@@ -283,19 +315,14 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Enabled = true;
-  this->RenderEventPropagation = true;
+
+  // we no longer support render even propagation. This leads to unnecessary
+  // complications since it results in code have different paths on client and
+  // servers.
+  this->RenderEventPropagation = false;
   this->RenderOneViewAtATime = false;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm)
-    {
-    vtkErrorMacro(
-      "vtkPVSynchronizedRenderWindows cannot be used in the current\n"
-      "setup. Aborting for debugging purposes.");
-    abort();
-    }
-
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   int processtype = pm->GetProcessType();
   switch (processtype)
     {
@@ -315,7 +342,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 
   case vtkProcessModule::PROCESS_CLIENT:
     this->Mode = BUILTIN;
-    if (activeSession->IsA("vtkSMSessionClient"))
+    if (this->Session->IsA("vtkSMSessionClient"))
       {
       this->Mode = CLIENT;
       }
@@ -331,7 +358,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 
   case DATA_SERVER:
     this->SetClientDataServerController(
-      activeSession->GetController(vtkPVSession::CLIENT));
+      this->Session->GetController(vtkPVSession::CLIENT));
     break;
 
   case BATCH:
@@ -346,14 +373,14 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
     this->SetParallelController(vtkMultiProcessController::GetGlobalController());
     // this will be NULL on satellites.
     this->SetClientServerController(
-      activeSession->GetController(vtkPVSession::CLIENT));
+      this->Session->GetController(vtkPVSession::CLIENT));
     break;
 
   case CLIENT:
     this->SetClientServerController(
-      activeSession->GetController(vtkPVSession::RENDER_SERVER_ROOT));
+      this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT));
     this->SetClientDataServerController(
-      activeSession->GetController(vtkPVSession::DATA_SERVER_ROOT));
+      this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT));
     if (this->ClientDataServerController == this->ClientServerController)
       {
       this->SetClientDataServerController(0);
@@ -392,6 +419,12 @@ vtkPVSynchronizedRenderWindows::~vtkPVSynchronizedRenderWindows()
   this->Observer->Target = NULL;
   this->Observer->Delete();
   this->Observer = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkPVSession* vtkPVSynchronizedRenderWindows::GetSession()
+{
+  return this->Session;
 }
 
 //----------------------------------------------------------------------------
@@ -449,6 +482,11 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
   // triggers from the client.
   if (controller && this->Mode == RENDER_SERVER)
     {
+    // Only one RMICallback for PVSynchronizedRenderWindow can live at a time
+    controller->RemoveAllRMICallbacks(SYNC_MULTI_RENDER_WINDOW_TAG);
+    controller->RemoveAllRMICallbacks(GET_ZBUFFER_VALUE_TAG);
+
+    // Attach the one
     this->ClientServerRMITag =
       controller->AddRMICallback(::RenderRMI, this, SYNC_MULTI_RENDER_WINDOW_TAG);
     this->ClientServerGetZBufferValueRMITag =
@@ -494,6 +532,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       {
       // we could very return a dummy window here.
       vtkRenderWindow* window = vtkRenderWindow::New();
+      window->SetWindowName("ParaView Data-Server");
       return window;
       }
 
@@ -505,6 +544,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       vtkRenderWindow* window = vtkRenderWindow::New();
       window->DoubleBufferOn();
       window->AlphaBitPlanesOn();
+      window->SetWindowName("ParaView");
       return window;
       }
 
@@ -516,6 +556,20 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       vtkRenderWindow* window = vtkRenderWindow::New();
       window->DoubleBufferOn();
       window->AlphaBitPlanesOn();
+      vtksys_ios::ostringstream name_stream;
+      if (this->Mode == BATCH)
+        {
+        name_stream << "ParaView (batch)";
+        }
+      else
+        {
+        name_stream << "ParaView Server";
+        }
+      if (this->ParallelController->GetNumberOfProcesses() > 1)
+        {
+        name_stream << " #" << this->ParallelController->GetLocalProcessId();
+        }
+      window->SetWindowName(name_stream.str().c_str());
       // SwapBuffers should be ON only on root node in BATCH mode
       // or when operating in tile-display mode.
       bool swap_buffers = false;
@@ -639,6 +693,11 @@ void vtkPVSynchronizedRenderWindows::SetWindowSize(unsigned int id,
 {
   this->Internals->RenderWindows[id].Size[0] = width;
   this->Internals->RenderWindows[id].Size[1] = height;
+
+  // Make sure none of the dimension is 0
+  width = width ? width : 10;
+  height = height ? height : 10;
+
   if (this->Mode == BUILTIN || this->Mode == CLIENT)
     {
     vtkRenderWindow* window = this->GetRenderWindow(id);
@@ -814,7 +873,7 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
   // smart about it?
   this->SaveWindowAndLayout(renWin, stream);
 
-  this->ClientServerController->Broadcast(stream, 0);
+  this->ClientServerController->Send(stream, 1, 22222);
 
   this->UpdateWindowLayout();
 
@@ -834,7 +893,7 @@ void vtkPVSynchronizedRenderWindows::RootStartRender(vtkRenderWindow* renWin)
     {
     // * Get window layout from the server. $CODE_GET_LAYOUT_AND_UPDATE$
     vtkMultiProcessStream stream;
-    this->ClientServerController->Broadcast(stream, 1);
+    this->ClientServerController->Receive(stream, 1, 22222);
 
     // Load the layout for all the windows from the client.
     this->LoadWindowAndLayout(renWin, stream);
@@ -1197,13 +1256,7 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
 //----------------------------------------------------------------------------
 bool vtkPVSynchronizedRenderWindows::GetIsInCave()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
-
-  // active session must be a paraview-session.
-  assert(activeSession != NULL);
-
-  vtkPVServerInformation* server_info = activeSession->GetServerInformation();
+  vtkPVServerInformation* server_info = this->Session->GetServerInformation();
 
   int temp[2];
   if (!this->GetTileDisplayParameters(temp, temp))
@@ -1217,13 +1270,7 @@ bool vtkPVSynchronizedRenderWindows::GetIsInCave()
 bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
   int tile_dims[2], int tile_mullions[2])
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
-
-  // active session must be a paraview-session.
-  assert(activeSession != NULL);
-
-  vtkPVServerInformation* info = activeSession->GetServerInformation();
+  vtkPVServerInformation* info = this->Session->GetServerInformation();
 
   tile_dims[0] = info->GetTileDimensions()[0];
   tile_dims[1] = info->GetTileDimensions()[1];

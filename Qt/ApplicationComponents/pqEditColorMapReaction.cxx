@@ -123,5 +123,7 @@ void pqEditColorMapReaction::editColorMap()
     editor.setRepresentation(repr);
     editor.exec();
     }
+
+  repr->renderViewEventually();
 }
 

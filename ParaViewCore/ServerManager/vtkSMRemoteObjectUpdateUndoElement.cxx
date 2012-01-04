@@ -20,15 +20,20 @@
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
 
+#include <vtkNew.h>
+
 vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
+vtkSetObjectImplementationMacro(vtkSMRemoteObjectUpdateUndoElement, ProxyLocator, vtkSMProxyLocator);
 //-----------------------------------------------------------------------------
 vtkSMRemoteObjectUpdateUndoElement::vtkSMRemoteObjectUpdateUndoElement()
 {
-  this->AfterState = new vtkSMMessage();
-  this->BeforeState = new vtkSMMessage();
+  this->ProxyLocator = NULL;
+  this->AfterState   = new vtkSMMessage();
+  this->BeforeState  = new vtkSMMessage();
 }
 
 //-----------------------------------------------------------------------------
@@ -36,14 +41,21 @@ vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 {
   delete this->AfterState;
   delete this->BeforeState;
-  this->AfterState = NULL;
+  this->AfterState  = NULL;
   this->BeforeState = NULL;
+
+  this->SetProxyLocator(NULL);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRemoteObjectUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GlobalId: " << this->GetGlobalId() << endl;
+  os << indent << "Before state: " << endl;
+  if(this->BeforeState) this->BeforeState->PrintDebugString();
+  os << indent << "After state: " << endl;
+  if(this->AfterState) this->AfterState->PrintDebugString();
 }
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::Undo()
@@ -72,11 +84,15 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      remoteObj->LoadState(state,
-                           this->Locator.GetPointer() ?
-                                 this->Locator.GetPointer() :
-                                 this->Session->GetStateLocator(),
-                           false);
+      if(this->ProxyLocator)
+        {
+        this->ProxyLocator->SetSession(this->Session);
+        remoteObj->LoadState(state, this->ProxyLocator);
+        }
+      else
+        {
+        remoteObj->LoadState(state, this->Session->GetProxyLocator());
+        }
       }
     }
   return 1; // OK, we say that everything is fine.
@@ -103,9 +119,4 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
 vtkTypeUInt32 vtkSMRemoteObjectUpdateUndoElement::GetGlobalId()
 {
   return this->BeforeState->global_id();
-}
-//-----------------------------------------------------------------------------
-void vtkSMRemoteObjectUpdateUndoElement::SetStateLocator(vtkSMStateLocator* locator)
-{
-  this->Locator = locator;
 }

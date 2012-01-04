@@ -55,7 +55,7 @@ protected:
 
   // Description:
   // Overridden to process "RepresentationType" elements.
-  int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented

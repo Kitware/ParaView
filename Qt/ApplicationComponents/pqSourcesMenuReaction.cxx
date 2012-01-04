@@ -35,6 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqUndoStack.h"
 #include "pqObjectBuilder.h"
+#include "pqServer.h"
+
+#include "pqCollaborationManager.h"
+#include "vtkSMCollaborationManager.h"
+#include "vtkPVServerInformation.h"
 
 //-----------------------------------------------------------------------------
 pqSourcesMenuReaction::pqSourcesMenuReaction(
@@ -50,6 +55,9 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(
     this, SLOT(updateEnableState()));
   QObject::connect(menuManager, SIGNAL(menuPopulated()),
     this, SLOT(updateEnableState()));
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(updateMasterEnableState(bool)),
+                   this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
@@ -57,7 +65,12 @@ pqSourcesMenuReaction::pqSourcesMenuReaction(
 void pqSourcesMenuReaction::updateEnableState()
 {
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  bool enabled = activeObjects->activeServer() != NULL;
+  this->updateEnableState( activeObjects->activeServer() != NULL &&
+                           activeObjects->activeServer()->isMaster());
+}
+//-----------------------------------------------------------------------------
+void pqSourcesMenuReaction::updateEnableState(bool enabled)
+{
   pqProxyGroupMenuManager* mgr =
     static_cast<pqProxyGroupMenuManager*>(this->parent());
   mgr->setEnabled(enabled);

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqManageCustomFiltersReaction_h 
 #define __pqManageCustomFiltersReaction_h
 
-#include "pqReaction.h"
+#include "pqMasterOnlyReaction.h"
 
 class pqCustomFilterManagerModel;
 
@@ -40,10 +40,10 @@ class pqCustomFilterManagerModel;
 /// Reaction for showing the custom-filter manager dialog.
 /// For now, this also manages loading and saving of custom filters in the
 /// application settings. We may want to move that code to a separate behavior.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManageCustomFiltersReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+  typedef pqMasterOnlyReaction Superclass;
 public:
   pqManageCustomFiltersReaction(QAction* parentObject);
 

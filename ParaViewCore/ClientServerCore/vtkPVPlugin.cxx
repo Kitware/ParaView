@@ -46,3 +46,8 @@ void vtkPVPlugin::SetFileName(const char* filename)
   this->FileName = NULL;
   this->FileName = vtksys::SystemTools::DuplicateString(filename);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVPlugin::GetBinaryResources(vtkstd::vector<vtkstd::string>&)
+{
+}

@@ -26,7 +26,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
@@ -188,7 +188,7 @@ public:
 
     vtkInternal::RepresentationData& data = iter->second;
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = repr->GetSessionProxyManager();
 
     // Create a new representation
     vtkSMProxy* newRepr =
@@ -255,7 +255,9 @@ vtkPVComparativeView::~vtkPVComparativeView()
 void vtkPVComparativeView::AddCue(vtkSMComparativeAnimationCueProxy* cue)
 {
   this->Internal->Cues.push_back(cue);
-  cue->GetCue()->AddObserver(vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
+  cue->UpdateVTKObjects();
+  vtkObject::SafeDownCast(cue->GetClientSideObject())->AddObserver(
+    vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
   this->MarkOutdated();
 }
 
@@ -268,7 +270,8 @@ void vtkPVComparativeView::RemoveCue(vtkSMComparativeAnimationCueProxy* cue)
     {
     if (iter->GetPointer() == cue)
       {
-      cue->GetCue()->RemoveObserver(this->MarkOutdatedObserver);
+      vtkObject::SafeDownCast(cue->GetClientSideObject())
+        ->RemoveObserver(this->MarkOutdatedObserver);
       this->Internal->Cues.erase(iter);
       this->MarkOutdated();
       break;
@@ -378,8 +381,8 @@ void vtkPVComparativeView::Build(int dx, int dy)
     // ensure that there are enough representation clones in the root view to
     // match the dimensions.
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMViewProxy* root_view = this->GetRootView();
+    vtkSMSessionProxyManager* pxm = root_view->GetSessionProxyManager();
     size_t numReprs = dx * dy;
     vtkInternal::MapOfReprClones::iterator reprIter;
     for (reprIter = this->Internal->RepresentationClones.begin();
@@ -464,7 +467,7 @@ void vtkPVComparativeView::AddNewView()
   ENSURE_INIT();
 
   vtkSMViewProxy* rootView = this->GetRootView();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = rootView->GetSessionProxyManager();
   vtkSMViewProxy* newView = vtkSMViewProxy::SafeDownCast(
     pxm->NewProxy(rootView->GetXMLGroup(), rootView->GetXMLName()));
   if (!newView)
@@ -711,7 +714,7 @@ void vtkPVComparativeView::Update()
     {
     // for now, we are saying that the first cue that has no animatable  proxy
     // is for animating time.
-    if (iter->GetPointer()->GetCue()->GetAnimatedProxy() == NULL)
+    if (vtkSMPropertyHelper(iter->GetPointer(), "AnimatedProxy").GetAsProxy() == NULL)
       {
       timeCue = iter->GetPointer();
       break;
@@ -728,7 +731,7 @@ void vtkPVComparativeView::Update()
 
       if (timeCue)
         {
-        double value = timeCue->GetCue()->GetValue(
+        double value = timeCue->GetValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
         vtkSMPropertyHelper(view,"ViewTime").Set(value);
         }
@@ -746,7 +749,7 @@ void vtkPVComparativeView::Update()
           {
           continue;
           }
-        iter->GetPointer()->GetCue()->UpdateAnimatedValue(
+        iter->GetPointer()->UpdateAnimatedValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
         }
 

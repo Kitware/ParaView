@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
+#include "vtk3DWidgetRepresentation.h"
 #include "vtkBoundingBox.h"
 #include "vtkBSPCutsGenerator.h"
 #include "vtkCamera.h"
@@ -45,6 +46,7 @@
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
+#include "vtkPVSession.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballRotate.h"
@@ -64,6 +66,20 @@
 #include <assert.h>
 #include <vtkstd/vector>
 #include <vtkstd/set>
+#include <vtkstd/map>
+
+class vtkPVRenderView::vtkInternals
+{
+public:
+  vtkstd::map<void*, int> RepToIdMap;
+  vtkstd::map<int, vtkDataRepresentation*> IdToRepMap;
+  int UniqueId;
+  vtkInternals()
+    {
+    this->UniqueId = 0;
+    }
+};
+
 
 //----------------------------------------------------------------------------
 // Statics
@@ -87,9 +103,12 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  this->Internals = new vtkInternals();
+  this->CounterSynchronizedSuccessfully = true;
+
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
-  this->RemoteRenderingAvailable = false;
+  this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
 
   this->UsedLODForLastRender = false;
   this->MakingSelection = false;
@@ -116,6 +135,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseInteractiveRenderingForSceenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->Selector = vtkPVHardwareSelector::New();
+  this->SynchronizationCounter  = 0;
 
   this->LastComputedBounds[0] = this->LastComputedBounds[2] =
     this->LastComputedBounds[4] = -1.0;
@@ -260,6 +280,9 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->OrderedCompositingBSPCutsSource->Delete();
   this->OrderedCompositingBSPCutsSource = NULL;
+
+  delete this->Internals;
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -280,21 +303,53 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Initialize(unsigned int id)
 {
+  if (this->Identifier == id)
+    {
+    // already initialized
+    return;
+    }
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderView->GetRenderWindow());
   this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
 
-  this->SynchronizedRenderers->Initialize();
+  this->SynchronizedRenderers->Initialize(this->SynchronizedWindows->GetSession());
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
+}
 
-  this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
-  // Synchronize this among all processes involved.
-  unsigned int cannot_render = (this->RemoteRenderingAvailable &&
-                                vtkPVRenderView::IsRemoteRenderingAllowed()) ? 0 : 1;
-  this->SynchronizeSize(cannot_render);
-  this->RemoteRenderingAvailable = cannot_render == 0;
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (vtk3DWidgetRepresentation::SafeDownCast(rep) == NULL)
+    {
+    // We only increase that counter when widget are not involved as in
+    // collaboration mode only the master has the widget in its representation
+    this->SynchronizationCounter++;
+
+    unsigned int id = this->Internals->UniqueId++;
+    this->Internals->RepToIdMap[rep] = id;
+    this->Internals->IdToRepMap[id] = rep;
+    }
+  this->Superclass::AddRepresentationInternal(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
+{
+  if (this->Internals->RepToIdMap.find(rep) !=
+    this->Internals->RepToIdMap.end())
+    {
+    this->Internals->IdToRepMap.erase(
+      this->Internals->RepToIdMap[rep]);
+    this->Internals->RepToIdMap.erase(rep);
+
+    // We only increase that counter when widget are not involved as in
+    // collaboration mode only the master has the widget in its representation
+    this->SynchronizationCounter++;
+    }
+
+  this->Superclass::RemoveRepresentationInternal(rep);
 }
 
 //----------------------------------------------------------------------------
@@ -406,9 +461,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->MakingSelection = true;
 
-  bool render_event_propagation =
-    this->SynchronizedWindows->GetRenderEventPropagation();
-  this->SynchronizedWindows->RenderEventPropagationOff();
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
@@ -426,6 +478,12 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
 
   vtkSelection* sel = this->Selector->Select(region);
+
+  // look at ::Render(..,..). We need to disable these once we are done with
+  // rendering.
+  this->SynchronizedWindows->SetEnabled(false);
+  this->SynchronizedRenderers->SetEnabled(false);
+
   if (sel)
     {
     // A valid sel is only generated on the "driver" node. The driver node may not have
@@ -439,7 +497,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     {
     vtkErrorMacro("Failed to capture selection.");
     }
-  this->SynchronizedWindows->SetRenderEventPropagation(render_event_propagation);
 
   this->MakingSelection = false;
 }
@@ -604,6 +661,62 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SynchronizeForCollaboration()
+{
+  this->CounterSynchronizedSuccessfully = false;
+
+  // Also, can we optimize this further? This happens on every render in
+  // collaborative mode.
+  vtkMultiProcessController* p_controller =
+    this->SynchronizedWindows->GetParallelController();
+  vtkMultiProcessController* d_controller = 
+    this->SynchronizedWindows->GetClientDataServerController();
+  vtkMultiProcessController* r_controller =
+    this->SynchronizedWindows->GetClientServerController();
+  if (d_controller != NULL)
+    {
+    vtkErrorMacro("RenderServer-DataServer configuration is not supported in "
+      "collabortion mode.");
+    abort();
+    }
+
+  if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
+    {
+    vtkMultiProcessStream stream;
+    stream << this->SynchronizationCounter << this->RemoteRenderingThreshold;
+    r_controller->Send(stream, 1, 41000);
+    int server_sync_counter;
+    r_controller->Receive(&server_sync_counter, 1, 1, 41001);
+    this->CounterSynchronizedSuccessfully =
+      (server_sync_counter == this->SynchronizationCounter);
+    }
+  else
+    {
+    if (r_controller)
+      {
+      vtkMultiProcessStream stream;
+      r_controller->Receive(stream, 1, 41000);
+      int client_sync_counter;
+      stream >> client_sync_counter >> this->RemoteRenderingThreshold;
+      r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
+      this->CounterSynchronizedSuccessfully =
+        (client_sync_counter == this->SynchronizationCounter);
+      }
+
+    if (p_controller)
+      {
+      p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
+      int temp = this->CounterSynchronizedSuccessfully? 1 : 0;
+      p_controller->Broadcast(&temp, 1, 0);
+      this->CounterSynchronizedSuccessfully = (temp == 1);
+      }
+    }
+  // Force DoDataDelivery(). That should happen every time in collaborative
+  // mode.
+  this->UpdateTime.Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Update()
 {
   vtkTimerLog::MarkStartEvent("RenderView::Update");
@@ -644,6 +757,13 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (activeSession && activeSession->IsMultiClients())
+    {
+    this->SynchronizeForCollaboration();
+    }
+
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
 
@@ -667,17 +787,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   // Decide if we are doing remote rendering or local rendering.
   bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();
-
-  // When in tile-display mode, we are always doing shared rendering. However
-  // when use_distributed_rendering we tell IceT that geometry is duplicated on
-  // all processes.
-  this->SynchronizedWindows->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
-  this->SynchronizedRenderers->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
-  this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
-    in_cave_mode ||
-    (!use_distributed_rendering && in_tile_display_mode));
 
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
@@ -786,8 +895,20 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   if (skip_rendering)
     {
+    // essential to restore state.
     return;
     }
+
+  // When in tile-display mode, we are always doing shared rendering. However
+  // when use_distributed_rendering we tell IceT that geometry is duplicated on
+  // all processes.
+  this->SynchronizedWindows->SetEnabled(
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
+  this->SynchronizedRenderers->SetEnabled(
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
+  this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
+    in_cave_mode ||
+    (!use_distributed_rendering && in_tile_display_mode));
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -798,11 +919,26 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Call Render() on local render window only if
   // 1: Local process is the driver OR
   // 2: RenderEventPropagation is Off and we are doing distributed rendering.
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
-    (!this->SynchronizedWindows->GetRenderEventPropagation() &&
-     use_distributed_rendering))
+  // 3: In tile-display mode or cave-mode.
+  // Note, ParaView no longer has RenderEventPropagation ON. It's set to off
+  // always.
+  if (
+    (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
+     (!this->SynchronizedWindows->GetRenderEventPropagation() && use_distributed_rendering) ||
+     in_tile_display_mode || in_cave_mode) &&
+    vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_DATA_SERVER)
     {
     this->GetRenderWindow()->Render();
+    }
+
+  if (!this->MakingSelection)
+    {
+
+    // If we are making selection, then it's a multi-step render process and we
+    // need to leave the SynchronizedWindows/SynchronizedRenderers enabled for
+    // that entire process.
+    this->SynchronizedWindows->SetEnabled(false);
+    this->SynchronizedRenderers->SetEnabled(false);
     }
 }
 
@@ -817,7 +953,13 @@ void vtkPVRenderView::DoDataDelivery(
     (!using_lod_rendering &&
      this->StillRenderTime > this->UpdateTime))
     {
-    //cout << "skipping delivery" << endl;
+    // skipping delivery
+    return;
+    }
+
+  if (!this->CounterSynchronizedSuccessfully)
+    {
+    // Skip data-delivery for this render.
     return;
     }
 
@@ -841,7 +983,10 @@ void vtkPVRenderView::DoDataDelivery(
         this->ReplyInformationVector->GetInformationObject(cc);
       if (info->Has(NEEDS_DELIVERY()) && info->Get(NEEDS_DELIVERY()) == 1)
         {
-        need_delivery.push_back(cc);
+        assert(this->Internals->RepToIdMap.find(this->GetRepresentation(cc)) !=
+          this->Internals->RepToIdMap.end());
+        need_delivery.push_back(
+          this->Internals->RepToIdMap[this->GetRepresentation(cc)]);
         }
       }
 
@@ -885,13 +1030,21 @@ void vtkPVRenderView::DoDataDelivery(
     {
     int index;
     stream >> index;
-    vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
-      this->GetRepresentation(index));
+    vtkPVDataRepresentation* repr =
+      vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
     if (repr)
       {
-      //cout << "Requesting Delivery: " << index << ": " << repr->GetClassName()
-      //  << endl;
+      // it is essential that the representation is made visible for this pass.
+      bool visible = repr->GetVisibility();
+      if (visible == false)
+        {
+        repr->SetVisibility(true);
+        }
       repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
+      if (visible == false)
+        {
+        repr->SetVisibility(visible);
+        }
       }
     }
 }

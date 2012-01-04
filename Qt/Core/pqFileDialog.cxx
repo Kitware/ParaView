@@ -288,6 +288,10 @@ pqFileDialog::pqFileDialog(
   Implementation(new pqImplementation(this, server))
 {
   this->Implementation->Ui.setupUi(this);
+  // ensures that the favorites and the browser component are sized
+  // proportionately.
+  this->Implementation->Ui.mainSplitter->setStretchFactor(0, 1);
+  this->Implementation->Ui.mainSplitter->setStretchFactor(1, 4);
   this->setWindowTitle(title);
 
   this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);

@@ -45,7 +45,7 @@ vtkChartXY* vtkXYChartRepresentation::GetChart()
 {
   if (this->ContextView)
     {
-    return vtkChartXY::SafeDownCast(this->ContextView->GetChart());
+    return vtkChartXY::SafeDownCast(this->ContextView->GetContextItem());
     }
   else
     {

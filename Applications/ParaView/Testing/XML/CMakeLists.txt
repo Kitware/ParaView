@@ -1,6 +1,7 @@
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -22,20 +23,27 @@ ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
 
 SET (TESTS_WITH_BASELINES
   ${TESTS_WITH_BASELINES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRContour.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRDualClip.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHDerivedDensity2DClyinder.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CreateDelete.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
@@ -116,6 +124,26 @@ SET (TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
+# Set properties for CTH tests
+set(CTHAMRBaseline_BREAK TRUE)
+
+set(CTHAMRContour_BREAK TRUE)
+set(CTHAMRContour_DISABLE_CS TRUE)
+set(CTHAMRContour_DISABLE_CRS TRUE)
+
+set(CTHAMRDualClip_BREAK TRUE)
+set(CTHAMRDualClip_DISABLE_CS TRUE)
+set(CTHAMRDualClip_DISABLE_CRS TRUE)
+
+set(CTHAMRClip_BREAK TRUE)
+set(CTHAMRClip_DISABLE_CS TRUE)
+set(CTHAMRClip_DISABLE_CRS TRUE)
+
+set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
+set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
+set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
+
+
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
 SET (GlobalProperties_BREAK TRUE)
@@ -134,9 +162,9 @@ SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.
 
-set (ColorEditor1_BREAK TRUE)
+set (NewColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
-set (ColorEditor3_BREAK TRUE)
+set (NewColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
@@ -164,6 +192,10 @@ SET (UndoRedo4_THRESHOLD 15)
 SET (XYChart_THRESHOLD 150)
 
 SET (XYHistogram_THRESHOLD 60)
+
+# The color and opacity are often different on different machines.
+SET (NewColorEditor1_THRESHOLD 60)
+SET (NewColorEditor3_THRESHOLD 60)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.
@@ -210,10 +242,13 @@ SET (SaveCSV_THRESHOLD 40)
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
 
-# ColorEditor3 does volume rendering of structrued data which required remote
+# NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
-SET (ColorEditor3_DISABLE_CS TRUE)
-SET (ColorEditor3_DISABLE_CRS TRUE)
+SET (NewColorEditor3_DISABLE_CS TRUE)
+SET (NewColorEditor3_DISABLE_CRS TRUE)
+# NewColorEditor1 has a clip widget that can not be handled properly by
+# the collaboration render window yet, so disable for now.
+SET (NewColorEditor1_DISABLE_CRS TRUE)
 
 # ViewSettingsDialog uses texture background which is currently supported only
 # in local render mode.
@@ -246,6 +281,109 @@ ENDIF()
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
 
+##########################################################
+# List of known incompatible tests for Collaboration
+#
+#   Contains Undo/Redo actions:
+#     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
+#
+#   Contains Plugin Loading actions:
+#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
+#
+#   Does not work in CS or CRS mode
+#     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
+#
+#   Does not work because a disconnection is involved
+#     - ExportX3dPOVVRML
+#
+#   Don't want to support for now
+#     - ComparativeVisPanel
+#     - LoadSaveStateAnimation: The time get reset by collab
+#
+#   Timing issues (Works on speedy computer)
+#     - 3DWidgetInCustomFilter, CustomFilter
+#
+##########################################################
+
+OPTION(PARAVIEW_COLLABORATION_TESTING
+    "Add Collaboration testing"
+    ON)
+MARK_AS_ADVANCED(PARAVIEW_COLLABORATION_TESTING)
+
+# The create/delete test was only meant for collaboration
+SET (CreateDelete_DISABLE_C TRUE)
+SET (CreateDelete_DISABLE_CS TRUE)
+SET (CreateDelete_DISABLE_CRS TRUE)
+
+# List of test Enable for collaboration
+set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ColorEditor2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ColorEditor4_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Contour_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ContourRange_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (CreateDelete_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (CustomSourceProbe_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (D3SmallCells_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (DualSphereAnimation_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (EnSight_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExodusIIPanel_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExodusModeShapes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExodusXML_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExTimeseries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExTimeseries2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExtractBlock_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ExtractLevel_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (FindDataDialog_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (FFTOverTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Flow_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Flow2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Fractal2D_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (GridConnectivity_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (LoadState_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (NormalGlyphs_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ObjectInspectorSphere_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (OpenSaveData_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Plot3DReader_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PlotEdges_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PlotEdges2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PropertyConversion_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PropertyConversion1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PropertyConversion2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (RepresentationSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SaveColorMap_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SaveCSV_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SelectReader_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SimpleInteraction_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Slice_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SpreadSheet1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SpreadSheet2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SPTimeseries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (SpyPlotHistoryReader_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (StreamTracerUpdates_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (TemporalInterpolator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (TemporalShiftScale_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Tessellate_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (Threshold_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (UnstructuredOutline_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (VariableSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (VariableSelector1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfRead_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadImageData_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadImageDataCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadRectilinearGrid_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadRectilinearGridCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadStructuredGrid_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfReadStructuredGridCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   PARALLEL
@@ -271,5 +409,9 @@ IF (PARAVIEW_DATA_ROOT)
   ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
 # TODO: remote rendering tests and reverse connect tests.
+
+  add_multi_client_tests("pvcs-collab"
+    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    TEST_SCRIPTS ${TESTS_WITH_BASELINES})
 
 ENDIF (PARAVIEW_DATA_ROOT)

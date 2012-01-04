@@ -135,7 +135,8 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset,
+                        vtkSMProxyLocator*);
 
 
   virtual void RemoveAllProxies(int modify);
@@ -143,8 +144,7 @@ protected:
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkSMProxy* parent,
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
 
   int MultipleInput;
   int PortIndex;

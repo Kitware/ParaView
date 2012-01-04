@@ -36,24 +36,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPolicy.h"
 #include "pqOutputPort.h"
 #include "pqPipelineModel.h"
+#include "pqPipelineAnnotationFilterModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "pqObjectBuilder.h"
 
 #include <QHeaderView>
 #include <QKeyEvent>
+
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   : Superclass(parentObject)
 {
   this->PipelineModel = new pqPipelineModel(this);
+  this->FilteredPipelineModel = new pqPipelineAnnotationFilterModel(this);
+  this->FilteredPipelineModel->setSourceModel(this->PipelineModel);
 
   // Initialize pqFlatTreeView.
-  this->setModel(this->PipelineModel); 
+  this->setModel(this->FilteredPipelineModel);
   this->getHeader()->hide();
   this->getHeader()->moveSection(1, 0);
   this->installEventFilter(this);
@@ -62,9 +66,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   // Connect the model to the ServerManager model.
   pqServerManagerModel *smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
-  pqObjectBuilder* builder = 
-    pqApplicationCore::instance()->getObjectBuilder();
-  QObject::connect(builder, SIGNAL(finishedAddingServer(pqServer*)),
+  QObject::connect(smModel, SIGNAL(preServerAdded(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->PipelineModel, SLOT(removeServer(pqServer*)));
@@ -90,17 +92,17 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   modifiedFont.setBold(true);
   this->PipelineModel->setModifiedFont(modifiedFont);
 
-  // Create the selection adaptor.
-  new pqPipelineModelSelectionAdaptor(this->getSelectionModel(),
-    pqApplicationCore::instance()->getSelectionModel(), this);
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
 
+  new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
+
+
   // Make sure the tree items get expanded when new descendents
   // are added.
   QObject::connect(this->PipelineModel, SIGNAL(firstChildAdded(const QModelIndex &)),
-      this, SLOT(expand(const QModelIndex &)));
+      this, SLOT(expandWithModelIndexTranslation(const QModelIndex &)));
 }
 
 //-----------------------------------------------------------------------------
@@ -131,15 +133,19 @@ bool pqPipelineBrowserWidget::eventFilter(QObject *object, QEvent *eventArg)
 }
 
 //----------------------------------------------------------------------------
-void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index)
+void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
 {
   // we make sure we are only clicking on an eye
-  if (index.column() == 1)
+  if (index_.column() == 1)
     {
     pqDisplayPolicy* display_policy = pqApplicationCore::instance()->getDisplayPolicy();
 
+    // Get object relative to pqPipelineModel
+    const pqPipelineModel* model = this->getPipelineModel(index_);
+    QModelIndex index = this->pipelineModelIndex(index_);
+
     // We need to obtain the source to give the undo element some sensible name.
-    pqServerManagerModelItem* smModelItem = this->PipelineModel->getItemFor(index);
+    pqServerManagerModelItem* smModelItem = model->getItemFor(index);
     pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
     pqOutputPort* port = source? source->getOutputPort(0) :
       qobject_cast<pqOutputPort*>(smModelItem);
@@ -150,8 +156,11 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index)
 
       bool is_selected = false;
       QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
-      foreach (QModelIndex selIndex, indexes)
+      foreach (QModelIndex selIndex_, indexes)
         {
+        // Convert index to pqPipelineModel
+        QModelIndex selIndex = this->pipelineModelIndex(selIndex_);
+
         if (selIndex.row() == index.row() && selIndex.parent() == index.parent())
           {
           is_selected = true;
@@ -173,8 +182,8 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index)
         // change the selection to the item, if we just made it visible.
         if (new_visibility_state)
           {
-          QModelIndex itemIndex = this->PipelineModel->index(index.row(), 0,
-            index.parent());
+          QModelIndex itemIndex = this->getModel()->index(index_.row(), 0,
+            index_.parent());
           this->getSelectionModel()->select(itemIndex,
             QItemSelectionModel::ClearAndSelect);
           }
@@ -187,7 +196,7 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index)
 void pqPipelineBrowserWidget::setSelectionVisibility(bool visible)
 {
   QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
-  this->setVisibility(visible, indexes); 
+  this->setVisibility(visible, indexes);
 }
 
 //----------------------------------------------------------------------------
@@ -197,9 +206,14 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
   pqDisplayPolicy* display_policy = pqApplicationCore::instance()->getDisplayPolicy();
 
   bool begun_undo_set = false;
-  foreach (QModelIndex index, indexes)
+
+  foreach (QModelIndex index_, indexes)
     {
-    pqServerManagerModelItem* smModelItem = this->PipelineModel->getItemFor(index);
+    // Get object relative to pqPipelineModel
+    const pqPipelineModel* model = this->getPipelineModel(index_);
+    QModelIndex index = this->pipelineModelIndex(index_);
+
+    pqServerManagerModelItem* smModelItem = model->getItemFor(index);
     pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
     pqOutputPort* port = source? source->getOutputPort(0) :
       qobject_cast<pqOutputPort*>(smModelItem);
@@ -234,3 +248,60 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
     }
 }
 
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::enableAnnotationFilter(const QString& annotationKey)
+{
+  this->FilteredPipelineModel->enableAnnotationFilter(annotationKey);
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::disableAnnotationFilter()
+{
+  this->FilteredPipelineModel->disableAnnotationFilter();
+}
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::enableSessionFilter(vtkSession* session)
+{
+  this->FilteredPipelineModel->enableSessionFilter(session);
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::disableSessionFilter()
+{
+  this->FilteredPipelineModel->disableSessionFilter();
+}
+
+//----------------------------------------------------------------------------
+const QModelIndex pqPipelineBrowserWidget::pipelineModelIndex(const QModelIndex& index) const
+{
+  if(qobject_cast<const pqPipelineModel*>(index.model()))
+    {
+    return index;
+    }
+  const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+  assert("Invalid model used inside index" && filterModel);
+
+  // Make a recusrive call to support unknown filter depth
+  return this->pipelineModelIndex(filterModel->mapToSource(index));
+}
+
+//----------------------------------------------------------------------------
+const pqPipelineModel* pqPipelineBrowserWidget::getPipelineModel(const QModelIndex& index) const
+{
+  if(const pqPipelineModel* model = qobject_cast<const pqPipelineModel*>(index.model()))
+    {
+    return model;
+    }
+
+  const QSortFilterProxyModel* filterModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+  assert("Invalid model used inside index" && filterModel);
+
+  // Make a recusrive call to support unknown filter depth
+  return this->getPipelineModel(filterModel->mapToSource(index));
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::expandWithModelIndexTranslation(const QModelIndex &index)
+{
+  this->expand(this->FilteredPipelineModel->mapFromSource(index));
+}

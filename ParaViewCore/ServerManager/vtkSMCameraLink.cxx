@@ -21,6 +21,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMMessage.h"
 
 #include <vtkstd/list>
 
@@ -85,8 +86,11 @@ public:
       if (rmp)
         {
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
-        iren->RemoveObserver(this->Observer);
-        iren->RemoveObserver(this->Observer); 
+        if(iren)
+          {
+          iren->RemoveObserver(this->Observer);
+          iren->RemoveObserver(this->Observer);
+          }
         rmp->RemoveObserver(this->Observer);
         }
       }
@@ -324,10 +328,10 @@ void vtkSMCameraLink::ResetCamera(vtkObject* caller)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
+void vtkSMCameraLink::SaveXMLState(const char* linkname, vtkPVXMLElement* parent)
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
-  Superclass::SaveState(linkname, root);
+  Superclass::SaveXMLState(linkname, root);
   unsigned int numElems = root->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -346,4 +350,15 @@ void vtkSMCameraLink::PrintSelf(ostream& os, vtkIndent indent)
     << this->SynchronizeInteractiveRenders << endl;
 }
 
-
+//-----------------------------------------------------------------------------
+void vtkSMCameraLink::LoadState(const vtkSMMessage *msg, vtkSMProxyLocator *locator)
+{
+  this->Superclass::LoadState(msg, locator);
+  this->SetSynchronizeInteractiveRenders(msg->GetExtension(LinkState::sync_interactive_renders) ? 1:0);
+}
+//-----------------------------------------------------------------------------
+void vtkSMCameraLink::UpdateState()
+{
+  this->Superclass::UpdateState();
+  this->State->GetExtension(LinkState::sync_interactive_renders, this->GetSynchronizeInteractiveRenders());
+}

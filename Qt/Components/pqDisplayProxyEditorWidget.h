@@ -52,13 +52,6 @@ public:
   pqDisplayProxyEditorWidget(QWidget* parent=NULL);
   virtual ~pqDisplayProxyEditorWidget();
 
-  /// Set the source and view. Source and view are used by this class
-  /// only if representation is NULL. It is used to decide if a new
-  /// representation can be created for the source at all.
-  void setView(pqView* view);
-  void setOutputPort(pqOutputPort* port);
-
-
   pqRepresentation* getRepresentation() const;
 
 public slots:
@@ -68,6 +61,12 @@ public slots:
   /// that the widget can show a default GUI which allows the user to
   /// turn visibility on which entails creating a new representation.
   void setRepresentation(pqRepresentation*);
+
+  /// Set the source and view. Source and view are used by this class
+  /// only if representation is NULL. It is used to decide if a new
+  /// representation can be created for the source at all.
+  void setView(pqView* view);
+  void setOutputPort(pqOutputPort* port);
 
 protected slots:
   void onVisibilityChanged(bool);

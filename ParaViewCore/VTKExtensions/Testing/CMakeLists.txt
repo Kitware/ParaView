@@ -17,6 +17,7 @@ IF (VTK_DATA_ROOT)
     TestContinuousClose3D
     TestPVFilters
     TestSpyPlotTracers
+    TestPVAMRDualContour
     )
 ENDIF (VTK_DATA_ROOT)
 

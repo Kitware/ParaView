@@ -76,6 +76,7 @@ public:
   /// InitializeSubInterpretor().
   void executeInitFromGUI();
 
+  void promptForInput();
 signals:
   void executing(bool);
   void getInputLine(QString& input);
@@ -96,7 +97,6 @@ private:
   pqPythonShell(const pqPythonShell&);
   pqPythonShell& operator=(const pqPythonShell&);
 
-  void promptForInput();
   void internalExecuteCommand(const QString&);
 
   struct pqImplementation;

@@ -25,11 +25,14 @@ IF(QT_TESTING_WITH_PYTHON)
   SET(PYTHON_MOC_SRCS 
     pqPythonEventSourceImage.h
   )
-INCLUDE_DIRECTORIES(
-  ${PYTHON_INCLUDE_PATH}
-)
+  INCLUDE_DIRECTORIES(
+    ${PYTHON_INCLUDE_PATH}
+  )
 ENDIF(QT_TESTING_WITH_PYTHON)
 
+INCLUDE_DIRECTORIES(
+  ${protobuf_SOURCE_DIR}/src
+)
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
@@ -44,14 +47,16 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqContextView.h
+  pqCollaborationEventPlayer.h
+  pqCollaborationManager.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
-  pqCommandServerStartup.h
   pqComparativeContextView.h
   pqComparativeRenderView.h
   pqComparativeXYBarChartView.h
   pqComparativeXYChartView.h
   pqCoreTestUtility.h
+  pqCoreUtilities.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
   pqFileDialog.h
@@ -68,7 +73,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
-  pqManualServerStartup.h
   pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -79,6 +83,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
+  pqPlotMatrixView.h
   pqPlotSettingsModel.h
   pqPluginManager.h
   pqProgressManager.h
@@ -87,6 +92,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxy.h
   pqQVTKWidget.h
   pqQVTKWidgetEventTranslator.h
+  pqRecentlyUsedResourcesList.h
   pqRenderView.h
   pqRenderViewBase.h
   pqRepresentation.h
@@ -97,13 +103,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqScalarsToColors.h
 #  pqScatterPlotRepresentation.h
   pqServer.h
+  pqServerConfigurationCollection.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.h
-  pqServerResources.h
-  pqServerStartup.h
-  pqServerStartups.h
   pqSettings.h
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.h
@@ -184,12 +187,14 @@ VTK_ADD_LIBRARY(pqCore
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
+  pqCollaborationEventPlayer.cxx
+  pqCollaborationEventPlayer.h
+  pqCollaborationManager.cxx
+  pqCollaborationManager.h
   pqColorButtonEventPlayer.cxx
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
   pqColorButtonEventTranslator.h
-  pqCommandServerStartup.cxx
-  pqCommandServerStartup.h
   pqComparativeContextView.cxx
   pqComparativeContextView.h
   pqComparativeRenderView.cxx
@@ -247,8 +252,6 @@ VTK_ADD_LIBRARY(pqCore
   pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
-  pqManualServerStartup.cxx
-  pqManualServerStartup.h
   pqNameCount.cxx
   pqNameCount.h
   pqObjectBuilder.cxx
@@ -273,6 +276,8 @@ VTK_ADD_LIBRARY(pqCore
   pqPipelineRepresentation.h
   pqPipelineSource.cxx
   pqPipelineSource.h
+  pqPlotMatrixView.cxx
+  pqPlotMatrixView.h
   pqPlotSettingsModel.cxx
   pqPlotSettingsModel.h
   pqPluginManager.cxx
@@ -287,12 +292,16 @@ VTK_ADD_LIBRARY(pqCore
   pqProxy.h
   pqProxyModifiedStateUndoElement.cxx
   pqProxyModifiedStateUndoElement.h
+  pqProxySelection.cxx
+  pqProxySelection.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidget.h
+  pqRecentlyUsedResourcesList.cxx
+  pqRecentlyUsedResourcesList.h
   pqRenderViewBase.cxx
   pqRenderViewBase.h
   pqRenderView.cxx
@@ -311,6 +320,10 @@ VTK_ADD_LIBRARY(pqCore
   pqScalarsToColors.h
   pqServer.cxx
   pqServer.h
+  pqServerConfiguration.cxx
+  pqServerConfiguration.h
+  pqServerConfigurationCollection.cxx
+  pqServerConfigurationCollection.h
   pqServerManagerModel.cxx
   pqServerManagerModel.h
   pqServerManagerModelInterface.cxx
@@ -319,15 +332,8 @@ VTK_ADD_LIBRARY(pqCore
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
   pqServerManagerObserver.h
-  pqServerManagerSelectionModel.cxx
-  pqServerManagerSelectionModel.h
   pqServerResource.cxx
   pqServerResource.h
-  pqServerResources.cxx
-  pqServerResources.h
-  pqServerStartup.h
-  pqServerStartups.cxx
-  pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
   pqSMAdaptor.cxx
@@ -397,6 +403,7 @@ TARGET_LINK_LIBRARIES(pqCore
   QVTK
   vtkCharts
   vtkPVServerManager
+  protobuf
 )
 
 IF(VTK_USE_INFOVIS)

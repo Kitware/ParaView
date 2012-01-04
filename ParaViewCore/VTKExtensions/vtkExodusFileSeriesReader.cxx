@@ -234,7 +234,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
     }
 
   vtkStdString originalFile = this->GetFileName(0);
-  this->RemoveAllFileNames();
+  this->RemoveAllFileNamesInternal();
 
   vtkStdString path;
   vtkStdString baseName;
@@ -267,7 +267,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   if (!regEx.find(baseName))
     {
     // Filename does not follow convention.  Just use it.
-    this->AddFileName(originalFile);
+    this->AddFileNameInternal(originalFile);
     return;
     }
 
@@ -279,7 +279,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
     {
     vtkWarningMacro(<< "Could not open directory " << originalFile.c_str()
                     << " is supposed to be from (" << path.c_str() << ")");
-    this->AddFileName(originalFile);
+    this->AddFileNameInternal(originalFile);
     return;
     }
 
@@ -289,7 +289,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
     if (!regEx.find(file)) continue;
     if (regEx.match(1) != prefix) continue;
     if (regEx.match(3) != suffix) continue;
-    this->AddFileName((path + file).c_str());
+    this->AddFileNameInternal((path + file).c_str());
     }
 
   // Check to make sure we found something.
@@ -297,6 +297,6 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
     {
     vtkWarningMacro(<< "Could not find any actual files matching "
                     << originalFile.c_str());
-    this->AddFileName(originalFile);
+    this->AddFileNameInternal(originalFile);
     }
 }

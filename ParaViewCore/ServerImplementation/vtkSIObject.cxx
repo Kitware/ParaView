@@ -21,6 +21,7 @@
 
 #include <assert.h>
 
+vtkStandardNewMacro(vtkSIObject);
 //----------------------------------------------------------------------------
 vtkSIObject::vtkSIObject()
 {

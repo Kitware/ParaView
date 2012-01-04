@@ -27,6 +27,7 @@ SET (Kit_SRCS
   vtkSIAMRVolumeRepresentationProxy.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
+  vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIContextArraysProperty.cxx
   vtkSIDataArrayProperty.cxx
@@ -65,7 +66,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVProxyDefinitionIterator.cxx
-  vtkSIObject.cxx
   vtkSIVectorProperty.cxx
   vtkPVSessionBase.cxx
   vtkSMMessage.cxx
@@ -87,7 +87,13 @@ INCLUDE_DIRECTORIES(
 #------------------------------------------------------------------------------
 # Compile protobuf resources.
 # run it from a script so we can set necessary paths.
-
+get_target_property(PROTOC_LOCATION protoc_compiler LOCATION)
+if (WIN32)
+  get_filename_component(PROTOC_DIR ${PROTOC_LOCATION} PATH)
+  get_filename_component(PROTOC_PDIR ${PROTOC_DIR} PATH)
+  get_filename_component(PROTOC_FNAME ${PROTOC_LOCATION} NAME_WE)
+  set(PROTOC_LOCATION "${PROTOC_PDIR}/\${OutDir}/${PROTOC_FNAME}")
+endif (WIN32)
 configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
                @ONLY)
@@ -129,6 +135,9 @@ IF(PARAVIEW_ENABLE_PYTHON)
       )
   ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
+
+SET (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
+    CACHE INTERNAL "Server Manager XMLs")
 
 #needs to depend on vtkParaViewIncludeModulesToSMApplication so
 #we can regenerate when python filters or VisItBridge are toggled on/off

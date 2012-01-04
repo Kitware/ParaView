@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqInterfaceTracker.h"
 #include "pqStandardViewModules.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "pqServer.h"
 
 #include <QStringList>
 
@@ -66,8 +67,7 @@ public:
   virtual vtkSMProxy* createViewProxy(
     const QString& viewtype, pqServer *server)
     {
-    (void)server;
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
     if (viewtype == "RenderViewWithSobel")
       {
       return pxm->NewProxy("views", "RenderViewWithSobel");

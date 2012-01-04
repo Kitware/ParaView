@@ -20,6 +20,9 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/String.hxx>
 
+#include <assert.h>
+
+#include <vtksys/ios/sstream>
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h>
 # include <sys/wait.h>
@@ -43,6 +46,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->TestTiledDisplay = 0;
   this->ReverseConnection = 0;
   this->TestRemoteRendering = 0;
+  this->TestMultiClient = 0;
 }
 
 vtkSMTestDriver::~vtkSMTestDriver()
@@ -164,72 +168,78 @@ static vtkstd::string FixExecutablePath(const vtkstd::string& path)
 
 int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
 {
-  this->ArgStart = 1;
   int i;
   for(i =1; i < argc - 1; ++i)
     {
     if(strcmp(argv[i], "--client") == 0)
       {
-      this->ArgStart = i+2;
-      this->ClientExecutable = ::FixExecutablePath(argv[i+1]);
+      ClientExecutableInfo info;
+      info.ClientExecutable = ::FixExecutablePath(argv[i+1]);
+      info.ArgStart = i+2;
+      info.ArgEnd = argc;
+      this->ClientExecutables.push_back(info);
+      if (this->ClientExecutables.size() > 1)
+        {
+        // if more than one client executable was specified, we truncate the
+        // previous client's arguments processing at the "--client".
+        ClientExecutableInfo &prevInfo =
+          this->ClientExecutables[this->ClientExecutables.size()-2];
+        prevInfo.ArgEnd = i;
+        }
       }
     if(strcmp(argv[i], "--test-remote-rendering") == 0)
       {
-      this->ArgStart = i+1;
       this->TestRemoteRendering = 1;
       fprintf(stderr, "Test Render Server.\n");
       }
     if(strcmp(argv[i], "--render-server") == 0)
       {
-      this->ArgStart = i+2;
       this->TestRenderServer = 1;
       this->RenderServerExecutable = ::FixExecutablePath(argv[i+1]);
       fprintf(stderr, "Test Render Server.\n");
       }
     if (strcmp(argv[i], "--data-server") == 0)
       {
-      this->ArgStart = i+2;
       this->TestServer = 1;
       this->DataServerExecutable = ::FixExecutablePath(argv[i+1]);
       fprintf(stderr, "Test Render Server.\n");
       }
     if(strcmp(argv[i], "--server") == 0)
       {
-      this->ArgStart = i+2;
       this->TestServer = 1;
       this->ServerExecutable = ::FixExecutablePath(argv[i+1]);
       fprintf(stderr, "Test Server.\n");
       }
     if(strcmp(argv[i], "--test-tiled") == 0)
       {
-      this->ArgStart = i+1;
       this->TestServer = 1;
       this->TestTiledDisplay = 1;
+      fprintf(stderr, "Test Tiled Display.\n");
+      }
+    if(strcmp(argv[i], "--test-multi-clients") == 0)
+      {
+      this->TestMultiClient = 1;
       fprintf(stderr, "Test Tiled Display.\n");
       }
     if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
       this->MPIServerNumProcessFlag = 
         this->MPIRenderServerNumProcessFlag = "1";
-      this->ArgStart = i+1;
       fprintf(stderr, "Test with one mpi process.\n");
       }
     if(strcmp(argv[i], "--test-rc") == 0)
       {
-      this->ArgStart = i+1;
       this->ReverseConnection = 1;
       fprintf(stderr, "Test reverse connection.\n");
       }
     if(strcmp(argv[i], "--timeout") == 0)
       {
-      this->ArgStart = i+2;
       this->TimeOut = atoi(argv[i+1]);
       fprintf(stderr, "The timeout was set to %f.\n", this->TimeOut);
       }
     if (strncmp(argv[i], "--server-exit-timeout",
         strlen("--server-exit-timeout")) == 0)
       {
-      this->ArgStart = i+2;
       this->ServerExitTimeOut = atoi(argv[i+1]);
       fprintf(stderr, "The server exit timeout was set to %f.\n", 
         this->ServerExitTimeOut);
@@ -237,23 +247,27 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     if(strncmp(argv[i], "--server-preflags",17) == 0)
       {
       this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
-      this->ArgStart = i+2;
       fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i+1]);
       }
     if(strncmp(argv[i], "--server-postflags",18 ) == 0)
       {
       this->SeparateArguments(argv[i+1], this->MPIServerPostFlags);
-      this->ArgStart = i+2;
       fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors"))==0)
       {
-      this->ArgStart =i+1;
       this->AllowErrorInOutput = 1;
       fprintf(stderr, "The allow erros in output flag was set to %d.\n", 
         this->AllowErrorInOutput);
       }
     }
+
+ if (this->TestMultiClient &&
+   (!this->TestServer || this->TestRenderServer))
+   {
+   fprintf(stderr, "Multi-client tests require --server.\n");
+   abort();
+   }
 
   return 1;
 }
@@ -264,7 +278,7 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                                 vtkSMTestDriver::ProcessType type,
                                 const char* numProc,
                                 int argStart,
-                                int argCount,
+                                int argEnd,
                                 char* argv[])
 {
   if(this->MPIRun.size() && type != CLIENT)
@@ -369,7 +383,7 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       }
 
     // remaining flags for the test
-    for(int ii = argStart; ii < argCount; ++ii)
+    for(int ii = argStart; ii < argEnd; ++ii)
       {
       commandLine.push_back(argv[ii]);
       }
@@ -382,12 +396,18 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     }
 #endif
 
+  if (type == SERVER && this->TestMultiClient)
+    {
+    commandLine.push_back("--multi-clients");
+    }
+
   commandLine.push_back(0);
 }
 
-int vtkSMTestDriver::StartServer(vtksysProcess* server, const char* name,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err)
+int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name,
+  vtkstd::vector<char>& out,
+  vtkstd::vector<char>& err,
+  const char* string_to_wait_for)
 {
   if(!server)
     {
@@ -400,8 +420,9 @@ int vtkSMTestDriver::StartServer(vtksysProcess* server, const char* name,
   vtkstd::string output;
   while(!foundWaiting)
     {
-    int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
-                                         &foundWaiting);
+    int pipe = this->WaitForAndPrintLine(
+      name, server, output, 100.0, out, err,
+      string_to_wait_for, &foundWaiting);
     if(pipe == vtksysProcess_Pipe_None ||
        pipe == vtksysProcess_Pipe_Timeout)
       {
@@ -421,7 +442,7 @@ int vtkSMTestDriver::StartServer(vtksysProcess* server, const char* name,
     }
 }
 
-int vtkSMTestDriver::StartClient(vtksysProcess* client, const char* name)
+int vtkSMTestDriver::StartProcess(vtksysProcess* client, const char* name)
 {
   if(!client)
     {
@@ -522,7 +543,10 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& out
 }
 
 #define VTK_CLEAN_PROCESSES \
-  vtksysProcess_Delete(client); \
+  for (size_t __kk=0; __kk < clients.size(); __kk++)\
+    {\
+    vtksysProcess_Delete(clients[__kk]);\
+    }\
   vtksysProcess_Delete(renderServer); \
   vtksysProcess_Delete(server); 
 
@@ -570,7 +594,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // Allocate process managers.
   vtksysProcess* renderServer = 0;
   vtksysProcess* server = 0;
-  vtksysProcess* client = 0;
+  vtkstd::vector<vtksysProcess*> clients;
   if(this->TestRenderServer)
     {
     renderServer = vtksysProcess_New();
@@ -591,12 +615,17 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       return 1;
       }
     }
-  client = vtksysProcess_New();
-  if(!client)
+
+  for (size_t cc=0; cc < this->ClientExecutables.size(); cc++)
     {
-    VTK_CLEAN_PROCESSES;
-    cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the client.\n";
-    return 1;
+    vtksysProcess* client = vtksysProcess_New();
+    if(!client)
+      {
+      VTK_CLEAN_PROCESSES;
+      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the client.\n";
+      return 1;
+      }
+    clients.push_back(client);
     }
 
   vtkstd::vector<char> ClientStdOut;
@@ -642,39 +671,44 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     }
 
   // Construct the client process command line.
-  vtksys_stl::vector<const char*> clientCommand;
-  
-  const char* pv = this->ClientExecutable.c_str();
-  this->CreateCommandLine(clientCommand,
-                          pv,
-                          CLIENT,
-                          "",
-                          this->ArgStart, argc, argv);
-  this->ReportCommand(&clientCommand[0], "client");
-  vtksysProcess_SetCommand(client, &clientCommand[0]);
-  vtksysProcess_SetWorkingDirectory(client, this->GetDirectory(pv).c_str());
+  for (size_t cc=0; cc < this->ClientExecutables.size(); cc++)
+    {
+    const ClientExecutableInfo &info = this->ClientExecutables[cc];
+
+    vtksys_stl::vector<const char*> clientCommand;
+    const char* pv = info.ClientExecutable.c_str();
+    this->CreateCommandLine(clientCommand,
+                            pv,
+                            CLIENT,
+                            "",
+                            info.ArgStart, info.ArgEnd, argv);
+    this->ReportCommand(&clientCommand[0], "client");
+    vtksysProcess_SetCommand(clients[cc], &clientCommand[0]);
+    vtksysProcess_SetWorkingDirectory(clients[cc], this->GetDirectory(pv).c_str());
+    }
 
   // Kill the processes if they are taking too long.
   if(this->ReverseConnection)
     {
-    if(!this->StartServer(client, "client",
-                          ClientStdOut, ClientStdErr))
+    assert(clients.size() == 1);
+    if(!this->StartProcessAndWait(clients[0], "client",
+                          ClientStdOut, ClientStdErr, "Waiting"))
       {
       cerr << "vtkSMTestDriver: Reverse connection client never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Now run the server
-    if(!this->StartClient(server, "server"))
+    if(!this->StartProcess(server, "server"))
       {
-      this->Stop(client, "client");
+      this->Stop(clients[0], "client");
       VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Now run the render server
-    if(!this->StartClient(renderServer, "renderserver"))
+    if(!this->StartProcess(renderServer, "renderserver"))
       {
-      this->Stop(client, "client");
+      this->Stop(clients[0], "client");
       this->Stop(server, "server");
       VTK_CLEAN_PROCESSES;
       return -1;
@@ -683,29 +717,40 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   else
     {
     // Start the render server if there is one
-    if(!this->StartServer(renderServer, "renderserver",
-                          RenderServerStdOut, RenderServerStdErr))
+    if(!this->StartProcessAndWait(renderServer, "renderserver",
+        RenderServerStdOut, RenderServerStdErr, "Waiting"))
       {
       cerr << "vtkSMTestDriver: Render server never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Start the data server if there is one
-    if(!this->StartServer(server, "server",
-                          ServerStdOut, ServerStdErr))
+    if(!this->StartProcessAndWait(server, "server",
+        ServerStdOut, ServerStdErr, "Waiting"))
       {
       this->Stop(renderServer, "renderserver");
       cerr << "vtkSMTestDriver: Server never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
       }
-    // Now run the client
-    if(!this->StartClient(client, "client"))
+
+    // Now run the client(s).
+    for (size_t cc=0; cc < clients.size(); cc++)
       {
-      this->Stop(server, "server");
-      this->Stop(renderServer, "renderserver");
-      VTK_CLEAN_PROCESSES;
-      return -1;
+      vtksys_ios::ostringstream client_name;
+      client_name << "client";
+      if (clients.size() > 1)
+        {
+        client_name << cc;
+        }
+      if (!this->StartProcessAndWait(clients[cc], client_name.str().c_str(),
+          ClientStdOut, ClientStdErr, "started"))
+        {
+        this->Stop(server, "server");
+        this->Stop(renderServer, "renderserver");
+        VTK_CLEAN_PROCESSES;
+        return -1;
+        }
       }
     }
 
@@ -713,10 +758,22 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   int clientPipe = 1;
   vtkstd::string output;
   int mpiError = 0;
+  vtkstd::vector<int> client_pipe_status;
+  client_pipe_status.resize(clients.size(), 1);
   while(clientPipe)
     {
-    clientPipe = this->WaitForAndPrintLine("client", client, output, 0.1,
-                                           ClientStdOut, ClientStdErr, 0);
+    clientPipe = 0;
+    for (size_t cc=0; cc < clients.size(); cc++)
+      {
+      // we don't stop listening from clients until all clients have closed
+      // their pipes.
+      if (client_pipe_status[cc])
+        {
+        client_pipe_status [cc] = this->WaitForAndPrintLine("client", clients[cc], output, 0.1,
+          ClientStdOut, ClientStdErr);
+        }
+      clientPipe |= client_pipe_status[cc];
+      }
     if(!mpiError && this->OutputStringHasError("client", output))
       {
       mpiError = 1;
@@ -726,14 +783,14 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     double timeout = (clientPipe)? 0.1 : this->ServerExitTimeOut;
     output = "";
     this->WaitForAndPrintLine("server", server, output, timeout,
-                                           ServerStdOut, ServerStdErr, 0);
+                              ServerStdOut, ServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("server", output))
       {
       mpiError = 1;
       }
     output = "";
     this->WaitForAndPrintLine("renderserver", renderServer, output, timeout,
-                                RenderServerStdOut, RenderServerStdErr, 0);
+                              RenderServerStdOut, RenderServerStdErr, 0);
     if(!mpiError && this->OutputStringHasError("renderserver", output))
       {
       mpiError = 1;
@@ -742,7 +799,10 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     }
 
   // Wait for the client and server to exit.
-  vtksysProcess_WaitForExit(client, 0);
+  for (size_t cc=0; cc < clients.size(); cc++)
+    {
+    vtksysProcess_WaitForExit(clients[cc], 0);
+    }
 
   // Once client is finished, the servers
   // must finish quickly. If not, is usually is a sign that
@@ -763,18 +823,21 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   //
   // For example: "killall -9 rsh paraview"
   //
-  if(vtksysProcess_GetState(client) != vtksysProcess_State_Exited ||
-     vtksysProcess_GetState(server) != vtksysProcess_State_Exited ||
-     vtksysProcess_GetState(renderServer) != vtksysProcess_State_Exited)
+  if(strlen(PV_TEST_CLEAN_COMMAND) > 0)
     {
-    if(strlen(PV_TEST_CLEAN_COMMAND) > 0)
-      {
-      system(PV_TEST_CLEAN_COMMAND);
-      }
+    system(PV_TEST_CLEAN_COMMAND);
     }
 #endif
-  // Get the results.
-  int clientResult = this->ReportStatus(client, "client");
+  // Get the results (0 == success).
+  int clientResult = 0;
+  for (size_t cc=0; cc < clients.size(); cc++)
+    {
+    vtksys_ios::ostringstream client_name;
+    client_name << "client" << cc;
+    int cur_result = this->ReportStatus(clients[cc], client_name.str().c_str());
+    // 0 == success
+    clientResult |= cur_result;
+    }
   int serverResult = 0;
   if(server)
     {
@@ -1017,13 +1080,14 @@ int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* proce
                                       vtkstd::string& line, double timeout,
                                       vtkstd::vector<char>& out,
                                       vtkstd::vector<char>& err,
+                                      const char* string_to_wait_for,
                                       int* foundWaiting)
 {
   int pipe = this->WaitForLine(process, line, timeout, out, err);
   if(pipe == vtksysProcess_Pipe_STDOUT || pipe == vtksysProcess_Pipe_STDERR)
     {
     this->PrintLine(pname, line.c_str());
-    if(foundWaiting && (line.find("Waiting") != line.npos))
+    if (foundWaiting && string_to_wait_for && (line.find(string_to_wait_for) != line.npos))
       {
       *foundWaiting = 1;
       }

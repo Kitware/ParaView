@@ -128,12 +128,14 @@ struct vtkSMProxyInternals;
 //ETX
 class vtkClientServerStream;
 class vtkPVInformation;
+class vtkSMLoadStateContext;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManager;
+class vtkSMSessionProxyManager;
 class vtkSMProxyObserver;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
@@ -150,6 +152,36 @@ public:
   static vtkSMProxy* New();
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Descritpion:
+  // Set or override a key/value pair as annotation to that proxy.
+  // If the value is NULL, this method is equivalent to RemoveAnnotation(key)
+  void SetAnnotation(const char* key, const char* value);
+
+  // Description:
+  // Retreive an annotation with a given key.
+  // If not found, this will return NULL.
+  const char* GetAnnotation(const char* key);
+
+  // Description:
+  // Remove a given annotation based on its key to the proxy.
+  void RemoveAnnotation(const char* key);
+
+  // Description:
+  // Remove all proxy annotations.
+  void RemoveAllAnnotations();
+
+  // Description:
+  // Return true if a given annotation exists.
+  bool HasAnnotation(const char* key);
+
+  // Description:
+  // Return the number of available annotations.
+  int GetNumberOfAnnotations();
+
+  // Description:
+  // Return the nth key of the available annotations.
+  const char* GetAnnotationKeyAt(int index);
 
   // Description:
   // Get/Set the location where the underlying VTK-objects are created. The
@@ -392,6 +424,19 @@ public:
   // along the pipeline.
   void UpdateSelfAndAllInputs();
 
+  // Description:
+  // Allow to switch off any push of state change to the server for that
+  // particular object.
+  // This is used when we load a state based on a server notification. In that
+  // particular case, the server is already aware of that new state, so we keep
+  // those changes local.
+  virtual void EnableLocalPushOnly();
+
+  // Description:
+  // Enable the given remote object to communicate its state normaly to the
+  // server location.
+  virtual void DisableLocalPushOnly();
+
 //BTX
 
   // Description:
@@ -407,8 +452,7 @@ public:
   // properties values and just setup the new proxy hierarchy with all subproxy
   // globalID set. This allow to split the load process in 2 step to prevent
   // invalid state when property refere to a sub-proxy that does not exist yet.
-  virtual void LoadState( const vtkSMMessage* msg, vtkSMStateLocator* locator,
-                          bool definitionOnly = false);
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
   vtkSMProxy();
@@ -419,6 +463,11 @@ protected:
   void ExecuteStream(const vtkClientServerStream& msg,
                      bool ignore_errors = false,
                      vtkTypeUInt32 location = 0);
+
+  // Any method changing the annotations will trigger this method that will
+  // update the local full state as well as sending the annotation state part
+  // to the session.
+  virtual void UpdateAndPushAnnotationState();
 
   // Description:
   // Get the last result
@@ -451,15 +500,15 @@ protected:
   friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
   friend class vtkSMNamedPropertyIterator;
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMSourceProxy;
   friend class vtkSMUndoRedoStateLoader;
-  // -- PVEE only
-  friend class vtkWSMApplication;
+  friend class vtkSMDeserializerProtobuf;
+  friend class vtkSMStateLocator;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -606,7 +655,7 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
 
@@ -623,7 +672,7 @@ protected:
   // Handle events fired by subproxies.
   virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, void* data);
 
-  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
+  virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
     vtkPVXMLElement *element);
 
   // Description:
@@ -638,7 +687,6 @@ protected:
   vtkSetStringMacro(SIClassName);
   vtkGetStringMacro(SIClassName);
   char* SIClassName;
-
 
   char* VTKClassName;
   char* XMLGroup;

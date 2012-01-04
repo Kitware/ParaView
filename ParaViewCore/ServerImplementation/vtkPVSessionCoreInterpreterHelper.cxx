@@ -43,6 +43,11 @@ vtkSIObject* vtkPVSessionCoreInterpreterHelper::GetSIObject(vtkTypeUInt32 gid)
 {
   return this->Core->GetSIObject(gid);
 }
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkPVSessionCoreInterpreterHelper::GetNextGlobalIdChunk(vtkTypeUInt32 chunkSize)
+{
+  return this->Core->GetNextChunkGlobalUniqueIdentifier(chunkSize);
+}
 
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkPVSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid)

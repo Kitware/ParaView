@@ -656,7 +656,7 @@ class ColorArrayProperty(VectorProperty):
     color by. It handles attribute type as well as well array name."""
 
     def GetAvailable(self):
-        """"Returns the list of available arrays as (attribute type, array name
+        """Returns the list of available arrays as (attribute type, array name
         tuples."""
         arrays = []
         for a in self.Proxy.Input.PointData:
@@ -692,10 +692,18 @@ class ColorArrayProperty(VectorProperty):
                 break
 
         if  not found:
-            raise ValueError("Could not locate array %s in the input." % arr)
+            pvoptions = vtkProcessModule.GetProcessModule().GetOptions()
+            # if this process is from a parallel batch run in symmetric mpi mode
+            # then we may not have any points or cells on some processes in which
+            # case we'll probably be missing the point and cell data too.  the
+            # check below makes sure that we avoid this situation.
+            if pvoptions.GetProcessType() != 0x40 or pvoptions.GetSymmetricMPIMode() == False \
+                    or len(self.Available) != 0:
+                raise ValueError("Could not locate array %s in the input." % arr)
 
         catt = self.Proxy.GetProperty("ColorAttributeType")
-        catt.SetData(att)
+        if att != None:
+            catt.SetData(att)
         self.SMProperty.SetElement(0, arr)
         self._UpdateProperty()
 
@@ -704,7 +712,7 @@ class ColorArrayProperty(VectorProperty):
 
 
 class EnumerationProperty(VectorProperty):
-    """"Subclass of VectorProperty that is applicable for enumeration type
+    """Subclass of VectorProperty that is applicable for enumeration type
     properties."""
 
     def GetElement(self, index):
@@ -1449,10 +1457,13 @@ class ProxyManager(object):
     of the vtkSMProxyManager C++ class.
     """
 
-    def __init__(self):
+    def __init__(self, session=None):
         """Constructor. Assigned self.SMProxyManager to
-        vtkSMObject.GetProxyManager()."""
-        self.SMProxyManager = vtkSMObject.GetProxyManager()
+        vtkSMProxyManager.GetProxyManager()."""
+        global ActiveConnection
+        if not session:
+            session = ActiveConnection.Session
+        self.SMProxyManager = session.GetSessionProxyManager()
 
     def RegisterProxy(self, group, name, aProxy):
         """Registers a proxy (either SMProxy or proxy) with the
@@ -1636,7 +1647,7 @@ class PropertyIterator(object):
         return self.Proxy.GetProperty(self.Key)
 
     def __getattr__(self, name):
-        """returns attributes from the vtkSMProxyIterator."""
+        """returns attributes from the vtkSMPropertyIterator."""
         return getattr(self.SMIterator, name)
 
 class ProxyDefinitionIterator(object):
@@ -1688,6 +1699,7 @@ class ProxyIterator(object):
      """
     def __init__(self):
         self.SMIterator = vtkSMProxyIterator()
+        self.SMIterator.SetSession(ActiveConnection.Session)
         self.SMIterator.Begin()
         self.AProxy = None
         self.Group = None
@@ -1727,6 +1739,11 @@ class ProxyIterator(object):
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
 
+# Caution: Observers must be global methods otherwise we run into memory
+#          leak when the interpreter get reset from the C++ layer.
+def _update_definitions(caller, event):
+    updateModules(ActiveConnection.Modules)
+
 class Connection(object):
     """
       This is a python representation for a session/connection.
@@ -1734,19 +1751,25 @@ class Connection(object):
     def __init__(self, connectionId, session):
         """Default constructor. Creates a Connection with the given
         ID, all other data members initialized to None."""
+        global MultiServerConnections
         global ActiveConnection
         self.ID = connectionId
         self.Session = session
-        if ActiveConnection:
+        self.Modules = PVModule()
+        self.Alive = True
+        self.DefinitionObserverTag = 0
+        self.CustomDefinitionObserverTag = 0
+        if MultiServerConnections == None and ActiveConnection:
             raise RuntimeError, "Concurrent connections not supported!"
+        if MultiServerConnections != None and not self in MultiServerConnections:
+           MultiServerConnections.append(self)
         ActiveConnection = self
         __InitAfterConnect__(self)
-        return
+        __exposeActiveModules__()
 
     def __eq__(self, other):
         "Returns true if the connection ids are the same."
-        return (self.ID == other.ID and self.Session == other.Session)
-
+        return (self.ID == other.ID)
 
     def __repr__(self):
         """User friendly string representation"""
@@ -1768,6 +1791,25 @@ class Connection(object):
            connection"""
         return self.Session.GetServerInformation().GetNumberOfProcesses()
 
+    def AttachDefinitionUpdater(self):
+        """Attach observer to automatically update modules when needed."""
+        # ProxyDefinitionsUpdated = 2000
+        self.DefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2000, _update_definitions)
+        # CompoundProxyDefinitionsUpdated = 2001
+        self.CustomDefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2001, _update_definitions)
+        pass
+
+    def close(self):
+        if self.DefinitionObserverTag:
+            self.Session.GetProxyDefinitionManager().RemoveObserver(self.DefinitionObserverTag)
+            self.Session.GetProxyDefinitionManager().RemoveObserver(self.CustomDefinitionObserverTag)
+        self.Session = None
+        self.Modules = None
+        self.Alive = False
+
+    def __del__(self):
+        if self.Alive:
+           self.close()
 
 def SaveState(filename):
     """Given a state filename, saves the state of objects registered
@@ -1797,13 +1839,25 @@ def InitFromGUI():
     """
     Method used to initialize the Python Shell from the ParaView GUI.
     """
-    global fromGUI
+    global fromGUI, ActiveConnection
+    if not fromGUI:
+       print "from paraview.simple import *"
     fromGUI = True
     # ToggleProgressPrinting() ### FIXME COLLABORATION
-    session = ProxyManager().GetSession();
-    Connection(\
-      vtkProcessModule.GetProcessModule().GetSessionID(session),\
-      session)
+    enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
+    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
+    iter.InitTraversal()
+    ActiveConnection = None
+    activeSession = vtkSMProxyManager.GetProxyManager().GetActiveSession()
+    tmpActiveConnection = None
+    while not iter.IsDoneWithTraversal():
+       c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
+       if c.Session == activeSession:
+          tmpActiveConnection = c
+       iter.GoToNextItem()
+    iter.UnRegister(None)
+    if tmpActiveConnection:
+       ActiveConnection = tmpActiveConnection
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
@@ -1853,18 +1907,31 @@ def ReverseConnect(port=11111):
     session.Connect("csrc://hostname:" + port)
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
     connection = Connection(id, session)
-    return session
+    return connection
 
 def Disconnect(session=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
     global ActiveConnection
+    global MultiServerConnections
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
-    if not session or session == ActiveConnection:
+    if ActiveConnection and (not session or session == ActiveConnection.Session):
         session = ActiveConnection.Session
-        ActiveConnection = None
+        if MultiServerConnections:
+           MultiServerConnections.remove(ActiveConnection)
+           ActiveConnection.close()
+           ActiveConnection = None
+           switchActiveConnection()
+        else:
+           ActiveConnection.close()
+           ActiveConnection = None
+    elif MultiServerConnections:
+        for connection in MultiServerConnections:
+          if connection.Session == session:
+            connection.close()
+            MultiServerConnections.remove(connection)
     if session:
       vtkProcessModule.GetProcessModule().UnRegisterSession(session)
     return
@@ -1877,10 +1944,10 @@ def CreateProxy(xml_group, xml_name, session=None):
     sph = servermanager.sources.SphereSource()"""
     global ActiveConnection
     if not session:
-        session = ActiveConnection
+        session = ActiveConnection.Session
     if not session:
         raise RuntimeError, "Cannot create objects without a session."
-    pxm = ProxyManager()
+    pxm = ProxyManager(session)
     return pxm.NewProxy(xml_group, xml_name)
 
 def GetRenderView(connection=None):
@@ -1927,7 +1994,7 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     This method can also be used to initialize properties by passing
     keyword arguments where the key is the name of the property."""
     if not session:
-        session = ActiveConnection
+        session = ActiveConnection.Session
     if not session:
         raise RuntimeError, "Cannot create view without session."
     pxm = ProxyManager()
@@ -2008,19 +2075,19 @@ def LoadXML(xmlstring):
     raise RuntimeError, "Deprecated. Use LoadPlugin(...) instead."
 
 
-def LoadPlugin(filename,  remote=True, session=None):
+def LoadPlugin(filename,  remote=True, connection=None):
     """ Given a filename and a session (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
     filters and rendering modules."""
 
-    if not session:
-        session = ActiveConnection
-    if not session:
-        raise RuntimeError, "Cannot load a plugin without a session."
-    plm = session.Session.GetPluginManager()
+    if not connection:
+        connection = ActiveConnection
+    if not connection:
+        raise RuntimeError, "Cannot load a plugin without a connection."
+    plm = vtkSMProxyManager.GetProxyManager().GetPluginManager()
 
     if remote:
-        status = plm.LoadRemotePlugin(filename)
+        status = plm.LoadRemotePlugin(filename, connection.Session)
     else:
         status = plm.LoadLocalPlugin(filename)
 
@@ -2029,7 +2096,7 @@ def LoadPlugin(filename,  remote=True, session=None):
         raise RuntimeError, "Problem loading plugin %s" % (filename)
     else:
         # we should never have to call this. The modules should update automatically.
-        updateModules()
+        updateModules(connection.Modules)
 
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
@@ -2255,8 +2322,11 @@ def _createInitialize(group, name):
         if not connection:
             raise RuntimeError,\
                   'Cannot create a proxy without a session.'
+        if not connection.Session.GetProxyDefinitionManager().HasDefinition(pgroup, pname):
+            error_msg = "The connection does not provide any definition for %s." % pname
+            raise RuntimeError, error_msg
         self.InitializeFromProxy(\
-            CreateProxy(pgroup, pname, connection), update)
+            CreateProxy(pgroup, pname, connection.Session), update)
     return aInitialize
 
 def _createGetProperty(pName):
@@ -2338,49 +2408,45 @@ def _printProgress(caller, event):
         currentAlgorithm = None
         currentProgress = 0
 
-def updateModules():
+def updateModules(m):
     """Called when a plugin is loaded, this method updates
     the proxy class object in all known modules."""
-    global sources, filters, writers, rendering, animation, implicit_functions,\
-           piecewise_functions, extended_sources, misc
 
-    createModule("sources", sources)
-    createModule("filters", filters)
-    createModule("writers", writers)
-    createModule("representations", rendering)
-    createModule("views", rendering)
-    createModule("lookup_tables", rendering)
-    createModule("textures", rendering)
-    createModule('cameramanipulators', rendering)
-    createModule("animation", animation)
-    createModule("misc", misc)
-    createModule('animation_keyframes', animation)
-    createModule('implicit_functions', implicit_functions)
-    createModule('piecewise_functions', piecewise_functions)
-    createModule("extended_sources", extended_sources)
-    createModule("incremental_point_locators", misc)
+    createModule("sources", m.sources)
+    createModule("filters", m.filters)
+    createModule("writers", m.writers)
+    createModule("representations", m.rendering)
+    createModule("views", m.rendering)
+    createModule("lookup_tables", m.rendering)
+    createModule("textures", m.rendering)
+    createModule('cameramanipulators', m.rendering)
+    createModule("animation", m.animation)
+    createModule("misc", m.misc)
+    createModule('animation_keyframes', m.animation)
+    createModule('implicit_functions', m.implicit_functions)
+    createModule('piecewise_functions', m.piecewise_functions)
+    createModule("extended_sources", m.extended_sources)
+    createModule("incremental_point_locators", m.misc)
 
-def _createModules():
+def _createModules(m):
     """Called when the module is loaded, this creates sub-
     modules for all know proxy groups."""
-    global sources, filters, writers, rendering, animation, implicit_functions,\
-           piecewise_functions, extended_sources, misc
 
-    sources = createModule('sources')
-    filters = createModule('filters')
-    writers = createModule('writers')
-    rendering = createModule('representations')
-    createModule('views', rendering)
-    createModule("lookup_tables", rendering)
-    createModule("textures", rendering)
-    createModule('cameramanipulators', rendering)
-    animation = createModule('animation')
-    createModule('animation_keyframes', animation)
-    implicit_functions = createModule('implicit_functions')
-    piecewise_functions = createModule('piecewise_functions')
-    extended_sources = createModule("extended_sources")
-    misc = createModule("misc")
-    createModule("incremental_point_locators", misc)
+    m.sources = createModule('sources')
+    m.filters = createModule('filters')
+    m.writers = createModule('writers')
+    m.rendering = createModule('representations')
+    createModule('views', m.rendering)
+    createModule("lookup_tables", m.rendering)
+    createModule("textures", m.rendering)
+    createModule('cameramanipulators', m.rendering)
+    m.animation = createModule('animation')
+    createModule('animation_keyframes', m.animation)
+    m.implicit_functions = createModule('implicit_functions')
+    m.piecewise_functions = createModule('piecewise_functions')
+    m.extended_sources = createModule("extended_sources")
+    m.misc = createModule("misc")
+    createModule("incremental_point_locators", m.misc)
 
 class PVModule(object):
     pass
@@ -2510,7 +2576,7 @@ def __determineName(proxy, group):
     return "%s%d" % (name, val)
 
 def __getName(proxy, group):
-    pxm = ProxyManager()
+    pxm = ProxyManager(proxy.GetSession())
     if isinstance(proxy, Proxy):
         proxy = proxy.SMProxy
     return pxm.GetProxyName(group, proxy)
@@ -2805,6 +2871,48 @@ ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' 
 # Connect() automatically sets this if it is not already set.
 ActiveConnection = None
 
+# Fields for multi-server support
+MultiServerConnections = None
+
+# API for multi-server support
+def enableMultiServer(multiServer=True):
+  """This method enable the current servermanager to support several
+  connections. Once we enable the multi-server support, the user can create
+  as many connection as he want and switch from one to another in order to
+  create and manage proxy."""
+  global MultiServerConnections, ActiveConnection
+  if not multiServer and MultiServerConnections:
+      raise RuntimeError, "Once we enable Multi-Server support we can not get back"
+  MultiServerConnections = []
+  if ActiveConnection:
+    MultiServerConnections.append(ActiveConnection)
+
+def switchActiveConnection(newActiveConnection=None):
+  """Switch active connection to be the provided one or if none just pick the
+  other one"""
+  global MultiServerConnections, ActiveConnection
+  if MultiServerConnections == None:
+    raise RuntimeError, "enableMultiServer() must be called before"
+
+  # Manage the case when no connection is provided
+  if newActiveConnection:
+    ActiveConnection = newActiveConnection
+    __exposeActiveModules__()
+    # Update active session for ParaView
+    if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
+       vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
+    return ActiveConnection
+  else:
+    for connection in MultiServerConnections:
+      if connection != ActiveConnection:
+         ActiveConnection = connection
+         __exposeActiveModules__()
+         # Update active session for ParaView
+         if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
+            vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
+         return ActiveConnection
+  return None
+
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.
 if not vtkProcessModule.GetProcessModule():
@@ -2835,45 +2943,46 @@ _pyproxies = {}
 loader = _ModuleLoader()
 sys.meta_path.append(loader)
 
-def _proxyDefinitionsUpdated(caller, event):
-    """callback that gets called when RegisterEvent or UnRegisterEvent gets
-       fired from the proxy manager. These events are fired when definitions are
-       added or proxys are registered. We need to ensure that we update the
-       modules only when definitions have changed."""
-    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #if vtkSMObject.GetProxyManager().GetProxyDefinitionsUpdated():
-    #    updateModules()
-    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class __DefinitionUpdater(object):
-    """Internal class used to add observer to the proxy manager to handle
-       addition of new definitions."""
-    def __init__(self):
-        # Setup observer to update the modules when new proxy definitions are
-        # added. Unfortunately, we don't have a specific even when a definition
-        # is added. So this callback will get called even when proxy is
-        # registered :(
-        self.Tag = vtkSMObject.GetProxyManager().AddObserver("RegisterEvent",
-          _proxyDefinitionsUpdated)
-        pass
-
-    def __del__(self):
-        if vtkSMObject.GetProxyManager():
-            vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
-
 def __InitAfterConnect__(connection):
     """
     This function is called everytime after a server connection is made.
     Since the ProxyManager and all proxy definitions are changed every time a
     new connection is made, we re-create all the modules
     """
-    _createModules()
+    _createModules(connection.Modules)
+
     if not paraview.fromFilter:
         # fromFilter is set when this module is imported from the programmable
         # filter
-        global _defUpdater
-        _defUpdater = __DefinitionUpdater()
+        connection.AttachDefinitionUpdater()
+        pass
+
+def __exposeActiveModules__():
+    """Update servermanager submodules to point to the current
+    ActiveConnection.Modules.*"""
+    # Expose all active module to the current servermanager module
+    if ActiveConnection:
+       for m in [mName for mName in dir(ActiveConnection.Modules) if mName[0] != '_' ]:
+          exec "global %s;%s = ActiveConnection.Modules.%s" % (m,m,m)
 
 if hasattr(sys, "ps1"):
     # session is interactive.
     print vtkSMProxyManager.GetParaViewSourceVersion();
+
+def GetConnectionFromId(id):
+   for connection in MultiServerConnections:
+      if connection.ID == id:
+         return connection
+   return None
+
+def GetConnectionFromSession(session):
+   for connection in MultiServerConnections:
+      if connection.Session == session:
+         return connection
+   return None
+
+def GetConnectionAt(index):
+   return MultiServerConnections[index]
+
+def GetNumberOfConnections():
+   return len(MultiServerConnections)

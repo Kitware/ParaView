@@ -22,9 +22,12 @@
 #define __vtkSMProxyLocator_h
 
 #include "vtkSMObject.h"
+#include "vtkWeakPointer.h" // needed to keep the session around
 
-class vtkSMProxy;
+class vtkCollection;
 class vtkSMDeserializer;
+class vtkSMProxy;
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMProxyLocator : public vtkSMObject
 {
@@ -40,14 +43,29 @@ public:
   virtual vtkSMProxy* LocateProxy(vtkTypeUInt32 globalID);
 
   // Description:
-  // Get/Set the de-serializer to used to locate XMLs for unknown proxies
+  // Get/Set the de-serializer to used to locate XMLs/Protobuf for unknown proxies
   // requested to be located using LocateProxy().
   void SetDeserializer(vtkSMDeserializer*);
   vtkGetObjectMacro(Deserializer, vtkSMDeserializer);
 
   // Description:
+  // Get/Set the session.
+  virtual vtkSMSession* GetSession();
+  virtual void SetSession(vtkSMSession* s);
+
+  // Description:
   // Clear the locator.
   virtual void Clear();
+
+  // Description:
+  // Copy all the Located proxy into the collection.
+  // This allow to keep a reference to them outside of the current locator.
+  // This is needed if we don't want to delete those proxy and if we want to
+  // Clear() the current ProxyLocator.
+  virtual void GetLocatedProxies(vtkCollection* collectionToFill);
+
+  virtual void UseSessionToLocateProxy(bool useSessionToo)
+    { this->LocateProxyWithSessionToo = useSessionToo; }
 
 //BTX
 protected:
@@ -60,6 +78,8 @@ protected:
   virtual vtkSMProxy* NewProxy(vtkTypeUInt32 globalID);
 
   vtkSMDeserializer* Deserializer;
+  vtkWeakPointer<vtkSMSession> Session;
+  bool LocateProxyWithSessionToo;
 
 private:
   vtkSMProxyLocator(const vtkSMProxyLocator&); // Not implemented

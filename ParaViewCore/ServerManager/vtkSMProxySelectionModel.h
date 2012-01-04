@@ -23,20 +23,41 @@
 #ifndef __vtkSMProxySelectionModel_h
 #define __vtkSMProxySelectionModel_h
 
-#include "vtkSMObject.h"
+#include "vtkSMRemoteObject.h"
+#include "vtkSMMessageMinimal.h" // Needed for vtkSMMessage*
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkSMProxySelectionModelInternal;
 class vtkCollection;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMObject
+//BTX
+#include <vtkstd/set> // needed for vtkset::set.
+//ETX
+
+class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxySelectionModel*  New();
-  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMObject);
+  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMRemoteObject);
   void PrintSelf(ostream&  os,  vtkIndent  indent);
+
+  // Description:
+  // Override the set session, so we can attach an observer to the Collaboration
+  // manager in order to monitor master/slave changes.
+  virtual void SetSession(vtkSMSession*);
+
+  // Description:
+  // Allow to synchronize the active object with master or just keep remote object
+  // out-of-synch. Only the state from the master will be loaded.
+  void SetFollowingMaster(bool following);
+  bool IsFollowingMaster();
  
 //BTX
+  // Description:
+  // Type for selection.
+  typedef vtkstd::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
+
   // vtkSMProxy selection flags
   enum ProxySelectionFlag {
     NO_UPDATE        = 0,
@@ -72,10 +93,11 @@ public:
   // Returns the selected proxy at the given index.
   vtkSMProxy* GetSelectedProxy(unsigned int  index);
 
+  //BTX
   // Description:
-  // Get the collection of proxies that are currently selected.
-  // WARNING: Do not modify the returned collection.
-  vtkGetObjectMacro(Selection, vtkCollection);
+  // Returns the selection set. 
+  const SelectionType& GetSelection() { return this->Selection; }
+  //ETX
 
   // Description:
   // Update the selected set of proxies. \c command affects how the selection is
@@ -86,15 +108,15 @@ public:
   // \li DESELECT: deselect the proxies
   // \li CLEAR_AND_SELECT: clear selection and then add the specified proxies as
   // the selection.
-  void Select(vtkCollection*  proxies,  int  command);
-  void Select(vtkSMProxy*  proxy,  int  command);
+  //BTX
+  void Select(const SelectionType &proxies,  int command);
+  //ETX
+  void Select(vtkSMProxy* proxy,  int command);
  
   // Description:
   // Wrapper friendly methods to doing what Select() can do.
-  void NoUpdate(vtkSMProxy*  proxy)
-    { this->Select(proxy, NO_UPDATE); }
-  void Clear(vtkSMProxy*  proxy)
-    { this->Select(proxy, CLEAR); }
+  void Clear()
+    { this->Select(NULL, CLEAR); }
   void Select(vtkSMProxy*  proxy)
     { this->Select(proxy, SELECT); }
   void Deselect(vtkSMProxy*  proxy)
@@ -103,31 +125,55 @@ public:
     { this->Select(proxy, CLEAR_AND_SELECT); }
 
   // Description:
-  // These are valid only in the event handlers for
-  // vtkCommand::SelectionChangedEvent.
-  vtkGetObjectMacro(NewlySelected, vtkCollection);
-  vtkGetObjectMacro(NewlyDeselected, vtkCollection);
+  // Utility method to get the data bounds for the currently selected items.
+  // This only makes sense for selections comprising of source-proxies or
+  // output-port proxies.
+  // Returns true is the bounds are valid.
+  bool GetSelectionDataBounds(double bounds[6]);
+
 //BTX 
+
+  // Description:
+  // This method return the full object state that can be used to create that
+  // object from scratch.
+  // This method will be used to fill the undo stack.
+  // If not overriden this will return NULL.
+  virtual const vtkSMMessage* GetFullState();
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMProxySelectionModel();
   ~vtkSMProxySelectionModel();
 
   void InvokeCurrentChanged(vtkSMProxy*  proxy);
   void InvokeSelectionChanged();
+
+  vtkSmartPointer<vtkSMProxy> Current;
+  SelectionType Selection;
+
+  // Description:
+  // When the state has changed we call that method so the state can be shared
+  // is any collaboration is involved
+  void PushStateToSession();
   
-  vtkCollection* NewlySelected;
-  vtkCollection* NewlyDeselected;
-  vtkCollection* Selection;
+  // Cached version of State
+  vtkSMMessage* State;
 
 private:
   vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&); // Not implemented
   void operator = (const  vtkSMProxySelectionModel&); // Not implemented
 
   class vtkInternal;
+  friend class vtkInternal;
   vtkInternal* Internal;
 //ETX
 };
 
 #endif
-
-

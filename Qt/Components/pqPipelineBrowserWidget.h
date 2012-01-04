@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeView.h"
 #include "pqComponentsExport.h"
 
-class pqView;
 class pqPipelineModel;
+class pqPipelineAnnotationFilterModel;
 class pqPipelineSource;
+class pqView;
+class vtkSession;
 
 /// pqPipelineBrowserWidget is the widget for the pipeline  browser. This is a
 /// replacement for pqPipelineBrowser.
@@ -56,6 +58,18 @@ public:
   /// Set the visibility of selected items.
   void setSelectionVisibility(bool visible);
 
+  /// Set Annotation filter to use
+  void enableAnnotationFilter(const QString& annotationKey);
+
+  /// Disable any Annotation filter
+  void disableAnnotationFilter();
+
+  /// Set Session filter to use
+  void enableSessionFilter(vtkSession* session);
+
+  /// Disable any Session filter
+  void disableSessionFilter();
+
 signals:
   /// Fired when the delete key is pressed.
   /// Typically implies that the selected items need to be deleted.
@@ -68,11 +82,15 @@ public slots:
 
 protected slots:
   void handleIndexClicked(const QModelIndex& index);
+  void expandWithModelIndexTranslation(const QModelIndex &);
 
 protected:
   /// sets the visibility for items in the indices list.
   void setVisibility(bool visible, const QModelIndexList& indices);
   pqPipelineModel* PipelineModel;
+  pqPipelineAnnotationFilterModel* FilteredPipelineModel;
+  const QModelIndex pipelineModelIndex(const QModelIndex& index) const;
+  const pqPipelineModel* getPipelineModel(const QModelIndex& index) const;
 
 private:
   Q_DISABLE_COPY(pqPipelineBrowserWidget)

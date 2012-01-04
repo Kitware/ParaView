@@ -26,6 +26,7 @@
 #include <vtkstd/map>
 #include <vtkstd/vector>
 #include "vtkStdString.h"
+#include <vtkstd/string>
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and
@@ -86,6 +87,17 @@ struct vtkSMProxyInternals
   // Vector of vtkSMProxyLink for shared properties among subproxies.
   typedef  vtkstd::vector<vtkSmartPointer<vtkSMProxyLink> > SubProxyLinksType;
   SubProxyLinksType SubProxyLinks;
+
+  // Annotation map
+  typedef vtkstd::map<vtkstd::string,  vtkstd::string> AnnotationMap;
+  AnnotationMap Annotations;
+  bool EnableAnnotationPush;
+
+  // Setup default values
+  vtkSMProxyInternals()
+    {
+    this->EnableAnnotationPush = true;
+    }
 };
 
 #endif

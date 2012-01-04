@@ -184,6 +184,10 @@ protected:
   // Re-reads information from the metadata file, if necessary.
   virtual void UpdateMetaData();
 
+  // Add/Remove filenames without changing the MTime.
+  void RemoveAllFileNamesInternal();
+  void AddFileNameInternal(const char*);
+
   int IgnoreReaderTime;
 
 private:

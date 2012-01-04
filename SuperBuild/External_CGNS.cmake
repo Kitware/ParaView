@@ -3,6 +3,13 @@
 set(CGNS_source "${CMAKE_CURRENT_BINARY_DIR}/CGNS")
 set(CGNS_install "${CMAKE_CURRENT_BINARY_DIR}")
 
+set(CGNS_INCLUDE_DIR "${CGNS_install}/include")
+if(APPLE)
+  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns.a")
+else()
+  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX}")
+endif()
+
 # If Windows we use CMake otherwise ./configure
 if(WIN32)
   
@@ -89,12 +96,12 @@ else()
     DEPENDS ${CGNS_dependencies}
   )
 
-endif()
+  # more cgns install suck
+  if(NOT WIN32 AND NOT APPLE)
+    ExternalProject_Add_Step(CGNS SetCGNSLibExecutable
+      COMMAND chmod a+x ${CGNS_LIBRARY}
+      DEPENDEES install
+    )
+  endif()
 
-set(CGNS_INCLUDE_DIR "${CGNS_install}/include")
-
-if(APPLE)
-  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns.a")
-else()
-  set(CGNS_LIBRARY "${CGNS_install}/lib/libcgns${_LINK_LIBRARY_SUFFIX}")
 endif()

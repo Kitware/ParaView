@@ -40,8 +40,8 @@ public:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
-  // A proxy can be set to be both input and output by setting updateDir
-  // to INPUT | OUTPUT
+  // A proxy can be set to be both input and output by adding 2 link, one
+  // to INPUT and the other to OUTPUT
   virtual void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
   // Description:
@@ -71,6 +71,17 @@ public:
   // Description:
   // Remove all links.
   virtual void RemoveAllLinks();
+
+//BTX
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMProxyLink();
   ~vtkSMProxyLink();
@@ -94,16 +105,22 @@ protected:
 
   // Description:
   // Save the state of the link.
-  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
+  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent);
 
   // Description:
   // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
+  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
+
+  // Description:
+  // Update the internal protobuf state
+  virtual void UpdateState();
+
 private:
   vtkSMProxyLinkInternals* Internals;
 
   vtkSMProxyLink(const vtkSMProxyLink&); // Not implemented
   void operator=(const vtkSMProxyLink&); // Not implemented
+//ETX
 };
 
 #endif

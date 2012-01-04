@@ -158,11 +158,6 @@ public:
   vtkGetVector2Macro(TimeStepRange, int);
 
   // Description:
-  // Get the data array selection tables used to configure which data
-  // arrays are loaded by the reader.
-  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
-
-  // Description:
   // Cell array selection
   int GetNumberOfCellArrays();
   const char* GetCellArrayName(int idx);
@@ -270,10 +265,6 @@ protected:
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);
 
-  // Callback registered with the SelectionObserver.
-  static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
-                                        void *clientdata, void *calldata);
-
   // Description:
   // This does the updating of meta data of the dataset from the
   // first binary file registered in the map:
@@ -282,17 +273,6 @@ protected:
   // - name of fields
   int UpdateMetaData(vtkInformation* request,
                      vtkInformationVector* outputVector);
-
-  // Description:
-  // This does the updating of the meta data of the case file
-  int UpdateCaseFile(const char *fname,
-                     vtkInformation* request, 
-                     vtkInformationVector* outputVector);
-
-  // Description:
-  // This does the updating of the meta data for a series, when no case file provided
-  int UpdateSpyDataFile(vtkInformation* request, 
-                        vtkInformationVector* outputVector);
 
   int UpdateFile(vtkInformation *request, 
                  vtkInformationVector *outputVector);
@@ -304,17 +284,11 @@ protected:
 
   // Have all the readers have the same global level structure
   void SetGlobalLevels(vtkCompositeDataSet *cds);
-  // Description:
-  // Get and set the current file name. Protected because
-  // this method should only be used internally
-  vtkSetStringMacro(CurrentFileName);
-  vtkGetStringMacro(CurrentFileName);
 
   // The observer to modify this object when the array selections are
   // modified.
-  vtkCallbackCommand *SelectionObserver;
   char *FileName;
-  char *CurrentFileName;
+
   int TimeStep; // set by the user
   int TimeStepRange[2];
   int CurrentTimeStep; // computed
@@ -344,10 +318,16 @@ protected:
                    vtkDataArray *a3);
 
   int ComputeDerivedVariables;
-  int ComputeDerivedVars(vtkCellData* data, 
-    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID, int dims[3]);
-  
+  int ComputeDerivedVars(vtkCellData* data,
+    vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID);
 
+  // Description:
+  // Get the data array selection tables used to configure which data
+  // arrays are loaded by the reader.
+  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
+
+  // vtkSpyPlotReaderMap needs access to GetCellDataArraySelection().
+  friend class vtkSpyPlotReaderMap;
   vtkSpyPlotReaderMap *Map;
   
   int DistributeFiles;
@@ -368,11 +348,17 @@ protected:
 
   int MergeXYZComponents;
 
-  int UpdateFileCallCount;
+  // This flag is used to determine if core meta-data needs to be re-read.
+  bool FileNameChanged;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
   void operator=(const vtkSpyPlotReader&);  // Not implemented.
+
+  class VectorOfDoubles;
+
+  VectorOfDoubles* TimeSteps;
+  void SetTimeStepsInternal(const VectorOfDoubles&);
 };
 
 #endif

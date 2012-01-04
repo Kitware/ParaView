@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkPVServerInformation.h"
 
 //----------------------------------------------------------------------------
 vtkPVSession::vtkPVSession()
@@ -102,7 +103,7 @@ void vtkPVSession::CleanupPendingProgressInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
+bool vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
 {
   int tag = -1;
   int len = -1;
@@ -126,10 +127,16 @@ void vtkPVSession::OnWrongTagEvent(vtkObject*, unsigned long, void* calldata)
     // Treat as a socket error.
     // this->OnSocketError();
     }
+  return false;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+bool vtkPVSession::IsMultiClients()
+{
+  return (this->GetServerInformation()->GetMultiClientsEnable() != 0);
 }

@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+class pqServerConfiguration;
+
 /// @ingroup Reactions
 /// Reaction for connecting to a server.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqServerConnectReaction : public pqReaction
@@ -49,7 +51,14 @@ public:
   /// having to create a reaction instance.
   static void connectToServerWithWarning();
   static void connectToServer();
-  static void connectToServer(const char* server_resource_name);
+
+  /// ParaView names server configurations (in pvsc files). To connect to a
+  /// server using the configuration specified, use this API.
+  static bool connectToServerUsingConfigurationName(const char* config_name);
+
+  /// To connect to a server given a configuration, use this API.
+  static bool connectToServerUsingConfiguration(
+    const pqServerConfiguration& config);
 
 protected:
   /// Called when the action is triggered.

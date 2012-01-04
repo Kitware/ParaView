@@ -26,6 +26,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStringList.h"
 
 #include <vtkstd/list>
@@ -35,6 +36,7 @@
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
+#include <assert.h>
 
 static void string_replace(vtkstd::string& string, char c, vtkstd::string str)
 {
@@ -51,6 +53,7 @@ class vtkSMReaderFactory::vtkInternals
 public:
   struct vtkValue
     {
+    vtkWeakPointer<vtkSMSession> Session;
     vtkstd::string Group;
     vtkstd::string Name;
     vtkstd::vector<vtkstd::string> Extensions;
@@ -58,20 +61,21 @@ public:
     vtkstd::vector<vtkstd::string> FilenamePatterns;
     vtkstd::string Description;
 
-    vtkSMProxyManager* GetProxyManager()
+    vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
       {
-      return vtkSMProxyManager::GetProxyManager();
+      return vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
       }
 
-    vtkSMProxy* GetPrototypeProxy(const char* groupName, const char* proxyName)
+    vtkSMProxy* GetPrototypeProxy(vtkSMSession* session, const char* groupName, const char* proxyName)
       {
-      return this->GetProxyManager()->GetPrototypeProxy(groupName, proxyName);
+      return session->GetSessionProxyManager()->GetPrototypeProxy(groupName, proxyName);
       }
 
-    void FillInformation()
+    void FillInformation(vtkSMSession* session)
       {
 
-      vtkSMProxy* prototype = this->GetPrototypeProxy(this->Group.c_str(),
+      vtkSMProxy* prototype = this->GetPrototypeProxy(session,
+                                                      this->Group.c_str(),
                                                       this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
@@ -112,9 +116,10 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkSMSession* vtkNotUsed(session))
+    bool CanCreatePrototype(vtkSMSession* session)
       {
-      return (this->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str())
+      return (this->GetPrototypeProxy(session,
+                                      this->Group.c_str(), this->Name.c_str())
               != NULL);
       }
 
@@ -131,11 +136,6 @@ public:
     // Tests if the FilenameRegEx matches the filename.
     bool FilenameRegExTest(const char* filename);
     };
-
-  vtkSMProxyManager* GetProxyManager()
-    {
-    return vtkSMObject::GetProxyManager();
-    }
 
   void BuildExtensions(
     const char* filename, vtkstd::vector<vtkstd::string>& extensions)
@@ -234,11 +234,12 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   const char* filename,
   const vtkstd::vector<vtkstd::string>& extensions,
-  vtkSMSession* vtkNotUsed(session),
+  vtkSMSession* session,
   bool skip_filename_test/*=false*/)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
-  vtkSMProxy* prototype = this->GetPrototypeProxy( this->Group.c_str(),
+  vtkSMSessionProxyManager* pxm = this->GetProxyManager(session);
+  vtkSMProxy* prototype = this->GetPrototypeProxy( session,
+                                                   this->Group.c_str(),
                                                    this->Name.c_str() );
   if (!prototype)
     {
@@ -247,6 +248,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 
   if (!skip_filename_test)
     {
+    this->FillInformation(session);
     if (!this->ExtensionTest(extensions) &&
       !this->FilenameRegExTest(filename))
       {
@@ -295,9 +297,9 @@ void vtkSMReaderFactory::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
+void vtkSMReaderFactory::RegisterPrototypes(vtkSMSession* session, const char* xmlgroup)
 {
-  vtkSMProxyManager* pxm = this->Internals->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkPVProxyDefinitionIterator* iter;
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -328,9 +330,6 @@ void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   value.Group = xmlgroup;
   value.Name = xmlname;
 
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
-
   this->Internals->Prototypes.push_front(value);
 }
 
@@ -347,8 +346,6 @@ void vtkSMReaderFactory::RegisterPrototype(
   value.Group = xmlgroup;
   value.Name = xmlname;
 
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
   if (description)
     {
     value.Description = description;
@@ -473,6 +470,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
         iter->CanReadFile(filename, extensions, session))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -504,6 +502,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
       (!filename || iter->CanReadFile(filename, extensions, session, true)))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -569,6 +568,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
     {
     if (iter->CanCreatePrototype(session))
       {
+      iter->FillInformation(session);
       vtkstd::string ext_list;
       if (iter->Extensions.size() > 0)
         {
@@ -611,9 +611,11 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* vtkNotUsed(session))
+bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* session)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("file_listing", "ServerFileListing"));
   if (!proxy)
@@ -656,9 +658,11 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
-  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* vtkNotUsed(session))
+  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* session)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );
   if (!proxy)
     {
@@ -676,4 +680,3 @@ void vtkSMReaderFactory::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

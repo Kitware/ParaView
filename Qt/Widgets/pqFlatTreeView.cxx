@@ -51,7 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QtDebug>
 #include <QTime>
-
+#include <QToolTip>
+#include <QHelpEvent>
 
 class pqFlatTreeViewColumn
 {
@@ -2484,6 +2485,42 @@ void pqFlatTreeView::wheelEvent(QWheelEvent *e)
     {
     e->ignore();
     }
+}
+
+// Handle proxy with "tooltip" annotation so they can display their custom
+// tooltip information instead of the default behaviour.
+bool pqFlatTreeView::event(QEvent *e)
+{
+  if(e->type() == QEvent::ToolTip)
+    {
+    QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+    pqFlatTreeViewItem* item = this->getItem(this->getIndexCellAt(helpEvent->pos()));
+    if (item)
+      {
+      QVariant v = this->Model->data( item->Index.sibling(item->Index.row(), 0),
+                                      Qt::ToolTipRole);
+      if(!v.toString().isEmpty())
+        {
+        QToolTip::showText(helpEvent->globalPos(), v.toString());
+        e->accept();
+        }
+      else
+        {
+        QToolTip::hideText();
+        e->ignore();
+        }
+      }
+    else
+      {
+      QToolTip::hideText();
+      e->ignore();
+      }
+    if(e->isAccepted())
+      {
+      return true;
+      }
+    }
+  return QAbstractScrollArea::event(e);
 }
 
 int pqFlatTreeView::horizontalOffset() const

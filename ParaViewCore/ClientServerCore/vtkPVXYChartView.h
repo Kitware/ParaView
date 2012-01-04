@@ -233,6 +233,10 @@ public:
   // Provides access to the chart view.
   virtual vtkChart* GetChart();
 
+  // Description:
+  // Get the context item.
+  virtual vtkAbstractContextItem* GetContextItem();
+
 //BTX
 protected:
   vtkPVXYChartView();

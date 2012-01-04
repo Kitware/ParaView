@@ -56,6 +56,15 @@ struct vtkSMProxyPropertyInternals;
 class VTK_EXPORT vtkSMProxyProperty : public vtkSMProperty
 {
 public:
+  // Description:
+  // When we load ProxyManager state we want Proxy/InputProperty to be able to
+  // create the corresponding missing proxy. Although when the goal is to load
+  // a state on any standard proxy, we do not want that proxy property be able
+  // to create new proxy based on some previous state.
+  static void EnableProxyCreation();
+  static void DisableProxyCreation();
+  static bool CanCreateProxy();
+
   static vtkSMProxyProperty* New();
   vtkTypeMacro(vtkSMProxyProperty, vtkSMProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -113,6 +122,8 @@ public:
   // Removes all unchecked proxies.
   virtual void RemoveAllUncheckedProxies();
 
+  virtual void ClearUncheckedProxies();
+
   // Description:
   // Remove all proxies from the list.
   virtual void RemoveAllProxies()
@@ -164,7 +175,7 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage* msg, int msg_offset, vtkSMProxyLocator*);
 
   virtual void RemoveAllProxies(int modify);
 
@@ -195,6 +206,9 @@ protected:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
+  // Static flag used to know if the locator should be used to create proxy
+  // or if the session should be used to find only the existing ones
+  static bool CreateProxyAllowed;
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
+#include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
 #include "pqCrashRecoveryBehavior.h"
 #include "pqDataTimeStepBehavior.h"
@@ -50,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardViewModules.h"
+#include "pqStandardSummaryPanelImplementation.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
@@ -67,6 +69,8 @@ pqParaViewBehaviors::pqParaViewBehaviors(
 
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));
+
+  pgm->addInterface(new pqStandardSummaryPanelImplementation(pgm));
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();
@@ -91,6 +95,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqObjectPickingBehavior(this);
+  new pqCollaborationBehavior(this);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
@@ -101,5 +106,9 @@ pqParaViewBehaviors::pqParaViewBehaviors(
     mainWindow);
   QObject::connect(altSpace, SIGNAL(activated()),
     pqApplicationCore::instance(), SLOT(quickLaunch()));
+  QShortcut *ctrlF = new QShortcut(Qt::CTRL + Qt::Key_F,
+    mainWindow);
+  QObject::connect(ctrlF, SIGNAL(activated()),
+    pqApplicationCore::instance(), SLOT(startSearch()));
 }
 

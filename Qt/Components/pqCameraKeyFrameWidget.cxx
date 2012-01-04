@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProperty.h"
 #include "vtkPVSession.h"
 
@@ -178,7 +179,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
 
   this->Internal->PSplineProxy.TakeReference(
     pxm->NewProxy("parametric_functions", "Spline"));
@@ -250,11 +251,11 @@ bool pqCameraKeyFrameWidget::usePathBasedMode() const
 void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
 {
   this->Internal->setPosition(
-    vtkSMPropertyHelper(keyFrame, "Position").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "Position").GetDoubleArray()[0]);
   this->Internal->setFocalPoint(
-    vtkSMPropertyHelper(keyFrame, "FocalPoint").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "FocalPoint").GetDoubleArray()[0]);
   this->Internal->setViewUp(
-    vtkSMPropertyHelper(keyFrame, "ViewUp").GetAsDoublePtr());
+    &vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
   this->Internal->setViewAngle(
     vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
 

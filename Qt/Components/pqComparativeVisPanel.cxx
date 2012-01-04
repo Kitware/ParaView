@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMVectorProperty.h"
 
 // Qt Includes.
@@ -138,8 +139,8 @@ namespace pqComparativeVisPanelNS
 
   vtkSMProxy* newCue(vtkSMProxy* proxy, const char* pname, int index)
     {
-    vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
     pqServer* activeServer = pqActiveObjects::instance().activeServer();
+    vtkSMSessionProxyManager *pxm = activeServer->proxyManager();
 
     // Create a new cueProxy.
     vtkSMProxy* cueProxy = pxm->NewProxy("animation", "ComparativeAnimationCue");
@@ -174,7 +175,7 @@ namespace pqComparativeVisPanelNS
         maxValue = domain[1].toDouble();
         }
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->GetCue()->UpdateWholeRange(minValue, maxValue);
+        cueProxy)->UpdateWholeRange(minValue, maxValue);
       }
     if (!proxy)
       {
@@ -183,7 +184,7 @@ namespace pqComparativeVisPanelNS
       // this is a "Time" animation cue. Use the range provided by the time
       // keeper.
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
-        cueProxy)->GetCue()->UpdateWholeRange(range.first, range.second);
+        cueProxy)->UpdateWholeRange(range.first, range.second);
       }
     cueProxy->UpdateVTKObjects();
     pxm->RegisterProxy("comparative_cues",
@@ -455,7 +456,7 @@ void pqComparativeVisPanel::removeParameter(int index)
 
   BEGIN_UNDO_SET("Remove Parameter");
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->view()->proxyManager();
   vtkSmartPointer<vtkSMProxy> cue = item->data(
     pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
   item = NULL;

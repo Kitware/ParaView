@@ -168,15 +168,11 @@ void pqDataRepresentation::setDefaultPropertyValues()
     return;
     }
 
-  // Set default arrays and lookup table.
+  // this used to call proxy->UpdatePipeline(), however that's totally
+  // unnecessary. It gets called already e.g. by pqDisplayPolicy or by
+  // vtkSMRenderViewProxy::CreateDefaultRepresentation etc.
   vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
-  
-  // setDefaultPropertyValues() can always call Update on the display. 
-  // This is safe since setDefaultPropertyValues is called only after having
-  // added the display to the render module, which ensures that the
-  // update time has been set correctly on the display.
-  proxy->UpdatePipeline();
   proxy->GetProperty("Input")->UpdateDependentDomains();
   
   this->Superclass::setDefaultPropertyValues();
@@ -281,26 +277,37 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
 int pqDataRepresentation::getProxyScalarMode( )
 {
   vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast( this->getProxy() );
-   if (!repr)
+  if (!repr)
     {
     return 0;
+    }
+
+  // we check on if there is a color array name first since
+  // color attribute type may still be POINT_DATA or CELL_DATA even though
+  // the object isn't colored by field data
+  QVariant colorArrayName = pqSMAdaptor::getElementProperty(
+    repr->GetProperty("ColorArrayName"));
+
+  if(colorArrayName.isValid() == false || colorArrayName.isNull() == true ||
+     colorArrayName == "")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_NONE;
     }
 
   QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
     repr->GetProperty("ColorAttributeType"));
 
-   if(scalarMode == "CELL_DATA")
-      {
-      return vtkDataObject::FIELD_ASSOCIATION_CELLS;
-      }
-    else if(scalarMode == "POINT_DATA")
-      {
-      return vtkDataObject::FIELD_ASSOCIATION_POINTS;
-      }
+  if(scalarMode == "CELL_DATA")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_CELLS;
+    }
+  else if(scalarMode == "POINT_DATA")
+    {
+    return vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    }
 
-   return vtkDataObject::FIELD_ASSOCIATION_NONE;
-  }
-
+  return vtkDataObject::FIELD_ASSOCIATION_NONE;
+}
 
 //-----------------------------------------------------------------------------
 vtkPVArrayInformation* pqDataRepresentation::getArrayInformation( const char* arrayname, const int &fieldType )

@@ -106,6 +106,11 @@ void vtkSMVectorProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMVectorProperty::ClearUncheckedElements()
+{
+}
+
+//---------------------------------------------------------------------------
 void vtkSMVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

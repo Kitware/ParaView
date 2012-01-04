@@ -29,7 +29,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -93,7 +93,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqProxyTabWidget" name="proxyTabWidget"/>
+   <widget class="pqObjectInspectorWidget" name="proxyTabWidget"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -102,12 +102,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>pqProxyTabWidget</class>
-   <extends>QWidget</extends>
-   <header>pqProxyTabWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>pqViewManager</class>
    <extends>QWidget</extends>
@@ -118,6 +112,12 @@
    <class>pqStatusBar</class>
    <extends>QStatusBar</extends>
    <header>pqStatusBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqObjectInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqObjectInspectorWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

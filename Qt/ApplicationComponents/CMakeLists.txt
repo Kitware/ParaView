@@ -35,6 +35,7 @@ SET (MOC_HEADERS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqColorToolbar.h
+  pqCollaborationBehavior.h
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
@@ -50,6 +51,7 @@ SET (MOC_HEADERS
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
+  pqGenericSummaryDisplayPanel.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqLoadDataReaction.h
@@ -58,12 +60,14 @@ SET (MOC_HEADERS
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
+  pqMasterOnlyReaction.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
   pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
+  pqPluginDocumentationBehavior.h
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.h
   pqPVApplicationCore.h
@@ -85,6 +89,7 @@ SET (MOC_HEADERS
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
   pqTestingReaction.h
@@ -148,6 +153,8 @@ SET (SOURCE_FILES
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
   pqChangePipelineInputReaction.h
+  pqCollaborationBehavior.cxx
+  pqCollaborationBehavior.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
@@ -180,6 +187,8 @@ SET (SOURCE_FILES
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
   pqFixPathsInStateFilesBehavior.h
+  pqGenericSummaryDisplayPanel.h
+  pqGenericSummaryDisplayPanel.cxx
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -196,6 +205,8 @@ SET (SOURCE_FILES
   pqManageLinksReaction.h
   pqManagePluginsReaction.cxx
   pqManagePluginsReaction.h
+  pqMasterOnlyReaction.h
+  pqMasterOnlyReaction.cxx
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx
@@ -210,6 +221,8 @@ SET (SOURCE_FILES
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.cxx
   pqPluginDockWidgetsBehavior.h
+  pqPluginDocumentationBehavior.cxx
+  pqPluginDocumentationBehavior.h
   pqProxyGroupMenuManager.cxx
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.cxx
@@ -252,6 +265,8 @@ SET (SOURCE_FILES
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardSummaryPanelImplementation.cxx
+  pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.cxx
   pqStandardViewFrameActionGroup.h
   pqStatusBar.cxx
