@@ -431,3 +431,32 @@ void vtkSMProxyManager::UnRegisterProxy(
     vtkErrorMacro("No active session found.");
     }
 }
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(const char* groupname, unsigned int idx)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->GetProxyName(groupname, idx);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(
+  const char* groupname, vtkSMProxy* pxy)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->GetProxyName(groupname, pxy);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+  return NULL;
+}
