@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraLinkReaction.h"
 #include "pqCameraToolbar.h"
 #include "pqCameraUndoRedoReaction.h"
+#include "pqCatalystConnectReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
@@ -71,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
-
 #include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -232,6 +232,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqApplicationCore::instance(),
     SLOT(showOutputWindow()));
 
+
+  menu.addSeparator(); // --------------------------------------------------
+
+  new pqCatalystConnectReaction(menu.addAction("Connect To Catalyst")
+    << pqSetName("actionConnectCatalyst"));
 
   menu.addSeparator(); // --------------------------------------------------
 

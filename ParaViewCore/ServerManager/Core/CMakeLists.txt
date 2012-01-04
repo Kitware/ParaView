@@ -29,11 +29,13 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkLiveInsituLink.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
+  vtkSMCatalystSession.cxx
   vtkSMCollaborationManager.cxx
   vtkSMCompositeTreeDomain.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx

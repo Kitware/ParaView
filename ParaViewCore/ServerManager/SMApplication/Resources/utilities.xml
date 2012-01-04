@@ -2654,4 +2654,40 @@
       <!-- End of PlotOptionsBase -->
     </ContextNamedOptionsProxy>
   </ProxyGroup>
+
+  <ProxyGroup name="coprocessing">
+    <Proxy name="LiveInsituLink" class="vtkLiveInsituLink"
+      processes="dataserver">
+      <Documentation>
+        Proxy used to connect to Catalyst CoProcessor for live-data
+        visualization.
+      </Documentation>
+
+      <IntVectorProperty name="InsituPort"
+        command="SetInsituPort"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ProcessType"
+        command="SetProcessType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Visualization" value="0" />
+          <Entry text="Simulation" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Hostname"
+        command="SetHostname"
+        number_of_elements="1"
+        default_values="localhost">
+      </StringVectorProperty>
+
+      <Property name="Initialize" command="Initialize" />
+
+    </Proxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

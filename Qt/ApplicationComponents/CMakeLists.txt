@@ -51,6 +51,8 @@ set (Module_SRCS
   pqCameraToolbar.h
   pqCameraUndoRedoReaction.cxx
   pqCameraUndoRedoReaction.h
+  pqCatalystConnectReaction.cxx
+  pqCatalystConnectReaction.h
   pqCategoryToolbarsBehavior.cxx
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
@@ -227,6 +229,7 @@ set (Module_MOC_HDRS
   pqCameraReaction.h
   pqCameraToolbar.h
   pqCameraUndoRedoReaction.h
+  pqCatalystConnectReaction.h
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
