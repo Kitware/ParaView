@@ -6741,6 +6741,39 @@
        </Documentation>
      </StringVectorProperty>
 
+      <IntVectorProperty
+         name="SingleLevel"
+	 command="SetSingleLevel"
+	 number_of_elements="1"
+	 default_values="0">
+	<Documentation>
+          Specify whether to only read in a single level and any variables
+          that are prescribed over this surface.
+	</Documentation>
+	<BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CellLayerRight"
+	 command="SetCellLayerRight"
+	 number_of_elements="1"
+	 default_values="1">
+	<Documentation>
+          Specify whether to add the extra layer of cells on the
+          right or left of the domain.
+	</Documentation>
+	<BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
      <Hints>
        <ReaderFactory extensions="nc ncdf"
                       file_description="CAM NetCDF (Unstructured)" />
