@@ -73,21 +73,23 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/,
   this->StateLocator = vtkSMStateLocator::New();
   this->IsAutoMPI = false;
 
-  if (initialize_during_constructor)
-    {
-    this->Initialize();
-    }
-
   // Create and setup deserializer for the local ProxyLocator
   vtkNew<vtkSMDeserializerProtobuf> deserializer;
   deserializer->SetStateLocator(this->StateLocator);
-  deserializer->SetSession(this);
 
   // Create and setup proxy locator
   this->ProxyLocator = vtkSMProxyLocator::New();
   this->ProxyLocator->SetDeserializer(deserializer.GetPointer());
   this->ProxyLocator->UseSessionToLocateProxy(true);
-  this->ProxyLocator->SetSession(this);
+
+  // don't set the session on ProxyLocator right now since the
+  // SessionProxyManager is not setup until Initialize().
+  // we will initialize it in this->Initialize().
+
+  if (initialize_during_constructor)
+    {
+    this->Initialize();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -198,6 +200,7 @@ void vtkSMSession::Initialize()
   // Initialize the proxy manager.
   // this updates proxy definitions if we are connected to a remote server.
   this->SessionProxyManager = vtkSMSessionProxyManager::New(this);
+  this->ProxyLocator->SetSession(this);
 
   // Initialize the plugin manager.
   vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);

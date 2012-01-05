@@ -14,16 +14,7 @@
 =========================================================================*/
 #include "vtkSMDeserializer.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-
-#include <assert.h>
 
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
@@ -40,15 +31,33 @@ vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
                                            const char* xmlname,
                                            const char* subname)
 {
-  assert("Expect a valid session" && this->Session);
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert("Expect a valid SessionProxyManager" && pxm);
-  vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subname);
-  return proxy;
+  vtkSMSessionProxyManager* pxm = this->SessionProxyManager;
+  return pxm? pxm->NewProxy(xmlgroup, xmlname, subname) : NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDeserializer::SetSessionProxyManager(vtkSMSessionProxyManager* pxm)
+{
+  this->SessionProxyManager = pxm;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSessionProxyManager* vtkSMDeserializer::GetSessionProxyManager()
+{
+  return this->SessionProxyManager;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMDeserializer::GetSession()
+{
+  return this->SessionProxyManager?
+    this->SessionProxyManager->GetSession() : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDeserializer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SessionProxyManager: " <<
+    this->SessionProxyManager.GetPointer() << endl;
 }

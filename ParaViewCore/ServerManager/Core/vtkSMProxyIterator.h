@@ -23,25 +23,31 @@
 #define __vtkSMProxyIterator_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMSessionObject.h"
+#include "vtkSMObject.h"
 
 //BTX
 struct vtkSMProxyIteratorInternals;
 //ETX
 
 class vtkSMProxy;
+class vtkSMSession;
+class vtkSMSessionProxyManager;
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyIterator : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyIterator : public vtkSMObject
 {
 public:
   static vtkSMProxyIterator* New();
-  vtkTypeMacro(vtkSMProxyIterator, vtkSMSessionObject);
+  vtkTypeMacro(vtkSMProxyIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Override the set sesssion so the SessionProxyManager could be cache for
-  // transversal code.
-  virtual void SetSession(vtkSMSession *);
+  void SetSessionProxyManager(vtkSMSessionProxyManager*);
+
+  // Description:
+  // Convenience method. Internally calls
+  // this->SetSessionProxyManager(session->GetSessionProxyManager());
+  void SetSession(vtkSMSession* session);
 
   // Description:
   // Go to the beginning of the collection.

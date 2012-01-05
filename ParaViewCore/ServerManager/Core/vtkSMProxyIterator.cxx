@@ -15,7 +15,7 @@
 #include "vtkSMProxyIterator.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManagerInternals.h"
 
@@ -42,13 +42,18 @@ vtkSMProxyIterator::~vtkSMProxyIterator()
 {
   delete this->Internals;
 }
+  
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::SetSession(vtkSMSession* session)
 {
-  this->Superclass::SetSession(session);
+  this->SetSessionProxyManager(
+    session? session->GetSessionProxyManager() : NULL);
+}
 
-  // Keep the pointer in cache (prevent search for each step)
-  this->Internals->ProxyManager = this->GetSessionProxyManager();
+//---------------------------------------------------------------------------
+void vtkSMProxyIterator::SetSessionProxyManager(vtkSMSessionProxyManager* pxm)
+{
+  this->Internals->ProxyManager = pxm;
 }
 
 //---------------------------------------------------------------------------
@@ -122,10 +127,10 @@ void vtkSMProxyIterator::Begin()
 //---------------------------------------------------------------------------
 int vtkSMProxyIterator::IsAtEnd()
 {
-  assert("Session should be set" && this->Session);
   vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
 
-  if (this->Internals->GroupIterator == 
+  if (pm == NULL ||
+    this->Internals->GroupIterator == 
       pm->Internals->RegisteredProxyMap.end())
     {
     return 1;
@@ -156,8 +161,8 @@ void vtkSMProxyIterator::Next()
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::NextInternal()
 {
-  assert("Session should be set" && this->Session);
   vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+  assert(pm != NULL);
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -255,8 +260,8 @@ void vtkSMProxyIterator::NextInternal()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetGroup()
 {
-  assert("Session should be set" && this->Session);
   vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+  assert (pm != NULL);
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -269,8 +274,8 @@ const char* vtkSMProxyIterator::GetGroup()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetKey()
 {
-  assert("Session should be set" && this->Session);
   vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+  assert(pm != NULL);
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())
@@ -287,8 +292,8 @@ const char* vtkSMProxyIterator::GetKey()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyIterator::GetProxy()
 {
-  assert("Session should be set" && this->Session);
   vtkSMSessionProxyManager* pm = this->Internals->ProxyManager;
+  assert(pm != NULL);
 
   if (this->Internals->GroupIterator != 
       pm->Internals->RegisteredProxyMap.end())

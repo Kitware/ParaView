@@ -22,18 +22,31 @@
 #define __vtkSMDeserializer_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMSessionObject.h"
+#include "vtkObject.h"
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
+class vtkSMSessionProxyManager;
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializer : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializer : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkSMDeserializer, vtkSMSessionObject);
+  vtkTypeMacro(vtkSMDeserializer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Get/Set the proxy manager on which this deserializer is expected to
+  // operate.
+  vtkSMSessionProxyManager* GetSessionProxyManager();
+  void SetSessionProxyManager(vtkSMSessionProxyManager*);
+
+  // Description:
+  // Provides access to the session. This is same as calling
+  // this->GetSessionProxyManager()->GetSession() (with NULL checks).
+  vtkSMSession* GetSession();
 
 //BTX
 protected:
@@ -52,6 +65,8 @@ protected:
   // simply asks the proxy manager to create a new proxy of the requested type.
   virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
                                   const char* subProxyName = NULL);
+
+  vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
 
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented

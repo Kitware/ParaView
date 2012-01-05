@@ -75,11 +75,8 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
                                            const char* xml_name,
                                            const char* subProxyName)
 {
-  // Check if the proxy requested is a view module.
-  if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
-    {
-    return this->Superclass::CreateProxy( xml_group, xml_name, subProxyName);
-    }
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert (pxm != NULL);
 
   //**************************************************************************
   // This is temporary code until we clean up time-keeper and animation scene
@@ -92,7 +89,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     {
     // If an animation scene already exists, we use that.
     vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-    iter->SetSession(this->Session);
+    iter->SetSessionProxyManager(pxm);
     vtkSMProxy* scene = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
@@ -113,8 +110,6 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
     && strcmp(xml_name, "TimeKeeper") == 0)
     {
-    assert("Session should be valid" && this->Session);
-    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
     vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
@@ -170,8 +165,9 @@ void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  assert("Session should be valid" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert(pxm != NULL);
+
   if (pxm->GetProxyName(group, proxy))
     {
     // Don't re-register a proxy in the same group.
@@ -322,16 +318,17 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 void vtkSMStateLoader::HandleCustomProxyDefinitions(
   vtkPVXMLElement* element)
 {
-  assert("Session should be valid" && this->Session);
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
+  assert(pm != NULL);
   pm->LoadCustomProxyDefinitions(element);
 }
 
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 {
-  assert("Session should be valid" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert(pxm != NULL);
+
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -371,8 +368,8 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
-  assert("Session should be valid" && this->Session);
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert(pxm != NULL);
   
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -452,9 +449,10 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
     return 0;
     }
 
-  if (!this->Session)
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  if (pxm == NULL)
     {
-    vtkErrorMacro("Cannot load state without a session.");
+    vtkErrorMacro("Cannot load state without a ProxyManager");
     return 0;
     }
 
@@ -472,7 +470,6 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
   // often override those that the timekeeper painstakingly computed. Here we
   // explicitly trigger the timekeeper so that the scene re-determines the
   // ranges, unless they are locked of course.
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
   if (timekeeper)
     {
