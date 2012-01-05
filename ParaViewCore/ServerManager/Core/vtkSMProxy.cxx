@@ -2216,11 +2216,9 @@ void vtkSMProxy::ExecuteStream(const vtkClientServerStream& stream,
     {
     this->GetSession()->ExecuteStream(location, stream, ignore_errors);
     }
-  else
-    {
-    vtkErrorMacro("Could not locate session to execute stream on.");
-    }
+  // if no session, nothing to do.
 }
+
 //---------------------------------------------------------------------------
 const vtkClientServerStream& vtkSMProxy::GetLastResult()
 {

@@ -439,7 +439,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
       if (domain)
         {
-        assert("Session should be valid" && proxy->GetSession());
         domain->SetSession(proxy->GetSession());
         if (domain->ReadXMLAttributes(this, domainEl))
           {
