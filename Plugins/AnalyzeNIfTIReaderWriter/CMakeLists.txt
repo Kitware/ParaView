@@ -40,10 +40,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
-# These classes have static methods and no dll export/imports implemented
-# just build them static for now.
-#add_library(vtkNIfTIIO STATIC vtknifti1_io.cxx vtkznzlib.cxx)
-
 ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
   SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx vtkAnalyzeWriter.cxx vtkNIfTIReader.cxx vtkNIfTIWriter.cxx vtknifti1_io.cxx vtkznzlib.cxx
   SERVER_MANAGER_XML readers.xml
