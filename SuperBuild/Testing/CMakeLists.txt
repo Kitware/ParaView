@@ -53,8 +53,6 @@ endif()
 
 set(PV_INSTALL_BINARY ${PV_INSTALL_LOCATION}/bin/paraview${CMAKE_EXECUTABLE_SUFFIX})
 
-
-
 if(PARAVIEW_BUILD_PLUGIN_AcuSolveReader)
   add_test(
     NAME LoadAcuSolveReaderPlugin
@@ -95,4 +93,13 @@ if(PARAVIEW_DATA_ROOT)
       COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
     )
   endif()
+endif()
+
+# On Windows run Uninstall
+if(WIN32)
+  add_test(
+    NAME UninstallParaView 
+    COMMAND ${PV_INSTALL_LOCATION}/Uninstall.exe /S
+    WORKING_DIRECTORY ${PV_INSTALL_LOCATION}
+  )
 endif()
