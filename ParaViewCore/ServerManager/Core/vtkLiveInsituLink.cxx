@@ -23,6 +23,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMMessage.h"
 #include "vtkSMSessionProxyManager.h"
 
 #include <assert.h>
@@ -52,16 +53,13 @@ namespace
 }
 
 vtkStandardNewMacro(vtkLiveInsituLink);
-vtkCxxSetObjectMacro(vtkLiveInsituLink, Controller, vtkMultiProcessController);
-vtkCxxSetObjectMacro(vtkLiveInsituLink, ProxyManager, vtkSMSessionProxyManager);
 //----------------------------------------------------------------------------
 vtkLiveInsituLink::vtkLiveInsituLink():
   Hostname(0),
   InsituPort(0),
   ProcessType(SIMULATION),
-  Controller(0),
+  ProxyId(0),
   InsituXMLState(0),
-  ProxyManager(0),
   URL(0)
 {
   this->SetHostname("localhost");
@@ -71,8 +69,6 @@ vtkLiveInsituLink::vtkLiveInsituLink():
 vtkLiveInsituLink::~vtkLiveInsituLink()
 {
   this->SetHostname(0);
-  this->SetController(0);
-  this->SetProxyManager(0);
   this->SetURL(0);
 
   delete []this->InsituXMLState;
@@ -88,7 +84,7 @@ void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
     return;
     }
 
-  this->SetProxyManager(pxm);
+  this->ProxyManager = pxm;
 
   switch (this->ProcessType)
     {
@@ -114,6 +110,11 @@ void vtkLiveInsituLink::InitializeVisualization()
   int myId = pm->GetPartitionId();
   // int numProcs = pm->GetNumberOfLocalPartitions();
 
+  // save the visualization session reference so that we can communicate back to
+  // the client.
+  this->VisualizationSession =
+    vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
+
   if (myId == 0)
     {
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
@@ -130,6 +131,7 @@ void vtkLiveInsituLink::InitializeVisualization()
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
       this->InsituProcessConnected(controller);
+      controller->Delete();
       }
     else
       {
@@ -165,6 +167,7 @@ void vtkLiveInsituLink::InitializeSimulation()
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
       this->InsituProcessConnected(controller);
+      controller->Delete();
       }
     // nothing to do, no server to connect to.
     }
@@ -182,13 +185,14 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
   if (controller)
     {
     this->InsituProcessConnected(controller);
+    controller->Delete();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* controller)
 {
-  this->SetController(controller);
+  this->Controller = controller;
   switch (this->ProcessType)
     {
   case VISUALIZATION:
@@ -208,6 +212,17 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       // setup RMI callbacks.
       controller->AddRMICallback(&UpdateRMI, this, UPDATE_RMI_TAG);
       controller->AddRMICallback(&PostProcessRMI, this, POSTPROCESS_RMI_TAG);
+
+      if (this->VisualizationSession)
+        {
+        vtkSMMessage message;
+        message.set_global_id(this->ProxyId);
+        message.set_location(vtkPVSession::CLIENT);
+        // overloading ChatMessage for now.
+        message.SetExtension(ChatMessage::author, CONNECTED);
+        message.SetExtension(ChatMessage::txt, this->InsituXMLState);
+        this->VisualizationSession->NotifyAllClients(&message);
+        }
       }
     break;
 
@@ -299,6 +314,8 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
   assert(this->ProcessType == VISUALIZATION);
   // send updated state to simulation, if any.
 
+  // Check if the state changed since the last time we sent it, if so, provide
+  // the updated state to the simulation process.
   int xml_state_size = 0;
   this->Controller->Send(&xml_state_size, 1, 1, 8010);
 }
@@ -307,6 +324,18 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
 void vtkLiveInsituLink::OnSimulationPostProcess(double time)
 {
   assert(this->ProcessType == VISUALIZATION);
+
+  // notify the client that updated data is available.
+  if (this->VisualizationSession)
+    {
+    vtkSMMessage message;
+    message.set_global_id(this->ProxyId);
+    message.set_location(vtkPVSession::CLIENT);
+    // overloading ChatMessage for now.
+    message.SetExtension(ChatMessage::author, NEXT_TIMESTEP_AVAILABLE);
+    message.SetExtension(ChatMessage::txt, "");
+    this->VisualizationSession->NotifyAllClients(&message);
+    }
 }
 
 //----------------------------------------------------------------------------

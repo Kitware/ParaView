@@ -19,12 +19,15 @@
 #ifndef __vtkLiveInsituLink_h
 #define __vtkLiveInsituLink_h
 
-#include "vtkSMObject.h"
+#include "vtkPVSessionBase.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMObject.h"
+#include "vtkWeakPointer.h"
 
 class vtkMultiProcessController;
 class vtkSMSessionProxyManager;
 class vtkPVXMLElement;
+class vtkPVSessionBase;
 
 class VTK_EXPORT vtkLiveInsituLink : public vtkSMObject
 {
@@ -55,6 +58,9 @@ public:
   vtkSetClampMacro(ProcessType, int, VISUALIZATION, SIMULATION);
   vtkGetMacro(ProcessType, int);
 
+  vtkSetMacro(ProxyId, unsigned int);
+  vtkGetMacro(ProxyId, unsigned int);
+
   // Description:
   // Initializes the link.
   void Initialize() { this->Initialize(NULL); }
@@ -68,6 +74,13 @@ public:
   // API to be used from the Visualization side.
   void OnSimulationUpdate(double time);
   void OnSimulationPostProcess(double time);
+
+
+  enum NotificationTags
+    {
+    CONNECTED = 1200,
+    NEXT_TIMESTEP_AVAILABLE = 1201
+    };
 //BTX
 protected:
   vtkLiveInsituLink();
@@ -89,19 +102,18 @@ protected:
   char* Hostname;
   int InsituPort;
   int ProcessType;
-  vtkMultiProcessController* Controller;
+  unsigned int ProxyId;
 
   char* InsituXMLState;
   vtkSmartPointer<vtkPVXMLElement> XMLState;
-
-  void SetController(vtkMultiProcessController*);
+  vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
+  vtkSmartPointer<vtkMultiProcessController> Controller;
 
 private:
   vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
   void operator=(const vtkLiveInsituLink&); // Not implemented
 
-  void SetProxyManager(vtkSMSessionProxyManager*);
-  vtkSMSessionProxyManager* ProxyManager;
+  vtkWeakPointer<vtkSMSessionProxyManager> ProxyManager;
 
   vtkSetStringMacro(URL);
   char* URL;

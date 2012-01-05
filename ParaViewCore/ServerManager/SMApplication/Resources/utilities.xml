@@ -2656,7 +2656,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="coprocessing">
-    <Proxy name="LiveInsituLink" class="vtkLiveInsituLink"
+    <LiveInsituLinkProxy name="LiveInsituLink" class="vtkLiveInsituLink"
       processes="dataserver">
       <Documentation>
         Proxy used to connect to Catalyst CoProcessor for live-data
@@ -2687,7 +2687,7 @@
 
       <Property name="Initialize" command="Initialize" />
 
-    </Proxy>
+    </LiveInsituLinkProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

@@ -35,7 +35,6 @@ set (Module_SRCS
   vtkSMArraySelectionDomain.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
-  vtkSMCatalystSession.cxx
   vtkSMCollaborationManager.cxx
   vtkSMCompositeTreeDomain.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
@@ -66,6 +65,7 @@ set (Module_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
+  vtkSMLiveInsituLinkProxy.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNumberOfComponentsDomain.cxx
   vtkSMNumberOfGroupsDomain.cxx

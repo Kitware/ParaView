@@ -33,11 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqServerResource.h"
-#include "vtkProcessModule.h"
-#include "vtkSMCatalystSession.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPropertyHelper.h"
+
 
 //-----------------------------------------------------------------------------
 pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
@@ -53,22 +54,26 @@ pqCatalystConnectReaction::~pqCatalystConnectReaction()
 //-----------------------------------------------------------------------------
 bool pqCatalystConnectReaction::connect()
 {
-  pqServerResource resource("catalyst:");
-  pqApplicationCore::instance()->getServerManagerModel()->setActiveResource(resource);
+  pqServer* server = pqActiveObjects::instance().activeServer();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMCatalystSession* session = vtkSMCatalystSession::New();
-  session->SetVisualizationSession(
-    pqActiveObjects::instance().activeServer()->session());
+  vtkSMProxy* proxy =
+    pqApplicationCore::instance()->getObjectBuilder()->createProxy(
+      "coprocessing", "LiveInsituLink", server, "coprocessing");
+  vtkSMLiveInsituLinkProxy* adaptor =
+    vtkSMLiveInsituLinkProxy::SafeDownCast(proxy);
+  if (!adaptor)
+    {
+    qCritical("Current VisualizationSession cannot create LiveInsituLink.");
+    return false;
+    }
 
-  session->SetInsituPort(22222);
-  // initialize the session. this will set up the sockets to accept connections
-  // from Catalyst.
-  session->Initialize();
-  
-  vtkIdType sid = pm->RegisterSession(session);
-  session->Delete();
-  (void)sid;
+  vtkSMPropertyHelper(adaptor, "InsituPort").Set(22222);
+  vtkSMPropertyHelper(adaptor, "ProcessType").Set("Visualization");
+  adaptor->UpdateVTKObjects();
+
+  adaptor->InvokeCommand("Initialize");
+
+  server->setMonitorServerNotifications(true);
 
   // FIXME: setup listeners so that when activeServer dies, the associated
   // live-insitu connection is also destroyed.
