@@ -57,7 +57,7 @@
 
 #include <hdf5.h>    // for the HDF data loading engine
 
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro( vtkEnzoReader );
 
@@ -201,7 +201,7 @@ public:
   int                   Index;
   int                   Level;
   int                   ParentId;
-  vtkstd::vector< int > ChildrenIds;
+  std::vector< int > ChildrenIds;
 
   int                   MinParentWiseIds[3];
   int                   MaxParentWiseIds[3];
@@ -217,8 +217,8 @@ public:
   double                MaxBounds[3];
   double                SubdivisionRatio[3];
              
-  vtkstd::string        BlockFileName;
-  vtkstd::string        ParticleFileName;
+  std::string        BlockFileName;
+  std::string        ParticleFileName;
   
   void   Init()
          {
@@ -265,15 +265,15 @@ public:
            this->SubdivisionRatio[2] = 1.0;
          }
          
-  void GetParentWiseIds(  vtkstd::vector< vtkEnzoReaderBlock > & blocks  );
-  void GetLevelBasedIds(  vtkstd::vector< vtkEnzoReaderBlock > & blocks  );
+  void GetParentWiseIds(  std::vector< vtkEnzoReaderBlock > & blocks  );
+  void GetLevelBasedIds(  std::vector< vtkEnzoReaderBlock > & blocks  );
 };
 
 // ----------------------------------------------------------------------------
 // get the bounding (cell) Ids of this block in terms of its parent block's
 // sub-division resolution (indexing is limited to the scope of the parent)
 void vtkEnzoReaderBlock::GetParentWiseIds
-  (  vtkstd::vector< vtkEnzoReaderBlock > & blocks  )
+  (  std::vector< vtkEnzoReaderBlock > & blocks  )
 {
   if ( this->ParentId != 0 )
     {
@@ -408,7 +408,7 @@ void vtkEnzoReaderBlock::GetParentWiseIds
 // all siblings of this block --- those sibling blocks beyond the scope of the 
 // parent of this block)
 void vtkEnzoReaderBlock::GetLevelBasedIds
-  (  vtkstd::vector< vtkEnzoReaderBlock > & blocks  )
+  (  std::vector< vtkEnzoReaderBlock > & blocks  )
 {
   // note that this function is invoked from the root in a top-down manner
   // and the parent-wise Ids have been determined in advance
@@ -503,14 +503,14 @@ public:
   vtkDataArray  * DataArray;
   vtkEnzoReader * TheReader;
 
-  vtkstd::string                       DirectoryName;
-  vtkstd::string                       MajorFileName;
-  vtkstd::string                       BoundaryFileName;
-  vtkstd::string                       HierarchyFileName;
-  vtkstd::vector< vtkstd::string >     BlockAttributeNames;
-  vtkstd::vector< vtkstd::string >     ParticleAttributeNames;
-  vtkstd::vector< vtkstd::string >     TracerParticleAttributeNames;
-  vtkstd::vector< vtkEnzoReaderBlock > Blocks;
+  std::string                       DirectoryName;
+  std::string                       MajorFileName;
+  std::string                       BoundaryFileName;
+  std::string                       HierarchyFileName;
+  std::vector< std::string >     BlockAttributeNames;
+  std::vector< std::string >     ParticleAttributeNames;
+  std::vector< std::string >     TracerParticleAttributeNames;
+  std::vector< vtkEnzoReaderBlock > Blocks;
  
   void   Init()
          {
@@ -579,7 +579,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
 
   int     levlId = 0;
   int     parent = 0;
-  vtkstd::string   theStr = "";
+  std::string   theStr = "";
   
   while ( stream )
     {
@@ -695,7 +695,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
         }
 
       // obtain the block file name (szName includes the full path)
-      vtkstd::string    szName;
+      std::string    szName;
       while ( theStr != "BaryonFileName" )
         {
         stream >> theStr;
@@ -797,7 +797,7 @@ void vtkEnzoReaderInternal::ReadGeneralParameters()
     return;
     }
 
-  vtkstd::string tmpStr( "" );
+  std::string tmpStr( "" );
   while ( stream )
     {
     stream >> tmpStr;
@@ -885,7 +885,7 @@ void vtkEnzoReaderInternal::GetAttributeNames()
 
 
   // open the block file
-  vtkstd::string   blckFile = this->Blocks[ blkIndex ].BlockFileName;
+  std::string   blckFile = this->Blocks[ blkIndex ].BlockFileName;
   hid_t   fileIndx = H5Fopen( blckFile.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   
   if ( fileIndx < 0 )
@@ -998,8 +998,8 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
   polyData = NULL;
   
   // block attributes to be removed and / or exported
-  vtkstd::vector < vtkstd::string > toRemove;
-  vtkstd::vector < vtkstd::string > toExport;
+  std::vector < std::string > toRemove;
+  std::vector < std::string > toExport;
   toRemove.clear();
   toExport.clear();
   
@@ -1039,7 +1039,7 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
   // remove block attributes
   for ( i = 0; i < nRemoves; i ++ )
     {
-    for ( vtkstd::vector < vtkstd::string >::iterator
+    for ( std::vector < std::string >::iterator
           stringIt  = this->BlockAttributeNames.begin();
           stringIt != this->BlockAttributeNames.end();
           stringIt ++
@@ -1056,7 +1056,7 @@ void vtkEnzoReaderInternal::CheckAttributeNames()
   // export attributes from blocks to particles
   for ( i = 0; i < nExports; i ++ )
     {
-    for ( vtkstd::vector < vtkstd::string >::iterator
+    for ( std::vector < std::string >::iterator
           stringIt  = this->BlockAttributeNames.begin();
           stringIt != this->BlockAttributeNames.end();
           stringIt ++
@@ -1154,9 +1154,9 @@ void vtkEnzoReader::SetFileName( const char * fileName )
        && ( ( this->FileName == NULL ) || strcmp( fileName, this->FileName ) )
      )
     {
-    vtkstd::string  tempName( fileName );
-    vtkstd::string  bExtName( ".boundary" );
-    vtkstd::string  hExtName( ".hierarchy" );
+    std::string  tempName( fileName );
+    std::string  bExtName( ".boundary" );
+    std::string  hExtName( ".hierarchy" );
     
     if (  tempName.length() > hExtName.length() &&
           tempName.substr( tempName.length() - hExtName.length() )
@@ -1946,7 +1946,7 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   
   
   // get the particle file name
-  vtkstd::string particle = 
+  std::string particle =
                           this->Internal->Blocks[ blockIdx ].ParticleFileName;
   if ( particle == "" )
     {
@@ -2175,7 +2175,7 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   // currently only the HDF5 file format is supported
   
   
-  vtkstd::string blckFile = this->Internal->Blocks[ blockIdx ].BlockFileName;
+  std::string blckFile = this->Internal->Blocks[ blockIdx ].BlockFileName;
 
   hid_t  fileIndx = H5Fopen( blckFile.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   if ( fileIndx < 0 )

@@ -45,8 +45,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkView.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/map>
+#include <vector>
+#include <map>
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
@@ -510,8 +510,8 @@ bool vtkSMSelectionHelper::MergeSelection(
     {
     // before totally giving up, check to see if the input selection can be
     // converted to the same type as the output.
-    vtkstd::string inputType = input->GetXMLName();
-    vtkstd::string outputType = output->GetXMLName();
+    std::string inputType = input->GetXMLName();
+    std::string outputType = output->GetXMLName();
 
     if (
       (inputType == "GlobalIDSelectionSource" &&
@@ -550,7 +550,7 @@ bool vtkSMSelectionHelper::MergeSelection(
     vtkSMPropertyHelper outputIDs(output, "IDs");
     vtkSMPropertyHelper inputIDs(input, "IDs");
 
-    vtkstd::vector<vtkIdType> ids;
+    std::vector<vtkIdType> ids;
     unsigned int cc;
     unsigned int count = inputIDs.GetNumberOfElements();
     for (cc=0; cc < count; cc++)
@@ -572,7 +572,7 @@ bool vtkSMSelectionHelper::MergeSelection(
     vtkSMPropertyHelper outputIDs(output, "Blocks");
     vtkSMPropertyHelper inputIDs(input, "Blocks");
 
-    vtkstd::vector<vtkIdType> ids;
+    std::vector<vtkIdType> ids;
     unsigned int cc;
     unsigned int count = inputIDs.GetNumberOfElements();
     for (cc=0; cc < count; cc++)
@@ -598,7 +598,7 @@ namespace
   // Splits \c selection into a collection of selections based on the
   // SOURCE_ID().
   void vtkSplitSelection(vtkSelection* selection,
-    vtkstd::map<int, vtkSmartPointer<vtkSelection> >& map_of_selections)
+    std::map<int, vtkSmartPointer<vtkSelection> >& map_of_selections)
     {
     for (unsigned int cc=0; cc < selection->GetNumberOfNodes(); cc++)
       {
@@ -655,10 +655,10 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
   // This relies on SOURCE_ID() defined on the selection nodes to locate the
   // representation proxy for the representation that was selected.
 
-  vtkstd::map<int, vtkSmartPointer<vtkSelection> > selections;
+  std::map<int, vtkSmartPointer<vtkSelection> > selections;
   vtkSplitSelection(selection, selections);
 
-  vtkstd::map<int, vtkSmartPointer<vtkSelection> >::iterator iter;
+  std::map<int, vtkSmartPointer<vtkSelection> >::iterator iter;
   for (iter = selections.begin(); iter != selections.end(); ++iter)
     {
     vtkSMProxy* reprProxy = vtkLocateRepresentation(view, iter->first);

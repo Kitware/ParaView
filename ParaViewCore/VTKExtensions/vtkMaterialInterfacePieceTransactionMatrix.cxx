@@ -16,7 +16,7 @@
 #include "vtkCommunicator.h"
 #include "vtksys/ios/iostream"
 #include <cassert>
-using vtkstd::vector;
+using std::vector;
 
 namespace
 {

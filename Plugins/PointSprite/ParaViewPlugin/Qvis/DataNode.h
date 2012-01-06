@@ -85,36 +85,36 @@ class DataNode
 {
 public:
     // Internal node constructor
-    DataNode(const vtkstd::string &name);
+    DataNode(const std::string &name);
 
     // Single element constructors
-    DataNode(const vtkstd::string &name, char val);
-    DataNode(const vtkstd::string &name, unsigned char val);
-    DataNode(const vtkstd::string &name, int val);
-    DataNode(const vtkstd::string &name, long val);
-    DataNode(const vtkstd::string &name, float val);
-    DataNode(const vtkstd::string &name, double val);
-    DataNode(const vtkstd::string &name, const vtkstd::string &val);
-    DataNode(const vtkstd::string &name, bool val);
+    DataNode(const std::string &name, char val);
+    DataNode(const std::string &name, unsigned char val);
+    DataNode(const std::string &name, int val);
+    DataNode(const std::string &name, long val);
+    DataNode(const std::string &name, float val);
+    DataNode(const std::string &name, double val);
+    DataNode(const std::string &name, const std::string &val);
+    DataNode(const std::string &name, bool val);
 
     // Array constructors
-    DataNode(const vtkstd::string &name, const char *vals, int len);
-    DataNode(const vtkstd::string &name, const unsigned char *vals, int len);
-    DataNode(const vtkstd::string &name, const int *vals, int len);
-    DataNode(const vtkstd::string &name, const long *vals, int len);
-    DataNode(const vtkstd::string &name, const float *vals, int len);
-    DataNode(const vtkstd::string &name, const double *val, int len);
-    DataNode(const vtkstd::string &name, const vtkstd::string *vals, int len);
-    DataNode(const vtkstd::string &name, const bool *vals, int len);
+    DataNode(const std::string &name, const char *vals, int len);
+    DataNode(const std::string &name, const unsigned char *vals, int len);
+    DataNode(const std::string &name, const int *vals, int len);
+    DataNode(const std::string &name, const long *vals, int len);
+    DataNode(const std::string &name, const float *vals, int len);
+    DataNode(const std::string &name, const double *val, int len);
+    DataNode(const std::string &name, const std::string *vals, int len);
+    DataNode(const std::string &name, const bool *vals, int len);
 
     // Vector constructors
-    DataNode(const vtkstd::string &name, const charVector &vec);
-    DataNode(const vtkstd::string &name, const unsignedCharVector &vec);
-    DataNode(const vtkstd::string &name, const intVector &vec);
-    DataNode(const vtkstd::string &name, const longVector &vec);
-    DataNode(const vtkstd::string &name, const floatVector &vec);
-    DataNode(const vtkstd::string &name, const doubleVector &vec);
-    DataNode(const vtkstd::string &name, const stringVector &vec);
+    DataNode(const std::string &name, const charVector &vec);
+    DataNode(const std::string &name, const unsignedCharVector &vec);
+    DataNode(const std::string &name, const intVector &vec);
+    DataNode(const std::string &name, const longVector &vec);
+    DataNode(const std::string &name, const floatVector &vec);
+    DataNode(const std::string &name, const doubleVector &vec);
+    DataNode(const std::string &name, const stringVector &vec);
 
     ~DataNode();
 
@@ -125,7 +125,7 @@ public:
     long               AsLong() const;
     float              AsFloat() const;
     double             AsDouble() const;
-    const vtkstd::string &AsString() const;
+    const std::string &AsString() const;
     bool               AsBool() const;
 
     const char          *AsCharArray() const;
@@ -134,7 +134,7 @@ public:
     const long          *AsLongArray() const;
     const float         *AsFloatArray() const;
     const double        *AsDoubleArray() const;
-    const vtkstd::string   *AsStringArray() const;
+    const std::string   *AsStringArray() const;
     const bool          *AsBoolArray() const;
 
     const charVector          &AsCharVector() const;
@@ -151,7 +151,7 @@ public:
     void SetLong(long val);
     void SetFloat(float val);
     void SetDouble(double val);
-    void SetString(const vtkstd::string &val);
+    void SetString(const std::string &val);
     void SetBool(bool val);
     void SetCharArray(const char *vals, int len);
     void SetUnsignedCharArray(const unsigned char *vals, int len);
@@ -159,7 +159,7 @@ public:
     void SetLongArray(const long *vals, int len);
     void SetFloatArray(const float *vals, int len);
     void SetDoubleArray(const double *vals, int len);
-    void SetStringArray(const vtkstd::string *vals, int len);
+    void SetStringArray(const std::string *vals, int len);
     void SetBoolArray(const bool *vals, int len);
     void SetCharVector(const charVector &vec);
     void SetUnsignedCharVector(const unsignedCharVector &vec);
@@ -170,14 +170,14 @@ public:
     void SetStringVector(const stringVector &vec);
 
     // Node operations
-    DataNode *GetNode(const vtkstd::string &key, DataNode *parentNode = 0);
+    DataNode *GetNode(const std::string &key, DataNode *parentNode = 0);
     void AddNode(DataNode *node);
     void RemoveNode(DataNode *node, bool deleteNode = true);
-    void RemoveNode(const vtkstd::string &key, bool deleteNode = true);
+    void RemoveNode(const std::string &key, bool deleteNode = true);
 
     // Functions to return private members.
-    const vtkstd::string &GetKey() const;
-    void SetKey(const vtkstd::string &);
+    const std::string &GetKey() const;
+    void SetKey(const std::string &);
     NodeTypeEnum GetNodeType() const;
     int GetLength() const;
     int GetNumChildren() const;
@@ -186,13 +186,13 @@ public:
 private:
     void FreeData();
 
-    vtkstd::string   Key;
+    std::string   Key;
     NodeTypeEnum  NodeType;
     int           Length;
     void          *Data;
 
     // Static members
-    static vtkstd::string         bogusString;
+    static std::string         bogusString;
     static charVector          bogusCharVector;
     static unsignedCharVector  bogusUnsignedCharVector;
     static intVector           bogusIntVector;

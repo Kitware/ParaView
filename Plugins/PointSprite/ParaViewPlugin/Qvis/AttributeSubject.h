@@ -76,9 +76,9 @@ public:
     AttributeSubject(const char *);
     virtual ~AttributeSubject();
     virtual void SelectAll() = 0;
-    virtual const vtkstd::string TypeName() const;
+    virtual const std::string TypeName() const;
     virtual void Notify();
-    virtual AttributeSubject *CreateCompatible(const vtkstd::string &) const;
+    virtual AttributeSubject *CreateCompatible(const std::string &) const;
     virtual AttributeSubject *NewInstance(bool /*copy*/) const { return 0; };
 
     virtual bool VarChangeRequiresReset(void) { return false; };

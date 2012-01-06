@@ -446,7 +446,7 @@ bool PrismPanel::pqUI::LoadConversions(QString &fileName)
     if(in.gcount())
     {
 
-        vtkstd::string line;
+        std::string line;
         line.assign(buffer,in.gcount()-1);
         if(line.find("<PRISM_Conversions>")==line.npos)
         {
@@ -488,7 +488,7 @@ bool PrismPanel::pqUI::LoadConversions(QString &fileName)
        {
            SESAMEConversionsForTable tableData;
 
-           vtkstd::string data= tableElement->GetAttribute("Id");
+           std::string data= tableElement->GetAttribute("Id");
            int intValue;
            sscanf(data.c_str(),"%d",&intValue);
            tableData.TableId=intValue;
@@ -496,7 +496,7 @@ bool PrismPanel::pqUI::LoadConversions(QString &fileName)
            for(int v=0;v<tableElement->GetNumberOfNestedElements();v++)
            {
                vtkXMLDataElement* variableElement = tableElement->GetNestedElement(v);
-               vtkstd::string variableString= variableElement->GetName();
+               std::string variableString= variableElement->GetName();
                if(variableString=="Variable")
                {
                    SESAMEConversionVariable variableData;

@@ -914,7 +914,7 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
     }
   else if (element->GetName() && strcmp(element->GetName(), "Property") == 0)
     {
-    vtkstd::string newtext;
+    std::string newtext;
     int value = 0;
     vtkPVXMLElement* valueElement = NULL;
     vtkPVXMLElement* domainElement = NULL;

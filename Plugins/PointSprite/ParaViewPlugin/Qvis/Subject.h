@@ -38,7 +38,7 @@
 #ifndef SUBJECT_H
 #define SUBJECT_H
 #include <pqComponentsExport.h>
-#include <vtkstd/vector>
+#include <vector>
 
 // Forward declaration
 class SimpleObserver;
@@ -71,7 +71,7 @@ public:
 protected:
     Subject();
 private:
-    vtkstd::vector<SimpleObserver *> observers;
+    std::vector<SimpleObserver *> observers;
 };
 
 #endif

@@ -250,7 +250,7 @@ bool vtkSquirtCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
 //-----------------------------------------------------------------------------
 const char *vtkSquirtCompressor::SaveConfiguration()
 {
-  vtkstd::ostringstream oss;
+  std::ostringstream oss;
   oss
     << vtkImageCompressor::SaveConfiguration()
     << " "
@@ -267,7 +267,7 @@ const char *vtkSquirtCompressor::RestoreConfiguration(const char *stream)
   stream=vtkImageCompressor::RestoreConfiguration(stream);
   if (stream)
     {
-    vtkstd::istringstream iss(stream);
+    std::istringstream iss(stream);
     iss >> this->SquirtLevel;
     return stream+iss.tellg();
     }

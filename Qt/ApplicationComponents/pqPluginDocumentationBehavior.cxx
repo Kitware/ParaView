@@ -105,7 +105,7 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
     return;
     }
 
-  vtkstd::vector<vtkstd::string> resources;
+  std::vector<std::string> resources;
   plugin->GetBinaryResources(resources);
 
   QHelpEngine* engine = qobject_cast<QHelpEngine*>(this->parent());
@@ -113,7 +113,7 @@ void pqPluginDocumentationBehavior::updatePlugin(vtkPVPlugin* plugin)
 
   for (size_t cc=0; cc < resources.size(); cc++)
     {
-    const vtkstd::string& str = resources[cc];
+    const std::string& str = resources[cc];
     unsigned char* decoded_stream = new unsigned char[str.size()];
     unsigned long length = vtksysBase64_Decode(
       reinterpret_cast<const unsigned char*>(str.c_str()),

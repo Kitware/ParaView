@@ -76,7 +76,7 @@ Subject::~Subject()
     // If there are still observers around it means that this
     // object is being destroyed first. Tell the remaining observers
     // that they should not try to detach.
-    vtkstd::vector<SimpleObserver *>::iterator pos;
+    std::vector<SimpleObserver *>::iterator pos;
     for(pos = observers.begin(); pos != observers.end(); ++pos)
     {
         (*pos)->SubjectRemoved(this);
@@ -128,7 +128,7 @@ Subject::Attach(SimpleObserver *o)
 void
 Subject::Detach(SimpleObserver *o)
 {
-    vtkstd::vector<SimpleObserver *>::iterator pos;
+    std::vector<SimpleObserver *>::iterator pos;
 
     // Erase all references to observer o.
     for(pos = observers.begin(); pos != observers.end(); )
@@ -162,7 +162,7 @@ Subject::Detach(SimpleObserver *o)
 void
 Subject::Notify()
 {
-    vtkstd::vector<SimpleObserver *>::iterator pos;
+    std::vector<SimpleObserver *>::iterator pos;
 
     for(pos = observers.begin(); pos != observers.end(); ++pos)
     {

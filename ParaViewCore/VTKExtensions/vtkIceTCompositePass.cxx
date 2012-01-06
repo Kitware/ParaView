@@ -255,7 +255,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
       vtkIdType numprocs = orderedProcessIds->GetNumberOfTuples();
       IceTInt *tmparray = new IceTInt[numprocs];
       const int *opiarray = orderedProcessIds->GetPointer(0);
-      vtkstd::copy(opiarray, opiarray+numprocs, tmparray);
+      std::copy(opiarray, opiarray+numprocs, tmparray);
       icetCompositeOrder(tmparray);
       delete[] tmparray;
       }

@@ -30,23 +30,23 @@
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 
 class vtkSMSILModel::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkSMSILModel::CheckState> CheckStatesType;
+  typedef std::vector<vtkSMSILModel::CheckState> CheckStatesType;
   CheckStatesType CheckStates;
 
-  typedef vtkstd::map<vtkstd::string, vtkIdType> VertexNameMapType;
+  typedef std::map<std::string, vtkIdType> VertexNameMapType;
   VertexNameMapType VertexNameMap;
 
   // Returns the vertex ids for all leaf nodes in the subtree identified by
   // vertexid.
   void CollectLeaves(vtkGraph* sil, vtkIdType vertexid,
-    vtkstd::set<vtkIdType>& list,
+    std::set<vtkIdType>& list,
     bool traverse_cross_edges)
     {
     vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
@@ -438,7 +438,7 @@ void vtkSMSILModel::UpdatePropertyValue(vtkSMStringVectorProperty* svp)
   // TODO: eventually, we may add support to specify the subtree using the
   // SILDomain. For now, I am just going to get the "true leaves".
 
-  vtkstd::set<vtkIdType> leaf_ids;
+  std::set<vtkIdType> leaf_ids;
   this->Internals->CollectLeaves(
     this->SIL, 0,leaf_ids, /*traverse_cross_edges=*/ true);
 
@@ -446,7 +446,7 @@ void vtkSMSILModel::UpdatePropertyValue(vtkSMStringVectorProperty* svp)
   const char * const check_states[] = { "0", "1", "2" };
   int cc=0;
   // Now get the check states (and names) for all these leaf_ids.
-  vtkstd::set<vtkIdType>::iterator iter;
+  std::set<vtkIdType>::iterator iter;
   for (iter = leaf_ids.begin(); iter != leaf_ids.end(); ++iter, ++cc)
     {
     values[2*cc] = this->GetName(*iter);
@@ -520,7 +520,7 @@ vtkIdType vtkSMSILModel::FindVertex(const char* name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSILModel::GetLeaves(vtkstd::set<vtkIdType>& leaves,
+void vtkSMSILModel::GetLeaves(std::set<vtkIdType>& leaves,
   vtkIdType root, bool traverse_cross_edges)
 {
   this->Internals->CollectLeaves(

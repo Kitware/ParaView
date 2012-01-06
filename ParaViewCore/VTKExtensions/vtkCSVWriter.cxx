@@ -28,7 +28,7 @@
 #include "vtkTable.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkCSVWriter);
@@ -244,7 +244,7 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
     return;
     }
 
-  vtkstd::vector<vtkSmartPointer<vtkArrayIterator> > columnsIters;
+  std::vector<vtkSmartPointer<vtkArrayIterator> > columnsIters;
 
   int cc;
   int numArrays = dsa->GetNumberOfArrays();
@@ -278,7 +278,7 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
   for (vtkIdType index=0; index < numRows; index++)
     {
     first = true;
-    vtkstd::vector<vtkSmartPointer<vtkArrayIterator> >::iterator iter;
+    std::vector<vtkSmartPointer<vtkArrayIterator> >::iterator iter;
     for (iter = columnsIters.begin(); iter != columnsIters.end(); ++iter)
       {
       switch ((*iter)->GetDataType())

@@ -32,14 +32,14 @@
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/set>
+#include <set>
 #include "vtkNew.h"
 
 //*****************************************************************************
 class vtkSMUndoStack::vtkInternal
 {
 public:
-  typedef  vtkstd::set<vtkSmartPointer<vtkSMSession> >   SessionSetType;
+  typedef  std::set<vtkSmartPointer<vtkSMSession> >   SessionSetType;
   SessionSetType  Sessions;
   vtkNew<vtkSMProxyLocator>         UndoSetProxyLocator;
   vtkNew<vtkSMDeserializerProtobuf> UndoSetProxyDeserializer;

@@ -78,12 +78,12 @@ VisItException::VisItException()
 //
 // ****************************************************************************
 
-VisItException::VisItException(const vtkstd::string &m)
+VisItException::VisItException(const std::string &m)
 {
     filename = "Unknown";
-    vtkstd::string mtmp = vtkstd::string(m,0,16);
-    if (mtmp.find(':') == vtkstd::string::npos)
-        msg = /*vtkstd::string(Init::GetComponentName())*/ + ": " + m;
+    std::string mtmp = std::string(m,0,16);
+    if (mtmp.find(':') == std::string::npos)
+        msg = /*std::string(Init::GetComponentName())*/ + ": " + m;
     else
     {
         if (mtmp.find("avtprep:") == 0 ||
@@ -95,7 +95,7 @@ VisItException::VisItException(const vtkstd::string &m)
       mtmp.find("viewer:") == 0)
             msg = m;
         else
-            msg = /*vtkstd::string(Init::GetComponentName())*/ + ": " + m;
+            msg = /*std::string(Init::GetComponentName())*/ + ": " + m;
     }
     type     = "VisItException";
     line     = -1;

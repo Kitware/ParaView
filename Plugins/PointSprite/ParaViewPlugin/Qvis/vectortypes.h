@@ -37,17 +37,17 @@
 
 #ifndef VECTOR_TYPES_H
 #define VECTOR_TYPES_H
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 // Some vector typedefs.
-typedef vtkstd::vector<bool>             boolVector;
-typedef vtkstd::vector<char>             charVector;
-typedef vtkstd::vector<unsigned char>    unsignedCharVector;
-typedef vtkstd::vector<int>              intVector;
-typedef vtkstd::vector<long>             longVector;
-typedef vtkstd::vector<float>            floatVector;
-typedef vtkstd::vector<double>           doubleVector;
-typedef vtkstd::vector<vtkstd::string>      stringVector;
+typedef std::vector<bool>             boolVector;
+typedef std::vector<char>             charVector;
+typedef std::vector<unsigned char>    unsignedCharVector;
+typedef std::vector<int>              intVector;
+typedef std::vector<long>             longVector;
+typedef std::vector<float>            floatVector;
+typedef std::vector<double>           doubleVector;
+typedef std::vector<std::string>      stringVector;
 
 #endif

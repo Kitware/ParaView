@@ -52,7 +52,7 @@
 #include "vtkVRUITrackerState.h"
 #include <QDateTime>
 #include <QDebug>
-#include <vtkstd/vector>
+#include <vector>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -686,7 +686,7 @@ void vtkVRUIConnection::GetNextPacket()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRUIConnection::NewAnalogValue(vtkstd::vector<float> *data)
+void vtkVRUIConnection::NewAnalogValue(std::vector<float> *data)
 {
   vtkVREventData temp;
   temp.connId = this->Address;
@@ -837,7 +837,7 @@ void vtkVRUIConnection::NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> dat
 // ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueButtonData()
 {
-  vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
+  std::vector<bool> *buttons=this->Internals->State->GetButtonStates();
   for (unsigned int i = 0; i < ( *buttons ).size(); ++i)
     {
     NewButtonValue( ( *buttons )[i], i );
@@ -847,14 +847,14 @@ void vtkVRUIConnection::GetAndEnqueueButtonData()
 // ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueAnalogData()
 {
-  vtkstd::vector<float> *analog=this->Internals->State->GetValuatorStates();
+  std::vector<float> *analog=this->Internals->State->GetValuatorStates();
   NewAnalogValue( analog );
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRUIConnection::GetAndEnqueueTrackerData()
 {
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
+  std::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
   for (unsigned int i = 0; i < ( *trackers ).size(); ++i)

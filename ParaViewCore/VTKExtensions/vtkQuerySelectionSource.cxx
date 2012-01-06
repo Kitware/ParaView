@@ -23,7 +23,7 @@
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 
@@ -53,10 +53,10 @@ class vtkQuerySelectionSource::vtkInternals
     stream << " ";
     }
 public:
-  typedef vtkstd::vector<vtkIdType> IdTypeVector;
+  typedef std::vector<vtkIdType> IdTypeVector;
   IdTypeVector IdTypeValues;
 
-  typedef vtkstd::vector<double> DoubleVector;
+  typedef std::vector<double> DoubleVector;
   DoubleVector DoubleValues;
   void PrintValues(ostream& stream, int num_comps)
     {

@@ -22,23 +22,23 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyLocator.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 class vtkSMProxyListDomainInternals
 {
 public:
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxy> > VectorOfProxies;
+  typedef std::vector<vtkSmartPointer<vtkSMProxy> > VectorOfProxies;
   VectorOfProxies ProxyList;
 
   struct ProxyInfo
     {
-    vtkstd::string GroupName;
-    vtkstd::string ProxyName;
+    std::string GroupName;
+    std::string ProxyName;
     };
 
-  typedef vtkstd::vector<ProxyInfo> VectorOfProxyInfo;
+  typedef std::vector<ProxyInfo> VectorOfProxyInfo;
   VectorOfProxyInfo ProxyTypeList;
 };
 

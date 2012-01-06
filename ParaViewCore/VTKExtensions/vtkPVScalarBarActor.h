@@ -36,7 +36,7 @@
 #include "vtkScalarBarActor.h"
 
 #include "vtkSmartPointer.h" // For ivars
-#include <vtkstd/vector>     // For ivars
+#include <vector>     // For ivars
 
 class VTK_EXPORT vtkPVScalarBarActor : public vtkScalarBarActor
 {
@@ -82,8 +82,8 @@ protected:
   // Description:
   // These replace the TextMappers and TextActors fields because they are a
   // lot easier to work with.
-  vtkstd::vector<vtkSmartPointer<vtkTextMapper> > LabelMappers;
-  vtkstd::vector<vtkSmartPointer<vtkActor2D> >    LabelActors;
+  std::vector<vtkSmartPointer<vtkTextMapper> > LabelMappers;
+  std::vector<vtkSmartPointer<vtkActor2D> >    LabelActors;
 //ETX
 
   // Description:
@@ -117,10 +117,10 @@ protected:
   // Given a data range, finds locations for tick marks that will have
   // "friendly" labels (that is, can be represented with less units of
   // precision).
-  virtual vtkstd::vector<double> LinearTickMarks(const double range[2],
+  virtual std::vector<double> LinearTickMarks(const double range[2],
                                                  int maxTicks,
                                                  bool intOnly=false);
-  virtual vtkstd::vector<double> LogTickMarks(const double range[2],
+  virtual std::vector<double> LogTickMarks(const double range[2],
                                               int maxTicks);
 //ETX
 

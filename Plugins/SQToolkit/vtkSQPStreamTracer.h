@@ -27,7 +27,7 @@
 #include "vtkSQStreamTracer.h"
 
 #include "vtkSmartPointer.h" // This is a leaf node. No need to
-#include <vtkstd/vector>     // use PIMPL to avoid compile time penalty.
+#include <vector>     // use PIMPL to avoid compile time penalty.
 
 class vtkInterpolatedVelocityField;
 class vtkMultiProcessController;
@@ -80,7 +80,7 @@ protected:
   int EmptyData;
 
 //BTX
-  typedef vtkstd::vector< vtkSmartPointer<vtkPolyData> > TmpOutputsType;
+  typedef std::vector< vtkSmartPointer<vtkPolyData> > TmpOutputsType;
 //ETX
 
   TmpOutputsType TmpOutputs;

@@ -509,7 +509,7 @@ bool vtkZlibImageCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
 //-----------------------------------------------------------------------------
 const char *vtkZlibImageCompressor::SaveConfiguration()
 {
-  vtkstd::ostringstream oss;
+  std::ostringstream oss;
   oss
     << vtkImageCompressor::SaveConfiguration()
     << " "
@@ -530,7 +530,7 @@ const char *vtkZlibImageCompressor::RestoreConfiguration(const char *stream)
   stream=vtkImageCompressor::RestoreConfiguration(stream);
   if (stream)
     {
-    vtkstd::istringstream iss(stream);
+    std::istringstream iss(stream);
     int colorSpace;
     int stripAlpha;
     iss

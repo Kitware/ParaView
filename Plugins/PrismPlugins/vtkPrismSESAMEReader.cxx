@@ -13,9 +13,9 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkRectilinearGrid.h>
-#include <vtkstd/vector>
-#include <vtkstd/string>
-#include <vtkstd/algorithm>
+#include <vector>
+#include <string>
+#include <algorithm>
 #include <vtksys/ios/sstream>
 #include <vtkStringArray.h>
 #include <vtkSmartPointer.h>
@@ -31,15 +31,15 @@ static const char* TableLineFormat = "%2i%6i%6i";
 class vtkPrismSESAMEReader::MyInternal
 {
 public:
-  vtkstd::string FileName;
+  std::string FileName;
   FILE* File;
-  vtkstd::vector<int> TableIds;
-  vtkstd::vector<long> TableLocations;
+  std::vector<int> TableIds;
+  std::vector<long> TableLocations;
   vtkIdType NumberTableVariables;
   vtkIdType TableId;
   bool ReadTable;
-  vtkstd::vector<vtkstd::string> TableArrays;
-  vtkstd::vector<int> TableArrayStatus;
+  std::vector<std::string> TableArrays;
+  std::vector<int> TableArrayStatus;
   vtkIntArray* TableIdsArray;
 
   vtkSmartPointer<vtkRectilinearGridGeometryFilter> RectGridGeometry;
@@ -54,8 +54,8 @@ public:
 
   SESAMEFORMAT FileFormat;
 
-  vtkstd::string TableXAxisName;
-  vtkstd::string TableYAxisName;
+  std::string TableXAxisName;
+  std::string TableYAxisName;
   bool readTableHeader(char* buffer,int *tableId)
     {
     int dummy;
@@ -71,15 +71,15 @@ public:
       }
     else
       {
-      vtkstd::string header=buffer;
-      vtkstd::transform(header.begin(),header.end(),header.begin(),tolower);
-      vtkstd::string::size_type record_pos=header.find("record");
-      vtkstd::string::size_type type_pos=header.find("type");
-      vtkstd::string::size_type index_pos=header.find("index");
-      vtkstd::string::size_type matid_pos=header.find("matid");
+      std::string header=buffer;
+      std::transform(header.begin(),header.end(),header.begin(),tolower);
+      std::string::size_type record_pos=header.find("record");
+      std::string::size_type type_pos=header.find("type");
+      std::string::size_type index_pos=header.find("index");
+      std::string::size_type matid_pos=header.find("matid");
 
 
-      if(record_pos!=vtkstd::string::npos && type_pos!=vtkstd::string::npos)
+      if(record_pos!=std::string::npos && type_pos!=std::string::npos)
         {
         char buffer2[SESAME_NUM_CHARS];
         if(sscanf(buffer, "%s%s%s%d%s", buffer2,buffer2,buffer2,&table,buffer2 ) == 5)
@@ -94,7 +94,7 @@ public:
           return 0;
           }
         }
-      else if(index_pos!=vtkstd::string::npos && matid_pos!=vtkstd::string::npos)
+      else if(index_pos!=std::string::npos && matid_pos!=std::string::npos)
         {
         *tableId=-1;
         return 1;
@@ -130,15 +130,15 @@ public:
           }
         else
           {
-          vtkstd::string header=buffer;
-          vtkstd::transform(header.begin(),header.end(),header.begin(),tolower);
-          vtkstd::string::size_type record_pos=header.find("record");
-          vtkstd::string::size_type type_pos=header.find("type");
-          vtkstd::string::size_type index_pos=header.find("index");
-          vtkstd::string::size_type matid_pos=header.find("matid");
+          std::string header=buffer;
+          std::transform(header.begin(),header.end(),header.begin(),tolower);
+          std::string::size_type record_pos=header.find("record");
+          std::string::size_type type_pos=header.find("type");
+          std::string::size_type index_pos=header.find("index");
+          std::string::size_type matid_pos=header.find("matid");
 
 
-          if(record_pos!=vtkstd::string::npos && type_pos!=vtkstd::string::npos)
+          if(record_pos!=std::string::npos && type_pos!=std::string::npos)
             {
             char buffer2[SESAME_NUM_CHARS];
             if(sscanf(buffer, "%s%d%s", buffer2,&table,buffer2 ) == 3)
@@ -153,7 +153,7 @@ public:
               return 0;
               }
             }
-          else if(index_pos!=vtkstd::string::npos && matid_pos!=vtkstd::string::npos)
+          else if(index_pos!=std::string::npos && matid_pos!=std::string::npos)
             {
             *tableId=-1;
             return 1;
@@ -683,11 +683,11 @@ void vtkPrismSESAMEReader::ExecuteInformation()
       }
       else
       {
-        vtkstd::stringstream ss;
-        vtkstd::string varID;
+        std::stringstream ss;
+        std::string varID;
         ss<<j+1;
         ss>>varID;
-        vtkstd::string varName="Variable ";
+        std::string varName="Variable ";
         varName.append(varID);
         this->Internal->TableArrays.push_back(varName);
         this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
@@ -786,11 +786,11 @@ else if((this->Internal->TableId == 306 ||
       }
       else
       {
-        vtkstd::stringstream ss;
-        vtkstd::string varID;
+        std::stringstream ss;
+        std::string varID;
         ss<<j+1;
         ss>>varID;
-        vtkstd::string varName="Variable ";
+        std::string varName="Variable ";
         varName.append(varID);
         this->Internal->TableArrays.push_back(varName);
         this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
@@ -882,11 +882,11 @@ else if((this->Internal->TableId == 306 ||
       }
       else
       {
-        vtkstd::stringstream ss;
-        vtkstd::string varID;
+        std::stringstream ss;
+        std::string varID;
         ss<<j+1;
         ss>>varID;
-        vtkstd::string varName="Variable ";
+        std::string varName="Variable ";
         varName.append(varID);
         this->Internal->TableArrays.push_back(varName);
         this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
@@ -965,7 +965,7 @@ void vtkPrismSESAMEReader::ReadTable()
     }
 
   unsigned int i;
-  vtkstd::vector<vtkFloatArray*> scalars;
+  std::vector<vtkFloatArray*> scalars;
   for(i=0; i<this->Internal->TableArrayStatus.size(); i++)
     {
     vtkFloatArray* newArray = this->Internal->TableArrayStatus[i] ?
@@ -1167,7 +1167,7 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
   yName->InsertNextValue(this->Internal->TableYAxisName);
 
   unsigned int i;
-  vtkstd::vector<vtkFloatArray*> scalars;
+  std::vector<vtkFloatArray*> scalars;
   for(i=0; i<this->Internal->TableArrayStatus.size(); i++)
     {
     vtkFloatArray* newArray = this->Internal->TableArrayStatus[i] ?
@@ -1323,7 +1323,7 @@ void vtkPrismSESAMEReader::ReadVaporization401Table()
   yName->InsertNextValue(this->Internal->TableYAxisName);
 
   unsigned int i;
-  vtkstd::vector<vtkFloatArray*> scalars;
+  std::vector<vtkFloatArray*> scalars;
   for(i=0; i<this->Internal->TableArrayStatus.size(); i++)
     {
     vtkFloatArray* newArray = this->Internal->TableArrayStatus[i] ?

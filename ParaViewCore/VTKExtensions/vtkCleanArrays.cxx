@@ -24,10 +24,10 @@
 #include "vtkDataSet.h"
 #include "vtkDataArray.h"
 
-#include <vtkstd/algorithm>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/iterator>
+#include <algorithm>
+#include <set>
+#include <string>
+#include <iterator>
 
 vtkStandardNewMacro(vtkCleanArrays);
 vtkCxxSetObjectMacro(vtkCleanArrays, Controller, vtkMultiProcessController);
@@ -50,7 +50,7 @@ vtkCleanArrays::~vtkCleanArrays()
 class vtkCleanArrays::vtkArrayData
 {
 public:
-  vtkstd::string Name;
+  std::string Name;
   int NumberOfComponents;
   int Type;
   vtkArrayData() 
@@ -104,7 +104,7 @@ public:
 
 };
 
-class vtkCleanArrays::vtkArraySet : public vtkstd::set<vtkCleanArrays::vtkArrayData>
+class vtkCleanArrays::vtkArraySet : public std::set<vtkCleanArrays::vtkArrayData>
 {
   int Valid;
 public:
@@ -233,9 +233,9 @@ static void IntersectStreams(
   setB.Load(B);
   if (setA.IsValid() && setB.IsValid())
     {
-    vtkstd::set_intersection(setA.begin(), setA.end(),
+    std::set_intersection(setA.begin(), setA.end(),
       setB.begin(), setB.end(),
-      vtkstd::inserter(setC, setC.begin()));
+      std::inserter(setC, setC.begin()));
     setC.MarkValid();
     }
   else if (setA.IsValid())
@@ -263,9 +263,9 @@ static void UnionStreams(
   setB.Load(B);
   if (setA.IsValid() && setB.IsValid())
     {
-    vtkstd::set_union(setA.begin(), setA.end(),
+    std::set_union(setA.begin(), setA.end(),
       setB.begin(), setB.end(),
-      vtkstd::inserter(setC, setC.begin()));
+      std::inserter(setC, setC.begin()));
     setC.MarkValid();
     }
   else if (setA.IsValid())

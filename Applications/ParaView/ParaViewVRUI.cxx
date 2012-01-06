@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vruiPipe.h"
 #include "vruiServerState.h"
 #include "vruiThread.h"
-#include <vtkstd/vector>
+#include <vector>
 #include <iostream>
 #include <QTcpSocket>
 #include <QWaitCondition>
@@ -329,7 +329,7 @@ void ParaViewVRUI::GetNextPacket()
 // ----------------------------------------------------------------------------
 void ParaViewVRUI::PrintPositionOrientation()
 {
-  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
+  std::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
     this->Internals->State->GetTrackerStates();
 
   float pos[3];
@@ -341,7 +341,7 @@ void ParaViewVRUI::PrintPositionOrientation()
   // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
   //      << endl;
 
-  vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
+  std::vector<bool> *buttons=this->Internals->State->GetButtonStates();
   // cout << "button0=" << (*buttons)[0] << endl;
   pqView *view = 0;
   view = pqActiveObjects::instance().activeView();

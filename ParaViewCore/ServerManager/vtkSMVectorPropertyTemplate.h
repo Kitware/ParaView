@@ -20,9 +20,9 @@
 #define __vtkSMVectorPropertyTemplate_h
 
 #include <assert.h>
-#include <vtkstd/vector>
-#include <vtkstd/algorithm>
-#include <vtkstd/string>
+#include <vector>
+#include <algorithm>
+#include <string>
 #include <vtksys/ios/sstream>
 #include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
@@ -36,9 +36,9 @@ class vtkSMVectorPropertyTemplate
 {
   vtkSMProperty* Property;
 public:
-  vtkstd::vector<T> Values;
-  vtkstd::vector<T> UncheckedValues;
-  vtkstd::vector<T> DefaultValues; // Values set in the XML configuration.
+  std::vector<T> Values;
+  std::vector<T> UncheckedValues;
+  std::vector<T> DefaultValues; // Values set in the XML configuration.
   bool DefaultsValid;
   bool Initialized;
 
@@ -166,7 +166,7 @@ public:
       }
     else
       {
-      modified = !vtkstd::equal(this->UncheckedValues.begin(), this->UncheckedValues.end(), values);
+      modified = !std::equal(this->UncheckedValues.begin(), this->UncheckedValues.end(), values);
       }
 
     if(!modified)
@@ -174,7 +174,7 @@ public:
       return 1;
       }
 
-    vtkstd::copy(values, values + numArgs, this->UncheckedValues.begin());
+    std::copy(values, values + numArgs, this->UncheckedValues.begin());
 
     this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     return 1;
@@ -239,14 +239,14 @@ public:
       }
     else
       {
-      modified = !vtkstd::equal(this->Values.begin(), this->Values.end(), values);
+      modified = !std::equal(this->Values.begin(), this->Values.end(), values);
       }
     if (!modified && this->Initialized)
       {
       return 1;
       }
 
-    vtkstd::copy(values, values+numArgs, this->Values.begin());
+    std::copy(values, values+numArgs, this->Values.begin());
 
     this->Initialized = true;
     this->Property->Modified();

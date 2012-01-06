@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 
-#include <vtkstd/vector>
+#include <vector>
 //-----------------------------------------------------------------------------
 class pqTimeKeeper::pqInternals
 {

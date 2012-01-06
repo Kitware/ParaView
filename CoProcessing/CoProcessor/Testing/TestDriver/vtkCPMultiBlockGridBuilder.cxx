@@ -19,15 +19,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/algorithm> // for vtkstd::find
+#include <vector>
+#include <algorithm> // for std::find
 
 vtkStandardNewMacro(vtkCPMultiBlockGridBuilder);
 vtkCxxSetObjectMacro(vtkCPMultiBlockGridBuilder, Grid, vtkMultiBlockDataSet);
 
 struct vtkCPMultiBlockGridBuilderInternals
 {
-  typedef vtkstd::vector<vtkSmartPointer<vtkCPGridBuilder> > GridBuilderContainer;
+  typedef std::vector<vtkSmartPointer<vtkCPGridBuilder> > GridBuilderContainer;
   typedef GridBuilderContainer::iterator GridBuilderIterator;
   GridBuilderContainer GridBuilders;
 };
@@ -96,7 +96,7 @@ void vtkCPMultiBlockGridBuilder::RemoveGridBuilder(
   vtkCPGridBuilder* gridBuilder)
 {
   vtkCPMultiBlockGridBuilderInternals::GridBuilderIterator it = 
-    vtkstd::find(this->Internal->GridBuilders.begin(), 
+    std::find(this->Internal->GridBuilders.begin(),
                  this->Internal->GridBuilders.end(), gridBuilder);
   if(it != this->Internal->GridBuilders.end())
     {

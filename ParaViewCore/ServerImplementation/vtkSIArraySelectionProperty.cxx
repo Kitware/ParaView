@@ -25,7 +25,7 @@
 #include "vtkSMMessage.h"
 #include "vtkStringArray.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSIArraySelectionProperty);
@@ -109,11 +109,11 @@ bool vtkSIArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
         }
       if (!pname)
         {
-        // Initializing a vtkstd::string to NULL does not have a defined
+        // Initializing a std::string to NULL does not have a defined
         // behavior.
         break;
         }
-      vtkstd::string name = pname;
+      std::string name = pname;
 
       vtksys_ios::ostringstream saname;
       saname << "Get" << this->Command << "ArrayStatus" << ends;

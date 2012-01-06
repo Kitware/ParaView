@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkObject.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/Base64.h>
 #include <vtksys/RegularExpression.hxx>
@@ -42,8 +42,8 @@ public:
   int MaxLen;
   long CurrentPosition;
   int Count;
-  vtkstd::string Prefix;
-  vtkstd::string Suffix;
+  std::string Prefix;
+  std::string Suffix;
   bool UseBase64Encoding;
 
   void PrintHeader(const char* title, const char* file)
@@ -102,7 +102,7 @@ public:
       }
     }
 
-  bool ReadLine(vtksys_ios::istream& ifs, vtkstd::string &line)
+  bool ReadLine(vtksys_ios::istream& ifs, std::string &line)
     {
     if (!ifs)
       {
@@ -134,8 +134,8 @@ public:
     this->PrintHeader(title, file);
     this->Stream << "\"";
 
-    vtkstd::string line;
-    vtkstd::string::size_type cc;
+    std::string line;
+    std::string::size_type cc;
 
     vtksys::RegularExpression reIfDef("^[ \r\n\t]*#[ \r\n\t]*if");
     vtksys::RegularExpression reElse("^[ \r\n\t]*#[ \r\n\t]*el(se|if)");
@@ -235,8 +235,8 @@ int main(int argc, char* argv[])
     argv_offset = 1;
     }
 
-  vtkstd::string output = argv[argv_offset + 1];
-  vtkstd::string output_file_name =
+  std::string output = argv[argv_offset + 1];
+  std::string output_file_name =
     vtksys::SystemTools::GetFilenameWithoutExtension(
       output);
   ot.Prefix = argv[argv_offset + 2];
@@ -255,8 +255,8 @@ int main(int argc, char* argv[])
   int cc;
   for ( cc = 5; (cc + argv_offset) < argc; cc ++ )
     {
-    vtkstd::string fname = argv[argv_offset + cc];
-    vtkstd::string moduleName =
+    std::string fname = argv[argv_offset + cc];
+    std::string moduleName =
       vtksys::SystemTools::GetFilenameWithoutLastExtension(fname);
     if (moduleName.size() == 0)
       {

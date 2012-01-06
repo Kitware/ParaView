@@ -21,12 +21,12 @@
 #include "vtkSMProxy.h"
 #include "vtkCollection.h"
 
-#include <vtkstd/map>
+#include <map>
 
 class vtkSMProxyLocator::vtkInternal
 {
 public:
-  typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy> > ProxiesType;
+  typedef std::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy> > ProxiesType;
   ProxiesType Proxies;
 };
 

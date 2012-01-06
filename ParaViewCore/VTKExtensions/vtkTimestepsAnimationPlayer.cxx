@@ -17,9 +17,9 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/set>
+#include <set>
 
-class vtkTimestepsAnimationPlayerSetOfDouble : public vtkstd::set<double> {};
+class vtkTimestepsAnimationPlayerSetOfDouble : public std::set<double> {};
 
 vtkStandardNewMacro(vtkTimestepsAnimationPlayer);
 //-----------------------------------------------------------------------------

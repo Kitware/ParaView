@@ -110,7 +110,7 @@ void pqSILModel::update(vtkGraph* sil)
 
 //-----------------------------------------------------------------------------
 void pqSILModel::collectLeaves(vtkIdType vertexid,
-  vtkstd::set<vtkIdType>& id_set)
+  std::set<vtkIdType>& id_set)
 {
   this->SILModel->GetLeaves(id_set, vertexid, /*traverse_cross_edges=*/false);
 }
@@ -124,7 +124,7 @@ QList<QVariant> pqSILModel::status(const QString& hierarchyName) const
     return values;
     }
 
-  const vtkstd::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
+  const std::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
   foreach (vtkIdType vertex, vertexIds)
     {
     bool checked = 
@@ -152,7 +152,7 @@ void pqSILModel::setStatus(const QString& hierarchyName,
     check_status[name] = checked;
     }
 
-  const vtkstd::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
+  const std::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
   foreach (vtkIdType vertex, vertexIds)
     {
     QString name = QString(this->SILModel->GetName(vertex));

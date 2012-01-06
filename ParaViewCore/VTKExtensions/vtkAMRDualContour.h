@@ -27,8 +27,8 @@
 #define __vtkAMRDualContour_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 
 class vtkDataSet;
 class vtkImageData;

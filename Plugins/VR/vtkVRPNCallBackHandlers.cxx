@@ -31,7 +31,7 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkstd/vector>
+#include <vector>
 #include <iostream>
 
 // ----------------------------------------------------------------------------

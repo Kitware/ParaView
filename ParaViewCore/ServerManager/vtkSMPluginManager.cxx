@@ -28,12 +28,12 @@
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
-#include <vtkstd/map>
+#include <map>
 
 class vtkSMPluginManager::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkSMSession*,
+  typedef std::map<vtkSMSession*,
           vtkSmartPointer<vtkPVPluginsInformation> > RemoteInfoMapType;
   RemoteInfoMapType RemoteInformations;
 };

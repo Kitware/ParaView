@@ -44,7 +44,7 @@ public:
     vtkSmartPointer<vtkBox> Box;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
-    vtkstd::string AxisVarName[3];
+    std::string AxisVarName[3];
     MyInternal()
     {
         this->SimulationDataThreshold=false;
@@ -304,7 +304,7 @@ int vtkPrismFilter::RequestSESAMEData(
                                       vtkInformationVector **vtkNotUsed(inputVector),
                                       vtkInformationVector *outputVector)
 {
-    vtkstd::string filename=this->Internal->Reader->GetFileName();
+    std::string filename=this->Internal->Reader->GetFileName();
     if(filename.empty())
     {
         return 1;

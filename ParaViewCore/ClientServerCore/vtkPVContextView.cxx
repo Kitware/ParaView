@@ -98,7 +98,7 @@ void vtkPVContextView::Update()
 
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    vtkstd::vector<int> need_delivery;
+    std::vector<int> need_delivery;
     int num_reprs = this->GetNumberOfRepresentations();
     for (int cc=0; cc < num_reprs; cc++)
       {

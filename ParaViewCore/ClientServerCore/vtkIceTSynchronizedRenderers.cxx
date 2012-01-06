@@ -34,7 +34,7 @@
 #include <IceT.h>
 #include <IceTGL.h>
 
-#include <vtkstd/map>
+#include <map>
 
 // This pass is used to simply render an image onto the frame buffer. Used when
 // an ImageProcessingPass is set to paste the IceT composited image into the

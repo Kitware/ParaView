@@ -22,18 +22,18 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/set>
-#include <vtkstd/algorithm>
-#include <vtkstd/iterator>
+#include <set>
+#include <algorithm>
+#include <iterator>
 
 //-----------------------------------------------------------------------------
 class vtkPVOpenGLExtensionsInformationInternal
 {
 public:
-  typedef vtkstd::set<vtkstd::string> SetOfStrings;
+  typedef std::set<std::string> SetOfStrings;
   SetOfStrings Extensions;
 };
 
@@ -83,12 +83,12 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
   mgr->SetRenderWindow(renWin);
   mgr->Update();
 
-  vtkstd::vector<vtkstd::string> extensions;
+  std::vector<std::string> extensions;
   vtksys::SystemTools::Split(mgr->GetExtensionsString(), 
     extensions, ' ');
 
   this->Internal->Extensions.clear();
-  vtkstd::vector<vtkstd::string>::iterator iter;
+  std::vector<std::string>::iterator iter;
   for (iter =  extensions.begin(); iter != extensions.end(); iter++)
     {
     this->Internal->Extensions.insert(*iter);
@@ -111,13 +111,13 @@ void vtkPVOpenGLExtensionsInformation::AddInformation(vtkPVInformation* pvinfo)
     vtkErrorMacro("Could not downcast to vtkPVOpenGLExtensionsInformation.");
     return;
     }
-  vtkstd::set<vtkstd::string> setSelf = this->Internal->Extensions;
-  vtkstd::set<vtkstd::string> &setOther = info->Internal->Extensions;
+  std::set<std::string> setSelf = this->Internal->Extensions;
+  std::set<std::string> &setOther = info->Internal->Extensions;
 
   this->Internal->Extensions.clear();
-  vtkstd::set_intersection(setSelf.begin(), setSelf.end(),
+  std::set_intersection(setSelf.begin(), setSelf.end(),
     setOther.begin(), setOther.end(),
-    vtkstd::inserter(this->Internal->Extensions, this->Internal->Extensions.begin()));
+    std::inserter(this->Internal->Extensions, this->Internal->Extensions.begin()));
 }
 
 //-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ void vtkPVOpenGLExtensionsInformation::CopyToStream(vtkClientServerStream* css)
   css->Reset();
   *css << vtkClientServerStream::Reply;
 
-  vtkstd::string data;
+  std::string data;
   vtkPVOpenGLExtensionsInformationInternal::SetOfStrings::iterator iter;
   for (iter = this->Internal->Extensions.begin(); 
     iter != this->Internal->Extensions.end();
@@ -151,9 +151,9 @@ void vtkPVOpenGLExtensionsInformation::CopyFromStream(
     return;
     }
 
-  vtkstd::vector<vtkstd::string> extensions;
+  std::vector<std::string> extensions;
   vtksys::SystemTools::Split(ext, extensions, ' ');
-  vtkstd::vector<vtkstd::string>::iterator iter;
+  std::vector<std::string>::iterator iter;
   for (iter =  extensions.begin(); iter != extensions.end(); ++iter)
     {
     this->Internal->Extensions.insert(*iter);

@@ -46,8 +46,8 @@
 
 #include "vtkToolkits.h"     // For VTK_USE_MPI 
 #include "vtkPolyDataAlgorithm.h"
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 class vtkDataArraySelection;
 class vtkMultiProcessController;
@@ -183,7 +183,7 @@ protected:
   // velocity_0 returns 0, velocity_1 returns 0 etc
   int             IndexOfVectorComponent(const char *name);
 //BTX
-  vtkstd::string  NameOfVectorComponent(const char *name);
+  std::string  NameOfVectorComponent(const char *name);
 //ETX
   //
   // Internal Variables
@@ -207,9 +207,9 @@ protected:
   char         *Yarray;
   char         *Zarray;
   //BTX
-  vtkstd::vector<double>                  TimeStepValues;
-  typedef vtkstd::vector<vtkstd::string>  stringlist;
-  vtkstd::vector<stringlist>              FieldArrays;
+  std::vector<double>                  TimeStepValues;
+  typedef std::vector<std::string>  stringlist;
+  std::vector<stringlist>              FieldArrays;
   //ETX
 
   // To allow paraview gui to enable/disable scalar reading

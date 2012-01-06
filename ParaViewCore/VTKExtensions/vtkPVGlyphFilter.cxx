@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
@@ -474,13 +474,13 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
     for(int i = 0; i < this->BlockMaxNumPts; i++)
       {
       r = rand() % static_cast<int>( floor(PtsNotBlanked));
-      while( vtkstd::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
+      while( std::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
         {
         r = rand() % static_cast<int>( floor(PtsNotBlanked) );
         }
       this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
       }
-    vtkstd::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
+    std::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
     }
 
 

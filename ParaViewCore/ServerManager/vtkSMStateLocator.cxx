@@ -22,8 +22,8 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
+#include <map>
+#include <set>
 
 //***************************************************************************
 //                        Internal class Definition
@@ -86,7 +86,7 @@ public:
 
   void CallBackUndoStack(vtkObject* vtkNotUsed(src),long unsigned int event, void* vtkNotUsed(data))
     {
-    vtkstd::map<vtkTypeUInt32, vtkTypeUInt32>::iterator iter;
+    std::map<vtkTypeUInt32, vtkTypeUInt32>::iterator iter;
     iter = this->TimeToLiveMap.begin();
     vtkTypeUInt32 globalId = 0;
     switch(event)
@@ -102,7 +102,7 @@ public:
         break;
       case vtkUndoStack::UndoSetRemovedEvent:
         // Register for delete all the state that reach the 0 TimeToLive
-        vtkstd::set<vtkTypeUInt32> itemsToDelete;
+        std::set<vtkTypeUInt32> itemsToDelete;
         for(; iter != this->TimeToLiveMap.end(); iter++)
           {
           globalId = iter->first;
@@ -115,7 +115,7 @@ public:
             }
           }
         // Clean-up state map and TTL map
-        for(vtkstd::set<vtkTypeUInt32>::iterator i = itemsToDelete.begin();
+        for(std::set<vtkTypeUInt32>::iterator i = itemsToDelete.begin();
             i != itemsToDelete.end();
             i++)
           {
@@ -183,8 +183,8 @@ public:
 
 private:
   vtkTypeUInt32 UndoStackSize;
-  vtkstd::map<vtkTypeUInt32, vtkSMMessage> StateMap;
-  vtkstd::map<vtkTypeUInt32, vtkTypeUInt32> TimeToLiveMap;
+  std::map<vtkTypeUInt32, vtkSMMessage> StateMap;
+  std::map<vtkTypeUInt32, vtkTypeUInt32> TimeToLiveMap;
   unsigned int SessionRegistrationObserverID;
   unsigned int SessionUnRegistrationObserverID;
   unsigned int UndoStackRemoveObserverID;

@@ -37,9 +37,9 @@
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
 
-#include <vtkstd/algorithm>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <algorithm>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>
@@ -84,7 +84,7 @@ public:
     }
 
 protected:
-  vtkstd::string PropertyName;
+  std::string PropertyName;
   vtkSMProxy* Proxy;
 };
 
@@ -1030,7 +1030,7 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
 void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 {
   int found=0;
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
+  std::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Consumers.begin();
   for(; i != this->Internals->Consumers.end(); i++)
     {
@@ -1052,7 +1052,7 @@ void vtkSMProxy::AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveConsumer(vtkSMProperty* property, vtkSMProxy*)
 {
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
+  std::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Consumers.begin();
   for(; i != this->Internals->Consumers.end(); i++)
     {
@@ -1093,7 +1093,7 @@ vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
 void vtkSMProxy::AddProducer(vtkSMProperty* property, vtkSMProxy* proxy)
 {
   int found=0;
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
+  std::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Producers.begin();
   for(; i != this->Internals->Producers.end(); i++)
     {
@@ -1114,7 +1114,7 @@ void vtkSMProxy::AddProducer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveProducer(vtkSMProperty* property, vtkSMProxy* proxy)
 {
-  vtkstd::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i = 
+  std::vector<vtkSMProxyInternals::ConnectionInfo>::iterator i =
     this->Internals->Producers.begin();
   for(; i != this->Internals->Producers.end(); i++)
     {
@@ -1357,16 +1357,16 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
   if (processes)
     {
     vtkTypeUInt32 uiprocesses = 0;
-    vtkstd::string strprocesses = processes;
-    if (strprocesses.find("client") != vtkstd::string::npos)
+    std::string strprocesses = processes;
+    if (strprocesses.find("client") != std::string::npos)
       {
       uiprocesses |= vtkProcessModule::CLIENT;
       }
-    if (strprocesses.find("renderserver") != vtkstd::string::npos)
+    if (strprocesses.find("renderserver") != std::string::npos)
       {
       uiprocesses |= vtkProcessModule::RENDER_SERVER;
       }
-    if (strprocesses.find("dataserver") != vtkstd::string::npos)
+    if (strprocesses.find("dataserver") != std::string::npos)
       {
       uiprocesses |= vtkProcessModule::DATA_SERVER;
       }
@@ -1474,7 +1474,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
               propElement->GetAttribute("name") )
       {
       // Make sure that attribute value won't get corrupted inside the comming call
-      vtkstd::string propName = propElement->GetAttribute("name");
+      std::string propName = propElement->GetAttribute("name");
       this->NewProperty(propName.c_str(), propElement);
       }
     }
@@ -1899,7 +1899,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 
   // Manage its sub-proxy state
   int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);
-  vtkstd::vector<vtkSMMessage> subProxyStateToLoad;
+  std::vector<vtkSMMessage> subProxyStateToLoad;
   for(int idx=0; idx < nbSubProxy; idx++)
     {
     const ProxyState_SubProxy *subProxyMsg =
@@ -1959,7 +1959,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 
   // Manage properties
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
+  std::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
   for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
     {
     const ProxyState_Property *prop_message =

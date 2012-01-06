@@ -27,13 +27,13 @@
 #include "vtkWidgetCallbackMapper.h"
 #include "vtkWidgetEvent.h"
 
-#include <vtkstd/list>
+#include <list>
 
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
-class vtkNodeList : public vtkstd::list<vtkHandleWidget*> {};
-typedef vtkstd::list<vtkHandleWidget*>::iterator vtkNodeListIterator;
+class vtkNodeList : public std::list<vtkHandleWidget*> {};
+typedef std::list<vtkHandleWidget*>::iterator vtkNodeListIterator;
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D()

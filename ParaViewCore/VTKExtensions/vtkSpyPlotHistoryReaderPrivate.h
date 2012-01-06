@@ -23,10 +23,10 @@
 #ifndef __vtkSpyPlotHistoryReaderPrivate_h
 #define __vtkSpyPlotHistoryReaderPrivate_h
 
-#include <vtkstd/map> // Needed for STL map.
-#include <vtkstd/set> // Needed for STL set.
-#include <vtkstd/vector> // Needed for STL vector.
-#include <vtkstd/string> // Needed for STL string.
+#include <map> // Needed for STL map.
+#include <set> // Needed for STL set.
+#include <vector> // Needed for STL vector.
+#include <string> // Needed for STL string.
 #include <sstream> // Needed for STL sstream.
 
 //-----------------------------------------------------------------------------

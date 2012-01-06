@@ -43,9 +43,9 @@ public:
   vtkKWRemoteExecuteInternal()
     {
     }
-  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
+  typedef std::vector<std::string> VectorOfStrings;
   VectorOfStrings Args;
-  vtkstd::string Command;
+  std::string Command;
 };
 //============================================================================
 //----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
 
   cout << "self is " << self << endl;
 
-  vtkstd::string command = "";
+  std::string command = "";
   command +=  self->SSHCommand;
   command += " ";
   if ( self->SSHArguments )

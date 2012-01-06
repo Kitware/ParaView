@@ -345,7 +345,7 @@ void pqScatterPlotRepresentation::colorByArray(const char* array)
     this->GetArrayNumberOfComponents(array);  
   int component = this->GetArrayComponent(array);;
 
-  vtkstd::string arrayName = this->GetArrayName(array).toStdString();
+  std::string arrayName = this->GetArrayName(array).toStdString();
   pqApplicationCore* core = pqApplicationCore::instance();
   pqLookupTableManager* lut_mgr = core->getLookupTableManager();
   vtkSMProxy* lut = 0;

@@ -21,7 +21,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkCPCellFieldBuilder);
 
@@ -51,7 +51,7 @@ void vtkCPCellFieldBuilder::BuildField(unsigned long timeStep, double time,
   vtkDoubleArray* array = vtkDoubleArray::New();
   array->SetNumberOfComponents(numberOfComponents);
   array->SetNumberOfTuples(numberOfCells);
-  vtkstd::vector<double> tupleValues(numberOfComponents);
+  std::vector<double> tupleValues(numberOfComponents);
   double point[3], parametricCenter[3], weights[100];
   for(vtkIdType i=0;i<numberOfCells;i++)
     {

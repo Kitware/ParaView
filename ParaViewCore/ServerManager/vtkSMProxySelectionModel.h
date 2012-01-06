@@ -32,7 +32,7 @@ class vtkCollection;
 class vtkSMProxy;
 
 //BTX
-#include <vtkstd/set> // needed for vtkset::set.
+#include <set> // needed for vtkset::set.
 //ETX
 
 class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
@@ -56,7 +56,7 @@ public:
 //BTX
   // Description:
   // Type for selection.
-  typedef vtkstd::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
+  typedef std::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
 
   // vtkSMProxy selection flags
   enum ProxySelectionFlag {
