@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtTestingConfigure.h"
 
-#include "pqCollaborationEventPlayer.h"
 #include "pqApplicationCore.h"
+#include "pqCollaborationEventPlayer.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorButtonEventTranslator.h"
 #include "pqFileDialogEventPlayer.h"
@@ -66,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageDifference.h"
 #include "vtkImageShiftScale.h"
 #include "vtkJPEGWriter.h"
+#include "vtkNew.h"
 #include "vtkPNGReader.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
@@ -347,4 +348,19 @@ QString pqCoreTestUtility::TestDirectory()
   return QString();
 }
 
-
+//-----------------------------------------------------------------------------
+bool pqCoreTestUtility::CompareImage(const QString& testPNGImage,
+  const QString& referenceImage, double threshold, ostream& output, 
+  const QString& tempDirectory)
+{
+  vtkNew<vtkPNGReader> reader;
+  if (!reader->CanReadFile(testPNGImage.toAscii().data()))
+    {
+    output << "Cannot read file : " << testPNGImage.toAscii().data() << endl;
+    return false;
+    }
+  reader->SetFileName(testPNGImage.toAscii().data());
+  reader->Update();
+  return pqCoreTestUtility::CompareImage(reader->GetOutput(),
+    referenceImage, threshold, output, tempDirectory); 
+}

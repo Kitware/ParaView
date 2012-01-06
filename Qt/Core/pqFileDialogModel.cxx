@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogModel.h"
 
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 #include <QStyle>
 #include <QDir>
@@ -212,7 +212,7 @@ bool CaseInsensitiveSort(const pqFileDialogModelFileInfo& A, const
 }
 
 class CaseInsensitiveSortGroup
-  : public vtkstd::binary_function<pqFileDialogModelFileInfo, pqFileDialogModelFileInfo, bool>
+  : public std::binary_function<pqFileDialogModelFileInfo, pqFileDialogModelFileInfo, bool>
 {
 public:
   CaseInsensitiveSortGroup(const QString& groupName)

@@ -17,8 +17,8 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkMPIMToNSocketConnection.h"
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 class vtkMPIMToNSocketConnectionPortInformationInternals
 {
@@ -26,13 +26,13 @@ public:
   struct NodeInformation
   {
     int PortNumber;
-    vtkstd::string HostName;
+    std::string HostName;
     NodeInformation()
       {
       this->PortNumber = -1;
       }
   };
-  vtkstd::vector<NodeInformation> ServerInformation;
+  std::vector<NodeInformation> ServerInformation;
 };
 
 

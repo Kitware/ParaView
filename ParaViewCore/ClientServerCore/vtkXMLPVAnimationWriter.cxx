@@ -25,9 +25,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkXMLWriter.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
@@ -38,30 +38,30 @@ class vtkXMLPVAnimationWriterInternals
 {
 public:
   // The name of the group to which each input belongs.
-  typedef vtkstd::vector<vtkstd::string> InputGroupNamesType;
+  typedef std::vector<std::string> InputGroupNamesType;
   InputGroupNamesType InputGroupNames;
   
   // The part number each input has been assigned in its group.
-  typedef vtkstd::vector<int> InputPartNumbersType;
+  typedef std::vector<int> InputPartNumbersType;
   InputPartNumbersType InputPartNumbers;
   
   // The modified time when each input was last written in a previous
   // animation step.
-  typedef vtkstd::vector<unsigned long> InputMTimesType;
+  typedef std::vector<unsigned long> InputMTimesType;
   InputMTimesType InputMTimes;
   
   // The number of times each input has changed during this animation
   // sequence.
-  typedef vtkstd::vector<int> InputChangeCountsType;
+  typedef std::vector<int> InputChangeCountsType;
   InputChangeCountsType InputChangeCounts;
   
   // Count the number of parts in each group.
-  typedef vtkstd::map<vtkstd::string, int> GroupMapType;
+  typedef std::map<std::string, int> GroupMapType;
   GroupMapType GroupMap;
   
   // Create the file name for the given input during this animation
   // step.
-  vtkstd::string CreateFileName(int index, const char* prefix,
+  std::string CreateFileName(int index, const char* prefix,
                                 const char* ext);
 };
 
@@ -197,7 +197,7 @@ void vtkXMLPVAnimationWriter::Start()
   this->CreateWriters();
   
   // Create the subdirectory for the internal files.
-  vtkstd::string subdir = this->GetFilePath();
+  std::string subdir = this->GetFilePath();
   subdir += this->GetFilePrefix();
   this->MakeDirectory(subdir.c_str());
   
@@ -246,7 +246,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     
     // Create this animation entry.
     vtkXMLWriter* writer = this->GetWriter(i);
-    vtkstd::string fname =
+    std::string fname =
       this->Internal->CreateFileName(i, this->GetFilePrefix(),
                                      writer->GetDefaultFileExtension());
     vtksys_ios::ostringstream entry_with_warning_C4701;
@@ -261,7 +261,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     // Write this step's file if its input has changed.
     if(changed)
       {
-      vtkstd::string fullName = this->GetFilePath();
+      std::string fullName = this->GetFilePath();
       fullName += fname;
       writer->SetFileName(fullName.c_str());
       this->AddFileName(fullName.c_str());
@@ -317,7 +317,7 @@ int vtkXMLPVAnimationWriter::WriteInternal()
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string
+std::string
 vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
                                                  const char* prefix,
                                                  const char* ext)
@@ -348,7 +348,7 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
   fn_with_warning_C4701 << "." << ext << ends;
   
   // Return the result.
-  vtkstd::string fname = fn_with_warning_C4701.str();
+  std::string fname = fn_with_warning_C4701.str();
   return fname;
 }
 
@@ -403,7 +403,7 @@ void vtkXMLPVAnimationWriter::DeleteFiles()
     this->DeleteAFile(this->FileNamesCreated[i]);
     }
   this->DeleteAFile(this->FileName);
-  vtkstd::string subdir = this->GetFilePath();
+  std::string subdir = this->GetFilePath();
   subdir += this->GetFilePrefix();
   this->RemoveADirectory(subdir.c_str());
 }

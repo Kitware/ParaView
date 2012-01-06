@@ -144,6 +144,12 @@ void pqCPWritersMenuManager::createMenu()
 {
   QMainWindow *mainWindow = qobject_cast<QMainWindow*>(
     pqCoreUtilities::mainWidget());
+  if(mainWindow == NULL)
+    {
+    // we don't have a main window to add our menus to yet so we'll wait a bit
+    QTimer::singleShot(1000, this, SLOT(createMenu()));
+    return;
+    }
 
   if(this->Menu == NULL)
     {

@@ -238,7 +238,7 @@ int vtkVDFReader::RequestData(vtkInformation *request,
     }
 
   // load data for all enabled point arrays
-  for (vtkstd::map<vtkstd::string,int>::iterator it = data.begin(); it !=data.end(); ++it)
+  for (std::map<std::string,int>::iterator it = data.begin(); it !=data.end(); ++it)
     {
     if (it->second == 0)
       {
@@ -334,7 +334,7 @@ int vtkVDFReader::RequestInformation(vtkInformation *request,
     is_layered = vdc_md->GetGridType().compare("layered") == 0;
     RefinementRange[1] = vdc_md->GetNumTransforms();
 
-    const vtkstd::vector<vtkstd::string> NamesAll = vdc_md->GetVariableNames();
+    const std::vector<std::string> NamesAll = vdc_md->GetVariableNames();
     for (size_t i=0; i<NamesAll.size(); i++)
       {
       data[NamesAll[i]] = 0;
@@ -424,7 +424,7 @@ void vtkVDFReader::SetVariableType(int newtype)
 int vtkVDFReader::FillTimeSteps()
 {
   //get list of all possible variables in metadata
-  const vtkstd::vector<vtkstd::string> nms = vdc_md->GetVariableNames();
+  const std::vector<std::string> nms = vdc_md->GetVariableNames();
 
   //get all possible timesteps
   int tmp_nTimeSteps = vdc_md->GetNumTimeSteps();
@@ -477,15 +477,15 @@ const char *vtkVDFReader::GetPointArrayName(int index)
 //-----------------------------------------------------------------------------
 int vtkVDFReader::GetPointArrayStatus(const char* name)
 {
-  return data[vtkstd::string(name)];
+  return data[std::string(name)];
 }
 
 //-----------------------------------------------------------------------------
 void vtkVDFReader::SetPointArrayStatus(const char* name, int en)
 {
-  if (en != data[vtkstd::string(name)])
+  if (en != data[std::string(name)])
     {
-    data[vtkstd::string(name)] = en;
+    data[std::string(name)] = en;
     this->Modified();
     }
 }
@@ -512,28 +512,28 @@ void vtkVDFReader::GetVarDims(size_t *udims, size_t *bdims)
 void vtkVDFReader::SetExtents(vtkInformation *outInfo)
 {
 
-  const vtkstd::vector<double> glExt = vdc_md->GetExtents(),
+  const std::vector<double> glExt = vdc_md->GetExtents(),
     tsExt = vdc_md->GetTSExtents(TimeStep);
-  uExt = (vtkstd::vector<double>) (tsExt.empty()? glExt: tsExt);
+  uExt = (std::vector<double>) (tsExt.empty()? glExt: tsExt);
 
   vdfiobase->GetDim(ext_p, this->Refinement);
   int ext[6] = {0, (int)ext_p[0]-1, 0, (int)ext_p[1]-1, 0, (int)ext_p[2]-1};
 
-  vtkstd::vector<vtkstd::string> var_list;
+  std::vector<std::string> var_list;
   switch (this->VariableType) {
   case 0:
-    var_list = (vtkstd::vector<vtkstd::string>) vdc_md->GetVariables3D();
+    var_list = (std::vector<std::string>) vdc_md->GetVariables3D();
     break;
   case 1:
-    var_list = (vtkstd::vector<vtkstd::string>) vdc_md->GetVariables2DXY();
+    var_list = (std::vector<std::string>) vdc_md->GetVariables2DXY();
     ext[5] = 0;
     break;
   case 2:
-    var_list = (vtkstd::vector<vtkstd::string>) vdc_md->GetVariables2DXZ();
+    var_list = (std::vector<std::string>) vdc_md->GetVariables2DXZ();
     ext[3] = 0;
     break;
   case 3:
-    var_list = (vtkstd::vector<vtkstd::string>) vdc_md->GetVariables2DYZ();
+    var_list = (std::vector<std::string>) vdc_md->GetVariables2DYZ();
     ext[1] = 0;
     break;
   default :

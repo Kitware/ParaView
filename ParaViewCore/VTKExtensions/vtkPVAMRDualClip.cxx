@@ -8,8 +8,8 @@
 
 #include "vtkCompositeDataIterator.h"
 
-#include <vtkstd/string>  // STL required.
-#include <vtkstd/vector>  // STL required.
+#include <string>  // STL required.
+#include <vector>  // STL required.
 
 vtkStandardNewMacro(vtkPVAMRDualClip);
 
@@ -20,7 +20,7 @@ class vtkPVAMRDualClipInternal
 {
 public:
 
-  vtkstd::vector<vtkstd::string> CellArrays;
+  std::vector<std::string> CellArrays;
 };
 
 //-----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ int vtkPVAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
 //-----------------------------------------------------------------------------
 void vtkPVAMRDualClip::AddInputCellArrayToProcess(const char* name)
 {
-  this->Implementation->CellArrays.push_back(vtkstd::string(name));
+  this->Implementation->CellArrays.push_back(std::string(name));
   this->Modified();
 }
 

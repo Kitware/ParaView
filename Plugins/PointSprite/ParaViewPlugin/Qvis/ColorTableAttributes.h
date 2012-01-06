@@ -67,9 +67,9 @@ public:
     virtual bool operator == (const ColorTableAttributes &obj) const;
     virtual bool operator != (const ColorTableAttributes &obj) const;
 
-    virtual const vtkstd::string TypeName() const;
+    virtual const std::string TypeName() const;
     virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const vtkstd::string &) const;
+    virtual AttributeSubject *CreateCompatible(const std::string &) const;
     virtual AttributeSubject *NewInstance(bool) const;
 
     // Property selection methods
@@ -81,18 +81,18 @@ public:
 
     // Property setting methods
     void SetNames(const stringVector &names_);
-    void SetActiveContinuous(const vtkstd::string &activeContinuous_);
-    void SetActiveDiscrete(const vtkstd::string &activeDiscrete_);
+    void SetActiveContinuous(const std::string &activeContinuous_);
+    void SetActiveDiscrete(const std::string &activeDiscrete_);
 
     // Property getting methods
     const stringVector &GetNames() const;
           stringVector &GetNames();
     const AttributeGroupVector &GetColorTables() const;
           AttributeGroupVector &GetColorTables();
-    const vtkstd::string  &GetActiveContinuous() const;
-          vtkstd::string  &GetActiveContinuous();
-    const vtkstd::string  &GetActiveDiscrete() const;
-          vtkstd::string  &GetActiveDiscrete();
+    const std::string  &GetActiveContinuous() const;
+          std::string  &GetActiveContinuous();
+    const std::string  &GetActiveDiscrete() const;
+          std::string  &GetActiveDiscrete();
 
     // Persistence methods
     virtual bool CreateNode(DataNode *node, bool completeSave, bool forceAdd);
@@ -112,25 +112,25 @@ public:
 
 
     // Keyframing methods
-    virtual vtkstd::string               GetFieldName(int index) const;
+    virtual std::string               GetFieldName(int index) const;
     virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual vtkstd::string               GetFieldTypeName(int index) const;
+    virtual std::string               GetFieldTypeName(int index) const;
     virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
 
     // User-defined methods
-    int GetColorTableIndex(const vtkstd::string &name) const;
+    int GetColorTableIndex(const std::string &name) const;
     const ColorControlPointList *GetColorControlPoints(int index) const;
-    const ColorControlPointList *GetColorControlPoints(const vtkstd::string &name) const;
-    void AddColorTable(const vtkstd::string &name, const ColorControlPointList &cpts);
-    void RemoveColorTable(const vtkstd::string &name);
+    const ColorControlPointList *GetColorControlPoints(const std::string &name) const;
+    void AddColorTable(const std::string &name, const ColorControlPointList &cpts);
+    void RemoveColorTable(const std::string &name);
     void RemoveColorTable(int index);
 protected:
     AttributeGroup *CreateSubAttributeGroup(int index);
 private:
     stringVector         names;
     AttributeGroupVector colorTables;
-    vtkstd::string          activeContinuous;
-    vtkstd::string          activeDiscrete;
+    std::string          activeContinuous;
+    std::string          activeDiscrete;
 
     // Static class format string for type map.
     static const char *TypeMapFormatString;

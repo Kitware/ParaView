@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkCPNodalFieldBuilder);
 
@@ -51,7 +51,7 @@ void vtkCPNodalFieldBuilder::BuildField(unsigned long timeStep, double time,
   vtkDoubleArray* array = vtkDoubleArray::New();
   array->SetNumberOfComponents(numberOfComponents);
   array->SetNumberOfTuples(numberOfPoints);
-  vtkstd::vector<double> tupleValues(numberOfComponents);
+  std::vector<double> tupleValues(numberOfComponents);
   double point[3];
   for(vtkIdType i=0;i<numberOfPoints;i++)
     {

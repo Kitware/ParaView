@@ -23,20 +23,20 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
-#include <vtkstd/set>
-#include <vtkstd/map>
-#include <vtkstd/vector>
+#include <set>
+#include <map>
+#include <vector>
 
 class vtkSMTimeKeeper::vtkInternal
 {
 public:
-  typedef vtkstd::set<vtkSmartPointer<vtkSMViewProxy> > ViewsType;
+  typedef std::set<vtkSmartPointer<vtkSMViewProxy> > ViewsType;
   ViewsType Views;
 
-  typedef vtkstd::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
+  typedef std::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
   SourcesType Sources;
 
-  typedef vtkstd::map<void*, unsigned long> ObserverIdsMap;
+  typedef std::map<void*, unsigned long> ObserverIdsMap;
   ObserverIdsMap ObserverIds;
 
   ~vtkInternal()
@@ -180,7 +180,7 @@ void vtkSMTimeKeeper::SetTime(double time)
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeper::UpdateTimeSteps()
 {
-  vtkstd::set<double> timesteps;
+  std::set<double> timesteps;
   double timerange[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
 
   vtkInternal::SourcesType::iterator iter;
@@ -225,7 +225,7 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
     this->TimeRangeProperty)->SetElements2(
     timerange[0], timerange[1]);
 
-  vtkstd::vector<double> timesteps_vector;
+  std::vector<double> timesteps_vector;
   timesteps_vector.insert(timesteps_vector.begin(),
     timesteps.begin(), timesteps.end());
   if (timesteps_vector.size() > 0)

@@ -24,11 +24,11 @@
 #include "vtkSMSession.h"
 #include "vtkSMStateLocator.h"
 
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
-#include <vtkstd/iterator>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <vector>
+#include <iterator>
 
 #include <assert.h>
 
@@ -37,8 +37,8 @@ vtkStandardNewMacro(vtkSMInputProperty);
 
 struct vtkSMInputPropertyInternals
 {
-  vtkstd::vector<unsigned int> OutputPorts;
-  vtkstd::vector<unsigned int> UncheckedOutputPorts;
+  std::vector<unsigned int> OutputPorts;
+  std::vector<unsigned int> UncheckedOutputPorts;
 };
 
 //---------------------------------------------------------------------------
@@ -95,9 +95,9 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
     const Variant *value = &prop->value();
     assert(value->proxy_global_id_size() == value->port_number_size());
     int nbProxies = value->proxy_global_id_size();
-    vtkstd::set<vtkTypeUInt32> newProxyIdList;
-    vtkstd::set<vtkTypeUInt32>::iterator proxyIdIter;
-    vtkstd::map<vtkTypeUInt32,int> proxyIdPortMap;
+    std::set<vtkTypeUInt32> newProxyIdList;
+    std::set<vtkTypeUInt32>::iterator proxyIdIter;
+    std::map<vtkTypeUInt32,int> proxyIdPortMap;
 
     // Fill indexed proxy id list
     for(int i=0;i<nbProxies;i++)

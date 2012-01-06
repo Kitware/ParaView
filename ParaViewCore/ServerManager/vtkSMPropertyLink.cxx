@@ -24,7 +24,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkStdString.h"
 
-#include <vtkstd/list>
+#include <list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
 //-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public:
     vtkCommand* Observer;
     };
 
-  typedef vtkstd::list<LinkedProperty> LinkedPropertyType;
+  typedef std::list<LinkedProperty> LinkedPropertyType;
   LinkedPropertyType LinkedProperties;
   vtkSMPropertyLinkObserver* PropertyObserver;
 };

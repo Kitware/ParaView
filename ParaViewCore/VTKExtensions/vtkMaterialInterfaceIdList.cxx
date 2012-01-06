@@ -14,9 +14,9 @@
 =========================================================================*/
 
 #include "vtkMaterialInterfaceIdList.h"
-using vtkstd::vector;
+using std::vector;
 #include <cassert>
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 namespace {
 // Binary search. l & r are the range to search in.

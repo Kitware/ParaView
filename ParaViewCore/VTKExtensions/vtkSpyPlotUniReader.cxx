@@ -8,7 +8,7 @@
 #include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkByteSwap.h"
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 //=============================================================================
 //-----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
       }
     }
   
-  vtkstd::vector<unsigned char> arrayBuffer;
+  std::vector<unsigned char> arrayBuffer;
   ifstream ifs(this->FileName, ios::binary|ios::in);
   vtkSpyPlotIStream spis;
   spis.SetStream(&ifs);
@@ -1534,7 +1534,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
       }
     if ( dh->NumberOfTracers > 0 )
       {
-      vtkstd::vector<unsigned char> tracerBuffer;
+      std::vector<unsigned char> tracerBuffer;
       int tracer;
       vtkFloatArray *coords[3];
       for (tracer = 0; tracer < 3; tracer ++)
@@ -1689,7 +1689,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
     dh->ActualNumberOfBlocks = totalBlocks;
     dh->SavedBlocksGeometryOffset = spis->Tell();
     
-    vtkstd::vector<unsigned char> arrayBuffer;
+    std::vector<unsigned char> arrayBuffer;
     for ( block = 0; block < dh->NumberOfBlocks; ++ block )
       {
       if (dh->SavedBlockAllocatedStates[block])

@@ -26,9 +26,9 @@
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
-class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
+class vtkKdTreeGeneratorVector : public std::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);

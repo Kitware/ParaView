@@ -32,14 +32,14 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-#include <vtkstd/map>
-#include <vtkstd/vector>
+#include <map>
+#include <vector>
 #include <assert.h>
 
 class vtkPVSynchronizedRenderWindows::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkSmartPointer<vtkRenderer> > VectorOfRenderers;
+  typedef std::vector<vtkSmartPointer<vtkRenderer> > VectorOfRenderers;
 
   struct RenderWindowInfo
     {
@@ -72,9 +72,9 @@ public:
       }
     };
 
-  vtkstd::vector<CallbackInfo> RMICallbacks;
+  std::vector<CallbackInfo> RMICallbacks;
 
-  typedef vtkstd::map<unsigned int, RenderWindowInfo> RenderWindowsMap;
+  typedef std::map<unsigned int, RenderWindowInfo> RenderWindowsMap;
   RenderWindowsMap RenderWindows;
 
   unsigned int GetKey(vtkRenderWindow* win)
@@ -857,7 +857,7 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
     // Tell the server-root to start rendering.
     vtkMultiProcessStream stream;
     stream << this->Internals->ActiveId;
-    vtkstd::vector<unsigned char> data;
+    std::vector<unsigned char> data;
     stream.GetRawData(data);
     this->ClientServerController->TriggerRMIOnAllChildren(
       &data[0], static_cast<int>(data.size()), SYNC_MULTI_RENDER_WINDOW_TAG);
@@ -915,7 +915,7 @@ void vtkPVSynchronizedRenderWindows::RootStartRender(vtkRenderWindow* renWin)
     // * Tell the satellites to start rendering.
     vtkMultiProcessStream stream;
     stream << this->Internals->ActiveId;
-    vtkstd::vector<unsigned char> data;
+    std::vector<unsigned char> data;
     stream.GetRawData(data);
     this->ParallelController->TriggerRMIOnAllChildren(
       &data[0], static_cast<int>(data.size()), SYNC_MULTI_RENDER_WINDOW_TAG);
@@ -1535,7 +1535,7 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
     parallelController->Broadcast(stream, 0);
     }
 
-  vtkstd::string xml;
+  std::string xml;
   stream >> xml;
   vtkSelectionSerializer::Parse(xml.c_str(), selection);
   return true;
@@ -1609,7 +1609,7 @@ void vtkPVSynchronizedRenderWindows::TriggerRMI(
 
   assert(c_ds_controller == NULL || c_ds_controller != c_rs_controller);
 
-  vtkstd::vector<unsigned char> data;
+  std::vector<unsigned char> data;
   stream.GetRawData(data);
 
   if (this->Mode == CLIENT)
@@ -1720,7 +1720,7 @@ double vtkPVSynchronizedRenderWindows::GetZbufferDataAtPoint(int x, int y,
     vtkMultiProcessStream stream;
     stream << id << x << y;
 
-    vtkstd::vector<unsigned char> data;
+    std::vector<unsigned char> data;
     stream.GetRawData(data);
     this->ClientServerController->TriggerRMIOnAllChildren(
       &data[0], static_cast<int>(data.size()), GET_ZBUFFER_VALUE_TAG);

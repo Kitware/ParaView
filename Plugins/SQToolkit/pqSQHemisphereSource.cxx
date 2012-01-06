@@ -41,9 +41,9 @@ Copyright 2008 SciberQuest Inc.
 #endif
 
 #include <vector>
-using vtkstd::vector;
+using std::vector;
 #include <string>
-using vtkstd::string;
+using std::string;
 #include <fstream>
 using std::ofstream;
 using std::ifstream;

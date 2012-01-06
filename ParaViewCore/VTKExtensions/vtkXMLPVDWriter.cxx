@@ -45,8 +45,8 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
@@ -54,11 +54,11 @@ vtkStandardNewMacro(vtkXMLPVDWriter);
 class vtkXMLPVDWriterInternals
 {
 public:
-  vtkstd::vector< vtkSmartPointer<vtkXMLWriter> > Writers;
-  vtkstd::string FilePath;
-  vtkstd::string FilePrefix;
-  vtkstd::vector<vtkstd::string> Entries;
-  vtkstd::string CreatePieceFileName(int index);
+  std::vector< vtkSmartPointer<vtkXMLWriter> > Writers;
+  std::string FilePath;
+  std::string FilePrefix;
+  std::vector<std::string> Entries;
+  std::string CreatePieceFileName(int index);
 };
 
 //----------------------------------------------------------------------------
@@ -184,7 +184,7 @@ int vtkXMLPVDWriter::RequestData(vtkInformation* request,
   this->GetProgressRange(progressRange);
   
   // Create the subdirectory for the internal files.
-  vtkstd::string subdir = this->Internal->FilePath;
+  std::string subdir = this->Internal->FilePath;
   subdir += this->Internal->FilePrefix;
   this->MakeDirectory(subdir.c_str());
  
@@ -198,8 +198,8 @@ int vtkXMLPVDWriter::RequestData(vtkInformation* request,
     if(vtkXMLWriter* w = this->GetWriter(i))
       {
       // Set the file name.
-      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
-      vtkstd::string full = this->Internal->FilePath;
+      std::string fname = this->Internal->CreatePieceFileName(i);
+      std::string full = this->Internal->FilePath;
       full += fname;
       w->SetFileName(full.c_str());
       
@@ -260,7 +260,7 @@ int vtkXMLPVDWriter::WriteData()
   os << indent << "<" << this->GetDataSetName() << ">\n";
   
   // Write the set of entries.
-  for(vtkstd::vector<vtkstd::string>::const_iterator i =
+  for(std::vector<std::string>::const_iterator i =
         this->Internal->Entries.begin();
       i != this->Internal->Entries.end(); ++i)
     {
@@ -542,11 +542,11 @@ vtkXMLWriter* vtkXMLPVDWriter::GetWriter(int index)
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::SplitFileName()
 {
-  vtkstd::string fileName = this->FileName;
-  vtkstd::string name;
+  std::string fileName = this->FileName;
+  std::string name;
   
   // Split the file name and extension from the path.
-  vtkstd::string::size_type pos = fileName.find_last_of("/\\");
+  std::string::size_type pos = fileName.find_last_of("/\\");
   if(pos != fileName.npos)
     {
     // Keep the slash in the file path.
@@ -626,9 +626,9 @@ void vtkXMLPVDWriter::DeleteAllEntries()
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
+std::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
 {
-  vtkstd::string fname;
+  std::string fname;
   vtksys_ios::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701
     << this->FilePrefix.c_str() << "/"

@@ -48,7 +48,7 @@ static const char *Renderer_strings[] = {
 "Splatting", "Texture3D", "RayCasting", 
 "RayCastingIntegration"};
 
-vtkstd::string
+std::string
 VolumeAttributes::Renderer_ToString(VolumeAttributes::Renderer t)
 {
     int index = int(t);
@@ -56,7 +56,7 @@ VolumeAttributes::Renderer_ToString(VolumeAttributes::Renderer t)
     return Renderer_strings[index];
 }
 
-vtkstd::string
+std::string
 VolumeAttributes::Renderer_ToString(int t)
 {
     int index = (t < 0 || t >= 4) ? 0 : t;
@@ -64,7 +64,7 @@ VolumeAttributes::Renderer_ToString(int t)
 }
 
 bool
-VolumeAttributes::Renderer_FromString(const vtkstd::string &s, VolumeAttributes::Renderer &val)
+VolumeAttributes::Renderer_FromString(const std::string &s, VolumeAttributes::Renderer &val)
 {
     val = VolumeAttributes::Splatting;
     for(int i = 0; i < 4; ++i)
@@ -85,7 +85,7 @@ VolumeAttributes::Renderer_FromString(const vtkstd::string &s, VolumeAttributes:
 static const char *GradientType_strings[] = {
 "CenteredDifferences", "SobelOperator"};
 
-vtkstd::string
+std::string
 VolumeAttributes::GradientType_ToString(VolumeAttributes::GradientType t)
 {
     int index = int(t);
@@ -93,7 +93,7 @@ VolumeAttributes::GradientType_ToString(VolumeAttributes::GradientType t)
     return GradientType_strings[index];
 }
 
-vtkstd::string
+std::string
 VolumeAttributes::GradientType_ToString(int t)
 {
     int index = (t < 0 || t >= 2) ? 0 : t;
@@ -101,7 +101,7 @@ VolumeAttributes::GradientType_ToString(int t)
 }
 
 bool
-VolumeAttributes::GradientType_FromString(const vtkstd::string &s, VolumeAttributes::GradientType &val)
+VolumeAttributes::GradientType_FromString(const std::string &s, VolumeAttributes::GradientType &val)
 {
     val = VolumeAttributes::CenteredDifferences;
     for(int i = 0; i < 2; ++i)
@@ -123,7 +123,7 @@ static const char *Scaling_strings[] = {
 "Linear", "Log10", "Skew"
 };
 
-vtkstd::string
+std::string
 VolumeAttributes::Scaling_ToString(VolumeAttributes::Scaling t)
 {
     int index = int(t);
@@ -131,7 +131,7 @@ VolumeAttributes::Scaling_ToString(VolumeAttributes::Scaling t)
     return Scaling_strings[index];
 }
 
-vtkstd::string
+std::string
 VolumeAttributes::Scaling_ToString(int t)
 {
     int index = (t < 0 || t >= 3) ? 0 : t;
@@ -139,7 +139,7 @@ VolumeAttributes::Scaling_ToString(int t)
 }
 
 bool
-VolumeAttributes::Scaling_FromString(const vtkstd::string &s, VolumeAttributes::Scaling &val)
+VolumeAttributes::Scaling_FromString(const std::string &s, VolumeAttributes::Scaling &val)
 {
     val = VolumeAttributes::Linear;
     for(int i = 0; i < 3; ++i)
@@ -160,7 +160,7 @@ VolumeAttributes::Scaling_FromString(const vtkstd::string &s, VolumeAttributes::
 static const char *SamplingType_strings[] = {
 "KernelBased", "Rasterization"};
 
-vtkstd::string
+std::string
 VolumeAttributes::SamplingType_ToString(VolumeAttributes::SamplingType t)
 {
     int index = int(t);
@@ -168,7 +168,7 @@ VolumeAttributes::SamplingType_ToString(VolumeAttributes::SamplingType t)
     return SamplingType_strings[index];
 }
 
-vtkstd::string
+std::string
 VolumeAttributes::SamplingType_ToString(int t)
 {
     int index = (t < 0 || t >= 2) ? 0 : t;
@@ -176,7 +176,7 @@ VolumeAttributes::SamplingType_ToString(int t)
 }
 
 bool
-VolumeAttributes::SamplingType_FromString(const vtkstd::string &s, VolumeAttributes::SamplingType &val)
+VolumeAttributes::SamplingType_FromString(const std::string &s, VolumeAttributes::SamplingType &val)
 {
     val = VolumeAttributes::KernelBased;
     for(int i = 0; i < 2; ++i)
@@ -451,7 +451,7 @@ VolumeAttributes::operator != (const VolumeAttributes &obj) const
 //   
 // ****************************************************************************
 
-const vtkstd::string
+const std::string
 VolumeAttributes::TypeName() const
 {
     return "VolumeAttributes";
@@ -501,7 +501,7 @@ VolumeAttributes::CopyAttributes(const AttributeGroup *atts)
 // ****************************************************************************
 
 AttributeSubject *
-VolumeAttributes::CreateCompatible(const vtkstd::string &tname) const
+VolumeAttributes::CreateCompatible(const std::string &tname) const
 {
     AttributeSubject *retval = 0;
     if(TypeName() == tname)
@@ -977,7 +977,7 @@ VolumeAttributes::SetResampleTarget(int resampleTarget_)
 }
 
 void
-VolumeAttributes::SetOpacityVariable(const vtkstd::string &opacityVariable_)
+VolumeAttributes::SetOpacityVariable(const std::string &opacityVariable_)
 {
     opacityVariable = opacityVariable_;
     Select(7, (void *)&opacityVariable);
@@ -1161,13 +1161,13 @@ VolumeAttributes::GetResampleTarget() const
     return resampleTarget;
 }
 
-const vtkstd::string &
+const std::string &
 VolumeAttributes::GetOpacityVariable() const
 {
     return opacityVariable;
 }
 
-vtkstd::string &
+std::string &
 VolumeAttributes::GetOpacityVariable()
 {
     return opacityVariable;
@@ -1328,7 +1328,7 @@ VolumeAttributes::SelectFreeformOpacity()
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 VolumeAttributes::GetFieldName(int index) const
 {
     switch (index)
@@ -1426,7 +1426,7 @@ VolumeAttributes::GetFieldType(int index) const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 VolumeAttributes::GetFieldTypeName(int index) const
 {
     switch (index)

@@ -16,12 +16,12 @@
 
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/vector>
+#include <vector>
 //----------------------------------------------------------------------------
 class vtkPVKeyFrameInternals
 {
 public:
-  typedef vtkstd::vector<double> VectorOfDoubles;
+  typedef std::vector<double> VectorOfDoubles;
   VectorOfDoubles KeyValues;
 };
 //----------------------------------------------------------------------------

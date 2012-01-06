@@ -4,6 +4,14 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
 )
 
+SET (TESTS_WITH_INLINE_COMPARES
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
+)
+
 SET (TESTS_WITH_BASELINES)
 IF(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
@@ -144,6 +152,7 @@ set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
+set (TestIsoVolume_BREAK TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
@@ -198,6 +207,11 @@ SET (XYHistogram_THRESHOLD 60)
 SET (NewColorEditor1_THRESHOLD 60)
 SET (NewColorEditor3_THRESHOLD 60)
 
+SET (SLACTools_DISABLE_CS TRUE)
+SET (SLACTools_DISABLE_CRS TRUE)
+SET (SLACTools_BREAK TRUE)
+SET(SLACTools_THRESHOLD 20)
+
 # Histogram filter produces different results when running in parallel, so
 # disable it.
 IF (PARAVIEW_USE_MPI)
@@ -243,6 +257,9 @@ SET (SaveCSV_THRESHOLD 40)
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
 
+set (LoadStateMultiView_BREAK TRUE)
+set (RenderNan_BREAK TRUE)
+
 # NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
 SET (NewColorEditor3_DISABLE_CS TRUE)
@@ -274,6 +291,9 @@ SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+
+# Set image threshold overrides for the tests.
+SET(SaveLargeScreenshot_THRESHOLD 10000)
 
 IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
   SET(EyeDomeLighting_DISABLE_C TRUE)
@@ -385,6 +405,12 @@ set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 
+IF (PARAVIEW_DATA_ROOT)
+  set (TESTS_WITHOUT_BASELINES
+    ${TESTS_WITHOUT_BASELINES}
+    ${TESTS_WITH_INLINE_COMPARES})
+ENDIF (PARAVIEW_DATA_ROOT)
+
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   PARALLEL
@@ -402,10 +428,18 @@ IF (PARAVIEW_DATA_ROOT)
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
   )
 
+  add_client_server_tests("pvcs"
+    TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+  )
+
   IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     add_client_render_server_tests("pvcrs"
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    )
+
+    add_client_render_server_tests("pvcrs"
+      TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
     )
   ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 

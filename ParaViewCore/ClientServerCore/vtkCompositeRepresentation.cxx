@@ -23,19 +23,19 @@
 #include "vtkView.h"
 #include "vtkWeakPointer.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 #include <assert.h>
 
 class vtkCompositeRepresentation::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVDataRepresentation> >
+  typedef std::map<std::string, vtkSmartPointer<vtkPVDataRepresentation> >
     RepresentationMap;
   RepresentationMap Representations;
 
-  vtkstd::string ActiveRepresentationKey;
+  std::string ActiveRepresentationKey;
 
   vtkWeakPointer<vtkView> View;
   vtkSmartPointer<vtkStringArray> RepresentationTypes;

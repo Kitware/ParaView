@@ -23,7 +23,7 @@
 #ifndef __vtkMaterialInterfaceIdList_h
 #define __vtkMaterialInterfaceIdList_h
 
-#include <vtkstd/vector>
+#include <vector>
 #include "vtkMaterialInterfaceIdListItem.h"
 
 class vtkMaterialInterfaceIdList
@@ -47,7 +47,7 @@ public:
   // Description:
   // Initialize the container with a list of id's
   // these must be in ascending order.
-  void Initialize(vtkstd::vector<int> ids, bool preSorted=false);
+  void Initialize(std::vector<int> ids, bool preSorted=false);
   // Description:
   // Initialize the container from the ids that have
   // been pushed. This must be done before querrying.
@@ -65,6 +65,6 @@ public:
   int GetLocalId(int globalId);
 private:
   bool IsInitialized;
-  vtkstd::vector<vtkMaterialInterfaceIdListItem> IdList;
+  std::vector<vtkMaterialInterfaceIdListItem> IdList;
 };
 #endif

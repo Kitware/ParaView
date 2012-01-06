@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkMaterialInterfaceProcessRing.h"
 #include "vtksys/ios/iostream"
-using vtkstd::vector;
+using std::vector;
 using vtksys_ios::ostream;
 using vtksys_ios::cerr;
 using vtksys_ios::endl;

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkToolkits.h" // For VTK_USE_MPI
 
 #include "vtkPVPythonInterpretor.h"
-#include <vtkstd/vector>
+#include <vector>
 
 namespace ParaViewPython {
 
@@ -36,7 +36,7 @@ namespace ParaViewPython {
 
   //---------------------------------------------------------------------------
 
-  void ProcessArgsForPython( vtkstd::vector<char*> & pythonArgs,
+  void ProcessArgsForPython( std::vector<char*> & pythonArgs,
                              const char *script,
                              int argc, char* argv[] )
     {
@@ -91,7 +91,7 @@ namespace ParaViewPython {
       options->GetRemainingArguments(&remaining_argc, &remaining_argv);
 
       // Process arguments
-      vtkstd::vector<char*> pythonArgs;
+      std::vector<char*> pythonArgs;
       ProcessArgsForPython(pythonArgs, options->GetPythonScriptName(),
         remaining_argc, remaining_argv);
 
@@ -101,7 +101,7 @@ namespace ParaViewPython {
       interpretor->Delete();
 
       // Free python args
-      vtkstd::vector<char*>::iterator it = pythonArgs.begin();
+      std::vector<char*>::iterator it = pythonArgs.begin();
       while(it != pythonArgs.end())
         {
         delete [] *it;

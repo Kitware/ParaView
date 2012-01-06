@@ -35,13 +35,13 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkViewport.h"
 
-#include <vtkstd/list>
+#include <list>
 
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
-class vtkHandleList : public vtkstd::list<vtkHandleRepresentation*> {};
-typedef vtkstd::list<vtkHandleRepresentation*>::iterator vtkHandleListIterator;
+class vtkHandleList : public std::list<vtkHandleRepresentation*> {};
+typedef std::list<vtkHandleRepresentation*>::iterator vtkHandleListIterator;
 
 //----------------------------------------------------------------------------
 class vtkTFERSimple1DDisplayXLess 

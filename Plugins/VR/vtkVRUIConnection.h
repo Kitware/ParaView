@@ -115,7 +115,7 @@ protected:
   void GetAndEnqueueAnalogData();
   void GetAndEnqueueTrackerData();
 
-  void NewAnalogValue(vtkstd::vector<float> *data);
+  void NewAnalogValue(std::vector<float> *data);
   void NewButtonValue(int state,  int button);
   void NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor);
 

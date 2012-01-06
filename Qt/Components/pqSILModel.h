@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 #include <QVector>
 #include <QSet>
-#include <vtkstd/set>
+#include <set>
 
 #include "vtkObject.h"
 #include "pqComponentsExport.h"
@@ -168,7 +168,7 @@ protected:
 
   /// Used to initialize the HierarchyVertexIds list with the leaf node ids for
   /// each of the hierarchies.
-  void collectLeaves(vtkIdType vertexid, vtkstd::set<vtkIdType>& list);
+  void collectLeaves(vtkIdType vertexid, std::set<vtkIdType>& list);
 
   vtkSMSILModel* SILModel;
 
@@ -179,7 +179,7 @@ protected:
 
   /// This map keeps a list of vertex ids that refer to the leaves in the
   /// hierarchy.
-  QMap<QString, vtkstd::set<vtkIdType> > HierarchyVertexIds;
+  QMap<QString, std::set<vtkIdType> > HierarchyVertexIds;
   vtkSmartPointer<vtkGraph> SIL;
 
 private:

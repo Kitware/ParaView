@@ -23,7 +23,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <assert.h>
 
 #include "vtkStdString.h"
@@ -32,7 +32,7 @@ vtkStandardNewMacro(vtkSMProxyGroupDomain);
 
 struct vtkSMProxyGroupDomainInternals
 {
-  vtkstd::vector<vtkStdString> Groups;
+  std::vector<vtkStdString> Groups;
 };
 
 //---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProxy* proxy)
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   if (pxm)
     {
-    vtkstd::vector<vtkStdString>::iterator it = 
+    std::vector<vtkStdString>::iterator it =
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {
@@ -126,7 +126,7 @@ unsigned int vtkSMProxyGroupDomain::GetNumberOfProxies()
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
-    vtkstd::vector<vtkStdString>::iterator it = 
+    std::vector<vtkStdString>::iterator it =
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {
@@ -147,7 +147,7 @@ const char* vtkSMProxyGroupDomain::GetProxyName(unsigned int idx)
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
-    vtkstd::vector<vtkStdString>::iterator it = 
+    std::vector<vtkStdString>::iterator it =
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {
@@ -172,7 +172,7 @@ const char* vtkSMProxyGroupDomain::GetProxyName(vtkSMProxy* proxy)
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
-    vtkstd::vector<vtkStdString>::iterator it = 
+    std::vector<vtkStdString>::iterator it =
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {
@@ -193,7 +193,7 @@ vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(const char* name)
   vtkSMSessionProxyManager* pm = this->GetSessionProxyManager();
   if (pm)
     {
-    vtkstd::vector<vtkStdString>::iterator it = 
+    std::vector<vtkStdString>::iterator it =
       this->PGInternals->Groups.begin();
     for (; it != this->PGInternals->Groups.end(); it++)
       {

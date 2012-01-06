@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSystemInformation.h"
 #include "vtkSMSession.h"
 
-#include <vtkstd/map>
-#include <vtkstd/algorithm>
+#include <map>
+#include <algorithm>
 
 namespace
 {
@@ -357,24 +357,24 @@ namespace
 
   class GatherSummary
     {
-    vtkstd::map<int, SummaryInfo> &Map;
+    std::map<int, SummaryInfo> &Map;
   public:
-    GatherSummary(vtkstd::map<int, SummaryInfo>& map):
+    GatherSummary(std::map<int, SummaryInfo>& map):
       Map(map) { }
     void operator() (
       const vtkPVSystemInformation::SystemInformationType& data)
       {
       SummaryInfo& info = this->Map[data.ProcessType];
-      info.PhysicalMin = vtkstd::min(info.PhysicalMin,
+      info.PhysicalMin = std::min(info.PhysicalMin,
         data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
-      info.PhysicalMax = vtkstd::max(info.PhysicalMax,
+      info.PhysicalMax = std::max(info.PhysicalMax,
         data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
       info.PhysicalSum += 
         (data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
 
-      info.VirtualMin = vtkstd::min(info.VirtualMin,
+      info.VirtualMin = std::min(info.VirtualMin,
         data.TotalVirtualMemory - data.AvailableVirtualMemory);
-      info.VirtualMax = vtkstd::max(info.VirtualMax,
+      info.VirtualMax = std::max(info.VirtualMax,
         data.TotalVirtualMemory - data.AvailableVirtualMemory);
       info.VirtualSum += 
         (data.TotalVirtualMemory - data.AvailableVirtualMemory);
@@ -387,14 +387,14 @@ namespace
 //-----------------------------------------------------------------------------
 void pqMemoryInspector::updateSummary()
 {
-  vtkstd::map<int, SummaryInfo> collector;
-  vtkstd::for_each(
+  std::map<int, SummaryInfo> collector;
+  std::for_each(
     this->Internals->Model.GetInformation()->GetSystemInformations().begin(),
     this->Internals->Model.GetInformation()->GetSystemInformations().end(),
     GatherSummary(collector));
   QString text;
 
-  for (vtkstd::map<int, SummaryInfo>::iterator iter = collector.begin();
+  for (std::map<int, SummaryInfo>::iterator iter = collector.begin();
   iter != collector.end(); ++iter)
     {
     text += this->Internals->SummaryText.arg(

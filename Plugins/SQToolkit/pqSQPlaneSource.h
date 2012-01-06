@@ -12,7 +12,7 @@ Copyright 2008 SciberQuest Inc.
 
 #include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"
-#include <vtkstd/vector>
+#include <vector>
 
 #include "ui_pqSQPlaneSourceForm.h"
 using Ui::pqSQPlaneSourceForm;

@@ -20,8 +20,8 @@
 #define __vtkIntersectFragments_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector"//
-#include "vtkstd/string"//
+#include "vector"//
+#include "string"//
 
 class vtkPolyData;
 //class vtkMultiBlockDataSet;
@@ -82,13 +82,13 @@ protected:
   // Build arrays that describe which fragment
   // intersections are not empty.
   void BuildLoadingArray(
-          vtkstd::vector<vtkIdType> &loadingArray,
+          std::vector<vtkIdType> &loadingArray,
           int blockId);
   int PackLoadingArray(vtkIdType *&buffer, int blockId);
   int UnPackLoadingArray(
           vtkIdType *buffer,
           int bufSize,
-          vtkstd::vector<vtkIdType> &loadingArray,
+          std::vector<vtkIdType> &loadingArray,
           int blockId);
   //
   void ComputeGeometricAttributes();
@@ -96,23 +96,23 @@ protected:
   int SendGeometricAttributes(const int recipientProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&centers,
-          vtkstd::vector<vtkstd::vector<int *> >&ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<std::vector<vtkDoubleArray *> >&centers,
+          std::vector<std::vector<int *> >&ids);
   // Free resources.
   int CleanUpAfterCollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&centers,
-          vtkstd::vector<vtkstd::vector<int *> >&ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<std::vector<vtkDoubleArray *> >&centers,
+          std::vector<std::vector<int *> >&ids);
   // Recieve all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&centers,
-          vtkstd::vector<vtkstd::vector<int *> >&ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<std::vector<vtkDoubleArray *> >&centers,
+          std::vector<std::vector<int *> >&ids);
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes(
-          vtkstd::vector<vtkstd::vector<int> >&unique);
+          std::vector<std::vector<int> >&unique);
   // Gather geometric attributes on a single process.
   int GatherGeometricAttributes(const int recipientProcId);
   // Copy attributes from input to output
@@ -124,11 +124,11 @@ protected:
   //
   vtkMultiProcessController* Controller;
   // Global ids of what we own before the intersection.
-  vtkstd::vector<vtkstd::vector<int> >FragmentIds;
+  std::vector<std::vector<int> >FragmentIds;
   // Centers, and global fragment ids.
   // an array for each block.
-  vtkstd::vector<vtkDoubleArray *>IntersectionCenters;
-  vtkstd::vector<vtkstd::vector<int> >IntersectionIds;
+  std::vector<vtkDoubleArray *>IntersectionCenters;
+  std::vector<std::vector<int> >IntersectionIds;
   //
   vtkCutter *Cutter;
   // data in/out
@@ -138,7 +138,7 @@ protected:
   vtkMultiBlockDataSet *StatsOut;
   int NBlocks;
   // only used on controller.
-  vtkstd::vector<int> NFragmentsIntersected;
+  std::vector<int> NFragmentsIntersected;
 
   /// PARAVIEW interface data
   vtkImplicitFunction *CutFunction;

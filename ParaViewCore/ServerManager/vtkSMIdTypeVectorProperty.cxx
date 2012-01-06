@@ -53,7 +53,7 @@ void vtkSMIdTypeVectorProperty::WriteTo(vtkSMMessage* msg)
   prop->set_name(this->GetXMLName());
   Variant *variant = prop->mutable_value();
   variant->set_type(Variant::IDTYPE);
-  vtkstd::vector<vtkIdType>::iterator iter;
+  std::vector<vtkIdType>::iterator iter;
   for (iter = this->Internals->Values.begin(); iter!=
     this->Internals->Values.end(); ++iter)
     {
@@ -226,7 +226,7 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
           return 0;
           }
         vtkIdType *idtype_values = new vtkIdType[numElems];
-        vtkstd::copy(initVal, initVal+numElems, idtype_values);
+        std::copy(initVal, initVal+numElems, idtype_values);
         this->SetElements(idtype_values);
         delete[] idtype_values;
         this->Internals->UpdateDefaultValues();

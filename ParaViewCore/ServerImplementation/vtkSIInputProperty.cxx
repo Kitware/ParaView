@@ -70,8 +70,8 @@ bool vtkSIInputProperty::Push(vtkSMMessage* message, int offset)
   const Variant *variant = &prop->value();
   assert(variant->proxy_global_id_size() == variant->port_number_size());
 
-  vtkstd::vector<vtkTypeUInt32> proxy_ids;
-  vtkstd::vector<int> output_ports;
+  std::vector<vtkTypeUInt32> proxy_ids;
+  std::vector<int> output_ports;
 
   proxy_ids.resize(variant->proxy_global_id_size());
   output_ports.resize(proxy_ids.size());

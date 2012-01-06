@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkChart.h"
 #include "vtkNew.h"
 
-#include <vtkstd/set>
-#include <vtkstd/map>
+#include <set>
+#include <map>
 
 // Qt includes.
 #include <QAction>
@@ -206,7 +206,7 @@ public:
   vtkSMMessage LastMousePointerPosition;
   bool MousePointerLocationUpdated;
   bool BroadcastMouseLocation;
-  vtkstd::map<vtkTypeUInt32, ChartBounds> ContextViewBoundsToShare;
+  std::map<vtkTypeUInt32, ChartBounds> ContextViewBoundsToShare;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
 
 protected:
@@ -502,7 +502,7 @@ void pqCollaborationManager::sendChartViewBoundsToOtherClients()
 {
   if(this->Internals->ContextViewBoundsToShare.size() > 0)
     {
-    vtkstd::map<vtkTypeUInt32, ChartBounds>::iterator iter;
+    std::map<vtkTypeUInt32, ChartBounds>::iterator iter;
     iter = this->Internals->ContextViewBoundsToShare.begin();
     while(iter != this->Internals->ContextViewBoundsToShare.end())
       {

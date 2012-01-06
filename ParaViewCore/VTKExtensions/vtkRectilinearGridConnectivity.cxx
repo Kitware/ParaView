@@ -32,9 +32,9 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkMultiProcessController.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <vector>
+#include <string>
 
 
 vtkStandardNewMacro( vtkRectilinearGridConnectivity );
@@ -76,10 +76,10 @@ public:
   int                              NumberIntegralComponents;
   int                              VolumeFractionArraysType;
   double                           VolumeFractionValueScale;
-  vtkstd::vector<       int      > ComponentNumbersPerArray;
-  vtkstd::vector< vtkstd::string > VolumeFractionArrayNames;
-  vtkstd::vector< vtkstd::string > VolumeDataAttributeNames;
-  vtkstd::vector< vtkstd::string > IntegrableAttributeNames;
+  std::vector<       int      > ComponentNumbersPerArray;
+  std::vector< std::string > VolumeFractionArrayNames;
+  std::vector< std::string > VolumeDataAttributeNames;
+  std::vector< std::string > IntegrableAttributeNames;
   
   int IntegrablePointDataArraysAvailable( vtkRectilinearGrid * rectGrid )
     {
@@ -2789,13 +2789,13 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons
   
   vtkIncrementalOctreePointLocator   * pntAdder = NULL; // for this block only
   vtkRectilinearGridConnectivityFace * thisFace = NULL; // face from the hash
-  vtkstd::vector< vtkRectilinearGridConnectivityFace * > *  theGroup = NULL; 
-  vtkstd::vector< vtkRectilinearGridConnectivityFace * >::iterator faceItrt;
-  vtkstd::map<     int, 
-                   vtkstd::vector< vtkRectilinearGridConnectivityFace * >
+  std::vector< vtkRectilinearGridConnectivityFace * > *  theGroup = NULL;
+  std::vector< vtkRectilinearGridConnectivityFace * >::iterator faceItrt;
+  std::map<     int,
+                   std::vector< vtkRectilinearGridConnectivityFace * >
              >     faceGrps; // faces grouped by the fragment Id
-  vtkstd::map<     int, 
-                   vtkstd::vector< vtkRectilinearGridConnectivityFace * >
+  std::map<     int,
+                   std::vector< vtkRectilinearGridConnectivityFace * >
              >::iterator   grpItrat;
           
           
@@ -2823,7 +2823,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons
       if (  grpItrat == faceGrps.end()  )
         {
         // create a faces group for this new fragment and add this face to it
-        vtkstd::vector< vtkRectilinearGridConnectivityFace * >  macroVol;
+        std::vector< vtkRectilinearGridConnectivityFace * >  macroVol;
         macroVol.push_back( thisFace );
         faceGrps[ thisFace->FragmentId ] = macroVol;
         }
@@ -3595,10 +3595,10 @@ void  vtkRectilinearGridConnectivity::CreateInterProcessPolygons
   vtkDoubleArray  * theArray = NULL;
   vtkDoubleArray ** attrVals = NULL;
   
-  vtkstd::vector< int >        *  theGroup = NULL; 
-  vtkstd::vector< int >::iterator cellItrt;
-  vtkstd::map<  int,  vtkstd::vector< int >  >  cellGrps;  
-  vtkstd::map<  int,  vtkstd::vector< int >  >::iterator   grpItrat;
+  std::vector< int >        *  theGroup = NULL;
+  std::vector< int >::iterator cellItrt;
+  std::map<  int,  std::vector< int >  >  cellGrps;
+  std::map<  int,  std::vector< int >  >::iterator   grpItrat;
   
   // number of points and that of cells
   numbPnts = fragPoly->GetNumberOfPoints();
@@ -3676,7 +3676,7 @@ void  vtkRectilinearGridConnectivity::CreateInterProcessPolygons
     if ( grpItrat == cellGrps.end() )
       {
       // create a group (of cells) for this new fragment and add this cell to it
-      vtkstd::vector< int >     cellGrup;
+      std::vector< int >     cellGrup;
       cellGrup.push_back( i );
       cellGrps[ fIdxsPtr[i] ] = cellGrup;
       }
