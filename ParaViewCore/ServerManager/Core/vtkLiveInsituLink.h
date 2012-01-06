@@ -81,6 +81,13 @@ public:
     CONNECTED = 1200,
     NEXT_TIMESTEP_AVAILABLE = 1201
     };
+
+  void UpdateInsituXMLState(const char* txt)
+    {
+    this->InsituXMLStateChanged = true;
+    this->SetInsituXMLState(txt);
+    }
+
 //BTX
 protected:
   vtkLiveInsituLink();
@@ -104,6 +111,7 @@ protected:
   int ProcessType;
   unsigned int ProxyId;
 
+  bool InsituXMLStateChanged;
   char* InsituXMLState;
   vtkSmartPointer<vtkPVXMLElement> XMLState;
   vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
@@ -117,6 +125,9 @@ private:
 
   vtkSetStringMacro(URL);
   char* URL;
+
+
+  vtkSetStringMacro(InsituXMLState);
 //ETX
 };
 

@@ -15,18 +15,23 @@
 #include "vtkSMLiveInsituLinkProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkLiveInsituLink.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
 
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMLiveInsituLinkProxy);
 //----------------------------------------------------------------------------
 vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy()
 {
+  this->StateDirty = false;
 }
 
 //----------------------------------------------------------------------------
@@ -39,6 +44,18 @@ vtkSMLiveInsituLinkProxy::~vtkSMLiveInsituLinkProxy()
 vtkSMSessionProxyManager* vtkSMLiveInsituLinkProxy::GetInsituProxyManager()
 {
   return this->InsituProxyManager;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::SetInsituProxyManager(
+  vtkSMSessionProxyManager* pxm)
+{
+  this->InsituProxyManager = pxm;
+  if (pxm)
+    {
+    pxm->AddObserver(vtkCommand::PropertyModifiedEvent,
+      this, &vtkSMLiveInsituLinkProxy::MarkStateDirty);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -85,10 +102,6 @@ void vtkSMLiveInsituLinkProxy::CreateVTKObjects()
            << vtkClientServerStream::End;
     this->ExecuteStream(stream);
     }
-
-  // Setup the dummy proxy manager.
-  vtkSMSessionProxyManager* pxm = vtkSMSessionProxyManager::New(NULL);
-  this->InsituProxyManager.TakeReference(pxm);
 }
 
 //----------------------------------------------------------------------------
@@ -100,13 +113,32 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
   if (parser->Parse(state))
     {
     this->InsituProxyManager->LoadXMLState(parser->GetRootElement());
+    this->StateDirty = false;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
 {
-  cout << "NewTimestepAvailable" << endl;
+  if (this->StateDirty)
+    {
+    cout << "Push new state to server." << endl;
+    // push new state.
+    vtkPVXMLElement* root = this->InsituProxyManager->SaveXMLState();
+    vtksys_ios::ostringstream data;
+    root->PrintXML(data, vtkIndent());
+    root->Delete();
+
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "UpdateInsituXMLState"
+           << data.str().c_str()
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+
+    this->StateDirty = false;
+    }
 }
 
 //----------------------------------------------------------------------------

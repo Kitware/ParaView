@@ -62,6 +62,7 @@ set (Module_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
+  vtkSMInsituStateLoader.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx

@@ -71,6 +71,34 @@ vtkSMStateLoader::~vtkSMStateLoader()
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::LocateExistingProxyUsingRegistrationName(
+  vtkTypeUInt32 id)
+{
+  vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
+    = this->Internal->RegistrationInformation.find(id);
+  if (iter == this->Internal->RegistrationInformation.end())
+    {
+    return NULL;
+    }
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  assert(pxm != NULL);
+
+  vtkSMStateLoaderInternals::VectorOfRegInfo::iterator iter2;
+  for (iter2 =iter->second.begin(); iter2 != iter->second.end(); iter2++)
+    {
+    vtkSMProxy* proxy = pxm->GetProxy(iter2->GroupName.c_str(),
+      iter2->ProxyName.c_str());
+    if (proxy)
+      {
+      return proxy;
+      }
+    }
+
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
                                            const char* xml_name,
                                            const char* subProxyName)

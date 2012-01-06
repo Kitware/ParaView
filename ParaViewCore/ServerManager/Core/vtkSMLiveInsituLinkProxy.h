@@ -19,10 +19,11 @@
 #ifndef __vtkSMLiveInsituLinkProxy_h
 #define __vtkSMLiveInsituLinkProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
-class VTK_EXPORT vtkSMLiveInsituLinkProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMLiveInsituLinkProxy : public vtkSMProxy
 {
 public:
   static vtkSMLiveInsituLinkProxy* New();
@@ -33,6 +34,7 @@ public:
   // Provides access to the a dummy proxy manager representing the 
   // insitu visualization pipeline.
   vtkSMSessionProxyManager* GetInsituProxyManager();
+  void SetInsituProxyManager(vtkSMSessionProxyManager*);
 
 //BTX
   // Description:
@@ -47,11 +49,14 @@ protected:
   // that the server-side can send messages to this proxy.
   virtual void CreateVTKObjects();
 
+  void MarkStateDirty() { this->StateDirty = true; }
+
   void InsituConnected(const char* initialial_state);
   void NewTimestepAvailable();
 
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
 
+  bool StateDirty;
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented

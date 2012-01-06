@@ -23,6 +23,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMInsituStateLoader.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -59,6 +60,7 @@ vtkLiveInsituLink::vtkLiveInsituLink():
   InsituPort(0),
   ProcessType(SIMULATION),
   ProxyId(0),
+  InsituXMLStateChanged(false),
   InsituXMLState(0),
   URL(0)
 {
@@ -206,6 +208,7 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       this->InsituXMLState = new char[size + 1];
       controller->Receive(this->InsituXMLState, size, 1, 8001);
       this->InsituXMLState[size] = 0;
+      this->InsituXMLStateChanged = false;
 
       cout << "Received InsituXMLState" << endl;
 
@@ -273,6 +276,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 
     if (xml_state_size > 0)
       {
+      cout << "receiving modified state from Vis" << endl;
       char* buffer = new char[xml_state_size + 1];
       this->Controller->Receive(buffer, xml_state_size, 1, 8011);
       buffer[xml_state_size] = 0;
@@ -288,7 +292,9 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 
   if (this->XMLState)
     {
-    this->ProxyManager->LoadXMLState(this->XMLState /* FIXME: , loader */);
+    vtkNew<vtkSMInsituStateLoader> loader;
+    loader->SetSessionProxyManager(this->ProxyManager);
+    this->ProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
     }
 }
 
@@ -317,7 +323,18 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
   // Check if the state changed since the last time we sent it, if so, provide
   // the updated state to the simulation process.
   int xml_state_size = 0;
+
+  if (this->InsituXMLStateChanged)
+    {
+    xml_state_size = strlen(this->InsituXMLState);
+    }
   this->Controller->Send(&xml_state_size, 1, 1, 8010);
+  if (xml_state_size > 0)
+    {
+    cout << "Sending modified state to simulation" << endl;
+    this->Controller->Send(this->InsituXMLState, xml_state_size, 1, 8011);
+    this->InsituXMLStateChanged = false;
+    }
 }
 
 //----------------------------------------------------------------------------

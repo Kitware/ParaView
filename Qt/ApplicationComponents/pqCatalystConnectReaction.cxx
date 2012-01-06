@@ -33,12 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
 
+#include <QDockWidget>
 
 //-----------------------------------------------------------------------------
 pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
@@ -71,9 +74,15 @@ bool pqCatalystConnectReaction::connect()
   vtkSMPropertyHelper(adaptor, "ProcessType").Set("Visualization");
   adaptor->UpdateVTKObjects();
 
-  adaptor->InvokeCommand("Initialize");
+  // create a new "server session" that acts as the dummy session representing
+  // the insitu viz pipeline.
+  pqServer* catalyst = pqApplicationCore::instance()->getObjectBuilder()->createServer(
+    pqServerResource("builtin:"));
+  catalyst->setResource(pqServerResource("catalyst:"));
+  adaptor->SetInsituProxyManager(catalyst->proxyManager());
+  catalyst->setMonitorServerNotifications(true);
 
-  server->setMonitorServerNotifications(true);
+  adaptor->InvokeCommand("Initialize");
 
   // FIXME: setup listeners so that when activeServer dies, the associated
   // live-insitu connection is also destroyed.

@@ -106,6 +106,11 @@ protected:
   // Checks the root element for version. If failed, return false.
   virtual bool VerifyXMLVersion(vtkPVXMLElement* rootElement);
 
+  // Description:
+  // Returns the first proxy already registered using any of the registration
+  // (group, name) assigned to the proxy with the given id in the state file.
+  vtkSMProxy* LocateExistingProxyUsingRegistrationName(vtkTypeUInt32 id);
+
   vtkPVXMLElement* ServerManagerStateElement;
   vtkSMProxyLocator* ProxyLocator;
 private:
