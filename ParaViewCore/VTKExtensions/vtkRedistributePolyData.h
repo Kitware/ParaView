@@ -105,7 +105,7 @@ protected:
 
 //ETX
 
-  virtual void MakeSchedule (vtkCommSched*);
+  virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
   void OrderSchedule (vtkCommSched*);
 
   void SendCellSizes (vtkIdType*, vtkIdType*, vtkPolyData*, int, 
@@ -157,7 +157,9 @@ protected:
   void ReceiveArrays (vtkDataArray*, vtkIdType, int, 
                       vtkIdType*, int); 
 
-  void Execute();
+  int RequestData(vtkInformation* request,
+                  vtkInformationVector** inputVector,
+                  vtkInformationVector* outputVector);
 
   // Do this as a proprocessing step.
   void CompleteInputArrays(vtkPolyData* input);
