@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,51,13,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,51,13,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ExtractHistogram" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/WindowCaption" command="mousePress" arguments="1,1,0,42,4" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/WindowCaption" command="mouseRelease" arguments="1,0,0,42,4" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/MultiViewFrameMenu/CloseAction" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalAction" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/3D View" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/selectedViewOnly" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/width" command="set_string" arguments="900" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/height" command="set_string" arguments="900" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/ok" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveLargeScreenshot.png" />
+</pqevents>
