@@ -40,15 +40,15 @@ void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
-          << sourceProxy->GetID() << "GetOutput"
+          << VTKOBJECT(sourceProxy) << "GetOutput"
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  this->ExecuteStream(stream);
 
   stream  << vtkClientServerStream::Invoke
-          << this->GetID() << "CopyData" 
+          << VTKOBJECT(this) << "CopyData" 
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  this->ExecuteStream(stream);
 
   this->MarkModified(this);
 }
