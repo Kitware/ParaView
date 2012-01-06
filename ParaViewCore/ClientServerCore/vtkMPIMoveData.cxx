@@ -34,6 +34,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
@@ -45,20 +46,18 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkTrivialProducer.h"
 #include "vtkToolkits.h"
+#include <vtkTrivialProducer.h>
 #include "vtkUndirectedGraph.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
+#include <vtkstd/vector>
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributeCompositePolyData.h"
 #endif
-
-#include <vtkstd/vector>
-#include <vtkTrivialProducer.h>
 
 bool vtkMPIMoveData::UseZLibCompression = false;
 
@@ -138,22 +137,21 @@ namespace
       result->ShallowCopy(pieces[0]);
       return false;
       }
-    vtkstd::vector< vtkSmartPointer<vtkTrivialProducer> > pieceProducers(pieces.size());
-    vtkstd::vector< vtkSmartPointer<vtkTrivialProducer> >::iterator producerIter;
     vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
-    for (iter = pieces.begin(), producerIter = pieceProducers.begin();
-         iter != pieces.end(), producerIter != pieceProducers.end();
-        ++iter, ++producerIter)
+    for (iter = pieces.begin();
+         iter != pieces.end();
+         ++iter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
-      
+
       if (ds && ds->GetNumberOfPoints() == 0)
         {
         // skip empty pieces.
         continue;
         }
-      producerIter->GetPointer()->SetOutput(iter->GetPointer());
-      appender->AddInputConnection(0, producerIter->GetPointer()->GetOutputPort());
+      vtkNew<vtkTrivialProducer> tp;
+      tp->SetOutput(iter->GetPointer());
+      appender->AddInputConnection(0, tp->GetOutputPort());
       }
     appender->Update();
     result->ShallowCopy(appender->GetOutputDataObject(0));
