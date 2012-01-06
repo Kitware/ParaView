@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
 
@@ -39,7 +40,8 @@ int main(int argc, char* argv[])
   //---------------------------------------------------------------------------
   vtkSMSession* session = vtkSMSession::New();
   cout << "==== Starting ====" << endl;
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
 
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
   vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);

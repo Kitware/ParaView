@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSignalAdaptors.h"
 
-pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent)
-  : QWidget(parent),
+pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *p)
+  : QWidget(p),
     ui(new Ui::pqSurfaceLICSummaryDisplayPanel)
 {
   ui->setupUi(this);
@@ -51,9 +51,10 @@ pqSurfaceLICSummaryDisplayPanel::pqSurfaceLICSummaryDisplayPanel(pqRepresentatio
   vtkSMProxy *proxy = representation->getProxy();
 
   pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(this->ui->VectorFieldSelector);
-  pqComboBoxDomain *domain = new pqComboBoxDomain(this->ui->VectorFieldSelector,
-                                                  proxy->GetProperty("SelectLICVectors"),
-                                                  "array_list");
+  new pqComboBoxDomain(this->ui->VectorFieldSelector,
+                       proxy->GetProperty("SelectLICVectors"),
+                       "array_list");
+
   this->Links.addPropertyLink(adaptor,
                               "currentText",
                               SIGNAL(currentTextChanged(const QString&)),

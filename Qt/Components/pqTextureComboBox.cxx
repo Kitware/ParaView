@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <assert.h>
 
 // Qt Includes.
 #include <QFileInfo>
@@ -60,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
+#include "pqServer.h"
 
 
 class pqTextureComboBox::pqInternal
@@ -261,6 +264,9 @@ void pqTextureComboBox::reload()
   // Get all proxies under "textures" group and add them to the menu.
   vtkSMProxyIterator* proxyIter = vtkSMProxyIterator::New();
   proxyIter->SetModeToOneGroup();
+
+  // Look for proxy that in the current active server/session
+  proxyIter->SetSession(pqApplicationCore::instance()->getActiveServer()->session());
 
   QMap<QString, int> countMap;
   for (proxyIter->Begin(TEXTURESGROUP); !proxyIter->IsAtEnd(); proxyIter->Next())

@@ -1,6 +1,7 @@
 
 if(UNIX)
   set(ENV{LD_LIBRARY_PATH} "@CMAKE_CURRENT_BINARY_DIR@/python-build/lib")
+
   include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
 
   set(library_param --enable-shared)

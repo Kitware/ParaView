@@ -102,6 +102,12 @@ public:
     return "@PLUGIN_REQUIRED_PLUGINS@";
     }
 
+  // Description:
+  // Provides access to binary resources compiled into the plugin.
+  // This is primarily used to compile in icons and compressed help project
+  // (qch) files into plugins.
+  virtual void GetBinaryResources(vtkstd::vector<vtkstd::string>& resources);
+
 #ifdef plugin_type_servermanager
   // Description:
   // Obtain the server-manager configuration xmls, if any.

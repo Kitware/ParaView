@@ -43,13 +43,13 @@ class vtkPVPluginsInformation;
 
 /// pqPluginManager works with vtkSMPluginManager to keep track for plugins
 /// loaded/available. It also ensures that when a new session is created, the
-/// default plugin-configuration-xmls are parsed on all processes invovled to
+/// default plugin-configuration-xmls are parsed on all processes involved to
 /// ensure that auto-load plugins are loaded. It preserves the information about
 /// plugins loaded across ParaView sessions in settings so that users can easily
 /// load previously loaded plugins.
 ///
-/// In addition, pqPluginManager also provides support to load non-standard Qt
-/// plugins such as bqrc resource files.
+/// pqPluginManager can work with multiple sessions. It maintains internal
+/// data-structures for different sessions.
 class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
@@ -59,7 +59,7 @@ public:
   ~pqPluginManager();
 
   /// Called during application initialization to load plugins from settings.
-  /// This only loads "local" plugins. pqApplicationCore class this method
+  /// This only loads "local" plugins. pqApplicationCore calls this method
   /// explicitly after the essential components of the core have been
   /// initialized. This ensures that any plugins  being loaded during startup of
   /// application have the environment setup correctly.
@@ -72,18 +72,20 @@ public:
   /// return status on success, if NOTLOADED was returned, the error is reported
   /// If errorMsg is non-null, then errors are not reported, but the error
   /// message is put in the errorMsg string
-  LoadStatus loadExtension(pqServer* server, const QString& lib, 
+  LoadStatus loadExtension(pqServer* session, const QString& lib, 
     QString* errorMsg=0, bool remote=true);
 
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
   void loadExtensions(pqServer*);
 
-  /// return all the plugins loaded on a server, or locally if NULL is passed in
-  vtkPVPluginsInformation* loadedExtensions(bool remote);
+  /// return all the plugins loaded on a session. This will either returns the
+  /// plugins information for local processes or server-process (for remote
+  /// sessions) based on the state of \c remote.
+  vtkPVPluginsInformation* loadedExtensions(pqServer* session, bool remote);
 
   /// Return all the paths that plugins will be searched for.
-  QStringList pluginPaths(bool remote);
+  QStringList pluginPaths(pqServer* session, bool remote);
 
   /// simply adds the plugin to the ignore list, so when this class tries to
   /// serialize the plugin information, it skips the indicated plugin.
@@ -93,7 +95,7 @@ public:
   /// ensures that plugins required on client and server are present on both.
   /// Fires requiredPluginsNotLoaded() signal if any mismatch is found.
   /// Returns true is all plugin requirements are satisfied, else returns false.
-  bool verifyPlugins();
+  bool verifyPlugins(pqServer* session);
 
 signals:
   /// notification when plugin has been loaded.
@@ -101,7 +103,7 @@ signals:
 
   /// notification that the plugins on the client and
   /// server are mismatched.
-  void requiredPluginsNotLoaded();
+  void requiredPluginsNotLoaded(pqServer*);
 
 protected:
   void initialize(vtkSMPluginManager*);

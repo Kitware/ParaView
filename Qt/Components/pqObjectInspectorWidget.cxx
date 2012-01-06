@@ -739,6 +739,9 @@ void pqObjectInspectorWidget::showHelp()
   if(this->CurrentPanel && this->CurrentPanel->referenceProxy())
     {
     this->helpRequested(this->CurrentPanel->referenceProxy()->getProxy()->GetXMLName());
+    this->helpRequested(
+      this->CurrentPanel->referenceProxy()->getProxy()->GetXMLGroup(),
+      this->CurrentPanel->referenceProxy()->getProxy()->GetXMLName());
     }
 }
 

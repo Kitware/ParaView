@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonShell.h"
 #include "pqPythonScriptEditor.h"
 #include "pqSettings.h"
-#include "pqServerStartups.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -103,6 +102,9 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
   // Listen for signal when server is finished being created
   this->connect(core->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
+    this, SLOT(onServerCreationFinished(pqServer*)));
+  this->connect(core->getObjectBuilder(),
+    SIGNAL(activeServerChanged(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
 
   // Init Python tracing ivar
@@ -175,8 +177,7 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-    this->Internal->PythonDialog->print(
-      "from paraview.simple import *\n");
+    //this->Internal->PythonDialog->print("from paraview.simple import *\n");
     this->Internal->PythonDialog->shell()->executeInitFromGUI();
     this->Internal->PythonDialog->shell()->promptForInput();
     emit this->paraviewPythonModulesImported();

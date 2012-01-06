@@ -42,11 +42,13 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMSession.h"
 #include "vtkUnsignedIntArray.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkView.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
 
@@ -58,10 +60,12 @@ void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-  vtkSMSession* vtkNotUsed(session),
+  vtkSMSession* session,
   vtkSelectionNode* selection,
   vtkSMProxy* selSource /*=NULL*/)
 {
+  assert("Session need to be provided and need to be valid" && session);
+
   if (!selection || !selection->GetSelectionList())
     {
     return selSource;
@@ -130,7 +134,8 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     {
     // If selSource is not present we need to create a new one. The type of
     // proxy we instantiate depends on the type of the vtkSelection.
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* pxm =
+        vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
     selSource = pxm->NewProxy("sources", proxyname);
     }
 
@@ -396,7 +401,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   // Conversion not possible, so simply create a new proxy of the requested
   // output type with some empty defaults.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = dataSource->GetSessionProxyManager();
   vtkSMProxy* outSource = pxm->NewProxy("sources", outproxyname);
   if (!outSource)
     {
@@ -430,7 +435,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
   int dataPort, int outputType)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = dataSource->GetSessionProxyManager();
 
   // * Update all inputs.
   inSource->UpdatePipeline();

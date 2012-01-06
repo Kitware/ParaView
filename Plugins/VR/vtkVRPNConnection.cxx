@@ -117,11 +117,6 @@ vtkVRPNConnection::vtkVRPNConnection(QObject* parentObject)
   this->ButtonPresent = false;
   this->TrackerTransformPresent = false;
   this->Transformation = vtkMatrix4x4::New();
-
-  // this->Mapping["Tracker0@192.168.1.126"]="kinect";
-  // this->Mapping["device0@localhost"]="space-navigator";
-  // this->Mapping["TRACKER.0"] = "head";
-  // this->Mapping["TRACKER.13"] = "right-hand";
 }
 
 // -----------------------------------------------------------------------destr
@@ -182,14 +177,14 @@ bool vtkVRPNConnection::Init()
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
-  this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
-  this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
+  // this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
+  // this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
 
   this->Initialized= ( this->Internals->Tracker!=0
                        && this->Internals->Analog!=0
-                       && this->Internals->Button!=0
-                       && this->Internals->Dial!=0
-                       && this->Internals->Text!=0 );
+                       && this->Internals->Button!=0 );
+                       // && this->Internals->Dial!=0
+                       // && this->Internals->Text!=0 );
 
   if(this->Initialized)
     {
@@ -210,13 +205,12 @@ void vtkVRPNConnection::run()
     {
     if(this->Initialized)
       {
-      //    std::cout << "callback()" << std::endl;
+      // std::cout << "callback()" << std::endl;
       this->Internals->Tracker->mainloop();
       this->Internals->Button->mainloop();
       this->Internals->Analog->mainloop();
-      this->Internals->Dial->mainloop();
-      this->Internals->Text->mainloop();
-      //msleep( 40 );
+      // this->Internals->Dial->mainloop();
+      // this->Internals->Text->mainloop();
       }
     }
 }
@@ -224,8 +218,9 @@ void vtkVRPNConnection::run()
 // ---------------------------------------------------------------------private
 void vtkVRPNConnection::Stop()
 {
+  this->Initialized = false;
   this->_Stop = true;
-  QThread::terminate();
+  QThread::wait();
 }
 
 // ---------------------------------------------------------------------private
@@ -267,9 +262,14 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
   temp.data.tracker.sensor = data.sensor;
   double rotMatrix[3][3];
-  vtkMath::QuaternionToMatrix3x3( data.quat, rotMatrix );
+  double vtkQuat[4] = {data.quat[3],
+                       data.quat[0],
+                       data.quat[1],
+                       data.quat[2]};
+  vtkMath::QuaternionToMatrix3x3( vtkQuat, rotMatrix );
   vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-
+#define COLUMN_MAJOR 1
+#if COLUMN_MAJOR
   matrix->Element[0][0] = rotMatrix[0][0];
   matrix->Element[0][1] = rotMatrix[0][1];
   matrix->Element[0][2] = rotMatrix[0][2];
@@ -290,8 +290,32 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   matrix->Element[3][2] = 0.0f;
   matrix->Element[3][3] = 1.0f;
 
+#else
+
+  matrix->Element[0][0] = rotMatrix[0][0];
+  matrix->Element[1][0] = rotMatrix[0][1];
+  matrix->Element[2][0] = rotMatrix[0][2];
+  matrix->Element[3][0] = 0.0;
+
+  matrix->Element[0][1] = rotMatrix[1][0];
+  matrix->Element[1][1] = rotMatrix[1][1];
+  matrix->Element[2][1] = rotMatrix[1][2];
+  matrix->Element[3][1] = 0.0;
+
+  matrix->Element[0][2] = rotMatrix[2][0];
+  matrix->Element[1][2] = rotMatrix[2][1];
+  matrix->Element[2][2] = rotMatrix[2][2];
+  matrix->Element[3][2] = 0.0;
+
+  matrix->Element[0][3] = data .pos[0]*1;
+  matrix->Element[1][3] = data.pos[1];
+  matrix->Element[2][3] = data.pos[2];
+  matrix->Element[3][3] = 1.0f;
+#endif
+
   vtkMatrix4x4::Multiply4x4( this->Transformation, matrix, matrix );
 
+#if COLUMN_MAJOR
   temp.data.tracker.matrix[0] = matrix->Element[0][0];
   temp.data.tracker.matrix[1] = matrix->Element[0][1];
   temp.data.tracker.matrix[2] = matrix->Element[0][2];
@@ -311,7 +335,27 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   temp.data.tracker.matrix[13] = matrix->Element[3][1];
   temp.data.tracker.matrix[14] = matrix->Element[3][2];
   temp.data.tracker.matrix[15] = matrix->Element[3][3];
+#else
+  temp.data.tracker.matrix[0] = matrix->Element[0][0];
+  temp.data.tracker.matrix[1] = matrix->Element[1][0];
+  temp.data.tracker.matrix[2] = matrix->Element[2][0];
+  temp.data.tracker.matrix[3] = matrix->Element[3][0];
 
+  temp.data.tracker.matrix[4] = matrix->Element[0][1];
+  temp.data.tracker.matrix[5] = matrix->Element[1][1];
+  temp.data.tracker.matrix[6] = matrix->Element[2][1];
+  temp.data.tracker.matrix[7] = matrix->Element[3][1];
+
+  temp.data.tracker.matrix[8] = matrix->Element[0][2];
+  temp.data.tracker.matrix[9] = matrix->Element[1][2];
+  temp.data.tracker.matrix[10] = matrix->Element[2][2];
+  temp.data.tracker.matrix[11] = matrix->Element[3][2];
+
+  temp.data.tracker.matrix[12] = matrix->Element[0][3];
+  temp.data.tracker.matrix[13] = matrix->Element[1][3];
+  temp.data.tracker.matrix[14] = matrix->Element[2][3];
+  temp.data.tracker.matrix[15] = matrix->Element[3][3];
+#endif
   matrix->Delete();
   this->EventQueue->enqueue( temp );
 }
@@ -319,7 +363,7 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
 // ---------------------------------------------------------------------private
 std::string vtkVRPNConnection::GetName( int eventType, int id )
 {
-  std::stringstream returnStr,connection,event;
+  std::stringstream returnStr,connection,e;
   if(this->Name.size())
     returnStr << this->Name << ".";
   else
@@ -327,25 +371,25 @@ std::string vtkVRPNConnection::GetName( int eventType, int id )
   switch (eventType )
     {
     case ANALOG_EVENT:
-      event << "analog." << id;
-      if( this->AnalogMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->AnalogMapping[event.str()];
+      e << "analog." << id;
+      if( this->AnalogMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->AnalogMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case BUTTON_EVENT:
-      event << "button." << id;
-      if( this->ButtonMapping.find( event.str())!= this->ButtonMapping.end())
-        returnStr << this->ButtonMapping[event.str()];
+      e << "button." << id;
+      if( this->ButtonMapping.find( e.str())!= this->ButtonMapping.end())
+        returnStr << this->ButtonMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     case TRACKER_EVENT:
-      event << "tracker."<< id;
-      if( this->TrackerMapping.find( event.str())!=this->TrackerMapping.end())
-        returnStr << this->TrackerMapping[event.str()];
+      e << "tracker."<< id;
+      if( this->TrackerMapping.find( e.str())!=this->TrackerMapping.end())
+        returnStr << this->TrackerMapping[e.str()];
       else
-        returnStr << event.str();
+        returnStr << e.str();
       break;
     }
   return returnStr.str();
@@ -373,33 +417,33 @@ bool vtkVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
     {
     for ( unsigned cc=0; cc < child->GetNumberOfNestedElements();++cc )
       {
-      vtkPVXMLElement* event = child->GetNestedElement(cc);
-      if ( event && event->GetName() )
+      vtkPVXMLElement* e = child->GetNestedElement(cc);
+      if ( e && e->GetName() )
         {
-        const char* id = event->GetAttributeOrEmpty( "id" );
-        const char* name = event->GetAttributeOrEmpty( "name" );
+        const char* id = e->GetAttributeOrEmpty( "id" );
+        const char* name = e->GetAttributeOrEmpty( "name" );
         this->verifyConfig(id, name);
 
-        if ( strcmp( event->GetName(), "Button" )==0 )
+        if ( strcmp( e->GetName(), "Button" )==0 )
           {
           this->AddButton( id, name );
           }
-        else if ( strcmp( event->GetName(), "Analog" )==0 )
+        else if ( strcmp( e->GetName(), "Analog" )==0 )
           {
           this->AddAnalog( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "Tracker" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "Tracker" ) ==0 )
           {
           this->AddTracking( id, name );
           }
-        else if ( strcmp ( event->GetName(),  "TrackerTransform" ) ==0 )
+        else if ( strcmp ( e->GetName(),  "TrackerTransform" ) ==0 )
           {
-          this->configureTransform( event );
+          this->configureTransform( e );
           }
 
         else
           {
-          qWarning() << "Unknown Device type: \"" << event->GetName() <<"\"";
+          qWarning() << "Unknown Device type: \"" << e->GetName() <<"\"";
           }
         returnVal = true;
         }
@@ -453,15 +497,15 @@ void vtkVRPNConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "button" )==0 )
       {
-      event->SetName("Button");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Button");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
@@ -484,15 +528,15 @@ void vtkVRPNConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "analog" )==0 )
       {
-      event->SetName("Analog");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Analog");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 
@@ -515,15 +559,15 @@ void vtkVRPNConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
       if (!(stm >> word)) break;
       token.push_back(word);
       }
-    vtkPVXMLElement* event = vtkPVXMLElement::New();
+    vtkPVXMLElement* e = vtkPVXMLElement::New();
     if ( strcmp( token[0].c_str(), "tracker" )==0 )
       {
-      event->SetName("Tracker");
-      event->AddAttribute("id", token[1].c_str() );
-      event->AddAttribute("name",value.c_str());
+      e->SetName("Tracker");
+      e->AddAttribute("id", token[1].c_str() );
+      e->AddAttribute("name",value.c_str());
       }
-    child->AddNestedElement(event);
-    event->FastDelete();
+    child->AddNestedElement(e);
+    e->FastDelete();
     }
 }
 

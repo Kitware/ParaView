@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqQVTKWidget.h"
 #include "pqContextView.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -47,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 #include "vtkSMContextViewProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkChart.h"
 #include "vtkNew.h"
 
@@ -63,14 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QMouseEvent>
 #include <QTimer>
-
-
-#define RETURN_IF_SERVER_NOT_VALID() \
-        if(pqApplicationCore::instance()->getActiveServer() != this->Internals->server()) \
-          {\
-          cout << "Not same server" << endl;\
-          return;\
-          }
 
 //***************************************************************************
 //                           Internal class
@@ -101,118 +95,151 @@ public:
     QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()),
                      this->Owner, SLOT(sendChartViewBoundsToOtherClients()));
     this->CollaborativeTimer.start();
-    }
-  //-------------------------------------------------
-  void setServer(pqServer* s)
-    {
-    if(!this->Server.isNull())
-      {
-      QObject::disconnect( this->Server,
-                           SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                           this->Owner, SLOT(onClientMessage(vtkSMMessage*)));
-      QObject::disconnect( this->Server,
-                           SIGNAL(triggeredMasterUser(int)),
-                           this->Owner, SIGNAL(triggeredMasterUser(int)));
-      QObject::disconnect( this->Server,
-                           SIGNAL(triggeredUserListChanged()),
-                           this->Owner, SIGNAL(triggeredUserListChanged()));
-      QObject::disconnect( this->Server,
-                           SIGNAL(triggeredUserName(int, QString&)),
-                           this->Owner, SIGNAL(triggeredUserName(int, QString&)));
-      QObject::disconnect( this->Server,
-                           SIGNAL(triggerFollowCamera(int)),
-                           this->Owner, SIGNAL(triggerFollowCamera(int)));
-      }
-    this->Server = s;
-    if(s)
-      {
-      // DO NOT put Qt::QueuedConnection otherwise Camera synchro may failed as
-      // it could happen in-between a Session::ProcessingRemoteNotification
-      QObject::connect( s,
-                        SIGNAL(sentFromOtherClient(vtkSMMessage*)),
-                        this->Owner, SLOT(onClientMessage(vtkSMMessage*)));
-      QObject::connect( s,
-                        SIGNAL(triggeredMasterUser(int)),
-                        this->Owner, SIGNAL(triggeredMasterUser(int)));
-      QObject::connect( s,
-                        SIGNAL(triggeredUserListChanged()),
-                        this->Owner, SIGNAL(triggeredUserListChanged()));
-      QObject::connect( s,
-                        SIGNAL(triggeredUserName(int, QString&)),
-                        this->Owner, SIGNAL(triggeredUserName(int, QString&)));
-      QObject::connect( s,
-                        SIGNAL(triggerFollowCamera(int)),
-                        this->Owner, SIGNAL(triggerFollowCamera(int)));
 
-      this->CollaborationManager = s->session()->GetCollaborationManager();
-      if(this->CollaborationManager)
-        {
-        this->CollaborationManager->UpdateUserInformations();
-        // Update the client id for mouse pointer
-        this->LastMousePointerPosition.set_client_id(
-            this->CollaborationManager->GetUserId());
-        }
-      }
+    this->ProxyManager = vtkSMProxyManager::GetProxyManager();
+    this->ProxyManagerObserverTag = this->ProxyManager->AddObserver(
+          vtkSMProxyManager::ActiveSessionChanged, this,
+          &pqCollaborationManager::pqInternals::activeServerChanged);
     }
 
   //-------------------------------------------------
-  pqServer* server()
+  ~pqInternals()
     {
-    return this->Server.data();
+    if(this->ProxyManager)
+      {
+      this->ProxyManager->RemoveObserver(this->ProxyManagerObserverTag);
+      this->ProxyManagerObserverTag = 0;
+      }
+    }
+  //-------------------------------------------------
+  void activeServerChanged(vtkObject*,unsigned long,void*)
+    {
+    this->ActiveCollaborationManager = NULL;
+    this->AciveSession = NULL;
+    if(!this->ProxyManager)
+      {
+      return; // No more proxy manager
+      }
+    this->AciveSession = this->ProxyManager->GetActiveSession();
+    if(this->AciveSession && this->AciveSession->IsMultiClients())
+      {
+      this->ActiveCollaborationManager = this->AciveSession->GetCollaborationManager();
+      this->ActiveCollaborationManager->UpdateUserInformations();
+      this->LastMousePointerPosition.set_client_id(this->ActiveCollaborationManager->GetUserId());
+      }
+    this->Owner->updateEnabledState();
+    }
+
+  //-------------------------------------------------
+  void registerServer(pqServer* server)
+    {
+    if(server == NULL || !server->session()->GetCollaborationManager())
+      {
+      return;
+      }
+    QObject::connect( server,
+                      SIGNAL(sentFromOtherClient(pqServer*,vtkSMMessage*)),
+                      this->Owner,
+                      SLOT(onClientMessage(pqServer*,vtkSMMessage*)));
+    QObject::connect( server,
+                      SIGNAL(triggeredMasterUser(int)),
+                      this->Owner, SIGNAL(triggeredMasterUser(int)));
+    QObject::connect( server,
+                      SIGNAL(triggeredUserListChanged()),
+                      this->Owner, SIGNAL(triggeredUserListChanged()));
+    QObject::connect( server,
+                      SIGNAL(triggeredUserName(int, QString&)),
+                      this->Owner, SIGNAL(triggeredUserName(int, QString&)));
+    QObject::connect( server,
+                      SIGNAL(triggerFollowCamera(int)),
+                      this->Owner, SIGNAL(triggerFollowCamera(int)));
+
+    this->VTKConnect->Connect( server->session()->GetCollaborationManager(),
+                               vtkSMCollaborationManager::CameraChanged,
+                               pqApplicationCore::instance(),
+                               SLOT(render()));
+    }
+  //-------------------------------------------------
+  void unRegisterServer(pqServer* server)
+    {
+    if(server == NULL || !server->session()->GetCollaborationManager())
+      {
+      return;
+      }
+    QObject::disconnect( server,
+                         SIGNAL(sentFromOtherClient(pqServer*,vtkSMMessage*)),
+                         this->Owner,
+                         SLOT(onClientMessage(pqServer*,vtkSMMessage*)));
+    QObject::disconnect( server,
+                         SIGNAL(triggeredMasterUser(int)),
+                         this->Owner, SIGNAL(triggeredMasterUser(int)));
+    QObject::disconnect( server,
+                         SIGNAL(triggeredUserListChanged()),
+                         this->Owner, SIGNAL(triggeredUserListChanged()));
+    QObject::disconnect( server,
+                         SIGNAL(triggeredUserName(int, QString&)),
+                         this->Owner, SIGNAL(triggeredUserName(int, QString&)));
+    QObject::disconnect( server,
+                         SIGNAL(triggerFollowCamera(int)),
+                         this->Owner, SIGNAL(triggerFollowCamera(int)));
+
+    this->VTKConnect->Disconnect( server->session()->GetCollaborationManager(),
+                                  vtkSMCollaborationManager::CameraChanged,
+                                  pqApplicationCore::instance(),
+                                  SLOT(render()));
     }
   //-------------------------------------------------
   int GetClientId(int idx)
     {
-    if(this->CollaborationManager)
+    if(this->ActiveCollaborationManager)
       {
-      return this->CollaborationManager->GetUserId(idx);
+      return this->ActiveCollaborationManager->GetUserId(idx);
       }
     return -1;
     }
 
 public:
   QMap<int, QString> UserNameMap;
-  vtkWeakPointer<vtkSMCollaborationManager> CollaborationManager;
+  vtkWeakPointer<vtkSMSession> AciveSession;
+  vtkWeakPointer<vtkSMCollaborationManager> ActiveCollaborationManager;
+  vtkWeakPointer<vtkSMProxyManager> ProxyManager;
   vtkSMMessage LastMousePointerPosition;
   bool MousePointerLocationUpdated;
   bool BroadcastMouseLocation;
   vtkstd::map<vtkTypeUInt32, ChartBounds> ContextViewBoundsToShare;
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
 
 protected:
-  QPointer<pqServer> Server;
   QPointer<pqCollaborationManager> Owner;
   QTimer CollaborativeTimer;
+  unsigned long ProxyManagerObserverTag;
 };
 //***************************************************************************/
 pqCollaborationManager::pqCollaborationManager(QObject* parentObject) :
   Superclass(parentObject)
 {
-  this->UserViewToFollow = -1;
   this->Internals = new pqInternals(this);
-  pqApplicationCore* core = pqApplicationCore::instance();
 
   // Chat management + User list panel
-  QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
-                    this,        SLOT(onChatMessage(int,QString&)));
+  QObject::connect( this, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                    this,        SLOT(onChatMessage(pqServer*,int,QString&)));
 
-  QObject::connect(this, SIGNAL(triggeredMasterUser(int)),
-    this, SLOT(updateEnabledState()));
-
-  core->registerManager("COLLABORATION_MANAGER", this);
+  QObject::connect( this, SIGNAL(triggeredMasterUser(int)),
+                    this, SLOT(updateEnabledState()));
 }
 
 //-----------------------------------------------------------------------------
 pqCollaborationManager::~pqCollaborationManager()
 {
   // Chat management + User list panel
-  QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
-                       this, SLOT(onChatMessage(int,QString&)));
+  QObject::disconnect( this, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                       this, SLOT(onChatMessage(pqServer*,int,QString&)));
 
   delete this->Internals;
 
 }
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
+void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg)
 {
   if(msg->HasExtension(QtEvent::type))
     {
@@ -223,9 +250,9 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
       {
       case QtEvent::CHAT:
         userId = msg->GetExtension(ChatMessage::author);
-        userName = this->Internals->CollaborationManager->GetUserLabel(userId);
+        userName = server->session()->GetCollaborationManager()->GetUserLabel(userId);
         chatMsg =  msg->GetExtension(ChatMessage::txt).c_str();
-        emit triggerChatMessage(userId, chatMsg);
+        emit triggerChatMessage(server, userId, chatMsg);
         break;
       case QtEvent::CHART_BOUNDS:
         {
@@ -237,9 +264,9 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
           }
         vtkSMContextViewProxy* view =
             vtkSMContextViewProxy::SafeDownCast(
-                this->collaborationManager()->GetSession()->GetRemoteObject(
-                    viewId));
-        if(view)
+              server->session()->GetRemoteObject(
+                viewId));
+        if(view && (this->Internals->AciveSession == server->session())) // Make sure we share the same active server
           {
           view->SetViewBounds(range);
           }
@@ -250,9 +277,10 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
         break;
       }
     }
-  else if(msg->HasExtension(MousePointer::view) &&
-          ( msg->GetExtension(MousePointer::forceShow) ||
-            static_cast<int>(msg->client_id()) == this->UserViewToFollow))
+  else if( msg->HasExtension(MousePointer::view) &&
+           (this->Internals->AciveSession == server->session()) && // Make sure we share the same active server
+           ( msg->GetExtension(MousePointer::forceShow) ||
+             (static_cast<int>(msg->client_id()) == this->activeCollaborationManager()->GetFollowedUser())) )
     {
     this->showMousePointer(msg->GetExtension(MousePointer::view),
                            msg->GetExtension(MousePointer::x),
@@ -261,53 +289,57 @@ void pqCollaborationManager::onClientMessage(vtkSMMessage* msg)
     }
   else
     {
-    emit triggerStateClientOnlyMessage(msg);
+    emit triggerStateClientOnlyMessage(server, msg);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::onChatMessage(int userId, QString& msgContent)
+void pqCollaborationManager::onChatMessage(pqServer* server, int userId, QString& msgContent)
 {
-  RETURN_IF_SERVER_NOT_VALID();
-
   // Broadcast to others only if its our message
-  if(userId == this->Internals->CollaborationManager->GetUserId())
+  if( this->activeCollaborationManager() &&
+      userId == this->activeCollaborationManager()->GetUserId())
     {
     vtkSMMessage chatMsg;
     chatMsg.SetExtension(QtEvent::type, QtEvent::CHAT);
     chatMsg.SetExtension( ChatMessage::author,
-                          this->Internals->CollaborationManager->GetUserId());
+                          this->activeCollaborationManager()->GetUserId());
     chatMsg.SetExtension( ChatMessage::txt, msgContent.toStdString() );
 
-    this->Internals->server()->sendToOtherClients(&chatMsg);
+    server->sendToOtherClients(&chatMsg);
+    }
+  else if(!this->activeCollaborationManager())
+    {
+    qDebug() << "The active server is not a Collaborative one.";
     }
 }
 //-----------------------------------------------------------------------------
-vtkSMCollaborationManager* pqCollaborationManager::collaborationManager()
+vtkSMCollaborationManager* pqCollaborationManager::activeCollaborationManager()
 {
-  return this->Internals->CollaborationManager;
-}
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::setServer(pqServer* s)
-{
-  this->Internals->setServer(s);
-  this->updateEnabledState();
+  return this->Internals->ActiveCollaborationManager;
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqCollaborationManager::server()
+void pqCollaborationManager::onServerAdded(pqServer* s)
 {
-  return this->Internals->server();
+  this->Internals->registerServer(s);
 }
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::onServerRemoved(pqServer* s)
+{
+  this->Internals->unRegisterServer(s);
+}
+
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
 {
   pqQVTKWidget* widget = qobject_cast<pqQVTKWidget*>(QObject::sender());
-  if(widget)
+  if(widget && this->activeCollaborationManager())
     {
     bool isChartView =
         (vtkSMContextViewProxy::SafeDownCast(
-            this->collaborationManager()->GetSession()->GetRemoteObject(
+            this->activeCollaborationManager()->GetSession()->GetRemoteObject(
                 widget->getProxyId())) != NULL);
 
     double w2 = widget->width() / 2;
@@ -326,7 +358,7 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
         isChartView ? MousePointer::BOTH : MousePointer::HEIGHT);
     this->Internals->MousePointerLocationUpdated = true;
     }
-  else
+  else if(this->activeCollaborationManager())
     {
     qCritical("Invalid cast");
     }
@@ -335,9 +367,9 @@ void pqCollaborationManager::updateMousePointerLocation(QMouseEvent* e)
 void pqCollaborationManager::sendMousePointerLocationToOtherClients()
 {
   if( this->Internals->BroadcastMouseLocation &&
-      this->Internals->MousePointerLocationUpdated )
+      this->Internals->MousePointerLocationUpdated && this->activeCollaborationManager() )
     {
-    this->Internals->server()->sendToOtherClients(&this->Internals->LastMousePointerPosition);
+    this->activeCollaborationManager()->SendToOtherClients(&this->Internals->LastMousePointerPosition);
     this->Internals->MousePointerLocationUpdated = false;
     }
 }
@@ -378,20 +410,10 @@ void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId,
     }
 }
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::setFollowUserView(int value)
-{
-  this->UserViewToFollow = value;
-}
-//-----------------------------------------------------------------------------
-int pqCollaborationManager::getUserViewToFollow()
-{
-  return this->UserViewToFollow;
-}
-
-//-----------------------------------------------------------------------------
 void pqCollaborationManager::updateEnabledState()
 {
-  bool enabled = this->collaborationManager()->IsMaster();
+  bool enabled = (this->activeCollaborationManager() ?
+                    this->activeCollaborationManager()->IsMaster() : true);
   QWidget* mainWidget = pqCoreUtilities::mainWidget();
   foreach (QWidget* wdg, mainWidget->findChildren<QWidget*>())
     {
@@ -468,13 +490,12 @@ void pqCollaborationManager::enableMousePointerSharing(bool enable)
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds)
 {
-//  cout << "set bounds: ["
-//       << bounds[0] << ", " << bounds[1] << ", "
-//       << bounds[2] << ", " << bounds[3] << ", "
-//       << bounds[4] << ", " << bounds[5] << ", "
-//       << bounds[6] << ", " << bounds[7] << "]"
-//       << endl;
-  this->Internals->ContextViewBoundsToShare[gid].SetRange(bounds);
+  pqContextView* chartView = qobject_cast<pqContextView*>(QObject::sender());
+  if( chartView && activeCollaborationManager() &&
+      activeCollaborationManager()->GetSession() == chartView->getServer()->session())
+    {
+    this->Internals->ContextViewBoundsToShare[gid].SetRange(bounds);
+    }
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::sendChartViewBoundsToOtherClients()
@@ -493,7 +514,7 @@ void pqCollaborationManager::sendChartViewBoundsToOtherClients()
         msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
         }
 
-      this->collaborationManager()->SendToOtherClients(&msg);
+      this->activeCollaborationManager()->SendToOtherClients(&msg);
 
       // Move forward
       iter++;

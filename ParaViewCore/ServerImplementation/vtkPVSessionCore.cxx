@@ -238,7 +238,7 @@ vtkPVSessionCore::vtkPVSessionCore()
   this->LocalGlobalID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
 
   this->Interpreter =
-    vtkClientServerInterpreterInitializer::GetInterpreter();
+    vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
   this->MPIMToNSocketConnection = NULL;
   this->SymmetricMPIMode = false;
 
@@ -313,6 +313,7 @@ vtkPVSessionCore::~vtkPVSessionCore()
          << vtkClientServerID(1)
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
+  this->Interpreter->Delete();
   this->Interpreter = 0;
 
   // Manage controller

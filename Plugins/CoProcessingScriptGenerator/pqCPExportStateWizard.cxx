@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -311,7 +312,8 @@ bool pqCPExportStateWizard::validateCurrentPage()
     export_rendering = "False";
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
-    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* proxyManager =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     pqServerManagerModel* smModel =
       pqApplicationCore::instance()->getServerManagerModel();
     bool haveSomeWriters = false;

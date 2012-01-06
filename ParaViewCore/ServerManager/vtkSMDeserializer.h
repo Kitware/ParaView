@@ -21,24 +21,18 @@
 #ifndef __vtkSMDeserializer_h
 #define __vtkSMDeserializer_h
 
-#include "vtkSMObject.h"
-#include "vtkWeakPointer.h" // Otherwise we have a loop in reference count
+#include "vtkSMSessionObject.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMDeserializer : public vtkSMObject
+class VTK_EXPORT vtkSMDeserializer : public vtkSMSessionObject
 {
 public:
-  vtkTypeMacro(vtkSMDeserializer, vtkSMObject);
+  vtkTypeMacro(vtkSMDeserializer, vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the session.
-  virtual vtkSMSession* GetSession();
-  virtual void SetSession(vtkSMSession* s);
 
 //BTX
 protected:
@@ -58,7 +52,6 @@ protected:
   virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname,
                                   const char* subProxyName = NULL);
 
-  vtkWeakPointer<vtkSMSession> Session;
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented
   void operator=(const vtkSMDeserializer&); // Not implemented

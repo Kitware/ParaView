@@ -531,7 +531,18 @@ void pqServerResource::addData(const QString& key, const QString& value)
 
 const QString pqServerResource::data(const QString& key) const
 {
-  return this->Implementation->ExtraData[key];
+  return this->data(key, QString());
+}
+
+const QString pqServerResource::data(const QString& key, const QString& default_value) const
+{
+  return this->Implementation->ExtraData.contains(key)?
+    this->Implementation->ExtraData[key] : default_value;
+}
+
+bool pqServerResource::hasData(const QString& key) const
+{
+  return this->Implementation->ExtraData.contains(key);
 }
 
 const QString pqServerResource::serializeString() const

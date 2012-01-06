@@ -1,0 +1,13 @@
+
+include(@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake)
+
+execute_process(
+  COMMAND sh configure --prefix=${INSTALL_DIR} ${CONFIGURE_ARGS}
+  WORKING_DIRECTORY "${WORKING_DIR}"
+  RESULT_VARIABLE res)
+
+if(NOT ${res} EQUAL 0)
+  message("Config Errors detected: \n${CDAT_OUT}\n${CDAT_ERR}")
+  message(FATAL_ERROR "Error in config")
+endif()
+message("Config succeeded.")

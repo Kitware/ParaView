@@ -34,12 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqPVApplicationCore.h"
+#include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqServerResources.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonManager.h"
@@ -103,8 +103,8 @@ void pqSaveStateReaction::saveState(const QString& filename)
   resource.setScheme("session");
   resource.setPath(filename);
   resource.setSessionServer(server->getResource());
-  pqApplicationCore::instance()->serverResources().add(resource);
-  pqApplicationCore::instance()->serverResources().save(
+  pqApplicationCore::instance()->recentlyUsedResources().add(resource);
+  pqApplicationCore::instance()->recentlyUsedResources().save(
     *pqApplicationCore::instance()->settings());
 }
 //-----------------------------------------------------------------------------

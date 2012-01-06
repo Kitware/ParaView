@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "pqApplicationCore.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtksys/ios/sstream"
 
 class pqCustomFilterManagerModelInternal : public QList<QString> {};
@@ -194,7 +195,8 @@ void pqCustomFilterManagerModel::removeCustomFilter(QString name)
 
 void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
 {
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   pqSettings *settings = pqApplicationCore::instance()->settings();
 
   QString key = "CustomFilters";
@@ -222,7 +224,15 @@ void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
 void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
 {
   // Store the custom filters for a subsequent ParaView session
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  if(!proxyManager)
+    {
+    // No active session
+    return;
+    }
+
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("CustomFilterDefinitions");
   proxyManager->SaveCustomProxyDefinitions(root);

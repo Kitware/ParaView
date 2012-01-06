@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
 Program:   Visualization Toolkit
@@ -15,11 +16,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotBlock.h"
 
 #include "vtkCellData.h"
+#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkByteSwap.h"
 #include "vtkBoundingBox.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <sstream>
 #include <assert.h>
@@ -566,118 +569,160 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int &coordinateSystem)
 //-----------------------------------------------------------------------------
 void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data, 
   const int &numberOfMaterials, vtkDataArray** materialMasses, 
-  vtkDataArray** materialVolumeFractions, int dims[3],
+  vtkDataArray** materialVolumeFractions,
   const int& downConvertVolumeFraction  ) const
-{
-  double spacing[3] = {0,0,0};
-  this->GetSpacing(spacing);
-  
-  //construct the density arrays for all the materials
-  vtkFloatArray** materialDensities = new vtkFloatArray*[numberOfMaterials];  
-  bool* validDensityToCompute = new bool[numberOfMaterials];
-  
-  for ( int i=0; i < numberOfMaterials; i++)
-    {
-    //only create density arrays for materials that we have all the needed information for
-    validDensityToCompute[i] = materialMasses[i] != NULL && materialVolumeFractions[i] != NULL;
-    if ( validDensityToCompute[i] )
-      {
-      materialDensities[i] = vtkFloatArray::New();
-      std::stringstream buffer;
-      buffer << "Derived Density - " << i+1;
-      materialDensities[i]->SetName(buffer.str().c_str());
-      materialDensities[i]->SetNumberOfComponents(1);
-      materialDensities[i]->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
-      }
-    }  
+{  
+  vtkIdType arraySize =
+      this->SavedRealDims[0]*this->SavedRealDims[1]*this->SavedRealDims[2];
+  vtkDoubleArray* volumeArray = vtkDoubleArray::New();
+  volumeArray->SetName("Derived Volume");
+  volumeArray->SetNumberOfValues(arraySize);
 
-  double volume = -1, mass = -1, density = -1, volfrac = -1;  
+  //first compute the volume array and hold onto it
   vtkIdType pos = 0;
-  for ( int i=0; i < dims[0]; i++)
+  for ( int k=0; k < this->SavedRealDims[2]; k++)
     {
-    //not a bug, volume is constant for across the x value
-    volume = this->GetCellVolume(spacing,i);
-    for ( int j=0; j < dims[1]; j++)
+    for ( int j=0; j < this->SavedRealDims[1]; j++)
       {
-      for ( int k=0; k < dims[2]; k++, pos++)
+      for ( int i=0; i < this->SavedRealDims[0]; i++, pos++)
         {
         //sum the mass for each each material
-        for(int mat=0; mat<numberOfMaterials;++mat)
-          {
-          if ( validDensityToCompute[mat] )
-            {
-            mass = materialMasses[mat]->GetTuple1(pos);
-            volfrac = materialVolumeFractions[mat]->GetTuple1(pos);
-            if ( downConvertVolumeFraction )
-              {
-              //converting from 0-255 to a float
-              volfrac /= 255.0; 
-              }
-            density = mass * ( volume * volfrac );
-            materialDensities[mat]->SetTuple1(pos,density);
-            }
-          }        
+        volumeArray->SetValue(pos,this->GetCellVolume(i,j,k));
         }
       }
     }
-  
+
+
   for ( int i=0; i < numberOfMaterials; i++)
     {
-    if ( validDensityToCompute[i] )
+    //only create density arrays for materials that we have all the needed information for
+    bool validDensity = materialMasses[i] != NULL && materialVolumeFractions[i] != NULL;
+    if (validDensity)
       {
-      data->AddArray(materialDensities[i]);
-      materialDensities[i]->Delete();
+      vtkDoubleArray* materialDensity = vtkDoubleArray::New();
+      std::stringstream buffer;
+      buffer << "Derived Density - " << i+1;
+      materialDensity->SetName(buffer.str().c_str());
+      materialDensity->SetNumberOfComponents(1);
+      materialDensity->SetNumberOfTuples(arraySize);
+
+      if(downConvertVolumeFraction)
+        {
+        vtkUnsignedCharArray* materialFraction =
+            vtkUnsignedCharArray::SafeDownCast(materialVolumeFractions[i]);
+        this->ComputeMaterialDensity(materialMasses[i],
+                                   materialFraction,
+                                   volumeArray,
+                                   materialDensity);
+        }
+      else
+        {
+        vtkFloatArray* materialFraction =
+            vtkFloatArray::SafeDownCast(materialVolumeFractions[i]);
+        this->ComputeMaterialDensity(materialMasses[i],
+                                   materialFraction,
+                                   volumeArray,
+                                   materialDensity);
+        }
+
+      data->AddArray(materialDensity);
+      materialDensity->FastDelete();
       }
     }
-  delete[] materialDensities;
-  delete[] validDensityToCompute;
-  
+
+  data->AddArray(volumeArray);
+  volumeArray->FastDelete();
 }
 //-----------------------------------------------------------------------------
-double vtkSpyPlotBlock::GetCellVolume( double spacing[3], const int &i) const
+double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
 {  
-  if ( this->CoordSystem == Cartesian3D )
-    {
-    //3d space
-    return spacing[2] * spacing[1] * spacing[0];    
-    }
-  else
-    {
-    //make sure the cell index is valid;
-    double volume = -1;
-    if ( i < 0 || i >= this->Dimensions[0])
-      {
-      //invalid coordinate
-      return volume;
-      }
 
-    double xCoordSquared = (spacing[0] * i) * (spacing[0] * i); //get the x coordinate squared
-    double nextXCoordSquared = (spacing[0] * i + spacing[0]) * (spacing[0] * i + spacing[0]);
-
-    //determine the volume by the blocks coordiate system:
-    switch(this->CoordSystem)
-      {
-      case vtkSpyPlotBlock::Cylinder1D:      
-        volume = vtkMath::Pi() * (nextXCoordSquared - xCoordSquared);
-        break;
-      case vtkSpyPlotBlock::Sphere1D:
-        volume = 4 * (vtkMath::Pi()/3) * (nextXCoordSquared - xCoordSquared);
-        break;
-      case vtkSpyPlotBlock::Cartesian2D:
-        volume = spacing[1] * spacing[0];
-        break;
-      case vtkSpyPlotBlock::Cylinder2D:
-        volume = vtkMath::Pi() * (spacing[1]) * (nextXCoordSquared - xCoordSquared);
-        break;
-      case vtkSpyPlotBlock::Cartesian3D:
-        break;
-      }
+  //make sure the cell index is valid;
+  double volume = -1;
+  if ( i < 0 || i >= this->SavedRealDims[0] ||
+       j < 0 || j >= this->SavedRealDims[1] ||
+       k < 0 || k >= this->SavedRealDims[2] )
+    {
+    //invalid coordinate
     return volume;
     }
 
-  return -1;
+    //determine the volume by the blocks coordiate system:
+    float* x = static_cast<float*>(this->XYZArrays[0]->GetVoidPointer(0));
+    float* y = static_cast<float*>(this->XYZArrays[1]->GetVoidPointer(0));
+    float* z = static_cast<float*>(this->XYZArrays[2]->GetVoidPointer(0));
+    switch(this->CoordSystem)
+      {
+      case vtkSpyPlotBlock::Cylinder1D:      
+        volume = vtkMath::DoublePi() * (x[i+1]*x[i+1]-x[i]*x[i]);;
+        break;
+      case vtkSpyPlotBlock::Sphere1D:
+        volume = 4 * (vtkMath::DoublePi()/3) * (x[i+1]*x[i+1]*x[i+1]-x[i]*x[i]*x[i]);
+        break;
+      case vtkSpyPlotBlock::Cartesian2D:
+        volume = (y[j+1]-y[j])*(x[i+1]-x[i]);
+        break;
+      case vtkSpyPlotBlock::Cylinder2D:
+        volume = vtkMath::DoublePi() *(y[j+1]-y[j])*(x[i+1]*x[i+1]-x[i]*x[i]);
+        break;
+      case vtkSpyPlotBlock::Cartesian3D:
+        volume = (z[k+1]-z[k])*(y[j+1]-y[j])*(x[i+1]-x[i]);
+        break;
+      }
+  return volume;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::ComputeMaterialDensity(vtkDataArray*  materialMass,
+                                             vtkUnsignedCharArray* materialFraction,
+                                             vtkDoubleArray* volumes,
+                                             vtkDoubleArray* materialDensity) const
+{
+  double mass = -1, volume = -1, density = -1, volfrac = -1;
+  const vtkIdType size = materialMass->GetNumberOfTuples();
+  for(vtkIdType i=0; i < size; ++i)
+    {
+    mass = materialMass->GetTuple1(i);
+    volfrac = static_cast<int>(materialFraction->GetValue(i)) / 255.0;
+    volume = volumes->GetValue(i);
+    if(volfrac == 0 || mass == 0 || volume == 0)
+      {
+      density = 0;
+      }
+    else
+      {
+      density = mass / ( volume * volfrac );
+      }
+
+    materialDensity->SetValue(i,density);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::ComputeMaterialDensity(vtkDataArray*  materialMass,
+                                             vtkFloatArray* materialFraction,
+                                             vtkDoubleArray* volumes,
+                                             vtkDoubleArray* materialDensity) const
+{
+
+  double mass = -1, volume = -1, density = -1, volfrac = -1;
+  const vtkIdType size = materialMass->GetNumberOfTuples();
+  for(vtkIdType i=0; i < size; ++i)
+    {
+    mass = materialMass->GetTuple1(i);
+    volfrac = materialFraction->GetValue(i);
+    volume = volumes->GetValue(i);
+    if(volfrac == 0 || mass == 0 || volume == 0)
+      {
+      density = 0;
+      }
+    else
+      {
+      density = mass / ( volume * volfrac );
+      }
+    materialDensity->SetValue(i,density);
+    }
+}
  
 //-----------------------------------------------------------------------------
 /* SetGeometry - sets the geometric definition of the block's ith direction

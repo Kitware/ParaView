@@ -42,7 +42,8 @@ public:
   enum EventIds
     {
     RegisterRemoteObjectEvent   = 1234,
-    UnRegisterRemoteObjectEvent = 4321
+    UnRegisterRemoteObjectEvent = 4321,
+    ProcessingRemoteEnd         = 2143
     };
 
   //---------------------------------------------------------------------------
@@ -178,7 +179,7 @@ protected:
   virtual void CleanupPendingProgressInternal();
 
   friend class vtkSMRemoteObject;
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
 
   // Description:
   // Methods used to monitor if we are currently processing a server notification

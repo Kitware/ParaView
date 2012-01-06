@@ -36,6 +36,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMServerStateLocator.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -326,8 +327,9 @@ void vtkSMSessionClient::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::SetupDataServerRenderServerConnection()
 {
-  vtkSMProxy* mpiMToN = vtkSMObject::GetProxyManager()->NewProxy(
-    "internals", "MPIMToNSocketConnection");
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this);
+  vtkSMProxy* mpiMToN = pxm->NewProxy("internals", "MPIMToNSocketConnection");
   vtkSMPropertyHelper(mpiMToN, "WaitingProcess").Set(
     vtkProcessModule::PROCESS_RENDER_SERVER);
   mpiMToN->UpdateVTKObjects();
@@ -720,6 +722,7 @@ bool vtkSMSessionClient::GatherInformation(
       }
     }
 
+  bool add_local_info = false;
   if ( (location & vtkPVSession::CLIENT) != 0)
     {
     bool ret_value = this->Superclass::GatherInformation(
@@ -729,6 +732,7 @@ bool vtkSMSessionClient::GatherInformation(
       this->EndBusyWork();
       return ret_value;
       }
+    add_local_info = true;
     }
 
   vtkMultiProcessStream stream;
@@ -780,7 +784,17 @@ bool vtkSMSessionClient::GatherInformation(
       }
     vtkClientServerStream csstream;
     csstream.SetData(data2, length2);
-    information->CopyFromStream(&csstream);
+    if (add_local_info)
+      {
+      vtkPVInformation* tempInfo = information->NewInstance();
+      tempInfo->CopyFromStream(&csstream);
+      information->AddInformation(tempInfo);
+      tempInfo->Delete();
+      }
+    else
+      {
+      information->CopyFromStream(&csstream);
+      }
     delete [] data2;
     }
   this->EndBusyWork();

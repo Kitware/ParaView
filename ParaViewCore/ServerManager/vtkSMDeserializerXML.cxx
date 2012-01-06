@@ -19,7 +19,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMDeserializerXML);
@@ -77,7 +77,7 @@ vtkSMProxy* vtkSMDeserializerXML::CreateProxy(const char* xmlgroup,
                                               const char* xmlname,
                                               const char* subProxyName /*=NULL*/)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname, subProxyName);
   return proxy;
 }

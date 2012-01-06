@@ -65,10 +65,6 @@ public:
   // Loads the state for the links.
   virtual int LoadLinkState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
-  // Description:
-  // Override the session setting to make sure that Proxy will always be managed
-  // as a prototype.
-  virtual void SetSession(vtkSMSession*);
 //BTX
   struct ModifiedInfo
     {

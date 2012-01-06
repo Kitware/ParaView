@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMSession.h"
 
@@ -71,10 +72,11 @@ int vtkSMGlobalPropertiesLinkUndoElement::UndoRedoInternal(bool undo)
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->GetSession());
   vtkSMProxy* proxy =
       vtkSMProxy::SafeDownCast(
-          pxm->GetSession()->GetRemoteObject(this->ProxyGlobalID));
+          this->GetSession()->GetRemoteObject(this->ProxyGlobalID));
   vtkSMGlobalPropertiesManager* propertyManager =
       pxm->GetGlobalPropertiesManager(this->GlobalPropertyManagerName);
 

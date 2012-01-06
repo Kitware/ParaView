@@ -26,6 +26,8 @@
 
 class vtkTransform;
 class vtkInformationDoubleVectorKey;
+class vtkInformationIntegerVectorKey;
+class vtkInformationIntegerKey;
 
 class VTK_EXPORT vtkPrismView : public vtkPVRenderView
 {
@@ -63,6 +65,17 @@ public:
   static vtkInformationDoubleVectorKey* PRISM_THRESHOLD_BOUNDS();
 
   // Description:
+  // Describes if the bounds of the geoemtery have been log scaled or not
+  // this is needed as we always want to display in non log scaled space but
+  // actually scale in log space
+  static vtkInformationIntegerVectorKey* PRISM_USE_LOG_SCALING();
+
+  // Description:
+  // Describes the SESAME table that the prism view is currently
+  // working on. This is needed to use the correct type of log scaling
+  static vtkInformationIntegerKey* PRISM_TABLE_ID();
+
+  // Description:
   // Calls vtkView::REQUEST_INFORMATION() on all representations
   void GatherRepresentationInformation();
 
@@ -88,6 +101,7 @@ public:
   // Get the current threshold scale mode for each axis.
   vtkGetVector6Macro(ThresholdWorldBounds,double);
 
+
 //BTX
 protected:
   vtkPrismView();
@@ -101,6 +115,12 @@ protected:
   double CustomWorldBounds[6];
   double FullWorldBounds[6];
   double ThresholdWorldBounds[6];
+
+  int LogScalingEnabled[3];
+  int PrismTableId;
+
+  class vtkPrismViewLogScale;
+  class vtkPrismViewTableId;
 
 private:
   vtkPrismView(const vtkPrismView&); // Not implemented

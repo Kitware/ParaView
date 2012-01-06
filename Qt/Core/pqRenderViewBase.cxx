@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkRenderWindow.h"
@@ -387,7 +387,7 @@ vtkSMProxy* pqRenderViewBase::createCameraManipulator(
     strManipName = "None";
     }
 
-  vtkSMProxyManager* pxm = this->proxyManager();
+  vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", 
     strManipName.toAscii().data());
   if(!manip)

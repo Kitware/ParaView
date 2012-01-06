@@ -23,10 +23,6 @@
 // use PushToStack(). 
 // Applications can subclass vtkSMUndoStackBuilder to record GUI related
 // changes and add them to the undo stack.
-// .SECTION TODO
-// \li Mutiple clients are not supported. For now, the server can connect to only
-// one client.
-
 #ifndef __vtkSMUndoStackBuilder_h
 #define __vtkSMUndoStackBuilder_h
 
@@ -114,6 +110,11 @@ public:
                               vtkTypeUInt32 globalId,
                               const vtkSMMessage* previousState,
                               const vtkSMMessage* newState);
+
+  // Indicate that a new object was created.
+  // Simply fires the vtkSMUndoStack::ObjectCreationEvent from the undo-stack.
+  virtual void OnCreateObject(
+    vtkSMSession* session, vtkSMMessage* newState);
 
 protected:
   vtkSMUndoStackBuilder();

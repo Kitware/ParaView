@@ -739,6 +739,8 @@ int vtkSpyPlotReader::RequestData(
         hasBadGhostCells = this->PrepareData(
           vtkMultiBlockDataSet::SafeDownCast(cds), block, &rg, extents, realExtents,
           realDims, &cd);
+
+        //currently only for rectilinear grids do we computed derived variables
         grids.push_back(rg);
         }
 
@@ -749,16 +751,18 @@ int vtkSpyPlotReader::RequestData(
       if(!hasBadGhostCells)
         {
         this->UpdateFieldData(numFields, dims, level, blockID,
-                              uniReader, cd);
-        this->ComputeDerivedVars(cd, block, uniReader, blockID,dims);
+                              uniReader, cd);        
         }
       else // we have some bad ghost cells
         {
         this->UpdateBadGhostFieldData(numFields, dims, realDims,
                                       realExtents, level, blockID,
                                       uniReader, cd);
-        this->ComputeDerivedVars(cd, block, uniReader, blockID,realDims);
-        }
+        }      
+      if(!this->IsAMR)
+      {
+        this->ComputeDerivedVars(cd, block, uniReader, blockID);
+      }
 
       // Add active block array, for debugging
       if (this->GenerateActiveBlockArray)
@@ -2237,10 +2241,9 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 //-----------------------------------------------------------------------------
 // synch data set structure
 int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
-  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID,
-  int dims[3])
+  vtkSpyPlotBlock *block, vtkSpyPlotUniReader *reader, const int& blockID)
 {
-  if ( this->ComputeDerivedVariables != 1 )
+  if ( this->ComputeDerivedVariables != 1 || this->IsAMR)
     {
     return 0;
     }
@@ -2260,7 +2263,7 @@ int vtkSpyPlotReader::ComputeDerivedVars(vtkCellData* data,
 
   block->SetCoordinateSystem(reader->GetCoordinateSystem());
   block->ComputeDerivedVariables(data, numberOfMaterials,
-    materialMasses, materialVolumeFractions, dims, this->DownConvertVolumeFraction);
+    materialMasses, materialVolumeFractions, this->DownConvertVolumeFraction);
     
   //cleanup memory and leave  
   delete[] materialMasses;

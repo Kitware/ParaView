@@ -31,23 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #ifndef __vtkVRConnectionManager_h
 #define __vtkVRConnectionManager_h
-// --------------------------------------------------------------------includes
+
 #include <QObject>
 
-// -----------------------------------------------------------------pre-defines
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkVRPNConnection;
 class vtkVRUIConnection;
 
-// -----------------------------------------------------------------------class
 class vtkVRConnectionManager: public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  // ............................................................public-methods
   vtkVRConnectionManager(vtkVRQueue* quque, QObject* parent=0);
   virtual ~vtkVRConnectionManager();
 
@@ -70,19 +67,10 @@ public slots:
   // save the connection configuration
   void saveConnectionsConfiguration( vtkPVXMLElement* root );
 
-protected:
-  // ...........................................................protected-ivars
-
-protected:
-//BTX
-  // .......................................................................BTX
 private:
   Q_DISABLE_COPY(vtkVRConnectionManager);
   class pqInternals;
   pqInternals* Internals;
-
-//ETX
-  // .......................................................................ETX
 };
 
 #endif // __vtkVRConnectionManager_h

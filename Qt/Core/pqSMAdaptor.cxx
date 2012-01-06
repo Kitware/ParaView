@@ -44,13 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // server manager includes
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
+#include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
-#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMExtentDomain.h"
+#include "vtkSMFileListDomain.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntRangeDomain.h"
@@ -58,21 +61,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyGroupDomain.h"
-#include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSILDomain.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkSMExtentDomain.h"
-#include "vtkSMFileListDomain.h"
-#include "vtkSMCompositeTreeDomain.h"
-#include "vtkSMSILDomain.h"
 
 // ParaView includes
 #include "pqSMProxy.h"
@@ -351,7 +350,7 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
     {
-    vtkSMProxyManager* pm = Property->GetParent()->GetProxyManager();
+    vtkSMSessionProxyManager* pm = Property->GetParent()->GetSessionProxyManager();
     
     // get group domain of this property 
     // and add all proxies in those groups to our list
@@ -1701,6 +1700,94 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
   if(Type == UNCHECKED)
     {
     Property->UpdateDependentDomains();
+    }
+}
+
+QStringList pqSMAdaptor::getFieldSelection(vtkSMProperty *Property,
+                                           PropertyValueType Type)
+{
+  vtkSMStringVectorProperty *StringVectorProperty =
+    vtkSMStringVectorProperty::SafeDownCast(Property);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(StringVectorProperty->GetDomain("field_list"));
+
+  QString mode;
+  QString scalars;
+
+  if(StringVectorProperty && domain)
+    {
+    int which;
+
+    if(Type == CHECKED)
+      {
+      which = QString(StringVectorProperty->GetElement(3)).toInt();
+      }
+    else if(Type == UNCHECKED)
+      {
+      which = QString(StringVectorProperty->GetUncheckedElement(3)).toInt();
+      }
+
+    for(unsigned int i = 0; i < domain->GetNumberOfEntries(); i++)
+      {
+      if(domain->GetEntryValue(i) == which)
+        {
+        mode = domain->GetEntryText(i);
+        break;
+        }
+      }
+
+    if(Type == CHECKED)
+      {
+      scalars = StringVectorProperty->GetElement(4);
+      }
+    else if(Type == UNCHECKED)
+      {
+      scalars = StringVectorProperty->GetUncheckedElement(4);
+      }
+    }
+
+  QStringList selection;
+  selection.append(mode);
+  selection.append(scalars);
+  return selection;
+}
+
+void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
+                                    const QStringList &Value,
+                                    PropertyValueType Type)
+{
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMEnumerationDomain* domain =
+    vtkSMEnumerationDomain::SafeDownCast(prop->GetDomain("field_list"));
+
+  if(Value.size() != 2)
+    {
+    return;
+    }
+
+  if(Property && domain)
+    {
+    for(unsigned int i = 0; i < domain->GetNumberOfEntries(); i++)
+      {
+      if(Value[0] == domain->GetEntryText(i))
+        {
+        const char *text = QString("%1").arg(domain->GetEntryValue(i)).toAscii().data();
+
+        if(Type == CHECKED)
+          {
+          Property->SetElement(3, text);
+          Property->SetElement(4, Value[1].toAscii().data());
+          }
+        else if(Type == UNCHECKED)
+          {
+          Property->SetUncheckedElement(3, text);
+          Property->SetUncheckedElement(4, Value[1].toAscii().data());
+          Property->UpdateDependentDomains();
+          }
+        break;
+        }
+      }
     }
 }
 

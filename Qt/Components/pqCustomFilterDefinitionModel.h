@@ -42,8 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqCustomFilterDefinitionModelItem;
 class pqPipelineSource;
-class pqServerManagerSelection;
+class pqProxySelection;
 class QPixmap;
+class vtkCollection;
 
 
 /// \class pqCustomFilterDefinitionModel
@@ -140,7 +141,7 @@ public:
   /// list are added to the hierarchy.
   ///
   /// \param items The list of selected model items.
-  void setContents(const pqServerManagerSelection *items);
+  void setContents(const pqProxySelection& items);
 
   /// \brief
   ///   Gets the next index in the model's tree hierarchy.

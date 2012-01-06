@@ -34,13 +34,14 @@
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
 #define MAX_NUMBER_OF_PORTS 10
@@ -221,7 +222,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   // this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
                                         vtkPVXMLElement* element)
 {
   const char* executiveName = element->GetAttribute("executive");
@@ -537,11 +538,27 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     }
   this->PInternals->SelectionProxies.resize(numOutputs);
 
-  vtkSMProxyManager* pxm = this->GetProxyManager();
   vtkClientServerStream stream;
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   for (int j=0; j<numOutputs; j++)
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;
+    // If the selection proxy has been created previously on the server,
+    // lets register it...
+    // This happen in collaboration mode when the SelectionProxy
+    // became alive because of the SelectionRepresentation before the
+    // CreateSelectionProxies() get called on the original source proxy...
+    if( esProxy =
+        vtkSMSourceProxy::SafeDownCast(
+          this->Session->GetRemoteObject(this->GetGlobalID()+j+1)))
+      {
+      esProxy->DisableSelectionProxies = true;
+      this->PInternals->SelectionProxies[j] = esProxy;
+      continue;
+      }
+
+    // Otherwise create it properly
     esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
         pxm->NewProxy("filters", "PVExtractSelection")));
     if (esProxy)

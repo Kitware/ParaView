@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVariant.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkScatterPlotMatrix.h"
 
@@ -439,7 +439,7 @@ void pqContextView::setSelection(vtkSelection* sel)
 
   if (!selectionSource)
     {
-    vtkSMProxyManager* pxm = this->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     selectionSource =
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
     vtkSMPropertyHelper(selectionSource, "FieldType").Set(selectionType);

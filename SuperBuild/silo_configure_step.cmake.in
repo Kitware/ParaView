@@ -13,11 +13,9 @@ if(WIN32)
     )
 else()
 
-  if(APPLE)
-    set(ENV{CPPFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
-    set(ENV{CXXFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
-    set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
-  endif()
+  set(ENV{CPPFLAGS} "@pv_tpl_cxx_flags@ @paraview_osx_flags@")
+  set(ENV{CXXFLAGS} "@pv_tpl_cxx_flags@ @paraview_osx_flags@")
+  set(ENV{CFLAGS} "@pv_tpl_c_flags@ @paraview_osx_flags@")
 
   EXECUTE_PROCESS(
     COMMAND sh configure --prefix=@Silo_install@ --disable-fortran --with-zlib=@ZLIB_INCLUDE_DIR@,@zlib_install@/lib --with-hdf5=@HDF5_INCLUDE_DIR@,@HDF5_install@/lib --with-qt=@qt_dir@ --disable-silex --disable-static --enable-shared --disable-browser --without-readline

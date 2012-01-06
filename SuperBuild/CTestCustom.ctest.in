@@ -152,8 +152,16 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "CLAPACK.BLAS.SRC"
   "CLAPACK.F2CLIBS.libf2c"
 
+  # configure
+  "configure: WARNING:*"
+  "configure: warning:*"
+  "config.status: WARNING:*"
+
   # Make
   "warning: jobserver unavailable"
+
+  # MPL
+  "WARNING: Could not find .freetype2. headers in any"
 
   # Python - Windows
   "Modules.zlib.gzio"
@@ -179,6 +187,8 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # About redefinition of symbols
   "pyconfig.h.*warning:.*redefined"
   "features.h.*"
+  "with. will become a reserved keyword in Python"
+  "as. will become a reserved keyword in Python"
 
   # Visual studio spurious warnings...
   "The following environment variables were not found"
@@ -205,6 +215,11 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # disable warnings from UI files.
   "ui_.*"
+
+  # Qt documentation warnings.
+  "Warning:.*.jpg does not exist! Skipping it.*"
+  "Warning:.*.css does not exist! Skipping it.*"
+  "Warning:.*.png does not exist! Skipping it.*"
   )
 
 IF(APPLE)

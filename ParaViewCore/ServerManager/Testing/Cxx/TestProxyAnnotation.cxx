@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
   vtkSMSession* session = vtkSMSession::New();
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
 
   // *******************************************************************
   // Test specific code

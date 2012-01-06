@@ -40,8 +40,8 @@ pqPlotMatrixView::pqPlotMatrixView(const QString &group,
                                    const QString &name,
                                    vtkSMContextViewProxy *viewModule,
                                    pqServer *server,
-                                   QObject *parent)
-  : pqContextView(viewType(), group, name, viewModule, server, parent)
+                                   QObject *parentObj)
+  : pqContextView(viewType(), group, name, viewModule, server, parentObj)
 {
 }
 

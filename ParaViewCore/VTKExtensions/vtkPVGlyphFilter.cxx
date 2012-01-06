@@ -481,7 +481,7 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
 
 
   // Identify the first point to glyph.
-  if(this->RandomMode)
+  if(this->RandomMode && this->RandomPtsInDataset.size() > 0) // FIXME this was a quick fix to prevent some test failure with mpi pvcrs.FindDataDialog.Flow
     {
     this->BlockNextPoint = this->RandomPtsInDataset[0];
     }

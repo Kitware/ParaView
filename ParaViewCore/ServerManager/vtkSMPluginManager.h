@@ -12,10 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPluginManager
+// .NAME vtkSMPluginManager - manages ParaView plugins.
 // .SECTION Description
 // vtkSMPluginManager is used to load plugins as well as discover information
 // about currently loaded and available plugins.
+//
+// vtkSMPluginManager supports multiple sessions. Every vtkSMSession registers
+// itself with the vtkSMPluginManager during initialization.
 
 #ifndef __vtkSMPluginManager_h
 #define __vtkSMPluginManager_h
@@ -33,33 +36,46 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the session whose plugin state this manager reflects.
-  // Note this is not reference counted.
-  void SetSession(vtkSMSession*);
+  // Register/Unregister a session. Every vtkSMSession must be registered with
+  // the vtkSMPluginManager. This is done automatically by vtkSMSession during
+  // the initialization stage. Note that the vtkSMSession is not reference
+  // counted.
+  void RegisterSession(vtkSMSession*);
+  void UnRegisterSession(vtkSMSession*);
 
   // Description:
-  // Initializes the plugin manager with information about client and server
-  // side plugins on the session.
-  void Initialize();
-
-  // Description:
-  // API to iterate over local and remote plugin information objects.
+  // vtkPVPluginsInformation provides information about plugins
+  // loaded/available. LocalInformation corresponds to plugins loaded on the
+  // local process. For remote sessions i.e. those that connect to a remote
+  // server process, one can use GetRemoteInformation() to access information
+  // about plugins on the remote process.
   vtkGetObjectMacro(LocalInformation, vtkPVPluginsInformation);
-  vtkGetObjectMacro(RemoteInformation, vtkPVPluginsInformation);
+  vtkPVPluginsInformation* GetRemoteInformation(vtkSMSession*);
 
   // Description:
-  // Returns the plugin search paths used either locally or remotely.
-  const char* GetPluginSearchPaths(bool remote);
+  // Returns the plugin search paths used either locally or remotely. For
+  // non-remote sessions, GetRemotePluginSearchPaths() returns the same value as
+  // GetLocalPluginSearchPaths().
+  const char* GetLocalPluginSearchPaths();
+  const char* GetRemotePluginSearchPaths(vtkSMSession*);
 
   // Description:
   // Loads the plugin either locally or remotely.
-  bool LoadRemotePlugin(const char* filename);
+  bool LoadRemotePlugin(const char* filename, vtkSMSession*);
   bool LoadLocalPlugin(const char* filename);
 
   // Description:
-  // Loads the plugin configuration xml.
+  // Plugin configuration XML is a simple XML that makes ParaView aware of the
+  // plugins available and may result in loading of those plugins that are
+  // marked for auto-loading. In ParaView application there are two uses for this:
+  // \li .plugins - used to notify ParaView of the distributed plugins
+  // \li session - used to save/restore the plugins loaded by the users.
+  //
+  // This method loads the plugin configuration xml either on the local process or the
+  // remote server process(es). \c session is only used when
+  // remote==true and session itself is a remote session.
   void LoadPluginConfigurationXMLFromString(const char* xmlcontents,
-    bool remote);
+    vtkSMSession* session, bool remote);
 
   enum
     {
@@ -70,10 +86,8 @@ protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
 
-  char* PluginSearchPaths;
-
   vtkPVPluginsInformation* LocalInformation;
-  vtkPVPluginsInformation* RemoteInformation;
+
 private:
   vtkSMPluginManager(const vtkSMPluginManager&); // Not implemented
   void operator=(const vtkSMPluginManager&); // Not implemented

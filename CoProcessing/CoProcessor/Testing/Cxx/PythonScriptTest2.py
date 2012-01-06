@@ -58,6 +58,7 @@ def DoCoProcessing(datadescription):
 
 def GetNextProxyToDelete():
   iter = servermanager.vtkSMProxyIterator()
+  iter.SetSession(servermanager.ActiveConnection.Session)
   iter.Begin()
   while not iter.IsAtEnd():
     if iter.GetGroup().find("prototypes") != -1:

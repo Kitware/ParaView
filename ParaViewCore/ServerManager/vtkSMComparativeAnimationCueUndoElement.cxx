@@ -19,6 +19,7 @@
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkCollection.h"
 #include "vtkSMProxyLocator.h"

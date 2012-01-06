@@ -133,6 +133,20 @@ protected:
   void DumpError(const char* string);
   void DumpOutput(const char* string);
   vtkStdString GetInputLine();
+
+  // Need to be called before releasing the interpretor, otherwise
+  // active session VTK callback will be trigger while the interpretor
+  // is shutting down which will make the application crash.
+  // This is only required when ActiveSessionObserverAttached == true
+  // meaning when python has been initialized by the UI
+  // meaning that method has been called: paraview.servermanager.InitFromGUI()
+  void DetachActiveSessionObserver();
+
+  // Description:
+  // Declare that DetachActiveSessionObserver() should be called at close time.
+  // CAUTION: This must be set to true when paraview.servermanager.InitFromGUI()
+  //          get called.
+  bool ActiveSessionObserverAttached;
   
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.

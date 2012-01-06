@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqRecentlyUsedResourcesList.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqServerResources.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -74,7 +74,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   QString filters = readerFactory->GetSupportedFileTypes(
     server->session());
   if (!filters.isEmpty())
@@ -123,7 +123,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
     }
 
   vtkSMReaderFactory* readerFactory =
-    vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
+      vtkSMProxyManager::GetProxyManager()->GetReaderFactory();
   pqPipelineSource* reader = NULL;
 
   //Extension to ReaderType,ReaderGroup Hash table
@@ -257,8 +257,8 @@ pqPipelineSource* pqLoadDataReaction::LoadFile(
       {
       resource.addData(QString("file.%1").arg(cc-1), files[cc]);
       }
-    core->serverResources().add(resource);
-    core->serverResources().save(*core->settings());
+    core->recentlyUsedResources().add(resource);
+    core->recentlyUsedResources().save(*core->settings());
     }
   
   return reader;

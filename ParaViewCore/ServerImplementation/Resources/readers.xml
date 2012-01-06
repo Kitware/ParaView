@@ -3793,11 +3793,16 @@
        <Documentation>
          This property lists which cell-centered arrays to read.
        </Documentation>
+       <Hints>
+         <ShowInSummaryPanel/>
+       </Hints>
      </StringVectorProperty>
 
      <Hints>
-      <ReaderFactory filename_patterns="spct*"
-          file_description="SpyPlot CTH dataset" />
+      <ReaderFactory
+        extensions="spct*"
+        filename_patterns="spct*"
+        file_description="SpyPlot CTH dataset" />
      </Hints>
    <!-- End spcthreader-->
    </SourceProxy>
@@ -5754,10 +5759,10 @@
    <!-- End of ProStar Reader -->
 
    <!-- Beginning of LSDyna Reader -->
-   <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
+   <SourceProxy name="LSDynaReader" class="vtkPLSDynaReader">
      <Documentation
       short_help="Read LS-Dyna databases (d3plot)."
-      long_help="Reads LS-Dyna databases (d3plot)." >
+      long_help="Read LS-Dyna databases (d3plot)." >
       This reader reads LS-Dyna databases.
      </Documentation>
 
@@ -5992,17 +5997,6 @@
        <BooleanDomain name="bool"/>
        <Documentation>
          Should cells that have been deleted (failed structurally, for example) be removed from the mesh?
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="SplitByMaterialId"
-                        command="SetSplitByMaterialId"
-                        number_of_elements="1"
-                        default_values="0"
-                        label="Split by Material Id">
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         Should each material have its own mesh, or should there be one mesh for all materials?
        </Documentation>
      </IntVectorProperty>
 

@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqStandardSummaryPanelImplementation::pqStandardSummaryPanelImplementation(QObject *parent)
-  : QObject(parent)
+pqStandardSummaryPanelImplementation::pqStandardSummaryPanelImplementation(QObject *p)
+  : QObject(p)
 {
 }
 

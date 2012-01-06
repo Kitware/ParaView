@@ -1,6 +1,7 @@
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -27,15 +28,16 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRDualClip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CTHDerivedDensity2DClyinder.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
@@ -160,9 +162,9 @@ SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.
 
-set (ColorEditor1_BREAK TRUE)
+set (NewColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
-set (ColorEditor3_BREAK TRUE)
+set (NewColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
@@ -191,6 +193,10 @@ SET (UndoRedo4_THRESHOLD 15)
 SET (XYChart_THRESHOLD 150)
 
 SET (XYHistogram_THRESHOLD 60)
+
+# The color and opacity are often different on different machines.
+SET (NewColorEditor1_THRESHOLD 60)
+SET (NewColorEditor3_THRESHOLD 60)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.
@@ -237,10 +243,13 @@ SET (SaveCSV_THRESHOLD 40)
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
 
-# ColorEditor3 does volume rendering of structrued data which required remote
+# NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
-SET (ColorEditor3_DISABLE_CS TRUE)
-SET (ColorEditor3_DISABLE_CRS TRUE)
+SET (NewColorEditor3_DISABLE_CS TRUE)
+SET (NewColorEditor3_DISABLE_CRS TRUE)
+# NewColorEditor1 has a clip widget that can not be handled properly by
+# the collaboration render window yet, so disable for now.
+SET (NewColorEditor1_DISABLE_CRS TRUE)
 
 # ViewSettingsDialog uses texture background which is currently supported only
 # in local render mode.
@@ -283,7 +292,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
-#     - ViewSettingsDialog, ColorEditor3, RectilinearFractal
+#     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
 #
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
@@ -312,7 +321,6 @@ set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (ColorEditor1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ColorEditor4_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})

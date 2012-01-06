@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QList>
 #include <QMap>
@@ -316,7 +317,7 @@ void pqPQLookupTableManager::setLUTDefaultState(vtkSMProxy* lutProxy)
 pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   const QString& arrayname, int number_of_components, int component)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* lutProxy =
     pxm->NewProxy("lookup_tables", "PVLookupTable");
   QString name = this->Internal->getRegistrationName(
@@ -387,7 +388,7 @@ pqScalarOpacityFunction* pqPQLookupTableManager::createOpacityFunction(
   pqServer* server, const QString& arrayname, 
   int number_of_components, int component)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* opacityFunction = 
     pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
   //opacityFunction->UpdateVTKObjects();
@@ -451,8 +452,10 @@ void pqPQLookupTableManager::setOpacityFunctionDefaultState(
  vtkSMProxy* opFuncProxy)
 {
   // Setup default opacity function to go from (0.0,0.0) to (1.0,1.0).
+  // We are new setting defaults for midPoint (0.5) and sharpness(0.0) 
   QList<QVariant> values;
-  values << 0.0 << 0.0 << 1.0 << 1.0 ;
+  values << 0.0 << 0.0 << 0.5 << 0.0 ;
+  values << 1.0 << 1.0 << 0.5 << 0.0 ;
   pqSMAdaptor::setMultipleElementProperty(
     opFuncProxy->GetProperty("Points"), values);
 

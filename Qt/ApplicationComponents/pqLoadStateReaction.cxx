@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqServerResources.h"
 #include "vtkPVXMLParser.h"
 
 #include <QFileInfo>
@@ -83,8 +83,8 @@ void pqLoadStateReaction::loadState(const QString& filename)
     resource.setScheme("session");
     resource.setPath(filename);
     resource.setSessionServer(server->getResource());
-    pqApplicationCore::instance()->serverResources().add(resource);
-    pqApplicationCore::instance()->serverResources().save(
+    pqApplicationCore::instance()->recentlyUsedResources().add(resource);
+    pqApplicationCore::instance()->recentlyUsedResources().save(
       *pqApplicationCore::instance()->settings());
     }
   else
