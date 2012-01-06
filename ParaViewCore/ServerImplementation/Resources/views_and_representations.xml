@@ -1585,14 +1585,16 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -1805,7 +1807,8 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
@@ -1850,7 +1853,8 @@
       </IntVectorProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -2014,7 +2018,8 @@
       </DoubleVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
@@ -2192,7 +2197,8 @@
         </Documentation>
       </IntVectorProperty>
 
-      <ProxyProperty name="LookupTable" command="SetLookupTable">
+      <ProxyProperty name="LookupTable" command="SetLookupTable"
+        skip_dependency="1">
         <Documentation>
           Set the lookup table to use for scalar mapping.
         </Documentation>
@@ -2496,7 +2502,8 @@
       </ProxyProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
