@@ -724,3 +724,9 @@ void pqMultiViewWidget::reset()
 {
   this->layoutManager()->Reset();
 }
+
+//-----------------------------------------------------------------------------
+QList<vtkSMViewProxy*> pqMultiViewWidget::viewProxies() const
+{
+  return this->Internals->ViewFrames.keys();
+}

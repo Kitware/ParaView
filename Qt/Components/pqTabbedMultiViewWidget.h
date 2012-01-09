@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqProxy;
 class pqServer;
-class vtkSMViewLayoutProxy;
+class pqView;
 class vtkImageData;
+class vtkSMViewLayoutProxy;
 
 /// pqTabbedMultiViewWidget is used to to enable adding of multiple
 /// pqMultiViewWidget instances in tabs. This class directly listens to the
@@ -101,8 +102,15 @@ protected slots:
   /// widget is visible.
   void frameActivated();
 
+  /// verifies that all views loaded from state are indeed assigned to some view
+  /// layout, or we just assign them to one.
+  void onStateLoaded();
+
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
+
+  /// assigns a frame to the view.
+  void assignToFrame(pqView*, bool warnIfTabCreated);
 
 private:
   Q_DISABLE_COPY(pqTabbedMultiViewWidget);

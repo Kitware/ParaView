@@ -41,6 +41,7 @@ class pqViewFrame;
 class vtkImageData;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
+class vtkSMViewProxy;
 
 /// pqMultiViewWidget is a widget that manages layout of multiple views. It
 /// works together with a vtkSMViewLayoutProxy instance to keep track of the layout
@@ -73,6 +74,9 @@ public:
 
   /// cleans up the environment after image capture.
   void cleanupAfterCapture();
+
+  /// Returns list of views assigned to frames in this widget.
+  QList<vtkSMViewProxy*> viewProxies() const;
 
 signals:
   /// fired when a frame in this widget becomes active.

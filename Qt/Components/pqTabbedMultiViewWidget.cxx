@@ -121,11 +121,11 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   vbox->setSpacing(0);
   vbox->addWidget(this->Internals->TabWidget);
 
-  pqApplicationCore::instance()->registerManager(
-    "MULTIVIEW_WIDGET", this);
+  pqApplicationCore* core = pqApplicationCore::instance();
 
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
+  core->registerManager("MULTIVIEW_WIDGET", this);
+
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
     this, SLOT(proxyAdded(pqProxy*)));
@@ -137,6 +137,12 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   this->Internals->TabWidget->addTab(new QWidget(this), "+");
   QObject::connect(this->Internals->TabWidget, SIGNAL(currentChanged(int)),
     this, SLOT(currentTabChanged(int)));
+
+  // we need to ensure that all views loaded from the state do get assigned to
+  // some layout correctly.
+  QObject::connect(
+    core, SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(onStateLoaded()));
 }
 
 //-----------------------------------------------------------------------------
@@ -190,31 +196,12 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
       {
       return;
       }
+
     // FIXME: we may want to give server-manager the opportunity to place the
     // view after creation, if it wants. The GUI should try to find a place for
     // it, only if the server-manager (through undo-redo, or loading state or
     // Python or collaborative-client).
-    pqMultiViewWidget* frame = this->Internals->assignableFrame(proxy);
-
-    if (!frame)
-      {
-      qDebug() << "This code may not work in multi-clients mode";
-      // implies no vtkSMViewLayoutProxy was registered for this session.
-      this->createTab(proxy->getServer());
-      frame = qobject_cast<pqMultiViewWidget*>(
-        this->Internals->TabWidget->currentWidget());
-      }
-
-    if (frame)
-      {
-      frame->assignToFrame(qobject_cast<pqView*>(proxy));
-      }
-    else
-      {
-      qCritical() <<
-        "A new view was added, but pqTabbedMultiViewWidget has no "
-        "idea where to put this view.";
-      }
+    this->assignToFrame(qobject_cast<pqView*>(proxy), true);
     }
 }
 
@@ -244,6 +231,36 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
         break;
         }
       }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::assignToFrame(pqView* view, bool warnIfTabCreated)
+{
+  pqMultiViewWidget* frame = this->Internals->assignableFrame(view);
+
+  if (!frame)
+    {
+    if (warnIfTabCreated)
+      {
+      qWarning() << "This code may not work in multi-clients mode";
+      }
+
+    // implies no vtkSMViewLayoutProxy was registered for this session.
+    this->createTab(view->getServer());
+    frame = qobject_cast<pqMultiViewWidget*>(
+      this->Internals->TabWidget->currentWidget());
+    }
+
+  if (frame)
+    {
+    frame->assignToFrame(view);
+    }
+  else
+    {
+    qCritical() <<
+      "A new view was added, but pqTabbedMultiViewWidget has no "
+      "idea where to put this view.";
     }
 }
 
@@ -476,5 +493,29 @@ void pqTabbedMultiViewWidget::frameActivated()
     {
     this->Internals->TabWidget->setCurrentWidget(widget);
     }
+}
 
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::onStateLoaded()
+{
+  QSet<vtkSMViewProxy*> proxies;
+  foreach (pqMultiViewWidget* wdg, this->Internals->TabWidgets.values())
+    {
+    if (wdg)
+      {
+      proxies.unite(wdg->viewProxies().toSet());
+      }
+    }
+
+  // check that all views are assigned to some frame or other.
+  QList<pqView*> views =
+    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
+
+  foreach (pqView* view, views)
+    {
+    if (!proxies.contains(view->getViewProxy()))
+      {
+      this->assignToFrame(view, false);
+      }
+    }
 }
