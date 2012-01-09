@@ -156,14 +156,14 @@ public:
         item->setGeometry(
           QRect(offset + rect.x(), rect.y(),
             static_cast<int>(fractions[cc] * rect.width()), rect.height()));
-        offset += fractions[cc] * rect.width();
+        offset += static_cast<int>(fractions[cc] * rect.width());
         }
       else if (this->direction() == TopToBottom)
         {
         item->setGeometry(
           QRect(rect.x(), offset + rect.y(),
             rect.width(), static_cast<int>(fractions[cc] * rect.height())));
-        offset += fractions[cc] * rect.height();
+        offset += static_cast<int>(fractions[cc] * rect.height());
         }
       }
     }
