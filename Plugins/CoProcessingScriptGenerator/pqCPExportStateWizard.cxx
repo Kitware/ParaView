@@ -484,7 +484,8 @@ bool pqCPExportStateWizard::validateCurrentPage()
     }
   else // we are creating images so add information to the view proxies
     {
-    vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();
+    vtkSMSessionProxyManager* proxyManager =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     for(int i=0;i<this->Internals->viewsContainer->count();i++)
       {
       pqImageOutputInfo* viewInfo = dynamic_cast<pqImageOutputInfo*>(
