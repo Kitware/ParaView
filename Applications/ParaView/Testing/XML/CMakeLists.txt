@@ -279,6 +279,7 @@ IF (NOT BUILD_SHARED_LIBS)
   SET (H5PartReaderPlugin_DISABLE_C TRUE)
   SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
+  SET (SLACTools_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
