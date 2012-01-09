@@ -155,14 +155,14 @@ public:
         {
         item->setGeometry(
           QRect(offset + rect.x(), rect.y(),
-            fractions[cc] * rect.width(), rect.height()));
+            static_cast<int>(fractions[cc] * rect.width()), rect.height()));
         offset += fractions[cc] * rect.width();
         }
       else if (this->direction() == TopToBottom)
         {
         item->setGeometry(
           QRect(rect.x(), offset + rect.y(),
-            rect.width(), fractions[cc] * rect.height()));
+            rect.width(), static_cast<int>(fractions[cc] * rect.height())));
         offset += fractions[cc] * rect.height();
         }
       }
@@ -451,8 +451,8 @@ QWidget* pqMultiViewWidget::createWidget(
       // set the sizes are percentage. QSplitter uses the initially specified
       // sizes as reference.
       QList<int> sizes;
-      sizes << vlayout->GetSplitFraction(index) * 10000;
-      sizes << (1.0 - vlayout->GetSplitFraction(index))  * 10000;
+      sizes << static_cast<int>(vlayout->GetSplitFraction(index) * 10000);
+      sizes << static_cast<int>((1.0 - vlayout->GetSplitFraction(index)) * 10000);
       splitter->setSizes(sizes);
 
       // FIXME: Don't like this as this QueuedConnection may cause multiple
