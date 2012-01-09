@@ -208,8 +208,11 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
     originalIds->InsertValue(newId, id);
     }
 
-  output->InsertNextCell(VTK_POLY_VERTEX,
-    static_cast<vtkIdType>(pointIds.size()), &pointIds[0]);
+  if(!pointIds.empty())
+    {
+    output->InsertNextCell(VTK_POLY_VERTEX,
+                           static_cast<vtkIdType>(pointIds.size()), &pointIds[0]);
+    }
 
   outputPD->AddArray(originalIds);
   originalIds->FastDelete();
