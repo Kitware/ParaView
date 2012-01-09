@@ -64,7 +64,7 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 
   <!-- Add some test for the Camera Setting Dialog -->
-  <pqevent object="pqClientMainWindow/pqParaViewBehaviors0/pqViewFrameActionsBehavior0/pqStandardViewFrameActionGroup0/CameraButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CameraButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewXPlus" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewXMinus" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup" command="mouseMove" arguments="1,0,0,88,46" />
