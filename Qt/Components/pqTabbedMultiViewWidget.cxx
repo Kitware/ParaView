@@ -198,6 +198,7 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
 
     if (!frame)
       {
+      qDebug() << "This code may not work in multi-clients mode";
       // implies no vtkSMViewLayoutProxy was registered for this session.
       this->createTab(proxy->getServer());
       frame = qobject_cast<pqMultiViewWidget*>(
