@@ -103,6 +103,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
@@ -153,6 +154,7 @@ set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
 set (TestIsoVolume_BREAK TRUE)
+set (TabbedViews_BREAK TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
