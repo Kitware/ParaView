@@ -180,6 +180,12 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(viewChanged(pqView*)), this, SLOT(markActive(pqView*)));
+
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
+    this, SLOT(proxyRemoved(pqProxy*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +246,16 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
     }
 
   return this->Superclass::eventFilter(caller, evt);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::proxyRemoved(pqProxy* proxy)
+{
+  vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxy->getProxy());
+  if (view && this->Internals->ViewFrames.contains(view) && this->layoutManager())
+    {
+    this->layoutManager()->RemoveView(view);
+    }
 }
 
 //-----------------------------------------------------------------------------

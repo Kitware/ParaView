@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QUuid>
 #include "pqComponentsExport.h"
 
+class pqProxy;
 class pqView;
 class pqViewFrame;
 class vtkImageData;
@@ -129,6 +130,10 @@ protected slots:
 
   /// swap frame positions.
   void swapPositions(const QString&);
+
+  /// when a view proxy is unregistered, we ensure that the frame is marked as
+  /// empty.
+  void proxyRemoved(pqProxy*);
 
 protected:
   /// Called whenever a new frame needs to be created for a view. Note that view
