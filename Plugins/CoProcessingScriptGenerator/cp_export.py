@@ -213,10 +213,11 @@ def DoCoProcessing(datadescription):
                             # rescale all of the points
                             oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]
                             newrange = maxvalue - minvalue
+                            newrgbpoints = list(rgbpoints)
                             for v in range(numpts):
-                                rgbpoints[v*4] = minvalue+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
+                                newrgbpoints[v*4] = minvalue+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
 
-                            lut.RGBPoints.SetData(rgbpoints)
+                            lut.RGBPoints.SetData(newrgbpoints)
 
     for view in cp_views:
         if timestep %% view.cpFrequency == 0 or datadescription.GetForceOutput() == True:
