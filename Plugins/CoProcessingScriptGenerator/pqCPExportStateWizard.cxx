@@ -245,7 +245,16 @@ void pqCPExportStateWizardPage3::initializePage()
     QListWidgetItem* item = this->Internals->simulationInputs->item(cc);
     QString text = item->text();
     this->Internals->nameWidget->setItem(cc, 0, new QTableWidgetItem(text));
-    this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
+    // if there is only 1 input then call it input, otherwise
+    // use the same name as the filter
+    if(this->Internals->simulationInputs->count() == 1)
+      {
+      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem("input"));
+      }
+    else
+      {
+      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
+      }
     QTableWidgetItem* tableItem = this->Internals->nameWidget->item(cc, 1);
     tableItem->setFlags(tableItem->flags()|Qt::ItemIsEditable);
 
