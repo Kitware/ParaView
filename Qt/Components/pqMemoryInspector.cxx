@@ -166,7 +166,7 @@ public:
   virtual int rowCount(const QModelIndex &idx=QModelIndex()) const
     {
     (void)idx;
-    return this->Information->GetSystemInformations().size();
+    return static_cast<int>(this->Information->GetSystemInformations().size());
     }
   virtual int columnCount(const QModelIndex& idx=QModelIndex()) const
     {
