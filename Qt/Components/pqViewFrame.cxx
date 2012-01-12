@@ -300,19 +300,19 @@ void pqViewFrame::addTitleBarAction(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqViewFrame::addTitleBarAction(const QString& title)
+QAction* pqViewFrame::addTitleBarAction(const QString& titlestr)
 {
-  QAction* action = new QAction(title, this);
-  action->setObjectName(title);
+  QAction* action = new QAction(titlestr, this);
+  action->setObjectName(titlestr);
   this->addTitleBarAction(action);
   return action;
 }
 
 //-----------------------------------------------------------------------------
-QAction* pqViewFrame::addTitleBarAction(const QIcon& icon, const QString& title)
+QAction* pqViewFrame::addTitleBarAction(const QIcon& icon, const QString& titlestr)
 {
-  QAction* action = new QAction(icon, title, this);
-  action->setObjectName(title);
+  QAction* action = new QAction(icon, titlestr, this);
+  action->setObjectName(titlestr);
   this->addTitleBarAction(action);
   return action;
 }

@@ -624,10 +624,10 @@ void pqMultiViewWidget::standardButtonPressed(int button)
       if (index.toInt() != 0)
         {
         int location = index.toInt();
-        int parent = vtkSMViewLayoutProxy::GetParent(location);
+        int parent_idx = vtkSMViewLayoutProxy::GetParent(location);
         this->layoutManager()->Collapse(location);
         this->makeActive(qobject_cast<pqViewFrame*>(
-            this->Internals->Widgets[parent]));
+            this->Internals->Widgets[parent_idx]));
         }
       END_UNDO_SET();
       }
@@ -669,7 +669,6 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 int pqMultiViewWidget::prepareForCapture(int dx, int dy)
 {
   QSize requestedSize(dx, dy);
-  QSize originalSize = this->size();
   QSize mySize = this->size();
 
   int magnification =  pqView::computeMagnification(requestedSize, mySize);
@@ -702,8 +701,8 @@ void pqMultiViewWidget::swapPositions(const QString& uid_str)
   QUuid other (uid_str);
 
   vtkSMViewLayoutProxy* vlayout = this->layoutManager();
-  pqViewFrame* sender = qobject_cast<pqViewFrame*>(this->sender());
-  if (!sender || !vlayout)
+  pqViewFrame* senderFrame = qobject_cast<pqViewFrame*>(this->sender());
+  if (!senderFrame || !vlayout)
     {
     return;
     }
@@ -724,7 +723,7 @@ void pqMultiViewWidget::swapPositions(const QString& uid_str)
     return;
     }
 
-  int id1 = sender->property("FRAME_INDEX").toInt();
+  int id1 = senderFrame->property("FRAME_INDEX").toInt();
   int id2 = swapWith->property("FRAME_INDEX").toInt();
   vtkSMViewProxy* view1 = vlayout->GetView(id1);
   vtkSMViewProxy* view2 = vlayout->GetView(id2);
@@ -733,7 +732,7 @@ void pqMultiViewWidget::swapPositions(const QString& uid_str)
     {
     return;
     }
-  
+
   BEGIN_UNDO_SET("Swap Views");
   vlayout->SwapCells(id1, id2);
   END_UNDO_SET();
