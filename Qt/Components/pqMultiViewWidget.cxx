@@ -568,6 +568,11 @@ void pqMultiViewWidget::reload()
       iter.remove();
       }
     }
+
+  // we let the GUI updated immediately. This is needed since when a new view is
+  // created (for example), it may depend on the size of the view during its
+  // initialization to ensure camera is reset correctly.
+  QCoreApplication::sendPostedEvents();
 }
 
 //-----------------------------------------------------------------------------
