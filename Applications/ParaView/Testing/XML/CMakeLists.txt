@@ -376,7 +376,9 @@ set (PlotEdges2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+# disabling since the state file doesn't have view layout and such old state
+# files are not currently supported in collaborative mode.
+#set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (RepresentationSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (SaveColorMap_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
