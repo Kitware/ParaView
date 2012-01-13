@@ -380,3 +380,4 @@ void vtkAMRVolumeRepresentation::SetShade(bool val)
 {
   this->Property->SetShade(val);
 }
+//----------------------------------------------------------------------------

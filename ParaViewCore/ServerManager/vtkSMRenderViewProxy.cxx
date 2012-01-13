@@ -106,6 +106,7 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
   this->IsSelectionCached = false;
+  this->LastCameraDependantRepUpdate = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -917,6 +918,28 @@ double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
   this->Session->DeActivate();
 
   return result;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::StillRender()
+{
+  vtkCamera *camera = this->GetActiveCamera();
+  unsigned long ctime = (camera != NULL) ? camera->GetMTime() : 0;
+  if (ctime > this->LastCameraDependantRepUpdate)
+    {
+    this->LastCameraDependantRepUpdate = ctime;
+    unsigned int numProducers = this->GetNumberOfProducers();
+    vtkSMRepresentationProxy *rep;
+    for (unsigned int i=0; i<numProducers; i++)
+      {
+      rep = vtkSMRepresentationProxy::SafeDownCast(this->GetProducerProxy(i));
+      if (rep && rep->GetProperty("StillCameraModified"))
+        {
+        rep->InvokeCommand("StillCameraModified");
+        }
+      }
+    }
+  this->Superclass::StillRender();
 }
 
 //----------------------------------------------------------------------------

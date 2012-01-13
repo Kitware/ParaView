@@ -1481,6 +1481,7 @@
           <Property name="ResamplingMethod" />
           <Property name="NumberOfSamples" />
           <Property name="FreezeFocalPoint" />
+          <Property name="StillCameraModified"/>
           <Property name="Shade"/>
         </ExposedProperties>
       </SubProxy>
@@ -2105,6 +2106,15 @@
         default_values="100.0">
         <DoubleRangeDomain name="range" min="0" max="100" />
       </DoubleVectorProperty>
+
+      <IntVectorProperty name="StillCameraModified"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use Internally to update resampler filter during still renders.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="Shade"
         command="SetShade"
