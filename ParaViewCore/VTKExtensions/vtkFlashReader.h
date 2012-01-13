@@ -46,7 +46,7 @@
 
 #include "vtkHierarchicalBoxDataSetAlgorithm.h"
 //#include "vtkMultiBlockDataSetAlgorithm.h"
-#include <vtkstd/vector> // STL Header
+#include <vector> // STL Header
 
 class    vtkDataSet;
 class    vtkPolyData;
@@ -483,11 +483,11 @@ protected:
   int            MaximumNumberOfBlocks;
   
 //BTX
-  vtkstd::vector<int>    ToGlobalBlockMap;
-  vtkstd::vector<double> BlockRank;
+  std::vector<int>    ToGlobalBlockMap;
+  std::vector<double> BlockRank;
   // Every process to have the same blocks.  They may be empty but they have to be the same.
   // Keep track of whichprocess will actually load the block.
-  vtkstd::vector<int>    BlockProcess;
+  std::vector<int>    BlockProcess;
 //ETX
   virtual void GenerateBlockMap();
   void AddBlockToMap(int globalId);

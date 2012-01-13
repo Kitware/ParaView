@@ -36,7 +36,7 @@
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
-#include <vtkstd/map>
+#include <map>
 
 class vtkSpreadSheetView::vtkInternals
 {
@@ -48,7 +48,7 @@ public:
     vtkTimeStamp RecentUseTime;
     };
 
-  typedef vtkstd::map<vtkIdType, CacheInfo> CacheType;
+  typedef std::map<vtkIdType, CacheInfo> CacheType;
   CacheType CachedBlocks;
 
   vtkTable* GetDataObject(vtkIdType blockId)

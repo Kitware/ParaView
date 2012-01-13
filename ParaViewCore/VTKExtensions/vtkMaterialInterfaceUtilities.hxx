@@ -31,9 +31,9 @@ using vtksys_ios::ifstream;
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
 #include<vtkstd/vector>
-using vtkstd::vector;
+using std::vector;
 #include<vtkstd/string>
-using vtkstd::string;
+using std::string;
 #include<vtkstd/algorithm>
 // other
 #include<assert.h>
@@ -165,7 +165,7 @@ void NewVtkArrayPointer(
                 T *&pv,
                 int nComps,
                 vtkIdType nTups,
-                vtkstd::string name)
+                std::string name)
 {
   pv=T::New();
   pv->SetNumberOfComponents(nComps);
@@ -179,7 +179,7 @@ void ReNewVtkArrayPointer(
                 T *&pv,
                 int nComps,
                 vtkIdType nTups,
-                vtkstd::string name)
+                std::string name)
 {
   if (pv!=0)
     {
@@ -190,7 +190,7 @@ void ReNewVtkArrayPointer(
 // vtk object memory managment helper
 template<class T>
 inline
-void ReNewVtkArrayPointer(T *&pv,vtkstd::string name)
+void ReNewVtkArrayPointer(T *&pv,std::string name)
 {
   ReNewVtkArrayPointer(pv,1,0,name);
 }
@@ -642,7 +642,7 @@ void PrintHistogram(vector<TCnt> &bins, vector<TLabel> &binIds)
       }
     // clip at width of 40.
     int wid= maxBin<maxWidth ? bins[i] : bins[i]*maxWidth/maxBin;
-    cerr << "{" << setw(12) << vtkstd::left << binIds[i] << "}*";
+    cerr << "{" << setw(12) << std::left << binIds[i] << "}*";
     for (int j=1; j<wid; ++j)
       {
       cerr << "*";

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/LoadStateMultiView.pvsm" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.1/Frame.3/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/SplitVertical" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TestMultiView.pvsm" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
+  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TestMultiView.pvsm" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Maximize" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Minimize" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.1/Frame.4/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Close" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LoadStateMultiView.png" />
+</pqevents>

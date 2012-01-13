@@ -62,11 +62,11 @@
 
 #include <hdf5.h>    // for the HDF data loading engine
 
-#include <vtkstd/algorithm> // for 'find()'
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <algorithm> // for 'find()'
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 #include <cassert>
 
@@ -136,17 +136,17 @@ typedef  struct tagFlashReaderSimulationInformation
   char   BuildTimeStamp[80];
 } FlashReaderSimulationInformation;
 
-static vtkstd::string GetSeparatedParticleName( const vtkstd::string & variable )
+static std::string GetSeparatedParticleName( const std::string & variable )
 {
-  vtkstd::string sepaName = variable;
+  std::string sepaName = variable;
   
   if ( sepaName.length() > 9 && sepaName.substr(0,9) == "particle_" )
     {
-    sepaName = vtkstd::string( "Particles/" ) + sepaName.substr( 9 );
+    sepaName = std::string( "Particles/" ) + sepaName.substr( 9 );
     }
   else
     {
-    sepaName = vtkstd::string( "Particles/" ) + sepaName;
+    sepaName = std::string( "Particles/" ) + sepaName;
     }
   
   return sepaName;
@@ -185,15 +185,15 @@ public:
   FlashReaderSimulationInformation    SimulationInformation;  // CFD simulation
   
   // blocks
-  vtkstd::vector< Block >             Blocks;
-  vtkstd::vector<  int  >             LeafBlocks;
-  vtkstd::vector< vtkstd::string >    AttributeNames;
+  std::vector< Block >             Blocks;
+  std::vector<  int  >             LeafBlocks;
+  std::vector< std::string >    AttributeNames;
   
   // particles
-  vtkstd::string                      ParticleName;
-  vtkstd::vector< hid_t >             ParticleAttributeTypes;
-  vtkstd::vector< vtkstd::string >    ParticleAttributeNames;
-  vtkstd::map< vtkstd::string, int >  ParticleAttributeNamesToIds;
+  std::string                      ParticleName;
+  std::vector< hid_t >             ParticleAttributeTypes;
+  std::vector< std::string >    ParticleAttributeNames;
+  std::map< std::string, int >  ParticleAttributeNamesToIds;
   
   
   int      GetCycle();
@@ -370,7 +370,7 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     }
     
   hsize_t        objIndex;
-  vtkstd::string sObjName = "processor number";
+  std::string sObjName = "processor number";
   char           namefromfile[17];
   for ( objIndex = 0; objIndex < numbObjs; objIndex ++ )
     {
@@ -378,7 +378,7 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     if ( objsize == 16 )
       {
       H5Gget_objname_by_idx( rootIndx, objIndex, namefromfile, 17 );
-      vtkstd::string tempstr = namefromfile;
+      std::string tempstr = namefromfile;
       if ( tempstr == sObjName ) // if this file contains processor numbers
         {
         this->HaveProcessorsInfo = 1;
@@ -1450,7 +1450,7 @@ void vtkFlashReaderInternal::ReadParticleAttributes()
   for ( int i = 0; i < numMembers; i ++ )
     {
     char  * member_name = H5Tget_member_name( point_raw_type, i );
-    vtkstd::string nice_name = GetSeparatedParticleName( member_name );
+    std::string nice_name = GetSeparatedParticleName( member_name );
     hid_t  member_raw_type = H5Tget_member_type( point_raw_type, i );
     hid_t  member_type = H5Tget_native_type( member_raw_type, H5T_DIR_ASCEND );
     int    index = (int)(this->ParticleAttributeTypes.size());
@@ -1569,13 +1569,13 @@ void vtkFlashReaderInternal::ReadParticleAttributesFLASH3()
   H5Dread( pnameId, string24, H5S_ALL, H5S_ALL, H5P_DEFAULT, cnames );
 
   // Convert the single string to individual variable names.
-  vtkstd::string  snames( cnames );
+  std::string  snames( cnames );
   delete[] cnames;
   cnames = NULL;
   
   for ( int i = 0; i < numNames; i ++ )
     { 
-    vtkstd::string name = snames.substr( i * 24, 24 );
+    std::string name = snames.substr( i * 24, 24 );
     
     int sp = (int)(name.find_first_of(' '));
     if ( sp < 24 )
@@ -1588,7 +1588,7 @@ void vtkFlashReaderInternal::ReadParticleAttributesFLASH3()
           name != "particle_z" 
        )  
       {
-      vtkstd::string nice_name = GetSeparatedParticleName( name );
+      std::string nice_name = GetSeparatedParticleName( name );
       this->ParticleAttributeTypes.push_back( H5T_NATIVE_DOUBLE );
       this->ParticleAttributeNames.push_back( name );
       this->ParticleAttributeNamesToIds[ nice_name ] = i;
@@ -1706,7 +1706,7 @@ int vtkFlashReader::UpdateMetaData(vtkInformation* vtkNotUsed(request),
   int fieldsCount = this->GetNumberOfCellArrays();
   vtkDebugMacro("Number of fields: " << fieldsCount);
   
-  vtkstd::set<vtkstd::string> fileFields;
+  std::set<std::string> fileFields;
   
   int field;
   for(field=0; field<fieldsCount; ++field)
@@ -2282,7 +2282,7 @@ const char * vtkFlashReader::GetParticleAttributeName( int attrIndx )
     return NULL;
     }
   
-  vtkstd::map< vtkstd::string, int >::iterator i;
+  std::map< std::string, int >::iterator i;
   for (   i  = this->Internal->ParticleAttributeNamesToIds.begin(); 
           i != this->Internal->ParticleAttributeNamesToIds.end() &&
           (  ( *i ).second != attrIndx  );   i ++   ) {}
@@ -2300,7 +2300,7 @@ int vtkFlashReader::IsParticleAttribute( const char * attrName )
     int  numAttrs = static_cast< int > 
                     ( this->Internal->ParticleAttributeNames.size() );
     int  tempIndx = this->Internal->
-                    ParticleAttributeNamesToIds[  vtkstd::string( attrName )  ];
+                    ParticleAttributeNamesToIds[  std::string( attrName )  ];
     attrIndx = ( tempIndx > 0 && tempIndx < numAttrs ) ? tempIndx : ( -1 );
     }
     
@@ -2463,6 +2463,7 @@ void vtkFlashReader::AddBlockToMap(int globalId)
   this->BlockRank.push_back(rank);
   this->ToGlobalBlockMap.push_back(globalId);
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkFlashReader::RequestData(
@@ -2731,11 +2732,11 @@ int vtkFlashReader::GetBlock( int blockIdx, vtkUniformGrid *ug )
     } // END for all attributes
 
   // vectorize
-  if( this->MergeXYZComponents )
+  if (this->MergeXYZComponents)
     {
       this->MergeVectors( ug->GetCellData() );
     }
-
+    
   return 1;
 }
 
@@ -2870,9 +2871,9 @@ void vtkFlashReader::GetBlockAttribute( const char * atribute, int blockIdx,
     }
   // remove the prefix ("mesh_blockandlevel/" or "mesh_blockandproc/") to get
   // the actual attribute name
-  vtkstd::string  tempName = atribute;
+  std::string  tempName = atribute;
   size_t          slashPos = tempName.find( "/" );
-  vtkstd::string  attrName = tempName.substr ( slashPos + 1 );
+  std::string  attrName = tempName.substr ( slashPos + 1 );
   hid_t           dataIndx = H5Dopen
                              ( this->Internal->FileIndex, attrName.c_str() );
   
@@ -3115,7 +3116,7 @@ int vtkFlashReader::GetParticles( vtkPolyData * polyData )
     }
   
   // attach the cell data attributes to the vtkPolyData
-  for ( vtkstd::vector< vtkstd::string >::iterator
+  for ( std::vector< std::string >::iterator
         attrIter  = this->Internal->ParticleAttributeNames.begin();
         attrIter != this->Internal->ParticleAttributeNames.end(); attrIter ++ )
     {
@@ -3159,7 +3160,7 @@ void vtkFlashReader::GetParticlesAttribute( const char  * atribute,
   int              attrIndx = this->Internal
                                   ->ParticleAttributeNamesToIds[ atribute ];
   hid_t            attrType = this->Internal->ParticleAttributeTypes[ attrIndx ];
-  vtkstd::string   attrName = this->Internal->ParticleAttributeNames[ attrIndx ];
+  std::string   attrName = this->Internal->ParticleAttributeNames[ attrIndx ];
   
   if ( attrType != H5T_NATIVE_INT && attrType != H5T_NATIVE_DOUBLE )
     {
@@ -3418,7 +3419,7 @@ void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx,
                             this->Internal->NumberOfBlocks;
   //float        * sampVals = new float [ numSamps ];
   double        * sampVals = new double [ numSamps ];
-  vtkstd::string dataName = vtkstd::string( curvName ).substr( 7 ); 
+  std::string dataName = std::string( curvName ).substr( 7 );
   hid_t          dataIndx = H5Dopen
                             ( this->Internal->FileIndex, dataName.c_str() );
   if ( dataIndx < 0 )

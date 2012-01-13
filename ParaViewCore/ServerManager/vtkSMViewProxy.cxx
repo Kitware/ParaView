@@ -39,6 +39,7 @@ vtkSMViewProxy::vtkSMViewProxy()
 {
   this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = 0;
+  this->Enable = true;
 }
 
 //----------------------------------------------------------------------------

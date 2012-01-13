@@ -27,7 +27,7 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkSmartPointer.h" // For ivars
-#include <vtkstd/vector>     // For ivars
+#include <vector>     // For ivars
 
 class vtkCell;
 class vtkPoints;
@@ -91,8 +91,8 @@ protected:
   vtkEquivalenceSet *EquivalenceSet;
   vtkDoubleArray* FragmentVolumes;
 //BTX
-  vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > CellAttributesIntegration;
-  vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > PointAttributesIntegration;
+  std::vector<vtkSmartPointer<vtkDoubleArray> > CellAttributesIntegration;
+  std::vector<vtkSmartPointer<vtkDoubleArray> > PointAttributesIntegration;
 //ETX
   // Temporary structures to help integration.
   vtkPoints* CellPoints;

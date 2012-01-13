@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPVApplicationCore.h"
 #include "pqSetName.h"
-#include "pqViewManager.h"
+#include "pqTabbedMultiViewWidget.h"
 
 #include <QDockWidget>
 #include <QMainWindow>
@@ -82,8 +82,8 @@ void pqViewMenuManager::buildMenu()
 
   this->Menu->addSeparator();
 
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
     {
     QAction* fullscreen = this->Menu->addAction("Full Screen");

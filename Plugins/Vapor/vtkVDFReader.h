@@ -139,9 +139,9 @@
 #include "vapor/DataMgr.h" //needed for vapor datastructures
 #include "vapor/WaveletBlock3DRegionReader.h" //needed for vapor datastructures
 
-#include <vtkstd/map> //needed for protected ivars
-#include <vtkstd/vector> //needed for protected ivars
-#include <vtkstd/string> //needed for protected ivars
+#include <map> //needed for protected ivars
+#include <vector> //needed for protected ivars
+#include <string> //needed for protected ivars
 
 //using namespace std;
 using namespace VAPoR;
@@ -213,9 +213,9 @@ protected:
   int RefinementRange[2];
 
 //BTX
-  vtkstd::map<vtkstd::string,int> data;
-  vtkstd::vector<double> uExt;
-  vtkstd::vector<vtkstd::string> current_var_list;
+  std::map<std::string,int> data;
+  std::vector<double> uExt;
+  std::vector<std::string> current_var_list;
 //ETX
 
 private:

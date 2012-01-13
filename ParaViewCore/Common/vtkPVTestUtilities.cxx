@@ -21,11 +21,11 @@
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-#include "vtkstd/string"//
-#include "vtkstd/vector"//
+#include "string"//
+#include "vector"//
 #include "vtkType.h"//
-using vtkstd::string;
-using vtkstd::vector;
+using std::string;
+using std::vector;
 
 vtkStandardNewMacro(vtkPVTestUtilities);
 

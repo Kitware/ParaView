@@ -52,6 +52,7 @@ SET (Kit_SRCS
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
+  vtkSMDataSourceProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
   vtkSMDeserializerProtobuf.cxx
@@ -149,6 +150,7 @@ SET (Kit_SRCS
   vtkSMUndoStackBuilder.cxx
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
+  vtkSMViewLayoutProxy.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx

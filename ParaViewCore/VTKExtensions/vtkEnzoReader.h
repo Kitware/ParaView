@@ -419,7 +419,7 @@ protected:
   char         * FileName;
   
 //BTX
-  vtkstd::vector<int> BlockMap;
+  std::vector<int> BlockMap;
 //ETX
   virtual void GenerateBlockMap();
 

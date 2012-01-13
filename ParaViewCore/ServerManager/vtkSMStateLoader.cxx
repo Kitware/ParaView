@@ -30,9 +30,9 @@
 #include "vtkSMStateVersionController.h"
 #include "vtkSMSession.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkSMStateLoader);
@@ -40,14 +40,14 @@ vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
 {
-  vtkstd::string GroupName;
-  vtkstd::string ProxyName;
+  std::string GroupName;
+  std::string ProxyName;
 };
 
 struct vtkSMStateLoaderInternals
 {
-  typedef vtkstd::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
-  typedef vtkstd::map<int, VectorOfRegInfo> RegInfoMapType;
+  typedef std::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
+  typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
 };
 
@@ -335,8 +335,8 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
       {
       continue;
       }
-    vtkstd::string group = currentElement->GetAttribute("group");
-    vtkstd::string type = currentElement->GetAttribute("type");
+    std::string group = currentElement->GetAttribute("group");
+    std::string type = currentElement->GetAttribute("type");
     vtkSMGlobalPropertiesManager* mgr =
       pxm->GetGlobalPropertiesManager(mgrname);
     if (mgr && (group != mgr->GetXMLGroup() || type != mgr->GetXMLName()))
@@ -473,8 +473,9 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
+int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
 {
+  vtkPVXMLElement* rootElement = parent;
   if (rootElement->GetName() && 
     strcmp(rootElement->GetName(),"ServerManagerState") != 0)
     {
@@ -488,7 +489,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
     }
   
   vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
-  if (!convertor->Process(rootElement))
+  if (!convertor->Process(parent))
     {
     vtkWarningMacro("State convertor was not able to convert the state to current "
       "version successfully");

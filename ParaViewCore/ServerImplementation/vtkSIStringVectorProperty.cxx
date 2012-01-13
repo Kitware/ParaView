@@ -19,14 +19,14 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 #include <assert.h>
 
 class vtkSIStringVectorProperty::vtkVectorOfStrings :
-  public vtkstd::vector <vtkstd::string> {};
+  public std::vector <std::string> {};
 class vtkSIStringVectorProperty::vtkVectorOfInts :
-  public vtkstd::vector<int> {};
+  public std::vector<int> {};
 
 vtkStandardNewMacro(vtkSIStringVectorProperty);
 //----------------------------------------------------------------------------
@@ -147,18 +147,18 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(
     hasDefaultValues = (tmp != NULL);
     if (tmp && delimiter)
       {
-      vtkstd::string initVal = tmp;
-      vtkstd::string delim = delimiter;
-      vtkstd::string::size_type pos1 = 0;
-      vtkstd::string::size_type pos2 = 0;
-      for (int i=0; i<number_of_elements && pos2 != vtkstd::string::npos; i++)
+      std::string initVal = tmp;
+      std::string delim = delimiter;
+      std::string::size_type pos1 = 0;
+      std::string::size_type pos2 = 0;
+      for (int i=0; i<number_of_elements && pos2 != std::string::npos; i++)
         {
         if (i != 0)
           {
           pos1 += delim.size();
           }
         pos2 = initVal.find(delimiter, pos1);
-        vtkstd::string value = (pos1 == pos2) ? "" : initVal.substr(pos1, pos2-pos1);
+        std::string value = (pos1 == pos2) ? "" : initVal.substr(pos1, pos2-pos1);
         values[i] = value;
         pos1 = pos2;
         }

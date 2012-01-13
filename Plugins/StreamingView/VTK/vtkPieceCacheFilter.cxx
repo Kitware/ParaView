@@ -24,7 +24,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkAdaptiveOptions.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 #define DEBUGPRINT_CACHING(arg) ;
 #define DEBUGPRINT_APPENDING(arg) ;
@@ -304,7 +304,7 @@ int vtkPieceCacheFilter::RequestData(
       }
 
     this->Cache[index] =
-      vtkstd::pair<unsigned long, vtkDataSet *>
+      std::pair<unsigned long, vtkDataSet *>
       (outData->GetUpdateTime(), cpy);
     }
   else

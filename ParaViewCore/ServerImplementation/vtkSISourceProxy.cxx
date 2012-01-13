@@ -34,7 +34,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
@@ -45,9 +45,9 @@ bool vtkSISourceProxy::DisableExtentsTranslator = false;
 class vtkSISourceProxy::vtkInternals
 {
 public:
-  vtkstd::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
-  vtkstd::vector<vtkSmartPointer<vtkAlgorithm> > ExtractPieces;
-  vtkstd::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
+  std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
+  std::vector<vtkSmartPointer<vtkAlgorithm> > ExtractPieces;
+  std::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
 };
 
 //*****************************************************************************

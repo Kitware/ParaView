@@ -96,7 +96,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGWriter.h"
 
 
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(vtkMantaRenderer);
 

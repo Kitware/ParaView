@@ -27,21 +27,21 @@
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkPVSessionCore.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <map>
+#include <set>
+#include <string>
 #include <vtksys/ios/sstream>
 
 //****************************************************************************
 struct SubProxyInfo
 {
-  SubProxyInfo(vtkstd::string name, vtkTypeUInt32 id)
+  SubProxyInfo(std::string name, vtkTypeUInt32 id)
     {
     this->Name = name;
     this->GlobalID = id;
     }
 
-  vtkstd::string Name;
+  std::string Name;
   vtkTypeUInt32 GlobalID;
 };
 //****************************************************************************
@@ -55,15 +55,15 @@ public:
     this->SubSIProxies.clear();
     }
 
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProperty> >
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProperty> >
     SIPropertiesMapType;
   SIPropertiesMapType SIProperties;
 
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSIProxy> >
+  typedef std::map<std::string, vtkSmartPointer<vtkSIProxy> >
     SubSIProxiesMapType;
   SubSIProxiesMapType SubSIProxies;
 
-  typedef vtkstd::vector<SubProxyInfo> SubProxiesVectorType;
+  typedef std::vector<SubProxyInfo> SubProxiesVectorType;
   SubProxiesVectorType SubProxyInfoVector;
 };
 
@@ -158,7 +158,7 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
   // Return a set of Pull only property (information_only props)
   // In fact Pushed Property can not be fetch at the same time as Pull
   // property with the current implementation
-  vtkstd::set<vtkstd::string> prop_names;
+  std::set<std::string> prop_names;
   if (message->ExtensionSize(PullRequest::arguments) > 0)
     {
     const Variant *propList = &message->GetExtension(PullRequest::arguments, 0);
@@ -424,7 +424,7 @@ bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
       {
       // read property xml
       const char* name = propElement->GetAttribute("name");
-      vtkstd::string tagName = propElement->GetName();
+      std::string tagName = propElement->GetName();
       if (name && tagName.find("Property") == (tagName.size()-8))
         {
         if (!this->ReadXMLProperty(propElement))
@@ -449,14 +449,14 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 {
   // Since the XML is "cleaned" out, we are assured that there are no duplicate
   // properties.
-  vtkstd::string name = propElement->GetAttributeOrEmpty("name");
+  std::string name = propElement->GetAttributeOrEmpty("name");
   assert(!name.empty() && this->GetSIProperty(name.c_str()) == NULL);
 
   // Patch XML to remove InformationHelper and set right si_class
   vtkSIProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkSmartPointer<vtkObject> object;
-  vtkstd::string classname;
+  std::string classname;
   if (propElement->GetAttribute("si_class"))
     {
     classname = propElement->GetAttribute("si_class");

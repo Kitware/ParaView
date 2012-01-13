@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "vtkImageData.h"
 #include "pqView.h"
-#include "pqViewManager.h"
+#include "pqTabbedMultiViewWidget.h"
 
 #include <QWidget>
 #include <QDebug>
@@ -68,15 +68,17 @@ bool pqComponentsTestUtility::CompareView(
 
   // To prevent capture inside a too small Qt frame we maximize
   // the frame for the time of the capture...
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  bool needToRestore = true;
-  if (viewManager)
-    {
-    needToRestore =
-        !viewManager->isMaximizedWidget(curView->getWidget()->parentWidget());
-    viewManager->maximizeWidget(curView->getWidget()->parentWidget());
-    }
+
+  // FIXME_VIEW_LAYOUT
+  //pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+  //  pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  //bool needToRestore = true;
+  //if (viewManager)
+  //  {
+  //  needToRestore =
+  //      !viewManager->isMaximizedWidget(curView->getWidget()->parentWidget());
+  //  viewManager->maximizeWidget(curView->getWidget()->parentWidget());
+  //  }
 
 
   // All tests need a 300x300 render window size.
@@ -87,10 +89,11 @@ bool pqComponentsTestUtility::CompareView(
   curView->getWidget()->resize(cur_size);
   curView->render();
 
-  if (viewManager && needToRestore)
-    {
-    viewManager->restoreWidget(curView->getWidget()->parentWidget());
-    }
+  // FIXME_VIEW_LAYOUT
+  //if (viewManager && needToRestore)
+  //  {
+  //  viewManager->restoreWidget(curView->getWidget()->parentWidget());
+  //  }
 
   return retVal;
 }

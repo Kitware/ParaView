@@ -46,10 +46,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotBlockIterator.h"
 #include "vtkSpyPlotIStream.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <set>
+#include <vector>
+#include <string>
 #include <sys/stat.h>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
@@ -68,7 +68,7 @@ vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController
 
 static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level);
 
-class vtkSpyPlotReader::VectorOfDoubles : public vtkstd::vector<double> {};
+class vtkSpyPlotReader::VectorOfDoubles : public std::vector<double> {};
 
 //-----------------------------------------------------------------------------
 vtkSpyPlotReader::vtkSpyPlotReader()
@@ -583,7 +583,7 @@ int vtkSpyPlotReader::RequestData(
   vtkDebugMacro( "--------------------------- Request Data --------------------------------" );
   vtkSpyPlotUniReader* uniReader = 0;
 
-  vtkstd::vector<vtkRectilinearGrid*> grids;
+  std::vector<vtkRectilinearGrid*> grids;
 
   vtkInformation *info=outputVector->GetInformationObject(0);
   vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
@@ -1258,7 +1258,7 @@ void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int
       }
     }
   /*
-    vtkstd::vector<vtkRectilinearGrid*>::iterator it;
+    std::vector<vtkRectilinearGrid*>::iterator it;
     for ( it = grids.begin(); it != grids.end(); ++ it )
     {
     (*it)->Print(cout);
@@ -2190,8 +2190,8 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
           }
         else
           {
-          vtkstd::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
-          vtkstd::vector<vtkAMRBox> boxes;
+          std::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
+          std::vector<vtkAMRBox> boxes;
           int kk;
           for (kk=0; kk < numberOfDataSets; kk++)
             {
@@ -2220,7 +2220,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
         else
           {
           int kk;
-          vtkstd::vector<vtkSmartPointer<vtkDataSet> > datasets;
+          std::vector<vtkSmartPointer<vtkDataSet> > datasets;
           for (kk=0; kk < numberOfDataSets; kk++)
             {
             datasets.push_back(vtkDataSet::SafeDownCast(mbDS->GetBlock(kk)));

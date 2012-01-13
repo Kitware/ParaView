@@ -203,6 +203,7 @@ SET (Kit_SRCS
   vtkUndoSet.cxx
   vtkUndoStack.cxx
   vtkUpdateSuppressorPipeline.cxx
+  vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx

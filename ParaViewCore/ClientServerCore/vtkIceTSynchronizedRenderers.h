@@ -42,6 +42,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Identifier used to indentify the view to the vtkTileDisplayHelper.
+  vtkSetMacro(Identifier, unsigned int);
+  vtkGetMacro(Identifier, unsigned int);
+
+  // Description:
   // Set the renderer to be synchronized by this instance. A
   // vtkSynchronizedRenderers instance can be used to synchronize exactly 1
   // renderer on each processes. You can create multiple instances on
@@ -118,6 +123,8 @@ public:
 protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
+
+  unsigned int Identifier;
 
   virtual void HandleEndRender();
 

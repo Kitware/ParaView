@@ -63,9 +63,9 @@ class pqViewFrameActionsBehaviorInterface :
   Q_OBJECT
     Q_INTERFACES(pqViewFrameActionGroupInterface)
 public:
-    virtual bool connect(pqMultiViewFrame* frame, pqView* view)
+    virtual bool connect(pqViewFrame* frame, pqView* view)
       { return this->Group->connect(frame, view); }
-    virtual bool disconnect(pqMultiViewFrame* frame, pqView* view)
+    virtual bool disconnect(pqViewFrame* frame, pqView* view)
       { return this->Group->disconnect(frame, view); }
     virtual pqViewFrameActionGroup* actionGroup()
       { return this->Group; }

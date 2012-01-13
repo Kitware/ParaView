@@ -32,8 +32,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
+#include <map>
+#include <set>
 #include <assert.h>
 
 namespace
@@ -226,7 +226,7 @@ void vtkSelectionConverter::Convert(
     }
 
   // key==piece offset, while value==list of ids for that piece.
-  typedef vtkstd::map<int, vtkstd::set<vtkIdType> > indicesType;
+  typedef std::map<int, std::set<vtkIdType> > indicesType;
   indicesType indices;
 
   for (vtkIdType hitId=0; hitId<numHits; hitId++)
@@ -301,7 +301,7 @@ void vtkSelectionConverter::Convert(
       }
 
     vtkIdTypeArray* outputArray = vtkIdTypeArray::New();
-    vtkstd::set<vtkIdType>::iterator sit;
+    std::set<vtkIdType>::iterator sit;
     outputArray->SetNumberOfTuples(mapIter->second.size());
     vtkIdType* out_ptr = outputArray->GetPointer(0);
     vtkIdType index=0;

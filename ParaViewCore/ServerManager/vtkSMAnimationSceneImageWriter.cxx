@@ -36,8 +36,8 @@
 # include "vtkMPEG2Writer.h"
 #endif
 
-#include <vtkstd/algorithm>
-#include <vtkstd/string>
+#include <algorithm>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 
 #ifdef _WIN32
@@ -201,10 +201,10 @@ void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src
   outextent[2] = outextent[3];
   outextent[3] = temp;
   // snap extents to what is available.
-  outextent[0] = vtkstd::max(outextent[0], dest->GetExtent()[0]);
-  outextent[1] = vtkstd::min(outextent[1], dest->GetExtent()[1]);
-  outextent[2] = vtkstd::max(outextent[2], dest->GetExtent()[2]);
-  outextent[3] = vtkstd::min(outextent[3], dest->GetExtent()[3]);
+  outextent[0] = std::max(outextent[0], dest->GetExtent()[0]);
+  outextent[1] = std::min(outextent[1], dest->GetExtent()[1]);
+  outextent[2] = std::max(outextent[2], dest->GetExtent()[2]);
+  outextent[3] = std::min(outextent[3], dest->GetExtent()[3]);
   vtkImageIterator<unsigned char> outIt(dest, outextent);
 
   while (!outIt.IsAtEnd() && !inIt.IsAtEnd())
@@ -261,7 +261,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     {
     char number[1024];
     sprintf(number, ".%04d", this->FileCount);
-    vtkstd::string filename = this->Prefix;
+    std::string filename = this->Prefix;
     filename = filename + number + this->Suffix;
     this->ImageWriter->SetInput(combinedImage);
     this->ImageWriter->SetFileName(filename.c_str());
@@ -351,7 +351,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
   vtkImageWriter* iwriter =0;
   vtkGenericMovieWriter* mwriter = 0;
 
-  vtkstd::string extension = vtksys::SystemTools::GetFilenameLastExtension(
+  std::string extension = vtksys::SystemTools::GetFilenameLastExtension(
     this->FileName);
   if (extension == ".jpg" || extension == ".jpeg")
     {
@@ -414,9 +414,9 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     this->SetImageWriter(iwriter);
     iwriter->Delete();
 
-    vtkstd::string filename = this->FileName;
-    vtkstd::string::size_type dot_pos = filename.rfind(".");
-    if(dot_pos != vtkstd::string::npos)
+    std::string filename = this->FileName;
+    std::string::size_type dot_pos = filename.rfind(".");
+    if(dot_pos != std::string::npos)
       {
       this->SetPrefix(filename.substr(0, dot_pos).c_str());
       this->SetSuffix(filename.substr(dot_pos).c_str());

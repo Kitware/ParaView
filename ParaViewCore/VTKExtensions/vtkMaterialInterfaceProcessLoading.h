@@ -23,7 +23,7 @@
 #include <cassert>
 #include "vtkType.h"
 #include "vtksys/ios/iostream"
-#include "vtkstd/vector"
+#include "vector"
 
 class vtkMaterialInterfaceProcessLoading
 {
@@ -88,5 +88,5 @@ class vtkMaterialInterfaceProcessLoading
     vtkIdType Data[SIZE];
 };
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkMaterialInterfaceProcessLoading &fp);
-vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkstd::vector<vtkMaterialInterfaceProcessLoading> &vfp);
+vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, std::vector<vtkMaterialInterfaceProcessLoading> &vfp);
 #endif

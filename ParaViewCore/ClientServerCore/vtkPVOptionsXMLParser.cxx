@@ -27,7 +27,7 @@ void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
     this->SetProcessTypeInt(vtkCommandOptions::EVERYBODY);
     return;
     }
-  vtkstd::string type = ptype;
+  std::string type = ptype;
   if(type == "client")
     {
     this->SetProcessTypeInt(vtkPVOptions::PVCLIENT);

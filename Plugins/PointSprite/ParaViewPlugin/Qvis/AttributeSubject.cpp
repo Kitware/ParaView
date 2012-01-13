@@ -116,7 +116,7 @@ AttributeSubject::Notify()
 // ****************************************************************************
 
 AttributeSubject *
-AttributeSubject::CreateCompatible(const vtkstd::string &) const
+AttributeSubject::CreateCompatible(const std::string &) const
 {
     return 0;
 }
@@ -136,7 +136,7 @@ AttributeSubject::CreateCompatible(const vtkstd::string &) const
 //   
 // ****************************************************************************
 
-const vtkstd::string 
+const std::string
 AttributeSubject::TypeName() const
 {
     return "AttributeSubject";

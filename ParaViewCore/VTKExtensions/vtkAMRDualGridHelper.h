@@ -23,7 +23,7 @@
 #define __vtkAMRDualGridHelper_h
 
 #include "vtkObject.h"
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkDataArray;
 class vtkIntArray;
@@ -167,7 +167,7 @@ private:
   double GlobalOrigin[3];
   
   // Each level will have a grid to help find neighbors.
-  vtkstd::vector<vtkAMRDualGridHelperLevel*> Levels;
+  std::vector<vtkAMRDualGridHelperLevel*> Levels;
 
   int EnableDegenerateCells;
 
@@ -191,7 +191,7 @@ private:
 
   // Degenerate regions that span processes.  We keep them in a queue
   // to communicate and process all at once.
-  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
+  std::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
   vtkIdType DegenerateRegionMessageSize(int srcProc, int destProc);
   void* CopyDegenerateRegionBlockToMessage(
     const vtkAMRDualGridHelperDegenerateRegion &region,
@@ -325,7 +325,7 @@ public:
   int NormalAxis;
 
   // Sparse array of points for equivalence computation.
-  vtkstd::vector<vtkAMRDualGridHelperSeed> FragmentIds;
+  std::vector<vtkAMRDualGridHelperSeed> FragmentIds;
   void AddFragmentSeed(int level, int x, int y, int z, int fragmentId);
 
   // This is the number of blocks pointing to this face.

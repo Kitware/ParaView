@@ -34,7 +34,7 @@
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
-#include <vtkstd/list>
+#include <list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
 
@@ -56,7 +56,7 @@ public:
 
 struct vtkSMNewWidgetRepresentationInternals
 {
-  typedef vtkstd::list<vtkSmartPointer<vtkSMLink> > LinksType;
+  typedef std::list<vtkSmartPointer<vtkSMLink> > LinksType;
   LinksType Links;
   vtkWeakPointer<vtkSMRenderViewProxy> ViewProxy;
 };

@@ -23,7 +23,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMMessage.h"
 
-#include <vtkstd/list>
+#include <list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
 
@@ -101,7 +101,7 @@ public:
     LinkedCamera& operator=(const LinkedCamera&);
   };
 
-  typedef vtkstd::list<LinkedCamera*> LinkedProxiesType;
+  typedef std::list<LinkedCamera*> LinkedProxiesType;
   LinkedProxiesType LinkedProxies;
 
   bool Updating;

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVKeyFrame.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 
 //****************************************************************************
@@ -55,7 +55,7 @@ protected:
 class vtkPVKeyFrameCueManipulatorInternals
 {
 public:
-  typedef vtkstd::vector<vtkPVKeyFrame*> KeyFrameVector;
+  typedef std::vector<vtkPVKeyFrame*> KeyFrameVector;
   KeyFrameVector KeyFrames;
 };
 //****************************************************************************

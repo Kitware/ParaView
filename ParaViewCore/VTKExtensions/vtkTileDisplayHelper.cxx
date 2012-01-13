@@ -20,7 +20,8 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-#include <vtkstd/map>
+#include <map>
+#include <set>
 
 class vtkTileDisplayHelper::vtkInternals
 {
@@ -39,13 +40,18 @@ public:
     double PhysicalViewport[4];
     };
 
-  typedef vtkstd::map<void*, vtkTile> TilesMapType;
+  typedef std::set<unsigned int> KeySet;
+  KeySet EnabledKeys;
+
+  typedef std::map<unsigned int, vtkTile> TilesMapType;
   TilesMapType LeftEyeTilesMap;
   TilesMapType RightEyeTilesMap;  
 
   void FlushTile(const TilesMapType::iterator& iter, const TilesMapType& TileMap, const int &vtkNotUsed(leftEye))
     {
-    if (iter != TileMap.end())
+    if (iter != TileMap.end() &&
+      (this->EnabledKeys.size() == 0 || 
+      this->EnabledKeys.find(iter->first) != this->EnabledKeys.end()))
       {
       vtkTile& tile = iter->second;
       vtkRenderer* renderer = tile.Renderer;
@@ -62,7 +68,7 @@ public:
 
   // Iterates over all valid tiles in the TilesMap and flush the images to the
   // screen.
-  void FlushTiles(void* current, const int &leftEye)
+  void FlushTiles(unsigned int current, const int &leftEye)
     {    
     TilesMapType *TileMap = NULL;
     if ( leftEye )
@@ -125,7 +131,7 @@ vtkTileDisplayHelper* vtkTileDisplayHelper::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::SetTile(void* key,
+void vtkTileDisplayHelper::SetTile(unsigned int key,
   double viewport[4], vtkRenderer* renderer,
   vtkSynchronizedRenderers::vtkRawImage& image)
 {
@@ -145,16 +151,28 @@ void vtkTileDisplayHelper::SetTile(void* key,
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::EraseTile(void* key)
+void vtkTileDisplayHelper::EraseTile(unsigned int key)
 {
   this->Internals->LeftEyeTilesMap.erase(key);
   this->Internals->RightEyeTilesMap.erase(key);
 }
 
 //----------------------------------------------------------------------------
-void vtkTileDisplayHelper::FlushTiles(void* key, int leftEye)
+void vtkTileDisplayHelper::FlushTiles(unsigned int key, int leftEye)
 {
   this->Internals->FlushTiles(key,leftEye);
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::ResetEnabledKeys()
+{
+  this->Internals->EnabledKeys.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::EnableKey(unsigned int key)
+{
+  this->Internals->EnabledKeys.insert(key);
 }
 
 //----------------------------------------------------------------------------

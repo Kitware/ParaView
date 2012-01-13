@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomViewButtonDialog.h"
 
 // STL
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 #define pqErrorMacro(estr)\

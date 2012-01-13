@@ -40,26 +40,14 @@ IF(PARAVIEW_BUILD_QT_GUI)
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
-ADD_PARAVIEW_PLUGIN(AnalyzeReader "1.0"
-  SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx vtknifti1_io.cxx vtkznzlib.cxx
-  SERVER_MANAGER_XML readers.xml
-  GUI_RESOURCE_FILES AnalyzeReader.xml
-  )
-
-ADD_PARAVIEW_PLUGIN(AnalyzeWriter "1.0"
-  SERVER_MANAGER_SOURCES vtkAnalyzeWriter.cxx vtknifti1_io.cxx vtkznzlib.cxx
-  SERVER_MANAGER_XML writers.xml
-  GUI_RESOURCE_FILES AnalyzeWriter.xml
-  )
-
-ADD_PARAVIEW_PLUGIN(NIfTIReader "1.0"
-  SERVER_MANAGER_SOURCES vtkNIfTIReader.cxx vtknifti1_io.cxx vtkznzlib.cxx
-  SERVER_MANAGER_XML readers.xml
-  GUI_RESOURCE_FILES NIfTIReader.xml
-  )
-
-ADD_PARAVIEW_PLUGIN(NIfTIWriter "1.0"
-  SERVER_MANAGER_SOURCES vtkNIfTIWriter.cxx vtknifti1_io.cxx vtkznzlib.cxx
-  SERVER_MANAGER_XML writers.xml
-  GUI_RESOURCE_FILES NIfTIWriter.xml
+ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
+  SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx
+                         vtkAnalyzeWriter.cxx
+                         vtkNIfTIReader.cxx
+                         vtkNIfTIWriter.cxx
+                         vtknifti1_io.cxx
+                         vtkznzlib.cxx
+  SERVER_MANAGER_XML     AnalyzeNIfTISM.xml
+  GUI_RESOURCE_FILES     AnalyzeNIfTIReaders.xml
+                         AnalyzeNIfTIWriters.xml
   )

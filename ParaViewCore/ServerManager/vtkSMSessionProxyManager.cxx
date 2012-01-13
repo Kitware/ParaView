@@ -51,9 +51,9 @@
 #include "vtkSMSessionClient.h"
 #include "vtkSMCollaborationManager.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
+#include <map>
+#include <set>
+#include <vector>
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
@@ -79,7 +79,7 @@ public:
 #endif
 
 
-class vtkSMProxyManagerProxySet : public vtkstd::set<vtkSMProxy*> {};
+class vtkSMProxyManagerProxySet : public std::set<vtkSMProxy*> {};
 
 //*****************************************************************************
 class vtkSMProxyManagerObserver : public vtkCommand
@@ -382,7 +382,7 @@ vtkSMProxy* vtkSMSessionProxyManager::GetPrototypeProxy(const char* groupname,
     return NULL;
     }
 
-  vtkstd::string protype_group = groupname;
+  std::string protype_group = groupname;
   protype_group += "_prototypes";
   vtkSMProxy* proxy = this->GetProxy(protype_group.c_str(), name);
   if (proxy)
@@ -418,7 +418,7 @@ vtkSMProxy* vtkSMSessionProxyManager::GetPrototypeProxy(const char* groupname,
 void vtkSMSessionProxyManager::RemovePrototype(
   const char* groupname, const char* proxyname)
 {
-  vtkstd::string prototype_group = groupname;
+  std::string prototype_group = groupname;
   prototype_group += "_prototypes";
   vtkSMProxy* proxy = this->GetProxy(prototype_group.c_str(), proxyname);
   if (proxy)
@@ -481,7 +481,7 @@ void vtkSMSessionProxyManager::GetProxies(const char* group,
       {
       vtkSMProxyManagerProxyMapType::iterator it2 =
         it->second.begin();
-      vtkstd::set<vtkTypeUInt32> ids;
+      std::set<vtkTypeUInt32> ids;
       for (; it2 != it->second.end(); it2++)
         {
         vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
@@ -628,8 +628,8 @@ namespace
 {
   struct vtkSMProxyManagerProxyInformation
     {
-    vtkstd::string GroupName;
-    vtkstd::string ProxyName;
+    std::string GroupName;
+    std::string ProxyName;
     vtkSMProxy* Proxy;
     };
 }
@@ -639,7 +639,7 @@ void vtkSMSessionProxyManager::UnRegisterProxies()
 {
 
   // Clear internal proxy containers
-  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
+  std::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToAll();
   iter->SetSession(this->Session);
@@ -653,7 +653,7 @@ void vtkSMSessionProxyManager::UnRegisterProxies()
     }
   iter->Delete();
 
-  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter =
+  std::vector<vtkSMProxyManagerProxyInformation>::iterator vIter =
     toUnRegister.begin();
   for (;vIter != toUnRegister.end(); ++vIter)
     {
@@ -702,11 +702,11 @@ void vtkSMSessionProxyManager::UnRegisterProxy( const char* group, const char* n
 void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
 {
   // Remove entries and keep them in a set
-  vtkstd::set<vtkSMProxyManagerEntry> entriesToRemove;
+  std::set<vtkSMProxyManagerEntry> entriesToRemove;
   this->Internals->RemoveTuples(name, entriesToRemove);
 
   // Notify that some entries have been deleted
-  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter = entriesToRemove.begin();
+  std::set<vtkSMProxyManagerEntry>::iterator iter = entriesToRemove.begin();
   while(iter != entriesToRemove.end())
     {
     vtkSMProxyManager::RegisteredProxyInformation info;
@@ -733,11 +733,11 @@ void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
 void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
 {
   // Find tuples
-  vtkstd::set<vtkSMProxyManagerEntry> tuplesToRemove;
+  std::set<vtkSMProxyManagerEntry> tuplesToRemove;
   this->Internals->FindProxyTuples(proxy, tuplesToRemove);
 
   // Remove tuples
-  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter = tuplesToRemove.begin();
+  std::set<vtkSMProxyManagerEntry>::iterator iter = tuplesToRemove.begin();
   while(iter != tuplesToRemove.end())
     {
     this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
@@ -786,19 +786,9 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
     this->Observer);
   proxyInfo->UpdateInformationObserverTag = proxy->AddObserver(
     vtkCommand::UpdateInformationEvent, this->Observer);
-
   // Note, these observer will be removed in the destructor of proxyInfo.
 
-  vtkSMProxyManager::RegisteredProxyInformation info;
-  info.Proxy = proxy;
-  info.GroupName = groupname;
-  info.ProxyName = name;
-  info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
-
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-
   // Update state
-
   if(proxy->GetLocation() != 0 && !proxy->IsPrototype()) // Not a prototype !!!
     {
     proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
@@ -817,6 +807,14 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
       this->TriggerStateUpdate();
       }
     }
+
+  // Fire event.
+  vtkSMProxyManager::RegisteredProxyInformation info;
+  info.Proxy = proxy;
+  info.GroupName = groupname;
+  info.ProxyName = name;
+  info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
@@ -929,18 +927,18 @@ void vtkSMSessionProxyManager::RegisterLink(const char* name, vtkSMLink* link)
     }
   this->Internals->RegisteredLinkMap[name] = link;
 
+  // PXM state management
+  link->SetSession(this->GetSession());
+  link->PushStateToSession();
+  this->Internals->UpdateLinkState();
+  this->TriggerStateUpdate();
+
   vtkSMProxyManager::RegisteredProxyInformation info;
   info.Proxy = 0;
   info.GroupName = 0;
   info.ProxyName = name;
   info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-
-  // PXM state management
-  link->SetSession(this->GetSession());
-  link->PushStateToSession();
-  this->Internals->UpdateLinkState();
-  this->TriggerStateUpdate();
 }
 
 //---------------------------------------------------------------------------
@@ -962,17 +960,18 @@ void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
+    this->Internals->RegisteredLinkMap.erase(it);
+
+    // PXM state management
+    this->Internals->UpdateLinkState();
+    this->TriggerStateUpdate();
+
     vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = 0;
     info.GroupName = 0;
     info.ProxyName = name;
     info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
-    this->Internals->RegisteredLinkMap.erase(it);
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-
-    // PXM state management
-    this->Internals->UpdateLinkState();
-    this->TriggerStateUpdate();
     }
 }
 
@@ -1196,7 +1195,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
   rootElement->AddAttribute("version", version_string.str().c_str());
 
 
-  vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
+  std::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
 
   // First save the state of all proxies
   vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
@@ -1526,9 +1525,9 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
   this->StateUpdateNotification = false;
 
   // Need to compute differences and just call Register/UnRegister for those items
-  vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
-  vtkstd::set<vtkSMProxyManagerEntry> tuplesToRegister;
-  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+  std::set<vtkSMProxyManagerEntry> tuplesToUnregister;
+  std::set<vtkSMProxyManagerEntry> tuplesToRegister;
+  std::set<vtkSMProxyManagerEntry>::iterator iter;
 
   // Fill delta sets
   this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
@@ -1583,7 +1582,7 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
     }
 
   // Manage Link state
-  vtkstd::set<vtkstd::string> linkNameToKeep;
+  std::set<std::string> linkNameToKeep;
   for(int i = 0,
       size = msg->ExtensionSize(PXMRegistrationState::registered_link);
       i < size && this->Session;

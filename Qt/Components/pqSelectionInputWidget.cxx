@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqSMAdaptor.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <assert.h>
 
 #include "ui_pqSelectionInputWidget.h"
@@ -327,7 +327,7 @@ void pqSelectionInputWidget::postAccept()
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy->GetNumberOfConsumers() == 0)
       {
-      vtkstd::string key = iter->GetKey();
+      std::string key = iter->GetKey();
       iter->Next();
       pxm->UnRegisterProxy("selection_sources", key.c_str(), proxy);
       }
@@ -352,7 +352,7 @@ void pqSelectionInputWidget::preAccept()
     {
     if (!pxm->GetProxyName("selection_sources", sel_source))
       {
-      vtkstd::string key = vtkstd::string("selection_source.") +
+      std::string key = std::string("selection_source.") +
         sel_source->GetGlobalIDAsString();
       pxm->RegisterProxy("selection_sources", key.c_str(), sel_source);
       }

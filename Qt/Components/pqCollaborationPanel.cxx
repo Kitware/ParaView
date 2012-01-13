@@ -64,8 +64,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include <vtkNew.h>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 #include <vtksys/ios/sstream>
 
 //*****************************************************************************
@@ -77,7 +77,7 @@ public:
   bool NeedToConnectToCollaborationManager;
   int CameraToFollowOfUserId;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
-  vtkstd::map<int, vtkSMMessage> LocalCameraStateCache;
+  std::map<int, vtkSMMessage> LocalCameraStateCache;
   vtkSMCollaborationManager* LastSeenCollaborationManager;
 };
 //-----------------------------------------------------------------------------

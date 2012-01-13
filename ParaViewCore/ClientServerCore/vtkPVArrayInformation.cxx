@@ -24,12 +24,12 @@
 #include "vtkStdString.h"
 #include "vtkPVPostFilter.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 namespace
 {
-  typedef vtkstd::vector<vtkStdString*> vtkInternalComponentNameBase;
+  typedef std::vector<vtkStdString*> vtkInternalComponentNameBase;
 
   struct vtkPVArrayInformationInformationKey
   {
@@ -37,7 +37,7 @@ namespace
     vtkStdString Name;
   };
 
-  typedef vtkstd::vector<vtkPVArrayInformationInformationKey> vtkInternalInformationKeysBase;
+  typedef std::vector<vtkPVArrayInformationInformationKey> vtkInternalInformationKeysBase;
 }
 
 class vtkPVArrayInformation::vtkInternalComponentNames:

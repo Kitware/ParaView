@@ -545,9 +545,9 @@ int main(int argc, char **argv)
   int use_depth_peeling = 0;
   int act_as_server = 0;
   int interactive=0;
-  vtkstd::string data;
-  vtkstd::string temp;
-  vtkstd::string baseline;
+  std::string data;
+  std::string temp;
+  std::string baseline;
 
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);

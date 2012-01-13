@@ -12,7 +12,7 @@ Copyright 2008 SciberQuest Inc.
 
 #include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"// no comment
-#include <vtkstd/vector>// no comment
+#include <vector>// no comment
 
 #include "ui_pqSQHemisphereSourceForm.h"//  no comment
 using Ui::pqSQHemisphereSourceForm;

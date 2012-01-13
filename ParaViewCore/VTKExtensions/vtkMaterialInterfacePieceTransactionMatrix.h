@@ -29,7 +29,7 @@
 
 #include "vtkMaterialInterfacePieceTransaction.h" //
 #include "vtkType.h" //
-#include "vtkstd/vector" //
+#include "vector" //
 
 class vtkCommunicator;
 
@@ -59,7 +59,7 @@ public:
   // Description:
   // Given a proc and a fragment, return a ref to
   // the associated list of tranactions.
-  vtkstd::vector<vtkMaterialInterfacePieceTransaction> &GetTransactions(
+  std::vector<vtkMaterialInterfacePieceTransaction> &GetTransactions(
                   int fragmentId,
                   int procId);
   // Description:
@@ -101,13 +101,13 @@ private:
   ///
   int NProcs;
   int NFragments;
-  vtkstd::vector<vtkMaterialInterfacePieceTransaction> *Matrix;
+  std::vector<vtkMaterialInterfacePieceTransaction> *Matrix;
   vtkIdType FlatMatrixSize;
   vtkIdType NumberOfTransactions;
 };
 //
 inline
-vtkstd::vector<vtkMaterialInterfacePieceTransaction> &
+std::vector<vtkMaterialInterfacePieceTransaction> &
 vtkMaterialInterfacePieceTransactionMatrix::GetTransactions(
                 int fragmentId,
                 int procId)

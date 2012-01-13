@@ -43,17 +43,22 @@ public:
 
   // Description:
   // Register a tile.
-  void SetTile(void* key,
+  void SetTile(unsigned int key,
     double viewport[4], vtkRenderer* renderer,
     vtkSynchronizedRenderers::vtkRawImage& tile);
 
   // Description:
   // Erase a tile.
-  void EraseTile(void* key);
+  void EraseTile(unsigned int key);
 
   // Description:
   // Flush the tiles.
-  void FlushTiles(void* key, int leftEye);
+  void FlushTiles(unsigned int key, int leftEye);
+
+  // Description:
+  // Set the enabled tiles-set. Only enabled keys are "flushed".
+  void ResetEnabledKeys();
+  void EnableKey(unsigned int);
 
 //BTX
 protected:

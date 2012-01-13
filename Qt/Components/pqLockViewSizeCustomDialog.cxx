@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
-#include "pqViewManager.h"
+#include "pqTabbedMultiViewWidget.h"
 
 //=============================================================================
 class pqLockViewSizeCustomDialog::pqUI : public Ui::pqLockViewSizeCustomDialog
@@ -100,15 +100,15 @@ inline QSize pqLockViewSizeCustomDialog::customResolution() const
 //-----------------------------------------------------------------------------
 void pqLockViewSizeCustomDialog::apply()
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
     {
-    viewManager->setMaxViewWindowSize(this->customResolution());
+    viewManager->lockViewSize(this->customResolution());
     }
   else
     {
-    qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
+    qCritical("pqLockViewSizeCustomDialog requires pqTabbedMultiViewWidget.");
     }
   pqSettings *settings = pqApplicationCore::instance()->settings();
   settings->setValue("LockViewSize/CustomResolution", this->customResolution());
@@ -124,15 +124,15 @@ void pqLockViewSizeCustomDialog::accept()
 //-----------------------------------------------------------------------------
 void pqLockViewSizeCustomDialog::unlock()
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
     {
-    viewManager->setMaxViewWindowSize(QSize(-1, -1));
+    viewManager->lockViewSize(QSize(-1, -1));
     }
   else
     {
-    qCritical("pqLockViewSizeCustomDialog requires pqViewManager.");
+    qCritical("pqLockViewSizeCustomDialog requires pqTabbedMultiViewWidget.");
     }
   this->reject();
 }

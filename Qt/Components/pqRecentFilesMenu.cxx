@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QMessageBox>
 
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 /////////////////////////////////////////////////////////////////////////////
 // pqRecentFilesMenu::pqImplementation
@@ -134,7 +134,7 @@ void pqRecentFilesMenu::onResourcesChanged()
       resource.schemeHostsPorts();
       
     // If this host isn't already in the list, add it ...
-    if(!vtkstd::count_if(servers.begin(), servers.end(), pqImplementation::SameSchemeAndHost(server)))
+    if(!std::count_if(servers.begin(), servers.end(), pqImplementation::SameSchemeAndHost(server)))
       {
       servers.push_back(server);
       }

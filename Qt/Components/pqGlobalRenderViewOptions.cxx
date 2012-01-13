@@ -470,7 +470,7 @@ void pqGlobalRenderViewOptions::applyChanges()
     settings->setValue("CompressorType",COMPRESSOR_SQUIRT);
     // build a configuration string that can be passed directly to
     // the compressor.
-    vtkstd::ostringstream os;
+    std::ostringstream os;
     os << "vtkSquirtCompressor 0 "
        << this->Internal->squirtColorspaceSlider->value();
     settings->setValue("CompressorConfig",os.str().c_str());
@@ -481,7 +481,7 @@ void pqGlobalRenderViewOptions::applyChanges()
     settings->setValue("CompressorType",COMPRESSOR_ZLIB);
     // build a configuration string that can be passed directly to
     // the compressor.
-    vtkstd::ostringstream os;
+    std::ostringstream os;
     os << "vtkZlibImageCompressor 0 "
        << this->Internal->zlibCompressionLevel->value()
        << " "

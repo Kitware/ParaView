@@ -23,8 +23,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
 
@@ -33,9 +33,9 @@ struct vtkPVCompositeDataInformationInternals
   struct vtkNode
     {
     vtkSmartPointer<vtkPVDataInformation> Info;
-    vtkstd::string Name;
+    std::string Name;
     };
-  typedef vtkstd::vector<vtkNode> VectorOfDataInformation;
+  typedef std::vector<vtkNode> VectorOfDataInformation;
 
 
   VectorOfDataInformation ChildrenInformation;
@@ -269,8 +269,8 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
         }
       }
 
-    vtkstd::string &otherName = info->Internal->ChildrenInformation[i].Name;
-    vtkstd::string &localName = this->Internal->ChildrenInformation[i].Name;
+    std::string &otherName = info->Internal->ChildrenInformation[i].Name;
+    std::string &localName = this->Internal->ChildrenInformation[i].Name;
     if (!otherName.empty())
       {
       if (!localName.empty() && localName != otherName)
@@ -377,7 +377,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       }
 
     vtkTypeUInt32 length;
-    vtkstd::vector<unsigned char> data;
+    std::vector<unsigned char> data;
     vtkClientServerStream dcss;
     
     msgIdx++;

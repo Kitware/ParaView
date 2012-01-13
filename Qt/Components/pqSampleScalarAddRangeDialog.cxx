@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarAddRangeDialog::pqImplementation
@@ -172,7 +172,7 @@ void pqSampleScalarAddRangeDialog::onRangeChanged()
     {
     if(to_value < from_value)
       {
-      vtkstd::swap(from_value, to_value);
+      std::swap(from_value, to_value);
       }
 
     logOk = !(from_value < 0.0 && to_value > 0.0);

@@ -24,9 +24,9 @@
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 
-#include <vtkstd/map>
-#include <vtkstd/list>
-#include <vtkstd/string>
+#include <map>
+#include <list>
+#include <string>
 #include <assert.h>
 
 class vtkSMGlobalPropertiesManager::vtkInternals
@@ -36,11 +36,11 @@ public:
     {
   public:
     vtkWeakPointer<vtkSMProxy> Proxy;
-    vtkstd::string PropertyName;
+    std::string PropertyName;
     };
 
-  typedef vtkstd::list<vtkValue> VectorOfValues;
-  typedef vtkstd::map<vtkstd::string, VectorOfValues> LinksType;
+  typedef std::list<vtkValue> VectorOfValues;
+  typedef std::map<std::string, VectorOfValues> LinksType;
   LinksType Links;
 };
 
@@ -253,8 +253,8 @@ int vtkSMGlobalPropertiesManager::LoadLinkState(
       vtkWarningMacro("Invalid element in global link state. Ignoring.");
       continue;
       }
-    vtkstd::string global_name = child->GetAttributeOrEmpty("global_name");
-    vtkstd::string property = child->GetAttributeOrEmpty("property");
+    std::string global_name = child->GetAttributeOrEmpty("global_name");
+    std::string property = child->GetAttributeOrEmpty("property");
     int proxyid = 0;
     child->GetScalarAttribute("proxy", &proxyid);
     vtkSMProxy* proxy = locator->LocateProxy(proxyid);

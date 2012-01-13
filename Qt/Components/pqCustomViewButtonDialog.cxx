@@ -12,7 +12,7 @@
 
 #include "pqFileDialog.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 #define pqErrorMacro(estr)\
@@ -201,7 +201,7 @@ void pqCustomViewButtonDialog::importConfigurations()
       }
 
     // check type
-    vtkstd::string requiredType(fileInfo.FileIdentifier);
+    std::string requiredType(fileInfo.FileIdentifier);
     const char *foundType=root->GetName();
     if (foundType==0 || foundType!=requiredType)
       {
@@ -218,7 +218,7 @@ void pqCustomViewButtonDialog::importConfigurations()
       pqErrorMacro("No version attribute was found.");
       return;
       }
-    vtkstd::string requiredVersion(fileInfo.WriterVersion);
+    std::string requiredVersion(fileInfo.WriterVersion);
     if (foundVersion!=requiredVersion)
       {
       pqErrorMacro("Unsupported version " << foundVersion << ".");
@@ -346,7 +346,7 @@ void pqCustomViewButtonDialog::exportConfigurations()
 
       if (!this->Configurations[i].isEmpty())
         {
-        vtkstd::string camConfig(this->Configurations[i].toStdString());
+        std::string camConfig(this->Configurations[i].toStdString());
 
         vtkPVXMLParser *parser=vtkPVXMLParser::New();
         parser->InitializeParser();

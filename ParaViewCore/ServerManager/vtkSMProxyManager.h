@@ -111,6 +111,8 @@ public:
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
+  const char* GetProxyName(const char* groupname, unsigned int idx);
+  const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
 
   // Description:
   // ParaView has notion of "global properties". These are application wide

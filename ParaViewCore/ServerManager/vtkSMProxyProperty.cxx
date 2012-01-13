@@ -30,11 +30,11 @@
 #include "vtkStdString.h"
 #include "vtkCommand.h"
 
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
-#include <vtkstd/iterator>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <vector>
+#include <iterator>
 
 #include <assert.h>
 
@@ -104,7 +104,7 @@ public:
 //***************************************************************************
 struct vtkSMProxyPropertyInternals
 {
-  typedef vtkstd::vector<vtkSMProxyProperty::vtkProxyPointer> VectorOfProxies;
+  typedef std::vector<vtkSMProxyProperty::vtkProxyPointer> VectorOfProxies;
 
   void PrintProxy()
     {
@@ -118,8 +118,8 @@ struct vtkSMProxyPropertyInternals
     }
 
   VectorOfProxies Proxies;
-  vtkstd::vector<vtkSMProxy*> UncheckedProxies;
-  vtkstd::map<void*, int> ProducerCounts;
+  std::vector<vtkSMProxy*> UncheckedProxies;
+  std::map<void*, int> ProducerCounts;
 };
 //***************************************************************************
 vtkStandardNewMacro(vtkSMProxyProperty);
@@ -128,6 +128,7 @@ bool vtkSMProxyProperty::CreateProxyAllowed = false; // static init
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
   this->PPInternals = new vtkSMProxyPropertyInternals;
+  this->SkipDependency = false;
 }
 
 //---------------------------------------------------------------------------
@@ -157,7 +158,7 @@ void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
 {
-  vtkstd::vector<vtkSMProxy* >::iterator it =
+  std::vector<vtkSMProxy* >::iterator it =
     this->PPInternals->UncheckedProxies.begin();
   unsigned int idx = 0;
   for (; 
@@ -388,8 +389,8 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
     {
     const Variant *value = &prop->value();
     int nbProxies = value->proxy_global_id_size();
-    vtkstd::set<vtkTypeUInt32> newProxyIdList;
-    vtkstd::set<vtkTypeUInt32>::const_iterator proxyIdIter;
+    std::set<vtkTypeUInt32> newProxyIdList;
+    std::set<vtkTypeUInt32>::const_iterator proxyIdIter;
 
     // Fill indexed proxy id list
     for(int i=0; i < nbProxies; i++)
@@ -461,6 +462,11 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
 int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
                                           vtkPVXMLElement* element)
 {
+  int skip_dependency;
+  if (element->GetScalarAttribute("skip_dependency", &skip_dependency))
+    {
+    this->SkipDependency = (skip_dependency == 1);
+    }
   return this->Superclass::ReadXMLAttributes(parent, element);
 }
 
@@ -549,7 +555,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::AddProducer(vtkSMProxy* producer)
 {
-  if (producer && this->GetParent())
+  if (producer && this->GetParent() && !this->SkipDependency)
     {
     this->PPInternals->ProducerCounts[producer]++;
     if (this->PPInternals->ProducerCounts[producer] == 1)
@@ -563,7 +569,7 @@ void vtkSMProxyProperty::AddProducer(vtkSMProxy* producer)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveProducer(vtkSMProxy* producer)
 {
-  if (producer && this->GetParent())
+  if (producer && this->GetParent() && !this->SkipDependency)
     {
     this->PPInternals->ProducerCounts[producer]--;
     assert(this->PPInternals->ProducerCounts[producer] >= 0);
@@ -579,7 +585,7 @@ void vtkSMProxyProperty::RemoveProducer(vtkSMProxy* producer)
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  os << indent << "SkipDependency: "<< this->SkipDependency << endl;
   os << indent << "Values: ";
   for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
     {

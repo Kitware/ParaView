@@ -54,7 +54,7 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
   Variant *variant = prop->mutable_value();
   variant->set_type(Variant::INT);
 
-  vtkstd::vector<int>::iterator iter;
+  std::vector<int>::iterator iter;
   for (iter = this->Internals->Values.begin(); iter!=
     this->Internals->Values.end(); ++iter)
     {

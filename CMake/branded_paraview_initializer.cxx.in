@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "@BPC_PVMAIN_WINDOW_INCLUDE@"
 #include "pqPVApplicationCore.h"
-#include "pqViewManager.h"
 #include "pqBrandPluginsLoader.h"
 #include "pqOptions.h"
 #include "pqSettings.h"

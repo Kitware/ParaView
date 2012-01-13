@@ -22,8 +22,8 @@
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
-#include <vtkstd/vector>
-#include <vtkstd/map>
+#include <vector>
+#include <map>
 
 #define GENERATE_DEBUG_LOG 0
 
@@ -62,9 +62,9 @@ struct Controller
     this->IsMaster = false;
     }
 
-  void AddRMICallbacks(vtkstd::vector<RMICallbackInfo>& callbacks)
+  void AddRMICallbacks(std::vector<RMICallbackInfo>& callbacks)
     {
-    vtkstd::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+    std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
     while(iter != callbacks.end())
       {
       this->AddRMICallback(iter->RMIObserverID, iter->Function, iter->Arg , iter->Tag);
@@ -72,18 +72,18 @@ struct Controller
       }
     }
 
-  void DetachCallBacks(vtkstd::vector<RMICallbackInfo>& callbacks)
+  void DetachCallBacks(std::vector<RMICallbackInfo>& callbacks)
     {
     // Remove activate observer
     this->MultiProcessController->RemoveObserver(this->ActivateObserverId);
     this->ActivateObserverId = 0;
 
     // Remove all registered RMICallbacks
-    vtkstd::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
+    std::vector<RMICallbackInfo>::iterator iter = callbacks.begin();
     while(iter != callbacks.end())
       {
       unsigned long rmiObserverID = iter->RMIObserverID;
-      vtkstd::vector<unsigned long>::iterator observerIdIter =
+      std::vector<unsigned long>::iterator observerIdIter =
           this->RMICallbackIdMapping[rmiObserverID].begin();
       while(observerIdIter != this->RMICallbackIdMapping[rmiObserverID].end())
         {
@@ -117,7 +117,7 @@ struct Controller
   int Id;
   bool IsMaster;
   vtkSmartPointer<vtkMultiProcessController> MultiProcessController;
-  vtkstd::map<unsigned long, vtkstd::vector<unsigned long> > RMICallbackIdMapping;
+  std::map<unsigned long, std::vector<unsigned long> > RMICallbackIdMapping;
 };
 
 public:
@@ -156,7 +156,7 @@ public:
   //-----------------------------------------------------------------
   void UnRegisterController(vtkMultiProcessController* ctrl)
     {
-    vtkstd::vector<Controller>::iterator iter, iterToDel;
+    std::vector<Controller>::iterator iter, iterToDel;
     bool found = false;
     for(iter = this->Controllers.begin(); iter != this->Controllers.end(); iter++)
       {
@@ -181,7 +181,7 @@ public:
   //-----------------------------------------------------------------
   Controller* FindController(vtkMultiProcessController* ctrl)
     {
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       if(iter->MultiProcessController.GetPointer() == ctrl)
@@ -229,7 +229,7 @@ public:
   void InitializeControllers()
     {
     this->NeedToInitializeControllers = true;
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       // CAUTION: This initialization only correct for vtkSocketController
@@ -245,7 +245,7 @@ public:
     this->RMICallbacks.push_back(RMICallbackInfo(this->RMICallbackIdCounter, function, arg, tag));
 
     // Register it to the previously registered controllers
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       iter->AddRMICallback(this->RMICallbackIdCounter, function, arg, tag);
@@ -257,9 +257,9 @@ public:
   void RemoveAllRMICallbacks(int tag)
     {
     // Clear registered RMICallbacks
-    vtkstd::vector<int> callbackToRemove;
-    vtkstd::vector<RMICallbackInfo> callbackToKeep;
-    vtkstd::vector<RMICallbackInfo>::iterator iter = this->RMICallbacks.begin();
+    std::vector<int> callbackToRemove;
+    std::vector<RMICallbackInfo> callbackToKeep;
+    std::vector<RMICallbackInfo>::iterator iter = this->RMICallbacks.begin();
     while(iter != this->RMICallbacks.end())
       {
       if(tag == iter->Tag)
@@ -275,8 +275,8 @@ public:
     this->RMICallbacks = callbackToKeep;
 
     // Remove RMICallbacks on controllers
-    vtkstd::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
-    vtkstd::vector<int>::iterator tagIter;
+    std::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
+    std::vector<int>::iterator tagIter;
     while(ctrlIter != this->Controllers.end())
       {
       tagIter = callbackToRemove.begin();
@@ -294,7 +294,7 @@ public:
     {
     // Remove RMICallback on controllers
     bool result = false;
-    vtkstd::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
+    std::vector<Controller>::iterator ctrlIter = this->Controllers.begin();
     while(ctrlIter != this->Controllers.end())
       {
       result = ctrlIter->RemoveRMICallback(observerTagId)
@@ -327,8 +327,8 @@ public:
   //-----------------------------------------------------------------
   void CleanNonConnectedControllers()
     {
-    vtkstd::vector<vtkMultiProcessController*> controllersToDelete;
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<vtkMultiProcessController*> controllersToDelete;
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
@@ -341,7 +341,7 @@ public:
       }
 
     // Clean up the invalid controllers
-    vtkstd::vector<vtkMultiProcessController*>::iterator iter2 =
+    std::vector<vtkMultiProcessController*>::iterator iter2 =
         controllersToDelete.begin();
     while(iter2 != controllersToDelete.end())
       {
@@ -358,8 +358,8 @@ public:
   void TriggerRMI2All(int remoteProcessId, void* data, int argLength,
                       int tag, bool sendToActiveController)
     {
-    vtkstd::vector<vtkMultiProcessController*> controllersToNotify;
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<vtkMultiProcessController*> controllersToNotify;
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       if( sendToActiveController ||
@@ -377,7 +377,7 @@ public:
       }
 
     // Do the notification now...
-    vtkstd::vector<vtkMultiProcessController*>::iterator iter2 =
+    std::vector<vtkMultiProcessController*>::iterator iter2 =
         controllersToNotify.begin();
     while(iter2 != controllersToNotify.end())
       {
@@ -402,7 +402,7 @@ public:
   void SetMasterController(int controllerId)
     {
     bool found = false;
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       iter->IsMaster = (iter->Id == controllerId);
@@ -428,7 +428,7 @@ public:
   //-----------------------------------------------------------------
   int GetMasterController()
     {
-    vtkstd::vector<Controller>::iterator iter = this->Controllers.begin();
+    std::vector<Controller>::iterator iter = this->Controllers.begin();
     while(iter != this->Controllers.end())
       {
       if(iter->IsMaster)
@@ -465,8 +465,8 @@ private:
   int ControllerID;
   Controller* ActiveController;
   vtkWeakPointer<vtkCompositeMultiProcessController> Owner;
-  vtkstd::vector<RMICallbackInfo> RMICallbacks;
-  vtkstd::vector<Controller> Controllers;
+  std::vector<RMICallbackInfo> RMICallbacks;
+  std::vector<Controller> Controllers;
   bool NeedToInitializeControllers;
   unsigned long RMICallbackIdCounter;
 };

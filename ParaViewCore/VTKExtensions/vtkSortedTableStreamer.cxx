@@ -48,14 +48,14 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkDoubleArray.h"
 
-#include <vtkstd/algorithm>
+#include <algorithm>
 #include <vtksys/stl/map>
-#include <vtkstd/vector>
-#include <vtkstd/set>
+#include <vector>
+#include <set>
 
 #include <float.h>
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 using vtksys_ios::ostringstream;
 
@@ -530,11 +530,11 @@ public:
       // Sort it
       if(reverseOrder)
         {
-        vtkstd::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Ascendent);
+        std::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Ascendent);
         }
       else
         {
-        vtkstd::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Descendent);
+        std::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Descendent);
         }
       }
 
@@ -564,11 +564,11 @@ public:
       // Sort it
       if(reverseOrder)
         {
-        vtkstd::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Ascendent);
+        std::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Ascendent);
         }
       else
         {
-        vtkstd::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Descendent);
+        std::sort(this->Array, this->Array + this->ArraySize, SortableArrayItem::Descendent);
         }
       }
   };

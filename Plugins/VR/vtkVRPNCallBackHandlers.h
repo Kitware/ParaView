@@ -19,7 +19,7 @@
 #ifndef __vtkVRPNCallBackHandlers_h
 #define __vtkVRPNCallBackHandlers_h
 
-#include <vtkstd/vector>
+#include <vector>
 #include <iostream>
 #include <vrpn_Tracker.h>
 #include <vrpn_Button.h>

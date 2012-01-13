@@ -99,9 +99,10 @@ inline void scalePoint(double point[3], bool scalingEnabled[3], const int &table
  inline bool scaleBounds(int scalingEnabled[3], const int &tableId,
    double bounds[6])
 {
-  bool scaling[3] = {static_cast<bool>(scalingEnabled[0]),
-                    static_cast<bool>(scalingEnabled[1]),
-                    static_cast<bool>(scalingEnabled[2])};
+  (void)tableId;
+  bool scaling[3] = {(scalingEnabled[0]>0),
+                     (scalingEnabled[1]>0),
+                     (scalingEnabled[2]>0)};
 
   //make two fake point that we scale
   double point1[3] = {bounds[0], bounds[2], bounds[4]};

@@ -23,13 +23,13 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 //----------------------------------------------------------------------------
 class vtkSMAnimationScene::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
+  typedef std::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews ViewModules;
   void StillRenderAllViews()
     {

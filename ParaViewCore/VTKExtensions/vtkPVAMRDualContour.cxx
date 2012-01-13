@@ -22,8 +22,8 @@
 
 #include "vtkCompositeDataIterator.h"
 
-#include <vtkstd/string>  // STL required.
-#include <vtkstd/vector>  // STL required.
+#include <string>  // STL required.
+#include <vector>  // STL required.
 
 vtkStandardNewMacro(vtkPVAMRDualContour);
 
@@ -33,7 +33,7 @@ const double PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR=255;
 class vtkPVAMRDualContourInternal
 {
 public:
-  vtkstd::vector<vtkstd::string> CellArrays;
+  std::vector<std::string> CellArrays;
 };
 
 //-----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
 //-----------------------------------------------------------------------------
 void vtkPVAMRDualContour::AddInputCellArrayToProcess(const char* name)
 {
-  this->Implementation->CellArrays.push_back(vtkstd::string(name));
+  this->Implementation->CellArrays.push_back(std::string(name));
   this->Modified();
 }
 

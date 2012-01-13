@@ -34,9 +34,9 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
+#include <map>
+#include <set>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
@@ -99,7 +99,7 @@ private:
 
 //-----------------------------------------------------------------------------
 class vtkSMProxyManagerProxyListType :
-  public vtkstd::vector<vtkSmartPointer<vtkSMProxyManagerProxyInfo> >
+  public std::vector<vtkSmartPointer<vtkSMProxyManagerProxyInfo> >
 {
 public:
   // Returns if the proxy exists in  this vector.
@@ -133,12 +133,12 @@ public:
 
 //-----------------------------------------------------------------------------
 class vtkSMProxyManagerProxyMapType:
-  public vtkstd::map<vtkStdString, vtkSMProxyManagerProxyListType> {};
+  public std::map<vtkStdString, vtkSMProxyManagerProxyListType> {};
 //-----------------------------------------------------------------------------
 struct vtkSMProxyManagerEntry
 {
-  vtkstd::string Group;
-  vtkstd::string Name;
+  std::string Group;
+  std::string Name;
   vtkSmartPointer<vtkSMProxy> Proxy;
 
   vtkSMProxyManagerEntry(const char* group, const char* name, vtkSMProxy* proxy)
@@ -193,26 +193,26 @@ struct vtkSMSessionProxyManagerInternals
   // This data structure stores actual proxy instances grouped in
   // collections.
   typedef
-  vtkstd::map<vtkStdString, vtkSMProxyManagerProxyMapType> ProxyGroupType;
+  std::map<vtkStdString, vtkSMProxyManagerProxyMapType> ProxyGroupType;
   ProxyGroupType RegisteredProxyMap;
 
   // This data structure stores the tuples(group, name, proxy) to compute
   // diff when a state is loaded.
   typedef
-  vtkstd::set<vtkSMProxyManagerEntry> GroupNameProxySet;
+  std::set<vtkSMProxyManagerEntry> GroupNameProxySet;
   GroupNameProxySet RegisteredProxyTuple;
 
   // This data structure stores a set of proxies that have been modified.
-  typedef vtkstd::set<vtkSMProxy*> SetOfProxies;
+  typedef std::set<vtkSMProxy*> SetOfProxies;
   SetOfProxies ModifiedProxies;
 
   // Data structure to save registered links.
-  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMLink> >
+  typedef std::map<vtkStdString, vtkSmartPointer<vtkSMLink> >
     LinkType;
   LinkType RegisteredLinkMap;
 
   // Data structure for selection models.
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel> >
     SelectionModelsType;
   SelectionModelsType SelectionModels;
 
@@ -224,9 +224,9 @@ struct vtkSMSessionProxyManagerInternals
 
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,
-                       vtkstd::set<vtkSMProxyManagerEntry> &tuplesFounds)
+                       std::set<vtkSMProxyManagerEntry> &tuplesFounds)
     {
-    vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+    std::set<vtkSMProxyManagerEntry>::iterator iter;
     iter = this->RegisteredProxyTuple.begin();
     while(iter != this->RegisteredProxyTuple.end())
       {
@@ -241,11 +241,11 @@ struct vtkSMSessionProxyManagerInternals
   // --------------------------------------------------------------------------
   void ComputeDelta(const vtkSMMessage* newState,
                     vtkSMProxyLocator* locator,
-                    vtkstd::set<vtkSMProxyManagerEntry> &toRegister,
-                    vtkstd::set<vtkSMProxyManagerEntry> &toUnregister)
+                    std::set<vtkSMProxyManagerEntry> &toRegister,
+                    std::set<vtkSMProxyManagerEntry> &toUnregister)
     {
     // Fill equivalent temporary data structure
-    vtkstd::set<vtkSMProxyManagerEntry> newStateContent;
+    std::set<vtkSMProxyManagerEntry> newStateContent;
     int max = newState->ExtensionSize(PXMRegistrationState::registered_proxy);
     for(int cc=0; cc < max; cc++)
       {
@@ -263,7 +263,7 @@ struct vtkSMSessionProxyManagerInternals
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     // Look for proxy to Register
-    vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+    std::set<vtkSMProxyManagerEntry>::iterator iter;
     iter = newStateContent.begin();
     while(iter != newStateContent.end())
       {
@@ -290,14 +290,14 @@ struct vtkSMSessionProxyManagerInternals
 
   // --------------------------------------------------------------------------
   void RemoveTuples( const char* name,
-                     vtkstd::set<vtkSMProxyManagerEntry> &removedEntries)
+                     std::set<vtkSMProxyManagerEntry> &removedEntries)
     {
     // Convert param
-    vtkstd::string nameString = name;
+    std::string nameString = name;
 
     // Deal with set
     GroupNameProxySet resultSet;
-    vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+    std::set<vtkSMProxyManagerEntry>::iterator iter;
     iter = this->RegisteredProxyTuple.begin();
     while(iter != this->RegisteredProxyTuple.end())
       {
@@ -341,18 +341,18 @@ struct vtkSMSessionProxyManagerInternals
 
   // --------------------------------------------------------------------------
   void RemoveTuples(const char* group, const char* name,
-                    vtkstd::set<vtkSMProxyManagerEntry> &removedEntries,
+                    std::set<vtkSMProxyManagerEntry> &removedEntries,
                     bool doMapOnly)
     {
     // Convert parameters
-    vtkstd::string groupString = group;
-    vtkstd::string nameString = name;
+    std::string groupString = group;
+    std::string nameString = name;
 
     // Deal with set
     if(!doMapOnly)
       {
       GroupNameProxySet resultSet;
-      vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+      std::set<vtkSMProxyManagerEntry>::iterator iter;
       iter = this->RegisteredProxyTuple.begin();
       while(iter != this->RegisteredProxyTuple.end())
         {
@@ -411,8 +411,8 @@ struct vtkSMSessionProxyManagerInternals
   bool RemoveTuples(const char* group, const char* name, vtkSMProxy* proxy)
     {
     // Convert parameters
-    vtkstd::string groupString = group;
-    vtkstd::string nameString = name;
+    std::string groupString = group;
+    std::string nameString = name;
 
     // Will be overriden if the proxy is found
     bool found = false;
@@ -477,7 +477,7 @@ struct vtkSMSessionProxyManagerInternals
   void UpdateProxySelectionModelState()
     {
     this->State.ClearExtension(PXMRegistrationState::registered_selection_model);
-    vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >::iterator iter;
+    std::map<std::string, vtkSmartPointer<vtkSMProxySelectionModel> >::iterator iter;
     for(iter  = this->SelectionModels.begin();
         iter != this->SelectionModels.end();
         iter++)

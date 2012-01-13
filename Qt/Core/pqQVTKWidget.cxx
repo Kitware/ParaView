@@ -74,22 +74,6 @@ pqQVTKWidget::~pqQVTKWidget()
 }
 
 //----------------------------------------------------------------------------
-void pqQVTKWidget::setPositionReference(QWidget* widget)
-{
-  this->PositionReference = widget;
-}
-
-//----------------------------------------------------------------------------
-QWidget* pqQVTKWidget::positionReference() const
-{
-  if (this->PositionReference)
-    {
-    return this->PositionReference;
-    }
-  return this->parentWidget();
-}
-
-//----------------------------------------------------------------------------
 void pqQVTKWidget::resizeEvent(QResizeEvent* e)
 {
   this->Superclass::resizeEvent(e);
@@ -106,15 +90,7 @@ void pqQVTKWidget::updateSizeProperties()
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
     vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
-
-    QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
-      this->mapToParent(QPoint(0, 0));
-    int view_position[2];
-    view_position[0] = view_pos.x();
-    view_position[1] = view_pos.y();;
-    vtkSMPropertyHelper(this->ViewProxy, "ViewPosition").Set(view_position, 2);
     this->ViewProxy->UpdateProperty("ViewSize");
-    this->ViewProxy->UpdateProperty("ViewPosition");
     END_UNDO_EXCLUDE();
     }
 

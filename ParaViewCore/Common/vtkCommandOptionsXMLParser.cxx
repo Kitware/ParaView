@@ -15,7 +15,7 @@
 #include "vtkCommandOptionsXMLParser.h"
 #include "vtkCommandOptions.h"
 #include "vtkObjectFactory.h"
-#include <vtkstd/map>
+#include <map>
 #include "vtkStdString.h"
 
 //----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ public:
         }
       return this->ArgumentToVariableMap[arg].ProcessType;
     }
-  vtkstd::map<vtkstd::string, vtkCommandOptionsXMLParserArgumentStructure> ArgumentToVariableMap;
+  std::map<std::string, vtkCommandOptionsXMLParserArgumentStructure> ArgumentToVariableMap;
   int ProcessType;
 };
 
@@ -151,7 +151,7 @@ void vtkCommandOptionsXMLParserInternal::AddArgument(
   vardata.VariableType = type;
   vardata.Variable = var;
   vardata.ProcessType = ptype;
-  this->ArgumentToVariableMap[vtkstd::string(arg+2)] = vardata;
+  this->ArgumentToVariableMap[std::string(arg+2)] = vardata;
 }
 
 //****************************************************************************

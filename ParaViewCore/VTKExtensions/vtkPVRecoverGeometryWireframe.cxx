@@ -33,8 +33,8 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkstd/algorithm>
-#include <vtkstd/vector>
+#include <algorithm>
+#include <vector>
 #include <vtksys/hash_map.hxx>
 
 static const unsigned char NO_EDGE_FLAG = static_cast<unsigned char >(-1);
@@ -146,7 +146,7 @@ int vtkPVRecoverGeometryWireframe::RequestData(
   vtkPolyData *output = vtkPolyData::GetData(outputVector);
 
   vtkIdType npts, *pts;
-  vtkstd::vector<vtkIdType> originalPts;
+  std::vector<vtkIdType> originalPts;
 
   if (!input->GetCellData()->HasArray(ORIGINAL_FACE_IDS()))
     {
@@ -188,14 +188,14 @@ int vtkPVRecoverGeometryWireframe::RequestData(
   outputPD->SetActiveAttribute("vtkEdgeFlags", vtkDataSetAttributes::EDGEFLAG);
   edgeflags->SetNumberOfComponents(1);
   edgeflags->SetNumberOfTuples(numOriginalPoints);
-  vtkstd::fill(edgeflags->GetPointer(0),
+  std::fill(edgeflags->GetPointer(0),
                edgeflags->GetPointer(numOriginalPoints), NO_EDGE_FLAG);
 
   // Some (probably many) points will have to be duplicated because different
   // cells will need different edge flags.  This array maps the original
   // point id to the duplicate id.
-  vtkstd::vector<vtkIdType> duplicatePointMap(numOriginalPoints);
-  vtkstd::fill(duplicatePointMap.begin(), duplicatePointMap.end(), -1);
+  std::vector<vtkIdType> duplicatePointMap(numOriginalPoints);
+  std::fill(duplicatePointMap.begin(), duplicatePointMap.end(), -1);
 
   // Shallow copy the verts.  Set the edge flags to true.
   vtkCellArray *inputVerts = input->GetVerts();
@@ -257,7 +257,7 @@ int vtkPVRecoverGeometryWireframe::RequestData(
     // we may change the indices, but we allways compare edges by the original
     // indices.
     originalPts.resize(npts);
-    vtkstd::copy(pts, pts+npts, originalPts.begin());
+    std::copy(pts, pts+npts, originalPts.begin());
     vtkIdType originalFace = faceIds->GetValue(inputCellId);
     for (vtkIdType i = 0; i < npts; i++)
       {
@@ -270,7 +270,7 @@ int vtkPVRecoverGeometryWireframe::RequestData(
       if (edgeMatch == edgeMap.end())
         {
         // Not encountered yet.  Add to the map.
-        edgeMap.insert(vtkstd::make_pair(edge, edgeInfo));
+        edgeMap.insert(std::make_pair(edge, edgeInfo));
         }
       else
         {

@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 static void vtkInitializationHelperInit(vtkClientServerInterpreter*);

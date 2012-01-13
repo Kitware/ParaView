@@ -49,8 +49,8 @@
 #include "vtkDepthSortPolyData.h"
 #include "vtkScalarsToColors.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/algorithm>
+#include <vector>
+#include <algorithm>
 #include <functional>
 
 #include <cmath>

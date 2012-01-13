@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 #include "vtkStdString.h"
 
@@ -26,7 +26,7 @@ vtkStandardNewMacro(vtkSMStringListDomain);
 
 struct vtkSMStringListDomainInternals
 {
-  vtkstd::vector<vtkStdString> Strings;
+  std::vector<vtkStdString> Strings;
 };
 
 //---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ int vtkSMStringListDomain::RemoveString(const char* string)
     return -1;
     }
   int index=0;
-  vtkstd::vector<vtkStdString>::iterator iter =
+  std::vector<vtkStdString>::iterator iter =
     this->SLInternals->Strings.begin();
   for(; iter != this->SLInternals->Strings.end(); iter++, index++)
     {

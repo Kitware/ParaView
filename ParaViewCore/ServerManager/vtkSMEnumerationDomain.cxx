@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include "vtkStdString.h"
@@ -34,7 +34,7 @@ struct vtkSMEnumerationDomainInternals
     int Value;
   };
 
-  typedef vtkstd::vector<EntryType> EntriesType;
+  typedef std::vector<EntryType> EntriesType;
   EntriesType  Entries;
 };
 

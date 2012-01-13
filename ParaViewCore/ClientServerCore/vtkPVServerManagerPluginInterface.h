@@ -22,8 +22,8 @@
 #define __vtkPVServerManagerPluginInterface_h
 
 #include "vtkClientServerInterpreterInitializer.h"
-#include <vtkstd/vector> // STL Header
-#include <vtkstd/string> // STL Header
+#include <vector> // STL Header
+#include <string> // STL Header
 
 class VTK_EXPORT vtkPVServerManagerPluginInterface
 {
@@ -32,7 +32,7 @@ public:
 
   // Description:
   // Obtain the server-manager configuration xmls, if any.
-  virtual void GetXMLs(vtkstd::vector<vtkstd::string>& vtkNotUsed(xmls)) = 0;
+  virtual void GetXMLs(std::vector<std::string>& vtkNotUsed(xmls)) = 0;
 
   // Description:
   // Returns the callback function to call to initialize the interpretor for the

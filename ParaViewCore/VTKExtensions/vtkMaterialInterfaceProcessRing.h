@@ -22,7 +22,7 @@
 #ifndef __vtkMaterialInterfaceProcessRing_h
 #define __vtkMaterialInterfaceProcessRing_h
 
-#include "vtkstd/vector"
+#include "vector"
 #include "vtkMaterialInterfaceProcessLoading.h"
 
 class vtkMaterialInterfaceProcessRing
@@ -62,7 +62,7 @@ public:
   // Build from a process loading from a sorted
   // vector of process loading items.
   void Initialize(
-      vtkstd::vector<vtkMaterialInterfaceProcessLoading> &Q,
+      std::vector<vtkMaterialInterfaceProcessLoading> &Q,
       vtkIdType upperLoadingBound);
   // Description:
   // Get the next process id from the ring.
@@ -83,6 +83,6 @@ public:
 private:
   int NextElement;
   int BufferSize;
-  vtkstd::vector<int> Buffer;
+  std::vector<int> Buffer;
 };
 #endif

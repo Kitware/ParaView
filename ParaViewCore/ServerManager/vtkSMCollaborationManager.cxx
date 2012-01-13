@@ -26,9 +26,9 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <vector>
+#include <string>
 
 //****************************************************************************
 //                              Internal class
@@ -68,7 +68,7 @@ public:
 
   const char* GetUserName(int userId)
     {
-    vtkstd::string &name = this->UserNames[userId];
+    std::string &name = this->UserNames[userId];
     if(name.empty())
       {
 
@@ -241,14 +241,14 @@ public:
     }
 
   vtkWeakPointer<vtkSMCollaborationManager> Manager;
-  vtkstd::map<int, vtkstd::string>          UserNames;
-  vtkstd::vector<int>                       Users;
+  std::map<int, std::string>          UserNames;
+  std::vector<int>                       Users;
   int                                       Me;
   int                                       UserToFollow;
   int                                       Master;
   vtkSMMessage                              State;
   vtkSMMessage                              PendingCameraUpdate;
-  vtkstd::map<int, vtkSMMessage>            LocalCameraStateCache;
+  std::map<int, vtkSMMessage>            LocalCameraStateCache;
   unsigned long                             ObserverTag;
 };
 //****************************************************************************

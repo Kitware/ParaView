@@ -55,7 +55,7 @@
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <vtkstd/map>
+#include <map>
 
 namespace
 {
@@ -626,7 +626,7 @@ namespace
   //-----------------------------------------------------------------------------
   static void vtkShrinkSelection(vtkSelection* sel)
     {
-    vtkstd::map<int, int> pixelCounts;
+    std::map<int, int> pixelCounts;
     unsigned int numNodes = sel->GetNumberOfNodes();
     int choosen = -1;
     int maxPixels = -1;
@@ -648,7 +648,7 @@ namespace
         }
       }
 
-    vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
+    std::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
     if (choosen != -1)
       {
       for (unsigned int cc=0; cc < numNodes; cc++)

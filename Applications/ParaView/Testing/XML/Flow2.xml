@@ -4,6 +4,10 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/RectGrid2.vtk" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <!--
+    Disabling this since 2 3DWdigets on summary panel and properties panel mess
+    with the test playback. Can;t wait for properties panel to be deprecated
+    soon
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/originX" command="set_string" arguments="-0.0889" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/originY" command="key" arguments="45" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/originY" command="set_string" arguments="-0" />
@@ -12,6 +16,9 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/originZ" command="set_string" arguments="0.435" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/normalX" command="set_string" arguments="0" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/normalZ" command="set_string" arguments="1" />
+  -->
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="IntegrateFlowThroughSurface" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
@@ -24,7 +31,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="IntegrateAttributes" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Glyph" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Source/1QComboBox0" command="set_string" arguments="Sphere" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/LockScaleFactor" command="set_boolean" arguments="true" />
@@ -33,14 +40,10 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleMode" command="set_string" arguments="off" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0|0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Display" />
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0/1/0|0" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow" command="contextMenu" arguments="" />
 
   <!-- hide orientation axes since on some dashboards it's not resized correctly -->
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditViewSettings" />

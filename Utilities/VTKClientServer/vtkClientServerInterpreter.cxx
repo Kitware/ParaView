@@ -19,9 +19,9 @@
 #include "vtkDynamicLoader.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <sys/stat.h>
 
@@ -31,9 +31,9 @@ vtkStandardNewMacro(vtkClientServerInterpreter);
 class vtkClientServerInterpreterInternals
 {
 public:
-  typedef vtkstd::map<vtkstd::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
-  typedef vtkstd::map<vtkstd::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
-  typedef vtkstd::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
+  typedef std::map<std::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+  typedef std::map<std::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
+  typedef std::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
   ClassToFunctionMapType ClassToFunctionMap;
   IDToMessageMapType IDToMessageMap;
@@ -773,16 +773,16 @@ int vtkClientServerInterpreter::Load(const char* moduleName)
 static
 void vtkClientServerInterpreterSplit(const char* path,
                                      char split, char slash,
-                                     vtkstd::vector<vtkstd::string>& paths)
+                                     std::vector<std::string>& paths)
 {
-  vtkstd::string str = path?path:"";
-  vtkstd::string::size_type lpos = 0;
-  vtkstd::string::size_type rpos = str.npos;
+  std::string str = path?path:"";
+  std::string::size_type lpos = 0;
+  std::string::size_type rpos = str.npos;
   while((rpos = str.find(split, lpos)) != str.npos)
     {
     if(lpos < rpos)
       {
-      vtkstd::string dir = str.substr(lpos, rpos-lpos);
+      std::string dir = str.substr(lpos, rpos-lpos);
       if(*(dir.end()-1) != slash)
         {
         dir += slash;
@@ -793,7 +793,7 @@ void vtkClientServerInterpreterSplit(const char* path,
     }
   if(lpos < str.length())
     {
-    vtkstd::string dir = str.substr(lpos);
+    std::string dir = str.substr(lpos);
     if(*(dir.end()-1) != slash)
       {
       dir += slash;
@@ -807,7 +807,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
                                      const char*const* optionalPaths)
 {
   // The library search path.
-  typedef vtkstd::vector<vtkstd::string> PathsType;
+  typedef std::vector<std::string> PathsType;
   PathsType paths;
 
   // Try user-specified paths if any.
@@ -815,7 +815,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
     {
     for(const char*const* p = optionalPaths; *p; ++p)
       {
-      vtkstd::string path = *p;
+      std::string path = *p;
       if(path.length() > 0)
         {
         char end = *(path.end()-1);
@@ -841,19 +841,19 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
 #endif
 
   // Search for the module.
-  vtkstd::string searched;
-  vtkstd::string libName = vtkDynamicLoader::LibPrefix();
+  std::string searched;
+  std::string libName = vtkDynamicLoader::LibPrefix();
   libName += moduleName;
   libName += vtkDynamicLoader::LibExtension();
   for(PathsType::iterator p = paths.begin(); p != paths.end(); ++p)
     {
     struct stat data;
-    vtkstd::string fullPath = *p;
+    std::string fullPath = *p;
 
 #if defined(CMAKE_INTDIR)
     // Look in the subdirectory for the configuration in which this
     // interpreter was built.
-    vtkstd::string fullPathWithIntDir = fullPath;
+    std::string fullPathWithIntDir = fullPath;
     fullPathWithIntDir += CMAKE_INTDIR "/";
     fullPathWithIntDir += libName;
     if(stat(fullPathWithIntDir.c_str(), &data) == 0)
@@ -903,7 +903,7 @@ int vtkClientServerInterpreter::LoadInternal(const char* moduleName,
     }
 
   // Get the init function.
-  vtkstd::string initFuncName = moduleName;
+  std::string initFuncName = moduleName;
   initFuncName += "_Initialize";
   void* pfunc = vtkDynamicLoader::GetSymbolAddress(lib, initFuncName.c_str());
   InitFunction func = *reinterpret_cast<InitFunction*>(&pfunc);
