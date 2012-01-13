@@ -47,6 +47,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <ctype.h> // for isprint().
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
@@ -877,6 +878,14 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     vtkStdString fname;
     metafile >> fname;
     if (fname.empty()) continue;
+    for (size_t cc=0; cc < fname.size(); cc++)
+      {
+      if (!isprint(fname.c_str()[cc]))
+        {
+        // must not be an ASCII file.
+        return 0;
+        }
+      }
     if ((fname.at(0) != '/') && ((fname.size() < 2) || (fname.at(1) != ':')))
       {
       fname = filePath + fname;
