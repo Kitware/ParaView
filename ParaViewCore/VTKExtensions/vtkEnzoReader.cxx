@@ -60,7 +60,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessController.h"
 #include "vtkAssertUtils.hpp"
+#include "vtkAMRUtilities.h"
 #include "vtkMath.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <hdf5.h>          // for the HDF data loading engine
 #include <cassert>
