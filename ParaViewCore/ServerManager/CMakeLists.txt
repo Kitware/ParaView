@@ -149,6 +149,7 @@ SET (Kit_SRCS
   vtkSMUndoStackBuilder.cxx
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
+  vtkSMViewLayoutProxy.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx

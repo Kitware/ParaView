@@ -19,7 +19,10 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 
-#include "vtksys/ios/sstream"
+#include <vector>
+#include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMStateVersionController);
 //----------------------------------------------------------------------------
@@ -33,8 +36,14 @@ vtkSMStateVersionController::~vtkSMStateVersionController()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
+bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
 {
+  vtkPVXMLElement* root = parent;
+  if (parent && strcmp(parent->GetName(), "ServerManagerState") != 0)
+    {
+    root = root->FindNestedElementByName("ServerManagerState");
+    }
+
   if (!root || strcmp(root->GetName(), "ServerManagerState") != 0)
     {
     vtkErrorMacro("Invalid root element. Expected \"ServerManagerState\"");
@@ -115,12 +124,22 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     this->UpdateVersion( version, updated_version );
     }
 
-  if ( this->GetMajor(version) == 3 && this->GetMajor(version) < 11 )
+  if ( this->GetMajor(version) == 3 && this->GetMinor(version) < 11 )
     {
-    status = status && this->Process_3_10_to_4_0(root);
-    // Since now the state file has been updated to version 4.0.0, we must update
+    status = status && this->Process_3_10_to_3_12(root);
+    // Since now the state file has been updated to version 3.12.0, we must update
     // the version number to reflect that.
-    int updated_version[3] = { 4, 0, 0 };
+    int updated_version[3] = { 3, 12, 0 };
+    this->UpdateVersion( version, updated_version );
+    }
+
+  if (this->GetMajor(version) == 3 && this->GetMajor(version) < 14)
+    {
+    status = status && this->Process_3_12_to_3_14(root, parent);
+
+    // Since now the state file has been updated to version 3.14.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = { 3, 14, 0 };
     this->UpdateVersion( version, updated_version );
     }
 
@@ -879,7 +898,7 @@ namespace
 };
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::Process_3_10_to_4_0( vtkPVXMLElement * root )
+bool vtkSMStateVersionController::Process_3_10_to_3_12( vtkPVXMLElement * root )
 {
     {
     // Change all "Representation" properties from ints to string.
@@ -899,6 +918,135 @@ bool vtkSMStateVersionController::Process_3_10_to_4_0( vtkPVXMLElement * root )
     this->Select( root, "Proxy",attrs3, &::ConvertRepresentationProperty, this);
     }
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_12_to_3_14(
+  vtkPVXMLElement* smroot, vtkPVXMLElement* pvroot)
+{
+  // Handle <ViewManager/> element. Convert it to a "ViewLayout" proxy state.
+  {
+  vtkPVXMLElement* viewManager = pvroot->FindNestedElementByName("ViewManager");
+  if (viewManager)
+    {
+    vtkPVXMLElement* viewLayout = this->ConvertMultiViewLayout(viewManager);
+    smroot->AddNestedElement(viewLayout);
+    viewLayout->Delete();
+
+    vtkPVXMLElement* item = vtkPVXMLElement::New();
+    item->SetName("Item");
+    item->AddAttribute("id", "1");
+    item->AddAttribute("name", "ViewLayout1");
+  
+    vtkPVXMLElement* layouts = vtkPVXMLElement::New();
+    layouts->SetName("ProxyCollection");
+    layouts->AddAttribute("name", "layouts");
+    layouts->AddNestedElement(item);
+    item->Delete();
+    
+    smroot->AddNestedElement(layouts);
+    layouts->Delete();
+    }
+  }
+  return true;
+}
+
+namespace
+{
+  void HandleSplitterElements(int index, vtkPVXMLElement* node,
+    std::vector<vtkSmartPointer<vtkPVXMLElement> > &items)
+    {
+    if (static_cast<int>(items.size()) < index+1)
+      {
+      items.resize(index+1);
+      }
+    items[index] = vtkSmartPointer<vtkPVXMLElement>::New();
+    items[index]->SetName("Item");
+
+    if (node && strcmp(node->GetName(), "Splitter") == 0)
+      {
+      if (node->GetAttribute("orientation") &&
+        strcmp(node->GetAttribute("orientation"), "Horizontal")==0)
+        {
+        items[index]->SetAttribute("direction", "2");
+        }
+      else
+        {
+        items[index]->SetAttribute("direction", "1");
+        }
+      if (node->GetAttribute("sizes"))
+        {
+        vtksys::RegularExpression reg_ex("([0-9]+).([0-9]+)");
+        if (reg_ex.find(node->GetAttribute("sizes")))
+          {
+          int x1 = atoi(reg_ex.match(1).c_str());
+          int x2 =  atoi(reg_ex.match(2).c_str());
+          double fraction = static_cast<double>(x1)/(x1 + x2);
+          items[index]->AddAttribute("fraction", fraction);
+          }
+        }
+      items[index]->AddAttribute("view", "0");
+      HandleSplitterElements(2*index + 1, node->GetNestedElement(0), items);
+      HandleSplitterElements(2*index + 2, node->GetNestedElement(1), items);
+      }
+    else
+      {
+      items[index]->AddAttribute("direction", "0");
+      items[index]->AddAttribute("fraction", "0.5");
+      items[index]->AddAttribute("view", "0");
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMStateVersionController::ConvertMultiViewLayout(
+  vtkPVXMLElement* viewManager)
+{
+  vtkPVXMLElement* multiView = viewManager->FindNestedElementByName("MultiView");
+  std::vector<vtkSmartPointer<vtkPVXMLElement> > items;
+  HandleSplitterElements(0, multiView->FindNestedElementByName("Splitter"), items);
+
+  // now handle "Frame elements;
+  for (unsigned int cc=0; cc < viewManager->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* child = viewManager->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), "Frame") == 0)
+      {
+      std::vector<vtksys::String> indexes = vtksys::SystemTools::SplitString(
+        child->GetAttribute("index"), '.');
+      int index = 0;
+      for (size_t kk=0; kk < indexes.size(); kk++)
+        {
+        int val = atoi(indexes[kk].c_str());
+        index = val==0? (2*index + 1) : (2*index+2);
+        }
+      // handle no-split explicitly.
+      if (index==1 && indexes.size() == 1 && items.size() == 1)
+        {
+        index=0;
+        }
+      items[index]->SetAttribute("view", child->GetAttribute("view_module"));
+      }
+    }
+
+  vtkPVXMLElement* layout = vtkPVXMLElement::New();
+  layout->SetName("Layout");
+  layout->AddAttribute("number_of_elements", static_cast<int>(items.size()));
+  for (size_t cc=0; cc < items.size(); cc++)
+    {
+    layout->AddNestedElement(items[cc]);
+    }
+
+  vtkPVXMLElement* proxy = vtkPVXMLElement::New();
+  proxy->SetName("Proxy");
+  proxy->AddNestedElement(layout);
+  layout->Delete();
+
+  proxy->AddAttribute("group", "misc");
+  proxy->AddAttribute("type", "ViewLayout");
+  proxy->AddAttribute("id", "1");
+  proxy->AddAttribute("servers", "5");
+  return proxy;
 }
 
 //----------------------------------------------------------------------------

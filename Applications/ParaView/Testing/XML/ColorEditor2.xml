@@ -2,14 +2,14 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SuperquadricSource" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.503536,0.334944,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.506365,0.47182,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.506365,0.47182,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.503536,0.334944,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.506365,0.47182,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.506365,0.47182,1,0,0)" />
   <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Display" />
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="TextureCoords" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.483734,0.690821,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.483734,0.648953,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.483734,0.648953,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.483734,0.690821,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.483734,0.648953,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.483734,0.648953,1,0,0)" />
   <pqevent object="pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorButtonStack/ColorMapPage/EditColorMapButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/ColorSpace" command="set_string" arguments="Wrapped HSV" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/UseAutoRescale" command="set_boolean" arguments="false" />

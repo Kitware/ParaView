@@ -17,9 +17,9 @@
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="2" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="21" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="key" arguments="16777220" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.406181,0.356618,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.406181,0.356618,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.406181,0.356618,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.406181,0.356618,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.406181,0.356618,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.406181,0.356618,1,0,0)" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="DISPL" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
 </pqevents>

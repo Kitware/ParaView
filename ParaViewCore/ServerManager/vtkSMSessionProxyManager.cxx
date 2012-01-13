@@ -786,19 +786,9 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
     this->Observer);
   proxyInfo->UpdateInformationObserverTag = proxy->AddObserver(
     vtkCommand::UpdateInformationEvent, this->Observer);
-
   // Note, these observer will be removed in the destructor of proxyInfo.
 
-  vtkSMProxyManager::RegisteredProxyInformation info;
-  info.Proxy = proxy;
-  info.GroupName = groupname;
-  info.ProxyName = name;
-  info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
-
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-
   // Update state
-
   if(proxy->GetLocation() != 0 && !proxy->IsPrototype()) // Not a prototype !!!
     {
     proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
@@ -817,6 +807,14 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
       this->TriggerStateUpdate();
       }
     }
+
+  // Fire event.
+  vtkSMProxyManager::RegisteredProxyInformation info;
+  info.Proxy = proxy;
+  info.GroupName = groupname;
+  info.ProxyName = name;
+  info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
@@ -929,18 +927,18 @@ void vtkSMSessionProxyManager::RegisterLink(const char* name, vtkSMLink* link)
     }
   this->Internals->RegisteredLinkMap[name] = link;
 
+  // PXM state management
+  link->SetSession(this->GetSession());
+  link->PushStateToSession();
+  this->Internals->UpdateLinkState();
+  this->TriggerStateUpdate();
+
   vtkSMProxyManager::RegisteredProxyInformation info;
   info.Proxy = 0;
   info.GroupName = 0;
   info.ProxyName = name;
   info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-
-  // PXM state management
-  link->SetSession(this->GetSession());
-  link->PushStateToSession();
-  this->Internals->UpdateLinkState();
-  this->TriggerStateUpdate();
 }
 
 //---------------------------------------------------------------------------
@@ -962,17 +960,18 @@ void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
     {
+    this->Internals->RegisteredLinkMap.erase(it);
+
+    // PXM state management
+    this->Internals->UpdateLinkState();
+    this->TriggerStateUpdate();
+
     vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = 0;
     info.GroupName = 0;
     info.ProxyName = name;
     info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
-    this->Internals->RegisteredLinkMap.erase(it);
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-
-    // PXM state management
-    this->Internals->UpdateLinkState();
-    this->TriggerStateUpdate();
     }
 }
 

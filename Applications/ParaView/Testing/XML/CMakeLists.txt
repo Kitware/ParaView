@@ -77,6 +77,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ObjectInspectorSphere.xml
@@ -102,6 +103,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
@@ -152,6 +154,7 @@ set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
 set (TestIsoVolume_BREAK TRUE)
+set (TabbedViews_BREAK TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
@@ -278,6 +281,7 @@ IF (NOT BUILD_SHARED_LIBS)
   SET (H5PartReaderPlugin_DISABLE_C TRUE)
   SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
+  SET (SLACTools_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
@@ -363,7 +367,6 @@ set (Flow_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Flow2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Fractal2D_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (GridConnectivity_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (LoadState_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (NormalGlyphs_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ObjectInspectorSphere_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (OpenSaveData_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
@@ -373,7 +376,9 @@ set (PlotEdges2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+# disabling since the state file doesn't have view layout and such old state
+# files are not currently supported in collaborative mode.
+#set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (RepresentationSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (SaveColorMap_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})

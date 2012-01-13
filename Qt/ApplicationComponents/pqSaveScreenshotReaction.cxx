@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqSaveSnapshotDialog.h"
 #include "pqSettings.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
-#include "pqViewManager.h"
 #include "vtkImageData.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -80,11 +80,12 @@ void pqSaveScreenshotReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqSaveScreenshotReaction::saveScreenshot()
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (!viewManager)
     {
-    qCritical("Could not locate pqViewManager. If using custom-widget as the "
+    qCritical("Could not locate pqTabbedMultiViewWidget. "
+      "If using custom-widget as the "
       "central widget, you cannot use pqSaveScreenshotReaction.");
     return;
     }
@@ -175,11 +176,12 @@ void pqSaveScreenshotReaction::saveScreenshot()
 void pqSaveScreenshotReaction::saveScreenshot(
   const QString& filename, const QSize& size, int quality, bool all_views)
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (!viewManager)
     {
-    qCritical("Could not locate pqViewManager. If using custom-widget as the "
+    qCritical("Could not locate pqTabbedMultiViewWidget. "
+      "If using custom-widget as the "
       "central widget, you cannot use pqSaveScreenshotReaction.");
     return;
     }

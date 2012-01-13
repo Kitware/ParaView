@@ -185,6 +185,12 @@ void pqView::initialize()
 }
 
 //-----------------------------------------------------------------------------
+void pqView::cancelPendingRenders()
+{
+  this->Internal->RenderTimer.stop();
+}
+
+//-----------------------------------------------------------------------------
 void pqView::render()
 {
   this->Internal->RenderTimer.start();
