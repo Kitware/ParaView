@@ -64,6 +64,7 @@ SET (Kit_SRCS
   vtkPVDisplayInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
+  vtkPVExtractSelection.cxx
   vtkPVFileInformation.cxx
   vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
@@ -139,8 +140,8 @@ IF(PARAVIEW_ENABLE_PYTHON)
   SET(Kit_SRCS ${Kit_SRCS}
     vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
-    vtkPythonExtractSelection.cxx
     vtkPythonProgrammableFilter.cxx
+    vtkPythonExtractSelection.cxx
     )
   SET (KIT_LIBS ${KIT_LIBS} ${PYTHON_LIBRARIES} vtkPVPythonInterpretor)
   INCLUDE_DIRECTORIES(

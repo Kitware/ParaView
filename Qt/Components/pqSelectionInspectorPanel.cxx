@@ -643,49 +643,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     SIGNAL(currentTextChanged(const QString&)),
     selSource, selSource->GetProperty("FieldType"));
 
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("ContainingCells"));
-
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("InsideOut"));
-
-  if (selSource->GetProperty("IDs"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      idsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("IDs"));
-    }
-
-  if (selSource->GetProperty("Locations"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      idsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Locations"));
-    }
-
-  if (selSource->GetProperty("Blocks"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->BlocksAdaptor, "values",
-      SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Blocks"));
-    }
-
-  if (selSource->GetProperty("Thresholds"))
-    {
-    // Link Threshold selection properties
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->ThresholdScalarArrayAdaptor, "currentText",
-      SIGNAL(currentTextChanged(const QString&)),
-      selSource, selSource->GetProperty("ArrayName"));
-
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->ThresholdsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Thresholds"));
-    }
-
   if (selSource->GetProperty("UserFriendlyText"))
     {
     selSource->UpdatePropertyInformation();

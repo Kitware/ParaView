@@ -1428,56 +1428,11 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         </EnumerationDomain>
      </IntVectorProperty>
 
-     <IntVectorProperty name="TermMode"
-        command="SetTermMode"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="None" />
-          <Entry value="1" text="ID" />
-          <Entry value="2" text="GLOBALID" />
-          <Entry value="3" text="ARRAY" />
-          <Entry value="4" text="LOCATION" />
-          <Entry value="5" text="BLOCK" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Operator"
-        command="SetOperator"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="None" />
-          <Entry value="1" text="IS_ONE_OF" />
-          <Entry value="2" text="IS_BETWEEN" />
-          <Entry value="3" text="IS_GE" />
-          <Entry value="4" text="IS_LE" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <StringVectorProperty name="ArrayName"
-        command="SetArrayName"
+      <StringVectorProperty name="QueryString"
+        command="SetQueryString"
         number_of_elements="1"
         default_values="">
       </StringVectorProperty>
-
-      <IntVectorProperty name="ArrayComponent"
-        command="SetArrayComponent"
-        number_of_elements="1"
-        default_values="0">
-      </IntVectorProperty>
-
-      <IdTypeVectorProperty name="IdTypeValues"
-        command="SetIdTypeValues"
-        set_number_command="SetNumberOfIdTypeValues"
-        argument_is_array="1">
-      </IdTypeVectorProperty>
-
-      <DoubleVectorProperty name="DoubleValues"
-        command="SetDoubleValues"
-        set_number_command="SetNumberOfDoubleValues"
-        argument_is_array="1">
-      </DoubleVectorProperty>
 
       <IntVectorProperty name="CompositeIndex"
         command="SetCompositeIndex"
@@ -1491,7 +1446,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         default_values="-1">
       </IntVectorProperty>
 
-
       <IntVectorProperty name="HierarchicalIndex"
         command="SetHierarchicalIndex"
         number_of_elements="1"
@@ -1504,17 +1458,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         default_values="-1">
       </IntVectorProperty>
 
-      <IntVectorProperty name="ContainingCells"
-        command="SetContainingCells"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Useful only when FieldType==POINT. This results in selecting the cells
-          that contain the matching points.
-        </Documentation>
-      </IntVectorProperty>
-
       <StringVectorProperty name="UserFriendlyText"
         information_only="1"
         command="GetUserFriendlyText">
@@ -1523,19 +1466,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
           Reconstructs the query as a user friendly text eg. "IDs >= 12".
         </Documentation>
       </StringVectorProperty>
-
-      <IntVectorProperty 
-         name="InsideOut" 
-         command="SetInverse" 
-         number_of_elements="1"
-         default_values="0" >
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          When this property is false the selection describes everything that
-          should be extracted. When this is true the selection describes
-          everything that should NOT be extracted.
-        </Documentation>
-      </IntVectorProperty>
     <!-- end of SelectionQuerySource -->
    </SourceProxy>
 

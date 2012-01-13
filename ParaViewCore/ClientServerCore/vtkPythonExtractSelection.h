@@ -24,6 +24,7 @@
 class vtkCharArray;
 class vtkDataSet;
 class vtkTable;
+class vtkSelection;
 class vtkUnstructuredGrid;
 
 class VTK_EXPORT vtkPythonExtractSelection : public vtkProgrammableFilter
@@ -34,22 +35,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Which field data to get the arrays from. See
-  // vtkDataObject::FieldAssociations for choices. The default
-  // is FIELD_ASSOCIATION_POINTS.
-  vtkSetMacro(ArrayAssociation, int);
-  vtkGetMacro(ArrayAssociation, int);
-
-  // Description:
-  // Set the text of the python expression to execute. This expression
-  // must return a scalar value (which is converted to an array) or a
-  // numpy array.
-  vtkSetStringMacro(Expression)
-  vtkGetStringMacro(Expression)
+  // Convenience method to specify the selection connection (2nd input
+  // port)
+  void SetSelectionConnection(vtkAlgorithmOutput* algOutput)
+    {
+    this->SetInputConnection(1, algOutput);
+    }
 
   // Description:
   // Internal method.
-  vtkDataObject* ExtractElements(vtkDataObject* data, vtkCharArray* mask);
+  vtkDataObject* ExtractElements(vtkDataObject* data, vtkSelection* selection, vtkCharArray* mask);
 
 //BTX
 protected:
@@ -71,9 +66,6 @@ protected:
   virtual int RequestDataObject(vtkInformation* request, 
                                 vtkInformationVector** inputVector, 
                                 vtkInformationVector* outputVector);
-
-  int ArrayAssociation;
-  char* Expression;
 
 private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented

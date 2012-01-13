@@ -31,6 +31,8 @@
 #include "vtkTable.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 
 #include <assert.h>
 #include <vtksys/ios/sstream>
@@ -40,26 +42,36 @@
 vtkStandardNewMacro(vtkPythonExtractSelection);
 //----------------------------------------------------------------------------
 vtkPythonExtractSelection::vtkPythonExtractSelection()
-  : ArrayAssociation(vtkDataObject::FIELD_ASSOCIATION_POINTS),
-  Expression(0)
 {
   this->SetExecuteMethod(vtkPythonExtractSelection::ExecuteScript, this);
   
   // eventually, once this class starts taking in a real vtkSelection.
-  // this->SetNumberOfInputPorts(2);
+  this->SetNumberOfInputPorts(2);
 }
 
 //----------------------------------------------------------------------------
 vtkPythonExtractSelection::~vtkPythonExtractSelection()
 {
-  this->SetExpression(0);
 }
 
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::FillInputPortInformation(int port, vtkInformation *info)
 {
-  this->Superclass::FillInputPortInformation(port, info);
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  if(port == 0)
+    {
+    this->Superclass::FillInputPortInformation(port, info);
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+    }
+  else if(port == 1)
+    {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
+    info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+    }
+  else
+    {
+    return 0;
+    }
+
   return 1;
 }
 
@@ -134,7 +146,7 @@ void vtkPythonExtractSelection::Exec()
          << "paraview.fromFilter = True" << endl
          << "from paraview import extract_selection as pv_es" << endl
          << "me = paraview.servermanager.vtkPythonExtractSelection('" << aplus << " ')" << endl
-         << "pv_es.Exec(me, me.GetInputDataObject(0, 0), me.GetOutputDataObject(0))" << endl
+         << "pv_es.Exec(me, me.GetInputDataObject(0, 0),  me.GetInputDataObject(1, 0), me.GetOutputDataObject(0))" << endl
          << "del me" << endl;
 
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(
@@ -144,19 +156,20 @@ void vtkPythonExtractSelection::Exec()
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkPythonExtractSelection::ExtractElements(
-  vtkDataObject* data, vtkCharArray* mask)
+  vtkDataObject* data, vtkSelection *selection, vtkCharArray* mask)
 {
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
   vtkTable* table = vtkTable::SafeDownCast(data);
+  vtkSelectionNode* selNode = selection->GetNode(0);
 
   if (ds)
     {
-    switch (this->ArrayAssociation)
+    switch (selNode->GetFieldType())
       {
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    case vtkSelectionNode::POINT:
       return this->ExtractPoints(ds, mask);
 
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    case vtkSelectionNode::CELL:
       return this->ExtractCells(ds, mask);
       }
     }
@@ -189,7 +202,7 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
   outputPD->CopyAllocate(inputPD, numPoints);
 
   vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
-  originalIds->SetName("vtkOriginalIds");
+  originalIds->SetName("vtkOriginalPointIds");
   originalIds->Allocate(numPoints);
 
   const char* pmask = mask->GetPointer(0);
@@ -248,11 +261,11 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
   outputPD->CopyAllocate(inputPD);
 
   vtkIdTypeArray* originalPointIds = vtkIdTypeArray::New();
-  originalPointIds->SetName("vtkOriginalIds");
+  originalPointIds->SetName("vtkOriginalPointIds");
   originalPointIds->Allocate(numPoints);
 
   vtkIdTypeArray* originalCellIds = vtkIdTypeArray::New();
-  originalCellIds->SetName("vtkOriginalIds");
+  originalCellIds->SetName("vtkOriginalCellIds");
   originalCellIds->Allocate(numCells);
 
   std::map<vtkIdType, vtkIdType> outPointIdMap;

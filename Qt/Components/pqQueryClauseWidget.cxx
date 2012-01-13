@@ -586,66 +586,6 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
     }
   vtkSMPropertyHelper(selSource, "FieldType").Set(field_type);
 
-  // * Determine the TermMode.
-  int term_mode = vtkQuerySelectionSource::NONE;
-  switch (criteria_type)
-    {
-  case INDEX:
-    term_mode = vtkQuerySelectionSource::ID;
-    break;
-
-  case GLOBALID:
-    term_mode = vtkQuerySelectionSource::GLOBALID;
-    break;
-
-  case THRESHOLD:
-    term_mode = vtkQuerySelectionSource::ARRAY;
-    break;
-
-  case LOCATION:
-    term_mode = vtkQuerySelectionSource::LOCATION;
-    break;
-
-  case BLOCK:
-    if (!this->AsQualifier)
-      {
-      term_mode = vtkQuerySelectionSource::BLOCK;
-      break;
-      }
-
-  default: break;
-    }
-
-  vtkSMPropertyHelper(selSource, "TermMode").Set(term_mode);
-
-  //* Determine Operator.
-  int op = vtkQuerySelectionSource::NONE;
-  switch (condition_type)
-    {
-  case SINGLE_VALUE:
-  case LIST_OF_VALUES:
-  case TRIPLET_OF_VALUES:
-  case BLOCK_ID_VALUE:
-  case LIST_OF_BLOCK_ID_VALUES:
-    op = vtkQuerySelectionSource::IS_ONE_OF;
-    break;
-
-  case SINGLE_VALUE_LE:
-    op = vtkQuerySelectionSource::IS_LE;
-    break;
-
-  case SINGLE_VALUE_GE:
-    op = vtkQuerySelectionSource::IS_GE;
-    break;
-
-  case PAIR_OF_VALUES:
-    op = vtkQuerySelectionSource::IS_BETWEEN;
-    break;
-
-  default: break;
-    }
-  vtkSMPropertyHelper(selSource, "Operator").Set(op);
-
   // * Pass on qualifiers and values from this and sub widgets.
   this->addSelectionQualifiers(selSource);
   foreach (pqQueryClauseWidget* child, 

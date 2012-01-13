@@ -40,7 +40,7 @@ def PassBlock(self, iterCD):
     """Test if the block passes the block-criteria, if any"""
     return True
 
-def ExtractElements(self, inputDS, mask):
+def ExtractElements(self, inputDS, selection, mask):
     if type(mask) == bool:
         if mask:
             # FIXME: We need to add the "vtkOriginalIds" array.
@@ -51,19 +51,29 @@ def ExtractElements(self, inputDS, mask):
     else:
         # mask must be an array. Process it.
         mask_array = dataset_adapter.numpyTovtkDataArray(int8(mask), "_mask_array")
-        retVal = self.ExtractElements(inputDS, mask_array)
+        retVal = self.ExtractElements(inputDS, selection, mask_array)
         if retVal:
             retVal.UnRegister(None)
             return retVal
     return None
 
-def ExecData(self, inputDS):
+def ExecData(self, inputDS, selection):
     """inputDS is either a non-composite data object"""
+
+    selection_node = selection.GetNode(0)
+    array_association = 1
+
+    # convert from vtkSelectionNode's field type to vtkDataObject's field association
+    if(selection_node.GetFieldType() == 0):
+      array_association = 1
+    elif(selection_node.GetFieldType() == 1):
+      array_association = 0
+
     # wrap the data objects. makes them easier to use.
     do = dataset_adapter.WrapDataObject(inputDS)
     dsa = dataset_adapter.DataSetAttributes(
-      inputDS.GetAttributes(self.GetArrayAssociation()),
-      do, self.GetArrayAssociation())
+      inputDS.GetAttributes(array_association),
+      do, array_association)
 
     new_locals = {}
     # define global variables for all the arrays.
@@ -76,16 +86,16 @@ def ExecData(self, inputDS):
     new_locals["input"] = do
     new_locals["element"] = do
     new_locals["id"] = arange(inputDS.GetNumberOfElements(
-        self.GetArrayAssociation()))
+        array_association))
 
     # evaluate the query expression. The expression should return a mask which
     # is either an array or a boolean value.
-    mask = eval(self.GetExpression(), globals(), new_locals)
+    mask = eval(selection_node.GetQueryString(), globals(), new_locals)
 
     # print mask
 
     # extract the elements from the input dataset using the mask.
-    extracted_ds = ExtractElements(self, inputDS, mask)
+    extracted_ds = ExtractElements(self, inputDS, selection, mask)
 
     del mask
     del new_locals
@@ -93,7 +103,7 @@ def ExecData(self, inputDS):
     del dsa
     return extracted_ds
 
-def Exec(self, inputDO, outputDO):
+def Exec(self, inputDO, selection, outputDO):
     if inputDO.IsA("vtkCompositeDataSet"):
         outputDO.CopyStructure(inputDO)
 
@@ -103,13 +113,13 @@ def Exec(self, inputDO, outputDO):
         iterCD.UnRegister(None)
         while not iterCD.IsDoneWithTraversal():
             if PassBlock(self, iterCD):
-                ds = ExecData(self, iterCD.GetCurrentDataObject())
+                ds = ExecData(self, iterCD.GetCurrentDataObject(), selection)
                 outputDO.SetDataSet(iterCD, ds)
                 del ds
             iterCD.GoToNextItem()
         del iterCD
     else:
-      ds = ExecData(self, inputDO)
+      ds = ExecData(self, inputDO, selection)
       if ds:
         outputDO.ShallowCopy(ds)
       del ds

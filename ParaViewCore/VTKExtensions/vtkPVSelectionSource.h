@@ -109,6 +109,11 @@ public:
   vtkSetMacro(Inverse, int);
   vtkGetMacro(Inverse, int);
 
+  // Description:
+  // Set/get the query expression string.
+  vtkSetStringMacro(QueryString);
+  vtkGetStringMacro(QueryString);
+
 //BTX
 protected:
   vtkPVSelectionSource();
@@ -129,7 +134,8 @@ protected:
     THRESHOLDS,
     LOCATIONS,
     BLOCKS,
-    PEDIGREEIDS
+    PEDIGREEIDS,
+    QUERY
     };
 
   Modes Mode;
@@ -138,6 +144,7 @@ protected:
   int Inverse;
   double Frustum[32];
   char *ArrayName;
+  char *QueryString;
 
 private:
   vtkPVSelectionSource(const vtkPVSelectionSource&); // Not implemented

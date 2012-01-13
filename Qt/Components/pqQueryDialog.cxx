@@ -58,8 +58,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkQuerySelectionSource.h"
 
 #include <QList>
+
+#include <QtDebug>
 
 class pqQueryDialog::pqInternals : public Ui::pqQueryDialog
 {
@@ -100,17 +103,17 @@ pqQueryDialog::pqQueryDialog(
     }
 
   // Ensure that there's only 1 clause
-  this->resetClauses();
+//  this->resetClauses();
 
-  QObject::connect(this->Internals->selectionType,
-    SIGNAL(currentIndexChanged(int)),
-    this, SLOT(resetClauses()));
+//  QObject::connect(this->Internals->selectionType,
+//    SIGNAL(currentIndexChanged(int)),
+//    this, SLOT(resetClauses()));
 
-  QObject::connect(this->Internals->addRow,
-    SIGNAL(clicked()), this, SLOT(addClause()));
+//  QObject::connect(this->Internals->addRow,
+//    SIGNAL(clicked()), this, SLOT(addClause()));
 
   /// Currently we don't support multiple clauses.
-  this->Internals->addRow->hide();
+//  this->Internals->addRow->hide();
 
   QObject::connect(this->Internals->runQuery,
     SIGNAL(clicked()), this, SLOT(runQuery()));
@@ -237,77 +240,30 @@ void pqQueryDialog::populateSelectionType()
 }
 
 //-----------------------------------------------------------------------------
-void pqQueryDialog::resetClauses()
-{
-  foreach (pqQueryClauseWidget* clause, this->Internals->Clauses)
-    {
-    delete clause;
-    }
-  this->Internals->Clauses.clear();
-
-  delete this->Internals->queryClauseFrame->layout();
-  QVBoxLayout *vbox = new QVBoxLayout(this->Internals->queryClauseFrame);
-  vbox->setMargin(0);
-
-  this->addClause();
-}
-
-//-----------------------------------------------------------------------------
-void pqQueryDialog::addClause()
-{
-  if(this->Internals->source->currentPort() == NULL ||
-     this->Internals->source->currentPort()->getSource()->getProxy()->GetObjectsCreated() != 1)
-    {
-    return; // We can not create a Clause on nothing...
-    }
-
-  pqQueryClauseWidget* clause = new pqQueryClauseWidget(this);
-  QObject::connect(clause, SIGNAL(removeClause()), this, SLOT(removeClause()));
-  if (this->Internals->Clauses.size() == 0)
-    {
-    // don't allow removal of the first clause.
-    clause->setRemovable(false);
-    }
-
-  int attr_type = this->Internals->selectionType->itemData(
-    this->Internals->selectionType->currentIndex()).toInt();
-  clause->setProducer(this->Internals->source->currentPort());
-  clause->setAttributeType(attr_type);
-  clause->initialize();
-
-  this->Internals->Clauses.push_back(clause);
-
-  QVBoxLayout* vbox =
-    qobject_cast<QVBoxLayout*>(this->Internals->queryClauseFrame->layout());
-  vbox->addWidget(clause);
-}
-
-//-----------------------------------------------------------------------------
-void pqQueryDialog::removeClause()
-{
-  pqQueryClauseWidget* clause =
-      qobject_cast<pqQueryClauseWidget*>(this->sender());
-  if (clause)
-    {
-    this->Internals->Clauses.removeAll(clause);
-    delete clause;
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqQueryDialog::runQuery()
 {
-  if (this->Internals->Clauses.size() == 0)
+  int attr_type = this->Internals->selectionType->itemData(
+    this->Internals->selectionType->currentIndex()).toInt();
+
+  // create selection source
+  vtkSMSessionProxyManager *proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSMProxy *selectionSource =
+    proxyManager->NewProxy("sources", "SelectionQuerySource");
+
+  vtkSMPropertyHelper(selectionSource, "QueryString").Set(
+    this->Internals->queryLineEdit->text().toAscii().constData());
+
+  if(attr_type == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-    return; // no query to run.
+    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::CELL);
+    }
+  else if(attr_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::POINT);
     }
 
-  vtkSMProxy* selSource = this->Internals->Clauses[0]->newSelectionSource();
-  if (!selSource)
-    {
-    return;
-    }
-  selSource->UpdateVTKObjects();
+  selectionSource->UpdateVTKObjects();
 
   this->setupSpreadSheet();
 
@@ -316,13 +272,10 @@ void pqQueryDialog::runQuery()
   this->Internals->spreadsheet->setModel(NULL);
 
   this->Internals->source->currentPort()->setSelectionInput(
-      vtkSMSourceProxy::SafeDownCast(selSource), 0);
-  selSource->Delete();
+      vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
+  selectionSource->Delete();
 
   this->Internals->source->currentPort()->renderAllViews();
-
-  int attr_type = this->Internals->selectionType->itemData(
-    this->Internals->selectionType->currentIndex()).toInt();
 
   vtkSMProxy* repr = this->Internals->RepresentationProxy;
   // Pass the chosen attribute type to the spreasheet so we show cells or
@@ -523,7 +476,7 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
 {
 
   // Reset the spreadsheet view
-  this->resetClauses();
+//  this->resetClauses();
   this->freeSMProxy();
 
   if(this->Producer != NULL)
