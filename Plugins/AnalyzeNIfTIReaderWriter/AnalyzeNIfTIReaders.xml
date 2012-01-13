@@ -1,0 +1,4 @@
+<ParaViewReaders>
+  <Proxy group="sources" name="AnalyzeReader" />
+  <Proxy group="sources" name="NIfTIReader" />
+</ParaViewReaders>

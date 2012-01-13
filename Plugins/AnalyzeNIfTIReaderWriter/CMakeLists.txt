@@ -41,7 +41,13 @@ IF(PARAVIEW_BUILD_QT_GUI)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
-  SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx vtkAnalyzeWriter.cxx vtkNIfTIReader.cxx vtkNIfTIWriter.cxx vtknifti1_io.cxx vtkznzlib.cxx
-  SERVER_MANAGER_XML readers.xml
-  GUI_RESOURCE_FILES AnalyzeReader.xml
+  SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx
+                         vtkAnalyzeWriter.cxx
+                         vtkNIfTIReader.cxx
+                         vtkNIfTIWriter.cxx
+                         vtknifti1_io.cxx
+                         vtkznzlib.cxx
+  SERVER_MANAGER_XML     AnalyzeNIfTISM.xml
+  GUI_RESOURCE_FILES     AnalyzeNIfTIReaders.xml
+                         AnalyzeNIfTIWriters.xml
   )
