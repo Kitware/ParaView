@@ -187,6 +187,8 @@ def DoCoProcessing(datadescription):
                         input = rep.Input
                         input.UpdatePipeline() #make sure range is up-to-date
                         lut = rep.LookupTable
+                        if lut == None:
+                            continue
                         if rep.ColorAttributeType == 'POINT_DATA':
                             datainformation = input.GetPointDataInformation()
                         elif rep.ColorAttributeType == 'CELL_DATA':
