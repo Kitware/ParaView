@@ -96,7 +96,7 @@ protected:
   enum RMITags
     {
     UPDATE_RMI_TAG=8800,
-    POSTPROCESS_RMI_TAG=8800,
+    POSTPROCESS_RMI_TAG=8801,
     };
 
 
