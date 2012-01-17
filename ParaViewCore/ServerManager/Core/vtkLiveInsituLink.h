@@ -28,7 +28,8 @@ class vtkMultiProcessController;
 class vtkSMSessionProxyManager;
 class vtkPVXMLElement;
 class vtkPVSessionBase;
-
+class vtkTrivialProducer;
+class vtkExtractsDeliveryHelper;
 class VTK_EXPORT vtkLiveInsituLink : public vtkSMObject
 {
 public:
@@ -46,6 +47,10 @@ public:
   // Set the host name.
   vtkSetStringMacro(Hostname);
   vtkGetStringMacro(Hostname);
+
+  // Called on the vis-process to register a producer for an extract.
+  void RegisterExtract(vtkTrivialProducer* producer,
+    const char* groupname, const char* proxyname, int portnumber);
 
   // Description:
   // Set/Get the link type i.e. whether the current process is the visualization
@@ -117,6 +122,8 @@ protected:
   vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
   vtkSmartPointer<vtkMultiProcessController> Controller;
 
+  vtkExtractsDeliveryHelper* ExtractsDeliveryHelper;
+
 private:
   vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
   void operator=(const vtkLiveInsituLink&); // Not implemented
@@ -126,8 +133,10 @@ private:
   vtkSetStringMacro(URL);
   char* URL;
 
-
   vtkSetStringMacro(InsituXMLState);
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

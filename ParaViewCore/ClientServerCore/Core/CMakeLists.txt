@@ -30,6 +30,7 @@
 #==========================================================================
 set (Module_SRCS
   vtkCompleteArrays.cxx
+  vtkExtractsDeliveryHelper.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkNetworkAccessManager.cxx
@@ -93,6 +94,7 @@ if (PARAVIEW_USE_MPI)
 endif()
 
 set_source_files_properties(
+  vtkExtractsDeliveryHelper
   vtkProcessModuleAutoMPI
   vtkPVOptionsXMLParser
   vtkPVPlugin

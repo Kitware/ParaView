@@ -27,9 +27,18 @@
 
 #include <vtksys/ios/sstream>
 
+class vtkSMLiveInsituLinkProxy::vtkInternals
+{
+public:
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy> >
+    ExtractProxiesType;
+  ExtractProxiesType ExtractProxies;
+};
+
 vtkStandardNewMacro(vtkSMLiveInsituLinkProxy);
 //----------------------------------------------------------------------------
-vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy()
+vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy() :
+  Internals(new vtkInternals())
 {
   this->StateDirty = false;
 }
@@ -37,7 +46,8 @@ vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy()
 //----------------------------------------------------------------------------
 vtkSMLiveInsituLinkProxy::~vtkSMLiveInsituLinkProxy()
 {
-
+  delete this->Internals;
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -120,6 +130,15 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
 {
+  // Mark all extract producer proxies as dirty.
+  vtkInternals::ExtractProxiesType::iterator iter;
+  for (iter = this->Internals->ExtractProxies.begin();
+    iter != this->Internals->ExtractProxies.end();
+    ++iter)
+    {
+    iter->second->MarkModified(iter->second.GetPointer());
+    }
+
   if (this->StateDirty)
     {
     cout << "Push new state to server." << endl;
@@ -139,6 +158,41 @@ void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
 
     this->StateDirty = false;
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMLiveInsituLinkProxy::HasExtract(
+    const char* reg_group, const char* reg_name, int port_number)
+{
+  vtksys_ios::ostringstream key;
+  key << reg_group << ":" << reg_name << ":" << port_number;
+  return (this->Internals->ExtractProxies.find(key.str()) !=
+    this->Internals->ExtractProxies.end());
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
+  const char* reg_group, const char* reg_name, int port_number)
+{
+  vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy("sources",
+    "PVTrivialProducer");
+  proxy->UpdateVTKObjects();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << VTKOBJECT(this)
+    << "RegisterExtract"
+    << VTKOBJECT(proxy)
+    << reg_group << reg_name << port_number
+    << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  vtksys_ios::ostringstream key;
+  key << reg_group << ":" << reg_name << ":" << port_number;
+  this->Internals->ExtractProxies[key.str()] = proxy;
+  proxy->Delete();
+
+  return proxy;
 }
 
 //----------------------------------------------------------------------------

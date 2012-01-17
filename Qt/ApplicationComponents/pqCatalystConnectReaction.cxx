@@ -34,14 +34,96 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputPort.h"
 #include "pqServer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QDockWidget>
+
+namespace
+{
+  class pqCatalystDisplayPolicy : public pqDisplayPolicy
+  {
+  typedef pqDisplayPolicy Superclass;
+  QPointer<pqServer> MainSession;
+  QPointer<pqServer> CatalystSession;
+  vtkWeakPointer<vtkSMLiveInsituLinkProxy> InsituLinkProxy;
+
+public:
+  pqCatalystDisplayPolicy(
+    pqServer* session,
+    pqServer* catalystSession,
+    vtkSMLiveInsituLinkProxy* linkProxy,
+    QObject* parentObject)
+    : Superclass(parentObject),
+    MainSession(session),
+    CatalystSession(catalystSession),
+    InsituLinkProxy(linkProxy)
+  {
+  }
+  virtual ~pqCatalystDisplayPolicy() { }
+  
+  virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const
+    {
+    if (port && port->getServer() == this->CatalystSession)
+      {
+      if (this->InsituLinkProxy->HasExtract(
+          port->getSource()->getSMGroup().toAscii().data(),
+          port->getSource()->getSMName().toAscii().data(),
+          port->getPortNumber()))
+        {
+        return Visible;
+        }
+
+      return Hidden;
+      }
+    else
+      {
+      return this->Superclass::getVisibility(view, port);
+      }
+    }
+
+  virtual pqDataRepresentation* setRepresentationVisibility(
+    pqOutputPort* port, pqView* view, bool visible) const
+    {
+    if (port && port->getServer() == this->CatalystSession)
+      {
+      if (visible && 
+        !this->InsituLinkProxy->HasExtract(
+          port->getSource()->getSMGroup().toAscii().data(),
+          port->getSource()->getSMName().toAscii().data(),
+          port->getPortNumber()))
+        {
+        this->addExtract(port);
+        }
+      return NULL;
+      }
+    else
+      {
+      return this->Superclass::setRepresentationVisibility(port, view, visible);
+      }
+    }
+protected:
+  void addExtract(pqOutputPort* port) const
+    {
+    vtkSMProxy* proxy = this->InsituLinkProxy->CreateExtract(
+      port->getSource()->getSMGroup().toAscii().data(),
+      port->getSource()->getSMName().toAscii().data(),
+      port->getPortNumber());
+
+    this->MainSession->proxyManager()->RegisterProxy(
+      "sources", QString("%1 (%2)").arg(port->getSource()->getSMName()).arg(
+        port->getPortNumber()).toAscii().data(),
+      proxy);
+    }
+  };
+}
 
 //-----------------------------------------------------------------------------
 pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
@@ -83,6 +165,10 @@ bool pqCatalystConnectReaction::connect()
   catalyst->setMonitorServerNotifications(true);
 
   adaptor->InvokeCommand("Initialize");
+
+  pqCatalystDisplayPolicy* dp = new pqCatalystDisplayPolicy(
+    server, catalyst, adaptor, catalyst);
+  pqApplicationCore::instance()->setDisplayPolicy(dp);
 
   // FIXME: setup listeners so that when activeServer dies, the associated
   // live-insitu connection is also destroyed.

@@ -36,6 +36,14 @@ public:
   vtkSMSessionProxyManager* GetInsituProxyManager();
   void SetInsituProxyManager(vtkSMSessionProxyManager*);
 
+  // Description:
+  bool HasExtract(
+    const char* reg_group, const char* reg_name, int port_number);
+
+  // Description:
+  vtkSMProxy* CreateExtract(
+    const char* reg_group, const char* reg_name, int port_number);
+
 //BTX
   // Description:
   // Overridden to handle server-notification messages.
@@ -60,6 +68,9 @@ protected:
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 
