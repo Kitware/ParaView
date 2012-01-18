@@ -103,12 +103,15 @@ void vtkExtractsDeliveryHelper::Update()
       cout << "  " << iter->first.c_str() << endl;
       }
 
-    // update all inputs.
-    for (iter = this->ExtractProducers.begin();
-      iter != this->ExtractProducers.end(); ++iter)
-      {
-      iter->second->GetProducer()->Update();
-      }
+    // update all inputs. We shouldn't call Update() here since that messes up
+    // the time/piece requests that'd be set by paraview. The co-processing code
+    // should ensure all pipelines are updated.
+
+    //for (iter = this->ExtractProducers.begin();
+    //  iter != this->ExtractProducers.end(); ++iter)
+    //  {
+    //  iter->second->GetProducer()->Update();
+    //  }
 
     // reduce to N procs where N is the number of Vis procs.
     int M = this->NumberOfSimulationProcesses;

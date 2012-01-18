@@ -59,7 +59,9 @@ public:
   void Update();
 
   vtkSetMacro(NumberOfVisualizationProcesses, int);
+  vtkGetMacro(NumberOfVisualizationProcesses, int);
   vtkSetMacro(NumberOfSimulationProcesses, int);
+  vtkGetMacro(NumberOfSimulationProcesses, int);
 
 //BTX
 protected:

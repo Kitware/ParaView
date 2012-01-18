@@ -80,7 +80,6 @@ public:
   void OnSimulationUpdate(double time);
   void OnSimulationPostProcess(double time);
 
-
   enum NotificationTags
     {
     CONNECTED = 1200,
@@ -94,6 +93,7 @@ public:
     }
 
 //BTX
+  void InsituProcessConnected(vtkMultiProcessController* controller);
 protected:
   vtkLiveInsituLink();
   ~vtkLiveInsituLink();
@@ -102,6 +102,7 @@ protected:
     {
     UPDATE_RMI_TAG=8800,
     POSTPROCESS_RMI_TAG=8801,
+    INITIALIZE_CONNECTION=8802
     };
 
 
@@ -109,7 +110,6 @@ protected:
   void InitializeSimulation();
 
   void OnConnectionCreatedEvent();
-  void InsituProcessConnected(vtkMultiProcessController* controller);
 
   char* Hostname;
   int InsituPort;
@@ -117,6 +117,8 @@ protected:
   unsigned int ProxyId;
 
   bool InsituXMLStateChanged;
+  bool ExtractsChanged;
+
   char* InsituXMLState;
   vtkSmartPointer<vtkPVXMLElement> XMLState;
   vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
@@ -128,7 +130,7 @@ private:
   vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
   void operator=(const vtkLiveInsituLink&); // Not implemented
 
-  vtkWeakPointer<vtkSMSessionProxyManager> ProxyManager;
+  vtkWeakPointer<vtkSMSessionProxyManager> CoprocessorProxyManager;
 
   vtkSetStringMacro(URL);
   char* URL;

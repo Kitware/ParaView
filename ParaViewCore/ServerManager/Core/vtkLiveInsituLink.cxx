@@ -41,13 +41,28 @@
 
 namespace
 {
+  void InitializeConnection(void *localArg,
+    void *vtkNotUsed(remoteArg),
+    int vtkNotUsed(remoteArgLength),
+    int vtkNotUsed(remoteProcessId))
+    {
+    vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
+    self->InsituProcessConnected(NULL);
+    }
+
   void UpdateRMI(void *localArg,
     void *remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
     {
     vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
     double time = *(reinterpret_cast<double*>(remoteArg));
- 
-    self->OnSimulationUpdate(time);
+    if (self->GetProcessType() == vtkLiveInsituLink::VISUALIZATION)
+      {
+      self->OnSimulationUpdate(time);
+      }
+    else
+      {
+      self->SimulationUpdate(time);
+      }
     }
 
   void PostProcessRMI(void *localArg,
@@ -56,7 +71,14 @@ namespace
     vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
     double time = *(reinterpret_cast<double*>(remoteArg));
  
-    self->OnSimulationPostProcess(time);
+    if (self->GetProcessType() == vtkLiveInsituLink::VISUALIZATION)
+      {
+      self->OnSimulationPostProcess(time);
+      }
+    else
+      {
+      self->SimulationPostProcess(time);
+      }
     }
 }
 
@@ -90,6 +112,7 @@ vtkLiveInsituLink::vtkLiveInsituLink():
   ProcessType(SIMULATION),
   ProxyId(0),
   InsituXMLStateChanged(false),
+  ExtractsChanged(false),
   InsituXMLState(0),
   ExtractsDeliveryHelper(vtkExtractsDeliveryHelper::New()),
   URL(0),
@@ -123,7 +146,7 @@ void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
     return;
     }
 
-  this->ProxyManager = pxm;
+  this->CoprocessorProxyManager = pxm;
 
   switch (this->ProcessType)
     {
@@ -151,13 +174,14 @@ void vtkLiveInsituLink::InitializeVisualization()
   int myId = pm->GetPartitionId();
   // int numProcs = pm->GetNumberOfLocalPartitions();
 
-  // save the visualization session reference so that we can communicate back to
-  // the client.
-  this->VisualizationSession =
-    vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
-
+  cout << myId << ": InitializeVisualization" << endl;
   if (myId == 0)
     {
+    // save the visualization session reference so that we can communicate back to
+    // the client.
+    this->VisualizationSession =
+      vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
+
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
     vtksys_ios::ostringstream url;
@@ -182,6 +206,18 @@ void vtkLiveInsituLink::InitializeVisualization()
     }
   else
     {
+    vtkMultiProcessController* parallelController =
+      vtkMultiProcessController::GetGlobalController();
+
+    // add callback to listen to "events" from root node.
+    // the command channel between sim and vis nodes is only setup on the root
+    // nodes (there are socket connections between satellites for data x'fer but
+    // not for any other kind of communication.
+    parallelController->AddRMICallback(&InitializeConnection, this,
+      INITIALIZE_CONNECTION);
+    parallelController->AddRMICallback(&UpdateRMI, this, UPDATE_RMI_TAG);
+    parallelController->AddRMICallback(&PostProcessRMI, this,
+      POSTPROCESS_RMI_TAG);
     }
 }
 
@@ -190,8 +226,15 @@ void vtkLiveInsituLink::InitializeSimulation()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
-  // int numProcs = pm->GetNumberOfLocalPartitions();
+  int numProcs = pm->GetNumberOfLocalPartitions();
 
+  if (!pm->GetSymmetricMPIMode() && numProcs > 1)
+    {
+    vtkErrorMacro(
+      "Running in parallel without symmetric mode is not supported. "
+      "Aborting for debugging purposes.");
+    abort();
+    }
 
   if (myId == 0)
     {
@@ -214,6 +257,7 @@ void vtkLiveInsituLink::InitializeSimulation()
     }
   else
     {
+    this->InsituProcessConnected(NULL);
     }
 }
 
@@ -240,11 +284,21 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
   int numProcs = parallelController->GetNumberOfProcesses();
   int myId = parallelController->GetLocalProcessId();
 
+  if (myId == 0)
+    {
+    assert(controller != NULL);
+    }
+  else
+    {
+    assert(controller == NULL);
+    }
+
   switch (this->ProcessType)
     {
   case VISUALIZATION:
     // Visualization side is the "slave" side in this relationship. We listen to
     // commands from SIMULATION.
+    if (myId == 0)
       {
       unsigned int size=0;
       controller->Receive(&size, 1, 1, 8000);
@@ -254,8 +308,6 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       controller->Receive(this->InsituXMLState, size, 1, 8001);
       this->InsituXMLState[size] = 0;
       this->InsituXMLStateChanged = false;
-
-      cout << "Received InsituXMLState" << endl;
 
       // setup RMI callbacks.
       controller->AddRMICallback(&UpdateRMI, this, UPDATE_RMI_TAG);
@@ -267,36 +319,56 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       controller->Receive(&otherProcs, 1, 1, 8003);
       this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(numProcs);
       this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(otherProcs);
-      if (myId < std::min(numProcs, otherProcs))
-        {
-        vtkSocketController* sim2vis = vtkSocketController::New();
-        if (!sim2vis->WaitForConnection(this->InsituPort + 1 + myId))
-          {
-          abort();
-          }
-        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
-          sim2vis);
-        sim2vis->Delete();
-        }
 
-      if (this->VisualizationSession)
+      if (numProcs > 1)
         {
-        vtkSMMessage message;
-        message.set_global_id(this->ProxyId);
-        message.set_location(vtkPVSession::CLIENT);
-        // overloading ChatMessage for now.
-        message.SetExtension(ChatMessage::author, CONNECTED);
-        message.SetExtension(ChatMessage::txt, this->InsituXMLState);
-        this->VisualizationSession->NotifyAllClients(&message);
+        parallelController->TriggerRMIOnAllChildren(INITIALIZE_CONNECTION);
+        parallelController->Broadcast(&otherProcs, 1, 0);
         }
+      }
+    else
+      {
+      int otherProcs = 0;
+      parallelController->Broadcast(&otherProcs, 1, 0);
+      this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(numProcs);
+      this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(otherProcs);
+      }
+
+    // wait for each of the sim processes to setup a socket connection to the
+    // vis nodes for data x'fer.
+    if (myId < std::min(
+        this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
+        this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
+      {
+      vtkSocketController* sim2vis = vtkSocketController::New();
+      if (!sim2vis->WaitForConnection(this->InsituPort + 1 + myId))
+        {
+        abort();
+        }
+      this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
+        sim2vis);
+      sim2vis->Delete();
+      }
+
+    // notify client.
+    if (this->VisualizationSession)
+      {
+      assert(myId == 0);
+      vtkSMMessage message;
+      message.set_global_id(this->ProxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      // overloading ChatMessage for now.
+      message.SetExtension(ChatMessage::author, CONNECTED);
+      message.SetExtension(ChatMessage::txt, this->InsituXMLState);
+      this->VisualizationSession->NotifyAllClients(&message);
       }
     break;
 
   case SIMULATION:
+    if (myId ==0)
       {
-      cout << "Sending InsituXMLState" << endl;
       // send startup state to the visualization process.
-      vtkPVXMLElement* xml = this->ProxyManager->SaveXMLState();
+      vtkPVXMLElement* xml = this->CoprocessorProxyManager->SaveXMLState();
       vtksys_ios::ostringstream xml_string;
       xml->PrintXML(xml_string, vtkIndent());
       xml->Delete();
@@ -312,18 +384,33 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       controller->Send(&numProcs, 1, 1, 8003);
       this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(otherProcs);
       this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(numProcs);
-      if (myId < std::min(numProcs, otherProcs))
+      if (numProcs > 1)
         {
-        vtkSocketController* sim2vis = vtkSocketController::New();
-        vtksys::SystemTools::Delay(1000);
-        if (!sim2vis->ConnectTo(this->Hostname, this->InsituPort + 1 + myId))
-          {
-          abort();
-          }
-        this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
-          sim2vis);
-        sim2vis->Delete();
+        parallelController->Broadcast(&otherProcs, 1, 0);
         }
+      }
+    else
+      {
+      int otherProcs = 0;
+      parallelController->Broadcast(&otherProcs, 1, 0);
+      this->ExtractsDeliveryHelper->SetNumberOfVisualizationProcesses(otherProcs);
+      this->ExtractsDeliveryHelper->SetNumberOfSimulationProcesses(numProcs);
+      }
+
+    // connect to the sim-nodes for data x'fer.
+    if (myId < std::min(
+        this->ExtractsDeliveryHelper->GetNumberOfVisualizationProcesses(),
+        this->ExtractsDeliveryHelper->GetNumberOfSimulationProcesses()))
+      {
+      vtkSocketController* sim2vis = vtkSocketController::New();
+      vtksys::SystemTools::Delay(1000);
+      if (!sim2vis->ConnectTo(this->Hostname, this->InsituPort + 1 + myId))
+        {
+        abort();
+        }
+      this->ExtractsDeliveryHelper->SetSimulation2VisualizationController(
+        sim2vis);
+      sim2vis->Delete();
       }
     break;
     }
@@ -342,71 +429,106 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 {
   assert(this->ProcessType == SIMULATION);
 
-  // Ping the Visualization process to see if it has any updated state. If not,
-  // just load the most recent state received.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  int numProcs = pm->GetNumberOfLocalPartitions();
 
-  // FIXME: Controller will be NULL on satellites.
-  if (this->Controller)
+  char* buffer = NULL;
+  int buffer_size = 0;
+
+  vtkMultiProcessStream extractsMessage;
+  extractsMessage << 0; // indicating nothing changed.
+
+  if (myId == 0)
     {
-    cout << "SimulationUpdate: " << time << endl;
-    this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
-      UPDATE_RMI_TAG);
-
-    // Get status of the state. Did is change?
-    int xml_state_size = 0;
-    this->Controller->Receive(&xml_state_size, 1, 1, 8010);
-    cout << "Receive State Size : " << xml_state_size << endl;
-    if (xml_state_size > 0)
+    // steps to perform:
+    // 1. Check with visualization root-node to see if it has new coprocessing
+    //    state updates. If so receive them and broadcast to all satellites.
+    // 2. Update the CoprocessorProxyManager using the most recent XML state we
+    //    have.
+    if (this->Controller)
       {
-      cout << "receiving modified state from Vis" << endl;
-      char* buffer = new char[xml_state_size + 1];
-      this->Controller->Receive(buffer, xml_state_size, 1, 8011);
-      buffer[xml_state_size] = 0;
+      // Notify the vis root-node.
+      this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
+        UPDATE_RMI_TAG);
 
-      vtkNew<vtkPVXMLParser> parser;
-      if (parser->Parse(buffer))
+      // Get status of the state. Did it change? If so receive the state and
+      // broadcast it to satellites.
+      this->Controller->Receive(&buffer_size, 1, 1, 8010);
+      if (buffer_size > 0)
         {
-        this->XMLState = parser->GetRootElement();
+        cout << "receiving modified state from Vis" << endl;
+        buffer = new char[buffer_size + 1];
+        this->Controller->Receive(buffer, buffer_size, 1, 8011);
+        buffer[buffer_size] = 0;
         }
-      delete[] buffer;
+
+      // Get the information about extracts. When the extracts have changed or
+      // not is encoded in the stream itself.
+      this->Controller->Receive(extractsMessage, 1, 8012);
+      }
+
+    if (numProcs > 1)
+      {
+      pm->GetGlobalController()->Broadcast(&buffer_size, 1, 0);
+      if (buffer_size > 0)
+        {
+        pm->GetGlobalController()->Broadcast(buffer, buffer_size, 0);
+        }
+      pm->GetGlobalController()->Broadcast(extractsMessage, 0);
       }
     }
+  else
+    {
+    assert(numProcs > 1);
+    pm->GetGlobalController()->Broadcast(&buffer_size, 1, 0);
+    if (buffer_size > 0)
+      {
+      buffer = new char[buffer_size + 1];
+      pm->GetGlobalController()->Broadcast(buffer, buffer_size, 0);
+      buffer[buffer_size] = 0;
+      }
+    pm->GetGlobalController()->Broadcast(extractsMessage, 0);
+    }
 
+  // ** here on, all the code is executed on all processes (root and
+  // satellites).
+
+  if (buffer && buffer_size > 0)
+    {
+    vtkNew<vtkPVXMLParser> parser;
+    if (parser->Parse(buffer))
+      {
+      this->XMLState = parser->GetRootElement();
+      }
+    }
+  delete[] buffer;
+
+  // This assumes that the coprocessing pipeline is recreated at every timestep
+  // and hence we need to reload the state for every timestep. This may be
+  // changed once we stop re-creating the coprocessing pipeline.
   if (this->XMLState)
     {
     vtkNew<vtkSMInsituStateLoader> loader;
-    loader->SetSessionProxyManager(this->ProxyManager);
-    this->ProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
+    loader->SetSessionProxyManager(this->CoprocessorProxyManager);
+    this->CoprocessorProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
     }
-}
 
-//----------------------------------------------------------------------------
-void vtkLiveInsituLink::SimulationPostProcess(double time)
-{
-  assert(this->ProcessType == SIMULATION);
-  // We're done insitu-processing.
-  // Pass on the extracts to the visualization process.
-
-  this->ExtractsDeliveryHelper->ClearAllExtracts();
-
-  // FIXME: Controller will be NULL on satellites.
-  if (this->Controller)
+  // Process information about extracts.
+  int extracts_valid = 0;
+  extractsMessage >> extracts_valid;
+  if (extracts_valid)
     {
-    this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
-      POSTPROCESS_RMI_TAG);
-
-    // get information about extracts that the visualization process wants.
-    vtkMultiProcessStream stream;
-    this->Controller->Receive(stream, 1, 9000);
-    int size;
-    stream >> size;
-    for (int cc=0; cc < size; cc++)
+    this->ExtractsDeliveryHelper->ClearAllExtracts();
+    int numberOfExtracts;
+    extractsMessage >> numberOfExtracts;
+    for (int cc=0; cc < numberOfExtracts; cc++)
       {
       std::string group, name;
       int port;
-      stream >> group >> name >> port;
+      extractsMessage >> group >> name >> port;
 
-      vtkSMProxy* proxy = this->ProxyManager->GetProxy(
+      vtkSMProxy* proxy = this->CoprocessorProxyManager->GetProxy(
         group.c_str(), name.c_str());
       if (proxy)
         {
@@ -430,32 +552,91 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
         }
       }
     }
+}
 
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::SimulationPostProcess(double time)
+{
+  assert(this->ProcessType == SIMULATION);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  if (myId == 0 && this->Controller)
+    {
+    // notify vis root node that we are ready to ship extracts.
+    this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
+      POSTPROCESS_RMI_TAG);
+    }
+
+  // We're done coprocessing. Deliver the extracts to the visualization
+  // processes.
   this->ExtractsDeliveryHelper->Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::OnSimulationUpdate(double time)
 {
-  cout << "vtkLiveInsituLink::OnSimulationUpdate: " << time << endl;
   assert(this->ProcessType == VISUALIZATION);
-  // send updated state to simulation, if any.
 
-  // Check if the state changed since the last time we sent it, if so, provide
-  // the updated state to the simulation process.
-  int xml_state_size = 0;
+  // this method get called on:
+  // - root node when "sim" notifies the root viz node.
+  // - satellizes when "root" viz node notifies the satellizes.
+  cout << "vtkLiveInsituLink::OnSimulationUpdate: " << time << endl;
 
-  if (this->InsituXMLStateChanged)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  if (myId == 0 && pm->GetNumberOfLocalPartitions() > 1)
     {
-    xml_state_size = strlen(this->InsituXMLState);
+    pm->GetGlobalController()->TriggerRMIOnAllChildren(
+      &time, static_cast<int>(sizeof(double)), UPDATE_RMI_TAG);
     }
-  this->Controller->Send(&xml_state_size, 1, 1, 8010);
-  if (xml_state_size > 0)
+
+  if (myId == 0)
     {
-    cout << "Sending modified state to simulation" << endl;
-    this->Controller->Send(this->InsituXMLState, xml_state_size, 1, 8011);
-    this->InsituXMLStateChanged = false;
+    // The steps to perform are:
+    // 1. Send coprocessing pipeline state to the simulation root node, if the
+    //    state has changed since the last time we sent it.
+    // 2. Send information about extracts to the simulation root, if the
+    //    requested extracts has changed.
+
+    int xml_state_size = 0;
+    if (this->InsituXMLStateChanged)
+      {
+      xml_state_size = strlen(this->InsituXMLState);
+      }
+    // xml_state_size of 0 indicates that there are not updates to the state.
+    // the CoProcessor simply uses the state it received most recently.
+    this->Controller->Send(&xml_state_size, 1, 1, 8010);
+    if (xml_state_size > 0)
+      {
+      cout << "Sending modified state to simulation" << endl;
+      this->Controller->Send(this->InsituXMLState, xml_state_size, 1, 8011);
+      }
+
+    vtkMultiProcessStream extractsMessage;
+    if (this->ExtractsChanged)
+      {
+      extractsMessage << 1;
+      extractsMessage << static_cast<int>(this->Internals->Extracts.size());
+      for (std::map<vtkInternals::Key, vtkSmartPointer<vtkTrivialProducer> >::iterator iter=
+        this->Internals->Extracts.begin(); iter != this->Internals->Extracts.end(); ++iter)
+        {
+        extractsMessage << iter->first.Group << iter->first.Name << iter->first.Port;
+        }
+      }
+    else
+      {
+      extractsMessage << 0;
+      }
+    this->Controller->Send(extractsMessage, 1, 8012);
     }
+  else
+    {
+    // There's nothing to do on satellites for this call right now.
+    }
+
+  this->InsituXMLStateChanged = false;
+  this->ExtractsChanged = false;
 }
 
 //----------------------------------------------------------------------------
@@ -463,30 +644,23 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
 {
   assert(this->ProcessType == VISUALIZATION);
 
-  // communicate to the simulation the information about extracts needed.
-  // FIXME: we need to update this to send this information only if it has
-  // changed.
-  if (this->Controller)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  if (myId == 0 && pm->GetNumberOfLocalPartitions() > 1)
     {
-    vtkMultiProcessStream stream;
-    stream << static_cast<int>(this->Internals->Extracts.size());
-    for (std::map<vtkInternals::Key, vtkSmartPointer<vtkTrivialProducer> >::iterator iter=
-      this->Internals->Extracts.begin();
-      iter != this->Internals->Extracts.end();
-      ++iter)
-      {
-      stream << iter->first.Group
-        << iter->first.Name
-        << iter->first.Port;
-      }
-    this->Controller->Send(stream, 1, 9000);
+    pm->GetGlobalController()->TriggerRMIOnAllChildren(
+      &time, static_cast<int>(sizeof(double)), POSTPROCESS_RMI_TAG);
     }
+  
+  cout << "vtkLiveInsituLink::OnSimulationPostProcess: " << time << endl;
 
+  // Obtains extracts from the simulations processes.
   this->ExtractsDeliveryHelper->Update();
 
   // notify the client that updated data is available.
   if (this->VisualizationSession)
     {
+    assert (myId == 0);
 
     // here we may let the client know exactly what extracts were updated, if
     // all were not updated. Currently we just assume all extracts are
@@ -510,6 +684,7 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
   cout << "Adding Extract: " << groupname << ", " << proxyname << endl;
   this->Internals->Extracts[vtkInternals::Key(groupname, proxyname, portnumber)]
     = producer;
+  this->ExtractsChanged = true;
 
   vtksys_ios::ostringstream key;
   key << groupname << ":" << proxyname << ":" << portnumber;
