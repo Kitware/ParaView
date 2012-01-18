@@ -652,17 +652,12 @@ void pqServer::processServerNotification()
     vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
   while (nam->ProcessEvents(1) == 1) { }
 
-  if (sessionClient && sessionClient->IsMultiClients())
+  foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
     {
-    // we don't want to do this rendering business unless in collaboration
-    // mode.
-    foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+    vtkSMViewProxy* viewProxy = view->getViewProxy();
+    if(viewProxy && viewProxy->HasDirtyRepresentation())
       {
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      if(viewProxy && viewProxy->HasDirtyRepresentation())
-        {
-        view->render();
-        }
+      view->render();
       }
     }
   this->IdleCollaborationTimer.start();

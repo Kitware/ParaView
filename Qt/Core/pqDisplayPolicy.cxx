@@ -72,7 +72,8 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
 {
   QString view_type = QString::null;
 
-  if (!opPort)
+  if (!opPort ||
+    opPort->getServer()->getResource().scheme() == "catalyst")
     {
     return view_type;
     }
@@ -153,6 +154,12 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
 pqView* pqDisplayPolicy::getPreferredView(
   pqOutputPort* opPort, pqView* currentView) const
 {
+  if (opPort && opPort->getServer() &&
+    opPort->getServer()->getResource().scheme() == "catalyst")
+    {
+    return 0;
+    }
+
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
   QString view_type = this->getPreferredViewType(opPort, true);
@@ -241,6 +248,12 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
     return 0;
     }
 
+  if (opPort->getServer() &&
+    opPort->getServer()->getResource().scheme() == "catalyst")
+    {
+    return 0;
+    }
+
   pqDataRepresentation* repr = opPort->getRepresentation(view);
 
   if (!repr && !visible)
@@ -310,6 +323,12 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
       // No repr exists, not can one be created.
       return NotApplicable;
       }
+    }
+
+  if (port && port->getServer() &&
+    port->getServer()->getResource().scheme() == "catalyst")
+    {
+    return NotApplicable;
     }
 
   // Default behavior if no view is present

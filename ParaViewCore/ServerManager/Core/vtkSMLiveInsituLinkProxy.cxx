@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkCommand.h"
 #include "vtkLiveInsituLink.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -158,6 +159,8 @@ void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
 
     this->StateDirty = false;
     }
+
+  this->InvokeEvent(vtkCommand::UpdateEvent);
 }
 
 //----------------------------------------------------------------------------

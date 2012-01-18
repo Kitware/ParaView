@@ -37,12 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "pqLiveInsituVisualizationManager.h"
 
 #include <QDockWidget>
 
@@ -121,6 +124,14 @@ protected:
       "sources", QString("%1 (%2)").arg(port->getSource()->getSMName()).arg(
         port->getPortNumber()).toAscii().data(),
       proxy);
+
+    //pqPipelineSource* pqproxy =
+    //  pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
+    //Q_ASSERT(pqproxy);
+    //pqActiveObjects::instance().setActiveServer(pqproxy->getServer());
+    //this->setRepresentationVisibility(
+    //  pqproxy->getOutputPort(0),
+    //  pqActiveObjects::instance().activeView(), true);
     }
   };
 }
@@ -141,36 +152,8 @@ bool pqCatalystConnectReaction::connect()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  vtkSMProxy* proxy =
-    pqApplicationCore::instance()->getObjectBuilder()->createProxy(
-      "coprocessing", "LiveInsituLink", server, "coprocessing");
-  vtkSMLiveInsituLinkProxy* adaptor =
-    vtkSMLiveInsituLinkProxy::SafeDownCast(proxy);
-  if (!adaptor)
-    {
-    qCritical("Current VisualizationSession cannot create LiveInsituLink.");
-    return false;
-    }
+  pqLiveInsituVisualizationManager* mgr =
+    new pqLiveInsituVisualizationManager(22222, server);
 
-  vtkSMPropertyHelper(adaptor, "InsituPort").Set(22222);
-  vtkSMPropertyHelper(adaptor, "ProcessType").Set("Visualization");
-  adaptor->UpdateVTKObjects();
-
-  // create a new "server session" that acts as the dummy session representing
-  // the insitu viz pipeline.
-  pqServer* catalyst = pqApplicationCore::instance()->getObjectBuilder()->createServer(
-    pqServerResource("builtin:"));
-  catalyst->setResource(pqServerResource("catalyst:"));
-  adaptor->SetInsituProxyManager(catalyst->proxyManager());
-  catalyst->setMonitorServerNotifications(true);
-
-  adaptor->InvokeCommand("Initialize");
-
-  pqCatalystDisplayPolicy* dp = new pqCatalystDisplayPolicy(
-    server, catalyst, adaptor, catalyst);
-  pqApplicationCore::instance()->setDisplayPolicy(dp);
-
-  // FIXME: setup listeners so that when activeServer dies, the associated
-  // live-insitu connection is also destroyed.
-  return true;
+  return (mgr != NULL);
 }

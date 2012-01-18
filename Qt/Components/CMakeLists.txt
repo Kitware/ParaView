@@ -214,6 +214,8 @@ set (Module_SRCS
   pqLinksEditor.h
   pqLinksManager.cxx
   pqLinksManager.h
+  pqLiveInsituVisualizationManager.cxx
+  pqLiveInsituVisualizationManager.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
@@ -502,6 +504,7 @@ set (Module_MOC_HDRS
   pqLineWidget.h
   pqLinksEditor.h
   pqLinksManager.h
+  pqLiveInsituVisualizationManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
