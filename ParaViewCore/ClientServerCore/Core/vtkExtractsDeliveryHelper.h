@@ -70,8 +70,13 @@ protected:
   int NumberOfSimulationProcesses;
   int NumberOfVisualizationProcesses;
 
-  std::map<std::string, vtkSmartPointer<vtkTrivialProducer> > ExtractConsumers;
-  std::map<std::string, vtkSmartPointer<vtkAlgorithmOutput> > ExtractProducers;
+  typedef std::map<std::string, vtkSmartPointer<vtkTrivialProducer> >
+    ExtractConsumersType;
+  ExtractConsumersType ExtractConsumers;
+
+  typedef std::map<std::string, vtkSmartPointer<vtkAlgorithmOutput> >
+    ExtractProducersType;
+  ExtractProducersType ExtractProducers;
 
   vtkSmartPointer<vtkSocketController> Simulation2VisualizationController;
   vtkSmartPointer<vtkMultiProcessController> ParallelController;

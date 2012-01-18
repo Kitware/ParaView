@@ -59,6 +59,10 @@ protected:
 
   void MarkStateDirty() { this->StateDirty = true; }
 
+  // Description:
+  // Pushes XML state to the server if needed.
+  void PushUpdatedState();
+
   void InsituConnected(const char* initialial_state);
   void NewTimestepAvailable();
 

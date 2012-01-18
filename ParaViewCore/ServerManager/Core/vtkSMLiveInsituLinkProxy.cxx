@@ -140,6 +140,14 @@ void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
     iter->second->MarkModified(iter->second.GetPointer());
     }
 
+  this->PushUpdatedState();
+
+  this->InvokeEvent(vtkCommand::UpdateEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::PushUpdatedState()
+{
   if (this->StateDirty)
     {
     cout << "Push new state to server." << endl;
@@ -155,12 +163,11 @@ void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
            << "UpdateInsituXMLState"
            << data.str().c_str()
            << vtkClientServerStream::End;
+    cout << "Push new state to server--done" << endl;
     this->ExecuteStream(stream);
 
     this->StateDirty = false;
     }
-
-  this->InvokeEvent(vtkCommand::UpdateEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -177,6 +184,8 @@ bool vtkSMLiveInsituLinkProxy::HasExtract(
 vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
   const char* reg_group, const char* reg_name, int port_number)
 {
+  this->PushUpdatedState();
+
   vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy("sources",
     "PVTrivialProducer");
   proxy->UpdateVTKObjects();

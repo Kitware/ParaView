@@ -96,7 +96,7 @@ void vtkExtractsDeliveryHelper::Update()
   if (this->ProcessIsProducer)
     {
     cout << "Push extracts for: " << endl;
-    std::map<std::string, vtkSmartPointer<vtkAlgorithmOutput> >::iterator iter;
+    ExtractProducersType::iterator iter;
     for (iter = this->ExtractProducers.begin();
       iter != this->ExtractProducers.end(); ++iter)
       {
@@ -131,35 +131,41 @@ void vtkExtractsDeliveryHelper::Update()
           iter->second->GetProducer()->GetOutputDataObject(iter->second->GetIndex()),
           1, 12001);
         }
+      // mark end.
+      vtkMultiProcessStream stream;
+      stream << std::string("null");
+      comm->Send(stream, 1, 12000);
       }
     }
   else
     {
-    cout << "Receive extract for : " << endl;
-    std::map<std::string, vtkSmartPointer<vtkTrivialProducer> >::iterator iter;
-    for (iter = this->ExtractConsumers.begin();
-      iter != this->ExtractConsumers.end(); ++iter)
-      {
-      cout << "  " << iter->first.c_str() << endl;
-      }
-
     vtkSocketController* comm = this->Simulation2VisualizationController;
     if (comm)
       {
-      for (iter = this->ExtractConsumers.begin();
-        iter != this->ExtractConsumers.end(); ++iter)
+      while (true)
         {
         std::string key;
         vtkMultiProcessStream stream;
         comm->Receive(stream, 1, 12000);
         stream >> key;
-        assert (key == iter->first);
+        if (key == "null")
+          {
+          break;
+          }
+        cout << "Received extract for: " << key.c_str() << endl;
         vtkDataObject* extract = comm->ReceiveDataObject(1, 12001);
-        if (extract)
+        ExtractConsumersType::iterator iter;
+        iter = this->ExtractConsumers.find(key);
+        if (iter != this->ExtractConsumers.end())
           {
           iter->second->SetOutput(extract);
-          extract->FastDelete();
           }
+        else
+          {
+          vtkWarningMacro("Received unidentified extract " <<
+            key.c_str() << ". Ignoring.");
+          }
+        extract->Delete();
         }
       }
     }
