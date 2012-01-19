@@ -14,7 +14,7 @@ FIND_PATH( SILO_INCLUDE_DIR silo.h
   /usr/include
 )
 
-FIND_LIBRARY( SILO_LIBRARY silo
+FIND_LIBRARY( SILO_LIBRARY NAMES silo siloh5
   /usr/lib
   /usr/local/lib
 )
