@@ -66,6 +66,14 @@ public:
 
   static ProcessTypes GetProcessType();
 
+  // Description:
+  // This method has been added to support migration from one type to another
+  // but this method call if NOT RECOMMENDED.
+  // -> We use it to handle the Animation saving at disconnection time on the
+  //    server side. We create a new session and migrate the sever process to
+  //    a batch process.
+  void UpdateProcessType(ProcessTypes newType);
+
   //********** PROCESS INITIALIZATION/CLEANUP API *****************************
 
   // Description:

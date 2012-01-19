@@ -24,6 +24,7 @@ SET (Kit_SRCS
   vtkPVComparativeView.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
   vtkPVRepresentationAnimationHelper.cxx
+  vtkPVServerSideAnimationPlayer.cxx
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx

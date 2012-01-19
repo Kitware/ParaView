@@ -167,10 +167,20 @@ public:
   // won't affect the proxy/property state at all. It will simply remain the same.
   virtual bool IsProcessingRemoteNotification();
 
+  // Description:
+  // Update internal session core in order to use the one used in another session
+  virtual void UseSessionCoreOf(vtkPVSessionBase* other);
+
 //BTX
 protected:
   vtkPVSessionBase();
   ~vtkPVSessionBase();
+
+  // Description:
+  // Method used to migrate from one Session type to another by keeping the same
+  // vtkPVSessionCore
+  vtkPVSessionCore* GetSessionCore() const;
+  void SetSessionCore(vtkPVSessionCore*);
 
   // Description:
   // Should be called to begin/end receiving progresses on this session.

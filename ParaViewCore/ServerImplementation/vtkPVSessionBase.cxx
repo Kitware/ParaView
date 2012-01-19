@@ -336,3 +336,34 @@ bool vtkPVSessionBase::IsProcessingRemoteNotification()
 {
   return this->ProcessingRemoteNotification;
 }
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::UseSessionCoreOf(vtkPVSessionBase* other)
+{
+  if(other)
+    {
+    this->SetSessionCore(other->GetSessionCore());
+    }
+  else
+    {
+    vtkErrorMacro("No vtkPVSessionBase provided");
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVSessionCore* vtkPVSessionBase::GetSessionCore() const
+{
+  return this->SessionCore;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::SetSessionCore(vtkPVSessionCore* other)
+{
+  if(this->SessionCore)
+    {
+    this->SessionCore->Delete();
+    }
+  this->SessionCore = other;
+  if(this->SessionCore)
+    {
+    this->SessionCore->Register(this);
+    }
+}

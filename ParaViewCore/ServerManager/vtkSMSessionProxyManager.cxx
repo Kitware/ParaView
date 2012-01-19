@@ -1109,7 +1109,8 @@ void vtkSMSessionProxyManager::LoadXMLState( const char* filename,
 
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
-                                      vtkSMStateLoader* loader/*=NULL*/)
+                                             vtkSMStateLoader* loader/*=NULL*/,
+                                             bool keepOriginalIds/*=false*/)
 {
   if (!rootElement)
     {
@@ -1126,7 +1127,7 @@ void vtkSMSessionProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
     {
     spLoader = loader;
     }
-  if (spLoader->LoadState(rootElement))
+  if (spLoader->LoadState(rootElement, keepOriginalIds))
     {
     vtkSMProxyManager::LoadStateInformation info;
     info.RootElement = rootElement;

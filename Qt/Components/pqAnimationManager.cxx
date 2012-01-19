@@ -34,15 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAnimationSettings.h"
 
 #include "vtkMath.h"
-#include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 #include <QIntValidator>
 #include <QFileInfo>
@@ -63,11 +67,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "pqTabbedMultiViewWidget.h"
+
+#include <vtksys/ios/sstream>
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -613,27 +619,44 @@ bool pqAnimationManager::saveAnimation()
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);
+    vtkSMPropertyHelper(writer, "FileName").Set(filename.toAscii().data());
+    vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
+    vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
+    writer->UpdateVTKObjects();
     writer->Delete();
 
-    pqSMAdaptor::setElementProperty(writer->GetProperty("FileName"),
-      filename.toAscii().data());
-    pqSMAdaptor::setElementProperty(writer->GetProperty("Magnification"), 
-      magnification); 
-    pqSMAdaptor::setElementProperty(writer->GetProperty("FrameRate"),
-      dialogUI.frameRate->value());
-    writer->UpdateVTKObjects();
+     // Get ProxyManager XML state
+    vtksys_ios::ostringstream xmlStringStream;
+    vtkSmartPointer<vtkPVXMLElement> state;
+    state.TakeReference(pxm->SaveXMLState());
+    state->PrintXML(xmlStringStream, vtkIndent(0));
 
-    // We save the animation offline.
-    vtkSMProxy* cleaner = 
-      pxm->NewProxy("connection_cleaners", "AnimationPlayer");
+    // We create a server side proxy that will save the animation at disconnection.
+    vtkSMProxy* cleaner = pxm->NewProxy("remote_player", "AnimationPlayer");
+    vtkSMPropertyHelper(cleaner, "Writer").Set(writer);
+    vtkSMPropertyHelper(cleaner, "XMLState").Set(xmlStringStream.str().c_str());
+    cleaner->UpdateVTKObjects();
     pxm->RegisterProxy("animation","cleaner",cleaner);
     cleaner->Delete();
 
-    pqSMAdaptor::setProxyProperty(cleaner->GetProperty("Writer"), writer);
-    cleaner->UpdateVTKObjects();
+    // Make sure we delete the view before disconnecting
+    vtkSMProxyProperty* viewList =
+        vtkSMProxyProperty::SafeDownCast(
+          scene->getProxy()->GetProperty("ViewModules"));
+    for(int i=0; i < viewList->GetNumberOfProxies(); i++)
+      {
+      vtkSMProxy* proxy = viewList->GetProxy(i);
+      pxm->UnRegisterProxy(proxy);
+      }
 
-    qCritical("Saving animations after disconnecting from servers "
-      "is temporarily not supported.");
+    // Disconnect from the server
+    pqApplicationCore* core = pqApplicationCore::instance();
+    if (server)
+      {
+      server->session()->PreDisconnection();
+      core->getObjectBuilder()->removeServer(server);
+      }
+
     return false;
     }
 
