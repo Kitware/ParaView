@@ -50,6 +50,7 @@ public:
   enum CriteriaType
     {
     INVALID=0x0,
+    QUERY = 0x01,
     BLOCK =0x10,
     AMR_LEVEL=0x20,
     AMR_BLOCK=0x40,

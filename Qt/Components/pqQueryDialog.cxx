@@ -63,8 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QList>
 
-#include <QtDebug>
-
 class pqQueryDialog::pqInternals : public Ui::pqQueryDialog
 {
 public:
@@ -253,7 +251,7 @@ void pqQueryDialog::resetClauses()
   QVBoxLayout *vbox = new QVBoxLayout(this->Internals->queryClauseFrame);
   vbox->setMargin(0);
 
-//  this->addClause();
+  this->addClause();
 }
 
 //-----------------------------------------------------------------------------
@@ -297,17 +295,23 @@ void pqQueryDialog::removeClause()
 //-----------------------------------------------------------------------------
 void pqQueryDialog::runQuery()
 {
-  int attr_type = this->Internals->selectionType->itemData(
-    this->Internals->selectionType->currentIndex()).toInt();
+  if(this->Internals->Clauses.isEmpty())
+    {
+    return;
+    }
 
   // create selection source
-  vtkSMSessionProxyManager *proxyManager =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxy *selectionSource =
-    proxyManager->NewProxy("sources", "SelectionQuerySource");
+  vtkSMProxy* selectionSource = this->Internals->Clauses[0]->newSelectionSource();
+    if (!selectionSource)
+      {
+      return;
+      }
 
   vtkSMPropertyHelper(selectionSource, "QueryString").Set(
     this->Internals->queryLineEdit->text().toAscii().constData());
+
+  int attr_type = this->Internals->selectionType->itemData(
+    this->Internals->selectionType->currentIndex()).toInt();
 
   if(attr_type == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
@@ -531,7 +535,7 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
 {
 
   // Reset the spreadsheet view
-//  this->resetClauses();
+  this->resetClauses();
   this->freeSMProxy();
 
   if(this->Producer != NULL)
@@ -563,7 +567,7 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
       {
       this->Internals->extractSelectionOverTime->show();
       }
-//    this->updateLabels();
+    this->updateLabels();
     }
   else
     {

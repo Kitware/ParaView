@@ -36,8 +36,23 @@ contains = in1d
 #          return in1d(self.array, other)
 #        return self.array == other
 
-def PassBlock(self, iterCD):
+def PassBlock(self, iterCD, selection_node):
     """Test if the block passes the block-criteria, if any"""
+    props = selection_node.GetProperties()
+
+    if iterCD.IsA("vtkHierarchicalBoxDataIterator"):
+        if props.Has(selection_node.HIERARCHICAL_INDEX()):
+            if iterCD.GetCurrentIndex() != props.Get(selection_node.HIERARCHICAL_INDEX()):
+                return False
+
+        if props.Has(selection_node.HIERARCHICAL_LEVEL()):
+            if iterCD.GetCurrentLevel() != props.Get(selection_node.HIERARCHICAL_LEVEL()):
+                return False
+    elif iterCD.IsA("vtkCompositeDataIterator"):
+        if props.Has(selection_node.COMPOSITE_INDEX()):
+            if iterCD.GetCurrentFlatIndex() != props.Get(selection_node.COMPOSITE_INDEX()):
+                return False
+
     return True
 
 def ExtractElements(self, inputDS, selection, mask):
@@ -104,6 +119,8 @@ def ExecData(self, inputDS, selection):
     return extracted_ds
 
 def Exec(self, inputDO, selection, outputDO):
+    selection_node = selection.GetNode(0)
+
     if inputDO.IsA("vtkCompositeDataSet"):
         outputDO.CopyStructure(inputDO)
 
@@ -112,7 +129,7 @@ def Exec(self, inputDO, selection, outputDO):
         iterCD = inputDO.NewIterator()
         iterCD.UnRegister(None)
         while not iterCD.IsDoneWithTraversal():
-            if PassBlock(self, iterCD):
+            if PassBlock(self, iterCD, selection_node):
                 ds = ExecData(self, iterCD.GetCurrentDataObject(), selection)
                 outputDO.SetDataSet(iterCD, ds)
                 del ds

@@ -331,6 +331,8 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
 
   QList<CriteriaTypes> sub_widgets;
 
+  sub_widgets.push_back(QUERY);
+
   if (multi_block)
     {
     sub_widgets.push_back(BLOCK);
@@ -445,15 +447,6 @@ void pqQueryClauseWidget::showCompositeTree()
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
 {
-  CriteriaType criteria_type = this->currentCriteriaType(); 
-  if (criteria_type == INVALID)
-    {
-    qWarning("No valid query created.");
-    return NULL;
-    }
-
-  ConditionMode condition_type = this->currentConditionType();
-
   // Find the proper Proxy manager
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
@@ -461,6 +454,15 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
   // * Create a new selection source proxy based on the criteria_type.
   vtkSMProxy* selSource = pxm->NewProxy("sources",
       "SelectionQuerySource");
+
+//  CriteriaType criteria_type = this->currentCriteriaType();
+//  if (criteria_type == INVALID)
+//    {
+//    qWarning("No valid query created.");
+//    return NULL;
+//    }
+
+  ConditionMode condition_type = this->currentConditionType();
 
   // * Determine FieldType.
   int field_type = 0;
