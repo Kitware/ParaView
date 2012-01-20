@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXYBarChartView.h
+   Module:    pqChartSelectionReaction.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
-
+   under the terms of the ParaView license version 1.2. 
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,41 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqXYBarChartView_h
-#define __pqXYBarChartView_h
+#ifndef __pqChartSelectionReaction_h 
+#define __pqChartSelectionReaction_h
 
-#include "pqContextView.h"
+#include "pqReaction.h"
+#include <QPointer>
 
-class vtkSMSourceProxy;
-class pqDataRepresentation;
+class pqContextView;
 
-/// Bar chart view
-class PQCORE_EXPORT pqXYBarChartView : public pqContextView
+/// @ingroup Reactions
+/// Reaction for starting selections on chart.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqReaction
 {
   Q_OBJECT
-  typedef pqContextView Superclass;
-
+  typedef pqReaction Superclass;
 public:
-  static QString XYBarChartViewType() { return "XYBarChartView"; }
-  static QString XYBarChartViewTypeName() { return "Bar Chart View"; }
-  /// Currently the bar chart view is not supporting selection.
-  virtual bool supportsSelection() const {return false;}
+  pqChartSelectionReaction(QAction* parent, pqContextView* view, int selectionMode=0);
 
-public:
-  pqXYBarChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
+  /// start selection on the view.
+  static void startSelection(pqContextView* view, int selectionMode=0);
 
-  virtual ~pqXYBarChartView();
+public slots:
+  /// Updates the enabled state. Applications need not explicitly call
+  /// this.
+  void updateEnableState();
 
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
+protected:
+  /// Called when the action is triggered.
+  virtual void onTriggered();
 
 private:
-  pqXYBarChartView(const pqXYBarChartView&); // Not implemented.
-  void operator=(const pqXYBarChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqChartSelectionReaction)
+  QPointer<pqContextView> View;
+  int SelectionMode;
 };
 
 #endif

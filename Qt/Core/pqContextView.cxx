@@ -329,6 +329,12 @@ bool pqContextView::canRedo() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqContextView::supportsSelection() const
+{
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 /// Resets the zoom level to 100%.
 void pqContextView::resetDisplay()
 {

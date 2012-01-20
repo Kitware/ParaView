@@ -34,6 +34,7 @@ SET (MOC_HEADERS
   pqCameraUndoRedoReaction.h
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
+  pqChartSelectionReaction.h
   pqColorToolbar.h
   pqCollaborationBehavior.h
   pqCommandLineOptionsBehavior.h
@@ -153,6 +154,8 @@ SET (SOURCE_FILES
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
   pqChangePipelineInputReaction.h
+  pqChartSelectionReaction.cxx
+  pqChartSelectionReaction.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
   pqColorToolbar.cxx
