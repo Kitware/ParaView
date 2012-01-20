@@ -2067,6 +2067,87 @@
      <!-- End TecplotReaderCore-->
    </SourceProxy>
 
+   <SourceProxy name="NetCDFCAMReaderCore"
+                class="vtkNetCDFCAMReader"
+                label="NetCDF CAM reader">
+     <Documentation>
+       Core for NetCDF CAM reader.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ConnectivityFileName"
+        animateable="0"
+        command="SetConnectivityFileName"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read for the grid connectivity.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointsFileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read for the points and field information.
+       </Documentation>
+     </StringVectorProperty>
+
+      <IntVectorProperty
+         name="SingleLevel"
+	 command="SetSingleLevel"
+	 number_of_elements="1"
+	 default_values="0">
+	<Documentation>
+          Specify whether to only read in a single level and any variables
+          that are prescribed over this surface.
+	</Documentation>
+	<BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CellLayerRight"
+	 command="SetCellLayerRight"
+	 number_of_elements="1"
+	 default_values="1">
+	<Documentation>
+          Specify whether to add the extra layer of cells on the
+          right or left of the domain.
+	</Documentation>
+	<BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="nc ncdf"
+                      file_description="CAM NetCDF (Unstructured)" />
+     </Hints>
+
+   </SourceProxy>
+   <!-- End NetCDFCAMReaderCore -->
+
    <SourceProxy name="NetCDFPOPReaderCore"
               class="vtkNetCDFPOPReader"
               label="NetCDF POP reader">
@@ -6710,7 +6791,9 @@
    <!-- End WindBladeReader -->
 
    <SourceProxy name="NetCDFCAMReader"
-                class="vtkNetCDFCAMReader"
+                class="vtkFileSeriesReader"
+                si_class="vtkSIFileSeriesReaderProxy"
+                file_name_method="SetFileName"
                 label="NetCDF CAM reader">
      <Documentation
         short_help="Read unstructured grid NetCDF files in CAM format."
@@ -6719,27 +6802,45 @@
        as quadrilateral cells. The reader creates hex cells in order to create a volumetric grid.
      </Documentation>
 
-     <StringVectorProperty
-        name="ConnectivityFileName"
-        animateable="0"
-        command="SetConnectivityFileName"
-        number_of_elements="1">
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="NetCDFCAMReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="ConnectivityFileName" />
+         <Property name="SingleLevel" />
+         <Property name="CellLayerRight" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+                           command="GetCurrentFileName"
+                           information_only="1" >
+       <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="1"
+                           repeat_command="1"
+                           information_property="FileNameInfo" >
        <FileListDomain name="files"/>
        <Documentation>
-         This property specifies the file name to read for the grid connectivity.
+         The list of files to be read by the reader.
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty
-        name="PointsFileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-       <FileListDomain name="files"/>
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
        <Documentation>
-         This property specifies the file name to read for the points and field information.
+         Available timestep values.
        </Documentation>
-     </StringVectorProperty>
+     </DoubleVectorProperty>
 
      <Hints>
        <ReaderFactory extensions="nc ncdf"
