@@ -9448,7 +9448,25 @@ This property controls how the filter works to generate tensor cell data. You ca
 	    Z coordinate in the generated polydata dataset.
 	  </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="Create2DPoints" command="SetCreate2DPoints"
+                         number_of_elements="1" default_values="0"
+                         label="2D Points">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Specify whether the points of the polydata are 3D or 2D. If this is set to
+           true then the Z Column will be ignored and the z value of each point on the
+           polydata will be set to 0. By default this will be off.
+         </Documentation>
+      </IntVectorProperty>
 
+      <IntVectorProperty name="KeepAllDataArrays" command="SetPreserveCoordinateColumnsAsDataArrays"
+                         number_of_elements="1" default_values="0">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Allow user to keep columns specified as X,Y,Z as Data arrays.
+           By default this will be off.
+         </Documentation>
+      </IntVectorProperty>
     </SourceProxy>
 
     <!-- ==================================================================== -->
