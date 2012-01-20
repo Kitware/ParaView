@@ -643,7 +643,7 @@ bool pqAnimationManager::saveAnimation()
     vtkSMProxyProperty* viewList =
         vtkSMProxyProperty::SafeDownCast(
           scene->getProxy()->GetProperty("ViewModules"));
-    for(int i=0; i < viewList->GetNumberOfProxies(); i++)
+    for(unsigned int i=0; i < viewList->GetNumberOfProxies(); i++)
       {
       vtkSMProxy* proxy = viewList->GetProxy(i);
       pxm->UnRegisterProxy(proxy);
