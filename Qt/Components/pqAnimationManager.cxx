@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAnimationSettings.h"
 
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -41,11 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 
 #include <QIntValidator>
@@ -380,7 +383,8 @@ bool pqAnimationManager::saveAnimation()
 
   // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
-    this->Internals->ActiveServer->isRemote());
+        this->Internals->ActiveServer->isRemote() &&
+        !this->Internals->ActiveServer->session()->IsMultiClients());
 
   // Use viewManager is available.
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
@@ -639,14 +643,23 @@ bool pqAnimationManager::saveAnimation()
     pxm->RegisterProxy("animation","cleaner",cleaner);
     cleaner->Delete();
 
-    // Make sure we delete the view before disconnecting
-    vtkSMProxyProperty* viewList =
-        vtkSMProxyProperty::SafeDownCast(
-          scene->getProxy()->GetProperty("ViewModules"));
-    for(unsigned int i=0; i < viewList->GetNumberOfProxies(); i++)
+    // Make sure we delete all the view before disconnecting
+    vtkNew<vtkSMProxyIterator> proxyIter;
+    proxyIter->SetSession(server->session());
+    std::vector<vtkSMViewProxy*> viewToDelete;
+    for (proxyIter->Begin(); !proxyIter->IsAtEnd(); proxyIter->Next())
       {
-      vtkSMProxy* proxy = viewList->GetProxy(i);
-      pxm->UnRegisterProxy(proxy);
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxyIter->GetProxy());
+      // We need to ensure that we skip prototypes.
+      if (view)
+        {
+        viewToDelete.push_back(view);
+        }
+      }
+    for(std::vector<vtkSMViewProxy*>::iterator it = viewToDelete.begin();
+        it != viewToDelete.end(); it++)
+      {
+      pxm->UnRegisterProxy(*it);
       }
 
     // Disconnect from the server

@@ -7,7 +7,7 @@ object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
 object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
+object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitVertical'
 QtTesting.playCommand(object3, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
 object4 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
