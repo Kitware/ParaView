@@ -44,6 +44,7 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
   this->RequestedResamplingMode = 0; // Frustrum Mode
   this->RenderView = NULL;
   this->VolumeMapper = vtkAMRVolumeMapper::New();
+  this->VolumeMapper->SetUseDefaultThreading(true);
   this->Property = vtkVolumeProperty::New();
 
   this->Actor = vtkPVLODVolume::New();
