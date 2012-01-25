@@ -110,7 +110,7 @@ public slots:
   /// to extend VTK selection support for those, so we will implement them later
   /// (possibly 3.10/4.0)
   void initialize()
-    { this->initialize(CriteriaTypes(ANY) ^ PROCESSID ^ AMR_LEVEL ^ AMR_BLOCK); }
+    { this->initialize(CriteriaTypes(QUERY)); }
 
   /// initialize the widget only with the subset of criteria mentioned.
   /// A query clause has two components, the query term and the qualifiers. Some

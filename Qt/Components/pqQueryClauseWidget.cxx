@@ -179,6 +179,12 @@ void pqQueryClauseWidget::populateSelectionCriteria(
   this->Internals->Arrays.clear();
 
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
+
+  if(type_flags & QUERY)
+    {
+    this->Internals->criteria->addItem("Query", QUERY);
+    }
+
   if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
     {
     if (type_flags & BLOCK)
@@ -221,6 +227,10 @@ void pqQueryClauseWidget::populateSelectionCondition()
 
   switch (criteria_type)
     {
+  case QUERY:
+    this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
+    break;
+
   case PROCESSID:
     this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
     this->Internals->condition->addItem("is between",
@@ -330,8 +340,6 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   QVBoxLayout* vbox = qobject_cast<QVBoxLayout*>(this->layout());
 
   QList<CriteriaTypes> sub_widgets;
-
-  sub_widgets.push_back(QUERY);
 
   if (multi_block)
     {
@@ -451,16 +459,9 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  // * Create a new selection source proxy based on the criteria_type.
+  // Create a new selection source proxy based on the criteria_type.
   vtkSMProxy* selSource = pxm->NewProxy("sources",
       "SelectionQuerySource");
-
-//  CriteriaType criteria_type = this->currentCriteriaType();
-//  if (criteria_type == INVALID)
-//    {
-//    qWarning("No valid query created.");
-//    return NULL;
-//    }
 
   ConditionMode condition_type = this->currentConditionType();
 
@@ -490,7 +491,7 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
     }
   vtkSMPropertyHelper(selSource, "FieldType").Set(field_type);
 
-  // * Pass on qualifiers and values from this and sub widgets.
+  // Pass on qualifiers and values from this and sub widgets.
   this->addSelectionQualifiers(selSource);
   foreach (pqQueryClauseWidget* child, 
     this->findChildren<pqQueryClauseWidget*>())
@@ -589,6 +590,10 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
 
   switch (criteria_type)
     {
+  case QUERY:
+      vtkSMPropertyHelper(selSource, "QueryString").Set(values[0].toString().toAscii().constData());
+      break;
+
   case BLOCK:
     if (this->AsQualifier)
       {

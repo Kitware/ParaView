@@ -307,9 +307,6 @@ void pqQueryDialog::runQuery()
       return;
       }
 
-  vtkSMPropertyHelper(selectionSource, "QueryString").Set(
-    this->Internals->queryLineEdit->text().toAscii().constData());
-
   int attr_type = this->Internals->selectionType->itemData(
     this->Internals->selectionType->currentIndex()).toInt();
 
