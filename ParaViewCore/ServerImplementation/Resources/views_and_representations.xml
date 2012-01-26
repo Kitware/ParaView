@@ -1243,7 +1243,11 @@
           <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
           <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
           <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
-		  <Property name="DataBounds" />
+          <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
+          <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
+          <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
+          <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+          <Property name="DataBounds" />
           <Property name="CustomBounds"/>
           <Property name="CustomBoundsActive"/>
         </ExposedProperties>
