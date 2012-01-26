@@ -2933,6 +2933,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty  name="EnableCustomAxisRange"
+        command="EnableCustomAxisRange"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Allow user to enable or disable custom range label
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty  name="YAxisVisibility"
         command="SetYAxisVisibility"
         number_of_elements="1"
@@ -3056,6 +3066,31 @@
           Set the location of tick marks.
         </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="XAxisRange"
+        command="SetXAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="YAxisRange"
+        command="SetYAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ZAxisRange"
+        command="SetZAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
 
