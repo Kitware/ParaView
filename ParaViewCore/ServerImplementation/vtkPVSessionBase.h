@@ -174,6 +174,7 @@ public:
 //BTX
 protected:
   vtkPVSessionBase();
+  vtkPVSessionBase(vtkPVSessionCore* coreToUse);
   ~vtkPVSessionBase();
 
   // Description:
@@ -213,6 +214,9 @@ protected:
 private:
   vtkPVSessionBase(const vtkPVSessionBase&); // Not implemented
   void operator=(const vtkPVSessionBase&); // Not implemented
+
+  // Shared constructor method
+  void InitSessionBase(vtkPVSessionCore* coreToUse);
 
   vtkPVServerInformation* LocalServerInformation;
   unsigned long ActivateObserverTag;

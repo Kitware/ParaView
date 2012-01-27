@@ -16,10 +16,11 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleAutoMPI.h"
-#include "vtkProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVSessionCore.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
@@ -44,8 +45,23 @@ vtkSmartPointer<vtkProcessModuleAutoMPI> vtkSMSession::AutoMPI =
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
-vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/)
+vtkSMSession* vtkSMSession::New(vtkPVSessionBase *otherSession)
 {
+  vtkPVSessionCore* core = otherSession->GetSessionCore();
+  vtkSMSession* session = new vtkSMSession(true, core);
+  return session;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/,
+                           vtkPVSessionCore* preExistingSessionCore/*=NULL*/)
+  : vtkPVSessionBase(preExistingSessionCore ? preExistingSessionCore : vtkPVSessionCore::New())
+{
+  if(!preExistingSessionCore)
+    {
+    this->SessionCore->UnRegister(NULL);
+    }
+
   this->SessionProxyManager = NULL;
   this->StateLocator = vtkSMStateLocator::New();
   this->IsAutoMPI = false;

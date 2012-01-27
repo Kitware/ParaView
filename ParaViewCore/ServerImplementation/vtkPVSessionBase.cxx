@@ -30,8 +30,24 @@
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase()
 {
+  this->InitSessionBase(vtkPVSessionCore::New());
+  this->SessionCore->UnRegister(NULL);
+}
+//----------------------------------------------------------------------------
+vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse )
+{
+  this->InitSessionBase(coreToUse);
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
+{
   this->ProcessingRemoteNotification = false;
-  this->SessionCore = vtkPVSessionCore::New();
+  cout << "Set the session core" << endl;
+  this->SessionCore = coreToUse;
+  if(this->SessionCore)
+    {
+    this->SessionCore->Register(NULL);
+    }
 
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
@@ -71,8 +87,11 @@ vtkPVSessionBase::~vtkPVSessionBase()
     vtkProcessModule::GetProcessModule()->InvokeEvent(vtkCommand::ExitEvent);
     }
 
-  this->SessionCore->Delete();
-  this->SessionCore = NULL;
+  if (this->SessionCore)
+    {
+    this->SessionCore->Delete();
+    this->SessionCore = NULL;
+    }
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = NULL;
