@@ -15,6 +15,7 @@
 #include "vtkSMSession.h"
 
 #include "vtkCommand.h"
+#include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"

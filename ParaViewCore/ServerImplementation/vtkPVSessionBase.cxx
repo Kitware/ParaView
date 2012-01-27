@@ -42,7 +42,6 @@ vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse )
 void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
 {
   this->ProcessingRemoteNotification = false;
-  cout << "Set the session core" << endl;
   this->SessionCore = coreToUse;
   if(this->SessionCore)
     {

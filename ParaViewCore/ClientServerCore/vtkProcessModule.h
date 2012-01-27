@@ -72,7 +72,7 @@ public:
   // -> We use it to handle the Animation saving at disconnection time on the
   //    server side. We create a new session and migrate the sever process to
   //    a batch process.
-  void UpdateProcessType(ProcessTypes newType);
+  void UpdateProcessType(ProcessTypes newType, bool dontKnowWhatImDoing = true);
 
   //********** PROCESS INITIALIZATION/CLEANUP API *****************************
 

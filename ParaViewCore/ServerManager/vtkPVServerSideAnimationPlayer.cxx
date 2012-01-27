@@ -75,7 +75,7 @@ public:
     else
       {
       // Satellite
-      vtkProcessModule::GetProcessModule()->UpdateProcessType(vtkProcessModule::PROCESS_BATCH);
+      vtkProcessModule::GetProcessModule()->UpdateProcessType(vtkProcessModule::PROCESS_BATCH, false);
       }
   }
 
@@ -147,7 +147,7 @@ void vtkPVServerSideAnimationPlayer::TriggerExecution(vtkObject*, unsigned long,
     {
     // Switch process type to Batch mode
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkProcessModule::GetProcessModule()->UpdateProcessType(vtkProcessModule::PROCESS_BATCH);
+    vtkProcessModule::GetProcessModule()->UpdateProcessType(vtkProcessModule::PROCESS_BATCH, false);
 
     // Make sure our internal session will be used across rendering calls and
     // proxy management
@@ -172,7 +172,7 @@ void vtkPVServerSideAnimationPlayer::TriggerExecution(vtkObject*, unsigned long,
         if (vtkSMPropertyHelper(view,
                                 "UseOffscreenRenderingForScreenshots", true).GetAsInt() == 1)
           {
-          vtkSMPropertyHelper(view, "SetUseOffscreenRendering", true).Set(1);
+          vtkSMPropertyHelper(view, "UseOffscreenRendering", true).Set(1);
           view->UpdateVTKObjects();
           }
         }
