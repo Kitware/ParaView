@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCameraUndoRedoReaction.h"
+#include "pqChartSelectionReaction.h"
+#include "pqContextView.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqViewFrame.h"
@@ -44,9 +46,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
 
+#include "vtkContextScene.h"
+
 #include <QMenu>
 #include <QPushButton>
 #include <QSet>
+
+//-----------------------------------------------------------------------------
+inline void createChartSelectionAction(
+  const QString &filename, const QString &actText,
+  const QString &objName, QObject* actParent,
+  int selType, pqViewFrame* actFrame, pqContextView* chart_view)
+{
+  QAction* selAction = new QAction(
+    QIcon(filename), actText, actParent);
+  selAction->setObjectName(objName);
+  selAction->setCheckable(true);
+  actFrame->addTitleBarAction(selAction);
+  new pqChartSelectionReaction(selAction, chart_view,selType);
+}
 
 //-----------------------------------------------------------------------------
 pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentObject)
@@ -58,6 +76,7 @@ pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentOb
 pqStandardViewFrameActionGroup::~pqStandardViewFrameActionGroup()
 {
 }
+
 
 //-----------------------------------------------------------------------------
 bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
@@ -107,6 +126,27 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       "Camera Undo");
     backAction->setObjectName("BackButton");
     new pqCameraUndoRedoReaction(backAction, true, view);
+    }
+  // Adding special selection controls for chart/context view
+  pqContextView* const chart_view = qobject_cast<pqContextView*>(view);
+  if (chart_view && chart_view->supportsSelection())
+    {
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartToggle16.png",
+      "Toggle Selection", "ChartSelectToggleButton",
+      this, vtkContextScene::SELECTION_TOGGLE, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartMinus16.png",
+      "Subtract Selection", "ChartSelectMinusButton",
+      this, vtkContextScene::SELECTION_SUBTRACTION, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartPlus16.png",
+      "Add Selection", "ChartSelectPlusButton",
+      this, vtkContextScene::SELECTION_ADDITION, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChart16.png",
+      "Start Selection", "ChartSelectButton",
+      this, vtkContextScene::SELECTION_DEFAULT, frame, chart_view);
     }
   return true;
 }
