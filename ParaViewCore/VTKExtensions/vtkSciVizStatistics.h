@@ -55,15 +55,20 @@ public:
   vtkGetMacro(AttributeMode,int);
   vtkSetMacro(AttributeMode,int);
 
-  /// Return the number of columns available for the current value of \a AttributeMode.
+  // Description:
+  // Return the number of columns available for the current value of \a AttributeMode.
   int GetNumberOfAttributeArrays();
 
-  /// Get the name of the \a n-th array ffor the current value of \a AttributeMode.
+  // Description:
+  // Get the name of the \a n-th array ffor the current value of \a AttributeMode.
   const char* GetAttributeArrayName( int n );
-  /// Get the status of the specified array (i.e., whether or not it is a column of interest).
+
+  // Description:
+  // Get the status of the specified array (i.e., whether or not it is a column of interest).
   int GetAttributeArrayStatus( const char* arrName );
 
-  /// An alternate interface for preparing a selection of arrays in ParaView.
+  // Description:
+  // An alternate interface for preparing a selection of arrays in ParaView.
   void EnableAttributeArray( const char* arrName );
   void ClearAttributeArrays();
 
