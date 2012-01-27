@@ -23,6 +23,7 @@ ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNas.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNek.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
