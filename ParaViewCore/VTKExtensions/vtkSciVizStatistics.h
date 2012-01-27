@@ -29,7 +29,7 @@
 // and provides a simplified interface to vtkStatisticsAlgorithm.
 // .SECTION Thanks
 // Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
-// for implementing this class.
+// for implementing this class. Updated by Philippe Pebay, Kitware SAS 2012
 
 #ifndef __vtkSciVizStatistics_h
 #define __vtkSciVizStatistics_h
