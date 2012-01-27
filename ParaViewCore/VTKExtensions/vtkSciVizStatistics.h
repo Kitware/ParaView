@@ -62,8 +62,6 @@ public:
   const char* GetAttributeArrayName( int n );
   /// Get the status of the specified array (i.e., whether or not it is a column of interest).
   int GetAttributeArrayStatus( const char* arrName );
-  /// Set the status of the specified array (i.e., whether or not it is a column of interest).
-  void SetAttributeArrayStatus( const char* arrName, int stat );
 
   /// An alternate interface for preparing a selection of arrays in ParaView.
   void EnableAttributeArray( const char* arrName );
