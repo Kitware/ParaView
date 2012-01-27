@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
+#ifdef PARAVIEW_USE_VRUI
 class vtkVRUIConnection;
+#endif
 #ifdef PARAVIEW_USE_VRPN
 class vtkVRPNConnection;
 #endif
@@ -54,9 +56,10 @@ public:
   void add( vtkVRPNConnection* conn );
   void remove ( vtkVRPNConnection *conn );
 #endif
+#ifdef PARAVIEW_USE_VRUI
   void add( vtkVRUIConnection* conn );
   void remove ( vtkVRUIConnection *conn );
-
+#endif
   void clear();
 
 public slots:

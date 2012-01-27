@@ -3,35 +3,50 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
-# ParaView
+# Find and Include ParaView
 if(NOT ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 endif()
 
-# Optionally check if we want to use VRPN too (default is VRUI)
-SET(PARAVIEW_USE_VRPN OFF CACHE BOOL "Build ParaView with VRPN support. VRUI is default")
+# Checks to see if we want to use VRPN or VRUI.
+if(APPLE OR UNIX) #  APPLE and UNIX will use VRUI by default
+  SET(PARAVIEW_USE_VRPN OFF CACHE BOOL "Build ParaView with VRPN support")
+  SET(PARAVIEW_USE_VRUI ON CACHE BOOL "Build ParaView with VRUI support")
+else() # Windows will use VRPN by default
+  SET(PARAVIEW_USE_VRPN ON CACHE BOOL "Build ParaView with VRPN support")
+  SET(PARAVIEW_USE_VRUI OFF CACHE BOOL "Build ParaView with VRUI support")
+endif()
 
+# if VRPN
+mark_as_advanced(VRPN_INCLUDE_DIR)
+mark_as_advanced(VRPN_LIBRARY)
 if(PARAVIEW_USE_VRPN)
   if(NOT EXISTS VRPN_INCLUDE_DIR)
     find_path(VRPN_INCLUDE_DIR vrpn_Tracker.h)
   endif()
-
   find_library(VRPN_LIBRARY vrpn)
   set(VRPN_MOC_SRC vtkVRPNConnection.h)
   set(VRPN_SOURCE_FILES
     vtkVRPNConnection.cxx
     vtkVRPNCallBackHandlers.cxx)
-else(PARAVIEW_USE_VRPN)
-  mark_as_advanced(VRPN_INCLUDE_DIR)
-  mark_as_advanced(VRPN_LIBRARY)
 endif(PARAVIEW_USE_VRPN)
+
+# if VRUI
+if(PARAVIEW_USE_VRUI)
+  set(VRUI_MOC_SRC vtkVRUIConnection.h)
+  set(VRUI_SOURCE_FILES
+    vtkVRUIConnection.cxx
+    vtkVRUIPipe.cxx
+    vtkVRUIServerState.cxx
+    vtkVRUITrackerState.cxx)
+endif(PARAVIEW_USE_VRUI)
 
 QT4_WRAP_CPP(MOC_SRCS
   pqVRStarter.h
   vtkVRConnectionManager.h
   ${VRPN_MOC_SRC}
-  vtkVRUIConnection.h
+  ${VRUI_MOC_SRC}
   vtkVRQueue.h
   vtkVRQueueHandler.h
   vtkVRInteractorStyle.h
@@ -63,10 +78,7 @@ endif(PARAVIEW_USE_VRPN)
 SET( VR_SOURCE_FILES
   vtkVRConnectionManager.cxx
   ${VRPN_SOURCE_FILES}
-  vtkVRUIConnection.cxx
-  vtkVRUIPipe.cxx
-  vtkVRUIServerState.cxx
-  vtkVRUITrackerState.cxx
+  ${VRUI_SOURCE_FILES}
   vtkVRQueue.cxx
   vtkVRQueueHandler.cxx
   vtkVRInteractorStyle.cxx

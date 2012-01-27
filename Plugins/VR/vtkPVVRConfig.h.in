@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVConfig.h.in
+  Module:    vtkPVVRConfig.h.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -17,5 +17,6 @@
 #define __vtkPVVRConfig_h
 
 #cmakedefine PARAVIEW_USE_VRPN
+#cmakedefine PARAVIEW_USE_VRUI
 
 #endif // __vtkPVVRConfig.h_h

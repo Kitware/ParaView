@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_USE_VRPN
 #include "vtkVRPNConnection.h"
 #endif
+#ifdef PARAVIEW_USE_VRUI
 #include "vtkVRUIConnection.h"
+#endif
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"
 #include "vtkObjectFactory.h"
@@ -56,8 +58,10 @@ struct vtkVRConnectionManager::pqInternals
 #ifdef PARAVIEW_USE_VRPN
   QList<QPointer<vtkVRPNConnection> > VRPNConnections;
 #endif
+#ifdef PARAVIEW_USE_VRUI
   QList<QPointer<vtkVRUIConnection> > VRUIConnections;
   QPointer<vtkVRQueue> Queue;
+#endif
 };
 
 // -----------------------------------------------------------------------cnstr
@@ -93,7 +97,7 @@ void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
   this->Internals->VRPNConnections.removeAll( conn );
 }
 #endif
-
+#ifdef PARAVIEW_USE_VRUI
 void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
 {
   this->Internals->VRUIConnections.push_front( conn );
@@ -104,14 +108,16 @@ void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
   conn->Stop();
   this->Internals->VRUIConnections.removeAll( conn );
 }
-
+#endif
 void vtkVRConnectionManager::clear()
 {
   this->stop();
 #ifdef PARAVIEW_USE_VRPN
   this->Internals->VRPNConnections.clear();
 #endif
+#ifdef PARAVIEW_USE_VRUI
   this->Internals->VRUIConnections.clear();
+#endif
 }
 
 void vtkVRConnectionManager::start()
@@ -125,6 +131,7 @@ void vtkVRConnectionManager::start()
       }
     }
 #endif
+#ifdef PARAVIEW_USE_VRUI
   foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn && conn->Init())
@@ -132,6 +139,7 @@ void vtkVRConnectionManager::start()
         conn->start();
       }
     }
+#endif
 }
 
 void vtkVRConnectionManager::stop()
@@ -145,6 +153,7 @@ void vtkVRConnectionManager::stop()
       }
     }
 #endif
+#ifdef PARAVIEW_USE_VRUI
     foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn)
@@ -152,6 +161,7 @@ void vtkVRConnectionManager::stop()
         conn->Stop();
       }
     }
+#endif
 }
 
 void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
@@ -175,8 +185,8 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             const char* name = child->GetAttributeOrEmpty( "name" );
             const char* address = child->GetAttributeOrEmpty( "address" );
 #ifdef PARAVIEW_USE_VRPN        // TODO: Need to throw some warning if VRPN is
-                                // used when not compiled. For now it will
-                                // simply ignore VRPN fields
+                                // used when not compiled. For now we will
+                                // simply ignore VRPN configuration
             vtkVRPNConnection* device = new vtkVRPNConnection(this);
             device->SetQueue( this->Internals->Queue );
             device->SetName( name );
@@ -190,6 +200,9 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             const char* name = child->GetAttributeOrEmpty( "name" );
             const char* address = child->GetAttributeOrEmpty( "address" );
             const char* port = child->GetAttribute( "port" );
+#ifdef PARAVIEW_USE_VRUI        // TODO: Need to throw some warning if VRUI is
+                                // used when not compiled. For not we will
+                                // simply ignore VRUI configuration
             vtkVRUIConnection* device = new vtkVRUIConnection(this);
             device->SetQueue( this->Internals->Queue );
             device->SetName( name );
@@ -199,6 +212,7 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
               : device->SetPort("8555"); // default
             device->configure(child, locator);
             this->add(device);
+#endif
             }
           else
             {
@@ -231,6 +245,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
       }
     }
 #endif
+#ifdef PARAVIEW_USE_VRUI
   foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
@@ -240,6 +255,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
       child->Delete();
       }
     }
+#endif
   root->AddNestedElement(tempParent);
   tempParent->Delete();
 }
