@@ -190,7 +190,6 @@ public:
       // show a summary.
       return tooltipTemplate().arg(
         processTypeToText(info.ProcessType)).arg(
-        this->data(this->index(row, PROCESS_NAME)).toString()).arg(
         info.ProcessId).arg(info.NumberOfProcesses).arg(
         info.Hostname.c_str()).arg(info.OSName.c_str()).arg(
         info.Is64Bits? "64":"32").arg(
