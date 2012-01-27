@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //// ParaView Includes.
 #include "pqCollaborationManager.h"
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 #include "pqServer.h"
@@ -57,13 +58,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVServerInformation.h"
 
 #include "vtkCommand.h"
 #include <vtkNew.h>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 #include <vtksys/ios/sstream>
 
 //*****************************************************************************
@@ -71,9 +73,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCollaborationPanel::pqInternal : public Ui::pqCollaborationPanel
 {
 public:
+
+  bool NeedToConnectToCollaborationManager;
   int CameraToFollowOfUserId;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
-  vtkstd::map<int, vtkSMMessage> LocalCameraStateCache;
+  std::map<int, vtkSMMessage> LocalCameraStateCache;
+  vtkSMCollaborationManager* LastSeenCollaborationManager;
 };
 //-----------------------------------------------------------------------------
 pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
@@ -83,6 +88,7 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   this->Internal->members->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
   this->Internal->members->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
   this->Internal->CameraToFollowOfUserId = -1;
+  this->Internal->NeedToConnectToCollaborationManager = true;
 
   QObject::connect( this->Internal->message, SIGNAL(returnPressed()),
                     this, SLOT(onUserMessage()));
@@ -96,23 +102,20 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p):Superclass(p)
   QObject::connect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)),
                    this, SIGNAL(shareLocalMousePointer(bool)));
 
-  QObject::connect( this, SIGNAL(triggerChatMessage(int,QString&)),
-                    this,   SLOT(writeChatMessage(int,QString&)));
-
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                    SIGNAL(serverAdded(pqServer*)),
-                    this, SLOT(connectLocalSlots()));
-
-  QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
-                    SIGNAL(aboutToRemoveServer(pqServer*)),
-                    this, SLOT(disconnectLocalSlots()));
+  QObject::connect( this, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                    this,   SLOT(writeChatMessage(pqServer*,int,QString&)));
 
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(viewAdded(pqView*)),
                     this, SLOT(connectViewLocalSlots(pqView*)));
+
   QObject::connect( pqApplicationCore::instance()->getServerManagerModel(),
                     SIGNAL(preViewRemoved(pqView*)),
                     this, SLOT(disconnectViewLocalSlots(pqView*)));
+
+  QObject::connect( &pqActiveObjects::instance(),
+                    SIGNAL(serverChanged(pqServer*)),
+                    this, SLOT(onServerChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -132,16 +135,37 @@ pqCollaborationPanel::~pqCollaborationPanel()
   QObject::disconnect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)),
                       this, SIGNAL(shareLocalMousePointer(bool)));
 
-  QObject::disconnect( this, SIGNAL(triggerChatMessage(int,QString&)),
-                       this,   SLOT(writeChatMessage(int,QString&)));
+  QObject::disconnect( this, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                       this,   SLOT(writeChatMessage(pqServer*,int,QString&)));
 
-  QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
-                       SIGNAL(serverAdded(pqServer*)),
-                       this, SLOT(connectLocalSlots()));
+  QObject::disconnect( &pqActiveObjects::instance(),
+                       SIGNAL(serverChanged(pqServer*)),
+                       this, SLOT(onServerChanged()));
 
-  QObject::disconnect( pqApplicationCore::instance()->getServerManagerModel(),
-                       SIGNAL(aboutToRemoveServer(pqServer*)),
-                       this, SLOT(disconnectLocalSlots()));
+  pqCollaborationManager* collab = this->getCollaborationManager();
+  if(collab)
+    {
+    // If we disconnect, this means a new session has been created so all
+    // objects that we observed have been deleted
+    QObject::disconnect( collab, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                         this,   SLOT(writeChatMessage(pqServer*,int,QString&)));
+    QObject::disconnect( collab,
+                         SIGNAL(triggeredUserListChanged()),
+                         this,   SLOT(onUserUpdate()));
+
+    QObject::disconnect( this,   SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                         collab, SLOT(onChatMessage(pqServer*,int,QString&)));
+
+    QObject::disconnect( this,   SIGNAL(shareLocalMousePointer(bool)),
+                         collab, SLOT(enableMousePointerSharing(bool)));
+
+    QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
+                         this,   SLOT(onNewMaster(int)));
+
+    QObject::disconnect( collab, SIGNAL(triggerFollowCamera(int)),
+                         this,   SLOT(followUserCamera(int)));
+
+    }
 
   delete this->Internal;
   this->Internal = 0;
@@ -158,17 +182,20 @@ void pqCollaborationPanel::onUserMessage()
   vtkSMCollaborationManager* collab = getSMCollaborationManager();
   if(collab)
     {
+    pqServer* activeServer =
+        pqApplicationCore::instance()->getServerManagerModel()->findServer(
+          collab->GetSession());
     int userId = collab->GetUserId();
     QString msg = this->Internal->message->text();
-    emit triggerChatMessage( userId, msg);
+    emit triggerChatMessage(activeServer, userId, msg);
     this->Internal->message->clear();
     }
   }
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::writeChatMessage(int userId, QString& txt)
+void pqCollaborationPanel::writeChatMessage(pqServer* server, int userId, QString& txt)
   {
   QString message = QString("<b>%1:</b> %2 <br/>\n\n").
-                    arg( this->getSMCollaborationManager()->GetUserLabel(userId),
+                    arg( server->session()->GetCollaborationManager()->GetUserLabel(userId),
                          txt.trimmed());
 
   this->Internal->content->textCursor().atEnd();
@@ -216,12 +243,12 @@ void pqCollaborationPanel::cellDoubleClicked(int row, int col)
 void pqCollaborationPanel::followUserCamera(int userId)
 {
   // Update collaboration manager to know if we follow a given user or not
-  if(pqCollaborationManager* collabManager = this->getCollaborationManager())
+  if(this->getSMCollaborationManager())
     {
-    collabManager->setFollowUserView(userId);
+    this->getSMCollaborationManager()->FollowUser(userId);
     }
 
-  if(this->Internal->CameraToFollowOfUserId == userId)
+  if(this->Internal->CameraToFollowOfUserId == userId || this->getSMCollaborationManager() == NULL)
     {
     return;
     }
@@ -255,7 +282,7 @@ void pqCollaborationPanel::followUserCamera(int userId)
 
   // If we follow master lets selection model follow as well
   bool followMaster = (userId == this->getSMCollaborationManager()->GetMasterId());
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   for(vtkIdType idx=0; idx < pxm->GetNumberOfSelectionModel(); idx++)
     {
     vtkSMProxySelectionModel* selectionModel = pxm->GetSelectionModelAt(idx);
@@ -309,23 +336,30 @@ vtkSMCollaborationManager* pqCollaborationPanel::getSMCollaborationManager()
   pqCollaborationManager* pqCollab = this->getCollaborationManager();
   if(pqCollab)
     {
-    return pqCollab->collaborationManager();
+    if(this->Internal->LastSeenCollaborationManager != pqCollab->activeCollaborationManager())
+      {
+      this->Internal->LastSeenCollaborationManager = pqCollab->activeCollaborationManager();
+      // Update user list UI
+      onUserUpdate();
+      }
+    return this->Internal->LastSeenCollaborationManager;
     }
   return NULL;
 }
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::onUserUpdate()
 {
-
   vtkSMCollaborationManager* collab = this->getSMCollaborationManager();
   if(!collab)
     {
+    this->Internal->members->setRowCount(0);
     return;
     }
   int nbUsers = collab->GetNumberOfConnectedClients();
   int userId;
   QString userName;
   this->Internal->members->setRowCount(nbUsers);
+  this->Internal->CameraToFollowOfUserId = collab->GetFollowedUser();
   for(int cc = 0; cc < nbUsers; cc++)
     {
     userId = collab->GetUserId(cc);
@@ -375,93 +409,6 @@ void pqCollaborationPanel::onUserUpdate()
     }
 }
 //-----------------------------------------------------------------------------
-void pqCollaborationPanel::connectLocalSlots()
-{
-  pqCollaborationManager* collab = this->getCollaborationManager();
-  if(collab)
-    {
-    QObject::connect( collab, SIGNAL(triggerChatMessage(int,QString&)),
-                      this,   SLOT(writeChatMessage(int,QString&)));
-    QObject::connect( collab,
-                      SIGNAL(triggeredUserListChanged()),
-                      this,   SLOT(onUserUpdate()));
-
-    QObject::connect( this,   SIGNAL(triggerChatMessage(int,QString&)),
-                      collab, SLOT(onChatMessage(int,QString&)));
-
-    QObject::connect( this,   SIGNAL(shareLocalMousePointer(bool)),
-                      collab, SLOT(enableMousePointerSharing(bool)));
-
-    QObject::connect( collab, SIGNAL(triggeredMasterUser(int)),
-                      this,   SLOT(onNewMaster(int)));
-
-    QObject::connect( collab, SIGNAL(triggerFollowCamera(int)),
-                      this,   SLOT(followUserCamera(int)));
-
-    // Update the graphical panel
-    collab->collaborationManager()->UpdateUserInformations();
-    onUserUpdate(); // This may be called twice (one here + one from emit)
-
-    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentDock)
-      {
-      parentDock->toggleViewAction()->setEnabled(true);
-      QObject::connect( parentDock, SIGNAL(visibilityChanged(bool)),
-                        this,         SLOT(onUserUpdate()));
-      }
-
-    // By default we should follow the master
-    this->followUserCamera(collab->collaborationManager()->GetMasterId());
-    }
-  else
-    {
-    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentDock)
-      {
-      parentDock->hide();
-      parentDock->toggleViewAction()->setEnabled(false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationPanel::disconnectLocalSlots()
-{
-  pqCollaborationManager* collab = this->getCollaborationManager();
-  if(collab)
-    {
-    // If we disconnect, this means a new session has been created so all
-    // objects that we observed have been deleted
-    QObject::disconnect( collab, SIGNAL(triggerChatMessage(int,QString&)),
-                         this,   SLOT(writeChatMessage(int,QString&)));
-    QObject::disconnect( collab,
-                         SIGNAL(triggeredUserListChanged()),
-                         this,   SLOT(onUserUpdate()));
-    QObject::disconnect( collab,
-                         SIGNAL(triggerStateClientOnlyMessage(vtkSMMessage*)),
-                         this,   SLOT(onShareOnlyMessage(vtkSMMessage*)));
-
-    QObject::disconnect( this,   SIGNAL(triggerChatMessage(int,QString&)),
-                         collab, SLOT(onChatMessage(int,QString&)));
-
-    QObject::disconnect( this,   SIGNAL(shareLocalMousePointer(bool)),
-                         collab, SLOT(enableMousePointerSharing(bool)));
-
-    QObject::disconnect( collab, SIGNAL(triggeredMasterUser(int)),
-                         this,   SLOT(onNewMaster(int)));
-
-    QObject::disconnect( collab, SIGNAL(triggerFollowCamera(int)),
-                         this,   SLOT(followUserCamera(int)));
-
-    QDockWidget* parentDock = qobject_cast<QDockWidget*>(this->parentWidget());
-    if(parentDock)
-      {
-      QObject::disconnect( parentDock, SIGNAL(visibilityChanged(bool)),
-                           this,         SLOT(onUserUpdate()));
-      }
-    }
-}
-//-----------------------------------------------------------------------------
 void pqCollaborationPanel::connectViewLocalSlots(pqView* view)
 {
   vtkSMRenderViewProxy* viewProxy =
@@ -490,4 +437,43 @@ void pqCollaborationPanel::disconnectViewLocalSlots(pqView* view)
 void pqCollaborationPanel::stopFollowingCamera()
 {
   this->followUserCamera(-1);
+}
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::onServerChanged()
+{
+  // update user list if real changes...
+  this->getSMCollaborationManager();
+
+  // Make sure we follow the collaboration manager once this one get created...
+  if(this->Internal->NeedToConnectToCollaborationManager)
+    {
+    pqCollaborationManager* collab = this->getCollaborationManager();
+    if(collab)
+      {
+      this->Internal->NeedToConnectToCollaborationManager = false;
+      QObject::connect( collab, SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                        this,   SLOT(writeChatMessage(pqServer*,int,QString&)));
+      QObject::connect( collab,
+                        SIGNAL(triggeredUserListChanged()),
+                        this,   SLOT(onUserUpdate()));
+
+      QObject::connect( this,   SIGNAL(triggerChatMessage(pqServer*,int,QString&)),
+                        collab, SLOT(onChatMessage(pqServer*,int,QString&)));
+
+      QObject::connect( this,   SIGNAL(shareLocalMousePointer(bool)),
+                        collab, SLOT(enableMousePointerSharing(bool)));
+
+      QObject::connect( collab, SIGNAL(triggeredMasterUser(int)),
+                        this,   SLOT(onNewMaster(int)));
+
+      QObject::connect( collab, SIGNAL(triggerFollowCamera(int)),
+                        this,   SLOT(followUserCamera(int)));
+
+      // By default we should follow the master
+      if(collab->activeCollaborationManager())
+        {
+        this->followUserCamera(collab->activeCollaborationManager()->GetMasterId());
+        }
+      }
+    }
 }

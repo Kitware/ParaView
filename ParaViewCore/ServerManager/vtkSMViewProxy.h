@@ -43,6 +43,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Enable/Disable a view.
+  vtkSetMacro(Enable, bool);
+  vtkGetMacro(Enable, bool);
+  vtkBooleanMacro(Enable, bool);
+
+  // Description:
   // Renders the view using full resolution.
   virtual void StillRender();
 
@@ -98,11 +104,12 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
   vtkSetStringMacro(DefaultRepresentationName);
   char* DefaultRepresentationName;
 
+  bool Enable;
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented

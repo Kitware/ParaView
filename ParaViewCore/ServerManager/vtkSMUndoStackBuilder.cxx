@@ -31,7 +31,7 @@
 #include "vtkUndoStackInternal.h"
 
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/map>
+#include <map>
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);
@@ -141,6 +141,17 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
   undoElement->SetUndoRedoState( previousState, newState );
   this->Add(undoElement);
   undoElement->FastDelete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnCreateObject(
+  vtkSMSession* vtkNotUsed(session), vtkSMMessage* newState)
+{
+  if (this->UndoStack)
+    {
+    this->UndoStack->InvokeEvent(
+      vtkSMUndoStack::ObjectCreationEvent, newState);
+    }
 }
 
 //-----------------------------------------------------------------------------

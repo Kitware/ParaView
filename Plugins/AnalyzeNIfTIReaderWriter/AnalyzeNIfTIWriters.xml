@@ -1,0 +1,4 @@
+<ParaViewWriters>
+  <Proxy group="writers" name="AnalyzeWriter" />
+  <Proxy group="writers" name="NIfTIWriter" />
+</ParaViewWriters>

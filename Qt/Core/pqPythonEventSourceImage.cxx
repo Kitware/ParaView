@@ -49,10 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectNaming.h"
 #include "pqTestUtility.h"
 
-// VTK includes
-#include "vtkPNGReader.h"
-#include "vtkSmartPointer.h"
-
 // SM includes
 #include "vtkProcessModule.h"
 
@@ -212,19 +208,7 @@ void pqPythonEventSourceImage::doComparison()
     SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_TEST_ROOT", test_directory);
     SnapshotTestImage = SnapshotTestImage.replace("$PARAVIEW_DATA_ROOT",
       pqCoreTestUtility::DataRoot());
-
-    vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
-    if (!reader->CanReadFile(SnapshotTestImage.toAscii().data()))
-      {
-      qCritical("cannot read file %s\n", SnapshotTestImage.toAscii().data());
-      ::SnapshotResult = false;
-      }
-    else
-      {
-      reader->SetFileName(SnapshotTestImage.toAscii().data());
-      reader->Update();
-      ::SnapshotResult = pqCoreTestUtility::CompareImage(
-        reader->GetOutput(), baseline_image, threshold, std::cerr, test_directory);
-      }
+    ::SnapshotResult = pqCoreTestUtility::CompareImage(
+      SnapshotTestImage, baseline_image, threshold, std::cerr, test_directory);
     }
 }

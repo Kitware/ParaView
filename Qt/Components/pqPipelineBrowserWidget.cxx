@@ -92,12 +92,12 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   modifiedFont.setBold(true);
   this->PipelineModel->setModifiedFont(modifiedFont);
 
-  // Create the selection adaptor.
-  new pqPipelineModelSelectionAdaptor(this->getSelectionModel(),
-    pqApplicationCore::instance()->getSelectionModel(), this);
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setActiveView(pqView*)));
+
+  new pqPipelineModelSelectionAdaptor(this->getSelectionModel());
+
 
   // Make sure the tree items get expanded when new descendents
   // are added.
@@ -258,6 +258,17 @@ void pqPipelineBrowserWidget::enableAnnotationFilter(const QString& annotationKe
 void pqPipelineBrowserWidget::disableAnnotationFilter()
 {
   this->FilteredPipelineModel->disableAnnotationFilter();
+}
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::enableSessionFilter(vtkSession* session)
+{
+  this->FilteredPipelineModel->enableSessionFilter(session);
+}
+
+//----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::disableSessionFilter()
+{
+  this->FilteredPipelineModel->disableSessionFilter();
 }
 
 //----------------------------------------------------------------------------

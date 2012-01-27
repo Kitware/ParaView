@@ -31,7 +31,7 @@ class vtkSMStringVectorProperty::vtkInternals :
   public vtkSMVectorPropertyTemplate<vtkStdString>
 {
 public:
-  vtkstd::vector<int> ElementTypes;
+  std::vector<int> ElementTypes;
 
   vtkInternals(vtkSMStringVectorProperty* ivp):
     vtkSMVectorPropertyTemplate<vtkStdString>(ivp)

@@ -25,6 +25,7 @@
 class vtkIceTSynchronizedRenderers;
 class vtkImageProcessingPass;
 class vtkPKdTree;
+class vtkPVSession;
 class vtkRenderer;
 class vtkRenderPass;
 class vtkSynchronizedRenderers;
@@ -42,9 +43,13 @@ public:
   vtkSetMacro(DisableIceT, bool);
   vtkGetMacro(DisableIceT, bool);
 
-  // Description:
-  // Must be called once to initialize the class.
-  void Initialize();
+  // Must be called once to initialize the class. Id is uniquefier. It is
+  // typically same as the id passed to vtkPVView::Initialize(). This makes it
+  // possible to identify what view this instance corresponds to.
+  // vtkPVSynchronizedRenderer passes this id to vtkIceTSynchronizedRenderers.
+  // vtkIceTSynchronizedRenderers uses the id to ensure that the correct group
+  // of views is shown on a tile-display.
+  void Initialize(vtkPVSession* session, unsigned int id);
 
   // Description:
   // kd tree that gives processes ordering. Initial value is a NULL pointer.

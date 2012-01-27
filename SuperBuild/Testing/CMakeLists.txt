@@ -36,7 +36,7 @@ elseif(UNIX AND NOT APPLE)
 else()
   add_test(
     NAME MountDMG
-    COMMAND hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg
+    COMMAND yes Y | /usr/bin/hdiutil attach ${ParaView_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME}.dmg > /dev/null
   )
 
   add_test(
@@ -47,7 +47,7 @@ else()
 
   add_test(
     NAME UnMountDMG 
-    COMMAND hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}.dmg
+    COMMAND /usr/bin/hdiutil detach /Volumes/${CPACK_PACKAGE_FILE_NAME}
   )
 endif()
 
@@ -71,5 +71,35 @@ if(PARAVIEW_BUILD_PLUGIN_Nektar)
   add_test(
     NAME LoadNektarReaderPlugin
     COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadNektarReaderPlugin.xml --exit
+  )
+endif()
+
+if(PARAVIEW_DATA_ROOT)
+  add_test(
+    NAME LoadXDMFZlibData.xml
+    COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+  )
+
+  if(PARAVIEW_BUILD_Silo)
+    add_test(
+      NAME LoadSiloData.xml
+      COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+    )
+  endif()
+
+  if(PARAVIEW_BUILD_CGNS)
+    add_test(
+      NAME LoadCGNSData.xml
+      COMMAND ${PV_INSTALL_BINARY} -dr --disable-light-kit --test-directory=${Testing_Temporary_dir} --test-script=${PV_INSTALL_TEST_XML_DIR}/LoadXDMFZlibData.xml --exit
+    )
+  endif()
+endif()
+
+# On Windows run Uninstall
+if(WIN32)
+  add_test(
+    NAME UninstallParaView 
+    COMMAND ${PV_INSTALL_LOCATION}/Uninstall.exe /S
+    WORKING_DIRECTORY ${PV_INSTALL_LOCATION}
   )
 endif()

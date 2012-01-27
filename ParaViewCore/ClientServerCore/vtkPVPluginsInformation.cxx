@@ -20,21 +20,21 @@
 #include "vtkPVPluginTracker.h"
 #include "vtkClientServerStream.h"
 
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
-#include <vtkstd/iterator>
+#include <set>
+#include <string>
+#include <vector>
+#include <iterator>
 
 namespace
 {
   class vtkItem
     {
   public:
-    vtkstd::string Name;
-    vtkstd::string FileName;
-    vtkstd::string RequiredPlugins;
-    vtkstd::string Version;
-    vtkstd::string StatusMessage;
+    std::string Name;
+    std::string FileName;
+    std::string RequiredPlugins;
+    std::string Version;
+    std::string StatusMessage;
     bool AutoLoadForce;
     bool AutoLoad;
     bool Loaded;
@@ -48,6 +48,16 @@ namespace
       RequiredOnClient(false),
       RequiredOnServer(false)
       {
+      }
+
+    bool RefersToSamePlugin(const vtkItem& item)
+      {
+      if (!item.Name.empty() && (item.Name == this->Name))
+        {
+        return true;
+        }
+      return (!item.FileName.empty() && item.FileName != "linked-in"
+        && item.FileName == this->FileName);
       }
 
     bool Load(const vtkClientServerStream& stream, int &offset)
@@ -117,7 +127,7 @@ namespace
 }
 
 class vtkPVPluginsInformation::vtkInternals :
-  public vtkstd::vector<vtkItem>
+  public std::vector<vtkItem>
 {
 };
 
@@ -251,9 +261,14 @@ void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
     for (self_iter = this->Internals->begin();
       self_iter != this->Internals->end(); ++self_iter)
       {
-      if (other_iter->Name == self_iter->Name ||
-        other_iter->FileName == self_iter->FileName)
+      if (self_iter->RefersToSamePlugin(*other_iter))
         {
+        // cout << "Other: " << endl
+        //      << "  Name: " << other_iter->Name.c_str() << endl
+        //      << "  Filename: " << other_iter->FileName.c_str() <<endl
+        //      << "Self: " << endl
+        //      << "  Name: " << self_iter->Name.c_str() << endl
+        //      << "  Filename: " << self_iter->FileName.c_str() << endl;
         bool prev_autoload = self_iter->AutoLoad;
         bool auto_load_force = self_iter->AutoLoadForce;
         (*self_iter) = (*other_iter);
@@ -401,21 +416,21 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
     vtkPVPluginsInformation* client_plugins,
     vtkPVPluginsInformation* server_plugins)
 {
-  vtkstd::set<vtkItem, vtkItem> client_set;
-  vtkstd::set<vtkItem, vtkItem> server_set;
-  vtkstd::copy(client_plugins->Internals->begin(), client_plugins->Internals->end(),
-    vtkstd::inserter(client_set, client_set.begin()));
-  vtkstd::copy(server_plugins->Internals->begin(), server_plugins->Internals->end(),
-    vtkstd::inserter(server_set, server_set.begin()));
+  std::set<vtkItem, vtkItem> client_set;
+  std::set<vtkItem, vtkItem> server_set;
+  std::copy(client_plugins->Internals->begin(), client_plugins->Internals->end(),
+    std::inserter(client_set, client_set.begin()));
+  std::copy(server_plugins->Internals->begin(), server_plugins->Internals->end(),
+    std::inserter(server_set, server_set.begin()));
 
   bool all_requirements_are_met = true;
-  vtkstd::vector<vtkItem>::iterator iter;
+  std::vector<vtkItem>::iterator iter;
   for (iter = client_plugins->Internals->begin();
     iter != client_plugins->Internals->end(); ++iter)
     {
     if (iter->RequiredOnServer)
       {
-      vtkstd::set<vtkItem, vtkItem>::iterator iter2 = server_set.find(*iter);
+      std::set<vtkItem, vtkItem>::iterator iter2 = server_set.find(*iter);
       if (iter2 == server_set.end() || iter2->Loaded == false)
         {
         all_requirements_are_met = false;
@@ -433,7 +448,7 @@ bool vtkPVPluginsInformation::PluginRequirementsSatisfied(
     {
     if (iter->RequiredOnClient)
       {
-      vtkstd::set<vtkItem, vtkItem>::iterator iter2 = client_set.find(*iter);
+      std::set<vtkItem, vtkItem>::iterator iter2 = client_set.find(*iter);
       if (iter2 == client_set.end() || iter2->Loaded == false)
         {
         all_requirements_are_met = false;

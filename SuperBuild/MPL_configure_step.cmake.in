@@ -1,5 +1,5 @@
 message("Configuring MPL:\n@MPL_binary@")
-set(ENV{LD_LIBRARY_PATH} "@freetype_install@/lib")
+set(ENV{LD_LIBRARY_PATH} "@python_install@/lib")
 set(ENV{VS_UNICODE_OUTPUT} "")
 
 include("@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake")
@@ -12,8 +12,7 @@ if(WIN32)
   file(TO_NATIVE_PATH "@png_install@/lib" png_lib_win32)
   set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
   set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
-elseif(APPLE)
-  #set(ENV{CFLAGS} "-arch x86_64 -mmacosx-version-min=@CMAKE_OSX_DEPLOYMENT_TARGET@ -isysroot @CMAKE_OSX_SYSROOT@")
+  set(ENV{CL} "@pv_tpl_c_flags@")
 endif()
 
 execute_process(

@@ -30,12 +30,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqStandardViewFrameActionGroup.h"
+#include "ui_pqEmptyView.h"
 
-#include "pqRenderView.h"
-#include "pqEditCameraReaction.h"
-#include "pqViewSettingsReaction.h"
+#include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqCameraUndoRedoReaction.h"
-#include "pqMultiViewFrame.h"
+#include "pqChartSelectionReaction.h"
+#include "pqContextView.h"
+#include "pqEditCameraReaction.h"
+#include "pqInterfaceTracker.h"
+#include "pqViewFrame.h"
+#include "pqObjectBuilder.h"
+#include "pqRenderView.h"
+#include "pqUndoStack.h"
+#include "pqViewModuleInterface.h"
+#include "pqViewSettingsReaction.h"
+
+#include "vtkContextScene.h"
+
+#include <QMenu>
+#include <QPushButton>
+#include <QSet>
+
+//-----------------------------------------------------------------------------
+inline void createChartSelectionAction(
+  const QString &filename, const QString &actText,
+  const QString &objName, QObject* actParent,
+  int selType, pqViewFrame* actFrame, pqContextView* chart_view)
+{
+  QAction* selAction = new QAction(
+    QIcon(filename), actText, actParent);
+  selAction->setObjectName(objName);
+  selAction->setCheckable(true);
+  actFrame->addTitleBarAction(selAction);
+  new pqChartSelectionReaction(selAction, chart_view,selType);
+}
 
 //-----------------------------------------------------------------------------
 pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentObject)
@@ -44,62 +73,200 @@ pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentOb
 }
 
 //-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *view)
+pqStandardViewFrameActionGroup::~pqStandardViewFrameActionGroup()
 {
+}
+
+
+//-----------------------------------------------------------------------------
+bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
+{
+  Q_ASSERT(frame != NULL);
+
+  frame->contextMenu()->addSeparator();
+  QMenu* convertMenu = frame->contextMenu()->addMenu("Convert To ...");
+  QObject::connect(convertMenu, SIGNAL(aboutToShow()),
+    this, SLOT(aboutToShowConvertMenu()));
+
+  if (view == NULL)
+    {
+    // Setup the UI shown when no view is present in the frame.
+    QWidget* empty_frame = new QWidget(frame);
+    this->setupEmptyFrame(empty_frame);
+    frame->setCentralWidget(empty_frame);
+    return true;
+    }
+
   pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
   if (render_module)
     {
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"),
-      "Adjust Camera",
-      this);
+    QAction* cameraAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");
     cameraAction->setObjectName("CameraButton");
-    frame->addTitlebarAction(cameraAction);
     new pqEditCameraReaction(cameraAction, view);
     }
 
-  QAction* optionsAction = new QAction(
-    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options", this);
+  QAction* optionsAction = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options");
   optionsAction->setObjectName("OptionsButton");
-  frame->addTitlebarAction(optionsAction);
   new pqViewSettingsReaction(optionsAction, view);
 
   if (view->supportsUndo())
     {
     // Setup undo/redo connections if the view module
     // supports interaction undo.
-    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
-      "Camera Redo",
-      this);
+    QAction* forwardAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
+      "Camera Redo");
     forwardAction->setObjectName("ForwardButton");
-    frame->addTitlebarAction(forwardAction);
     new pqCameraUndoRedoReaction(forwardAction, false, view);
 
-    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
-      "Camera Undo",
-      this);
+    QAction* backAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
+      "Camera Undo");
     backAction->setObjectName("BackButton");
-    frame->addTitlebarAction(backAction);
     new pqCameraUndoRedoReaction(backAction, true, view);
     }
+  // Adding special selection controls for chart/context view
+  pqContextView* const chart_view = qobject_cast<pqContextView*>(view);
+  if (chart_view && chart_view->supportsSelection())
+    {
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartToggle16.png",
+      "Toggle Selection", "ChartSelectToggleButton",
+      this, vtkContextScene::SELECTION_TOGGLE, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartMinus16.png",
+      "Subtract Selection", "ChartSelectMinusButton",
+      this, vtkContextScene::SELECTION_SUBTRACTION, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartPlus16.png",
+      "Add Selection", "ChartSelectPlusButton",
+      this, vtkContextScene::SELECTION_ADDITION, frame, chart_view);
+    createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChart16.png",
+      "Start Selection", "ChartSelectButton",
+      this, vtkContextScene::SELECTION_DEFAULT, frame, chart_view);
+    }
   return true;
 }
 
-inline void REMOVE_ACTION(const char* name, pqMultiViewFrame* frame)
+//-----------------------------------------------------------------------------
+bool pqStandardViewFrameActionGroup::disconnect(pqViewFrame *frame, pqView *)
 {
-  QAction* action = frame->getAction(name);
-  if (action)
+  frame->removeTitleBarActions(); 
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+namespace
+{
+  struct ViewType
     {
-    frame->removeTitlebarAction(action);
-    delete action;
+    QString Label;
+    QString Name;
+    };
+
+  bool ViewTypeComparator(const ViewType& one, const ViewType& two)
+    {
+    return one.Label.toLower() < two.Label.toLower();
+    }
+
+  static QList<ViewType> availableViewTypes()
+    {
+    QList<ViewType> views;
+    pqInterfaceTracker* tracker =
+      pqApplicationCore::instance()->interfaceTracker();
+    foreach (pqViewModuleInterface* vi,
+      tracker->interfaces<pqViewModuleInterface*>())
+      {
+      QStringList viewTypes = vi->viewTypes();
+      for (int cc=0; cc < viewTypes.size(); cc++)
+        {
+        ViewType info;
+        info.Label = vi->viewTypeName(viewTypes[cc]);
+        info.Name = viewTypes[cc];
+        views.push_back(info);
+        }
+      }
+    qSort(views.begin(), views.end(), ViewTypeComparator);
+    return views;
     }
 }
+
 //-----------------------------------------------------------------------------
-bool pqStandardViewFrameActionGroup::disconnect(pqMultiViewFrame *frame, pqView *)
+void pqStandardViewFrameActionGroup::aboutToShowConvertMenu()
 {
-  REMOVE_ACTION("CameraButton", frame);
-  REMOVE_ACTION("OptionsButton", frame);
-  REMOVE_ACTION("ForwardButton", frame);
-  REMOVE_ACTION("BackButton", frame);
-  return true;
+  QMenu* menu = qobject_cast<QMenu*>(this->sender());
+  if (menu)
+    {
+    menu->clear();
+    QList<ViewType> views = availableViewTypes();
+    foreach (const ViewType& type, views)
+      {
+      QAction* view_action = new QAction(type.Label, menu);
+      view_action->setProperty("PV_VIEW_TYPE", type.Name);
+      view_action->setProperty("PV_VIEW_LABEL", type.Label);
+      view_action->setProperty("PV_COMMAND", "Convert To");
+      menu->addAction(view_action);
+      QObject::connect(view_action, SIGNAL(triggered()),
+        this, SLOT(invoked()), Qt::QueuedConnection);
+      }
+    }
 }
 
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::setupEmptyFrame(QWidget* frame)
+{
+  Ui::EmptyView ui;
+  ui.setupUi(frame);
+
+  QList<ViewType> views = availableViewTypes();
+  foreach (const ViewType& type, views)
+    {
+    QPushButton* button = new QPushButton(type.Label, ui.ConvertActionsFrame);
+    button->setObjectName(type.Name);
+    button->setProperty("PV_VIEW_TYPE", type.Name);
+    button->setProperty("PV_VIEW_LABEL", type.Label);
+    button->setProperty("PV_COMMAND", "Create");
+
+    QObject::connect(button, SIGNAL(clicked()),
+      this, SLOT(invoked()), Qt::QueuedConnection);
+    ui.ConvertActionsFrame->layout()->addWidget(button);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::invoked()
+{
+  QObject* osender = this->sender();
+  if (!osender)
+    {
+    return;
+    }
+
+  // either create a new view, or convert the existing one.
+  // This slot is called either from an action in the "Convert To" menu, or from
+  // the buttons on an empty frame.
+  QString type = osender->property("PV_VIEW_TYPE").toString();
+  QString label = osender->property("PV_VIEW_LABEL").toString();
+  QString command = osender->property("PV_COMMAND").toString();
+
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()-> getObjectBuilder();
+
+  BEGIN_UNDO_SET(QString("%1 %2").arg(command).arg(label));
+
+  // destroy active-view, if present (implying convert was called).
+  if (pqActiveObjects::instance().activeView())
+    {
+    builder->destroy(pqActiveObjects::instance().activeView());
+    }
+
+  if (type != "None")
+    {
+    builder->createView(type, pqActiveObjects::instance().activeServer());
+    }
+
+  END_UNDO_SET();
+}

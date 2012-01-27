@@ -38,7 +38,7 @@ vtkSMExporterProxy::~vtkSMExporterProxy()
 
 //----------------------------------------------------------------------------
 int vtkSMExporterProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pxm, vtkPVXMLElement* element)
+  vtkSMSessionProxyManager* pxm, vtkPVXMLElement* element)
 {
   const char* exts = element->GetAttribute("file_extension");
   if (exts)

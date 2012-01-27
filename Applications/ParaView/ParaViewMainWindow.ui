@@ -23,7 +23,8 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="pqViewManager" name="MultiViewManager" native="true"/>
+     <widget class="pqTabbedMultiViewWidget" name="MultiViewWidget">
+     </widget>
     </item>
    </layout>
   </widget>
@@ -256,9 +257,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqViewManager</class>
+   <class>pqTabbedMultiViewWidget</class>
    <extends>QWidget</extends>
-   <header>pqViewManager.h</header>
+   <header>pqTabbedMultiViewWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

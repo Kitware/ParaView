@@ -13,9 +13,9 @@
 
 =========================================================================*/
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
-#include <vtkstd/map>
-#include <vtkstd/set>
+#include <string>
+#include <map>
+#include <set>
 
 #include <sys/stat.h>
 #include <assert.h>
@@ -74,10 +74,10 @@ extern "C"
 
 //*****************************************************************************
 class AdiosData;
-typedef vtkstd::map<vtkstd::string, AdiosData> AdiosDataMap;
+typedef std::map<std::string, AdiosData> AdiosDataMap;
 typedef AdiosDataMap::const_iterator AdiosDataMapIterator;
 class AdiosVariable;
-typedef vtkstd::map<vtkstd::string, AdiosVariable> AdiosVariableMap;
+typedef std::map<std::string, AdiosVariable> AdiosVariableMap;
 typedef AdiosVariableMap::const_iterator AdiosVariableMapIterator;
 //*****************************************************************************
 class AdiosVariable
@@ -222,7 +222,7 @@ public:
     }
   // --------------------------------------------------------------------------
 public:
-  vtkstd::string Name;
+  std::string Name;
   int GroupIndex;
   int VarIndex;
   int NumberOfElements;
@@ -285,9 +285,9 @@ public:
     memcpy(&v,this->Data,sizeof(double));
     return v;
     }
-  vtkstd::string AsString() const
+  std::string AsString() const
     {
-    vtkstd::string v = (char *)this->Data;
+    std::string v = (char *)this->Data;
     return v;
     }
   // --------------------------------------------------------------------------
@@ -322,7 +322,7 @@ private:
     }
   // --------------------------------------------------------------------------
 public:
-  vtkstd::string Name;
+  std::string Name;
   size_t Size;
   void *Data;
   ADIOS_DATATYPES Type;
@@ -563,7 +563,7 @@ public:
     return true;
     }
   // --------------------------------------------------------------------------
-  int ExtractTimeStep(vtkstd::string &variableName)
+  int ExtractTimeStep(std::string &variableName)
     {
     const std::string prefix("/Timestep_");
 
@@ -600,7 +600,7 @@ public:
   // --------------------------------------------------------------------------
   bool IsPixieFileType()
     {
-    vtkstd::string schema;
+    std::string schema;
     return (this->GetStringAttribute("/schema/name", schema) && schema == "Pixie");
     }
   // --------------------------------------------------------------------------
@@ -614,11 +614,11 @@ public:
 
 //  int GetPixieDataType(const char* variableName)
 //    {
-//    vtkstd::string name = variableName;
+//    std::string name = variableName;
 //    const std::string prefix("/Timestep_");
-//    vtkstd::string::size_type index = name.find(prefix);
+//    std::string::size_type index = name.find(prefix);
 
-//    vtkstd::string head = name;
+//    std::string head = name;
 //    if(index == 0) // Remove /Timestep_xxx
 //      {
 //      head = name.substr(0, name.find( 1, "/" ));
@@ -627,13 +627,13 @@ public:
 //    cout << "Head: " << head.c_str() << endl;
 
 //    // Pixie specific coordinate management
-//    vtkstd::string c1Key = head + "/coords/coord1";
-//    vtkstd::string c2Key = head + "/coords/coord2";
-//    vtkstd::string c3Key = head + "/coords/coord3";
+//    std::string c1Key = head + "/coords/coord1";
+//    std::string c2Key = head + "/coords/coord2";
+//    std::string c3Key = head + "/coords/coord3";
 
-//    vtkstd::string c1Value;
-//    vtkstd::string c2Value;
-//    vtkstd::string c3Value;
+//    std::string c1Value;
+//    std::string c2Value;
+//    std::string c3Value;
 
 //    if(this->GetStringAttribute(c1Key, c1Value) &&
 //       this->GetStringAttribute(c2Key, c2Value) &&
@@ -650,7 +650,7 @@ public:
 //        return VTK_RECTILINEAR_GRID;
 //        }
 //      AdiosVariable requestedVar = varIter->second;
-//      vtkstd::string coordVarName = head2 + c1Value;
+//      std::string coordVarName = head2 + c1Value;
 //      varIter = this->Variables.find(coordVarName);
 //      if(varIter == this->Variables.end())
 //        {
@@ -789,9 +789,9 @@ public:
     // Build filter var name
     ostringstream varHead;
     varHead << "/Timestep_" << timestep << "/";
-    vtkstd::string timestepFilter = varHead.str();
-    vtkstd::string nodesFilter = "/nodes";
-    vtkstd::string cellsFilter = "/cells";
+    std::string timestepFilter = varHead.str();
+    std::string nodesFilter = "/nodes";
+    std::string cellsFilter = "/cells";
 
     // Loop over variable to find the ones to load
     AdiosVariableMapIterator varIter = this->Variables.begin();
@@ -802,8 +802,8 @@ public:
           && varIter->second.Extent[1] == (gridSize[0]-1)
           && varIter->second.Extent[3] == (gridSize[1]-1)
           && varIter->second.Extent[5] == (gridSize[2]-1)
-          && varIter->second.Name.find(nodesFilter) == vtkstd::string::npos
-          && varIter->second.Name.find(cellsFilter) == vtkstd::string::npos )
+          && varIter->second.Name.find(nodesFilter) == std::string::npos
+          && varIter->second.Name.find(cellsFilter) == std::string::npos )
         {
         vtkDataArray *array = NULL;
         if(varIter->second.IsTimeDependent())
@@ -850,7 +850,7 @@ public:
       return NULL;
 
     // Get grid size
-    vtkstd::string coordName[3];
+    std::string coordName[3];
     coordName[0] = "/nodes/X";
     coordName[1] = "/nodes/Y";
     coordName[2] = "/nodes/Z";
@@ -984,9 +984,9 @@ public:
     // Build filter var name
     ostringstream varHead;
     varHead << "/Timestep_" << timestep << "/";
-    vtkstd::string timestepFilter = varHead.str();
-    vtkstd::string nodesFilter = "/nodes";
-    vtkstd::string cellsFilter = "/cells";
+    std::string timestepFilter = varHead.str();
+    std::string nodesFilter = "/nodes";
+    std::string cellsFilter = "/cells";
 
     // Loop over variable to find the ones to load
     AdiosVariableMapIterator varIter = this->Variables.begin();
@@ -997,8 +997,8 @@ public:
           && varIter->second.Extent[1] == size3D[0]
           && varIter->second.Extent[3] == size3D[1]
           && varIter->second.Extent[5] == size3D[2]
-          && varIter->second.Name.find(nodesFilter) == vtkstd::string::npos
-          && varIter->second.Name.find(cellsFilter) == vtkstd::string::npos )
+          && varIter->second.Name.find(nodesFilter) == std::string::npos
+          && varIter->second.Name.find(cellsFilter) == std::string::npos )
         {
         vtkDataArray *array = NULL;
         if(varIter->second.IsTimeDependent())
@@ -1095,7 +1095,7 @@ public:
         {
         ostringstream labelKey;
         labelKey << "/node_data[" << i << "]/labels";
-        vtkstd::string arrayName;
+        std::string arrayName;
         if(!this->GetStringAttribute(labelKey.str(), arrayName))
           continue;
 
@@ -1112,7 +1112,7 @@ public:
       }
     }
   // --------------------------------------------------------------------------
-  bool GetIntegerAttribute(const vtkstd::string &key, int &value)
+  bool GetIntegerAttribute(const std::string &key, int &value)
     {
     if(!this->Open())
       return false;
@@ -1124,7 +1124,7 @@ public:
     return true;
     }
   // --------------------------------------------------------------------------
-  bool GetStringAttribute(const vtkstd::string &key, vtkstd::string &value)
+  bool GetStringAttribute(const std::string &key, std::string &value)
     {
     if(!this->Open())
       return false;
@@ -1141,7 +1141,7 @@ public:
     if(!this->Open())
       return NULL;
 
-    AdiosVariableMapIterator iter = this->Variables.find(vtkstd::string(name));
+    AdiosVariableMapIterator iter = this->Variables.find(std::string(name));
     if(iter == this->Variables.end())
       {
       cout << "ERROR in ReadPoints: Variable " << name << " not found." << endl;
@@ -1235,7 +1235,7 @@ public:
     if(!this->Open())
       return NULL;
 
-    AdiosVariableMapIterator varIter = this->Variables.find(vtkstd::string(name));
+    AdiosVariableMapIterator varIter = this->Variables.find(std::string(name));
     if( varIter == this->Variables.end() )
       {
       cout << "ERROR in ReadVariable: Variable " << name << " not found !" << endl;
@@ -1332,9 +1332,9 @@ public:
     array->SetNumberOfTuples(nbTuples); // Allocate array memory
 
     // Create a nice array name (Just remove the xxx part of /xxx/yy/zzz)
-    vtkstd::string arrayName = var.Name;
-    vtkstd::string::size_type index = arrayName.find("/", 1);
-    if(index != vtkstd::string::npos)
+    std::string arrayName = var.Name;
+    std::string::size_type index = arrayName.find("/", 1);
+    if(index != std::string::npos)
       {
       arrayName = arrayName.substr( index + 1, arrayName.size() - 1 );
       }
@@ -1371,7 +1371,7 @@ public:
   // --------------------------------------------------------------------------
   int GetRealTimeStep(int timeStepIndex)
     {
-    vtkstd::set<int>::iterator iter = this->RealTimeSteps.begin();
+    std::set<int>::iterator iter = this->RealTimeSteps.begin();
     for(int i = 0;i<timeStepIndex; i++)
       iter++;
     return *(iter);
@@ -1463,14 +1463,14 @@ public:
     }
   // --------------------------------------------------------------------------
 public:
-  vtkstd::string FileName;
+  std::string FileName;
   ADIOS_FILE *File;
   ADIOS_GROUP **Groups;
 
   AdiosDataMap Scalars;
   AdiosDataMap Attributes;
   AdiosVariableMap Variables;
-  vtkstd::set<int> RealTimeSteps;
+  std::set<int> RealTimeSteps;
 
   vtkExtentTranslator *ExtentTranslator;
   int CurrentWholeExtent[6];

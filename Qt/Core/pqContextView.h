@@ -84,6 +84,9 @@ public:
   /// Returns true if redo can be done.
   virtual bool canRedo() const;
 
+  /// Returns true if selection can be done.
+  virtual bool supportsSelection() const;
+
   /// Resets the zoom level to 100%.
   virtual void resetDisplay();
 

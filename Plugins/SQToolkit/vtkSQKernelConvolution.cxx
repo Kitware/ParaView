@@ -27,8 +27,8 @@ Copyright 2008 SciberQuest Inc.
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 
-#include <vtkstd/string>
-using vtkstd::string;
+#include <string>
+using std::string;
 
 #include "Numerics.hxx"
 

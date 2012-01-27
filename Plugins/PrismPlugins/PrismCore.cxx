@@ -4,9 +4,9 @@
 #include "PrismView.h"
 #include "PrismScaleViewDialog.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqActiveView.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqObjectBuilder.h"
@@ -18,7 +18,7 @@
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMProperty.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSelectionManager.h"
 #include "pqDataRepresentation.h"
@@ -213,13 +213,10 @@ PrismCore::PrismCore(QObject* p)
 
     this->setParent(model);
 
-    pqServerManagerSelectionModel *selection =
-        pqApplicationCore::instance()->getSelectionModel();
-
     //used to update the selection when the user is selecting something in the pipeline browser
-    this->connect(selection,
-        SIGNAL(selectionChanged(const pqServerManagerSelection&, const pqServerManagerSelection&)),
-        this, SLOT(onSelectionChanged()));
+    this->connect(&pqActiveObjects::instance(),
+      SIGNAL(sourceChanged(pqPipelineSource*)),
+      this, SLOT(onSelectionChanged()));
 
    //used to determine if the current object is valid after it is created on the server
    pqObjectBuilder *builder=pqApplicationCore::instance()->getObjectBuilder();
@@ -272,20 +269,7 @@ void PrismCore::registerActions(QAction* prismView, QAction* sesameSurface,
 //-----------------------------------------------------------------------------
 pqPipelineSource* PrismCore::getActiveSource() const
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
-  pqPipelineSource* source = 0;
-  pqServerManagerModelItem* item = 0;
-  if(sels.empty())
-    {
-    return NULL;
-    }
-  pqServerManagerSelection::ConstIterator iter = sels.begin();
-
-  item = *iter;
-  source = dynamic_cast<pqPipelineSource*>(item);   
-
-  return source;
+  return pqActiveObjects::instance().activeSource();
 }
 
 //-----------------------------------------------------------------------------
@@ -544,7 +528,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
 
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = prismP->GetSessionProxyManager();
 
     vtkSMSourceProxy* selSource=vtkSMSourceProxy::SafeDownCast(
       pxm->NewProxy("sources", "GlobalIDSelectionSource"));
@@ -620,7 +604,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
     pqServerManagerModel* model= pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(sourceP);
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* pxm = sourceP->GetSessionProxyManager();
 
     vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
     if(!selSource)
@@ -725,49 +709,32 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 //-----------------------------------------------------------------------------
 void PrismCore::onSelectionChanged()
 {
-  pqServerManagerSelectionModel *selection =
-    pqApplicationCore::instance()->getSelectionModel();
-  pqServerManagerModelItem *item = selection->currentItem();
-  if(item)
+  pqPipelineSource *source = pqActiveObjects::instance().activeSource();
+  if (source)
     {
-    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource *source = NULL;
-    int portNumber=0;
-    if(port)
-      {
-      source=port->getSource();
-      portNumber=port->getPortNumber();
-      }
-    if(!source)
-      {
-      source= qobject_cast<pqPipelineSource *>(item);
-      }
+    int portNumber = pqActiveObjects::instance().activePort()->getPortNumber();
+    vtkSMSessionProxyManager *proxyManager = source->proxyManager();
+    proxyManager->InstantiateGroupPrototypes("filters");
+    vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
 
-    if(source)
+    if (prismFilter)
       {
-      vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-      proxyManager->InstantiateGroupPrototypes("filters");
-      vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
+      vtkSMProperty *inputP = prismFilter->GetProperty("Input");
+      vtkSMInputProperty* input = vtkSMInputProperty::SafeDownCast(inputP);
 
-      if (prismFilter)
+      if (input)
         {
-        vtkSMProperty *inputP = prismFilter->GetProperty("Input");
-        vtkSMInputProperty* input = vtkSMInputProperty::SafeDownCast(inputP);
-
-        if (input)
+        if (input->GetNumberOfProxies() == 1)
           {
-          if (input->GetNumberOfProxies() == 1)
-            {
-            input->SetUncheckedInputConnection(0, source->getProxy(), portNumber);
-            }
-          else
-            {
-            input->RemoveAllUncheckedProxies();
-            input->AddUncheckedInputConnection(source->getProxy(), portNumber);
-            }
-            
-          emit this->prismViewCreatable(input->IsInDomains());          
+          input->SetUncheckedInputConnection(0, source->getProxy(), portNumber);
           }
+        else
+          {
+          input->RemoveAllUncheckedProxies();
+          input->AddUncheckedInputConnection(source->getProxy(), portNumber);
+          }
+
+        emit this->prismViewCreatable(input->IsInDomains());          
         }
       }
     }

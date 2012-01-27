@@ -22,6 +22,7 @@ Module:    PrismSurfacePanel.cxx
 
 // ParaView Server Manager includes
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMArraySelectionDomain.h"
@@ -99,14 +100,14 @@ SESAMEConversionsForTable::SESAMEConversionsForTable()
 class PrismSurfacePanel::pqUI : public QObject, public Ui::PrismSurfacePanelWidget 
 {
 public:
-    pqUI(PrismSurfacePanel* p) : QObject(p)
+    pqUI(PrismSurfacePanel* p, pqProxy* object_proxy) : QObject(p)
     {
         // Make a clone of the XDMFReader proxy.
         // We'll use the clone to help us with the interdependent properties.
         // In other words, modifying properties outside of accept()/reset() is wrong.
         // We have to modify properties to get the information we need
         // and we'll do that with the clone.
-        vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
+        vtkSMSessionProxyManager* pm = object_proxy->proxyManager();
         PanelHelper.TakeReference(pm->NewProxy("misc", "SESAMEReaderHelper"));
         PanelHelper->InitializeAndCopyFromProxy(p->proxy());
         this->PanelHelper->UpdatePropertyInformation();
@@ -136,7 +137,7 @@ public:
 PrismSurfacePanel::PrismSurfacePanel(pqProxy* object_proxy, QWidget* p) :
 pqNamedObjectPanel(object_proxy, p)
 {
-    this->UI = new pqUI(this);
+    this->UI = new pqUI(this, object_proxy);
     this->UI->setupUi(this);
 
     this->UI->Table306Found=false;
@@ -470,7 +471,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
     if(in.gcount())
     {
 
-        vtkstd::string line;
+        std::string line;
         line.assign(buffer,in.gcount()-1);
         if(line.find("<PRISM_Conversions>")==line.npos)
         {
@@ -513,7 +514,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
        {
            SESAMEConversionsForTable tableData;
 
-           vtkstd::string data= tableElement->GetAttribute("Id");
+           std::string data= tableElement->GetAttribute("Id");
            int intValue;
            sscanf(data.c_str(),"%d",&intValue);
            tableData.TableId=intValue;
@@ -521,7 +522,7 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
            for(int v=0;v<tableElement->GetNumberOfNestedElements();v++)
            {
                vtkXMLDataElement* variableElement = tableElement->GetNestedElement(v);
-               vtkstd::string variableString= variableElement->GetName();
+               std::string variableString= variableElement->GetName();
                if(variableString=="Variable")
                {
                    SESAMEConversionVariable variableData;

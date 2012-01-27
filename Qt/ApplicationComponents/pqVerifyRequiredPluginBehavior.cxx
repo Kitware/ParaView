@@ -41,7 +41,7 @@ pqVerifyRequiredPluginBehavior::pqVerifyRequiredPluginBehavior(QObject* parentOb
   : Superclass(parentObject)
 {
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(requiredPluginsNotLoaded()),
+    SIGNAL(requiredPluginsNotLoaded(pqServer*)),
     this, SLOT(requiredPluginsNotLoaded()));
 }
 

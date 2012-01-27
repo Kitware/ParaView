@@ -135,6 +135,7 @@ class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManager;
+class vtkSMSessionProxyManager;
 class vtkSMProxyObserver;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
@@ -499,7 +500,7 @@ protected:
   friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
   friend class vtkSMNamedPropertyIterator;
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;
   friend class vtkSMProxyRegisterUndoElement;
@@ -654,7 +655,7 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
 
@@ -671,7 +672,7 @@ protected:
   // Handle events fired by subproxies.
   virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, void* data);
 
-  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
+  virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
     vtkPVXMLElement *element);
 
   // Description:

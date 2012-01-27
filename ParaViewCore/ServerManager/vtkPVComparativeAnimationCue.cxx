@@ -24,8 +24,8 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 #include <string.h>
 
 class vtkPVComparativeAnimationCue::vtkInternals
@@ -45,7 +45,7 @@ public:
   class vtkCueCommand
     {
   private:
-    vtkstd::string ValuesToString(double* values)
+    std::string ValuesToString(double* values)
       {
       vtksys_ios::ostringstream str;
       for (unsigned int cc=0; cc < this->NumberOfValues; cc++)
@@ -65,7 +65,7 @@ public:
       double * values = NULL;
       if (str != NULL && *str != 0)
         {
-        vtkstd::vector<vtksys::String> parts =
+        std::vector<vtksys::String> parts =
           vtksys::SystemTools::SplitString(str, ',');
         if (static_cast<unsigned int>(parts.size()) == this->NumberOfValues)
           {
@@ -219,7 +219,7 @@ public:
 
   void RemoveCommand(const vtkCueCommand& cmd)
     {
-    vtkstd::vector<vtkCueCommand>::iterator iter;
+    std::vector<vtkCueCommand>::iterator iter;
     for (iter = this->CommandQueue.begin();
       iter != this->CommandQueue.end(); ++iter)
       {
@@ -233,7 +233,7 @@ public:
 
   void InsertCommand(const vtkCueCommand& cmd, int pos)
     {
-    vtkstd::vector<vtkCueCommand>::iterator iter;
+    std::vector<vtkCueCommand>::iterator iter;
     int cc=0;
     for (iter = this->CommandQueue.begin();
       iter != this->CommandQueue.end() && cc < pos;
@@ -243,7 +243,7 @@ public:
     this->CommandQueue.insert(iter, cmd);
     }
 
-  vtkstd::vector<vtkCueCommand> CommandQueue;
+  std::vector<vtkCueCommand> CommandQueue;
 };
 
 vtkStandardNewMacro(vtkPVComparativeAnimationCue);
@@ -323,7 +323,7 @@ void vtkPVComparativeAnimationCue::UpdateXRange(
 
   int position = 0;
   // remove obsolete values.
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); position++)
     {
@@ -378,7 +378,7 @@ void vtkPVComparativeAnimationCue::UpdateYRange(
 
   int position = 0;
   // remove obsolete values.
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); position++)
     {
@@ -428,7 +428,7 @@ void vtkPVComparativeAnimationCue::UpdateWholeRange(
 
   // remove all  values (we are just recording the state change here).
   int position = 0;
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); ++position, ++iter)
     {
@@ -469,7 +469,7 @@ void vtkPVComparativeAnimationCue::UpdateValue(
   changeXML->SetName("StateChange");
 
   int position = 0;
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); ++position)
     {
@@ -509,7 +509,7 @@ double* vtkPVComparativeAnimationCue::GetValues(
   int x, int y, int dx, int dy, unsigned int &numValues)
 {
   numValues = 0;
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); ++iter)
     {
@@ -638,7 +638,7 @@ vtkPVXMLElement* vtkPVComparativeAnimationCue::AppendCommandInfo(vtkPVXMLElement
     return NULL;
     }
 
-  vtkstd::vector<vtkInternals::vtkCueCommand>::iterator iter;
+  std::vector<vtkInternals::vtkCueCommand>::iterator iter;
   for (iter = this->Internals->CommandQueue.begin();
     iter != this->Internals->CommandQueue.end(); ++iter)
     {

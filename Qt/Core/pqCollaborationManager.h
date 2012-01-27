@@ -61,28 +61,24 @@ class PQCORE_EXPORT pqCollaborationManager : public  QObject
 public:  
   pqCollaborationManager(QObject* parent);
   virtual ~pqCollaborationManager();
-  void setServer(pqServer*);
-  pqServer* server();
 
   /// Return the vtkSMCollaborationManager
-  vtkSMCollaborationManager* collaborationManager();
-
-  void setFollowUserView(int);
-  int getUserViewToFollow();
+  vtkSMCollaborationManager* activeCollaborationManager();
 
 signals:
   /// This will be triggered by the remote clients to update any interessting
   /// components. This should be triggered by local client to broadcast to
   /// the other clients
-  void triggerChatMessage(int userId, QString& msgContent);
+  void triggerChatMessage(pqServer* server, int userId, QString& msgContent);
 
   /// This will forward client_only message to anyone that may interessted when
   /// not managed locally
-  void triggerStateClientOnlyMessage(vtkSMMessage* msg);
+  void triggerStateClientOnlyMessage(pqServer* origin, vtkSMMessage* msg);
 
   /// Signal triggered when user information get updated
-  /// (just forwared from the pqServer)
-  /// This allow us to not care about which server is currently used
+  /// regardless the active one
+  /// A nice thing TODO could be to just forwared from the pqServer but ONLY IF
+  /// (activeServer == sender)
   void triggeredMasterUser(int);
   void triggeredMasterChanged(bool);
   void triggeredUserName(int, QString&);
@@ -93,9 +89,15 @@ signals:
   void triggerFollowCamera(int);
 
 public slots:
+  /// Slot used to keep track of all possible vtkSMCollaborationManagers
+  /// They are unsed in pqCollaborationBehavior to listen the
+  /// ServerManagerModel... (preServerAdded/aboutToRemoveServer)
+  void onServerAdded(pqServer*);
+  void onServerRemoved(pqServer*);
+
   /// This will be triggered by the triggerChatMessage() signal and will
   /// broadcast to other client a chat message
-  void onChatMessage(int userId, QString& msgContent);
+  void onChatMessage(pqServer* server, int userId, QString& msgContent);
 
   /// updates the enabled-state for application wide widgets and actions based
   /// whether the application is a master or not.
@@ -132,7 +134,7 @@ private slots:
   /// Called when a message has been sent by another client
   /// This method will trigger signals that will be used by other Qt classes
   /// to synchronize their state.
-  void onClientMessage(vtkSMMessage* msg);
+  void onClientMessage(pqServer* server, vtkSMMessage* msg);
 
   /// Called when a chart view has changed is view bounds
   void onChartViewChange(vtkTypeUInt32 gid, double* bounds);
@@ -149,7 +151,6 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
-  int UserViewToFollow;
 };
 
 #endif // !_pqCollaborationManager_h

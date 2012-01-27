@@ -53,7 +53,8 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::Initialize()
+void vtkPVSynchronizedRenderer::Initialize(
+  vtkPVSession* session, unsigned int id)
 {
   if(this->Mode != INVALID)
     {
@@ -69,11 +70,13 @@ void vtkPVSynchronizedRenderer::Initialize()
       "setup. Aborting for debugging purposes.");
     abort();
     }
-
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (id == 0)
+    {
+    vtkWarningMacro("Id should not be 0.");
+    }
 
   // active session must be a paraview-session.
-  assert(activeSession != NULL);
+  assert(session != NULL);
 
   int processtype = pm->GetProcessType();
   switch (processtype)
@@ -93,7 +96,7 @@ void vtkPVSynchronizedRenderer::Initialize()
 
   case vtkProcessModule::PROCESS_CLIENT:
     this->Mode = BUILTIN;
-    if (activeSession->IsA("vtkSMSessionClient"))
+    if (session->IsA("vtkSMSessionClient"))
       {
       this->Mode = CLIENT;
       }
@@ -108,7 +111,7 @@ void vtkPVSynchronizedRenderer::Initialize()
   int tile_dims[2] = {0, 0};
   int tile_mullions[2] = {0, 0};
 
-  vtkPVServerInformation* info = activeSession->GetServerInformation();
+  vtkPVServerInformation* info = session->GetServerInformation();
   info->GetTileDimensions(tile_dims);
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
   tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
@@ -145,7 +148,7 @@ void vtkPVSynchronizedRenderer::Initialize()
         }
       this->CSSynchronizer->SetRootProcessId(0);
       this->CSSynchronizer->SetParallelController(
-        activeSession->GetController(vtkPVSession::RENDER_SERVER));
+        session->GetController(vtkPVSession::RENDER_SERVER));
       }
     break;
 
@@ -163,7 +166,7 @@ void vtkPVSynchronizedRenderer::Initialize()
       this->CSSynchronizer->WriteBackImagesOff();
       this->CSSynchronizer->SetRootProcessId(1);
       this->CSSynchronizer->SetParallelController(
-        activeSession->GetController(vtkPVSession::CLIENT));
+        session->GetController(vtkPVSession::CLIENT));
       }
 
     // DONT BREAK, server needs to setup everything in the BATCH case
@@ -188,11 +191,11 @@ void vtkPVSynchronizedRenderer::Initialize()
         }
       else
         {
-        this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
-        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
-          tile_dims[0], tile_dims[1]);
-        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
-          tile_mullions[0], tile_mullions[1]);
+        vtkIceTSynchronizedRenderers* isr = vtkIceTSynchronizedRenderers::New();
+        isr->SetIdentifier(id);
+        isr->SetTileDimensions(tile_dims[0], tile_dims[1]);
+        isr->SetTileMullions(tile_mullions[0], tile_mullions[1]);
+        this->ParallelSynchronizer = isr;
         }
 #else
       // FIXME: need to add support for compositing when not using IceT

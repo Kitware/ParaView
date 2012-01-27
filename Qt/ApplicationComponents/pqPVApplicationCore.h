@@ -90,6 +90,9 @@ public:
 public slots:
   /// Pops-up the quick launch dialog.
   void quickLaunch();
+  /// Pops-up the search dialog if the focused widget is
+  /// QAsbstractItemView type.
+  void startSearch();
 
 protected:
   QPointer<pqSelectionManager> SelectionManager;

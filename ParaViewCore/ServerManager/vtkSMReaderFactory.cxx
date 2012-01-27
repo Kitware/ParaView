@@ -26,20 +26,22 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkStringList.h"
 
-#include <vtkstd/list>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <list>
+#include <set>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
+#include <assert.h>
 
-static void string_replace(vtkstd::string& string, char c, vtkstd::string str)
+static void string_replace(std::string& string, char c, std::string str)
 {
   size_t cc= string.find(c);
-  while (cc < vtkstd::string::npos)
+  while (cc < std::string::npos)
     {
     string = string.replace(cc, 1, str);
     cc = string.find(c, cc + str.size());
@@ -51,27 +53,29 @@ class vtkSMReaderFactory::vtkInternals
 public:
   struct vtkValue
     {
-    vtkstd::string Group;
-    vtkstd::string Name;
-    vtkstd::vector<vtkstd::string> Extensions;
-    vtkstd::vector<vtksys::RegularExpression> FilenameRegExs;
-    vtkstd::vector<vtkstd::string> FilenamePatterns;
-    vtkstd::string Description;
+    vtkWeakPointer<vtkSMSession> Session;
+    std::string Group;
+    std::string Name;
+    std::vector<std::string> Extensions;
+    std::vector<vtksys::RegularExpression> FilenameRegExs;
+    std::vector<std::string> FilenamePatterns;
+    std::string Description;
 
-    vtkSMProxyManager* GetProxyManager()
+    vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
       {
-      return vtkSMProxyManager::GetProxyManager();
+      return vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
       }
 
-    vtkSMProxy* GetPrototypeProxy(const char* groupName, const char* proxyName)
+    vtkSMProxy* GetPrototypeProxy(vtkSMSession* session, const char* groupName, const char* proxyName)
       {
-      return this->GetProxyManager()->GetPrototypeProxy(groupName, proxyName);
+      return session->GetSessionProxyManager()->GetPrototypeProxy(groupName, proxyName);
       }
 
-    void FillInformation()
+    void FillInformation(vtkSMSession* session)
       {
 
-      vtkSMProxy* prototype = this->GetPrototypeProxy(this->Group.c_str(),
+      vtkSMProxy* prototype = this->GetPrototypeProxy(session,
+                                                      this->Group.c_str(),
                                                       this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
@@ -94,12 +98,12 @@ public:
       if (filename_patterns)
         {
         vtksys::SystemTools::Split(filename_patterns, this->FilenamePatterns,' ');
-        vtkstd::vector<vtkstd::string>::iterator iter;
+        std::vector<std::string>::iterator iter;
         // convert the wild-card based patterns to regular expressions.
         for (iter = this->FilenamePatterns.begin(); iter !=
           this->FilenamePatterns.end(); iter++)
           {
-          vtkstd::string regex = *iter;
+          std::string regex = *iter;
           ::string_replace(regex, '.', "\\.");
           ::string_replace(regex, '?', ".");
           ::string_replace(regex, '*', ".?");
@@ -112,33 +116,29 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkSMSession* vtkNotUsed(session))
+    bool CanCreatePrototype(vtkSMSession* session)
       {
-      return (this->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str())
+      return (this->GetPrototypeProxy(session,
+                                      this->Group.c_str(), this->Name.c_str())
               != NULL);
       }
 
     // Returns true if the reader can read the file. More correctly, it returns
     // false is the reader reports that it cannot read the file.
     bool CanReadFile(const char* filename,
-      const vtkstd::vector<vtkstd::string>& extensions, vtkSMSession* session,
+      const std::vector<std::string>& extensions, vtkSMSession* session,
       bool skip_filename_test=false);
 
     // Tests if 'any' of the strings in extensions is contained in
     // this->Extensions.
-    bool ExtensionTest(const vtkstd::vector<vtkstd::string>& extensions);
+    bool ExtensionTest(const std::vector<std::string>& extensions);
 
     // Tests if the FilenameRegEx matches the filename.
     bool FilenameRegExTest(const char* filename);
     };
 
-  vtkSMProxyManager* GetProxyManager()
-    {
-    return vtkSMObject::GetProxyManager();
-    }
-
   void BuildExtensions(
-    const char* filename, vtkstd::vector<vtkstd::string>& extensions)
+    const char* filename, std::vector<std::string>& extensions)
     {
     // basically we are filling up extensions with all possible extension
     // combintations eg. myfilename.tar.gz.vtk.000 results in
@@ -148,20 +148,20 @@ public:
     // tar, tar.gz
     // gz
     // in that order.
-    vtkstd::string extension =
+    std::string extension =
       vtksys::SystemTools::GetFilenameExtension(filename);
     if (extension.size() > 0)
       {
       extension.erase(extension.begin()); // remove the first "."
       }
-    vtkstd::vector<vtkstd::string> parts;
+    std::vector<std::string> parts;
     vtksys::SystemTools::Split(extension.c_str(), parts, '.');
     int num_parts = static_cast<int>(parts.size());
     for (int cc=num_parts-1; cc >= 0; cc--)
       {
       for (int kk=cc; kk >=0; kk--)
         {
-        vtkstd::string cur_string;
+        std::string cur_string;
         for (int ii=kk; ii <=cc; ii++)
           {
           if (parts[ii].size() == 0)
@@ -179,24 +179,24 @@ public:
       }
     }
 
-  typedef vtkstd::list<vtkValue> PrototypesType;
+  typedef std::list<vtkValue> PrototypesType;
   PrototypesType Prototypes;
-  vtkstd::string SupportedFileTypes;
+  std::string SupportedFileTypes;
 };
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
-  const vtkstd::vector<vtkstd::string>& extensions)
+  const std::vector<std::string>& extensions)
 {
   if (this->Extensions.size() == 0)
     {
     return false;
     }
 
-  vtkstd::vector<vtkstd::string>::const_iterator iter1;
+  std::vector<std::string>::const_iterator iter1;
   for (iter1 = extensions.begin(); iter1 != extensions.end(); ++iter1)
     {
-    vtkstd::vector<vtkstd::string>::const_iterator iter2;
+    std::vector<std::string>::const_iterator iter2;
     for (iter2 = this->Extensions.begin(); iter2 != this->Extensions.end();
       ++iter2)
       {
@@ -218,7 +218,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
     return false;
     }
 
-  vtkstd::vector<vtksys::RegularExpression>::iterator iter;
+  std::vector<vtksys::RegularExpression>::iterator iter;
   for (iter = this->FilenameRegExs.begin();
     iter != this->FilenameRegExs.end(); ++iter)
     {
@@ -233,12 +233,13 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   const char* filename,
-  const vtkstd::vector<vtkstd::string>& extensions,
-  vtkSMSession* vtkNotUsed(session),
+  const std::vector<std::string>& extensions,
+  vtkSMSession* session,
   bool skip_filename_test/*=false*/)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
-  vtkSMProxy* prototype = this->GetPrototypeProxy( this->Group.c_str(),
+  vtkSMSessionProxyManager* pxm = this->GetProxyManager(session);
+  vtkSMProxy* prototype = this->GetPrototypeProxy( session,
+                                                   this->Group.c_str(),
                                                    this->Name.c_str() );
   if (!prototype)
     {
@@ -247,6 +248,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 
   if (!skip_filename_test)
     {
+    this->FillInformation(session);
     if (!this->ExtensionTest(extensions) &&
       !this->FilenameRegExTest(filename))
       {
@@ -295,9 +297,9 @@ void vtkSMReaderFactory::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
+void vtkSMReaderFactory::RegisterPrototypes(vtkSMSession* session, const char* xmlgroup)
 {
-  vtkSMProxyManager* pxm = this->Internals->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkPVProxyDefinitionIterator* iter;
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -328,9 +330,6 @@ void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   value.Group = xmlgroup;
   value.Name = xmlname;
 
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
-
   this->Internals->Prototypes.push_front(value);
 }
 
@@ -347,8 +346,6 @@ void vtkSMReaderFactory::RegisterPrototype(
   value.Group = xmlgroup;
   value.Name = xmlname;
 
-  // fills extension information etc. from the prototype.
-  value.FillInformation();
   if (description)
     {
     value.Description = description;
@@ -463,7 +460,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
     return this->Readers;
     }
 
-  vtkstd::vector<vtkstd::string> extensions;
+  std::vector<std::string> extensions;
   this->Internals->BuildExtensions(filename, extensions);
 
   vtkInternals::PrototypesType::iterator iter;
@@ -473,6 +470,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
         iter->CanReadFile(filename, extensions, session))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -493,7 +491,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
     return this->Readers;
     }
 
-  vtkstd::vector<vtkstd::string> extensions;
+  std::vector<std::string> extensions;
   // purposefully set the extensions to empty, since we don't want the extension
   // test to be used for this case.
 
@@ -504,6 +502,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
     if (iter->CanCreatePrototype(session) &&
       (!filename || iter->CanReadFile(filename, extensions, session, true)))
       {
+      iter->FillInformation(session);
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
       this->Readers->AddString(iter->Description.c_str());
@@ -524,7 +523,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
     return false;
     }
 
-  vtkstd::vector<vtkstd::string> extensions;
+  std::vector<std::string> extensions;
   this->Internals->BuildExtensions(filename, extensions);
 
   vtkInternals::PrototypesType::iterator iter;
@@ -542,12 +541,12 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
 }
 
 //----------------------------------------------------------------------------
-static vtkstd::string vtkJoin(
-  const vtkstd::vector<vtkstd::string> exts, const char* prefix,
+static std::string vtkJoin(
+  const std::vector<std::string> exts, const char* prefix,
   const char* suffix)
 {
   vtksys_ios::ostringstream stream;
-  vtkstd::vector<vtkstd::string>::const_iterator iter;
+  std::vector<std::string>::const_iterator iter;
   for (iter = exts.begin(); iter != exts.end(); ++iter)
     {
     stream << prefix << *iter << suffix;
@@ -561,7 +560,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   vtksys_ios::ostringstream all_types;
   all_types << "Supported Files (";
 
-  vtkstd::set<vtkstd::string> sorted_types;
+  std::set<std::string> sorted_types;
 
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
@@ -569,7 +568,8 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
     {
     if (iter->CanCreatePrototype(session))
       {
-      vtkstd::string ext_list;
+      iter->FillInformation(session);
+      std::string ext_list;
       if (iter->Extensions.size() > 0)
         {
         ext_list = ::vtkJoin(iter->Extensions, "*.", " ");
@@ -577,7 +577,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 
       if (iter->FilenameRegExs.size() > 0)
         {
-        vtkstd::string ext_join = ::vtkJoin(
+        std::string ext_join = ::vtkJoin(
           iter->FilenamePatterns, "", " ");
         if (ext_list.size() > 0)
           {
@@ -601,7 +601,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
     }
   all_types << ")";
 
-  vtkstd::set<vtkstd::string>::iterator iter2;
+  std::set<std::string>::iterator iter2;
   for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
     {
     all_types << ";;" << (*iter2);
@@ -611,9 +611,11 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* vtkNotUsed(session))
+bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkSMSession* session)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("file_listing", "ServerFileListing"));
   if (!proxy)
@@ -656,9 +658,11 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
-  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* vtkNotUsed(session))
+  const char* readerxmlgroup, const char* readerxmlname, vtkSMSession* session)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  assert("Session should be valid" && session);
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );
   if (!proxy)
     {
@@ -676,4 +680,3 @@ void vtkSMReaderFactory::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

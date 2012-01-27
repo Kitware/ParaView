@@ -93,7 +93,7 @@
       <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
         command="SetUseOffscreenRenderingForScreenshots"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           Set whether offscreen rendering should be used during
@@ -1243,7 +1243,11 @@
           <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
           <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
           <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
-		  <Property name="DataBounds" />
+          <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
+          <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
+          <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
+          <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+          <Property name="DataBounds" />
           <Property name="CustomBounds"/>
           <Property name="CustomBoundsActive"/>
         </ExposedProperties>
@@ -1571,6 +1575,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1585,14 +1592,16 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -1790,6 +1799,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1805,7 +1817,8 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
@@ -1850,7 +1863,8 @@
       </IntVectorProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -2014,7 +2028,8 @@
       </DoubleVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
@@ -2192,7 +2207,8 @@
         </Documentation>
       </IntVectorProperty>
 
-      <ProxyProperty name="LookupTable" command="SetLookupTable">
+      <ProxyProperty name="LookupTable" command="SetLookupTable"
+        skip_dependency="1">
         <Documentation>
           Set the lookup table to use for scalar mapping.
         </Documentation>
@@ -2244,6 +2260,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2484,6 +2503,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+	      <Hints>
+	        <NoDefault />
+	      </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2496,7 +2518,8 @@
       </ProxyProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
@@ -2914,6 +2937,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty  name="EnableCustomAxisRange"
+        command="EnableCustomAxisRange"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Allow user to enable or disable custom range label
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty  name="YAxisVisibility"
         command="SetYAxisVisibility"
         number_of_elements="1"
@@ -3037,6 +3070,31 @@
           Set the location of tick marks.
         </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="XAxisRange"
+        command="SetXAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="YAxisRange"
+        command="SetYAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ZAxisRange"
+        command="SetZAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
 

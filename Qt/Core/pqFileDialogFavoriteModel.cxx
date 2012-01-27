@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSmartPointer.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
-#include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkStringList.h>
 
@@ -109,7 +109,7 @@ public:
 
   if(server)
     {
-    vtkSMProxyManager* pxm = server->proxyManager();
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
 
     vtkSMProxy* helper = pxm->NewProxy("misc","FileInformationHelper");
     pqSMAdaptor::setElementProperty(helper->GetProperty("SpecialDirectories"),

@@ -79,6 +79,9 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
 
   this->MeshVisibility = true;
   this->SetMeshVisibility(false);
+
+  this->GlyphMapper->SetInterpolateScalarsBeforeMapping(0);
+  this->LODGlyphMapper->SetInterpolateScalarsBeforeMapping(0);
 }
 
 //----------------------------------------------------------------------------
@@ -227,9 +230,74 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::UpdateColoringParameters()
+{
+  this->Superclass::UpdateColoringParameters();
+  
+  if (this->Mapper->GetScalarVisibility() == 0 ||
+    this->Mapper->GetScalarMode() != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
+    {
+    // we are not coloring the glyphs with scalars.
+    const char* null = NULL;
+    this->GlyphMapper->SetScalarVisibility(0);
+    this->LODGlyphMapper->SetScalarVisibility(0);
+    this->GlyphMapper->SelectColorArray(null);
+    this->LODGlyphMapper->SelectColorArray(null);
+    return;
+    }
+
+  this->GlyphMapper->SetScalarVisibility(1);
+  this->GlyphMapper->SelectColorArray(this->ColorArrayName);
+  this->GlyphMapper->SetUseLookupTableScalarRange(1);
+  this->GlyphMapper->SetScalarMode(
+    VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+
+  this->LODGlyphMapper->SetScalarVisibility(1);
+  this->LODGlyphMapper->SelectColorArray(this->ColorArrayName);
+  this->LODGlyphMapper->SetUseLookupTableScalarRange(1);
+  this->LODGlyphMapper->SetScalarMode(
+    VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+}
+
+//----------------------------------------------------------------------------
 void vtkGlyph3DRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//**************************************************************************
+// Overridden to forward to vtkGlyph3DMapper
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetLookupTable(vtkScalarsToColors* val)
+{
+  this->GlyphMapper->SetLookupTable(val);
+  this->LODGlyphMapper->SetLookupTable(val);
+  this->Superclass::SetLookupTable(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetMapScalars(int val)
+{
+  this->GlyphMapper->SetColorMode(val);
+  this->LODGlyphMapper->SetColorMode(val);
+  this->Superclass::SetMapScalars(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetInterpolateScalarsBeforeMapping(int val)
+{
+  // The GlyphMapper does not support InterpolateScalarsBeforeMapping==1. So
+  // leave it at 0.
+  this->Superclass::SetInterpolateScalarsBeforeMapping(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetStatic(int val)
+{
+  this->GlyphMapper->SetStatic(val);
+  this->LODGlyphMapper->SetStatic(val);
+  this->Superclass::SetStatic(val);
 }
 
 //**************************************************************************

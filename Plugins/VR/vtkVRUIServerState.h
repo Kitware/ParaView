@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkVRUIServerState
 {
@@ -45,20 +45,20 @@ public:
 
   // Description:
   // Return the state of all the trackers.
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *GetTrackerStates();
+  std::vector<vtkSmartPointer<vtkVRUITrackerState> > *GetTrackerStates();
 
   // Description:
   // Return the state of all the buttons.
-  vtkstd::vector<bool> *GetButtonStates();
+  std::vector<bool> *GetButtonStates();
 
   // Description:
   // Return the state of all the valuators (whatever it is).
-  vtkstd::vector<float> *GetValuatorStates();
+  std::vector<float> *GetValuatorStates();
 
 protected:
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > TrackerStates;
-  vtkstd::vector<bool> ButtonStates;
-  vtkstd::vector<float> ValuatorStates;
+  std::vector<vtkSmartPointer<vtkVRUITrackerState> > TrackerStates;
+  std::vector<bool> ButtonStates;
+  std::vector<float> ValuatorStates;
 
 private:
   vtkVRUIServerState(const vtkVRUIServerState&); // Not implemented.

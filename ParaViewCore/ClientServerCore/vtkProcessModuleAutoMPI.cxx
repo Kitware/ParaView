@@ -22,8 +22,8 @@
 #include "vtkProcessModule.h"
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-#include "vtkstd/string"
-#include "vtkstd/vector"
+#include "string"
+#include "vector"
 #include "vtksys/Process.h"
 #include "vtksys/stl/string"
 #include "vtksys/stl/vector"
@@ -65,7 +65,7 @@ public:
   vtkStandardNewMacro(vtkGetFreePort);
 
   void vtkCopy(vtksys_stl::vector<const char*>& dest,
-    const vtksys_stl::vector<vtkstd::string>& src)
+    const vtksys_stl::vector<std::string>& src)
     {
     dest.resize(src.size());
     for (size_t cc=0; cc < src.size(); cc++)
@@ -81,47 +81,47 @@ class vtkProcessModuleAutoMPIInternals
 public:
   // This specify the preflags and post flags that can be set using:
   // VTK_MPI_PRENUMPROC_FLAGS VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
-  vtkstd::vector<vtkstd::string> MPIPreNumProcFlags;
-  vtkstd::vector<vtkstd::string> MPIPreFlags;
-  vtkstd::vector<vtkstd::string> MPIPostFlags;
+  std::vector<std::string> MPIPreNumProcFlags;
+  std::vector<std::string> MPIPreFlags;
+  std::vector<std::string> MPIPostFlags;
 
   // MPIServerFlags allows you to specify flags specific for
   // the client or the server
-  vtkstd::vector<vtkstd::string> MPIServerPreFlags;
-  vtkstd::vector<vtkstd::string> MPIServerPostFlags;
+  std::vector<std::string> MPIServerPreFlags;
+  std::vector<std::string> MPIServerPostFlags;
 
   int TotalMulticoreProcessors;
   double TimeOut;
-  vtkstd::string ParaView;  // fullpath to paraview executable
-  vtkstd::string ParaViewServer;  // fullpath to paraview server executable
-  vtkstd::string MPINumProcessFlag;
-  vtkstd::string MPIServerNumProcessFlag;
-  vtkstd::string MPIRun;  // fullpath to mpirun executable
-  vtkstd::string CurrentPrintLineName;
+  std::string ParaView;  // fullpath to paraview executable
+  std::string ParaViewServer;  // fullpath to paraview server executable
+  std::string MPINumProcessFlag;
+  std::string MPIServerNumProcessFlag;
+  std::string MPIRun;  // fullpath to mpirun executable
+  std::string CurrentPrintLineName;
 
   void SeparateArguments(const char* str,
-                         vtkstd::vector<vtkstd::string>& flags);
+                         std::vector<std::string>& flags);
   int StartRemoteBuiltInSelf (const char* servername,int port);
   void ReportCommand (const char* const* command, const char* name);
   int StartServer (vtksysProcess* server, const char* name,
-                   vtkstd::vector<char>& out,
-                   vtkstd::vector<char>& err);
+                   std::vector<char>& out,
+                   std::vector<char>& err);
   int WaitForAndPrintLine (const char* pname, vtksysProcess* process,
-                           vtkstd::string& line, double timeout,
-                           vtkstd::vector<char>& out,
-                           vtkstd::vector<char>& err,
+                           std::string& line, double timeout,
+                           std::vector<char>& out,
+                           std::vector<char>& err,
                            int* foundWaiting);
-  int WaitForLine (vtksysProcess* process, vtkstd::string& line,
+  int WaitForLine (vtksysProcess* process, std::string& line,
                               double timeout,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err);
+                              std::vector<char>& out,
+                              std::vector<char>& err);
   void PrintLine (const char* pname, const char* line);
-  void CreateCommandLine (vtksys_stl::vector<vtkstd::string>& commandLine,
+  void CreateCommandLine (vtksys_stl::vector<std::string>& commandLine,
                           const char* paraView,
                           const char* numProc,
                           int port);
   bool CollectConfiguredOptions ();
-  bool SetMPIRun(vtkstd::string mpiexec);
+  bool SetMPIRun(std::string mpiexec);
 };
 
 #ifdef WIN32
@@ -231,22 +231,22 @@ int vtkProcessModuleAutoMPIInternals::
   if(server)
     {
     // Construct the Command line that will be executed
-    vtksys_stl::vector<vtkstd::string> serverCommandStr;
+    vtksys_stl::vector<std::string> serverCommandStr;
     vtksys_stl::vector<const char*> serverCommand;
-    //vtkstd::string serverExe = this->ParaViewServer;
+    //std::string serverExe = this->ParaViewServer;
 
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    vtkstd::string app_dir =
+    std::string app_dir =
       vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
 
 #if defined(__APPLE__)
-    vtkstd::string pvserver_rel(app_dir + "/../bin/" + vtkstd::string(PARAVIEW_SERVER));
-    vtkstd::string serverExe = vtksys::SystemTools::CollapseFullPath(pvserver_rel.c_str());
+    std::string pvserver_rel(app_dir + "/../bin/" + std::string(PARAVIEW_SERVER));
+    std::string serverExe = vtksys::SystemTools::CollapseFullPath(pvserver_rel.c_str());
     vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
     cerr << "Mac AppDir: " << serverExe << endl;
     cerr << "Mac ServerExe: " << serverExe << endl;
 #elif defined(WIN32)
-    vtkstd::string serverExe = PARAVIEW_SERVER;
+    std::string serverExe = PARAVIEW_SERVER;
 
     // Set the working directory as the location of pvserver. Some
     // mpi packages have issue with full paths containing spaces so
@@ -254,8 +254,8 @@ int vtkProcessModuleAutoMPIInternals::
     cerr << "Setting working directory to be " << app_dir.c_str() << endl;
     vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
 #else
-    vtkstd::string serverExe = 
-      app_dir + vtkstd::string("/") + vtkstd::string(PARAVIEW_SERVER);
+    std::string serverExe =
+      app_dir + std::string("/") + std::string(PARAVIEW_SERVER);
 #endif
 
     this->CreateCommandLine(serverCommandStr,
@@ -275,8 +275,8 @@ int vtkProcessModuleAutoMPIInternals::
       }
     }
 
-  vtkstd::vector<char> ServerStdOut;
-  vtkstd::vector<char> ServerStdErr;
+  std::vector<char> ServerStdOut;
+  std::vector<char> ServerStdErr;
 
  // Start the data server if there is one
   if(!this->StartServer(server, "server",
@@ -294,11 +294,11 @@ int vtkProcessModuleAutoMPIInternals::
  * Used to set the this->Internals->MPIRun variable to the appropriate MPI path
  *
  */
-bool vtkProcessModuleAutoMPIInternals::SetMPIRun(vtkstd::string mpiexec)
+bool vtkProcessModuleAutoMPIInternals::SetMPIRun(std::string mpiexec)
 {
   mpiexec = vtksys::SystemTools::GetFilenameName(mpiexec);
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  vtkstd::string app_dir = options->GetApplicationPath();
+  std::string app_dir = options->GetApplicationPath();
   app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str())+"/"+mpiexec;
   if(vtksys::SystemTools::FileExists(app_dir.c_str(),true))
     {
@@ -386,7 +386,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
  */
 void
 vtkProcessModuleAutoMPIInternals::CreateCommandLine(
-  vtksys_stl::vector<vtkstd::string>& commandLine,
+  vtksys_stl::vector<std::string>& commandLine,
   const char* paraView,
   const char* numProc,
   int port)
@@ -412,7 +412,7 @@ vtkProcessModuleAutoMPIInternals::CreateCommandLine(
 
     }
   char temp[100];
-  vtkstd::string portString;
+  std::string portString;
   sprintf(temp,"--server-port=%d",port);
   portString+=temp;
   portString+='\0';
@@ -432,11 +432,11 @@ vtkProcessModuleAutoMPIInternals::CreateCommandLine(
 
 //--------------------------------------------------------------------internal
 void vtkProcessModuleAutoMPIInternals::SeparateArguments(const char* str,
-                                     vtkstd::vector<vtkstd::string>& flags)
+                                     std::vector<std::string>& flags)
 {
-  vtkstd::string arg = str;
-  vtkstd::string::size_type pos1 = 0;
-  vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
+  std::string arg = str;
+  std::string::size_type pos1 = 0;
+  std::string::size_type pos2 = arg.find_first_of(" ;");
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
@@ -489,8 +489,8 @@ void vtkProcessModuleAutoMPIInternals::ReportCommand(const char* const* command,
  * @return 0 = failure : 1 = success
  */
 int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const char* name,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err)
+                              std::vector<char>& out,
+                              std::vector<char>& err)
 {
   if(!server)
     {
@@ -500,7 +500,7 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
   vtksysProcess_SetTimeout(server, this->TimeOut);
   vtksysProcess_Execute(server);
   int foundWaiting = 0;
-  vtkstd::string output;
+  std::string output;
   while(!foundWaiting)
     {
     int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
@@ -526,9 +526,9 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
 
 //--------------------------------------------------------------------internal
 int vtkProcessModuleAutoMPIInternals::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
-                                      vtkstd::string& line, double timeout,
-                                      vtkstd::vector<char>& out,
-                                      vtkstd::vector<char>& err,
+                                      std::string& line, double timeout,
+                                      std::vector<char>& out,
+                                      std::vector<char>& err,
                                       int* foundWaiting)
 {
   int pipe = this->WaitForLine(process, line, timeout, out, err);
@@ -544,14 +544,14 @@ int vtkProcessModuleAutoMPIInternals::WaitForAndPrintLine(const char* pname, vtk
 }
 
 //---------------------------------------------------------------------internal
-int vtkProcessModuleAutoMPIInternals::WaitForLine(vtksysProcess* process, vtkstd::string& line,
+int vtkProcessModuleAutoMPIInternals::WaitForLine(vtksysProcess* process, std::string& line,
                               double timeout,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err)
+                              std::vector<char>& out,
+                              std::vector<char>& err)
 {
   line = "";
-  vtkstd::vector<char>::iterator outiter = out.begin();
-  vtkstd::vector<char>::iterator erriter = err.begin();
+  std::vector<char>::iterator outiter = out.begin();
+  std::vector<char>::iterator erriter = err.begin();
   while(1)
     {
     // Check for a newline in stdout.
@@ -612,14 +612,14 @@ int vtkProcessModuleAutoMPIInternals::WaitForLine(vtksysProcess* process, vtkstd
     else if(pipe == vtksysProcess_Pipe_STDOUT)
       {
       // Append to the stdout buffer.
-      vtkstd::vector<char>::size_type size = out.size();
+      std::vector<char>::size_type size = out.size();
       out.insert(out.end(), data, data+length);
       outiter = out.begin()+size;
       }
     else if(pipe == vtksysProcess_Pipe_STDERR)
       {
       // Append to the stderr buffer.
-      vtkstd::vector<char>::size_type size = err.size();
+      std::vector<char>::size_type size = err.size();
       err.insert(err.end(), data, data+length);
       erriter = err.begin()+size;
       }

@@ -144,8 +144,8 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char *str
   // contain the class name of the compressor type to use,
   // follwed by a stream that the named class will restore itself
   // from.
-  vtkstd::istringstream iss(stream);
-  vtkstd::string className;
+  std::istringstream iss(stream);
+  std::string className;
   iss >> className;
 
   // Allocate the desired compressor unless we have one in hand.

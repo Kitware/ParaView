@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QComboBox>
+#include <QPointer>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
@@ -54,14 +55,11 @@ class pqSpreadSheetViewDecorator::pqInternal : public Ui::pqSpreadSheetViewDecor
 {
 public:
   pqPropertyLinks Links;
-  pqSignalAdaptorComboBox* AttributeAdaptor;
-  pqComboBoxDomain* AttributeDomain;
-  pqSignalAdaptorSpinBox* DecimalPrecisionAdaptor;
+  QPointer<pqSignalAdaptorComboBox> AttributeAdaptor;
+  QPointer<pqComboBoxDomain> AttributeDomain;
+  QPointer<pqSignalAdaptorSpinBox> DecimalPrecisionAdaptor;
   pqInternal()
     {
-    this->AttributeAdaptor = 0;
-    this->AttributeDomain = 0;
-    this->DecimalPrecisionAdaptor = 0;
     }
   ~pqInternal()
     {

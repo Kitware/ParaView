@@ -56,11 +56,11 @@ vtkSMTestDriver::~vtkSMTestDriver()
 // now implement the vtkSMTestDriver class
 
 void vtkSMTestDriver::SeparateArguments(const char* str,
-                                     vtkstd::vector<vtkstd::string>& flags)
+                                     std::vector<std::string>& flags)
 {
-  vtkstd::string arg = str;
-  vtkstd::string::size_type pos1 = 0;
-  vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
+  std::string arg = str;
+  std::string::size_type pos1 = 0;
+  std::string::size_type pos2 = arg.find_first_of(" ;");
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
@@ -151,13 +151,13 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 }
 
 /// This adds the debug/build configuration crap for the executable on windows.
-static vtkstd::string FixExecutablePath(const vtkstd::string& path)
+static std::string FixExecutablePath(const std::string& path)
 {
 #ifdef  CMAKE_INTDIR
-  vtkstd::string parent_dir =
+  std::string parent_dir =
     vtksys::SystemTools::GetFilenamePath(path.c_str());
 
-  vtkstd::string filename =
+  std::string filename =
     vtksys::SystemTools::GetFilenameName(path);
   parent_dir += "/" CMAKE_INTDIR "/";
   return parent_dir + filename;
@@ -405,8 +405,8 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
 }
 
 int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name,
-  vtkstd::vector<char>& out,
-  vtkstd::vector<char>& err,
+  std::vector<char>& out,
+  std::vector<char>& err,
   const char* string_to_wait_for)
 {
   if(!server)
@@ -417,7 +417,7 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   vtksysProcess_SetTimeout(server, this->TimeOut);
   vtksysProcess_Execute(server);
   int foundWaiting = 0;
-  vtkstd::string output;
+  std::string output;
   while(!foundWaiting)
     {
     int pipe = this->WaitForAndPrintLine(
@@ -474,7 +474,7 @@ void vtkSMTestDriver::Stop(vtksysProcess* p, const char* name)
     }
 }
 
-int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output)
+int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output)
 {
   const char* possibleMPIErrors[] = {
     "error",
@@ -507,8 +507,8 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& out
     return 0;
     }
 
-  vtkstd::vector<vtkstd::string> lines;
-  vtkstd::vector<vtkstd::string>::iterator it;
+  std::vector<std::string> lines;
+  std::vector<std::string>::iterator it;
   vtksys::SystemTools::Split(output.c_str(), lines);
 
   int i, j;
@@ -560,11 +560,11 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // For example: "killall -9 rsh paraview;"
   if(strlen(PV_TEST_INIT_COMMAND) > 0)
     {
-    vtkstd::vector<vtksys::String> commands = vtksys::SystemTools::SplitString(
+    std::vector<vtksys::String> commands = vtksys::SystemTools::SplitString(
       PV_TEST_INIT_COMMAND, ';');
     for (unsigned int cc=0; cc < commands.size(); cc++)
       {
-      vtkstd::string command = commands[cc];
+      std::string command = commands[cc];
       if (command.size() > 0)
         {
         system(command.c_str());
@@ -594,7 +594,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // Allocate process managers.
   vtksysProcess* renderServer = 0;
   vtksysProcess* server = 0;
-  vtkstd::vector<vtksysProcess*> clients;
+  std::vector<vtksysProcess*> clients;
   if(this->TestRenderServer)
     {
     renderServer = vtksysProcess_New();
@@ -628,12 +628,12 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     clients.push_back(client);
     }
 
-  vtkstd::vector<char> ClientStdOut;
-  vtkstd::vector<char> ClientStdErr;
-  vtkstd::vector<char> ServerStdOut;
-  vtkstd::vector<char> ServerStdErr;
-  vtkstd::vector<char> RenderServerStdOut;
-  vtkstd::vector<char> RenderServerStdErr;
+  std::vector<char> ClientStdOut;
+  std::vector<char> ClientStdErr;
+  std::vector<char> ServerStdOut;
+  std::vector<char> ServerStdErr;
+  std::vector<char> RenderServerStdOut;
+  std::vector<char> RenderServerStdErr;
 
   // Construct the render server process command line
   vtksys_stl::vector<const char*> renderServerCommand;
@@ -756,9 +756,9 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
 
   // Report the output of the processes.
   int clientPipe = 1;
-  vtkstd::string output;
+  std::string output;
   int mpiError = 0;
-  vtkstd::vector<int> client_pipe_status;
+  std::vector<int> client_pipe_status;
   client_pipe_status.resize(clients.size(), 1);
   while(clientPipe)
     {
@@ -958,14 +958,14 @@ int vtkSMTestDriver::ReportStatus(vtksysProcess* process, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMTestDriver::WaitForLine(vtksysProcess* process, vtkstd::string& line,
+int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line,
                               double timeout,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err)
+                              std::vector<char>& out,
+                              std::vector<char>& err)
 {
   line = "";
-  vtkstd::vector<char>::iterator outiter = out.begin();
-  vtkstd::vector<char>::iterator erriter = err.begin();
+  std::vector<char>::iterator outiter = out.begin();
+  std::vector<char>::iterator erriter = err.begin();
   while(1)
     {
     // Check for a newline in stdout.
@@ -1026,14 +1026,14 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, vtkstd::string& line,
     else if(pipe == vtksysProcess_Pipe_STDOUT)
       {
       // Append to the stdout buffer.
-      vtkstd::vector<char>::size_type size = out.size();
+      std::vector<char>::size_type size = out.size();
       out.insert(out.end(), data, data+length);
       outiter = out.begin()+size;
       }
     else if(pipe == vtksysProcess_Pipe_STDERR)
       {
       // Append to the stderr buffer.
-      vtkstd::vector<char>::size_type size = err.size();
+      std::vector<char>::size_type size = err.size();
       err.insert(err.end(), data, data+length);
       erriter = err.begin()+size;
       }
@@ -1077,9 +1077,9 @@ void vtkSMTestDriver::PrintLine(const char* pname, const char* line)
 
 //----------------------------------------------------------------------------
 int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
-                                      vtkstd::string& line, double timeout,
-                                      vtkstd::vector<char>& out,
-                                      vtkstd::vector<char>& err,
+                                      std::string& line, double timeout,
+                                      std::vector<char>& out,
+                                      std::vector<char>& err,
                                       const char* string_to_wait_for,
                                       int* foundWaiting)
 {
@@ -1096,7 +1096,7 @@ int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* proce
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string vtkSMTestDriver::GetDirectory(vtkstd::string location)
+std::string vtkSMTestDriver::GetDirectory(std::string location)
 {
   return vtksys::SystemTools::GetParentDirectory(location.c_str());
 }

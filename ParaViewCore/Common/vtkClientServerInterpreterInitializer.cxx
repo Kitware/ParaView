@@ -19,15 +19,15 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkClientServerInterpreterInitializer::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkWeakPointer<vtkClientServerInterpreter> >
+  typedef std::vector<vtkWeakPointer<vtkClientServerInterpreter> >
     VectorOfInterpreters;
   VectorOfInterpreters Interpreters;
-  typedef vtkstd::vector<
+  typedef std::vector<
     vtkClientServerInterpreterInitializer::InterpreterInitializationCallback>
     VectorOfCallbacks;
   VectorOfCallbacks Callbacks;
@@ -73,7 +73,8 @@ vtkClientServerInterpreterInitializer::GetInitializer()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter* vtkClientServerInterpreterInitializer::GetInterpreter()
+vtkClientServerInterpreter*
+vtkClientServerInterpreterInitializer::GetGlobalInterpreter()
 {
   static vtkSmartPointer<vtkClientServerInterpreter> Singleton;
   if (!Singleton)

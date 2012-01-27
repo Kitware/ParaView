@@ -89,6 +89,9 @@ public slots:
   /// Forces an immediate render.
   virtual void forceRender();
 
+  /// Cancels any pending renders.
+  void cancelPendingRenders();
+
   /// Called to undo interaction.
   /// View modules supporting interaction undo must override this method.
   virtual void undo() {}

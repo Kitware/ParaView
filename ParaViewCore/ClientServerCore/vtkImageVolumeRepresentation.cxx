@@ -32,8 +32,8 @@
 #include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkVolumeProperty.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 
 vtkStandardNewMacro(vtkImageVolumeRepresentation);

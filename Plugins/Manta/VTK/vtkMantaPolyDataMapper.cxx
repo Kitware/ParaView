@@ -114,7 +114,7 @@ public:
   ~Helper() {}
 
   Manta::Material *material;
-  vtkstd::vector<Manta::Vector> texCoords;
+  std::vector<Manta::Vector> texCoords;
 };
 
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
@@ -272,7 +272,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
 {
 
   Manta::Material *material = this->MyHelper->material;
-  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+  std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
   int total_triangles = 0;
   vtkCellArray *cells = polys->GetPolys();
@@ -449,7 +449,7 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
                                          Manta::Group *lines)
 {
   Manta::Material *material = this->MyHelper->material;
-  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+  std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
   // total number of triangles
   int total_triangles = 0;
@@ -696,7 +696,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   this->MyHelper->material = NULL;
   this->MyHelper->texCoords.clear();
   Manta::Material *&material = this->MyHelper->material;
-  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+  std::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
 
   if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
     {

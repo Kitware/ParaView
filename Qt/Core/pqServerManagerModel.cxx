@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSourceProxy.h"
@@ -395,7 +395,7 @@ void pqServerManagerModel::onProxyUnRegistered(const QString& group,
   // Verify if the proxy is registered under a different name in the same group.
   // If so, we are simply renaming the proxy.
   vtkSmartPointer<vtkStringList> names = vtkSmartPointer<vtkStringList>::New();
-  vtkSMProxyManager* pxm = proxy->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   pxm->GetProxyNames(group.toAscii().data(), proxy, names);
   for (int cc=0; cc < names->GetLength(); cc++)
     {
@@ -435,6 +435,7 @@ void pqServerManagerModel::onProxyUnRegistered(const QString& group,
 
   if (view)
     {
+    view->cancelPendingRenders();
     emit this->viewRemoved(view);
     }
   else if (source)

@@ -12,6 +12,7 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkMath.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPolyData.h"
@@ -30,11 +31,13 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkExtractPolyDataGeometry.h"
 #include "vtkBox.h"
 #include "vtkCleanPolyData.h"
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <algorithm>
+#include <map>
+#include <vector>
+#include <string>
 #include "vtkMultiBlockDataSet.h"
+
+#include "vtkBoundingBox.h"
 
 #include <math.h>
 
@@ -64,7 +67,7 @@ class vtkPrismSurfaceReader::MyInternal
         vtkSmartPointer<vtkBox> Box;
 
         vtkSmartPointer<vtkCleanPolyData> CleanPolyData;
-        vtkstd::string AxisVarName[3];
+        std::string AxisVarName[3];
         vtkSmartPointer<vtkStringArray> ArrayNames;
 
         bool ArrayLogScaling[3];
@@ -76,7 +79,7 @@ class vtkPrismSurfaceReader::MyInternal
         bool WarpSurface;
         bool DisplayContours;
         int NumberOfContours;
-        vtkstd::string  ContourVarName;
+        std::string  ContourVarName;
         vtkSmartPointer<vtkDoubleArray> XRangeArray;
         vtkSmartPointer<vtkDoubleArray> YRangeArray;
         vtkSmartPointer<vtkDoubleArray> ZRangeArray;
@@ -895,6 +898,12 @@ int vtkPrismSurfaceReader::RequestData(
     vtkDebugMacro( << "SESAME arrays not found" );
     return 0;
   }
+
+  //the bounding box is used to store the un scaled bounds
+  //so that we can pass those to the view.
+  //We do this instead of passing the scaled bounds, as converting
+  //back can cause a numeric inaccuracey
+  vtkBoundingBox unScaledBoundingBox;
   int tID=this->GetTable();
   bool scalingEnabled[3] = {this->GetXLogScaling(),
                               this->GetYLogScaling(),
@@ -916,11 +925,22 @@ int vtkPrismSurfaceReader::RequestData(
     coords[0] = (xArray) ? xArray->GetValue(ptId) : 0.0;
     coords[1] = (yArray) ? yArray->GetValue(ptId) : 0.0;
     coords[2] = (zArray) ? zArray->GetValue(ptId) : 0.0;
+
+    unScaledBoundingBox.AddPoint(coords);
+
     vtkPrismCommon::scalePoint(coords,scalingEnabled,tID);
 
     newPts->InsertPoint(ptId,coords);
 
   }
+
+  double viewUnscaledBounds[6];
+  unScaledBoundingBox.GetBounds(viewUnscaledBounds);
+
+  //add on the flags to the surface, curves and contours that they
+  //should be used to compute the world bounds.
+  this->SetupViewKeys(viewUnscaledBounds,surfaceOutput,curveOutput,contourOutput);
+
 
   double bounds[6];
   localOutput->GetBounds(bounds);
@@ -930,6 +950,7 @@ int vtkPrismSurfaceReader::RequestData(
     bounds[4]=-10;
     bounds[5]=10;
   }
+
 
   //scale the threshold numbers
   vtkPrismCommon::scaleThresholdBounds(scalingEnabled,tID,
@@ -1010,36 +1031,6 @@ int vtkPrismSurfaceReader::RequestData(
     surfaceOutput->GetFieldData()->AddArray(zNameArray);
   }
 
-  
-  //add on the flag to the surface, curves and contours that they
-  //should be used to compute the world bounds.
-  vtkDoubleArray *prismBounds = vtkDoubleArray::New();
-  prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
-  prismBounds->SetNumberOfValues(6);
-  //we use the surface bounds as we want the properly scaled dataset including log scaling
-  localOutput->GetBounds(prismBounds->GetPointer(0)); //copy the bounds into the prismBounds array
-
-  //add on the flag to the surface, curves and contours that they
-  //have a thresholded bounds too
-  vtkDoubleArray *prismThresholdBounds = vtkDoubleArray::New();
-  prismThresholdBounds->SetName("PRISM_THRESHOLD_BOUNDS");
-  prismThresholdBounds->SetNumberOfValues(6);
-  //copy the thresholded bounds into the prismBounds array
-  this->Internal->Box->GetBounds(prismThresholdBounds->GetPointer(0));
-
-  surfaceOutput->GetFieldData()->AddArray(prismBounds);
-  surfaceOutput->GetFieldData()->AddArray(prismThresholdBounds);
-
-  curveOutput->GetFieldData()->AddArray(prismBounds);
-  curveOutput->GetFieldData()->AddArray(prismThresholdBounds);
-
-  contourOutput->GetFieldData()->AddArray(prismBounds);
-  contourOutput->GetFieldData()->AddArray(prismThresholdBounds);
-
-  prismBounds->FastDelete();
-  prismThresholdBounds->FastDelete();
-
-
   if(this->Internal->DisplayContours)
   {
     vtkIdType numberArrays=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetNumberOfArrays();
@@ -1089,11 +1080,75 @@ int vtkPrismSurfaceReader::RequestData(
     curveOutput->SetPoints(newCurvePts);
   }
   return 1;
-
-
-
 }
 
+//----------------------------------------------------------------------------
+void vtkPrismSurfaceReader::SetupViewKeys(double geomBounds[6],
+                                          vtkPointSet* surfaceOutput,
+                                          vtkPointSet* curveOutput,
+                                          vtkPointSet* contourOutput)
+{
+  //add on the flag to the surface, curves and contours that they
+  //should be used to compute the world bounds.
+  vtkDoubleArray *prismBounds = vtkDoubleArray::New();
+  prismBounds->SetName("PRISM_GEOMETRY_BOUNDS");
+  prismBounds->SetNumberOfValues(6);
+
+  //add on the flag to the surface, curves and contours that they
+  //have a thresholded bounds too
+  vtkDoubleArray *prismThresholdBounds = vtkDoubleArray::New();
+  prismThresholdBounds->SetName("PRISM_THRESHOLD_BOUNDS");
+  prismThresholdBounds->SetNumberOfValues(6);
+
+  double* pBounds = prismBounds->GetPointer(0);
+  for(int i=0; i < 6; ++i)
+    {
+    //we use the local bounds as we want the unscaled data
+    pBounds[i] = geomBounds[i];
+    }
+
+  double* tBounds = prismThresholdBounds->GetPointer(0);
+  tBounds[0] = this->XThresholdBetween[0];
+  tBounds[1] = this->XThresholdBetween[1];
+  tBounds[2] = this->YThresholdBetween[0];
+  tBounds[3] = this->YThresholdBetween[1];
+  tBounds[4] = geomBounds[4];
+  tBounds[5] = geomBounds[5];
+
+  vtkIntArray *prismLogBounds = vtkIntArray::New();
+  prismLogBounds->SetName("PRISM_USE_LOG_SCALING");
+  prismLogBounds->SetNumberOfValues(3);
+
+  prismLogBounds->SetValue(0,static_cast<int>(this->GetXLogScaling()));
+  prismLogBounds->SetValue(1,static_cast<int>(this->GetYLogScaling()));
+  prismLogBounds->SetValue(2,static_cast<int>(this->GetZLogScaling()));
+
+  vtkIntArray *prismTableId = vtkIntArray::New();
+  prismTableId->SetName("PRISM_TABLE_ID");
+  prismTableId->SetNumberOfValues(1);
+  prismTableId->SetValue(0,this->GetTable());
+
+  surfaceOutput->GetFieldData()->AddArray(prismBounds);
+  surfaceOutput->GetFieldData()->AddArray(prismThresholdBounds);
+  surfaceOutput->GetFieldData()->AddArray(prismLogBounds);
+  surfaceOutput->GetFieldData()->AddArray(prismTableId);
+
+  curveOutput->GetFieldData()->AddArray(prismBounds);
+  curveOutput->GetFieldData()->AddArray(prismThresholdBounds);
+  curveOutput->GetFieldData()->AddArray(prismLogBounds);
+  curveOutput->GetFieldData()->AddArray(prismTableId);
+
+  contourOutput->GetFieldData()->AddArray(prismBounds);
+  contourOutput->GetFieldData()->AddArray(prismThresholdBounds);
+  contourOutput->GetFieldData()->AddArray(prismLogBounds);
+  contourOutput->GetFieldData()->AddArray(prismTableId);
+
+  prismBounds->FastDelete();
+  prismThresholdBounds->FastDelete();
+  prismLogBounds->FastDelete();
+  prismTableId->FastDelete();
+
+}
 //----------------------------------------------------------------------------
 int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 {
@@ -1150,8 +1205,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       //Next we match the correct 401 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,vtkstd::vector<int> > tableMap;
-      vtkstd::vector<int> indexes;
+      std::map<std::string,std::vector<int> > tableMap;
+      std::vector<int> indexes;
       indexes.resize(2);
       //Density
       indexes[0]=2;//Vapor Density on Coexistence Line
@@ -1180,12 +1235,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray[2];
       vtkSmartPointer<vtkFloatArray> zArray[2];
 
-      vtkstd::map<vtkstd::string,vtkstd::vector<int> >::iterator iter;
+      std::map<std::string,std::vector<int> >::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
         //First check for pressure.
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
           if(iter->second[0]!=-1)
@@ -1342,7 +1397,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->ColdConversionFilter->GetOutput();
 
       //Next we match the correct 306 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Pressure
@@ -1358,11 +1413,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));
@@ -1498,7 +1553,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->SolidMeltConversionFilter->GetOutput();
 
       //Next we match the correct 401 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Temperature
@@ -1516,11 +1571,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));
@@ -1642,7 +1697,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->LiquidMeltConversionFilter->GetOutput();
 
       //Next we match the correct 412 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Temperature
@@ -1660,11 +1715,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));

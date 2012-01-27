@@ -26,7 +26,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 

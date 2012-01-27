@@ -31,7 +31,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#include <vtkstd/map>
+#include <map>
 #include <vtksys/ios/sstream>
 
 struct vtkPPhastaReaderInternal
@@ -47,9 +47,9 @@ struct vtkPPhastaReaderInternal
       }
   };
 
-  typedef vtkstd::map<int, TimeStepInfo> TimeStepInfoMapType;
+  typedef std::map<int, TimeStepInfo> TimeStepInfoMapType;
   TimeStepInfoMapType TimeStepInfoMap;
-  typedef vtkstd::map<int, vtkSmartPointer<vtkUnstructuredGrid> > 
+  typedef std::map<int, vtkSmartPointer<vtkUnstructuredGrid> >
   CachedGridsMapType;
   CachedGridsMapType CachedGrids;
 };
@@ -263,10 +263,10 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
     
     vtksys_ios::ostringstream geomFName;
-    vtkstd::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
+    std::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
     if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
       {
-      vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
       if (!path.empty())
         {
         geomFName << path.c_str() << "/";
@@ -276,10 +276,10 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     this->Reader->SetGeometryFileName(geomFName.str().c_str());
 
     vtksys_ios::ostringstream fieldFName;
-    vtkstd::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
+    std::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
     if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
       {
-      vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
       if (!path.empty())
         {
         fieldFName << path.c_str() << "/";
@@ -487,7 +487,7 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
         if (strcmp("Field", nested2->GetName()) == 0)
           {
           numberOfFields2++;
-          vtkstd::string paraviewFieldTagStr, dataTypeStr;
+          std::string paraviewFieldTagStr, dataTypeStr;
           const char* paraviewFieldTag = 0;
           paraviewFieldTag = nested2->GetAttribute("paraview_field_tag");
           if (!paraviewFieldTag)

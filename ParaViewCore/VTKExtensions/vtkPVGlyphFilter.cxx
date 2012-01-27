@@ -26,13 +26,14 @@
 #include "vtkMaskPoints.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkUniformGrid.h"
 
 #include <stdlib.h>
 #include <time.h>
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
@@ -350,8 +351,6 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
     vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
     if (ds)
       {
-      vtkPolyData* tmpOut = vtkPolyData::New();
-
       // Uniform grids might be blanked, we make a note if we 
       // have a uniform grid to facilitate blanking friendly
       // glyph sampling.
@@ -379,6 +378,15 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
             = blockInfo->Get(vtkHierarchicalBoxDataSet::NUMBER_OF_BLANKED_POINTS());
           }
         }
+      // To fix Bug-9334, the output should be a new output that does not interfere
+      // with the output of this filter, which seems to be the cause of this bug.
+      vtkNew<vtkPolyData> tmpOut;
+      vtkNew<vtkPolyData> newoutput;
+      vtkNew<vtkInformationVector> outputV;
+      vtkNew<vtkInformation> newOutInfo;
+      newOutInfo->Copy(info);
+      newOutInfo->Set(vtkDataObject::DATA_OBJECT(), newoutput.GetPointer());
+      outputV->SetInformationObject(0, newOutInfo.GetPointer());
 
       //Calculate the number of points on this block that need to be glyphed
       double nPtsNotBlanked
@@ -401,20 +409,11 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         }
       this->CalculatePtsToGlyph( nPtsNotBlanked );
 
-      // We have set all ofthe parameters that will be used in 
-      // our overloaded IsPoitVisible. Now let the glypher take over.
+      // We have set all of the parameters that will be used in 
+      // our overloaded IsPointVisible. Now let vktGlyph3D take over.
       newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
-      retVal = this->Superclass::RequestData(request, inputVs, outputVector);
-
-      //Accumulate the results.
-      tmpOut->ShallowCopy(output);
-      append->AddInput(tmpOut);
-
-      // Call FastDelete() instead of Delete() to avoid garbage
-      // collection checks. This improves the preformance significantly
-      tmpOut->FastDelete();
-
-      // Glypher failed, so we skip the rest and fail as well.
+      retVal = this->Superclass::RequestData(request, inputVs, outputV.GetPointer());
+      // vktGlyph3D failed, so we skip the rest and fail as well.
       if (!retVal)
         {
         vtkErrorMacro("vtkGlyph3D failed.");
@@ -423,6 +422,11 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         append->Delete();
         return 0;
         }
+
+      //Accumulate the results.
+      tmpOut->ShallowCopy(newoutput.GetPointer());
+      append->AddInput(tmpOut.GetPointer());
+
       numInputs++;
       }
     iter->GoToNextItem();
@@ -470,18 +474,18 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
     for(int i = 0; i < this->BlockMaxNumPts; i++)
       {
       r = rand() % static_cast<int>( floor(PtsNotBlanked));
-      while( vtkstd::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
+      while( std::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
         {
         r = rand() % static_cast<int>( floor(PtsNotBlanked) );
         }
       this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
       }
-    vtkstd::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
+    std::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
     }
 
 
   // Identify the first point to glyph.
-  if(this->RandomMode)
+  if(this->RandomMode && this->RandomPtsInDataset.size() > 0) // FIXME this was a quick fix to prevent some test failure with mpi pvcrs.FindDataDialog.Flow
     {
     this->BlockNextPoint = this->RandomPtsInDataset[0];
     }

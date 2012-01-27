@@ -38,8 +38,8 @@
 
 #include "assert.h"
 #include <fstream>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <set>
+#include <string>
 #include <vtksys/ios/sstream>
 
 #define LOG(x)\
@@ -152,7 +152,7 @@ public:
       }
     }
   //---------------------------------------------------------------------------
-  vtkstd::set<vtkTypeUInt32>& GetSIObjectOfClient(int clientId)
+  std::set<vtkTypeUInt32>& GetSIObjectOfClient(int clientId)
     {
     return this->ClientSIRegistrationMap[clientId];
     }
@@ -216,18 +216,18 @@ public:
       }
     }
   //---------------------------------------------------------------------------
-  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject> >
+  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkSIObject> >
     SIObjectMapType;
-  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> >
+  typedef std::map<vtkTypeUInt32, vtkWeakPointer<vtkObject> >
     RemoteObjectMapType;
-  typedef vtkstd::map<int, vtkstd::set<vtkTypeUInt32> >
+  typedef std::map<int, std::set<vtkTypeUInt32> >
     ClientSIRegistrationMapType;
   ClientSIRegistrationMapType ClientSIRegistrationMap;
   SIObjectMapType SIObjectMap;
   RemoteObjectMapType RemoteObjectMap;
   unsigned long InterpreterObserverID;
-  vtkstd::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
-  vtkstd::set<int> KnownClients;
+  std::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
+  std::set<int> KnownClients;
 };
 
 //****************************************************************************/
@@ -238,7 +238,7 @@ vtkPVSessionCore::vtkPVSessionCore()
   this->LocalGlobalID = vtkReservedRemoteObjectIds::RESERVED_MAX_IDS;
 
   this->Interpreter =
-    vtkClientServerInterpreterInitializer::GetInterpreter();
+    vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
   this->MPIMToNSocketConnection = NULL;
   this->SymmetricMPIMode = false;
 
@@ -313,6 +313,7 @@ vtkPVSessionCore::~vtkPVSessionCore()
          << vtkClientServerID(1)
          << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
+  this->Interpreter->Delete();
   this->Interpreter = 0;
 
   // Manage controller
@@ -424,7 +425,7 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
       //abort();
       }
     // Create the corresponding SI object.
-    vtkstd::string classname = message->GetExtension(DefinitionHeader::server_class);
+    std::string classname = message->GetExtension(DefinitionHeader::server_class);
     vtkObject* object;
     object = vtkInstantiator::CreateInstance(classname.c_str());
     if (!object)
@@ -869,7 +870,7 @@ void vtkPVSessionCore::GatherInformationStatelliteCallback()
   vtkMultiProcessStream stream;
   this->ParallelController->Broadcast(stream, 0);
 
-  vtkstd::string classname;
+  std::string classname;
   vtkTypeUInt32 globalid;
   stream >> classname >> globalid;
 
@@ -994,7 +995,7 @@ vtkTypeUInt32 vtkPVSessionCore::GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32
 void vtkPVSessionCore::GarbageCollectSIObject(int* clientIds, int nbClients)
 {
   // Look for dead clients IDs
-  vtkstd::set<int> deadClients;
+  std::set<int> deadClients;
   deadClients = this->Internals->KnownClients;
   for(int i=0; i < nbClients; i++)
     {
@@ -1006,14 +1007,14 @@ void vtkPVSessionCore::GarbageCollectSIObject(int* clientIds, int nbClients)
   unregisterMsg.set_location(vtkProcessModule::SERVERS);
 
   // UnRegister SI Objects of dead clients
-  vtkstd::set<int>::iterator iter = deadClients.begin();
-  vtkstd::set<vtkTypeUInt32>::iterator idIter;
+  std::set<int>::iterator iter = deadClients.begin();
+  std::set<vtkTypeUInt32>::iterator idIter;
   while(iter != deadClients.end())
     {
     // Set Client ID
     unregisterMsg.set_client_id(*iter);
 
-    vtkstd::set<vtkTypeUInt32> ids = this->Internals->GetSIObjectOfClient(*iter);
+    std::set<vtkTypeUInt32> ids = this->Internals->GetSIObjectOfClient(*iter);
     idIter = ids.begin();
     while(idIter != ids.end())
       {

@@ -44,13 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // server manager includes
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
+#include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
-#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMExtentDomain.h"
+#include "vtkSMFileListDomain.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntRangeDomain.h"
@@ -58,21 +61,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyGroupDomain.h"
-#include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSILDomain.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkSMExtentDomain.h"
-#include "vtkSMFileListDomain.h"
-#include "vtkSMCompositeTreeDomain.h"
-#include "vtkSMSILDomain.h"
 
 // ParaView includes
 #include "pqSMProxy.h"
@@ -351,7 +350,7 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
     {
-    vtkSMProxyManager* pm = Property->GetParent()->GetProxyManager();
+    vtkSMSessionProxyManager* pm = Property->GetParent()->GetSessionProxyManager();
     
     // get group domain of this property 
     // and add all proxies in those groups to our list
@@ -1314,7 +1313,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
   else if(svp)
     {
     const char** cvalues = new const char*[num];
-    vtkstd::string *str_values= new vtkstd::string[num];
+    std::string *str_values= new std::string[num];
     for (int cc=0; cc < num; cc++)
       {
       str_values[cc] = Value[cc].toString().toAscii().data();

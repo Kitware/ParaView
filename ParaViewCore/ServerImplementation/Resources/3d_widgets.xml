@@ -1407,7 +1407,7 @@
                          command="SetEnabled"
                          number_of_elements="1"
                          default_values="0">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <!-- End of WidgetBase -->
     </Proxy>
@@ -1426,7 +1426,7 @@
                          command="SetProcessEvents"
                          number_of_elements="1"
                          default_values="1">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </Proxy>
 
@@ -1437,7 +1437,7 @@
                          command="SetProcessEvents"
                          number_of_elements="1"
                          default_values="1">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </Proxy>
 
@@ -1477,7 +1477,7 @@
         command="SetProcessEvents"
         number_of_elements="1"
         default_values="1">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
     </Proxy>
@@ -1488,7 +1488,7 @@
                          command="SetSelectable"
                          number_of_elements="1"
                          default_values="0">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="Resizable"
@@ -1517,7 +1517,7 @@
                          command="SetSelectable"
                          number_of_elements="1"
                          default_values="0">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="Resizable"
@@ -1532,7 +1532,7 @@
                          command="SetProcessEvents"
                          number_of_elements="1"
                          default_values="1">
-        <BooleanDomain/>
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
 

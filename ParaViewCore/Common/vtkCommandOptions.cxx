@@ -20,7 +20,7 @@
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
+#include <string>
 
 
 //----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ int vtkCommandOptions::Parse(int argc, const char* const argv[])
   // First get options from the xml file
   for(int i =0; i < argc; ++i)
     {
-    vtkstd::string arg = argv[i];
+    std::string arg = argv[i];
     if(arg.size() > 4 && arg.find(".pvx") == (arg.size() -4))
       {
       if(!this->LoadXMLConfigFile(arg.c_str()))
@@ -341,11 +341,11 @@ void vtkCommandOptions::ComputeApplicationPath()
 {
   this->SetApplicationPath(NULL);
   
-  vtkstd::string argv0 = this->GetArgv0();
+  std::string argv0 = this->GetArgv0();
   if(argv0.size())
     {
-    if(argv0.rfind('/') != vtkstd::string::npos || 
-       argv0.rfind('\\') != vtkstd::string::npos)
+    if(argv0.rfind('/') != std::string::npos ||
+       argv0.rfind('\\') != std::string::npos)
       {
       // is a relative/absolute path, compute it based on cwd
       argv0 = vtksys::SystemTools::CollapseFullPath(argv0.c_str());

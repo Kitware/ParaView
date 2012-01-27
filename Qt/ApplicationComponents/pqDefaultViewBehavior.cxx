@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "vtkSMSession.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QMessageBox>
 
@@ -77,13 +78,26 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   // collaborative visualization server.
   if(core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0)
     {
+    pqObjectBuilder* builder =
+      pqApplicationCore::instance()->getObjectBuilder();
+
+    // before creating a view, ensure that a layout (vtkSMViewLayoutProxy) is
+    // present.
+    if (server->proxyManager()->GetNumberOfProxies("layouts") == 0)
+      {
+      vtkSMProxy* vlayout = builder->createProxy(
+        "misc", "ViewLayout", server, "layouts");
+      Q_ASSERT(vlayout != NULL);
+      (void)vlayout;
+      }
+
     pqSettings* settings = core->settings();
     QString curView = settings->value("/defaultViewType",
                                       pqRenderView::renderViewType()).toString();
     if (curView != "None" && !curView.isEmpty())
       {
       // When a server is created, we create a new render view for it.
-      core->getObjectBuilder()->createView(curView, server);
+      builder->createView(curView, server);
       }
     }
 

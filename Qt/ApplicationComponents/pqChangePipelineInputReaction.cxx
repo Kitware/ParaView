@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqChangePipelineInputReaction.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqChangeInputDialog.h"
 #include "pqCoreUtilities.h"
@@ -38,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProxy.h"
@@ -50,15 +50,12 @@ pqChangePipelineInputReaction::pqChangePipelineInputReaction(
   QAction* parentObject)
 : Superclass(parentObject)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::connect(core->getSelectionModel(),
-    SIGNAL(
-      selectionChanged(const pqServerManagerSelection&,
-        const pqServerManagerSelection&)),
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
     this, SLOT(updateEnableState()));
 
   // nameChanged() is fired even when modified state is changed ;).
-  QObject::connect(core->getServerManagerModel(),
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
     this, SLOT(updateEnableState()));
   this->updateEnableState();
@@ -67,15 +64,8 @@ pqChangePipelineInputReaction::pqChangePipelineInputReaction(
 //-----------------------------------------------------------------------------
 void pqChangePipelineInputReaction::updateEnableState()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
-  if (selection.size() != 1)
-    {
-    this->parentAction()->setEnabled(false);
-    return;
-    }
-  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(selection[0]);
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
+    pqActiveObjects::instance().activeSource());
   if (filter == NULL || filter->modifiedState() == pqProxy::UNINITIALIZED)
     {
     this->parentAction()->setEnabled(false);
@@ -88,19 +78,9 @@ void pqChangePipelineInputReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqChangePipelineInputReaction::changeInput()
 {
-  pqServerManagerSelectionModel* selModel=
-    pqApplicationCore::instance()->getSelectionModel();
-  const pqServerManagerSelection& selection = *(selModel->selectedItems());
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
+    pqActiveObjects::instance().activeSource());
 
-  // The change input dialog only supports one filter at a time.
-  if (selection.size() != 1)
-    {
-    qCritical() << "No active selection.";
-    return;
-    }
-
-  pqPipelineFilter *filter = 
-    qobject_cast<pqPipelineFilter *>(selection[0]);
   if (!filter)
     {
     qCritical() << "No active filter.";
@@ -127,8 +107,8 @@ void pqChangePipelineInputReaction::changeInput()
     QString inputPortName = iter.key();
     const QList<pqOutputPort*> &inputs = iter.value();
 
-    vtkstd::vector<vtkSMProxy*> inputPtrs;
-    vtkstd::vector<unsigned int> inputPorts;
+    std::vector<vtkSMProxy*> inputPtrs;
+    std::vector<unsigned int> inputPorts;
 
     foreach (pqOutputPort* opport, inputs)
       {

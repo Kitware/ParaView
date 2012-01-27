@@ -29,8 +29,8 @@
 #define __vtkMaterialInterfaceFilter_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector" // needed for vector
-#include "vtkstd/string" // needed for string
+#include "vector" // needed for vector
+#include "string" // needed for string
 
 #include "vtkSmartPointer.h" // needed for smart pointer
 #include "vtkTimerLog.h" // needed for vtkTimerLog.
@@ -266,10 +266,10 @@ protected:
   // Set up the result arrays for the calculations we are about to
   // make.
   void PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
-                      vtkstd::vector<vtkstd::string> &volumeWtdAvgArrayNames,
-                      vtkstd::vector<vtkstd::string> &massWtdAvgArrayNames,
-                      vtkstd::vector<vtkstd::string> &summedArrayNames,
-                      vtkstd::vector<vtkstd::string> &integratedArrayNames);
+                      std::vector<std::string> &volumeWtdAvgArrayNames,
+                      std::vector<std::string> &massWtdAvgArrayNames,
+                      std::vector<std::string> &summedArrayNames,
+                      std::vector<std::string> &integratedArrayNames);
   // Craete a new fragment/piece.
   vtkPolyData *NewFragmentMesh();
   // Process each cell, looking for fragments.
@@ -316,7 +316,7 @@ protected:
   int GetNumberOfLocalBlocks(
         vtkHierarchicalBoxDataSet* input);
   // Complex ghost layer Handling.
-  vtkstd::vector<vtkMaterialInterfaceFilterBlock*> GhostBlocks;
+  std::vector<vtkMaterialInterfaceFilterBlock*> GhostBlocks;
   void ShareGhostBlocks();
   void HandleGhostBlockRequests();
   int ComputeRequiredGhostExtent(
@@ -362,58 +362,58 @@ protected:
   int ReceiveIntegratedAttributes(const int sourceProcId);
   // Size buffers etc...
   int PrepareToCollectIntegratedAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&volumes,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMaxs,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMins,
-          vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&volumes,
+          std::vector<vtkDoubleArray *>&clipDepthMaxs,
+          std::vector<vtkDoubleArray *>&clipDepthMins,
+          std::vector<vtkDoubleArray *>&moments,
+          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&sums);
   // Free resources.
   int CleanUpAfterCollectIntegratedAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&volumes,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMaxs,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMins,
-          vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&volumes,
+          std::vector<vtkDoubleArray *>&clipDepthMaxs,
+          std::vector<vtkDoubleArray *>&clipDepthMins,
+          std::vector<vtkDoubleArray *>&moments,
+          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&sums);
   // Receive all integrated attribute arrays from all other
   // processes.
   int CollectIntegratedAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&volumes,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMaxs,
-          vtkstd::vector<vtkDoubleArray *>&clipDepthMins,
-          vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&volumes,
+          std::vector<vtkDoubleArray *>&clipDepthMaxs,
+          std::vector<vtkDoubleArray *>&clipDepthMins,
+          std::vector<vtkDoubleArray *>&moments,
+          std::vector<std::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&massWtdAvgs,
+          std::vector<std::vector<vtkDoubleArray *> >&sums);
   // Send my integrated attributes to all other processes.
   int BroadcastIntegratedAttributes(const int sourceProcessId);
   // Send my geometric attribuites to a controler.
   int SendGeometricAttributes(const int controllingProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&coaabb,
-          vtkstd::vector<vtkDoubleArray *>&obb,
-          vtkstd::vector<int *> &ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&coaabb,
+          std::vector<vtkDoubleArray *>&obb,
+          std::vector<int *> &ids);
   // Free resources.
   int CleanUpAfterCollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&coaabb,
-          vtkstd::vector<vtkDoubleArray *>&obb,
-          vtkstd::vector<int *> &ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&coaabb,
+          std::vector<vtkDoubleArray *>&obb,
+          std::vector<int *> &ids);
   // Recieve all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
-          vtkstd::vector<vtkDoubleArray *>&coaabb,
-          vtkstd::vector<vtkDoubleArray *>&obb,
-          vtkstd::vector<int *> &ids);
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkDoubleArray *>&coaabb,
+          std::vector<vtkDoubleArray *>&obb,
+          std::vector<int *> &ids);
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes();
   // Gather geometric attributes on a single process.
@@ -426,11 +426,11 @@ protected:
   void CleanLocalFragmentGeometry();
   //
   void BuildLoadingArray(
-          vtkstd::vector<vtkIdType> &loadingArray);
+          std::vector<vtkIdType> &loadingArray);
   int PackLoadingArray(vtkIdType *&buffer);
   int UnPackLoadingArray(
           vtkIdType *buffer, int bufSize,
-          vtkstd::vector<vtkIdType> &loadingArray);
+          std::vector<vtkIdType> &loadingArray);
 
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data sets.
@@ -470,12 +470,12 @@ protected:
   vtkMaterialInterfaceFilterBlock** InputBlocks;
   void DeleteAllBlocks();
   int InitializeBlocks(vtkHierarchicalBoxDataSet* input,
-                       vtkstd::string &materialFractionArrayName,
-                       vtkstd::string &massArrayName,
-                       vtkstd::vector<vtkstd::string> &volumeWtdAvgArrayNames,
-                       vtkstd::vector<vtkstd::string> &massWtdAvgArrayNames,
-                       vtkstd::vector<vtkstd::string> &summedArrayNames,
-                       vtkstd::vector<vtkstd::string> &integratedArrayNames);
+                       std::string &materialFractionArrayName,
+                       std::string &massArrayName,
+                       std::vector<std::string> &volumeWtdAvgArrayNames,
+                       std::vector<std::string> &massWtdAvgArrayNames,
+                       std::vector<std::string> &summedArrayNames,
+                       std::vector<std::string> &integratedArrayNames);
   void AddBlock(vtkMaterialInterfaceFilterBlock* block);
 
   // New methods for connecting neighbors.
@@ -487,7 +487,7 @@ protected:
     int blockIndex[3],
     int faceAxis,
     int faceMaxFlag,
-    vtkstd::vector<vtkMaterialInterfaceFilterBlock*> *result);
+    std::vector<vtkMaterialInterfaceFilterBlock*> *result);
 
   // We need ghost cells for edges and corners as well as faces.
   // neighborDirection is used to specify a face, edge or corner.
@@ -516,7 +516,7 @@ protected:
   vtkPolyData *CurrentFragmentMesh;
   // As peices/fragments are found they are stored here
   // until resolution.
-  vtkstd::vector<vtkPolyData *> FragmentMeshes;
+  std::vector<vtkPolyData *> FragmentMeshes;
 
   // TODO? this could be cleaned up (somewhat) by
   // addding an integration class which encapsulates
@@ -539,7 +539,7 @@ protected:
   vtkDoubleArray* ClipDepthMaximums;
 
   // Accumulator for moments of the current fragment
-  vtkstd::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
+  std::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
   // Moments indexed by fragment id
   vtkDoubleArray *FragmentMoments;
   // Centers of fragment AABBs, only computed if moments are not
@@ -549,37 +549,37 @@ protected:
 
   // Weighted average, where weights correspond to fragment volume.
   // Accumulators one for each array to average, scalar or vector
-  vtkstd::vector<vtkstd::vector<double> > FragmentVolumeWtdAvg;
+  std::vector<std::vector<double> > FragmentVolumeWtdAvg;
   // weighted averages indexed by fragment id.
-  vtkstd::vector<vtkDoubleArray *>FragmentVolumeWtdAvgs;
+  std::vector<vtkDoubleArray *>FragmentVolumeWtdAvgs;
   // number of arrays for which to compute the weighted average
   int NVolumeWtdAvgs;
   // Names of the arrays to average.
-  vtkstd::vector<vtkstd::string> VolumeWtdAvgArrayNames;
+  std::vector<std::string> VolumeWtdAvgArrayNames;
 
   // Weighted average, where weights correspond to fragment mass.
   // Accumulators one for each array to average, scalar or vector
-  vtkstd::vector<vtkstd::vector<double> > FragmentMassWtdAvg;
+  std::vector<std::vector<double> > FragmentMassWtdAvg;
   // weighted averages indexed by fragment id.
-  vtkstd::vector<vtkDoubleArray *>FragmentMassWtdAvgs;
+  std::vector<vtkDoubleArray *>FragmentMassWtdAvgs;
   // number of arrays for which to compute the weighted average
   int NMassWtdAvgs;
   // Names of the arrays to average.
-  vtkstd::vector<vtkstd::string> MassWtdAvgArrayNames;
+  std::vector<std::string> MassWtdAvgArrayNames;
 
   // Unique list of all integrated array names
   // it's used construct list of arrays that
   // will be coppied into output.
-  vtkstd::vector<vtkstd::string> IntegratedArrayNames;
-  vtkstd::vector<int> IntegratedArrayNComp;
+  std::vector<std::string> IntegratedArrayNames;
+  std::vector<int> IntegratedArrayNComp;
   // number of integrated arrays
   int NToIntegrate;
 
   // Sum of data over the fragment.
   // Accumulators, one for each array to sum
-  vtkstd::vector<vtkstd::vector<double> > FragmentSum;
+  std::vector<std::vector<double> > FragmentSum;
   // sums indexed by fragment id.
-  vtkstd::vector<vtkDoubleArray *>FragmentSums;
+  std::vector<vtkDoubleArray *>FragmentSums;
   // number of arrays for which to compute the weighted average
   int NToSum;
   ///};
@@ -615,16 +615,16 @@ protected:
   // multi block is indexed by material.
   vtkMultiBlockDataSet *ResolvedFragments;
   // for each material a list of global ids of pieces we own.
-  vtkstd::vector<vtkstd::vector<int> > ResolvedFragmentIds;
+  std::vector<std::vector<int> > ResolvedFragmentIds;
   // List of split fragments
-  vtkstd::vector<vtkstd::vector<int> >FragmentSplitMarker;
+  std::vector<std::vector<int> >FragmentSplitMarker;
   vtkIntArray *FragmentSplitGeometry;
 
   // A polydata with points at fragment centers, same structure
   // as the resolved fragments.
   vtkMultiBlockDataSet *ResolvedFragmentCenters;
   //
-  vtkstd::vector<vtkPoints *> ResolvedFragmentPoints;
+  std::vector<vtkPoints *> ResolvedFragmentPoints;
 
   // A polydata representing OBB, same structure as the resolved
   // fragments.
@@ -639,7 +639,7 @@ protected:
 
   // Use for the moment to find neighbors.
   // It could be changed into the primary storage of blocks.
-  vtkstd::vector<vtkMaterialInterfaceLevel*> Levels;
+  std::vector<vtkMaterialInterfaceLevel*> Levels;
 
   // Ivars for computing the point on corners and edges of a face.
   vtkMaterialInterfaceFilterIterator* FaceNeighbors;

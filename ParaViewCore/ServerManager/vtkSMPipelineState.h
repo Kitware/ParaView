@@ -33,7 +33,7 @@ class vtkSMProxyLocator;
 class VTK_EXPORT vtkSMPipelineState : public vtkSMRemoteObject
 {
   // My friends are...
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
 
 public:
   static vtkSMPipelineState* New();

@@ -26,7 +26,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include "vtkSMPropertyInternals.h"
@@ -270,7 +270,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
+int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                      vtkPVXMLElement* element)
 {
   // TODO: some of the attributes are no longer necessary on the proxy-side,
@@ -388,15 +388,15 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
       this->SetHints(domainEl);
       continue;
       }
-    else if ( vtkstd::string(domainEl->GetName()).find("InformationHelper") !=
-              vtkstd::string::npos)
+    else if ( std::string(domainEl->GetName()).find("InformationHelper") !=
+              std::string::npos)
       {
       // InformationHelper are used to extract information from VTK object
       // therefore they are not used on the proxy side (SM).
       continue;
       }
-    else if ( vtkstd::string(domainEl->GetName()).find("StringArrayHelper") !=
-              vtkstd::string::npos)
+    else if ( std::string(domainEl->GetName()).find("StringArrayHelper") !=
+              std::string::npos)
       {
       // InformationHelper are used to extract information from VTK object
       // therefore they are not used on the proxy side (SM).
@@ -413,6 +413,8 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
       if (domain)
         {
+        assert("Session should be valid" && proxy->GetSession());
+        domain->SetSession(proxy->GetSession());
         if (domain->ReadXMLAttributes(this, domainEl))
           {
           const char* dname = domainEl->GetAttribute("name");

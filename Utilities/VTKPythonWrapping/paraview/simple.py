@@ -38,23 +38,36 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 5
 import servermanager
 
-def _disconnect():
-    if servermanager.ActiveConnection:
+def enableMultiServer():
+    servermanager.enableMultiServer()
+
+def switchActiveConnection(newActiveConnection=None, ns=None):
+    if not ns:
+       ns = globals()
+    _remove_functions(ns)
+    servermanager.switchActiveConnection(newActiveConnection)
+    _add_functions(ns)
+
+def Disconnect(ns=None, force=True):
+    if servermanager.ActiveConnection and (force or servermanager.MultiServerConnections == None):
+        if ns:
+           _remove_functions(ns)
+        _remove_functions(globals())
         servermanager.ProxyManager().DisableStateUpdateNotification()
         servermanager.ProxyManager().UnRegisterProxies()
         active_objects.view = None
         active_objects.source = None
         import gc
-        gc.collect()
         servermanager.Disconnect()
+        gc.collect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage:
     > Connect("amber") # Connect to a single server at default port
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
-    _disconnect()
-    session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    Disconnect(globals(), False)
+    connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
 
     servermanager.ProxyManager().DisableStateUpdateNotification()
@@ -72,13 +85,13 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
 
-    return session
+    return connection
 
 def ReverseConnect(port=11111):
     """Create a reverse connection to a server.  Listens on port and waits for
     an incoming connection from the server."""
-    _disconnect()
-    session = servermanager.ReverseConnect(port)
+    Disconnect(globals(), False)
+    connection = servermanager.ReverseConnect(port)
     _add_functions(globals())
 
     servermanager.ProxyManager().DisableStateUpdateNotification()
@@ -96,7 +109,7 @@ def ReverseConnect(port=11111):
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
 
-    return session
+    return connection
 
 def _create_view(view_xml_name):
     "Creates and returns a 3D render view."
@@ -146,17 +159,19 @@ def OpenDataFile(filename, **extraArgs):
     """Creates a reader to read the give file, if possible.
        This uses extension matching to determine the best reader possible.
        If a reader cannot be identified, then this returns None."""
-    reader_factor = servermanager.ProxyManager().GetReaderFactory()
-    if  reader_factor.GetNumberOfRegisteredPrototypes() == 0:
-      reader_factor.RegisterPrototypes("sources")
     session = servermanager.ActiveConnection.Session
+    reader_factor = servermanager.vtkSMProxyManager.GetProxyManager().GetReaderFactory()
+    if reader_factor.GetNumberOfRegisteredPrototypes() == 0:
+      reader_factor.RegisterPrototypes(session, "sources")
     first_file = filename
     if type(filename) == list:
         first_file = filename[0]
     if not reader_factor.TestFileReadability(first_file, session):
-        raise RuntimeError, "File not readable: %s " % first_file
+        msg = "File not readable: %s " % first_file
+        raise RuntimeError, msg
     if not reader_factor.CanReadFile(first_file, session):
-        raise RuntimeError, "File not readable. No reader found for '%s' " % first_file
+        msg = "File not readable. No reader found for '%s' " % first_file
+        raise RuntimeError, msg
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
@@ -174,9 +189,10 @@ def CreateWriter(filename, proxy=None, **extraArgs):
        data, it simply creates the writer and returns it."""
     if not filename:
        raise RuntimeError, "filename must be specified"
-    writer_factory = servermanager.ProxyManager().GetWriterFactory()
+    session = servermanager.ActiveConnection.Session
+    writer_factory = servermanager.vtkSMProxyManager.GetProxyManager().GetWriterFactory()
     if writer_factory.GetNumberOfRegisteredPrototypes() == 0:
-        writer_factory.RegisterPrototypes("writers")
+        writer_factory.RegisterPrototypes(session, "writers")
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:
@@ -672,15 +688,30 @@ def _func_name_valid(name):
     return valid
 
 def _add_functions(g):
-    for m in [servermanager.filters, servermanager.sources,
-              servermanager.writers, servermanager.animation]:
+    activeModule = servermanager.ActiveConnection.Modules
+    for m in [activeModule.filters, activeModule.sources,
+              activeModule.writers, activeModule.animation]:
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str):
                 if not key in g and _func_name_valid(key):
+                    #print "add %s function" % key
                     g[key] = _create_func(key, m)
                     exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
+
+def _remove_functions(g):
+    list = []
+    if servermanager.ActiveConnection:
+       list = [m for m in dir(servermanager.ActiveConnection.Modules) if m[0] != '_']
+
+    for m in list:
+        dt = servermanager.ActiveConnection.Modules.__dict__[m].__dict__
+        for key in dt.keys():
+            cl = dt[key]
+            if not isinstance(cl, str) and g.has_key(key):
+                g.pop(key)
+                #print "remove %s function" % key
 
 def GetActiveView():
     "Returns the active view."
@@ -895,9 +926,12 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
     information known about plugins distributed with ParaView to locate the
     shared library for the plugin to load. Raises a RuntimeError if the plugin
     was not found."""
-    plm = servermanager.ProxyManager().GetSession().GetPluginManager()
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Cannot load a plugin without a session."
+    plm = servermanager.vtkSMProxyManager.GetProxyManager().GetPluginManager()
     if remote:
-        info = plm.GetRemoteInformation()
+        session = servermanager.ActiveConnection.Session
+        info = plm.GetRemoteInformation(session)
     else:
         info = plm.GetLocalInformation()
     for cc in range(0, info.GetNumberOfPlugins()):
@@ -911,18 +945,25 @@ class ActiveObjects(object):
     objects are shared between Python and the user interface. This class
     is for internal use. Use the Set/Get methods for setting and getting
     active objects."""
-    def __get_selection_model(self, name):
+    def __get_selection_model(self, name, session=None):
         "Internal method."
-        pxm = servermanager.ProxyManager()
+        if session and session != servermanager.ActiveConnection.Session:
+            raise RuntimeError, "Try to set an active object with invalid active connection."
+        pxm = servermanager.ProxyManager(session)
         model = pxm.GetSelectionModel(name)
+        if not model:
+            model = servermanager.vtkSMProxySelectionModel()
+            pxm.RegisterSelectionModel(name, model)
         return model
 
     def set_view(self, view):
         "Sets the active view."
-        active_view_model = self.__get_selection_model("ActiveView") 
+        active_view_model = self.__get_selection_model("ActiveView")
         if view:
+            active_view_model = self.__get_selection_model("ActiveView", view.GetSession())
             active_view_model.SetCurrentProxy(view.SMProxy, 0)
         else:
+            active_view_model = self.__get_selection_model("ActiveView")
             active_view_model.SetCurrentProxy(None, 0)
 
     def get_view(self):
@@ -932,11 +973,13 @@ class ActiveObjects(object):
 
     def set_source(self, source):
         "Sets the active source."
-        active_sources_model = self.__get_selection_model("ActiveSources") 
+        active_sources_model = self.__get_selection_model("ActiveSources")
         if source:
             # 3 == CLEAR_AND_SELECT
+            active_sources_model = self.__get_selection_model("ActiveSources", source.GetSession())
             active_sources_model.SetCurrentProxy(source.SMProxy, 3)
         else:
+            active_sources_model = self.__get_selection_model("ActiveSources")
             active_sources_model.SetCurrentProxy(None, 3)
 
     def __convert_proxy(self, px):
@@ -1050,3 +1093,19 @@ else:
     _add_functions(globals())
 
 active_objects = ActiveObjects()
+
+def _switchToActiveConnectionCallback(caller, event):
+   if servermanager:
+      session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
+      if session and ((not servermanager.ActiveConnection) or session != servermanager.ActiveConnection.Session):
+         switchActiveConnection(servermanager.GetConnectionFromSession(session))
+
+class ActiveSessionObserver:
+    def __init__(self):
+        self.ObserverTag = servermanager.vtkSMProxyManager.GetProxyManager().AddObserver(9753, _switchToActiveConnectionCallback)
+
+    def __del__(self):
+        if servermanager:
+            servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
+
+active_session_observer = ActiveSessionObserver()

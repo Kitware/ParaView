@@ -24,11 +24,13 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMTesting.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkTesting.h"
 #include "vtkTestingOptions.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+#include <string>
 
 
 //----------------------------------------------------------------------------
@@ -105,7 +107,7 @@ void vtkTestingProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkTestingProcessModuleGUIHelper::Run()
+int vtkTestingProcessModuleGUIHelper::Run(vtkSMSession* session)
 {
   int res = 0;
   // Load the state and process it.
@@ -133,7 +135,7 @@ int vtkTestingProcessModuleGUIHelper::Run()
   ifp.close();
 
   // Replace ${DataDir} with the actual data dir path.
-  vtkstd::string str_buffer (buffer);
+  std::string str_buffer (buffer);
   delete []buffer;
   buffer = 0;
   if (options->GetDataDir())
@@ -143,10 +145,10 @@ int vtkTestingProcessModuleGUIHelper::Run()
     }
   parser->Parse(str_buffer.c_str(), str_buffer.length());
 
-  vtkSMProxyManager::GetProxyManager()->LoadXMLState(parser->GetRootElement());
+  vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
+  pxm->LoadXMLState(parser->GetRootElement());
   parser->Delete();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   pxm->UpdateRegisteredProxiesInOrder(0);
 
   vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(

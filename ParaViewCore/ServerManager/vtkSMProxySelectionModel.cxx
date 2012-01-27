@@ -14,24 +14,23 @@
 =========================================================================*/
 #include "vtkSMProxySelectionModel.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMOutputPort.h"
-#include "vtkCollection.h"
-#include "vtkSMProxyLocator.h"
-
-#include "vtkSMMessage.h"
-
+#include "vtkPVDataInformation.h"
 #include "vtkPVSession.h"
-#include "vtkSMSession.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMMessage.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/set>
+#include <vector>
+#include <set>
 #include <vtkNew.h>
 
 //-----------------------------------------------------------------------------
@@ -41,17 +40,16 @@ vtkStandardNewMacro(vtkSMProxySelectionModel);
 class vtkSMProxySelectionModel::vtkInternal
 {
 public:
-  typedef  vtkstd::vector< vtkSmartPointer<vtkSMProxy> >   vtkSMSelection;
-  vtkSMSelection  Selection;
-  vtkSmartPointer<vtkSMProxy>  Current;
   unsigned int CollaborationManagerObserverID;
   vtkSMProxySelectionModel* Owner;
   bool FollowinMaster;
   bool Initilized;
-  vtkstd::map<int, vtkSMMessage> ClientsCachedState;
+  bool DisableSessionStatePush;
+  std::map<int, vtkSMMessage> ClientsCachedState;
 
   vtkInternal(vtkSMProxySelectionModel* owner)
     {
+    this->DisableSessionStatePush = false;
     this->Owner = owner;
     this->CollaborationManagerObserverID = 0;
     this->FollowinMaster = true;
@@ -105,9 +103,6 @@ public:
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::vtkSMProxySelectionModel()
 {
-  this->NewlySelected = vtkCollection::New();
-  this->NewlyDeselected = vtkCollection::New();
-  this->Selection = vtkCollection::New();
   this->Internal = new vtkSMProxySelectionModel::vtkInternal(this);
 
   this->State = new vtkSMMessage();
@@ -118,25 +113,25 @@ vtkSMProxySelectionModel::vtkSMProxySelectionModel()
 //-----------------------------------------------------------------------------
 vtkSMProxySelectionModel::~vtkSMProxySelectionModel()
 {
-  this->NewlySelected->Delete();
-  this->NewlyDeselected->Delete();
-  this->Selection->Delete();
   delete this->Internal;
   delete this->State;
 }
+
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxySelectionModel::GetCurrentProxy()
 {
-  return this->Internal->Current;
+  return this->Current;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command)
 { 
-  if (this->Internal->Current != proxy)
+  if (this->Current != proxy)
     {
-    this->Internal->Current = proxy;
+    this->Internal->DisableSessionStatePush = true;
+    this->Current = proxy;
     this->Select(proxy, command);
+    this->Internal->DisableSessionStatePush = false;
     this->InvokeCurrentChanged(proxy);
     }
 }
@@ -144,13 +139,13 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command
 //-----------------------------------------------------------------------------
 bool vtkSMProxySelectionModel::IsSelected(vtkSMProxy*  proxy)
 {
-  return this->Selection->IsItemPresent(proxy) != 0;
+  return this->Selection.find(proxy) != this->Selection.end();
 }
 
 //-----------------------------------------------------------------------------
 unsigned int vtkSMProxySelectionModel::GetNumberOfSelectedProxies()
 {
-  return static_cast<unsigned int>(this->Selection->GetNumberOfItems());
+  return static_cast<unsigned int>(this->Selection.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -158,124 +153,130 @@ vtkSMProxy* vtkSMProxySelectionModel::GetSelectedProxy(unsigned int idx)
 {
   if (idx < this->GetNumberOfSelectedProxies())
     {
-    return vtkSMProxy::SafeDownCast(this->Selection->GetItemAsObject(idx));
+    SelectionType::iterator iter = this->Selection.begin();
+    for (unsigned int cc=0; cc < idx; ++cc, ++iter)
+      {
+      }
+    return vtkSMProxy::SafeDownCast(iter->GetPointer());
     }
-  return 0;
+
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::Select(vtkSMProxy* proxy, int command)
 {
-  vtkCollection* collection = vtkCollection::New();
+  SelectionType selection;
   if (proxy)
     {
-    collection->AddItem(proxy);
+    selection.insert(proxy);
     }
-  this->Select(collection, command);
-  collection->Delete();
+  this->Select(selection, command);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxySelectionModel::Select(vtkCollection*  proxies, int command)
+void vtkSMProxySelectionModel::Select(
+  const vtkSMProxySelectionModel::SelectionType& proxies, int command)
 { 
   if (command == vtkSMProxySelectionModel::NO_UPDATE)
     {
     return;
     }
 
-  bool changed = false;
-
-  this->NewlyDeselected->RemoveAllItems();
-  this->NewlySelected->RemoveAllItems();
+  SelectionType new_selection;
 
   if (command & vtkSMProxySelectionModel::CLEAR)
     {
-    this->Internal->ExportSelection(this->Selection, this->NewlyDeselected);
-    this->Selection->RemoveAllItems();
-    changed = true;
+    // everything from old-selection needs to be removed. 
     }
-
-  vtkSMProxy* proxy;
-  for (proxies->InitTraversal();
-    (proxy = vtkSMProxy::SafeDownCast(proxies->GetNextItemAsObject())) != 0; )
+  else
     {
-    if ((command & vtkSMProxySelectionModel::SELECT) &&
-      !this->Selection->IsItemPresent(proxy))
-      {
-      this->Selection->AddItem(proxy);
-      if (!this->NewlySelected->IsItemPresent(proxy))
-        {
-        this->NewlySelected->AddItem(proxy);
-        changed = true;
-        }
-      }
+    // start with existing selection.
+    new_selection = this->Selection;
+    }
 
-    if ((command & vtkSMProxySelectionModel::DESELECT)  &&
-      this->Selection->IsItemPresent(proxy))
+  for (SelectionType::const_iterator iter = proxies.begin();
+    iter != proxies.end(); ++iter)
+    {
+    vtkSMProxy* proxy = iter->GetPointer();
+    if (proxy && (command & vtkSMProxySelectionModel::SELECT) !=0)
       {
-      this->Selection->RemoveItem(proxy);
-      if (!this->NewlyDeselected->IsItemPresent(proxy))
-        {
-        this->NewlyDeselected->AddItem(proxy);
-        changed = true;
-        }
+      new_selection.insert(proxy);
+      }
+    if (proxy && (command & vtkSMProxySelectionModel::DESELECT) !=0)
+      {
+      new_selection.erase(proxy);
       }
     }
 
+  bool changed = (this->Selection != new_selection);
   if (changed)
     {
-    this->InvokeSelectionChanged(command);
+    this->Selection = new_selection;
+    this->InvokeSelectionChanged();
     }
-
-  this->NewlyDeselected->RemoveAllItems();
-  this->NewlySelected->RemoveAllItems();
-
-  // Update the local state and push to the session
-  this->State->ClearExtension(ProxySelectionModelState::proxy);
-  this->State->ClearExtension(ProxySelectionModelState::port);
-  this->Selection->InitTraversal();
-  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
-    {
-    if(vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
-      {
-      this->State->AddExtension( ProxySelectionModelState::proxy,
-                                 port->GetSourceProxy()->GetGlobalID());
-      this->State->AddExtension( ProxySelectionModelState::port,
-                                 port->GetPortIndex());
-      }
-    else
-      {
-      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
-      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
-      }
-    }
-  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::InvokeCurrentChanged(vtkSMProxy*  proxy)
 {
   this->InvokeEvent(vtkCommand::CurrentChangedEvent, proxy);
+  this->PushStateToSession();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxySelectionModel::InvokeSelectionChanged(int selectionFlag)
+void vtkSMProxySelectionModel::InvokeSelectionChanged()
 {
-  this->InvokeEvent(vtkCommand::SelectionChangedEvent, (void*)&selectionFlag);
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
+  this->PushStateToSession();
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMProxySelectionModel::GetSelectionDataBounds(double bounds[6])
+{
+  vtkBoundingBox bbox;
+  for (SelectionType::iterator iter = this->Selection.begin();
+    iter != this->Selection.end(); ++iter)
+    {
+    vtkSMProxy* proxy = iter->GetPointer();
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+    vtkSMOutputPort* opPort = vtkSMOutputPort::SafeDownCast(proxy);
+    if (source)
+      {
+      for (unsigned int kk=0; kk <  source->GetNumberOfOutputPorts(); kk++)
+        {
+        bbox.AddBounds(source->GetDataInformation(kk)->GetBounds());
+        }
+      }
+    else if (opPort)
+      {
+      bbox.AddBounds(opPort->GetDataInformation()->GetBounds());
+      }
+    }
+  if (bbox.IsValid())
+    {
+    bbox.GetBounds(bounds);
+    return true;
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::PrintSelf(ostream&  os,  vtkIndent  indent)
 {
   this->Superclass::PrintSelf(os, indent);
+os << indent << "Current Proxy: "
+   << (this->Current ? this->Current->GetGlobalIDAsString() : "NULL") << endl;
   os << indent << "Selected Proxies: ";
-  this->Selection->InitTraversal();
-  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
+  for( SelectionType::iterator iter = this->Selection.begin();
+       iter != this->Selection.end(); iter++)
     {
-    os << obj->GetGlobalID() << " ";
+    os << iter->GetPointer()->GetGlobalIDAsString() << " ";
     }
   os << endl;
 }
+
 //-----------------------------------------------------------------------------
 const vtkSMMessage* vtkSMProxySelectionModel::GetFullState()
 {
@@ -307,8 +308,35 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   // Has we are going to load a state, we can consider to be initialized
   this->Internal->Initilized = true;
 
+  // Load current proxy
+  vtkSMProxy* currentProxy = NULL;
+  if( msg->GetExtension(ProxySelectionModelState::current_proxy) != 0)
+    {
+    currentProxy =
+        locator->LocateProxy(
+          msg->GetExtension(ProxySelectionModelState::current_proxy));
+    if(currentProxy)
+      {
+      if(msg->GetExtension(ProxySelectionModelState::current_port) != -1)
+        {
+        // We have to select an output port
+        vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(currentProxy);
+        assert("Try to select an output port of a non source proxy" && source);
+
+        currentProxy =
+            source->GetOutputPort(
+              msg->GetExtension(ProxySelectionModelState::current_port));
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Did not find the CURRENT proxy for selection Model");
+      }
+    }
+
+  SelectionType new_selection;
+
   // Load the proxy in the state
-  vtkstd::set<vtkSMProxy*> newProxyInSelection;
   for(int i=0; i < msg->ExtensionSize(ProxySelectionModelState::proxy); i++)
     {
     vtkSMProxy* proxy =
@@ -325,7 +353,7 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
         }
 
       // Just add the proxy in the set
-      newProxyInSelection.insert(proxy);
+      new_selection.insert(proxy);
       }
     else
       {
@@ -333,58 +361,68 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
       }
     }
 
-  // Take care of the deselect first
-  vtkNew<vtkCollection> proxyToDeselect;
-  this->Selection->InitTraversal();
-  while (vtkSMProxy* obj = vtkSMProxy::SafeDownCast(this->Selection->GetNextItemAsObject()))
-    {
-    if(newProxyInSelection.find(obj) == newProxyInSelection.end())
-      {
-      proxyToDeselect->AddItem(obj);
-      }
-    else
-      {
-      newProxyInSelection.erase(obj);
-      }
-    }
-
-  // Take care of the add-on
-  vtkNew<vtkCollection> proxyToSelect;
-  for( vtkstd::set<vtkSMProxy*>::iterator iter = newProxyInSelection.begin();
-       iter != newProxyInSelection.end();
-       iter++)
-    {
-    if(*iter)
-      {
-      proxyToSelect->AddItem(*iter);
-      }
-    }
-
   // Apply the state
   bool tmp = this->IsLocalPushOnly();
   this->EnableLocalPushOnly();
-  if(proxyToDeselect->GetNumberOfItems() > 0)
-    {
-    this->Select(proxyToDeselect.GetPointer(), DESELECT);
-    }
-  if(proxyToSelect->GetNumberOfItems() == 1)
-    {
-    // No need to do: this->Select(proxyToSelect.GetPointer(), SELECT);
-    // This is achieved in the SetCurrentProxy.
-
-    this->SetCurrentProxy(
-        vtkSMProxy::SafeDownCast(proxyToSelect->GetItemAsObject(0)), SELECT);
-    }
-  else if(proxyToSelect->GetNumberOfItems() > 0)
-    {
-    this->Select(proxyToSelect.GetPointer(), SELECT);
-    }
+  this->Select(new_selection, CLEAR_AND_SELECT);
+  this->SetCurrentProxy(currentProxy, new_selection.size() == 0 ? SELECT : NO_UPDATE);
   if(!tmp) this->DisableLocalPushOnly();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxySelectionModel::PushStateToSession()
 {
+  if(this->Internal->DisableSessionStatePush)
+    {
+    return;
+    }
+
+  // Update the local state and push to the session
+  this->State->ClearExtension(ProxySelectionModelState::current_proxy);
+  this->State->ClearExtension(ProxySelectionModelState::current_port);
+  this->State->ClearExtension(ProxySelectionModelState::proxy);
+  this->State->ClearExtension(ProxySelectionModelState::port);
+
+  // - Selection
+  for ( SelectionType::iterator iter = this->Selection.begin();
+        iter != this->Selection.end(); ++iter)
+    {
+    vtkSMProxy* obj = iter->GetPointer();
+    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(obj))
+      {
+      this->State->AddExtension( ProxySelectionModelState::proxy,
+                                 port->GetSourceProxy()->GetGlobalID());
+      this->State->AddExtension( ProxySelectionModelState::port,
+                                 port->GetPortIndex());
+      }
+    else
+      {
+      this->State->AddExtension(ProxySelectionModelState::proxy, obj->GetGlobalID());
+      this->State->AddExtension(ProxySelectionModelState::port, -1); // Not an outputport
+      }
+    }
+  // - Current
+  if ( this->Current )
+    {
+    if (vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(this->Current.GetPointer()))
+      {
+      this->State->SetExtension( ProxySelectionModelState::current_proxy,
+                                 port->GetSourceProxy()->GetGlobalID());
+      this->State->SetExtension( ProxySelectionModelState::current_port,
+                                 port->GetPortIndex());
+      }
+    else
+      {
+      this->State->SetExtension( ProxySelectionModelState::current_proxy,
+                                 this->Current->GetGlobalID());
+      this->State->SetExtension( ProxySelectionModelState::current_port,
+                                 -1); // Not an outputport
+      }
+    }
+
+  // If we push our state we are correctly initialized
+  this->Internal->Initilized = true;
+
   if(!this->IsLocalPushOnly() && this->GetSession())
     {
     this->PushState(this->State);

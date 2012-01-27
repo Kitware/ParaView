@@ -103,6 +103,9 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
   this->connect(core->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
+  this->connect(core->getObjectBuilder(),
+    SIGNAL(activeServerChanged(pqServer*)),
+    this, SLOT(onServerCreationFinished(pqServer*)));
 
   // Init Python tracing ivar
   this->Internal->IsPythonTracing = false;
@@ -174,8 +177,7 @@ void pqPythonManager::initializeParaviewPythonModules()
   pqServer* activeServer = this->Internal->ActiveServer;
   if (activeServer)
     {
-    this->Internal->PythonDialog->print(
-      "from paraview.simple import *\n");
+    //this->Internal->PythonDialog->print("from paraview.simple import *\n");
     this->Internal->PythonDialog->shell()->executeInitFromGUI();
     this->Internal->PythonDialog->shell()->promptForInput();
     emit this->paraviewPythonModulesImported();

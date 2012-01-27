@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqServerConnectReaction.h"
 
+#include "vtkProcessModule.h"
+
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -60,7 +62,8 @@ void pqServerConnectReaction::connectToServerWithWarning()
 
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  if (smmodel->findItems<pqPipelineSource*>(server).size() > 0)
+  if ( !vtkProcessModule::GetProcessModule()->GetMultipleSessionsSupport() &&
+       (smmodel->findItems<pqPipelineSource*>(server).size() > 0) )
     {
     int ret = QMessageBox::warning(
       pqCoreUtilities::mainWidget(),

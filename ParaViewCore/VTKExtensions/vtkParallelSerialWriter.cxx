@@ -31,7 +31,7 @@
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
@@ -59,7 +59,7 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
   this->CurrentTimeIndex = 0;
 
   this->Interpreter = 0;
-  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetInterpreter());
+  this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
 //-----------------------------------------------------------------------------
@@ -199,11 +199,11 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
         iter->GoToNextItem(), idx++)
       {
       vtkDataObject* curObj = iter->GetCurrentDataObject();
-      vtkstd::string path = 
+      std::string path =
         vtksys::SystemTools::GetFilenamePath(this->FileName);
-      vtkstd::string fnamenoext =
+      std::string fnamenoext =
         vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-      vtkstd::string ext =
+      std::string ext =
         vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
       vtksys_ios::ostringstream fname;
       fname << path << "/" << fnamenoext << idx << ext;
@@ -260,11 +260,11 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
       vtksys_ios::ostringstream fname;
       if (this->WriteAllTimeSteps)
         {
-        vtkstd::string path = 
+        std::string path =
           vtksys::SystemTools::GetFilenamePath(filename);
-        vtkstd::string fnamenoext =
+        std::string fnamenoext =
           vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
-        vtkstd::string ext =
+        std::string ext =
           vtksys::SystemTools::GetFilenameLastExtension(filename);
         fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
         }

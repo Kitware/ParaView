@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@ARG_VIEW_TYPE@Implementation.h"
 #include "@ARG_VIEW_TYPE@.h"
 
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "@ARG_DISPLAY_TYPE@.h"
 #include "pqServer.h"
 
@@ -69,9 +69,9 @@ bool @ARG_VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
 }
 
 vtkSMProxy* @ARG_VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype,
-                                                           pqServer * /*server*/)
+                                                           pqServer *server)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   if(viewtype == "@ARG_VIEW_TYPE@")
     {
     // See what happens if we augment the type with View, in case this is

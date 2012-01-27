@@ -39,7 +39,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
 #include "vtkPVDataInformation.h"
@@ -47,7 +47,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 
-using vtkstd::string;
+using std::string;
 
 vtkStandardNewMacro(vtkSMPointSpriteRepresentationProxy)
 //----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace
 }
 
 int vtkSMPointSpriteRepresentationProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(pm, element))
     {

@@ -203,7 +203,7 @@ ColorControlPoint::operator != (const ColorControlPoint &obj) const
 //   
 // ****************************************************************************
 
-const vtkstd::string
+const std::string
 ColorControlPoint::TypeName() const
 {
     return "ColorControlPoint";
@@ -253,7 +253,7 @@ ColorControlPoint::CopyAttributes(const AttributeGroup *atts)
 // ****************************************************************************
 
 AttributeSubject *
-ColorControlPoint::CreateCompatible(const vtkstd::string &tname) const
+ColorControlPoint::CreateCompatible(const std::string &tname) const
 {
     AttributeSubject *retval = 0;
     if(TypeName() == tname)
@@ -469,7 +469,7 @@ ColorControlPoint::SelectColors()
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 ColorControlPoint::GetFieldName(int index) const
 {
     switch (index)
@@ -521,7 +521,7 @@ ColorControlPoint::GetFieldType(int index) const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 ColorControlPoint::GetFieldTypeName(int index) const
 {
     switch (index)

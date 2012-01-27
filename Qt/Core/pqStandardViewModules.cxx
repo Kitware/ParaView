@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 
 #include <QDebug>
@@ -145,7 +146,7 @@ bool pqStandardViewModules::canCreateView(const QString& viewtype) const
 vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
                                                    pqServer *server)
 {
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   const char* root_xmlname = 0;
   if(viewtype == pqRenderView::renderViewType())
     {

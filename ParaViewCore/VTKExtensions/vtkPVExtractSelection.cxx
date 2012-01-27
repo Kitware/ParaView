@@ -31,10 +31,10 @@
 #include "vtkTable.h"
 #include "vtkGraph.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkPVExtractSelection::vtkSelectionNodeVector :
-  public vtkstd::vector<vtkSmartPointer<vtkSelectionNode> >
+  public std::vector<vtkSmartPointer<vtkSelectionNode> >
 {
 };
 

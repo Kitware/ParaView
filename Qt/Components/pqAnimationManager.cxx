@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 #include <QIntValidator>
@@ -50,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSize>
 #include <QtDebug>
-
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
@@ -67,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqViewManager.h"
+#include "pqTabbedMultiViewWidget.h"
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -377,8 +377,8 @@ bool pqAnimationManager::saveAnimation()
     this->Internals->ActiveServer->isRemote());
 
   // Use viewManager is available.
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   
   // Set current size of the window.
   QSize viewSize = viewManager? viewManager->clientSize() : QSize(800, 600);
@@ -603,12 +603,13 @@ bool pqAnimationManager::saveAnimation()
 
   // Enforce any view size conditions (such a multiple of 4). 
   ::enforceMultiple4(newSize); 
-  int magnification = viewManager? viewManager->prepareForCapture(newSize): 1;
+  int magnification = viewManager?
+    viewManager->prepareForCapture(newSize.width(), newSize.height()): 1;
  
   if (disconnect_and_save)
     {
     pqServer* server = this->Internals->ActiveServer;
-    vtkSMProxyManager* pxm = server->proxyManager();
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);
@@ -687,7 +688,7 @@ bool pqAnimationManager::saveAnimation()
   sceneProxy->UpdateVTKObjects();
   if (viewManager)
     {
-    viewManager->finishedCapture();
+    viewManager->cleanupAfterCapture();
     }
 
   if (stereo)

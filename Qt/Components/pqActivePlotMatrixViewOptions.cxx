@@ -95,16 +95,13 @@ void pqActivePlotMatrixViewOptions::changeView(pqView *view)
   if(this->Dialog)
     {
     this->Editor->setView(view);
-    this->Dialog->setWindowTitle("View Settings");
+    this->Dialog->setWindowTitle("Plot Matrix View Settings");
     }
 }
 
 void pqActivePlotMatrixViewOptions::closeOptions()
 {
-  //if(this->Dialog && this->Chart->getView())
-    {
-    this->Dialog->accept();
-    }
+  this->Dialog->accept();
 }
 
 void pqActivePlotMatrixViewOptions::finishDialog(int result)

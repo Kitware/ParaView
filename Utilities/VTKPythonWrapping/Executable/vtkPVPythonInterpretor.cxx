@@ -24,8 +24,8 @@
 #include "pvpythonmodules.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/algorithm>
-#include <vtkstd/string>
+#include <algorithm>
+#include <string>
 
 #include <signal.h>  // for signal
 
@@ -62,9 +62,9 @@ extern "C" {
 static void vtkPythonAppInitPrependPythonPath(const char* dir)
 {
   // Convert slashes for this platform.
-  vtkstd::string out_dir = dir ? dir : "";
+  std::string out_dir = dir ? dir : "";
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  vtkstd::replace(out_dir.begin(), out_dir.end(), '/', '\\');
+  std::replace(out_dir.begin(), out_dir.end(), '/', '\\');
 #endif
 
   // Append the path to the python sys.path object.
@@ -75,10 +75,10 @@ static void vtkPythonAppInitPrependPythonPath(const char* dir)
 }
 
 //----------------------------------------------------------------------------
-static bool vtkPythonAppInitPrependPath2(const vtkstd::string& prefix, 
-  const vtkstd::string& path)
+static bool vtkPythonAppInitPrependPath2(const std::string& prefix,
+  const std::string& path)
 {
-  vtkstd::string package_dir;
+  std::string package_dir;
   package_dir = prefix + "/../" + path;
   package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
   if (!vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
@@ -100,7 +100,7 @@ static bool vtkPythonAppInitPrependPath2(const vtkstd::string& prefix,
 static void vtkPythonAppInitPrependPath(const char* self_dir)
 {
   // Try to put the VTK python module location in sys.path.
-  vtkstd::string pkg_prefix = self_dir;
+  std::string pkg_prefix = self_dir;
 #if defined(CMAKE_INTDIR)
   pkg_prefix += "/..";
 #endif
@@ -134,11 +134,11 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       0
     };
 
-    vtkstd::string prefix = self_dir;
+    std::string prefix = self_dir;
     vtkPythonAppInitPrependPythonPath(self_dir); // Propbably not needed any longer.
 
 #if defined(WIN32)
-    vtkstd::string lib_dir = vtkstd::string(prefix + "/../lib/paraview-" + PARAVIEW_VERSION);
+    std::string lib_dir = std::string(prefix + "/../lib/paraview-" + PARAVIEW_VERSION);
     lib_dir = vtksys::SystemTools::CollapseFullPath( lib_dir.c_str());
     vtkPythonAppInitPrependPythonPath(lib_dir.c_str());
 #endif
@@ -151,7 +151,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 #if defined(__APPLE__)
     // On OS X distributions, the libraries are in a different directory
     // than the module. They are in a place relative to the executable.
-    vtkstd::string libs_dir = vtkstd::string(self_dir) + "/../Libraries";
+    std::string libs_dir = std::string(self_dir) + "/../Libraries";
     libs_dir = vtksys::SystemTools::CollapseFullPath(libs_dir.c_str());
     if(vtksys::SystemTools::FileIsDirectory(libs_dir.c_str()))
       {
@@ -160,7 +160,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 #endif
     for(const char** dir = inst_dirs; *dir; ++dir)
       {
-      vtkstd::string package_dir;
+      std::string package_dir;
       package_dir = prefix;
       package_dir += *dir;
       package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
@@ -168,7 +168,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
         {
         // We found the modules.  Add the location to sys.path, but
         // without the "/vtk" suffix.
-        vtkstd::string path_dir =
+        std::string path_dir =
           vtksys::SystemTools::GetFilenamePath(package_dir);
         vtkPythonAppInitPrependPythonPath(path_dir.c_str());
         break;
@@ -215,7 +215,7 @@ public:
   PyThreadState* Interpretor;
   PyThreadState* PreviousInterpretor; // save when MakeCurrent is called.
 
-  vtkstd::vector<vtkPythonMessage> Messages;
+  std::vector<vtkPythonMessage> Messages;
 
   vtkPVPythonInterpretorInternal()
     {
@@ -262,6 +262,7 @@ vtkStandardNewMacro(vtkPVPythonInterpretor);
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
+  this->ActiveSessionObserverAttached = false;
   this->Internal = new vtkPVPythonInterpretorInternal();
   this->ExecutablePath = 0;
   this->CaptureStreams = false;
@@ -270,6 +271,7 @@ vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::~vtkPVPythonInterpretor()
 {
+  this->DetachActiveSessionObserver();
   delete this->Internal;
   this->SetExecutablePath(0);
 }
@@ -329,7 +331,7 @@ void vtkPVPythonInterpretor::DumpOutput(const char* str)
 //-----------------------------------------------------------------------------
 void vtkPVPythonInterpretor::FlushMessages()
 {
-  vtkstd::vector<vtkPythonMessage>::iterator iter =
+  std::vector<vtkPythonMessage>::iterator iter =
     this->Internal->Messages.begin();
 
   for (; iter != this->Internal->Messages.end(); ++iter)
@@ -372,7 +374,7 @@ void vtkPVPythonInterpretor::InitializeInternal()
     {
     // Use the executable location to try to set sys.path to include
     // the VTK python modules.
-    vtkstd::string self_dir = vtksys::SystemTools::GetFilenamePath(exe_str);
+    std::string self_dir = vtksys::SystemTools::GetFilenamePath(exe_str);
     vtkPythonAppInitPrependPath(self_dir.c_str());
     }
 
@@ -495,8 +497,8 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
 
   // The embedded python interpreter cannot handle DOS line-endings, see
   // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
-  vtkstd::string buffer = script ? script : "";
-  buffer.erase(vtkstd::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
+  std::string buffer = script ? script : "";
+  buffer.erase(std::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
 
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
@@ -535,8 +537,19 @@ void vtkPVPythonInterpretor::ExecuteInitFromGUI()
     "from paraview.simple import *\n"
     "active_objects.view = servermanager.GetRenderView()\n"
     "";
+  this->ActiveSessionObserverAttached = true;
   this->RunSimpleString(initStr);
   this->FlushMessages();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::DetachActiveSessionObserver()
+{
+if(this->ActiveSessionObserverAttached)
+  {
+  this->RunSimpleString("paraview.simple.active_session_observer = None\n");
+  this->FlushMessages();
+  }
 }
 
 //-----------------------------------------------------------------------------

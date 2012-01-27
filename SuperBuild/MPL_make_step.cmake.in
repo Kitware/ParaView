@@ -12,6 +12,7 @@ if(WIN32)
   file(TO_NATIVE_PATH "@png_install@/lib" png_lib_win32)
   set(ENV{INCLUDE} "${freetype_include_win32};${png_include_win32};$ENV{INCLUDE}")
   set(ENV{LIB} "${freetype_lib_win32};${z_lib_win32};${png_lib_win32};$ENV{LIB}")
+  set(ENV{CL} "@pv_tpl_c_flags@")
 endif()
 
 execute_process(

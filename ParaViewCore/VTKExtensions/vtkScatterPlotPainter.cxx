@@ -52,9 +52,9 @@
 #include "vtkTransform.h"
 #include "vtkgl.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
+#include <string>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkScatterPlotPainter);

@@ -56,7 +56,7 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
   prop->set_name(this->GetXMLName());
   Variant *variant = prop->mutable_value();
   variant->set_type(Variant::FLOAT64);
-  vtkstd::vector<double>::iterator iter;
+  std::vector<double>::iterator iter;
   for (iter = this->Internals->Values.begin(); iter!=
     this->Internals->Values.end(); ++iter)
     {

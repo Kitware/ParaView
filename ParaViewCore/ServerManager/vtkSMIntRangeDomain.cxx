@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
 
@@ -35,7 +35,7 @@ struct vtkSMIntRangeDomainInternals
 
     EntryType() : Min(0), Max(0), Resolution(0), MinSet(0), MaxSet(0), ResolutionSet(0) {}
   };
-  vtkstd::vector<EntryType> Entries;
+  std::vector<EntryType> Entries;
 };
 
 //---------------------------------------------------------------------------

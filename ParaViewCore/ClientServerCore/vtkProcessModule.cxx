@@ -71,7 +71,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       {
       // MPICH changes the current working directory after MPI_Init. We fix that
       // by changing the CWD back to the original one after MPI_Init.
-      vtkstd::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
+      std::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
 
       // This is here to avoid false leak messages from vtkDebugLeaks when
       // using mpich. It appears that the root process which spawns all the
@@ -182,6 +182,10 @@ bool vtkProcessModule::Finalize()
 {
   if(vtkProcessModule::Singleton)
     {
+    // Make sure no session are kept inside ProcessModule so SessionProxyManager
+    // could cleanup their Proxies before the ProcessModule get deleted.
+    vtkProcessModule::Singleton->Internals->Sessions.clear();
+
     vtkProcessModule::Singleton->InvokeEvent(vtkCommand::ExitEvent);
     }
 
@@ -232,6 +236,7 @@ vtkProcessModule::vtkProcessModule()
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
+  this->MultipleSessionsSupport = false; // Set MULTI-SERVER to false as DEFAULT
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);

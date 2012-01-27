@@ -28,7 +28,10 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
@@ -36,6 +39,7 @@ vtkSMViewProxy::vtkSMViewProxy()
 {
   this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = 0;
+  this->Enable = true;
 }
 
 //----------------------------------------------------------------------------
@@ -222,7 +226,8 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
 {
   if (this->DefaultRepresentationName)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    assert("The session should be valid" && this->Session);
+    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
     vtkSmartPointer<vtkSMProxy> p;
     p.TakeReference(pxm->NewProxy("representations", this->DefaultRepresentationName));
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(p);
@@ -237,7 +242,7 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
 
 //----------------------------------------------------------------------------
 int vtkSMViewProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
 {
   if (!this->Superclass::ReadXMLAttributes(pm, element))
     {

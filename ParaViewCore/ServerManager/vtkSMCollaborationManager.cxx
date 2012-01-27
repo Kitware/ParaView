@@ -26,9 +26,9 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <vector>
+#include <string>
 
 //****************************************************************************
 //                              Internal class
@@ -68,7 +68,7 @@ public:
 
   const char* GetUserName(int userId)
     {
-    vtkstd::string &name = this->UserNames[userId];
+    std::string &name = this->UserNames[userId];
     if(name.empty())
       {
 
@@ -100,7 +100,7 @@ public:
       if(this->UserNames[userId] != userName)
         {
         this->UserNames[userId] = userName;
-        this->UpdateState(-1);
+        this->UpdateState(this->UserToFollow);
         this->Manager->InvokeEvent(
             (unsigned long)vtkSMCollaborationManager::UpdateUserName,
             (void*) &userId);
@@ -110,7 +110,7 @@ public:
     else
       {
       this->UserNames.erase(userId);
-      this->UpdateState(-1);
+      this->UpdateState(this->UserToFollow);
       }
     return false;
     }
@@ -188,7 +188,7 @@ public:
       this->UserToFollow = newFollow;
       }
 
-    return foundChanges;
+    return foundChanges || newFollow;
     }
 
   // Return the camera update message user origin otherwise
@@ -241,14 +241,14 @@ public:
     }
 
   vtkWeakPointer<vtkSMCollaborationManager> Manager;
-  vtkstd::map<int, vtkstd::string>          UserNames;
-  vtkstd::vector<int>                       Users;
+  std::map<int, std::string>          UserNames;
+  std::vector<int>                       Users;
   int                                       Me;
   int                                       UserToFollow;
   int                                       Master;
   vtkSMMessage                              State;
   vtkSMMessage                              PendingCameraUpdate;
-  vtkstd::map<int, vtkSMMessage>            LocalCameraStateCache;
+  std::map<int, vtkSMMessage>            LocalCameraStateCache;
   unsigned long                             ObserverTag;
 };
 //****************************************************************************
@@ -329,8 +329,18 @@ void vtkSMCollaborationManager::PromoteToMaster(int clientId)
   this->UpdateUserInformations();
 }
 //----------------------------------------------------------------------------
+int vtkSMCollaborationManager::GetFollowedUser()
+{
+  return this->Internal->UserToFollow;
+}
+//----------------------------------------------------------------------------
 void vtkSMCollaborationManager::FollowUser(int clientId)
 {
+  if( this->Internal->UserToFollow == clientId)
+    {
+    return;
+    }
+
   if(this->IsMaster())
     {
     this->Internal->UpdateState(clientId);

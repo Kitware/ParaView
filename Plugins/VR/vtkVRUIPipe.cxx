@@ -179,7 +179,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
   assert("pre: state_exists" && state!=0);
 
   // read all trackers states.
-  vtkstd::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=state->GetTrackerStates();
+  std::vector<vtkSmartPointer<vtkVRUITrackerState> > *trackers=state->GetTrackerStates();
   size_t i=0;
   size_t c=trackers->size();
 
@@ -210,7 +210,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
     ++i;
     }
   // read all buttons states.
-  vtkstd::vector<bool> *buttons=state->GetButtonStates();
+  std::vector<bool> *buttons=state->GetButtonStates();
   i=0;
   c=buttons->size();
   while(i<c)
@@ -227,7 +227,7 @@ void vtkVRUIPipe::ReadState(vtkVRUIServerState *state)
     }
 
   // read all valuators states.
-  vtkstd::vector<float> *valuators=state->GetValuatorStates();
+  std::vector<float> *valuators=state->GetValuatorStates();
   i=0;
   c=valuators->size();
   while(i<c)

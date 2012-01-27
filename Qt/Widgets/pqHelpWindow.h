@@ -81,7 +81,7 @@ private:
 };
 
 
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkReply>
 #include <QBuffer>
 /// Internal class used to add support to QWebView to load files from
 /// QHelpEngine.

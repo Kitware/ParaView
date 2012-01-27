@@ -119,7 +119,8 @@ protected:
 
   friend class vtkSMLinkObserver;
   friend class vtkSMStateLoader;
-  friend class vtkSMProxyManager;
+  friend class vtkSMSessionProxyManager;
+//ETX
   vtkCommand* Observer;
   // Set by default. In a link P1->P2, if this flag is set, when ever Proxy with P1
   // is updated i.e. UpdateVTKObjects() is called, this class calls

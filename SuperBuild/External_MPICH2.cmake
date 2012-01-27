@@ -25,8 +25,12 @@ if(WIN32)
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
 else()
+
+  set(mpich2_configure_args "--disable-rpath^^--disable-f77^^--disable-fc")
+
   # on linux build the binaries static
   ExternalProject_Add(MPICH2
+    LIST_SEPARATOR ^^
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${MPICH2_source}
     INSTALL_DIR ${MPICH2_install}
@@ -34,8 +38,8 @@ else()
     URL_MD5 ${MPICH2_MD5}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ""
-    CONFIGURE_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --disable-rpath --disable-f77 --disable-fc
-    BUILD_COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FCFLAGS=-fPIC make
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DADDITIONAL_CFLAGS=-fPIC -DADDITIONAL_CXXFLAGS=-fPIC -DADDITIONAL_FFLAGS=-fPIC -DINSTALL_DIR=<INSTALL_DIR> -DWORKING_DIR=<SOURCE_DIR> CONFIGURE_ARGS=${mpich2_configure_args} -P ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_configure_step.cmake
+    BUILD_COMMAND ${CMAKE_COMMAND} -DADDITIONAL_CFLAGS=-fPIC -DADDITIONAL_CXXFLAGS=-fPIC -DADDITIONAL_FFLAGS=-fPIC -DWORKING_DIR=<SOURCE_DIR> -P ${ParaViewSuperBuild_CMAKE_BINARY_DIR}/paraview_make_step.cmake
   )
 endif()
 

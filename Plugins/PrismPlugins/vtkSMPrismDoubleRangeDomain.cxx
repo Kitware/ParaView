@@ -3,7 +3,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkSMPrismDoubleRangeDomain);
 

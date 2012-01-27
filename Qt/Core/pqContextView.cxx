@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVariant.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkScatterPlotMatrix.h"
 
@@ -329,6 +329,12 @@ bool pqContextView::canRedo() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqContextView::supportsSelection() const
+{
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 /// Resets the zoom level to 100%.
 void pqContextView::resetDisplay()
 {
@@ -439,7 +445,7 @@ void pqContextView::setSelection(vtkSelection* sel)
 
   if (!selectionSource)
     {
-    vtkSMProxyManager* pxm = this->proxyManager();
+    vtkSMSessionProxyManager* pxm = this->proxyManager();
     selectionSource =
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
     vtkSMPropertyHelper(selectionSource, "FieldType").Set(selectionType);

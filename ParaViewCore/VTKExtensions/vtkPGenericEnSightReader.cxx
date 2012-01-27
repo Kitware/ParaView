@@ -31,8 +31,8 @@
 #include "vtkPEnSightGoldBinaryReader.h"
 #include "vtkPEnSightGoldReader.h"
 
-#include <vtkstd/string>
-#include <vtkstd/map>
+#include <string>
+#include <map>
 #include <assert.h>
 #include <ctype.h> /* isspace */
 

@@ -8,11 +8,11 @@ if(CMAKE_Fortran_COMPILER)
   if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel" AND WIN32)
     include(DetectIntelFortranEnvironment)
     set(OpenMPI_EXTRA_ARGS 
-      -DCMAKE_Fortran_COMPILER:FILE_PATH=${intel_ifort_path}/ifort.exe
+      -DCMAKE_Fortran_COMPILER:FILEPATH=${intel_ifort_path}/ifort.exe
     )
   else()
     set(OpenMPI_EXTRA_ARGS 
-      -DCMAKE_Fortran_COMPILER:FILE_PATH=${CMAKE_Fortran_COMPILER}
+      -DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}
     )
   #list(APPEND OpenMPI_EXTRA_ARGS
   #  -DOMPI_WANT_F77_BINDINGS:BOOL=ON

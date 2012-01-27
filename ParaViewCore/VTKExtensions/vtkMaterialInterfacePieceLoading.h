@@ -24,7 +24,7 @@
 
 #include <cassert>
 #include "vtkType.h"
-#include "vtkstd/vector"
+#include "vector"
 #include "vtksys/ios/iostream"
 
 class vtkMaterialInterfacePieceLoading
@@ -79,5 +79,5 @@ private:
   vtkIdType Data[SIZE];
 };
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkMaterialInterfacePieceLoading &fp);
-void PrintPieceLoadingHistogram(vtkstd::vector<vtkstd::vector<vtkIdType> > &pla);
+void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> > &pla);
 #endif

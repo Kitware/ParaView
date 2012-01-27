@@ -322,13 +322,13 @@ AttributeGroup::InterpolateConst(const AttributeGroup *atts1,
             ConstInterp<unsigned char>::InterpVector(addrOut,addr1,addr2,f);
             break;
           case FieldType_string:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_stringVector:
-            ConstInterp<vtkstd::string>::InterpVector(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpVector(addrOut,addr1,addr2,f);
             break;
           case FieldType_colortable:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_opacity:
             ConstInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
@@ -340,7 +340,7 @@ AttributeGroup::InterpolateConst(const AttributeGroup *atts1,
             ConstInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_variablename:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_color:
           case FieldType_att:
@@ -479,13 +479,13 @@ AttributeGroup::InterpolateLinear(const AttributeGroup *atts1,
             LinInterp<unsigned char>::InterpVector(addrOut,addr1,addr2,f);
             break;
           case FieldType_string:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_stringVector:
-            ConstInterp<vtkstd::string>::InterpVector(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpVector(addrOut,addr1,addr2,f);
             break;
           case FieldType_colortable:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_opacity:
             LinInterp<double>::InterpScalar(addrOut,addr1,addr2,f);
@@ -497,7 +497,7 @@ AttributeGroup::InterpolateLinear(const AttributeGroup *atts1,
             LinInterp<int>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_variablename:
-            ConstInterp<vtkstd::string>::InterpScalar(addrOut,addr1,addr2,f);
+            ConstInterp<std::string>::InterpScalar(addrOut,addr1,addr2,f);
             break;
           case FieldType_color:
           case FieldType_att:
@@ -635,15 +635,15 @@ AttributeGroup::EqualTo(const AttributeGroup *atts) const
                return false;
             break;
           case FieldType_string:
-            if (!(EqualVal<vtkstd::string>::EqualScalar(addr1,addr2)))
+            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
                return false;
             break;
           case FieldType_stringVector:
-            if (!(EqualVal<vtkstd::string>::EqualVector(addr1,addr2)))
+            if (!(EqualVal<std::string>::EqualVector(addr1,addr2)))
                return false;
             break;
           case FieldType_colortable:
-            if (!(EqualVal<vtkstd::string>::EqualScalar(addr1,addr2)))
+            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
                return false;
             break;
           case FieldType_opacity:
@@ -659,7 +659,7 @@ AttributeGroup::EqualTo(const AttributeGroup *atts) const
                return false;
             break;
           case FieldType_variablename:
-            if (!(EqualVal<vtkstd::string>::EqualScalar(addr1,addr2)))
+            if (!(EqualVal<std::string>::EqualScalar(addr1,addr2)))
                return false;
             break;
           case FieldType_color:
@@ -706,7 +706,7 @@ AttributeGroup::EqualTo(const AttributeGroup *atts) const
 //
 // ****************************************************************************
 
-const vtkstd::string
+const std::string
 AttributeGroup::TypeName() const
 {
     return "AttributeGroup";
@@ -765,8 +765,8 @@ AttributeGroup::WriteType(Connection &conn, AttributeGroup::typeInfo &info)
         break;
     case msgTypeString:
         { // new scope
-          // Write a vtkstd::string to the connection
-          vtkstd::string *sptr = (vtkstd::string *)(info.address);
+          // Write a std::string to the connection
+          std::string *sptr = (std::string *)(info.address);
 
           for(i = 0; i < sptr->size(); ++i)
               conn.WriteChar(sptr->at(i));
@@ -845,7 +845,7 @@ AttributeGroup::WriteType(Connection &conn, AttributeGroup::typeInfo &info)
         break;
     case msgTypeListString:
         { // new scope
-          vtkstd::string *sptr = (vtkstd::string *)(info.address);
+          std::string *sptr = (std::string *)(info.address);
           int j;
 
           conn.WriteInt(info.length);
@@ -1048,7 +1048,7 @@ AttributeGroup::ReadType(Connection &conn, int attrId, AttributeGroup::typeInfo 
     case msgTypeString:
         { // new scope
           unsigned char c;
-          vtkstd::string *sptr = (vtkstd::string *)(info.address);
+          std::string *sptr = (std::string *)(info.address);
           sptr->erase();
 
           // Read characters until there is a null-terminator.
@@ -1133,7 +1133,7 @@ AttributeGroup::ReadType(Connection &conn, int attrId, AttributeGroup::typeInfo 
         break;
     case msgTypeListString:
         { // new scope
-          vtkstd::string *sptr = (vtkstd::string *)(info.address);
+          std::string *sptr = (std::string *)(info.address);
 
           conn.ReadInt(&(info.length));
           for(i = 0; i < info.length; ++i)
@@ -1326,7 +1326,7 @@ AttributeGroup::ReadType(Connection &conn, int attrId, AttributeGroup::typeInfo 
           for(i = vecLen; i > 0; --i)
           {
               unsigned char c;
-              vtkstd::string   str;
+              std::string   str;
 
               // Read characters until there is a null-terminator.
               do
@@ -1478,7 +1478,7 @@ AttributeGroup::SelectField(int index)
 // ****************************************************************************
 
 void
-AttributeGroup::SelectFields(const vtkstd::vector<int> &indices)
+AttributeGroup::SelectFields(const std::vector<int> &indices)
 {
     // Select and unselect to make sure that the addresses are all okay.
     SelectAll();
@@ -1888,7 +1888,7 @@ AttributeGroup::CalculateMessageSize(Connection &conn)
                 break;
             case msgTypeString:
             { // new scope
-                vtkstd::string *sptr = (vtkstd::string *)(pos->address);
+                std::string *sptr = (std::string *)(pos->address);
                 messageSize += (conn.CharSize(conn.DEST) * (sptr->size() + 1));
             }
                 break;
@@ -1926,7 +1926,7 @@ AttributeGroup::CalculateMessageSize(Connection &conn)
                 break;
             case msgTypeListString:
             { // new scope
-                vtkstd::string *sptr = (vtkstd::string *)(pos->address);
+                std::string *sptr = (std::string *)(pos->address);
 
                 messageSize += conn.IntSize(conn.DEST);
                 for(i = 0; i < pos->length; ++i, ++sptr)
@@ -2396,7 +2396,7 @@ AttributeGroup::typeInfo::operator =(const AttributeGroup::typeInfo &obj)
     length = obj.length;
 }
 
-vtkstd::string
+std::string
 AttributeGroup::GetFieldName(int /*index*/) const
 {
     return "<UNKNOWN name>";
@@ -2408,7 +2408,7 @@ AttributeGroup::GetFieldType(int /*index*/) const
     return FieldType_unknown;
 }
 
-vtkstd::string
+std::string
 AttributeGroup::GetFieldTypeName(int /*index*/) const
 {
     return "<UNKNOWN type>";
@@ -2534,7 +2534,7 @@ operator << (ostream& os, const AttributeGroup& atts)
             }
             break;
         case msgTypeString:
-            {   vtkstd::string *sptr = (vtkstd::string *)(pos->address);
+            {   std::string *sptr = (std::string *)(pos->address);
                 if (sptr)
                     os << sptr->c_str();
             }
@@ -2590,7 +2590,7 @@ operator << (ostream& os, const AttributeGroup& atts)
             }
             break;
         case msgTypeListString:
-            {   vtkstd::string *sptr = (vtkstd::string *)(pos->address);
+            {   std::string *sptr = (std::string *)(pos->address);
                 for(i = 0; i < pos->length; ++i)
                     os << ", " << sptr[i].c_str();
             }

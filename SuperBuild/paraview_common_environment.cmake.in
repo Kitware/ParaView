@@ -1,9 +1,10 @@
 
 if(UNIX)
   set(ENV{LDFLAGS} "-L@ParaViewSuperBuild_BINARY_DIR@/lib")
-  set(ENV{CFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CFLAGS}")
-  set(ENV{CPPFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CPPFLAGS}")
-  set(ENV{CXXFLAGS} "-I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CXXFLAGS}")
+  set(ENV{CFLAGS} "@pv_tpl_c_flags@ -I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CFLAGS}")
+  set(ENV{CPPFLAGS} "@pv_tpl_cxx_flags@ -I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CPPFLAGS}")
+  set(ENV{CXXFLAGS} "@pv_tpl_cxx_flags@ -I@ParaViewSuperBuild_BINARY_DIR@/include -I@ParaViewSuperBuild_BINARY_DIR@/include/freetype2 @paraview_osx_flags@ ${ADDITIONAL_CXXFLAGS}")
+  set(ENV{FFLAGS} "${ADDITIONAL_FFLAGS}")
   set(ENV{PKG_CONFIG_PATH} "@ParaViewSuperBuild_BINARY_DIR@/lib/pkgconfig")
   if(APPLE)
     set(ENV{PYTHONPATH} "@CMAKE_CURRENT_BINARY_DIR@/ParaView-build/Utilities/VTKPythonWrapping/site-packages")

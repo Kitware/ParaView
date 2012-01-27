@@ -30,10 +30,10 @@
 #include "vtkMPIController.h"
 #endif
 
-#include <vtkstd/vector>
-#include <vtkstd/deque>
-#include <vtkstd/string>
-#include <vtkstd/map>
+#include <vector>
+#include <deque>
+#include <string>
+#include <map>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # define SNPRINTF _snprintf
@@ -67,12 +67,12 @@ class vtkProgressStore
     {
   public:
     int ObjectID;
-    vtkstd::vector<double> Progress;
-    vtkstd::vector<vtkstd::string> Text;
+    std::vector<double> Progress;
+    std::vector<std::string> Text;
 
     // Returns true if there's some progress to report for this row.
     // NOTE: This is a non-idempotent method.
-    bool Report(vtkstd::string& txt, double& progress)
+    bool Report(std::string& txt, double& progress)
       {
       progress = VTK_DOUBLE_MAX;
       for (unsigned int cc=0; cc < this->Progress.size(); cc++)
@@ -104,7 +104,7 @@ class vtkProgressStore
       return true;
       }
     };
-  typedef vtkstd::deque<vtkRow> ListOfRows;
+  typedef std::deque<vtkRow> ListOfRows;
   ListOfRows Rows;
 
   vtkRow& Find(int objectId)
@@ -137,7 +137,7 @@ class vtkProgressStore
     }
 
 public:
-  void AddLocalProgress(int objectId, const vtkstd::string& txt,
+  void AddLocalProgress(int objectId, const std::string& txt,
     double progress)
     {
     vtkRow& row = this->Find(objectId);
@@ -146,7 +146,7 @@ public:
     }
 
   void AddRemoteProgress(int remoteId, int objectId,
-    const vtkstd::string& txt, double progress)
+    const std::string& txt, double progress)
     {
     vtkRow& row = this->Find(objectId);
     row.Text[remoteId] = txt;
@@ -155,7 +155,7 @@ public:
 
   // Returns the progress to report. This is a non-idempotent method (esp. when
   // any of the filters is reporting 100%).
-  bool GetProgress(int &objectId, vtkstd::string& txt, double& progress)
+  bool GetProgress(int &objectId, std::string& txt, double& progress)
     {
     ListOfRows::iterator iter;
     for (iter = this->Rows.begin(); iter != this->Rows.end(); ++iter)
@@ -214,7 +214,7 @@ protected:
 class vtkPVProgressHandler::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkObject*, int> MapOfObjectToInt;
+  typedef std::map<vtkObject*, int> MapOfObjectToInt;
   MapOfObjectToInt RegisteredObjects;
 
   vtkProgressStore ProgressStore;
@@ -447,7 +447,7 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* obj,
     {
     return;
     }
-  vtkstd::string text = ::vtkGetProgressText(obj);
+  std::string text = ::vtkGetProgressText(obj);
   if (text.size() > 128)
     {
     vtkWarningMacro("Progress text is tuncated to 128 characters.");
@@ -463,7 +463,7 @@ void vtkPVProgressHandler::RefreshProgress()
 {
   int id;
   double progress;
-  vtkstd::string text;
+  std::string text;
 
   // NOTE: All the sends/receives have to be non-blocking.
 
@@ -532,7 +532,7 @@ void vtkPVProgressHandler::SendProgressToClient(
   // Called on Root node of the server process to send the progress to the
   // client.
   int id;
-  vtkstd::string text;
+  std::string text;
   double progress;
   if (this->Internals->ProgressStore.GetProgress(id, text, progress))
     {
@@ -631,7 +631,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
     memcpy(&progress, this->Internals->AsyncRequestData + sizeof(int)*2, sizeof(int));
     vtkByteSwap::SwapLE(&progress);
 
-    vtkstd::string text = reinterpret_cast<const char*>(
+    std::string text = reinterpret_cast<const char*>(
       this->Internals->AsyncRequestData + sizeof(int)*3);
     //cout << "----Received: " << text.c_str() << ": " << progress << endl;
 
@@ -687,7 +687,7 @@ void vtkPVProgressHandler::SendProgressToRoot()
     {
     double progress;
     int id;
-    vtkstd::string text;
+    std::string text;
     if (this->Internals->ProgressStore.GetProgress(id, text, progress))
       {
       if (this->ReportProgress(progress))

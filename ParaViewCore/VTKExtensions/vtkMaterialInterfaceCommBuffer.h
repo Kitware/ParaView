@@ -53,7 +53,7 @@ public:
   // Description:
   // Set up for a set of incoming header.
   static void SizeHeader(
-          vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers,
+          std::vector<vtkMaterialInterfaceCommBuffer> &buffers,
           int nBlocks);
   // Description:
   // Initialize the buffer.
@@ -119,7 +119,7 @@ public:
   int UnPack(int *&rData,const int nComps,const vtkIdType nTups,const bool copyFlag);
   int UnPack(vtkDoubleArray *da,const int nComps,const vtkIdType nTups,const bool copyFlag);
   int UnPack(vtkFloatArray *da,const int nComps,const vtkIdType nTups,const bool copyFlag);
-  //static void Resize(vtkstd::vector<vtkMaterialInterfaceCommBuffer> &buffers);
+  //static void Resize(std::vector<vtkMaterialInterfaceCommBuffer> &buffers);
 private:
   vtkIdType EOD;
   char *Buffer;

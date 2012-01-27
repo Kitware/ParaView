@@ -6,7 +6,7 @@ set(python_BUILD_IN_SOURCE 1)
 
 if(WIN32)
 
-  set(python_sln ${CMAKE_BINARY_DIR}/${proj}-build/PCbuild/pcbuild.sln)
+  set(python_sln ${python_build}/PCbuild/pcbuild.sln)
   string(REPLACE "/" "\\" python_sln ${python_sln})
 
   get_filename_component(python_base ${python_sln} PATH)
@@ -24,8 +24,8 @@ if(WIN32)
     URL ${PYTHON_URL}/${PYTHON_GZ}
     URL_MD5 ${PYTHON_MD5}
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
-    SOURCE_DIR python-build
-    PATCH_COMMAND ""
+    SOURCE_DIR ${python_build}
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/PythonPatches/pyproject.vsprops ${python_base}
     CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE ${python_BUILD_IN_SOURCE}
     BUILD_COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build ${python_configuration} /project select

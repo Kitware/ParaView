@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 
 // standard includes
-#include <vtkstd/set>
+#include <set>
 
 // Qt includes
 #include <QString>

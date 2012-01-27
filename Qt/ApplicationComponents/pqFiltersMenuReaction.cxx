@@ -42,21 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "pqCollaborationManager.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDataTypeDomain.h"
 #include "vtkSMDocumentation.h"
+#include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMDataTypeDomain.h"
-#include "vtkSMInputArrayDomain.h"
-#include "vtkPVServerInformation.h"
-
 
 #include <QMap>
 #include <QDebug>
@@ -150,6 +149,13 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 //-----------------------------------------------------------------------------
 void pqFiltersMenuReaction::updateEnableState()
 {
+  // Impossible to validate anything without any SessionProxyManager
+  if(!vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
+    {
+    this->Timer.start(100); // Try later
+    return;
+    }
+
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   pqServer* server = activeObjects->activeServer();
   bool enabled = (server != NULL);
@@ -162,10 +168,14 @@ void pqFiltersMenuReaction::updateEnableState()
   if (enabled)
     {
     pqApplicationCore* core = pqApplicationCore::instance();
-    pqServerManagerSelection selected =
-      *core->getSelectionModel()->selectedItems();
-    foreach (pqServerManagerModelItem* item, selected)
+    pqServerManagerModel* smmodel = core->getServerManagerModel();
+    vtkSMProxySelectionModel* selModel =
+      pqActiveObjects::instance().activeSourcesSelectionModel();
+    for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
       {
+      pqServerManagerModelItem* item =
+        smmodel->findItem<pqServerManagerModelItem*>(
+          selModel->GetSelectedProxy(cc));
       pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
       pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
       if (opPort)
@@ -191,9 +201,14 @@ void pqFiltersMenuReaction::updateEnableState()
           this, SLOT(onDataUpdated()));
         break;
         }
-      outputPorts.append(opPort);
+
+      // Make sure we still have a valid port, this issue came up with multi-server
+      if(opPort)
+        {
+        outputPorts.append(opPort);
+        }
       }
-    if (selected.size()==0)
+    if (selModel->GetNumberOfSelectedProxies() == 0 || outputPorts.size() == 0)
       {
       enabled = false;
       }
@@ -291,8 +306,9 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
     xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)
@@ -302,15 +318,18 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
     }
 
   // Get the list of selected sources.
-  pqServerManagerSelection selected =
-      *core->getSelectionModel()->selectedItems();
-
   QMap<QString, QList<pqOutputPort*> > namedInputs;
   QList<pqOutputPort*> selectedOutputPorts;
 
+  vtkSMProxySelectionModel* selModel =
+    pqActiveObjects::instance().activeSourcesSelectionModel();
   // Determine the list of selected output ports.
-  foreach (pqServerManagerModelItem* item, selected)
+  for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
     {
+    pqServerManagerModelItem* item =
+      smmodel->findItem<pqServerManagerModelItem*>(
+        selModel->GetSelectedProxy(cc));
+
     pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
     if (opPort)

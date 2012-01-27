@@ -25,7 +25,7 @@
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLParser.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/Directory.hxx>
 #include <vtksys/ios/sstream>
@@ -47,8 +47,8 @@ namespace
   class vtkPVXMLOnlyPlugin : public vtkPVPlugin,
                            public vtkPVServerManagerPluginInterface
   {
-  vtkstd::string PluginName;
-  vtkstd::string XML;
+  std::string PluginName;
+  std::string XML;
   vtkPVXMLOnlyPlugin(){};
   vtkPVXMLOnlyPlugin(const vtkPVXMLOnlyPlugin& other);
   void operator=(const vtkPVXMLOnlyPlugin& other);
@@ -112,7 +112,7 @@ public:
 
   // Description:
   // Obtain the server-manager configuration xmls, if any.
-  virtual void GetXMLs(vtkstd::vector<vtkstd::string>& xmls)
+  virtual void GetXMLs(std::vector<std::string>& xmls)
     {
     xmls.push_back(this->XML);
     }
@@ -130,8 +130,8 @@ public:
   // BUG # 10293
   class vtkPVPluginLoaderCleaner
     {
-    vtkstd::vector<vtkLibHandle> Handles;
-    vtkstd::vector<vtkPVXMLOnlyPlugin*> XMLPlugins;
+    std::vector<vtkLibHandle> Handles;
+    std::vector<vtkPVXMLOnlyPlugin*> XMLPlugins;
   public:
     void Register(vtkLibHandle &handle)
       {
@@ -144,13 +144,13 @@ public:
 
     ~vtkPVPluginLoaderCleaner()
       {
-      for (vtkstd::vector<vtkLibHandle>::iterator iter = this->Handles.begin();
+      for (std::vector<vtkLibHandle>::iterator iter = this->Handles.begin();
         iter != this->Handles.end(); ++iter)
         {
         vtkDynamicLoader::CloseLibrary(*iter);
         }
 
-      for (vtkstd::vector<vtkPVXMLOnlyPlugin*>::iterator iter =
+      for (std::vector<vtkPVXMLOnlyPlugin*>::iterator iter =
         this->XMLPlugins.begin();
         iter != this->XMLPlugins.end(); ++iter)
         {
@@ -224,7 +224,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
     "Loading Plugins from standard PLUGIN_PATHS \n"
     << this->SearchPaths);
 
-  vtkstd::vector<vtkstd::string> paths;
+  std::vector<std::string> paths;
   vtksys::SystemTools::Split(this->SearchPaths, paths, ';');
   for (size_t cc=0; cc < paths.size(); cc++)
     {
@@ -245,12 +245,12 @@ void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 
   for (unsigned int cc=0; cc < dir.GetNumberOfFiles(); cc++)
     {
-    vtkstd::string ext =
+    std::string ext =
       vtksys::SystemTools::GetFilenameLastExtension(dir.GetFile(cc));
     if (ext == ".so" || ext == ".dll" || ext == ".xml" || ext == ".dylib" ||
       ext == ".xml" || ext == ".sl")
       {
-      vtkstd::string file = dir.GetPath();
+      std::string file = dir.GetPath();
       file += "/";
       file += dir.GetFile(cc);
       this->LoadPluginSilently(file.c_str());
@@ -272,7 +272,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     }
 
   this->SetFileName(file);
-  vtkstd::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
+  std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
 
 
@@ -326,7 +326,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
     }
 
-  vtkstd::string pv_verfication_data = pv_plugin_query_verification_data();
+  std::string pv_verfication_data = pv_plugin_query_verification_data();
 
   vtkPVPluginLoaderDebugMacro("Plugin's signature: " <<
     pv_verfication_data.c_str());
@@ -377,7 +377,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   // its dependencies. This isn't the right thing to do. A better
   // solution would be to let the plugin tell us where to look so
   // that a list of locations could be added.
-  vtkstd::string ldLibPath;
+  std::string ldLibPath;
 #if defined(_WIN32) && !defined(__CYGWIN__)
   const char LIB_PATH_SEP=';';
   const char PATH_SEP='\\';
@@ -394,7 +394,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   const char *LIB_PATH_NAME="LD_LIBRARY_PATH";
 #endif
   // Trim the plugin name from the end of its path.
-  vtkstd::string thisPluginsPath(file);
+  std::string thisPluginsPath(file);
   size_t eop=thisPluginsPath.rfind(PATH_SEP);
   thisPluginsPath=thisPluginsPath.substr(0,eop);
   // Load the shared library search path.

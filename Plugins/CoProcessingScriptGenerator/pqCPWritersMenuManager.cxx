@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkProcessModule.h"
 #include "vtkPVProxyDefinitionIterator.h"
@@ -50,7 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProxySelectionModel.h"
 
 #include <QAction>
 #include <QDebug>
@@ -58,6 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+
+#include <assert.h>
 
 namespace
 {
@@ -88,10 +91,9 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
   // this updates the available writers whenever the active
   // source changes
   QObject::connect(
-    pqApplicationCore::instance()->getSelectionModel(),
-    SIGNAL(selectionChanged(const pqServerManagerSelection&,
-    const pqServerManagerSelection&)),
-    this, SLOT(updateEnableState()));
+        &pqActiveObjects::instance(),
+        SIGNAL(sourceChanged(pqPipelineSource*)),
+        this, SLOT(updateEnableState()));
 
   // this updates the available writers whenever a filter
   // is updated (i.e. the user hits the Apply button)
@@ -99,7 +101,6 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
                    this, SLOT(updateEnableState()));
   this->Timer.setInterval(11);
   this->Timer.setSingleShot(true);
-  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
                    SIGNAL(dataUpdated(pqPipelineSource*)),
                    &this->Timer, SLOT(start()));
@@ -143,6 +144,12 @@ void pqCPWritersMenuManager::createMenu()
 {
   QMainWindow *mainWindow = qobject_cast<QMainWindow*>(
     pqCoreUtilities::mainWidget());
+  if(mainWindow == NULL)
+    {
+    // we don't have a main window to add our menus to yet so we'll wait a bit
+    QTimer::singleShot(1000, this, SLOT(createMenu()));
+    return;
+    }
 
   if(this->Menu == NULL)
     {
@@ -156,7 +163,9 @@ void pqCPWritersMenuManager::createMenu()
     }
   this->Menu->clear();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
   vtkSMProxyDefinitionManager* proxyDefinitions =
     pxm->GetProxyDefinitionManager();
 
@@ -198,35 +207,36 @@ void pqCPWritersMenuManager::createMenu()
 //-----------------------------------------------------------------------------
 void pqCPWritersMenuManager::updateEnableState()
 {
-  if (!this->Menu)
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  if (!this->Menu || !pxm)
     {
     return;
     }
 
   // Get the list of selected sources. Make sure the list contains
   // only valid sources.
-  const pqServerManagerSelection *selItems =
-    pqApplicationCore::instance()->getSelectionModel()->selectedItems();
+  pqServerManagerModel* pqModel = pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxySelectionModel* selection = pxm->GetSelectionModel("ActiveSources");
 
   QList<pqOutputPort*> outputPorts;
-  pqServerManagerModelItem* item = NULL;
-  pqServerManagerSelection::ConstIterator iter = selItems->begin();
-  for( ; iter != selItems->end(); ++iter)
+  for(int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
-    item = *iter;
-    pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
-    pqOutputPort* port = source? source->getOutputPort(0) :
-      qobject_cast<pqOutputPort*>(item);
+    vtkSMProxy* smProxy = selection->GetSelectedProxy(index);
+    pqPipelineSource* source = pqModel->findItem<pqPipelineSource*>(smProxy);
+    pqOutputPort* port = source ? source->getOutputPort(0) :
+                                  pqModel->findItem<pqOutputPort*>(smProxy);
     if (port)
       {
       outputPorts.append(port);
       }
     }
 
+  assert("A proxy manager should have been found by now" && pxm);
+
   // Iterate over all filters in the menu and see if they can be
   // applied to the current source(s).
   bool some_enabled = false;
-  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
   QList<QAction *> menu_actions = this->Menu->findChildren<QAction *>();
   foreach( QAction* action, menu_actions)
     {
@@ -265,7 +275,7 @@ void pqCPWritersMenuManager::updateEnableState()
     vtkSMInputProperty *input = ::getInputProperty(output);
     if (input)
       {
-      if (!input->GetMultipleInput() && selItems->size() > 1)
+      if (!input->GetMultipleInput() && selection->GetNumberOfSelectedProxies() > 1)
         {
         action->setEnabled(false);
         continue;
@@ -312,7 +322,8 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)
@@ -322,21 +333,20 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
     }
 
   // Get the list of selected sources.
-  pqServerManagerSelection selected =
-    *core->getSelectionModel()->selectedItems();
+  vtkSMProxySelectionModel* selection = pxm->GetSelectionModel("ActiveSources");
+  pqServerManagerModel* pqModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqOutputPort*> selectedOutputPorts;
   QMap<QString, QList<pqOutputPort*> > namedInputs;
-
+  pqPipelineSource* source;
+  pqOutputPort* opPort;
   // Determine the list of selected output ports.
-  foreach (pqServerManagerModelItem* item, selected)
+  for (unsigned int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
-    pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
-    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
-    if (opPort)
+    if (opPort = pqModel->findItem<pqOutputPort*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(opPort);
       }
-    else if (source)
+    else if (source = pqModel->findItem<pqPipelineSource*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(source->getOutputPort(0));
       }

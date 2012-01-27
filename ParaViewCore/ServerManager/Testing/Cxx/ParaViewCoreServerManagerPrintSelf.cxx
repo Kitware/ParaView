@@ -226,7 +226,7 @@ int main(int , char *[])
   PRINT_SELF(vtkSMProxyLink);
   PRINT_SELF(vtkSMProxyListDomain);
   PRINT_SELF(vtkSMProxyLocator);
-  PRINT_SELF(vtkSMProxyManager);
+  //PRINT_SELF(vtkSMProxyManager);
   PRINT_SELF(vtkSMProxyProperty);
   PRINT_SELF(vtkSMProxySelectionModel);
   PRINT_SELF(vtkSMPSWriterProxy);

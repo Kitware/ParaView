@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 static void vtkInitializationHelperInit(vtkClientServerInterpreter*);
@@ -164,15 +164,18 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::New();
-  vtkSMObject::SetProxyManager(pxm);
-  pxm->Delete();
+  // Set multi-server flag to vtkProcessModule
+  vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(
+        options->GetMultiServerMode() != 0);
+
+  // Make sure the ProxyManager get created...
+  vtkSMProxyManager::GetProxyManager();
 }
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  vtkSMObject::SetProxyManager(NULL);
+  vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();
 
   // Optional:  Delete all global objects allocated by libprotobuf.

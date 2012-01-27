@@ -56,33 +56,33 @@ vtkAnalyzeReader::~vtkAnalyzeReader()
 
 
 //GetExtension from uiig library.
-static vtkstd::string
-GetExtension( const vtkstd::string& filename ) {
+static std::string
+GetExtension( const std::string& filename ) {
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const vtkstd::string::size_type it = filename.find_last_of( "." );
+  const std::string::size_type it = filename.find_last_of( "." );
 
-  // This determines the file's type by creating a new vtkstd::string
+  // This determines the file's type by creating a new std::string
   // who's value is the extension of the input filename
   // eg. "myimage.gif" has an extension of "gif"
-  vtkstd::string fileExt( filename, it+1, filename.length() );
+  std::string fileExt( filename, it+1, filename.length() );
 
   return( fileExt );
 }
 
 //GetRootName from uiig library.
-static vtkstd::string
-GetRootName( const vtkstd::string& filename )
+static std::string
+GetRootName( const std::string& filename )
 {
-  const vtkstd::string fileExt = GetExtension(filename);
+  const std::string fileExt = GetExtension(filename);
 
   // Create a base filename
   // i.e Image.hdr --> Image
   if( fileExt.length() > 0 )
     {
-    const vtkstd::string::size_type it = filename.find_last_of( fileExt );
-    vtkstd::string baseName( filename, 0, it-fileExt.length() );
+    const std::string::size_type it = filename.find_last_of( fileExt );
+    std::string baseName( filename, 0, it-fileExt.length() );
     return( baseName );
     }
   //Default to return same as input when the extension is nothing (Analyze)
@@ -90,11 +90,11 @@ GetRootName( const vtkstd::string& filename )
 }
 
 
-static vtkstd::string
-GetHeaderFileName( const vtkstd::string & filename )
+static std::string
+GetHeaderFileName( const std::string & filename )
 {
-  vtkstd::string ImageFileName = GetRootName(filename);
-  vtkstd::string fileExt = GetExtension(filename);
+  std::string ImageFileName = GetRootName(filename);
+  std::string fileExt = GetExtension(filename);
   //If file was named xxx.img.gz then remove both the gz and the img endings.
   if(!fileExt.compare("gz"))
     {
@@ -105,11 +105,11 @@ GetHeaderFileName( const vtkstd::string & filename )
 }
 
 //Returns the base image filename.
-static vtkstd::string GetImageFileName( const vtkstd::string& filename )
+static std::string GetImageFileName( const std::string& filename )
 {
   // Why do we add ".img" here?  Look in fileutils.h
-  vtkstd::string fileExt = GetExtension(filename);
-  vtkstd::string ImageFileName = GetRootName(filename);
+  std::string fileExt = GetExtension(filename);
+  std::string ImageFileName = GetRootName(filename);
   if(!fileExt.compare("gz"))
     {
     //First strip both extensions off
@@ -123,7 +123,7 @@ static vtkstd::string GetImageFileName( const vtkstd::string& filename )
   else
     {
     //uiig::Reporter* reporter = uiig::Reporter::getReporter();
-    //vtkstd::string temp="Error, Can not determine compressed file image name. ";
+    //std::string temp="Error, Can not determine compressed file image name. ";
     //temp+=filename;
     //reporter->setMessage( temp );
     return ("");
@@ -384,10 +384,10 @@ void vtkAnalyzeReaderUpdate2(vtkAnalyzeReader *self, vtkImageData * vtkNotUsed(d
   //3: given .img.gz
   //4: given .hdr and image is .img.gz
   //   Special processing needed for this case onl
-  // NOT NEEDED const vtkstd::string fileExt = GetExtension(m_FileName);
+  // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */
-  vtkstd::string ImageFileName = GetImageFileName( self->GetFileName() );
+  std::string ImageFileName = GetImageFileName( self->GetFileName() );
   //NOTE: gzFile operations act just like FILE * operations when the files
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
@@ -483,10 +483,10 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
   //3: given .img.gz
   //4: given .hdr and image is .img.gz
   //   Special processing needed for this case onl
-  // NOT NEEDED const vtkstd::string fileExt = GetExtension(m_FileName);
+  // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */
-  vtkstd::string ImageFileName = GetImageFileName(GetFileName() );
+  std::string ImageFileName = GetImageFileName(GetFileName() );
   //NOTE: gzFile operations act just like FILE * operations when the files
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
@@ -1066,28 +1066,28 @@ void vtkAnalyzeReader::PrintSelf(ostream& os, vtkIndent indent)
 int vtkAnalyzeReader::CanReadFile(const char* fname)
 {
 
-  vtkstd::string filename(fname);
+  std::string filename(fname);
 
   // we check that the correction extension is given by the user
-  vtkstd::string filenameext = GetExtension(filename);
-  if(filenameext != vtkstd::string("hdr") 
-    && filenameext != vtkstd::string("img.gz")
-    && filenameext != vtkstd::string("img")
+  std::string filenameext = GetExtension(filename);
+  if(filenameext != std::string("hdr")
+    && filenameext != std::string("img.gz")
+    && filenameext != std::string("img")
     )
     {
     return false;
     }
 
-  const vtkstd::string HeaderFileName = GetHeaderFileName(filename);
+  const std::string HeaderFileName = GetHeaderFileName(filename);
   //
   // only try to read HDR files
-  vtkstd::string ext = GetExtension(HeaderFileName);
+  std::string ext = GetExtension(HeaderFileName);
 
-  if(ext == vtkstd::string("gz"))
+  if(ext == std::string("gz"))
     {
     ext = GetExtension(GetRootName(HeaderFileName));
     }
-  if(ext != vtkstd::string("hdr") && ext != vtkstd::string("img"))
+  if(ext != std::string("hdr") && ext != std::string("img"))
     {
     return false;
     }

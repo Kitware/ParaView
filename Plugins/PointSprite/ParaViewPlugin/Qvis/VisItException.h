@@ -109,28 +109,28 @@ class VisItException
 {
   public:
                        VisItException();
-                       VisItException(const vtkstd::string &msg);
+                       VisItException(const std::string &msg);
     virtual           ~VisItException() VISIT_THROW_NOTHING {;};
 
     void               Log(void);
 
     void               SetThrowLocation(int, const char *);
     void               SetType(const char *t) { type = t; };
-    void               SetType(const vtkstd::string &t) { type = t; };
-    const vtkstd::string &Message() { return msg; };
-    const vtkstd::string &GetExceptionType() { return type; };
+    void               SetType(const std::string &t) { type = t; };
+    const std::string &Message() { return msg; };
+    const std::string &GetExceptionType() { return type; };
 
     int                GetLine() const { return line; };
-    const vtkstd::string &GetFilename() const  { return filename; };
+    const std::string &GetFilename() const  { return filename; };
 
     static void LogCatch(const char *exceptionType, const char *srcFile,
                          int srcLine);
 
   protected:
     int                line;
-    vtkstd::string        filename;
-    vtkstd::string        msg;
-    vtkstd::string        type;
+    std::string        filename;
+    std::string        msg;
+    std::string        type;
     ostream           *log;
 };
 

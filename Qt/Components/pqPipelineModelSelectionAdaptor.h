@@ -34,36 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSelectionAdaptor.h"
 
-
-// pqPipelineModelSelectionAdaptor is an adaptor that connects a
-// QItemSelectionModel for a pqPipelineModel to a 
-// pqServerManagerSelectionModel. When the selection in the QItemSelectionModel
-// changes, the pqServerManagerSelectionModel will be updated and vice versa.
-// Every model implemented on top of pqServerManagerModel that should
-// participate in synchronized selections would typically define such 
-// an adaptor.
-class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : 
-  public pqSelectionAdaptor
+/// pqPipelineModelSelectionAdaptor is an adaptor that connects a
+/// QItemSelectionModel for a pqPipelineModel to pqActiveObjects.
+class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : public pqSelectionAdaptor
 {
   Q_OBJECT
 
 public:
-  pqPipelineModelSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* parent=0);
+  pqPipelineModelSelectionAdaptor(QItemSelectionModel* pipelineSelectionModel);
   virtual ~pqPipelineModelSelectionAdaptor();
 
 protected:
-  // Maps a pqServerManagerModelItem to an index in the QAbstractItemModel.
-  // Subclass must implement this method.
-  QModelIndex mapFromSMModel( pqServerManagerModelItem* item) const;
+  virtual QModelIndex mapFromItem(pqServerManagerModelItem*) const;
+  virtual pqServerManagerModelItem* mapToItem(const QModelIndex& index) const;
 
-  // Maps a QModelIndex to a pqServerManagerModelItem.
-  // Subclass must implement this method.
-  virtual pqServerManagerModelItem* mapToSMModel(
-    const QModelIndex& index) const;
-
+private:
+  Q_DISABLE_COPY(pqPipelineModelSelectionAdaptor);
 };
-
-
 #endif
-

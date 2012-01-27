@@ -249,7 +249,7 @@ ColorTableAttributes::operator != (const ColorTableAttributes &obj) const
 //   
 // ****************************************************************************
 
-const vtkstd::string
+const std::string
 ColorTableAttributes::TypeName() const
 {
     return "ColorTableAttributes";
@@ -299,7 +299,7 @@ ColorTableAttributes::CopyAttributes(const AttributeGroup *atts)
 // ****************************************************************************
 
 AttributeSubject *
-ColorTableAttributes::CreateCompatible(const vtkstd::string &tname) const
+ColorTableAttributes::CreateCompatible(const std::string &tname) const
 {
     AttributeSubject *retval = 0;
     if(TypeName() == tname)
@@ -579,14 +579,14 @@ ColorTableAttributes::SetNames(const stringVector &names_)
 }
 
 void
-ColorTableAttributes::SetActiveContinuous(const vtkstd::string &activeContinuous_)
+ColorTableAttributes::SetActiveContinuous(const std::string &activeContinuous_)
 {
     activeContinuous = activeContinuous_;
     Select(2, (void *)&activeContinuous);
 }
 
 void
-ColorTableAttributes::SetActiveDiscrete(const vtkstd::string &activeDiscrete_)
+ColorTableAttributes::SetActiveDiscrete(const std::string &activeDiscrete_)
 {
     activeDiscrete = activeDiscrete_;
     Select(3, (void *)&activeDiscrete);
@@ -620,25 +620,25 @@ ColorTableAttributes::GetColorTables()
     return colorTables;
 }
 
-const vtkstd::string &
+const std::string &
 ColorTableAttributes::GetActiveContinuous() const
 {
     return activeContinuous;
 }
 
-vtkstd::string &
+std::string &
 ColorTableAttributes::GetActiveContinuous()
 {
     return activeContinuous;
 }
 
-const vtkstd::string &
+const std::string &
 ColorTableAttributes::GetActiveDiscrete() const
 {
     return activeDiscrete;
 }
 
-vtkstd::string &
+std::string &
 ColorTableAttributes::GetActiveDiscrete()
 {
     return activeDiscrete;
@@ -888,7 +888,7 @@ ColorTableAttributes::operator [] (int i) const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 ColorTableAttributes::GetFieldName(int index) const
 {
     switch (index)
@@ -944,7 +944,7 @@ ColorTableAttributes::GetFieldType(int index) const
 //   
 // ****************************************************************************
 
-vtkstd::string
+std::string
 ColorTableAttributes::GetFieldTypeName(int index) const
 {
     switch (index)
@@ -1041,7 +1041,7 @@ ColorTableAttributes::FieldsEqual(int index_, const AttributeGroup *rhs) const
 // ****************************************************************************
 
 int
-ColorTableAttributes::GetColorTableIndex(const vtkstd::string &name) const
+ColorTableAttributes::GetColorTableIndex(const std::string &name) const
 {
     int retval = -1;
     for(unsigned int i = 0; i < names.size(); ++i)
@@ -1109,7 +1109,7 @@ ColorTableAttributes::GetColorControlPoints(int index) const
 // ****************************************************************************
 
 const ColorControlPointList *
-ColorTableAttributes::GetColorControlPoints(const vtkstd::string &name) const
+ColorTableAttributes::GetColorControlPoints(const std::string &name) const
 {
     int index = GetColorTableIndex(name);
 
@@ -1143,7 +1143,7 @@ ColorTableAttributes::GetColorControlPoints(const vtkstd::string &name) const
 // ****************************************************************************
 
 void
-ColorTableAttributes::AddColorTable(const vtkstd::string &name,
+ColorTableAttributes::AddColorTable(const std::string &name,
     const ColorControlPointList &cpts)
 {
     // Remove the color table if it already exists in the list.
@@ -1156,14 +1156,14 @@ ColorTableAttributes::AddColorTable(const vtkstd::string &name,
     AddColorTables(cpts);
 
     // Store the name, colortable pairs into a map.
-    vtkstd::map<vtkstd::string, AttributeGroup *> sortMap;
+    std::map<std::string, AttributeGroup *> sortMap;
     unsigned int i;
     for(i = 0; i < names.size(); ++i)
         sortMap[names[i]] = colorTables[i];
 
     // Traverse the map, it will be sorted. Store the names and color table
     // pointer back into the old vectors.
-    vtkstd::map<vtkstd::string, AttributeGroup *>::iterator pos;
+    std::map<std::string, AttributeGroup *>::iterator pos;
     for(i = 0, pos = sortMap.begin(); pos != sortMap.end(); ++pos, ++i)
     {
         names[i] = pos->first;
@@ -1190,7 +1190,7 @@ ColorTableAttributes::AddColorTable(const vtkstd::string &name,
 // ****************************************************************************
 
 void
-ColorTableAttributes::RemoveColorTable(const vtkstd::string &name)
+ColorTableAttributes::RemoveColorTable(const std::string &name)
 {
     int index = GetColorTableIndex(name);
     RemoveColorTable(index);
@@ -1248,14 +1248,14 @@ ColorTableAttributes::RemoveColorTable(int index)
             if(names.size() > 0)
                 SetActiveContinuous(names[0]);
             else
-                SetActiveContinuous(vtkstd::string(""));
+                SetActiveContinuous(std::string(""));
         }
         if(isActiveDiscrete)
         {
             if(names.size() > 0)
                 SetActiveDiscrete(names[0]);
             else
-                SetActiveDiscrete(vtkstd::string(""));
+                SetActiveDiscrete(std::string(""));
         }
     }
 }

@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 
-#include <vtkstd/vector>
+#include <vector>
 //-----------------------------------------------------------------------------
 class pqTimeKeeper::pqInternals
 {
@@ -196,6 +196,11 @@ void pqTimeKeeper::setTime(double time)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
+  if (!source || source->getServer() != this->getServer())
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("TimeSources"));
   if (!pp->IsProxyAdded(source->getProxy()))
@@ -208,6 +213,11 @@ void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
+  if (!source || source->getServer() != this->getServer())
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("TimeSources"));
   pp->RemoveProxy(source->getProxy());
@@ -217,6 +227,11 @@ void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
 {
+  if (!source || source->getServer() != this->getServer())
+    {
+    return false;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("TimeSources"));
   return (source && pp->IsProxyAdded(source->getProxy()));
@@ -225,6 +240,11 @@ bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::viewAdded(pqView* view)
 {
+  if (view->getServer() != this->getServer())
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Views"));
   if (!pp->IsProxyAdded(view->getProxy()))
@@ -237,6 +257,11 @@ void pqTimeKeeper::viewAdded(pqView* view)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::viewRemoved(pqView* view)
 {
+  if (view->getServer() != this->getServer())
+    {
+    return;
+    }
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Views"));
   if (pp->IsProxyAdded(view->getProxy()))

@@ -23,10 +23,10 @@
 #include "vtkSMProxyLink.h"
 #include "vtkWeakPointer.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
+#include <map>
+#include <vector>
 #include "vtkStdString.h"
-#include <vtkstd/string>
+#include <string>
 
 //---------------------------------------------------------------------------
 // Internal data structure for storing object IDs, server IDs and
@@ -50,16 +50,16 @@ struct vtkSMProxyInternals
   };
   // Note that the name of the property is the map key. That is the
   // only place where name is stored
-  typedef vtkstd::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
+  typedef std::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
   PropertyInfoMap Properties;
 
   // This vector keeps track of the order in which properties
   // were added for the Property iterator
-  vtkstd::vector<vtkStdString> PropertyNamesInOrder;
+  std::vector<vtkStdString> PropertyNamesInOrder;
 
-  vtkstd::vector<int> ServerIDs;
+  std::vector<int> ServerIDs;
 
-  typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
+  typedef std::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
   ProxyMap SubProxies;
 
   struct ConnectionInfo
@@ -69,8 +69,8 @@ struct vtkSMProxyInternals
     vtkWeakPointer<vtkSMProperty> Property;
     vtkWeakPointer<vtkSMProxy> Proxy;
   };
-  vtkstd::vector<ConnectionInfo> Consumers;
-  vtkstd::vector<ConnectionInfo> Producers;
+  std::vector<ConnectionInfo> Consumers;
+  std::vector<ConnectionInfo> Producers;
 
   struct ExposedPropertyInfo
     {
@@ -81,15 +81,15 @@ struct vtkSMProxyInternals
   // Map for exposed properties. The key is the exposed property name,
   // value is a ExposedPropertyInfo object which indicates the subproxy name
   // and the property name in that subproxy.
-  typedef vtkstd::map<vtkStdString, ExposedPropertyInfo> ExposedPropertyInfoMap;
+  typedef std::map<vtkStdString, ExposedPropertyInfo> ExposedPropertyInfoMap;
   ExposedPropertyInfoMap ExposedProperties;
 
   // Vector of vtkSMProxyLink for shared properties among subproxies.
-  typedef  vtkstd::vector<vtkSmartPointer<vtkSMProxyLink> > SubProxyLinksType;
+  typedef  std::vector<vtkSmartPointer<vtkSMProxyLink> > SubProxyLinksType;
   SubProxyLinksType SubProxyLinks;
 
   // Annotation map
-  typedef vtkstd::map<vtkstd::string,  vtkstd::string> AnnotationMap;
+  typedef std::map<std::string,  std::string> AnnotationMap;
   AnnotationMap Annotations;
   bool EnableAnnotationPush;
 

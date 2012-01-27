@@ -1,0 +1,13 @@
+
+include(@ParaViewSuperBuild_CMAKE_BINARY_DIR@/paraview_common_environment.cmake)
+
+execute_process(
+  COMMAND make ${BUILD_ARGS}
+  WORKING_DIRECTORY "${WORKING_DIR}"
+  RESULT_VARIABLE res)
+
+if(NOT ${res} EQUAL 0)
+  message("Make Errors detected: \n${CDAT_OUT}\n${CDAT_ERR}")
+  message(FATAL_ERROR "Error in Make")
+endif()
+message("Make succeeded.")

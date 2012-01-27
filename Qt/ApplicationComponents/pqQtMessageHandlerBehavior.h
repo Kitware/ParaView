@@ -45,6 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqQtMessageHandlerBehavior : public QObject
   typedef QObject Superclass;
 public:
   pqQtMessageHandlerBehavior(QObject* parent=0);
+  ~pqQtMessageHandlerBehavior();
 
 private:
   Q_DISABLE_COPY(pqQtMessageHandlerBehavior)

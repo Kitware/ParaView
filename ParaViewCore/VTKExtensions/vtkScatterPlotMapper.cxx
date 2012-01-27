@@ -53,9 +53,9 @@
 #include "vtkTransform.h"
 #include "vtkgl.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
+#include <string>
 #include <assert.h>
 
 //#define PI 3.141592653589793
@@ -236,15 +236,15 @@ void vtkScatterPlotMapper::SetArrayByPointCoord(ArrayIndex idx,
 
 void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
 {
-  vtkstd::string array(arrayName);
+  std::string array(arrayName);
   
   // Skip delimiters at beginning.
-  vtkstd::string::size_type lastPos = array.find_first_not_of(',', 0);
+  std::string::size_type lastPos = array.find_first_not_of(',', 0);
   // Find first "non-delimiter".
-  vtkstd::string::size_type pos = array.find_first_of(',', lastPos);
-  vtkstd::vector<vtkstd::string> tokens;
+  std::string::size_type pos = array.find_first_of(',', lastPos);
+  std::vector<std::string> tokens;
 
-  while (vtkstd::string::npos != pos || vtkstd::string::npos != lastPos)
+  while (std::string::npos != pos || std::string::npos != lastPos)
     {
     // Found a token, add it to the vector.
     tokens.push_back(array.substr(lastPos, pos - lastPos));
@@ -254,9 +254,9 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
     pos = array.find_first_of(',', lastPos);
     }
   
-  vtkstd::string arrayString = "";
-  vtkstd::string arrayType = "";
-  vtkstd::string arrayComponent = "";
+  std::string arrayString = "";
+  std::string arrayType = "";
+  std::string arrayComponent = "";
   switch(tokens.size())
     {
     case 0:
@@ -279,12 +279,12 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
   if(arrayComponent.empty())
     {
     array = arrayString;
-    vtkstd::size_t startParenthesis = array.find('(');
+    std::size_t startParenthesis = array.find('(');
     arrayString = array.substr(0, startParenthesis);
-    if(startParenthesis != vtkstd::string::npos)
+    if(startParenthesis != std::string::npos)
       {
-      vtkstd::size_t endParenthesis = array.find(')',arrayString.length());
-      if( endParenthesis != vtkstd::string::npos)
+      std::size_t endParenthesis = array.find(')',arrayString.length());
+      if( endParenthesis != std::string::npos)
         {
         vtksys_ios::stringstream componentString;
         componentString << 

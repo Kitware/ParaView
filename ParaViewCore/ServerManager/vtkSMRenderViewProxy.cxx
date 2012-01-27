@@ -47,7 +47,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
@@ -55,7 +55,7 @@
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <vtkstd/map>
+#include <map>
 
 namespace
 {
@@ -339,7 +339,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = source->GetProxyManager();
+  vtkSMSessionProxyManager* pxm = source->GetSessionProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
@@ -612,7 +612,7 @@ namespace
   //-----------------------------------------------------------------------------
   static void vtkShrinkSelection(vtkSelection* sel)
     {
-    vtkstd::map<int, int> pixelCounts;
+    std::map<int, int> pixelCounts;
     unsigned int numNodes = sel->GetNumberOfNodes();
     int choosen = -1;
     int maxPixels = -1;
@@ -634,7 +634,7 @@ namespace
         }
       }
 
-    vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
+    std::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
     if (choosen != -1)
       {
       for (unsigned int cc=0; cc < numNodes; cc++)
@@ -760,7 +760,7 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(&frustum[index*4]);
 
-  vtkSMProxy* selectionSource = this->GetProxyManager()->NewProxy("sources",
+  vtkSMProxy* selectionSource = this->GetSessionProxyManager()->NewProxy("sources",
     "FrustumSelectionSource");
   vtkSMPropertyHelper(selectionSource, "FieldType").Set(fieldAssociation);
   vtkSMPropertyHelper(selectionSource, "Frustum").Set(frustum, 32);

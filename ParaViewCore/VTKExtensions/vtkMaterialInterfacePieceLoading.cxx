@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkMaterialInterfacePieceLoading.h"
 #include "vtkMaterialInterfaceUtilities.hxx"
-#include "vtkstd/vector"
-using vtkstd::vector;
+#include "vector"
+using std::vector;
 using vtksys_ios::ostream;
 using vtksys_ios::cerr;
 using vtksys_ios::endl;

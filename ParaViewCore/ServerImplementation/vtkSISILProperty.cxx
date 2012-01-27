@@ -31,13 +31,13 @@
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 
-class vtkSISILProperty::vtkIdTypeSet : public vtkstd::set<vtkIdType> {};
+class vtkSISILProperty::vtkIdTypeSet : public std::set<vtkIdType> {};
 
 vtkStandardNewMacro(vtkSISILProperty);
 //----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ bool vtkSISILProperty::Pull(vtkSMMessage* msgToFill)
 
   // Build the meta-data
   vtkIdType numVertices = graphSIL->GetNumberOfVertices();
-  vtkstd::map<vtkstd::string, vtkIdType> vertexNameMap;
+  std::map<std::string, vtkIdType> vertexNameMap;
   vtkStringArray* names =
       vtkStringArray::SafeDownCast(
           graphSIL->GetVertexData()->GetAbstractArray("Names"));
@@ -149,7 +149,7 @@ bool vtkSISILProperty::Pull(vtkSMMessage* msgToFill)
   vtkIdType subTreeVertexId = 0;
   if(this->SubTree)
     {
-    vtkstd::map<vtkstd::string, vtkIdType>::iterator iter;
+    std::map<std::string, vtkIdType>::iterator iter;
     iter = vertexNameMap.find(this->SubTree);
     if (iter != vertexNameMap.end())
       {

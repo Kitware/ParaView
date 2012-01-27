@@ -482,8 +482,8 @@ int vtkMultiResolutionStreamer::Coarsen(vtkStreamingHarness *harness)
   int cnt = 0;
 
   //find every pair of siblings and merge them
-  vtkstd::map<int, vtkPieceList* > levels;
-  vtkstd::map<int, vtkPieceList* >::iterator iter;
+  std::map<int, vtkPieceList* > levels;
+  std::map<int, vtkPieceList* >::iterator iter;
 
   vtkPieceList *ToDo = harness->GetPieceList1();
   vtkPieceList *NextFrame = harness->GetPieceList2();

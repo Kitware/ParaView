@@ -21,7 +21,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/string>
+#include <string>
 
 #define safeio(a) ((a)?(a):"NULL")
 
@@ -59,7 +59,7 @@ vtkCxxSetObjectMacro(vtkSMProxyConfigurationReader,Proxy,vtkSMProxy);
 //-----------------------------------------------------------------------------
 bool vtkSMProxyConfigurationReader::CanReadVersion(const char *version)
 {
-  return vtkstd::string(version)==this->GetReaderVersion();
+  return std::string(version)==this->GetReaderVersion();
 }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +98,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(const char *filename)
 //-----------------------------------------------------------------------------
 int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement *configXml)
 {
-  vtkstd::string requiredIdentifier(this->GetFileIdentifier());
+  std::string requiredIdentifier(this->GetFileIdentifier());
   const char *foundIdentifier=configXml->GetName();
   if (foundIdentifier==0 || foundIdentifier!=requiredIdentifier)
     {
@@ -133,7 +133,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement *configXml)
   // Compare type of proxy in the file with the one we have to make
   // sure they match.
   const char *foundType=proxyXml->GetAttribute("type");
-  vtkstd::string requiredType=this->Proxy->GetXMLName();
+  std::string requiredType=this->Proxy->GetXMLName();
   if (this->ValidateProxyType
     && (foundType==0 || foundType!=requiredType))
     {

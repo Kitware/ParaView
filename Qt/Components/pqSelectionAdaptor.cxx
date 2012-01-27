@@ -35,67 +35,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractProxyModel>
 #include <QPointer>
 #include <QtDebug>
+#include <QSet>
 
 // ParaView includes.
-#include "pqServerManagerSelectionModel.h"
+#include "pqActiveObjects.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSmartPointer.h"
 
 //-----------------------------------------------------------------------------
-class pqSelectionAdaptorInternal
+pqSelectionAdaptor::pqSelectionAdaptor(QItemSelectionModel* _parent)
+: QObject(_parent),
+  QSelectionModel(_parent),
+  IgnoreSignals(false)
 {
-public:
-  QPointer<QItemSelectionModel> QSelectionModel;
-  QPointer<pqServerManagerSelectionModel> SMSelectionModel;
-  bool IgnoreSignals;
-};
-
-//-----------------------------------------------------------------------------
-pqSelectionAdaptor::pqSelectionAdaptor(
-  QItemSelectionModel* qSelectionModel,
-    pqServerManagerSelectionModel* smSelectionModel, QObject* _parent/*=0*/)
-: QObject(_parent)
-{
-  this->Internal = new pqSelectionAdaptorInternal();
-  this->Internal->QSelectionModel = qSelectionModel;
-  this->Internal->SMSelectionModel = smSelectionModel;
-  this->Internal->IgnoreSignals = false;
-
-  QObject::connect(this->Internal->QSelectionModel,
-    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
-    this, SLOT(currentChanged(const QModelIndex&, const QModelIndex& )));
-
-  QObject::connect(this->Internal->QSelectionModel,
+  QObject::connect(this->QSelectionModel,
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-    this, SLOT(selectionChanged(const QItemSelection&,
-        const QItemSelection&)));
+    this, SLOT(selectionChanged()));
 
-  QObject::connect(this->Internal->SMSelectionModel,
-    SIGNAL(currentChanged(pqServerManagerModelItem*)),
-    this, SLOT(currentChanged(pqServerManagerModelItem*)));
-
-  QObject::connect(this->Internal->SMSelectionModel,
-    SIGNAL(selectionChanged(const pqServerManagerSelection&,
-        const pqServerManagerSelection&)),
-    this, SLOT(selectionChanged(const pqServerManagerSelection&,
-        const pqServerManagerSelection&)));
+  pqActiveObjects* ao = &pqActiveObjects::instance();
+  QObject::connect(ao, SIGNAL(portChanged(pqOutputPort*)),
+    this, SLOT(currentProxyChanged()));
+  QObject::connect(ao, SIGNAL(selectionChanged(const pqProxySelection&)),
+    this, SLOT(proxySelectionChanged()));
 }
 
 //-----------------------------------------------------------------------------
 pqSelectionAdaptor::~pqSelectionAdaptor()
 {
-  delete this->Internal;
 }
 
-//-----------------------------------------------------------------------------
-QItemSelectionModel* pqSelectionAdaptor::getQSelectionModel() const
-{
-  return this->Internal->QSelectionModel;
-}
-
-//-----------------------------------------------------------------------------
-pqServerManagerSelectionModel* pqSelectionAdaptor::getSMSelectionModel() const
-{
-  return this->Internal->SMSelectionModel;
-}
 //-----------------------------------------------------------------------------
 // Returns the QAbstractItemModel used by the QSelectionModel.
 // If QSelectionModel uses a QAbstractProxyModel, this method skips
@@ -152,140 +121,75 @@ QModelIndex pqSelectionAdaptor::mapFromSource(
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
-    const QModelIndex& /*previous*/)
+void pqSelectionAdaptor::selectionChanged()
 {
-  if (this->Internal->IgnoreSignals)
+  if (this->IgnoreSignals)
     {
     return;
     }
-  if (!this->Internal->SMSelectionModel)
-    {
-    qDebug() << "No SMSelectionModel set.!";
-    return;
-    }
-  this->Internal->IgnoreSignals = true;
-  pqServerManagerModelItem* smCurrent = this->mapToSMModel(
-    this->mapToSource(current));
-  
-  pqServerManagerSelectionModel::SelectionFlags command = 
-    pqServerManagerSelectionModel::NoUpdate;
 
-  // This doesn't seem to work well for pipeline browser.
-  if (this->Internal->QSelectionModel->isSelected(current))
-    {
-    command |= pqServerManagerSelectionModel::Select;
-    }
-  else if (this->Internal->SMSelectionModel->isSelected(smCurrent))
-    {
-    command |= pqServerManagerSelectionModel::Deselect;
-    }
-  //command |= pqServerManagerSelectionModel::ClearAndSelect;
-  this->Internal->SMSelectionModel->setCurrentItem(smCurrent, command);
-  this->Internal->IgnoreSignals = false;
-}
+  this->IgnoreSignals = true;
 
-//-----------------------------------------------------------------------------
-void pqSelectionAdaptor::selectionChanged(
-  const QItemSelection& /*selected*/, 
-  const QItemSelection& /*deselected*/)
-{
-  if (this->Internal->IgnoreSignals)
-    {
-    return;
-    }
-  if (!this->Internal->SMSelectionModel)
-    {
-    qDebug() << "No SMSelectionModel set.!";
-    return;
-    }
+  QItemSelectionModel* qModel = this->QSelectionModel;
 
-  QItemSelectionModel* qModel = this->Internal->QSelectionModel;
-
-  this->Internal->IgnoreSignals = true;
-  
-  pqServerManagerSelection newSMSelection;
+  pqProxySelection selection;
   const QModelIndexList &indexes = qModel->selection().indexes();
-
   foreach (const QModelIndex& index, indexes)
     {
-    pqServerManagerModelItem* smItem = this->mapToSMModel(
-      this->mapToSource(index));
-    if (!newSMSelection.contains(smItem))
+    pqServerManagerModelItem* item = this->mapToItem(this->mapToSource(index));
+    if (item)
       {
-      newSMSelection.push_back(smItem);
+      selection.insert(item);
       }
     }
-
-  this->Internal->SMSelectionModel->select(newSMSelection,
-   pqServerManagerSelectionModel::ClearAndSelect);
-  this->Internal->IgnoreSignals = false;
+  pqActiveObjects::instance().setSelection(selection,
+    this->mapToItem(this->mapToSource(qModel->currentIndex())));
+  this->IgnoreSignals = false;
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionAdaptor::currentChanged(
-  pqServerManagerModelItem* item)
+void pqSelectionAdaptor::currentProxyChanged()
 {
-  if (this->Internal->IgnoreSignals)
+  if (this->IgnoreSignals)
     {
     return;
     }
-  if (!this->Internal->QSelectionModel)
-    {
-    qDebug() << "No QSelectionModel set.!";
-    return;
-    }
+  this->IgnoreSignals = true;
 
   const QModelIndex& index = this->mapFromSource(
-    this->mapFromSMModel(item), this->getQSelectionModel()->model());
-  this->Internal->IgnoreSignals = true;
+    this->mapFromItem(pqActiveObjects::instance().activePort()),
+    this->getQSelectionModel()->model());
+
   QItemSelectionModel::SelectionFlags command = 
     QItemSelectionModel::NoUpdate;
-  if (this->Internal->SMSelectionModel->isSelected(item))
-    {
-    command |= QItemSelectionModel::Select;
-    }
-  else if (this->Internal->QSelectionModel->isSelected(index))
-    {
-    command |= QItemSelectionModel::Deselect;
-    }
-  this->Internal->QSelectionModel->setCurrentIndex(index, 
-    command | this->qtSelectionFlags());
-  this->Internal->IgnoreSignals = false;
+  command |= QItemSelectionModel::Select;
+  this->QSelectionModel->setCurrentIndex(index, command | this->qtSelectionFlags());
+
+  this->IgnoreSignals = false;
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionAdaptor::selectionChanged(
-  const pqServerManagerSelection& selected,
-    const pqServerManagerSelection& deselected)
+void pqSelectionAdaptor::proxySelectionChanged()
 {
-  if (this->Internal->IgnoreSignals)
+  if (this->IgnoreSignals)
     {
     return;
     }
-  this->Internal->IgnoreSignals = true;
-  QItemSelection qSelected;
-  QItemSelection qDeselected;
+  
+  this->IgnoreSignals = true;
 
-  foreach (pqServerManagerModelItem* item, selected)
+  QItemSelection qSelection;
+  const pqProxySelection& selection = pqActiveObjects::instance().selection();
+  foreach (pqServerManagerModelItem* item, selection)
     {
     const QModelIndex& index = this->mapFromSource(
-      this->mapFromSMModel(item), this->getQSelectionModel()->model());
-    qSelected.push_back(QItemSelectionRange(index));
+      this->mapFromItem(item),
+      this->getQSelectionModel()->model());
+    qSelection.push_back(QItemSelectionRange(index));
     }
 
-  foreach(pqServerManagerModelItem* item, deselected )
-    {
-    const QModelIndex& index = this->mapFromSource(
-      this->mapFromSMModel(item), this->getQSelectionModel()->model());
-    qDeselected.push_back(QItemSelectionRange(index));
-    }
+  this->QSelectionModel->select(qSelection,
+    QItemSelectionModel::ClearAndSelect | this->qtSelectionFlags());
 
-  this->Internal->QSelectionModel->select(qDeselected,
-    QItemSelectionModel::Deselect | this->qtSelectionFlags());
-
-  this->Internal->QSelectionModel->select(qSelected,
-    QItemSelectionModel::Select | this->qtSelectionFlags());
-  this->Internal->IgnoreSignals = false;
+  this->IgnoreSignals = false;
 }
-

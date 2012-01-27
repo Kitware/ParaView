@@ -88,6 +88,10 @@ public:
   // Set visibility of the representation.
   virtual void SetVisibility(bool visible);
 
+  // Description:
+  // Allow user to specify custom XYZAxisRanges based on arbitrary number
+  virtual void EnableCustomAxisRange(bool useCustomRange);
+
   //***************************************************************************
   // Forwarded to internal vtkCubeAxesActor
   virtual void SetFlyMode(int val);
@@ -100,18 +104,21 @@ public:
   virtual void SetXAxisTickVisibility(int val);
   virtual void SetXAxisMinorTickVisibility(int val);
   virtual void SetDrawXGridlines(int val);
+  virtual void SetXAxisRange(double min, double max);
 
   virtual void SetYAxisVisibility(int val);
   virtual void SetYTitle(const char* val);
   virtual void SetYAxisTickVisibility(int val);
   virtual void SetYAxisMinorTickVisibility(int val);
   virtual void SetDrawYGridlines(int val);
+  virtual void SetYAxisRange(double min, double max);
 
   virtual void SetZAxisVisibility(int val);
   virtual void SetZTitle(const char* val);
   virtual void SetZAxisTickVisibility(int val);
   virtual void SetZAxisMinorTickVisibility(int val);
   virtual void SetDrawZGridlines(int val);
+  virtual void SetZAxisRange(double min, double max);
 //BTX
 protected:
   vtkCubeAxesRepresentation();
@@ -144,6 +151,7 @@ protected:
   double CustomBounds[6];
   int CustomBoundsActive[3];
   double DataBounds[6];
+  bool UseBoundsRangeAsLabel;
 private:
   vtkCubeAxesRepresentation(const vtkCubeAxesRepresentation&); // Not implemented
   void operator=(const vtkCubeAxesRepresentation&); // Not implemented

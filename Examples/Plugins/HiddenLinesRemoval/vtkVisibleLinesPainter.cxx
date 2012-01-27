@@ -30,7 +30,7 @@
 #include "vtkRenderer.h"
 #include "vtkOpenGLRenderWindow.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <assert.h>
 #include "vtkgl.h"
 

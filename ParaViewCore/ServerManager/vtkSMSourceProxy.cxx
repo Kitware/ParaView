@@ -34,13 +34,14 @@
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 #define OUTPUT_PORTNAME_PREFIX "Output-"
 #define MAX_NUMBER_OF_PORTS 10
@@ -53,14 +54,14 @@ struct vtkSMSourceProxyOutputPort
 {
   vtkSmartPointer<vtkSMOutputPort> Port;
   vtkSmartPointer<vtkSMDocumentation> Documentation;
-  vtkstd::string Name;
+  std::string Name;
 };
 
 struct vtkSMSourceProxyInternals
 {
-  typedef vtkstd::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
+  typedef std::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
-  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
+  std::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
 
   // Resizes output ports and ensures that Name for each port is initialized to
   // the default.
@@ -221,7 +222,7 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   // this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
                                         vtkPVXMLElement* element)
 {
   const char* executiveName = element->GetAttribute("executive");
@@ -473,7 +474,7 @@ void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   // Mark the extract selection proxies modified as well.
   // This is needed to be done explicitly since we don't use vtkSMInputProperty
   // to connect this proxy to the input of the extract selection filter.
-  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
+  std::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
   for (iter = this->PInternals->SelectionProxies.begin();
     iter != this->PInternals->SelectionProxies.end(); ++iter)
     {
@@ -537,8 +538,9 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     }
   this->PInternals->SelectionProxies.resize(numOutputs);
 
-  vtkSMProxyManager* pxm = this->GetProxyManager();
   vtkClientServerStream stream;
+  assert("Session should be valid" && this->Session);
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
   for (int j=0; j<numOutputs; j++)
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;

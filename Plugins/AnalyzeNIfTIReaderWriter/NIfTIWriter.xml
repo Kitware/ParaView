@@ -1,5 +1,0 @@
-<ParaViewWriters>
-  <Writer name="NIfTIWriter"
-          extensions="nii"
-          file_description="NIfTI File Format"/>
-</ParaViewWriters>

@@ -51,6 +51,7 @@ SET (Kit_SRCS
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
+  vtkSMDataSourceProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
   vtkSMDeserializerProtobuf.cxx
@@ -125,6 +126,8 @@ SET (Kit_SRCS
   vtkSMServerStateLocator.cxx
   vtkSMSession.cxx
   vtkSMSessionClient.cxx
+  vtkSMSessionObject.cxx
+  vtkSMSessionProxyManager.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
@@ -146,6 +149,7 @@ SET (Kit_SRCS
   vtkSMUndoStackBuilder.cxx
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
+  vtkSMViewLayoutProxy.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx
@@ -169,8 +173,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx
   vtkSMLink.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyManager.cxx # since New() is protected.
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
+  vtkSMSessionProxyManager.cxx # since New() is non-standard.
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx

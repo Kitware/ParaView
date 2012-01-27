@@ -21,7 +21,7 @@
 #ifndef __vtkSMRemoteObject_h
 #define __vtkSMRemoteObject_h
 
-#include "vtkSMObject.h"
+#include "vtkSMSessionObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
@@ -30,7 +30,7 @@ class vtkSMSession;
 class vtkSMProxyLocator;
 class vtkSMLoadStateContext;
 
-class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
+class VTK_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
 {
 // My friends are...
   friend class vtkSMStateHelper;          // To pull state
@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
   friend class vtkSMDeserializerXML;      // To set GlobalId
 
 public:
-  vtkTypeMacro(vtkSMRemoteObject,vtkSMObject);
+  vtkTypeMacro(vtkSMRemoteObject,vtkSMSessionObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,10 +48,9 @@ public:
   vtkGetMacro(Location, vtkTypeUInt32);
 
   // Description:
-  // Get/Set the session on wihch this object exists.
-  // Note that session is not reference counted.
+  // Override the SetSession so if the object already have an ID
+  // we automatically register it to the associated session
   virtual void SetSession(vtkSMSession*);
-  vtkSMSession* GetSession();
 
   // Description:
   // Get the global unique id for this object. If none is set and the session is
@@ -145,9 +144,6 @@ protected:
   // Location flag identify the processes on which the vtkSIObject
   // corresponding to this vtkSMRemoteObject exist.
   vtkTypeUInt32 Location;
-
-  // Identifies the session id to which this object is related.
-  vtkWeakPointer<vtkSMSession> Session;
 
   // Allow remote object to be discard for any state management such as
   // Undo/Redo, Register/UnRegister (in ProxyManager) and so on...

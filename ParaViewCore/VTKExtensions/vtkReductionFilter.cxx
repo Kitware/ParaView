@@ -38,7 +38,7 @@
 #include "vtkSelectionSerializer.h"
 
 #include <vtksys/ios/sstream>
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
@@ -350,7 +350,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     this->PassThrough = -1;
     }
 
-  vtkstd::vector<vtkSmartPointer<vtkDataObject> > data_sets;
+  std::vector<vtkSmartPointer<vtkDataObject> > data_sets;
   if (myId == 0)
     {
     int cc = 0;

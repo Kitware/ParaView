@@ -266,16 +266,7 @@ void pqTransferFunctionChartViewWidget::addPlot(vtkPlot* plot)
       currenItem, vtkControlPointsItem::CurrentPointEditEvent,
       this, SLOT(editPoint()));
     }
-  this->onChartUpdated();
   emit this->plotAdded(plot);
-}
-
-// ----------------------------------------------------------------------------
-void pqTransferFunctionChartViewWidget::onBoundsChanged()
-{
-  this->boundAxesToChartBounds();
-  this->setAxesToChartBounds();
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------
@@ -569,7 +560,6 @@ void pqTransferFunctionChartViewWidget::setLookuptTableToPlots(vtkLookupTable* l
     {
     plot->SetLookupTable(lut);
     }
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------
@@ -586,7 +576,6 @@ void pqTransferFunctionChartViewWidget
     {
     plot->SetColorTransferFunction(colorTF);
     }
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------
@@ -604,7 +593,6 @@ void pqTransferFunctionChartViewWidget
     {
     plot->SetOpacityFunction(opacityTF);
     }
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------
@@ -621,7 +609,6 @@ void pqTransferFunctionChartViewWidget
     {
     plot->SetPiecewiseFunction(piecewiseTF);
     }
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------
@@ -717,52 +704,6 @@ void pqTransferFunctionChartViewWidget::editPoint()
 }
 
 // ----------------------------------------------------------------------------
-void pqTransferFunctionChartViewWidget::boundAxesToChartBounds()
-{
-  vtkChartXY* currentchart = this->chart();
-  double bounds[8];
-  this->chartBounds(bounds);
-  for (int i = 0; i < currentchart->GetNumberOfAxes(); ++i)
-    {
-    if (bounds[2*i] != VTK_DOUBLE_MAX)
-      {
-      currentchart->GetAxis(i)->SetMinimumLimit(bounds[2*i]);
-      currentchart->GetAxis(i)->SetMaximumLimit(bounds[2*i + 1]);
-      }
-    }
-  /// We only set the plot user bounds if the chart is using User bounds.
-  double userBounds[8];
-  this->chartUserBounds(userBounds);
-  if (userBounds[0] < userBounds[1])
-    {
-    this->setPlotsUserBounds(userBounds);
-    }
-}
-
-// ----------------------------------------------------------------------------
-void pqTransferFunctionChartViewWidget::moveAllPoints(double xOffset, double yOffset)
-{
-  vtkVector2f offset(xOffset, yOffset);
-  foreach(vtkControlPointsItem* controlPointsItem, this->controlPointsItems())
-    {
-    vtkSmartPointer<vtkIdTypeArray> ids;
-    ids.TakeReference(controlPointsItem->GetControlPointsIds());
-    controlPointsItem->MovePoints(offset, ids.GetPointer());
-    }
-}
-
-// ----------------------------------------------------------------------------
-void pqTransferFunctionChartViewWidget::spreadAllPoints(double factor)
-{
-  foreach(vtkControlPointsItem* controlPointsItem, this->controlPointsItems())
-    {
-    vtkSmartPointer<vtkIdTypeArray> ids;
-    ids.TakeReference(controlPointsItem->GetControlPointsIds());\
-    controlPointsItem->SpreadPoints(factor, ids.GetPointer());
-    }
-}
-
-// ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::setTitle(const QString& newTitle)
 {
   this->Internal->Chart->SetTitle(newTitle.toLatin1().data());
@@ -811,26 +752,6 @@ vtkContextScene* pqTransferFunctionChartViewWidget::scene()const
 }
 
 // ----------------------------------------------------------------------------
-void pqTransferFunctionChartViewWidget::onChartUpdated()
-{
-  double oldBounds[8];
-  memcpy(oldBounds, this->Internal->OldBounds, 8 * sizeof(double));
-  double newBounds[8];
-  this->chartBounds(newBounds);
-  if (oldBounds[0] != newBounds[0] ||
-      oldBounds[1] != newBounds[1] ||
-      oldBounds[2] != newBounds[2] ||
-      oldBounds[3] != newBounds[3] ||
-      oldBounds[4] != newBounds[4] ||
-      oldBounds[5] != newBounds[5] ||
-      oldBounds[6] != newBounds[6] ||
-      oldBounds[7] != newBounds[7])
-    {
-    emit boundsChanged();
-    }
-}
-
-// ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::chartBounds(double* bounds)const
 {
   if (this->Internal->UserBounds[1] < this->Internal->UserBounds[0])
@@ -853,7 +774,6 @@ void pqTransferFunctionChartViewWidget::setChartUserBounds(double* userBounds)
     {
     this->Internal->UserBounds[i] = userBounds[i];
     }
-  this->onChartUpdated();
 }
 
 // ----------------------------------------------------------------------------

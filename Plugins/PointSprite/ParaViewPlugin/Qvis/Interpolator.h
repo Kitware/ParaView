@@ -38,7 +38,7 @@
 #ifndef INTERPOLATOR_H
 #define INTERPOLATOR_H
 
-#include <vtkstd/vector>
+#include <vector>
 
 // ****************************************************************************
 //  Class:  ConstInterp
@@ -136,9 +136,9 @@ template <class T>
 void
 ConstInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 {
-    vtkstd::vector<T> &out = *(vtkstd::vector<T>*)out_;
-    vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
-    vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
+    std::vector<T> &out = *(std::vector<T>*)out_;
+    std::vector<T> &a1  = *(std::vector<T>*)a1_;
+    std::vector<T> &a2  = *(std::vector<T>*)a2_;
     int l1 = static_cast<int>(a1.size());
     int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
@@ -253,9 +253,9 @@ template <class T>
 void
 LinInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 {
-    vtkstd::vector<T> &out = *(vtkstd::vector<T>*)out_;
-    vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
-    vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
+    std::vector<T> &out = *(std::vector<T>*)out_;
+    std::vector<T> &a1  = *(std::vector<T>*)a1_;
+    std::vector<T> &a2  = *(std::vector<T>*)a2_;
     int l1 = static_cast<int>(a1.size());
     int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
@@ -314,9 +314,9 @@ template<>
 void
 LinInterp<int>::InterpVector(void *out_, void *a1_, void *a2_, double f)
 {
-    vtkstd::vector<int> &out = *(vtkstd::vector<int>*)out_;
-    vtkstd::vector<int> &a1  = *(vtkstd::vector<int>*)a1_;
-    vtkstd::vector<int> &a2  = *(vtkstd::vector<int>*)a2_;
+    std::vector<int> &out = *(std::vector<int>*)out_;
+    std::vector<int> &a1  = *(std::vector<int>*)a1_;
+    std::vector<int> &a2  = *(std::vector<int>*)a2_;
     int l1 = static_cast<int>(a1.size());
     int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
