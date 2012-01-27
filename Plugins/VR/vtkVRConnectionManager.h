@@ -31,14 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #ifndef __vtkVRConnectionManager_h
 #define __vtkVRConnectionManager_h
+#include "vtkPVVRConfig.h"
 
 #include <QObject>
 
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
-class vtkVRPNConnection;
 class vtkVRUIConnection;
+#ifdef PARAVIEW_USE_VRPN
+class vtkVRPNConnection;
+#endif
 
 class vtkVRConnectionManager: public QObject
 {
@@ -47,9 +50,10 @@ class vtkVRConnectionManager: public QObject
 public:
   vtkVRConnectionManager(vtkVRQueue* quque, QObject* parent=0);
   virtual ~vtkVRConnectionManager();
-
+#ifdef PARAVIEW_USE_VRPN
   void add( vtkVRPNConnection* conn );
   void remove ( vtkVRPNConnection *conn );
+#endif
   void add( vtkVRUIConnection* conn );
   void remove ( vtkVRUIConnection *conn );
 

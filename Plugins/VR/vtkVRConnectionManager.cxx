@@ -34,7 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // --------------------------------------------------------------------includes
 #include "pqApplicationCore.h"
 #include <QPointer>
+#include "vtkPVVRConfig.h"
+#ifdef PARAVIEW_USE_VRPN
 #include "vtkVRPNConnection.h"
+#endif
 #include "vtkVRUIConnection.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"
@@ -50,7 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // update constructor and destructor methods.
 struct vtkVRConnectionManager::pqInternals
 {
+#ifdef PARAVIEW_USE_VRPN
   QList<QPointer<vtkVRPNConnection> > VRPNConnections;
+#endif
   QList<QPointer<vtkVRUIConnection> > VRUIConnections;
   QPointer<vtkVRQueue> Queue;
 };
@@ -76,6 +81,7 @@ vtkVRConnectionManager::~vtkVRConnectionManager()
   delete this->Internals;
 }
 
+#ifdef PARAVIEW_USE_VRPN
 void vtkVRConnectionManager::add( vtkVRPNConnection* conn )
 {
   this->Internals->VRPNConnections.push_front( conn );
@@ -86,6 +92,7 @@ void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
   conn->Stop();
   this->Internals->VRPNConnections.removeAll( conn );
 }
+#endif
 
 void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
 {
@@ -101,12 +108,15 @@ void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
 void vtkVRConnectionManager::clear()
 {
   this->stop();
+#ifdef PARAVIEW_USE_VRPN
   this->Internals->VRPNConnections.clear();
+#endif
   this->Internals->VRUIConnections.clear();
 }
 
 void vtkVRConnectionManager::start()
 {
+#ifdef PARAVIEW_USE_VRPN
   foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     if (conn && conn->Init())
@@ -114,6 +124,7 @@ void vtkVRConnectionManager::start()
         conn->start();
       }
     }
+#endif
   foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn && conn->Init())
@@ -125,6 +136,7 @@ void vtkVRConnectionManager::start()
 
 void vtkVRConnectionManager::stop()
 {
+#ifdef PARAVIEW_USE_VRPN
   foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     if (conn)
@@ -132,6 +144,7 @@ void vtkVRConnectionManager::stop()
         conn->Stop();
       }
     }
+#endif
     foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn)
@@ -161,12 +174,16 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             {
             const char* name = child->GetAttributeOrEmpty( "name" );
             const char* address = child->GetAttributeOrEmpty( "address" );
+#ifdef PARAVIEW_USE_VRPN        // TODO: Need to throw some warning if VRPN is
+                                // used when not compiled. For now it will
+                                // simply ignore VRPN fields
             vtkVRPNConnection* device = new vtkVRPNConnection(this);
             device->SetQueue( this->Internals->Queue );
             device->SetName( name );
             device->SetAddress( address );
             device->configure(child, locator);
             this->add(device);
+#endif
             }
           else if (strcmp(child->GetName(), "VRUIConnection")==0)
             {
@@ -203,6 +220,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
  Q_ASSERT(root != NULL);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
+#ifdef PARAVIEW_USE_VRPN
   foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
@@ -212,6 +230,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
       child->Delete();
       }
     }
+#endif
   foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
