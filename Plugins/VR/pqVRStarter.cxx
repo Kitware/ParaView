@@ -33,9 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 #include "vtkPVVRConfig.h"
-#ifdef PARAVIEW_USE_VRPN
-#include "vtkVRPNConnection.h"
-#endif
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"

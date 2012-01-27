@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class QTimer;
-class vtkVRPNConnection;
 class vtkVRQueue;
 class vtkVRQueueHandler;
 class vtkPVXMLElement;
