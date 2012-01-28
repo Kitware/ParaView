@@ -463,8 +463,6 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
   vtkSMProxy* selSource = pxm->NewProxy("sources",
       "SelectionQuerySource");
 
-  ConditionMode condition_type = this->currentConditionType();
-
   // * Determine FieldType.
   int field_type = 0;
   switch (this->attributeType())
