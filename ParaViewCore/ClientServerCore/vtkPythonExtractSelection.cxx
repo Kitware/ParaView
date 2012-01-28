@@ -337,7 +337,7 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
 
 //----------------------------------------------------------------------------
 vtkTable* vtkPythonExtractSelection::ExtractElements(
-  vtkTable* data, vtkCharArray* mask)
+  vtkTable* vtkNotUsed(data), vtkCharArray* vtkNotUsed(mask))
 {
   abort();
   return NULL;
