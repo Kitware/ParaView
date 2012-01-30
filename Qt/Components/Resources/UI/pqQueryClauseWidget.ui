@@ -143,6 +143,13 @@
        </widget>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="helpButton">
+       <property name="text">
+        <string>?</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>

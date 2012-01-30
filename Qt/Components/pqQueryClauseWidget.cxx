@@ -359,6 +359,7 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   foreach (CriteriaTypes t_flag, sub_widgets)
     {
     pqQueryClauseWidget* sub_widget = new pqQueryClauseWidget(this);
+    sub_widget->Internals->helpButton->hide();
     sub_widget->setProducer(this->producer());
     sub_widget->setAttributeType(this->attributeType());
     sub_widget->initialize(t_flag, true);
