@@ -94,12 +94,32 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
    set(pv_runtime_dest ${PV_INSTALL_LIB_DIR})
   endif()
 
-  # Now install the plugins for sqldrivers. For use by the help system
-  install(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
+  # Now install the QtSVG file
+  if(QT_QTSVG_FOUND)
+    install(FILES ${QT_BINARY_DIR}/QtSvg4.dll
+            DESTINATION ${pv_runtime_dest}
+            PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+            COMPONENT Runtime)
+  endif()
+  
+  # Now install all the Qt plugins 
+  if(QT_QTSVG_FOUND)          
+  install(DIRECTORY ${QT_PLUGINS_DIR}/iconengines 
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)     
+  endif()          
+  if(QT_PHONON_FOUND)
+  install(DIRECTORY ${QT_PLUGINS_DIR}/codecs
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)     
+  install(DIRECTORY ${QT_PLUGINS_DIR}/phonon_backend 
+          DESTINATION ${pv_runtime_dest}
+          COMPONENT Runtime)             
+  endif()          
+  install(DIRECTORY ${QT_PLUGINS_DIR}/imageformats 
           DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
-
-  install(DIRECTORY ${QT_PLUGINS_DIR}/imageformats 
+  install(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
           DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
 
