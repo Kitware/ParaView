@@ -45,7 +45,7 @@ vtkStandardNewMacro(vtkPVExtractSelection);
 //----------------------------------------------------------------------------
 vtkPVExtractSelection::vtkPVExtractSelection()
 {
-  this->SetNumberOfOutputPorts(1);
+  this->SetNumberOfOutputPorts(2);
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +79,26 @@ int vtkPVExtractSelection::RequestDataObject(
     return 0;
     }
 
+  // Second and output is selection
+  for (int i = 1; i < 2; ++i)
+    {
+    vtkInformation* info = outputVector->GetInformationObject(i);
+    vtkSelection *selOut = vtkSelection::GetData(info);
+    if (!selOut || !selOut->IsA("vtkSelection"))
+      {
+      vtkDataObject* newOutput = vtkSelection::New();
+      if (!newOutput)
+        {
+        vtkErrorMacro("Could not create vtkSelectionOutput");
+        return 0;
+        }
+      newOutput->SetPipelineInformation(info);
+      this->GetOutputPortInformation(i)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+      newOutput->Delete();
+      }
+    }
+
   return 1;
 }
 
@@ -100,7 +120,7 @@ int vtkPVExtractSelection::RequestData(
     return 1;
     }
 
-  if(sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
+  if (sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
     {
     vtkPythonExtractSelection *pythonExtractSelection = vtkPythonExtractSelection::New();
 
@@ -129,6 +149,31 @@ int vtkPVExtractSelection::RequestData(
       {
       return 0;
       }
+    }
+
+  //make an ids selection for the second output
+  //we can do this because all of the extractSelectedX filters produce
+  //arrays called "vtkOriginalXIds" that record what input cells produced
+  //each output cell, at least as long as PRESERVE_TOPOLOGY is off
+  //when we start allowing PreserveTopology, this will have to instead run
+  //through the vtkInsidedNess arrays, and for every on entry, record the
+  //entries index
+  //
+  // TODO: The ExtractSelectedGraph filter does not produce the vtkOriginalXIds,
+  // so to add support for vtkGraph selection in ParaView the filter will have
+  // to be extended. This requires test cases in ParaView to confirm it functions
+  // as expected.
+  vtkSelection *output = vtkSelection::SafeDownCast(
+    outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
+
+  output->Initialize();
+
+  // If input selection content type is vtkSelectionNode::BLOCKS, then we simply
+  // need to shallow copy the input as the output.
+  if (this->GetContentType(sel) == vtkSelectionNode::BLOCKS)
+    {
+    output->ShallowCopy(sel);
+    return 1;
     }
 
   vtkSelectionNodeVector oVector;
@@ -203,6 +248,12 @@ int vtkPVExtractSelection::RequestData(
       {
       this->RequestDataInternal(oVector, outputDO, sel->GetNode(i));
       }
+    }
+
+  vtkSelectionNodeVector::iterator iter;
+  for (iter = oVector.begin(); iter != oVector.end(); ++iter)
+    {
+    output->AddNode(iter->GetPointer());
     }
 
   return 1;
