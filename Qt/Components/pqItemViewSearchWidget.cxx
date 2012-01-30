@@ -116,7 +116,8 @@ void pqItemViewSearchWidget::showSearchWidget()
     return;
     }
   this->setPalette(this->Private->DlgBackPal);
-  QPoint mappedPoint = this->Private->BaseWidget->geometry().topLeft();
+  QPoint mappedPoint = this->Private->BaseWidget->parentWidget()->childrenRect().topLeft();
+  mappedPoint.setX(0);
   mappedPoint = this->Private->BaseWidget->mapToGlobal(mappedPoint);
   mappedPoint = this->mapFromGlobal(mappedPoint);
   this->move(mappedPoint.x(), mappedPoint.y()-2*this->height());
