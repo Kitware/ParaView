@@ -79,11 +79,6 @@ public:
     QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqQueryClauseWidget();
 
-  /// Indicates whether this clause is deletable, true by default. If a clause
-  /// is not removable, the "-" button is disabled.
-  void setRemovable(bool);
-  bool isRemovable() const;
-
   /// Set/Get the data producer.
   void setProducer(pqOutputPort* p)
     { this->Producer = p; }
@@ -118,11 +113,6 @@ public slots:
   /// available operators may change in such case. Hence, we specify if it's
   /// being used as a qualifier or not.
   void initialize(CriteriaTypes type_flags, bool qualifier_mode=false);
-
-signals:
-  /// fired when the user clicks the "-" button on the clause indicating that
-  /// this clause should be removed.
-  void removeClause();
 
 protected slots:
   /// Based on the selection criteria, populate the options in the selection

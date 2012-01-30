@@ -82,9 +82,6 @@ pqQueryClauseWidget::pqQueryClauseWidget(
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  QObject::connect(this->Internals->remove, SIGNAL(clicked()),
-    this, SIGNAL(removeClause()));
-
   QObject::connect(this->Internals->showCompositeTree, SIGNAL(clicked()),
     this, SLOT(showCompositeTree()));
 
@@ -99,18 +96,6 @@ pqQueryClauseWidget::pqQueryClauseWidget(
 pqQueryClauseWidget::~pqQueryClauseWidget()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqQueryClauseWidget::setRemovable(bool r)
-{
-  this->Internals->remove->setVisible(r);
-}
-
-//-----------------------------------------------------------------------------
-bool pqQueryClauseWidget::isRemovable() const
-{
-  return this->Internals->remove->isVisible();
 }
 
 //-----------------------------------------------------------------------------
@@ -374,7 +359,6 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   foreach (CriteriaTypes t_flag, sub_widgets)
     {
     pqQueryClauseWidget* sub_widget = new pqQueryClauseWidget(this);
-    sub_widget->setRemovable(false);
     sub_widget->setProducer(this->producer());
     sub_widget->setAttributeType(this->attributeType());
     sub_widget->initialize(t_flag, true);

@@ -264,7 +264,6 @@ void pqQueryDialog::addClause()
     }
 
   pqQueryClauseWidget* clause = new pqQueryClauseWidget(this);
-  QObject::connect(clause, SIGNAL(removeClause()), this, SLOT(removeClause()));
 
   int attr_type = this->Internals->selectionType->itemData(
     this->Internals->selectionType->currentIndex()).toInt();
@@ -278,19 +277,6 @@ void pqQueryDialog::addClause()
     qobject_cast<QVBoxLayout*>(this->Internals->queryClauseFrame->layout());
   vbox->addWidget(clause);
 }
-
-//-----------------------------------------------------------------------------
-void pqQueryDialog::removeClause()
-{
-  pqQueryClauseWidget* clause =
-      qobject_cast<pqQueryClauseWidget*>(this->sender());
-  if (clause)
-    {
-    this->Internals->Clauses.removeAll(clause);
-    delete clause;
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 void pqQueryDialog::runQuery()
