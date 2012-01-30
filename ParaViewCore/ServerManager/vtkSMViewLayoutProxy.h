@@ -158,6 +158,11 @@ public:
   vtkSMViewProxy* GetView(int location);
 
   // Description:
+  // Returns the location for the view, of any. Returns -1 if the view is not
+  // found.
+  int GetViewLocation(vtkSMViewProxy*);
+
+  // Description:
   // Updates positions for all views using the layout and current sizes.
   // This method is called automatically when the layout changes or the
   // "ViewSize" property on the assigned views changes.
