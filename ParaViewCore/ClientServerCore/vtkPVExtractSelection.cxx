@@ -84,7 +84,7 @@ int vtkPVExtractSelection::RequestDataObject(
     }
 
   // Second and output is selection
-  for (int i = 1; i < 2; ++i)
+  for (int i = 1; i < this->GetNumberOfOutputPorts(); ++i)
     {
     vtkInformation* info = outputVector->GetInformationObject(i);
     vtkSelection *selOut = vtkSelection::GetData(info);
@@ -155,6 +155,11 @@ int vtkPVExtractSelection::RequestData(
       {
       return 0;
       }
+    }
+
+  if (this->GetNumberOfOutputPorts() < 2)
+    {
+    return 1;
     }
 
   //make an ids selection for the second output

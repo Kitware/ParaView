@@ -90,6 +90,7 @@ SET (Kit_SRCS
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSILInformation.cxx
+  vtkPVSingleOutputExtractSelection.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerManagerPluginInterface.cxx

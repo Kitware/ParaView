@@ -8942,7 +8942,7 @@ This property controls how the filter works to generate tensor cell data. You ca
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractSelection" class="vtkPVExtractSelection"
+   <SourceProxy name="ExtractSelection" class="vtkPVSingleOutputExtractSelection"
       label="Extract Selection">
      <Documentation
 	short_help="Extract different type of selections."
