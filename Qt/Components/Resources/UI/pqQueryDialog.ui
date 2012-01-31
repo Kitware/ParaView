@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Find Data</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1,0,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -184,42 +184,46 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="pqColorChooserButton" name="selectionColor">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Labels</string>
+        <string>Selection Color</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="labels">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Labels</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="labels">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="pqColorChooserButton" name="labelColor">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Label Color</string>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="pqColorChooserButton" name="labelColor">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Label Color</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="pqColorChooserButton" name="selectionColor">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Selection Color</string>
-     </property>
-    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
