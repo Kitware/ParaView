@@ -23,7 +23,15 @@ from paraview import servermanager
 if servermanager.progressObserverTag:
     servermanager.ToggleProgressPrinting()
 
-contains = in1d
+def __vtk_in1d(a, b):
+    return array([item in b for item in a])
+
+try:
+    contains = in1d
+except NameError:
+    # older versions of numpy don't have in1d function.
+    # in1d was introduced in numpy 1.4.0.
+    contains = __vtk_in1d
 
 #class _array(object):
 #    """used to wrap numpy array to add support for == operator
