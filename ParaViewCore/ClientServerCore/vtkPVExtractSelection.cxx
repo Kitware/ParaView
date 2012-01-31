@@ -25,12 +25,16 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPVConfig.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkGraph.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonExtractSelection.h"
+#endif
 
 #include <vector>
 
@@ -122,6 +126,7 @@ int vtkPVExtractSelection::RequestData(
 
   if (sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
     {
+#ifdef PARAVIEW_ENABLE_PYTHON
     vtkPythonExtractSelection *pythonExtractSelection = vtkPythonExtractSelection::New();
 
     vtkDataObject *localInputDO = inputDO->NewInstance();
@@ -140,6 +145,7 @@ int vtkPVExtractSelection::RequestData(
     pythonExtractSelection->Delete();
     localSel->Delete();
     localInputDO->Delete();
+#endif // PARAVIEW_ENABLE_PYTHON
     }
   else
     {

@@ -38,8 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQueryDialog.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
+#include "vtkPVConfig.h"
 
 #include <QEventLoop>
+#include <QMessageBox>
+
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -66,6 +69,7 @@ void pqDataQueryReaction::onExtractSelectionOverTime()
 //-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqQueryDialog dialog(
     pqActiveObjects::instance().activePort(),
     pqCoreUtilities::mainWidget());
@@ -89,5 +93,11 @@ void pqDataQueryReaction::showQueryDialog()
   QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
                    this,    SLOT(onExtractSelectionOverTime()));
   loop.exec();
+#else
+  QMessageBox::warning(0,
+                       "Selection Not Supported",
+                       "Error: Find Data requires that ParaView be built with "
+                       "Python enabled. To enable Python set the CMake flag '"
+                       "PARAVIEW_ENABLE_PYTHON' to True.");
+#endif // PARAVIEW_ENABLE_PYTHON
 }
-
