@@ -199,6 +199,9 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
 
   vtkDataSetAttributes* inputPD = input->GetPointData();
   vtkDataSetAttributes* outputPD = output->GetPointData();
+
+  outputPD->SetCopyGlobalIds(1);
+  outputPD->SetCopyPedigreeIds(1);
   outputPD->CopyAllocate(inputPD, numPoints);
 
   vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
@@ -228,6 +231,10 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
     }
 
   outputPD->AddArray(originalIds);
+  // unmark global and pedigree ids.
+  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
+
   originalIds->FastDelete();
 
   output->Squeeze();
@@ -257,6 +264,10 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
   vtkCellData *inputCD = input->GetCellData();
   vtkCellData *outputCD = output->GetCellData();
 
+  outputCD->SetCopyGlobalIds(1);
+  outputPD->SetCopyGlobalIds(1);
+  outputCD->SetCopyPedigreeIds(1);
+  outputPD->SetCopyPedigreeIds(1);
   outputCD->CopyAllocate(inputCD);
   outputPD->CopyAllocate(inputPD);
 
@@ -327,11 +338,19 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
     }
 
   outputPD->AddArray(originalPointIds);
+  // unmark global and pedigree ids.
+  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
   originalPointIds->FastDelete();
 
   outputCD->AddArray(originalCellIds);
+  // unmark global and pedigree ids.
+  outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+  outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
   originalCellIds->FastDelete();
   output->Squeeze();
+
+
   return output;
 }
 
