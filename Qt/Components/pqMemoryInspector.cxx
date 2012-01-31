@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqServer.h"
 #include "vtkNew.h"
 #include "vtkPVSystemInformation.h"
@@ -177,7 +178,7 @@ public:
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
     if (role != Qt::DisplayRole && role != Qt::ToolTipRole &&
-      role != Qt::UserRole)
+      role != Qt::UserRole && role != Qt::EditRole)
       {
       return QVariant();
       }
@@ -248,6 +249,18 @@ public:
 
     return this->Superclass::headerData(section, orientation, role);
     }
+
+  /// Method needed for copy/past cell editor
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const
+ {
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  }
+
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
+  {
+    // Fake edition...
+    return true;
+  }
   };
 };
 // Columns:
@@ -277,6 +290,7 @@ pqMemoryInspector::pqMemoryInspector(QWidget* parentObject, Qt::WindowFlags f)
   this->Internals->ProxyModel.setSourceModel(&this->Internals->Model);
   this->Internals->tableView->setModel(
     &this->Internals->ProxyModel);
+  this->Internals->tableView->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   QObject::connect(this->Internals->buttonBox,
     SIGNAL(accepted()), this, SLOT(refresh()));
   QObject::connect(this->Internals->physicalMemory,
