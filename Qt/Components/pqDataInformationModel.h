@@ -76,6 +76,10 @@ public:
   /// to it.
   pqOutputPort* getItemFor(const QModelIndex& index) const;
 
+  /// Method needed for copy/past cell editor
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+
 public slots:
   /// Called when a new source/filter is registered.
   void addSource(pqPipelineSource* source);
