@@ -37,7 +37,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
   this->NumberOfDisplays = 0;
   this->Displays= 0;
   this->SetNumberOfDisplays(1);
-
+  this->SetEyeSeparation(0.065);
   this->DisplayOrigin[0] = -0.5;
   this->DisplayOrigin[1] = -0.5;
   this->DisplayOrigin[2] = -0.5;
@@ -77,6 +77,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
       this->DefineDisplay(cc, options->GetLowerLeft(cc),
         options->GetLowerRight(cc), options->GetUpperRight(cc));
       }
+    this->SetEyeSeparation(options->GetEyeSeparation());
     }
 }
 
@@ -95,6 +96,11 @@ void vtkCaveSynchronizedRenderers::HandleStartRender()
   this->GetRenderer()->ResetCameraClippingRange();
 }
 
+//-----------------------------------------------------------------------------
+void vtkCaveSynchronizedRenderers::SetEyeSeparation(double eyeSeparation)
+{
+  this->EyeSeparation = eyeSeparation;
+}
 //-----------------------------------------------------------------------------
 void vtkCaveSynchronizedRenderers::SetNumberOfDisplays(int numberOfDisplays)
 {
@@ -180,7 +186,7 @@ void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* camera)
     camera->SetScreenTopRight(this->DisplayY);
     camera->SetUseOffAxisProjection(true);
     camera->SetEyePosition(eyePosition);
-    camera->SetEyeSeparation(0.065);
+    camera->SetEyeSeparation(this->EyeSeparation);
 
     // cam->SetHeadTracked( true );
     // cam->SetScreenConfig( this->DisplayOrigin,

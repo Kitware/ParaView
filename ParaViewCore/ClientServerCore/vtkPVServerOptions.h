@@ -40,6 +40,7 @@ public:
 
   // Description:
   // Get information about machines used in a data or render server.
+  double GetEyeSeparation();
   unsigned int GetNumberOfMachines();
   const char* GetMachineName(unsigned int idx);
   const char* GetDisplayName(unsigned int idx);
@@ -51,6 +52,11 @@ protected:
   // Description:
   // Add machine information from the xml tag <Machine ....>
   int AddMachineInformation(const char** atts);
+
+  // Description:
+  // Add eye separation information from the xml tag <EyeSeparation ...>
+  int AddEyeSeparationInformation(const char** atts);
+
   // Description:
   // Default constructor.
   vtkPVServerOptions();
