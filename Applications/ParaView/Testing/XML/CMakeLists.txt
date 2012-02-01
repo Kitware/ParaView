@@ -67,7 +67,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
@@ -135,6 +134,13 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
+
+# only enable find data tests if numpy is available
+include("TestNumPy")
+
+IF ("1" STREQUAL ${HAS_NUMPY})
+  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES} ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
+ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
