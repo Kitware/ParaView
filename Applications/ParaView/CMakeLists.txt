@@ -94,7 +94,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
    set(pv_runtime_dest ${PV_INSTALL_LIB_DIR})
   endif()
 
-  # Now install the QtSVG file
+  # Now install the all the plugins
   if(QT_QTSVG_FOUND)
     install(FILES ${QT_BINARY_DIR}/QtSvg4.dll
             DESTINATION ${pv_runtime_dest}
@@ -103,26 +103,12 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
   endif()
   
   # Now install all the Qt plugins 
-  if(QT_QTSVG_FOUND)          
-  install(DIRECTORY ${QT_PLUGINS_DIR}/iconengines 
+  #tack on the / to get all the subdirectories not the plugin directory
+  install(DIRECTORY "${QT_PLUGINS_DIR}/"
           DESTINATION ${pv_runtime_dest}
-          COMPONENT Runtime)     
-  endif()          
-  if(QT_PHONON_FOUND)
-  install(DIRECTORY ${QT_PLUGINS_DIR}/codecs
-          DESTINATION ${pv_runtime_dest}
-          COMPONENT Runtime)     
-  install(DIRECTORY ${QT_PLUGINS_DIR}/phonon_backend 
-          DESTINATION ${pv_runtime_dest}
-          COMPONENT Runtime)             
-  endif()          
-  install(DIRECTORY ${QT_PLUGINS_DIR}/imageformats 
-          DESTINATION ${pv_runtime_dest}
-          COMPONENT Runtime)
-  install(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
-          DESTINATION ${pv_runtime_dest}
-          COMPONENT Runtime)
-
+          COMPONENT Runtime
+          FILES_MATCHING PATTERN "*.dll")
+          
   if(PARAVIEW_ENABLE_PYTHON)
     option(PARAVIEW_INSTALL_PYTHON "Install core python modules in ParaView." OFF)
     mark_as_advanced(PARAVIEW_INSTALL_PYTHON)
