@@ -208,6 +208,30 @@ vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
 }
 
 //----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::RemoveExtract(vtkSMProxy* proxy)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << VTKOBJECT(this)
+    << "UnRegisterExtract"
+    << VTKOBJECT(proxy)
+    << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  vtkInternals::ExtractProxiesType::iterator iter;
+  for (iter = this->Internals->ExtractProxies.begin();
+    iter != this->Internals->ExtractProxies.end();
+    ++iter)
+    {
+    if (iter->second == proxy)
+      {
+      this->Internals->ExtractProxies.erase(iter);
+      break;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

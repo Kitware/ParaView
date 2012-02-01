@@ -51,6 +51,7 @@ public:
   // Called on the vis-process to register a producer for an extract.
   void RegisterExtract(vtkTrivialProducer* producer,
     const char* groupname, const char* proxyname, int portnumber);
+  void UnRegisterExtract(vtkTrivialProducer* producer);
 
   // Description:
   // Set/Get the link type i.e. whether the current process is the visualization

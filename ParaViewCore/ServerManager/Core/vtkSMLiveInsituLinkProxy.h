@@ -43,6 +43,7 @@ public:
   // Description:
   vtkSMProxy* CreateExtract(
     const char* reg_group, const char* reg_name, int port_number);
+  void RemoveExtract(vtkSMProxy*);
 
 //BTX
   // Description:

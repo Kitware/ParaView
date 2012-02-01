@@ -83,6 +83,12 @@ void vtkExtractsDeliveryHelper::AddExtractConsumer(
 }
 
 //----------------------------------------------------------------------------
+void vtkExtractsDeliveryHelper::RemoveExtractConsumer(const char* key)
+{
+  this->ExtractConsumers.erase(key);
+}
+
+//----------------------------------------------------------------------------
 void vtkExtractsDeliveryHelper::AddExtractProducer(
   const char* key, vtkAlgorithmOutput* producerPort)
 {

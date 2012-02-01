@@ -68,6 +68,12 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
   this->Internals->Session = server;
 
   pqApplicationCore* core = pqApplicationCore::instance();
+
+  // we need to unregister extracts when the extracts proxy is deleted.
+  QObject::connect(core->getServerManagerModel(),
+    SIGNAL(preSourceRemoved(pqPipelineSource*)),
+    this, SLOT(sourceRemoved(pqPipelineSource*)));
+
   vtkSMProxy* proxy = core->getObjectBuilder()->createProxy(
     "coprocessing", "LiveInsituLink", server, "coprocessing");
 
@@ -164,6 +170,20 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
   //  pqproxy->getOutputPort(0),
   //  pqActiveObjects::instance().activeView(), true);
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveInsituVisualizationManager::sourceRemoved(pqPipelineSource* source)
+{
+  if (source->getServer() != this->Internals->Session ||
+    !source->property("CATALYST_EXTRACT").toBool())
+    {
+    return;
+    }
+
+  // remove extract.
+  this->Internals->LiveInsituLinkProxy->RemoveExtract(source->getProxy());
+  this->Internals->ExtractSourceProxies.removeAll(source);
 }
 
 //-----------------------------------------------------------------------------

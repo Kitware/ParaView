@@ -55,6 +55,8 @@ public:
   // Register extracts. This method is used on the Visualization processes to
   // register the producer
   void AddExtractConsumer(const char* key, vtkTrivialProducer* consumer);
+  void RemoveExtractConsumer(const char* key);
+
   void AddExtractProducer(const char* key, vtkAlgorithmOutput* producerPort);
 
   void Update();

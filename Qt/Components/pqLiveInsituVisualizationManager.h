@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 
 class pqOutputPort;
-class pqServer;
-class vtkSMLiveInsituLinkProxy;
 class pqPipelineSource;
+class pqServer;
 class vtkEventQtSlotConnect;
+class vtkSMLiveInsituLinkProxy;
 
 class PQCOMPONENTS_EXPORT pqLiveInsituVisualizationManager : public QObject
 {
@@ -56,6 +56,7 @@ public:
 
 protected slots:
   void timestepsUpdated();
+  void sourceRemoved(pqPipelineSource*);
 
 private:
   Q_DISABLE_COPY(pqLiveInsituVisualizationManager);

@@ -90,6 +90,13 @@ public:
     std::string Group;
     std::string Name;
     int Port;
+    std::string ToString() const
+      {
+      vtksys_ios::ostringstream key;
+      key << this->Group.c_str() << ":" << this->Name.c_str() << ":" <<
+        this->Port;
+      return key.str();
+      }
     bool operator < (const Key& other) const
       {
       return this->Group < other.Group ||
@@ -101,7 +108,8 @@ public:
       Group(group), Name(name), Port(port) {}
     };
 
-  std::map<Key, vtkSmartPointer<vtkTrivialProducer> > Extracts;
+  typedef std::map<Key, vtkSmartPointer<vtkTrivialProducer> > ExtractsMap;
+  ExtractsMap Extracts;
 };
 
 vtkStandardNewMacro(vtkLiveInsituLink);
@@ -536,10 +544,9 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
           proxy->GetClientSideObject());
         if (algo)
           {
-          vtksys_ios::ostringstream key;
-          key << group.c_str() << ":" << name.c_str() << ":" << port;
+          vtkInternals::Key key(group.c_str(), name.c_str(), port);
           this->ExtractsDeliveryHelper->AddExtractProducer(
-            key.str().c_str(), algo->GetOutputPort(port));
+            key.ToString().c_str(), algo->GetOutputPort(port));
           }
         else
           {
@@ -618,8 +625,8 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
       {
       extractsMessage << 1;
       extractsMessage << static_cast<int>(this->Internals->Extracts.size());
-      for (std::map<vtkInternals::Key, vtkSmartPointer<vtkTrivialProducer> >::iterator iter=
-        this->Internals->Extracts.begin(); iter != this->Internals->Extracts.end(); ++iter)
+      for (vtkInternals::ExtractsMap::iterator iter=this->Internals->Extracts.begin();
+        iter != this->Internals->Extracts.end(); ++iter)
         {
         extractsMessage << iter->first.Group << iter->first.Name << iter->first.Port;
         }
@@ -682,13 +689,29 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
   assert(this->ProcessType == VISUALIZATION);
 
   cout << "Adding Extract: " << groupname << ", " << proxyname << endl;
-  this->Internals->Extracts[vtkInternals::Key(groupname, proxyname, portnumber)]
-    = producer;
+  vtkInternals::Key key(groupname, proxyname, portnumber);
+  this->Internals->Extracts[key] = producer;
   this->ExtractsChanged = true;
+  this->ExtractsDeliveryHelper->AddExtractConsumer(
+    key.ToString().c_str(), producer);
+}
 
-  vtksys_ios::ostringstream key;
-  key << groupname << ":" << proxyname << ":" << portnumber;
-  this->ExtractsDeliveryHelper->AddExtractConsumer(key.str().c_str(), producer);
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::UnRegisterExtract(vtkTrivialProducer* producer)
+{
+  assert(this->ProcessType == VISUALIZATION);
+  for (vtkInternals::ExtractsMap::iterator iter=this->Internals->Extracts.begin();
+    iter != this->Internals->Extracts.end(); ++iter)
+    {
+    if (iter->second.GetPointer() == producer)
+      {
+      this->ExtractsDeliveryHelper->RemoveExtractConsumer(
+        iter->first.ToString().c_str());
+      this->Internals->Extracts.erase(iter);
+      this->ExtractsChanged = true;
+      break;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
