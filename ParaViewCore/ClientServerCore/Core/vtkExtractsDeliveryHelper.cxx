@@ -16,6 +16,8 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkDataObject.h"
+// FIXME:MODULARIZATION
+// #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
@@ -91,13 +93,66 @@ void vtkExtractsDeliveryHelper::AddExtractProducer(
 }
 
 //----------------------------------------------------------------------------
+vtkDataObject* vtkExtractsDeliveryHelper::Collect(
+  int node_count, vtkDataObject* dObj)
+{
+  int numProcs = this->ParallelController->GetNumberOfProcesses();
+  int myId = this->ParallelController->GetLocalProcessId();
+  if (myId >= node_count)
+    {
+    int destination = myId % node_count;
+    this->ParallelController->Send(dObj, destination, 13001);
+    return NULL;
+    }
+  else
+    {
+    std::vector<vtkDataObject*> pieces;
+    vtkDataObject* clone = dObj->NewInstance();
+    clone->ShallowCopy(dObj);
+    pieces.push_back(clone);
+
+    for (int cc=1; myId + cc * node_count < numProcs; cc++)
+      {
+      vtkDataObject* piece =
+        this->ParallelController->ReceiveDataObject(
+          vtkMultiProcessController::ANY_SOURCE, 13001);
+      if (piece)
+        {
+        pieces.push_back(piece);
+        }
+      }
+
+    vtkDataObject* result = NULL;
+    if (pieces.size() > 1)
+      {
+      //FIXME:MODULARIZATION
+      //result = vtkMPIMoveData::MergePieces(
+      //  &pieces[0], static_cast<unsigned int>(pieces.size()));
+      abort();
+      }
+    else
+      {
+      result = dObj;
+      dObj->Register(this);
+      }
+
+    for (size_t cc=0; cc < pieces.size(); cc++)
+      {
+      pieces[cc]->Delete();
+      pieces[cc] = NULL;
+      }
+
+    return result;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkExtractsDeliveryHelper::Update()
 {
   if (this->ProcessIsProducer)
     {
     cout << "Push extracts for: " << endl;
-    ExtractProducersType::iterator iter;
-    for (iter = this->ExtractProducers.begin();
+    for (ExtractProducersType::iterator iter = this->ExtractProducers.begin();
       iter != this->ExtractProducers.end(); ++iter)
       {
       cout << "  " << iter->first.c_str() << endl;
@@ -106,7 +161,6 @@ void vtkExtractsDeliveryHelper::Update()
     // update all inputs. We shouldn't call Update() here since that messes up
     // the time/piece requests that'd be set by paraview. The co-processing code
     // should ensure all pipelines are updated.
-
     //for (iter = this->ExtractProducers.begin();
     //  iter != this->ExtractProducers.end(); ++iter)
     //  {
@@ -116,23 +170,40 @@ void vtkExtractsDeliveryHelper::Update()
     // reduce to N procs where N is the number of Vis procs.
     int M = this->NumberOfSimulationProcesses;
     int N = this->NumberOfVisualizationProcesses;
+
+    std::map<std::string, vtkSmartPointer<vtkDataObject> > gathered_extracts;
     if (M > N)
       {
-      vtkWarningMacro("FIXME: Need to reduce M to N ");
+      // when simulation processes in greater than vis processes, the simulation
+      // processes will gather data on the first N processes and then ship that
+      // over.
+      for (ExtractProducersType::iterator iter = this->ExtractProducers.begin();
+        iter != this->ExtractProducers.end(); ++iter)
+        {
+        vtkDataObject* dObj = this->Collect(N,
+          iter->second->GetProducer()->GetOutputDataObject(iter->second->GetIndex()));
+        gathered_extracts[iter->first].TakeReference(dObj);
+        }
+      }
+
+    if (N >= M)
+      {
+      // totally acceptable case, nothing special to do. Only the first M
+      // visualization processes have data. One can use D3 for load balancing.
       }
 
     vtkSocketController* comm = this->Simulation2VisualizationController;
     if (comm)
       {
-      for (iter = this->ExtractProducers.begin();
+      for (ExtractProducersType::iterator iter = this->ExtractProducers.begin();
         iter != this->ExtractProducers.end(); ++iter)
         {
         vtkMultiProcessStream stream;
         stream << iter->first;
         comm->Send(stream, 1, 12000);
-        comm->Send(
-          iter->second->GetProducer()->GetOutputDataObject(iter->second->GetIndex()),
-          1, 12001);
+        vtkDataObject* dObj = (M > N)?  gathered_extracts[iter->first].GetPointer() :
+          iter->second->GetProducer()->GetOutputDataObject(iter->second->GetIndex());
+        comm->Send(dObj, 1, 12001);
         }
       // mark end.
       vtkMultiProcessStream stream;

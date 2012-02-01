@@ -1296,6 +1296,32 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
 }
 
 //-----------------------------------------------------------------------------
+vtkDataObject* vtkMPIMoveData::MergePieces(
+  vtkDataObject** pieces, unsigned int num_pieces)
+{
+  if (num_pieces == 0)
+    {
+    return NULL;
+    }
+
+  vtkDataObject* result = pieces[0]->NewInstance();
+
+  std::vector<vtkSmartPointer<vtkDataObject> > piece_vector;
+  piece_vector.resize(num_pieces);
+  for (unsigned int cc=0; cc < num_pieces; cc++)
+    {
+    piece_vector[cc] = pieces[cc];
+    }
+
+  if (vtkMPIMoveDataMerge(piece_vector, result))
+    {
+    return result;
+    }
+  result->Delete();
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
 void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

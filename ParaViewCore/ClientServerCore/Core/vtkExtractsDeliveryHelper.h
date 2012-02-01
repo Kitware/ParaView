@@ -24,8 +24,9 @@
 #include "vtkSmartPointer.h"
 
 class vtkAlgorithmOutput;
-class vtkSocketController;
+class vtkDataObject;
 class vtkMultiProcessController;
+class vtkSocketController;
 class vtkTrivialProducer;
 
 #include <map>
@@ -67,6 +68,8 @@ public:
 protected:
   vtkExtractsDeliveryHelper();
   ~vtkExtractsDeliveryHelper();
+
+  vtkDataObject* Collect(int nodes_to_collect_to, vtkDataObject*);
 
   bool ProcessIsProducer;
   int NumberOfSimulationProcesses;
