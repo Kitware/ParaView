@@ -28,7 +28,7 @@
 class vtkDataSet;
 class vtkImageData;
 class vtkUnstructuredGrid;
-class vtkHierarchicalBoxDataSet;
+class vtkNonOverlappingAMR;
 class vtkPoints;
 class vtkUnsignedCharArray;
 class vtkDoubleArray;
@@ -98,12 +98,12 @@ protected:
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  void InitializeCopyAttributes(vtkHierarchicalBoxDataSet *hbdsInput, vtkDataSet* mesh);
+  void InitializeCopyAttributes(vtkNonOverlappingAMR *hbdsInput, vtkDataSet* mesh);
 
   // Description:
   // Not a pipeline function. This is a helper function that
   // allows creating a new data set given a input and a cell array name.
-  vtkMultiBlockDataSet* DoRequestData(vtkHierarchicalBoxDataSet* input,
+  vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,
                                           const char* arrayNameToProcess);
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);

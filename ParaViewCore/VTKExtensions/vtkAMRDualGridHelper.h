@@ -27,7 +27,7 @@
 
 class vtkDataArray;
 class vtkIntArray;
-class vtkHierarchicalBoxDataSet;
+class vtkNonOverlappingAMR;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperLevel;
 class vtkMultiProcessController;
@@ -74,7 +74,7 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController *);
 
-  int                       Initialize(vtkHierarchicalBoxDataSet* input,
+  int                       Initialize(vtkNonOverlappingAMR* input,
                                        const char* arrayName);
   const double*             GetGlobalOrigin() { return this->GlobalOrigin;}
   const double*             GetRootSpacing() { return this->RootSpacing;}
@@ -134,7 +134,7 @@ private:
   void UnmarshalBlocks(vtkIntArray *buffer);
 
   vtkMultiProcessController *Controller;
-  void ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* input);
+  void ComputeGlobalMetaData(vtkNonOverlappingAMR* input);
   void AddBlock(int level, vtkImageData* volume);
 
   // Manage connectivity seeds between blocks.
