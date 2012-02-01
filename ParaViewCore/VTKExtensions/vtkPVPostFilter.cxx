@@ -75,10 +75,11 @@ namespace
           else if(mangledName.size() > arrayNameLength + 1)
             {
             vtkAbstractArray *array = dataSetAttributes->GetAbstractArray(arrayIndex);
-            size_t componentCount = array->GetNumberOfComponents();
+            int componentCount = array->GetNumberOfComponents();
 
             // check the for a matching component name
-            for(size_t componentIndex = 0; componentIndex < componentCount; componentIndex++)
+            //has to be from -1 as -1 represents the Magnitude component
+            for(int componentIndex = -1; componentIndex < componentCount; componentIndex++)
               {
               vtkStdString componentNameString;
               const char *componentName = array->GetComponentName(componentIndex);
