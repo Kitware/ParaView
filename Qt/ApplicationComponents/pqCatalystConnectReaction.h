@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCatalystConnectReaction_h
 
 #include "pqReaction.h"
+#include <QPointer>
+
+class pqLiveInsituVisualizationManager;
 
 /// @ingroup Reactions
 /// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
@@ -46,15 +49,21 @@ public:
   virtual ~pqCatalystConnectReaction();
 
   /// Connect to Catalyst 
-  static bool connect();
+  bool connect();
 
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
-    { pqCatalystConnectReaction::connect(); }
+    { this->connect(); }
+
+  /// reaction disabled when already connected to a catalyst server or in
+  /// collaboration mode.
+  virtual void updateEnableState();
 
 private:
   Q_DISABLE_COPY(pqCatalystConnectReaction)
+
+  QMap<void*, QPointer<pqLiveInsituVisualizationManager> > Managers;
 };
 
 #endif

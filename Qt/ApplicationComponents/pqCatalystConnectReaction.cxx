@@ -34,112 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
-#include "pqDisplayPolicy.h"
-#include "pqObjectBuilder.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMLiveInsituLinkProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMSession.h"
-#include "vtkSMSessionProxyManager.h"
 #include "pqLiveInsituVisualizationManager.h"
-
-#include <QDockWidget>
-
-namespace
-{
-  class pqCatalystDisplayPolicy : public pqDisplayPolicy
-  {
-  typedef pqDisplayPolicy Superclass;
-  QPointer<pqServer> MainSession;
-  QPointer<pqServer> CatalystSession;
-  vtkWeakPointer<vtkSMLiveInsituLinkProxy> InsituLinkProxy;
-
-public:
-  pqCatalystDisplayPolicy(
-    pqServer* session,
-    pqServer* catalystSession,
-    vtkSMLiveInsituLinkProxy* linkProxy,
-    QObject* parentObject)
-    : Superclass(parentObject),
-    MainSession(session),
-    CatalystSession(catalystSession),
-    InsituLinkProxy(linkProxy)
-  {
-  }
-  virtual ~pqCatalystDisplayPolicy() { }
-  
-  virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const
-    {
-    if (port && port->getServer() == this->CatalystSession)
-      {
-      if (this->InsituLinkProxy->HasExtract(
-          port->getSource()->getSMGroup().toAscii().data(),
-          port->getSource()->getSMName().toAscii().data(),
-          port->getPortNumber()))
-        {
-        return Visible;
-        }
-
-      return Hidden;
-      }
-    else
-      {
-      return this->Superclass::getVisibility(view, port);
-      }
-    }
-
-  virtual pqDataRepresentation* setRepresentationVisibility(
-    pqOutputPort* port, pqView* view, bool visible) const
-    {
-    if (port && port->getServer() == this->CatalystSession)
-      {
-      if (visible && 
-        !this->InsituLinkProxy->HasExtract(
-          port->getSource()->getSMGroup().toAscii().data(),
-          port->getSource()->getSMName().toAscii().data(),
-          port->getPortNumber()))
-        {
-        this->addExtract(port);
-        }
-      return NULL;
-      }
-    else
-      {
-      return this->Superclass::setRepresentationVisibility(port, view, visible);
-      }
-    }
-protected:
-  void addExtract(pqOutputPort* port) const
-    {
-    vtkSMProxy* proxy = this->InsituLinkProxy->CreateExtract(
-      port->getSource()->getSMGroup().toAscii().data(),
-      port->getSource()->getSMName().toAscii().data(),
-      port->getPortNumber());
-
-    this->MainSession->proxyManager()->RegisterProxy(
-      "sources", QString("%1 (%2)").arg(port->getSource()->getSMName()).arg(
-        port->getPortNumber()).toAscii().data(),
-      proxy);
-
-    //pqPipelineSource* pqproxy =
-    //  pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
-    //Q_ASSERT(pqproxy);
-    //pqActiveObjects::instance().setActiveServer(pqproxy->getServer());
-    //this->setRepresentationVisibility(
-    //  pqproxy->getOutputPort(0),
-    //  pqActiveObjects::instance().activeView(), true);
-    }
-  };
-}
+#include "pqOptions.h"
+#include "pqServer.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
+    this, SLOT(updateEnableState()));
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -148,12 +55,41 @@ pqCatalystConnectReaction::~pqCatalystConnectReaction()
 }
 
 //-----------------------------------------------------------------------------
+void pqCatalystConnectReaction::updateEnableState()
+{
+  if (!pqApplicationCore::instance()->getOptions()->GetMultiServerMode())
+    {
+    this->parentAction()->setEnabled(false);
+    return;
+    }
+
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (server && 
+    server->getResource().scheme() != "catalyst" &&
+    !server->session()->IsMultiClients() &&
+    !this->Managers.contains(server))
+    {
+    this->parentAction()->setEnabled(true); 
+    }
+  else
+    {
+    this->parentAction()->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool pqCatalystConnectReaction::connect()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
 
-  pqLiveInsituVisualizationManager* mgr =
-    new pqLiveInsituVisualizationManager(22222, server);
+  if (server != NULL || !this->Managers.contains(server))
+    {
+    pqLiveInsituVisualizationManager* mgr =
+      new pqLiveInsituVisualizationManager(22222, server);
+    this->Managers[server] = mgr;
+    this->updateEnableState();
+    return true;
+    }
 
-  return (mgr != NULL);
+  return false;
 }
