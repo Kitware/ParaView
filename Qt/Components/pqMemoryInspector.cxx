@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QtDebug>
+#include <QTextEdit>
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
@@ -284,8 +285,8 @@ pqMemoryInspector::pqMemoryInspector(QWidget* parentObject, Qt::WindowFlags f)
   this->Internals->setupUi(this);
 
   // save the rich-text formatted text for later use.
-  this->Internals->SummaryText = this->Internals->summary->text();
-  this->Internals->summary->setText("");
+  this->Internals->SummaryText = this->Internals->summary->document()->toHtml();
+  this->Internals->summary->document()->setHtml("");
 
   this->Internals->ProxyModel.setSourceModel(&this->Internals->Model);
   this->Internals->tableView->setModel(
@@ -420,7 +421,15 @@ void pqMemoryInspector::updateSummary()
       memorySizeToText(iter->second.VirtualMax).toString()).arg(
       memorySizeToText(iter->second.VirtualSum/iter->second.Count).toString());
     }
-  this->Internals->summary->setText(text);
+  this->Internals->summary->document()->setHtml(text);
+
+  // Try reduce height of the process summary
+  int height = this->Internals->summary->heightForWidth(this->Internals->summary->width());
+  if(height < 0)
+    {
+    height = this->Internals->summary->minimumSizeHint().height();
+    }
+  this->Internals->summary->setMaximumHeight(height + 10);
 }
 
 //-----------------------------------------------------------------------------
