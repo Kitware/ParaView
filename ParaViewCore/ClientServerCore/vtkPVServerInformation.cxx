@@ -383,7 +383,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
       }
     }
   double eyeSeparation;
-  if (!css->GetArgument(0, 23, &eyeSeparation))
+  if (!css->GetArgument(0, 23 + (numMachines-1)*10, &eyeSeparation))
     {
     vtkErrorMacro("Error parsing eye-separations from message.");
     return;
