@@ -665,9 +665,16 @@ int vtkSpyPlotReader::RequestData(
   this->SetGlobalMinLevelAndSpacing( blockIterator );
   // export global bounds, minimum level, spacing, and box size
   // in field data arrays for use by downstream filters
-  if ( hbds )
+  if ( hbds != NULL )
     {
     this->AddAttributes(hbds);
+    assert("FieldData should not be NULL!" && hbds->GetFieldData()!=NULL );
+
+    vtkFieldData *fd = hbds->GetFieldData();
+    assert("Must have a GlobalBounds array!" && fd->HasArray("GlobalBounds"));
+    assert("Must have a GlobalBoxSize array!" && fd->HasArray("GlobalBoxSize"));
+    assert("Must have a MinLevel array!" && fd->HasArray("MinLevel"));
+    assert("Must have a MinLevelSpacing!" && fd->HasArray("MinLevelSpacing"));
     }
 
   int needTracers = 1;
