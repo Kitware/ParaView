@@ -226,9 +226,13 @@ void pqServer::initialize()
   // after a collaborative update
   // As well as multi-server, force the newly created server connection to be the
   // active one
-  if(this->Session)
+  if(vtkSMProxyManager::GetProxyManager()->GetActiveSession() == this->Session)
     {
     vtkSMProxyManager::GetProxyManager()->SetActiveSession((vtkSMSession*)NULL);
+    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
+    }
+  else
+    {
     vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
     }
 }
