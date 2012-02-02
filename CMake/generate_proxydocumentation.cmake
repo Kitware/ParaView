@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 # xmlpatterns       :- xmlpatterns executable.
 # xml_to_xml_xsl    :- xsl file to convert SM xml to internal xml Model.
 # xml_to_html_xsl   :- xsl file to conevrt the internal xml to html.
+# xml_to_wiki_xsl   :- xsl file to conevrt the internal xml to wiki.
 # input_xmls        :- + separated list of SM xml files
 # input_gui_xmls    :- + separated list of GUI xml files used to generate the
 #                        CatergoryIndex.html
@@ -79,4 +80,26 @@ foreach (single_html ${multiple_htmls_as_list})
     string (REGEX REPLACE "\\\\emph{([^}]+)}" "<i>\\1</i>" single_html "${single_html}")
     file (WRITE "${output_dir}/${filename}" "${single_html}")
   endif()
+endforeach()
+
+#                     ----------- WIKI -----------
+# process the temporary.xml using the thrird XSL to generate a wiki content
+set(wiki_sections sources filters writers)
+foreach(wiki_section ${wiki_sections})
+  message("Processing wiki ${wiki_section}")
+  set(GROUP ${wiki_section})
+  set(tmp_wiki_xsl ${CMAKE_CURRENT_BINARY_DIR}/${wiki_section}_xml_to_wiki.xsl)
+  set(wiki_file ${output_dir}/${wiki_section}.wiki)
+  CONFIGURE_FILE(
+        ${xml_to_wiki_xsl}
+        ${tmp_wiki_xsl}
+        @ONLY IMMEDIATE)
+  execute_process(
+        COMMAND "${xmlpatterns}"
+                "${tmp_wiki_xsl}"
+                "${output_file}"
+        OUTPUT_VARIABLE wiki_content)
+  string (REGEX REPLACE " +" " " wiki_content "${wiki_content}")
+  string (REGEX REPLACE "\n " "\n" wiki_content "${wiki_content}")
+  file (WRITE "${wiki_file}" "${wiki_content}")
 endforeach()
