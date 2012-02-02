@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkInformationStringVectorKey.h"
@@ -440,8 +441,8 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
 //----------------------------------------------------------------------------
 namespace
 {
-  template <class T>
-  void CopyComponent(T* outIter, T* inIter, int compNo)
+  template <class T, class U>
+  void CopyComponent(T* outIter, U* inIter, int compNo)
     {
     vtkDataArray* inDa = vtkDataArray::SafeDownCast(inIter->GetArray());
     vtkIdType numTuples = inIter->GetNumberOfTuples();
@@ -473,6 +474,17 @@ namespace
         outIter->SetValue(cc, inIter->GetTuple(cc)[compNo]);
         }
       }
+    }
+
+  template <>
+  void CopyComponent(vtkArrayIteratorTemplate<double>* /*outIter*/,
+                     vtkArrayIteratorTemplate<vtkStdString>* /*inIter*/,
+                     int /*compNo*/)
+    {
+    //Because the vtkTemplateMacro is coded to attempt to call
+    //the function with each use case, we have to handle the string to double
+    //conversion, which in reality should never happen. So for know we
+    //are leaving it empty
     }
 }
 
@@ -530,20 +542,42 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
     cIndex = atoi(demangled_component_name);
     }
 
-  vtkAbstractArray* newArray = array->NewInstance();
+  //when we compute the magnitude we must place
+  //the result in a double array, since we don't the size of the
+  //resulting data.
+  bool isMagnitude = (cIndex == -1);
+  vtkAbstractArray* newArray = isMagnitude ? vtkDoubleArray::New() :
+                                                array->NewInstance();
+
   newArray->SetNumberOfComponents(1);
   newArray->SetNumberOfTuples(array->GetNumberOfTuples());
   newArray->SetName(requested_name);
 
   vtkArrayIterator* inIter = array->NewIterator();
   vtkArrayIterator* outIter = newArray->NewIterator();
-  switch (array->GetDataType())
+
+
+  if(isMagnitude)
     {
-    vtkArrayIteratorTemplateMacro(
-      ::CopyComponent(static_cast<VTK_TT*>(outIter),
-        static_cast<VTK_TT*>(inIter), cIndex);
-    );
+    switch (array->GetDataType())
+      {
+      vtkArrayIteratorTemplateMacro(
+        ::CopyComponent(static_cast< vtkArrayIteratorTemplate<double>* >(outIter),
+          static_cast<VTK_TT*>(inIter), cIndex);
+      );
+      }
     }
+  else
+    {
+    switch (array->GetDataType())
+      {
+      vtkArrayIteratorTemplateMacro(
+        ::CopyComponent(static_cast<VTK_TT*>(outIter),
+          static_cast<VTK_TT*>(inIter), cIndex);
+      );
+      }
+    }
+
   inIter->Delete();
   outIter->Delete();
   dsa->AddArray(newArray);
