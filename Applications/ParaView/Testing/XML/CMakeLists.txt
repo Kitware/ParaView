@@ -89,6 +89,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
@@ -183,6 +184,7 @@ set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
 SET (PlotEdges2_BREAK TRUE)
 SET (PropertyConversion2_BREAK TRUE)
+SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 set (EyeDomeLighting_BREAK TRUE)
