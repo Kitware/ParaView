@@ -1711,9 +1711,9 @@ int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR *hb,
   ug->SetExtent(extents);
   ug->SetOrigin(origin);
   *cd = ug->GetCellData();
-  ug->Delete();
 
   hb->SetDataSet( *level, hb->GetNumberOfDataSets(*level), ug );
+  ug->Delete();
   return needsFixing;
 }
 
