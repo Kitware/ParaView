@@ -8155,7 +8155,7 @@ Tessellate a higher-order dataset.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkNonOverlappingAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Level Scalars filter.
@@ -8595,7 +8595,7 @@ Tessellate a higher-order dataset.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkUniformGridAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Extract Group filter.
@@ -8714,7 +8714,7 @@ This filter extracts a list of datasets from hierarchical datasets.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkUniformGridAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Extract Datasets filter.
@@ -11118,7 +11118,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 	 <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-	 <DataType value="vtkHierarchicalBoxDataSet"/>
+	 <DataType value="vtkNonOverlappingAMR"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array" attribute_type="cell" />
        <Documentation>
