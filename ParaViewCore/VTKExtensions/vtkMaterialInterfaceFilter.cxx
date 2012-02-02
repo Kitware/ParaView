@@ -3172,7 +3172,9 @@ void vtkMaterialInterfaceFilter::PrepareForPass(
   if ( !hbdsIt->IsDoneWithTraversal() )
     {
 //    testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
-    testImage=hbdsInput->GetDataSet(hbdsIt);
+    testImage=
+        vtkUniformGrid::SafeDownCast(
+            hbdsInput->GetDataSet(hbdsIt) );
     }
   hbdsIt->Delete();
   // if we got a null pointer then this indicates that
