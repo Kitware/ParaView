@@ -69,6 +69,9 @@ signals:
   /// fired everytime the user click on the ExtractSelectionOverTime button
   void extractSelectionOverTime();
 
+  /// Fired when the user clicks on the help button.
+  void helpRequested();
+
 protected slots:
   /// Must be triggered before server disconnect to release all SMProxy links
   void freeSMProxy();

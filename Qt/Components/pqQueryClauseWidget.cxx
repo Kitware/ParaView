@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqHelpWindow.h"
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -126,6 +127,10 @@ void pqQueryClauseWidget::initialize(
   QObject::connect(this->Internals->condition,
     SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateValueWidget()));
+  QObject::connect(this->Internals->helpButton,
+                   SIGNAL(clicked()),
+                   this,
+                   SIGNAL(helpRequested()));
 }
 
 //-----------------------------------------------------------------------------

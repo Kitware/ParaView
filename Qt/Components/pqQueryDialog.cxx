@@ -265,6 +265,9 @@ void pqQueryDialog::addClause()
 
   pqQueryClauseWidget* clause = new pqQueryClauseWidget(this);
 
+  // connect help requested signal
+  connect(clause, SIGNAL(helpRequested()), this, SIGNAL(helpRequested()));
+
   int attr_type = this->Internals->selectionType->itemData(
     this->Internals->selectionType->currentIndex()).toInt();
   clause->setProducer(this->Internals->source->currentPort());

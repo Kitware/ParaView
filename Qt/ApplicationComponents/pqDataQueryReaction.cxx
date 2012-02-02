@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFiltersMenuReaction.h"
+#include "pqHelpReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqQueryDialog.h"
 #include "pqSelectionManager.h"
@@ -67,6 +68,12 @@ void pqDataQueryReaction::onExtractSelectionOverTime()
 }
 
 //-----------------------------------------------------------------------------
+void pqDataQueryReaction::showHelp()
+{
+  pqHelpReaction::showHelp("qthelp://paraview.org/paraview/Book/Book_Chapter6.html");
+}
+
+//-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -92,6 +99,8 @@ void pqDataQueryReaction::showQueryDialog()
                    this,    SLOT(onExtractSelection()));
   QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
                    this,    SLOT(onExtractSelectionOverTime()));
+  QObject::connect(&dialog, SIGNAL(helpRequested()),
+                   this,    SLOT(showHelp()));
   loop.exec();
 #else
   QMessageBox::warning(0,
