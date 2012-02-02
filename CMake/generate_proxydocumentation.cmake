@@ -88,6 +88,7 @@ set(wiki_sections sources filters writers)
 foreach(wiki_section ${wiki_sections})
   message("Processing wiki ${wiki_section}")
   set(GROUP ${wiki_section})
+  set(QUERY "not(contains(lower-case($proxy_name),'reader'))")
   set(tmp_wiki_xsl ${CMAKE_CURRENT_BINARY_DIR}/${wiki_section}_xml_to_wiki.xsl)
   set(wiki_file ${output_dir}/${wiki_section}.wiki)
   CONFIGURE_FILE(
@@ -103,3 +104,22 @@ foreach(wiki_section ${wiki_sections})
   string (REGEX REPLACE "\n " "\n" wiki_content "${wiki_content}")
   file (WRITE "${wiki_file}" "${wiki_content}")
 endforeach()
+
+# Handle readers...
+message("Processing wiki readers")
+set(GROUP sources)
+set(QUERY "contains(lower-case($proxy_name),'reader')")
+set(tmp_wiki_xsl ${CMAKE_CURRENT_BINARY_DIR}/readers_xml_to_wiki.xsl)
+set(wiki_file ${output_dir}/readers.wiki)
+CONFIGURE_FILE(
+        ${xml_to_wiki_xsl}
+        ${tmp_wiki_xsl}
+        @ONLY IMMEDIATE)
+execute_process(
+        COMMAND "${xmlpatterns}"
+                "${tmp_wiki_xsl}"
+                "${output_file}"
+        OUTPUT_VARIABLE wiki_content)
+string (REGEX REPLACE " +" " " wiki_content "${wiki_content}")
+string (REGEX REPLACE "\n " "\n" wiki_content "${wiki_content}")
+file (WRITE "${wiki_file}" "${wiki_content}")

@@ -5,6 +5,9 @@
 
 <xsl:template match="/xml">
 <xsl:for-each select="proxy[group='@GROUP@']">
+<xsl:sort select="label"/>
+<xsl:variable name="proxy_name"><xsl:value-of select="label"/></xsl:variable>
+<xsl:if test="@QUERY@">
 ==<xsl:value-of select="label" />==
 
 <xsl:value-of select="documentation/brief" />
@@ -36,6 +39,7 @@
 </xsl:for-each>
 
 |}
+</xsl:if>
 </xsl:for-each>
 </xsl:template>
 
