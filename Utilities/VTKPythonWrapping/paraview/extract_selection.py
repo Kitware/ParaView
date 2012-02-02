@@ -64,7 +64,10 @@ def PassBlock(self, iterCD, selection_node):
     return True
 
 def ExtractElements(self, inputDS, selection, mask):
-    if type(mask) == bool:
+    if mask is None:
+        # nothing was selected
+        return None
+    elif type(mask) == bool:
         if mask:
             # FIXME: We need to add the "vtkOriginalIds" array.
             return inputDS
@@ -113,9 +116,12 @@ def ExecData(self, inputDS, selection):
 
     # evaluate the query expression. The expression should return a mask which
     # is either an array or a boolean value.
-    mask = eval(selection_node.GetQueryString(), globals(), new_locals)
+    mask = None
 
-    # print mask
+    try:
+      mask = eval(selection_node.GetQueryString(), globals(), new_locals)
+    except NameError:
+      pass
 
     # extract the elements from the input dataset using the mask.
     extracted_ds = ExtractElements(self, inputDS, selection, mask)
