@@ -479,52 +479,55 @@ namespace
 //----------------------------------------------------------------------------
 int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
   const char* requested_name, const char* demangled_name,
-  const char* demagled_component_name)
+  const char* demangled_component_name)
 {
   vtkAbstractArray* array = dsa->GetAbstractArray(demangled_name);
-  assert(array != NULL && demangled_name && demagled_component_name);
+  assert(array != NULL && demangled_name && demangled_component_name);
 
   int cIndex = -1;
+  bool found = false;
   // demagled_component_name can be a real component name OR
   // X,Y,Z for the first 3 components OR
   // 0,...N i.e. an integer for the index OR
   // Magnitude to indicate vector magnitude.
   // Now to the trick is to decide what way this particular request has been
   // made.
-  for (int cc=0; cc < array->GetNumberOfComponents(); cc++)
+
+  //First pass is to match the demangled name to a component name
+  //Component names take highest priority so if somebody named component 4 to be "1"
+  //that should match before resorting to using atoi
+  for (int cc=0; cc < array->GetNumberOfComponents() && array->HasAComponentName(); cc++)
     {
     const char* comp_name = array->GetComponentName(cc);
-    if (comp_name && strcmp(comp_name, demagled_component_name) == 0)
+    if (comp_name && strcmp(comp_name, demangled_component_name) == 0)
       {
       cIndex = cc;
+      found = true;
       break;
       }
     }
-  if (cIndex == -1)
+
+  //if we still haven't found a match we will check the component agianst the
+  //the default names.
+  int numComps = array->GetNumberOfComponents();
+  //compare agianst cIndex to only run this if component names didn't match
+  for(int i=-1; i < numComps && cIndex == -1;i++)
     {
-    const char* default_names[3];
-    default_names[0] = "x";
-    default_names[1] = "y";
-    default_names[2] = "z";
-    for (int cc=0; cc < 3; cc++)
+    vtkStdString defaultName = vtkPVPostFilter::DefaultComponentName(i,numComps);
+    if(vtksys::SystemTools::Strucmp(
+         defaultName.c_str(),demangled_component_name) == 0)
       {
-      if (vtksys::SystemTools::Strucmp(demagled_component_name, default_names[cc]) == 0)
-        {
-        cIndex = cc;
-        break;
-        }
+      cIndex = i;
+      found = true;
+      break;
       }
     }
-  if (cIndex == -1)
+
+  //None of the component names or default names matched so we
+  //go onto doing a pure conversion of the string to integer and using that.
+  if(!found)
     {
-    if (vtksys::SystemTools::Strucmp(demagled_component_name, "Magnitude") == 0)
-      {
-      // -1 implies magnitude.
-      }
-    else
-      {
-      cIndex = atoi(demagled_component_name);
-      }
+    cIndex = atoi(demangled_component_name);
     }
 
   vtkAbstractArray* newArray = array->NewInstance();
