@@ -16,101 +16,30 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIProxy.h"
-#include "vtkSIObject.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSIObject.h"
+#include "vtkSIProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 
+#include <algorithm>
 #include <assert.h>
+#include <iterator>
 #include <set>
-#include <vtkSmartPointer.h>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
-class vtkSIProxyProperty::InternalCache
+class vtkSIProxyProperty::InternalCache : public std::set<vtkTypeUInt32>
 {
-public:
-  InternalCache(vtkSIProxyProperty* parent)
-    {
-    this->Parent = parent;
-    }
-
-  //--------------------------------------------------------------------------
-  void SetVariant(const Variant *variant)
-    {
-    this->NumberOfDependancyToDelete = this->Dependancy.size();
-    this->VariantSet.clear();
-    for (int cc=0; cc < variant->proxy_global_id_size(); cc++)
-      {
-      this->VariantSet.insert( variant->proxy_global_id(cc) );
-      vtkSIObject* obj = this->Parent->GetSIObject(variant->proxy_global_id(cc));
-      if(obj)
-        {
-        this->Dependancy.push_back(obj);
-        }
-      }
-    }
-
-  //--------------------------------------------------------------------------
-  void CleanCommand()
-    {
-    this->RegisteredProxy.clear();
-    }
-  //--------------------------------------------------------------------------
-  void GetProxyToRemove( std::vector<vtkTypeUInt32> &proxyToRemove )
-    {
-    proxyToRemove.clear();
-    std::set<vtkTypeUInt32>::iterator iter = this->RegisteredProxy.begin();
-    while(iter != this->RegisteredProxy.end())
-      {
-      if(this->VariantSet.find(*iter) == this->VariantSet.end())
-        {
-        proxyToRemove.push_back(*iter);
-        }
-      // Go to next item
-      iter++;
-      }
-    }
-  //--------------------------------------------------------------------------
-  void GetProxyToAdd( std::vector<vtkTypeUInt32> &proxyToAdd )
-    {
-    proxyToAdd.clear();
-    std::set<vtkTypeUInt32>::iterator iter = this->VariantSet.begin();
-    while(iter != this->VariantSet.end())
-      {
-      if(this->RegisteredProxy.find(*iter) == this->RegisteredProxy.end())
-        {
-        proxyToAdd.push_back(*iter);
-        }
-      // Go to next item
-      iter++;
-      }
-    }
-  //--------------------------------------------------------------------------
-  void UpdateRegisteredProxy()
-    {
-    std::vector<vtkSmartPointer<vtkSIObject> >::iterator iterEnd = this->Dependancy.begin();
-    iterEnd += this->NumberOfDependancyToDelete;
-    this->Dependancy.erase(this->Dependancy.begin(), iterEnd);
-    this->NumberOfDependancyToDelete = 0;
-    this->RegisteredProxy = VariantSet;
-    this->VariantSet.clear();
-    }
-  //--------------------------------------------------------------------------
-private:
-  std::set<vtkTypeUInt32> RegisteredProxy;
-  std::set<vtkTypeUInt32> VariantSet;
-  std::vector<vtkSmartPointer<vtkSIObject> > Dependancy;
-  vtkSIProxyProperty* Parent;
-  size_t NumberOfDependancyToDelete;
 };
+
 //****************************************************************************/
 vtkStandardNewMacro(vtkSIProxyProperty);
 //----------------------------------------------------------------------------
 vtkSIProxyProperty::vtkSIProxyProperty()
 {
-  this->Cache = new InternalCache(this);
+  this->Cache = new InternalCache();
   this->CleanCommand = NULL;
   this->RemoveCommand = NULL;
   this->ArgumentType = vtkSIProxyProperty::VTK;
@@ -185,8 +114,13 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
                                                            offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  this->Cache->SetVariant(&prop->value());
-  std::vector<vtkTypeUInt32> proxy_ids;
+  std::set<vtkTypeUInt32> new_value;
+  for (int cc=0; cc < prop->value().proxy_global_id_size(); cc++)
+    {
+    new_value.insert( prop->value().proxy_global_id(cc) );
+    }
+
+  std::set<vtkTypeUInt32> to_add = new_value;
 
   vtkClientServerStream stream;
   vtkObjectBase* object = this->GetVTKObject();
@@ -194,7 +128,6 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
   // Deal with previous values to remove
   if (this->CleanCommand)
     {
-    this->Cache->CleanCommand();
     stream << vtkClientServerStream::Invoke
            << object
            << this->CleanCommand
@@ -202,13 +135,15 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
     }
   else if(this->RemoveCommand)
     {
-    // in all honesty, do we really need this anymore? It isn't a huge
-    // performance bottleneck if all inputs to a filter are re-set every time
-    // one changes.
-    this->Cache->GetProxyToRemove(proxy_ids);
-    for (size_t cc=0; cc < proxy_ids.size(); cc++)
+    std::set<vtkTypeUInt32> to_remove;
+    std::set_difference(this->Cache->begin(), this->Cache->end(),
+      new_value.begin(), new_value.end(), 
+      std::inserter(to_remove, to_remove.begin()));
+
+    for (vtkstd::set<vtkTypeUInt32>::iterator iter = to_remove.begin();
+      iter != to_remove.end(); ++iter)
       {
-      vtkObjectBase* arg = this->GetObjectBase(proxy_ids[cc]);
+      vtkObjectBase* arg = this->GetObjectBase(*iter);
       if(arg != NULL)
         {
         stream << vtkClientServerStream::Invoke
@@ -222,15 +157,19 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
         vtkWarningMacro("Try to REMOVE a Proxy to a ProxyProperty but the proxy was not found");
         }
       }
+
+    to_add.clear();
+    std::set_difference(new_value.begin(), new_value.end(), 
+      this->Cache->begin(), this->Cache->end(),
+      std::inserter(to_add, to_add.begin()));
     }
 
   // Deal with proxy to add
-  this->Cache->GetProxyToAdd(proxy_ids);
-  for (size_t cc=0; cc < proxy_ids.size(); cc++)
+  for (vtkstd::set<vtkTypeUInt32>::iterator iter = to_add.begin();
+      iter != to_add.end(); ++iter)
     {
-    vtkObjectBase* arg = this->GetObjectBase(proxy_ids[cc]);
-
-    if(arg != NULL || this->IsValidNull(proxy_ids[cc]))
+    vtkObjectBase* arg = this->GetObjectBase(*iter);
+    if(arg != NULL || this->IsValidNull(*iter))
       {
       stream << vtkClientServerStream::Invoke
              << object
@@ -245,7 +184,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
     }
 
   // Take care of the Empty case
-  if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
+  if (this->NullOnEmpty && this->CleanCommand == NULL && new_value.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
            << object
@@ -254,7 +193,9 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
            << vtkClientServerStream::End;
     }
 
-  this->Cache->UpdateRegisteredProxy();
+  this->Cache->clear();
+  std::copy(new_value.begin(), new_value.end(),
+    std::inserter(*this->Cache, this->Cache->begin()));
 
   // Save to cache when pulled for collaboration
   this->SaveValueToCache(message, offset);
