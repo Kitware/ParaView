@@ -2137,8 +2137,6 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
 
     #create the pipeline that reduces and transmits the data
     if arg1 == None:
-        print "getting appended"
-
         cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
         if cdinfo.GetDataIsComposite():
             print "use composite data append"
@@ -2157,11 +2155,9 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
             reducer.PostGatherHelperName = "vtkAppendFilter"
 
     elif type(arg1) is types.IntType:
-        print "getting node %d" % arg1
         reducer.PassThrough = arg1
 
     else:
-        print "applying operation"
         reducer.PreGatherHelper = arg1
         reducer.PostGatherHelper = arg2
 
