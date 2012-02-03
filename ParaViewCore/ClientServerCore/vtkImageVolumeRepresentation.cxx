@@ -337,3 +337,9 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 {
   this->Property->SetShade(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
+{
+  this->Property->SetIndependentComponents(val);
+}
