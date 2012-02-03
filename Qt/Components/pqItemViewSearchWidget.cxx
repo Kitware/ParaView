@@ -56,9 +56,9 @@ public:
   {
   this->BaseWidget = parentW ? 
     qobject_cast<QAbstractItemView*>(parentW) : NULL;;
-  this->RedPal.setColor(QPalette::Base, Qt::red);
+    this->RedPal.setColor(QPalette::Base, QColor(240,128,128));
   this->WhitePal.setColor(QPalette::Base, Qt::white);
-  this->DlgBackPal.setColor(QPalette::Background, Qt::darkYellow);
+  this->DlgBackPal.setColor(QPalette::Background, Qt::darkGray);
   }
   ~PIMPL() {}
   QString SearchString;
@@ -116,10 +116,12 @@ void pqItemViewSearchWidget::showSearchWidget()
     return;
     }
   this->setPalette(this->Private->DlgBackPal);
-  QPoint mappedPoint = this->Private->BaseWidget->geometry().topLeft();
+  QPoint mappedPoint = this->Private->BaseWidget->parentWidget()->childrenRect().topLeft();
+  mappedPoint.setX(0);
   mappedPoint = this->Private->BaseWidget->mapToGlobal(mappedPoint);
   mappedPoint = this->mapFromGlobal(mappedPoint);
-  this->move(mappedPoint.x(), mappedPoint.y()-2*this->height());
+  this->setGeometry( mappedPoint.x(), mappedPoint.y()-2*this->height(),
+                     this->Private->BaseWidget->width(), this->height());
   this->setModal(false);
   this->show();
   this->raise();
@@ -470,7 +472,7 @@ bool pqItemViewSearchWidget::matchString( const QAbstractItemModel * M,
     {
     this->Private->CurrentFound = curIdx;
     this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, Qt::green, Qt::BackgroundColorRole);
+      this->Private->CurrentFound, QVariant(QColor(152,251,152)), Qt::BackgroundColorRole);
     this->Private->BaseWidget->scrollTo(this->Private->CurrentFound);
     this->Private->lineEditSearch->setPalette(this->Private->WhitePal);
     return true;
