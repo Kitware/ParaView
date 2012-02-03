@@ -73,6 +73,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
+  pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -254,6 +255,8 @@ VTK_ADD_LIBRARY(pqCore
   pqLookupTableManager.h
   pqNameCount.cxx
   pqNameCount.h
+  pqNonEditableStyledItemDelegate.cxx
+  pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.cxx
   pqObjectBuilder.h
   pqOptions.cxx

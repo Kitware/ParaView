@@ -36,10 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QtDebug>
+#include <QTextEdit>
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqServer.h"
 #include "vtkNew.h"
 #include "vtkPVSystemInformation.h"
@@ -177,7 +179,7 @@ public:
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
     if (role != Qt::DisplayRole && role != Qt::ToolTipRole &&
-      role != Qt::UserRole)
+      role != Qt::UserRole && role != Qt::EditRole)
       {
       return QVariant();
       }
@@ -248,6 +250,18 @@ public:
 
     return this->Superclass::headerData(section, orientation, role);
     }
+
+  /// Method needed for copy/past cell editor
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const
+ {
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  }
+
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
+  {
+    // Fake edition...
+    return true;
+  }
   };
 };
 // Columns:
@@ -271,12 +285,13 @@ pqMemoryInspector::pqMemoryInspector(QWidget* parentObject, Qt::WindowFlags f)
   this->Internals->setupUi(this);
 
   // save the rich-text formatted text for later use.
-  this->Internals->SummaryText = this->Internals->summary->text();
-  this->Internals->summary->setText("");
+  this->Internals->SummaryText = this->Internals->summary->document()->toHtml();
+  this->Internals->summary->document()->setHtml("");
 
   this->Internals->ProxyModel.setSourceModel(&this->Internals->Model);
   this->Internals->tableView->setModel(
     &this->Internals->ProxyModel);
+  this->Internals->tableView->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   QObject::connect(this->Internals->buttonBox,
     SIGNAL(accepted()), this, SLOT(refresh()));
   QObject::connect(this->Internals->physicalMemory,
@@ -406,7 +421,15 @@ void pqMemoryInspector::updateSummary()
       memorySizeToText(iter->second.VirtualMax).toString()).arg(
       memorySizeToText(iter->second.VirtualSum/iter->second.Count).toString());
     }
-  this->Internals->summary->setText(text);
+  this->Internals->summary->document()->setHtml(text);
+
+  // Try reduce height of the process summary
+  int height = this->Internals->summary->heightForWidth(this->Internals->summary->width());
+  if(height < 0)
+    {
+    height = this->Internals->summary->minimumSizeHint().height();
+    }
+  this->Internals->summary->setMaximumHeight(height + 10);
 }
 
 //-----------------------------------------------------------------------------

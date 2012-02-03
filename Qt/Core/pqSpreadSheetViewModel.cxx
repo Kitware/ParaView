@@ -399,7 +399,7 @@ void pqSpreadSheetViewModel::onDataFetched(
 QVariant pqSpreadSheetViewModel::data(
   const QModelIndex& idx, int role/*=Qt::DisplayRole*/) const
 {
-  if (role != Qt::DisplayRole)
+  if (role != Qt::DisplayRole && role != Qt::EditRole)
     {
     return QVariant();
     }
@@ -764,4 +764,15 @@ void pqSpreadSheetViewModel::setDecimalPrecision(int dPrecision)
 int pqSpreadSheetViewModel::getDecimalPrecision()
 {
   return this->Internal->DecimalPrecision;
+}
+//-----------------------------------------------------------------------------
+Qt::ItemFlags pqSpreadSheetViewModel::flags ( const QModelIndex & index ) const
+{
+  return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+}
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+{
+  // Do nothing, we are not supposed to change our data...
+  return true;
 }
