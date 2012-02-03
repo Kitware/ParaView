@@ -783,6 +783,22 @@ vtkSMViewProxy* vtkSMViewLayoutProxy::GetView(int location)
 }
 
 //----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::GetViewLocation(vtkSMViewProxy* view)
+{
+  int index = 0;
+  for (vtkInternals::KDTreeType::iterator iter =
+    this->Internals->KDTree.begin();
+    iter != this->Internals->KDTree.end(); ++iter, ++index)
+    {
+    if (iter->ViewProxy == view)
+      {
+      return index;
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 {
   if (val < 0.0 || val > 1.0)
