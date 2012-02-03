@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <meta name="keywords" content=""/>
+        <meta name="description" content=""/>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <title>ParaView Users Manual</title>
+        <link href="../style.css" rel="stylesheet" type="text/css" media="screen"/>
+    </head>
+    <body>
+        <div id="wrapper">
+          <div id="header-wrapper">
+            <div id="header">
+              <div id="logo">
+                <h1><a href="http://www.paraview.org">ParaView </a></h1>
+                <p>User's Manual (Abridged)</p>
+              </div>
+            </div>
+          </div>
+          <!-- end #header -->
+            <div id="page">
+                <div id="content">
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Find Data Dialog</a>
+                        </h2>
+
+                        <p>As previously described, Selection is a mechanism in ParaView for sub-setting and focusing on a particular elements in the dataset. Different views provides different mechanisms for selecting elements, for example, you can select visible cells or points using the 3D View. Another mechanism for creating selections is by specifying a selection criteria. For example, suppose you want to select all cells where the pressure value is between a certain threshold. In such cases, you can use the Find Data dialog. The Find Data dialog performs a dual role: not only does it enable specifying the selection criteria but also show details of the selected elements in a spreadsheet. This makes it easier to inspect the selected elements. </p>
+                         <p align="center">
+                             <p>
+                                 <img src="13281364655026108416.png" align="center"/>
+                             </p>
+                             <strong>Figure 6.13</strong> Find Data options</p>
+                    </div>
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">When to use Find Data</a>
+                        </h2>
+                        <div class="entry">
+                            <p> This feature is useful when you run into situations where you want to know the cell or the point at which a certain condition happens For example: </p>
+                            <ul>
+                                <li>
+                                    <p> What are the cells at which PRESSURE &gt;= 12? </p>
+                                </li>
+                                <li>
+                                    <p> What are the points with TEMP values in the range (12, 133)? </p>
+                                </li>
+                                <li>
+                                    <p> Locate the cell at ID 122, in Block 2. </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <p>This feature provides a convenient way of creating selections based on certain criteria that can then be extracted from the data if needed. </p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Using the Find Data dialog</a>
+                        </h2>
+                        <div class="entry">
+                            <p>The dialog is designed to be used in two distinct operations: </p>
+                            <ul>
+                                <li>
+                                    <p> Define the selection criteria or query </p>
+                                </li>
+                                <li>
+                                    <p> Process the selected cells/points e.g. show labels in active 3D view, extract selection etc. </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <p>You must define the selection query and then execute the query, using the Run Query button before being able to inspect or process the selected elements. </p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Defining the Query</a>
+                        </h2>
+                        <div class="entry">
+                            <p>First, decide what type of elements you are interested in selecting, that is cells or points and from what data source. This can be done using the following combo boxes. Note that as you change these, any previous selections/queries will be cleared. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13281364655056769024.png" align="center"/>
+                                </p>
+                                <strong>Figure 6.14</strong> Find Data options</p>
+                            <p>Next, you must define the query string. The syntax for specifying the query string is similar to the expressions used in the Python Calculator. In fact, ParaView indeed uses Python and numpy under the covers to parse the queries. </p>
+                            <p>In addition, based on the data type and the nature of the current session, there may be additional rows that allow users to qualify the selection using optional parameters such as process number (when running in parallel), or block number (for composite datasets). </p>
+                            <p>Once you have defined your query, hit Run Query button to execute the query. If any elements get selected, then they will be shown in the spreadsheet in this dialog. Also, if any of the views are showing in the dataset that is selected, then they will be highlighted the selected elements as well, just like regular view-based selection. </p>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p> Select elements with a particular id </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <div id="preformatted">id == 100</div>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p> Select elements given a list of ids </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <div id="preformatted">contains(id, [100,101, 102])</div> or <div id="preformatted">in1d(id, [100,101, 102])</div>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p> Select elements with matching a criteria with element arrays Temp and V.</p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <div id="preformatted">Temp &gt; 200</div> or <div id="preformatted">Temp == 200</div> or <div id="preformatted">contains(Temp, [200,300,400])</div> or <div id="preformatted">(Temp &gt; 300) &amp; (Temp &lt; 400) # don't forget the parenthesis</div> or <div id="preformatted">(Temp &gt; 300) | (mag(V) &gt; 0)</div>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p> Select cells with cell volume matching certain criteria </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <div id="preformatted">volume(cell) &gt; 0</div> or <div id="preformatted">volume(cell)  == max(volume(cell))</div>
+                            <ul>
+                                <li>
+                                    <p> For the element type chosen, every element array becomes available as a field with same name as the array. Thus, if you are selecting points and the dataset has point arrays named "Temp" and "pressure", then you can construct queries using these arrays. </p>
+                                </li>
+                                <li>
+                                    <p> Special fields id (corresponding to element id), cell (corresponding to the cell), dataset (corresponding to the dataset) are available and can be used to compute quantities to construct queries e.g. to compare volume of cells, use volume(cell). </p>
+                                </li>
+                                <li>
+                                    <p> Queries can be combined using operators '&amp;' and '|'. </p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Displaying the Selection</a>
+                        </h2>
+                        <div class="entry">
+                            <p>Once a query is executed, the selected elements will be highlighted in all views where the selected data is visible. If the active view is a 3D view, you can choose whether the show labels for selected elements as well as the color to use for showing the selected elements using the controls on the Find Data dialog itself. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13281364655165650944.png" align="center"/>
+                                </p>
+                                <strong>Figure 6.15</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Extracting the Selection</a>
+                        </h2>
+                        <div class="entry">
+                            <p>The results of a query are temporary. They get replaced when a new query is executed or when the user creates a selection using any of the selection mechanisms. Sometimes, however, users may want to further analyze the selected elements such as apply more filters to only the selected elements, or plot the change in attributes on the selected elements over time. In that case, you should extract the selection. That creates a new filter that is setup to run the query on its input and produce a dataset matching the selection criteria. Both Extract Selection and Plot Selection Over Time are filters available through the Filters menu. The Find Data dialog provides shortcut buttons to quickly create those filters and set then up with the selection criteria chosen. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13281364655199721472.png" align="center"/>
+                                </p>
+                                <strong>Figure 6.16</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="about">
+                        <p>
+          This is an abridged version of the ParaView User's Manual. For a
+          regularly updated version of the manual, refer to the
+          <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">
+          ParaView Wiki (Manual)</a>
+                        </p>
+                    </div>
+                </div>
+                <div style="clear: both;"/>
+            </div>
+        </div>
+        <div id="footer">
+            <p>Design by <a href="http://www.freecsstemplates.org/"> CSS Templates</a>.</p>
+        </div>
+    </body>
+</html>
