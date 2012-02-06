@@ -426,46 +426,48 @@ void PrismPanel::onConversionFileButton()
 
 bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
 {
-    if(fileName.isEmpty())
-        return false;
+  if (fileName.isEmpty())
+    {
+    return false;
+    }
 
-    //First check to make sure file is valid
-    QFile file(fileName.toAscii().constData());
-    if (!file.open(QFile::ReadOnly))
-      {
-      qCritical() << "Failed to open file : " << fileName;
-      return false;
-      }
+  //First check to make sure file is valid
+  QFile file(fileName.toAscii().constData());
+  if (!file.open(QFile::ReadOnly))
+    {
+    qCritical() << "Failed to open file : " << fileName;
+    return false;
+    }
 
-    QString data (file.readAll());
-    file.close();
+  QString data (file.readAll());
+  file.close();
 
-    if (data.indexOf("<PRISM_Conversions>") == -1)
-      {
-      //This is an incorrect file format.
-      QString message;
-      message="Invalid SESAME Conversion File: ";
-      message.append(fileName);
-      QMessageBox::critical(NULL,QString("Error"),message);
-      return false;
-      }
+  if (data.indexOf("<PRISM_Conversions>") == -1)
+    {
+    //This is an incorrect file format.
+    QString message;
+    message="Invalid SESAME Conversion File: ";
+    message.append(fileName);
+    QMessageBox::critical(NULL,QString("Error"),message);
+    return false;
+    }
 
-    vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(
-      data.toAscii().constData());
-    if (!rootElement)
-      {
-      return false;
-      }
+  vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(
+    data.toAscii().constData());
+  if (!rootElement)
+    {
+    return false;
+    }
 
-    if(strcmp(rootElement->GetName(),"PRISM_Conversions"))
-      {
-      QString message;
-      message="Corrupted or Invalid SESAME Conversions File: ";
-      message.append(fileName);
-      QMessageBox::critical(NULL,QString("Error"),message);
+  if (strcmp(rootElement->GetName(),"PRISM_Conversions"))
+    {
+    QString message;
+    message="Corrupted or Invalid SESAME Conversions File: ";
+    message.append(fileName);
+    QMessageBox::critical(NULL,QString("Error"),message);
 
-      return false;
-      }
+    return false;
+    }
 
    this->SESAMEConversions.clear();
 
