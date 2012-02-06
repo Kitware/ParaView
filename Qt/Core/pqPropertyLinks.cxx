@@ -422,20 +422,7 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
           }
         else
           {
-          QList<QVariant> domain;
-          domain = pqSMAdaptor::getSelectionPropertyDomain(this->Internal->Property);
-          QList<QVariant> selection;
-          selection.append(domain[this->Internal->Index]);
-          selection.append(prop);
-
-          pqSMAdaptor::setSelectionProperty(this->Internal->Property,
-                                            selection,
-                                            propertyValueType);
-
-          if(this->Internal->AutoUpdate && !this->Internal->UseUncheckedProperties)
-            {
-            this->Internal->Proxy->UpdateVTKObjects();
-            }
+          qCritical() << "Case not supported.";
           }
 
       break;
