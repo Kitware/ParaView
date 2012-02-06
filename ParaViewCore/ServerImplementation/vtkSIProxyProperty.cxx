@@ -34,12 +34,17 @@ class vtkSIProxyProperty::InternalCache : public std::set<vtkTypeUInt32>
 {
 };
 
+class vtkSIProxyProperty::vtkObjectCache :
+  public std::map<vtkTypeUInt32, vtkSmartPointer<vtkObjectBase> > {};
+
 //****************************************************************************/
 vtkStandardNewMacro(vtkSIProxyProperty);
 //----------------------------------------------------------------------------
 vtkSIProxyProperty::vtkSIProxyProperty()
 {
   this->Cache = new InternalCache();
+  this->ObjectCache = new vtkObjectCache();
+
   this->CleanCommand = NULL;
   this->RemoveCommand = NULL;
   this->ArgumentType = vtkSIProxyProperty::VTK;
@@ -52,6 +57,7 @@ vtkSIProxyProperty::~vtkSIProxyProperty()
   this->SetCleanCommand(NULL);
   this->SetRemoveCommand(NULL);
   delete this->Cache;
+  delete this->ObjectCache;
 }
 
 //----------------------------------------------------------------------------
@@ -132,6 +138,8 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
            << object
            << this->CleanCommand
            << vtkClientServerStream::End;
+
+    this->ObjectCache->clear();
     }
   else if(this->RemoveCommand)
     {
@@ -144,6 +152,10 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
       iter != to_remove.end(); ++iter)
       {
       vtkObjectBase* arg = this->GetObjectBase(*iter);
+      if (arg == NULL)
+        {
+        arg = (*this->ObjectCache)[*iter].GetPointer();
+        }
       if(arg != NULL)
         {
         stream << vtkClientServerStream::Invoke
@@ -151,10 +163,12 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
                << this->GetRemoveCommand()
                << arg
                << vtkClientServerStream::End;
+
+        this->ObjectCache->erase(*iter);
         }
       else
         {
-        vtkWarningMacro("Try to REMOVE a Proxy to a ProxyProperty but the proxy was not found");
+        vtkWarningMacro("Failed to locate vtkObjectBase for id : " << *iter);
         }
       }
 
@@ -176,6 +190,10 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
              << this->GetCommand()
              << arg
              << vtkClientServerStream::End;
+
+      // we keep an object cache so that even if the object gets unregistered
+      // before the property is pushed, we have a reference to it.
+      (*this->ObjectCache)[*iter] = arg;
       }
     else
       {
@@ -191,6 +209,8 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
            << this->GetCommand()
            << vtkClientServerID(0)
            << vtkClientServerStream::End;
+
+    this->ObjectCache->clear();
     }
 
   this->Cache->clear();
