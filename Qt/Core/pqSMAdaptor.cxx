@@ -610,6 +610,75 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
 }
 
 void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
+                                   QList<QVariant> value,
+                                   PropertyValueType Type)
+{
+  if(!Property)
+    {
+    return;
+    }
+
+  vtkSMStringListRangeDomain* StringDomain = NULL;
+
+  vtkSMDomainIterator* iter = Property->NewDomainIterator();
+  iter->Begin();
+  while(!iter->IsAtEnd())
+    {
+    vtkSMDomain* d = iter->GetDomain();
+    if(!StringDomain)
+      {
+      StringDomain = vtkSMStringListRangeDomain::SafeDownCast(d);
+      break;
+      }
+    iter->Next();
+    }
+  iter->Delete();
+  if (!StringDomain)
+    {
+    // unlike the other overload of setSelectionProperty(), this can only work
+    // with vtkSMStringListRangeDomain and not vtkSMStringListDomain or
+    // vtkSMEnumerationDomain. That's because for those domains we need the full
+    // list of elements to be updated correctly.
+    qCritical() << "Only vtkSMStringListRangeDomain are supported.";
+    return;
+    }
+
+  if (value.size() != 2)
+    {
+    qCritical() << "Method expected a list of pairs. Incorrect API." << endl;
+    return;
+    }
+
+  QList<QVariant> current_value = pqSMAdaptor::getMultipleElementProperty(
+    Property, Type);
+
+  QString name = value[0].toString();
+  QVariant status = value[1];
+  if (status.type() == QVariant::Bool)
+    {
+    status = status.toInt();
+    }
+
+  bool name_found = false;
+  for (int cc=0; (cc+1) < current_value.size(); cc++)
+    {
+    if (current_value[cc].toString() == name)
+      {
+      current_value[cc+1] = status;
+      name_found = true;
+      break;
+      }
+    }
+  if (!name_found)
+    {
+    current_value.push_back(name);
+    current_value.push_back(status);
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(Property, current_value, Type);
+}
+
+void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
                                        QList<QList<QVariant> > Value,
                                        PropertyValueType Type)
 {
