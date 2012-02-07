@@ -69,7 +69,6 @@ public:
   this->Table->setCornerButtonEnabled(false);
   this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Table->setSelectionModel(&this->SelectionModel);
-  this->Table->setItemDelegate(new pqNonEditableStyledItemDelegate(table));
   this->Table->horizontalHeader()->setMovable(true);
   this->SingleColumnMode = false;
 
