@@ -368,14 +368,6 @@ void pqActiveObjects::setActiveServer(pqServer* server)
 
   this->ActiveServer = server;
 
-  // Connect current ActiveServer with our notification Observer
-  if(this->ActiveServer)
-    {
-    this->VTKConnector->Connect(this->ActiveServer->session(), vtkCommand::UserEvent,
-                                this,
-                                SLOT(onNotification(vtkObject*,ulong,void*,void*)));
-    }
-
   vtkSMProxyManager::GetProxyManager()->SetActiveSession(
     server? server->session() : NULL);
   if ( server
@@ -395,6 +387,11 @@ void pqActiveObjects::setActiveServer(pqServer* server)
     this->VTKConnector->Connect(
       server->activeViewSelectionModel(), vtkCommand::SelectionChangedEvent,
       this, SLOT(viewSelectionChanged()));
+
+    // Connect current ActiveServer with our notification Observer
+    this->VTKConnector->Connect(
+          this->ActiveServer->session(), vtkCommand::UserEvent,
+          this, SLOT(onNotification(vtkObject*,ulong,void*,void*)));
     }
 
   this->sourceSelectionChanged();
