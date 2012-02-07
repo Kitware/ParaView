@@ -993,7 +993,7 @@ void vtkPrismSESAMEReader::ReadTable()
       {
       if (inverse_log_scale_needed)
         {
-        v[k] = pow(10.0, v[k]);
+        v[k] = pow(10.0f, v[k]);
         }
 
       if ( numRead < datadims[0] )
@@ -1030,7 +1030,7 @@ void vtkPrismSESAMEReader::ReadTable()
       {
       if (inverse_log_scale_needed)
         {
-        v[k] = pow(10.0, v[k]);
+        v[k] = pow(10.0f, v[k]);
         }
       if ( numRead < datadims[0] )
         {
