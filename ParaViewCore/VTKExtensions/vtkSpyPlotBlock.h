@@ -100,14 +100,14 @@ protected:
   //will return a negative volume if you requst a the volume of a cell
   //that is outside the demensions of the block
   double GetCellVolume(int i, int j, int k) const;
-  void ComputeMaterialDensity(vtkDataArray*  materialMasses,
-                              vtkUnsignedCharArray* materialFraction,
-                              vtkDoubleArray* volumes,
-                              vtkDoubleArray* materialdensity) const;
-  void ComputeMaterialDensity(vtkDataArray*  materialMasses,
-                              vtkFloatArray* materialFraction,
-                              vtkDoubleArray* volumes,
-                              vtkDoubleArray* materialdensity) const;
+  void ComputeMaterialDensity(vtkIdType position,
+    vtkDataArray*  materialMasses, vtkUnsignedCharArray* materialFraction,
+    vtkDoubleArray* volumes, vtkDoubleArray* materialdensity,
+    double* material_mass, double* material_volume) const;
+  void ComputeMaterialDensity(vtkIdType position,
+    vtkDataArray*  materialMasses, vtkFloatArray* materialFraction,
+    vtkDoubleArray* volumes, vtkDoubleArray* materialdensity,
+    double* material_mass, double* material_volume) const;
 
   int Dimensions[3];
   struct BlockStatusType
