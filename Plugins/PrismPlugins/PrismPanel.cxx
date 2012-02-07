@@ -280,21 +280,8 @@ pqNamedObjectPanel(object_proxy, p)
     this,
     SLOT(onConversionFileButton()));
 
-
-
-
-
-
-
-  this->onSamplesChanged();
-
-
-
-
-    this->linkServerManagerProperties();
-
-
-
+ this->onSamplesChanged();
+ this->linkServerManagerProperties();
 }
 
 //----------------------------------------------------------------------------
@@ -303,7 +290,28 @@ PrismPanel::~PrismPanel()
   delete this->UI;
 }
 
+//----------------------------------------------------------------------------
+void PrismPanel::initializePanel()
+{
+  // clear possible changes in helper
+  this->setupTableWidget();
+  this->setupVariables();
+  this->setupConversions();
+  this->updateConversions();
 
+  this->setupXThresholds();
+  this->setupYThresholds();
+
+  // BUG #12780: Use log scaling values weren't being set correctly unless the
+  // tableid was changed after the panel was created.
+  QComboBox* tableWidget = this->UI->TableIdWidget;
+  if (tableWidget->currentIndex() != -1)
+    {
+    this->setTableId(tableWidget->currentText());
+    }
+}
+
+//----------------------------------------------------------------------------
 void PrismPanel::onConversionVariableChanged(int index)
 {
   this->UI->ConversionTree->blockSignals(true);
@@ -1022,63 +1030,49 @@ void PrismPanel::accept()
 //----------------------------------------------------------------------------
 void PrismPanel::reset()
 {
-
-
-    // clear possible changes in helper
-
-
-    this->setupTableWidget();
-    this->setupVariables();
-    this->setupConversions();
-    this->updateConversions();
-
-    this->setupXThresholds();
-    this->setupYThresholds();
-
-
-    pqNamedObjectPanel::reset();
+  this->initializePanel();
+  pqNamedObjectPanel::reset();
 }
-
 
 //----------------------------------------------------------------------------
 void PrismPanel::linkServerManagerProperties()
 {
-    this->setupTableWidget();
-    this->setupVariables();
-    this->setupConversions();
-   
-    this->updateConversions();
-    this->updateXThresholds();
-    this->updateYThresholds();
+  this->initializePanel();
 
-
-
-    vtkSMDoubleVectorProperty* xThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UI->PanelHelper->GetProperty("ThresholdSESAMEXBetween"));
-
-    if(xThresholdVP)
+  // BUG #12780: Use log scaling values weren't being set correctly unless the
+  // tableid was changed after the panel was created.
+  QComboBox* tableWidget = this->UI->TableIdWidget;
+  if (tableWidget->currentIndex() != -1)
     {
-        xThresholdVP->SetElement(0,this->UI->ThresholdXBetweenLower->value());
-        xThresholdVP->SetElement(1,this->UI->ThresholdXBetweenUpper->value());
+    this->setTableId(tableWidget->currentText());
     }
 
-    vtkSMDoubleVectorProperty* yThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UI->PanelHelper->GetProperty("ThresholdSESAMEYBetween"));
+  vtkSMDoubleVectorProperty* xThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UI->PanelHelper->GetProperty("ThresholdSESAMEXBetween"));
 
-    if(yThresholdVP)
+  if(xThresholdVP)
     {
-        yThresholdVP->SetElement(0,this->UI->ThresholdYBetweenLower->value());
-        yThresholdVP->SetElement(1,this->UI->ThresholdYBetweenUpper->value());
+    xThresholdVP->SetElement(0,this->UI->ThresholdXBetweenLower->value());
+    xThresholdVP->SetElement(1,this->UI->ThresholdXBetweenUpper->value());
     }
 
-      this->UI->PanelHelper->UpdateVTKObjects();
-       this->UI->PanelHelper->UpdatePropertyInformation();
+  vtkSMDoubleVectorProperty* yThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UI->PanelHelper->GetProperty("ThresholdSESAMEYBetween"));
 
-    // parent class hooks up some of our widgets in the ui
-    pqNamedObjectPanel::linkServerManagerProperties();
+  if(yThresholdVP)
+    {
+    yThresholdVP->SetElement(0,this->UI->ThresholdYBetweenLower->value());
+    yThresholdVP->SetElement(1,this->UI->ThresholdYBetweenUpper->value());
+    }
 
-   // this->UI->LoadConversions(this->UI->ConversionFileName);
-   // this->onConversionTypeChanged(0);
+  this->UI->PanelHelper->UpdateVTKObjects();
+  this->UI->PanelHelper->UpdatePropertyInformation();
+
+  // parent class hooks up some of our widgets in the ui
+  pqNamedObjectPanel::linkServerManagerProperties();
+
+  // this->UI->LoadConversions(this->UI->ConversionFileName);
+  // this->onConversionTypeChanged(0);
 
 }
 
@@ -1219,7 +1213,6 @@ void PrismPanel::setupTableWidget()
         }
     }
     tableWidget->blockSignals(false);
-
 }
 
 
