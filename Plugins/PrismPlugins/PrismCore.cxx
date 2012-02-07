@@ -750,17 +750,8 @@ void PrismCore::onChangePrismViewScale()
     return;
     }
 
-  static QPointer<PrismScaleViewDialog> dialog;
-  if (dialog == NULL)
-    {
-    QWidget *mainWindow = pqCoreUtilities::mainWidget();
-    dialog = new PrismScaleViewDialog(mainWindow);
-    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    dialog->setView(pview);
-    dialog->show();
-    }
-  else
-    {
-    dialog->raise();
-    }
+  QWidget *mainWindow = pqCoreUtilities::mainWidget();
+  PrismScaleViewDialog dialog(mainWindow);
+  dialog.setView(pview);
+  dialog.exec();
 }

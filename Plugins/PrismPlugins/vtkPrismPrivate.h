@@ -24,6 +24,9 @@
 #define __vtkPrismPrivate_h
 
 #include <math.h>
+#include "vtkCommunicator.h"
+#include "vtkMultiProcessController.h"
+
 //-----------------------------------------------------------------------------
 namespace vtkPrismCommon
 {
