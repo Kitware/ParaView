@@ -108,9 +108,9 @@ bool vtkPrismFilter::GetSimulationDataThreshold()
 //----------------------------------------------------------------------------
 unsigned long vtkPrismFilter::GetMTime()
 {
-    unsigned long time = this->Superclass::GetMTime();
-    unsigned long readertime = this->Internal->Reader->GetMTime();
-    return time > readertime ? time : readertime;
+  unsigned long time = this->Superclass::GetMTime();
+  unsigned long readertime = this->Internal->Reader->GetMTime();
+  return time > readertime ? time : readertime;
 }
 
 //----------------------------------------------------------------------------

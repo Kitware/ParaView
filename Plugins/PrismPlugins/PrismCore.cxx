@@ -223,7 +223,6 @@ PrismCore::PrismCore(QObject* p)
     this->connect(builder,SIGNAL(proxyCreated(pqProxy*)),
        this, SLOT(onSelectionChanged()));
 
-    this->ScaleViewDialog = NULL;
     this->onSelectionChanged();
     }
 
@@ -751,13 +750,17 @@ void PrismCore::onChangePrismViewScale()
     return;
     }
 
-  if (!this->ScaleViewDialog)
+  static QPointer<PrismScaleViewDialog> dialog;
+  if (dialog == NULL)
     {
     QWidget *mainWindow = pqCoreUtilities::mainWidget();
-    this->ScaleViewDialog = new PrismScaleViewDialog(mainWindow);
+    dialog = new PrismScaleViewDialog(mainWindow);
+    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+    dialog->setView(pview);
+    dialog->show();
     }
-  
-  //show the dialog
-  this->ScaleViewDialog->setView(pview);
-  this->ScaleViewDialog->show();
+  else
+    {
+    dialog->raise();
+    }
 }
