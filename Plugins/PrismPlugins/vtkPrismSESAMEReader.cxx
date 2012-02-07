@@ -917,19 +917,19 @@ void vtkPrismSESAMEReader::Execute()
   // read the file
   JumpToTable(this->Internal->TableId);
   if(this->Internal->TableId==401)
-  {
+    {
     this->ReadVaporization401Table();
-  }
+    }
   else if(this->Internal->TableId==411 ||
     this->Internal->TableId==412 ||
     this->Internal->TableId==306)
-  {
+    {
     this->ReadCurveFromTable();
-  }
+    }
   else
-  {
+    {
     this->ReadTable();
-  }
+    }
 }
 
 void vtkPrismSESAMEReader::ReadTable()
@@ -982,42 +982,56 @@ void vtkPrismSESAMEReader::ReadTable()
   int scalarCount = 0;
   int readFromTable = 0;
 
+  // BUG #12780: for 500/600 tables, the SESAME file holds log10 values, so we
+  // need to "unlog" them as we are reading the values in.
+  bool inverse_log_scale_needed = (this->Internal->TableId >= 500 &&
+    this->Internal->TableId < 700);
+
   if (result!= 0)
-  {
-    for (int k=2;k<5;k++)
     {
+    for (int k=2;k<5;k++)
+      {
+      if (inverse_log_scale_needed)
+        {
+        v[k] = pow(10.0, v[k]);
+        }
+
       if ( numRead < datadims[0] )
-      {
-        xCoords->InsertNextTuple1(  v[k] );
-      }
+        {
+        xCoords->InsertNextTuple1(v[k]);
+        }
       else if ( numRead < (datadims[0] + datadims[1]) )
-      {
-        yCoords->InsertNextTuple1(  v[k] );
-      }
+        {
+        yCoords->InsertNextTuple1(v[k]);
+        }
       else
-      {
+        {
         scalarCount++;
         if(scalarCount > datadims[0] * datadims[1])
-        {
+          {
           scalarCount = 1;
           scalarIndex++;
-        }
+          }
         if(this->Internal->TableArrayStatus.size() > scalarIndex &&
           this->Internal->TableArrayStatus[scalarIndex])
-        {
+          {
           scalars[scalarIndex]->InsertNextTuple1(v[k]);
+          }
         }
-      }
       numRead++;
+      }
     }
-  }
 
 
   while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
       &(v[4])  )) != 0)
-    {
+    { 
     for (int k=0;k<readFromTable;k++)
       {
+      if (inverse_log_scale_needed)
+        {
+        v[k] = pow(10.0, v[k]);
+        }
       if ( numRead < datadims[0] )
         {
         xCoords->InsertNextTuple1(  v[k] );
