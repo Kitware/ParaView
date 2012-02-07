@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSession.h"
 
 #include <QDebug>
 
@@ -226,6 +227,9 @@ void pqActiveObjects::viewSelectionChanged()
   if (this->ActiveView)
     {
     QObject::disconnect(this->ActiveView, 0, this, 0);
+    this->VTKConnector->Disconnect(this->ActiveView->getProxy(), vtkCommand::UserEvent,
+                                   this,
+                                   SLOT(onNotification(vtkObject*,ulong,void*,void*)));
     }
   if (view)
     {
@@ -236,6 +240,12 @@ void pqActiveObjects::viewSelectionChanged()
     }
 
   this->ActiveView = view;
+  if(this->ActiveView)
+    {
+    this->VTKConnector->Connect(this->ActiveView->getProxy(), vtkCommand::UserEvent,
+                                this,
+                                SLOT(onNotification(vtkObject*,ulong,void*,void*)));
+    }
 
   // if view changed, then the active representation may have changed as well.
   this->updateRepresentation();
@@ -258,6 +268,15 @@ void pqActiveObjects::sourceSelectionChanged()
     // This mean that the servermanager is currently updating itself and no
     // selection manager is set yet...
     return;
+    }
+
+  // Disconnect previous ActiveSource with our notification Observer
+  if(this->ActiveSource)
+    {
+    this->VTKConnector->Disconnect(this->ActiveSource->getProxy(),
+                                   vtkCommand::UserEvent,
+                                   this,
+                                   SLOT(onNotification(vtkObject*,ulong,void*,void*)));
     }
 
   pqServerManagerModel* smmodel =
@@ -290,6 +309,15 @@ void pqActiveObjects::sourceSelectionChanged()
     }
   this->ActiveSource = source;
   this->ActivePort = opPort;
+
+  // Connect current ActiveSource with our notification Observer
+  if(this->ActiveSource)
+    {
+    this->VTKConnector->Connect(this->ActiveSource->getProxy(),
+                                vtkCommand::UserEvent,
+                                this,
+                                SLOT(onNotification(vtkObject*,ulong,void*,void*)));
+    }
 
   // Update the Selection.
   this->Selection.copyFrom(selModel);
@@ -339,6 +367,14 @@ void pqActiveObjects::setActiveServer(pqServer* server)
                               this, SLOT(onActiveServerChanged()));
 
   this->ActiveServer = server;
+
+  // Connect current ActiveServer with our notification Observer
+  if(this->ActiveServer)
+    {
+    this->VTKConnector->Connect(this->ActiveServer->session(), vtkCommand::UserEvent,
+                                this,
+                                SLOT(onNotification(vtkObject*,ulong,void*,void*)));
+    }
 
   vtkSMProxyManager::GetProxyManager()->SetActiveSession(
     server? server->session() : NULL);
@@ -532,4 +568,24 @@ void pqActiveObjects::updateRepresentation()
     this->ActiveRepresentation = NULL;
     }
   this->triggerSignals();
+}
+//-----------------------------------------------------------------------------
+void pqActiveObjects::onNotification(vtkObject* src,
+                                     unsigned long vtkNotUsed(event),
+                                     void* vtkNotUsed(method),
+                                     void* data)
+{
+  char* eventData = reinterpret_cast<char*>(data);
+  if(this->activeSource() && src == this->activeSource()->getProxy())
+    {
+    emit sourceNotification(this->activeSource(), eventData);
+    }
+  else if(this->activeView() && src == this->activeView()->getProxy())
+    {
+    emit viewNotification(this->activeView(), eventData);
+    }
+  else if (this->activeServer() && src == this->activeServer()->session())
+    {
+    emit serverNotification(this->activeServer(), eventData);
+    }
 }

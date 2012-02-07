@@ -444,6 +444,19 @@ def trace_save_screenshot(filename, size, allViews):
       trace_globals.trace_output.append(saveStr)
   trace_globals.trace_output.append("\n")
 
+def trace_change_widget_visibility(action):
+  """This method is called when user show or hide the widget visibility from
+  the UI of the given active source"""
+  if not trace_globals.observer_active: return
+
+  # make sure the trace is up to date
+  append_trace()
+
+  trace_globals.trace_output.append(
+    "active_objects.source.SMProxy.InvokeEvent('UserEvent', '%s')" % (action))
+  trace_globals.trace_output.append("\n")
+
+
 def trace_save_animation(filename, magnification, quality, frame_rate):
   """This method is called from the paraview C++ implementation. Do not change
      the arguments without updating the C++ code."""

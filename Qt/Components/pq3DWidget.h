@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqProxyPanel.h"
 
+class QKeySequence;
 class pq3DWidgetInternal;
+class pqPipelineSource;
 class pqProxy;
 class pqRenderViewBase;
-class QKeySequence;
 class vtkPVXMLElement;
 class vtkSMNewWidgetRepresentationProxy;
 class vtkSMProperty;
@@ -170,6 +171,9 @@ protected slots:
 
   /// Called when master/slave change
   virtual void updateMasterEnableState(bool);
+
+  /// Handle custom user notification to show/hide corresponding widget
+  void handleSourceNotification(pqPipelineSource*,char*);
 
 protected:
   /// Subclasses can override this method to map properties to
