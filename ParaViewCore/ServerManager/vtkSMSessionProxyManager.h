@@ -81,7 +81,7 @@
 //  - To show a source proxy or a filter inside the menu of ParaView we use a hint
 //       <SourceProxy ...>
 //           <Hints>
-//              <ShowInGUI                   => The category attribute allow to
+//              <ShowInMenu                  => The category attribute allow to
 //                  category="PersoFilter"/>    specify in which sub-menu this
 //                                              proxy should be in. (optional)
 //           </Hints>
