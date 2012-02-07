@@ -1260,12 +1260,15 @@ void PrismPanel::setupConversions()
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  if ( settings->contains("PrismPlugin/Conversions/SESAMEFileName") )
-  {
-      this->UI->ConversionFileName = settings->value("PrismPlugin/Conversions/SESAMEFileName").toString();
-      this->UI->LoadConversions(this->UI->ConversionFileName);
-  }
-  else
+
+  // disabling loading of SESAMEFileName from settings since that's conflicting
+  // with the compiled in conversions file.
+  //if ( settings->contains("PrismPlugin/Conversions/SESAMEFileName") )
+  //{
+  //    this->UI->ConversionFileName = settings->value("PrismPlugin/Conversions/SESAMEFileName").toString();
+  //    this->UI->LoadConversions(this->UI->ConversionFileName);
+  //}
+  //else
     {
     // load compiled in SESAME file.
     this->UI->ConversionFileName = "Default";
