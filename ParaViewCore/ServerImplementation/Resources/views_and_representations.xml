@@ -1421,6 +1421,7 @@
           <Property name="ScalarOpacityFunction" />
           <Property name="VolumeRenderingMode" />
           <Property name="Shade"/>
+          <Property name="InterpolationType"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -1859,6 +1860,16 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Enable/Disable shading.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MapScalars"
+        command="SetIndependantComponents"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable independant component usage such a unsigned char RGBA data array.
         </Documentation>
       </IntVectorProperty>
 
