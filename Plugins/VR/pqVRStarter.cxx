@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRStarter.h"
 #include <QtDebug>
 #include <QTimer>
-#include "vtkVRPNConnection.h"
+#include "vtkPVVRConfig.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"

@@ -49,6 +49,7 @@ public:
   };
   void PrintSelf(ostream& os, vtkIndent indent)
     {
+      os << indent << "Eye Separation: " << this->EyeSeparation << "\n";
       os << indent << "Machine Information :\n";
       vtkIndent ind = indent.GetNextIndent();
       for(unsigned int i =0; i < this->MachineInformationVector.size(); ++i)
@@ -85,6 +86,7 @@ public:
         }
     }
   std::vector<MachineInformation> MachineInformationVector; // store the vector of machines
+  double EyeSeparation;		// Store Eye Separation information required for VR module
 };
 
 #endif

@@ -33,11 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRUIConnection_h
 
 #include <QThread>
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
 #include "vtkVRQueue.h"
 #include "vtkVRUITrackerState.h"
 #include "vtkSmartPointer.h"
