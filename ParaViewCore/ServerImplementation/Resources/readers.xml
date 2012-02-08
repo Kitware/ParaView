@@ -6728,7 +6728,8 @@
 
    <SourceProxy name="WindBladeReader"
                 class="vtkWindBladeReader"
-                label="WindBlade reader">
+                label="WindBlade reader"
+                multiprocess_support="multiple_processes">
 
      <Documentation
        short_help="Read WindBlade simulation files."

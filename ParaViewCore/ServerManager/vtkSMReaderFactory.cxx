@@ -27,6 +27,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
 #include <list>
@@ -264,7 +265,9 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 
   vtkSMProxy* proxy = pxm->NewProxy(this->Group.c_str(), this->Name.c_str());
   proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
-  proxy->UpdateVTKObjects();
+  // we deliberate don't call UpdateVTKObjects() here since CanReadFile() can
+  // avoid callind UpdateVTKObjects() all together if not needed.
+  // proxy->UpdateVTKObjects();
   bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
   proxy->Delete();
   return canRead;
@@ -644,6 +647,24 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   int canRead = 1;
   vtkSMSession* session = proxy->GetSession();
 
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+  if (source && session->GetNumberOfProcesses(source->GetLocation()) > 1)
+    {
+    if (source->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS)
+      {
+      return false;
+      }
+    }
+  else
+    {
+    if (source->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES)
+      {
+      return false;
+      }
+    }
+
+  // ensure that VTK objects are created.
+  proxy->UpdateVTKObjects();
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -669,7 +690,6 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename,
     return false;
     }
   proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
-  proxy->UpdateVTKObjects();
   bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
   proxy->Delete();
   return canRead;
