@@ -264,7 +264,7 @@ void pqTimeKeeper::viewRemoved(pqView* view)
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Views"));
-  if (pp->IsProxyAdded(view->getProxy()))
+  while (pp->IsProxyAdded(view->getProxy()))
     {
     pp->RemoveProxy(view->getProxy());
     this->getProxy()->UpdateProperty("Views");

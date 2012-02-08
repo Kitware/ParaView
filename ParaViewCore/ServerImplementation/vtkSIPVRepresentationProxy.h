@@ -28,6 +28,8 @@ public:
   vtkTypeMacro(vtkSIPVRepresentationProxy, vtkSIProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  virtual void AboutToDelete();
+
 //BTX
 protected:
   vtkSIPVRepresentationProxy();

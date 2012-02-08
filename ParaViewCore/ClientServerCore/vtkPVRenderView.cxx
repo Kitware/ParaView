@@ -1331,6 +1331,16 @@ void vtkPVRenderView::InvalidateCachedSelection()
   this->Selector->InvalidateCachedSelection();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PrepareForScreenshot()
+{
+  if (this->Interactor && this->GetRenderWindow())
+    {
+    this->GetRenderWindow()->SetInteractor(this->Interactor);
+    }
+  this->Superclass::PrepareForScreenshot();
+}
+
 //*****************************************************************
 // Forwarded to orientation axes widget.
 
