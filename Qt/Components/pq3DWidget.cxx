@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView GUI includes.
 #include "pq3DWidgetInterface.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqBoxWidget.h"
 #include "pqDistanceWidget.h"
@@ -70,9 +71,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
-#include "pqServer.h"
+
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonManager.h"
+#include "pqPythonDialog.h"
+#include "pqPythonShell.h"
+#endif
 
 namespace
 {
@@ -191,6 +199,11 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   QObject::connect( pqApplicationCore::instance(),
                     SIGNAL(updateMasterEnableState(bool)),
                     this, SLOT(updateMasterEnableState(bool)));
+
+  QObject::connect( &pqActiveObjects::instance(),
+                    SIGNAL(sourceNotification(pqPipelineSource*,char*)),
+                    this,
+                    SLOT(handleSourceNotification(pqPipelineSource*,char*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -573,6 +586,25 @@ void pq3DWidget::setWidgetVisible(bool visible)
     {
     this->Internal->WidgetVisible = visible;
     this->updateWidgetVisibility();
+
+    // Handle trace to support show/hide actions
+#ifdef PARAVIEW_ENABLE_PYTHON
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqPythonManager* manager =
+        qobject_cast<pqPythonManager*>(core->manager("PYTHON_MANAGER"));
+    if (manager && manager->interpreterIsInitialized() &&
+        manager->canStopTrace() && this->renderView())
+      {
+      QString script =
+          QString("try:\n"
+                  "  paraview.smtrace\n"
+                  "  paraview.smtrace.trace_change_widget_visibility('%1')\n"
+                  "except AttributeError: pass\n").arg(
+            visible ? "ShowWidget" : "HideWidget");
+      pqPythonShell* shell = manager->pythonShellDialog()->shell();
+      shell->executeScript(script);
+      }
+#endif
     
     emit this->widgetVisibilityChanged(visible);
     }
@@ -721,5 +753,20 @@ void pq3DWidget::updateMasterEnableState(bool I_am_the_Master)
   else
     {
     this->hideWidget();
+    }
+}
+//-----------------------------------------------------------------------------
+void pq3DWidget::handleSourceNotification(pqPipelineSource* source,char* msg)
+{
+  if(source->getProxy() == this->Internal->ReferenceProxy.GetPointer() && msg)
+    {
+    if(!strcmp("HideWidget", msg))
+      {
+      this->hideWidget();
+      }
+    else if(!strcmp("ShowWidget",msg))
+      {
+      this->showWidget();
+      }
     }
 }
