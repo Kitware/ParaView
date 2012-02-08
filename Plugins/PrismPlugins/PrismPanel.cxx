@@ -8,16 +8,17 @@ Module:    PrismPanel.cxx
 #include "PrismPanel.h"
 
 // Qt includes
+#include <QComboBox>
+#include <QDoubleValidator>
+#include <QFileInfo>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QMap>
+#include <QMessageBox>
+#include <QTableWidget>
+#include <QtDebug>
 #include <QTreeWidget>
 #include <QVariant>
-#include <QLabel>
-#include <QComboBox>
-#include <QTableWidget>
-#include <QKeyEvent>
-#include <QMessageBox>
-#include <QMap>
-#include <QFileInfo>
-#include <QDoubleValidator>
 
 // VTK includes
 
@@ -125,7 +126,7 @@ public:
     QMap<int,SESAMEConversionsForTable> SESAMEConversions;
 
 
-    bool LoadConversions(QString &filename);
+    bool LoadConversions(const QString &filename);
 
     PrismTableWidget *ConversionTree;
     SESAMEComboBoxDelegate* ConversionVariableEditor;
@@ -171,9 +172,6 @@ pqNamedObjectPanel(object_proxy, p)
     SLOT(onConversionTreeCellChanged( int , int  )));
 
 
-
-
-
     QObject::connect(this->UI->TableIdWidget, SIGNAL(currentIndexChanged(QString)), 
         this, SLOT(setTableId(QString)));
 
@@ -186,18 +184,12 @@ pqNamedObjectPanel(object_proxy, p)
     QObject::connect(this->UI->LiquidMeltCurve, SIGNAL(toggled (bool)),
         this, SLOT(showCurve(bool)));
 
-
-
-
-
     QObject::connect(this->UI->XLogScaling, SIGNAL(toggled (bool)),
         this, SLOT(useXLogScaling(bool)));
     QObject::connect(this->UI->YLogScaling, SIGNAL(toggled (bool)),
         this, SLOT(useYLogScaling(bool)));
     QObject::connect(this->UI->ZLogScaling, SIGNAL(toggled (bool)),
         this, SLOT(useZLogScaling(bool)));
-
-
 
     QObject::connect(this->UI->ThresholdXBetweenLower, SIGNAL(valueEdited(double)),
         this, SLOT(lowerXChanged(double)));
@@ -432,49 +424,49 @@ void PrismPanel::onConversionFileButton()
 
 }
 
-bool PrismPanel::pqUI::LoadConversions(QString &fileName)
+bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
 {
-    if(fileName.isEmpty())
-        return false;
-
-    //First check to make sure file is valid
-    ifstream in(fileName.toAscii().constData());
-   // bool done=false;
-    const int bufferSize = 4096;
-    char buffer[bufferSize];
-    in.getline(buffer, bufferSize);
-    if(in.gcount())
+  if (fileName.isEmpty())
     {
-
-        std::string line;
-        line.assign(buffer,in.gcount()-1);
-        if(line.find("<PRISM_Conversions>")==line.npos)
-        {
-            //This is an incorrect file format.
-
-            QString message;
-            message="Invalid SESAME Conversion File: ";
-            message.append(fileName);
-            QMessageBox::critical(NULL,QString("Error"),message);
-            in.close();
-            return false;
-        }
+    return false;
     }
 
-    in.close();
-  
-    
-    vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromFile(fileName.toAscii().constData());
-    if(!rootElement)
-        return false;
-    if(strcmp(rootElement->GetName(),"PRISM_Conversions"))
+  //First check to make sure file is valid
+  QFile file(fileName.toAscii().constData());
+  if (!file.open(QFile::ReadOnly))
     {
-        QString message;
-        message="Corrupted or Invalid SESAME Conversions File: ";
-        message.append(fileName);
-        QMessageBox::critical(NULL,QString("Error"),message);
+    qCritical() << "Failed to open file : " << fileName;
+    return false;
+    }
 
-        return false;
+  QString data (file.readAll());
+  file.close();
+
+  if (data.indexOf("<PRISM_Conversions>") == -1)
+    {
+    //This is an incorrect file format.
+    QString message;
+    message="Invalid SESAME Conversion File: ";
+    message.append(fileName);
+    QMessageBox::critical(NULL,QString("Error"),message);
+    return false;
+    }
+
+  vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(
+    data.toAscii().constData());
+  if (!rootElement)
+    {
+    return false;
+    }
+
+  if (strcmp(rootElement->GetName(),"PRISM_Conversions"))
+    {
+    QString message;
+    message="Corrupted or Invalid SESAME Conversions File: ";
+    message.append(fileName);
+    QMessageBox::critical(NULL,QString("Error"),message);
+
+    return false;
     }
 
    this->SESAMEConversions.clear();
@@ -1268,15 +1260,20 @@ void PrismPanel::setupConversions()
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  if ( settings->contains("PrismPlugin/Conversions/SESAMEFileName") )
-  {
-      this->UI->ConversionFileName = settings->value("PrismPlugin/Conversions/SESAMEFileName").toString();
-      this->UI->LoadConversions(this->UI->ConversionFileName);
-  }
-  else
-  {
-      this->UI->ConversionFileName = QString();
-  }
+
+  // disabling loading of SESAMEFileName from settings since that's conflicting
+  // with the compiled in conversions file.
+  //if ( settings->contains("PrismPlugin/Conversions/SESAMEFileName") )
+  //{
+  //    this->UI->ConversionFileName = settings->value("PrismPlugin/Conversions/SESAMEFileName").toString();
+  //    this->UI->LoadConversions(this->UI->ConversionFileName);
+  //}
+  //else
+    {
+    // load compiled in SESAME file.
+    this->UI->ConversionFileName = "Default";
+    this->UI->LoadConversions(":/PrismPlugin/ParaViewResources/SESAMEConversions.xml");
+    }
 
   QString units;
   if ( settings->contains("PrismPlugin/Conversions/SESAMEUnits") )
