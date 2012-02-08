@@ -45,6 +45,7 @@
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVEnvironmentInformation.h"
 #include "vtkPVEnvironmentInformationHelper.h"
+#include "vtkPVExtractSelection.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkPVGenericAttributeInformation.h"
@@ -158,6 +159,7 @@ int main(int, char**)
   PRINT_SELF(vtkPVDisplayInformation);
   PRINT_SELF(vtkPVEnvironmentInformation);
   PRINT_SELF(vtkPVEnvironmentInformationHelper);
+  PRINT_SELF(vtkPVExtractSelection);
   PRINT_SELF(vtkPVFileInformation);
   PRINT_SELF(vtkPVFileInformationHelper);
   PRINT_SELF(vtkPVGenericAttributeInformation);

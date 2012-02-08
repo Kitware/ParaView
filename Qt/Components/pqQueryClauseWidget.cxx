@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqHelpWindow.h"
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -82,9 +83,6 @@ pqQueryClauseWidget::pqQueryClauseWidget(
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  QObject::connect(this->Internals->remove, SIGNAL(clicked()),
-    this, SIGNAL(removeClause()));
-
   QObject::connect(this->Internals->showCompositeTree, SIGNAL(clicked()),
     this, SLOT(showCompositeTree()));
 
@@ -99,18 +97,6 @@ pqQueryClauseWidget::pqQueryClauseWidget(
 pqQueryClauseWidget::~pqQueryClauseWidget()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqQueryClauseWidget::setRemovable(bool r)
-{
-  this->Internals->remove->setVisible(r);
-}
-
-//-----------------------------------------------------------------------------
-bool pqQueryClauseWidget::isRemovable() const
-{
-  return this->Internals->remove->isVisible();
 }
 
 //-----------------------------------------------------------------------------
@@ -141,6 +127,10 @@ void pqQueryClauseWidget::initialize(
   QObject::connect(this->Internals->condition,
     SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateValueWidget()));
+  QObject::connect(this->Internals->helpButton,
+                   SIGNAL(clicked()),
+                   this,
+                   SIGNAL(helpRequested()));
 }
 
 //-----------------------------------------------------------------------------
@@ -178,79 +168,18 @@ void pqQueryClauseWidget::populateSelectionCriteria(
   this->Internals->criteria->clear();
   this->Internals->Arrays.clear();
 
-  if (type_flags & INDEX)
-    {
-    this->Internals->criteria->addItem("ID", INDEX);
-    }
-
-  vtkPVDataSetAttributesInformation* attrInfo = this->getChosenAttributeInfo();
-  if (type_flags & GLOBALID)
-    {
-    // Do we have global ids?
-    if (attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS))
-      {
-      this->Internals->criteria->addItem("Global ID", GLOBALID);
-      this->Internals->criteria->setCurrentIndex(
-        this->Internals->criteria->count()-1);
-      }
-    }
-
-  if (type_flags & THRESHOLD)
-    {
-    // Now add the attribute arrays.
-    for (int cc=0; cc < attrInfo->GetNumberOfArrays(); cc++)
-      {
-      vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
-      if (arrayInfo->GetNumberOfComponents() > 1)
-        {
-        this->Internals->criteria->addItem(
-          QString("%1 (Magnitude)").arg(arrayInfo->GetName()),
-          THRESHOLD);
-
-        int item_index = (this->Internals->criteria->count()-1);
-        this->Internals->Arrays.insert(item_index,
-          pqInternals::ArrayInfo(arrayInfo->GetName(), -1));
-
-        for (int kk=0; kk < arrayInfo->GetNumberOfComponents(); kk++)
-          {
-          this->Internals->criteria->addItem(
-            QString("%1 (%2)").arg(arrayInfo->GetName()).arg(kk),
-            THRESHOLD);
-          item_index = (this->Internals->criteria->count()-1);
-          this->Internals->Arrays.insert(item_index,
-            pqInternals::ArrayInfo(arrayInfo->GetName(), kk));
-          }
-        }
-      else
-        {
-        this->Internals->criteria->addItem(arrayInfo->GetName(),
-          THRESHOLD);
-        int item_index = (this->Internals->criteria->count()-1);
-        this->Internals->Arrays.insert(item_index,
-          pqInternals::ArrayInfo(arrayInfo->GetName(), 0));
-        }
-      }
-    }
-
-  if (type_flags & LOCATION)
-    {
-    if (this->attributeType() == vtkDataObject::POINT)
-      {
-      this->Internals->criteria->addItem("Point", LOCATION);
-      }
-    else if (this->attributeType() == vtkDataObject::CELL)
-      {
-      this->Internals->criteria->addItem("Cell", LOCATION);
-      }
-    }
-
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
+
+  if(type_flags & QUERY)
+    {
+    this->Internals->criteria->addItem("Query", QUERY);
+    }
+
   if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
     {
     if (type_flags & BLOCK)
       {
       this->Internals->criteria->addItem("Block ID", BLOCK);
-      //this->Internals->criteria->addItem("Block Name", BLOCK);
       }
     }
   else if (dataInfo->GetCompositeDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
@@ -288,9 +217,10 @@ void pqQueryClauseWidget::populateSelectionCondition()
 
   switch (criteria_type)
     {
-  case INDEX:
-  case GLOBALID:
-  case THRESHOLD:
+  case QUERY:
+    this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
+    break;
+
   case PROCESSID:
     this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
     this->Internals->condition->addItem("is between",
@@ -301,19 +231,6 @@ void pqQueryClauseWidget::populateSelectionCondition()
       pqQueryClauseWidget::SINGLE_VALUE_GE);
     this->Internals->condition->addItem("is <=",
       pqQueryClauseWidget::SINGLE_VALUE_LE);
-    break;
-
-  case LOCATION:
-    if (this->attributeType() == vtkDataObject::POINT)
-      {
-      this->Internals->condition->addItem("is at",
-        pqQueryClauseWidget::TRIPLET_OF_VALUES);
-      }
-    else
-      {
-      this->Internals->condition->addItem("contains",
-        pqQueryClauseWidget::TRIPLET_OF_VALUES);
-      }
     break;
 
   case BLOCK:
@@ -416,28 +333,13 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
 
   if (multi_block)
     {
-    switch (criteria_type)
-      {
-    case INDEX:
-    case THRESHOLD:
-      sub_widgets.push_back(BLOCK);
-      break;
-    case GLOBALID:
-    default:
-      break;
-      }
+    sub_widgets.push_back(BLOCK);
     }
 
   if (amr)
     {
     switch (criteria_type)
       {
-    case INDEX:
-    case THRESHOLD:
-      sub_widgets.push_back(AMR_LEVEL);
-      sub_widgets.push_back(AMR_BLOCK);
-      break; 
-    case GLOBALID:
       // for now, when selecting Global ids, we don't allow the users to pick the
       // block to extract the array from. We can support this if needed in
       // future.
@@ -462,7 +364,7 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   foreach (CriteriaTypes t_flag, sub_widgets)
     {
     pqQueryClauseWidget* sub_widget = new pqQueryClauseWidget(this);
-    sub_widget->setRemovable(false);
+    sub_widget->Internals->helpButton->hide();
     sub_widget->setProducer(this->producer());
     sub_widget->setAttributeType(this->attributeType());
     sub_widget->initialize(t_flag, true);
@@ -543,20 +445,11 @@ void pqQueryClauseWidget::showCompositeTree()
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
 {
-  CriteriaType criteria_type = this->currentCriteriaType(); 
-  if (criteria_type == INVALID)
-    {
-    qWarning("No valid query created.");
-    return NULL;
-    }
-
-  ConditionMode condition_type = this->currentConditionType();
-
   // Find the proper Proxy manager
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  // * Create a new selection source proxy based on the criteria_type.
+  // Create a new selection source proxy based on the criteria_type.
   vtkSMProxy* selSource = pxm->NewProxy("sources",
       "SelectionQuerySource");
 
@@ -586,67 +479,7 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
     }
   vtkSMPropertyHelper(selSource, "FieldType").Set(field_type);
 
-  // * Determine the TermMode.
-  int term_mode = vtkQuerySelectionSource::NONE;
-  switch (criteria_type)
-    {
-  case INDEX:
-    term_mode = vtkQuerySelectionSource::ID;
-    break;
-
-  case GLOBALID:
-    term_mode = vtkQuerySelectionSource::GLOBALID;
-    break;
-
-  case THRESHOLD:
-    term_mode = vtkQuerySelectionSource::ARRAY;
-    break;
-
-  case LOCATION:
-    term_mode = vtkQuerySelectionSource::LOCATION;
-    break;
-
-  case BLOCK:
-    if (!this->AsQualifier)
-      {
-      term_mode = vtkQuerySelectionSource::BLOCK;
-      break;
-      }
-
-  default: break;
-    }
-
-  vtkSMPropertyHelper(selSource, "TermMode").Set(term_mode);
-
-  //* Determine Operator.
-  int op = vtkQuerySelectionSource::NONE;
-  switch (condition_type)
-    {
-  case SINGLE_VALUE:
-  case LIST_OF_VALUES:
-  case TRIPLET_OF_VALUES:
-  case BLOCK_ID_VALUE:
-  case LIST_OF_BLOCK_ID_VALUES:
-    op = vtkQuerySelectionSource::IS_ONE_OF;
-    break;
-
-  case SINGLE_VALUE_LE:
-    op = vtkQuerySelectionSource::IS_LE;
-    break;
-
-  case SINGLE_VALUE_GE:
-    op = vtkQuerySelectionSource::IS_GE;
-    break;
-
-  case PAIR_OF_VALUES:
-    op = vtkQuerySelectionSource::IS_BETWEEN;
-    break;
-
-  default: break;
-    }
-  vtkSMPropertyHelper(selSource, "Operator").Set(op);
-
-  // * Pass on qualifiers and values from this and sub widgets.
+  // Pass on qualifiers and values from this and sub widgets.
   this->addSelectionQualifiers(selSource);
   foreach (pqQueryClauseWidget* child, 
     this->findChildren<pqQueryClauseWidget*>())
@@ -666,16 +499,6 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   if (criteria_type == INVALID)
     {
     return;
-    }
-
-  if (criteria_type == THRESHOLD)
-    {
-    pqInternals::ArrayInfo info = this->Internals->Arrays[
-      this->Internals->criteria->currentIndex()];
-    vtkSMPropertyHelper(selSource, "ArrayName").Set(
-     info.ArrayName.toAscii().data());
-    vtkSMPropertyHelper(selSource, "ArrayComponent").Set(
-     info.ComponentNo);
     }
 
   ConditionMode condition_type = this->currentConditionType();
@@ -755,6 +578,10 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
 
   switch (criteria_type)
     {
+  case QUERY:
+      vtkSMPropertyHelper(selSource, "QueryString").Set(values[0].toString().toAscii().constData());
+      break;
+
   case BLOCK:
     if (this->AsQualifier)
       {
@@ -763,32 +590,6 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       break;
       }
     // break; -- don't break
-
-  case INDEX:
-  case GLOBALID:
-      {
-      vtkSMPropertyHelper helper(selSource, "IdTypeValues");
-      // get values are add them to values.
-      unsigned int cc=0;
-      foreach (QVariant val, values)
-        {
-        helper.Set(cc++, val.value<vtkIdType>());
-        }
-      }
-    break;
-
-  case LOCATION:
-  case THRESHOLD:
-      {
-      vtkSMPropertyHelper helper(selSource, "DoubleValues");
-      // get values are add them to values.
-      unsigned int cc=0;
-      foreach (QVariant val, values)
-        {
-        helper.Set(cc++, val.toDouble());
-        }
-      }
-    break;
 
   case AMR_LEVEL:
       {

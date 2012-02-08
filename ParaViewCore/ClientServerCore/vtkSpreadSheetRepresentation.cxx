@@ -73,7 +73,7 @@ int vtkSpreadSheetRepresentation::FillInputPortInformation(
     break;
 
   case 2:
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
     break;
 
   default:
@@ -108,11 +108,6 @@ int vtkSpreadSheetRepresentation::RequestData(
       this->GetInternalOutputPort(1, 0));
     }
 
-  if (this->GetNumberOfInputConnections(2) == 1)
-    {
-    this->GetInternalOutputPort(2, 0);
-    }
-
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -133,9 +128,9 @@ vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetExtractedDataProducer()
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkSpreadSheetRepresentation::GetSelectionProducer()
 {
-  if (this->GetNumberOfInputConnections(2) == 1)
+  if (this->GetNumberOfInputConnections(1) == 1)
     {
-    return this->GetInternalOutputPort(2, 0);
+    return this->GetInternalOutputPort(1, 0);
     }
   return NULL;
 }

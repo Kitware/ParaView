@@ -8785,21 +8785,6 @@ This filter extracts a list of datasets from hierarchical datasets.
 	 The input that provides the selection object.
        </Documentation>
      </InputProperty>
-
-     <IntVectorProperty
-	name="PreserveTopology"
-	command="SetPreserveTopology"
-	number_of_elements="1"
-	default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-	 If this property is set to 1 the output preserves the topology of its
-	 input and adds an insidedness array to mark which cells are inside or
-	 out. If 0 then the output is an unstructured grid which contains only
-	 the subset of cells that are inside.
-       </Documentation>
-     </IntVectorProperty>
-
      <!-- End ExtractSelection -->
    </SourceProxy>
 
@@ -8957,7 +8942,7 @@ This property controls how the filter works to generate tensor cell data. You ca
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractSelection" class="vtkExtractSelection"
+   <SourceProxy name="ExtractSelection" class="vtkPVSingleOutputExtractSelection"
       label="Extract Selection">
      <Documentation
 	short_help="Extract different type of selections."

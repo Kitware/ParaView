@@ -19,8 +19,7 @@
 // as selected (done by adding a new vtkCharArray named "__vtkIsSelected__").
 // It has two input ports:
 // \li 0 : vtkTable
-// \li 1 : vtkSelection (this is id-based or block-based selection) generated
-//         by vtkPVExtractSelection, for example). This input is optional.
+// \li 1 : vtkTable (the extracted selection).
 
 #ifndef __vtkMarkSelectedRows_h
 #define __vtkMarkSelectedRows_h

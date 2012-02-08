@@ -64,6 +64,7 @@ SET (Kit_SRCS
   vtkPVDisplayInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
+  vtkPVExtractSelection.cxx
   vtkPVFileInformation.cxx
   vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
@@ -89,6 +90,7 @@ SET (Kit_SRCS
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSILInformation.cxx
+  vtkPVSingleOutputExtractSelection.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerManagerPluginInterface.cxx
@@ -140,6 +142,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
     vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
     vtkPythonProgrammableFilter.cxx
+    vtkPythonExtractSelection.cxx
     )
   SET (KIT_LIBS ${KIT_LIBS} ${PYTHON_LIBRARIES} vtkPVPythonInterpretor)
   INCLUDE_DIRECTORIES(

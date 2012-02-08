@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 #include <string>
-#include <assert.h>
 
 #include "ui_pqSelectionInputWidget.h"
 class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget { };
@@ -316,7 +315,10 @@ void pqSelectionInputWidget::postAccept()
   vtkSMSessionProxyManager* pxm = sel_source ?
                                   sel_source->GetSessionProxyManager() : NULL;
 
-  assert("we should have a selection for postAccept" && sel_source && pxm);
+  if (!sel_source)
+    {
+    return;
+    }
 
   // Unregister any de-referenced proxy sources.
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();

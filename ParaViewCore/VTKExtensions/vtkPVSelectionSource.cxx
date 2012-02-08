@@ -646,6 +646,14 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       }
     break;
 
+  case QUERY:
+      {
+      source->SetContentType(vtkSelectionNode::QUERY);
+      source->SetQueryString(this->QueryString);
+      source->Update();
+      output->ShallowCopy(source->GetOutput());
+      }
+
   case ID:
   default:
       {

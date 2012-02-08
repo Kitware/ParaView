@@ -530,7 +530,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     return;
     }
 
-  pqSignalAdaptorTreeWidget* idsAdaptor = 0;
   const char* proxyname = selSource->GetXMLName();
   if (proxyname == QString("FrustumSelectionSource"))
     {
@@ -541,7 +540,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     {
     this->Implementation->comboSelectionType->setCurrentIndex(
       pqImplementation::GLOBALIDS); // Global IDs
-    idsAdaptor = this->Implementation->GlobalIDsAdaptor;
     }
   else if (proxyname == QString("IDSelectionSource"))
     {
@@ -554,7 +552,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnHidden(0,
       !this->Implementation->UseProcessID);
     this->Implementation->Indices->setColumnHidden(1, false);
-    idsAdaptor = this->Implementation->IndicesAdaptor;
     // resize is needed to ensure that all columns are of minimum size possible
     // since we have messed around with column visibility.
     this->Implementation->Indices->header()->resizeSections(
@@ -572,7 +569,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnHidden(1,
       !this->Implementation->UseProcessID);
     this->Implementation->Indices->setColumnHidden(2, false);
-    idsAdaptor = this->Implementation->IndicesAdaptor;
     this->Implementation->CompositeTreeAdaptor =
       new pqSignalAdaptorCompositeTreeWidget(
         this->Implementation->compositeTree,
@@ -596,7 +592,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnHidden(0, false);
     this->Implementation->Indices->setColumnHidden(1, false);
     this->Implementation->Indices->setColumnHidden(2, false);
-    idsAdaptor = this->Implementation->IndicesAdaptor;
 
     // resize is needed to ensure that all columns are of minimum size possible
     // since we have messed around with column visibility.
@@ -612,7 +607,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     {
     this->Implementation->comboSelectionType->setCurrentIndex(
       pqImplementation::LOCATIONS);
-    idsAdaptor = this->Implementation->LocationsAdaptor;
     }
   else if (proxyname == QString("BlockSelectionSource"))
     {
@@ -642,49 +636,6 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->FieldTypeAdaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     selSource, selSource->GetProperty("FieldType"));
-
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("ContainingCells"));
-
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("InsideOut"));
-
-  if (selSource->GetProperty("IDs"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      idsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("IDs"));
-    }
-
-  if (selSource->GetProperty("Locations"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      idsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Locations"));
-    }
-
-  if (selSource->GetProperty("Blocks"))
-    {
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->BlocksAdaptor, "values",
-      SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Blocks"));
-    }
-
-  if (selSource->GetProperty("Thresholds"))
-    {
-    // Link Threshold selection properties
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->ThresholdScalarArrayAdaptor, "currentText",
-      SIGNAL(currentTextChanged(const QString&)),
-      selSource, selSource->GetProperty("ArrayName"));
-
-    this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->ThresholdsAdaptor, "values", SIGNAL(valuesChanged()),
-      selSource, selSource->GetProperty("Thresholds"));
-    }
 
   if (selSource->GetProperty("UserFriendlyText"))
     {
