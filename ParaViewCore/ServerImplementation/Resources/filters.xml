@@ -1258,7 +1258,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
 	default_values="15.0" >
        <DoubleRangeDomain name="range" min="0" max="180" />
        <Documentation>
-	 The value of thie property is used in determining where the data set may be split. If the angle between two adjacent triangles is greater than or equal to the FeatureAngle value, then their boundary is considered a feature edge where the dataset can be split.
+	 The value of this property is used in determining where the data set may be split. If the angle between two adjacent triangles is greater than or equal to the FeatureAngle value, then their boundary is considered a feature edge where the dataset can be split.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2769,7 +2769,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
 	     </RequiredProperties>
 	   </ArrayListDomain>
 	   <Documentation>
-	     The value of thie property lists the name of the scalar array to use in computing the median.
+	     The value of this property lists the name of the scalar array to use in computing the median.
 	   </Documentation>
      </StringVectorProperty>
 
