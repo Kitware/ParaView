@@ -893,6 +893,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "AMR Dataset";
     case VTK_NON_OVERLAPPING_AMR:
       return "Non-Overlapping AMR Dataset";
+    case VTK_OVERLAPPING_AMR:
+      return "Overlapping AMR Dataset";
     case VTK_GENERIC_DATA_SET:
       return "Generic Dataset";
     case VTK_HYPER_OCTREE:
