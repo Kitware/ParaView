@@ -314,7 +314,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows(
   this->Internals->SharedWindowEndRenderTag = 0;
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
-  this->Enabled = true;
+  this->Enabled = false;
 
   // we no longer support render even propagation. This leads to unnecessary
   // complications since it results in code have different paths on client and

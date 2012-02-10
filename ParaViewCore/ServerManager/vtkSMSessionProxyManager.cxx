@@ -676,18 +676,25 @@ void vtkSMSessionProxyManager::UnRegisterProxies()
 void vtkSMSessionProxyManager::UnRegisterProxy( const char* group, const char* name,
                                          vtkSMProxy* proxy)
 {
+  if (!group || !name)
+    {
+    return;
+    }
+
   // Just in case a proxy ref is NOT held outside the ProxyManager iteself
   // Keep one during the full method call so the event could still have a valid
   // proxy object.
   vtkSmartPointer<vtkSMProxy> proxyHolder = proxy;
+  std::string nameHolder(name);
+  std::string groupHolder(group);
 
   // Do something only if the given tuple was found
   if(this->Internals->RemoveTuples(group, name, proxy))
     {
     vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = proxy;
-    info.GroupName = group;
-    info.ProxyName = name;
+    info.GroupName = groupHolder.c_str();
+    info.ProxyName = nameHolder.c_str();
     info.Type = vtkSMProxyManager::RegisteredProxyInformation::PROXY;
 
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
@@ -956,6 +963,7 @@ vtkSMLink* vtkSMSessionProxyManager::GetRegisteredLink(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
 {
+  std::string nameHolder = (name? name : "");
   vtkSMSessionProxyManagerInternals::LinkType::iterator it =
     this->Internals->RegisteredLinkMap.find(name);
   if (it != this->Internals->RegisteredLinkMap.end())
@@ -969,7 +977,7 @@ void vtkSMSessionProxyManager::UnRegisterLink(const char* name)
     vtkSMProxyManager::RegisteredProxyInformation info;
     info.Proxy = 0;
     info.GroupName = 0;
-    info.ProxyName = name;
+    info.ProxyName = nameHolder.c_str();
     info.Type = vtkSMProxyManager::RegisteredProxyInformation::LINK;
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     }

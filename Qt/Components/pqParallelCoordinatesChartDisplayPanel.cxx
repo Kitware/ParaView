@@ -147,6 +147,7 @@ void pqParallelCoordinatesChartDisplayPanel::reloadSeries()
 {
   this->updateAllViews();
   this->updateOptionsWidgets();
+  this->Internal->SettingsModel->reload();
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +167,7 @@ void pqParallelCoordinatesChartDisplayPanel::setDisplay(pqRepresentation* disp)
 
   // this is essential to ensure that when you undo-redo, the representation is
   // indeed update-to-date, thus ensuring correct domains etc.
-  proxy->UpdatePipeline();
+  // proxy->UpdatePipeline();
 
   // The model for the plot settings
   this->Internal->SettingsModel->setRepresentation(
@@ -184,6 +185,8 @@ void pqParallelCoordinatesChartDisplayPanel::setDisplay(pqRepresentation* disp)
     proxy, proxy->GetProperty("CompositeDataSetIndex"));
 
   this->setEnabled(true);
+
+  QObject::connect(disp, SIGNAL(dataUpdated()), this, SLOT(reloadSeries()));
 
   this->reloadSeries();
 }
