@@ -125,10 +125,14 @@ public:
   static void setSelectionProperty(vtkSMProperty* Property, 
                                    QList<QList<QVariant> > Value,
                                    PropertyValueType Type = CHECKED);
-  /// set the pairs of selections for a selection property
-  static void setSelectionProperty(vtkSMProperty* Property, 
+
+  /// used to set the status of an array, for example. note that this method
+  /// can only be used for properties with vtkSMArraySelectionDomain or
+  /// vtkSMStringListRangeDomain.
+  static void setSelectionProperty(vtkSMProperty* Property,
                                    QList<QVariant> Value,
                                    PropertyValueType Type = CHECKED);
+
   /// get the possible names for the selection property
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   

@@ -19,7 +19,6 @@ class pqDataRepresentation;
 class QAction;
 class QActionGroup;
 class pqRenderView;
-class PrismScaleViewDialog;
 
 class PrismCore : public QObject
 {
@@ -54,7 +53,6 @@ private:
   pqServer* getActiveServer() const;
 
  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
- PrismScaleViewDialog* ScaleViewDialog;
  bool ProcessingEvent;
 };
 

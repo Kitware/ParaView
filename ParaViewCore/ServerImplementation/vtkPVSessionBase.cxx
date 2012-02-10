@@ -30,8 +30,23 @@
 //----------------------------------------------------------------------------
 vtkPVSessionBase::vtkPVSessionBase()
 {
+  this->InitSessionBase(vtkPVSessionCore::New());
+  this->SessionCore->UnRegister(NULL);
+}
+//----------------------------------------------------------------------------
+vtkPVSessionBase::vtkPVSessionBase(vtkPVSessionCore* coreToUse )
+{
+  this->InitSessionBase(coreToUse);
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
+{
   this->ProcessingRemoteNotification = false;
-  this->SessionCore = vtkPVSessionCore::New();
+  this->SessionCore = coreToUse;
+  if(this->SessionCore)
+    {
+    this->SessionCore->Register(NULL);
+    }
 
   // initialize local process information.
   this->LocalServerInformation = vtkPVServerInformation::New();
@@ -71,8 +86,11 @@ vtkPVSessionBase::~vtkPVSessionBase()
     vtkProcessModule::GetProcessModule()->InvokeEvent(vtkCommand::ExitEvent);
     }
 
-  this->SessionCore->Delete();
-  this->SessionCore = NULL;
+  if (this->SessionCore)
+    {
+    this->SessionCore->Delete();
+    this->SessionCore = NULL;
+    }
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = NULL;
@@ -335,4 +353,35 @@ void vtkPVSessionBase::StopProcessingRemoteNotification(bool previousValue)
 bool vtkPVSessionBase::IsProcessingRemoteNotification()
 {
   return this->ProcessingRemoteNotification;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::UseSessionCoreOf(vtkPVSessionBase* other)
+{
+  if(other)
+    {
+    this->SetSessionCore(other->GetSessionCore());
+    }
+  else
+    {
+    vtkErrorMacro("No vtkPVSessionBase provided");
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVSessionCore* vtkPVSessionBase::GetSessionCore() const
+{
+  return this->SessionCore;
+}
+//----------------------------------------------------------------------------
+void vtkPVSessionBase::SetSessionCore(vtkPVSessionCore* other)
+{
+  if(this->SessionCore)
+    {
+    this->SessionCore->Delete();
+    }
+  this->SessionCore = other;
+  if(this->SessionCore)
+    {
+    this->SessionCore->Register(this);
+    }
 }

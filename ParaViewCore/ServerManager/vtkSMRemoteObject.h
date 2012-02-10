@@ -33,9 +33,8 @@ class vtkSMLoadStateContext;
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
 {
 // My friends are...
-  friend class vtkSMStateHelper;          // To pull state
-  friend class vtkSMDeserializerProtobuf; // To set GlobalId
-  friend class vtkSMDeserializerXML;      // To set GlobalId
+  friend class vtkSMStateHelper;    // To pull state
+  friend class vtkSMStateLoader;    // To set GlobalId as the originals
 
 public:
   vtkTypeMacro(vtkSMRemoteObject,vtkSMSessionObject);

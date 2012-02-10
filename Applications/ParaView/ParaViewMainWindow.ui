@@ -34,7 +34,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -185,8 +185,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>90</width>
-          <height>199</height>
+          <width>77</width>
+          <height>216</height>
          </rect>
         </property>
        </widget>
@@ -220,8 +220,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>90</width>
-          <height>198</height>
+          <width>77</width>
+          <height>214</height>
          </rect>
         </property>
        </widget>
@@ -229,15 +229,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QDockWidget" name="summaryDock">
-   <property name="windowTitle">
-    <string>Summary</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="pqSummaryPanel" name="summaryWidget"/>
   </widget>
   <widget class="QDockWidget" name="memoryInspectorDock">
    <property name="windowTitle">
@@ -313,12 +304,6 @@
    <class>pqProxyInformationWidget</class>
    <extends>QWidget</extends>
    <header>pqProxyInformationWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqSummaryPanel</class>
-   <extends>QWidget</extends>
-   <header>pqSummaryPanel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

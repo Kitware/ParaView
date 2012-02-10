@@ -959,7 +959,8 @@ QList<QString> pqPipelineRepresentation::getColorFields()
         {
         vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
         if (representation.compare("Volume", Qt::CaseInsensitive) == 0 &&
-          info->GetNumberOfComponents() != 1)
+            !( info->GetNumberOfComponents() == 1 ||
+              info->GetNumberOfComponents() == 4))
           {
           // Skip vectors when volumerendering.
           continue;
@@ -981,7 +982,8 @@ QList<QString> pqPipelineRepresentation::getColorFields()
       {
       vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
       if (representation.compare("Volume", Qt::CaseInsensitive) == 0 &&
-        info->GetNumberOfComponents() != 1)
+          !( info->GetNumberOfComponents() == 1 ||
+            info->GetNumberOfComponents() == 4))
         {
         // Skip vectors when volumerendering.
         continue;

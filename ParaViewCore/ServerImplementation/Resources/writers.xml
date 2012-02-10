@@ -1099,7 +1099,24 @@
         CSV. For composite datasets, it saves multiple csv files.
       </Documentation>
       <SubProxy>
-        <Proxy name="Writer" class="vtkCSVWriter" />
+        <Proxy name="Writer" class="vtkCSVWriter">
+          <IntVectorProperty name="Precision"
+            command="SetPrecision"
+            number_of_elements="1"
+            default_values="5">
+            <IntRangeDomain name="range" min="0" />
+          </IntVectorProperty>
+          <IntVectorProperty name="UseScientificNotation"
+            command="SetUseScientificNotation"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Precision" />
+          <Property name="UseScientificNotation" />
+        </ExposedProperties>
       </SubProxy>
 
       <InputProperty name="Input" command="SetInputConnection">
@@ -1158,7 +1175,24 @@
         CSV. For composite datasets, it saves multiple csv files.
       </Documentation>
       <SubProxy>
-        <Proxy name="Writer" class="vtkCSVWriter" />
+        <Proxy name="Writer" class="vtkCSVWriter">
+          <IntVectorProperty name="Precision"
+            command="SetPrecision"
+            number_of_elements="1"
+            default_values="5">
+            <IntRangeDomain name="range" min="0" />
+          </IntVectorProperty>
+          <IntVectorProperty name="UseScientificNotation"
+            command="SetUseScientificNotation"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Precision" />
+          <Property name="UseScientificNotation" />
+        </ExposedProperties>
       </SubProxy>
 
       <InputProperty name="Input" command="SetInputConnection">

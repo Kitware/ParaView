@@ -36,55 +36,10 @@ public:
   vtkTypeMacro(vtkQuerySelectionSource, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
-  enum
-    {
-    NONE = 0
-    };
-
-  enum TermModes
-    {
-    ID=1,
-    GLOBALID,
-    ARRAY,
-    LOCATION,
-    BLOCK
-    };
-
-  enum OperatorTypes
-    {
-    IS_ONE_OF=1,
-    IS_BETWEEN,
-    IS_GE,
-    IS_LE
-    };
-  //ETX
-
   // Description:
-  // Get/Set the query term mode.
-  vtkSetMacro(TermMode, int);
-  vtkGetMacro(TermMode, int);
-
-  // Description:
-  // Set the array name if TermMode == ARRAY.
-  vtkSetStringMacro(ArrayName);
-  vtkGetStringMacro(ArrayName);
-
-  // Description:
-  // Set the component number if TermMode == ARRAY.
-  // -1 implies Magnitude in case of multicomponent arrays. Default is 0.
-  vtkSetMacro(ArrayComponent, int);
-  vtkGetMacro(ArrayComponent, int);
-
-  // Description:
-  // Get/Set the operator.
-  vtkSetMacro(Operator, int);
-  vtkGetMacro(Operator,  int);
-
-  void SetNumberOfDoubleValues(unsigned int);
-  void SetNumberOfIdTypeValues(unsigned int);
-  void SetDoubleValues(double* values);
-  void SetIdTypeValues(vtkIdType* values);
+  // Set/get the query expression string.
+  vtkSetStringMacro(QueryString);
+  vtkGetStringMacro(QueryString);
 
   // Description:
   vtkSetMacro(CompositeIndex, int);
@@ -103,17 +58,6 @@ public:
   // vtkSelectionNode::SelectionField.
   vtkSetMacro(FieldType, int);
   vtkGetMacro(FieldType, int);
- 
-  // Description:
-  // Useful only when FieldType=POINT. If true, it results in selecting the
-  // cells that contain the selected points.
-  vtkSetMacro(ContainingCells, int);
-  vtkGetMacro(ContainingCells, int);
-
-  // Description:
-  // Invert the selection.
-  vtkSetMacro(Inverse, int);
-  vtkGetMacro(Inverse, int);
 
   // Description:
   // This merely reconstructs the query as a user friendly text eg. "IDs >= 12".
@@ -134,25 +78,15 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  // Returns a new instance for a vtkAbstractArray on success.
-  vtkAbstractArray* BuildSelectionList();
-
-  int TermMode;
-  int Operator;
   int FieldType;
-  int Inverse;
 
-  char* ArrayName;
-  int ArrayComponent;
+  char* QueryString;
 
   int CompositeIndex;
   int HierarchicalIndex;
   int HierarchicalLevel;
   int ProcessID;
 
-  int ContainingCells;
-
-  char* UserFriendlyText;
 private:
   vtkQuerySelectionSource(const vtkQuerySelectionSource&); // Not implemented
   void operator=(const vtkQuerySelectionSource&); // Not implemented

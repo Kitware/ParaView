@@ -525,6 +525,8 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
 
+  bool prev = this->SetBlockModifiedEvents(true);
+
   this->RemoveAllProxies();
   this->RemoveAllUncheckedProxies();
 
@@ -548,6 +550,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = imUpdate;
     }
 
+  this->SetBlockModifiedEvents(prev);
   this->Modified();
   this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }

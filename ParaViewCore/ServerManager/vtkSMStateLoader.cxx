@@ -46,6 +46,7 @@ struct vtkSMStateLoaderRegistrationInfo
 
 struct vtkSMStateLoaderInternals
 {
+  bool KeepOriginalId;
   typedef std::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
   typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
@@ -133,6 +134,12 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
   // Ensure that the proxy is created before it is registered, unless we are
   // reviving the server-side server manager, which needs special handling.
+  if(this->Internal->KeepOriginalId)
+    {
+    proxy->SetGlobalID(id);
+    }
+
+
   proxy->UpdateVTKObjects();
   if (proxy->IsA("vtkSMSourceProxy"))
     {
@@ -144,7 +151,6 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
-
   vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
     = this->Internal->RegistrationInformation.find(id);
   if (iter == this->Internal->RegistrationInformation.end())
@@ -433,8 +439,9 @@ bool vtkSMStateLoader::VerifyXMLVersion(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
+int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
 {
+  this->Internal->KeepOriginalId = keepOriginalId;
   if (!elem)
     {
     vtkErrorMacro("Cannot load state from (null) root element.");

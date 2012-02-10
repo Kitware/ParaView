@@ -101,17 +101,6 @@ int vtkSciVizStatistics::GetAttributeArrayStatus( const char* arrName )
   return this->P->Has( arrName ) ? 1 : 0;
 }
 
-void vtkSciVizStatistics::SetAttributeArrayStatus( const char* arrName, int stat )
-{
-  if ( arrName )
-    {
-    if ( this->P->SetBufferColumnStatus( arrName, stat ) )
-      {
-      this->Modified();
-      }
-    }
-}
-
 void vtkSciVizStatistics::EnableAttributeArray( const char* arrName )
 {
   if ( arrName )

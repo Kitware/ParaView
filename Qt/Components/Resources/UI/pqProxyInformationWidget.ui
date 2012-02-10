@@ -55,10 +55,19 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="filename">
-        <property name="text">
-         <string>Filename:</string>
-        </property>
+       <widget class="QLineEdit" name="filename">
+	 <property name="cursor">
+           <cursorShape>ArrowCursor</cursorShape>
+         </property>
+         <property name="acceptDrops">
+           <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+           <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+         </property>
+         <property name="readOnly">
+           <bool>true</bool>
+         </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -69,10 +78,19 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="path">
-        <property name="text">
-         <string>Path</string>
-        </property>
+       <widget class="QLineEdit" name="path">
+	 <property name="cursor">
+           <cursorShape>ArrowCursor</cursorShape>
+         </property>
+         <property name="acceptDrops">
+           <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+           <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+         </property>
+         <property name="readOnly">
+           <bool>true</bool>
+         </property>
        </widget>
       </item>
      </layout>
@@ -92,9 +110,18 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="type">
-        <property name="text">
-         <string>Type:</string>
+       <widget class="QLineEdit" name="type">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -116,9 +143,18 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="numberOfCells">
-            <property name="text">
-             <string>Number of Cells:</string>
+           <widget class="QLineEdit" name="numberOfCells">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -130,9 +166,18 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="numberOfPoints">
-            <property name="text">
-             <string>Number of Points:</string>
+           <widget class="QLineEdit" name="numberOfPoints">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -151,9 +196,18 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="numberOfRows">
-            <property name="text">
-             <string>Number Of Rows:</string>
+           <widget class="QLineEdit" name="numberOfRows">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -165,9 +219,18 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="numberOfColumns">
-            <property name="text">
-             <string>Number of Columns</string>
+           <widget class="QLineEdit" name="numberOfColumns">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -183,9 +246,18 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="memory">
-        <property name="text">
-         <string>Memory:</string>
+       <widget class="QLineEdit" name="memory">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -239,10 +311,19 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="dataTimeLabel">
-        <property name="text">
-         <string>Current data time step: &lt;b&gt;$TIME$&lt;/b&gt;</string>
-        </property>
+       <widget class="QLineEdit" name="dataTimeLabel">
+	 <property name="cursor">
+           <cursorShape>ArrowCursor</cursorShape>
+         </property>
+         <property name="acceptDrops">
+           <bool>false</bool>
+         </property>
+         <property name="styleSheet">
+           <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+         </property>
+         <property name="readOnly">
+           <bool>true</bool>
+         </property>
        </widget>
       </item>
      </layout>
@@ -254,43 +335,51 @@
       <string>Extents</string>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
-       <number>9</number>
-      </property>
-      <property name="spacing">
-       <number>6</number>
-      </property>
-      <item row="1" column="2">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="zExtent">
-        <property name="text">
-         <string>TextLabel</string>
+       <widget class="QLineEdit" name="zExtent">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="yExtent">
-        <property name="text">
-         <string>TextLabel</string>
+       <widget class="QLineEdit" name="yExtent">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="xExtent">
-        <property name="text">
-         <string>TextLabel</string>
+       <widget class="QLineEdit" name="xExtent">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -344,29 +433,34 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="zRange">
-        <property name="text">
-         <string>Z range:</string>
+       <widget class="QLineEdit" name="zRange">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="yRange">
-        <property name="text">
-         <string>Y range:</string>
+       <widget class="QLineEdit" name="yRange">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -378,9 +472,18 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="xRange">
-        <property name="text">
-         <string>X range:</string>
+       <widget class="QLineEdit" name="xRange">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

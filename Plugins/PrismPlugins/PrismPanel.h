@@ -39,6 +39,9 @@ protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
 
+
+  void initializePanel();
+
   // fill the parameters part of the GUI
   void setupVariables();
   void setupTableWidget();

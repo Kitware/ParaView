@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewWidget.h"
 
 #include "pqSpreadSheetViewModel.h"
+#include "pqNonEditableStyledItemDelegate.h"
 
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -53,9 +54,9 @@ namespace
 }
 
 //-----------------------------------------------------------------------------
-class pqSpreadSheetViewWidget::pqDelegate : public QItemDelegate
+class pqSpreadSheetViewWidget::pqDelegate : public pqNonEditableStyledItemDelegate
 {
-  typedef QItemDelegate Superclass;
+  typedef pqNonEditableStyledItemDelegate Superclass;
 public:
   pqDelegate(QObject* _parent=0):Superclass(_parent)
   {

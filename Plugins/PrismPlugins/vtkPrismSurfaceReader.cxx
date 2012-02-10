@@ -904,7 +904,6 @@ int vtkPrismSurfaceReader::RequestData(
   //We do this instead of passing the scaled bounds, as converting
   //back can cause a numeric inaccuracey
   vtkBoundingBox unScaledBoundingBox;
-  int tID=this->GetTable();
   bool scalingEnabled[3] = {this->GetXLogScaling(),
                               this->GetYLogScaling(),
                               this->GetZLogScaling()};
@@ -928,10 +927,11 @@ int vtkPrismSurfaceReader::RequestData(
 
     unScaledBoundingBox.AddPoint(coords);
 
-    vtkPrismCommon::scalePoint(coords,scalingEnabled,tID);
+    // if user asked to use log-scale, scale it, otherwise don't. This has
+    // nothing to do with the table id (as was the case in the past).
+    vtkPrismCommon::logScale(coords,scalingEnabled);
 
     newPts->InsertPoint(ptId,coords);
-
   }
 
   double viewUnscaledBounds[6];
@@ -951,9 +951,7 @@ int vtkPrismSurfaceReader::RequestData(
     bounds[5]=10;
   }
 
-
-  //scale the threshold numbers
-  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,tID,
+  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,
     this->XThresholdBetween, this->YThresholdBetween,
     this->ActualThresholdBounds);
   this->ActualThresholdBounds[4]=bounds[4];
@@ -1069,16 +1067,16 @@ int vtkPrismSurfaceReader::RequestData(
     contourOutput->SetPoints(newContourPts);
   }
 
-  if(tID==301)
-  {
+  if(this->GetTable()==301)
+    {
 
     return this->RequestCurveData(curveOutput);
-  }
+    }
   else
-  {
+    {
     vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
     curveOutput->SetPoints(newCurvePts);
-  }
+    }
   return 1;
 }
 
