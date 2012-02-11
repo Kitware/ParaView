@@ -260,10 +260,9 @@ int vtkChartRepresentation::GetNumberOfSeries()
 //----------------------------------------------------------------------------
 void vtkChartRepresentation::RescaleChart()
 {
-  vtkChart *chart = this->Options->GetChart();
-  if (chart)
+  if (this->Options && this->Options->GetChart())
     {
-    chart->RecalculateBounds();
+    this->Options->GetChart()->RecalculateBounds();
     }
 }
 
