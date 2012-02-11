@@ -71,6 +71,8 @@ public:
 protected slots:
   bool connectToPrelaunchedServer();
   void processFailed(QProcess::ProcessError);
+  void readStandardOutput();
+  void readStandardError();
 
 protected:
   bool launchAndConnectToServer();
