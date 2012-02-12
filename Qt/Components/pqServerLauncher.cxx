@@ -483,24 +483,50 @@ pqServerLauncher::~pqServerLauncher()
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::connectToServer()
 {
-  switch (this->Internals->Configuration.startupType())
+  pqServerConfiguration::StartupType startupType = 
+    this->Internals->Configuration.startupType();
+  if (startupType != pqServerConfiguration::MANUAL &&
+    startupType != pqServerConfiguration::COMMAND)
     {
-  case pqServerConfiguration::MANUAL:
-    return this->promptOptions()? this->connectToPrelaunchedServer() : false;
-
-  case pqServerConfiguration::COMMAND:
-    return this->promptOptions()? this->launchAndConnectToServer() : false;
-
-  default:
+    qCritical() << "Invalid server configuration."
+      << "Cannot connect to server";
     return false;
     }
+
+  // Check if there are any user-configurable parameters that we should obtain
+  // from the user. promptOptions() returns false only when user hits cancel, in
+  // which case the user is aborting connecting to the server.
+  if (!this->promptOptions())
+    {
+    return false;
+    }
+
+
+  if (startupType == pqServerConfiguration::COMMAND)
+    {
+    if (this->isReverseConnection())
+      {
+      // in reverse connection, we don't launchServer() immediately, instead we
+      // wait for the client to setup the "socket" before starting the server
+      // process.
+      QTimer::singleShot(0, this, SLOT(launchServerForReverseConnection()));
+      }
+    else
+      {
+      if (!this->launchServer(true))
+        {
+        return false;
+        }
+      }
+    }
+
+  return this->connectToPrelaunchedServer();
 }
 
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::connectToPrelaunchedServer()
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-  const pqServerResource& resource = this->Internals->Configuration.resource();
 
   QDialog dialog(pqCoreUtilities::mainWidget());
   QObject::connect(&dialog, SIGNAL(rejected()),
@@ -508,9 +534,11 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
-  ui.message->setText(QString("Connecting to '%1'").arg(
+  ui.message->setText(QString("Establishing connection to '%1' \n"
+      "Waiting for server to connect.").arg(
       this->Internals->Configuration.name()));
-  if (resource.scheme() == "csrc" || resource.scheme() == "cdsrsrc")
+  dialog.setWindowTitle("Waiting for Server Connection");
+  if (this->isReverseConnection())
     {
     // using reverse connect, popup the dialog.
     dialog.show();
@@ -518,8 +546,16 @@ bool pqServerLauncher::connectToPrelaunchedServer()
     dialog.activateWindow();
     }
 
+  const pqServerResource& resource = this->Internals->Configuration.resource();
   this->Internals->Server = builder->createServer(resource);
   return this->Internals->Server != NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::isReverseConnection() const
+{
+  const pqServerResource& resource = this->Internals->Configuration.resource();
+  return (resource.scheme() == "csrc" || resource.scheme() == "cdsrsrc");
 }
 
 //-----------------------------------------------------------------------------
@@ -570,7 +606,19 @@ bool pqServerLauncher::promptOptions()
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerLauncher::launchAndConnectToServer()
+void pqServerLauncher::launchServerForReverseConnection()
+{
+  if (!this->launchServer(false))
+    {
+    // server-launch failed, abort the "waiting for the server to connect" part
+    // by letting the pqObjectBuilder know.
+    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+    builder->abortPendingConnections();
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::launchServer(bool show_status_dialog)
 {
   // We need launch the server.
   double timeout, delay;
@@ -581,16 +629,19 @@ bool pqServerLauncher::launchAndConnectToServer()
     return false;
     }
 
-  // popup a dialog to tell the user that teh server is being lanuched.
+  // Pop-up a dialog to tell the user that the server is being launched.
   QDialog dialog(pqCoreUtilities::mainWidget());
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
   ui.cancel->hide();
   ui.message->setText(QString("Launching server '%1'").arg(
       this->Internals->Configuration.name()));
-  dialog.show();
-  dialog.raise();
-  dialog.activateWindow();
+  if (show_status_dialog)
+    {
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+    }
 
   // replace all $FOO$ with values for QProcessEnvironment.
   QRegExp regex("\\$([^$]*)\\$");
@@ -626,7 +677,8 @@ bool pqServerLauncher::launchAndConnectToServer()
   if (process->waitForStarted(timeout>0? timeout*1000 : -1) == false)
     {
     qCritical() << "Server launch timed out.";
-    process->deleteLater();
+    process->kill();
+    delete process;
     return false;
     }
 
@@ -657,7 +709,8 @@ bool pqServerLauncher::launchAndConnectToServer()
     QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
       process, SLOT(deleteLater()));
     }
-  return this->connectToPrelaunchedServer();
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
