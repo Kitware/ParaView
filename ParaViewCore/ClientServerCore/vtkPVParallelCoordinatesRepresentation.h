@@ -73,6 +73,10 @@ private:
   vtkPVParallelCoordinatesRepresentation(
       const vtkPVParallelCoordinatesRepresentation&); // Not implemented
   void operator=(const vtkPVParallelCoordinatesRepresentation&); // Not implemented
+
+  // Helper to determine if the number of columns changed.
+  bool NumberOfColumnsChanged();
+  vtkIdType NumberOfColumns;
 //ETX
 };
 
