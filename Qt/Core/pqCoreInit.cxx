@@ -39,7 +39,6 @@ void pqCoreInit()
 #ifndef PARAVIEW_BUILD_SHARED_LIBS
   Q_INIT_RESOURCE(pqCore);
   Q_INIT_RESOURCE(QtWidgets);
-  Q_INIT_RESOURCE(pqCoreTesting);
   Q_IMPORT_PLUGIN(QtWidgets);
 #endif
 }
