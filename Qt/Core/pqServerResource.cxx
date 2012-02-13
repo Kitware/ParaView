@@ -65,13 +65,16 @@ public:
       this->DataServerHost = temp.host();
       this->DataServerPort = temp.port();
 
-      QRegExp render_server_host("//([^:/]*)");
+      // we had conflicting documentation!!! The doc said that the render server
+      // is separated by a "/" while the code looks for "//". Updating the
+      // regular expressions so that both cases are handled.
+      QRegExp render_server_host("//?([^:/]*)");
       if(0 == render_server_host.indexIn(temp.path()))
         {
         this->RenderServerHost = render_server_host.cap(1);
         }
 
-      QRegExp render_server_port("//[^:]*:([^/]*)");
+      QRegExp render_server_port("//?[^:]*:([^/]*)");
       if(0 == render_server_port.indexIn(temp.path()))
         {
         bool ok = false;
