@@ -175,15 +175,15 @@ void pqTreeView::dropEvent(QDropEvent* dEvent)
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeView::dragEnterEvent ( QDragEnterEvent * event )
+void pqTreeView::dragEnterEvent ( QDragEnterEvent * dEvent )
 {
   QStringList mType = this->model()->mimeTypes();
-  const QMimeData* mData = event->mimeData();
+  const QMimeData* mData = dEvent->mimeData();
   foreach(QString type, mType)
     {
     if ( mData->hasFormat( type ) )
       {
-      event->accept();
+      dEvent->accept();
       return;
       }
     }

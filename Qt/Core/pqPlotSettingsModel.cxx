@@ -463,6 +463,8 @@ Qt::DropActions pqPlotSettingsModel::supportedDropActions () const
 bool pqPlotSettingsModel::dropMimeData(const QMimeData *mData, Qt::DropAction action,
                                       int row, int column, const QModelIndex &onIndex)
 {
+  Q_UNUSED(row);
+  Q_UNUSED(column);
   if (!mData || action != Qt::MoveAction)
       return false;
 
