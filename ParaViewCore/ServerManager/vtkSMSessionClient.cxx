@@ -172,7 +172,7 @@ bool vtkSMSessionClient::Connect(const char* url)
     {
     std::string hostname = pvserver.match(1);
     int port = atoi(pvserver.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port <= 0)? 11111: port;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << hostname << ":" << port << "?" << handshake.str();
@@ -180,8 +180,9 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
   else if (pvserver_reverse.find(url))
     {
+    // 0 ports are acceptable for reverse connections.
     int port = atoi(pvserver_reverse.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port < 0)? 11111: port;
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << handshake.str();
     data_server_url = stream.str();
@@ -191,11 +192,11 @@ bool vtkSMSessionClient::Connect(const char* url)
     {
     std::string dataserverhost = pvrenderserver.match(1);
     int dsport = atoi(pvrenderserver.match(2).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport <= 0)? 11111 : dsport;
 
     std::string renderserverhost = pvrenderserver.match(3);
     int rsport = atoi(pvrenderserver.match(4).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport <= 0)? 22221 : rsport;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << dataserverhost << ":" << dsport
@@ -209,10 +210,11 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
   else if (pvrenderserver_reverse.find(url))
     {
+    // 0 ports are acceptable for reverse connections.
     int dsport = atoi(pvrenderserver_reverse.match(4).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport < 0)? 11111 : dsport;
     int rsport = atoi(pvrenderserver_reverse.match(7).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport < 0)? 22221 : rsport;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << dsport

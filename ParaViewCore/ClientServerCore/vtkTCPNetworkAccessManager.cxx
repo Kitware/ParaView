@@ -26,7 +26,9 @@
 #include "vtkSmartPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
+
 #include <string>
 #include <vtksys/ios/sstream>
 #include <vector>
@@ -120,7 +122,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     }
   else
     {
-    vtkErrorMacro("Malformed URL: " << (url? url : ""));
+    vtkErrorMacro("Malformed URL: " << (url? url : "(empty)"));
     }
 
   return NULL;
@@ -345,6 +347,15 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     this->Internals->ServerSockets[port] = server_socket;
     server_socket->FastDelete();
     }
+
+  vtksys::SystemInformation sys_info;
+  sys_info.RunOSCheck();
+  const char* sys_hostname = sys_info.GetHostname()?
+    sys_info.GetHostname() : "localhost";
+
+  // print out a status message.
+  cout << "Accepting connection(s): " << sys_hostname << ":"
+      << server_socket->GetServerPort() << endl;
 
   this->AbortPendingConnectionFlag = false;
   vtkSocketController* controller = NULL;
