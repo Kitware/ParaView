@@ -8140,8 +8140,33 @@ Tessellate a higher-order dataset.
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="LevelIdScalars" class="vtkLevelIdScalars"
-      label="Level Scalars">
+   <SourceProxy name="OverlappingLevelIdScalars" class="vtkOverlappingAMRLevelIdScalars"
+      label="Level Scalars(Overlapping AMR)">
+     <Documentation
+    long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
+    short_help="Generate point scalars from level.">
+    The Level Scalars filter uses colors to show levels of a hierarchical dataset.
+     </Documentation>
+     <InputProperty
+    name="Input"
+    command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkOverlappingAMR"/>
+       </DataTypeDomain>
+       <Documentation>
+         This property specifies the input to the Level Scalars filter.
+       </Documentation>
+     </InputProperty>
+   <!-- End GroupIdScalars -->
+   </SourceProxy>
+   
+   <!-- ==================================================================== -->
+   <SourceProxy name="NonOverlappingLevelIdScalars" class="vtkNonOverlappingAMRLevelIdScalars"
+      label="Level Scalars(Non-Overlapping AMR)">
      <Documentation
 	long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
 	short_help="Generate point scalars from level.">
