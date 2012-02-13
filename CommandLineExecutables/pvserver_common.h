@@ -55,7 +55,15 @@ static bool RealMain(int argc, char* argv[],
   int process_id = controller->GetLocalProcessId();
   if (process_id == 0)
     {
-    cout << "Waiting for client" << endl;
+    // Report status:
+    if (options->GetReverseConnection())
+      {
+      cout << "Connecting to client (reverse connection requested)..." << endl;
+      }
+    else
+      {
+      cout << "Waiting for client..." << endl;
+      }
     }
   bool success = false;
   if (session->Connect())
