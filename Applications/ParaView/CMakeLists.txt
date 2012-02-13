@@ -95,7 +95,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
   endif()
 
   # Now install the all the plugins
-  if(QT_QTSVG_FOUND)
+  if(QT_QTSVG_FOUND and WIN32)
     install(FILES ${QT_BINARY_DIR}/QtSvg4.dll
             DESTINATION ${pv_runtime_dest}
             PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
