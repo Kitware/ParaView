@@ -34,9 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkChartRepresentation.h"
 #include "vtkColor.h" // for ivars
-#include "vtkNew.h"
+#include "vtkNew.h" // for ivars
 
 class vtkScatterPlotMatrix;
+class vtkStringArray;
 
 class VTK_EXPORT vtkPVPlotMatrixRepresentation : public vtkChartRepresentation
 {
