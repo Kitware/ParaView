@@ -32,18 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 
 #include "pqActiveObjects.h"
+#include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
 #include "vtkCollection.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkPVProxyDefinitionIterator.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkNew.h"
@@ -126,6 +127,7 @@ public:
   QSet<QString> ProxyDefinitionGroupToListen;
   QSet<unsigned long> CallBackIDs;
   QWidget Widget;
+  unsigned long ProxyManagerCallBackId;
 };
 
 //-----------------------------------------------------------------------------
@@ -152,12 +154,22 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   QObject::connect(&pqActiveObjects::instance(),
                    SIGNAL(serverChanged(pqServer*)),
                    this, SLOT(lookForNewDefinitions()));
+
+  this->Internal->ProxyManagerCallBackId = pqCoreUtilities::connect(
+        vtkSMProxyManager::GetProxyManager(),
+        vtkSMProxyManager::ActiveSessionChanged,
+        this, SLOT(lookForNewDefinitions()));
 }
 
 //-----------------------------------------------------------------------------
 pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
 {
   this->removeProxyDefinitionUpdateObservers();
+  if(vtkSMProxyManager::IsInitialized())
+    {
+    vtkSMProxyManager::GetProxyManager()->RemoveObserver(
+          this->Internal->ProxyManagerCallBackId);
+    }
   delete this->Internal;
   this->Internal = 0;
 }
