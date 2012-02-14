@@ -122,6 +122,6 @@ void pqCameraToolbar::activeViewChanged(pqView* view)
     {
     vtkSMRenderViewProxy* viewProxy =
         vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
-    this->Interactor = viewProxy->GetInteractor() ? viewProxy->GetInteractor() : NULL;
+    this->Interactor = viewProxy ? viewProxy->GetInteractor() : NULL;
     }
 }
