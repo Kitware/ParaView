@@ -864,7 +864,7 @@
 
   <ProxyGroup name="options">
   <!-- =================================================================== -->
-    <ContextNamedOptionsProxy name="PlotOptionsBase" class="vtkContextNamedOptions"
+    <ContextNamedOptionsProxy name="PlotOptionsBase" class="vtkXYChartNamedOptions"
       processes="client|dataserver|renderserver" >
       <StringVectorProperty name="VisibilityInfo"
         number_of_elements_per_command="2"

@@ -19,7 +19,7 @@
 #include "vtkChart.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCommand.h"
-#include "vtkContextNamedOptions.h"
+#include "vtkChartNamedOptions.h"
 #include "vtkContextView.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -38,7 +38,7 @@
 
 
 vtkStandardNewMacro(vtkChartRepresentation);
-vtkCxxSetObjectMacro(vtkChartRepresentation, Options, vtkContextNamedOptions);
+vtkCxxSetObjectMacro(vtkChartRepresentation, Options, vtkChartNamedOptions);
 //----------------------------------------------------------------------------
 vtkChartRepresentation::vtkChartRepresentation()
 {

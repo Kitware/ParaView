@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkXYChartNamedOptions.h
+  Module:    vtkChartNamedOptions.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,52 +12,32 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXYChartNamedOptions
+// .NAME vtkChartNamedOptions
 // .SECTION Description
 //
 
-#ifndef __vtkXYChartNamedOptions_h
-#define __vtkXYChartNamedOptions_h
+#ifndef __vtkChartNamedOptions_h
+#define __vtkChartNamedOptions_h
 
-#include "vtkChartNamedOptions.h"
+#include "vtkObject.h"
 
 class vtkChart;
 class vtkTable;
 
-class VTK_EXPORT vtkXYChartNamedOptions : public vtkChartNamedOptions
+class VTK_EXPORT vtkChartNamedOptions : public vtkObject
 {
 public:
-  static vtkXYChartNamedOptions* New();
-  vtkTypeMacro(vtkXYChartNamedOptions, vtkChartNamedOptions);
+  static vtkChartNamedOptions* New();
+  vtkTypeMacro(vtkChartNamedOptions, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set series visibility for the series with the given name.
+  // Set series visibility for the series with the given name.
   void SetVisibility(const char* name, int visible);
-  void SetLineThickness(const char* name, int value);
-  void SetLineStyle(const char* name, int value);
-  void SetColor(const char* name, double r, double g, double b);
-  void SetAxisCorner(const char* name, int corner);
-  void SetMarkerStyle(const char* name, int style);
-  void SetLabel(const char* name, const char* label);
 
+  // Description:
+  // Get series visibility for the series with the given name.
   int GetVisibility(const char* name);
-  int GetLineThickness(const char* name);
-  const char* GetLabel(const char* name);
-  int GetLineStyle(const char* name);
-  int GetMarkerStyle(const char* name);
-  int GetAxisCorner(const char* name);
-  void GetColor(const char* name, double rgb[3]);
-
-  // Description:
-  // Set the X series to be used for the plots, if NULL then the index of the
-  // y series should be used.
-  void SetXSeriesName(const char* name);
-  const char* GetXSeriesName();
-
-  // Description:
-  // Set whether the index should be used for the x axis.
-  void SetUseIndexForXAxis(bool useIndex);
 
   // Description:
   // Hides or plots that belong to this table.  When showing,
@@ -74,20 +54,32 @@ public:
   // Uses the enum from vtkChart.
   int GetChartType();
 
+// This BTX is here because currently vtkCharts is not client-server wrapped.
+//BTX
+  // Description:
+  // Sets the internal chart object whose options will be manipulated.
+  void SetChart(vtkChart* chart);
+  vtkChart * GetChart();
+//ETX
+
+  // Description:
+  // Sets the internal table object that can be plotted.
+  void SetTable(vtkTable* table);
+  vtkTable* GetTable();
+
   void RemovePlotsFromChart();
 
 //BTX
   // Description:
-  // Class for storing individual series properties like color, label, line
-  // thickness...
+  // Class for storing individual series properties like label, visibility.
   class PlotInfo;
 
 protected:
-  vtkXYChartNamedOptions();
-  ~vtkXYChartNamedOptions();
+  vtkChartNamedOptions();
+  ~vtkChartNamedOptions();
 
   // Description:
-  // Initializes the plots map, and adds a default series to plot
+  // Initializes the plots map, and adds a default series to plot.
   void RefreshPlots();
 
   // Description:
@@ -100,9 +92,10 @@ protected:
   PlotInfo& GetPlotInfo(const char* seriesName);
 
 private:
-  vtkXYChartNamedOptions(const vtkXYChartNamedOptions&); // Not implemented
-  void operator=(const vtkXYChartNamedOptions&); // Not implemented
+  vtkChartNamedOptions(const vtkChartNamedOptions&); // Not implemented
+  void operator=(const vtkChartNamedOptions&); // Not implemented
 
+  vtkTimeStamp RefreshTime;
   class vtkInternals;
   vtkInternals* Internals;
 //ETX
