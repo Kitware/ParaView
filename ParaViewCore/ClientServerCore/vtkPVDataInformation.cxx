@@ -888,9 +888,9 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
     case VTK_MULTIBLOCK_DATA_SET:
       return "Multi-block Dataset";
     case VTK_HIERARCHICAL_DATA_SET:
-      return "Hierarchical DataSet";
+      return "Hierarchical DataSet (Deprecated)";
     case VTK_HIERARCHICAL_BOX_DATA_SET:
-      return "AMR Dataset";
+      return "AMR Dataset (Deprecated)";
     case VTK_NON_OVERLAPPING_AMR:
       return "Non-Overlapping AMR Dataset";
     case VTK_OVERLAPPING_AMR:
