@@ -37,6 +37,10 @@
 // This line won't be split into smaller arguments
 #cmakedefine PV_SETUP_SCRIPT "@PV_SETUP_SCRIPT@"
 
+// if defined we use random port numbers for testing (needed for parallel
+// tests).
+#cmakedefine PV_TEST_USE_RANDOM_PORTS
+
 #ifndef DART_TESTING_TIMEOUT
 # define DART_TESTING_TIMEOUT 1500
 #endif

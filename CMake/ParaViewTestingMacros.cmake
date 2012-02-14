@@ -92,7 +92,6 @@ FUNCTION (add_client_server_tests prefix)
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
-       --server=testserver
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_server_tests)
@@ -105,7 +104,6 @@ FUNCTION (add_client_render_server_tests prefix)
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
-       --server=testserver-dsrs
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_render_server_tests)
@@ -126,7 +124,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         -dr
         --disable-light-kit
-        --server=testserver
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-script=${test_script}
         --test-master
@@ -135,7 +132,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         -dr
         --disable-light-kit
-        --server=testserver
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-slave
         ${extra_args}
