@@ -25,10 +25,10 @@
 #include "vtkColorSeries.h"
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
-#include "vtkSmartPointer.h"
+#include "vtkNew.h"
 
-#include "map"
-#include "vtksys/ios/sstream"
+#include <map>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 // Class to store information about each plot.
@@ -85,7 +85,6 @@ class vtkContextNamedOptions::vtkInternals
 public:
   vtkInternals()
   {
-    this->Colors = vtkSmartPointer<vtkColorSeries>::New();
     this->UseIndexForXAxis = true;
     this->ChartType = vtkChart::LINE;
     this->TableVisibility = false;
@@ -99,7 +98,7 @@ public:
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
-  vtkSmartPointer<vtkColorSeries> Colors;
+  vtkNew<vtkColorSeries> Colors;
 };
 
 //----------------------------------------------------------------------------
