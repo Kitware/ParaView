@@ -34,8 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QToolBar>
 #include "pqApplicationComponentsExport.h"
+#include "vtkWeakPointer.h"
 
 class pqRubberBandHelper;
+class pqView;
+class vtkPVGenericRenderWindowInteractor;
 
 /// pqCameraToolbar is the toolbar that has icons for resetting camera
 /// orientation.
@@ -61,13 +64,18 @@ public:
 
 private slots:
   void onSelectionModeChanged(int mode);
+  void startZoomToBox();
+  void endZoomToBox();
+  void activeViewChanged(pqView*);
 
 private:
   Q_DISABLE_COPY(pqCameraToolbar)
   void constructor();
 
   QAction* ZoomAction;
+  bool ZoomToBoxStarted;
   pqRubberBandHelper* SelectionHelper;
+  vtkWeakPointer<vtkPVGenericRenderWindowInteractor> Interactor;
 };
 
 #endif
