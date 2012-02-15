@@ -53,6 +53,10 @@ pqSelectionAdaptor::pqSelectionAdaptor(QItemSelectionModel* _parent)
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
     this, SLOT(selectionChanged()));
 
+  QObject::connect(this->QSelectionModel,
+    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+    this, SLOT(selectionChanged()));
+
   pqActiveObjects* ao = &pqActiveObjects::instance();
   QObject::connect(ao, SIGNAL(portChanged(pqOutputPort*)),
     this, SLOT(currentProxyChanged()));
