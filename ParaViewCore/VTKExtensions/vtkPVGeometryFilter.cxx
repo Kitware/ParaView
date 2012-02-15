@@ -733,8 +733,8 @@ int vtkPVGeometryFilter::RequestAMRData(
     return 0;
     }
 
-  vtkHierarchicalBoxDataSet *input=
-      vtkHierarchicalBoxDataSet::GetData(inputVector[0], 0);
+  vtkOverlappingAMR *input=
+      vtkOverlappingAMR::GetData(inputVector[0], 0);
   if( input == NULL )
     {
     vtkErrorMacro( "Input AMR composite dataset is NULL" );
