@@ -20,14 +20,14 @@
 #include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
+#include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 
 #include <vtksys/ios/sstream>
@@ -50,6 +50,7 @@ vtkSMOutputPort::vtkSMOutputPort()
   this->TemporalDataInformationValid = false;
   this->PortIndex = 0;
   this->SourceProxy = 0;
+  this->CompoundSourceProxy = 0;
   this->ObjectsCreated = 1;
 }
 
@@ -156,7 +157,7 @@ void vtkSMOutputPort::GatherClassNameInformation()
 
 
   this->ClassNameInformation->SetPortNumber(this->PortIndex);
-  vtkObjectBase* cso = this->GetSourceProxy()->GetClientSideObject();
+  vtkObjectBase* cso = this->SourceProxy->GetClientSideObject();
   if (cso)
     {
     this->ClassNameInformation->CopyFromObject(
@@ -235,10 +236,18 @@ void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, double dr)
 //----------------------------------------------------------------------------
 vtkSMSourceProxy* vtkSMOutputPort::GetSourceProxy()
 {
-  return this->SourceProxy.GetPointer();
+  return this->CompoundSourceProxy?
+    this->CompoundSourceProxy.GetPointer() : this->SourceProxy.GetPointer();
 }
+
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::SetSourceProxy(vtkSMSourceProxy* src)
 {
   this->SourceProxy = src;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::SetCompoundSourceProxy(vtkSMCompoundSourceProxy* src)
+{
+  this->CompoundSourceProxy = src;
 }
