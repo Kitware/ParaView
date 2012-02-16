@@ -46,7 +46,7 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="nii" file_description="NIfTI Files" />
+        <ReaderFactory extensions="nii img hdr" file_description="NIfTI Files" />
       </Hints>
       <!-- End NIfTIReader -->
    </SourceProxy>
