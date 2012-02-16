@@ -80,6 +80,7 @@ public:
   virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
   virtual unsigned int RemoveUncheckedProxy(vtkSMProxy* proxy);
   virtual void RemoveAllUncheckedProxies();
+  virtual void ClearUncheckedProxies();
   virtual void RemoveAllProxies()
   {
     this->Superclass::RemoveAllProxies();

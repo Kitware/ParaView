@@ -339,6 +339,15 @@ void vtkSMInputProperty::RemoveAllUncheckedProxies()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMInputProperty::ClearUncheckedProxies()
+{
+  this->IPInternals->UncheckedOutputPorts =
+    this->IPInternals->OutputPorts;
+
+  this->Superclass::ClearUncheckedProxies();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMInputProperty::RemoveAllProxies(int modify)
 {
   this->IPInternals->OutputPorts.clear();
