@@ -29,7 +29,7 @@
 class vtkAMRVolumeMapper;
 class vtkColorTransferFunction;
 class vtkFixedPointVolumeRayCastMapper;
-class vtkHierarchicalBoxDataSet;
+class vtkOverlappingAMR;
 class vtkOutlineSource;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
@@ -174,7 +174,7 @@ protected:
   // Passes on parameters to the active volume mapper
   virtual void UpdateMapperParameters();
 
-  vtkHierarchicalBoxDataSet* Cache;
+  vtkOverlappingAMR* Cache;
   vtkPVCacheKeeper* CacheKeeper;
   vtkAMRVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;

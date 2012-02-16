@@ -17,7 +17,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
 #include "vtkAMRVolumeMapper.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -59,7 +59,7 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = POINT_DATA;
-  this->Cache = vtkHierarchicalBoxDataSet::New();
+  this->Cache = vtkOverlappingAMR::New();
 
   this->CacheKeeper->SetInput(this->Cache);
   this->OutlineDeliveryFilter->SetInputConnection(
@@ -93,7 +93,7 @@ vtkAMRVolumeRepresentation::~vtkAMRVolumeRepresentation()
 int vtkAMRVolumeRepresentation::FillInputPortInformation(
   int, vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
@@ -179,8 +179,8 @@ int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
-    vtkHierarchicalBoxDataSet* input = 
-      vtkHierarchicalBoxDataSet::GetData(inputVector[0], 0);
+    vtkOverlappingAMR* input =
+      vtkOverlappingAMR::GetData(inputVector[0], 0);
     if (!this->GetUsingCacheForUpdate())
       {
       this->Cache->ShallowCopy(input);
@@ -191,7 +191,7 @@ int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
     this->VolumeMapper->SetInputConnection(
       this->CacheKeeper->GetOutputPort());
 
-    this->OutlineSource->SetBounds(vtkHierarchicalBoxDataSet::SafeDownCast(
+    this->OutlineSource->SetBounds(vtkOverlappingAMR::SafeDownCast(
         this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
     }
   else

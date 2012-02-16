@@ -1453,7 +1453,7 @@
 
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkHierarchicalBoxDataSet"/>
+          <DataType value="vtkOverlappingAMR"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array_cell" attribute_type="cell"
           optional="1">

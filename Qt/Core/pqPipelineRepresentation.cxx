@@ -952,7 +952,8 @@ QList<QString> pqPipelineRepresentation::getColorFields()
       compositeDataType = dataInfo->GetCompositeDataSetType();
       }
 
-    if ((compositeDataType == VTK_HIERARCHICAL_BOX_DATA_SET) ||
+    if ((compositeDataType == VTK_OVERLAPPING_AMR) ||
+        (compositeDataType == VTK_HIERARCHICAL_BOX_DATA_SET) ||
         (representation.compare("Volume", Qt::CaseInsensitive) != 0) ||
         (dataSetType != VTK_UNIFORM_GRID &&
          dataSetType != VTK_STRUCTURED_POINTS &&
