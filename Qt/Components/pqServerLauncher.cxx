@@ -674,7 +674,7 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
   // wait for process to start.
   // waitForStarted() may block until the process starts. That is generally a short
   // span of time, hence we don't worry about it too much.
-  if (process->waitForStarted(timeout>0? timeout*1000 : -1) == false)
+  if (process->waitForStarted(timeout>0? static_cast<int>(timeout*1000) : -1) == false)
     {
     qCritical() << "Server launch timed out.";
     process->kill();
