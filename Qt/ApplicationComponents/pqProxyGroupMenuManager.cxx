@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkNew.h"
 
-#include <QDebug>
 #include <QMenu>
 #include <QMap>
 #include <QPointer>
@@ -127,6 +126,7 @@ public:
   QSet<QString> ProxyDefinitionGroupToListen;
   QSet<unsigned long> CallBackIDs;
   QWidget Widget;
+  QPointer<QAction> SearchAction;
   unsigned long ProxyManagerCallBackId;
 };
 
@@ -158,7 +158,7 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   this->Internal->ProxyManagerCallBackId = pqCoreUtilities::connect(
         vtkSMProxyManager::GetProxyManager(),
         vtkSMProxyManager::ActiveSessionChanged,
-        this, SLOT(lookForNewDefinitions()));
+        this, SLOT(switchActiveServer()));
 }
 
 //-----------------------------------------------------------------------------
@@ -388,6 +388,10 @@ void pqProxyGroupMenuManager::populateMenu()
     QObject::disconnect(action, 0,  this, 0);
     }
   menuActions.clear();
+  if(!this->Internal->SearchAction.isNull())
+    {
+    this->Internal->SearchAction->deleteLater();
+    }
 
 
   QList<QMenu*> submenus = _menu->findChildren<QMenu*>();
@@ -398,9 +402,9 @@ void pqProxyGroupMenuManager::populateMenu()
   _menu->clear();
 
 #ifdef Q_WS_MAC
-  _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
+  this->Internal->SearchAction = _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
 #else
-  _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
+  this->Internal->SearchAction = _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
 #endif
 
   if (this->RecentlyUsedMenuSize > 0)
@@ -489,10 +493,12 @@ QAction* pqProxyGroupMenuManager::getAction(
       QStringList data_list;
       data_list << pgroup << pname;
       action << pqSetName(name) << pqSetData(data_list);
-      this->Internal->Widget.addAction(action); // we add action to ourselves so it won't get
-                               // deleted as we are updating the menu.
       iter.value().Action = action;
       }
+
+    // Add action in the pool for the QuickSearch...
+    this->Internal->Widget.addAction(action);
+
     action->setText(label);
     QString icon = this->Internal->Proxies[key].Icon;
 
@@ -554,9 +560,15 @@ void pqProxyGroupMenuManager::quickLaunch()
 }
 
 //-----------------------------------------------------------------------------
+QWidget* pqProxyGroupMenuManager::widgetActionsHolder() const
+{
+  return &this->Internal->Widget;
+}
+
+//-----------------------------------------------------------------------------
 QList<QAction*> pqProxyGroupMenuManager::actions() const
 {
-  return this->Internal->Widget.actions();
+  return this->widgetActionsHolder()->actions();
 }
 
 //-----------------------------------------------------------------------------
@@ -763,4 +775,17 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
 
   // Update the menu with the current definition
   this->populateMenu();
+}
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::switchActiveServer()
+{
+  // Clear the QuickSearch QAction pool...
+  QList<QAction*> actions = this->Internal->Widget.actions();
+  foreach(QAction* action, actions)
+    {
+    this->Internal->Widget.removeAction(action);
+    }
+
+  // Fill is back by updating the menu
+  this->lookForNewDefinitions();
 }
