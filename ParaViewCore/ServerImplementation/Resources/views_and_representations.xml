@@ -48,6 +48,9 @@
         <Documentation>
           Set the position on this view in the multiview configuration.
         </Documentation>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="ViewSize"
@@ -56,6 +59,9 @@
         state_ignored="1"
         ignore_synchronization="1"
         default_values="400 400" >
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the size of this view in the multiview configuration.
         </Documentation>
@@ -595,8 +601,8 @@
          <Property name="CameraParallelScaleInfo" />
          <Property name="CameraParallelProjection" />
          <Property name="EyeAngle" />
-	 <Property name="HeadPose" />
-	 <Property name="WandPose" />
+         <Property name="HeadPose" />
+         <Property name="WandPose" />
        </ExposedProperties>
      </SubProxy>
     </RenderViewProxy>
@@ -1576,9 +1582,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
-	      <Hints>
-	        <NoDefault />
-	      </Hints>
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1800,9 +1806,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
-	      <Hints>
-	        <NoDefault />
-	      </Hints>
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2271,9 +2277,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
-	      <Hints>
-	        <NoDefault />
-	      </Hints>
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2514,9 +2520,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
-	      <Hints>
-	        <NoDefault />
-	      </Hints>
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2839,13 +2845,13 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
-	  <DoubleVectorProperty
+      <DoubleVectorProperty
         name="DataBounds"
         command="GetDataBounds"
-		information_only="1"
+        information_only="1"
         number_of_elements="6"
         default_values="0 1 0 1 0 1">
-		<SimpleDoubleInformationHelper/>
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -4461,6 +4467,9 @@
         command="SetViewPosition"
         number_of_elements="2"
         default_values="0 0">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the position on this view in the multiview configuration.
         </Documentation>
@@ -4472,6 +4481,9 @@
         state_ignored="1"
         ignore_synchronization="1"
         default_values="400 400" >
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the size of this view in the multiview configuration.
         </Documentation>
