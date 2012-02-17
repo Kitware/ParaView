@@ -3653,7 +3653,7 @@
       <SubProxy>
         <Proxy name="PlotOptions"
           proxygroup="options"
-          proxyname="PlotOptionsBase">
+          proxyname="XYPlotOptions">
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
@@ -3907,6 +3907,19 @@
         </Documentation>
       </InputProperty>
 
+      <SubProxy>
+        <Proxy name="PlotOptions"
+          proxygroup="options"
+          proxyname="PlotOptionsBase">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="Label" exposed_name="SeriesLabel" />
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
     </ParallelCoordinatesRepresentationProxy>
 
     <!-- =================================================================== -->
@@ -4136,15 +4149,9 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
-          <Property name="Color" exposed_name="SeriesColor" />
           <Property name="Label" exposed_name="SeriesLabel" />
-          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
-          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
-
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
-          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
-          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
+          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
         </ExposedProperties>
       </SubProxy>
 

@@ -41,6 +41,14 @@ public:
   virtual int GetVisibility(const char* name);
 
   // Description:
+  // Set the label for the specified series.
+  virtual void SetLabel(const char* name, const char* label);
+
+  // Description:
+  // Get the label for the specified series.
+  virtual const char* GetLabel(const char* name);
+
+  // Description:
   // Hides or plots that belong to this table.  When showing,
   // only plots that are actually marked visible will be shown.
   virtual void SetTableVisibility(bool visible);

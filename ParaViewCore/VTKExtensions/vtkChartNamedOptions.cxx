@@ -34,7 +34,7 @@ public:
   vtkWeakPointer<vtkPlot> Plot;
   vtkStdString Label;
   bool VisibilityInitialized;
-  int Visible;
+  bool Visible;
 
   PlotInfo() : VisibilityInitialized(false), Visible(true)
     {
@@ -85,16 +85,30 @@ vtkChartNamedOptions::~vtkChartNamedOptions()
 void vtkChartNamedOptions::SetVisibility(const char* name, int visible)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
-  plotInfo.Visible = visible;
+  plotInfo.Visible = visible != 0;
   plotInfo.VisibilityInitialized = true;
-  this->SetPlotVisibilityInternal(plotInfo, visible !=0, name);
+  this->SetPlotVisibilityInternal(plotInfo, visible != 0, name);
 }
 
 //----------------------------------------------------------------------------
 int vtkChartNamedOptions::GetVisibility(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
-  return plotInfo.Visible? 1 : 0;
+  return plotInfo.Visible ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkChartNamedOptions::SetLabel(const char* name, const char* label)
+{
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
+  plotInfo.Label = label;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkChartNamedOptions::GetLabel(const char* name)
+{
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
+  return plotInfo.Label.c_str();
 }
 
 //----------------------------------------------------------------------------
