@@ -479,6 +479,7 @@ QAction* pqProxyGroupMenuManager::getAction(
       action << pqSetName(name) << pqSetData(data_list);
       this->Internal->Widget.addAction(action); // we add action to ourselves so it won't get
                                // deleted as we are updating the menu.
+      iter.value().Action = action;
       }
     action->setText(label);
     QString icon = this->Internal->Proxies[key].Icon;
@@ -494,8 +495,9 @@ QAction* pqProxyGroupMenuManager::getAction(
       action->setIcon(QIcon(icon));
       }
 
-    QObject::connect(action, SIGNAL(triggered(bool)), 
-      this, SLOT(triggered()));
+    // this avoids creating duplicate connections.
+    QObject::disconnect(action, 0,  this, 0);
+    QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(triggered()));
     return action;
     }
   return 0;
