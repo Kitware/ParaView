@@ -415,3 +415,7 @@ a:hover {
 #about a {
 	color: #1CB543;
 }
+
+.post .entry img {
+  max-width: 100%;
+}
