@@ -184,7 +184,7 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
           {
           QModelIndex itemIndex = this->getModel()->index(index_.row(), 0,
             index_.parent());
-          this->getSelectionModel()->select(itemIndex,
+          this->getSelectionModel()->setCurrentIndex(itemIndex,
             QItemSelectionModel::ClearAndSelect);
           }
         }
