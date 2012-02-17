@@ -59,7 +59,8 @@ protected:
   
   int StartProcessAndWait(vtksysProcess* server, const char* name,
                   std::vector<char>& out, std::vector<char>& err,
-                  const char* string_to_wait_for);
+                  const char* string_to_wait_for,
+                  std::string& matched_line);
   int StartProcess(vtksysProcess* client, const char* name);
   void Stop(vtksysProcess* p, const char* name);
   int OutputStringHasError(const char* pname, std::string& output);
@@ -71,7 +72,8 @@ protected:
                           std::string& line, double timeout,
                           std::vector<char>& out, std::vector<char>& err,
                           const char* string_to_wait_for=NULL,
-                          int* foundWaiting=NULL);
+                          int* foundWaiting=NULL,
+                          std::string* matched_line=NULL);
 
   std::string GetDirectory(std::string location);
 
@@ -82,6 +84,14 @@ private:
     int ArgStart;
     int ArgEnd;
     };
+
+  // Description:
+  // These method setup the \c process appropriately i.e. set the command,
+  // timeout etc.
+  bool SetupRenderServer(vtksysProcess* process);
+  bool SetupServer(vtksysProcess* process);
+  bool SetupClient(vtksysProcess* process, const ClientExecutableInfo& info,
+    char* argv[]);
 
   std::vector<ClientExecutableInfo> ClientExecutables;
   std::string ServerExecutable;  // fullpath to paraview server executable
@@ -124,6 +134,9 @@ private:
   std::string MPIRenderServerNumProcessFlag;
 
   std::string CurrentPrintLineName;
+
+  // identifies how to connect to the server.
+  std::string ServerURL;
 
   int RenderServerNumProcesses;
   double TimeOut;

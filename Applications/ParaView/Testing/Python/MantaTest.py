@@ -96,7 +96,7 @@ QtTesting.playCommand(object21, 'mouseRelease', '(0.419355,0.304348,1,0,0)')
 object37 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object37, 'set_string', 'Solid Color')
 object38 = 'pqClientMainWindow/1QTabBar1'
-QtTesting.playCommand(object38, 'set_tab', '1')
+QtTesting.playCommand(object38, 'set_tab_with_text', 'Display')
 object39 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_vcontainer/1QScrollBar0'
 QtTesting.playCommand(object39, 'mousePress', '1,1,0,8,40')
 QtTesting.playCommand(object39, 'mouseMove', '1,0,0,10,241')

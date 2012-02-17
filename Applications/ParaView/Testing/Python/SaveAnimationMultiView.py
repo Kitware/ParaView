@@ -9,12 +9,12 @@ QtTesting.playCommand(object1, 'activate', 'Wavelet')
 object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
 object6 = 'pqClientMainWindow/1QTabBar1'
-QtTesting.playCommand(object6, 'set_tab', '1')
+QtTesting.playCommand(object6, 'set_tab_with_text', 'Display')
 object24 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox'
 QtTesting.playCommand(object24, 'set_string', 'Surface')
 object25 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables'
 QtTesting.playCommand(object25, 'set_string', 'RTData')
-QtTesting.playCommand(object6, 'set_tab', '0')
+QtTesting.playCommand(object6, 'set_tab_with_text', 'Properties')
 object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitHorizontal'
 QtTesting.playCommand(object3, 'activate', '')
 
@@ -27,7 +27,7 @@ object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwid
 QtTesting.playCommand(object4, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'Sphere')
 QtTesting.playCommand(object2, 'activate', '')
-QtTesting.playCommand(object6, 'set_tab', '1')
+QtTesting.playCommand(object6, 'set_tab_with_text', 'Display')
 object8 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')
@@ -35,7 +35,7 @@ QtTesting.playCommand(object8, 'set_boolean', 'false')
 QtTesting.playCommand(object8, 'set_boolean', 'false')
 object9 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object9, 'activate', 'actionFileOpen')
-QtTesting.playCommand(object6, 'set_tab', '0')
+QtTesting.playCommand(object6, 'set_tab_with_text', 'Properties')
 object10 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object10, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd')
 QtTesting.playCommand(object2, 'activate', '')

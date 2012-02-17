@@ -16,7 +16,7 @@ QtTesting.playCommand(object2, 'activate', '')
 object5 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
 QtTesting.playCommand(object5, 'currentChanged', '/0/0|0')
 object6 = 'pqClientMainWindow/1QTabBar1'
-QtTesting.playCommand(object6, 'set_tab', '1')
+QtTesting.playCommand(object6, 'set_tab_with_text', 'Display')
 object7 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object7, 'set_boolean', 'true')
 object8 = 'pqClientMainWindow/menubar'
