@@ -85,15 +85,11 @@ public:
   vtkInternals()
   {
     this->UseIndexForXAxis = true;
-    this->ChartType = vtkChart::LINE;
-    this->TableVisibility = false;
   }
 
   PlotMapType PlotMap;
   std::string XSeriesName;
   bool UseIndexForXAxis;
-  int ChartType;
-  bool TableVisibility;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
@@ -106,6 +102,7 @@ vtkStandardNewMacro(vtkXYChartNamedOptions);
 //----------------------------------------------------------------------------
 vtkXYChartNamedOptions::vtkXYChartNamedOptions()
 {
+  this->ChartType = vtkChart::LINE;
   this->Internals = new vtkInternals();
 }
 
@@ -119,14 +116,14 @@ vtkXYChartNamedOptions::~vtkXYChartNamedOptions()
 //----------------------------------------------------------------------------
 void vtkXYChartNamedOptions::SetChartType(int type)
 {
-  this->Internals->ChartType = type;
+  this->ChartType = type;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 int vtkXYChartNamedOptions::GetChartType()
 {
-  return this->Internals->ChartType;
+  return this->ChartType;
 }
 
 //----------------------------------------------------------------------------
@@ -161,9 +158,9 @@ void vtkXYChartNamedOptions::SetXSeriesName(const char* name)
     }
 
   // If the X series column is changed, the range will have changed
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
-    this->Internals->Chart->RecalculateBounds();
+    this->Chart->RecalculateBounds();
     }
 }
 
@@ -183,9 +180,9 @@ void vtkXYChartNamedOptions::SetUseIndexForXAxis(bool useIndex)
     }
 
   // If the X series column is changed, the range will have changed
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
-    this->Internals->Chart->RecalculateBounds();
+    this->Chart->RecalculateBounds();
     }
 }
 
@@ -206,7 +203,7 @@ void SetPlotInfoColor(vtkXYChartNamedOptions::PlotInfo& plotInfo, vtkColor3ub co
 //----------------------------------------------------------------------------
 void vtkXYChartNamedOptions::RefreshPlots()
 {
-  if (!this->Internals->Table)
+  if (!this->Table)
     {
     return;
     }
@@ -220,11 +217,11 @@ void vtkXYChartNamedOptions::RefreshPlots()
     }
 
   // For each series (column in the table)
-  const vtkIdType numberOfColumns = this->Internals->Table->GetNumberOfColumns();
+  const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();
   for (vtkIdType i = 0; i < numberOfColumns; ++i)
     {
     // Get the series name
-    const char* seriesName = this->Internals->Table->GetColumnName(i);
+    const char* seriesName = this->Table->GetColumnName(i);
     if (!seriesName || !seriesName[0])
       {
       continue;
@@ -247,7 +244,7 @@ void vtkXYChartNamedOptions::RefreshPlots()
     }
 
   // Now we need to prune old series (table columns that were removed)
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
     PlotMapIterator it = this->Internals->PlotMap.begin();
     for ( ; it != this->Internals->PlotMap.end(); ++it)
@@ -256,7 +253,7 @@ void vtkXYChartNamedOptions::RefreshPlots()
       // the vtkTable then lets remove it from the chart
       if (it->second.Plot && newMap.find(it->first) == newMap.end())
         {
-        this->Internals->Chart->RemovePlotInstance(it->second.Plot);
+        this->Chart->RemovePlotInstance(it->second.Plot);
         }
       }
     }
@@ -267,7 +264,7 @@ void vtkXYChartNamedOptions::RefreshPlots()
 //----------------------------------------------------------------------------
 void vtkXYChartNamedOptions::RemovePlotsFromChart()
 {
-  if (!this->Internals->Chart)
+  if (!this->Chart)
     {
     return;
     }
@@ -280,7 +277,7 @@ void vtkXYChartNamedOptions::RemovePlotsFromChart()
       {
       vtkPlot* plot = plotInfo.Plot;
       plotInfo.Plot = 0; // clear the weak pointer before destroying the plot
-      this->Internals->Chart->RemovePlotInstance(plot);
+      this->Chart->RemovePlotInstance(plot);
       }
     }
 }
@@ -294,10 +291,10 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
     {
     plotInfo.Plot->SetVisible(static_cast<bool>(visible));
     }
-  else if (this->Internals->Chart && this->Internals->Table && visible)
+  else if (this->Chart && this->Table && visible)
     {
     // Create a new vtkPlot and initialize it
-    vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
+    vtkPlot *plot = this->Chart->AddPlot(this->ChartType);
     if (plot)
       {
       plotInfo.Plot = plot;
@@ -313,7 +310,7 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         line->SetMarkerStyle(plotInfo.MarkerStyle);
         }
       plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      plot->SetInput(this->Internals->Table,
+      plot->SetInput(this->Table,
                       this->Internals->XSeriesName.c_str(),
                       seriesName);
       }
@@ -340,7 +337,7 @@ vtkXYChartNamedOptions::GetPlotInfo(const char* seriesName)
 //----------------------------------------------------------------------------
 void vtkXYChartNamedOptions::SetTableVisibility(bool visible)
 {
-  this->Internals->TableVisibility = visible;
+  this->TableVisibility = visible;
 
   for (PlotMapIterator it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
@@ -403,9 +400,9 @@ void vtkXYChartNamedOptions::SetAxisCorner(const char* name, int value)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Corner = value;
-  if (plotInfo.Plot && this->Internals->Chart)
+  if (plotInfo.Plot && this->Chart)
     {
-    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Internals->Chart);
+    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Chart);
     if (chart)
       {
       chart->SetPlotCorner(plotInfo.Plot, value);

@@ -20,6 +20,7 @@
 #define __vtkChartNamedOptions_h
 
 #include "vtkObject.h"
+#include "vtkWeakPointer.h" // For ivars
 
 class vtkChart;
 class vtkTable;
@@ -33,26 +34,26 @@ public:
 
   // Description:
   // Set series visibility for the series with the given name.
-  void SetVisibility(const char* name, int visible);
+  virtual void SetVisibility(const char* name, int visible);
 
   // Description:
   // Get series visibility for the series with the given name.
-  int GetVisibility(const char* name);
+  virtual int GetVisibility(const char* name);
 
   // Description:
   // Hides or plots that belong to this table.  When showing,
   // only plots that are actually marked visible will be shown.
-  void SetTableVisibility(bool visible);
+  virtual void SetTableVisibility(bool visible);
 
   // Description:
   // Set the type of plots that will be added to charts by this proxy.
   // Uses the enum from vtkChart.
-  void SetChartType(int type);
+  virtual void SetChartType(int type);
 
   // Description:
   // Get the type of plots that will be added to charts by this proxy.
   // Uses the enum from vtkChart.
-  int GetChartType();
+  virtual int GetChartType();
 
 // This BTX is here because currently vtkCharts is not client-server wrapped.
 //BTX
@@ -67,7 +68,7 @@ public:
   void SetTable(vtkTable* table);
   vtkTable* GetTable();
 
-  void RemovePlotsFromChart();
+  virtual void RemovePlotsFromChart();
 
 //BTX
   // Description:
@@ -80,7 +81,18 @@ protected:
 
   // Description:
   // Initializes the plots map, and adds a default series to plot.
-  void RefreshPlots();
+  virtual void RefreshPlots();
+
+  vtkWeakPointer<vtkChart> Chart;
+  vtkWeakPointer<vtkTable> Table;
+  int ChartType;
+  bool TableVisibility;
+
+private:
+  vtkChartNamedOptions(const vtkChartNamedOptions&); // Not implemented
+  void operator=(const vtkChartNamedOptions&); // Not implemented
+
+  PlotInfo& GetPlotInfo(const char* seriesName);
 
   // Description:
   // If the plot exists this will set its visibility.  If the plot does not yet
@@ -88,12 +100,6 @@ protected:
   // is passed to this method so it can be used to initialize the vtkPlot if needed.
   void SetPlotVisibilityInternal(PlotInfo& info, bool visible,
                                  const char* seriesName);
-
-  PlotInfo& GetPlotInfo(const char* seriesName);
-
-private:
-  vtkChartNamedOptions(const vtkChartNamedOptions&); // Not implemented
-  void operator=(const vtkChartNamedOptions&); // Not implemented
 
   vtkTimeStamp RefreshTime;
   class vtkInternals;

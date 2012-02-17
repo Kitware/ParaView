@@ -43,6 +43,7 @@ void vtkXYChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetOptions(vtkChartNamedOptions *options)
 {
+  vtkChartRepresentation::SetOptions(options);
   this->XYOptions = vtkXYChartNamedOptions::SafeDownCast(options);
   if (!this->XYOptions)
     {

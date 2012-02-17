@@ -21,9 +21,6 @@
 
 #include "vtkChartNamedOptions.h"
 
-class vtkChart;
-class vtkTable;
-
 class VTK_EXPORT vtkXYChartNamedOptions : public vtkChartNamedOptions
 {
 public:
@@ -90,18 +87,17 @@ protected:
   // Initializes the plots map, and adds a default series to plot
   void RefreshPlots();
 
+private:
+  vtkXYChartNamedOptions(const vtkXYChartNamedOptions&); // Not implemented
+  void operator=(const vtkXYChartNamedOptions&); // Not implemented
+
   // Description:
   // If the plot exists this will set its visibility.  If the plot does not yet
   // exist and visible is true then the plot will be created.  The series name
   // is passed to this method so it can be used to initialize the vtkPlot if needed.
   void SetPlotVisibilityInternal(PlotInfo& info, bool visible,
                                  const char* seriesName);
-
   PlotInfo& GetPlotInfo(const char* seriesName);
-
-private:
-  vtkXYChartNamedOptions(const vtkXYChartNamedOptions&); // Not implemented
-  void operator=(const vtkXYChartNamedOptions&); // Not implemented
 
   class vtkInternals;
   vtkInternals* Internals;

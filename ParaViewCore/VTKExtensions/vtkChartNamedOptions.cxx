@@ -58,16 +58,9 @@ class vtkChartNamedOptions::vtkInternals
 public:
   vtkInternals()
   {
-    this->ChartType = vtkChart::POINTS;
-    this->TableVisibility = false;
   }
 
   PlotMapType PlotMap;
-  int ChartType;
-  bool TableVisibility;
-
-  vtkWeakPointer<vtkChart> Chart;
-  vtkWeakPointer<vtkTable> Table;
 };
 
 //----------------------------------------------------------------------------
@@ -76,6 +69,8 @@ vtkStandardNewMacro(vtkChartNamedOptions)
 //----------------------------------------------------------------------------
 vtkChartNamedOptions::vtkChartNamedOptions()
 {
+  this->ChartType = vtkChart::POINTS;
+  this->TableVisibility = false;
   this->Internals = new vtkInternals();
 }
 
@@ -105,7 +100,7 @@ int vtkChartNamedOptions::GetVisibility(const char* name)
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetTableVisibility(bool visible)
 {
-  this->Internals->TableVisibility = visible;
+  this->TableVisibility = visible;
 
   for (PlotMapIterator it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
@@ -119,37 +114,37 @@ void vtkChartNamedOptions::SetTableVisibility(bool visible)
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetChartType(int type)
 {
-  this->Internals->ChartType = type;
+  this->ChartType = type;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 int vtkChartNamedOptions::GetChartType()
 {
-  return this->Internals->ChartType;
+  return this->ChartType;
 }
 
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetChart(vtkChart* chart)
 {
-  if (this->Internals->Chart == chart)
+  if (this->Chart == chart)
     {
     return;
     }
-  this->Internals->Chart = chart;
+  this->Chart = chart;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 vtkChart * vtkChartNamedOptions::GetChart()
 {
-  return this->Internals->Chart;
+  return this->Chart;
 }
 
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetTable(vtkTable* table)
 {
-  if (this->Internals->Table == table)
+  if (this->Table == table)
     {
     if (table && table->GetMTime() < this->RefreshTime)
       {
@@ -157,9 +152,9 @@ void vtkChartNamedOptions::SetTable(vtkTable* table)
       }
     }
 
-  this->Internals->Table = table;
+  this->Table = table;
   this->RefreshPlots();
-  this->SetTableVisibility(this->Internals->TableVisibility);
+  this->SetTableVisibility(this->TableVisibility);
   this->RefreshTime.Modified();
   this->Modified();
 }
@@ -167,13 +162,13 @@ void vtkChartNamedOptions::SetTable(vtkTable* table)
 //----------------------------------------------------------------------------
 vtkTable* vtkChartNamedOptions::GetTable()
 {
-  return this->Internals->Table;
+  return this->Table;
 }
 
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::RemovePlotsFromChart()
 {
-  if (!this->Internals->Chart)
+  if (!this->Chart)
     {
     return;
     }
@@ -192,7 +187,7 @@ void vtkChartNamedOptions::RemovePlotsFromChart()
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::RefreshPlots()
 {
-  if (!this->Internals->Table)
+  if (!this->Table)
     {
     return;
     }
@@ -202,11 +197,11 @@ void vtkChartNamedOptions::RefreshPlots()
   int defaultVisible = 1;
 
   // For each series (column in the table)
-  const vtkIdType numberOfColumns = this->Internals->Table->GetNumberOfColumns();
+  const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();
   for (vtkIdType i = 0; i < numberOfColumns; ++i)
     {
     // Get the series name
-    const char* seriesName = this->Internals->Table->GetColumnName(i);
+    const char* seriesName = this->Table->GetColumnName(i);
     if (!seriesName || !seriesName[0])
       {
       continue;
@@ -225,7 +220,7 @@ void vtkChartNamedOptions::RefreshPlots()
     }
 
   // Now we need to prune old series (table columns that were removed)
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
     PlotMapIterator it = this->Internals->PlotMap.begin();
     for ( ; it != this->Internals->PlotMap.end(); ++it)
