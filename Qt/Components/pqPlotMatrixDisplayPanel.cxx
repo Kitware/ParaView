@@ -45,6 +45,11 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
   this->SettingsModel = new pqPlotSettingsModel(this);
   this->SettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(representation));
   ui.Series->setModel(this->SettingsModel);
+  ui.Series->setAcceptDrops(true);
+  ui.Series->setDragEnabled(true);
+  ui.Series->setDropIndicatorShown(true);
+  ui.Series->setDragDropOverwriteMode(false);
+  ui.Series->setDragDropMode(QAbstractItemView::InternalMove);
 
   vtkSMProxy *proxy = representation->getProxy();
 
