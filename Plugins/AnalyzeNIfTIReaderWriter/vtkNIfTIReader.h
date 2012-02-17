@@ -26,6 +26,9 @@
 #include "vtkImageReader.h"
 
 #define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"
+#define POINT_SPACE_ARRAY "vtkPointSpace"
+#define VOLUME_ORIGIN_DOUBLE_ARRAY "vtkVolumeOrigin"
+#define VOLUME_SPACING_DOUBLE_ARRAY "vtkVolumeSpacing"
 
 class vtkDataArray;
 class vtkUnsignedCharArray;

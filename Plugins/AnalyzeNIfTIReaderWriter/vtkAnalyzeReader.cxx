@@ -28,6 +28,7 @@
 #include "vtkFieldData.h"
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
+#include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkAnalyzeReader);
 
@@ -629,9 +630,12 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
   for (count = 0; count < totalIntMemorySizeInBytes ; count++){ 
     tempByte = unsignedOutP[count];
 
-    if(tempByte==252){
-    tempByte=tempByte;
-    }
+    //if(tempByte==252){
+    //tempByte=tempByte;
+    //}
+    //if(tempByte!=0){
+    //tempByte=tempByte;
+    //}
     //swap tempByte
     newByte = 0;
     for (bitCount = 0; bitCount < 8 ; bitCount++){
@@ -806,9 +810,9 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
 
   unsigned char * outUnsignedCharPtr = (unsigned char *) outPtr;
 
-  tempUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
+  int tempSizeInt = outDim[0]*outDim[1]*outDim[2]*scalarSize;
+  tempUnsignedCharData = new unsigned char[tempSizeInt];
   double tempSizeDouble;
-  int tempSizeInt = 0;
   if(tempScalarTypeValue==1){
   tempSizeDouble = outDim[0]*outDim[1]*outDim[2]*dataTypeSize;
   tempSizeInt = (int) tempSizeDouble;
@@ -999,6 +1003,13 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
       for (idSize = 0; idSize < scalarSize ; idSize++){ 
         charOutOffset = outOffset + idSize;
         outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
+    unsigned char tempByte = outUnsignedCharPtr[charOutOffset];
+    if(tempByte!=0){
+     tempByte=tempByte;
+    } else {
+     tempByte = tempByte;
+    }
+
       } 
     } else {
       outOffset = (idZ * outDim[0] * outDim[1]) + (idY * outDim[0]) + idX;
@@ -1021,6 +1032,34 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     }
   }
 
+ int endianess = this->GetDataByteOrder();
+ if(endianess==VTK_FILE_BYTE_ORDER_BIG_ENDIAN){
+   if(tempScalarTypeValue==VTK_SHORT){
+    unsigned char tempValue1;
+    unsigned char tempValue2;
+    for (count = 0; count < tempSizeInt ; count=count+2){ 
+    tempValue1 = tempUnsignedCharData[count];
+    tempValue2 = tempUnsignedCharData[count+1];
+    outUnsignedCharPtr[count]   = tempValue2;
+    outUnsignedCharPtr[count+1] = tempValue1;
+    } 
+   } else if(tempScalarTypeValue==VTK_INT){
+    unsigned char tempValue1;
+    unsigned char tempValue2;
+    unsigned char tempValue3;
+    unsigned char tempValue4;
+    for (count = 0; count < tempSizeInt ; count=count+4){ 
+    tempValue1 = tempUnsignedCharData[count];
+    tempValue2 = tempUnsignedCharData[count+1];
+    tempValue3 = tempUnsignedCharData[count+2];
+    tempValue4 = tempUnsignedCharData[count+3];
+    outUnsignedCharPtr[count]   = tempValue4;
+    outUnsignedCharPtr[count+1] = tempValue3;
+    outUnsignedCharPtr[count+2] = tempValue2;
+    outUnsignedCharPtr[count+3] = tempValue1;
+    } 
+   }
+ }
   delete tempUnsignedCharData;
   tempUnsignedCharData = NULL;
 
@@ -1047,6 +1086,36 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
 
   for(count=0;count<this->analyzeHeaderSize;count++){
    this->analyzeHeader->SetValue(count, analyzeHeaderUnsignedCharArray[count]);
+  }
+
+  vtkDataArray * tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
+  if (!tempVolumeOriginDoubleArray)
+  {
+  vtkDoubleArray * volumeOriginDoubleArray = NULL;
+  volumeOriginDoubleArray = vtkDoubleArray::New();
+  volumeOriginDoubleArray->SetName(VOLUME_ORIGIN_DOUBLE_ARRAY);
+    volumeOriginDoubleArray->SetNumberOfValues(3);
+  volumeOriginDoubleArray->SetValue(0,this->DataOrigin[0]); 
+  volumeOriginDoubleArray->SetValue(1,this->DataOrigin[1]); 
+  volumeOriginDoubleArray->SetValue(2,this->DataOrigin[2]); 
+  fa->AddArray(volumeOriginDoubleArray);
+  volumeOriginDoubleArray->Delete();
+    tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
+  }
+
+  vtkDataArray * tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
+  if (!tempVolumeSpacingDoubleArray)
+  {
+  vtkDoubleArray * volumeSpacingDoubleArray = NULL;
+  volumeSpacingDoubleArray = vtkDoubleArray::New();
+  volumeSpacingDoubleArray->SetName(VOLUME_SPACING_DOUBLE_ARRAY);
+    volumeSpacingDoubleArray->SetNumberOfValues(3);
+  volumeSpacingDoubleArray->SetValue(0,this->DataSpacing[0]); 
+  volumeSpacingDoubleArray->SetValue(1,this->DataSpacing[1]); 
+  volumeSpacingDoubleArray->SetValue(2,this->DataSpacing[2]); 
+  fa->AddArray(volumeSpacingDoubleArray);
+  volumeSpacingDoubleArray->Delete();
+    tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
   }
 
 }
@@ -1114,6 +1183,16 @@ int vtkAnalyzeReader::CanReadFile(const char* fname)
 
   //The final check is to make sure that it is not a nifti version of the analyze file.
   //Eventually the entire class will be subsumed by the nifti reader.
-  return vtknifti1_io::is_nifti_file(fname) == 0;
+  int tempNiftiValue = vtknifti1_io::is_nifti_file(fname);
+  if(tempNiftiValue == 0){// format = 2 anaylze files
+    return 1;
+  } else if(tempNiftiValue == 1) {// format = 1 nifti file
+    return 0;
+  } else if(tempNiftiValue == 2) {// format = 2 nifti files
+    return 0;
+  } else { 
+    return 0;
+  }
+  //return vtknifti1_io::is_nifti_file(fname) == 0;
 
 }
