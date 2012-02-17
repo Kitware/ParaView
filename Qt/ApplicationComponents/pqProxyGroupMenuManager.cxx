@@ -746,9 +746,15 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
 
         definitionSet.insert(QPair<QString, QString>(group, name));
         this->Internal->addProxy(group, name, NULL);
-        if(categoryName != NULL && this->Internal->Categories.contains(categoryName))
+        if(categoryName != NULL)
           {
           pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
+          // If no label just make it up
+          if(category.Label.isEmpty())
+            {
+            category.Label = categoryName;
+            }
+
           if(!category.Proxies.contains(QPair<QString, QString>(group, name)))
             {
             category.Proxies.push_back(QPair<QString, QString>(group, name));
