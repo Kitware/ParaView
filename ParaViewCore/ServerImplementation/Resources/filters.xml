@@ -11336,8 +11336,17 @@ This property controls how the filter works to generate tensor cell data. You ca
             <Group name="filters"/>
          </ProxyGroupDomain>
          <DataTypeDomain name="input_type">
-           <DataType value="vtkDataSet"/>
+	          <DataType value="vtkCompositeDataSet"/>
          </DataTypeDomain>
+         <InputArrayDomain name="input_array1"
+                           attribute_type="cell"
+                           number_of_components="1">
+         </InputArrayDomain>
+         <InputArrayDomain name="input_array3"
+                           attribute_type="cell"
+                           number_of_components="3"
+                           optional="1">
+         </InputArrayDomain>
       </InputProperty>
 
       <IntVectorProperty
@@ -11403,14 +11412,45 @@ This property controls how the filter works to generate tensor cell data. You ca
          <SimpleIntInformationHelper/>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="NumberOfMaterials"
-        command="SetNumberOfMaterials"
-        number_of_elements="1"
-        default_values="1" >
-         <IntRangeDomain name="range" min="1"/>
-      </IntVectorProperty>
+      <StringVectorProperty name="VolumeFractionArrays"
+        command="SetMaterialVolumeFractionArray"
+        set_number_command="SetNumberOfMaterials"
+        use_index="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Scalars"
+          input_domain_name="input_array1">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+      </StringVectorProperty>
 
+      <StringVectorProperty name="NormalArrays"
+        command="SetMaterialNormalArray"
+        use_index="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Vectors"
+          input_domain_name="input_array3">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="OrderingArrays"
+        command="SetMaterialOrderingArray"
+        use_index="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Scalars"
+          input_domain_name="input_array1">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+      </StringVectorProperty>
 
      <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
