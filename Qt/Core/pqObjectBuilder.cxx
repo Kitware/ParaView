@@ -888,8 +888,6 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
     return NULL;
     }
 
-  this->WaitingForConnection = true;
-
   // Create a modified version of the resource that only contains server information
   const pqServerResource server_resource = resource.schemeHostsPorts();
 
@@ -912,6 +910,9 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       this->removeServer(smModel->getItemAtIndex<pqServer*>(0));
       }
     }
+
+
+  this->WaitingForConnection = true;
 
   // Let the pqServerManagerModel know the resource to use for the connection
   // to be created.

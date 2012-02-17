@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QEventLoop>
 #include <QFormLayout>
+#include <QHostInfo>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPointer>
@@ -148,6 +148,7 @@ namespace
     QProcessEnvironment options = QProcessEnvironment::systemEnvironment();
 
     // Now append the pre-defined runtime environment to this.
+    options.insert("PV_CLIENT_HOST", QHostInfo::localHostName());
     options.insert("PV_CONNECTION_URI", resource.toURI());
     options.insert("PV_CONNECTION_SCHEME", resource.scheme());
     options.insert("PV_VERSION_MAJOR", QString::number(PARAVIEW_VERSION_MAJOR));
@@ -482,24 +483,50 @@ pqServerLauncher::~pqServerLauncher()
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::connectToServer()
 {
-  switch (this->Internals->Configuration.startupType())
+  pqServerConfiguration::StartupType startupType = 
+    this->Internals->Configuration.startupType();
+  if (startupType != pqServerConfiguration::MANUAL &&
+    startupType != pqServerConfiguration::COMMAND)
     {
-  case pqServerConfiguration::MANUAL:
-    return this->promptOptions()? this->connectToPrelaunchedServer() : false;
-
-  case pqServerConfiguration::COMMAND:
-    return this->promptOptions()? this->launchAndConnectToServer() : false;
-
-  default:
+    qCritical() << "Invalid server configuration."
+      << "Cannot connect to server";
     return false;
     }
+
+  // Check if there are any user-configurable parameters that we should obtain
+  // from the user. promptOptions() returns false only when user hits cancel, in
+  // which case the user is aborting connecting to the server.
+  if (!this->promptOptions())
+    {
+    return false;
+    }
+
+
+  if (startupType == pqServerConfiguration::COMMAND)
+    {
+    if (this->isReverseConnection())
+      {
+      // in reverse connection, we don't launchServer() immediately, instead we
+      // wait for the client to setup the "socket" before starting the server
+      // process.
+      QTimer::singleShot(0, this, SLOT(launchServerForReverseConnection()));
+      }
+    else
+      {
+      if (!this->launchServer(true))
+        {
+        return false;
+        }
+      }
+    }
+
+  return this->connectToPrelaunchedServer();
 }
 
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::connectToPrelaunchedServer()
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-  const pqServerResource& resource = this->Internals->Configuration.resource();
 
   QDialog dialog(pqCoreUtilities::mainWidget());
   QObject::connect(&dialog, SIGNAL(rejected()),
@@ -507,9 +534,11 @@ bool pqServerLauncher::connectToPrelaunchedServer()
 
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
-  ui.message->setText(QString("Connecting to '%1'").arg(
+  ui.message->setText(QString("Establishing connection to '%1' \n"
+      "Waiting for server to connect.").arg(
       this->Internals->Configuration.name()));
-  if (resource.scheme() == "csrc" || resource.scheme() == "cdsrsrc")
+  dialog.setWindowTitle("Waiting for Server Connection");
+  if (this->isReverseConnection())
     {
     // using reverse connect, popup the dialog.
     dialog.show();
@@ -517,23 +546,31 @@ bool pqServerLauncher::connectToPrelaunchedServer()
     dialog.activateWindow();
     }
 
+  const pqServerResource& resource = this->Internals->Configuration.resource();
   this->Internals->Server = builder->createServer(resource);
   return this->Internals->Server != NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::isReverseConnection() const
+{
+  const pqServerResource& resource = this->Internals->Configuration.resource();
+  return (resource.scheme() == "csrc" || resource.scheme() == "cdsrsrc");
 }
 
 //-----------------------------------------------------------------------------
 bool pqServerLauncher::promptOptions()
 {
   vtkPVXMLElement* optionsXML = this->Internals->Configuration.optionsXML();
+  // Get the process environment.
+  QProcessEnvironment& options = this->Internals->Options;
+  // setup the options using the default environment, in any case.
+  options = getDefaultEnvironment(this->Internals->Configuration);
   if (optionsXML == NULL)
     {
     return true;
     }
 
-  // Get the process environment.
-  QProcessEnvironment& options = this->Internals->Options;
-  options = getDefaultEnvironment(this->Internals->Configuration);
-  
   QDialog dialog(pqCoreUtilities::mainWidget());
 
   // setup the dialog using the configuration's XML.
@@ -569,7 +606,19 @@ bool pqServerLauncher::promptOptions()
 }
 
 //-----------------------------------------------------------------------------
-bool pqServerLauncher::launchAndConnectToServer()
+void pqServerLauncher::launchServerForReverseConnection()
+{
+  if (!this->launchServer(false))
+    {
+    // server-launch failed, abort the "waiting for the server to connect" part
+    // by letting the pqObjectBuilder know.
+    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+    builder->abortPendingConnections();
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqServerLauncher::launchServer(bool show_status_dialog)
 {
   // We need launch the server.
   double timeout, delay;
@@ -580,16 +629,19 @@ bool pqServerLauncher::launchAndConnectToServer()
     return false;
     }
 
-  // popup a dialog to tell the user that teh server is being lanuched.
+  // Pop-up a dialog to tell the user that the server is being launched.
   QDialog dialog(pqCoreUtilities::mainWidget());
   Ui::pqServerLauncherDialog ui;
   ui.setupUi(&dialog);
   ui.cancel->hide();
   ui.message->setText(QString("Launching server '%1'").arg(
       this->Internals->Configuration.name()));
-  dialog.show();
-  dialog.raise();
-  dialog.activateWindow();
+  if (show_status_dialog)
+    {
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+    }
 
   // replace all $FOO$ with values for QProcessEnvironment.
   QRegExp regex("\\$([^$]*)\\$");
@@ -605,35 +657,27 @@ bool pqServerLauncher::launchAndConnectToServer()
 
   cout << "Server launch command is : " << command.toAscii().data() << endl;
   QProcess* process = new QProcess(pqApplicationCore::instance());
-  // QObject::connect(process, SIGNAL(started()), this, SLOT(processStarted()));
+  process->setProcessEnvironment(this->Internals->Options);
+
   QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
     this, SLOT(processFailed(QProcess::ProcessError)));
+  QObject::connect(process, SIGNAL(readyReadStandardError()),
+    this, SLOT(readStandardError()));
+  QObject::connect(process, SIGNAL(readyReadStandardOutput()),
+    this, SLOT(readStandardOutput()));
 
-  process->setProcessEnvironment(this->Internals->Options);
-  process->setProcessChannelMode(QProcess::ForwardedChannels);
+  //don't forward channels, doesn't produce outputs on Windows, etc.
+  //process->setProcessChannelMode(QProcess::ForwardedChannels);
   process->start(command);
-  process->closeWriteChannel();
+  //process->closeWriteChannel();
 
   // wait for process to start.
-  // We don't use QProcess::waitForStarted() since that can freeze the
-  // application.
-  // We don't use pqEventDispatcher::processEventsAndWait() since we want to
-  // abort the wait if the process launches correctly.
-  QEventLoop eventLoop;
-  if (timeout > 0)
+  // waitForStarted() may block until the process starts. That is generally a short
+  // span of time, hence we don't worry about it too much.
+  if (process->waitForStarted(timeout>0? static_cast<int>(timeout*1000) : -1) == false)
     {
-    QTimer::singleShot(
-      static_cast<int>(timeout*1000), &eventLoop, SLOT(quit()));
-    }
-  QObject::connect(process, SIGNAL(started()), &eventLoop, SLOT(quit()));
-  QObject::connect(process, SIGNAL(error(QProcess::ProcessError)), &eventLoop, SLOT(quit()));
-  eventLoop.exec();
-
-  if (process->state() != QProcess::Running)
-    {
-    process->kill();
     qCritical() << "Server launch timed out.";
-    process->waitForFinished();
+    process->kill();
     delete process;
     return false;
     }
@@ -642,14 +686,31 @@ bool pqServerLauncher::launchAndConnectToServer()
   pqEventDispatcher::processEventsAndWait(static_cast<int>(delay * 1000));
   if (process->state() != QProcess::Running)
     {
-    qCritical() 
-      << "Server launched aborted before attempting to connect to it.";
-    process->waitForFinished();
-    delete process;
-    return false;
+    if (process->exitStatus() != QProcess::NormalExit	|| process->exitCode() != 0)
+      {
+      // if the launched code exited with error, we consider that the server launch
+      // failed and we cancel the connection. If the process quits with success, we
+      // still assume that the script has launched the server successfully (it's
+      // just treated as non-blocking).
+      qCritical()
+        << "Server launched aborted before attempting to connect to it.";
+      process->deleteLater();
+      return false;
+      }
+    else
+      {
+      // process has completed, so delete it.
+      process->deleteLater();
+      }
+    }
+  else
+    {
+    // setup slot to delete the QProcess instance when the process exits.
+    QObject::connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
+      process, SLOT(deleteLater()));
     }
 
-  return this->connectToPrelaunchedServer();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -676,4 +737,26 @@ void pqServerLauncher::processFailed(QProcess::ProcessError error_code)
 pqServer* pqServerLauncher::connectedServer() const
 {
   return this->Internals->Server;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::readStandardOutput()
+{
+  QProcess* process = qobject_cast<QProcess*>(this->sender());
+  if (process)
+    {
+    qDebug() << process->readAllStandardOutput().data();
+    pqEventDispatcher::processEvents();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerLauncher::readStandardError()
+{
+  QProcess* process = qobject_cast<QProcess*>(this->sender());
+  if (process)
+    {
+    qCritical() << process->readAllStandardError().data();
+    pqEventDispatcher::processEvents();
+    }
 }

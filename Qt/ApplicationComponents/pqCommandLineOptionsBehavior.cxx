@@ -78,6 +78,8 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   
   // check for --server.
   const char* serverresource_name = options->GetServerResourceName();
+  // (server-url gets lower priority than --server).
+  const char* server_url = options->GetServerURL();
   if (serverresource_name)
     {
     if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
@@ -86,6 +88,14 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       qCritical() << "Could not connect to requested server \"" 
         << serverresource_name 
         << "\". Creating default builtin connection.";
+      }
+    }
+  else if (server_url)
+    {
+    if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
+      {
+      qCritical() << "Could not connect to requested server \"" 
+        << server_url << "\". Creating default builtin connection.";
       }
     }
 
