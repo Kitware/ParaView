@@ -25,7 +25,6 @@ SET(ServersServerManager_SRCS
   TestComparativeAnimationCueProxy 
   TestXMLSaveLoadState
   TestProxyAnnotation
-  TestSMIntVectorProperty
   )
 
 FOREACH(name ${ServersServerManager_SRCS})
@@ -72,3 +71,29 @@ IF (PVServerManagerTestData)
       ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
+
+################################################################################
+# ParaView ServerManager Unit Tests
+if(${VTK_USE_QT})
+  find_package(Qt4 COMPONENTS QtCore QtTest REQUIRED)
+  set(QT_DONT_USE_QTGUI TRUE)
+  set(QT_USE_QTTEST TRUE)
+
+  include(${QT_USE_FILE})
+
+  set(UNITTESTS
+    vtkSMProxyTest
+    vtkSMProxyLinkTest
+    vtkSMDoubleVectorPropertyTest
+    vtkSMIntVectorPropertyTest
+    vtkSMStringVectorPropertyTest
+    vtkSMPropertyHelperTest
+  )
+
+  foreach(name ${UNITTESTS})
+    qt4_wrap_cpp(${name}_MOC_SOURCES ${name}.h)
+    add_executable(${name} ${name}.cxx ${${name}_MOC_SOURCES})
+    add_test(pvunit.${name} ${CXX_TEST_PATH}/${name})
+    target_link_libraries(${name} vtkPVServerManager ${QT_LIBRARIES})
+  endforeach()
+endif()
