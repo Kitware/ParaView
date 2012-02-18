@@ -84,21 +84,22 @@
 <Variable Name="Density" SESAME_Units="Mg/m^3" SESAME_SI="1000" SESAME_SI_Units="kg/m^3" SESAME_cgs="1" SESAME_cgs_Units="g/cm^3" />
 <Variable Name="Temperature" SESAME_Units="eV" SESAME_SI="11604.505" SESAME_SI_Units="K" SESAME_cgs="11604.505" SESAME_cgs_Units="K" />
 <Variable Name="Temperature eV" SESAME_Units="eV" SESAME_SI="1" SESAME_SI_Units="eV" SESAME_cgs="1" SESAME_cgs_Units="eV" />
-<Variable Name="Electrical Conductivity" SESAME_Units="1.0/s" SESAME_SI="1" SESAME_SI_Units="1.0/s" SESAME_cgs="1" SESAME_cgs_Units="1.0/s" />
+<!-- For electrical conductivity conversion see p543 of Knoepfel, "Magnetic Fields" (2000) -->
+<Variable Name="Electrical Conductivity" SESAME_Units="1.0/s" SESAME_SI="0.11111111e-9" SESAME_SI_Units="S/m" SESAME_cgs="0.11111111e-11" SESAME_cgs_Units="S/cm" />
 </Table>
 
 <Table Id="603">
 <Variable Name="Density" SESAME_Units="Mg/m^3" SESAME_SI="1000" SESAME_SI_Units="kg/m^3" SESAME_cgs="1" SESAME_cgs_Units="g/cm^3" />
 <Variable Name="Temperature" SESAME_Units="eV" SESAME_SI="11604.505" SESAME_SI_Units="K" SESAME_cgs="11604.505" SESAME_cgs_Units="K" />
 <Variable Name="Temperature eV" SESAME_Units="eV" SESAME_SI="1" SESAME_SI_Units="eV" SESAME_cgs="1" SESAME_cgs_Units="eV" />
-<Variable Name="Thermal Conductivity" SESAME_Units="1.0/(cm s)" SESAME_SI="1.0e2" SESAME_SI_Units="1.0/(m s)" SESAME_cgs="1" SESAME_cgs_Units="1.0/(cm s)" />
+<Variable Name="Thermal Conductivity" SESAME_Units="1.0/(cm s)" SESAME_SI="1.38066e-21" SESAME_SI_Units="J/(kg K s)" SESAME_cgs="1.38066e-16" SESAME_cgs_Units="erg/(g K s)" />
 </Table>
 
 <Table Id="604">
 <Variable Name="Density" SESAME_Units="Mg/m^3" SESAME_SI="1000" SESAME_SI_Units="kg/m^3" SESAME_cgs="1" SESAME_cgs_Units="g/cm^3" />
 <Variable Name="Temperature" SESAME_Units="eV" SESAME_SI="11604.505" SESAME_SI_Units="K" SESAME_cgs="11604.505" SESAME_cgs_Units="K" />
 <Variable Name="Temperature eV" SESAME_Units="eV" SESAME_SI="1" SESAME_SI_Units="eV" SESAME_cgs="1" SESAME_cgs_Units="eV" />
-<Variable Name="Thermoelectric Coefficient" SESAME_Units="1.0/(cm s)" SESAME_SI="1.0e2" SESAME_SI_Units="1.0/(m s)" SESAME_cgs="1" SESAME_cgs_Units="1.0/(cm s)" />
+<Variable Name="Thermoelectric Coefficient" SESAME_Units="1.0/(cm s)" SESAME_SI="1.38066e-21" SESAME_SI_Units="J/(kg K s)" SESAME_cgs="1.38066e-16" SESAME_cgs_Units="erg/(g K s)" />
 </Table>
 
 <Table Id="605">
