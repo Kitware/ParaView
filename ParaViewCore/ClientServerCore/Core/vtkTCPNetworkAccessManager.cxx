@@ -103,6 +103,15 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
       {
       handshake = parameters["handshake"].c_str();
       }
+    int timeout_in_seconds = 60;
+    if (parameters.find("timeout") != parameters.end())
+      {
+      timeout_in_seconds = atoi(parameters["timeout"].c_str());
+      if (timeout_in_seconds < 0)
+        {
+        timeout_in_seconds=0;
+        }
+      }
 
     if (parameters["listen"] == "true" &&
         parameters["multiple"] == "true")
@@ -117,7 +126,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
       }
     else
       {
-      return this->ConnectToRemote(hostname.c_str(), port, handshake);
+      return this->ConnectToRemote(hostname.c_str(), port, handshake,
+        timeout_in_seconds);
       }
     }
   else
@@ -274,7 +284,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
-  const char* hostname, int port, const char* handshake)
+  const char* hostname, int port, const char* handshake, int timeout_in_seconds)
 {
   
   // Create client socket.
@@ -291,13 +301,13 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
       break;
       }
     timer->StopTimer();
-    if (timer->GetElapsedTime() > 60.0)
+    if (timeout_in_seconds <= 0 || timer->GetElapsedTime() > timeout_in_seconds)
       {
       vtkErrorMacro(<< "Connect timeout.");
       return NULL;
       }
     vtkWarningMacro(<< "Connect failed.  Retrying for "
-      << (60.0 - timer->GetElapsedTime()) << " more seconds.");
+      << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
     vtksys::SystemTools::Delay(1000);
     }
 
