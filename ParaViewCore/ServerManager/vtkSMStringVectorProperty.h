@@ -102,6 +102,11 @@ public:
   void SetUncheckedElement(unsigned int idx, const char* value);
 
   // Description:
+  // Get/Set unchecked elements.
+  void GetUncheckedElements(vtkStringList* list);
+  int SetUncheckedElements(vtkStringList* list);
+
+  // Description:
   // Returns the size of unchecked elements. Usually this is
   // the same as the number of elements but can be different
   // before a domain check is performed.
