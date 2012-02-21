@@ -122,7 +122,6 @@ vtkLiveInsituLink::vtkLiveInsituLink():
   InsituXMLStateChanged(false),
   ExtractsChanged(false),
   InsituXMLState(0),
-  ExtractsDeliveryHelper(vtkExtractsDeliveryHelper::New()),
   URL(0),
   Internals(new vtkInternals())
 {
@@ -140,9 +139,6 @@ vtkLiveInsituLink::~vtkLiveInsituLink()
 
   delete this->Internals;
   this->Internals = NULL;
-
-  this->ExtractsDeliveryHelper->Delete();
-  this->ExtractsDeliveryHelper = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -155,6 +151,7 @@ void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
     }
 
   this->CoprocessorProxyManager = pxm;
+  this->ExtractsDeliveryHelper = vtkSmartPointer<vtkExtractsDeliveryHelper>::New();
 
   switch (this->ProcessType)
     {
@@ -232,6 +229,10 @@ void vtkLiveInsituLink::InitializeVisualization()
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::InitializeSimulation()
 {
+  // vtkLiveInsituLink::Initialize() should not call this method unless
+  // Controller==NULL.
+  assert(this->Controller == NULL);
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
   int numProcs = pm->GetNumberOfLocalPartitions();
@@ -250,9 +251,14 @@ void vtkLiveInsituLink::InitializeSimulation()
 
     vtksys_ios::ostringstream url;
     url << "tcp://" << this->Hostname << ":" << this->InsituPort << "?"
-      << "handshake=paraview.insitu." << PARAVIEW_VERSION;
+      << "timeout=0&handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
     vtkMultiProcessController* controller = nam->NewConnection(this->URL);
+    if (numProcs > 1)
+      {
+      int connection_established = controller != NULL? 1 : 0;
+      pm->GetGlobalController()->Broadcast(&connection_established, 1, 0);
+      }
     if (controller)
       {
       // controller would generally be NULL, however due to magically timing,
@@ -265,11 +271,17 @@ void vtkLiveInsituLink::InitializeSimulation()
     }
   else
     {
-    this->InsituProcessConnected(NULL);
+    int connection_established = 0;
+    pm->GetGlobalController()->Broadcast(&connection_established, 1, 0);
+    if (connection_established)
+      {
+      this->InsituProcessConnected(NULL);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
+// Callback on Visualization process when a simulation connects to it.
 void vtkLiveInsituLink::OnConnectionCreatedEvent()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -285,6 +297,8 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* controller)
 {
+  assert(this->Controller == NULL);
+
   this->Controller = controller;
 
   vtkMultiProcessController* parallelController =
@@ -527,6 +541,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
   extractsMessage >> extracts_valid;
   if (extracts_valid)
     {
+    assert(this->ExtractsDeliveryHelper.GetPointer() != NULL);
     this->ExtractsDeliveryHelper->ClearAllExtracts();
     int numberOfExtracts;
     extractsMessage >> numberOfExtracts;
@@ -575,9 +590,12 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
       POSTPROCESS_RMI_TAG);
     }
 
-  // We're done coprocessing. Deliver the extracts to the visualization
-  // processes.
-  this->ExtractsDeliveryHelper->Update();
+  if (this->ExtractsDeliveryHelper)
+    {
+    // We're done coprocessing. Deliver the extracts to the visualization
+    // processes.
+    this->ExtractsDeliveryHelper->Update();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -688,6 +706,12 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
 {
   assert(this->ProcessType == VISUALIZATION);
 
+  if (!this->ExtractsDeliveryHelper)
+    {
+    vtkWarningMacro("Connection to simulation has been dropped!!!");
+    return;
+    }
+
   cout << "Adding Extract: " << groupname << ", " << proxyname << endl;
   vtkInternals::Key key(groupname, proxyname, portnumber);
   this->Internals->Extracts[key] = producer;
@@ -700,6 +724,13 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
 void vtkLiveInsituLink::UnRegisterExtract(vtkTrivialProducer* producer)
 {
   assert(this->ProcessType == VISUALIZATION);
+
+  if (!this->ExtractsDeliveryHelper)
+    {
+    vtkWarningMacro("Connection to simulation has been dropped!!!");
+    return;
+    }
+
   for (vtkInternals::ExtractsMap::iterator iter=this->Internals->Extracts.begin();
     iter != this->Internals->Extracts.end(); ++iter)
     {

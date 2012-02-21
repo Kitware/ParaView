@@ -106,10 +106,16 @@ protected:
     INITIALIZE_CONNECTION=8802
     };
 
-
+  // Description:
+  // Called by Initialize() to initialize on a visualization process.
   void InitializeVisualization();
+
+  // Description:
+  // Called by Initialize() to initialize on a simulation process.
   void InitializeSimulation();
 
+  // Description:
+  // Callback on Visualization process when a simulation connects to it.
   void OnConnectionCreatedEvent();
 
   char* Hostname;
@@ -124,8 +130,7 @@ protected:
   vtkSmartPointer<vtkPVXMLElement> XMLState;
   vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
   vtkSmartPointer<vtkMultiProcessController> Controller;
-
-  vtkExtractsDeliveryHelper* ExtractsDeliveryHelper;
+  vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
 private:
   vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
