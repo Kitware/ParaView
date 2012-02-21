@@ -185,24 +185,55 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
 
   // Call Render() on local render window only on the client (or root node in
   // batch mode).
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
-    if (this->InTileDisplayMode())
-      {
-      this->SendImageToRenderServers();
-      }
-    this->ContextView->Render();
-    }
-  else if (this->InTileDisplayMode())
-    {
-    // We turn EraseOff so that the image we never overwrite the image pasted
-    // from the client-side.
-    this->ContextView->GetRenderer()->EraseOff();
-    this->ReceiveImageToFromClient();
-    vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
-      this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
-    this->GetRenderWindow()->Frame();
-    }
+ if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+   {
+   this->ContextView->Render();
+   }
+
+ if (!this->SynchronizedWindows->GetLocalProcessIsDriver() &&
+   this->InTileDisplayMode())
+   {
+   this->SynchronizedWindows->BeginRender(this->GetIdentifier());
+
+   double viewport[4];
+   this->ContextView->GetRenderer()->GetViewport(viewport);
+
+   int tile_dims[2], tile_mullions[2];
+   this->SynchronizedWindows->GetTileDisplayParameters(tile_dims, tile_mullions);
+
+   double tile_viewport[4];
+   this->GetRenderWindow()->GetTileViewport(tile_viewport);
+
+   double physical_viewport[4];
+   vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
+   tilesHelper->SetTileDimensions(tile_dims);
+   tilesHelper->SetTileMullions(tile_mullions);
+   tilesHelper->SetTileWindowSize(this->GetRenderWindow()->GetActualSize());
+   if (tilesHelper->GetPhysicalViewport(viewport,
+     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId(),
+     physical_viewport))
+     {
+     int old = this->RenderWindow->GetSwapBuffers();
+     this->RenderWindow->SetSwapBuffers(0);
+     this->ContextView->Render();
+     vtkSynchronizedRenderers::vtkRawImage image;
+     image.Capture(this->ContextView->GetRenderer());
+
+     vtkTileDisplayHelper::GetInstance()->SetTile(
+       this->Identifier,
+       this->ContextView->GetRenderer()->GetViewport(),
+       this->ContextView->GetRenderer(),
+       image);
+     this->RenderWindow->SetSwapBuffers(old);
+     }
+   else
+     {
+     vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier);
+     }
+
+   vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
+     this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
+   }
 }
 
 #include <math.h>
