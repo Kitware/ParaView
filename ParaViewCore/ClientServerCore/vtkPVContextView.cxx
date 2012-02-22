@@ -179,9 +179,8 @@ void vtkPVContextView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVContextView::Render(bool vtkNotUsed(interactive))
 {
-  // Since currently we only support client-side rendering, we disable render
-  // synchronization for charts among all processes.
-  this->SynchronizedWindows->SetEnabled(false);
+  this->SynchronizedWindows->SetEnabled(this->InTileDisplayMode());
+  this->SynchronizedWindows->BeginRender(this->GetIdentifier());
 
   // Call Render() on local render window only on the client (or root node in
   // batch mode).
@@ -193,7 +192,13 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
  if (!this->SynchronizedWindows->GetLocalProcessIsDriver() &&
    this->InTileDisplayMode())
    {
-   this->SynchronizedWindows->BeginRender(this->GetIdentifier());
+
+   int old = this->RenderWindow->GetSwapBuffers();
+   this->RenderWindow->SetSwapBuffers(0);
+   this->ContextView->Render();
+   vtkSynchronizedRenderers::vtkRawImage image;
+   image.Capture(this->ContextView->GetRenderer());
+   this->RenderWindow->SetSwapBuffers(old);
 
    double viewport[4];
    this->ContextView->GetRenderer()->GetViewport(viewport);
@@ -213,18 +218,11 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
      vtkMultiProcessController::GetGlobalController()->GetLocalProcessId(),
      physical_viewport))
      {
-     int old = this->RenderWindow->GetSwapBuffers();
-     this->RenderWindow->SetSwapBuffers(0);
-     this->ContextView->Render();
-     vtkSynchronizedRenderers::vtkRawImage image;
-     image.Capture(this->ContextView->GetRenderer());
-
      vtkTileDisplayHelper::GetInstance()->SetTile(
        this->Identifier,
-       this->ContextView->GetRenderer()->GetViewport(),
+       physical_viewport,
        this->ContextView->GetRenderer(),
        image);
-     this->RenderWindow->SetSwapBuffers(old);
      }
    else
      {
@@ -234,6 +232,8 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
    vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
      this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
    }
+
+ this->SynchronizedWindows->SetEnabled(false);
 }
 
 #include <math.h>
