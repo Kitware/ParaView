@@ -79,6 +79,9 @@ public:
   /// Returns list of views assigned to frames in this widget.
   QList<vtkSMViewProxy*> viewProxies() const;
 
+  /// Returns true if the view has been assigned to this layout.
+  bool isViewAssigned(pqView*) const;
+
 signals:
   /// fired when a frame in this widget becomes active.
   void frameActivated();

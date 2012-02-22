@@ -197,6 +197,14 @@ pqMultiViewWidget::~pqMultiViewWidget()
 }
 
 //-----------------------------------------------------------------------------
+bool pqMultiViewWidget::isViewAssigned(pqView* view) const
+{
+  return (view && this->Internals->LayoutManager &&
+    this->Internals->LayoutManager->GetViewLocation(
+      view->getViewProxy()) != -1);
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiViewWidget::viewAdded(pqView* view)
 {
   if (view && this->Internals->LayoutManager &&
