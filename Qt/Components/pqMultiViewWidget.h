@@ -135,6 +135,10 @@ protected slots:
   /// empty.
   void proxyRemoved(pqProxy*);
 
+  /// called when a new view is added. we update the layout if the view added
+  /// belongs to this layout.
+  void viewAdded(pqView*);
+
 protected:
   /// Called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
@@ -145,7 +149,7 @@ protected:
   /// Event filter callback to detect when a sub-frame becomes active, so that
   /// we can mark it as such.
   virtual bool eventFilter(QObject* caller, QEvent* evt);
-  
+
 private:
   QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
 
