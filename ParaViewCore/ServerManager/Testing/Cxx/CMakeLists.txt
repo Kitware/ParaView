@@ -87,6 +87,7 @@ if(${VTK_USE_QT})
     vtkSMDoubleVectorPropertyTest
     vtkSMIntVectorPropertyTest
     vtkSMStringVectorPropertyTest
+    vtkSMUndoStackTest
     vtkSMPropertyHelperTest
   )
 
