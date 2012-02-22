@@ -87,11 +87,12 @@ INCLUDE_DIRECTORIES(
 # Compile protobuf resources.
 # run it from a script so we can set necessary paths.
 get_target_property(PROTOC_LOCATION protoc_compiler LOCATION)
+set (PROTOC_LOCATION_WITH_CFG)
 if (WIN32)
   get_filename_component(PROTOC_DIR ${PROTOC_LOCATION} PATH)
   get_filename_component(PROTOC_PDIR ${PROTOC_DIR} PATH)
   get_filename_component(PROTOC_FNAME ${PROTOC_LOCATION} NAME_WE)
-  set(PROTOC_LOCATION "${PROTOC_PDIR}/\${OutDir}/${PROTOC_FNAME}")
+  set(PROTOC_LOCATION_WITH_CFG "${PROTOC_PDIR}/\${OutDir}/${PROTOC_FNAME}")
 endif (WIN32)
 configure_file(${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
@@ -100,7 +101,8 @@ add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
     COMMAND ${CMAKE_COMMAND}
-    ARGS    -DOutDir=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
+    ARGS    -DOutDir:PATH=${CMAKE_CFG_INTDIR}
+            -P ${CMAKE_CURRENT_BINARY_DIR}/ExecuteProtoC.cmake
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler ${ParaView_CMAKE_DIR}/ExecuteProtoC.cmake.in
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
