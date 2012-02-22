@@ -156,6 +156,13 @@ protected:
   virtual void CreateVTKObjects();
 
   bool IsSelectionCached;
+  void ClearSelectionCache(bool force = false);
+
+  // Internal fields for the observer mechanism that is used to invalidate
+  // the cache of selection when the current user became master
+  unsigned long NewMasterObserverId;
+  void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
+
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented
   void operator=(const vtkSMRenderViewProxy&); // Not implemented
