@@ -97,6 +97,11 @@ public:
     };
 
   typedef QMap<QString, CategoryInfo> CategoryInfoMap;
+
+  pqInternal()
+  {
+    this->LocalActiveSession = NULL;
+  }
  
   void addProxy(const QString& pgroup, const QString& pname, const QString& icon)
     {
@@ -128,6 +133,7 @@ public:
   QWidget Widget;
   QPointer<QAction> SearchAction;
   unsigned long ProxyManagerCallBackId;
+  void* LocalActiveSession;
 };
 
 //-----------------------------------------------------------------------------
@@ -785,13 +791,22 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::switchActiveServer()
 {
-  // Clear the QuickSearch QAction pool...
-  QList<QAction*> actions = this->Internal->Widget.actions();
-  foreach(QAction* action, actions)
-    {
-    this->Internal->Widget.removeAction(action);
-    }
+  void* newActiveSession = vtkSMProxyManager::IsInitialized() ?
+        vtkSMProxyManager::GetProxyManager()->GetActiveSession() : NULL;
 
-  // Fill is back by updating the menu
-  this->lookForNewDefinitions();
+  if(newActiveSession && newActiveSession != this->Internal->LocalActiveSession)
+    {
+    // Make sure we don't clear the menu twice for the same server
+    this->Internal->LocalActiveSession = newActiveSession;
+
+    // Clear the QuickSearch QAction pool...
+    QList<QAction*> actions = this->Internal->Widget.actions();
+    foreach(QAction* action, actions)
+      {
+      this->Internal->Widget.removeAction(action);
+      }
+
+    // Fill is back by updating the menu
+    this->lookForNewDefinitions();
+    }
 }
