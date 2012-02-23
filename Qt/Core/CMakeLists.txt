@@ -89,6 +89,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginManager.h
   pqProgressManager.h
   pqPropertyLinks.h
+  pqPropertyLinks2.h
+  pqPropertyLinks2Connection.h
   pqPropertyManager.h
   pqProxy.h
   pqQVTKWidget.h
@@ -275,6 +277,10 @@ VTK_ADD_LIBRARY(pqCore
   pqProgressManager.h
   pqPropertyLinks.cxx
   pqPropertyLinks.h
+  pqPropertyLinks2.cxx
+  pqPropertyLinks2.h
+  pqPropertyLinks2Connection.cxx
+  pqPropertyLinks2Connection.h
   pqPropertyManager.cxx
   pqPropertyManager.h
   pqProxy.cxx

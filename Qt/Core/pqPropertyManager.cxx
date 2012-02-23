@@ -39,13 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 // ParaView includes
-#include "pqPropertyLinks.h"
+#include "pqPropertyLinks2.h"
 
 //-----------------------------------------------------------------------------
 pqPropertyManager::pqPropertyManager(QObject* p)
   : QObject(p)
 {
-  this->Links = new pqPropertyLinks();
+  this->Links = new pqPropertyLinks2();
   this->Links->setUseUncheckedProperties(true);
   this->Links->setAutoUpdateVTKObjects(false);
   QObject::connect(this->Links, SIGNAL(qtWidgetChanged()),

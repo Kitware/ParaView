@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 class vtkSMProperty;
-class pqPropertyLinks;
+class pqPropertyLinks2;
 
 /// Manages links between Qt properties and unchecked proxy properties
 /// This is useful if more than one QWidget exposes a single proxy property
@@ -94,7 +94,7 @@ public slots:
   void propertyChanged();
   
 protected:
-  pqPropertyLinks* Links;
+  pqPropertyLinks2* Links;
   bool Modified;
 };
 #endif // !_pqPropertyManager_h
