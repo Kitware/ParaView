@@ -72,8 +72,8 @@ bool pqPropertyLinks2::addPropertyLink(
 {
   if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
     {
-    qWarning() << "Invalid parameters to pqPropertyLinks2::addPropertyLink";
-    qWarning() << "(" << qobject << ", " << qproperty << ", " << qsignal
+    qCritical() << "Invalid parameters to pqPropertyLinks2::addPropertyLink";
+    qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal
       << ") <==> ("
       << (smproxy? smproxy->GetXMLName() : "(none)")
       << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
@@ -89,7 +89,7 @@ bool pqPropertyLinks2::addPropertyLink(
     {
     if (*existing == *connection)
       {
-      qWarning() << "Skipping duplicate connection: "
+      qDebug() << "Skipping duplicate connection: "
         << "(" << qobject << ", " << qproperty << ", " << qsignal
         << ") <==> ("
         << smproxy << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
@@ -116,16 +116,8 @@ bool pqPropertyLinks2::removePropertyLink(
   QObject* qobject, const char* qproperty, const char* qsignal,
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
 {
-  if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
-    {
-    qWarning() << "Invalid parameters to pqPropertyLinks2::addPropertyLink";
-    qWarning() << "(" << qobject << ", " << qproperty << ", " << qsignal
-      << ") <==> ("
-      << (smproxy? smproxy->GetXMLName() : "(none)")
-      << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
-      << smindex << ")";
-    return false;
-    }
+  // remove has to be a little flexible about input arguments. It accepts null
+  // qobject and smproperty.
 
   pqPropertyLinks2Connection* connection = new pqPropertyLinks2Connection(
     qobject, qproperty, qsignal, smproxy, smproperty, smindex, this);

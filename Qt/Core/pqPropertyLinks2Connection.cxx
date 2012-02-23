@@ -45,12 +45,18 @@ QObject* qobject, const char* qproperty, const char* qsignal,
   ObjectQt(qobject), PropertyQt(qproperty), SignalQt(qsignal),
   ProxySM(smproxy), PropertySM(smproperty), IndexSM(smindex)
 {
-  this->VTKConnector->Connect(
-    this->PropertySM, vtkCommand::ModifiedEvent,
-    this, SIGNAL(smpropertyModified()));
+  if (this->PropertySM)
+    {
+    this->VTKConnector->Connect(
+      this->PropertySM, vtkCommand::ModifiedEvent,
+      this, SIGNAL(smpropertyModified()));
+    }
 
-  QObject::connect(this->ObjectQt, this->SignalQt.toAscii().data(),
-    this, SIGNAL(qtpropertyModified()));
+  if (this->ObjectQt && !this->SignalQt.isEmpty())
+    {
+    QObject::connect(this->ObjectQt, this->SignalQt.toAscii().data(),
+      this, SIGNAL(qtpropertyModified()));
+    }
 }
 
 //-----------------------------------------------------------------------------

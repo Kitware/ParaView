@@ -100,6 +100,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
   pqExodusIIPanel.h
+  pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
   pqFieldSelectionAdaptor.h
@@ -460,6 +461,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqDistanceWidget.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
+  pqExodusIIVariableSelectionWidget.cxx
+  pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.cxx
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.cxx
