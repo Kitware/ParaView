@@ -33,10 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDataRepresentation.h"
 #include "vtkChartRepresentation.h"
-#include "vtkSMParallelCoordinatesRepresentationProxy.h"
+#include "vtkPVPlotMatrixRepresentation.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkWeakPointer.h"
 
+#include <QMimeData>
 #include <QPointer>
 #include <QPixmap>
 
@@ -47,8 +49,9 @@ public:
   {
   }
 
-  vtkWeakPointer<vtkSMParallelCoordinatesRepresentationProxy> RepresentationProxy;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
+  QModelIndex rootIndex;
 
   vtkChartRepresentation* GetVTKRepresentation()
     {
@@ -88,7 +91,7 @@ void pqChartSeriesSettingsModel::setRepresentation(pqDataRepresentation* rep)
     }
 
   this->Implementation->RepresentationProxy =
-    vtkSMParallelCoordinatesRepresentationProxy::SafeDownCast(rep->getProxy());
+    vtkSMChartRepresentationProxy::SafeDownCast(rep->getProxy());
   this->Implementation->Representation = rep;
 }
 
@@ -195,13 +198,20 @@ QModelIndex pqChartSeriesSettingsModel::index(int row, int column,
 //-----------------------------------------------------------------------------
 QModelIndex pqChartSeriesSettingsModel::parent(const QModelIndex &) const
 {
-  return QModelIndex();
+  return this->rootIndex();
+}
+
+//-----------------------------------------------------------------------------
+QModelIndex pqChartSeriesSettingsModel::rootIndex() const
+{
+  return this->Implementation->rootIndex;
 }
 
 //-----------------------------------------------------------------------------
 Qt::ItemFlags pqChartSeriesSettingsModel::flags(const QModelIndex &idx) const
 {
-  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable
+    | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
   if(idx.isValid() && idx.model() == this)
     {
     if(idx.column() == 0)
@@ -275,4 +285,72 @@ QString pqChartSeriesSettingsModel::getSeriesLabel(int row) const
   return vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
     "SeriesLabel").GetStatus(name.toStdString().c_str(),
     name.toStdString().c_str()); // name by default.
+}
+
+//-----------------------------------------------------------------------------
+Qt::DropActions pqChartSeriesSettingsModel::supportedDropActions () const
+{
+  // returns what actions are supported when dropping
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
+//-----------------------------------------------------------------------------
+bool pqChartSeriesSettingsModel::dropMimeData(const QMimeData *mData, Qt::DropAction action,
+                                      int row, int column, const QModelIndex &onIndex)
+{
+  Q_UNUSED(row);
+  Q_UNUSED(column);
+  if (!mData || action != Qt::MoveAction)
+      return false;
+
+  QStringList types = mimeTypes();
+  if (types.isEmpty())
+      return false;
+  QString format = types.at(0);
+  if (!mData->hasFormat(format))
+      return false;
+  vtkPVPlotMatrixRepresentation* plotMatrixRep = vtkPVPlotMatrixRepresentation::SafeDownCast(
+    this->Implementation->GetVTKRepresentation());
+  if(!plotMatrixRep)
+    {
+    return false;
+    }
+  this->blockSignals(true);
+
+  QByteArray encoded = mData->data(format);
+  QDataStream stream(&encoded, QIODevice::ReadOnly);
+
+  QList<int> rows;
+  while (!stream.atEnd()) {
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+    if(!rows.contains(r))
+      {
+      rows.append(r);
+      }
+    }
+
+  if(rows.count() ==0)
+    {
+    return false;
+    }
+
+  // if the drop is on an item, insert the dropping items
+  // before the dropped-on item; else, we will just move
+  // them to the end.
+  int toRow = onIndex.isValid() ? onIndex.row() : rowCount();
+  plotMatrixRep->MoveInputTableColumn(rows.value(0), toRow);
+  this->blockSignals(false);
+  this->emitDataChanged();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSeriesSettingsModel::emitDataChanged()
+{
+  emit this->dataChanged(
+    this->createIndex(0, 0),
+    this->createIndex(this->rowCount(QModelIndex())-1, 0));
+  this->updateCheckState(0, Qt::Horizontal);
 }

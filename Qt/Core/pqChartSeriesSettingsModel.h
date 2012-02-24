@@ -95,6 +95,10 @@ public:
   /// \return A model index for the parent of the given index.
   virtual QModelIndex parent(const QModelIndex &index) const;
 
+  /// \brief Extended drag-n-drop operations for this model
+  virtual Qt::DropActions supportedDropActions() const;
+  virtual bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+
 public slots:
   /// Reloads the model i.e. refreshes all data from the display and resets the
   /// model.
@@ -113,6 +117,13 @@ public slots:
 
 signals:
   void redrawChart();
+
+protected:
+  virtual QModelIndex rootIndex() const;
+
+protected slots:
+  /// emits data-changed event whenever the properties are modified.
+  void emitDataChanged();
 
 private:
   class pqImplementation;
