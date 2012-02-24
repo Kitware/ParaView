@@ -11428,7 +11428,8 @@ This property controls how the filter works to generate tensor cell data. You ca
 
       <StringVectorProperty name="NormalArrays"
         command="SetMaterialNormalArray"
-        use_index="1"
+        number_of_elements_per_command="2"
+        element_types="2 2"
         repeat_command="1">
         <ArrayListDomain name="array_list"
           attribute_type="Vectors"
@@ -11437,11 +11438,20 @@ This property controls how the filter works to generate tensor cell data. You ca
 		        <Property name="Input" function="Input"/>
 	        </RequiredProperties>
 	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
       <StringVectorProperty name="OrderingArrays"
         command="SetMaterialOrderingArray"
-        use_index="1"
+        number_of_elements_per_command="2"
+        element_types="2 2"
         repeat_command="1">
         <ArrayListDomain name="array_list"
           attribute_type="Scalars"
@@ -11450,8 +11460,25 @@ This property controls how the filter works to generate tensor cell data. You ca
 		        <Property name="Input" function="Input"/>
 	        </RequiredProperties>
 	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
+      <Hints>
+        <!--
+          YoungsMaterialInterface uses a custom panel that creates custom
+          widgets for these two properties so we hide them from the
+          auto-generated part of the panel.
+        -->
+        <Property name="OrderingArrays" show="0" />
+        <Property name="NormalArrays" show="0" />
+      </Hints>
      <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
 

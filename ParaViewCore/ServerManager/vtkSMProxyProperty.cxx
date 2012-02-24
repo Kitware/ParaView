@@ -338,6 +338,19 @@ unsigned int vtkSMProxyProperty::GetNumberOfProxies()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::SetNumberOfUncheckedProxies(unsigned int num)
+{
+  if (num > 0)
+    {
+    this->PPInternals->UncheckedProxies.resize(num);
+    }
+  else
+    {
+    this->PPInternals->UncheckedProxies.clear();
+    }
+}
+
+//---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 {
   return static_cast<unsigned int>(this->PPInternals->UncheckedProxies.size());

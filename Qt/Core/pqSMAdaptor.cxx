@@ -1440,11 +1440,25 @@ QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
 
   if(Type == CHECKED)
     {
-    variant = vtkSMPropertyHelper(Property).GetAsVariant(Index);
+    if (vtkSMPropertyHelper(Property).GetNumberOfElements() > Index)
+      {
+      variant = vtkSMPropertyHelper(Property).GetAsVariant(Index);
+      }
+    else
+      {
+      return QVariant();
+      }
     }
   else if(Type == UNCHECKED)
     {
-    variant = vtkSMUncheckedPropertyHelper(Property).GetAsVariant(Index);
+    if (vtkSMUncheckedPropertyHelper(Property).GetNumberOfElements() > Index)
+      {
+      variant = vtkSMUncheckedPropertyHelper(Property).GetAsVariant(Index);
+      }
+    else
+      {
+      return QVariant();
+      }
     }
 
   return convertToQVariant(variant);
