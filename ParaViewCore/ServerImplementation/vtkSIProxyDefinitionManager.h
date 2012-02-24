@@ -175,6 +175,12 @@ public:
   vtkPVProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
     int scope=ALL_DEFINITIONS);
 
+  // Description:
+  // Desactivate the modification of the ProxyDefinitions for that given
+  // vtkSIProxyDefinitionManager to make sure update only come from the
+  // remote server and not plugin loaded on the client.
+  void EnableXMLProxyDefnitionUpdate(bool);
+
 //BTX
   // Description:
   // Push a new state to the underneath implementation

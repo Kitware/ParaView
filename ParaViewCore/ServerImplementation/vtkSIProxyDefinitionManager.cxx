@@ -28,9 +28,10 @@
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
@@ -58,10 +59,14 @@ typedef std::map<vtkStdString, StrToXmlMap>  StrToStrToXmlMap;
 class vtkSIProxyDefinitionManager::vtkInternals
 {
 public:
+  // Keep State Flag of the ProcessType
+  bool EnableXMLProxyDefinitionUpdate;
   // Keep track of ServerManager definition
   StrToStrToXmlMap CoreDefinitions;
   // Keep track of custom definition
   StrToStrToXmlMap CustomsDefinitions;
+  //-------------------------------------------------------------------------
+  vtkInternals() : EnableXMLProxyDefinitionUpdate(true) {}
   //-------------------------------------------------------------------------
   void Clear()
     {
@@ -1181,13 +1186,18 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     {
     std::vector<std::string> xmls;
     smplugin->GetXMLs(xmls);
-    for (size_t cc=0; cc < xmls.size(); cc++)
-      {
-      this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
-      }
 
-    // Make sure we invalidate any cached flatten version of our proxy definition
-    this->InternalsFlatten->Clear();
+    // Make sure only the SERVER is processing the XML proxy definition
+    if(this->Internals->EnableXMLProxyDefinitionUpdate)
+      {
+      for (size_t cc=0; cc < xmls.size(); cc++)
+        {
+        this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
+        }
+
+      // Make sure we invalidate any cached flatten version of our proxy definition
+      this->InternalsFlatten->Clear();
+      }
     }
 }
 //---------------------------------------------------------------------------
@@ -1269,4 +1279,9 @@ void vtkSIProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
 vtkTypeUInt32 vtkSIProxyDefinitionManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID;
+}
+//----------------------------------------------------------------------------
+void vtkSIProxyDefinitionManager::EnableXMLProxyDefnitionUpdate(bool enable)
+{
+  this->Internals->EnableXMLProxyDefinitionUpdate = enable;
 }
