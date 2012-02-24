@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqParallelCoordinatesSettingsModel.h
+   Module:    pqChartSeriesSettingsModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqParallelCoordinatesSettingsModel_h
-#define __pqParallelCoordinatesSettingsModel_h
+#ifndef __pqChartSeriesSettingsModel_h
+#define __pqChartSeriesSettingsModel_h
 
 #include "pqCheckableHeaderModel.h"
 #include "pqCoreExport.h"
@@ -40,15 +40,15 @@ class vtkTable;
 class vtkChartXY;
 class pqDataRepresentation;
 
-class PQCORE_EXPORT pqParallelCoordinatesSettingsModel : public pqCheckableHeaderModel
+class PQCORE_EXPORT pqChartSeriesSettingsModel : public pqCheckableHeaderModel
 {
   typedef pqCheckableHeaderModel Superclass;
 
   Q_OBJECT
 
 public:
-  pqParallelCoordinatesSettingsModel(QObject* parent = 0);
-  ~pqParallelCoordinatesSettingsModel();
+  pqChartSeriesSettingsModel(QObject* parent = 0);
+  ~pqChartSeriesSettingsModel();
 
   void setRepresentation(pqDataRepresentation* rep);
   pqDataRepresentation* representation() const;
