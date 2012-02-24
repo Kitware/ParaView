@@ -965,6 +965,15 @@ namespace
 
     if (node && strcmp(node->GetName(), "Splitter") == 0)
       {
+      // if splitter has just 1 view, then we aren't really splitting anything.
+      // Handle that first.
+      int count;
+      if (node->GetScalarAttribute("count", &count) && count==1)
+        {
+        HandleSplitterElements(index, NULL, items);
+        return;
+        }
+
       if (node->GetAttribute("orientation") &&
         strcmp(node->GetAttribute("orientation"), "Horizontal")==0)
         {
