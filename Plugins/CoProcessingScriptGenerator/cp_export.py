@@ -233,6 +233,7 @@ def DoCoProcessing(datadescription):
                 else:
                     print ' do not know what to do with a ', view.GetClassName()
 
+            view.ViewTime = datadescription.GetTime()
             WriteImage(fname, view, Magnification=view.cpMagnification)
 
 
