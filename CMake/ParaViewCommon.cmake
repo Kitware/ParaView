@@ -344,9 +344,6 @@ OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
 # Set this to get VTKs FOR LOOP "fix" to apply too all of Paraviews Source.
 SET(VTK_USE_FOR_SCOPE_WORKAROUND TRUE)
 
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
-  ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
-
 OPTION(PARAVIEW_DISABLE_VTK_TESTING "Disable VTK Testing" OFF)
 MARK_AS_ADVANCED(PARAVIEW_DISABLE_VTK_TESTING)
 IF (PARAVIEW_DISABLE_VTK_TESTING)
