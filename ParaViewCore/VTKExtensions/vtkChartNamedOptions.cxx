@@ -16,8 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkChart.h"
+#include "vtkChartParallelCoordinates.h"
 #include "vtkPlot.h"
 #include "vtkTable.h"
+#include "vtkScatterPlotMatrix.h"
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 #include "vtkNew.h"
@@ -156,6 +158,23 @@ vtkChart * vtkChartNamedOptions::GetChart()
 }
 
 //----------------------------------------------------------------------------
+void vtkChartNamedOptions::SetPlotMatrix(vtkScatterPlotMatrix* plotmatrix)
+{
+  if (this->PlotMatrix == plotmatrix)
+    {
+    return;
+    }
+  this->PlotMatrix = plotmatrix;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkScatterPlotMatrix * vtkChartNamedOptions::GetPlotMatrix()
+{
+  return this->PlotMatrix;
+}
+
+//----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetTable(vtkTable* table)
 {
   if (this->Table == table)
@@ -182,6 +201,10 @@ vtkTable* vtkChartNamedOptions::GetTable()
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::RemovePlotsFromChart()
 {
+  if(this->PlotMatrix)
+    {
+    this->PlotMatrix->SetVisibleColumns(NULL);
+    }
   if (!this->Chart)
     {
     return;
@@ -252,11 +275,22 @@ void vtkChartNamedOptions::RefreshPlots()
 }
 
 //----------------------------------------------------------------------------
-void vtkChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
+void vtkChartNamedOptions::SetPlotVisibilityInternal(PlotInfo&,
                                                      bool visible,
                                                      const char* seriesName)
 {
-  // FIXME: Do something sane for the base chart.
+  if (this->Chart)
+    {
+    if( vtkChartParallelCoordinates* parallelCharts =
+      vtkChartParallelCoordinates::SafeDownCast(this->Chart))
+      {
+      parallelCharts->SetColumnVisibility(seriesName, visible);
+      }
+    }
+  else if(this->PlotMatrix)
+    {
+    this->PlotMatrix->SetColumnVisibility(seriesName, visible);
+    }
 }
 
 //----------------------------------------------------------------------------

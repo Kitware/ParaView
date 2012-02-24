@@ -114,23 +114,6 @@ void vtkPVParallelCoordinatesRepresentation::SetVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetSeriesVisibility(
-    const char* name, int visible)
-{
-  if (this->GetChart())
-    {
-    this->GetChart()->SetColumnVisibility(name, visible != 0);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetLabel(const char*,
-                                                      const char*)
-{
-
-}
-
-//----------------------------------------------------------------------------
 void vtkPVParallelCoordinatesRepresentation::SetLineThickness(int value)
 {
   if (this->GetChart())

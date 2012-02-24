@@ -32,6 +32,7 @@
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTables.h"
 #include "vtkReductionFilter.h"
+#include "vtkScatterPlotMatrix.h"
 #include "vtkSelectionDeliveryFilter.h"
 #include "vtkSelection.h"
 #include "vtkTable.h"
@@ -101,7 +102,15 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
   this->ContextView = chartView;
   if (this->Options)
     {
-    this->Options->SetChart(vtkChart::SafeDownCast(chartView->GetContextItem()));
+    if(vtkChart* pChart = vtkChart::SafeDownCast(chartView->GetContextItem()))
+      {
+      this->Options->SetChart(pChart);
+      }
+    else if(vtkScatterPlotMatrix* plotMatrix =
+      vtkScatterPlotMatrix::SafeDownCast(chartView->GetContextItem()))
+      {
+      this->Options->SetPlotMatrix(plotMatrix);
+      }
     this->Options->SetTableVisibility(this->GetVisibility());
     }
   return true;
@@ -120,6 +129,7 @@ bool vtkChartRepresentation::RemoveFromView(vtkView* view)
     {
     this->Options->RemovePlotsFromChart();
     this->Options->SetChart(0);
+    this->Options->SetPlotMatrix(0);
     }
   this->ContextView = 0;
   return true;

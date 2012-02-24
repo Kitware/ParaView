@@ -24,6 +24,7 @@
 
 class vtkChart;
 class vtkTable;
+class vtkScatterPlotMatrix;
 
 class VTK_EXPORT vtkChartNamedOptions : public vtkObject
 {
@@ -69,6 +70,12 @@ public:
   // Sets the internal chart object whose options will be manipulated.
   void SetChart(vtkChart* chart);
   vtkChart * GetChart();
+
+  // Description:
+  // Sets the internal plot matrix object whose options will be manipulated.
+  void SetPlotMatrix(vtkScatterPlotMatrix* plotmatrix);
+  vtkScatterPlotMatrix * GetPlotMatrix();
+
 //ETX
 
   // Description:
@@ -93,6 +100,7 @@ protected:
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
+  vtkWeakPointer<vtkScatterPlotMatrix> PlotMatrix;
   int ChartType;
   bool TableVisibility;
 

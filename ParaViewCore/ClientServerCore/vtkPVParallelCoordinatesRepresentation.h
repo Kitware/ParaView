@@ -38,14 +38,6 @@ public:
   // Set visibility of the representation.
   virtual void SetVisibility(bool visible);
 
-  // Description:
-  // Set series visibility for the series with the given name.
-  void SetSeriesVisibility(const char* name, int visible);
-
-  // Description:
-  // Set series label for the series with the given name.
-  void SetLabel(const char* name, const char* label);
-
   void SetLineThickness(int value);
   void SetLineStyle(int value);
   void SetColor(double r, double g, double b);
