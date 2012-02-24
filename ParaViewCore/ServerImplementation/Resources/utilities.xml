@@ -2312,12 +2312,18 @@
       <!-- End of TimerLog -->
     </Proxy>
 
-    <ViewLayoutProxy name="ViewLayout" class="vtkViewLayout"
-      processes="renderserver">
+    <ViewLayoutProxy name="ViewLayout" processes="client">
       <Documentation>
         Proxy used to manage layout for mutliple views.
       </Documentation>
     </ViewLayoutProxy>
+
+    <Proxy name="InternalViewLayoutHelper"
+      class="vtkViewLayout" processes="renderserver">
+      <Documentation>
+        Proxy used to manage layout for mutliple views.
+      </Documentation>
+    </Proxy>
 
     <!-- End of group "misc" -->
   </ProxyGroup>

@@ -404,6 +404,10 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
+  // notify the world that we may create a new view. applications may handle
+  // this by setting up layouts, etc.
+  emit this->aboutToCreateView(server);
+
   proxy->UpdateVTKObjects();
 
   QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
