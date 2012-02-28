@@ -953,6 +953,22 @@ bool vtkSMStateVersionController::Process_3_12_to_3_14(
 
 namespace
 {
+  vtkPVXMLElement* FindNestedSplitterAtIndex(vtkPVXMLElement* node, int index)
+    {
+    for (unsigned int cc=0;
+        node != NULL && cc < node->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = node->GetNestedElement(cc);
+      int cur_index;
+      if (child && child->GetScalarAttribute("index", &cur_index) &&
+        cur_index == index)
+        {
+        return child;
+        }
+      }
+    return NULL;
+    }
+
   void HandleSplitterElements(int index, vtkPVXMLElement* node,
     std::vector<vtkSmartPointer<vtkPVXMLElement> > &items)
     {
@@ -986,8 +1002,9 @@ namespace
           }
         }
       items[index]->AddAttribute("view", "0");
-      HandleSplitterElements(2*index + 1, node->GetNestedElement(0), items);
-      HandleSplitterElements(2*index + 2, node->GetNestedElement(1), items);
+      // find nest element with index 0 and 1.
+      HandleSplitterElements(2*index + 1, FindNestedSplitterAtIndex(node, 0), items);
+      HandleSplitterElements(2*index + 2, FindNestedSplitterAtIndex(node, 1), items);
       }
     else
       {
@@ -1034,8 +1051,22 @@ vtkPVXMLElement* vtkSMStateVersionController::ConvertMultiViewLayout(
   layout->AddAttribute("number_of_elements", static_cast<int>(items.size()));
   for (size_t cc=0; cc < items.size(); cc++)
     {
-    layout->AddNestedElement(items[cc]);
+    if (items[cc])
+      {
+      layout->AddNestedElement(items[cc]);
+      }
+    else
+      {
+      vtkPVXMLElement* item = vtkPVXMLElement::New();
+      item->SetName("Item");
+      item->AddAttribute("direction","0");
+      item->AddAttribute("fraction", "0.5");
+      item->AddAttribute("view", "0");
+      layout->AddNestedElement(item);
+      item->Delete();
+      }
     }
+  //layout->PrintXML();
 
   vtkPVXMLElement* proxy = vtkPVXMLElement::New();
   proxy->SetName("Proxy");
