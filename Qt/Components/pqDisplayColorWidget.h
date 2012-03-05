@@ -56,7 +56,11 @@ class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 public:
   pqDisplayColorWidget( QWidget *parent=0 );
   ~pqDisplayColorWidget();
-  
+  /// Returns the current text in the combo box.
+  QString getCurrentText() const;
+
+
+protected:
   /// Removes all variables from the collection.
   void clear();
 
@@ -71,8 +75,6 @@ public:
   /// editing.
   pqPipelineRepresentation* getRepresentation() const;
 
-  /// Returns the current text in the combo box.
-  QString getCurrentText() const;
 
 public slots:
   /// Called when the variable selection changes. 

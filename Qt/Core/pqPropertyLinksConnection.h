@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqPropertyLinks2Connection_h
-#define __pqPropertyLinks2Connection_h
+#ifndef __pqPropertyLinksConnection_h
+#define __pqPropertyLinksConnection_h
 
 #include <QObject>
 #include <QPointer>
@@ -41,31 +41,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkEventQtSlotConnect.h"
 
-class pqPropertyLinks2;
+class pqPropertyLinks;
 
 /// *** THIS CLASS IS NOT DESIGNED FOR PUBLIC USE ***
-/// pqPropertyLinks2Connection is an internal class used by
-/// pqPropertyLinks2.
+/// pqPropertyLinksConnection is an internal class used by
+/// pqPropertyLinks.
 /// *** THIS CLASS IS NOT DESIGNED FOR PUBLIC USE ***
-class pqPropertyLinks2Connection : public QObject
+class pqPropertyLinksConnection : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
   /// This also sets up observers to monitor any changes. This does not change
   /// any values on either items.
-  pqPropertyLinks2Connection(
+  pqPropertyLinksConnection(
     QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+    bool use_unchecked_modified_event,
     QObject* parentObject=0);
 
-  virtual ~pqPropertyLinks2Connection();
+  virtual ~pqPropertyLinksConnection();
 
   vtkSMProxy* proxy() const
     { return this->ProxySM; }
 
   /// Comparison operator
-  bool operator==(const pqPropertyLinks2Connection& other) const;
+  bool operator==(const pqPropertyLinksConnection& other) const;
 
 public slots:
   /// Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
@@ -86,7 +87,7 @@ signals:
   void smpropertyModified();
 
 private:
-  Q_DISABLE_COPY(pqPropertyLinks2Connection)
+  Q_DISABLE_COPY(pqPropertyLinksConnection)
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
 
   QPointer<QObject> ObjectQt;

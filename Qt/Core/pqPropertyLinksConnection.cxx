@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqPropertyLinks2Connection.h"
+#include "pqPropertyLinksConnection.h"
 
 #include "pqSMAdaptor.h"
 #include "vtkCommand.h"
@@ -38,18 +38,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqPropertyLinks2Connection::pqPropertyLinks2Connection(
+pqPropertyLinksConnection::pqPropertyLinksConnection(
 QObject* qobject, const char* qproperty, const char* qsignal,
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+  bool use_unchecked_modified_event,
   QObject* parentObject): Superclass(parentObject),
   ObjectQt(qobject), PropertyQt(qproperty), SignalQt(qsignal),
   ProxySM(smproxy), PropertySM(smproperty), IndexSM(smindex)
 {
   if (this->PropertySM)
     {
-    this->VTKConnector->Connect(
-      this->PropertySM, vtkCommand::ModifiedEvent,
-      this, SIGNAL(smpropertyModified()));
+    if (use_unchecked_modified_event)
+      {
+      this->VTKConnector->Connect(
+        this->PropertySM, vtkCommand::UncheckedPropertyModifiedEvent,
+        this, SIGNAL(smpropertyModified()));
+      }
+    else
+      {
+      this->VTKConnector->Connect(
+        this->PropertySM, vtkCommand::ModifiedEvent,
+        this, SIGNAL(smpropertyModified()));
+      }
     }
 
   if (this->ObjectQt && !this->SignalQt.isEmpty())
@@ -60,12 +70,12 @@ QObject* qobject, const char* qproperty, const char* qsignal,
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyLinks2Connection::~pqPropertyLinks2Connection()
+pqPropertyLinksConnection::~pqPropertyLinksConnection()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool pqPropertyLinks2Connection::operator==(const pqPropertyLinks2Connection& other) const
+bool pqPropertyLinksConnection::operator==(const pqPropertyLinksConnection& other) const
 {
   return this->ObjectQt == other.ObjectQt &&
     this->PropertyQt == other.PropertyQt &&
@@ -76,7 +86,7 @@ bool pqPropertyLinks2Connection::operator==(const pqPropertyLinks2Connection& ot
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyLinks2Connection::copyValuesFromServerManagerToQt(bool use_unchecked)
+void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_unchecked)
 {
   if (!this->ObjectQt || !this->ProxySM || !this->PropertySM)
     {
@@ -196,7 +206,7 @@ void pqPropertyLinks2Connection::copyValuesFromServerManagerToQt(bool use_unchec
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyLinks2Connection::copyValuesFromQtToServerManager(bool use_unchecked)
+void pqPropertyLinksConnection::copyValuesFromQtToServerManager(bool use_unchecked)
 {
   if (!this->ObjectQt || !this->ProxySM || !this->PropertySM)
     {
