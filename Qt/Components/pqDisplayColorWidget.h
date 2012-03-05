@@ -44,7 +44,6 @@ class QHBoxLayout;
 
 class pqDataRepresentation;
 class pqPipelineRepresentation;
-class pqTriggerOnIdleHelper;
 class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
@@ -130,7 +129,6 @@ private:
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqPipelineRepresentation> Representation;
   QList<QString> AvailableArrays;
-  pqTriggerOnIdleHelper* ReloadGUIHelper;
 };
 
 #endif

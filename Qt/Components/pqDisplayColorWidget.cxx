@@ -42,14 +42,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QRegExp>
-#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
-#include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -87,9 +85,6 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
-  this->ReloadGUIHelper = new pqTriggerOnIdleHelper(this);
-  QObject::connect(this->ReloadGUIHelper, SIGNAL(triggered()),
-    this, SLOT(reloadGUIInternal()));
 }
 
 //-----------------------------------------------------------------------------
@@ -99,7 +94,6 @@ pqDisplayColorWidget::~pqDisplayColorWidget()
   delete this->PointDataIcon;
   delete this->SolidColorIcon;
   this->VTKConnect->Delete();
-  delete this->ReloadGUIHelper;
 }
 
 //-----------------------------------------------------------------------------
@@ -322,10 +316,10 @@ void pqDisplayColorWidget::updateComponents()
       // remove previous connection, if any
       this->VTKConnect->Disconnect(
         lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
-        this, SLOT(reloadGUI()), NULL);
+        this, SLOT(updateGUI()), NULL);
       this->VTKConnect->Connect(
         lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
-        this, SLOT(reloadGUI()), NULL, 0.0);
+        this, SLOT(updateGUI()), NULL, 0.0);
 
       this->Components->addItem("Magnitude");
       for(int i=0; i<numComponents; i++)
@@ -362,23 +356,21 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
 
   this->VTKConnect->Disconnect();
   this->Representation = qobject_cast<pqPipelineRepresentation*>(display);
-  this->ReloadGUIHelper->setServer(NULL);
   if(this->Representation)
     {
-    this->ReloadGUIHelper->setServer(display->getServer());
     vtkSMProxy* repr = this->Representation->getProxy();
     this->VTKConnect->Connect(repr->GetProperty("ColorAttributeType"),
-      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()),
       NULL, 0.0);
     this->VTKConnect->Connect(repr->GetProperty("ColorArrayName"),
-      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()),
       NULL, 0.0);
 
     if (repr->GetProperty("Representation"))
       {
       this->VTKConnect->Connect(
         repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-        this, SLOT(reloadGUI()),
+        this, SLOT(updateGUI()),
         NULL, 0.0);
       }
 
@@ -399,9 +391,7 @@ pqPipelineRepresentation* pqDisplayColorWidget::getRepresentation() const
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::reloadGUI()
 {
-  // pqTriggerOnIdleHelper is used to ensure that reloadGUI() never gets called
-  // when the process is busy.
-  this->ReloadGUIHelper->trigger();
+  this->reloadGUIInternal();
 }
 
 //-----------------------------------------------------------------------------
