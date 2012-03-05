@@ -335,6 +335,12 @@ pqCPExportStateWizard::pqCPExportStateWizard(
     this->Internals->nextView->setEnabled(true);
     }
   this->Internals->viewsContainer->setCurrentIndex(0);
+
+  // a bit of a hack but we name the finish button here since for testing
+  // it's having a hard time finding that button otherwise.
+  QAbstractButton* finishButton = this->button(FinishButton);
+  QString name("finishButton");
+  finishButton->setObjectName(name);
 }
 
 //-----------------------------------------------------------------------------

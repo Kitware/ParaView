@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPActionsGroup.h"
 
+#include "pqCoreUtilities.h"
 #include "pqCPExportStateWizard.h"
 
 //-----------------------------------------------------------------------------
@@ -42,7 +43,7 @@ pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
   export_action->setStatusTip("Export state for co-processing");
 
   QObject::connect(export_action, SIGNAL(triggered()),
-    this, SLOT(exportState()), Qt::QueuedConnection);
+                   this, SLOT(exportState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -53,7 +54,7 @@ pqCPActionsGroup::~pqCPActionsGroup()
 //-----------------------------------------------------------------------------
 void pqCPActionsGroup::exportState()
 {
-  pqCPExportStateWizard wizard;
+  pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
   wizard.exec();
 }
 
