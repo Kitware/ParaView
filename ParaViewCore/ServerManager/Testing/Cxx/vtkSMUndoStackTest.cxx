@@ -56,17 +56,17 @@ void vtkSMUndoStackTest::UndoRedo()
   undoStack->Push("ChangeRadius", undoSet);
   undoSet->Delete();
 
-  QVERIFY(undoStack->CanUndo() == true);
+  QVERIFY(static_cast<bool>(undoStack->CanUndo()) == true);
   undoStack->Undo();
-  QVERIFY(undoStack->CanUndo() == false);
+  QVERIFY(static_cast<bool>(undoStack->CanUndo()) == false);
   sphere->UpdateVTKObjects();
   QCOMPARE(vtkSMPropertyHelper(sphere, "Radius").GetAsDouble(), 0.5);
 
-  QVERIFY(undoStack->CanRedo() == true);
+  QVERIFY(static_cast<bool>(undoStack->CanRedo()) == true);
   undoStack->Redo();
   sphere->UpdateVTKObjects();
   QCOMPARE(vtkSMPropertyHelper(sphere, "Radius").GetAsDouble(), 1.2);
-  QVERIFY(undoStack->CanRedo() == false);
+  QVERIFY(static_cast<bool>(undoStack->CanRedo()) == false);
 
   undoStack->Delete();
 
