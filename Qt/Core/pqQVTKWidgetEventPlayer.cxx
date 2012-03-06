@@ -71,7 +71,7 @@ bool pqQVTKWidgetEventPlayer::playEvent(QObject* Object,
         QEvent::Type type = (Command == "mousePress")? QEvent::MouseButtonPress :
           ((Command=="mouseMove")?  QEvent::MouseMove : QEvent::MouseButtonRelease);
         QMouseEvent e(type, QPoint(x,y), button, buttons, keym);
-        QCoreApplication::sendEvent(widget, &e);
+        qApp->notify(widget, &e);
         }
       return true;
       }
