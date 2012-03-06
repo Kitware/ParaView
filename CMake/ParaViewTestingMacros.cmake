@@ -19,7 +19,7 @@ ENDMACRO (process_args)
 
 
 #Determine how many tests are to be grouped.
-SET (TEST_GROUP_SIZE 3)
+SET (TEST_GROUP_SIZE 1)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "" ${ARGN})
@@ -27,6 +27,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     set (counter 0)
     set (extra_args)
     set (full_test_name)
+    set (force_serial FALSE)
+
     while (${counter} LESS ${TEST_GROUP_SIZE})
       list(LENGTH ACT_TEST_SCRIPTS num_tests)
       if (num_tests)
@@ -57,6 +59,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
       endif (DEFINED ${test_name}_BREAK)
+      if (${test_name}_FORCE_SERIAL)
+        set (force_serial TRUE)
+      endif (${test_name}_FORCE_SERIAL)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
@@ -66,6 +71,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
+      if (force_serial)
+        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
+      endif()
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
