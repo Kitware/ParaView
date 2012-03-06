@@ -244,13 +244,19 @@ namespace pqCoreTestUtilityInternal{
   public:
     WidgetSizer(QWidget* widget, const QSize& size)
       {
-      this->OldSize = widget->size();
-      this->Widget = widget;
-      widget->resize(size);
+      if (size.isValid())
+        {
+        this->OldSize = widget->size();
+        this->Widget = widget;
+        widget->resize(size);
+        }
       }
     ~WidgetSizer()
       {
-      this->Widget->resize(this->OldSize); 
+      if (this->Widget && this->OldSize.isValid())
+        {
+        this->Widget->resize(this->OldSize);
+        }
       }
 
     };
@@ -308,9 +314,11 @@ bool pqCoreTestUtility::CompareView(
   pqView* curView,
   const QString& referenceImage,
   double threshold,
-  const QString& tempDirectory)
+  const QString& tempDirectory,
+  const QSize& size/*=QSize()*/)
 {
   Q_ASSERT(curView != NULL);
+  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->getWidget(), size);
 
   vtkImageData* test_image = curView->captureImage(1);
   if (!test_image)
