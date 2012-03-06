@@ -43,7 +43,8 @@ class pqPropertyLinks::pqInternals
 {
 public:
   QList<QPointer<pqPropertyLinksConnection> > Connections;
-  pqInternals() { }
+  bool IgnoreSMChanges;
+  pqInternals(): IgnoreSMChanges(false) { }
 };
 
 //-----------------------------------------------------------------------------
@@ -193,13 +194,16 @@ void pqPropertyLinks::onQtPropertyModified()
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::onSMPropertyModified()
 {
-  pqPropertyLinksConnection* connection =
-    qobject_cast<pqPropertyLinksConnection*>(this->sender());
-  if (connection)
+  if (!this->Internals->IgnoreSMChanges)
     {
-    connection->copyValuesFromServerManagerToQt(
-      this->useUncheckedProperties());
-    emit this->smPropertyChanged();
+    pqPropertyLinksConnection* connection =
+      qobject_cast<pqPropertyLinksConnection*>(this->sender());
+    if (connection)
+      {
+      connection->copyValuesFromServerManagerToQt(
+        this->useUncheckedProperties());
+      emit this->smPropertyChanged();
+      }
     }
 }
 
@@ -207,6 +211,15 @@ void pqPropertyLinks::onSMPropertyModified()
 void pqPropertyLinks::accept()
 {
   std::set<vtkSMProxy*> proxies_to_update;
+
+  // In some cases, pqPropertyLinks is used to connect multiple elements of a
+  // property to different widgets (e.g. the VOI widgets for ExtractVOI filter).
+  // In such cases when we "accept" changes from Index 0, for example, the Index
+  // 1 ends up resetting its value using the current value from the property.
+  // To avoid such incorrect feedback when we are accepting all changes, we use
+  // IgnoreSMChanges flag.
+  this->Internals->IgnoreSMChanges = true;
+
   foreach (pqPropertyLinksConnection* connection, this->Internals->Connections)
     {
     if (connection && connection->proxy())
@@ -215,6 +228,7 @@ void pqPropertyLinks::accept()
       proxies_to_update.insert(connection->proxy());
       }
     }
+  this->Internals->IgnoreSMChanges = false;
 
   for (std::set<vtkSMProxy*>::iterator iter = proxies_to_update.begin();
     iter != proxies_to_update.end(); ++iter)
