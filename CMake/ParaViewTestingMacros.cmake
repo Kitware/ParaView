@@ -142,6 +142,10 @@ FUNCTION(add_multi_client_tests prefix)
         ${extra_args}
         --exit
         )
+      if (${test_name}_FORCE_SERIAL)
+        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+      endif (${test_name}_FORCE_SERIAL)
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
