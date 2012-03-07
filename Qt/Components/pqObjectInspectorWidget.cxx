@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCutPanel.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
+#include "pqEventDispatcher.h"
 #include "pqExodusIIPanel.h"
 #include "pqExtractCTHPartsPanel.h"
 #include "pqGlyphPanel.h"
@@ -343,6 +344,9 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AutoAccept = pqApplicationCore::instance()->settings()->
     value("autoAccept", false).toBool();
 
+  // register timer with pqEventDispatcher so that it is ensured to have
+  // timed-out during test playback.
+  pqEventDispatcher::registerTimer(&this->AutoAcceptTimer);
   this->AutoAcceptTimer.setSingleShot(true);
   this->AutoAcceptTimer.setInterval(1000);  // 1 sec
   QObject::connect(&this->AutoAcceptTimer, SIGNAL(timeout()),

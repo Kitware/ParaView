@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAlwaysConnectedBehavior.h"
 
 #include "pqApplicationCore.h"
+#include "pqEventDispatcher.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -43,6 +44,10 @@ pqAlwaysConnectedBehavior::pqAlwaysConnectedBehavior(QObject* parentObject)
 : Superclass(parentObject),
   DefaultServer("builtin:")
 {
+  // register timer to ensure that the timer timeouts during test playback if
+  // active.
+  pqEventDispatcher::registerTimer(&this->Timer);
+
   this->Timer.setSingleShot(true);
   this->Timer.setInterval(0);
   QObject::connect(&this->Timer, SIGNAL(timeout()),
