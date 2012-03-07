@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqEventDispatcher.h"
 #include "pqProgressManager.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
@@ -91,6 +92,10 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->AnnotationLink = 0;
+    // register timer with testing framework, so that the testing framework
+    // ensures that any pending timers are processed before dispatching new
+    // events.
+    pqEventDispatcher::registerTimer(&this->RenderTimer);
     }
 
   ~pqViewInternal()

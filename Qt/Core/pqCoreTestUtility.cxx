@@ -104,6 +104,10 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   pqTestUtility(p)
 {
+  // we don't want to the dispatcher to wait during event playback. We will
+  // explicitly register timers that need to be timed out.
+  pqEventDispatcher::setEventPlaybackDelay(0);
+
   // add an XML source
   this->addEventSource("xml", new pqXMLEventSource(this));
   this->addEventObserver("xml", new pqXMLEventObserver(this));
