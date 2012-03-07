@@ -81,7 +81,7 @@
 //  - To show a source proxy or a filter inside the menu of ParaView we use a hint
 //       <SourceProxy ...>
 //           <Hints>
-//              <ShowInGUI                   => The category attribute allow to
+//              <ShowInMenu                  => The category attribute allow to
 //                  category="PersoFilter"/>    specify in which sub-menu this
 //                                              proxy should be in. (optional)
 //           </Hints>
@@ -324,7 +324,8 @@ public:
   // Loads the state of the server manager from XML.
   // If loader is not specified, a vtkSMStateLoader instance is used.
   void LoadXMLState(const char* filename, vtkSMStateLoader* loader=NULL);
-  void LoadXMLState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
+  void LoadXMLState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL,
+                    bool keepOriginalIds = false);
 
   // Description:
   // Save the state of the server manager in XML format in a file.

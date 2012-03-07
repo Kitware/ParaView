@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,12 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFiltersMenuReaction.h"
+#include "pqHelpReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqQueryDialog.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
+#include "vtkPVConfig.h"
 
 #include <QEventLoop>
+#include <QMessageBox>
+
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -64,8 +68,15 @@ void pqDataQueryReaction::onExtractSelectionOverTime()
 }
 
 //-----------------------------------------------------------------------------
+void pqDataQueryReaction::showHelp()
+{
+  pqHelpReaction::showHelp("qthelp://paraview.org/paraview/Book/Book_Chapter6.html");
+}
+
+//-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqQueryDialog dialog(
     pqActiveObjects::instance().activePort(),
     pqCoreUtilities::mainWidget());
@@ -88,6 +99,14 @@ void pqDataQueryReaction::showQueryDialog()
                    this,    SLOT(onExtractSelection()));
   QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
                    this,    SLOT(onExtractSelectionOverTime()));
+  QObject::connect(&dialog, SIGNAL(helpRequested()),
+                   this,    SLOT(showHelp()));
   loop.exec();
+#else
+  QMessageBox::warning(0,
+                       "Selection Not Supported",
+                       "Error: Find Data requires that ParaView be built with "
+                       "Python enabled. To enable Python set the CMake flag '"
+                       "PARAVIEW_ENABLE_PYTHON' to True.");
+#endif // PARAVIEW_ENABLE_PYTHON
 }
-

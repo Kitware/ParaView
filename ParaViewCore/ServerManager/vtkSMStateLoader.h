@@ -41,7 +41,7 @@ public:
 
   // Description:
   // Load the state from the given root element.
-  int LoadState(vtkPVXMLElement* rootElement);
+  int LoadState(vtkPVXMLElement* rootElement, bool keepOriginalId = false);
 
   // Description:
   // Get/Set the proxy locator to use. Default is 

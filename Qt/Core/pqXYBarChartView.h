@@ -46,6 +46,8 @@ class PQCORE_EXPORT pqXYBarChartView : public pqContextView
 public:
   static QString XYBarChartViewType() { return "XYBarChartView"; }
   static QString XYBarChartViewTypeName() { return "Bar Chart View"; }
+  /// Currently the bar chart view is not supporting selection.
+  virtual bool supportsSelection() const {return false;}
 
 public:
   pqXYBarChartView(const QString& group,

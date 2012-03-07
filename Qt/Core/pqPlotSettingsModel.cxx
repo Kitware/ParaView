@@ -35,10 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkChartRepresentation.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVPlotMatrixRepresentation.h"
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkWeakPointer.h"
 
+#include <QMimeData>
 #include <QPointer>
 #include <QPixmap>
 
@@ -59,6 +61,7 @@ public:
   vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
   vtkEventQtSlotConnect* Connection;
+  QModelIndex rootIndex;
 
   vtkChartRepresentation* GetVTKRepresentation()
     {
@@ -222,13 +225,19 @@ QModelIndex pqPlotSettingsModel::index(int row, int column,
 //-----------------------------------------------------------------------------
 QModelIndex pqPlotSettingsModel::parent(const QModelIndex &) const
 {
-  return QModelIndex();
+  return this->rootIndex();
+}
+//-----------------------------------------------------------------------------
+QModelIndex pqPlotSettingsModel::rootIndex() const
+{
+  return this->Implementation->rootIndex;
 }
 
 //-----------------------------------------------------------------------------
 Qt::ItemFlags pqPlotSettingsModel::flags(const QModelIndex &idx) const
 {
-  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable
+    | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
   if(idx.isValid() && idx.model() == this)
     {
     if(idx.column() == 0)
@@ -443,3 +452,61 @@ int pqPlotSettingsModel::getSeriesMarkerStyle(int row) const
     "SeriesMarkerStyle").GetStatus(this->getSeriesName(row), 1);
 }
 
+//-----------------------------------------------------------------------------
+Qt::DropActions pqPlotSettingsModel::supportedDropActions () const
+{
+  // returns what actions are supported when dropping
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotSettingsModel::dropMimeData(const QMimeData *mData, Qt::DropAction action,
+                                      int row, int column, const QModelIndex &onIndex)
+{
+  Q_UNUSED(row);
+  Q_UNUSED(column);
+  if (!mData || action != Qt::MoveAction)
+      return false;
+
+  QStringList types = mimeTypes();
+  if (types.isEmpty())
+      return false;
+  QString format = types.at(0);
+  if (!mData->hasFormat(format))
+      return false;
+  vtkPVPlotMatrixRepresentation* plotMatrixRep = vtkPVPlotMatrixRepresentation::SafeDownCast(
+    this->Implementation->GetVTKRepresentation());
+  if(!plotMatrixRep)
+    {
+    return false;
+    }
+  this->blockSignals(true);
+
+  QByteArray encoded = mData->data(format);
+  QDataStream stream(&encoded, QIODevice::ReadOnly);
+
+  QList<int> rows;
+  while (!stream.atEnd()) {
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+    if(!rows.contains(r))
+      {
+      rows.append(r);
+      }
+    }
+
+  if(rows.count() ==0)
+    {
+    return false;
+    }
+
+  // if the drop is on an item, insert the dropping items
+  // before the dropped-on item; else, we will just move
+  // them to the end.
+  int toRow = onIndex.isValid() ? onIndex.row() : rowCount();
+  plotMatrixRep->MoveInputTableColumn(rows.value(0), toRow);
+  this->blockSignals(false);
+  this->emitDataChanged();
+  return true;
+}

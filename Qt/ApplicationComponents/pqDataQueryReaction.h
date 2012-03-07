@@ -52,6 +52,7 @@ public:
 public slots:
   void onExtractSelection();
   void onExtractSelectionOverTime();
+  void showHelp();
 
 protected:
   /// Called when the action is triggered.

@@ -69,12 +69,22 @@ public:
   pqServer* connectedServer() const;
 
 protected slots:
-  bool connectToPrelaunchedServer();
   void processFailed(QProcess::ProcessError);
+  void readStandardOutput();
+  void readStandardError();
+  void launchServerForReverseConnection();
 
 protected:
-  bool launchAndConnectToServer();
+  /// Request the user for user-configurable options, if any. Returns false if
+  /// the user cancelled the dialog asking the options. Returns true if there
+  /// are not user-configurable options or the user has accepted the values.
   bool promptOptions();
+
+  bool launchServer(bool show_status_dialog);
+
+  bool connectToPrelaunchedServer();
+
+  bool isReverseConnection() const;
 
 private:
   Q_DISABLE_COPY(pqServerLauncher)

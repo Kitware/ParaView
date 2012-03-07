@@ -16,10 +16,10 @@
 // the second port contains an id selection.
 // .SECTION Description
 // vtkPVExtractSelection adds a second port to vtkExtractSelection.
-// Output port 0 -- is the output from the superclass. It's nothing but the
+// \li Output port 0 -- is the output from the superclass. It's nothing but the
 // extracted dataset.
 //
-// Output port 1 -- is a vtkSelection consisting of indices of the cells/points
+// \li Output port 1 -- is a vtkSelection consisting of indices of the cells/points
 // extracted. If vtkSelection used as the input to this filter is of the field
 // type vtkSelection::CELL, then the output vtkSelection has both the cell
 // indicides as well as point indices of the cells/points that were extracted.
@@ -27,11 +27,7 @@
 // has the indicies of the points that were extracted.
 // This second output is useful for correlating particular
 // cells in the subset with the original data set. This is used, for instance,
-// by ParaView's Spreadsheet view.
-//
-// Output port 2 -- is simply the input vtkSelection (set on input port number
-// 1).
-//
+// by Chart representations to show selections.
 // .SECTION See Also
 // vtkExtractSelection vtkSelection
 

@@ -73,11 +73,8 @@ pqSurfaceLICDisplayPanelDecorator::pqSurfaceLICDisplayPanelDecorator(
       this->Internals->Vectors, prop);
 
     this->Internals->Links.addPropertyLink(
-      adaptor, "attributeMode", SIGNAL(selectionChanged()),
-      repr, prop, 0);
-    this->Internals->Links.addPropertyLink(
-      adaptor, "scalar", SIGNAL(selectionChanged()),
-      repr, prop, 1);
+      adaptor, "selection", SIGNAL(selectionChanged()),
+      repr, prop);
     this->Internals->Links.addPropertyLink(
       this->Internals->NumberOfSteps, "value", SIGNAL(valueChanged(int)),
       repr, repr->GetProperty("LICNumberOfSteps"));

@@ -34,15 +34,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAnimationSettings.h"
 
 #include "vtkMath.h"
-#include "vtkProcessModule.h"
+#include "vtkNew.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <QIntValidator>
 #include <QFileInfo>
@@ -63,11 +70,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "pqTabbedMultiViewWidget.h"
+
+#include <vtksys/ios/sstream>
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -374,7 +383,8 @@ bool pqAnimationManager::saveAnimation()
 
   // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
-    this->Internals->ActiveServer->isRemote());
+        this->Internals->ActiveServer->isRemote() &&
+        !this->Internals->ActiveServer->session()->IsMultiClients());
 
   // Use viewManager is available.
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
@@ -613,27 +623,53 @@ bool pqAnimationManager::saveAnimation()
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);
+    vtkSMPropertyHelper(writer, "FileName").Set(filename.toAscii().data());
+    vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
+    vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
+    writer->UpdateVTKObjects();
     writer->Delete();
 
-    pqSMAdaptor::setElementProperty(writer->GetProperty("FileName"),
-      filename.toAscii().data());
-    pqSMAdaptor::setElementProperty(writer->GetProperty("Magnification"), 
-      magnification); 
-    pqSMAdaptor::setElementProperty(writer->GetProperty("FrameRate"),
-      dialogUI.frameRate->value());
-    writer->UpdateVTKObjects();
+     // Get ProxyManager XML state
+    vtksys_ios::ostringstream xmlStringStream;
+    vtkSmartPointer<vtkPVXMLElement> state;
+    state.TakeReference(pxm->SaveXMLState());
+    state->PrintXML(xmlStringStream, vtkIndent(0));
 
-    // We save the animation offline.
-    vtkSMProxy* cleaner = 
-      pxm->NewProxy("connection_cleaners", "AnimationPlayer");
+    // We create a server side proxy that will save the animation at disconnection.
+    vtkSMProxy* cleaner = pxm->NewProxy("remote_player", "AnimationPlayer");
+    vtkSMPropertyHelper(cleaner, "Writer").Set(writer);
+    vtkSMPropertyHelper(cleaner, "XMLState").Set(xmlStringStream.str().c_str());
+    cleaner->UpdateVTKObjects();
     pxm->RegisterProxy("animation","cleaner",cleaner);
     cleaner->Delete();
 
-    pqSMAdaptor::setProxyProperty(cleaner->GetProperty("Writer"), writer);
-    cleaner->UpdateVTKObjects();
+    // Make sure we delete all the view before disconnecting
+    vtkNew<vtkSMProxyIterator> proxyIter;
+    proxyIter->SetSession(server->session());
+    std::vector<vtkSMViewProxy*> viewToDelete;
+    for (proxyIter->Begin(); !proxyIter->IsAtEnd(); proxyIter->Next())
+      {
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxyIter->GetProxy());
+      // We need to ensure that we skip prototypes.
+      if (view)
+        {
+        viewToDelete.push_back(view);
+        }
+      }
+    for(std::vector<vtkSMViewProxy*>::iterator it = viewToDelete.begin();
+        it != viewToDelete.end(); it++)
+      {
+      pxm->UnRegisterProxy(*it);
+      }
 
-    qCritical("Saving animations after disconnecting from servers "
-      "is temporarily not supported.");
+    // Disconnect from the server
+    pqApplicationCore* core = pqApplicationCore::instance();
+    if (server)
+      {
+      server->session()->PreDisconnection();
+      core->getObjectBuilder()->removeServer(server);
+      }
+
     return false;
     }
 

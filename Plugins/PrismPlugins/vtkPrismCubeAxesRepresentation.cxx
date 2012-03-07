@@ -26,6 +26,7 @@ vtkStandardNewMacro(vtkPrismCubeAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkPrismCubeAxesRepresentation::vtkPrismCubeAxesRepresentation()
 {
+  this->EnableCustomAxisRange(true);
 }
 
 //----------------------------------------------------------------------------
@@ -51,17 +52,17 @@ int vtkPrismCubeAxesRepresentation::RequestData(vtkInformation* info,
       range = fieldData->GetArray("XRange");
       bounds[0] = range->GetTuple1(0);
       bounds[1] = range->GetTuple1(1);
-      this->CubeAxesActor->SetXAxisRange(bounds);
+      this->SetXAxisRange(bounds[0], bounds[1]);
 
       range = fieldData->GetArray("YRange");
       bounds[0] = range->GetTuple1(0);
       bounds[1] = range->GetTuple1(1);
-      this->CubeAxesActor->SetYAxisRange(bounds);
+      this->SetYAxisRange(bounds[0], bounds[1]);
 
       range = fieldData->GetArray("ZRange");
       bounds[0] = range->GetTuple1(0);
       bounds[1] = range->GetTuple1(1);
-      this->CubeAxesActor->SetZAxisRange(bounds);
+      this->SetZAxisRange(bounds[0], bounds[1]);
       }
     if (fieldData->HasArray("XTitle") &&
         fieldData->HasArray("YTitle") &&

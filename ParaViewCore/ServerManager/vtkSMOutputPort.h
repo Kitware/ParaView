@@ -34,6 +34,7 @@ class vtkCollection;
 class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkPVTemporalDataInformation;
+class vtkSMCompoundSourceProxy;
 class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
@@ -105,6 +106,12 @@ protected:
 
   void SetSourceProxy(vtkSMSourceProxy* src);
 
+  // When set to non-null, GetSourceProxy() returns this rather than the real
+  // source-proxy set using SetSourceProxy(). This provides a mechanism for
+  // vtkSMCompoundSourceProxy to take ownership of ports that don't really
+  // belong to it.
+  void SetCompoundSourceProxy(vtkSMCompoundSourceProxy* src);
+
   // Description:
   // An internal update pipeline method that subclasses may override.
   virtual void UpdatePipelineInternal(double time, bool doTime);
@@ -114,6 +121,7 @@ protected:
   int PortIndex;
 
   vtkWeakPointer<vtkSMSourceProxy> SourceProxy;
+  vtkWeakPointer<vtkSMCompoundSourceProxy> CompoundSourceProxy;
 
   vtkPVClassNameInformation* ClassNameInformation;
   int ClassNameInformationValid;
@@ -133,6 +141,7 @@ private:
   void operator=(const vtkSMOutputPort&); // Not implemented
 
   friend class vtkSMSourceProxy;
+  friend class vtkSMCompoundSourceProxy;
   void UpdatePipeline();
 
   // Update Pipeline with the given timestep request.

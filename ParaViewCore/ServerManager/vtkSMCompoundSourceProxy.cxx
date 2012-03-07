@@ -145,6 +145,7 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
                      << iter->ProxyName.c_str());
       continue;
       }
+    port->SetCompoundSourceProxy(this);
     this->SetOutputPort(index, iter->ExposedName.c_str(), port, doc);
 
     index++;
@@ -170,7 +171,7 @@ void vtkSMCompoundSourceProxy::CreateSelectionProxies()
   for (unsigned int cc=0; cc < numOutputs; cc++)
     {
     vtkSMOutputPort* port = this->GetOutputPort(cc);
-    vtkSMSourceProxy* source = port->GetSourceProxy();
+    vtkSMSourceProxy* source = port->SourceProxy.GetPointer();
     if (source && source != this)
       {
       source->CreateSelectionProxies();

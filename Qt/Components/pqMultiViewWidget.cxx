@@ -181,11 +181,12 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(viewChanged(pqView*)), this, SLOT(markActive(pqView*)));
 
-
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
     this, SLOT(proxyRemoved(pqProxy*)));
+  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
+    this, SLOT(viewAdded(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -193,6 +194,37 @@ pqMultiViewWidget::~pqMultiViewWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqMultiViewWidget::isViewAssigned(pqView* view) const
+{
+  return (view && this->Internals->LayoutManager &&
+    this->Internals->LayoutManager->GetViewLocation(
+      view->getViewProxy()) != -1);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::viewAdded(pqView* view)
+{
+  if (view && this->Internals->LayoutManager &&
+    this->Internals->LayoutManager->GetViewLocation(
+      view->getViewProxy()) != -1)
+    {
+    // a pqview was created for a view that this layout knows about. we have to
+    // reload the layout to ensure that the view gets placed correctly.
+    pqViewFrame* frame = this->Internals->ViewFrames[view->getViewProxy()];
+    if (frame)
+      {
+      QWidget* viewWidget = view->getWidget();
+      frame->setCentralWidget(viewWidget);
+      viewWidget->setParent(frame);
+      }
+    else
+      {
+      this->reload();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -373,10 +405,11 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   pqView* pqview = smmodel->findItem<pqView*>(view);
-  if (view)
+  // it's possible that pqview is NULL, if the view proxy hasnt been registered
+  // yet. This happens often when initialization state is being loaded in
+  // collaborative sessions.
+  if (view && pqview)
     {
-    Q_ASSERT(pqview != NULL);
-
     QWidget* viewWidget = pqview->getWidget();
     frame->setCentralWidget(viewWidget);
     viewWidget->setParent(frame);

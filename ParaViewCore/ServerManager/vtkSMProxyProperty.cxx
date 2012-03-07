@@ -338,6 +338,19 @@ unsigned int vtkSMProxyProperty::GetNumberOfProxies()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::SetNumberOfUncheckedProxies(unsigned int num)
+{
+  if (num > 0)
+    {
+    this->PPInternals->UncheckedProxies.resize(num);
+    }
+  else
+    {
+    this->PPInternals->UncheckedProxies.clear();
+    }
+}
+
+//---------------------------------------------------------------------------
 unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 {
   return static_cast<unsigned int>(this->PPInternals->UncheckedProxies.size());
@@ -525,6 +538,8 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
 
+  bool prev = this->SetBlockModifiedEvents(true);
+
   this->RemoveAllProxies();
   this->RemoveAllUncheckedProxies();
 
@@ -548,6 +563,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = imUpdate;
     }
 
+  this->SetBlockModifiedEvents(prev);
   this->Modified();
   this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
 }

@@ -347,7 +347,7 @@
          <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
         </property>
         <property name="statusTip">
-         <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
+         <string>Edit properties of the cube axes</string>
         </property>
         <property name="whatsThis">
          <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
@@ -369,7 +369,7 @@
          <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>
         </property>
         <property name="statusTip">
-         <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>
+         <string>Toggle visibility of the cube axes</string>
         </property>
         <property name="whatsThis">
          <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>

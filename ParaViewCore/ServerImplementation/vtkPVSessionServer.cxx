@@ -219,7 +219,7 @@ private:
 //****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
-vtkPVSessionServer::vtkPVSessionServer()
+vtkPVSessionServer::vtkPVSessionServer() : vtkPVSessionBase()
 {
   this->Internal = new vtkInternals(this);
 
@@ -321,11 +321,13 @@ bool vtkPVSessionServer::Connect(const char* url)
   // Add connect-id if needed (or maybe we extract that from url as well (just
   // like vtkNetworkAccessManager).
 
+  // for forward connections, port number 0 is acceptable, while for
+  // reverse-connections it's not.
   std::string client_url;
   if (pvserver.find(url))
     {
     int port = atoi(pvserver.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port < 0)? 11111: port;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
@@ -336,7 +338,7 @@ bool vtkPVSessionServer::Connect(const char* url)
     {
     std::string hostname = pvserver_reverse.match(1);
     int port = atoi(pvserver_reverse.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port <= 0)? 11111: port;
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
     client_url = stream.str();
@@ -344,10 +346,10 @@ bool vtkPVSessionServer::Connect(const char* url)
   else if (pvrenderserver.find(url))
     {
     int dsport = atoi(pvrenderserver.match(3).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport < 0)? 11111 : dsport;
 
     int rsport = atoi(pvrenderserver.match(6).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport < 0)? 22221 : rsport;
 
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)
@@ -369,11 +371,11 @@ bool vtkPVSessionServer::Connect(const char* url)
     {
     std::string dataserverhost = pvrenderserver.match(1);
     int dsport = atoi(pvrenderserver.match(3).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport <= 0)? 11111 : dsport;
 
     std::string renderserverhost = pvrenderserver.match(4);
     int rsport = atoi(pvrenderserver.match(6).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport <= 0)? 22221 : rsport;
 
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)

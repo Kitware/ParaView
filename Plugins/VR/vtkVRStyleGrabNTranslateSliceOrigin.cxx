@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
 #include <iostream>
@@ -91,7 +92,7 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::configure(vtkPVXMLElement* child,
       {
       std::cerr << "Expected \"origin\" Format:  Proxy.Property" << std::endl;
       }
-    this->Proxy = vtkSMProxyManager::GetProxyManager()->GetProxy( token[0].c_str() );
+    this->Proxy = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetProxy( token[0].c_str() );
     if( this->Proxy )
       {
       this->Property = vtkSMDoubleVectorProperty::SafeDownCast( this->Proxy->GetProperty( token[1].c_str()) );

@@ -381,31 +381,6 @@ QWidget* pqSummaryPanel::createButtonBox()
   this->AcceptButton->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_A));
 #endif
 
-  // if XP Style is being used
-  // swap it out for cleanlooks which looks almost the same
-  // so we can have a green accept button
-  // make all the buttons the same
-  QString styleName = this->AcceptButton->style()->metaObject()->className();
-  if(styleName == "QWindowsXPStyle")
-     {
-     QStyle* st = QStyleFactory::create("cleanlooks");
-     st->setParent(this);
-     this->AcceptButton->setStyle(st);
-     this->ResetButton->setStyle(st);
-     this->DeleteButton->setStyle(st);
-     QPalette buttonPalette = this->AcceptButton->palette();
-     buttonPalette.setColor(QPalette::Button, QColor(244,246,244));
-     this->AcceptButton->setPalette(buttonPalette);
-     this->ResetButton->setPalette(buttonPalette);
-     this->DeleteButton->setPalette(buttonPalette);
-     }
-
-  // Change the accept button palette so it is green when it is active.
-  QPalette acceptPalette = this->AcceptButton->palette();
-  acceptPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
-  this->AcceptButton->setPalette(acceptPalette);
-  this->AcceptButton->setDefault(true);
-
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("&Reset"));
@@ -428,6 +403,30 @@ QWidget* pqSummaryPanel::createButtonBox()
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
   this->DeleteButton->setEnabled(false);
+
+  // if XP Style is being used
+  // swap it out for cleanlooks which looks almost the same
+  // so we can have a green accept button
+  // make all the buttons the same
+  QString styleName = this->AcceptButton->style()->metaObject()->className();
+  if(styleName == "QWindowsXPStyle")
+     {
+     QStyle* st = QStyleFactory::create("cleanlooks");
+     st->setParent(this);
+     this->AcceptButton->setStyle(st);
+     this->ResetButton->setStyle(st);
+     this->DeleteButton->setStyle(st);
+     QPalette buttonPalette = this->AcceptButton->palette();
+     buttonPalette.setColor(QPalette::Button, QColor(244,246,244));
+     this->AcceptButton->setPalette(buttonPalette);
+     this->ResetButton->setPalette(buttonPalette);
+     this->DeleteButton->setPalette(buttonPalette);
+     }
+  // Change the accept button palette so it is green when it is active.
+  QPalette acceptPalette = this->AcceptButton->palette();
+  acceptPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+  this->AcceptButton->setPalette(acceptPalette);
+  this->AcceptButton->setDefault(true);
 
   frame->setLayout(l);
 

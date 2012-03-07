@@ -57,6 +57,11 @@ public:
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
+protected:
+  // Support for customized drag-n-drop events
+  virtual void dragEnterEvent( QDragEnterEvent * event );
+  virtual void dropEvent(QDropEvent *);
+
 private slots:
   void invalidateLayout();
 

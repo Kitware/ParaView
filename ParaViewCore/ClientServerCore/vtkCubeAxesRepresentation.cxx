@@ -45,6 +45,7 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
   this->CustomBoundsActive[0] = 0;
   this->CustomBoundsActive[1] = 0;
   this->CustomBoundsActive[2] = 0;
+  this->UseBoundsRangeAsLabel = true;
 }
 
 //----------------------------------------------------------------------------
@@ -238,6 +239,12 @@ void vtkCubeAxesRepresentation::UpdateBounds()
       }
     }
   this->CubeAxesActor->SetBounds(bds);
+  if(UseBoundsRangeAsLabel)
+    {
+    this->CubeAxesActor->SetXAxisRange(&bds[0]);
+    this->CubeAxesActor->SetYAxisRange(&bds[2]);
+    this->CubeAxesActor->SetZAxisRange(&bds[4]);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -359,4 +366,41 @@ void vtkCubeAxesRepresentation::SetZAxisMinorTickVisibility(int val)
 void vtkCubeAxesRepresentation::SetDrawZGridlines(int val)
 {
   this->CubeAxesActor->SetDrawZGridlines(val);
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetXAxisRange(double min, double max)
+{
+  if(!UseBoundsRangeAsLabel)
+    {
+    this->CubeAxesActor->SetXAxisRange(min, max);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetYAxisRange(double min, double max)
+{
+  if(!UseBoundsRangeAsLabel)
+    {
+    this->CubeAxesActor->SetYAxisRange(min, max);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetZAxisRange(double min, double max)
+{
+  if(!UseBoundsRangeAsLabel)
+    {
+    this->CubeAxesActor->SetZAxisRange(min, max);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::EnableCustomAxisRange(bool useCustomRange)
+{
+  this->UseBoundsRangeAsLabel = !useCustomRange;
+  if(UseBoundsRangeAsLabel)
+    {
+    double bounds[6];
+    this->CubeAxesActor->GetBounds(bounds);
+    this->CubeAxesActor->SetXAxisRange(&bounds[0]);
+    this->CubeAxesActor->SetYAxisRange(&bounds[2]);
+    this->CubeAxesActor->SetZAxisRange(&bounds[4]);
+    }
 }

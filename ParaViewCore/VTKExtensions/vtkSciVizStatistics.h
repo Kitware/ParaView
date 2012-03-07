@@ -29,7 +29,7 @@
 // and provides a simplified interface to vtkStatisticsAlgorithm.
 // .SECTION Thanks
 // Thanks to David Thompson and Philippe Pebay from Sandia National Laboratories 
-// for implementing this class.
+// for implementing this class. Updated by Philippe Pebay, Kitware SAS 2012
 
 #ifndef __vtkSciVizStatistics_h
 #define __vtkSciVizStatistics_h
@@ -55,17 +55,20 @@ public:
   vtkGetMacro(AttributeMode,int);
   vtkSetMacro(AttributeMode,int);
 
-  /// Return the number of columns available for the current value of \a AttributeMode.
+  // Description:
+  // Return the number of columns available for the current value of \a AttributeMode.
   int GetNumberOfAttributeArrays();
 
-  /// Get the name of the \a n-th array ffor the current value of \a AttributeMode.
+  // Description:
+  // Get the name of the \a n-th array ffor the current value of \a AttributeMode.
   const char* GetAttributeArrayName( int n );
-  /// Get the status of the specified array (i.e., whether or not it is a column of interest).
-  int GetAttributeArrayStatus( const char* arrName );
-  /// Set the status of the specified array (i.e., whether or not it is a column of interest).
-  void SetAttributeArrayStatus( const char* arrName, int stat );
 
-  /// An alternate interface for preparing a selection of arrays in ParaView.
+  // Description:
+  // Get the status of the specified array (i.e., whether or not it is a column of interest).
+  int GetAttributeArrayStatus( const char* arrName );
+
+  // Description:
+  // An alternate interface for preparing a selection of arrays in ParaView.
   void EnableAttributeArray( const char* arrName );
   void ClearAttributeArrays();
 

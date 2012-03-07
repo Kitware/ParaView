@@ -157,7 +157,7 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu&  menu,
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   mgr->addProxyDefinitionUpdateListener("sources");
   new pqSourcesMenuReaction(mgr);
-  pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
+  pqPVApplicationCore::instance()->registerForQuicklaunch(mgr->widgetActionsHolder());
   if (mainWindow)
     {
     // create toolbars for categories as needed.
@@ -173,7 +173,7 @@ void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
   new pqFiltersMenuReaction(mgr);
-  pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
+  pqPVApplicationCore::instance()->registerForQuicklaunch(mgr->widgetActionsHolder());
 
   if (mainWindow)
     {

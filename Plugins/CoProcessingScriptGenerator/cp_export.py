@@ -187,6 +187,8 @@ def DoCoProcessing(datadescription):
                         input = rep.Input
                         input.UpdatePipeline() #make sure range is up-to-date
                         lut = rep.LookupTable
+                        if lut == None:
+                            continue
                         if rep.ColorAttributeType == 'POINT_DATA':
                             datainformation = input.GetPointDataInformation()
                         elif rep.ColorAttributeType == 'CELL_DATA':
@@ -231,6 +233,7 @@ def DoCoProcessing(datadescription):
                 else:
                     print ' do not know what to do with a ', view.GetClassName()
 
+            view.ViewTime = datadescription.GetTime()
             WriteImage(fname, view, Magnification=view.cpMagnification)
 
 

@@ -131,6 +131,9 @@ public:
   pqDataRepresentation* activeRepresentation() const;
   vtkSMProxy* activeRepresentationProxy() const;
 
+  /// Method needed for copy/past cell editor
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
 public slots:
   /// resets the model.
   void forceUpdate();

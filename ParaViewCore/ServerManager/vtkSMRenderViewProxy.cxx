@@ -26,8 +26,6 @@
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -37,20 +35,23 @@
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
+#include "vtkRenderer.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -106,12 +107,19 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
   this->IsSelectionCached = false;
-  this->LastCameraDependantRepUpdate = 0;
+  this->NewMasterObserverId = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
+  if( this->NewMasterObserverId != 0 &&
+      this->Session && this->Session->GetCollaborationManager())
+    {
+    this->Session->GetCollaborationManager()->RemoveObserver(
+          this->NewMasterObserverId);
+    this->NewMasterObserverId = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -139,6 +147,11 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkSMSession* session = this->GetSession();
+
+  if(session->IsMultiClients() && !session->GetCollaborationManager()->IsMaster())
+    {
+    return "Cannot support selection in collaboration mode when not MASTER";
+    }
 
   if (session->GetIsAutoMPI())
     {
@@ -329,6 +342,15 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->ExecuteStream(stream);
     }
   info->Delete();
+
+  // Attach to the collaborative session a callback to clear the selection cache
+  // on the server side when we became master
+  if(this->Session->IsMultiClients())
+    {
+    this->NewMasterObserverId =
+        this->Session->GetCollaborationManager()->AddObserver(
+          vtkSMCollaborationManager::UpdateMasterUser, this, &vtkSMRenderViewProxy::NewMasterCallback);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -532,16 +554,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  if (this->IsSelectionCached)
-    {
-    this->IsSelectionCached = false;
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke
-            << VTKOBJECT(this)
-            << "InvalidateCachedSelection"
-            << vtkClientServerStream::End;
-    this->ExecuteStream(stream);
-    }
+  this->ClearSelectionCache();
 
   // skip modified properties on camera subproxy.
   if (modifiedProxy != this->GetSubProxy("ActiveCamera"))
@@ -921,29 +934,33 @@ double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::StillRender()
-{
-  vtkCamera *camera = this->GetActiveCamera();
-  unsigned long ctime = (camera != NULL) ? camera->GetMTime() : 0;
-  if (ctime > this->LastCameraDependantRepUpdate)
-    {
-    this->LastCameraDependantRepUpdate = ctime;
-    unsigned int numProducers = this->GetNumberOfProducers();
-    vtkSMRepresentationProxy *rep;
-    for (unsigned int i=0; i<numProducers; i++)
-      {
-      rep = vtkSMRepresentationProxy::SafeDownCast(this->GetProducerProxy(i));
-      if (rep && rep->GetProperty("StillCameraModified"))
-        {
-        rep->InvokeCommand("StillCameraModified");
-        }
-      }
-    }
-  this->Superclass::StillRender();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::NewMasterCallback(vtkObject*, unsigned long, void*)
+{
+  if( this->Session && this->Session->IsMultiClients() &&
+      this->Session->GetCollaborationManager()->IsMaster())
+    {
+    // Make sure we clear the selection cache server side as well as previous
+    // master might already have set a selection that has been cached.
+    this->ClearSelectionCache(/*force=*/true);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ClearSelectionCache(bool force/*=false*/)
+{
+  if(this->IsSelectionCached || force)
+    {
+    this->IsSelectionCached = false;
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << VTKOBJECT(this)
+            << "InvalidateCachedSelection"
+            << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+    }
 }

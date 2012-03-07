@@ -462,6 +462,10 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->MakingSelection = true;
 
+  // since setting this->MakingSelection to true may change data-delivery needs,
+  // we change the update time.
+  this->UpdateTime.Modified();
+
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
@@ -500,6 +504,7 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     }
 
   this->MakingSelection = false;
+  this->UpdateTime.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -508,7 +513,7 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
   assert(sel != NULL);
   this->SynchronizedWindows->BroadcastToDataServer(sel);
 
-  // not sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
+  // now, sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
   // pointers, since representations have know knowledge for that the PROP_ID()s
   // are.
   for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
@@ -1324,6 +1329,16 @@ void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 void vtkPVRenderView::InvalidateCachedSelection()
 {
   this->Selector->InvalidateCachedSelection();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PrepareForScreenshot()
+{
+  if (this->Interactor && this->GetRenderWindow())
+    {
+    this->GetRenderWindow()->SetInteractor(this->Interactor);
+    }
+  this->Superclass::PrepareForScreenshot();
 }
 
 //*****************************************************************

@@ -352,6 +352,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return QVariant(info.getName());
       }
     break;
@@ -361,6 +362,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return QVariant(info.getDataTypeAsString());
 
     case Qt::DecorationRole:
@@ -373,6 +375,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getNumberOfCells(); 
 
     case Qt::DecorationRole:
@@ -385,6 +388,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getNumberOfPoints(); 
 
     case Qt::DecorationRole:
@@ -397,6 +401,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getMemorySize();
       }
     break;
@@ -406,6 +411,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getGeometrySize();
       }
     break;
@@ -415,6 +421,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getBounds();
       }
     break;
@@ -424,6 +431,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
+    case Qt::EditRole:
       return info.getTimes();
       }
     break;
@@ -629,4 +637,15 @@ void pqDataInformationModel::refreshGeometrySizes()
 
   emit this->dataChanged(this->index(0, pqDataInformationModel::GeometrySize),
     this->index(this->rowCount()-1, pqDataInformationModel::GeometrySize));
+}
+//-----------------------------------------------------------------------------
+Qt::ItemFlags pqDataInformationModel::flags ( const QModelIndex & index ) const
+{
+  return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+}
+//-----------------------------------------------------------------------------
+bool pqDataInformationModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+{
+  // Do nothing, we are not supposed to change our data...
+  return true;
 }

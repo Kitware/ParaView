@@ -40,6 +40,8 @@ protected:
 
   // Needed when TileDisplay are retreived
   friend class vtkSMRenderViewProxy;
+  // Need to manually active the session
+  friend class vtkPVServerSideAnimationPlayer;
 
   // Description:
   // Subclasses must call this to mark the session active. This sets the active

@@ -106,6 +106,12 @@ protected slots:
   /// layout, or we just assign them to one.
   void onStateLoaded();
 
+  /// called when pqObjectBuilder is about to create a new view. We ensure that
+  /// a layout exists to accept that view. This is essential for collaborative
+  /// mode to work correctly without ending up multiple layouts on the two
+  /// processes.
+  void aboutToCreateView(pqServer*);
+
 protected:
   bool eventFilter(QObject *obj, QEvent *event);
 

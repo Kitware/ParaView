@@ -19,6 +19,7 @@
 #include "vtkProcessModule.h"
 
 #include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
 
@@ -60,14 +61,19 @@ vtkPVOptions::vtkPVOptions()
   this->TellVersion = 0;
 
   // initialize host names
+  vtksys::SystemInformation sys_info;
+  sys_info.RunOSCheck();
+  const char* sys_hostname = sys_info.GetHostname()?
+    sys_info.GetHostname() : "localhost";
+
   this->ServerHostName = 0;
-  this->SetServerHostName("localhost");
+  this->SetServerHostName(sys_hostname);
   this->DataServerHostName = 0;
-  this->SetDataServerHostName("localhost");
+  this->SetDataServerHostName(sys_hostname);
   this->RenderServerHostName = 0;
-  this->SetRenderServerHostName("localhost");
+  this->SetRenderServerHostName(sys_hostname);
   this->ClientHostName = 0;
-  this->SetClientHostName("localhost");
+  this->SetClientHostName(sys_hostname);
   // initialize ports to defaults
   this->ServerPort = 11111;
   this->DataServerPort = 11111;

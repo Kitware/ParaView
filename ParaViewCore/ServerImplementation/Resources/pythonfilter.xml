@@ -1,6 +1,5 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-
     <SourceProxy name="PythonCalculator" 
                  class="vtkPythonCalculator"
                  label="Python Calculator">

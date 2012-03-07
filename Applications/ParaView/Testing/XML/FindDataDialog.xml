@@ -11,24 +11,25 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Block ID" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/multiBlock/value_block" command="set_string" arguments="2" />
+
+    <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="True" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/valueStackedWidget/multiBlock/showCompositeTree" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/Blocks" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/Blocks" command="setCurrent" arguments="0.0.0.0.0.0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/Blocks" command="setCheckState" arguments="0.0.0.0.0.0,0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/extractSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Global ID" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is between" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_min" command="set_string" arguments="100" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="key" arguments="16777217" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="(GlobalElementId &gt; 100) &amp; (GlobalElementId &lt; 200)" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Global ID" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="GlobalElementId == 800" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="DISPL" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="Cell ID" />

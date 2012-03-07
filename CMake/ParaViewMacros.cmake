@@ -341,6 +341,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
             -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
             -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
             -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
+            -Dxml_to_wiki_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_wiki.xsl.in
             -Dinput_xmls:STRING=${xmls_string}
             -Dinput_gui_xmls:STRING=${gui_xmls_string}
             -Doutput_dir:PATH=${output_dir}

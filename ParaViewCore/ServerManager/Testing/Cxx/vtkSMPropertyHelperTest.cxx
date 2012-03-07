@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    TestSMIntVectorProperty.cxx
+Module:    vtkSMPropertyHelperTest.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -13,13 +13,34 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
+#include "vtkSMPropertyHelperTest.h"
+
 #include "vtkInitializationHelper.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMProxyManager.h"
 #include "vtkProcessModule.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMPropertyHelper.h"
 
-#define VERIFY(expr) if(!(expr)){ std::cerr << "failed: " << #expr << std::endl; return -1;}
+void vtkSMPropertyHelperTest::Set()
+{
+  vtkSMSession *session = vtkSMSession::New();
+  vtkSMSessionProxyManager *pxm = session->GetSessionProxyManager();
+  vtkSMProxy *proxy = pxm->NewProxy("sources", "SphereSource");
+  QVERIFY(proxy != NULL);
+  QCOMPARE(vtkSMPropertyHelper(proxy, "Radius").GetAsDouble(), 0.5);
+
+  vtkSMPropertyHelper(proxy, "Radius").Set(4.2);
+  QCOMPARE(vtkSMPropertyHelper(proxy, "Radius").GetAsDouble(), 4.2);
+
+  vtkSMPropertyHelper(proxy, "Radius").Set(8.4);
+  QCOMPARE(vtkSMPropertyHelper(proxy, "Radius").GetAsDouble(), 8.4);
+
+  proxy->Delete();
+  session->Delete();
+}
 
 int main(int argc, char *argv[])
 {
@@ -28,16 +49,11 @@ int main(int argc, char *argv[])
                                       vtkProcessModule::PROCESS_CLIENT,
                                       options);
 
-  vtkSMIntVectorProperty *property = vtkSMIntVectorProperty::New();
+  vtkSMPropertyHelperTest test;
+  int ret = QTest::qExec(&test, argc, argv);
 
-  property->SetNumberOfElements(4);
-  VERIFY(property->GetNumberOfElements() == 4);
-
-  property->Delete();
-
-  //---------------------------------------------------------------------------
   vtkInitializationHelper::Finalize();
   options->Delete();
 
-  return 0;
+  return ret;
 }

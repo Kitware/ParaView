@@ -25,11 +25,16 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPVConfig.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkGraph.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "vtkPythonExtractSelection.h"
+#endif
 
 #include <vector>
 
@@ -44,7 +49,7 @@ vtkStandardNewMacro(vtkPVExtractSelection);
 //----------------------------------------------------------------------------
 vtkPVExtractSelection::vtkPVExtractSelection()
 {
-  this->SetNumberOfOutputPorts(3);
+  this->SetNumberOfOutputPorts(2);
 }
 
 //----------------------------------------------------------------------------
@@ -78,8 +83,8 @@ int vtkPVExtractSelection::RequestDataObject(
     return 0;
     }
 
-  // Second and third outputs are selections
-  for (int i = 1; i <= 2; ++i)
+  // Second and output is selection
+  for (int i = 1; i < this->GetNumberOfOutputPorts(); ++i)
     {
     vtkInformation* info = outputVector->GetInformationObject(i);
     vtkSelection *selOut = vtkSelection::GetData(info);
@@ -107,18 +112,55 @@ int vtkPVExtractSelection::RequestData(
   vtkInformationVector** inputVector ,
   vtkInformationVector* outputVector)
 {
-  if (!this->Superclass::RequestData(request, inputVector, outputVector))
-    {
-    return 0;
-    }
-
-
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkSelection* sel = vtkSelection::GetData(inputVector[1], 0);
 
   vtkCompositeDataSet* cdInput = vtkCompositeDataSet::SafeDownCast(inputDO);
   vtkCompositeDataSet* cdOutput = vtkCompositeDataSet::GetData(outputVector, 0);
-  vtkDataObject *dataObjectOutput = vtkDataObject::GetData(outputVector, 0);
+  vtkDataObject *outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  if (!sel)
+    {
+    return 1;
+    }
+
+  if (sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
+    {
+#ifdef PARAVIEW_ENABLE_PYTHON
+    vtkPythonExtractSelection *pythonExtractSelection = vtkPythonExtractSelection::New();
+
+    vtkDataObject *localInputDO = inputDO->NewInstance();
+    localInputDO->ShallowCopy(inputDO);
+
+    vtkSelection *localSel = sel->NewInstance();
+    localSel->ShallowCopy(sel);
+
+    pythonExtractSelection->SetInputConnection(0, localInputDO->GetProducerPort());
+    pythonExtractSelection->SetSelectionConnection(localSel->GetProducerPort());
+
+    pythonExtractSelection->Update();
+
+    outputDO->ShallowCopy(pythonExtractSelection->GetOutputDataObject(0));
+
+    pythonExtractSelection->Delete();
+    localSel->Delete();
+    localInputDO->Delete();
+#endif // PARAVIEW_ENABLE_PYTHON
+    }
+  else
+    {
+    // only call superclass's request data for non-query type
+    // selections (which use the python extract selection filter)
+    if (!this->Superclass::RequestData(request, inputVector, outputVector))
+      {
+      return 0;
+      }
+    }
+
+  if (this->GetNumberOfOutputPorts() < 2)
+    {
+    return 1;
+    }
 
   //make an ids selection for the second output
   //we can do this because all of the extractSelectedX filters produce
@@ -136,16 +178,6 @@ int vtkPVExtractSelection::RequestData(
     outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
 
   output->Initialize();
-
-  if (!sel)
-    {
-    return 1;
-    }
-
-  // Simply pass the input selection into the third output
-  vtkSelection *passThroughSelection = vtkSelection::SafeDownCast(
-    outputVector->GetInformationObject(2)->Get(vtkDataObject::DATA_OBJECT()));
-  passThroughSelection->ShallowCopy(sel);
 
   // If input selection content type is vtkSelectionNode::BLOCKS, then we simply
   // need to shallow copy the input as the output.
@@ -194,18 +226,18 @@ int vtkPVExtractSelection::RequestData(
           hbIter->GetCurrentIndex(), sel);
         }
 
-      dataObjectOutput = vtkDataObject::SafeDownCast(cdOutput->GetDataSet(iter));
+      outputDO = vtkDataObject::SafeDownCast(cdOutput->GetDataSet(iter));
 
       vtkSelectionNodeVector curOVector;
-      if (curSel && dataObjectOutput)
+      if (curSel && outputDO)
         {
-        this->RequestDataInternal(curOVector, dataObjectOutput, curSel);
+        this->RequestDataInternal(curOVector, outputDO, curSel);
         }
 
       for (vtkSelectionNodeVector::iterator giter = non_composite_nodes.begin();
         giter != non_composite_nodes.end(); ++giter)
         {
-        this->RequestDataInternal(curOVector, dataObjectOutput, giter->GetPointer());
+        this->RequestDataInternal(curOVector, outputDO, giter->GetPointer());
         }
 
       for (vtkSelectionNodeVector::iterator viter = curOVector.begin();
@@ -220,12 +252,12 @@ int vtkPVExtractSelection::RequestData(
       }
     iter->Delete();
     }
-  else if (dataObjectOutput) // and not composite dataset.
+  else if (outputDO) // and not composite dataset.
     {
     unsigned int numNodes = sel->GetNumberOfNodes();
     for (unsigned int i = 0; i < numNodes; i++)
       {
-      this->RequestDataInternal(oVector, dataObjectOutput, sel->GetNode(i));
+      this->RequestDataInternal(oVector, outputDO, sel->GetNode(i));
       }
     }
 
@@ -385,4 +417,3 @@ void vtkPVExtractSelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
-

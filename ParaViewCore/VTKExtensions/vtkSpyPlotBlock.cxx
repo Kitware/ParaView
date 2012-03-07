@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkBoundingBox.h"
 #include "vtkUnsignedCharArray.h"
 
+#include <map>
 #include <sstream>
 #include <assert.h>
 
@@ -578,20 +579,12 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   volumeArray->SetName("Derived Volume");
   volumeArray->SetNumberOfValues(arraySize);
 
-  //first compute the volume array and hold onto it
-  vtkIdType pos = 0;
-  for ( int k=0; k < this->SavedRealDims[2]; k++)
-    {
-    for ( int j=0; j < this->SavedRealDims[1]; j++)
-      {
-      for ( int i=0; i < this->SavedRealDims[0]; i++, pos++)
-        {
-        //sum the mass for each each material
-        volumeArray->SetValue(pos,this->GetCellVolume(i,j,k));
-        }
-      }
-    }
+  vtkDoubleArray* averageDensityArray = vtkDoubleArray::New();
+  averageDensityArray->SetName("Derived Average Density");
+  averageDensityArray->SetNumberOfValues(arraySize);
 
+  typedef std::map<int, vtkDoubleArray*> MapOfArrays;
+  MapOfArrays materialDensityArrays;
 
   for ( int i=0; i < numberOfMaterials; i++)
     {
@@ -606,25 +599,7 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
       materialDensity->SetNumberOfComponents(1);
       materialDensity->SetNumberOfTuples(arraySize);
 
-      if(downConvertVolumeFraction)
-        {
-        vtkUnsignedCharArray* materialFraction =
-            vtkUnsignedCharArray::SafeDownCast(materialVolumeFractions[i]);
-        this->ComputeMaterialDensity(materialMasses[i],
-                                   materialFraction,
-                                   volumeArray,
-                                   materialDensity);
-        }
-      else
-        {
-        vtkFloatArray* materialFraction =
-            vtkFloatArray::SafeDownCast(materialVolumeFractions[i]);
-        this->ComputeMaterialDensity(materialMasses[i],
-                                   materialFraction,
-                                   volumeArray,
-                                   materialDensity);
-        }
-
+      materialDensityArrays[i] = materialDensity;
       data->AddArray(materialDensity);
       materialDensity->FastDelete();
       }
@@ -632,7 +607,55 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
 
   data->AddArray(volumeArray);
   volumeArray->FastDelete();
+
+  data->AddArray(averageDensityArray);
+  averageDensityArray->FastDelete();
+
+  vtkIdType pos = 0;
+  for ( int k=0; k < this->SavedRealDims[2]; k++)
+    {
+    for ( int j=0; j < this->SavedRealDims[1]; j++)
+      {
+      for ( int i=0; i < this->SavedRealDims[0]; i++, pos++)
+        {
+        //sum the mass for each each material
+        volumeArray->SetValue(pos, this->GetCellVolume(i,j,k));
+
+        double mass_sum = 0, occupied_volume_sum = 0;
+        for (MapOfArrays::iterator iter = materialDensityArrays.begin();
+          iter != materialDensityArrays.end(); ++iter)
+          {
+          int index = iter->first;
+          vtkDoubleArray* materialDensity = iter->second;
+          double material_mass = 0, material_volume = 0;
+          if (downConvertVolumeFraction)
+            {
+            vtkUnsignedCharArray* materialFraction =
+              static_cast<vtkUnsignedCharArray*>(materialVolumeFractions[index]);
+            this->ComputeMaterialDensity(pos, materialMasses[index],
+              materialFraction, volumeArray, materialDensity,
+              &material_mass, &material_volume);
+            }
+          else
+            {
+            vtkFloatArray* materialFraction =
+              static_cast<vtkFloatArray*>(materialVolumeFractions[index]);
+            this->ComputeMaterialDensity(pos, materialMasses[index],
+              materialFraction, volumeArray, materialDensity,
+              &material_mass, &material_volume);
+            }
+          mass_sum += material_mass;
+          occupied_volume_sum += material_volume;
+          }
+
+        double average_density = (occupied_volume_sum == 0)? 0 :
+          (mass_sum / occupied_volume_sum);
+        averageDensityArray->SetValue(pos, average_density);
+        }
+      }
+    }
 }
+
 //-----------------------------------------------------------------------------
 double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
 {  
@@ -673,55 +696,62 @@ double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
 }
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotBlock::ComputeMaterialDensity(vtkDataArray*  materialMass,
-                                             vtkUnsignedCharArray* materialFraction,
-                                             vtkDoubleArray* volumes,
-                                             vtkDoubleArray* materialDensity) const
+void vtkSpyPlotBlock::ComputeMaterialDensity(
+  vtkIdType pos,
+  vtkDataArray*  materialMass, vtkUnsignedCharArray* materialFraction,
+  vtkDoubleArray* volumes, vtkDoubleArray* materialDensity,
+  double * material_mass, double* material_volume) const
 {
   double mass = -1, volume = -1, density = -1, volfrac = -1;
-  const vtkIdType size = materialMass->GetNumberOfTuples();
-  for(vtkIdType i=0; i < size; ++i)
-    {
-    mass = materialMass->GetTuple1(i);
-    volfrac = static_cast<int>(materialFraction->GetValue(i)) / 255.0;
-    volume = volumes->GetValue(i);
-    if(volfrac == 0 || mass == 0 || volume == 0)
-      {
-      density = 0;
-      }
-    else
-      {
-      density = mass / ( volume * volfrac );
-      }
 
-    materialDensity->SetValue(i,density);
+  mass = materialMass->GetTuple1(pos);
+  volfrac = static_cast<int>(materialFraction->GetValue(pos)) / 255.0;
+  volume = volumes->GetValue(pos);
+  if(volfrac == 0 || mass == 0 || volume == 0)
+    {
+    density = 0;
+    *material_mass = 0;
+    *material_volume = 0;
     }
+  else
+    {
+    density = mass / ( volume * volfrac );
+
+    *material_mass = mass;
+    *material_volume = volume*volfrac;
+    }
+
+  materialDensity->SetValue(pos,density);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSpyPlotBlock::ComputeMaterialDensity(vtkDataArray*  materialMass,
-                                             vtkFloatArray* materialFraction,
-                                             vtkDoubleArray* volumes,
-                                             vtkDoubleArray* materialDensity) const
+void vtkSpyPlotBlock::ComputeMaterialDensity(
+  vtkIdType pos,
+  vtkDataArray*  materialMass, vtkFloatArray* materialFraction,
+  vtkDoubleArray* volumes, vtkDoubleArray* materialDensity,
+  double * material_mass, double* material_volume) const
 {
-
   double mass = -1, volume = -1, density = -1, volfrac = -1;
-  const vtkIdType size = materialMass->GetNumberOfTuples();
-  for(vtkIdType i=0; i < size; ++i)
+
+  mass = materialMass->GetTuple1(pos);
+  volfrac = materialFraction->GetValue(pos);
+  volume = volumes->GetValue(pos);
+
+  if(volfrac == 0 || mass == 0 || volume == 0)
     {
-    mass = materialMass->GetTuple1(i);
-    volfrac = materialFraction->GetValue(i);
-    volume = volumes->GetValue(i);
-    if(volfrac == 0 || mass == 0 || volume == 0)
-      {
-      density = 0;
-      }
-    else
-      {
-      density = mass / ( volume * volfrac );
-      }
-    materialDensity->SetValue(i,density);
+    density = 0;
+
+    *material_mass = 0;
+    *material_volume = 0;
     }
+  else
+    {
+    density = mass / ( volume * volfrac );
+
+    *material_mass = mass;
+    *material_volume = volume*volfrac;
+    }
+  materialDensity->SetValue(pos,density);
 }
  
 //-----------------------------------------------------------------------------

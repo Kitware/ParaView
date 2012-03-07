@@ -233,6 +233,9 @@ signals:
   void readerCreated(pqPipelineSource*, const QString& filename);
   void readerCreated(pqPipelineSource*, const QStringList& filename);
 
+  /// fired before attempting to create a view.
+  void aboutToCreateView(pqServer* server);
+
   /// Fired on successful completion of createView().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client

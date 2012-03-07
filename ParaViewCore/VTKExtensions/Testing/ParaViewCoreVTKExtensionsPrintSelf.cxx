@@ -115,7 +115,6 @@
 #include "vtkPVEnSightMasterServerTranslator.h"
 #include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVExtentTranslator.h"
-#include "vtkPVExtractSelection.h"
 #include "vtkPVExtractVOI.h"
 #include "vtkPVFrustumActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -321,7 +320,6 @@ int main(int , char *[])
   PRINT_SELF(vtkPVEnSightMasterServerTranslator);
   PRINT_SELF(vtkPVExponentialKeyFrame);
   PRINT_SELF(vtkPVExtentTranslator);
-  PRINT_SELF(vtkPVExtractSelection);
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
   PRINT_SELF(vtkPVGenericRenderWindowInteractor);

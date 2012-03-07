@@ -376,7 +376,8 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
     QPair<double, double>(0, 1);
   QList<QVariant> domain = pqSMAdaptor::getMultipleElementPropertyDomain(
     cue->getAnimatedProperty(), cue->getAnimatedPropertyIndex());
-  if(cue->getProxy()->IsA("vtkSMTimeAnimationCueProxy"))
+  if (this->Internal->Cue->getProxy()->GetXMLName() &&
+    strcmp(this->Internal->Cue->getProxy()->GetXMLName(), "TimeAnimationCue") ==0)
     {
     this->Internal->ValueRange.first = this->Internal->TimeRange.first;
     this->Internal->ValueRange.second = this->Internal->TimeRange.second;
@@ -552,16 +553,6 @@ void pqKeyFrameEditor::writeKeyFrameData()
   for(int i=0; i<newNumber-oldNumber; i++)
     {
     this->Internal->Cue->insertKeyFrame(0);
-    }
-
-  // if this was a time cue, tell the scene to use it if we have enough
-  // keyframes
-  if(this->Internal->Cue->getProxy()->IsA("vtkSMTimeAnimationCueProxy"))
-    {
-    vtkSMProperty* prop =
-      this->Internal->Cue->getProxy()->GetProperty("UseAnimationTime");
-    pqSMAdaptor::setElementProperty(prop, !(newNumber > 1));
-    this->Internal->Cue->getProxy()->UpdateVTKObjects();
     }
 
   QList<QPair<int, double> > sortedKeyFrames;

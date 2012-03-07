@@ -62,9 +62,11 @@ public:
   /// to load.
   vtkGetStringMacro(ServerResourceName);
 
+  /// Provides access to server-url if specified on the command line.
+  vtkGetStringMacro(ServerURL);
+
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
-  vtkSetStringMacro(ServerResourceName);
 
   int GetNumberOfTestScripts()
     { return this->TestScripts.size(); }
@@ -113,6 +115,7 @@ protected:
   char* TestDirectory;
   char* DataDirectory;
   char* ServerResourceName;
+  char* ServerURL;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
   int DisableLightKit;
@@ -122,6 +125,8 @@ protected:
   char* PythonScript;
 
   vtkSetStringMacro(PythonScript);
+  vtkSetStringMacro(ServerResourceName);
+  vtkSetStringMacro(ServerURL);
 
   struct TestInfo
     {

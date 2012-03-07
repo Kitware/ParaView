@@ -27,6 +27,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -783,6 +784,22 @@ vtkSMViewProxy* vtkSMViewLayoutProxy::GetView(int location)
 }
 
 //----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::GetViewLocation(vtkSMViewProxy* view)
+{
+  int index = 0;
+  for (vtkInternals::KDTreeType::iterator iter =
+    this->Internals->KDTree.begin();
+    iter != this->Internals->KDTree.end(); ++iter, ++index)
+    {
+    if (iter->ViewProxy == view)
+      {
+      return index;
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
 {
   if (val < 0.0 || val > 1.0)
@@ -837,9 +854,13 @@ void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
 {
   this->CreateVTKObjects();
 
+  vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy(
+    "misc", "InternalViewLayoutHelper");
+  proxy->UpdateVTKObjects();
+
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
+         << VTKOBJECT(proxy)
          << "ResetTileDisplay"
          << vtkClientServerStream::End;
   for (vtkInternals::KDTreeType::iterator iter =
@@ -850,14 +871,15 @@ void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
     if (iter->ViewProxy.GetPointer() != NULL)
       {
       stream << vtkClientServerStream::Invoke
-        << VTKOBJECT(this)
+        << VTKOBJECT(proxy)
         << "ShowOnTileDisplay"
         << static_cast<unsigned int>(iter->ViewProxy->GetGlobalID())
         << vtkClientServerStream::End;
       }
     }
-
-  this->ExecuteStream(stream);
+  this->GetSession()->ExecuteStream(
+    proxy->GetLocation(), stream, false);
+  proxy->Delete();
 }
 
 //----------------------------------------------------------------------------

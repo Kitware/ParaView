@@ -80,6 +80,7 @@ public:
   virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
   virtual unsigned int RemoveUncheckedProxy(vtkSMProxy* proxy);
   virtual void RemoveAllUncheckedProxies();
+  virtual void ClearUncheckedProxies();
   virtual void RemoveAllProxies()
   {
     this->Superclass::RemoveAllProxies();
@@ -89,6 +90,7 @@ public:
   // Sets the number of proxies. If the new number is greater than the current
   // number of proxies, then NULL will be inserted.
   virtual void SetNumberOfProxies(unsigned int num);
+  virtual void SetNumberOfUncheckedProxies(unsigned int num);
 
   // Description:
   // Sets the value of the property to the list of proxies specified.

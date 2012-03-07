@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkChartRepresentation.h"
 #include "vtkColor.h" // for ivars
+#include "vtkNew.h" // for ivars
 
 class vtkScatterPlotMatrix;
+class vtkStringArray;
 
 class VTK_EXPORT vtkPVPlotMatrixRepresentation : public vtkChartRepresentation
 {
@@ -55,6 +57,12 @@ public:
   // Description:
   // Sets the label for the series in the plot matrix.
   void SetSeriesLabel(const char *name, const char *label);
+
+  // Description:
+  // Get the name of the series with the given index.  Returns 0 if the index
+  // is out of range.  The returned pointer is only valid until the next call
+  // to GetSeriesName.
+  virtual const char* GetSeriesName(int series);
 
   // Description:
   // Sets the color for the scatter plots in the plot matrix.
@@ -83,6 +91,11 @@ public:
   // Description:
   // Sets the marker size for the active plots.
   void SetActivePlotMarkerSize(double size);
+
+  // Description:
+  // Move the column of the input table so that the scatter plot
+  // will be re-arranged accordingly.
+  void MoveInputTableColumn(int fromCol, int toCol);
 
   // Description:
   // Returns the scatter plot matrix.
@@ -115,6 +128,7 @@ private:
   int ActivePlotMarkerStyle;
   double ScatterPlotMarkerSize;
   double ActivePlotMarkerSize;
+  vtkNew<vtkStringArray> OrderedColumns;
 };
 
 #endif

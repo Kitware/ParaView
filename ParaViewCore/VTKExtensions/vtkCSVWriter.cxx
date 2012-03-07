@@ -42,6 +42,8 @@ vtkCSVWriter::vtkCSVWriter()
   this->SetFieldDelimiter(",");
   this->Stream = 0;
   this->FileName = 0;
+  this->Precision = 5;
+  this->UseScientificNotation = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -275,6 +277,14 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
     }
   (*this->Stream) << "\n";
 
+  // push the floating point precision/notation type.
+  if (this->UseScientificNotation)
+    {
+    (*this->Stream) << std::scientific;
+    }
+  
+  (*this->Stream) << std::setprecision(this->Precision);
+
   for (vtkIdType index=0; index < numRows; index++)
     {
     first = true;
@@ -305,4 +315,6 @@ void vtkCSVWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseStringDelimiter: " << this->UseStringDelimiter << endl;
   os << indent << "FileName: " << (this->FileName? this->FileName : "none")
     << endl;
+  os << indent << "UseScientificNotation: " << this->UseScientificNotation << endl;
+  os << indent << "Precision: " << this->Precision << endl;
 }

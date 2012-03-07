@@ -141,20 +141,6 @@ QWidget* pqContextView::createWidget()
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setObjectName("Viewport");
-
-  // do image caching for performance
-  // For now, we are doing this only on Apple because it can render
-  // and capture a frame buffer even when it is obstructred by a
-  // window. This does not work as well on other platforms.
-#if defined(__APPLE__)
-  vtkwidget->setAutomaticImageCacheEnabled(true);
-
-  // help the QVTKWidget know when to clear the cache
-  this->getConnector()->Connect(
-    this->getProxy(), vtkCommand::ModifiedEvent,
-    vtkwidget, SLOT(markCachedImageAsDirty()));
-#endif
-
   return vtkwidget;
 }
 
@@ -326,6 +312,12 @@ bool pqContextView::canUndo() const
 bool pqContextView::canRedo() const
 {
   return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqContextView::supportsSelection() const
+{
+  return true;
 }
 
 //-----------------------------------------------------------------------------

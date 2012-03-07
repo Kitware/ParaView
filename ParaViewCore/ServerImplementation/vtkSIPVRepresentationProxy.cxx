@@ -153,3 +153,9 @@ void vtkSIPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+void vtkSIPVRepresentationProxy::AboutToDelete()
+{
+  this->Internals->RepresentationProxies.clear();
+  this->Superclass::AboutToDelete();
+}

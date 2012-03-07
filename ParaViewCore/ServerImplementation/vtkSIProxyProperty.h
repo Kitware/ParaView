@@ -106,6 +106,9 @@ private:
   void operator=(const vtkSIProxyProperty&); // Not implemented
   class InternalCache;
   InternalCache *Cache;
+
+  class vtkObjectCache;
+  vtkObjectCache* ObjectCache;
 //ETX
 };
 

@@ -50,7 +50,7 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->AVISupport = 0;
 #if defined(_WIN32)
   this->AVISupport = 1;
-#else 
+#else
 # if defined(VTK_USE_FFMPEG_ENCODER)
   this->AVISupport = 1;
 # endif
@@ -114,6 +114,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     this->SetLowerRight(idx, info->GetLowerRight(idx));
     this->SetUpperRight(idx, info->GetUpperRight(idx));
     }
+  this->SetEyeSeparation(info->GetEyeSeparation());
   this->NumberOfProcesses = info->NumberOfProcesses;
 }
 
@@ -135,7 +136,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->UseOffscreenRendering = options->GetUseOffscreenRendering();
 #else
   this->UseOffscreenRendering = 0;
-#endif  
+#endif
   this->Timeout = options->GetTimeout();
   this->SetRenderModuleName(options->GetRenderModuleName());
 
@@ -153,6 +154,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
       this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
       this->SetUpperRight(idx, serverOptions->GetUpperRight(idx));
       }
+    this->SetEyeSeparation(serverOptions->GetEyeSeparation());
     }
 
   vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetSession());
@@ -194,7 +196,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->UseOffscreenRendering = 1;
       }
 
-    if (this->Timeout <= 0 || 
+    if (this->Timeout <= 0 ||
       (serverInfo->GetTimeout() > 0 && serverInfo->GetTimeout() < this->Timeout))
       {
       this->Timeout = serverInfo->GetTimeout();
@@ -222,6 +224,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
       this->SetUpperRight(idx, serverInfo->GetUpperRight(idx));
       }
+    this->SetEyeSeparation(serverInfo->GetEyeSeparation());
 
     if (this->NumberOfProcesses < serverInfo->NumberOfProcesses)
       {
@@ -265,6 +268,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
     *css << this->GetUpperRight(idx)[0] << this->GetUpperRight(idx)[1]
          << this->GetUpperRight(idx)[2];
     }
+  *css << this->GetEyeSeparation();
   *css << this->MultiClientsEnable;
   *css << this->ClientId;
   *css << vtkClientServerStream::End;
@@ -378,16 +382,36 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
       return;
       }
     }
-  if(!css->GetArgument(0, 23 + (numMachines-1)*10, &this->MultiClientsEnable))
+  double eyeSeparation;
+  if (!css->GetArgument(0, 23 + (numMachines-1)*10, &eyeSeparation))
+    {
+    vtkErrorMacro("Error parsing eye-separations from message.");
+    return;
+    }
+  this->SetEyeSeparation(eyeSeparation);
+
+  if(!css->GetArgument(0, 24 + (numMachines-1)*10, &this->MultiClientsEnable))
     {
     vtkErrorMacro("Error parsing MultiClientsEnable from message.");
     return;
     }
-  if(!css->GetArgument(0, 24 + (numMachines-1)*10, &this->ClientId))
+  if(!css->GetArgument(0, 25 + (numMachines-1)*10, &this->ClientId))
     {
     vtkErrorMacro("Error parsing ClientId from message.");
     return;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerInformation::SetEyeSeparation(double value)
+{
+  this->MachinesInternals->EyeSeparation = value;
+}
+
+//----------------------------------------------------------------------------
+double vtkPVServerInformation::GetEyeSeparation() const
+{
+  return static_cast<double>(this->MachinesInternals->EyeSeparation);
 }
 
 //----------------------------------------------------------------------------

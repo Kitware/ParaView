@@ -139,6 +139,11 @@ QMap<QString, QString> pqDisplayProxyEditorInternal::MaterialMap;
 pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidget* p)
   : pqDisplayPanel(repr, p), DisableSlots(0)
 {
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  bool allowSpecularHighlightingWithScalarColoring = settings->value(
+    "allowSpecularHighlightingWithScalarColoring").toBool();
+  this->DisableSpecularOnScalarColoring = !allowSpecularHighlightingWithScalarColoring;
+
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
 
@@ -158,11 +163,6 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
     this, SLOT(editCubeAxes()));
   QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged()),
     this, SLOT(volumeBlockSelected()));
-
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  bool allowSpecularHighlightingWithScalarColoring = settings->value(
-    "allowSpecularHighlightingWithScalarColoring").toBool();
-  this->DisableSpecularOnScalarColoring = !allowSpecularHighlightingWithScalarColoring;
 }
 
 //-----------------------------------------------------------------------------

@@ -45,10 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqDataRepresentation.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqSpreadSheetViewSelectionModel.h"
 #include "pqSpreadSheetViewWidget.h"

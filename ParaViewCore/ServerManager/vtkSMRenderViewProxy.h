@@ -121,10 +121,6 @@ public:
   // Returns the Z-buffer value at the given location in this view.
   double GetZBufferValue(int x, int y);
 
-  // Description:
-  // Renders the view using full resolution.
-  virtual void StillRender();
-
 //BTX
 protected:
   vtkSMRenderViewProxy();
@@ -160,10 +156,13 @@ protected:
   virtual void CreateVTKObjects();
 
   bool IsSelectionCached;
-  // Description:
-  // Indicates the last time representations that depend on the camera where 
-  // updated.
-  unsigned long LastCameraDependantRepUpdate;
+  void ClearSelectionCache(bool force = false);
+
+  // Internal fields for the observer mechanism that is used to invalidate
+  // the cache of selection when the current user became master
+  unsigned long NewMasterObserverId;
+  void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
+
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented
   void operator=(const vtkSMRenderViewProxy&); // Not implemented

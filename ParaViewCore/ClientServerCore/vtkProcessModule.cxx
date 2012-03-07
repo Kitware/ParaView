@@ -217,6 +217,17 @@ vtkProcessModule::ProcessTypes vtkProcessModule::GetProcessType()
 }
 
 //----------------------------------------------------------------------------
+void vtkProcessModule::UpdateProcessType(ProcessTypes newType, bool dontKnowWhatImDoing/*=true*/)
+{
+  if(dontKnowWhatImDoing)
+    {
+    vtkWarningMacro("UpdateProcessType from "
+                    << vtkProcessModule::ProcessType << " to " << newType);
+    }
+  vtkProcessModule::ProcessType = newType;
+}
+
+//----------------------------------------------------------------------------
 vtkProcessModule* vtkProcessModule::GetProcessModule()
 { 
   return vtkProcessModule::Singleton.GetPointer();
