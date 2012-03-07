@@ -47,19 +47,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QPointer>
 #include <QtDebug>
-#include <QTimer>
 #include <QWidget>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqEventDispatcher.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqProgressManager.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+#include "pqTimer.h"
 
 inline int pqCeil(double val)
 {
@@ -92,10 +91,6 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->AnnotationLink = 0;
-    // register timer with testing framework, so that the testing framework
-    // ensures that any pending timers are processed before dispatching new
-    // events.
-    pqEventDispatcher::registerTimer(&this->RenderTimer);
     }
 
   ~pqViewInternal()
@@ -106,7 +101,7 @@ public:
       }
     }
 
-  QTimer RenderTimer;
+  pqTimer RenderTimer;
 };
 
 //-----------------------------------------------------------------------------

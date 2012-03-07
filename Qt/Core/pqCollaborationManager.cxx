@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqContextView.h"
 #include "pqCoreUtilities.h"
-#include "pqEventDispatcher.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
 #include "pqServer.h"
@@ -96,7 +95,6 @@ public:
     QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()),
                      this->Owner, SLOT(sendChartViewBoundsToOtherClients()));
     this->CollaborativeTimer.start();
-    //pqEventDispatcher::registerTimer(&this->CollaborativeTimer);
 
     this->ProxyManager = vtkSMProxyManager::GetProxyManager();
     this->ProxyManagerObserverTag = this->ProxyManager->AddObserver(

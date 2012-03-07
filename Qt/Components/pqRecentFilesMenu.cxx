@@ -40,12 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerLauncher.h"
 #include "pqServerManagerModel.h"
 #include "pqServerResource.h"
+#include "pqTimer.h"
 #include "pqUndoStack.h"
+
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 
 #include <QMenu>
-#include <QTimer>
 #include <QtDebug>
 #include <QMessageBox>
 
@@ -207,7 +208,7 @@ void pqRecentFilesMenu::onOpenResource(QAction* action)
   // next time the UI is idle.
   this->Implementation->RecentResource =
     pqServerResource(action->data().toString());
-  QTimer::singleShot(0, this, SLOT(onOpenResource()));
+  pqTimer::singleShot(0, this, SLOT(onOpenResource()));
 }
 
 //-----------------------------------------------------------------------------

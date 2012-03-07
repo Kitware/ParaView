@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqChangeInputDialog.h"
 #include "pqCoreUtilities.h"
-#include "pqEventDispatcher.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -115,11 +114,6 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   pqProxyGroupMenuManager* menuManager)
 : Superclass(menuManager)
 {
-  // register timer with testing framework, so that the testing framework
-  // ensures that any pending timers are processed before dispatching new
-  // events.
-  pqEventDispatcher::registerTimer(&this->Timer);
-
   QObject::connect(&this->Timer, SIGNAL(timeout()),
     this, SLOT(updateEnableState()));
   this->Timer.setInterval(10);

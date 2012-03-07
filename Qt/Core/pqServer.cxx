@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include "pqApplicationCore.h"
-#include "pqEventDispatcher.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -120,7 +119,6 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   // Setup idle Timer for collaboration in order to get server notification
   this->IdleCollaborationTimer.setInterval(100);
   this->IdleCollaborationTimer.setSingleShot(true);
-  pqEventDispatcher::registerTimer(&this->IdleCollaborationTimer);
   QObject::connect(&this->IdleCollaborationTimer, SIGNAL(timeout()),
                    this, SLOT(processServerNotification()));
 }
