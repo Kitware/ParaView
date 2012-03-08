@@ -155,8 +155,6 @@ namespace
       appender->AddInputConnection(0, producerIter->GetPointer()->GetOutputPort());
       }
     appender->Update();
-    producer->Delete();
-    alg->Delete();
     result->ShallowCopy(appender->GetOutputDataObject(0));
     appender->Delete();
     return true;
