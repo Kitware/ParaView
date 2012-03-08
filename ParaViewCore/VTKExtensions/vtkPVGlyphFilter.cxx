@@ -425,7 +425,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 
       //Accumulate the results.
       tmpOut->ShallowCopy(newoutput.GetPointer());
-      append->AddInput(tmpOut.GetPointer());
+      append->AddInputData(tmpOut.GetPointer());
 
       numInputs++;
       }
