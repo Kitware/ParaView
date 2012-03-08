@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QPainter>
 #include <QStyle>
-#include <QTimer>
 #include <QHeaderView>
 #include <QLayout>
+
+#include "pqTimer.h"
 
 // enum for different pixmap types
 enum pqTreeWidgetPixmap
@@ -121,7 +122,7 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
   QObject::connect(this->model(), SIGNAL(modelReset()),
                    this, SLOT(invalidateLayout()));
 
-  this->Timer = new QTimer(this);
+  this->Timer = new pqTimer(this);
   this->Timer->setSingleShot(true);
   this->Timer->setInterval(10);
   QObject::connect(this->Timer, SIGNAL(timeout()),
