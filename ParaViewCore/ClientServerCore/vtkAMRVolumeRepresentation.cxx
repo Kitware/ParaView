@@ -61,7 +61,7 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
   this->ColorAttributeType = POINT_DATA;
   this->Cache = vtkOverlappingAMR::New();
 
-  this->CacheKeeper->SetInput(this->Cache);
+  this->CacheKeeper->SetInputData(this->Cache);
   this->OutlineDeliveryFilter->SetInputConnection(
     this->OutlineSource->GetOutputPort());
   this->OutlineUpdateSuppressor->SetInputConnection(

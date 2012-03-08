@@ -356,28 +356,29 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteAMRBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
-  int updatePiece, int updateNumPieces, int updateGhosts, bool extractface[6] )
+  int updatePiece, int updateNumPieces, int updateGhosts,
+  int *wholeExtent, bool extractface[6] )
 {
 
-  if (this->UseOutline && this->MakeOutlineOfInput)
-  {
-    vtkAlgorithmOutput *pport = input->GetProducerPort();
-    vtkDataObject *insin = NULL;
-    if (pport)
-      {
-      vtkAlgorithm *alg = pport->GetProducer();
-      if (alg &&
-          alg->GetNumberOfInputPorts() &&
-          alg->GetNumberOfInputConnections(0))
-        {
-        insin = alg->GetInputDataObject(0,0);
-        }
-      }
-    if (insin)
-      {
-      input = insin;
-      }
-  }
+//  if (this->UseOutline /*&& this->MakeOutlineOfInput*/ )
+//  {
+//    vtkAlgorithmOutput *pport = input->GetProducerPort();
+//    vtkDataObject *insin = NULL;
+//    if (pport)
+//      {
+//      vtkAlgorithm *alg = pport->GetProducer();
+//      if (alg &&
+//          alg->GetNumberOfInputPorts() &&
+//          alg->GetNumberOfInputConnections(0))
+//        {
+//        insin = alg->GetInputDataObject(0,0);
+//        }
+//      }
+//    if (insin)
+//      {
+//      input = insin;
+//      }
+//  }
 
   if( !input->IsA("vtkImageData") )
   {
@@ -387,7 +388,7 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
 
   this->AMRGridExecute(
    static_cast<vtkImageData*>( input ),output,
-   doCommunicate,updatePiece,extractface);
+   doCommunicate,updatePiece, wholeExtent, extractface);
 
 }
 
@@ -458,15 +459,15 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     if( input->IsA( "vtkHierarchicalBoxDataSet" ) ||
         input->IsA( "vtkOverlappingAMR") )
       {
-        this->RequestAMRData( request, inputVector, outputVector );
+      this->RequestAMRData( request, inputVector, outputVector );
       }
     else
       {
-        vtkGarbageCollector::DeferredCollectionPush();
-        this->RequestCompositeData(request, inputVector, outputVector);
-        vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
-        vtkGarbageCollector::DeferredCollectionPop();
-        vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
+      vtkGarbageCollector::DeferredCollectionPush();
+      this->RequestCompositeData(request, inputVector, outputVector);
+      vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
+      vtkGarbageCollector::DeferredCollectionPop();
+      vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
       }
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
     return 1;
@@ -773,6 +774,11 @@ int vtkPVGeometryFilter::RequestAMRData(
   vtkAMRBox rootAMRBox;
   input->GetRootAMRBox( rootAMRBox );
 
+  // Get the whole extent
+  int* wholeExtent =
+   vtkStreamingDemandDrivenPipeline::GetWholeExtent(
+       inputVector[0]->GetInformationObject(0));
+
   unsigned int level=0;
   for( ; level < input->GetNumberOfLevels(); ++level )
     {
@@ -796,7 +802,7 @@ int vtkPVGeometryFilter::RequestAMRData(
         if( this->IsAMRDataVisible(amrBox,rootAMRBox,extractface) )
           {
           vtkPolyData* tmpOut = vtkPolyData::New();
-          this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0,extractface);
+          this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0, wholeExtent, extractface);
           this->ExecuteCellNormals(tmpOut, 0);
           this->RemoveGhostCells(tmpOut);
           this->AddCompositeIndex(
@@ -1174,7 +1180,7 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AMRGridExecute(
     vtkImageData* input,vtkPolyData* output,
-    int doCommunicate,int updatePiece, bool extractface[6] )
+    int doCommunicate,int updatePiece, int *wholeExtent, bool extractface[6] )
 {
   double *spacing;
   double *origin;
@@ -1183,7 +1189,7 @@ void vtkPVGeometryFilter::AMRGridExecute(
 
   if( doCommunicate )
     {
-    ext = input->GetWholeExtent();
+    ext = wholeExtent;
     }
   else
     {

@@ -170,6 +170,7 @@ protected:
                       int updatePiece,
                       int updateNumPieces,
                       int updateGhosts,
+                      int *wholeExtent,
                       bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
@@ -189,6 +190,7 @@ protected:
                       vtkPolyData* output,
                       int doCommunicate,
                       int updatePiece,
+                      int *wholeExtent,
                       bool extractface[6] );
 
   void ImageDataExecute(vtkImageData* input,
