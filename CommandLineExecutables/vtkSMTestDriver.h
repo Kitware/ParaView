@@ -138,6 +138,7 @@ private:
   // identifies how to connect to the server.
   std::string ServerURL;
 
+  int RenderServerNumProcesses;
   double TimeOut;
   double ServerExitTimeOut; // time to wait for servers to finish.
   int TestRenderServer;
@@ -146,7 +147,6 @@ private:
   int AllowErrorInOutput;
   int TestRemoteRendering;
   int TestMultiClient;
-  int NumberOfServers;
   
   // Specify if the -rc flag was passed or not
   int ReverseConnection;
