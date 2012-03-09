@@ -167,8 +167,20 @@ bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
 // -----------------------------------------------------------------------------
 bool vtkVRInteractorStyle::update()
 {
-  this->OutProxy->UpdateVTKObjects();
-  ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
+  if(this->OutProxy)
+    {
+    this->OutProxy->UpdateVTKObjects();
+    }
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::render()
+{
+  if(this->OutProxy)
+    {
+    ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
+    }
   return false;
 }
 

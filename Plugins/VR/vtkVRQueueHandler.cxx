@@ -137,6 +137,17 @@ void vtkVRQueueHandler::processEvents()
       break;
       }
     }
+
+  // Triggers render for each objects that need to render. Typically only one
+  // object handles render without passing it forward.
+  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+    {
+    if (style && style->render())
+      {
+      break;
+      }
+    }
+
   // since timer is single-shot we start it again.
   this->Internals->Timer.start();
 }
